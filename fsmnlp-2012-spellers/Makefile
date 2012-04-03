@@ -1025,7 +1025,7 @@ results/kl/table3.dict-kl.errm-ed3-no-initial.corp-wiki.tex: corp/kl/automisp.wo
 
 # Table 4 (text type vs. speed)
 
-results/table3.tex: results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex results/fi/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex results/kl/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex \
+results/table4.tex: results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex results/fi/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex results/kl/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex \
 		results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-wronglang.tex results/fi/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-wronglang.tex results/kl/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-wronglang.tex
 	paste $^ > $@
 
