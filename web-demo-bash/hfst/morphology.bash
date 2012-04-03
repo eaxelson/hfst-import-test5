@@ -14,12 +14,10 @@ fi
 echo "<p>Analysing word-form <em>"
 echo $WORDFORM | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g'
 echo "</em>:</p>"
-case $VARIANT in
-    *)
-        echo "<pre>";
-        echo "$WORDFORM" |\
-            hfst-lookup hfst/$LL/morphology.$VARIANT.hfstol 2>&1 |\
-            sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g';
-        echo "</pre>";;
-esac
+
+echo "<pre>";
+echo "$WORDFORM" |\
+    hfst-lookup hfst/$LL/morphology.$VARIANT.hfstol 2>&1 |\
+    sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g';
+echo "</pre>";;
 
