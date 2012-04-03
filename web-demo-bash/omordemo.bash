@@ -4,7 +4,7 @@ PATH=${PWD}/bin:${PATH}
 TITLE="HFST web demo"
 HEADER="HFST"
 if test ! -z $QUERY_STRING ; then
-    PARAMS=$(echo $QUERY_STRING | tr ';&' '  ')
+    PARAMS=$(echo $QUERY_STRING | tr '?;&' ' ')
     for p in $PARAMS ; do
         case $p in
             language=*)
@@ -344,13 +344,13 @@ FORMS
 
 function print_results() {
     if test -x hfst/$LL/$FUNCTION.$VARIANT.bash ; then
-        hfst/$LL/morphology.$VARIANT.bash $WORDFORM
+        hfst/$LL/morphology.$VARIANT.bash $WORDFORM 2>&1
     elif test -x hfst/$LL/$FUNCTION.bash ; then
-        hfst/$LL/$FUNCTION.bash $WORDFORM $VARIANT
+        hfst/$LL/$FUNCTION.bash $WORDFORM $VARIANT 2>&1
     elif test -x hfst/$FUNCTION.$VARIANT.bash ; then
-        hfst/$FUNCTION.$VARIANT.bash $WORDFORM $LL
+        hfst/$FUNCTION.$VARIANT.bash $WORDFORM $LL 2>&1
     elif test -x hfst/$FUNCTION.bash ; then
-        hfst/$FUNCTION.bash $WORDFORM $LL $VARIANT
+        hfst/$FUNCTION.bash $WORDFORM $LL $VARIANT 2>&1
     elif test -r hfst/$LL/$FUNCTION.$VARIANT.hfstol ; then
         echo "<pre>"
         echo $WORDFORM | hfst-lookup hfst/$LL/$FUNCTION.$VARIANT.hfstol
