@@ -2465,9 +2465,10 @@ HfstTransducer &HfstTransducer::cross_product( const HfstTransducer &another )
 	t1_proj.input_project();
 	HfstTransducer t2_proj(automata2);
 	t2_proj.input_project();
+
 	if ( not t1_proj.compare(automata1) || not t2_proj.compare(automata2) )
 	{
-		HFST_THROW(ContextTransducersAreNotAutomataException);
+		HFST_THROW_MESSAGE(TransducersAreNotAutomataException, "HfstTransducer::cross_product");
 	}
 
 	// Put MARK all over lower part of automata1 and upper part of automata2,

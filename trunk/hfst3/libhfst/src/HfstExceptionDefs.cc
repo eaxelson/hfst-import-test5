@@ -52,6 +52,8 @@ HFST_EXCEPTION_CHILD_DEFINITION(StateIsNotFinalException);
 
 HFST_EXCEPTION_CHILD_DEFINITION(ContextTransducersAreNotAutomataException);
 
+HFST_EXCEPTION_CHILD_DEFINITION(TransducersAreNotAutomataException);
+
 HFST_EXCEPTION_CHILD_DEFINITION(StateIndexOutOfBoundsException);
 
 HFST_EXCEPTION_CHILD_DEFINITION(TransducerHeaderException);
