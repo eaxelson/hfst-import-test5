@@ -164,8 +164,9 @@ REGEXP2: REPLACE
             delete $3;
         }
        | REGEXP2 CROSS_PRODUCT REPLACE {
-            xreerror("No crossproduct");
-            $$ = $1;
+            $$ = & $1->cross_product(*$3);
+            // xreerror("No crossproduct");
+            // $$ = $1;
             delete $3;
         }
        | REGEXP2 LENIENT_COMPOSITION REPLACE {

@@ -15,7 +15,6 @@
 //#include "HfstSymbolDefs.h"
 #include "HfstTransducer.h"
 
-
 /** @file HfstXeroxRules.h
     \brief Declarations of HFST-XFST replace functions and data types. */
 
@@ -94,7 +93,7 @@ namespace hfst
 		 *  */
 		HfstTransducer removeMarkers( const HfstTransducer &tr );
 
-		/** \brief Generalized Lenient Composition (by Anssi Yli-Jyrä) of a \a t and a \a Constraint.
+		/** \brief Generalized Lenient Composition (by Anssi Yli-Jyrï¿½) of a \a t and a \a Constraint.
 		 * More about this composition can be found in:
 		 * http://www.ling.helsinki.fi/users/aylijyra/all/YliJyra-2008b:trafropar:inp.pdf
 		*/
