@@ -558,8 +558,8 @@ int main(int argc, char * argv[])
       message("Compiling and storing rules.");
       if (not command_line.has_output_file)
 	{
-	  HfstOutputStream stdout(command_line.format);
-	  grammar->compile_and_store(stdout);
+	  HfstOutputStream stdout_(command_line.format);
+	  grammar->compile_and_store(stdout_);
 	}
       else
 	{
