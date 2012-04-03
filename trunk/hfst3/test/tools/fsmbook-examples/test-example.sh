@@ -21,6 +21,7 @@ if ! [ -f $1.xfst.att ]; then
   rm $1;
 fi
 
+
 # If $1.foma.att does not exist, compile it.
 if ! [ -f $1.foma.att ]; then
   foma -f $1.xfst.script 2>1 > /dev/null;
@@ -28,6 +29,8 @@ if ! [ -f $1.foma.att ]; then
   rm $1" FOO BAR";
 fi
 fi
+
+
 
 
 # Convert the AT&T format into an HFST transducer in format openfst-tropical.
@@ -43,21 +46,24 @@ fi
 
 
 # For all HFST implementation types,
-  for i in sfst openfst-tropical foma; do
+  for i in openfst-tropical sfst foma; do
 
     echo "Testing" $i "..."
     if ! ($3/hfst-format --test-format $i); then
-	continue;
+   continue;
     fi
 
   # run the HFST script using the implementation type,
     sh $1.hfst.script $i $3
   # convert the result into openfst-tropical type
-    $3/hfst-fst2fst -f openfst-tropical $2.hfst.hfst > TMP
+   $3/hfst-fst2txt $2.hfst.hfst > TMP.att
+    $3/hfst-txt2fst -f openfst-tropical TMP.att > TMP
   # and compare it with the expected result.
     if ! ( $3/hfst-compare -q TMP $2.xfst.hfst ); then
-	echo "The result is incorrect!"
-	exit 1;
+   echo "The result is incorrect!"
+   exit 1;
     fi
+   
+   done
 
-  done
+
