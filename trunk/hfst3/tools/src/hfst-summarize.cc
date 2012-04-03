@@ -113,6 +113,8 @@ process_stream(HfstInputStream& instream)
   size_t transducer_n = 0;
   while (instream.is_good())
     {
+      transducer_n++;
+
       if (transducer_n < 2)
         {
           verbose_printf("Summarizing...\n");
@@ -491,6 +493,9 @@ process_stream(HfstInputStream& instream)
             }
         }
     }
+
+    fprintf(outfile, "\nRead %zu transducers in total.\n", transducer_n);
+
   return EXIT_SUCCESS;
 }
 
@@ -521,6 +526,7 @@ int main( int argc, char **argv ) {
         return EXIT_FAILURE;
     }
     retval = process_stream(*instream);
+
     if (outfile != stdout)
     {
         fclose(outfile);
