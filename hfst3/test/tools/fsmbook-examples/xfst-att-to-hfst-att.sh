@@ -4,7 +4,7 @@ perl -pe "s/(\s)\+(\s)/\1\@_IDENTITY_SYMBOL_\@\2/g;" |  # identity
 perl -pe "s/(\s)\+$/\1\@_IDENTITY_SYMBOL_\@/g;" |       # identity
 perl -pe "s/\*\*OTHER\*\*/\@_UNKNOWN_SYMBOL_\@/g;" |    # unknown
 perl -pe "s/\*\*EPSILON\*\*/\@_EPSILON_SYMBOL_\@/g;" |  # epsilon
-perl -pe '
+sed '
 s/\\u00d3/Ó/g;
 s/\\u00e0/à/g;
 s/\\u00e1/á/g;

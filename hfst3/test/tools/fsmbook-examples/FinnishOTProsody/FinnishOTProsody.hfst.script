@@ -1,29 +1,31 @@
 
 
 # Data
+echo "DATA ---"
 
-echo "{kalastelet} | {kalasteleminen} | {ilmoittautuminen} |
-                 {järjestelmättömyydestänsä} | {kalastelemme} |
-                 {ilmoittautumisesta} | {järjestelmällisyydelläni} |
-                 {järjestelmällistämätöntä} | {voimisteluttelemasta} |
-                 {opiskelija} | {opettamassa} | {kalastelet} |
-                 {strukturalismi} | {onnittelemanikin} | {mäki} |
-                 {perijä} | {repeämä} | {ergonomia} | {puhelimellani} |
-                 {matematiikka} | {puhelimistani} | {rakastajattariansa} |
-                 {kuningas} | {kainostelijat} | {ravintolat} |
-                 {merkonomin}" | hfst-regexp2fst -f $1 > FinnWords
+echo "{kalastelet} | {kalasteleminen} | {ilmoittautuminen} | \
+                 {järjestelmättömyydestänsä} | {kalastelemme} | \
+                 {ilmoittautumisesta} | {järjestelmällisyydelläni} | \
+                 {järjestelmällistämätöntä} | {voimisteluttelemasta} | \
+                 {opiskelija} | {opettamassa} | {kalastelet} | \
+                 {strukturalismi} | {onnittelemanikin} | {mäki} | \
+                 {perijä} | {repeämä} | {ergonomia} | {puhelimellani} | \
+                 {matematiikka} | {puhelimistani} | {rakastajattariansa} | \
+                 {kuningas} | {kainostelijat} | {ravintolat} | \
+                 {merkonomin} ;" | hfst-regexp2fst -f $1 > FinnWords
 
 # Basic definitions
+echo "BASIC DEFINITIONS ---"
 
 echo '[u | y | i]' | hfst-regexp2fst -f $1 > HighV                          # High vowel
 echo '[e | o | ö]' | hfst-regexp2fst -f $1 > MidV                          # Mid vowel
 echo '[a | ä]' | hfst-regexp2fst -f $1 > LowV                             # Low vowel
 echo '[HighV | MidV | LowV]' | hfst-regexp2fst -f $1 > USV                  # Unstressed Vowel
 
-echo '[b | c | d | f | g | h | j | k | l | m |
-          n | p | q | r | s | t | v | w | x | z]' | hfst-regexp2fst -f $1 > C  # Consonant
+echo "[b | c | d | f | g | h | j | k | l | m | \
+          n | p | q | r | s | t | v | w | x | z]" | hfst-regexp2fst -f $1 > C  # Consonant
 
-echo '[á | é | í | ó | ú | ý | ä´; | ö´;]' | hfst-regexp2fst -f $1 > MSV
+echo '[á | é | í | ó | ú | ý | ä´ | ö´ ]' | hfst-regexp2fst -f $1 > MSV
 echo '[à | è | ì | ò | ù | y` | ä` | ö`]' | hfst-regexp2fst -f $1 > SSV 
 echo '[@"MSV" | @"SSV"]' | hfst-regexp2fst -f $1 > SV                              # Stressed vowel
 echo '[@"USV" | @"SV"] ' | hfst-regexp2fst -f $1 > V                               # Vowel
@@ -45,6 +47,7 @@ echo '[@"S" "." @"S"]' | hfst-regexp2fst -f $1 > BF                             
 
 
 # Gen
+echo "-- GEN ---"
 
 # A diphthong is a combination of two unlike vowels that together form
 # the nucleus of a syllable. In general, Finnish diphthongs end in a high vowel.
@@ -52,24 +55,22 @@ echo '[@"S" "." @"S"]' | hfst-regexp2fst -f $1 > BF                             
 # that historically come from long ee, oo, and öö, respectively.
 # All other adjacent vowels must be separated by a syllable boundary.
 
-echo '[ [. .] -> "." || [@"HighV" | @"MidV"] _ @"LowV",
-                                           i _ [@"MidV" - e],
-                                           u _ [@"MidV" - o],
-                                           y _ [@"MidV" - ö] ]' | hfst-regexp2fst -f $1 > MarkNonDiphtongs
+echo ' [. .] -> "." || [@"HighV" | @"MidV"] _ @"LowV" , i _ [@"MidV" - e] , u _ [@"MidV" - o] , y _ [@"MidV" - ö] ;' | hfst-regexp2fst -f $1 > MarkNonDiphthongs
 
 # The general syllabification rule has exceptions. In particular, loan
 # words such as ate.isti 'atheist' must be partially syllabified in the
 # lexicon.
 
+echo "1"
 echo '@"C"* @"V"+ @"C"* @-> ... "." || _ @"C" @"V"' | hfst-regexp2fst -f $1 > Syllabify
+
 
 # Optionally adds primary or secondary stress to the first vowel
 # of each syllable.
 
-echo 'a (->) á|à, e (->) é|è, i (->) í|ì, o (->) ó|ò,
-              u (->) ú|ù, y (->) ý|y`, ä (->) ä´|ä`, ö (->) ö´;|ö`
-              || @"E" @"C"* _' | hfst-regexp2fst -f $1 > Stress
-
+echo 'a (->) á|à , e (->) é|è , i (->) í|ì , o (->) ó|ò , u (->) ú|ù , y (->) ý|y` , ä (->) ä´|ä` , ö (->) ö´|ö` || @"E" @"C"* _ ' | hfst-regexp2fst -f $1 > Stress
+              
+echo "3"
 # Scan the word, optionally dividing it to any combination of
 # unary, binary, and ternary feet. Each foot must contain at least
 # one stressed syllable.
@@ -80,10 +81,15 @@ echo '[[@"S" ("." @"S" ("." @"S")) & $@"SS"] (->) "(" ... ")" || @"E" _ @"E"]' |
 # function produces a great number of output candidates for
 # even short words. Long words have millions of possible outputs.
 
+echo "4"
 echo '[@"MarkNonDiphthongs" .o. @"Syllabify" .o. @"Stress" .o. @"Scan"]' | hfst-regexp2fst -f $1 > Gen
 
 
+
+
 # OT constraints
+
+echo "--- OT constraints --- "
 
 # We use asterisks to mark constraint violations. Ordinary constraints
 # such as Lapse assign single asterisks as the violation marks and the
@@ -95,6 +101,8 @@ echo '[@"MarkNonDiphthongs" .o. @"Syllabify" .o. @"Stress" .o. @"Scan"]' | hfst-
 
 echo '${*}' | hfst-regexp2fst -f $1 > Viol
 
+
+echo "1"
 # We prune candidates with "lenient composition" that eliminates
 # candidates that violate the constraint provided that at least
 # one output candidate survives.
@@ -116,12 +124,22 @@ echo '~[@"Viol"^14]' | hfst-regexp2fst -f $1 > Viol13
 echo '~[@"Viol"^15]' | hfst-regexp2fst -f $1 > Viol14 
 echo '~[@"Viol"^16]' | hfst-regexp2fst -f $1 > Viol15 
 
+
+
+echo "2"
+
+
 # This eliminates the violation marks after the candidate set has
 # been pruned by a constraint.
 
 echo '{*} -> 0' | hfst-regexp2fst -f $1 > Pardon
 
+
+echo "3"
+
 # Constraints
+
+echo "CONSTRAINTS---"
 
 # In this section we define nine constraints for Finnish prosody,
 # listed in the order of their ranking: MainStress, Clash, AlignLeft,
@@ -135,21 +153,22 @@ echo '{*} -> 0' | hfst-regexp2fst -f $1 > Pardon
 
 echo '[@"B" @"MSS" ~$@"MSS"]' | hfst-regexp2fst -f $1 > MainStress 
 
-
+echo "c1"
 # Clash: No stress on adjacent syllables.
 
 echo '@"SS" -> ... {*} || @"SS" @"B" _ ' | hfst-regexp2fst -f $1 > Clash 
 
+echo "c2"
 
 # Align-Left: The stressed syllable is initial in the foot.
 
 echo '@"SV" -> ... {*} || .#. ~[?* "(" @"C"*] _ ' | hfst-regexp2fst -f $1 > AlignLeft 
 
-
+echo "c3"
 # Foot-Bin: Feet are minimally bimoraic and maximally bisyllabic.
 
 echo '["(" @"Light" ")" | "(" @"S" ["." @"S"]^>1] -> ... {*} ' | hfst-regexp2fst -f $1 > FootBin 
-
+echo "c4"
 
 # Lapse: Every unstressed syllable must be adjacent to a stressed
 # syllable.
@@ -199,7 +218,7 @@ echo '[ "(" -> ...   {*} || .#. @"SB" _
 # violated many times. The limits have been chosen to produce
 # a unique winner in all the 25 test cases in FinnWords.
 
-echo '[FinnWords .o. Gen
+echo "[FinnWords .o. Gen
        .o. MainStress
        .o. Clash .O. Viol0 .o. Pardon
        .o. AlignLeft .O. Viol0
@@ -212,5 +231,5 @@ echo '[FinnWords .o. Gen
            Viol12 .O. Viol11 .O. Viol10 .O. Viol9 .O. Viol8 .O. Viol7 .O.
            Viol6  .O. Viol5  .O. Viol4  .O. Viol3 .O. Viol2 .O. Viol1 .O.
            Viol0 .o. Pardon
-      ]' | hfst-regexp2fst -f $1 > FinnishOTProsody.hfst.hfst
+      ]" | hfst-regexp2fst -f $1 > FinnishOTProsody.hfst.hfst
 
