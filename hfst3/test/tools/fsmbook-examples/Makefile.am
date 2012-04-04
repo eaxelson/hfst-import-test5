@@ -1,5 +1,5 @@
 SUBDIRS=EnglishNumerals NumbersToNumerals FinnishNumerals \
-	EinsteinsPuzzle Esperanto # FinnishOTProsody YaleShooting
+	EinsteinsPuzzle Esperanto BrazilianPortuguese1 # FinnishOTProsody YaleShooting
 #	Other directories are not included until we have the rule compiler.
 #	DateParser disables until we get hfst-regexp2fst working
 #	hfst-calculate cannot be used because make distcheck 
@@ -7,9 +7,8 @@ SUBDIRS=EnglishNumerals NumbersToNumerals FinnishNumerals \
 
 TESTS=english-numerals-test.sh \
 	numbers-to-numerals-test.sh finnish-numerals-test.sh \
-	einsteins-puzzle-test.sh esperanto-test.sh
+	einsteins-puzzle-test.sh esperanto-test.sh brazilian-portuguese1-test.sh
 # finnish-ot-prosody.sh 
-# brazilian-portuguese1-test.sh
 # yale-shooting.sh - containment and cmplement are not developed, testing => rules
 # brazilian-portuguese1-test.sh - xfst has OTHER - not comparable with hfst 
 # date-parser-test.sh
