@@ -6,28 +6,34 @@ echo "[ a | e | i | o | u " \
      "|                 ü " \
      "]" | hfst-regexp2fst -f $1 > Vowel
 
-echo "[?]" | hfst-regexp2fst -f $1 > Solution
-for i in \
-  '[ s -> z || @"Vowel" _ @"Vowel" ]' \
-  "[ ç -> s ]" \
-  "[ c h -> %$ ]" \
-  "[ c -> s || _ [ e | i | é | í | ê ] ]" \
+echo '[ s -> z || @"Vowel" _ @"Vowel" ]' \
+   " .o. " \
+   "[ ç -> s ]" \
+          " .o. " \
+       "[ c h -> %$ ]" \
+       " .o. " \
+       "[ c -> s || _ [ e | i | é | í | ê ] ]" \
+       " .o. " \
   "[ c -> k ]" \
+  " .o. " \
   "[ s s -> s ]" \
+  " .o. " \
   "[ n h -> N ]" \
+  " .o. " \
   "[ l h -> L ]" \
+  " .o. " \
   "[ h -> 0 ]" \
+  " .o. " \
   "[ r r -> R ]" \
+  " .o. " \
   "[ r -> R || .#. _ ]" \
+  " .o. " \
   "[ e -> i || _ (s) .#. , .#. p _ r ]" \
+  " .o. " \
   "[ o -> u || _ (s) .#. ]" \
+  " .o. " \
   "[ d -> J || _ [ i | ì ] ]" \
+  " .o. " \
   "[ t -> C || _ [ i | ì ] ]" \
-  "[ z -> s || _ .#. ]"; 
-do
-  echo $i | hfst-regexp2fst -f $1 | hfst-compose -1 Solution > TMP;
-  mv TMP Solution;
-done
-
-mv Solution BrazilianPortuguese1.hfst.hfst
-
+  " .o. " \
+  "[ z -> s || _ .#. ] " | hfst-regexp2fst -f $1 > BrazilianPortuguese1.hfst.hfst
