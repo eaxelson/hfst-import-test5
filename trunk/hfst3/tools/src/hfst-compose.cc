@@ -117,21 +117,29 @@ int
 compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 HfstOutputStream& outstream)
 {
-    bool bothInputs = firststream.is_good() && secondstream.is_good();
+    // there must be at least one transducer in both input streams
+    bool continueReading = firststream.is_good() && secondstream.is_good();
     if (firststream.get_type() != secondstream.get_type())
       {
         warning(0, 0, "Tranducer type mismatch in %s and %s; "
               "using former type as output\n",
               firstfilename, secondfilename);
       }
-    size_t transducer_n = 0;
-    while (bothInputs) {
-        transducer_n++;
-        HfstTransducer first(firststream);
-        HfstTransducer second(secondstream);
-        char* firstname = hfst_get_name(first, firstfilename);
-        char* secondname = hfst_get_name(second, secondfilename);
-        if (transducer_n == 1)
+    HfstTransducer * first=0;
+    HfstTransducer * second=0;
+    size_t transducer_n_first = 0; // transducers read from first stream
+    size_t transducer_n_second = 0; // transducers read from second stream
+    while (continueReading) {
+        transducer_n_first++;
+	first = new HfstTransducer(firststream);
+	if (secondstream.is_good())
+	  {
+	    second = new HfstTransducer(secondstream);
+	    transducer_n_second++;
+	  }
+        char* firstname = hfst_get_name(*first, firstfilename);
+        char* secondname = hfst_get_name(*second, secondfilename);
+        if (transducer_n_first == 1)
         {
             verbose_printf("Composing %s and %s...\n", firstname, 
                            secondname);
@@ -139,11 +147,11 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         else
         {
             verbose_printf("Composing %s and %s... %zu\n",
-                           firstname, secondname, transducer_n);
+                           firstname, secondname, transducer_n_first);
         }
 
         try {
-        if (first.has_flag_diacritics() or second.has_flag_diacritics()) 
+        if (first->has_flag_diacritics() or second->has_flag_diacritics()) 
           {
             if (not harmonize_flags)
               {
@@ -156,40 +164,52 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
               }
             else
               {
-		first.harmonize_flag_diacritics(second);
+		first->harmonize_flag_diacritics(*second);
               }
         }
 
-        hfst_set_name(first, first, second, "compose");
-        hfst_set_formula(first, first, second, "∘");
-        first.compose(second);
-        outstream << first;
+        hfst_set_name(*first, *first, *second, "compose");
+        hfst_set_formula(*first, *first, *second, "∘");
+        first->compose(*second);
+        outstream << *first;
 
         }
         catch (HfstTransducerTypeMismatchException)
           {
             error(EXIT_FAILURE, 0, "Could not compose %s and %s [%zu]\n"
                   "types %s and %s are not compatible for composition",
-                  firstname, secondname, transducer_n,
+                  firstname, secondname, transducer_n_first,
                   hfst_strformat(firststream.get_type()),
                   hfst_strformat(secondstream.get_type()));
           }
 
-        bothInputs = firststream.is_good() && secondstream.is_good();
+        continueReading = firststream.is_good() && 
+	  (secondstream.is_good() || transducer_n_second == 1);
 
+	delete first;
+	first=0;
+	// delete the transducer of second stream, unless we continue reading
+	// the first stream and there is only one transducer in the second stream
+	if ((continueReading && secondstream.is_good()) || not continueReading)
+	  {
+	    delete second;
+	    second=0;
+	  }
 	free(firstname);
 	free(secondname);
     }
     
     if (firststream.is_good())
+      {
+	error(EXIT_FAILURE, 0, "second input '%s' contains fewer transducers than first input '%s'; "
+	      "this is only possible if the second input contains exactly one transducer", 
+	      secondfilename, firstfilename);
+      }
+
+    if (secondstream.is_good())
     {
-      warning(0, 0, "%s contains more transducers than %s; "
-                     "residue skipped", firstfilename, secondfilename);
-    }
-    else if (secondstream.is_good())
-    {
-      warning(0, 0, "%s contains fewer transducers than %s; "
-                     "residue skipped", firstfilename, secondfilename);
+      error(EXIT_FAILURE, 0, "first input '%s' contains fewer transducers than second input '%s'",
+	    firstfilename, secondfilename);
     }
     firststream.close();
     secondstream.close();
