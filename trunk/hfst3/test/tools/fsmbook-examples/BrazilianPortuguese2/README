@@ -1,0 +1,6 @@
+run this to create att file:
+
+sudo xfst -f BrazilianPortuguese2.xfst.script
+cat BrazilianPortuguese2 | ../xfst-prolog-to-hfst-att.sh \
+  > BrazilianPortuguese2.xfst.att
+  
