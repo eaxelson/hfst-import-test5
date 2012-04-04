@@ -224,12 +224,9 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                   hfst_strformat(secondstream.get_type()));
       }
 
-    verbose_printf("Reading lexicon...");
-    HfstTransducer lexicon(firststream);
-    char* lexiconname = hfst_get_name(lexicon, firstfilename);
-    verbose_printf(" %s read\n", lexiconname);
     HfstTransducerVector rules;
-    size_t transducer_n = 1;
+    size_t rule_n = 1;	
+
     while (secondstream.is_good()) {
       HfstTransducer rule(secondstream);
       const char* rulename = rule.get_name().c_str();
@@ -241,51 +238,60 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
       else
         {
           verbose_printf("Reading and minimizing rule %zu...\n",
-                         transducer_n);
+                         rule_n);
         }
       rule.minimize();
       rules.push_back(rule);      
+      rule_n++;
     }
- 
-    verbose_printf("Computing intersecting composition...\n");
 
-    if (rules.size() > 0)
+    while (firststream.is_good()) 
       {
-	std::string symbol;
-	if ((symbol = check_all_symbols(lexicon,rules[0])) != "")
+	verbose_printf("Reading lexicon...");
+	HfstTransducer lexicon(firststream);
+	char* lexiconname = hfst_get_name(lexicon, firstfilename);
+	verbose_printf(" %s read\n", lexiconname);
+     
+	verbose_printf("Computing intersecting composition...\n");
+	
+	if (rules.size() > 0)
 	  {
-	    warning(0, 0, 
-		    "\nFound output symbols (e.g. \"%1s\") in transducer in\n"
-		    "file %2$s which will be filtered out because they are\n"
-		    "not found on the output tapes of transducers in file\n"
-		    "%3$s.",
-		    symbol.c_str(), firstfilename, secondfilename);
+	    std::string symbol;
+	    if ((symbol = check_all_symbols(lexicon,rules[0])) != "")
+	      {
+		warning(0, 0, 
+			"\nFound output symbols (e.g. \"%1s\") in transducer in\n"
+			"file %2$s which will be filtered out because they are\n"
+			"not found on the output tapes of transducers in file\n"
+			"%3$s.",
+			symbol.c_str(), firstfilename, secondfilename);
+	      }
+	    else if ((symbol = check_multi_char_symbols(lexicon,rules[0])) != "")
+	      { 
+		warning(0, 0, 
+			"\nFound output multi-char symbols (\"%1s\") in \n"
+			"transducer in file %2$s which are not found on the\n"
+			"output tape of transducers in file %3$s.",
+			symbol.c_str(), firstfilename, secondfilename);
+	      }
 	  }
-	  else if ((symbol = check_multi_char_symbols(lexicon,rules[0])) != "")
-	  { 
-	    warning(0, 0, 
-		    "\nFound output multi-char symbols (\"%1s\") in \n"
-		    "transducer in file %2$s which are not found on the\n"
-		    "output tape of transducers in file %3$s.",
-		    symbol.c_str(), firstfilename, secondfilename);
+	
+	lexicon.compose_intersect(rules);
+	char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+							(strlen(lexiconname) +
+							 strlen(secondfilename) +
+							 strlen("compose(%s, interserct(%s))")) 
+							+ 1));
+	if (sprintf(composed_name, "compose(%s, intersect(%s))", 
+		    lexiconname, secondfilename) > 0)
+	  {
+	    lexicon.set_name(composed_name);
 	  }
-      }
-    
-    lexicon.compose_intersect(rules);
-    char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                             (strlen(lexiconname) +
-                                              strlen(secondfilename) +
-                                              strlen("compose(%s, interserct(%s))")) 
-                                             + 1));
-    if (sprintf(composed_name, "compose(%s, intersect(%s))", 
-                lexiconname, secondfilename) > 0)
-      {
-        lexicon.set_name(composed_name);
-      }
-    hfst_set_formula(lexicon, lexicon, " ∘ ⋂R");
+	hfst_set_formula(lexicon, lexicon, " ∘ ⋂R");
 
-    verbose_printf("Storing result in %s...\n", outfilename);
-    outstream << lexicon;
+	verbose_printf("Storing result in %s...\n", outfilename);
+	outstream << lexicon;
+      }
 
     firststream.close();
     secondstream.close();

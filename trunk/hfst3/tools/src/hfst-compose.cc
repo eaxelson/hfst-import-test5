@@ -130,8 +130,8 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     size_t transducer_n_first = 0; // transducers read from first stream
     size_t transducer_n_second = 0; // transducers read from second stream
     while (continueReading) {
-        transducer_n_first++;
 	first = new HfstTransducer(firststream);
+        transducer_n_first++;
 	if (secondstream.is_good())
 	  {
 	    second = new HfstTransducer(secondstream);
@@ -189,7 +189,8 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
 	delete first;
 	first=0;
 	// delete the transducer of second stream, unless we continue reading
-	// the first stream and there is only one transducer in the second stream
+	// the first stream and there is only one transducer in the second 
+	// stream
 	if ((continueReading && secondstream.is_good()) || not continueReading)
 	  {
 	    delete second;
@@ -201,14 +202,18 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     
     if (firststream.is_good())
       {
-	error(EXIT_FAILURE, 0, "second input '%s' contains fewer transducers than first input '%s'; "
-	      "this is only possible if the second input contains exactly one transducer", 
+	error(EXIT_FAILURE, 0, 
+	      "second input '%s' contains fewer transducers than first input"
+	      " '%s'; this is only possible if the second input contains"
+	      " exactly one transducer", 
 	      secondfilename, firstfilename);
       }
 
     if (secondstream.is_good())
     {
-      error(EXIT_FAILURE, 0, "first input '%s' contains fewer transducers than second input '%s'",
+      error(EXIT_FAILURE, 0, 
+	    "first input '%s' contains fewer transducers than second input"
+	    " '%s'",
 	    firstfilename, secondfilename);
     }
     firststream.close();
