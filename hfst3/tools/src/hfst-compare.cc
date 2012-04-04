@@ -108,18 +108,23 @@ parse_options(int argc, char** argv)
 int
 compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
 {
-  //firststream.open();
-  //secondstream.open();
-    // should be is_good? 
-    bool bothInputs = firststream.is_good() && secondstream.is_good();
-    size_t transducer_n = 0;
+    bool continueReading = firststream.is_good() && secondstream.is_good();
+    size_t transducer_n_first = 0; // transducers read from first input
+    size_t transducer_n_second = 0; // transducers read from second input
     size_t mismatches = 0;
-    while (bothInputs) {
-        transducer_n++;
-        HfstTransducer first(firststream);
-        HfstTransducer second(secondstream);
-        char* firstname = strdup(first.get_name().c_str());
-        char* secondname = strdup(second.get_name().c_str());
+
+    HfstTransducer * first=0;
+    HfstTransducer * second=0;
+
+    while (continueReading) {
+        first = new HfstTransducer(firststream);
+        transducer_n_first++;
+	if (secondstream.is_good()) {
+	  second = new HfstTransducer(secondstream);
+	  transducer_n_second++;
+	}
+        char* firstname = strdup(first->get_name().c_str());
+        char* secondname = strdup(second->get_name().c_str());
         if (strlen(firstname) == 0)
           {
             firstname = strdup(firstfilename);
@@ -128,7 +133,7 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
           {
            secondname = strdup(secondfilename);
           } 
-        if (transducer_n == 1)
+        if (transducer_n_first == 1)
           {
             verbose_printf("Comparing %s and %s...\n", firstname, 
                            secondname);
@@ -136,13 +141,13 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
         else
           {
             verbose_printf("Comparing %s and %s... %zu\n",
-                           firstname, secondname, transducer_n);
+                           firstname, secondname, transducer_n_first);
         }
         try
           {
-            if (first.compare(second))
+            if (first->compare(*second))
               {
-                if (transducer_n == 1)
+                if (transducer_n_first == 1)
                   {
                     if (not silent)
                       fprintf(outfile, "%s == %s\n", firstname, secondname);
@@ -151,13 +156,13 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
                   {
                     if (not silent)
                       fprintf(outfile, "%s[%zu] == %s[%zu]\n",
-                              firstname, transducer_n,
-                              secondname, transducer_n);
+                              firstname, transducer_n_first,
+                              secondname, transducer_n_second);
                   }
               }
             else
               {
-                if (transducer_n == 1)
+                if (transducer_n_first == 1)
                   {
                     if (not silent)
                       fprintf(outfile, "%s != %s\n", firstname, secondname);
@@ -166,8 +171,8 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
                   {
                     if (not silent)
                       fprintf(outfile, "%s[%zu] != %s[%zu]\n",
-                              firstname, transducer_n, 
-                              secondname, transducer_n);
+                              firstname, transducer_n_first, 
+                              secondname, transducer_n_second);
                   }
                 mismatches++;
               }
@@ -177,52 +182,47 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
             // cannot recover yet, but beautify error messages
             error(2, 0, "Cannot compare `%s' and `%s' [%zu]\n"
                   "the formats %s and %s are not compatible for comparison\n",
-                  firstname, secondname, transducer_n,
+                  firstname, secondname, transducer_n_first,
                   hfst_strformat(firststream.get_type()),
                   hfst_strformat(secondstream.get_type()));
           }
 
+        continueReading = firststream.is_good() && 
+	  (secondstream.is_good() || transducer_n_second == 1);
 
-        bothInputs = firststream.is_good() && secondstream.is_good();
+	delete first;
+	first=0;
+	// delete the transducer of second stream, unless we continue reading
+	// the first stream and there is only one transducer in the second stream
+	if ((continueReading && secondstream.is_good()) || not continueReading)
+	  {
+	    delete second;
+	    second=0;
+	  }
     }
     
     if (firststream.is_good())
     {
-      while (firststream.is_good())
-        {
-          transducer_n++;
-          HfstTransducer dummy(firststream);
-          verbose_printf("Cannot compare %s %zu to non-existent transducer",
-                         firstfilename, transducer_n);
-          if (not silent)
-            fprintf(outfile, "%s[%zu] != ?\n", firstfilename, transducer_n);
-          mismatches++;
-        }
+	error(EXIT_FAILURE, 0, "second input '%s' contains fewer transducers than first input '%s'; "
+	      "this is only possible if the second input contains exactly one transducer", 
+	      secondfilename, firstfilename);
     }
     else if (secondstream.is_good())
     {
-      while (secondstream.is_good())
-        {
-          transducer_n++;
-          HfstTransducer dummy(secondstream);
-          verbose_printf("Cannot compare %s %zu to non-existent transducer",
-                         secondfilename, transducer_n);
-          if (not silent)
-            fprintf(outfile, "? != %s[%zu]\n", secondfilename, transducer_n);
-          mismatches++;
-        }
+      error(EXIT_FAILURE, 0, "first input '%s' contains fewer transducers than second input '%s'",
+	    firstfilename, secondfilename);
     }
     firststream.close();
     secondstream.close();
     fclose(outfile);
     if (mismatches == 0)
       {
-        verbose_printf("All %zu transducers matched\n", transducer_n);
+        verbose_printf("All %zu transducers matched\n", transducer_n_first);
         return EXIT_SUCCESS;
       }
     else
       {
-        verbose_printf("%zu/%zu were not equal\n", mismatches, transducer_n);
+        verbose_printf("%zu/%zu were not equal\n", mismatches, transducer_n_first);
         return EXIT_FAILURE;
       }
 }
