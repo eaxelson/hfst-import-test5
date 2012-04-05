@@ -78,8 +78,16 @@ void print_common_binary_program_parameter_instructions(FILE *file) {
       "If OUTFILE, or either INFILE1 or INFILE2 is missing or -,\n"
       "standard streams will be used.\n"
       "INFILE1, INFILE2, or both, must be specified.\n"
-      "Format of result depends on format of INFILE1\n"
-      "and INFILE2; both should have the same format.\n"
+      "Format of result depends on format of INFILE1 and INFILE2;\n"
+      "both should have the same format.\n"
+      );
+
+  fprintf(file, 
+      "\n"
+      "The operation is applied pairwise for INFILE1 and INFILE2\n"
+      "that must have the same number of transducers.\n"
+      "If INFILE2 has only one transducer, the operation is applied for\n"
+      "each transducer in INFILE1 keeping the second transducer constant.\n"  
       );
 
 }
