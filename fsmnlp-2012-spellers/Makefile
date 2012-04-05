@@ -42,7 +42,36 @@ dictionaries:	hfst/en/norvig.hfst \
 		hfst/kl/kl.hfst
 models:		hfst/fi/errmodel.edit-distance-1.hfst \
 		hfst/en/errmodel.edit-distance-1.hfst \
-		hfst/kl/errmodel.edit-distance-1.hfst
+		hfst/kl/errmodel.edit-distance-1.hfst \
+		hfst/en/errmodel.edit-distance-2.hfst \
+		hfst/fi/errmodel.edit-distance-2.hfst \
+		hfst/kl/errmodel.edit-distance-2.hfst \
+		hfst/en/errmodel.edit-distance-3.hfst \
+		hfst/fi/errmodel.edit-distance-3.hfst \
+		hfst/kl/errmodel.edit-distance-3.hfst \
+		hfst/en/errmodel.edit-distance-2-no-redundant.hfst \
+		hfst/fi/errmodel.edit-distance-2-no-redundant.hfst \
+		hfst/kl/errmodel.edit-distance-2-no-redundant.hfst \
+		hfst/en/errmodel.edit-distance-3-no-redundant.hfst \
+		hfst/fi/errmodel.edit-distance-3-no-redundant.hfst \
+		hfst/kl/errmodel.edit-distance-3-no-redundant.hfst \
+		hfst/fi/errmodel.edit-distance-1-no-initial.hfst \
+		hfst/en/errmodel.edit-distance-1-no-initial.hfst \
+		hfst/kl/errmodel.edit-distance-1-no-initial.hfst \
+		hfst/en/errmodel.edit-distance-2-no-initial.hfst \
+		hfst/fi/errmodel.edit-distance-2-no-initial.hfst \
+		hfst/kl/errmodel.edit-distance-2-no-initial.hfst \
+		hfst/en/errmodel.edit-distance-3-no-initial.hfst \
+		hfst/fi/errmodel.edit-distance-3-no-initial.hfst \
+		hfst/kl/errmodel.edit-distance-3-no-initial.hfst \
+		hfst/en/errmodel.edit-distance-2-no-initial-no-redundant.hfst \
+		hfst/fi/errmodel.edit-distance-2-no-initial-no-redundant.hfst \
+		hfst/kl/errmodel.edit-distance-2-no-initial-no-redundant.hfst \
+		hfst/en/errmodel.edit-distance-3-no-initial-no-redundant.hfst \
+		hfst/fi/errmodel.edit-distance-3-no-initial-no-redundant.hfst \
+		hfst/kl/errmodel.edit-distance-3-no-initial-no-redundant.hfst
+
+
 tables:		results/table1.tex results/table2.tex results/table3.tex results/table4.tex
 clean-models:
 	rm hfst/fi/errmodel.edit-distance-1.hfst \
