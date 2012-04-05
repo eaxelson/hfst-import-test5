@@ -13,6 +13,7 @@ s/ "?"/ "@_IDENTITY_SYMBOL_@"/
 s/"0":/"@_EPSILON_SYMBOL_@":/
 s/:"0"/:"@_EPSILON_SYMBOL_@"/
 s/"0"/@_EPSILON_SYMBOL_@/g
+s/"%0"/"0"/
 
 s/"\(.*\)":"\(.*\)"/\1 \2/
 s/"\(.*\)"/\1 \1/
