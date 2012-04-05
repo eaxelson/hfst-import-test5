@@ -76,4 +76,4 @@ define ValidDates [AllDates & MaxDays & LeapDates];
 
 push ValidDates
 
-write att DateParser FOO BAR
+write prolog > DateParser
