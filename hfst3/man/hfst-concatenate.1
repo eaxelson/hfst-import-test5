@@ -33,16 +33,21 @@ Read second input transducer from INFILE2
 .TP
 \fB\-o\fR, \fB\-\-output\fR=\fIOUTFILE\fR
 Write results to OUTFILE
+.SS "Flag diacritics:"
+.TP
+\fB\-F\fR, \fB\-\-harmonize\-flags\fR
+Harmonize flag diacritics
 .PP
 If OUTFILE, or either INFILE1 or INFILE2 is missing or \-,
 standard streams will be used.
 INFILE1, INFILE2, or both, must be specified.
-Format of result depends on format of INFILE1
-and INFILE2; both should have the same format.
-Flag diacritics:
-.TP
-\fB\-F\fR, \fB\-\-harmonize\-flags\fR
-Harmonize flag diacritics
+Format of result depends on format of INFILE1 and INFILE2;
+both should have the same format.
+.PP
+The operation is applied pairwise for INFILE1 and INFILE2
+that must have the same number of transducers.
+If INFILE2 has only one transducer, the operation is applied for
+each transducer in INFILE1 keeping the second transducer constant.
 .SH EXAMPLES
 .IP
 hfst\-concatenate \fB\-o\fR catdog.hfst cat.hfst dog.hfst
