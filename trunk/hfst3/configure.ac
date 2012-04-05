@@ -478,8 +478,6 @@ AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul 
 AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  test/libhfst/Makefile test/tools/Makefile
 		 test/tools/fsmbook-examples/Makefile
-		 test/tools/fsmbook-examples/BrazilianPortuguese1/Makefile
-		 test/tools/fsmbook-examples/BrazilianPortuguese2/Makefile
 		 test/tools/fsmbook-examples/EnglishNumerals/Makefile
 		 test/tools/fsmbook-examples/NumbersToNumerals/Makefile
 		 test/tools/fsmbook-examples/FinnishNumerals/Makefile
@@ -499,6 +497,8 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  scripts/Makefile scripts/hfst-foma-wrapper.sh],
                  [chmod +x scripts/hfst-foma-wrapper.sh])
 #		 test/tools/fsmbook-examples/DateParser/Makefile
+#		 test/tools/fsmbook-examples/BrazilianPortuguese1/Makefile
+#		 test/tools/fsmbook-examples/BrazilianPortuguese2/Makefile
 
 # output
 AC_OUTPUT
