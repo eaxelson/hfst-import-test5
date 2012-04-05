@@ -2386,6 +2386,7 @@ namespace hfst { namespace implementations
   static HfstTwoLevelPath random_path(StdVectorFst *t) {
     
     HfstTwoLevelPath path;    
+    path.first=0; // zero weight
     StateId current_state = t->Start();
 
     /* If the transducer is empty, return. */
@@ -2448,10 +2449,12 @@ namespace hfst { namespace implementations
       (StringPair
        (t->InputSymbols()->Find(arc.ilabel),
         t->InputSymbols()->Find(arc.olabel)));
-    
+    path.first = path.first + arc.weight.Value();
+
     /* If the target state is final, */
     if ( t->Final(t_target) != TropicalWeight::Zero() ) {
       if ( (rand() % 4) == 0 ) {  // randomly return the path so far,
+	path.first = path.first + t->Final(t_target).Value();
         return path;
       } // or continue.
       last_index = (int)path.second.size();  
