@@ -5,6 +5,19 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.3.10
+----------------------------
+
+* All binary tools handle the case where the first input
+  contains several transducers and the second input exactly
+  one transducer
+
+* hfst-summarize prints at the end how many transducers it has
+  read in total, making it easier to work with transducer archives
+
+* hfst-fst2strings bug fixed, now it prints weights with 
+  options --random -w
+
 Noteworthy changes in 3.3.9
 ---------------------------
 
