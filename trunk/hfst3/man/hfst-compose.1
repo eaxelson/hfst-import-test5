@@ -41,8 +41,13 @@ Harmonize flag diacritics.
 If OUTFILE, or either INFILE1 or INFILE2 is missing or \-,
 standard streams will be used.
 INFILE1, INFILE2, or both, must be specified.
-Format of result depends on format of INFILE1
-and INFILE2; both should have the same format.
+Format of result depends on format of INFILE1 and INFILE2;
+both should have the same format.
+.PP
+The operation is applied pairwise for INFILE1 and INFILE2
+that must have the same number of transducers.
+If INFILE2 has only one transducer, the operation is applied for
+each transducer in INFILE1 keeping the second transducer constant.
 .SH EXAMPLES
 .TP
 hfst\-compose \fB\-o\fR cat2dog.hfst cat2mouse.hfst mouse2dog.hfst
