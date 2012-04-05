@@ -59,7 +59,7 @@ print_usage()
         print_common_binary_program_options(message_out);
         fprintf(message_out,
                 "Flag diacritics:\n"
-                "  -F, --harmonize-flags  Harmonize flag diacritics.");
+                "  -F, --harmonize-flags  Harmonize flag diacritics.\n");
         fprintf(message_out, "\n");
         print_common_binary_program_parameter_instructions(message_out);
         fprintf(message_out, "\n");
