@@ -24,6 +24,9 @@
 
 #include <iostream>
 #include <fstream>
+#include <deque>
+
+using std::deque;
 
 #include <cstdio>
 #include <cstdlib>
@@ -45,7 +48,7 @@ using hfst::HfstOutputStream;
 
 
 // add tools-specific variables here
-unsigned long head_count = 1;
+long head_count = 1;
 
 void
 print_usage()
@@ -59,11 +62,14 @@ print_usage()
     print_common_program_options(message_out);
     print_common_unary_program_options(message_out);
     fprintf(message_out, "Archive options:\n"
-            "  -n, --n-first=NUMBER   Read first NUMBER transducers\n");
+            "  -n, --n-first=[-]K   print the first K transducers;\n"
+            "                       with the leading `-', print all but "
+            "last K transducers\n");
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
-    fprintf(message_out, "NUMBER must be a positive integer as parsed by "
-            "strtoul base 10\n");
+    fprintf(message_out, "K must be an integer, as parsed by "
+            "strtoul base 10, and not 0.\n"
+            "If K is omitted default is 1.");
     fprintf(message_out, "\n");
     print_report_bugs();
     fprintf(message_out, "\n");
@@ -101,7 +107,7 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
         case 'n':
-          head_count = hfst_strtoul(optarg, 10);
+          head_count = hfst_strtol(optarg, 10);
           break;
 #include "inc/getopt-cases-error.h"
         }
@@ -109,37 +115,76 @@ parse_options(int argc, char** argv)
 
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
+    if (head_count == 0)
+      {
+        warning(0, 0, "Argument 0 for count is not sensible");
+      }
     return EXIT_CONTINUE;
 }
 
 int
 process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
-{
-  //instream.open();
-  //outstream.open();
-    
+  {
     size_t transducer_n=0;
-    while (instream.is_good() && (transducer_n < head_count))
-    {
-        transducer_n++;
-        HfstTransducer trans(instream);
-        char* inputname = strdup(trans.get_name().c_str());
-        if (strlen(inputname) <= 0)
-          {
-            inputname = strdup(inputfilename);
+    if (head_count > 0)
+      {
+        while (instream.is_good() && (transducer_n < head_count))
+        {
+            transducer_n++;
+            HfstTransducer trans(instream);
+            char* inputname = strdup(trans.get_name().c_str());
+            if (strlen(inputname) <= 0)
+              {
+                inputname = strdup(inputfilename);
+              }
+            verbose_printf("Forwarding %s...%zu\n", inputname, transducer_n); 
+            outstream << trans;
           }
-        verbose_printf("Forwarding %s...%zu\n", inputname, transducer_n); 
-        
-        outstream << trans;
-    }
+      }
+    else if (head_count < 0)
+      {
+        deque<HfstTransducer> first_but_n;
+        verbose_printf("Counting all but last %zu\n", head_count);
+        while (instream.is_good())
+          {
+            transducer_n++;
+            HfstTransducer trans(instream);
+            first_but_n.push_back(trans);
+          }
+        if (-head_count > first_but_n.size())
+          {
+            warning(0, 0, "Stream in %s has less than %zu automata; "
+                    "Nothing will be written to output",
+                    inputfilename, -head_count);
+          }
+        for (unsigned int i = 0; i < -head_count; i++)
+          {
+            if (!first_but_n.empty())
+              {
+                first_but_n.pop_back();
+              }
+          }
+        while (!first_but_n.empty())
+          {
+            HfstTransducer trans = first_but_n.front();
+            char* inputname = strdup(trans.get_name().c_str());
+            if (strlen(inputname) <= 0)
+              {
+                inputname = strdup(inputfilename);
+              }
+            verbose_printf("Forwarding %s...%zu\n", inputname, transducer_n); 
+            outstream << trans;
+            first_but_n.pop_front();
+          }
+      }
     instream.close();
     outstream.close();
     return EXIT_SUCCESS;
-}
+  }
 
 
 int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstHead");
+    hfst_set_program_name(argv[0], "0.2", "HfstHead");
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)
     {

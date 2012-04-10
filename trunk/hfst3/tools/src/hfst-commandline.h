@@ -181,7 +181,15 @@ double hfst_strtoweight(const char *s);
  */
 int hfst_strtonumber(const char *s, bool *infinite);
 
+/**
+ * @brief parse @c unsigned long from string or print error message on failure.
+ */
 unsigned long hfst_strtoul(char *s, int base);
+
+/**
+ * @brief parse @c long from string @a s or print error message on failure.
+ */
+long hfst_strtol(char* s, int base);
 
 /** @brief parse string naming transducer format @c s or exit.
  */
