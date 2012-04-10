@@ -229,7 +229,25 @@ hfst_strtoul(char *s, int base)
       }
     else
       {
-        error(EXIT_FAILURE, errno, "%s not a weight", s);
+        error(EXIT_FAILURE, errno, "%s is not a valid unsigned number string",
+              s);
+        return rv;
+      }
+}
+
+long
+hfst_strtol(char *s, int base)
+{
+    errno = 0;
+    char *endptr;
+    long rv = strtol(s, &endptr, base);
+    if (*endptr == '\0')
+      {
+        return rv;
+      }
+    else
+      {
+        error(EXIT_FAILURE, errno, "%s is not a valid signed number string", s);
         return rv;
       }
 }

@@ -259,7 +259,6 @@ process_stream(HfstOutputStream& outstream)
   return EXIT_SUCCESS;
 }
 
-
 extern int xredebug;
 
 int main( int argc, char **argv ) 
