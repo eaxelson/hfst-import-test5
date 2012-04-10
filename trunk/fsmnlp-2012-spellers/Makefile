@@ -154,188 +154,158 @@ hfst/kl/kl.hfst:
 hfst/fi/errmodel.edit-distance-1.hfst: hfst/fi/omorfi-20110505.hfst
 	python editdist.py -s --no-elim -d 1 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-1.hfst: hfst/en/norvig.hfst
 	python editdist.py -s --no-elim -d 1 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/kl/errmodel.edit-distance-1.hfst: hfst/kl/kl.hfst
 	python editdist.py -s --no-elim -d 1 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 # Basic ED 2
 hfst/fi/errmodel.edit-distance-2.hfst: hfst/fi/omorfi-20110505.hfst
 	python editdist.py -s --no-elim -d 2 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-2.hfst: hfst/en/norvig.hfst
 	python editdist.py -s --no-elim -d 2 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/kl/errmodel.edit-distance-2.hfst: hfst/kl/kl.hfst
 	python editdist.py -s --no-elim -d 2 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 # Basic ED 3
 hfst/fi/errmodel.edit-distance-3.hfst: hfst/fi/omorfi-20110505.hfst
 	python editdist.py -s --no-elim -d 2 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-3.hfst: hfst/en/norvig.hfst
 	python editdist.py -s --no-elim -d 2 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/kl/errmodel.edit-distance-3.hfst: hfst/kl/kl.hfst
 	python editdist.py -s --no-elim -d 2 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 # ED 2, eliminate redundancies
 hfst/fi/errmodel.edit-distance-2-no-redundant.hfst: hfst/fi/omorfi-20110505.hfst
 	python editdist.py -s -d 2 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-2-no-redundant.hfst: hfst/en/norvig.hfst
 	python editdist.py -s -d 2 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/kl/errmodel.edit-distance-2-no-redundant.hfst: hfst/kl/kl.hfst
 	python editdist.py -s -d 2 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 # ED 3, eliminate redundancies
 hfst/fi/errmodel.edit-distance-3-no-redundant.hfst: hfst/fi/omorfi-20110505.hfst
 	python editdist.py -s -d 3 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-3-no-redundant.hfst: hfst/en/norvig.hfst
 	python editdist.py -s -d 3 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/kl/errmodel.edit-distance-3-no-redundant.hfst: hfst/kl/kl.hfst
 	python editdist.py -s -d 3 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 # ED 1, no initial edit
 hfst/fi/errmodel.edit-distance-1-no-initial.hfst: hfst/fi/omorfi-20110505.hfst
 	python editdist.py -s --no-elim --no-string-initial-correction -d 1 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-1-no-initial.hfst: hfst/en/norvig.hfst
 	python editdist.py -s --no-elim --no-string-initial-correction -d 1 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/kl/errmodel.edit-distance-1-no-initial.hfst: hfst/kl/kl.hfst
 	python editdist.py -s --no-elim --no-string-initial-correction -d 1 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 # ED 2, no initial edit
 hfst/fi/errmodel.edit-distance-2-no-initial.hfst: hfst/fi/omorfi-20110505.hfst
 	python editdist.py -s --no-elim --no-string-initial-correction -d 2 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-2-no-initial.hfst: hfst/en/norvig.hfst
 	python editdist.py -s --no-elim --no-string-initial-correction -d 2 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/kl/errmodel.edit-distance-2-no-initial.hfst: hfst/kl/kl.hfst
 	python editdist.py -s --no-elim --no-string-initial-correction -d 2 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 # ED 3, no initial edit
 hfst/fi/errmodel.edit-distance-3-no-initial.hfst: hfst/fi/omorfi-20110505.hfst
 	python editdist.py -s --no-elim --no-string-initial-correction -d 3 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-3-no-initial.hfst: hfst/en/norvig.hfst
 	python editdist.py -s --no-elim --no-string-initial-correction -d 3 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/kl/errmodel.edit-distance-3-no-initial.hfst: hfst/kl/kl.hfst
 	python editdist.py -s --no-elim --no-string-initial-correction -d 3 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 # ED 2, no initial edit, eliminate redundancies
 hfst/fi/errmodel.edit-distance-2-no-initial-no-redundant.hfst: hfst/fi/omorfi-20110505.hfst
 	python editdist.py -s --no-string-initial-correction -d 2 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-2-no-initial-no-redundant.hfst: hfst/en/norvig.hfst
 	python editdist.py -s --no-string-initial-correction -d 2 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/kl/errmodel.edit-distance-2-no-initial-no-redundant.hfst: hfst/kl/kl.hfst
 	python editdist.py -s --no-string-initial-correction -d 2 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 # ED 3, no initial edit
 hfst/fi/errmodel.edit-distance-3-no-initial-no-redundant.hfst: hfst/fi/omorfi-20110505.hfst
 	python editdist.py -s --no-string-initial-correction -d 3 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-3-no-initial-no-redundant.hfst: hfst/en/norvig.hfst
 	python editdist.py -s --no-string-initial-correction -d 3 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/kl/errmodel.edit-distance-3-no-initial-no-redundant.hfst: hfst/kl/kl.hfst
 	python editdist.py -s --no-string-initial-correction -d 3 -a $< |\
 		hfst-txt2fst -v |\
-		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 
@@ -410,7 +380,7 @@ results/fi/table1.dict-omorfi.errm-ed2.corp-wiki.tex: corp/fi/fiwiki.words
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/kl/table1.dict-kl.errm-ed2corp-wiki.tex: corp/kl/klwiki.words
+results/kl/table1.dict-kl.errm-ed2.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
 		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
