@@ -19,5 +19,5 @@ echo "<pre>";
 echo "$WORDFORM" |\
     hfst-lookup hfst/$LL/morphology.$VARIANT.hfstol 2>&1 |\
     sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g';
-echo "</pre>";;
+echo "</pre>"
 
