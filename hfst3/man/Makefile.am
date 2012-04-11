@@ -34,47 +34,48 @@ broken=hfst-xfst.1 hfst-foma-wrapper.1 hfst-apertium-proc.1 hfst-lexc.1
 aliases= hfst-determinise.1 hfst-expand.1 hfst-intersect.1 hfst-minimise.1 \
 	 hfst-minus.1 hfst-sfstpl2fst.1 hfst-summarise.1 hfst-union.1
 dist_man1_MANS=$(bootstrappable) $(aliases) $(broken)
-LN_S=ln -s
+LN_S=ln -s -f
 
 hfst-determinise.1:
-	$(LN_S) -f hfst-determinize.1 hfst-determinise.1 
+	$(LN_S) hfst-determinize.1 hfst-determinise.1 
 
 hfst-expand.1:
-	$(LN_S) -f hfst-fst2strings.1 hfst-expand.1 
+	$(LN_S) hfst-fst2strings.1 hfst-expand.1 
 
 hfst-intersect.1:
-	$(LN_S) -f hfst-conjunct.1 hfst-intersect.1 
+	$(LN_S) hfst-conjunct.1 hfst-intersect.1 
 
 hfst-minimise.1:
-	$(LN_S) -f hfst-minimize.1 hfst-minimise.1 
+	$(LN_S) hfst-minimize.1 hfst-minimise.1 
 
 hfst-minus.1:
-	$(LN_S) -f hfst-subtract.1 hfst-minus.1 
+	$(LN_S) hfst-subtract.1 hfst-minus.1 
 
 hfst-sfstpl2fst.1:
-	$(LN_S) -f hfst-calculate.1 hfst-sfstpl2fst.1 
+	$(LN_S) hfst-calculate.1 hfst-sfstpl2fst.1 
 
 hfst-summarise.1: 
-	$(LN_S) -f hfst-summarize.1 hfst-summarise.1 
+	$(LN_S) hfst-summarize.1 hfst-summarise.1 
 
 hfst-union.1:
-	$(LN_S) -f hfst-disjunct.1 hfst-union.1
+	$(LN_S) hfst-disjunct.1 hfst-union.1
 
 all:
-	make bootstrap
+	make bootstrap && make aliases
 
 bootstrap: 
 	for f in $(bootstrappable) ; do \
+	  if [ "$$f" != "hfst-lookup.1" ]; then \
 		N=`echo $$f | sed 's/.1/ \-\-help/' | sed 's/hfst/..\/tools\/src\/hfst/' | sh | sed -n 2p`; \
 		help2man \
 		-n="$$N" \
 		-s 1 -o $$f -N -S HFST `echo $$f | sed 's/.1//' | sed 's/hfst/..\/tools\/src\/hfst/'`; \
-	done; \
-        $(LN_S) -f hfst-determinize.1 hfst-determinise.1 && \
-        $(LN_S) -f hfst-fst2strings.1 hfst-expand.1 && \
-        $(LN_S) -f hfst-conjunct.1 hfst-intersect.1 && \
-        $(LN_S) -f hfst-minimize.1 hfst-minimise.1 && \
-        $(LN_S) -f hfst-subtract.1 hfst-minus.1 && \
-        $(LN_S) -f hfst-calculate.1 hfst-sfstpl2fst.1 && \
-        $(LN_S) -f hfst-summarize.1 hfst-summarise.1 && \
-        $(LN_S) -f hfst-disjunct.1 hfst-union.1
+	  fi; \
+	done;
+
+
+aliases:
+	for f in $(aliases) ; do \
+		make $$f; \
+	done; 
+

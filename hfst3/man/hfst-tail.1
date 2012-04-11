@@ -32,12 +32,14 @@ Read input transducer from INFILE
 Write output transducer to OUTFILE
 .SS "Archive options:"
 .TP
-\fB\-n\fR, \fB\-\-n\-last\fR=\fINUMBER\fR
-Read last NUMBER transducers
+\fB\-n\fR, \fB\-\-n\-last\fR=\fI[\fR+]K
+Print the last K transducers;
+use +K to print transducers starting from the Kth
 .PP
 If OUTFILE or INFILE is missing or \-, standard streams will be used.
 Format of result depends on format of INFILE
-NUMBER must be a positive integer as parsed by strtoul base 10
+K must be an integer, as parsed by strtoul base 10, and not 0.
+if K is omitted, it defaults to +1 (all except the first)
 .SH "REPORTING BUGS"
 Report bugs to <hfst\-bugs@helsinki.fi> or directly to our bug tracker at:
 <https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>
