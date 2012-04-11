@@ -14,33 +14,12 @@ fi
 echo "<p>Finding translations for <em>"
 echo $WORDFORM | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g'
 echo "</em>:</p>"
-case $VARIANT in
-    fiwn-fien)
-        echo "<div>click terms for wordnet search</div>"
-        echo "<dl><dt><a href='http://www.ling.helsinki.fi/cgi-bin/fiwn/search?wn=fi&w=$WORDFORM&t=over&sm=Search' title='search fiwn for Finnish $WORDFORM'>"
-        echo $WORDFORM | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g'
-        echo '</a></dt>'
-        echo "$WORDFORM" |\
-            hfst-lookup hfst/$LL/translation.$VARIANT.hfstol 2>&1 |\
-            awk '{printf("<dd><a href=\"http://www.ling.helsinki.fi/cgi-bin/fiwn/search?wn=en&w=%s&t=over&sm=Search\" title=\"search fiwn for English %s\">%s</a></dd>\n", $2, $2, $2);}' |\
-            sort | uniq;
-        echo '</dl>';;
-    fiwn-enfi)
-        echo "<div>click terms for wordnet search</div>"
-        echo "<dl><dt><a href='http://www.ling.helsinki.fi/cgi-bin/fiwn/search?wn=en&w=$WORDFORM&t=over&sm=Search' title='search fiwn for English $WORDFORM'>"
-        echo $WORDFORM | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g'
-        echo '</a></dt>'
-        echo "$WORDFORM" |\
-            hfst-lookup hfst/$LL/translation.$VARIANT.hfstol 2>&1 |\
-            awk '{printf("<dd><a href=\"http://www.ling.helsinki.fi/cgi-bin/fiwn/search?wn=fi&w=%s&t=over&sm=Search\" title=\"search fiwn for Finnish %s\">%s</a></dd>\n", $2, $2, $2);}' |\
-            sort | uniq;
-        echo '</dl>';;
-    *)
-        echo "<pre>";
-        echo "$WORDFORM" |\
-            hfst-lookup hfst/$LL/translation.$VARIANT.hfstol 2>&1 |\
-            sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' |\
-            sort | uniq ;
-        echo "</pre>";;
-esac
+        
+echo "<pre title='Output of hfst-lookup hfst/fi/translation.$VARIANT.hfstol'"
+echo " style='border: 3px dashed black;'>"
+echo "$WORDFORM" |\
+    hfst-lookup hfst/$LL/translation.$VARIANT.hfstol 2>&1 |\
+    sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' |\
+    sort | uniq ;
+echo "</pre>"
 
