@@ -66,7 +66,7 @@ function print_html_head() {
     <script type="text/javascript" language="javascript">
 function clear_options(options)
   {
-      for (i = options.length; i > 0; i--)
+      for (i = options.length; i >= 0; i--)
       {
         options[i] = null
       }
@@ -120,12 +120,10 @@ EOHEAD
             cat $ll/languages.js | sed -e 's/^/    /'
         fi
     done
-    echo "    document.getElementById('functions').disabled = true"
-    echo "    document.getElementById('variants').disabled = true"
+    echo "    populate_functions()"
     echo "}"
     echo
     echo "function populate_functions() {"
-    echo "  document.getElementById('functions').disabled = false"
     echo "  clear_options(document.getElementById('functions'))"
     echo "  var languages = document.getElementById('languages')"
     # all languages should have javascript for adding supported functions
@@ -141,10 +139,10 @@ EOHEAD
             echo "  }"
         fi
     done
+    echo "  populate_variants()"
     echo "}"
     echo
     echo "function populate_variants() {"
-    echo "  document.getElementById('variants').disabled = false"
     echo "  clear_options(document.getElementById('variants'))"
     echo "  var languages = document.getElementById('languages')"
     echo "  var funcs = document.getElementById('functions')"
@@ -167,7 +165,6 @@ EOHEAD
     echo "function init_forms() {"
     echo "  populate_languages()"
     if ! test -z $LL ; then
-        echo "  document.getElementById('functions').disabled = false"
         echo "  langs = document.getElementById('languages')"
         echo "  for (var i = 0; i < langs.options.length; i++ ) {"
         echo "    if (langs.options[i].value == '$LL' ) {"
@@ -177,7 +174,6 @@ EOHEAD
         echo "  populate_functions()"
     fi
     if ! test -z $FUNCNAME ; then
-        echo "  document.getElementById('variants').disabled = false"
         echo "  funcs = document.getElementById('functions')"
         echo "  for (var i = 0; i < funcs.options.length; i++ ) {"
         echo "    if (funcs.options[i].value == '$FUNCTION' ) {"
