@@ -15,7 +15,8 @@ echo "<p>Analysing word-form <em>"
 echo $WORDFORM | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g'
 echo "</em>:</p>"
 
-echo "<pre>";
+echo "<pre title='result of hfst-lookup hfst/$LL/morphology.variant.hfstol'"
+echo " style='border:black dashed 3px'>"
 echo "$WORDFORM" |\
     hfst-lookup hfst/$LL/morphology.$VARIANT.hfstol 2>&1 |\
     sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g';
