@@ -29,8 +29,8 @@ IMPLEMENTATION_SRCS=HfstTransitionGraph.cc \
                     compose_intersect/ComposeIntersectLexicon.cc \
                     compose_intersect/ComposeIntersectRule.cc \
                     compose_intersect/ComposeIntersectFst.cc \
-                    compose_intersect/ComposeIntersectUtilities.cc \
-                    HfstConstantTransducer.cc
+                    compose_intersect/ComposeIntersectUtilities.cc
+#                    HfstConstantTransducer.cc
 
 AM_CXXFLAGS=-Wno-deprecated -g
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
@@ -70,7 +70,6 @@ compisectincludedir = $(implincludedir)/compose_intersect
 
 implinclude_HEADERS = \
 		ConvertTransducerFormat.h \
-		HfstConstantTransducer.h \
 		FomaTransducer.h \
 		LogWeightTransducer.h \
 		SfstTransducer.h TropicalWeightTransducer.h \
@@ -82,6 +81,7 @@ implinclude_HEADERS = \
 		compose_intersect/ComposeIntersectRule.h \
 		compose_intersect/ComposeIntersectFst.h \
 		compose_intersect/ComposeIntersectUtilities.h
+#		HfstConstantTransducer.h
 
 compisectinclude_HEADERS=\
 		compose_intersect/ComposeIntersectRulePair.h \
@@ -123,8 +123,8 @@ LIBHFST_TSTS=HfstTransitionGraph ConvertTransducerFormat \
 		compose_intersect/ComposeIntersectLexicon \
 		compose_intersect/ComposeIntersectRule \
 		compose_intersect/ComposeIntersectFst \
-		compose_intersect/ComposeIntersectUtilities \
-		HfstConstantTransducer
+		compose_intersect/ComposeIntersectUtilities
+#		HfstConstantTransducer
 
 check_PROGRAMS=$(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS) $(LIBHFST_TSTS)
 
@@ -185,8 +185,8 @@ compose_intersect_ComposeIntersectFst_LDADD=../libhfst.la
 compose_intersect_ComposeIntersectUtilities_SOURCES=compose_intersect/ComposeIntersectUtilities.cc
 compose_intersect_ComposeIntersectUtilities_CXXFLAGS=-DMAIN_TEST
 compose_intersect_ComposeIntersectUtilities_LDADD=../libhfst.la
-HfstConstantTransducer_SOURCES=HfstConstantTransducer.cc
-HfstConstantTransducer_CXXFLAGS=-DMAIN_TEST
-HfstConstantTransducer_LDADD=../libhfst.la
+#HfstConstantTransducer_SOURCES=HfstConstantTransducer.cc
+#HfstConstantTransducer_CXXFLAGS=-DMAIN_TEST
+#HfstConstantTransducer_LDADD=../libhfst.la
 
 TESTS=$(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS) $(LIBHFST_TSTS)

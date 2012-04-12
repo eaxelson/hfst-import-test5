@@ -48,7 +48,7 @@
 
 #include "../HfstExceptionDefs.h"
 #include "optimized-lookup/transducer.h"
-#include "HfstConstantTransducer.h"
+//#include "HfstConstantTransducer.h"
 
 struct fsm;
 
