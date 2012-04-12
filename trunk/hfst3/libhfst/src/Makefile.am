@@ -115,3 +115,5 @@ TESTS=$(LIBHFST_TSTS)
 
 valgrind: valgrind-unit-tests.sh $(LIBHFST_TSTS)
 	$(SH) $(srcdir)/valgrind-unit-tests.sh $^
+
+EXTRA_DIST=HfstXeroxRulesTest.cc
