@@ -1155,8 +1155,9 @@ ccc : ddd
     /** \brief Compose this transducer with \a another. */
     HfstTransducer &compose(const HfstTransducer &another);
 
-    /** \brief Compose this transducer with the intersection of 
-        transducers in \a v. 
+    /** \brief Compose this transducer with the intersection of
+        transducers in \a v. If \a invert is true, then compose the
+        intersection of the transducers in \a v with this transducer.
 
         The algorithm used by this function is faster than intersecting 
         all transducers one by one and then composing this transducer 
@@ -1164,7 +1165,8 @@ ccc : ddd
 
         @pre The transducers in \a v are deterministic and epsilon-free.
     */
-    HfstTransducer &compose_intersect(const HfstTransducerVector &v);
+    HfstTransducer &compose_intersect(const HfstTransducerVector &v,
+				      bool invert=false);
 
     /** \brief Concatenate this transducer with \a another. */
     HfstTransducer &concatenate(const HfstTransducer &another);

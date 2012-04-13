@@ -2593,75 +2593,170 @@ HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
 }
 
 HfstTransducer &HfstTransducer::compose_intersect
-(const HfstTransducerVector &v)
+(const HfstTransducerVector &v, bool invert)
 {
-    if (v.empty())
-    { *this = HfstTransducer(type); }
-    
-    const HfstTransducer &first = *v.begin();
-
-    // If rule transducers contain word boundaries, add word boundaries to 
-    // the lexicon unless the lexicon already contains them. 
-    std::set<std::string> rule_alphabet = first.get_alphabet();
-
-    bool remove_word_boundary = false;
-    if (rule_alphabet.find("@#@") != rule_alphabet.end())
+  // Foma transducers don't harmonize porperly. If the input is foma
+  // transducers, convert to openfst type.
+  bool convert_to_openfst = false;
+  if (get_type() == FOMA_TYPE)
     { 
-    std::set<std::string> lexicon_alphabet = get_alphabet();
-    remove_word_boundary = 
-      (lexicon_alphabet.find("@#@") == lexicon_alphabet.end());
-    (void)remove_word_boundary;
-    HfstTokenizer tokenizer;
-    tokenizer.add_multichar_symbol("@#@");
-    tokenizer.add_multichar_symbol(internal_epsilon);
-    HfstTransducer wb(internal_epsilon,"@#@",tokenizer,type);
-    HfstTransducer wb_copy(wb);
-
-    wb.concatenate(*this).concatenate(wb_copy).minimize();
-    *this = wb;
+      convert_to_openfst = true; 
+      this->convert(TROPICAL_OPENFST_TYPE);
     }
+  
+  // The intersection of an empty set of rules is the empty language,
+  // which makes the result empty.
+  if (v.empty())
+    { *this = HfstTransducer(type); }
+  
+  const HfstTransducer &first = *v.begin();
+  
+  // If rule transducers contain word boundaries, add word boundaries to 
+  // the lexicon unless the lexicon already contains them. 
+  std::set<std::string> rule_alphabet = first.get_alphabet();
+
+  if (rule_alphabet.find("@#@") != rule_alphabet.end())
+    { 
+      std::set<std::string> lexicon_alphabet = get_alphabet();
+      HfstTokenizer tokenizer;
+      tokenizer.add_multichar_symbol("@#@");
+      tokenizer.add_multichar_symbol(internal_epsilon);
+      HfstTransducer wb(internal_epsilon,"@#@",tokenizer,type);
+      HfstTransducer wb_copy(wb);
+
+      // Add the word boundary symbol to the alphabet so harmonization
+      // won't touch it.
+      HfstBasicTransducer basic_this(*this);
+      basic_this.add_symbol_to_alphabet("@#@");
+      *this = HfstTransducer(basic_this,this->get_type());
+
+      wb.concatenate(*this).concatenate(wb_copy).minimize();
+      *this = wb;
+    }
+
+    HfstTransducer rule_1 = v.at(0);
+    
+    if (convert_to_openfst)
+      { rule_1.convert(TROPICAL_OPENFST_TYPE); }
+
+    HfstTransducer * harmonized_lexicon = rule_1.harmonize_(*this);
+
+    if (harmonized_lexicon == NULL)
+      { harmonized_lexicon = new HfstTransducer(*this); }
+
+    if (invert)
+      { 
+	harmonized_lexicon->invert(); 
+	harmonized_lexicon->substitute(StringPair("@#@",internal_epsilon),
+				       StringPair(internal_epsilon,"@#@"));
+      }
+
+    harmonized_lexicon->substitute(internal_identity,"||_IDENTITY_SYMBOL_||");
+    harmonized_lexicon->substitute(internal_unknown,"||_UNKNOWN_SYMBOL_||");
 
     if (v.size() == 1) 
     {
-    // In case there is only onw rule, compose with that.
-    implementations::ComposeIntersectRule rule(v.at(0));
-    // Create a ComposeIntersectLexicon from *this. 
-    implementations::ComposeIntersectLexicon lexicon(*this);
-    hfst::implementations::HfstBasicTransducer res = 
+      HfstTransducer rule_fst = v.at(0);
+      if (convert_to_openfst)
+	{ rule_fst.convert(TROPICAL_OPENFST_TYPE); }
+
+      if (invert)
+	{ 
+	  rule_fst.invert(); 
+	  rule_fst.substitute(StringPair(internal_epsilon,"@#@"),
+			      StringPair("@#@",internal_epsilon));
+	}
+      
+      // In case there is only onw rule, compose with that.
+      implementations::ComposeIntersectRule rule(rule_fst);
+      // Create a ComposeIntersectLexicon from *this. 
+      
+      //implementations::ComposeIntersectLexicon lexicon(*this);
+      implementations::ComposeIntersectLexicon lexicon(*harmonized_lexicon);
+      
+      hfst::implementations::HfstBasicTransducer res = 
         lexicon.compose_with_rules(&rule);
-    res.prune_alphabet();
-    *this = HfstTransducer(res,type);
+      
+      res.prune_alphabet();
+      *this = HfstTransducer(res,type);
     }
     else
-    {
+      {
 
-    // In case there are many rules, build a ComposeIntersectRulePair 
-    // recursively and compose with that.
-    std::vector<implementations::ComposeIntersectRule*> rule_vector;
-    implementations::ComposeIntersectRule * first_rule = 
-        new implementations::ComposeIntersectRule(*v.begin());
-    implementations::ComposeIntersectRule * second_rule = 
-        new implementations::ComposeIntersectRule(*(v.begin() + 1));
+	// In case there are many rules, build a ComposeIntersectRulePair 
+	// recursively and compose with that.
+	
+	HfstTransducer first_rule_fst = v.at(0);
+	if (convert_to_openfst)
+	  { first_rule_fst.convert(TROPICAL_OPENFST_TYPE); }
 
+	if (invert)
+	  { 
+	    first_rule_fst.invert(); 
+	    first_rule_fst.substitute(StringPair(internal_epsilon,"@#@"),
+				      StringPair("@#@",internal_epsilon));
+	  }
+
+	HfstTransducer second_rule_fst = v.at(1);
+	if (convert_to_openfst)
+	  { second_rule_fst.convert(TROPICAL_OPENFST_TYPE); }
+
+	if (invert)
+	  { 
+	    second_rule_fst.invert(); 
+	    second_rule_fst.substitute(StringPair(internal_epsilon,"@#@"),
+				       StringPair("@#@",internal_epsilon));
+	  }
+
+	std::vector<implementations::ComposeIntersectRule*> rule_vector;
+	implementations::ComposeIntersectRule * first_rule = 
+	  new implementations::ComposeIntersectRule(first_rule_fst);
+	implementations::ComposeIntersectRule * second_rule = 
+	  new implementations::ComposeIntersectRule(second_rule_fst);
+	
         implementations::ComposeIntersectRulePair * rules = 
-        new implementations::ComposeIntersectRulePair
-        (first_rule,second_rule);
+	  new implementations::ComposeIntersectRulePair
+	  (first_rule,second_rule);
+	
+	for (HfstTransducerVector::const_iterator it = v.begin() + 2;
+	     it != v.end();
+	     ++it)
+	  { 
+	    HfstTransducer rule_fst(*it);
+	    if (convert_to_openfst)
+	      { rule_fst.convert(TROPICAL_OPENFST_TYPE); }
 
-    for (HfstTransducerVector::const_iterator it = v.begin() + 2;
-         it != v.end();
-         ++it)
-    { 
-rules = new implementations::ComposeIntersectRulePair
-        (new implementations::ComposeIntersectRule(*it),rules); }
-    // Create a ComposeIntersectLexicon from *this. 
-    implementations::ComposeIntersectLexicon lexicon(*this);
-    hfst::implementations::HfstBasicTransducer res = 
-        lexicon.compose_with_rules(rules);
+	    if (invert)
+	      { 
+		rule_fst.invert(); 
+		rule_fst.substitute(StringPair(internal_epsilon,"@#@"),
+				    StringPair("@#@",internal_epsilon));
+	      }
+	
+	    rules = new implementations::ComposeIntersectRulePair
+	      (new implementations::ComposeIntersectRule(rule_fst),rules); 
+	  }
+	// Create a ComposeIntersectLexicon from *this. 
+	implementations::ComposeIntersectLexicon lexicon(*harmonized_lexicon);
+	hfst::implementations::HfstBasicTransducer res = 
+	  lexicon.compose_with_rules(rules);
+	
+	res.prune_alphabet();
+	*this = HfstTransducer(res,type);
+	
+	if (invert)
+	  { this->invert(); }
 
-    res.prune_alphabet();
-    *this = HfstTransducer(res,type);
-    delete rules;
-    }
+	delete rules;
+      }
+    
+    delete harmonized_lexicon;
+    
+    this->substitute("||_IDENTITY_SYMBOL_||",internal_identity);
+    this->substitute("||_UNKNOWN_SYMBOL_||",internal_unknown);
+
+    if (convert_to_openfst)
+      { this->convert(FOMA_TYPE); }
 
     return *this;
 }
