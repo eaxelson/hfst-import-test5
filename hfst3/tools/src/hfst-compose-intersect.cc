@@ -50,6 +50,11 @@ using hfst::HfstTransducerVector;
 
 //static bool insert_missing_flags=false;
 
+// If invert is true, the intersection of the rules is composed eith
+// the lexicon. Otherwise the lexicon is composed with the
+// intersection of the rules.
+static bool invert=false;
+
 void
 print_usage()
 {
@@ -59,6 +64,12 @@ print_usage()
         "\n", program_name );
         print_common_program_options(message_out);
         print_common_binary_program_options(message_out);
+	fprintf(message_out, "Composition options:\n"
+            "  -I, --invert                 Compose the intersection of the\n"
+	    "                               rules with the lexicon instead\n"
+            "                               of composing the lexicon with\n"
+	    "                               the intersection of the rules.\n"
+           );
         //print_common_binary_program_parameter_instructions(message_out);
 	fprintf(message_out,
 "\nIf OUTFILE, or either INFILE1 or INFILE2 is missing or -, standard\n" 
@@ -90,11 +101,12 @@ parse_options(int argc, char** argv)
         {
           HFST_GETOPT_COMMON_LONG,
           HFST_GETOPT_BINARY_LONG,
+	  {"invert", no_argument, 0, 'I'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_BINARY_SHORT "F",
+                             HFST_GETOPT_BINARY_SHORT "FI",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -105,6 +117,9 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-binary.h"
 #include "inc/getopt-cases-error.h"
+	case 'I':
+	  invert = true;
+	  break;
         }
     }
 
@@ -276,7 +291,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
 	      }
 	  }
 	
-	lexicon.compose_intersect(rules);
+	lexicon.compose_intersect(rules,invert);
 	char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
 							(strlen(lexiconname) +
 							 strlen(secondfilename) +
