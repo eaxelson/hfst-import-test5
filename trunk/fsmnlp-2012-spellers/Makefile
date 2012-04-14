@@ -641,7 +641,7 @@ results/kl/table1.dict-kl.errm-ed2.corp-wiki.generate-all.tex: corp/kl/klwiki.$(
 results/table2.tex: results/en/table2.dict-norvig.errm-ed1.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed1.corp-wiki.tex results/kl/table2.dict-kl.errm-ed1.corp-wiki.tex \
 			results/en/table2.dict-norvig.errm-ed2.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed2.corp-wiki.tex results/kl/table2.dict-kl.errm-ed2.corp-wiki.tex \
 			results/en/table2.dict-norvig.errm-ed3.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed3.corp-wiki.tex results/kl/table2.dict-kl.errm-ed3.corp-wiki.tex \
-			results/en/table2.dict-norvig.errm-ed1-no-initial.corp-wiki.tex results/fi/table2-no-initial.dict-omorfi.errm-ed1.corp-wiki.tex results/kl/table2-no-initial.dict-kl.errm-ed1.corp-wiki.tex \
+			results/en/table2.dict-norvig.errm-ed1-no-initial.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed1-no-initial.corp-wiki.tex results/kl/table2.dict-kl.errm-ed1-no-initial.corp-wiki.tex \
 			results/en/table2.dict-norvig.errm-ed2-no-initial.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed2-no-initial.corp-wiki.tex results/kl/table2.dict-kl.errm-ed2-no-initial.corp-wiki.tex \
 			results/en/table2.dict-norvig.errm-ed3-no-initial.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed3-no-initial.corp-wiki.tex results/kl/table2.dict-kl.errm-ed3-no-initial.corp-wiki.tex \
 			results/en/table2.dict-norvig.errm-ed2-no-redundant.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed2-no-redundant.corp-wiki.tex results/kl/table2.dict-kl.errm-ed2-no-redundant.corp-wiki.tex \
@@ -690,7 +690,7 @@ results/fi/table2.dict-omorfi.errm-ed2.corp-wiki.tex: corp/fi/fiwiki.$(WORDS).wo
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
-results/kl/table2.dict-kl.errm-ed2corp-wiki.tex: corp/kl/klwiki.$(WORDS).words
+results/kl/table2.dict-kl.errm-ed2.corp-wiki.tex: corp/kl/klwiki.$(WORDS).words
 	echo > $@.tsv
 	for i in $(TESTS) ; do \
 		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2.hfst $(KL_DICT) < corp/kl/klwiki.$(WORDS).words > /dev/null ;\
@@ -713,10 +713,10 @@ results/fi/table2.dict-omorfi.errm-ed3.corp-wiki.tex: corp/fi/fiwiki.$(WORDS).wo
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
-results/kl/table2.dict-kl.errm-ed3corp-wiki.tex: corp/kl/klwiki.$(WORDS).words
+results/kl/table2.dict-kl.errm-ed3.corp-wiki.tex: corp/kl/klwiki.$(WORDS).words
 	echo > $@.tsv
 	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3.hfst hfst/kl/norvig.hfst < corp/kl/klwiki.$(WORDS).words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3.hfst hfst/kl/kl.hfst < corp/kl/klwiki.$(WORDS).words > /dev/null ;\
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
@@ -906,12 +906,12 @@ results/kl/table2.dict-kl.errm-fallback.corp-wiki.tex: corp/kl/klwiki.$(WORDS).w
 
 # Table 3 (quality)
 
-results/table3.tex: results/en/table3.dict-norvig.errm-ed1.corp-wiki.tex results/fi/table3.dict-norvig.errm-ed1.corp-wiki.tex results/kl/table3.dict-norvig.errm-ed1.corp-wiki.tex \
-		results/en/table3.dict-norvig.errm-ed2.corp-wiki.tex results/fi/table3.dict-norvig.errm-ed2.corp-wiki.tex results/kl/table3.dict-norvig.errm-ed2.corp-wiki.tex \
-		results/en/table3.dict-norvig.errm-ed3.corp-wiki.tex results/fi/table3.dict-norvig.errm-ed3.corp-wiki.tex results/kl/table3.dict-norvig.errm-ed3.corp-wiki.tex \
-		results/en/table3.dict-norvig.errm-ed1-no-initial.corp-wiki.tex results/fi/table3.dict-norvig.errm-ed1-no-initial.corp-wiki.tex results/kl/table3.dict-norvig.errm-ed1-no-initial.corp-wiki.tex \
-		results/en/table3.dict-norvig.errm-ed2-no-initial.corp-wiki.tex results/fi/table3.dict-norvig.errm-ed2-no-initial.corp-wiki.tex results/kl/table3.dict-norvig.errm-ed2-no-initial.corp-wiki.tex \
-		results/en/table3.dict-norvig.errm-ed3-no-initial.corp-wiki.tex results/fi/table3.dict-norvig.errm-ed3-no-initial.corp-wiki.tex results/kl/table3.dict-norvig.errm-ed3-no-initial.corp-wiki.tex
+results/table3.tex: results/en/table3.dict-norvig.errm-ed1.corp-wiki.tex results/fi/table3.dict-omorfi.errm-ed1.corp-wiki.tex results/kl/table3.dict-kl.errm-ed1.corp-wiki.tex \
+		results/en/table3.dict-norvig.errm-ed2.corp-wiki.tex results/fi/table3.dict-omorfi.errm-ed2.corp-wiki.tex results/kl/table3.dict-kl.errm-ed2.corp-wiki.tex \
+		results/en/table3.dict-norvig.errm-ed3.corp-wiki.tex results/fi/table3.dict-omorfi.errm-ed3.corp-wiki.tex results/kl/table3.dict-kl.errm-ed3.corp-wiki.tex \
+		results/en/table3.dict-norvig.errm-ed1-no-initial.corp-wiki.tex results/fi/table3.dict-omorfi.errm-ed1-no-initial.corp-wiki.tex results/kl/table3.dict-kl.errm-ed1-no-initial.corp-wiki.tex \
+		results/en/table3.dict-norvig.errm-ed2-no-initial.corp-wiki.tex results/fi/table3.dict-omorfi.errm-ed2-no-initial.corp-wiki.tex results/kl/table3.dict-kl.errm-ed2-no-initial.corp-wiki.tex \
+		results/en/table3.dict-norvig.errm-ed3-no-initial.corp-wiki.tex results/fi/table3.dict-omorfi.errm-ed3-no-initial.corp-wiki.tex results/kl/table3.dict-kl.errm-ed3-no-initial.corp-wiki.tex
 	paste $^ > $@
 
 
@@ -1037,8 +1037,8 @@ results/kl/table3.dict-kl.errm-ed3-no-initial.corp-wiki.tex: corp/kl/automisp.wo
 
 # Table 4 (text type vs. speed)
 
-results/table4.tex: results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex results/fi/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex results/kl/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex \
-		results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-wronglang.tex results/fi/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-wronglang.tex results/kl/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-wronglang.tex
+results/table4.tex: results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex results/fi/table4.dict-omorfi.errm-ed2-no-redundant.corp-wiki-automispelled.tex results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-automispelled.tex \
+		results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-wronglang.tex results/fi/table4.dict-omorfi.errm-ed2-no-redundant.corp-wiki-wronglang.tex results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-wronglang.tex
 	paste $^ > $@
 
 # Automispelled
