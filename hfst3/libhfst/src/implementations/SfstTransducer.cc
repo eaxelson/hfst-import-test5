@@ -301,6 +301,10 @@ namespace hfst { namespace implementations {
     void SfstOutputStream::write_transducer(Transducer * transducer)
   { 
     transducer->store(ofile); 
+    if (fflush(ofile) != 0) {
+      HFST_THROW_MESSAGE(HfstFatalException, 
+			 "An error happened when writing an SfstTransducer.");
+    }
   }
 
   void SfstTransducer::print_test(Transducer *t)

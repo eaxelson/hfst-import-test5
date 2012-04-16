@@ -1035,6 +1035,12 @@ static inline int explode_line (char *buf, int *values) {
 
     /* End */
     fprintf(outfile, "%s","##end##\n");
+    if (fflush(outfile) != 0) {
+      HFST_THROW_MESSAGE
+        (HfstFatalException,
+         "an error happened when writing a foma transducer");
+    }
+      
     return(1);
 
     }
