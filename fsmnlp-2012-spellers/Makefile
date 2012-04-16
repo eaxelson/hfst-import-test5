@@ -1271,9 +1271,31 @@ results/kl/table3.dict-kl.errm-ed3-no-initial.corp-wiki.tex: corp/kl/automisp.wo
 
 # Table 4 (text type vs. speed)
 
-results/table4.tex: results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex results/fi/table4.dict-omorfi.errm-ed2-no-redundant.corp-wiki-automispelled.tex results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-automispelled.tex \
-		results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-wronglang.tex results/fi/table4.dict-omorfi.errm-ed2-no-redundant.corp-wiki-wronglang.tex results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-wronglang.tex
-	paste $^ > $@
+TABLE4_DATA=\
+			results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex\
+			results/fi/table4.dict-omorfi.errm-ed2-no-redundant.corp-wiki-automispelled.tex\
+			results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-automispelled.tex \
+			results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-wronglang.tex\
+			results/fi/table4.dict-omorfi.errm-ed2-no-redundant.corp-wiki-wronglang.tex\
+			results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-wronglang.tex
+
+results/table4.tex: $(TABLE1_DATA) $(TABLE4_DATA)
+	# this baseline is from test table 1
+	echo "Native Lang. Corpus &" > $@
+	paste -d '&' results/en/table1.dict-norvig.errm-ed2-no-redundant.corp-wiki.tex \
+		results/fi/table1.dict-omorfi.errm-ed2-no-redundant.corp-wiki.tex \
+		results/kl/table1.dict-kl.errm-ed2-no-redundant.corp-wiki.tex >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Added automatic errors &" >> $@
+	paste -d '&' results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex \
+		results/fi/table4.dict-omorfi.errm-ed2-no-redundant.corp-wiki-automispelled.tex \
+		results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-automispelled.tex >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Text in another language &" >> $@
+	paste -d '&' results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-wronglang.tex \
+		results/fi/table4.dict-omorfi.errm-ed2-no-redundant.corp-wiki-wronglang.tex \
+		results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-wronglang.tex >> $@
+	echo "\\\\\\\\" >> $@
 
 # Automispelled
 
