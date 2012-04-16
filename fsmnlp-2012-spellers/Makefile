@@ -1070,13 +1070,83 @@ results/kl/table2.dict-kl.errm-fallback.corp-wiki.tex: corp/kl/klwiki.$(WORDS).w
 
 # Table 3 (quality)
 
-results/table3.tex: results/en/table3.dict-norvig.errm-ed1.corp-wiki.tex results/fi/table3.dict-omorfi.errm-ed1.corp-wiki.tex results/kl/table3.dict-kl.errm-ed1.corp-wiki.tex \
-		results/en/table3.dict-norvig.errm-ed2.corp-wiki.tex results/fi/table3.dict-omorfi.errm-ed2.corp-wiki.tex results/kl/table3.dict-kl.errm-ed2.corp-wiki.tex \
-		results/en/table3.dict-norvig.errm-ed3.corp-wiki.tex results/fi/table3.dict-omorfi.errm-ed3.corp-wiki.tex results/kl/table3.dict-kl.errm-ed3.corp-wiki.tex \
-		results/en/table3.dict-norvig.errm-ed1-no-initial.corp-wiki.tex results/fi/table3.dict-omorfi.errm-ed1-no-initial.corp-wiki.tex results/kl/table3.dict-kl.errm-ed1-no-initial.corp-wiki.tex \
-		results/en/table3.dict-norvig.errm-ed2-no-initial.corp-wiki.tex results/fi/table3.dict-omorfi.errm-ed2-no-initial.corp-wiki.tex results/kl/table3.dict-kl.errm-ed2-no-initial.corp-wiki.tex \
-		results/en/table3.dict-norvig.errm-ed3-no-initial.corp-wiki.tex results/fi/table3.dict-omorfi.errm-ed3-no-initial.corp-wiki.tex results/kl/table3.dict-kl.errm-ed3-no-initial.corp-wiki.tex
-	paste $^ > $@
+TABLE3_DATA=\
+			results/en/table3.dict-norvig.errm-ed1.corp-wiki.tex\
+			results/fi/table3.dict-omorfi.errm-ed1.corp-wiki.tex\
+			results/kl/table3.dict-kl.errm-ed1.corp-wiki.tex \
+			results/en/table3.dict-norvig.errm-ed2.corp-wiki.tex \
+			results/fi/table3.dict-omorfi.errm-ed2.corp-wiki.tex \
+			results/kl/table3.dict-kl.errm-ed2.corp-wiki.tex \
+			results/en/table3.dict-norvig.errm-ed3.corp-wiki.tex \
+			results/fi/table3.dict-omorfi.errm-ed3.corp-wiki.tex \
+			results/kl/table3.dict-kl.errm-ed3.corp-wiki.tex \
+			results/en/table3.dict-norvig.errm-ed1-no-initial.corp-wiki.tex \
+			results/fi/table3.dict-omorfi.errm-ed1-no-initial.corp-wiki.tex \
+			results/kl/table3.dict-kl.errm-ed1-no-initial.corp-wiki.tex \
+			results/en/table3.dict-norvig.errm-ed2-no-initial.corp-wiki.tex \
+			results/fi/table3.dict-omorfi.errm-ed2-no-initial.corp-wiki.tex \
+			results/kl/table3.dict-kl.errm-ed2-no-initial.corp-wiki.tex \
+			results/en/table3.dict-norvig.errm-ed3-no-initial.corp-wiki.tex \
+			results/fi/table3.dict-omorfi.errm-ed3-no-initial.corp-wiki.tex \
+			results/kl/table3.dict-kl.errm-ed3-no-initial.corp-wiki.tex
+
+results/table3.tex: $(TABLE3_DATA)
+	#echo "Reference impl. &" > $@
+	#paste -d '&' results/en/table1.dict-hunspell.errm-hunspell.corp-wiki.tex \
+	#	results/fi/table1.dict-voikko.errm-voikko.corp-wiki.tex >> $@
+	#echo "& ---  \\\\\\\\" >> $@
+	#echo "Generate all edits 2 & " >> $@
+	#paste -d '&' results/en/table3.dict-norvig.errm-ed2.corp-wiki.generate-all.tex \
+	#	results/fi/table3.dict-omorfi.errm-ed2.corp-wiki.generate-all.tex \
+	#	results/kl/table3.dict-kl.errm-ed2.corp-wiki.generate-all.tex >> $@
+	#echo "\\\\\\\\" >> $@
+	echo "\\hline" >> $@
+	echo "Edit distance 1 &" >> $@
+	paste -d '&' results/en/table3.dict-norvig.errm-ed1.corp-wiki.tex \
+		results/fi/table3.dict-omorfi.errm-ed1.corp-wiki.tex \
+		results/kl/table3.dict-kl.errm-ed1.corp-wiki.tex >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Edit distance 2 &" >> $@
+	paste -d '&' results/en/table3.dict-norvig.errm-ed2.corp-wiki.tex \
+		results/fi/table3.dict-omorfi.errm-ed2.corp-wiki.tex \
+		results/kl/table3.dict-kl.errm-ed2.corp-wiki.tex >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Edit distance 3 &" >> $@
+	paste -d '&' results/en/table3.dict-norvig.errm-ed3.corp-wiki.tex \
+		results/fi/table3.dict-omorfi.errm-ed3.corp-wiki.tex \
+		results/kl/table3.dict-kl.errm-ed3.corp-wiki.tex >> $@
+	echo "\\\\\\\\" >> $@
+	echo "No first edits ed 1 & " >> $@
+	paste -d '&' results/en/table3.dict-norvig.errm-ed1-no-initial.corp-wiki.tex \
+		results/fi/table3.dict-omorfi.errm-ed1-no-initial.corp-wiki.tex \
+		results/kl/table3.dict-kl.errm-ed1-no-initial.corp-wiki.tex >> $@
+	echo "\\\\\\\\" >> $@
+	echo "No first edits ed 2 &" >> $@
+	paste -d '&' results/en/table3.dict-norvig.errm-ed2-no-initial.corp-wiki.tex \
+		results/fi/table3.dict-omorfi.errm-ed2-no-initial.corp-wiki.tex \
+		results/kl/table3.dict-kl.errm-ed2-no-initial.corp-wiki.tex >> $@
+	echo "\\\\\\\\" >> $@
+	echo "No first edits ed 3 &" >> $@
+	paste -d '&' results/en/table3.dict-norvig.errm-ed3-no-initial.corp-wiki.tex \
+		results/fi/table3.dict-omorfi.errm-ed3-no-initial.corp-wiki.tex \
+		results/kl/table3.dict-kl.errm-ed3-no-initial.corp-wiki.tex >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Avoid redundancy and first edits ed 2 &" >> $@
+	#paste -d '&' results/en/table3.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
+	#	results/fi/table3.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
+	#	results/kl/table3.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Avoid redundancy and first edits ed 3 &" >> $@
+	#paste -d '&' results/en/table3.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
+	#	results/fi/table3.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
+	#	results/kl/table3.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Lower order first ed 1 to 2 &" >> $@
+	#paste -d '&' results/en/table3.dict-norvig.errm-fallback.corp-wiki.tex \
+	#	results/fi/table3.dict-omorfi.errm-fallback.corp-wiki.tex \
+	#	results/kl/table3.dict-kl.errm-fallback.corp-wiki.tex >> $@
+	echo "\\\\\\\\" >> $@
+
 
 
 # Table 3, ED 1

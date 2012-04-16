@@ -436,25 +436,41 @@ indicated in parentheses.
 \begin{table}[h]
 \begin{center}
 \begin{scriptsize}
-\begin{tabular}{|l|rrrl|}
+\begin{tabular}{|l|rrr|}
 \hline
-\bf Error model & \bf En & \bf Fi & \bf Kl & (Notes) \\ 
+\bf Error model & \bf En & \bf Fi & \bf Kl\\ 
 \hline
-Reference impl.   & & & --- & en: hunspell, fi: voikko, kl: n/a \\
+Reference impl.   & & & --- \\
+Generate all edits 2 &
+\\
 \hline
-Edit distance 1                             & & & & \\
-Edit distance 2                             & & & & \\
-Edit distance 3                             & & & & \\
-No first edits ed 1                         & & & & \\
-No first edits ed 2                         & & & & \\
-No first edits ed 3                         & & & & \\
-Lower order first, ed 1-2                   & & & & \\
-Avoid redundancy ed 2                       & & & & \\
-Avoid redundancy ed 3                       & & & & \\
-Avoid redundancy and first edits ed 2       & & & & \\
-Avoid redundancy and first edits ed 3       & & & & \\
-Generate all edits 1                        & & & & \\
-Generate all edits 2                        & & & & \\
+Edit distance 1 &
+0.91&0.88&0.86
+\\
+Edit distance 2 &
+0.99&0.99&1.0
+\\
+Edit distance 3 &
+0.99&0.99&1.0
+\\
+No first edits ed 1 & 
+0.0&0.0&0.0
+\\
+No first edits ed 2 &
+0.0&0.0&0.0
+\\
+No first edits ed 3 &
+0.0&0.0&0.0
+\\
+Avoid redundancy and first edits ed 2 &
+0.0&0.0&0.0
+\\
+Avoid redundancy and first edits ed 3 &
+0.0&0.0&0.0
+\\
+Lower order first ed 1 to 2 &
+0.0&0.0&0.0
+\\
 \hline
 \end{tabular}
 \end{scriptsize}
