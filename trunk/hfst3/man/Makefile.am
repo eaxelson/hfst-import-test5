@@ -60,7 +60,7 @@ hfst-summarise.1:
 hfst-union.1:
 	$(LN_S) hfst-disjunct.1 hfst-union.1
 
-all:
+man:
 	make bootstrap && make aliases
 
 bootstrap: 
