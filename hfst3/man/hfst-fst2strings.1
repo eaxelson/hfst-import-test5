@@ -40,6 +40,9 @@ follow cycles at most NCYC times
 \fB\-w\fR, \fB\-\-print\-weights\fR
 display the weight for each string
 .TP
+\fB\-S\fR, \fB\-\-print\-separator\fR
+print separator "\-\-" after each transducer
+.TP
 \fB\-e\fR, \fB\-\-epsilon\-format\fR=\fIEPS\fR
 print epsilon as EPS
 .TP
@@ -82,7 +85,6 @@ generates all forms of lexical.hfst
 .SS "Known bugs:"
 .IP
 Does not work correctly for hfst optimized lookup format.
-Prints duplicate strings for foma format.
 .SH "REPORTING BUGS"
 Report bugs to <hfst\-bugs@helsinki.fi> or directly to our bug tracker at:
 <https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>
