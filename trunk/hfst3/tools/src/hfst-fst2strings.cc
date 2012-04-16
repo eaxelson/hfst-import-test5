@@ -73,6 +73,8 @@ static std::string output_exclude;
 static bool print_in_pairstring_format=false;
 static char * epsilon_format=0;
 
+static bool print_separator_after_each_transducer=false;
+
 void
 print_usage()
 {
@@ -87,9 +89,8 @@ print_usage()
 "  -r, --random=NRAND         print at most NRAND random strings\n"
 "  -c, --cycles=NCYC          follow cycles at most NCYC times\n"
 "  -w, --print-weights        display the weight for each string\n"
+"  -S, --print-separator      print separator \"--\" after each transducer\n"
 "  -e, --epsilon-format=EPS   print epsilon as EPS\n"
-/*"  -a, --print-pairstrings    print result in pairstring format\n"*/
-/*"  -S, --print-spaces         print spaces between symbols/symbol pairs\n"*/
 "  -X, --xfst=VARIABLE        toggle xfst compatibility option VARIABLE\n");
     fprintf(message_out, "Ignore paths if:\n"
 "  -l, --max-in-length=MIL    input string longer than MIL\n"
@@ -120,7 +121,6 @@ print_usage()
     fprintf(message_out, 
         "Known bugs:\n"
         "  Does not work correctly for hfst optimized lookup format.\n"
-        "  Prints duplicate strings for foma format.\n"
         "\n"
         );
 
@@ -148,11 +148,10 @@ parse_options(int argc, char** argv)
             {"max-out-length", required_argument, 0, 'L'},
             {"max-strings", required_argument, 0, 'n'},
             {"nbest", required_argument, 0, 'N'},
-        {"random", required_argument, 0, 'r'},
+	    {"random", required_argument, 0, 'r'},
+	    {"print-separator", no_argument, 0, 'S'},
             {"out-exclude", required_argument, 0, 'U'},
             {"out-prefix", required_argument, 0, 'P'},
-            {"print-pairstrings", no_argument, 0, 'a'},
-        {"print-spaces", no_argument, 0, 'S'},
             {"print-weights", no_argument, 0, 'w'},
             {"xfst", required_argument, 0, 'X'},
             {0,0,0,0}
@@ -160,7 +159,7 @@ parse_options(int argc, char** argv)
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT
-                             "Sawc:e:u:p:l:L:n:r:N:U:P:X:",
+                             "Swc:e:u:p:l:L:n:r:N:U:P:X:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -231,15 +230,12 @@ parse_options(int argc, char** argv)
         case 'U':
           output_exclude = optarg;
           break;
+	case 'S':
+	  print_separator_after_each_transducer = true;
+	  break;
         case 'e':
           epsilon_format = hfst_strdup(optarg);
           break;
-        case 'a':
-          print_in_pairstring_format = true;
-          break;
-    case 'S':
-      print_spaces = true;
-      break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -451,8 +447,8 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
   bool first_transducer=true;
   while(instream.is_good())
   {
-    if (!first_transducer)
-      outstream << "--\n";
+    if (!first_transducer && !print_separator_after_each_transducer)
+      outstream << "--" << std::endl;
     first_transducer=false;
     
     HfstTransducer t(instream);
@@ -533,7 +529,9 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
       }
     verbose_printf("Printed %i random string(s)\n", cb.count);
       }
-    
+
+    if (print_separator_after_each_transducer)
+      outstream << "--" << std::endl;
   }
     
   instream.close();
