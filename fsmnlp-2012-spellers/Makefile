@@ -1342,3 +1342,124 @@ results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-wronglang.tex: corp/fi
 		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-redundant.hfst $(KL_DICT) < corp/fi/fiwiki.$(WORDS).words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
+
+# table 5 and such
+TABLE5_DATA=\
+			results/en/table5.norvig.sigmasetsize \
+			results/fi/table5.omorfi-20110505.sigmasetsize \
+			results/kl/table5.kl.sigmasetsize  \
+			results/en/table5.errmodel.edit-distance-1.sizes \
+			results/en/table5.errmodel.edit-distance-1-no-initial.sizes \
+			results/en/table5.errmodel.edit-distance-2.sizes \
+			results/en/table5.errmodel.edit-distance-2-no-initial.sizes \
+			results/en/table5.errmodel.edit-distance-2-no-initial-no-redundant.sizes \
+			results/en/table5.errmodel.edit-distance-2-no-redundant.sizes \
+			results/en/table5.errmodel.edit-distance-3.sizes \
+			results/en/table5.errmodel.edit-distance-3-no-initial.sizes \
+			results/en/table5.errmodel.edit-distance-3-no-initial-no-redundant.sizes \
+			results/en/table5.errmodel.edit-distance-3-no-redundant.sizes \
+			results/fi/table5.errmodel.edit-distance-1.sizes \
+			results/fi/table5.errmodel.edit-distance-1-no-initial.sizes \
+			results/fi/table5.errmodel.edit-distance-2.sizes \
+			results/fi/table5.errmodel.edit-distance-2-no-initial.sizes \
+			results/fi/table5.errmodel.edit-distance-2-no-initial-no-redundant.sizes \
+			results/fi/table5.errmodel.edit-distance-2-no-redundant.sizes \
+			results/fi/table5.errmodel.edit-distance-3.sizes \
+			results/fi/table5.errmodel.edit-distance-3-no-initial.sizes \
+			results/fi/table5.errmodel.edit-distance-3-no-initial-no-redundant.sizes \
+			results/fi/table5.errmodel.edit-distance-3-no-redundant.sizes \
+			results/kl/table5.errmodel.edit-distance-1.sizes \
+			results/kl/table5.errmodel.edit-distance-1-no-initial.sizes \
+			results/kl/table5.errmodel.edit-distance-2.sizes \
+			results/kl/table5.errmodel.edit-distance-2-no-initial.sizes \
+			results/kl/table5.errmodel.edit-distance-2-no-initial-no-redundant.sizes \
+			results/kl/table5.errmodel.edit-distance-2-no-redundant.sizes \
+			results/kl/table5.errmodel.edit-distance-3.sizes \
+			results/kl/table5.errmodel.edit-distance-3-no-initial.sizes \
+			results/kl/table5.errmodel.edit-distance-3-no-initial-no-redundant.sizes \
+			results/kl/table5.errmodel.edit-distance-3-no-redundant.sizes
+
+results/table5.tex: $(TABLE5_DATA)
+	echo "Sigma set size &" > $@
+	paste -d '&' results/en/table5.norvig.sigmasetsize \
+		results/fi/table5.omorfi-20110505.sigmasetsize \
+		results/kl/table5.kl.sigmasetsize >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Edit distance 1 &" >> $@
+	paste -d '&' results/en/table5.errmodel.edit-distance-1.sizes \
+		results/fi/table5.errmodel.edit-distance-1.sizes \
+		results/kl/table5.errmodel.edit-distance-1.sizes >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Edit distance 2 &" >> $@
+	paste -d '&' results/en/table5.errmodel.edit-distance-2.sizes \
+		results/fi/table5.errmodel.edit-distance-2.sizes \
+		results/kl/table5.errmodel.edit-distance-2.sizes >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Edit distance 3 &" >> $@
+	paste -d '&' results/en/table5.errmodel.edit-distance-3.sizes \
+		results/fi/table5.errmodel.edit-distance-3.sizes \
+		results/kl/table5.errmodel.edit-distance-3.sizes >> $@
+	echo "\\\\\\\\" >> $@
+	echo "No first edits ed 1 & " >> $@
+	paste -d '&' results/en/table5.errmodel.edit-distance-1-no-initial.sizes \
+		results/fi/table5.errmodel.edit-distance-1-no-initial.sizes \
+		results/kl/table5.errmodel.edit-distance-1-no-initial.sizes >> $@
+	echo "\\\\\\\\" >> $@
+	echo "No first edits ed 2 &" >> $@
+	paste -d '&' results/en/table5.errmodel.edit-distance-2-no-initial.sizes \
+		results/fi/table5.errmodel.edit-distance-2-no-initial.sizes \
+		results/kl/table5.errmodel.edit-distance-2-no-initial.sizes >> $@
+	echo "\\\\\\\\" >> $@
+	echo "No first edits ed 3 &" >> $@
+	paste -d '&' results/en/table5.errmodel.edit-distance-3-no-initial.sizes \
+		results/fi/table5.errmodel.edit-distance-3-no-initial.sizes \
+		results/kl/table5.errmodel.edit-distance-3-no-initial.sizes >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Avoid redundancy and first edits ed 2 &" >> $@
+	paste -d '&' results/en/table5.errmodel.edit-distance-2-no-initial-no-redundant.sizes \
+		results/fi/table5.errmodel.edit-distance-2-no-initial-no-redundant.sizes \
+		results/kl/table5.errmodel.edit-distance-2-no-initial-no-redundant.sizes >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Avoid redundancy and first edits ed 3 &" >> $@
+	paste -d '&' results/en/table5.errmodel.edit-distance-3-no-initial-no-redundant.sizes \
+		results/fi/table5.errmodel.edit-distance-3-no-initial-no-redundant.sizes \
+		results/kl/table5.errmodel.edit-distance-3-no-initial-no-redundant.sizes >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Lower order first ed 1 to 2 &" >> $@
+	echo "&&" >> $@
+	echo "\\\\\\\\" >> $@
+
+results/en/table5.%.sigmasetsize: hfst/en/%.hfst
+	hfst-summarize -v $< |\
+		fgrep 'sigma set size' |\
+		sed -e 's/^.*://' > $@
+
+results/fi/table5.%.sigmasetsize: hfst/fi/%.hfst
+	hfst-summarize -v $< |\
+		fgrep 'sigma set size' |\
+		sed -e 's/^.*://' > $@
+
+results/kl/table5.%.sigmasetsize: hfst/kl/%.hfst
+	hfst-summarize -v $< |\
+		fgrep 'sigma set size' |\
+		sed -e 's/^.*://' > $@
+
+results/en/table5.%.sizes: hfst/en/%.hfst
+	hfst-summarize $< |\
+		grep '# of \(states\|arcs\)' |\
+		sed -e 's/^.*://' |\
+		tr -s "\n" "," > $@
+
+results/fi/table5.%.sizes: hfst/fi/%.hfst
+	hfst-summarize $< |\
+		grep '# of \(states\|arcs\)' |\
+		sed -e 's/^.*://' |\
+		tr -s "\n" "," > $@
+
+results/kl/table5.%.sizes: hfst/kl/%.hfst
+	hfst-summarize $< |\
+		grep '# of \(states\|arcs\)' |\
+		sed -e 's/^.*://' |\
+		tr -s "\n" "," > $@
+
+
