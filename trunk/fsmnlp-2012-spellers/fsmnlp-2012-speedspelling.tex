@@ -329,44 +329,44 @@ codes to denote the languages: \emph{en} for English, \emph{fi} for Finnish and
 \begin{table}[h]
 \begin{center}
 \begin{scriptsize}
-\begin{tabular}{|l|rrrl|}
+\begin{tabular}{|l|rrr|}
 \hline
-\bf Error model & \bf En & \bf Fi & \bf Kl & (Notes) \\ 
+\bf Error model & \bf En & \bf Fi & \bf Kl \\ 
 \hline
 Reference impl. &
 10.59&7.94
-& --- & en: hunspell, fi: voikko, kl: ---  \\
+& --- \\
 Generate all edits 2 & 
 41.79&1060.71&1345.17
-& \\
+\\
 \hline
 Edit distance 1 &
 0.40 &8.32&6.34
-& \\
+\\
 Edit distance 2 &
 11.22&346.63&726.70
-& \\
+\\
 Edit distance 3 &
 11.25&349.09&752.58
-& \\
-No first edits ed 1 & 
+\\
+No firsts ed 1 & 
 0.32&1.74&1.48
-& \\
-No first edits ed 2 &
+\\
+No firsts ed 2 &
 0.31&1.64&1.46
-& \\
-No first edits ed 3 &
+\\
+No firsts ed 3 &
 0.31&1.68&1.48
-& \\
-Avoid redundancy and first edits ed 2 &
+\\
+No redundancy or firsts ed 2 &
 0.24&1.17&1.46
-& \\
-Avoid redundancy and first edits ed 3 &
+\\
+No redundancy or firsts ed 3 &
 0.30&1.26&1.43
-& \\
+\\
 Lower order first ed 1 to 2 &
 5.49&193.10&676.70
-& \\
+\\
 \hline
 \end{tabular}
 \end{scriptsize}
@@ -383,27 +383,39 @@ models as with previous tests.
 \begin{table}[h]
 \begin{center}
 \begin{scriptsize}
-\begin{tabular}{|l|rrrl|}
+\begin{tabular}{|l|rrr|}
 \hline
-\bf Error model & \bf En & \bf Fi & \bf Kl & (Notes) \\ 
+\bf Error model & \bf En & \bf Fi & \bf Kl \\ 
 \hline
-Reference impl.   & & & --- & en: hunspell, fi: voikko, kl: n/a \\
+Reference impl.   & & & --- \\
 \hline
-Edit distance 1                             & & & & \\
-Edit distance 2                             & & & & \\
-Edit distance 3                             & & & & \\
-No first edits ed 1                         & & & & \\
-No first edits ed 2                         & & & & \\
-No first edits ed 3                         & & & & \\
-Lower order first, ed 1-2                   & & & & \\
-Avoid redundancy ed 1                       & & & & \\
-Avoid redundancy ed 2                       & & & & \\
-Avoid redundancy ed 3                       & & & & \\
-Avoid redundancy and first edits ed 1       & & & & \\
-Avoid redundancy ed 2                       & & & & \\
-Avoid redundancy ed 3                       & & & & \\
-Generate all edits 1                        & & & & \\
-Generate all edits 2                        & & & & \\
+Edit distance 1 &
+19 kiB&365 kiB&1774 kiB
+\\
+Edit distance 2 &
+189 kiB&12158 kiB&15911 kiB
+\\
+Edit distance 3 &
+189 kiB&12158 kiB&15911 kiB
+\\
+No first ed 1 & 
+13 kiB&2170 kiB&1600 kiB
+\\
+No first ed 2 &
+13 kiB&2170 kiB&1600 kiB
+\\
+No first ed 3 &
+13 kiB&2170 kiB&1600 kiB
+\\
+No redundancy or firsts ed 2 &
+13 kiB&2170 kiB&1600 kiB
+\\
+No redundancy or firsts ed 3 &
+13 kiB&2170 kiB&1600 kiB
+\\
+Lower order first ed 1 to 2 &
+195 kiB&12308 kiB&16086 kiB
+\\
 \hline
 \end{tabular}
 \end{scriptsize}
