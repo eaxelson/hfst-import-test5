@@ -20,7 +20,7 @@ FI_DICT=hfst/fi/omorfi-20110505.hfst
 KL_DICT=hfst/kl/kl.hfst
 
 TESTS=1 2 3 4 5
-WORDS=10000
+WORDS=10
 
 # article
 fsmnlp-2012-speedspelling.pdf: fsmnlp-2012-speedspelling.tex fsmnlp2012.bib
@@ -55,9 +55,9 @@ models: hfst/fi/errmodel.edit-distance-1.hfst \
 		hfst/en/errmodel.edit-distance-2-no-redundant.hfst \
 		hfst/fi/errmodel.edit-distance-2-no-redundant.hfst \
 		hfst/kl/errmodel.edit-distance-2-no-redundant.hfst \
-		hfst/en/errmodel.edit-distance-3-no-redundant.hfst \
-		hfst/fi/errmodel.edit-distance-3-no-redundant.hfst \
-		hfst/kl/errmodel.edit-distance-3-no-redundant.hfst \
+# 		hfst/en/errmodel.edit-distance-3-no-redundant.hfst \
+# 		hfst/fi/errmodel.edit-distance-3-no-redundant.hfst \
+# 		hfst/kl/errmodel.edit-distance-3-no-redundant.hfst \
 		hfst/fi/errmodel.edit-distance-1-no-initial.hfst \
 		hfst/en/errmodel.edit-distance-1-no-initial.hfst \
 		hfst/kl/errmodel.edit-distance-1-no-initial.hfst \
@@ -69,10 +69,10 @@ models: hfst/fi/errmodel.edit-distance-1.hfst \
 		hfst/kl/errmodel.edit-distance-3-no-initial.hfst \
 		hfst/en/errmodel.edit-distance-2-no-initial-no-redundant.hfst \
 		hfst/fi/errmodel.edit-distance-2-no-initial-no-redundant.hfst \
-		hfst/kl/errmodel.edit-distance-2-no-initial-no-redundant.hfst \
-		hfst/en/errmodel.edit-distance-3-no-initial-no-redundant.hfst \
-		hfst/fi/errmodel.edit-distance-3-no-initial-no-redundant.hfst \
-		hfst/kl/errmodel.edit-distance-3-no-initial-no-redundant.hfst
+		hfst/kl/errmodel.edit-distance-2-no-initial-no-redundant.hfst
+#		hfst/en/errmodel.edit-distance-3-no-initial-no-redundant.hfst \
+#		hfst/fi/errmodel.edit-distance-3-no-initial-no-redundant.hfst \
+#		hfst/kl/errmodel.edit-distance-3-no-initial-no-redundant.hfst
 
 
 tables:		results/table1.tex results/table2.tex results/table3.tex results/table4.tex
@@ -342,15 +342,15 @@ TABLE1_DATA=\
 			results/en/table1.dict-norvig.errm-ed2-no-redundant.corp-wiki.tex \
 			results/fi/table1.dict-omorfi.errm-ed2-no-redundant.corp-wiki.tex \
 			results/kl/table1.dict-kl.errm-ed2-no-redundant.corp-wiki.tex \
-			results/en/table1.dict-norvig.errm-ed3-no-redundant.corp-wiki.tex \
-			results/fi/table1.dict-omorfi.errm-ed3-no-redundant.corp-wiki.tex \
-			results/kl/table1.dict-kl.errm-ed3-no-redundant.corp-wiki.tex \
+# 			results/en/table1.dict-norvig.errm-ed3-no-redundant.corp-wiki.tex \
+# 			results/fi/table1.dict-omorfi.errm-ed3-no-redundant.corp-wiki.tex \
+# 			results/kl/table1.dict-kl.errm-ed3-no-redundant.corp-wiki.tex \
 			results/en/table1.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
 			results/fi/table1.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
 			results/kl/table1.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
-			results/en/table1.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
-			results/fi/table1.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
-			results/kl/table1.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
+# 			results/en/table1.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
+# 			results/fi/table1.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
+# 			results/kl/table1.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
 			results/en/table1.dict-norvig.errm-fallback.corp-wiki.tex \
 			results/fi/table1.dict-omorfi.errm-fallback.corp-wiki.tex \
 			results/kl/table1.dict-kl.errm-fallback.corp-wiki.tex \
