@@ -202,6 +202,10 @@ EOHEAD
 }
 
 function print_html_heading_info() {
+    # the domain may have additional heading
+    if test -r heading.html ; then
+        cat heading.html
+    fi
     cat<<EOHEADING
   <h1>$HEADER</h1>
   <p style="font-size: smaller;">
