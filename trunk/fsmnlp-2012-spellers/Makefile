@@ -108,19 +108,19 @@ corp/en/enwiki.$(WORDS).words: corp/en/enwiki-20120211-pages-articles.2000000.xm
 	awk '/<text/,/<\/text/ {print}' < $< |\
 		./wikipedia-deform.sh |\
 		tr -s ' ' '\n' |\
-		head -n 10000 > $@
+		head -n $(WORDS) > $@
 
 corp/fi/fiwiki.$(WORDS).words: corp/fi/fiwiki-20120213-pages-articles.2000000.xml
 	awk '/<text/,/<\/text/ {print}' < $< |\
 		./wikipedia-deform.sh |\
 		tr -s ' ' '\n' |\
-		head -n 10000 > $@
+		head -n $(WORDS) > $@
 
 corp/kl/klwiki.$(WORDS).words: corp/kl/klwiki-20120214-pages-articles.xml
 	awk '/<text/,/<\/text/ {print}' < $< |\
 		./wikipedia-deform.sh |\
 		tr -s ' ' '\n' |\
-		head -n 10000 > $@
+		head -n $(WORDS) > $@
 
 # to 1:1 recreate article results please be using --seed=15632753
 corp/en/automisp.words: corp/en/enwiki.$(WORDS).words
