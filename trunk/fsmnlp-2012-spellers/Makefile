@@ -20,7 +20,7 @@ FI_DICT=hfst/fi/omorfi-20110505.hfst
 KL_DICT=hfst/kl/kl.hfst
 
 TESTS=1 2 3 4 5
-WORDS=10
+WORDS=10000
 
 # article
 fsmnlp-2012-speedspelling.pdf: fsmnlp-2012-speedspelling.tex fsmnlp2012.bib
@@ -55,9 +55,9 @@ models: hfst/fi/errmodel.edit-distance-1.hfst \
 		hfst/en/errmodel.edit-distance-2-no-redundant.hfst \
 		hfst/fi/errmodel.edit-distance-2-no-redundant.hfst \
 		hfst/kl/errmodel.edit-distance-2-no-redundant.hfst \
-# 		hfst/en/errmodel.edit-distance-3-no-redundant.hfst \
-# 		hfst/fi/errmodel.edit-distance-3-no-redundant.hfst \
-# 		hfst/kl/errmodel.edit-distance-3-no-redundant.hfst \
+		hfst/en/errmodel.edit-distance-3-no-redundant.hfst \
+		hfst/fi/errmodel.edit-distance-3-no-redundant.hfst \
+		hfst/kl/errmodel.edit-distance-3-no-redundant.hfst \
 		hfst/fi/errmodel.edit-distance-1-no-initial.hfst \
 		hfst/en/errmodel.edit-distance-1-no-initial.hfst \
 		hfst/kl/errmodel.edit-distance-1-no-initial.hfst \
@@ -69,13 +69,14 @@ models: hfst/fi/errmodel.edit-distance-1.hfst \
 		hfst/kl/errmodel.edit-distance-3-no-initial.hfst \
 		hfst/en/errmodel.edit-distance-2-no-initial-no-redundant.hfst \
 		hfst/fi/errmodel.edit-distance-2-no-initial-no-redundant.hfst \
-		hfst/kl/errmodel.edit-distance-2-no-initial-no-redundant.hfst
-#		hfst/en/errmodel.edit-distance-3-no-initial-no-redundant.hfst \
-#		hfst/fi/errmodel.edit-distance-3-no-initial-no-redundant.hfst \
-#		hfst/kl/errmodel.edit-distance-3-no-initial-no-redundant.hfst
+		hfst/kl/errmodel.edit-distance-2-no-initial-no-redundant.hfst \
+		hfst/en/errmodel.edit-distance-3-no-initial-no-redundant.hfst \
+		hfst/fi/errmodel.edit-distance-3-no-initial-no-redundant.hfst \
+		hfst/kl/errmodel.edit-distance-3-no-initial-no-redundant.hfst
 
 
-tables:		results/table1.tex results/table2.tex results/table3.tex results/table4.tex
+tables:results/table1.tex results/table2.tex \
+	results/table3.tex results/table4.tex results/table5.tex
 
 clean-models:
 	rm hfst/fi/errmodel.edit-distance-1.hfst \
@@ -124,13 +125,13 @@ corp/kl/klwiki.$(WORDS).words: corp/kl/klwiki-20120214-pages-articles.xml
 
 # to 1:1 recreate article results please be using --seed=15632753
 corp/en/automisp.words: corp/en/enwiki.$(WORDS).words
-	python lines2misspell.py --input=$< --output=$@
+	python lines2misspell.py --seed=15632753 --input=$< --output=$@
 
 corp/fi/automisp.words: corp/fi/fiwiki.$(WORDS).words
-	python lines2misspell.py --input=$< --output=$@
+	python lines2misspell.py --seed=15632753 --input=$< --output=$@
 
 corp/kl/automisp.words: corp/kl/klwiki.$(WORDS).words
-	python lines2misspell.py --input=$< --output=$@
+	python lines2misspell.py --seed=15632753 --input=$< --output=$@
 
 # fetching / concocting dictionary automata from external sources
 big.txt:
@@ -342,15 +343,15 @@ TABLE1_DATA=\
 			results/en/table1.dict-norvig.errm-ed2-no-redundant.corp-wiki.tex \
 			results/fi/table1.dict-omorfi.errm-ed2-no-redundant.corp-wiki.tex \
 			results/kl/table1.dict-kl.errm-ed2-no-redundant.corp-wiki.tex \
-# 			results/en/table1.dict-norvig.errm-ed3-no-redundant.corp-wiki.tex \
-# 			results/fi/table1.dict-omorfi.errm-ed3-no-redundant.corp-wiki.tex \
-# 			results/kl/table1.dict-kl.errm-ed3-no-redundant.corp-wiki.tex \
+			results/en/table1.dict-norvig.errm-ed3-no-redundant.corp-wiki.tex \
+			results/fi/table1.dict-omorfi.errm-ed3-no-redundant.corp-wiki.tex \
+			results/kl/table1.dict-kl.errm-ed3-no-redundant.corp-wiki.tex \
 			results/en/table1.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
 			results/fi/table1.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
 			results/kl/table1.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
-# 			results/en/table1.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
-# 			results/fi/table1.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
-# 			results/kl/table1.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
+			results/en/table1.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
+			results/fi/table1.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
+			results/kl/table1.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
 			results/en/table1.dict-norvig.errm-fallback.corp-wiki.tex \
 			results/fi/table1.dict-omorfi.errm-fallback.corp-wiki.tex \
 			results/kl/table1.dict-kl.errm-fallback.corp-wiki.tex \
@@ -604,17 +605,17 @@ results/en/table1.dict-norvig.errm-ed3-no-redundant.corp-wiki.tex: corp/en/enwik
 
 results/fi/table1.dict-omorfi.errm-ed3-no-redundant.corp-wiki.tex: corp/fi/fiwiki.$(WORDS).words
 	echo > $@.tsv
-	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-3-no-redundant.hfst $(FI_DICT) < corp/fi/fiwiki.$(WORDS).words > /dev/null ;\
-	done
-	awk -f profile-times2tex.awk < $@.tsv > $@
+	#for i in $(TESTS) ; do \
+	#	hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-3-no-redundant.hfst $(FI_DICT) < corp/fi/fiwiki.$(WORDS).words > /dev/null ;\
+	#done
+	#awk -f profile-times2tex.awk < $@.tsv > $@
 
 results/kl/table1.dict-kl.errm-ed3-no-redundant.corp-wiki.tex: corp/kl/klwiki.$(WORDS).words
 	echo > $@.tsv
-	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.$(WORDS).words > /dev/null ;\
-	done
-	awk -f profile-times2tex.awk < $@.tsv > $@
+	#for i in $(TESTS) ; do \
+	#	hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.$(WORDS).words > /dev/null ;\
+	#done
+	#awk -f profile-times2tex.awk < $@.tsv > $@
 
 # Table 1, ED 2, no first and no redundancies
 
@@ -987,17 +988,17 @@ results/en/table2.dict-norvig.errm-ed3-no-redundant.corp-wiki.tex: corp/en/enwik
 
 results/fi/table2.dict-omorfi.errm-ed3-no-redundant.corp-wiki.tex: corp/fi/fiwiki.$(WORDS).words
 	echo > $@.tsv
-	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-3-no-redundant.hfst $(FI_DICT) < corp/fi/fiwiki.$(WORDS).words > /dev/null ;\
-	done
-	awk -f profile-mems2tex.awk < $@.tsv > $@
+	#for i in $(TESTS) ; do \
+	#	hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-3-no-redundant.hfst $(FI_DICT) < corp/fi/fiwiki.$(WORDS).words > /dev/null ;\
+	#done
+	#awk -f profile-mems2tex.awk < $@.tsv > $@
 
 results/kl/table2.dict-kl.errm-ed3-no-redundant.corp-wiki.tex: corp/kl/klwiki.$(WORDS).words
 	echo > $@.tsv
-	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.$(WORDS).words > /dev/null ;\
-	done
-	awk -f profile-mems2tex.awk < $@.tsv > $@
+	#for i in $(TESTS) ; do \
+	#	hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.$(WORDS).words > /dev/null ;\
+	#done
+	#awk -f profile-mems2tex.awk < $@.tsv > $@
 
 # Table 2, ED 2, no first and no redundancies
 

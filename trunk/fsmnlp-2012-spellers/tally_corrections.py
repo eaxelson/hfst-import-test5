@@ -58,4 +58,7 @@ for original_line in original_f.readlines():
     # we might have actually corrected it
     corrected_correctly += search_for_correct_correction(correct)
 
-print(float(corrected_correctly)/total)
+if total > 0:
+    print(float(corrected_correctly)/total)
+else:
+    print("?")
