@@ -189,17 +189,17 @@ hfst/kl/errmodel.edit-distance-2.hfst: hfst/kl/kl.hfst
 		hfst-fst2fst -v -f olw -o $@
 # Basic ED 3
 hfst/fi/errmodel.edit-distance-3.hfst: hfst/fi/omorfi-20110505.hfst
-	python editdist.py -s --no-elim -d 2 -a $< |\
+	python editdist.py -s --no-elim -d 3 -a $< |\
 		hfst-txt2fst -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-3.hfst: hfst/en/norvig.hfst
-	python editdist.py -s --no-elim -d 2 -a $< |\
+	python editdist.py -s --no-elim -d 3 -a $< |\
 		hfst-txt2fst -v |\
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/kl/errmodel.edit-distance-3.hfst: hfst/kl/kl.hfst
-	python editdist.py -s --no-elim -d 2 -a $< |\
+	python editdist.py -s --no-elim -d 3 -a $< |\
 		hfst-txt2fst -v |\
 		hfst-fst2fst -v -f olw -o $@
 
