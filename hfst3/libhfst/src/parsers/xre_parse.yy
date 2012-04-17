@@ -574,16 +574,49 @@ REGEXP8: REGEXP9 { }
             $$ = $2;
         }
        | CONTAINMENT REGEXP8 {
-            xreerror("No containment");
-            $$ = $2;
+            HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
+                                    hfst::internal_unknown,
+                                    hfst::xre::format);
+            HfstTransducer* right = new HfstTransducer(hfst::internal_unknown,
+                                    hfst::internal_unknown,
+                                    hfst::xre::format);
+            right->repeat_star();
+            left->repeat_star();
+            HfstTransducer* contain_once = 
+                & ((right->concatenate(*$2).concatenate(*left)));
+            $$ = & (contain_once->repeat_star());
+            delete $2;
+            delete left;
         }
        | CONTAINMENT_ONCE REGEXP8 {
-            xreerror("No containment once");
-            $$ = $2;
+            HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
+                                    hfst::internal_unknown,
+                                    hfst::xre::format);
+            HfstTransducer* right = new HfstTransducer(hfst::internal_unknown,
+                                    hfst::internal_unknown,
+                                    hfst::xre::format);
+            right->repeat_star();
+            left->repeat_star();
+            HfstTransducer* contain_once = 
+                & ((right->concatenate(*$2).concatenate(*left)));
+            $$ = contain_once;
+            delete $2;
+            delete left;
         }
        | CONTAINMENT_OPT REGEXP8 {
-            xreerror("No containment optionally");
-            $$ = $2;
+            HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
+                                    hfst::internal_unknown,
+                                    hfst::xre::format);
+            HfstTransducer* right = new HfstTransducer(hfst::internal_unknown,
+                                    hfst::internal_unknown,
+                                    hfst::xre::format);
+            right->repeat_star();
+            left->repeat_star();
+            HfstTransducer* contain_once = 
+                & ((right->concatenate(*$2).concatenate(*left)));
+            $$ = & (contain_once->optionalize());
+            delete $2;
+            delete left;
         }
        ;
 
@@ -623,8 +656,11 @@ REGEXP9: REGEXP10 { }
 
 REGEXP10: REGEXP11 { }
        | TERM_COMPLEMENT REGEXP10 {
-            xreerror("no term complement");
-            $$ = $2;
+            HfstTransducer* any = new HfstTransducer(hfst::internal_unknown,
+                                        hfst::internal_unknown,
+                                        hfst::xre::format);
+            $$ = & ( any->subtract(*$2));
+            delete $2;
         }
        | SUBSTITUTE_LEFT REGEXP10 COMMA REGEXP10 COMMA REGEXP10 RIGHT_BRACKET {
             xreerror("no substitute");
