@@ -213,13 +213,6 @@ CGOutputFormatter::process_final(const SymbolNumberVector& symbols, Capitalizati
     else
     {
       res << '"'; // after end of lexical form, now come any tags
-      // Print the full analysis string as well, as a CG subreading:
-      if(displayRawAnalysisInCG)
-      {
-        res << "\t" << token_stream.get_alphabet().symbols_to_string(
-          SymbolNumberVector(symbols.begin()+0,symbols.begin()+symbols.size()), caps);
-        res << " " << "‡";
-      }
       if(tag_start != symbols.size())
       {
         for(size_t i=tag_start; i<symbols.size(); i++)
@@ -240,6 +233,15 @@ CGOutputFormatter::process_final(const SymbolNumberVector& symbols, Capitalizati
           
           res << (i==tag_start?"\t":" ") << tag;
         }
+      }
+      // When -r option is given, print the full analysis string as well
+      // (as a specially prefixed tag):
+      if(displayRawAnalysisInCG)
+      {
+        res << " " << "+" << "∏" << '"';
+        res << token_stream.get_alphabet().symbols_to_string(
+          SymbolNumberVector(symbols.begin()+0,symbols.begin()+symbols.size()), caps);
+        res << '"';
       }
       
       break;
