@@ -19,7 +19,7 @@ cd debian/usr/bin;
 
 for tool in $HFST_PREFIX/bin/hfst-*;
 do
-    if (ldd $tool | grep "libhfst.so.12" > /dev/null) ; then
+    if (ldd $tool | grep "libhfst.so.17" > /dev/null) ; then
 	if ! (echo $tool | grep "2$" > /dev/null) && \
 	    ! (echo $tool | grep "3$" > /dev/null) && \
 	     ! (echo $tool | grep "\~" > /dev/null) ; then
@@ -49,9 +49,9 @@ cd ../../..
 
 cd debian/usr/lib/
 
-cp $HFST_PREFIX/lib/libhfst.so.12.0.0 .
-ln -s -T libhfst.so.12.0.0 libhfst.so.12
-ln -s -T libhfst.so.12 libhfst.so
+cp $HFST_PREFIX/lib/libhfst.so.17.0.0 .
+ln -s -T libhfst.so.17.0.0 libhfst.so.17
+ln -s -T libhfst.so.17 libhfst.so
 
 cp -P $HFST_PREFIX/lib/libhfstlexc.so.0.0.0 .
 ln -s -T libhfstlexc.so.0.0.0 libhfstlexc.so.0
