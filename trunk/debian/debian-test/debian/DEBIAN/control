@@ -1,10 +1,10 @@
 Package: hfst-dev
 Source: hfst
-Version: 3.3.5-1
+Version: 3.3.10-1
 Section: devel
 Priority: optional
 Architecture: amd64
-Provides: libhfstospell1, libhfstlexc0, libfst0, libfoma0, libsfst0
+Provides: libhfstospell1, libfst0, libfoma0, libsfst0
 Depends: libc6 (>= 1.1), libstdc++6 (>= 4.6.1)
 Maintainer: HFST team <hfst-info@sf.net>
 Description: HFST library and commandline tools

@@ -53,9 +53,9 @@ cp $HFST_PREFIX/lib/libhfst.so.17.0.0 .
 ln -s -T libhfst.so.17.0.0 libhfst.so.17
 ln -s -T libhfst.so.17 libhfst.so
 
-cp -P $HFST_PREFIX/lib/libhfstlexc.so.0.0.0 .
-ln -s -T libhfstlexc.so.0.0.0 libhfstlexc.so.0
-ln -s -T libhfstlexc.so.0 libhfstlexc.so
+#cp -P $HFST_PREFIX/lib/libhfstlexc.so.0.0.0 .
+#ln -s -T libhfstlexc.so.0.0.0 libhfstlexc.so.0
+#ln -s -T libhfstlexc.so.0 libhfstlexc.so
 
 cp -P $HFST_PREFIX/lib/libhfstospell.so.1.0.0 .
 ln -s -T libhfstospell.so.1.0.0 libhfstospell.so.1
