@@ -25,7 +25,7 @@ case $VARIANT in
         echo '</a></dt>'
         echo "$WORDFORM" |\
             hfst-lookup hfst/$LL/morphology.$VARIANT.hfstol 2>&1 |\
-            awk '{printf("<dd><a href=\"http://www.ling.helsinki.fi/cgi-bin/fiwn/search?wn=fi&w=%s&t=over&sm=Search\" title=\"search fiwn for Finnish %s\">%s</a></dd>\n", gensub(/+.*/, "", "g", $2), gensub(/+.*/, "", "g", $2), $2);}';
+            awk -F "\t" '{printf("<dd><a href=\"http://www.ling.helsinki.fi/cgi-bin/fiwn/search?wn=fi&w=%s&t=over&sm=Search\" title=\"search fiwn for Finnish %s\">%s</a></dd>\n", gensub(/+.*/, "", "g", $2), gensub(/+.*/, "", "g", $2), $2);}';
         echo '</dl>';;
     *)
         echo "<pre>";
