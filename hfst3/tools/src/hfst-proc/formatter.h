@@ -97,6 +97,7 @@ class CGOutputFormatter: public OutputFormatter
 
 class XeroxOutputFormatter: public OutputFormatter
 {
+  std::string process_final(const SymbolNumberVector& symbols, CapitalizationState caps) const;
  public:
   XeroxOutputFormatter(TokenIOStream& s, bool f): OutputFormatter(s,f) {}
   

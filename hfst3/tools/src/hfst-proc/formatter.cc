@@ -286,6 +286,53 @@ CGOutputFormatter::print_unknown_word(const TokenVector& surface_form) const
 
 //////////Function definitions for XeroxOutputFormatter
 
+std::string
+XeroxOutputFormatter::process_final(const SymbolNumberVector& symbols, CapitalizationState caps) const
+{
+  std::ostringstream res;
+  size_t start_pos = 0;
+  
+  while(start_pos < symbols.size())
+  {
+    size_t tag_start = symbols.size();
+    size_t compound_split = symbols.size();
+    for(size_t i=start_pos; i<symbols.size(); i++)
+    {
+      if(tag_start == symbols.size() &&
+         token_stream.get_alphabet().is_tag(symbols[i]))
+        tag_start = i;
+      
+      if(compound_split == symbols.size())
+      {
+        std::string s = token_stream.get_alphabet().symbol_to_string(symbols[i]);
+        if(s == "#" || s == "+" || s[s.length()-1] == '+')
+          compound_split = i;
+      }
+      
+      if(tag_start != symbols.size() && compound_split != symbols.size())
+        break;
+    }
+    
+    // grab the analysis
+    res << token_stream.get_alphabet().symbols_to_string(
+      SymbolNumberVector(symbols.begin()+start_pos,symbols.begin()+symbols.size()), caps);
+
+    // When -r option is given, print the full analysis string as well
+    // (as a specially prefixed tag):
+    if(displayRawAnalysisInCG)
+    {
+      res << "+" << "∏" << '"';
+      res << token_stream.get_alphabet().symbols_to_string(
+        SymbolNumberVector(symbols.begin()+0,symbols.begin()+symbols.size()), caps);
+      res << '"';
+    }
+    
+    break;
+  }
+  
+  return res.str();
+}
+
 std::set<std::string>
 XeroxOutputFormatter::process_finals(const LookupPathSet& finals, CapitalizationState caps) const
 {
@@ -295,11 +342,17 @@ XeroxOutputFormatter::process_finals(const LookupPathSet& finals, Capitalization
   for(LookupPathSet::const_iterator it=new_finals.begin(); it!=new_finals.end(); it++)
   {
     std::ostringstream res;
-    res << token_stream.get_alphabet().symbols_to_string((*it)->get_output_symbols(), caps);
+//    res << token_stream.get_alphabet().symbols_to_string((*it)->get_output_symbols(), caps);
+//    if(dynamic_cast<const LookupPathW*>(*it) != NULL && displayWeightsFlag)
+//      res << "\t" << dynamic_cast<const LookupPathW*>(*it)->get_weight();
+//    
+    results.insert(process_final((*it)->get_output_symbols(), caps));
+
+    // add weights if requested:
     if(dynamic_cast<const LookupPathW*>(*it) != NULL && displayWeightsFlag)
       res << "\t" << dynamic_cast<const LookupPathW*>(*it)->get_weight();
-    
     results.insert(res.str());
+
   }
   return results;
 }
