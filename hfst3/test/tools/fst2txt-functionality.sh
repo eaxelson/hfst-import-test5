@@ -10,9 +10,11 @@ for i in "" .sfst .ofst .foma; do
         if ! ../../tools/src/hfst-fst2txt -f dot < cat$i > test.txt ; then
             exit 1
         fi
-        if ! dot test.txt > /dev/null 2>&1 ; then
-            exit 1
-        fi
+	if which dot > /dev/null 2>&1 ; then
+            if ! dot test.txt > /dev/null 2>&1 ; then
+		exit 1
+            fi
+	fi
         rm test.txt;
     fi
 done
