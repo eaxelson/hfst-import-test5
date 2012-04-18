@@ -238,7 +238,7 @@ CGOutputFormatter::process_final(const SymbolNumberVector& symbols, Capitalizati
       // (as a specially prefixed tag):
       if(displayRawAnalysisInCG)
       {
-        res << " " << "+" << "∏" << '"';
+        res << " " << "∏" << '"';
         res << token_stream.get_alphabet().symbols_to_string(
           SymbolNumberVector(symbols.begin()+0,symbols.begin()+symbols.size()), caps);
         res << '"';
