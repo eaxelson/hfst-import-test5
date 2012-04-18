@@ -4,7 +4,7 @@ echo "[ a | e | i | o | u " \
      "| ã |         õ     " \
      "| à                 " \
      "|                 ü " \
-     "]" | hfst-regexp2fst -f $1 > Vowel
+     "]" | $2/hfst-regexp2fst -f $1 > Vowel
 
 echo  '[ s -> z || @"Vowel" _ @"Vowel" ]' \
 " .o. " \
@@ -36,6 +36,6 @@ echo  '[ s -> z || @"Vowel" _ @"Vowel" ]' \
   " .o. " \
   "[ t -> C || _ [ i | í ] ]" \
   " .o. " \
-  "[ z -> s || _ .#. ]" | hfst-regexp2fst -f $1 > BrazilianPortuguese2.hfst.hfst
+  "[ z -> s || _ .#. ]" | $2/hfst-regexp2fst -f $1 > BrazilianPortuguese2.hfst.hfst
 
 
