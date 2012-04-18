@@ -193,6 +193,10 @@ EOHEAD
     echo "  document.getElementById('wf').focus()"
     echo "}"
     echo "</script>"
+    # site may have additional html > head children
+    if test -r head.html ; then
+        cat head.html
+    fi
     # languages may have additional html > head children
     if test -r hfst/$LL/head.html ; then
         cat hfst/$LL/head.html
