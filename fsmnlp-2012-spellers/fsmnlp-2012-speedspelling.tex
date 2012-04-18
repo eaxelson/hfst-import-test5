@@ -237,7 +237,11 @@ this to be reasonable in finite-state systems as well, since it would typically
 appear that finite-state automata for dictionaries of natural languages have
 the most dense arc structure in the initial state of the automaton; excluding
 that from the application of errors will then give greatest improvements to
-search space minimising. On the error-model side this optimisation has been
+search space minimising. We have attempted to quantify this by restricting
+the dictionary in turn at positions in the input string and inspecting
+its remaining size (see table \ref{restricted_dictionary}).
+
+On the error-model side this optimisation has been
 justified by findings where only NNN \% of spelling-errors happen in the first
 character of the word\cite{Yannakoudakis/1983}. To further accommodate this
 optimisation to the structure of the morphologically complex languages we treat
@@ -566,6 +570,23 @@ Lower order first ed 1 to 2 &
 \end{center}
 \caption{\label{table:automata-sizes} The sizes of automata (nodes, then edges)}
 \end{table}
+
+\begin{table}[h]
+\begin{center}
+\begin{scriptsize}
+\begin{tabular}[|l|rrrr|]
+\hline
+\bf Point of restriction & \bf 1 & \bf 2 & \bf 3 & \bf 4 \\
+\hline
+\bf States \\
+\bf Arcs \\
+\hline
+\end{tabular}
+\caption{\label{restricted} The size of the dictionary after restriction at
+various points}
+\end{table}
+
+
 
 
 \section{Conclusions}
