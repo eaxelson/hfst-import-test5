@@ -3,7 +3,7 @@ Source: hfst
 Version: 3.3.10-1
 Section: devel
 Priority: optional
-Architecture: amd64
+Architecture: i386
 Provides: libhfstospell1, libfst0, libfoma0, libsfst0
 Depends: libc6 (>= 1.1), libstdc++6 (>= 4.6.1)
 Maintainer: HFST team <hfst-info@sf.net>
