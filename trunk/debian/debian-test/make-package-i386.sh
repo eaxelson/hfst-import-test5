@@ -6,7 +6,7 @@
 #
 
 HFST_PREFIX="/home/eaxelson/hfst-installation/"
-BACKEND_PREFIX="/"
+BACKEND_PREFIX="/usr/local/"
 SFST_PREFIX=$BACKEND_PREFIX"sfst"
 OPENFST_PREFIX=$BACKEND_PREFIX"openfst"
 FOMA_PREFIX=$BACKEND_PREFIX"foma"
@@ -57,7 +57,7 @@ ln -s -T libhfst.so.17 libhfst.so
 #ln -s -T libhfstlexc.so.0.0.0 libhfstlexc.so.0
 #ln -s -T libhfstlexc.so.0 libhfstlexc.so
 
-cp -P $HFST_PREFIX/lib/libhfstospell.so.1.0.0 .
+cp -P $BACKEND_PREFIX/lib/libhfstospell.so.1.0.0 .
 ln -s -T libhfstospell.so.1.0.0 libhfstospell.so.1
 ln -s -T libhfstospell.so.1 libhfstospell.so
 
@@ -72,7 +72,7 @@ ln -s -T libfst.so.0.0.0 libfst.so.0
 ln -s -T libfst.so.0 libfst.so
 
 # SFST
-cp $BACKEND_PREFIX/lib/libsfst.so.0.0.0 .
+cp $BACKEND_PREFIX/lib/libsfst.so libsfst.so.0.0.0
 rm -f libsfst.so libsfst.so.0
 ln -s -T libsfst.so.0.0.0 libsfst.so.0
 ln -s -T libsfst.so.0 libsfst.so
