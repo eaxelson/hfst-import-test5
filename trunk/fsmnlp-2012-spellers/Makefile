@@ -165,7 +165,7 @@ hfst/fi/errmodel.edit-distance-1.hfst: hfst/fi/omorfi-20110505.hfst
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-1.hfst: hfst/en/norvig.hfst
-	python editdist.py -s --no-elim -d 1 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ |\
+	python editdist.py -s --no-elim -d 1 abcdefghijklmnopqrstuvwxyz |\
 		hfst-txt2fst -v |\
 		hfst-fst2fst -v -f olw -o $@
 
@@ -180,7 +180,7 @@ hfst/fi/errmodel.edit-distance-2.hfst: hfst/fi/omorfi-20110505.hfst
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-2.hfst: hfst/en/norvig.hfst
-	python editdist.py -s --no-elim -d 2 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ |\
+	python editdist.py -s --no-elim -d 2 abcdefghijklmnopqrstuvwxyz |\
 		hfst-txt2fst -v |\
 		hfst-fst2fst -v -f olw -o $@
 
@@ -195,7 +195,7 @@ hfst/fi/errmodel.edit-distance-3.hfst: hfst/fi/omorfi-20110505.hfst
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-3.hfst: hfst/en/norvig.hfst
-	python editdist.py -s --no-elim -d 3 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ |\
+	python editdist.py -s --no-elim -d 3 abcdefghijklmnopqrstuvwxyz |\
 		hfst-txt2fst -v |\
 		hfst-fst2fst -v -f olw -o $@
 
@@ -211,7 +211,7 @@ hfst/fi/errmodel.edit-distance-2-no-redundant.hfst: hfst/fi/omorfi-20110505.hfst
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-2-no-redundant.hfst: hfst/en/norvig.hfst
-	python editdist.py -s -d 2 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ |\
+	python editdist.py -s -d 2 abcdefghijklmnopqrstuvwxyz |\
 		hfst-txt2fst -v |\
 		hfst-fst2fst -v -f olw -o $@
 
@@ -227,7 +227,7 @@ hfst/fi/errmodel.edit-distance-3-no-redundant.hfst: hfst/fi/omorfi-20110505.hfst
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-3-no-redundant.hfst: hfst/en/norvig.hfst
-	python editdist.py -s -d 3 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ |\
+	python editdist.py -s -d 3 abcdefghijklmnopqrstuvwxyz |\
 		hfst-txt2fst -v |\
 		hfst-fst2fst -v -f olw -o $@
 
@@ -243,7 +243,7 @@ hfst/fi/errmodel.edit-distance-1-no-initial.hfst: hfst/fi/omorfi-20110505.hfst
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-1-no-initial.hfst: hfst/en/norvig.hfst
-	python editdist.py -s --no-elim --no-string-initial-correction -d 1 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ |\
+	python editdist.py -s --no-elim --no-string-initial-correction -d 1 abcdefghijklmnopqrstuvwxyz |\
 		hfst-txt2fst -v |\
 		hfst-fst2fst -v -f olw -o $@
 
@@ -259,7 +259,7 @@ hfst/fi/errmodel.edit-distance-2-no-initial.hfst: hfst/fi/omorfi-20110505.hfst
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-2-no-initial.hfst: hfst/en/norvig.hfst
-	python editdist.py -s --no-elim --no-string-initial-correction -d 2 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ |\
+	python editdist.py -s --no-elim --no-string-initial-correction -d 2 abcdefghijklmnopqrstuvwxyz |\
 		hfst-txt2fst -v |\
 		hfst-fst2fst -v -f olw -o $@
 
@@ -275,7 +275,7 @@ hfst/fi/errmodel.edit-distance-3-no-initial.hfst: hfst/fi/omorfi-20110505.hfst
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-3-no-initial.hfst: hfst/en/norvig.hfst
-	python editdist.py -s --no-elim --no-string-initial-correction -d 3 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ |\
+	python editdist.py -s --no-elim --no-string-initial-correction -d 3 abcdefghijklmnopqrstuvwxyz |\
 		hfst-txt2fst -v |\
 		hfst-fst2fst -v -f olw -o $@
 
@@ -291,7 +291,7 @@ hfst/fi/errmodel.edit-distance-2-no-initial-no-redundant.hfst: hfst/fi/omorfi-20
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-2-no-initial-no-redundant.hfst: hfst/en/norvig.hfst
-	python editdist.py -s --no-string-initial-correction -d 2 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ |\
+	python editdist.py -s --no-string-initial-correction -d 2 abcdefghijklmnopqrstuvwxyz |\
 		hfst-txt2fst -v |\
 		hfst-fst2fst -v -f olw -o $@
 
@@ -307,7 +307,7 @@ hfst/fi/errmodel.edit-distance-3-no-initial-no-redundant.hfst: hfst/fi/omorfi-20
 		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-3-no-initial-no-redundant.hfst: hfst/en/norvig.hfst
-	python editdist.py -s --no-string-initial-correction -d 3 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ |\
+	python editdist.py -s --no-string-initial-correction -d 3 abcdefghijklmnopqrstuvwxyz |\
 		hfst-txt2fst -v |\
 		hfst-fst2fst -v -f olw -o $@
 
