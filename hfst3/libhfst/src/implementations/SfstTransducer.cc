@@ -588,7 +588,6 @@ namespace hfst { namespace implementations {
   
   Transducer * SfstTransducer::extract_input_language(Transducer * t)
   { 
-    t->complete_alphabet();
     Transducer * retval = &t->lower_level();
 
     // projection includes in the alphabet only symbols that
@@ -777,9 +776,11 @@ namespace hfst { namespace implementations {
     int last_index=0;
 
     std::vector<SFST::Node*> indexing;
-    t->nodeindexing(&indexing);
-    unsigned int number_of_nodes = (unsigned int)indexing.size();
-
+    std::pair<size_t, size_t> number_of_nodes_and_transitions = 
+      t->nodeindexing(&indexing);
+    unsigned int number_of_nodes = 
+      (unsigned int) number_of_nodes_and_transitions.first;
+    
     /* Whether a state has been visited. */
     std::vector<int> visited;
     visited.reserve(number_of_nodes);
@@ -1285,6 +1286,7 @@ int main(int argc, char * argv[])
     Transducer * t = SfstTransducer::define_transducer("a", "b");
 
     Transducer * t_input = SfstTransducer::extract_input_language(t);
+    std::cout << "#1.5" << std::endl;
     assert( does_sfst_alphabet_contain(t_input, "a") && 
         does_sfst_alphabet_contain(t_input, "b")  );
 
