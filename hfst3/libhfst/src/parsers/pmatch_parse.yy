@@ -184,7 +184,6 @@ REGEXP2: REPLACE
                std::pair<std::string,hfst::HfstTransducer*>($2,$3));
             $$ = $3;
         }
-       | INSERT { }
        | REPLACE RIGHT_CONTEXT {
             $$ = & $1->disjunct(*$2);
             delete $2;
@@ -560,7 +559,6 @@ REGEXP5: REGEXP6 { }
             $$ = $1;
             delete $3;
         }
-       | INSERT { }
        ;
 
 REGEXP6: REGEXP7 { }
@@ -568,7 +566,6 @@ REGEXP6: REGEXP7 { }
         $$ = & $1->concatenate(*$2);
         delete $2;
         }
-       | INSERT { }
        ;
 
 REGEXP7: REGEXP8 { }
@@ -587,7 +584,6 @@ REGEXP7: REGEXP8 { }
             $$ = $1;
             delete $3;
         }
-       | INSERT { }
 
        ;
 
@@ -675,6 +671,8 @@ REGEXP9: REGEXP10 { }
             $$ = & $1->repeat_n_to_k($2[0], $2[1]);
             free($2);
         }
+       | INSERT { }
+
        ;
 
 REGEXP10: REGEXP11 { }
