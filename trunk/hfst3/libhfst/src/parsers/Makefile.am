@@ -21,16 +21,20 @@ XRE_SRCS=xre_lex.ll xre_parse.yy xre_utils.cc XreCompiler.cc
 XRE_HDRS=XreCompiler.h xre_utils.h
 XRE_BUILT=xre_parse.h
 
+PMATCH_SRCS=pmatch_lex.ll pmatch_parse.yy pmatch_utils.cc PmatchCompiler.cc
+PMATCH_HDRS=PmatchCompiler.h pmatch_utils.h
+PMATCH_BUILT=pmatch_parse.h
+
 LEXC_SRCS=lexc-lexer.ll lexc-parser.yy lexc-utils.cc LexcCompiler.cc
 LEXC_HDRS=LexcCompiler.h lexc-utils.h
 LEXC_BUILT=lexc-parser.h
 
-BUILT_SOURCES=$(XRE_BUILT) $(LEXC_BUILT)
+BUILT_SOURCES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT)
 
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
-libhfstparsers_la_SOURCES=$(SFST_SRCS) $(XRE_SRCS) $(LEXC_SRCS)
+libhfstparsers_la_SOURCES=$(SFST_SRCS) $(XRE_SRCS) $(PMATCH_SRCS) $(LEXC_SRCS)
 
 AM_CPPFLAGS=-I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/libhfst/src
 
@@ -38,15 +42,18 @@ AM_CPPFLAGS=-I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/libhfst/src
 hfstincludedir = $(includedir)/hfst
 extincludedir = $(hfstincludedir)/parsers
 
-extinclude_HEADERS = $(XRE_HDRS) $(LEXC_HDRS)
+extinclude_HEADERS = $(XRE_HDRS) $(PMATCH_HDRS) $(LEXC_HDRS)
 
-LIBHFST_PARSER_TSTS=XreCompiler
+LIBHFST_PARSER_TSTS=XreCompiler PmatchCompiler
 
 check_PROGRAMS=$(LIBHFST_PARSER_TSTS)
 
 XreCompiler_SOURCES=XreCompiler.cc xre_utils.cc xre_parse.yy xre_lex.ll
 XreCompiler_CXXFLAGS=-DUNIT_TEST
 XreCompiler_LDADD=../libhfst.la
+PmatchCompiler_SOURCES=PmatchCompiler.cc pmatch_utils.cc pmatch_parse.yy pmatch_lex.ll
+PmatchCompiler_CXXFLAGS=-DUNIT_TEST
+PmatchCompiler_LDADD=../libhfst.la
 #LexcCompiler_SOURCES=LexcCompiler.cc lexc-utils.cc lexc-parser.yy lexc-lexer.ll
 #LexcCompiler_CXXFLAGS=-DUNIT_TEST
 #LexcCompiler_LDADD=../libhfst.la

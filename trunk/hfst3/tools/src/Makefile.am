@@ -106,6 +106,9 @@ endif
 if WANT_REGEXP2FST
 MAYBE_REGEXP2FST=hfst-regexp2fst
 endif
+if WANT_PMATCH2FST
+MAYBE_PMATCH2FST=hfst-pmatch2fst
+endif
 if WANT_REMOVE_EPSILONS
 MAYBE_REMOVE_EPSILONS=hfst-remove-epsilons
 endif
@@ -180,6 +183,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_OPTIMIZED_LOOKUP)                                  \
 			 $(MAYBE_PROJECT) $(MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP)  \
 			 $(MAYBE_PUSH_WEIGHTS) $(MAYBE_REGEXP2FST)                  \
+			 $(MAYBE_PMATCH2FST)					    \
 			 $(MAYBE_REMOVE_EPSILONS) $(MAYBE_REPEAT) $(MAYBE_REVERSE)  \
 			 $(MAYBE_REWEIGHT)                                          \
 			 $(MAYBE_SPLIT) $(MAYBE_STRINGS2FST) $(MAYBE_STRIP_HEADER)  \
@@ -231,8 +235,7 @@ hfst_preprocess_for_optimized_lookup_format_SOURCES=hfst-preprocess-for-optimize
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
 hfst_push_weights_SOURCES=hfst-push-weights.cc $(HFST_COMMON_SRC)
 hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc $(HFST_COMMON_SRC)
-#						parsers/XreCompiler.cc parsers/xre_parse.yy \
-#						parsers/xre_lex.ll parsers/xre_utils.cc
+hfst_pmatch2fst_SOURCES=hfst-pmatch2fst.cc $(HFST_COMMON_SRC)
 hfst_remove_epsilons_SOURCES=hfst-remove-epsilons.cc $(HFST_COMMON_SRC)
 hfst_repeat_SOURCES=hfst-repeat.cc $(HFST_COMMON_SRC)
 hfst_reverse_SOURCES=hfst-reverse.cc $(HFST_COMMON_SRC)
