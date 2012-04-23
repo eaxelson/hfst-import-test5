@@ -283,6 +283,12 @@ AC_ARG_ENABLE([regexp2fst],
 			  [enable_regexp2fst=$enableval],
 			  [enable_regexp2fst=yes])
 AM_CONDITIONAL([WANT_REGEXP2FST], [test x$enable_regexp2fst != xno])
+AC_ARG_ENABLE([pmatch2fst],
+			  [AS_HELP_STRING([--enable-pmatch2fst],
+							  [build pmatch2fst tool @<:@default=yes@:>@])],
+			  [enable_pmatch2fst=$enableval],
+			  [enable_pmatch2fst=yes])
+AM_CONDITIONAL([WANT_PMATCH2FST], [test x$enable_pmatch2fst != xno])
 AC_ARG_ENABLE([remove_epsilons],
 			  [AS_HELP_STRING([--enable-remove-epsilons],
 							  [build remove-epsilons tool @<:@default=yes@:>@])],
@@ -537,6 +543,7 @@ cat <<EOF
     *                 project: $enable_project
     *                 push-weights: $enable_push_weights
     *                 regexp2fst: $enable_regexp2fst
+    *                 pmatch2fst: $enable_pmatch2fst
     *                 remove-epsilons: $enable_remove_epsilons
     *                 repeat: $enable_repeat
     *                 reverse: $enable_reverse
