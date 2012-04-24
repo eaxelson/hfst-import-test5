@@ -5,11 +5,11 @@
 #  -------------------------------------------------
 #
 
-HFST_PREFIX="/home/eaxelson/hfst-installation/"
-BACKEND_PREFIX="/"
-SFST_PREFIX=$BACKEND_PREFIX"sfst"
-OPENFST_PREFIX=$BACKEND_PREFIX"openfst"
-FOMA_PREFIX=$BACKEND_PREFIX"foma"
+HFST_PREFIX="/usr/local/"
+BACKEND_PREFIX="/usr/local/"
+SFST_PREFIX=$BACKEND_PREFIX
+OPENFST_PREFIX=$BACKEND_PREFIX
+FOMA_PREFIX=$BACKEND_PREFIX
 
 # -------------------
 # Copy the HFST tools
