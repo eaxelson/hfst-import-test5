@@ -317,7 +317,8 @@ second number is the amount of edges.
 Sigma set size &
  43& 117& 133
 \\
-\\
+Dictionary sizes &
+ 49778, 86523& 286719, 783461& 628177, 11596911 \\
 \hline
 \end{tabular}
 \end{scriptsize}
@@ -327,40 +328,48 @@ The sizes of dictionaries as automata}
 \end{table}
 
 In the Table~\ref{table:error-sizes} we give the sizes of error models we've
-generated.
+generated. The sigma set size row shows the reduction made for the error models,
+we have removed the parts of alphabet from the error models that is usually not
+considered to be part of spell-checking mechanism, such as all punctuation that
+does not occur word-internally.
 
 \begin{table}[h]
 \begin{center}
 \begin{scriptsize}
 \begin{tabular}{|l|rrrr|}
 \hline
+\bf Automaton & \bf En & \bf Fi & \bf Kl  \\ 
+\hline
+Sigma set size &
+ 28& 60& 64
+\\
 Edit distance 1 &
- 1809, 81487,& 15254, 1922373,& 17032, 2265646,
+ 652, 2081,& 3308, 10209,& 3784, 11657,
 \\
 Edit distance 2 &
- 3615, 3657539,& 30507, 242141870,& 34063, 301244851,
+ 1303, 4136,& 6615, 20360,& 7567, 23252,
 \\
 Edit distance 3 &
- 3615, 3657539,& 30507, 242141870,& 34063, 301244851,
+ 1954, 6191,& 9922, 30511,& 11350, 34847,
 \\
-No firsts ed 1 & 
- 1, 43,& 1, 124,& 1, 131,
+No first edits ed 1 & 
+ 2, 52,& 2, 116,& 2, 124,
 \\
-No firsts ed 2 &
- 1, 43,& 1, 124,& 1, 131,
+No first edits ed 2 &
+ 653, 2107,& 3309, 10267,& 3785, 11719,
 \\
-No firsts ed 3 &
- 1, 43,& 1, 124,& 1, 131,
+No first edits ed 3 &
+ 1304, 4162,& 6616, 20418,& 7568, 23314,
 \\
-No redundancy or firsts ed 2 &
- 1, 43,& 1, 124,& 1, 131,
+Avoid redundancy and first edits ed 2 &
+ 653, 2107,& 3309, 10267,& 3785, 11719,
 \\
-No redundancy or firsts ed 3 &
- 1, 43,& 1, 124,& 1, 131,
+Avoid redundancy and first edits ed 3 &
+ 2606, 44047,& 13230, 434191,& 15134, 526879,
 \\
 Lower order first ed 1 to 2 &
 &&
-
+\\
 \end{tabular}
 \end{scriptsize}
 \end{center}
@@ -427,38 +436,38 @@ codes to denote the languages: \emph{en} for English, \emph{fi} for Finnish and
 \bf Error model & \bf En & \bf Fi & \bf Kl \\ 
 \hline
 Reference impl. &
-10.59&7.94
+9.99&8.01
 & --- \\
 Generate all edits 2 & 
-41.79&1060.71&1345.17
+17.12&535.21&164.71
 \\
 \hline
 Edit distance 1 &
-0.40 &8.32&6.34
+0.26&6.69&4.72
 \\
 Edit distance 2 &
-11.22&346.63&726.70
+7.51&222.23&560.26
 \\
 Edit distance 3 &
-11.25&349.09&752.58
+141.00&7343.21&too long
 \\
-No firsts ed 1 & 
-0.32&1.74&1.48
+No first edits ed 1 & 
+0.29&1.06&1.44
 \\
-No firsts ed 2 &
-0.31&1.64&1.46
+No first edits ed 2 &
+0.10&3.19&3.50
 \\
-No firsts ed 3 &
-0.31&1.68&1.48
+No first edits ed 3 &
+1.41&too long&too long
 \\
-No redundancy or firsts ed 2 &
-0.24&1.17&1.46
+Avoid redundancy and first edits ed 2 &
+0.10&3.19&3.47
 \\
-No redundancy or firsts ed 3 &
-0.30&1.26&1.43
+Avoid redundancy and first edits ed 3 &
+7.59&1097.81&3660.46
 \\
 Lower order first ed 1 to 2 &
-5.49&193.10&676.70
+29.69&2946.54&5298.49
 \\
 \hline
 \end{tabular}
@@ -480,34 +489,32 @@ models as with previous tests.
 \hline
 \bf Error model & \bf En & \bf Fi & \bf Kl \\ 
 \hline
-Reference impl.   & & & --- \\
-\hline
 Edit distance 1 &
-19 kiB&365 kiB&1774 kiB
+13.5 MiB&217.6 MiB&1601.3 MiB
 \\
 Edit distance 2 &
-189 kiB&12158 kiB&15911 kiB
+13.6 MiB&218.1 MiB&1601.9 MiB
 \\
 Edit distance 3 &
-189 kiB&12158 kiB&15911 kiB
+17.1 MiB&1293.4 MiB&too much
 \\
-No first ed 1 & 
-13 kiB&2170 kiB&1600 kiB
+No firsts ed 1 & 
+13.4 MiB&217.1 MiB&1600.7 MiB
 \\
-No first ed 2 &
-13 kiB&2170 kiB&1600 kiB
+No firsts ed 2 &
+13.5 MiB&217.6 MiB&1601.3 MiB
 \\
-No first ed 3 &
-13 kiB&2170 kiB&1600 kiB
+No firsts ed 3 &
+13.6 MiB&218.1 MiB&1601.9 MiB
 \\
 No redundancy or firsts ed 2 &
-13 kiB&2170 kiB&1600 kiB
+13.5 MiB&217.6 MiB&1601.3 MiB
 \\
 No redundancy or firsts ed 3 &
-13 kiB&2170 kiB&1600 kiB
+15.2 MiB&456.4 MiB&too much
 \\
 Lower order first ed 1 to 2 &
-195 kiB&12308 kiB&16086 kiB
+16.2 MiB&480.4 MiB&too much
 \\
 \hline
 \end{tabular}
@@ -533,36 +540,30 @@ indicated in parentheses.
 \hline
 \bf Error model & \bf En & \bf Fi & \bf Kl\\ 
 \hline
-Reference impl.   & & & --- \\
-Generate all edits 2 &
-\\
 \hline
 Edit distance 1 &
-0.91&0.88&0.86
+?&1.0&?
 \\
 Edit distance 2 &
-0.99&0.99&1.0
+?&1.0&?
 \\
 Edit distance 3 &
-0.99&0.99&1.0
+?&1.0&?
 \\
 No first edits ed 1 & 
-0.0&0.0&0.0
+?&0.0&?
 \\
 No first edits ed 2 &
-0.0&0.0&0.0
+?&1.0&?
 \\
 No first edits ed 3 &
-0.0&0.0&0.0
+?&1.0&?
 \\
 Avoid redundancy and first edits ed 2 &
-0.0&0.0&0.0
 \\
 Avoid redundancy and first edits ed 3 &
-0.0&0.0&0.0
 \\
 Lower order first ed 1 to 2 &
-0.0&0.0&0.0
 \\
 \hline
 \end{tabular}
@@ -593,13 +594,13 @@ the best speed/quality ratio in the previous tests.
 \bf Error model & \bf En & \bf Fi & \bf Kl  \\ 
 \hline
 Native Lang. Corpus &
-9.76&299.06&737.58
+0.10&3.19&3.47
 \\
 Added automatic errors &
-33.33&2596.35&978.79
+0.33&0.23&1.44
 \\
 Text in another language &
-28.07&1079.40&1237.19
+22.82&7.66&5.19
 \\
 \hline
 \end{tabular}

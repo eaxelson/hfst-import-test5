@@ -76,7 +76,8 @@ models: hfst/fi/errmodel.edit-distance-1.hfst \
 
 
 tables:results/table1.tex results/table2.tex \
-	results/table3.tex results/table4.tex results/table5.tex
+	results/table3.tex results/table4.tex results/table5.tex \
+	results/table6.tex
 
 clean-models:
 	rm hfst/fi/errmodel.edit-distance-1.hfst \
@@ -371,58 +372,58 @@ results/table1.tex: $(TABLE1_DATA)
 	echo "Reference impl. &" > $@
 	paste -d '&' results/en/table1.dict-hunspell.errm-hunspell.corp-wiki.tex \
 		results/fi/table1.dict-voikko.errm-voikko.corp-wiki.tex >> $@
-	echo "& --- & en: hunspell, fi: voikko, kl: ---  \\\\\\\\" >> $@
+	echo "& --- \\\\\\\\" >> $@
 	echo "Generate all edits 2 & " >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed2.corp-wiki.generate-all.tex \
 		results/fi/table1.dict-omorfi.errm-ed2.corp-wiki.generate-all.tex \
 		results/kl/table1.dict-kl.errm-ed2.corp-wiki.generate-all.tex >> $@
-	echo "& \\\\\\\\" >> $@
+	echo "\\\\\\\\" >> $@
 	echo "\\hline" >> $@
 	echo "Edit distance 1 &" >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex \
 		results/fi/table1.dict-omorfi.errm-ed1.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-ed1.corp-wiki.tex >> $@
-	echo "& \\\\\\\\" >> $@
+	echo "\\\\\\\\" >> $@
 	echo "Edit distance 2 &" >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed2.corp-wiki.tex \
 		results/fi/table1.dict-omorfi.errm-ed2.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-ed2.corp-wiki.tex >> $@
-	echo "& \\\\\\\\" >> $@
+	echo "\\\\\\\\" >> $@
 	echo "Edit distance 3 &" >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed3.corp-wiki.tex \
 		results/fi/table1.dict-omorfi.errm-ed3.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-ed3.corp-wiki.tex >> $@
-	echo "& \\\\\\\\" >> $@
+	echo "\\\\\\\\" >> $@
 	echo "No first edits ed 1 & " >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed1-no-initial.corp-wiki.tex \
 		results/fi/table1.dict-omorfi.errm-ed1-no-initial.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-ed1-no-initial.corp-wiki.tex >> $@
-	echo "& \\\\\\\\" >> $@
+	echo "\\\\\\\\" >> $@
 	echo "No first edits ed 2 &" >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed2-no-initial.corp-wiki.tex \
 		results/fi/table1.dict-omorfi.errm-ed2-no-initial.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-ed2-no-initial.corp-wiki.tex >> $@
-	echo "& \\\\\\\\" >> $@
+	echo "\\\\\\\\" >> $@
 	echo "No first edits ed 3 &" >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed3-no-initial.corp-wiki.tex \
 		results/fi/table1.dict-omorfi.errm-ed3-no-initial.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-ed3-no-initial.corp-wiki.tex >> $@
-	echo "& \\\\\\\\" >> $@
+	echo "\\\\\\\\" >> $@
 	echo "Avoid redundancy and first edits ed 2 &" >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
 		results/fi/table1.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex >> $@
-	echo "& \\\\\\\\" >> $@
+	echo "\\\\\\\\" >> $@
 	echo "Avoid redundancy and first edits ed 3 &" >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
 		results/fi/table1.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex >> $@
-	echo "& \\\\\\\\" >> $@
+	echo "\\\\\\\\" >> $@
 	echo "Lower order first ed 1 to 2 &" >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-fallback.corp-wiki.tex \
 		results/fi/table1.dict-omorfi.errm-fallback.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-fallback.corp-wiki.tex >> $@
-	echo "& \\\\\\\\" >> $@
+	echo "\\\\\\\\" >> $@
 
 
 # Table 1, ED 1
@@ -802,32 +803,32 @@ results/table2.tex: $(TABLE2_DATA)
 	paste -d '&' results/en/table2.dict-norvig.errm-ed1-no-initial.corp-wiki.tex \
 		results/fi/table2.dict-omorfi.errm-ed1-no-initial.corp-wiki.tex \
 		results/kl/table2.dict-kl.errm-ed1-no-initial.corp-wiki.tex >> $@
-	echo "& \\\\\\\\" >> $@
+	echo "\\\\\\\\" >> $@
 	echo "No firsts ed 2 &" >> $@
 	paste -d '&' results/en/table2.dict-norvig.errm-ed2-no-initial.corp-wiki.tex \
 		results/fi/table2.dict-omorfi.errm-ed2-no-initial.corp-wiki.tex \
 		results/kl/table2.dict-kl.errm-ed2-no-initial.corp-wiki.tex >> $@
-	echo "& \\\\\\\\" >> $@
+	echo "\\\\\\\\" >> $@
 	echo "No firsts ed 3 &" >> $@
 	paste -d '&' results/en/table2.dict-norvig.errm-ed3-no-initial.corp-wiki.tex \
 		results/fi/table2.dict-omorfi.errm-ed3-no-initial.corp-wiki.tex \
 		results/kl/table2.dict-kl.errm-ed3-no-initial.corp-wiki.tex >> $@
-	echo "& \\\\\\\\" >> $@
+	echo "\\\\\\\\" >> $@
 	echo "No redundancy or firsts ed 2 &" >> $@
 	paste -d '&' results/en/table2.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
 		results/fi/table2.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
 		results/kl/table2.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex >> $@
-	echo "& \\\\\\\\" >> $@
+	echo "\\\\\\\\" >> $@
 	echo "No redundancy or firsts ed 3 &" >> $@
 	paste -d '&' results/en/table2.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
 		results/fi/table2.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
 		results/kl/table2.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex >> $@
-	echo "& \\\\\\\\" >> $@
+	echo "\\\\\\\\" >> $@
 	echo "Lower order first ed 1 to 2 &" >> $@
 	paste -d '&' results/en/table2.dict-norvig.errm-fallback.corp-wiki.tex \
 		results/fi/table2.dict-omorfi.errm-fallback.corp-wiki.tex \
 		results/kl/table2.dict-kl.errm-fallback.corp-wiki.tex >> $@
-	echo "& \\\\\\\\" >> $@
+	echo "\\\\\\\\" >> $@
 
 
 # Table 2, ED 1
@@ -1081,10 +1082,11 @@ results/fi/table2.dict-omorfi.errm-fallback.corp-wiki.tex: corp/fi/fiwiki.$(WORD
 
 results/kl/table2.dict-kl.errm-fallback.corp-wiki.tex: corp/kl/klwiki.$(WORDS).words
 	echo > $@.tsv
-	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1.hfst hfst/kl/errmodel.edit-distance-2-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.$(WORDS).words > /dev/null ;\
-	done
-	awk -f profile-mems2tex.awk < $@.tsv > $@
+	echo "too much" > $@
+	#for i in $(TESTS) ; do \
+	#	hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1.hfst hfst/kl/errmodel.edit-distance-2-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.$(WORDS).words > /dev/null ;\
+	#done
+	#awk -f profile-mems2tex.awk < $@.tsv > $@
 
 # Table 3 (quality)
 
@@ -1150,19 +1152,19 @@ results/table3.tex: $(TABLE3_DATA)
 		results/kl/table3.dict-kl.errm-ed3-no-initial.corp-wiki.tex >> $@
 	echo "\\\\\\\\" >> $@
 	echo "Avoid redundancy and first edits ed 2 &" >> $@
-	#paste -d '&' results/en/table3.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
-	#	results/fi/table3.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
-	#	results/kl/table3.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex >> $@
+	paste -d '&' results/en/table3.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
+		results/fi/table3.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
+		results/kl/table3.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex >> $@
 	echo "\\\\\\\\" >> $@
 	echo "Avoid redundancy and first edits ed 3 &" >> $@
-	#paste -d '&' results/en/table3.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
-	#	results/fi/table3.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
-	#	results/kl/table3.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex >> $@
+	paste -d '&' results/en/table3.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
+		results/fi/table3.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
+		results/kl/table3.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex >> $@
 	echo "\\\\\\\\" >> $@
 	echo "Lower order first ed 1 to 2 &" >> $@
-	#paste -d '&' results/en/table3.dict-norvig.errm-fallback.corp-wiki.tex \
-	#	results/fi/table3.dict-omorfi.errm-fallback.corp-wiki.tex \
-	#	results/kl/table3.dict-kl.errm-fallback.corp-wiki.tex >> $@
+	paste -d '&' results/en/table3.dict-norvig.errm-fallback.corp-wiki.tex \
+		results/fi/table3.dict-omorfi.errm-fallback.corp-wiki.tex \
+		results/kl/table3.dict-kl.errm-fallback.corp-wiki.tex >> $@
 	echo "\\\\\\\\" >> $@
 
 
@@ -1290,74 +1292,74 @@ results/kl/table3.dict-kl.errm-ed3-no-initial.corp-wiki.tex: corp/kl/automisp.wo
 # Table 4 (text type vs. speed)
 
 TABLE4_DATA=\
-			results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex\
-			results/fi/table4.dict-omorfi.errm-ed2-no-redundant.corp-wiki-automispelled.tex\
-			results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-automispelled.tex \
-			results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-wronglang.tex\
-			results/fi/table4.dict-omorfi.errm-ed2-no-redundant.corp-wiki-wronglang.tex\
-			results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-wronglang.tex
+			results/en/table4.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki-automispelled.tex\
+			results/fi/table4.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki-automispelled.tex\
+			results/kl/table4.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki-automispelled.tex \
+			results/en/table4.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki-wronglang.tex\
+			results/fi/table4.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki-wronglang.tex\
+			results/kl/table4.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki-wronglang.tex
 
 results/table4.tex: $(TABLE1_DATA) $(TABLE4_DATA)
 	# this baseline is from test table 1
 	echo "Native Lang. Corpus &" > $@
-	paste -d '&' results/en/table1.dict-norvig.errm-ed2-no-redundant.corp-wiki.tex \
-		results/fi/table1.dict-omorfi.errm-ed2-no-redundant.corp-wiki.tex \
-		results/kl/table1.dict-kl.errm-ed2-no-redundant.corp-wiki.tex >> $@
+	paste -d '&' results/en/table1.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
+		results/fi/table1.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
+		results/kl/table1.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex >> $@
 	echo "\\\\\\\\" >> $@
 	echo "Added automatic errors &" >> $@
-	paste -d '&' results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex \
-		results/fi/table4.dict-omorfi.errm-ed2-no-redundant.corp-wiki-automispelled.tex \
-		results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-automispelled.tex >> $@
+	paste -d '&' results/en/table4.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki-automispelled.tex \
+		results/fi/table4.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki-automispelled.tex \
+		results/kl/table4.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki-automispelled.tex >> $@
 	echo "\\\\\\\\" >> $@
 	echo "Text in another language &" >> $@
-	paste -d '&' results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-wronglang.tex \
-		results/fi/table4.dict-omorfi.errm-ed2-no-redundant.corp-wiki-wronglang.tex \
-		results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-wronglang.tex >> $@
+	paste -d '&' results/en/table4.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki-wronglang.tex \
+		results/fi/table4.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki-wronglang.tex \
+		results/kl/table4.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki-wronglang.tex >> $@
 	echo "\\\\\\\\" >> $@
 
 # Automispelled
 
-results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex: corp/en/automisp.words
+results/en/table4.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki-automispelled.tex: corp/en/automisp.words
 	echo > $@.tsv
 	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-2.hfst hfst/en/norvig.hfst < corp/en/automisp.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-2-no-initial-no-redundant.hfst hfst/en/norvig.hfst < corp/en/automisp.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/fi/table4.dict-omorfi.errm-ed2-no-redundant.corp-wiki-automispelled.tex: corp/fi/automisp.words
+results/fi/table4.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki-automispelled.tex: corp/fi/automisp.words
 	echo > $@.tsv
 	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-2-no-redundant.hfst $(FI_DICT) < corp/fi/automisp.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-2-no-initial-no-redundant.hfst $(FI_DICT) < corp/fi/automisp.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-automispelled.tex: corp/kl/automisp.words
+results/kl/table4.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki-automispelled.tex: corp/kl/automisp.words
 	echo > $@.tsv
 	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-redundant.hfst $(KL_DICT) < corp/kl/automisp.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-initial-no-redundant.hfst $(KL_DICT) < corp/kl/automisp.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
 # Wrong language
 
-results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-wronglang.tex: corp/fi/fiwiki.$(WORDS).words
+results/en/table4.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki-wronglang.tex: corp/fi/fiwiki.$(WORDS).words
 	echo > $@.tsv
 	for i in $(TESTS) ; do \
 		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-2.hfst hfst/en/norvig.hfst < corp/fi/fiwiki.$(WORDS).words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/fi/table4.dict-omorfi.errm-ed2-no-redundant.corp-wiki-wronglang.tex: corp/kl/klwiki.$(WORDS).words
+results/fi/table4.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki-wronglang.tex: corp/kl/klwiki.$(WORDS).words
 	echo > $@.tsv
 	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-2-no-redundant.hfst $(FI_DICT) < corp/kl/klwiki.$(WORDS).words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-2-no-initial-no-redundant.hfst $(FI_DICT) < corp/kl/klwiki.$(WORDS).words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-wronglang.tex: corp/fi/automisp.words
+results/kl/table4.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki-wronglang.tex: corp/fi/automisp.words
 	echo > $@.tsv
 	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-redundant.hfst $(KL_DICT) < corp/fi/fiwiki.$(WORDS).words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-initial-no-redundant.hfst $(KL_DICT) < corp/fi/fiwiki.$(WORDS).words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
@@ -1373,36 +1375,36 @@ TABLE5_DATA=\
 TABLE6_DATA=results/en/table6.errmodel.edit-distance-1.sigmasetsize\
 			results/fi/table6.errmodel.edit-distance-1.sigmasetsize\
 			results/kl/table6.errmodel.edit-distance-1.sigmasetsize\
-			results/en/table5.errmodel.edit-distance-1.sizes \
-			results/en/table5.errmodel.edit-distance-1-no-initial.sizes \
-			results/en/table5.errmodel.edit-distance-2.sizes \
-			results/en/table5.errmodel.edit-distance-2-no-initial.sizes \
-			results/en/table5.errmodel.edit-distance-2-no-initial-no-redundant.sizes \
-			results/en/table5.errmodel.edit-distance-2-no-redundant.sizes \
-			results/en/table5.errmodel.edit-distance-3.sizes \
-			results/en/table5.errmodel.edit-distance-3-no-initial.sizes \
-			results/en/table5.errmodel.edit-distance-3-no-initial-no-redundant.sizes \
-			results/en/table5.errmodel.edit-distance-3-no-redundant.sizes \
-			results/fi/table5.errmodel.edit-distance-1.sizes \
-			results/fi/table5.errmodel.edit-distance-1-no-initial.sizes \
-			results/fi/table5.errmodel.edit-distance-2.sizes \
-			results/fi/table5.errmodel.edit-distance-2-no-initial.sizes \
-			results/fi/table5.errmodel.edit-distance-2-no-initial-no-redundant.sizes \
-			results/fi/table5.errmodel.edit-distance-2-no-redundant.sizes \
-			results/fi/table5.errmodel.edit-distance-3.sizes \
-			results/fi/table5.errmodel.edit-distance-3-no-initial.sizes \
-			results/fi/table5.errmodel.edit-distance-3-no-initial-no-redundant.sizes \
-			results/fi/table5.errmodel.edit-distance-3-no-redundant.sizes \
-			results/kl/table5.errmodel.edit-distance-1.sizes \
-			results/kl/table5.errmodel.edit-distance-1-no-initial.sizes \
-			results/kl/table5.errmodel.edit-distance-2.sizes \
-			results/kl/table5.errmodel.edit-distance-2-no-initial.sizes \
-			results/kl/table5.errmodel.edit-distance-2-no-initial-no-redundant.sizes \
-			results/kl/table5.errmodel.edit-distance-2-no-redundant.sizes \
-			results/kl/table5.errmodel.edit-distance-3.sizes \
-			results/kl/table5.errmodel.edit-distance-3-no-initial.sizes \
-			results/kl/table5.errmodel.edit-distance-3-no-initial-no-redundant.sizes \
-			results/kl/table5.errmodel.edit-distance-3-no-redundant.sizes
+			results/en/table6.errmodel.edit-distance-1.sizes \
+			results/en/table6.errmodel.edit-distance-1-no-initial.sizes \
+			results/en/table6.errmodel.edit-distance-2.sizes \
+			results/en/table6.errmodel.edit-distance-2-no-initial.sizes \
+			results/en/table6.errmodel.edit-distance-2-no-initial-no-redundant.sizes \
+			results/en/table6.errmodel.edit-distance-2-no-redundant.sizes \
+			results/en/table6.errmodel.edit-distance-3.sizes \
+			results/en/table6.errmodel.edit-distance-3-no-initial.sizes \
+			results/en/table6.errmodel.edit-distance-3-no-initial-no-redundant.sizes \
+			results/en/table6.errmodel.edit-distance-3-no-redundant.sizes \
+			results/fi/table6.errmodel.edit-distance-1.sizes \
+			results/fi/table6.errmodel.edit-distance-1-no-initial.sizes \
+			results/fi/table6.errmodel.edit-distance-2.sizes \
+			results/fi/table6.errmodel.edit-distance-2-no-initial.sizes \
+			results/fi/table6.errmodel.edit-distance-2-no-initial-no-redundant.sizes \
+			results/fi/table6.errmodel.edit-distance-2-no-redundant.sizes \
+			results/fi/table6.errmodel.edit-distance-3.sizes \
+			results/fi/table6.errmodel.edit-distance-3-no-initial.sizes \
+			results/fi/table6.errmodel.edit-distance-3-no-initial-no-redundant.sizes \
+			results/fi/table6.errmodel.edit-distance-3-no-redundant.sizes \
+			results/kl/table6.errmodel.edit-distance-1.sizes \
+			results/kl/table6.errmodel.edit-distance-1-no-initial.sizes \
+			results/kl/table6.errmodel.edit-distance-2.sizes \
+			results/kl/table6.errmodel.edit-distance-2-no-initial.sizes \
+			results/kl/table6.errmodel.edit-distance-2-no-initial-no-redundant.sizes \
+			results/kl/table6.errmodel.edit-distance-2-no-redundant.sizes \
+			results/kl/table6.errmodel.edit-distance-3.sizes \
+			results/kl/table6.errmodel.edit-distance-3-no-initial.sizes \
+			results/kl/table6.errmodel.edit-distance-3-no-initial-no-redundant.sizes \
+			results/kl/table6.errmodel.edit-distance-3-no-redundant.sizes
 
 results/table5.tex: $(TABLE5_DATA)
 	echo "Sigma set size &" > $@
@@ -1411,9 +1413,9 @@ results/table5.tex: $(TABLE5_DATA)
 		results/kl/table5.kl.sigmasetsize >> $@
 	echo "\\\\\\\\" >> $@
 	echo "Dictionary sizes &" >> $@
-	paste -d '&' results/en/table5.norvig.edit-distance-1.sizes \
-		results/fi/table5.omorfi-20110505.edit-distance-1.sizes \
-		results/kl/table5.kl.edit-distance-1.sizes >> $@
+	paste -d '&' results/en/table5.norvig.sizes \
+		results/fi/table5.omorfi-20110505.sizes \
+		results/kl/table5.kl.sizes >> $@
 
 results/table6.tex: $(TABLE6_DATA)
 	echo "Sigma set size &" > $@
