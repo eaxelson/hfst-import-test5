@@ -8,7 +8,7 @@ bindings - you can use either one.
 
 INSTALLATION
 
-You can either install the package or just it in the directory it comes in.
+You can either install the package or just run it in the directory it comes in.
 To install, use the standard setup.py. See
 
    	python setup.py --help
