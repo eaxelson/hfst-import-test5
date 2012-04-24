@@ -267,6 +267,8 @@ quality of results at all.
 Further optimisations like disallowing disjoint errors in higher order error
 models and so not we may test if we have time.
 
+
+
 \section{Material}
 \label{sec:materials}
 
@@ -297,6 +299,93 @@ only used first gigabyte of data. The Finnish Wikipedia is X gigabytes in size
 and consists of Y tokens of which Z unique. The Greenlandic Wikipedia is only
 X megabytes, consisting Y tokens of which Z unique. For actual tests we only use
 first N gigabytes of data for Finnish and English Wikipedia data.
+
+In Table~\ref{table:dictionary-sizes} we summarize the sizes of automata in
+terms of structural elements. On the first row, we give the effective size of
+alphabet needed to represent the whole dictionary, this is all the alphabetic
+characters and punctuation that is used in the dictionary. Then we give the
+sizes of the automata; the first number is the amount of vertices and the
+second number is the amount of edges.
+
+\begin{table}[h]
+\begin{center}
+\begin{scriptsize}
+\begin{tabular}{|l|rrr|}
+\hline
+\bf Automaton & \bf En & \bf Fi & \bf Kl  \\ 
+\hline
+Sigma set size &
+ 43& 117& 133
+\\
+\\
+\hline
+\end{tabular}
+\end{scriptsize}
+\end{center}
+\caption{\label{table:dictionary-sizes}
+The sizes of dictionaries as automata}
+\end{table}
+
+In the Table~\ref{table:error-sizes} we give the sizes of error models we've
+generated.
+
+\begin{table}[h]
+\begin{center}
+\begin{scriptsize}
+\begin{tabular}{|l|rrrr|}
+\hline
+Edit distance 1 &
+ 1809, 81487,& 15254, 1922373,& 17032, 2265646,
+\\
+Edit distance 2 &
+ 3615, 3657539,& 30507, 242141870,& 34063, 301244851,
+\\
+Edit distance 3 &
+ 3615, 3657539,& 30507, 242141870,& 34063, 301244851,
+\\
+No firsts ed 1 & 
+ 1, 43,& 1, 124,& 1, 131,
+\\
+No firsts ed 2 &
+ 1, 43,& 1, 124,& 1, 131,
+\\
+No firsts ed 3 &
+ 1, 43,& 1, 124,& 1, 131,
+\\
+No redundancy or firsts ed 2 &
+ 1, 43,& 1, 124,& 1, 131,
+\\
+No redundancy or firsts ed 3 &
+ 1, 43,& 1, 124,& 1, 131,
+\\
+Lower order first ed 1 to 2 &
+&&
+
+\end{tabular}
+\end{scriptsize}
+\end{center}
+\caption{\label{table:error-sizes}
+The sizes of error models as automata}
+\end{table}
+
+
+\begin{table}[h]
+\begin{center}
+\begin{scriptsize}
+\begin{tabular}{|l|rrrr|}
+\hline
+\bf Point of restriction & \bf 1 & \bf 2 & \bf 3 & \bf 4 \\
+\hline
+\bf States \\
+\bf Arcs \\
+\hline
+\end{tabular}
+\caption{\label{restricted} The size of the dictionary after restriction at
+various points}
+\end{scriptsize}
+\end{center}
+\end{table}
+
 
 \section{Evaluation}
 \label{sec:evaluation}
@@ -518,72 +607,6 @@ Text in another language &
 \end{center}
 \caption{\label{table:language-vs-text-type} Effect of text type on
 error models to speed}
-\end{table}
-
-In Table~\ref{table:automata-sizes} we also summarize the sizes of automata in
-terms of structural elements; the first number is the amount of vertices and the
-second number is the amount of edges. The size of alphabets $|\Sigma|$
-for the automata is: $|\Sigma_{en}| = $, $|\Sigma_{fi}| = $ and $|\Sigma_{kl} =
-$.
-
-\begin{table}[h]
-\begin{center}
-\begin{scriptsize}
-\begin{tabular}{|l|rrr|}
-\hline
-\bf Automaton & \bf En & \bf Fi & \bf Kl  \\ 
-\hline
-Sigma set size &
- 43& 117& 133
-\\
-\hline
-Edit distance 1 &
- 1809, 81487,& 15254, 1922373,& 17032, 2265646,
-\\
-Edit distance 2 &
- 3615, 3657539,& 30507, 242141870,& 34063, 301244851,
-\\
-Edit distance 3 &
- 3615, 3657539,& 30507, 242141870,& 34063, 301244851,
-\\
-No firsts ed 1 & 
- 1, 43,& 1, 124,& 1, 131,
-\\
-No firsts ed 2 &
- 1, 43,& 1, 124,& 1, 131,
-\\
-No firsts ed 3 &
- 1, 43,& 1, 124,& 1, 131,
-\\
-No redundancy or firsts ed 2 &
- 1, 43,& 1, 124,& 1, 131,
-\\
-No redundancy or firsts ed 3 &
- 1, 43,& 1, 124,& 1, 131,
-\\
-Lower order first ed 1 to 2 &
-&&
-\\
-\hline
-\end{tabular}
-\end{scriptsize}
-\end{center}
-\caption{\label{table:automata-sizes} The sizes of automata (nodes, then edges)}
-\end{table}
-
-\begin{table}[h]
-\begin{center}
-\begin{scriptsize}
-\begin{tabular}[|l|rrrr|]
-\hline
-\bf Point of restriction & \bf 1 & \bf 2 & \bf 3 & \bf 4 \\
-\hline
-\bf States \\
-\bf Arcs \\
-\hline
-\end{tabular}
-\caption{\label{restricted} The size of the dictionary after restriction at
-various points}
 \end{table}
 
 
