@@ -2514,6 +2514,152 @@ HfstTransducer &HfstTransducer::cross_product( const HfstTransducer &another )
 
 }
 
+//
+// -------------------- Shuffle functions --------------------
+//
+
+// A flag to indicate that there was an error during shuffle.
+static bool shuffle_failed=false;
+// Possible cases for function code_symbols_for_shuffle. 
+enum ShuffleCoding { ENCODE_FIRST_SHUFFLE_ARGUMENT, 
+		     ENCODE_SECOND_SHUFFLE_ARGUMENT, 
+		     DECODE_AFTER_SHUFFLE }; 
+// The current case in function code_symbols_for_shuffle.
+static ShuffleCoding shuffle_coding_case;
+
+// A function that is given as a parameter to substitute function
+// during the shuffle operation. The purpose of this function is (1)
+// to encode symbols in the two argument transducers so that no symbol
+// is present at both transducers or (2) to decode the symbols
+// in the shuffled transducer back to the original ones.
+bool code_symbols_for_shuffle(const StringPair &sp, StringPairSet &sps)
+{
+  // not automaton, shuffle fails
+  if (sp.first != sp.second) {
+    shuffle_failed=true;
+    return false;
+  }
+  // special symbols are not coded
+  if (is_epsilon(sp.first) ||
+      is_unknown(sp.first) ||
+      is_identity(sp.first)) {
+    return false;
+  }
+  switch (shuffle_coding_case)
+    {
+      // substitute each symbol foo in the first argument transducer 
+      // with a symbol @1foo
+    case ENCODE_FIRST_SHUFFLE_ARGUMENT:
+	{
+	  std::string symbol_escaped = "@1" + sp.first;
+	  StringPair new_sp(symbol_escaped, symbol_escaped);
+	  sps.insert(new_sp);
+	  break;
+	}	
+	// substitute each symbol bar in the second argument transducer
+	// with a symbol @2bar
+    case ENCODE_SECOND_SHUFFLE_ARGUMENT:
+	{
+	  std::string symbol_escaped = "@2" + sp.first;
+	  StringPair new_sp(symbol_escaped, symbol_escaped);
+	  sps.insert(new_sp);
+	  break;
+	}
+	// substitute each symbol @1foo or @2bar in the shuffled transducer
+	// with the original foo or bar.
+    case DECODE_AFTER_SHUFFLE:
+	{
+	  std::string symbol_unescaped = sp.first.substr(2);
+	  StringPair new_sp(symbol_unescaped, symbol_unescaped);
+	  sps.insert(new_sp);
+	  break;
+	}
+    default:
+      assert(false);
+    }
+  
+  return true;
+}
+
+HfstTransducer &HfstTransducer::shuffle(const HfstTransducer &another)
+{
+  // We use HfstBasicTransducers for efficiency
+  HfstBasicTransducer this_basic(*this);
+  HfstBasicTransducer another_basic(another);
+
+  // Find out the original alphabets of both transducers
+  StringSet this_alphabet = this_basic.get_alphabet();
+  StringSet another_alphabet = another_basic.get_alphabet();
+
+  // Encode first transducer, i.e. prefix each symbol with "@1"
+  shuffle_coding_case=ENCODE_FIRST_SHUFFLE_ARGUMENT;
+  this_basic.substitute(&code_symbols_for_shuffle);
+  // also remember to remove the unprefixed symbols from the alphabet
+  this_basic.remove_symbols_from_alphabet(this_alphabet);
+
+  // Encode second transducer, i.e. prefix each symbol with "@2"
+  shuffle_coding_case=ENCODE_SECOND_SHUFFLE_ARGUMENT;
+  another_basic.substitute(&code_symbols_for_shuffle);
+  // also remember to remove the unprefixed symbols from the alphabet
+  another_basic.remove_symbols_from_alphabet(another_alphabet);
+
+  // See if shuffle failed, i.e. either transducer is not an automaton
+  if (shuffle_failed) {
+    shuffle_failed=false;
+    HFST_THROW(HfstException);
+  }  
+
+  // The new alphabets of transducers where each symbol is prefixed
+  // with "@1" or "@2"
+  this_alphabet = this_basic.get_alphabet();
+  another_alphabet = another_basic.get_alphabet();
+
+  // Transform alphabets of transducers into string pair sets for function
+  // insert_freely
+  StringPairSet this_alphabet_pairset;
+  for (StringSet::const_iterator it = this_alphabet.begin();
+       it != this_alphabet.end(); it++) {
+    this_alphabet_pairset.insert(StringPair(*it, *it));
+  }
+  StringPairSet another_alphabet_pairset;
+  for (StringSet::const_iterator it = another_alphabet.begin();
+       it != another_alphabet.end(); it++) {
+    another_alphabet_pairset.insert(StringPair(*it, *it));
+  }
+
+  // Freely insert any number of any symbol in the first transducer
+  // to the second transducer and vice versa
+  this_basic.insert_freely(another_alphabet_pairset, 0);
+  another_basic.insert_freely(this_alphabet_pairset, 0);
+
+  // We use HfstTransducers for intersection
+  HfstTransducer this1(this_basic, this->get_type());
+  HfstTransducer another1(another_basic, another.get_type());
+
+  this1.intersect(another1);
+  this1.minimize();
+  
+  // We use HfstBasicTransducers again
+  HfstBasicTransducer this1_basic(this1);
+
+  // Decode the shuffled transducer, i.e. remove the prefixes
+  // "@1" and "@2" from symbols
+  shuffle_coding_case=DECODE_AFTER_SHUFFLE;
+  this1_basic.substitute(&code_symbols_for_shuffle);
+  // also remember to remove the prefixed symbols from the alphabet
+  this1_basic.remove_symbols_from_alphabet(this_alphabet);
+  this1_basic.remove_symbols_from_alphabet(another_alphabet);
+
+  // Convert once again to HfstTransducer
+  HfstTransducer this_finally(this1_basic, this->get_type());
+  this->operator=(this_finally);
+
+  return *this;
+}
+
+// ---------------------- Shuffle functions end --------------------
+
+
 
 HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
 {

@@ -1212,6 +1212,14 @@ ccc : ddd
     HfstTransducer &cross_product(const HfstTransducer &another);
 
 
+    /*
+     *  \brief Shuffle this transducer with transducer \@ another.
+     *  
+     *  Both transducers must be automata, i.e. map strings onto themselves.
+     *
+     */
+    HfstTransducer &shuffle(const HfstTransducer &another);
+
     /** \brief Create universal pair transducer of \a type.
      *
      *	The transducer has only one state, and it accepts:
