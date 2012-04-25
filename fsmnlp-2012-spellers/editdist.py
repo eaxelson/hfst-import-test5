@@ -328,7 +328,9 @@ class Transducer:
         return ret
 
     def make_transitions(self):
-        for state in range(options.distance):
+        # If we're not editing in the initial state, there's an extra state
+        # where we just want identities
+        for state in range(options.distance + options.no_initial):
             if options.minimum_edit != 0:
                 options.minimum_edit -= 1
             else:
@@ -340,8 +342,8 @@ class Transducer:
                 self.transitions += self.make_identities(state)
             self.transitions += self.make_substitutions(state)
             self.transitions += self.make_swaps(state)
-        self.transitions += self.make_identities(options.distance)
-        self.transitions.append(str(options.distance) + "\t0.0")
+        self.transitions += self.make_identities(options.distance + options.no_initial)
+        self.transitions.append(str(options.distance + options.no_initial) + "\t0.0")
 
 transducer = Transducer(alphabet)
 
