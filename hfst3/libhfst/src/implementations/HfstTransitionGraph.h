@@ -119,6 +119,8 @@ namespace hfst {
       HfstSymbolPair; 
     /** @brief A set of symbol pairs. */
     typedef std::set<HfstSymbolPair> HfstSymbolPairSet;
+    /** @brief A set of symbol pairs. */
+    typedef std::set<HfstSymbol> HfstSymbolSet;
     /** @brief A vector of symbol pairs. */
     typedef std::vector<HfstSymbolPair> HfstSymbolPairVector;
     /** @brief Datatype for the alphabet of a graph. */
@@ -301,6 +303,14 @@ namespace hfst {
         of the graph can have unexpected results. */
     void remove_symbol_from_alphabet(const HfstSymbol &symbol) {
       alphabet.erase(symbol);
+    }
+
+    void remove_symbols_from_alphabet(const HfstSymbolSet &symbols) {
+      for (typename HfstSymbolSet::const_iterator it = symbols.begin();
+           it != symbols.end(); it++)
+        {
+	  alphabet.erase(*it);
+	}
     }
 
     /** @brief Same as #add_symbol_to_alphabet for each symbol in
@@ -1157,13 +1167,21 @@ namespace hfst {
           HfstSymbolPairSet substituting_transitions;
           
           // If a substitution is to be performed,
-          if ((*func)(transition_symbol_pair, 
-                  substituting_transitions))
+	  bool perform_substitution=false;
+	  try {
+	    perform_substitution = 
+	      (*func)(transition_symbol_pair, substituting_transitions);
+	  }
+	  catch (const HfstException & e)
+	    {
+	      throw e;
+	    }
+	  if (perform_substitution)
             {          
               // change the transition to the first element
               // in new_sps
               typename HfstSymbolPairSet::const_iterator IT 
-            = substituting_transitions.begin();
+		= substituting_transitions.begin();
 
               if (not C::is_valid_symbol(IT->first) ||
               not C::is_valid_symbol(IT->second) )
@@ -1604,6 +1622,45 @@ namespace hfst {
           source_state++;
             }
 
+            return *this;
+          }
+
+        /** @brief Insert freely any number of any symbol in \a symbol_pairs in 
+            the graph with weight \a weight. */
+        HfstTransitionGraph &insert_freely
+          (const HfstSymbolPairSet &symbol_pairs, 
+	   typename C::WeightType weight) 
+          {
+	    for (typename HfstSymbolPairSet::const_iterator symbols_it 
+		   = symbol_pairs.begin();
+		 symbols_it != symbol_pairs.end(); symbols_it++)
+	      {
+		if ( not ( C::is_valid_symbol(symbols_it->first) &&           
+			   C::is_valid_symbol(symbols_it->second) ) ) {
+		  HFST_THROW_MESSAGE
+		    (EmptyStringException, 
+		     "HfstTransitionGraph::insert_freely"
+		     "(const HfstSymbolPairSet&, W)");
+		}
+
+		alphabet.insert(symbols_it->first);
+		alphabet.insert(symbols_it->second);
+	      }
+
+	    HfstState source_state=0;
+            for (iterator it = begin(); it != end(); it++) 
+	      {
+		for (typename HfstSymbolPairSet::const_iterator symbols_it 
+		       = symbol_pairs.begin();
+		     symbols_it != symbol_pairs.end(); symbols_it++)
+		  {
+		    HfstTransition <C> tr( source_state, symbols_it->first, 
+					   symbols_it->second, weight );
+		    it->push_back(tr);
+		  }
+		source_state++;
+	      }
+	    
             return *this;
           }
         

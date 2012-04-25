@@ -286,6 +286,27 @@ int main(int argc, char **argv)
     assert(t1.compare(t3));
       }
 
+      /* Function shuffle. */
+      {
+	verbose_print("function shuffle", types[i]);
+	
+	hfst::HfstTokenizer tok;
+	HfstTransducer t1("abc", "abc", tok, types[i]);
+	HfstTransducer t1_ = t1;
+	HfstTransducer t2("cde", "cde", tok, types[i]);
+	t1.shuffle(t2);
+
+	HfstTransducer t3("abc", "abC", tok, types[i]);
+	try {
+	  t3.shuffle(t2);
+	  assert(false);
+	}
+	catch (const HfstException & e)
+	  {
+	    assert(true);
+	  }
+      }
+
 
       /* Function convert. */
       {
