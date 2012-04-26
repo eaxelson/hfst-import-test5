@@ -319,6 +319,12 @@ AC_ARG_ENABLE([split],
 			  [enable_split=$enableval],
 			  [enable_split=yes])
 AM_CONDITIONAL([WANT_SPLIT], [test x$enable_split != xno])
+AC_ARG_ENABLE([shuffle],
+			  [AS_HELP_STRING([--enable-shuffle],
+							  [build shuffle tool @<:@default=yes@:>@])],
+			  [enable_shuffle=$enableval],
+			  [enable_shuffle=yes])
+AM_CONDITIONAL([WANT_SHUFFLE], [test x$enable_shuffle != xno])
 AC_ARG_ENABLE([strings2fst],
 			  [AS_HELP_STRING([--enable-strings2fst],
 							  [build strings2fst tool @<:@default=yes@:>@])],
@@ -547,6 +553,7 @@ cat <<EOF
     *                 remove-epsilons: $enable_remove_epsilons
     *                 repeat: $enable_repeat
     *                 reverse: $enable_reverse
+    *                 shuffle: $enable_shuffle
     *                 split: $enable_split
     *                 strings2fst: $enable_strings2fst
     *                 strip-header: $enable_strip_header

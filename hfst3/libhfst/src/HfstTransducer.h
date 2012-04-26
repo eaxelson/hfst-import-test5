@@ -1214,8 +1214,12 @@ ccc : ddd
 
     /*
      *  \brief Shuffle this transducer with transducer \@ another.
+     *
+     *  If transducer A accepts string "foo" and transducer B string "bar",
+     *  the transducer that results from shuffling A and B accepts all strings
+     *  [(f|b)(o|a)(o|r)].
      *  
-     *  Both transducers must be automata, i.e. map strings onto themselves.
+     *  @pre Both transducers must be automata, i.e. map strings onto themselves.
      *
      */
     HfstTransducer &shuffle(const HfstTransducer &another);

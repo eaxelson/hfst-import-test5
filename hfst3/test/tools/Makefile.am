@@ -44,7 +44,7 @@ TESTS=hfst-check-version.sh hfst-check-help.sh hfst-check-environment.sh \
 	  regexp2fst-functionality.sh \
 	  split-functionality.sh head-functionality.sh tail-functionality.sh \
 	  calculate-functionality.sh format-functionality.sh \
-	  lookup-functionality.sh \
+	  lookup-functionality.sh shuffle-functionality.sh \
 	  lexc-functionality.sh \
 	  lexc-compiler-functionality.sh \
 	  utf-8-strings.sh latin-1-strings.sh \
@@ -62,7 +62,9 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   unknown-star.hfst identity-star.hfst unknown2a.hfst identity.hfst \
 		   heavycat.hfst abid.hfst unk2unk.hfst unk_or_id_star.hfst a2b.hfst \
 		   a2b_complement.hfst a2b_input_projection_complement.hfst empty.hfst \
-		   walk_or_dog.hfst
+		   walk_or_dog.hfst \
+		   ab.hfst bc.hfst id.hfst aid.hfst idb.hfst \
+		   ab_shuffle_bc.hfst id_shuffle_id.hfst aid_shuffle_idb.hfst
 OL_CHECKS=cat2dog.hfstol cat2dog.genhfstol cat_weight_final.hfstol \
 			proc-caps.hfstol proc-caps.genhfstol \
 			compounds.hfstol
@@ -80,7 +82,8 @@ SFST_CHECKS=0to3cats.sfst 2to4cats.sfst 4cats.sfst\
 			identity.sfst abid.sfst unk2unk.sfst unk_or_id_star.sfst \
 			a2b.sfst a2b_complement.sfst a2b_input_projection_complement.sfst \
 			empty.sfst \
-			walk_or_dog.sfst
+			walk_or_dog.sfst ab.sfst bc.sfst id.sfst aid.sfst idb.sfst \
+			ab_shuffle_bc.sfst id_shuffle_id.sfst aid_shuffle_idb.sfst
 endif
 if WANT_OPENFST
 OFST_CHECKS=0to3cats.ofst \
@@ -97,7 +100,8 @@ OFST_CHECKS=0to3cats.ofst \
 			heavycat.hfst abid.ofst unk2unk.ofst \
 			cat2dog_0.3.ofst cat2dog_0.5.ofst empty.ofst unk_or_id_star.ofst \
 			a2b.ofst a2b_complement.ofst a2b_input_projection_complement.ofst \
-			walk_or_dog.ofst
+			walk_or_dog.ofst ab.ofst bc.ofst id.ofst aid.ofst idb.ofst \
+			ab_shuffle_bc.ofst id_shuffle_id.ofst aid_shuffle_idb.ofst
 endif
 if WANT_FOMA
 FOMA_CHECKS=0to3cats.foma 2to4cats.foma 4cats.foma \
@@ -113,7 +117,8 @@ FOMA_CHECKS=0to3cats.foma 2to4cats.foma 4cats.foma \
 			unknown2a.foma identity.foma abid.foma unk2unk.foma unk_or_id_star.foma \
 			a2b.foma a2b_complement.foma a2b_input_projection_complement.foma \
 			empty.foma \
-			walk_or_dog.foma
+			walk_or_dog.foma ab.foma bc.foma id.foma aid.foma idb.foma \
+			ab_shuffle_bc.foma id_shuffle_id.foma aid_shuffle_idb.foma
 endif
 
 check_DATA=$(DEFAULT_CHECKS) $(SFST_CHECKS) $(OFST_CHECKS) $(FOMA_CHECKS) $(OL_CHECKS)
@@ -130,8 +135,9 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 unknown-star.txt identity-star.txt unknown2a.txt identity.txt\
 		 heavycat.txt abid.txt unk2unk.txt cat2dog_0.3.txt cat2dog_0.5.txt empty.txt unk_or_id_star.txt \
 		 a2b.txt a2b_complement.txt a2b_input_projection_complement.txt \
-		 walk_or_dog.txt \
-		 compounds.txt
+		 walk_or_dog.txt ab.txt bc.txt id.txt aid.txt idb.txt \
+		 ab_shuffle_bc.txt id_shuffle_id.txt aid_shuffle_idb.txt \
+		 compounds.txt ab_shuffle_bc.txt id_shuffle_id.txt aid_shuffle_idb.txt
 FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-gen.strings \
 			proc-caps-out1.strings proc-caps-out2.strings \
 			proc-caps-out3.strings proc-caps-out4.strings \
@@ -169,7 +175,7 @@ ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
 
 .SUFFIXES= .txt .hfst .hfst.sfst .hfst.ofst .hfst.foma .hfstol .genhfstol
 
-# this compilation is uesd by check target before running the tests
+# this compilation is used by check target before running the tests
 #%.hfst: %.txt
 .txt.hfst:
 	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' $< > $@
