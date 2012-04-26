@@ -121,6 +121,9 @@ endif
 if WANT_REWEIGHT
 MAYBE_REWEIGHT=hfst-reweight
 endif
+if WANT_SHUFFLE
+MAYBE_SHUFFLE=hfst-shuffle
+endif
 if WANT_SPLIT
 MAYBE_SPLIT=hfst-split
 endif
@@ -185,7 +188,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_PUSH_WEIGHTS) $(MAYBE_REGEXP2FST)                  \
 			 $(MAYBE_PMATCH2FST)					    \
 			 $(MAYBE_REMOVE_EPSILONS) $(MAYBE_REPEAT) $(MAYBE_REVERSE)  \
-			 $(MAYBE_REWEIGHT)                                          \
+			 $(MAYBE_REWEIGHT) $(MAYBE_SHUFFLE)                         \
 			 $(MAYBE_SPLIT) $(MAYBE_STRINGS2FST) $(MAYBE_STRIP_HEADER)  \
 			 $(MAYBE_SUBTRACT) $(MAYBE_SUMMARIZE) $(MAYBE_TAIL)         \
 			 $(MAYBE_TXT2FST) $(MAYBE_CALCULATE) $(MAYBE_SUBSTITUTE)    \
@@ -240,6 +243,7 @@ hfst_remove_epsilons_SOURCES=hfst-remove-epsilons.cc $(HFST_COMMON_SRC)
 hfst_repeat_SOURCES=hfst-repeat.cc $(HFST_COMMON_SRC)
 hfst_reverse_SOURCES=hfst-reverse.cc $(HFST_COMMON_SRC)
 hfst_reweight_SOURCES=hfst-reweight.cc $(HFST_COMMON_SRC)
+hfst_shuffle_SOURCES=hfst-shuffle.cc $(HFST_COMMON_SRC)
 hfst_split_SOURCES=hfst-split.cc $(HFST_COMMON_SRC)
 hfst_strings2fst_SOURCES=hfst-strings2fst.cc $(HFST_COMMON_SRC) \
 HfstStrings2FstTokenizer.cc

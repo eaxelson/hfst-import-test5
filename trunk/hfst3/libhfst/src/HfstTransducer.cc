@@ -2539,10 +2539,9 @@ bool code_symbols_for_shuffle(const StringPair &sp, StringPairSet &sps)
     shuffle_failed=true;
     return false;
   }
-  // special symbols are not coded
+  // special symbols are not coded, except identities
   if (is_epsilon(sp.first) ||
-      is_unknown(sp.first) ||
-      is_identity(sp.first)) {
+      is_unknown(sp.first)) {
     return false;
   }
   switch (shuffle_coding_case)
@@ -2583,9 +2582,16 @@ bool code_symbols_for_shuffle(const StringPair &sp, StringPairSet &sps)
 
 HfstTransducer &HfstTransducer::shuffle(const HfstTransducer &another)
 {
+  if (this->type != another.type)
+    HFST_THROW_MESSAGE(TransducerTypeMismatchException,
+		       "HfstTransducer::shuffle(const HfstTransducer&)");
+
   // We use HfstBasicTransducers for efficiency
   HfstBasicTransducer this_basic(*this);
   HfstBasicTransducer another_basic(another);
+
+  // Expand (unknowns and) identities
+  this_basic.harmonize(another_basic);
 
   // Find out the original alphabets of both transducers
   StringSet this_alphabet = this_basic.get_alphabet();
@@ -2606,7 +2612,8 @@ HfstTransducer &HfstTransducer::shuffle(const HfstTransducer &another)
   // See if shuffle failed, i.e. either transducer is not an automaton
   if (shuffle_failed) {
     shuffle_failed=false;
-    HFST_THROW(HfstException);
+    HFST_THROW_MESSAGE(TransducersAreNotAutomataException,
+		       "HfstTransducer::shuffle(const HfstTransducer&)");
   }  
 
   // The new alphabets of transducers where each symbol is prefixed

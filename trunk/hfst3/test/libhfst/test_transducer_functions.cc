@@ -301,7 +301,7 @@ int main(int argc, char **argv)
 	  t3.shuffle(t2);
 	  assert(false);
 	}
-	catch (const HfstException & e)
+	catch (const TransducersAreNotAutomataException & e)
 	  {
 	    assert(true);
 	  }
