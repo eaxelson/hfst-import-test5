@@ -1,4 +1,8 @@
 #!/bin/sh
+if ! [ -x ../../tools/src/hfst-shuffle ]; then
+    exit 0;
+fi
+
 for i in .sfst .ofst .foma; do
     if ! ../../tools/src/hfst-shuffle ab$i bc$i > TMP; then
 	rm TMP;

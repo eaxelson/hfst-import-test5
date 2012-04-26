@@ -321,9 +321,9 @@ AC_ARG_ENABLE([split],
 AM_CONDITIONAL([WANT_SPLIT], [test x$enable_split != xno])
 AC_ARG_ENABLE([shuffle],
 			  [AS_HELP_STRING([--enable-shuffle],
-							  [build shuffle tool @<:@default=yes@:>@])],
+							  [build shuffle tool @<:@default=no@:>@])],
 			  [enable_shuffle=$enableval],
-			  [enable_shuffle=yes])
+			  [enable_shuffle=no])
 AM_CONDITIONAL([WANT_SHUFFLE], [test x$enable_shuffle != xno])
 AC_ARG_ENABLE([strings2fst],
 			  [AS_HELP_STRING([--enable-strings2fst],
