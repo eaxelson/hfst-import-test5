@@ -267,7 +267,41 @@ quality of results at all.
 Further optimisations like disallowing disjoint errors in higher order error
 models and so not we may test if we have time.
 
+\subsection{Algorithms}
+\label{sec:algorithms}
+The obvious baseline algorithm for the task of finding which strings can be
+altered by the error model in such a way that the alteration is present in the
+language model is generating all the possible alterations and checking which
+ones are present in the language model. This was done in~\cite{hassan/2008}
+by first calculating the composition of the input string with the error
+model and then composing the result with the language model.
 
+If we simplify the error model to one in which only substitutions occur,
+it can already be seen that this method is quite sensitive to input length
+and alphabet size. The composition explores each combination of edit sites
+in the input string ($\sum_{i=1}^d n \choose i$, where $n$ is the input length
+and $d$ is the edit distance) and each edit for each site ($|\Sigma| - 1$, the
+entire alphabet except for the actual input). This results in an
+$O(n^d \cdot |\Sigma|)$ algorithm, or for an English 26-letter lowercase
+alphabet, swap distance $2$ and the $8$-letter word ``spelling'',
+$700$ strings that are stored in a transducer. With transpositions, deletions,
+insertions and edit weights this grows to $100,215$ different combinations of
+output and weight. We have simulated this algorithm in our results by generating
+the edited strings by lookup, and performing another lookup with the language
+model on these strings.
+
+Plainly, it would be desirable to improve on this. The intuition behind our
+improvement is that when editing an input string, say ``spellling'', it is a
+wasted effort to explore the remainder after generating a prefix that is not
+present in the lexicon. For example, after changing the first character to ``z''
+and not editing the second characted, we have the prefix ``zp-'', which does
+not occur in our English lexicon. So the remaining possibilities - performing
+any remaining edits on the remaining $7$-character word - can be ignored.
+
+This is accomplished with a three-way composition, in which the input, the
+error model and the language model simultaneously constrain each other to
+produce the legal correction set. This algorithm is presented in some detail in
+\cite{hfst/2012/cla}.
 
 \section{Material}
 \label{sec:materials}
