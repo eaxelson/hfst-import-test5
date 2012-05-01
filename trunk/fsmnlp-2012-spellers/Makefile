@@ -659,24 +659,27 @@ results/kl/table1.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex: corp/k
 
 results/en/table1.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex: corp/en/enwiki.$(WORDS).words
 	echo > $@.tsv
-	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-3-no-initial-no-redundant.hfst hfst/en/norvig.hfst < corp/en/enwiki.$(WORDS).words > /dev/null ;\
-	done
-	awk -f profile-times2tex.awk < $@.tsv > $@
+	echo too long > $@
+	#for i in $(TESTS) ; do \
+	#	hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-3-no-initial-no-redundant.hfst hfst/en/norvig.hfst < corp/en/enwiki.$(WORDS).words > /dev/null ;\
+	#done
+	#awk -f profile-times2tex.awk < $@.tsv > $@
 
 results/fi/table1.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex: corp/fi/fiwiki.$(WORDS).words
 	echo > $@.tsv
-	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-3-no-initial-no-redundant.hfst $(FI_DICT) < corp/fi/fiwiki.$(WORDS).words > /dev/null ;\
-	done
-	awk -f profile-times2tex.awk < $@.tsv > $@
+	echo too long > $@
+	#for i in $(TESTS) ; do \
+	#	hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-3-no-initial-no-redundant.hfst $(FI_DICT) < corp/fi/fiwiki.$(WORDS).words > /dev/null ;\
+	#done
+	#awk -f profile-times2tex.awk < $@.tsv > $@
 
 results/kl/table1.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex: corp/kl/klwiki.$(WORDS).words
 	echo > $@.tsv
-	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-initial-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.$(WORDS).words > /dev/null ;\
-	done
-	awk -f profile-times2tex.awk < $@.tsv > $@
+	echo too long > $@
+	#for i in $(TESTS) ; do \
+	#	hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-initial-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.$(WORDS).words > /dev/null ;\
+	#done
+	#awk -f profile-times2tex.awk < $@.tsv > $@
 
 # Table 1, ED 2, fallback from ED 1 to ED 2 (no redundancies)
 
