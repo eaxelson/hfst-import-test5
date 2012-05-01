@@ -228,18 +228,17 @@ application in both fuzzy string matching and the finite-state implementation
 will use the dictionary to branch-and-bound limit the search space into
 substrings that would end up in legal word-forms so the actual search spaces
 will depend on structure of the dictionary and therefore will not be trivially
-predictable anymore .
+predictable anymore.
 
-To optimise the application of edit distance by limiting the search space
-bearing in mind the structure of dictionary, many traditional spell checkers
-will not attempt to correct the very first letter of the word-form. We estimate
-this to be reasonable in finite-state systems as well, since it would typically
-appear that finite-state automata for dictionaries of natural languages have
-the most dense arc structure in the initial state of the automaton; excluding
-that from the application of errors will then give greatest improvements to
-search space minimising. We have attempted to quantify this by restricting
-the dictionary in turn at positions in the input string and inspecting
-its remaining size (see table \ref{restricted_dictionary}).
+To optimise the application of edit distance by limiting the search space,
+many traditional spell checkers
+will not attempt to correct the very first letter of the word-form. We
+investigated whether this decision is a particularily effective way to
+limit the search space, but it does not appear to significantly differ from
+restricting edits at any other position in the input. Presumably, the
+rationale is a belief that errors predominately occur at other positions
+in the input. As far as we know, the complete justification for this belief
+remains to be made with a high-quality, hand-checked error corpus.
 
 On the error-model side this optimisation has been
 justified by findings where only NNN \% of spelling-errors happen in the first
