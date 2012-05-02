@@ -15,35 +15,31 @@ BZCAT=bzcat
 HUNSPELL=hunspell -1 -a
 VOIKKOSPELL=voikkospell -s
 
+# dictionaries to build or fetch
 EN_DICT=hfst/en/norvig.hfst
 FI_DICT=hfst/fi/omorfi-20110505.hfst
 KL_DICT=hfst/kl/kl.hfst
 
+# test settings
 TESTS=1 2 3 4 5
 WORDS=10000
 
-# article
-fsmnlp-2012-speedspelling.pdf: fsmnlp-2012-speedspelling.tex fsmnlp2012.bib
-	$(XELATEX) fsmnlp-2012-speedspelling.tex
-	$(BIBTEX)  fsmnlp-2012-speedspelling
-	$(XELATEX) fsmnlp-2012-speedspelling.tex
-	$(XELATEX) fsmnlp-2012-speedspelling.tex
-	$(XELATEX) fsmnlp-2012-speedspelling.tex
+# build target lists
+DICTIONARIES=$(EN_DICT) \
+			 $(FI_DICT) \
+			 $(KL_DICT)
 
-results: corpora dictionaries models tables
-corpora: corp/fi/fiwiki-20120213-pages-articles.2000000.xml \
-		 corp/en/enwiki-20120211-pages-articles.2000000.xml \
-		 corp/kl/klwiki-20120214-pages-articles.xml \
-		 corp/en/enwiki.$(WORDS).words \
-		 corp/fi/fiwiki.$(WORDS).words \
-		 corp/kl/klwiki.$(WORDS).words \
-		 corp/en/automisp.words \
-		 corp/fi/automisp.words \
-		 corp/kl/automisp.words
-dictionaries: hfst/en/norvig.hfst \
-			  hfst/fi/omorfi-20110505.hfst \
-			  hfst/kl/kl.hfst
-models: hfst/fi/errmodel.edit-distance-1.hfst \
+CORPORA=corp/fi/fiwiki-20120213-pages-articles.2000000.xml \
+		corp/en/enwiki-20120211-pages-articles.2000000.xml \
+		corp/kl/klwiki-20120214-pages-articles.xml \
+		corp/en/enwiki.$(WORDS).words \
+		corp/fi/fiwiki.$(WORDS).words \
+		corp/kl/klwiki.$(WORDS).words \
+		corp/en/automisp.words \
+		corp/fi/automisp.words \
+		corp/kl/automisp.words
+
+MODELS=hfst/fi/errmodel.edit-distance-1.hfst \
 		hfst/en/errmodel.edit-distance-1.hfst \
 		hfst/kl/errmodel.edit-distance-1.hfst \
 		hfst/en/errmodel.edit-distance-2.hfst \
@@ -74,18 +70,40 @@ models: hfst/fi/errmodel.edit-distance-1.hfst \
 		hfst/fi/errmodel.edit-distance-3-no-initial-no-redundant.hfst \
 		hfst/kl/errmodel.edit-distance-3-no-initial-no-redundant.hfst
 
+TABLES=results/table1.tex results/table2.tex \
+	   results/table3.tex results/table4.tex results/table5.tex \
+	   results/table6.tex
 
-tables:results/table1.tex results/table2.tex \
-	results/table3.tex results/table4.tex results/table5.tex \
-	results/table6.tex
+# article
+fsmnlp-2012-speedspelling.pdf: fsmnlp-2012-speedspelling.tex fsmnlp2012.bib
+	$(XELATEX) fsmnlp-2012-speedspelling.tex
+	$(BIBTEX)  fsmnlp-2012-speedspelling
+	$(XELATEX) fsmnlp-2012-speedspelling.tex
+	$(XELATEX) fsmnlp-2012-speedspelling.tex
+	$(XELATEX) fsmnlp-2012-speedspelling.tex
+
+# generic targets
+
+all: results fsmnlp-2012-speedspelling.pdf
+
+results: corpora dictionaries models tables
+
+dictionaries: $(DICTIONARIES)
+models: $(MODELS)
+corpora: $(CORPORA)
+tables: $(TABLES)
+
+clean-results: clean-tables clean-corpora clean-models
+
+clean-corpora:
+	-rm -rf $(CORPORA)
+
+clean-tables:
+	-rm -rf $(TABLES)
 
 clean-models:
-	rm hfst/fi/errmodel.edit-distance-1.hfst \
-	hfst/en/errmodel.edit-distance-1.hfst \
-	hfst/kl/errmodel.edit-distance-1.hfst
+	-rm -rf $(MODELS)
 
-# tests and tables...
-#
 # corpora acquisition
 fiwiki-20120213-pages-articles.xml.bz2:
 	$(WGET) 'http://dumps.wikimedia.org/fiwiki/20120213/fiwiki-20120213-pages-articles.xml.bz2'
@@ -499,10 +517,11 @@ results/en/table1.dict-norvig.errm-ed3.corp-wiki.tex: corp/en/enwiki.$(WORDS).wo
 
 results/fi/table1.dict-omorfi.errm-ed3.corp-wiki.tex: corp/fi/fiwiki.$(WORDS).words
 	echo > $@.tsv
-	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-3.hfst $(FI_DICT) < corp/fi/fiwiki.$(WORDS).words > /dev/null ;\
-	done
-	awk -f profile-times2tex.awk < $@.tsv > $@
+	echo "too long" > $@
+	#for i in $(TESTS) ; do \
+	#	hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-3.hfst $(FI_DICT) < corp/fi/fiwiki.$(WORDS).words > /dev/null ;\
+	#done
+	#awk -f profile-times2tex.awk < $@.tsv > $@
 
 results/kl/table1.dict-kl.errm-ed3.corp-wiki.tex: corp/kl/klwiki.$(WORDS).words
 	echo > $@.tsv
@@ -1047,17 +1066,19 @@ results/kl/table2.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex: corp/k
 
 results/en/table2.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex: corp/en/enwiki.$(WORDS).words
 	echo > $@.tsv
-	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-3-no-initial-no-redundant.hfst hfst/en/norvig.hfst < corp/en/enwiki.$(WORDS).words > /dev/null ;\
-	done
-	awk -f profile-mems2tex.awk < $@.tsv > $@
+	echo "too much" > $@
+	#for i in $(TESTS) ; do \
+	#	hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-3-no-initial-no-redundant.hfst hfst/en/norvig.hfst < corp/en/enwiki.$(WORDS).words > /dev/null ;\
+	#done
+	#awk -f profile-mems2tex.awk < $@.tsv > $@
 
 results/fi/table2.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex: corp/fi/fiwiki.$(WORDS).words
 	echo > $@.tsv
-	for i in $(TESTS) ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-3-no-initial-no-redundant.hfst $(FI_DICT) < corp/fi/fiwiki.$(WORDS).words > /dev/null ;\
-	done
-	awk -f profile-mems2tex.awk < $@.tsv > $@
+	echo "too much" > $@
+	#for i in $(TESTS) ; do \
+	#	hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-3-no-initial-no-redundant.hfst $(FI_DICT) < corp/fi/fiwiki.$(WORDS).words > /dev/null ;\
+	#done
+	#awk -f profile-mems2tex.awk < $@.tsv > $@
 
 results/kl/table2.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex: corp/kl/klwiki.$(WORDS).words
 	echo > $@.tsv
@@ -1154,21 +1175,6 @@ results/table3.tex: $(TABLE3_DATA)
 		results/fi/table3.dict-omorfi.errm-ed3-no-initial.corp-wiki.tex \
 		results/kl/table3.dict-kl.errm-ed3-no-initial.corp-wiki.tex >> $@
 	echo "\\\\\\\\" >> $@
-	echo "Avoid redundancy and first edits ed 2 &" >> $@
-	paste -d '&' results/en/table3.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
-		results/fi/table3.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
-		results/kl/table3.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex >> $@
-	echo "\\\\\\\\" >> $@
-	echo "Avoid redundancy and first edits ed 3 &" >> $@
-	paste -d '&' results/en/table3.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
-		results/fi/table3.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
-		results/kl/table3.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex >> $@
-	echo "\\\\\\\\" >> $@
-	echo "Lower order first ed 1 to 2 &" >> $@
-	paste -d '&' results/en/table3.dict-norvig.errm-fallback.corp-wiki.tex \
-		results/fi/table3.dict-omorfi.errm-fallback.corp-wiki.tex \
-		results/kl/table3.dict-kl.errm-fallback.corp-wiki.tex >> $@
-	echo "\\\\\\\\" >> $@
 
 
 
@@ -1227,10 +1233,11 @@ results/fi/table3.dict-omorfi.errm-ed3.corp-wiki.tex: corp/fi/automisp.words
 	python tally_corrections.py corp/fi/temp_mispell_corrections corp/fi/temp_correct_corrections corp/fi/temp_original_correct_words > $@
 
 results/kl/table3.dict-kl.errm-ed3.corp-wiki.tex: corp/kl/automisp.words
-	cut -f 1 corp/kl/automisp.words | hfst-ospell-fsmnlp-2012 hfst/kl/errmodel.edit-distance-3.hfst $(KL_DICT) > corp/kl/temp_mispell_corrections
-	cut -f 2 corp/kl/automisp.words | hfst-optimized-lookup $(KL_DICT) > corp/kl/temp_correct_corrections
-	cut -f 2 corp/kl/automisp.words > corp/kl/temp_original_correct_words
-	python tally_corrections.py corp/kl/temp_mispell_corrections corp/kl/temp_correct_corrections corp/kl/temp_original_correct_words > $@
+	echo "---" > $@
+	#cut -f 1 corp/kl/automisp.words | hfst-ospell-fsmnlp-2012 hfst/kl/errmodel.edit-distance-3.hfst $(KL_DICT) > corp/kl/temp_mispell_corrections
+	# cut -f 2 corp/kl/automisp.words | hfst-optimized-lookup $(KL_DICT) > corp/kl/temp_correct_corrections
+	#cut -f 2 corp/kl/automisp.words > corp/kl/temp_original_correct_words
+	#python tally_corrections.py corp/kl/temp_mispell_corrections corp/kl/temp_correct_corrections corp/kl/temp_original_correct_words > $@
 
 # Table 3, ED 1, no initial
 
@@ -1287,10 +1294,11 @@ results/fi/table3.dict-omorfi.errm-ed3-no-initial.corp-wiki.tex: corp/fi/automis
 	python tally_corrections.py corp/fi/temp_mispell_corrections corp/fi/temp_correct_corrections corp/fi/temp_original_correct_words > $@
 
 results/kl/table3.dict-kl.errm-ed3-no-initial.corp-wiki.tex: corp/kl/automisp.words
-	cut -f 1 corp/kl/automisp.words | hfst-ospell-fsmnlp-2012 hfst/kl/errmodel.edit-distance-3-no-initial.hfst $(KL_DICT) > corp/kl/temp_mispell_corrections
-	cut -f 2 corp/kl/automisp.words | hfst-optimized-lookup $(KL_DICT) > corp/kl/temp_correct_corrections
-	cut -f 2 corp/kl/automisp.words > corp/kl/temp_original_correct_words
-	python tally_corrections.py corp/kl/temp_mispell_corrections corp/kl/temp_correct_corrections corp/kl/temp_original_correct_words > $@
+	echo "---" > $@
+	#cut -f 1 corp/kl/automisp.words | hfst-ospell-fsmnlp-2012 hfst/kl/errmodel.edit-distance-3-no-initial.hfst $(KL_DICT) > corp/kl/temp_mispell_corrections
+	#cut -f 2 corp/kl/automisp.words | hfst-optimized-lookup $(KL_DICT) > corp/kl/temp_correct_corrections
+	#cut -f 2 corp/kl/automisp.words > corp/kl/temp_original_correct_words
+	#python tally_corrections.py corp/kl/temp_mispell_corrections corp/kl/temp_correct_corrections corp/kl/temp_original_correct_words > $@
 
 # Table 4 (text type vs. speed)
 
@@ -1371,43 +1379,77 @@ TABLE5_DATA=\
 			results/en/table5.norvig.sigmasetsize \
 			results/fi/table5.omorfi-20110505.sigmasetsize \
 			results/kl/table5.kl.sigmasetsize  \
-			results/en/table5.norvig.sizes \
-			results/fi/table5.omorfi-20110505.sizes \
-			results/kl/table5.kl.sizes
+			results/en/table5.norvig.states \
+			results/fi/table5.omorfi-20110505.states \
+			results/kl/table5.kl.states \
+			results/en/table5.norvig.arcs \
+			results/fi/table5.omorfi-20110505.arcs \
+			results/kl/table5.kl.arcs
 
 TABLE6_DATA=results/en/table6.errmodel.edit-distance-1.sigmasetsize\
 			results/fi/table6.errmodel.edit-distance-1.sigmasetsize\
 			results/kl/table6.errmodel.edit-distance-1.sigmasetsize\
-			results/en/table6.errmodel.edit-distance-1.sizes \
-			results/en/table6.errmodel.edit-distance-1-no-initial.sizes \
-			results/en/table6.errmodel.edit-distance-2.sizes \
-			results/en/table6.errmodel.edit-distance-2-no-initial.sizes \
-			results/en/table6.errmodel.edit-distance-2-no-initial-no-redundant.sizes \
-			results/en/table6.errmodel.edit-distance-2-no-redundant.sizes \
-			results/en/table6.errmodel.edit-distance-3.sizes \
-			results/en/table6.errmodel.edit-distance-3-no-initial.sizes \
-			results/en/table6.errmodel.edit-distance-3-no-initial-no-redundant.sizes \
-			results/en/table6.errmodel.edit-distance-3-no-redundant.sizes \
-			results/fi/table6.errmodel.edit-distance-1.sizes \
-			results/fi/table6.errmodel.edit-distance-1-no-initial.sizes \
-			results/fi/table6.errmodel.edit-distance-2.sizes \
-			results/fi/table6.errmodel.edit-distance-2-no-initial.sizes \
-			results/fi/table6.errmodel.edit-distance-2-no-initial-no-redundant.sizes \
-			results/fi/table6.errmodel.edit-distance-2-no-redundant.sizes \
-			results/fi/table6.errmodel.edit-distance-3.sizes \
-			results/fi/table6.errmodel.edit-distance-3-no-initial.sizes \
-			results/fi/table6.errmodel.edit-distance-3-no-initial-no-redundant.sizes \
-			results/fi/table6.errmodel.edit-distance-3-no-redundant.sizes \
-			results/kl/table6.errmodel.edit-distance-1.sizes \
-			results/kl/table6.errmodel.edit-distance-1-no-initial.sizes \
-			results/kl/table6.errmodel.edit-distance-2.sizes \
-			results/kl/table6.errmodel.edit-distance-2-no-initial.sizes \
-			results/kl/table6.errmodel.edit-distance-2-no-initial-no-redundant.sizes \
-			results/kl/table6.errmodel.edit-distance-2-no-redundant.sizes \
-			results/kl/table6.errmodel.edit-distance-3.sizes \
-			results/kl/table6.errmodel.edit-distance-3-no-initial.sizes \
-			results/kl/table6.errmodel.edit-distance-3-no-initial-no-redundant.sizes \
-			results/kl/table6.errmodel.edit-distance-3-no-redundant.sizes
+			results/en/table6.errmodel.edit-distance-1.states \
+			results/en/table6.errmodel.edit-distance-1-no-initial.states \
+			results/en/table6.errmodel.edit-distance-2.states \
+			results/en/table6.errmodel.edit-distance-2-no-initial.states \
+			results/en/table6.errmodel.edit-distance-2-no-initial-no-redundant.states \
+			results/en/table6.errmodel.edit-distance-2-no-redundant.states \
+			results/en/table6.errmodel.edit-distance-3.states \
+			results/en/table6.errmodel.edit-distance-3-no-initial.states \
+			results/en/table6.errmodel.edit-distance-3-no-initial-no-redundant.states \
+			results/en/table6.errmodel.edit-distance-3-no-redundant.states \
+			results/fi/table6.errmodel.edit-distance-1.states \
+			results/fi/table6.errmodel.edit-distance-1-no-initial.states \
+			results/fi/table6.errmodel.edit-distance-2.states \
+			results/fi/table6.errmodel.edit-distance-2-no-initial.states \
+			results/fi/table6.errmodel.edit-distance-2-no-initial-no-redundant.states \
+			results/fi/table6.errmodel.edit-distance-2-no-redundant.states \
+			results/fi/table6.errmodel.edit-distance-3.states \
+			results/fi/table6.errmodel.edit-distance-3-no-initial.states \
+			results/fi/table6.errmodel.edit-distance-3-no-initial-no-redundant.states \
+			results/fi/table6.errmodel.edit-distance-3-no-redundant.states \
+			results/kl/table6.errmodel.edit-distance-1.states \
+			results/kl/table6.errmodel.edit-distance-1-no-initial.states \
+			results/kl/table6.errmodel.edit-distance-2.states \
+			results/kl/table6.errmodel.edit-distance-2-no-initial.states \
+			results/kl/table6.errmodel.edit-distance-2-no-initial-no-redundant.states \
+			results/kl/table6.errmodel.edit-distance-2-no-redundant.states \
+			results/kl/table6.errmodel.edit-distance-3.states \
+			results/kl/table6.errmodel.edit-distance-3-no-initial.states \
+			results/kl/table6.errmodel.edit-distance-3-no-initial-no-redundant.states \
+			results/kl/table6.errmodel.edit-distance-3-no-redundant.states \
+			results/en/table6.errmodel.edit-distance-1.arcs \
+			results/en/table6.errmodel.edit-distance-1-no-initial.arcs \
+			results/en/table6.errmodel.edit-distance-2.arcs \
+			results/en/table6.errmodel.edit-distance-2-no-initial.arcs \
+			results/en/table6.errmodel.edit-distance-2-no-initial-no-redundant.arcs \
+			results/en/table6.errmodel.edit-distance-2-no-redundant.arcs \
+			results/en/table6.errmodel.edit-distance-3.arcs \
+			results/en/table6.errmodel.edit-distance-3-no-initial.arcs \
+			results/en/table6.errmodel.edit-distance-3-no-initial-no-redundant.arcs \
+			results/en/table6.errmodel.edit-distance-3-no-redundant.arcs \
+			results/fi/table6.errmodel.edit-distance-1.arcs \
+			results/fi/table6.errmodel.edit-distance-1-no-initial.arcs \
+			results/fi/table6.errmodel.edit-distance-2.arcs \
+			results/fi/table6.errmodel.edit-distance-2-no-initial.arcs \
+			results/fi/table6.errmodel.edit-distance-2-no-initial-no-redundant.arcs \
+			results/fi/table6.errmodel.edit-distance-2-no-redundant.arcs \
+			results/fi/table6.errmodel.edit-distance-3.arcs \
+			results/fi/table6.errmodel.edit-distance-3-no-initial.arcs \
+			results/fi/table6.errmodel.edit-distance-3-no-initial-no-redundant.arcs \
+			results/fi/table6.errmodel.edit-distance-3-no-redundant.arcs \
+			results/kl/table6.errmodel.edit-distance-1.arcs \
+			results/kl/table6.errmodel.edit-distance-1-no-initial.arcs \
+			results/kl/table6.errmodel.edit-distance-2.arcs \
+			results/kl/table6.errmodel.edit-distance-2-no-initial.arcs \
+			results/kl/table6.errmodel.edit-distance-2-no-initial-no-redundant.arcs \
+			results/kl/table6.errmodel.edit-distance-2-no-redundant.arcs \
+			results/kl/table6.errmodel.edit-distance-3.arcs \
+			results/kl/table6.errmodel.edit-distance-3-no-initial.arcs \
+			results/kl/table6.errmodel.edit-distance-3-no-initial-no-redundant.arcs \
+			results/kl/table6.errmodel.edit-distance-3-no-redundant.arcs
+
 
 results/table5.tex: $(TABLE5_DATA)
 	echo "Sigma set size &" > $@
@@ -1415,10 +1457,22 @@ results/table5.tex: $(TABLE5_DATA)
 		results/fi/table5.omorfi-20110505.sigmasetsize \
 		results/kl/table5.kl.sigmasetsize >> $@
 	echo "\\\\\\\\" >> $@
-	echo "Dictionary sizes &" >> $@
-	paste -d '&' results/en/table5.norvig.sizes \
-		results/fi/table5.omorfi-20110505.sizes \
-		results/kl/table5.kl.sizes >> $@
+	echo "Dictionary FSM nodes &" >> $@
+	paste -d '&' results/en/table5.norvig.states \
+		results/fi/table5.omorfi-20110505.states \
+		results/kl/table5.kl.states >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Dictionary FSM arcs &" >> $@
+	paste -d '&' results/en/table5.norvig.arcs \
+		results/fi/table5.omorfi-20110505.arcs \
+		results/kl/table5.kl.arcs >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Dictionary FSM on HDD & " >> $@
+	ls -sh $(EN_DICT) | cut -d ' ' -f 1 | sed -e 's/$/iB &' >> $@
+	ls -sh $(FI_DICT) | cut -d ' ' -f 1 | sed -e 's/$/iB &' >> $@
+	ls -sh $(KL_DICT) | cut -d ' ' -f 1 | sed -e 's/$/iB &' >> $@
+	echo "\\\\\\\\" >> $@
+
 
 results/table6.tex: $(TABLE6_DATA)
 	echo "Sigma set size &" > $@
@@ -1426,48 +1480,91 @@ results/table6.tex: $(TABLE6_DATA)
 		results/fi/table6.errmodel.edit-distance-1.sigmasetsize \
 		results/kl/table6.errmodel.edit-distance-1.sigmasetsize >> $@
 	echo "\\\\\\\\" >> $@
-	echo "Edit distance 1 &" >> $@
-	paste -d '&' results/en/table6.errmodel.edit-distance-1.sizes \
-		results/fi/table6.errmodel.edit-distance-1.sizes \
-		results/kl/table6.errmodel.edit-distance-1.sizes >> $@
+	echo "Edit distance 1 nodes &" >> $@
+	paste -d '&' results/en/table6.errmodel.edit-distance-1.states \
+		results/fi/table6.errmodel.edit-distance-1.states \
+		results/kl/table6.errmodel.edit-distance-1.states >> $@
 	echo "\\\\\\\\" >> $@
-	echo "Edit distance 2 &" >> $@
-	paste -d '&' results/en/table6.errmodel.edit-distance-2.sizes \
-		results/fi/table6.errmodel.edit-distance-2.sizes \
-		results/kl/table6.errmodel.edit-distance-2.sizes >> $@
+	echo "Edit distance 1 arcs &" >> $@
+	paste -d '&' results/en/table6.errmodel.edit-distance-1.arcs \
+		results/fi/table6.errmodel.edit-distance-1.arcs \
+		results/kl/table6.errmodel.edit-distance-1.arcs >> $@
 	echo "\\\\\\\\" >> $@
-	echo "Edit distance 3 &" >> $@
-	paste -d '&' results/en/table6.errmodel.edit-distance-3.sizes \
-		results/fi/table6.errmodel.edit-distance-3.sizes \
-		results/kl/table6.errmodel.edit-distance-3.sizes >> $@
+	echo "Edit distance 2 nodes &" >> $@
+	paste -d '&' results/en/table6.errmodel.edit-distance-2.states \
+		results/fi/table6.errmodel.edit-distance-2.states \
+		results/kl/table6.errmodel.edit-distance-2.states >> $@
 	echo "\\\\\\\\" >> $@
-	echo "No first edits ed 1 & " >> $@
-	paste -d '&' results/en/table6.errmodel.edit-distance-1-no-initial.sizes \
-		results/fi/table6.errmodel.edit-distance-1-no-initial.sizes \
-		results/kl/table6.errmodel.edit-distance-1-no-initial.sizes >> $@
+	echo "Edit distance 2 arcs &" >> $@
+	paste -d '&' results/en/table6.errmodel.edit-distance-2.arcs \
+		results/fi/table6.errmodel.edit-distance-2.arcs \
+		results/kl/table6.errmodel.edit-distance-2.arcs >> $@
 	echo "\\\\\\\\" >> $@
-	echo "No first edits ed 2 &" >> $@
-	paste -d '&' results/en/table6.errmodel.edit-distance-2-no-initial.sizes \
-		results/fi/table6.errmodel.edit-distance-2-no-initial.sizes \
-		results/kl/table6.errmodel.edit-distance-2-no-initial.sizes >> $@
+	echo "Edit distance 3 nodes &" >> $@
+	paste -d '&' results/en/table6.errmodel.edit-distance-3.states \
+		results/fi/table6.errmodel.edit-distance-3.states \
+		results/kl/table6.errmodel.edit-distance-3.states >> $@
 	echo "\\\\\\\\" >> $@
-	echo "No first edits ed 3 &" >> $@
-	paste -d '&' results/en/table6.errmodel.edit-distance-3-no-initial.sizes \
-		results/fi/table6.errmodel.edit-distance-3-no-initial.sizes \
-		results/kl/table6.errmodel.edit-distance-3-no-initial.sizes >> $@
+	echo "Edit distance 3 arcs &" >> $@
+	paste -d '&' results/en/table6.errmodel.edit-distance-3.arcs \
+		results/fi/table6.errmodel.edit-distance-3.arcs \
+		results/kl/table6.errmodel.edit-distance-3.arcs >> $@
 	echo "\\\\\\\\" >> $@
-	echo "Avoid redundancy and first edits ed 2 &" >> $@
-	paste -d '&' results/en/table6.errmodel.edit-distance-2-no-initial-no-redundant.sizes \
-		results/fi/table6.errmodel.edit-distance-2-no-initial-no-redundant.sizes \
-		results/kl/table6.errmodel.edit-distance-2-no-initial-no-redundant.sizes >> $@
+	echo "No first edits ed 1 nodes & " >> $@
+	paste -d '&' results/en/table6.errmodel.edit-distance-1-no-initial.states \
+		results/fi/table6.errmodel.edit-distance-1-no-initial.states \
+		results/kl/table6.errmodel.edit-distance-1-no-initial.states >> $@
 	echo "\\\\\\\\" >> $@
-	echo "Avoid redundancy and first edits ed 3 &" >> $@
-	paste -d '&' results/en/table6.errmodel.edit-distance-3-no-initial-no-redundant.sizes \
-		results/fi/table6.errmodel.edit-distance-3-no-initial-no-redundant.sizes \
-		results/kl/table6.errmodel.edit-distance-3-no-initial-no-redundant.sizes >> $@
+	echo "No first edits ed 1 arcs & " >> $@
+	paste -d '&' results/en/table6.errmodel.edit-distance-1-no-initial.arcs \
+		results/fi/table6.errmodel.edit-distance-1-no-initial.arcs \
+		results/kl/table6.errmodel.edit-distance-1-no-initial.arcs >> $@
 	echo "\\\\\\\\" >> $@
-	echo "Lower order first ed 1 to 2 &" >> $@
-	echo "&&" >> $@
+	echo "No first edits ed 2 nodes &" >> $@
+	paste -d '&' results/en/table6.errmodel.edit-distance-2-no-initial.states \
+		results/fi/table6.errmodel.edit-distance-2-no-initial.states \
+		results/kl/table6.errmodel.edit-distance-2-no-initial.states >> $@
+	echo "\\\\\\\\" >> $@
+	echo "No first edits ed 2 arcs &" >> $@
+	paste -d '&' results/en/table6.errmodel.edit-distance-2-no-initial.arcs \
+		results/fi/table6.errmodel.edit-distance-2-no-initial.arcs \
+		results/kl/table6.errmodel.edit-distance-2-no-initial.arcs >> $@
+	echo "\\\\\\\\" >> $@
+	echo "No first edits ed 3 nodes &" >> $@
+	paste -d '&' results/en/table6.errmodel.edit-distance-3-no-initial.states \
+		results/fi/table6.errmodel.edit-distance-3-no-initial.states \
+		results/kl/table6.errmodel.edit-distance-3-no-initial.states >> $@
+	echo "\\\\\\\\" >> $@
+	echo "No first edits ed 3 arcs &" >> $@
+	paste -d '&' results/en/table6.errmodel.edit-distance-3-no-initial.arcs \
+		results/fi/table6.errmodel.edit-distance-3-no-initial.arcs \
+		results/kl/table6.errmodel.edit-distance-3-no-initial.arcs >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Avoid redundancy and firsts ed 2 nodes &" >> $@
+	paste -d '&' results/en/table6.errmodel.edit-distance-2-no-initial-no-redundant.states \
+		results/fi/table6.errmodel.edit-distance-2-no-initial-no-redundant.states \
+		results/kl/table6.errmodel.edit-distance-2-no-initial-no-redundant.states >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Avoid redundancy and firsts ed 2 arcs &" >> $@
+	paste -d '&' results/en/table6.errmodel.edit-distance-2-no-initial-no-redundant.arcs \
+		results/fi/table6.errmodel.edit-distance-2-no-initial-no-redundant.arcs \
+		results/kl/table6.errmodel.edit-distance-2-no-initial-no-redundant.arcs >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Avoid redundancy and firsts ed 3 nodes &" >> $@
+	paste -d '&' results/en/table6.errmodel.edit-distance-3-no-initial-no-redundant.states \
+		results/fi/table6.errmodel.edit-distance-3-no-initial-no-redundant.states \
+		results/kl/table6.errmodel.edit-distance-3-no-initial-no-redundant.states >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Avoid redundancy and firsts ed 3 arcs &" >> $@
+	paste -d '&' results/en/table6.errmodel.edit-distance-3-no-initial-no-redundant.arcs \
+		results/fi/table6.errmodel.edit-distance-3-no-initial-no-redundant.arcs \
+		results/kl/table6.errmodel.edit-distance-3-no-initial-no-redundant.arcs >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Lower order first ed 1 to 2 arcs &" >> $@
+	echo "add & above & rows" >> $@
+	echo "\\\\\\\\" >> $@
+	echo "Lower order first ed 1 to 2 nodes &" >> $@
+	echo "add & above & rows" >> $@
 	echo "\\\\\\\\" >> $@
 
 results/en/table6.%.sigmasetsize: hfst/en/%.hfst
@@ -1485,23 +1582,39 @@ results/kl/table6.%.sigmasetsize: hfst/kl/%.hfst
 		fgrep 'sigma set size' |\
 		sed -e 's/^.*://' > $@
 
-results/en/table6.%.sizes: hfst/en/%.hfst
-	hfst-summarize $< |\
-		grep '# of \(states\|arcs\)' |\
-		sed -e 's/^.*://' |\
-		tr -s "\n" "," > $@
 
-results/fi/table6.%.sizes: hfst/fi/%.hfst
+results/en/table6.%.states: hfst/en/%.hfst
 	hfst-summarize $< |\
-		grep '# of \(states\|arcs\)' |\
-		sed -e 's/^.*://' |\
-		tr -s "\n" "," > $@
+		fgrep '# of states' |\
+		sed -e 's/^.*://' > $@
 
-results/kl/table6.%.sizes: hfst/kl/%.hfst
+results/fi/table6.%.states: hfst/fi/%.hfst
 	hfst-summarize $< |\
-		grep '# of \(states\|arcs\)' |\
-		sed -e 's/^.*://' |\
-		tr -s "\n" "," > $@
+		fgrep '# of states' |\
+		sed -e 's/^.*://' > $@
+
+results/kl/table6.%.states: hfst/kl/%.hfst
+	hfst-summarize $< |\
+		fgrep '# of states' |\
+		sed -e 's/^.*://' > $@
+
+
+results/en/table6.%.arcs: hfst/en/%.hfst
+	hfst-summarize $< |\
+		fgrep '# of arcs' |\
+		sed -e 's/^.*://' > $@
+
+results/fi/table6.%.arcs: hfst/fi/%.hfst
+	hfst-summarize $< |\
+		fgrep '# of arcs' |\
+		sed -e 's/^.*://' > $@
+
+results/kl/table6.%.arcs: hfst/kl/%.hfst
+	hfst-summarize $< |\
+		fgrep '# of arcs' |\
+		sed -e 's/^.*://' > $@
+
+
 
 
 results/en/table5.%.sigmasetsize: hfst/en/%.hfst
@@ -1519,22 +1632,35 @@ results/kl/table5.%.sigmasetsize: hfst/kl/%.hfst
 		fgrep 'sigma set size' |\
 		sed -e 's/^.*://' > $@
 
-results/en/table5.%.sizes: hfst/en/%.hfst
+results/en/table5.%.states: hfst/en/%.hfst
 	hfst-summarize $< |\
-		grep '# of \(states\|arcs\)' |\
-		sed -e 's/^.*://' |\
-		tr -s "\n" "," > $@
+		fgrep '# of states' |\
+		sed -e 's/^.*://' > $@
 
-results/fi/table5.%.sizes: hfst/fi/%.hfst
+results/fi/table5.%.states: hfst/fi/%.hfst
 	hfst-summarize $< |\
-		grep '# of \(states\|arcs\)' |\
-		sed -e 's/^.*://' |\
-		tr -s "\n" "," > $@
+		fgrep '# of states' |\
+		sed -e 's/^.*://' > $@
 
-results/kl/table5.%.sizes: hfst/kl/%.hfst
+results/kl/table5.%.states: hfst/kl/%.hfst
 	hfst-summarize $< |\
-		grep '# of \(states\|arcs\)' |\
-		sed -e 's/^.*://' |\
-		tr -s "\n" "," > $@
+		fgrep '# of states' |\
+		sed -e 's/^.*://' > $@
+
+
+results/en/table5.%.arcs: hfst/en/%.hfst
+	hfst-summarize $< |\
+		fgrep '# of arcs' |\
+		sed -e 's/^.*://' > $@
+
+results/fi/table5.%.arcs: hfst/fi/%.hfst
+	hfst-summarize $< |\
+		fgrep '# of arcs' |\
+		sed -e 's/^.*://' > $@
+
+results/kl/table5.%.arcs: hfst/kl/%.hfst
+	hfst-summarize $< |\
+		fgrep '# of arcs' |\
+		sed -e 's/^.*://' > $@
 
 
