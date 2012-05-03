@@ -321,10 +321,15 @@ picked 100,000 first word tokens for evaluation purposes.
 
 In Table~\ref{table:dictionary-sizes} we summarize the sizes of automata in
 terms of structural elements. On the first row, we give the effective size of
-alphabet needed to represent the whole dictionary, this is all the alphabetic
-characters and punctuation that is used in the dictionary. Then we give the
-sizes of the automata; the first number is the amount of vertices and the
-second number is the amount of edges.
+alphabet needed to represent the whole dictionary, this is all the Unicode
+code points that have been used in the dictionary, including alphabets, 
+punctuation and spaces. Next we give the sizes of automata as nodes and
+arcs of the finite-state automaton encoding the dictionary. Last we give the
+size of the automaton as serialised on the hard disk, while this is not the
+same amount of memory as its loaded data structures, it gives some indication
+of memory usage of the automaton in running program. As can be clearly
+seen from the table, the morphological complexity correlates quite directly
+in all of structural elements of automaton.
 
 \begin{table}[h]
 \begin{center}
@@ -333,7 +338,7 @@ second number is the amount of edges.
 \hline
 \bf Automaton & \bf En & \bf Fi & \bf Kl  \\ 
 \hline
-Sigma set size &
+$\Sigma$ set size &
  43& 117& 133
 \\
 Dictionary FSM nodes &
@@ -350,11 +355,17 @@ Dictionary FSM arcs &
 The sizes of dictionaries as automata}
 \end{table}
 
-In the Table~\ref{table:error-sizes} we give the sizes of error models we've
-generated. The sigma set size row shows the reduction made for the error models,
-we have removed the parts of alphabet from the error models that is usually not
-considered to be part of spell-checking mechanism, such as all punctuation that
-does not occur word-internally. 
+In the Table~\ref{table:error-sizes} we give the same calculations for the
+sizes of error models we've generated. The sigma set size row here shows the
+amount of alphabets left, when we have removed the parts of alphabet from the
+error models that is usually not considered to be part of spell-checking
+mechanism, such as all punctuation that does not occur word-internally and
+white-space characters\footnote{The method described here does not handle
+run-on words or extraneous spaces, as they introduce lot of programmatic
+complexity which we believe is irrelevant to the results of this experiment.}.
+Note, that sizes of error models can be directly computed from its parameters;
+i.e., the distance, the $\Sigma$ set size and the optimisation, this table
+is provided for reference only.
 
 \begin{table}[h]
 \begin{center}
@@ -363,7 +374,7 @@ does not occur word-internally.
 \hline
 \bf Automaton & \bf En & \bf Fi & \bf Kl  \\ 
 \hline
-Sigma set size &
+$\Sigma$ set size &
  28& 60& 64
 \\
 Edit distance 1 nodes &
@@ -425,24 +436,6 @@ add & above & rows
 \end{center}
 \caption{\label{table:error-sizes}
 The sizes of error models as automata}
-\end{table}
-
-
-\begin{table}[h]
-\begin{center}
-\begin{scriptsize}
-\begin{tabular}{|l|rrrr|}
-\hline
-\bf Point of restriction & \bf 1 & \bf 2 & \bf 3 & \bf 4 \\
-\hline
-\bf States \\
-\bf Arcs \\
-\hline
-\end{tabular}
-\caption{\label{restricted} The size of the dictionary after restriction at
-various points}
-\end{scriptsize}
-\end{center}
 \end{table}
 
 
@@ -527,6 +520,15 @@ Lower order first ed 1 to 2 &
 error models to speed}
 \end{table}
 
+The results show that not editing the first position does indeed give
+significant boost to the speed, regardless of language model, which is of course
+caused by the significant reduction in search space. However, the
+redundancy avoidance does not seem to make reasonable difference, this is most
+likely because the amount of duplicate paths in the search space is not so
+proportionally large and their traversal will be relatively fast. The separate
+application of error models gives the expected timing result between its
+relevant primary and secondary error models.
+
 In the Table~\ref{table:error-model-vs-language-memory} we measure the memory
 consumption when performing the same tests. The tests here are also performed
 using unmodified native language corpora and with same language and error
@@ -573,6 +575,20 @@ Lower order first ed 1 to 2 &
 \caption{\label{table:error-model-vs-language-memory} Effect of language and 
 error models to memory consumption}
 \end{table}
+
+The memory measurements show an interesting feature of our method of applying
+the spell-checking and correction here; the memory usage stays nearly same
+regardless of the selected error model. We assume that the memory figures shown
+in the table are dominated by the memory stamp of the dictionary automaton and
+the error model automaton loaded into memory, and the intermediate structures
+used by the error-applying traversal of the automaton will not typically
+contribute much (approx. half mebibyte for each larger edit distance), since
+they are created and deleted on-the-fly. One practical thing to note here is,
+the memory footstamp does give suggestion of how much available RAM is needed
+to get speed measurements of the
+table~\ref{table:error-model-vs-language-speed}, as our experience shows that
+if the dictionary automaton is partially in swap memory, the speed will
+decrease by order of magnitude in current operating systems.
 
 To measure the degradation of quality when using different error models we
 count the proportion of suggestion sets that contain the correct correction
@@ -623,6 +639,8 @@ Lower order first ed 1 to 2 &
 error models to quality}
 \end{table}
 
+These results tell us that our scripts are not working at all.
+
 Finally we measure how the text type used will effect the speed of the
 spell-checking. As the best-case scenario we use the unmodified texts of
 Wikipedia, which contain probably the most realistic native language
@@ -661,7 +679,7 @@ Text in another language &
 error models to speed}
 \end{table}
 
-
+The interestin thing to note here is, that \ldots
 
 
 \section{Conclusions}
