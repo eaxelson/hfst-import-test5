@@ -1,0 +1,9 @@
+This is a directory that contains a very simple example of a transducer library
+that is added under HFST. 
+The name of the library is My Finite-State Transducer Library - MFSTL.
+The library contains only two files, MyFst.h and MyFst.cc. 
+In the files is defined a transducer class MyFst that is written in namespace mfstl.
+
+The file libhfst/src/implementations/MfstlTransducer.cc forms a bridge between HFST and MFSTL.
+
+More info coming..
