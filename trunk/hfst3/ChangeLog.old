@@ -1,3 +1,137 @@
+2012-04-04 14:22  eaxelson
+
+	* tools/src/hfst-compose-intersect.cc, tools/src/hfst-compose.cc,
+	  tools/src/hfst-concatenate.cc, tools/src/hfst-conjunct.cc,
+	  tools/src/hfst-disjunct.cc, tools/src/hfst-subtract.cc: All
+	  binary tools now handle the case where the first input contains
+	  several transducers and the second input exactly one transducer.
+
+2012-04-04 13:31  sdrobac
+
+	* configure.ac, man/hfst-calculate.1, man/hfst-compare.1,
+	  man/hfst-compose-intersect.1, man/hfst-compose.1,
+	  man/hfst-concatenate.1, man/hfst-conjunct.1,
+	  man/hfst-determinize.1, man/hfst-disjunct.1, man/hfst-format.1,
+	  man/hfst-fst2fst.1, man/hfst-fst2strings.1, man/hfst-fst2txt.1,
+	  man/hfst-head.1, man/hfst-invert.1, man/hfst-minimize.1,
+	  man/hfst-name.1, man/hfst-project.1, man/hfst-push-weights.1,
+	  man/hfst-regexp2fst.1, man/hfst-remove-epsilons.1,
+	  man/hfst-repeat.1, man/hfst-reverse.1, man/hfst-split.1,
+	  man/hfst-strings2fst.1, man/hfst-substitute.1,
+	  man/hfst-subtract.1, man/hfst-summarize.1, man/hfst-tail.1,
+	  man/hfst-txt2fst.1,
+	  test/tools/fsmbook-examples/BrazilianPortuguese2/BrazilianPortuguese.hfst.script,
+	  test/tools/fsmbook-examples/BrazilianPortuguese2/BrazilianPortuguese.xfst.att,
+	  test/tools/fsmbook-examples/BrazilianPortuguese2/BrazilianPortuguese.xfst.script,
+	  test/tools/fsmbook-examples/BrazilianPortuguese2/Makefile.am,
+	  test/tools/fsmbook-examples/BrazilianPortuguese2/README,
+	  test/tools/fsmbook-examples/BrazilianPortuguese2/test.script,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/brazilian-portuguese2-test.sh:
+	  BrazilianPortuguese2 fmsbook example added to tests
+
+2012-04-04 11:54  sdrobac
+
+	* test/tools/fsmbook-examples/BrazilianPortuguese1/BrazilianPortuguese1.hfst.script,
+	  test/tools/fsmbook-examples/BrazilianPortuguese1/BrazilianPortuguese1.xfst.att,
+	  test/tools/fsmbook-examples/BrazilianPortuguese1/BrazilianPortuguese1.xfst.script,
+	  test/tools/fsmbook-examples/BrazilianPortuguese1/README,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/test-example.sh,
+	  test/tools/fsmbook-examples/xfst-prolog-to-hfst-att.sh:
+	  BrazilianPortuguese1 test should pass now
+
+2012-04-04 09:37  eaxelson
+
+	* tools/src/hfst-compare.cc: hfst-compare now handles the case
+	  where the first input contains several transducers and the second
+	  input exactly one transducer.
+
+2012-04-04 09:11  eaxelson
+
+	* tools/src/hfst-compose.cc: hfst-compose now handles the case
+	  where the first input contains several transducers and the second
+	  input exactly one transducer.
+
+2012-04-03 14:59  eaxelson
+
+	* tools/src/hfst-summarize.cc: hfst-summarize now prints at the end
+	  how many transducers it has read in total.
+
+2012-04-03 13:58  eaxelson
+
+	* tools/src/inc/check-params-binary.h: Added documentation to
+	  different cases that are gone through when checking binary
+	  parameters.
+
+2012-04-03 13:56  eaxelson
+
+	* tools/src/hfst-twolc/src/htwolcpre3.yy: Changed the variable name
+	  stdout to stdout_ to avoid namespace conflicts.
+
+2012-04-03 13:34  sdrobac
+
+	* test/tools/fsmbook-examples/FinnishOTProsody/Makefile.am:
+	  forgotten Makefile.am
+
+2012-04-03 12:44  sdrobac
+
+	* configure.ac: Configure file had to be changed to compile fsm
+	  book examples
+
+2012-04-03 12:43  sdrobac
+
+	* test/tools/fsmbook-examples/Makefile.am: Fsmbook examples update
+
+2012-04-03 12:34  sdrobac
+
+	* test/tools/fsmbook-examples/BrazilianPortuguese1/BrazilianPortuguese1.xfst.att,
+	  test/tools/fsmbook-examples/BrazilianPortuguese1/Makefile.am,
+	  test/tools/fsmbook-examples/FinnishOTProsody/FinnishOTProsody.hfst.script,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/YaleShooting/Makefile.am,
+	  test/tools/fsmbook-examples/test-example.sh,
+	  test/tools/fsmbook-examples/xfst-att-to-hfst-att.sh,
+	  test/tools/fsmbook-examples/xfst-prolog-to-hfst-att.sh: Fsmbook
+	  examples update
+
+2012-04-03 12:29  sdrobac
+
+	* libhfst/src/HfstExceptionDefs.cc,
+	  libhfst/src/HfstExceptionDefs.h, libhfst/src/HfstTransducer.cc,
+	  libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/HfstXeroxRulesTest.cc,
+	  libhfst/src/parsers/xre_parse.yy: In xfstRules, removed TMP
+	  marker from the result alphabet
+
+2012-04-02 10:04  eaxelson
+
+	* tools/src/hfst-compose-intersect.cc: Updated
+	  hfst-compose-intersect help message.
+
+2012-04-02 09:34  eaxelson
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/parsers/lexc-utils.cc,
+	  libhfst/src/parsers/xre_parse.yy: Appended namespace std:: in
+	  front of vector and pair where avoiding it might cause
+	  compilation problems. Also changed calls to 'rindex' to
+	  'strrchar'.
+
+2012-03-27 08:42  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.h:
+	  Doxygen for the speller and some ol internals
+
+2012-03-26 14:28  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS: Forgot to commit ChangeLog and
+	  NEWS, now ready for release 3.3.9.
+
+2012-03-26 14:09  eaxelson
+
+	* configure.ac, libhfst/src/Makefile.am: Ready for release 3.3.9
+
 2012-03-26 13:36  eaxelson
 
 	* man/hfst-calculate.1, man/hfst-fst2fst.1, man/hfst-regexp2fst.1,

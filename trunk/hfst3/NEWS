@@ -5,6 +5,23 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.3.11
+----------------------------
+
+* Changes to hfst-proc text formatting
+
+* Containment and term negation added to regexp parser
+
+* Composing intersection supports identity symbols and 
+  inverting the composition
+
+* Introduction of semifunctional pmatch2fst parser
+
+* Function shuffle added under HfstTransducer
+
+* Added the option --print-separator in hfst-fst2strings
+  to achieve better control of pipelined command line tools
+
 Noteworthy changes in 3.3.10
 ----------------------------
 
