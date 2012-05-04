@@ -1,3 +1,237 @@
+2012-04-27 06:22  moshagen
+
+	* libhfst/src/parsers, tools/src: Ignore generated items.
+
+2012-04-26 15:49  eaxelson
+
+	* configure.ac, test/tools/shuffle-functionality.sh: Now
+	  hfst-shuffle is disabled by default.
+
+2012-04-26 11:33  eaxelson
+
+	* configure.ac, libhfst/src/HfstTransducer.cc,
+	  libhfst/src/HfstTransducer.h,
+	  test/libhfst/test_transducer_functions.cc,
+	  test/tools/Makefile.am, test/tools/ab.txt,
+	  test/tools/ab_shuffle_bc.txt, test/tools/aid.txt,
+	  test/tools/aid_shuffle_idb.txt, test/tools/bc.txt,
+	  test/tools/id.txt, test/tools/id_shuffle_id.txt,
+	  test/tools/idb.txt, test/tools/shuffle-functionality.sh,
+	  tools/src/Makefile.am, tools/src/hfst-shuffle.cc: Added the
+	  command line tool hfst-shuffle and functionality tests for that.
+
+2012-04-25 13:39  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  test/libhfst/test_transducer_functions.cc: Tentatively added
+	  function shuffle under HfstTransducer.
+
+2012-04-23 16:06  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: A nicer single production
+	  for INSERT
+
+2012-04-23 14:57  eaxelson
+
+	* libhfst/src/implementations/SfstTransducer.cc: Fixed a bug in
+	  SfstTransducer::random_path that happened when indexing states of
+	  the argument transducer.
+
+2012-04-23 14:23  hardwick
+
+	* configure.ac, libhfst/src/Makefile.am,
+	  libhfst/src/parsers/Makefile.am,
+	  libhfst/src/parsers/PmatchCompiler.cc,
+	  libhfst/src/parsers/PmatchCompiler.h,
+	  libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h, tools/src/Makefile.am,
+	  tools/src/hfst-pmatch2fst.cc: Introduction of semifunctional
+	  pmatch2fst
+
+2012-04-18 23:03  moshagen
+
+	* tools/src/hfst-proc/formatter.cc: No plus sign in front of tags
+	  in CG mode, not even the special carry-through tag.
+
+2012-04-18 17:37  moshagen
+
+	* tools/src/hfst-proc/formatter.cc,
+	  tools/src/hfst-proc/formatter.h: Added experimental support for
+	  printing the raw analysis tag as part of the Xerox analysis. It
+	  is printed as a tag with a special prefix, and with the full
+	  analysis string enclosed in quotes. The idea is that vislcg, if
+	  enhanced to read the Xerox format, should carry this "tag"
+	  through the disambiguation (and possibly analysis), and print it
+	  out on the other end. The tag can then be used as input to
+	  morphological generation.
+
+2012-04-18 16:25  moshagen
+
+	* test/tools/fsmbook-examples/BrazilianPortuguese1,
+	  test/tools/fsmbook-examples/BrazilianPortuguese2: Ignore
+	  auto-generated files.
+
+2012-04-18 13:55  moshagen
+
+	* tools/src/hfst-proc/formatter.cc: Print the raw analysis string
+	  as a specially prefixed tag at the end, instead of as a
+	  sub-reading in the beginning of the analysis.
+
+2012-04-18 12:53  eaxelson
+
+	* test/tools/fst2txt-functionality.sh: Now hfst-fst2txt
+	  functionality test tests whether the program dot exists before
+	  using it.
+
+2012-04-18 12:32  eaxelson
+
+	* test/tools/fsmbook-examples/BrazilianPortuguese2/BrazilianPortuguese2.hfst.script:
+	  Changed call to the installed hfst-regexp2fst to the one in
+	  tools/src/.
+
+2012-04-18 12:25  eaxelson
+
+	* test/tools/fsmbook-examples/BrazilianPortuguese1/BrazilianPortuguese1.hfst.script:
+	  Changed call to the installed hfst-regexp2fst to the one in
+	  tools/src/.
+
+2012-04-17 01:21  mie
+
+	* libhfst/src/parsers/xre_parse.yy: Add containments and term
+	  negation, remove nasty windows formatting markers
+
+2012-04-16 15:16  eaxelson
+
+	* man/hfst-fst2strings.1, tools/src/hfst-fst2strings.cc: Added the
+	  option --print-separator in hfst-fst2strings. The option will
+	  print
+	  a separating line "--" after each input transducer is processed.
+
+2012-04-16 15:11  eaxelson
+
+	* libhfst/src/implementations/FomaTransducer.cc,
+	  libhfst/src/implementations/SfstTransducer.cc:
+	  FomaInputStream::write_transducer and
+	  SfstInputStream::write_transducer now call fflush
+	  after writing the transducer. Now the command line tools should
+	  work correctly when pipelined.
+
+2012-04-16 14:57  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy: The regexp [?] was parsed as
+	  [?|?:?] by FomaTransducer::define_transducer(const &string, const
+	  &string).
+	  This is now circumvented by using
+	  FomaTransducer::define_transducer(const &string) instead.
+	  This bug will be reported and fixed soon.
+
+2012-04-16 12:42  eaxelson
+
+	* man/Makefile.am, man/hfst-compose-intersect.1: Manpages are not
+	  created unless 'make man' is executed in directory man.
+
+2012-04-13 13:30  mpsilfve
+
+	* tools/src/hfst-compose-intersect.cc: Added support for inverting
+	  the composition i.e. computing intersect(rules) .o. lexicon
+	  instead of lexicon .o. intersect(rules).
+
+2012-04-13 13:28  mpsilfve
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h:
+	  Added possibility to invert the composition in compose_intersect
+	  i.e. to compute intersect(rules) .o. lexicon instead of lexicon
+	  .o. intersect(rules). Also added added support for indetity
+	  symbols in the lexicon to compose_intersect.
+
+2012-04-12 15:29  eaxelson
+
+	* libhfst/src/implementations/ConvertTransducerFormat.h,
+	  libhfst/src/implementations/HfstConstantTransducer.cc,
+	  libhfst/src/implementations/HfstConstantTransducer.h,
+	  libhfst/src/implementations/Makefile.am: Removed
+	  HfstConstantTransducer as it is not used.
+
+2012-04-12 14:15  eaxelson
+
+	* configure.ac, libhfst/src/Makefile.am: Removed FinnishOTProsody
+	  from tests as it does not yet work. Also added
+	  HfstXeroxRulesTest.cc to EXTRA_DIST.
+
+2012-04-11 11:28  eaxelson
+
+	* man/Makefile.am, man/hfst-head.1, man/hfst-tail.1: Temporarily
+	  excluded hfst-lookup from man page creation (due to a bug in
+	  help2man?). Also updated hfst-tail and hfst-head man pages.
+
+2012-04-10 22:31  mie
+
+	* test/tools/Makefile.am, test/tools/head-functionality.sh,
+	  tools/src/hfst-commandline.cc, tools/src/hfst-commandline.h,
+	  tools/src/hfst-head.cc, tools/src/hfst-regexp2fst.cc,
+	  tools/src/hfst-tail.cc: Heads and tails with plusses and minuses
+
+2012-04-10 19:24  mie
+
+	* test/tools/Makefile.am, test/tools/head-functionality.sh,
+	  test/tools/tail-functionality.sh: Test negative heads and
+	  positive tails
+
+2012-04-05 12:51  eaxelson
+
+	* configure.ac, test/tools/fsmbook-examples/Makefile.am: Added
+	  Brazilian Portuguese tests to fsmbook-examples, they now work
+	  because missing files were added.
+
+2012-04-05 12:49  sdrobac
+
+	* test/tools/fsmbook-examples/DateParser/DateParser.xfst.att,
+	  test/tools/fsmbook-examples/DateParser/DateParser.xfst.script,
+	  test/tools/fsmbook-examples/brazilian-portuguese1-test.sh,
+	  test/tools/fsmbook-examples/xfst-prolog-to-hfst-att.sh: adding
+	  missing files
+
+2012-04-05 12:42  sdrobac
+
+	* test/tools/fsmbook-examples/BrazilianPortuguese2/BrazilianPortuguese2.hfst.script,
+	  test/tools/fsmbook-examples/BrazilianPortuguese2/BrazilianPortuguese2.xfst.att,
+	  test/tools/fsmbook-examples/BrazilianPortuguese2/BrazilianPortuguese2.xfst.script:
+	  Added missing files
+
+2012-04-05 09:07  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am: Ready for release 3.3.10.
+
+2012-04-05 08:38  eaxelson
+
+	* configure.ac, test/tools/fsmbook-examples/Makefile.am: Brazilian
+	  Portuguese tests disabled in fstmbook-examples to get a working
+	  release. They probably had missing files.
+
+2012-04-05 08:14  eaxelson
+
+	* man/hfst-compare.1, man/hfst-compose.1, man/hfst-concatenate.1,
+	  man/hfst-conjunct.1, man/hfst-disjunct.1, man/hfst-subtract.1:
+	  Updated man pages of binary tools as their help messages were
+	  changed.
+
+2012-04-05 08:06  eaxelson
+
+	* tools/src/hfst-compose.cc, tools/src/hfst-concatenate.cc,
+	  tools/src/hfst-program-options.cc: Added documentation to the
+	  binary tools about the restored feature that the first input can
+	  have several transducers while the second has only one.
+
+2012-04-05 08:02  eaxelson
+
+	* libhfst/src/implementations/TropicalWeightTransducer.cc:
+	  TropicalWeightTransducer::extract_random_paths now also
+	  calculates the weight of each path. Fixes bug ID 3514912.
+
 2012-04-04 14:22  eaxelson
 
 	* tools/src/hfst-compose-intersect.cc, tools/src/hfst-compose.cc,
