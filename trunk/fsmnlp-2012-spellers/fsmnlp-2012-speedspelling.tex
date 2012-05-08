@@ -271,8 +271,13 @@ model and then composing the result with the language model.
 If we simplify the error model to one in which only substitutions occur, it can
 already be seen that this method is quite sensitive to input length and
 alphabet size. The composition explores each combination of edit sites in the
-input string (i.e. $\sum_{i=1}^d n \choose i$, where $n$ is the input length
-and $d$ is the edit distance) and each edit for each site ($|\Sigma| - 1$, the
+input string. If any number of edits up to $d$ can be made at positions in an
+input string of length $n$, there are
+\begin{displaymath}
+\sum_{i=1}^{d} {n \choose i}
+\end{displaymath}
+ways to choose the edit site, and each site is subject to a choice of
+$|\Sigma| - 1$ edits (the
 entire alphabet except for the actual input). This results in an $O(n^d \cdot
 |\Sigma|)$ algorithm, or for an English 26-letter lowercase alphabet, swap
 distance $2$ and the $8$-letter word ``spelling'', $700$ strings that are
@@ -286,7 +291,7 @@ Plainly, it would be desirable to improve on this. The intuition behind our
 improvement is that when editing an input string, say ``spellling'', it is a
 wasted effort to explore the remainder after generating a prefix that is not
 present in the lexicon. For example, after changing the first character to ``z''
-and not editing the second characted, we have the prefix ``zp-'', which does
+and not editing the second characted, we have the prefix \mbox{``zp-''}, which does
 not occur in our English lexicon. So the remaining possibilities - performing
 any remaining edits on the remaining $7$-character word - can be ignored.
 
