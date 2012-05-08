@@ -733,37 +733,37 @@ results/table1.tex: $(TABLE1_DATA)
 		results/fi/table1.dict-omorfi.errm-ed3.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-ed3.corp-wiki.tex >> $@
 	echo "\\\\\\\\" >> $@
-	echo "No first edits ed 1 & " >> $@
+	echo "No firsts ed 1 & " >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed1-no-initial.corp-wiki.tex \
 		results/fi/table1.dict-omorfi.errm-ed1-no-initial.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-ed1-no-initial.corp-wiki.tex >> $@
 	echo "\\\\\\\\" >> $@
-	echo "No first edits ed 2 &" >> $@
+	echo "No firsts ed 2 &" >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed2-no-initial.corp-wiki.tex \
 		results/fi/table1.dict-omorfi.errm-ed2-no-initial.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-ed2-no-initial.corp-wiki.tex >> $@
 	echo "\\\\\\\\" >> $@
-	echo "No first edits ed 3 &" >> $@
+	echo "No firsts ed 3 &" >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed3-no-initial.corp-wiki.tex \
 		results/fi/table1.dict-omorfi.errm-ed3-no-initial.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-ed3-no-initial.corp-wiki.tex >> $@
 	echo "\\\\\\\\" >> $@
-	echo "Avoid redundancy ed 2 &" >> $@
+	echo "No redundancy ed 2 &" >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed2-no-redundant.corp-wiki.tex \
 		results/fi/table1.dict-omorfi.errm-ed2-no-redundant.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-ed2-no-redundant.corp-wiki.tex >> $@
 	echo "\\\\\\\\" >> $@
-	echo "Avoid redundancy ed 3 &" >> $@
+	echo "No redundancy ed 3 &" >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed3-no-redundant.corp-wiki.tex \
 		results/fi/table1.dict-omorfi.errm-ed3-no-redundant.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-ed3-no-redundant.corp-wiki.tex >> $@
 	echo "\\\\\\\\" >> $@
-	echo "Avoid redundancy and first edits ed 2 &" >> $@
+	echo "No redundancy and firsts ed 2 &" >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
 		results/fi/table1.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex >> $@
 	echo "\\\\\\\\" >> $@
-	echo "Avoid redundancy and first edits ed 3 &" >> $@
+	echo "No redundancy and firsts ed 3 &" >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
 		results/fi/table1.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
 		results/kl/table1.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex >> $@
@@ -998,17 +998,17 @@ results/table3.tex: $(TABLE3_DATA)
 		results/fi/table3.dict-omorfi.errm-ed3.corp-wiki.tex \
 		results/kl/table3.dict-kl.errm-ed3.corp-wiki.tex >> $@
 	echo "\\\\\\\\" >> $@
-	echo "No first edits ed 1 & " >> $@
+	echo "No firsts ed 1 & " >> $@
 	paste -d '&' results/en/table3.dict-norvig.errm-ed1-no-initial.corp-wiki.tex \
 		results/fi/table3.dict-omorfi.errm-ed1-no-initial.corp-wiki.tex \
 		results/kl/table3.dict-kl.errm-ed1-no-initial.corp-wiki.tex >> $@
 	echo "\\\\\\\\" >> $@
-	echo "No first edits ed 2 &" >> $@
+	echo "No firsts ed 2 &" >> $@
 	paste -d '&' results/en/table3.dict-norvig.errm-ed2-no-initial.corp-wiki.tex \
 		results/fi/table3.dict-omorfi.errm-ed2-no-initial.corp-wiki.tex \
 		results/kl/table3.dict-kl.errm-ed2-no-initial.corp-wiki.tex >> $@
 	echo "\\\\\\\\" >> $@
-	echo "No first edits ed 3 &" >> $@
+	echo "No firsts ed 3 &" >> $@
 	paste -d '&' results/en/table3.dict-norvig.errm-ed3-no-initial.corp-wiki.tex \
 		results/fi/table3.dict-omorfi.errm-ed3-no-initial.corp-wiki.tex \
 		results/kl/table3.dict-kl.errm-ed3-no-initial.corp-wiki.tex >> $@
@@ -1380,56 +1380,56 @@ results/table6.tex: $(TABLE6_DATA)
 		results/fi/table6.errmodel.edit-distance-3.arcs \
 		results/kl/table6.errmodel.edit-distance-3.arcs >> $@
 	echo "\\\\\\\\" >> $@
-	echo "No first edits ed 1 nodes & " >> $@
+	echo "No firsts ed 1 nodes & " >> $@
 	paste -d '&' results/en/table6.errmodel.edit-distance-1-no-initial.states \
 		results/fi/table6.errmodel.edit-distance-1-no-initial.states \
 		results/kl/table6.errmodel.edit-distance-1-no-initial.states >> $@
 	echo "\\\\\\\\" >> $@
-	echo "No first edits ed 1 arcs & " >> $@
+	echo "No firsts ed 1 arcs & " >> $@
 	paste -d '&' results/en/table6.errmodel.edit-distance-1-no-initial.arcs \
 		results/fi/table6.errmodel.edit-distance-1-no-initial.arcs \
 		results/kl/table6.errmodel.edit-distance-1-no-initial.arcs >> $@
 	echo "\\\\\\\\" >> $@
-	echo "No first edits ed 2 nodes &" >> $@
+	echo "No firsts ed 2 nodes &" >> $@
 	paste -d '&' results/en/table6.errmodel.edit-distance-2-no-initial.states \
 		results/fi/table6.errmodel.edit-distance-2-no-initial.states \
 		results/kl/table6.errmodel.edit-distance-2-no-initial.states >> $@
 	echo "\\\\\\\\" >> $@
-	echo "No first edits ed 2 arcs &" >> $@
+	echo "No firsts ed 2 arcs &" >> $@
 	paste -d '&' results/en/table6.errmodel.edit-distance-2-no-initial.arcs \
 		results/fi/table6.errmodel.edit-distance-2-no-initial.arcs \
 		results/kl/table6.errmodel.edit-distance-2-no-initial.arcs >> $@
 	echo "\\\\\\\\" >> $@
-	echo "No first edits ed 3 nodes &" >> $@
+	echo "No firsts ed 3 nodes &" >> $@
 	paste -d '&' results/en/table6.errmodel.edit-distance-3-no-initial.states \
 		results/fi/table6.errmodel.edit-distance-3-no-initial.states \
 		results/kl/table6.errmodel.edit-distance-3-no-initial.states >> $@
 	echo "\\\\\\\\" >> $@
-	echo "No first edits ed 3 arcs &" >> $@
+	echo "No firsts ed 3 arcs &" >> $@
 	paste -d '&' results/en/table6.errmodel.edit-distance-3-no-initial.arcs \
 		results/fi/table6.errmodel.edit-distance-3-no-initial.arcs \
 		results/kl/table6.errmodel.edit-distance-3-no-initial.arcs >> $@
 	echo "\\\\\\\\" >> $@
-	echo "Avoid redundancy and firsts ed 2 nodes &" >> $@
+	echo "No redundancy and firsts ed 2 nodes &" >> $@
 	paste -d '&' results/en/table6.errmodel.edit-distance-2-no-initial-no-redundant.states \
 		results/fi/table6.errmodel.edit-distance-2-no-initial-no-redundant.states \
 		results/kl/table6.errmodel.edit-distance-2-no-initial-no-redundant.states >> $@
 	echo "\\\\\\\\" >> $@
-	echo "Avoid redundancy and firsts ed 2 arcs &" >> $@
+	echo "No redundancy and firsts ed 2 arcs &" >> $@
 	paste -d '&' results/en/table6.errmodel.edit-distance-2-no-initial-no-redundant.arcs \
 		results/fi/table6.errmodel.edit-distance-2-no-initial-no-redundant.arcs \
 		results/kl/table6.errmodel.edit-distance-2-no-initial-no-redundant.arcs >> $@
 	echo "\\\\\\\\" >> $@
-	echo "Avoid redundancy and firsts ed 3 nodes &" >> $@
-	paste -d '&' results/en/table6.errmodel.edit-distance-3-no-initial-no-redundant.states \
-		results/fi/table6.errmodel.edit-distance-3-no-initial-no-redundant.states \
-		results/kl/table6.errmodel.edit-distance-3-no-initial-no-redundant.states >> $@
-	echo "\\\\\\\\" >> $@
-	echo "Avoid redundancy and firsts ed 3 arcs &" >> $@
-	paste -d '&' results/en/table6.errmodel.edit-distance-3-no-initial-no-redundant.arcs \
-		results/fi/table6.errmodel.edit-distance-3-no-initial-no-redundant.arcs \
-		results/kl/table6.errmodel.edit-distance-3-no-initial-no-redundant.arcs >> $@
-	echo "\\\\\\\\" >> $@
+	#echo "No redundancy and firsts ed 3 nodes &" >> $@
+	#paste -d '&' results/en/table6.errmodel.edit-distance-3-no-initial-no-redundant.states \
+	#	results/fi/table6.errmodel.edit-distance-3-no-initial-no-redundant.states \
+	#	results/kl/table6.errmodel.edit-distance-3-no-initial-no-redundant.states >> $@
+	#echo "\\\\\\\\" >> $@
+	#echo "No redundancy and firsts ed 3 arcs &" >> $@
+	#paste -d '&' results/en/table6.errmodel.edit-distance-3-no-initial-no-redundant.arcs \
+	#	results/fi/table6.errmodel.edit-distance-3-no-initial-no-redundant.arcs \
+	#	results/kl/table6.errmodel.edit-distance-3-no-initial-no-redundant.arcs >> $@
+	#echo "\\\\\\\\" >> $@
 	echo "Lower order first ed 1 to 2 arcs &" >> $@
 	echo "add & above & rows" >> $@
 	echo "\\\\\\\\" >> $@
