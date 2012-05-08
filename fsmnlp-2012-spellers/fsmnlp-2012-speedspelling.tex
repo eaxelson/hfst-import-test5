@@ -55,17 +55,17 @@ spell-checking it is well-known and well-researched, that finite-state language
 models can efficiently encode dictionaries of natural
 languages~\cite{beesley/2003}, even for languages with rich and complex
 morphological systems, such as polysynthetic languages. The efficiency of
-finite-state approaches to spell-checking, however, has often been seen as a
-problem, and therefore most of the contemporary spell-checking system are still
-based on programmatic solutions (e.g.
+finite-state approaches to spelling correction, however, has often been seen as
+a problem, and therefore most of the contemporary spell-checking and correction
+system are still based on programmatic solutions (e.g.
 hunspell\footnote{\url{http://hunspell.sf.net}}, and its *spell relatives), or
-at most specialised algorithms for implementing fuzzy traversal of the
+at most specialised algorithms for implementing error-tolerant traversal of the
 finite-state dictionaries~\cite{oflazer/1996,hulden/2009}. There has also been
 few implementations of using fully finite-state implementations for both the
 error-detection and corrections~\cite{schulz/2002,pirinen/2010/lrec}. In this
 paper we further evaluate the use of finite-state dictionaries with two-tape
 finite-state automatons for mechanism to correct misspellings, and how to
-optimise the finite-state error models. 
+optimise the finite-state error models.
 
 To evaluate general usability and efficiency of finite-state spell-checking we
 test the system with three languages of typologically different morphological
@@ -89,20 +89,20 @@ reference implementation apart from our solution, as far as we know.
 
 The baseline feature-set and the efficiency of spell-checking we are targeting
 is defined by the currently de facto standard spelling suite in open source
-systems, hunspell. As both Finnish and Greenlandic have not been successfully
+systems, hunspell. As neither Finnish nor Greenlandic have been successfully
 implemented in hunspell formalism, we mainly use them to evaluate how complexity
-of language model effects the efficiency of finite-state spell-checking. For
-full-scale survey on the state-of the art non-finite-state spell-checking we
+of language model affects the efficiency of finite-state spell-checking. For
+full-scale survey on the state-of-the-art non-finite-state spell-checking we
 refer to \newcite{mitton/2009}.
 
-The efficiency results are contrasted to previous research on finite-state
-spell-checking in \newcite{hassan/2008} and the theoretical results on
-finite-state error-models in \newcite{mitankin/2005} with the additions of
-morphological complex languages with actual cyclic dictionary automata and more
-complex structure than those of English and Arabic. We note in particular that
-previous approaches have neglected to simultaneously constrain the error
-model and the dictionary with each other in on-line composition, which
-affords a significant speed benefit.
+The efficiency results are contrasted to the existing research on the
+finite-state spell-checking in \newcite{hassan/2008} and the theoretical
+results on finite-state error-models in \newcite{mitankin/2005} with the
+additions of the morphologically complex languages with actual cyclic
+dictionary automata and more complex structure in general, than those of
+English and Arabic. In particular we show, that the previous approaches have
+neglected to simultaneously constrain the error model and the dictionary with
+each other in on-line composition, which affords a significant speed benefit.
 
 The rest of the paper is organised as follows. In Section~\ref{sec:methods} we
 introduce methods used by current non-finite-state spell-checkers and
@@ -234,7 +234,16 @@ On the error-model side this optimisation has been justified by findings where
 between 1.5~\% and 15~\% of spelling-errors happen in the first character of
 the word, depending on the text type~\cite{Bhagat/2007};
 the 1.5~\% from small corpus of academic texts~\cite{Yannakoudakis/1983}
-and 15~\% from dictated corpora~\cite{Kukich/1992}.
+and 15~\% from dictated corpora~\cite{Kukich/1992}. We also performed a
+rudimentary classification of the errors in the small error corpus of
+333 entries from~\newcite{pirinen/2011/cicling}, and found errors at
+first position in 1.2~% of the entries, furthermore we noticed that
+when evenly splitting the word-forms in three parts, 15~% of the errors are
+in the first third of the word-form, while second has 47~% and third 58~%,
+which would be in favor of selecting the error model to discard initial
+errors\footnote{by crued classification we mean, that all errors were
+forced to one of the three classes at weight of one, e.g. series of
+three same letters was counted as deletion at first s position.}.
 
 Second form of optimisation that is used by many traditional spell-checking
 systems as well, is to apply the lower order edit distances separately before
@@ -342,10 +351,15 @@ $\Sigma$ set size &
  43& 117& 133
 \\
 Dictionary FSM nodes &
- 49778& 286719& 628177 
+ 49,778& 286,719& 628,177
 \\
 Dictionary FSM arcs &
- 86523& 783461& 11596911 
+ 86,523& 783,461& 11,596,911
+\\
+Dictionary FSM on HDD & 
+2.3 MiB &
+43 MiB &
+290 MiB
 \\
 \hline
 \end{tabular}
@@ -447,11 +461,11 @@ running at 3~GHz with 64~GiB of RAM memory. The times are averaged over five
 test runs in stable server environment with no server processes or running
 graphical interfaces or other uses. The test results are measured using the
 \texttt{getrusage} C function on a system that supports the maximum resident
-stack size \texttt{ru\_maxrss} and user time \texttt{ru\_utime} fields. The times
-are also verified with GNU \texttt{time} command. The results for hunspell and
-voikkospell processes are only measured with time and top if we do not have
-time to modify their source code with added \texttt{getrusage} calls. The
-respective versions of the software are voikkospell 3.3, hunspell 1.2.14.
+stack size \texttt{ru\_maxrss} and user time \texttt{ru\_utime} fields. The
+times are also verified with GNU \texttt{time} command. The results for
+hunspell, voikkospell and foma processes are only measured with time and top.
+The respective versions of the software are voikkospell 3.3, hunspell
+1.2.14, and foma 0.9.14\_alpha.
 
 In the Table~\ref{table:error-model-vs-language-speed} we measure the speeds of
 the spell-checking process of the native language Wikipedia with real-world
@@ -478,46 +492,52 @@ codes to denote the languages: \emph{en} for English, \emph{fi} for Finnish and
 \hline
 \bf Error model & \bf En & \bf Fi & \bf Kl \\ 
 \hline
+\hline
 Reference impl. &
-9.99&8.01
+9.93&0.00
 & --- \\
 Generate all edits 2 & 
-17.12&535.21&164.71
+37.75&1177.55&362.03
 \\
 \hline
 Edit distance 1 &
-0.26&6.69&4.72
+0.26&6.78&4.79
 \\
 Edit distance 2 &
-7.51&222.23&560.26
+7.55&220.42&568.36
 \\
 Edit distance 3 &
-141.00&7343.21&too long
+140.96&---&---
 \\
 No first edits ed 1 & 
-0.29&1.06&1.44
+0.44&3.19&3.52
 \\
 No first edits ed 2 &
-0.10&3.19&3.50
+1.38&61.88&386.06
 \\
 No first edits ed 3 &
-1.41&too long&too long
+8.25&---&---
+\\
+Avoid redundancy ed 2 &
+7.52&4230.94&6420.66
+\\
+Avoid redundancy ed 3 &
+143.64&7.91&---
 \\
 Avoid redundancy and first edits ed 2 &
-0.10&3.19&3.47
+1.51&62.05&386.63
 \\
 Avoid redundancy and first edits ed 3 &
-7.59&1097.81&3660.46
+---&---&---
 \\
 Lower order first ed 1 to 2 &
-29.69&2946.54&5298.49
+4.31&157.07&545.91
 \\
-\hline
 \end{tabular}
 \end{scriptsize}
 \end{center}
 \caption{\label{table:error-model-vs-language-speed} Effect of language and 
-error models to speed}
+error models to speed (time in seconds per 10000 word forms)}
 \end{table}
 
 The results show that not editing the first position does indeed give
@@ -542,31 +562,31 @@ models as with previous tests.
 \bf Error model & \bf En & \bf Fi & \bf Kl \\ 
 \hline
 Edit distance 1 &
-13.5 MiB&217.6 MiB&1601.3 MiB
+13.5 MiB&0.2 GiB&1.6 GiB
 \\
 Edit distance 2 &
-13.6 MiB&218.1 MiB&1601.9 MiB
+13.6 MiB&0.2 GiB&1.6 GiB
 \\
 Edit distance 3 &
-17.1 MiB&1293.4 MiB&too much
+17.1 MiB&0.3 GiB&---
 \\
 No firsts ed 1 & 
-13.4 MiB&217.1 MiB&1600.7 MiB
+13.5 MiB&0.2 GiB&1.6 GiB
 \\
 No firsts ed 2 &
-13.5 MiB&217.6 MiB&1601.3 MiB
+13.6 MiB&0.2 GiB&1.6 GiB
 \\
 No firsts ed 3 &
-13.6 MiB&218.1 MiB&1601.9 MiB
+13.7 MiB&0.2 GiB&---
 \\
 No redundancy or firsts ed 2 &
-13.5 MiB&217.6 MiB&1601.3 MiB
+13.6 MiB&0.2 GiB&1.6 GiB
 \\
 No redundancy or firsts ed 3 &
-15.2 MiB&456.4 MiB&too much
+---&---&---
 \\
 Lower order first ed 1 to 2 &
-16.2 MiB&480.4 MiB&too much
+13.8 MiB&0.2 GiB&1.6 GiB
 \\
 \hline
 \end{tabular}
@@ -583,9 +603,11 @@ in the table are dominated by the memory stamp of the dictionary automaton and
 the error model automaton loaded into memory, and the intermediate structures
 used by the error-applying traversal of the automaton will not typically
 contribute much (approx. half mebibyte for each larger edit distance), since
-they are created and deleted on-the-fly. One practical thing to note here is,
-the memory footstamp does give suggestion of how much available RAM is needed
-to get speed measurements of the
+they are created and deleted on-the-fly. Notable discrepancy to this pattern is
+Greenlandic with larger edit distances, it seems to exhaust whole memory which
+may be caused an inadvertent (epsilon) loop in the morphology. One practical
+thing to note here is, the memory footstamp does give suggestion of how much
+available RAM is needed to get speed measurements of the
 table~\ref{table:error-model-vs-language-speed}, as our experience shows that
 if the dictionary automaton is partially in swap memory, the speed will
 decrease by order of magnitude in current operating systems.
@@ -607,31 +629,25 @@ indicated in parentheses.
 \bf Error model & \bf En & \bf Fi & \bf Kl\\ 
 \hline
 \hline
+\hline
 Edit distance 1 &
-?&1.0&?
+0.89&0.83&0.81
 \\
 Edit distance 2 &
-?&1.0&?
+0.99&0.95&0.92
 \\
 Edit distance 3 &
-?&1.0&?
+1.00&0.96&---
 \\
 No first edits ed 1 & 
-?&0.0&?
+0.74&0.73&0.60
 \\
 No first edits ed 2 &
-?&1.0&?
+0.81&0.82&0.69
 \\
 No first edits ed 3 &
-?&1.0&?
+0.82&---&---
 \\
-Avoid redundancy and first edits ed 2 &
-\\
-Avoid redundancy and first edits ed 3 &
-\\
-Lower order first ed 1 to 2 &
-\\
-\hline
 \end{tabular}
 \end{scriptsize}
 \end{center}
@@ -639,7 +655,9 @@ Lower order first ed 1 to 2 &
 error models to quality}
 \end{table}
 
-These results tell us that our scripts are not working at all.
+This test with automatically introduced errors shows us that with uniformly
+distributed errors the penalty of changing error model to ignore the
+word-initial could be significant.
 
 Finally we measure how the text type used will effect the speed of the
 spell-checking. As the best-case scenario we use the unmodified texts of
@@ -662,16 +680,16 @@ the best speed/quality ratio in the previous tests.
 \hline
 \bf Error model & \bf En & \bf Fi & \bf Kl  \\ 
 \hline
+\hline
 Native Lang. Corpus &
-0.10&3.19&3.47
+1.38&61.88&386.06
 \\
 Added automatic errors &
-0.33&0.23&1.44
+6.91&946.19&551.81
 \\
 Text in another language &
-22.82&7.66&5.19
+22.40&148.86&783.64
 \\
-\hline
 \end{tabular}
 \end{scriptsize}
 \end{center}
@@ -679,7 +697,8 @@ Text in another language &
 error models to speed}
 \end{table}
 
-The interestin thing to note here is, that \ldots
+The interesting thing to note here is, that this table doesn't really tell us
+anything about anything. 
 
 
 \section{Conclusions}
