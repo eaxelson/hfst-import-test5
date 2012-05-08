@@ -139,51 +139,53 @@ same file. Now the file can be used by HFST:
 
   /** \page InstallHfst.html Installing the HFST API library
 
-      You can download the source code packet hfst-3.0.tar.gz
+      You can download the source code packet hfst-3.x.x.tar.gz
       from sourceforge
       <a href="http://sourceforge.net/projects/hfst/files/hfst/">download page</a>.
       Extract all files with the command
 
 \verbatim
-tar -xzvf hfst-3.X.X.tar.gz
+tar -xzvf hfst-3.x.x.tar.gz
 \endverbatim
 
-      move to directory hfst-3.X.X and run the commands
+      move to directory hfst-3.x.x and run the commands
 
 \verbatim
 autoreconf -i && ./configure && make && make install
 \endverbatim
 
       To successfully use the HFST library, you should have at least one 
-      of the backend libraries
-      (<a href="http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html">SFST</a> 
-      (version 1.4.2), 
-      <a href="http:://www.openfst.org">OpenFst</a> (version 1.2.6 or 1.2.7) or 
-      <a href="http://foma.sourceforge.net/">foma</a> (version 0.9.14alpha) ) 
-      installed on your computer. The in-built HfstTransitionGraph format
+      of the backend libraries installed on your computer:
+      <a href="http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html">SFST</a> 
+      (version 1.4.6g), 
+      <a href="http://www.openfst.org">OpenFst</a> (version 1.3.1) or 
+      <a href="http://code.google.com/p/foma/">foma</a> (version 0.9.16alpha).
+      The in-built HfstTransitionGraph format
       is very limited in its operations and used mainly for conversion 
       between different binary and text formats. The HFST optimized lookup
       transducer format also comes with the source code,
       but it has also a very limited selection of operations 
       as its main purpose is fast lookup of strings.
       By default, the configure script will make HFST compile the interface
-      with all the backend implementations that are available on the computer.
-      If you do not want an implementation, you can specify it 
+      with OpenFst as the only backend implementation.
+      If you do or do not want an implementation, you can specify it 
       with configure options. For example
 
 \verbatim
-./configure --with-sfst=false
+./configure --with-sfst=true --with-openfst=false
 \endverbatim
 
-      will exclude the SFST implementation. If the implementation is requested 
+      will exclude the OpenFst and include the SFST implementation. 
+      If an implementation that was not included when compiling the interface is requested,
+      e.g in the case above,
 
 \verbatim
-HfstTransducer tr("a", "b", SFST_TYPE);
+HfstTransducer tr("a", "b", FOMA_TYPE);
 \endverbatim
 
       an ImplementationTypeNotAvailableException is thrown.
 
-      The command make will compile all the API and command line tools and install
+      The command 'make' will compile all the API and command line tools and 'install'
       will install them to /usr/local. If you would rather install in eg. your home directory, 
       you can tell ./configure:
 
@@ -903,7 +905,7 @@ The examples given in this documentation use
 
    - Create transducers \link hfst::implementations::HfstTransitionGraph from scratch\endlink
 
-   - \link hfst::implementations::HfstTransitionGraph::iterator Iterate\endlink through a transducer's states and transitions
+   - \link hfst::implementations::HfstTransitionGraph::const_iterator Iterate\endlink through a transducer's states and transitions
 
    - Create transducers by \link hfst::HfstTokenizer tokenizing\endlink UTF-8 strings with multicharacter symbols
 
