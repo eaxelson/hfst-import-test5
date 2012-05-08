@@ -93,14 +93,14 @@ systems, hunspell. As neither Finnish nor Greenlandic have been successfully
 implemented in the hunspell formalism, we mainly use them to evaluate how
 the complexity of a language model affects the efficiency of finite-state
 spell-checking. For a full-scale survey on the state-of-the-art
-non-finite-state spell-checking we refer to \newcite{mitton/2009}.
+non-finite-state spell-checking, refer to \newcite{mitton/2009}.
 
-The efficiency results are contrasted to the existing research on the
+The efficiency results are contrasted with the existing research on
 finite-state spell-checking in \newcite{hassan/2008} and the theoretical
 results on finite-state error-models in \newcite{mitankin/2005} with the
-additions of the morphologically complex languages with actual cyclic
+additions of morphologically complex languages with actual cyclic
 dictionary automata and more complex structure in general, than those of
-English and Arabic. In particular we show, that the previous approaches have
+English and Arabic. In particular we show that the previous approaches have
 neglected to simultaneously constrain the error model and the dictionary with
 each other in on-line composition, which affords a significant speed benefit.
 
@@ -137,11 +137,11 @@ results.}
 \subsection{Language Models}
 \label{subsec:language-models}
 
-The most basic language model for spell-checking dictionary is a list of
+The most basic language model for a spell-checking dictionary is a list of
 correctly spelled word-forms. One of the easiest way to create such 
 spell-checker is collecting the word-forms from reasonably large corpus of
-mostly correctly spelt texts; additionally we can count the frequency of words
-and use that as likelihood $P=\frac{c(\mathrm{wordform})}{\mathrm{Corpus size}}$
+(mostly) correctly spelt texts; additionally we can count the frequency of words
+and use that as the likelihood $P=\frac{c(\mathrm{wordform})}{\mathrm{Corpus size}}$.
 For morphologically poor languages such as English, this is often sufficient
 approach~\cite{norvig/2010}, and we use it to create dictionary for our English
 spell-checking dictionary as well.
@@ -153,19 +153,19 @@ finite-state rule languages to implement morphophonological
 alterations~\cite{koskenniemi/1983}. This approach also applies to the newest
 available free open source and full fledged finite-state Finnish morphological
 dictionary we found~\cite{pirinen/2011/nodalida}. This language model features
-productive derivations, compounding and rudimentary probabilistic models from.
-The reference non-finite state language model for Finnish we found from
-currently used spell-checker is implemented in left-associative grammar
+productive derivations, compounding and rudimentary probabilistic models.
+The reference non-finite state language model for Finnish we found
+used in a spell-checker is implemented in a left-associative grammar
 formalism, a potentially slightly less efficient system with more expressive
-power and similar feature set as finite-state formulation in terms of
+power and similar featureset as a finite-state formulation, in terms of
 linguistic coverage.
 
 For polysynthetic languages it will be obvious that coverage of any
-word-list-based approach will be even lower, furthermore most simple extensions
-to it such as affix stripping of hunspell are not enough for describing
+word-list-based approach will be even lower. Furthermore, most simple extensions
+to it such as affix stripping of hunspell are not adequate for describing
 word-forms of the language. To our knowledge, the only approaches that have
-been in wide use for spell-checking and morphological analysis of Greenlandic
-have been based on traditional finite-state solutions like the Xerox formalisms
+been widely used for spell-checking and morphological analysis of Greenlandic
+have been based on traditional finite-state solutions, such as the Xerox formalisms,
 as with Finnish finite-state dictionaries.
 
 \subsection{Error Models}
