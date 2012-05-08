@@ -329,18 +329,18 @@ typological variation between them. The dictionaries
 are readily obtainable on the Internet.
 
 For error models we have created new implementations of the algorithms
-to create and modify finite-state error models. For baseline we have created
+to create and modify finite-state error models. For a baseline we have created
 the basic edit distance error models by hand and then modified them
 automatically to test different variants.
 
 To test the effect of correctness of the source text to speed of
-spelling-checker we have fetched of largest freely available open source text
+spelling-checker we have retrieved of largest freely available open source text
 materials from the internet, i.e. Wikipedia. The Wikipedia text as itself is
-good for real-world material as it does contain wide variety of spelling
-errors. For a material with more errors, we have used simple script to
+an appropriate real-world material as it contains a wide variety of spelling
+errors. For material with more errors, we have used a simple script to
 introduce the (further) errors at uniform probability of 1/33 per character;
 using this method we can also obtain a corpus of errors with correct
-corrections along them.  Finally we have used a text corpus from language
+corrections along them. Finally we have used a text corpus from language
 different than the one being spelled to ensure that majority of words are not
 in vocabulary and not fixable by standard error models, which should provide to
 be the worst case scenario test for the spell-checking.
@@ -359,8 +359,8 @@ terms of structural elements. On the first row, we give the effective size of
 alphabet needed to represent the whole dictionary, this is all the Unicode
 code points that have been used in the dictionary, including alphabets, 
 punctuation and spaces. Next we give the sizes of automata as nodes and
-arcs of the finite-state automaton encoding the dictionary. Last we give the
-size of the automaton as serialised on the hard disk, while this is not the
+arcs of the finite-state automaton encoding the dictionary. Finally we give the
+size of the automaton as serialised on the hard disk. While this is not the
 same amount of memory as its loaded data structures, it gives some indication
 of memory usage of the automaton in running program. As can be clearly
 seen from the table, the morphological complexity correlates quite directly
@@ -395,7 +395,7 @@ Dictionary FSM on HDD &
 The sizes of dictionaries as automata}
 \end{table}
 
-In the Table~\ref{table:error-sizes} we give the same calculations for the
+In the Table~\ref{table:error-sizes} we give the same figures for the
 sizes of error models we've generated. The sigma set size row here shows the
 amount of alphabets left, when we have removed the parts of alphabet from the
 error models that is usually not considered to be part of spell-checking
@@ -488,7 +488,7 @@ hunspell, voikkospell and foma processes are only measured with time and top.
 The respective versions of the software are voikkospell 3.3, hunspell
 1.2.14, and foma 0.9.16alpha.
 
-In the Table~\ref{table:error-model-vs-language-speed} we measure the speeds of
+In the Table~\ref{table:error-model-vs-language-speed} we measure the speed of
 the spell-checking process of the native language Wikipedia with real-world
 spelling errors and unknown strings. The error model rows are defined as
 follows: on the \emph{Reference impl.} row, we test the spell-checking speed of
