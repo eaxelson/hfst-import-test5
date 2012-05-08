@@ -473,9 +473,9 @@ spelling errors and unknown strings. The error model rows are defined as
 follows: on the \emph{Reference impl.} row, we test the spell-checking speed of
 the hunspell tool for English, and voikkospell tool for Finnish. On the
 \emph{edit distance 2} row we use the basic traditional edit distance 2 without
-any modifications. On the row \emph{lower order first}, we test applying the
-lower order edit distance models first, then iff no results are given advancing
-to higher orders up to edit distance 3. On the \emph{No first edits} row we
+any modifications. On the row \emph{lower order first}, we apply a
+lower order edit distance model first, then if no results are found,
+a higher order model is used. On the \emph{No first edits} row we
 use the error model that may not modify the first character of the word or the
 first character after compound word boundary. On the \emph{Avoid redundancy}
 row we use the error model edit distance 2 with the redundant edit combinations
