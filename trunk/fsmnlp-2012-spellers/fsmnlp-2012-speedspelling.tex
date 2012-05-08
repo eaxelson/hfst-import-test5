@@ -138,8 +138,8 @@ results.}
 \label{subsec:language-models}
 
 The most basic language model for a spell-checking dictionary is a list of
-correctly spelled word-forms. One of the easiest way to create such 
-spell-checker is collecting the word-forms from reasonably large corpus of
+correctly spelled word forms. One of the easiest way to create such 
+spell-checker is collecting the word forms from reasonably large corpus of
 (mostly) correctly spelt texts; additionally we can count the frequency of words
 and use that as the likelihood $P=\frac{c(\mathrm{wordform})}{\mathrm{Corpus size}}$.
 For morphologically poor languages such as English, this is often sufficient
@@ -163,7 +163,7 @@ linguistic coverage.
 For polysynthetic languages it will be obvious that coverage of any
 word-list-based approach will be even lower. Furthermore, most simple extensions
 to it such as affix stripping of hunspell are not adequate for describing
-word-forms of the language. To our knowledge, the only approaches that have
+word forms of the language. To our knowledge, the only approaches that have
 been widely used for spell-checking and morphological analysis of Greenlandic
 have been based on traditional finite-state solutions, such as the Xerox formalisms,
 as with Finnish finite-state dictionaries.
@@ -171,18 +171,21 @@ as with Finnish finite-state dictionaries.
 \subsection{Error Models}
 \label{subsec:error-models}
 
-The ubiquitous formula for modeling typing errors since the beginning of the
-spelling correction by computer has been the edit-distance algorithm sometimes
+The ubiquitous formula for modeling typing errors since the computer-assisted
+spelling correction began has been the edit distance metric sometimes
 attributed to \newcite{levenshtein/1966} and/or
-\newcite{damerau/1964}. What the algorithm does is it maps four most
-typical slips of fingers on keyboard to events in the fuzzy matching of the
-misspelt word-forms to correct ones, that is, deletion of character (i.e. not
-pressing a key), addition of a character (i.e. pressing extra key
-accidentally), changing a character (i.e. pressing wrong key) and swapping
-adjacent characters (i.e. pressing two keys in wrong order). When modeling edit
+\newcite{damerau/1964}. It maps four
+typical slips of the fingers on a keyboard to events in the fuzzy matching of the
+misspelt word forms to correct ones, that is, the deletion of a character
+(i.e. failing to
+press a key), addition of a character (i.e. hitting an extra key
+accidentally), changing a character (i.e. hitting the wrong key) and swapping
+adjacent characters (i.e. hitting two keys in the wrong order).
+
+When modeling edit
 distance as finite-state automaton, a relatively simple two-tape automaton is
-enough to implement the algorithm~\cite{hassan/2008}.  Basically the automaton
-will consist one arc for each type of error, additionally one state for each
+sufficient to implement the algorithm~\cite{hassan/2008}. The automaton
+will consist of one arc for each type of error, and additionally one state for each
 swapping of character type of error is needed to keep the character pair to be
 swapped in memory. This means that the trivial NFA implementing the algorithm
 is of space complexity $S(V, E, \Sigma) = O(|\Sigma|^2 |V| + |\Sigma|^2 |E|)$,
@@ -208,7 +211,7 @@ English texts and is not dealt with in scope of this experiment. This is what is
 the \texttt{PHON} part of the hunspell's correction mechanism.
 
 After fine-tuning the error models to reimplement hunspell's feature set, we
-use propose different variations of this edit-distance scheme to optimise the
+use propose different variations of this edit distance scheme to optimise the
 speed of error correction with little or no negative effect to the quality of
 the correction suggestions. The factors that make up the time of the
 finite-state spelling correction algorithm are the size of the search space,
@@ -224,7 +227,7 @@ suggestions generated finite}.
 
 To optimise the application of edit distance by limiting the search space, many
 traditional spell checkers will not attempt to correct the very first letter of
-the word-form. We investigated whether this decision is a particularly
+the word form. We investigated whether this decision is a particularly
 effective way to limit the search space, but it does not appear to
 significantly differ from restricting edits at any other position in the input.
 Presumably, the rationale is a belief that errors predominately occur at other
@@ -238,8 +241,8 @@ and 15~\% from dictated corpora~\cite{Kukich/1992}. We also performed a
 rudimentary classification of the errors in the small error corpus of
 333 entries from~\newcite{pirinen/2011/cicling}, and found errors at
 first position in 1.2~\% of the entries, furthermore we noticed that
-when evenly splitting the word-forms in three parts, 15~\% of the errors are
-in the first third of the word-form, while second has 47~\% and third 58~\%,
+when evenly splitting the word forms in three parts, 15~\% of the errors are
+in the first third of the word form, while second has 47~\% and third 58~\%,
 which would be in favor of selecting the error model to discard initial
 errors\footnote{by crude classification we mean, that all errors were
 forced to one of the three classes at weight of one, e.g. series of
@@ -309,7 +312,7 @@ typologically varied languages.
 
 For creating error models we have created new implementations of the algorithms
 to create and modify finite-state error models. For baseline we have created
-the basic edit-distance error models by hand and then modified them
+the basic edit distance error models by hand and then modified them
 automatically to test different variants.
 
 To test the effect of correctness of the source text to speed of
