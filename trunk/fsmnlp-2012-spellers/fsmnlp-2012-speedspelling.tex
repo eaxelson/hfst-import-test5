@@ -237,11 +237,11 @@ the 1.5~\% from small corpus of academic texts~\cite{Yannakoudakis/1983}
 and 15~\% from dictated corpora~\cite{Kukich/1992}. We also performed a
 rudimentary classification of the errors in the small error corpus of
 333 entries from~\newcite{pirinen/2011/cicling}, and found errors at
-first position in 1.2~% of the entries, furthermore we noticed that
-when evenly splitting the word-forms in three parts, 15~% of the errors are
-in the first third of the word-form, while second has 47~% and third 58~%,
+first position in 1.2~\% of the entries, furthermore we noticed that
+when evenly splitting the word-forms in three parts, 15~\% of the errors are
+in the first third of the word-form, while second has 47~\% and third 58~\%,
 which would be in favor of selecting the error model to discard initial
-errors\footnote{by crued classification we mean, that all errors were
+errors\footnote{by crude classification we mean, that all errors were
 forced to one of the three classes at weight of one, e.g. series of
 three same letters was counted as deletion at first s position.}.
 
@@ -465,7 +465,7 @@ stack size \texttt{ru\_maxrss} and user time \texttt{ru\_utime} fields. The
 times are also verified with GNU \texttt{time} command. The results for
 hunspell, voikkospell and foma processes are only measured with time and top.
 The respective versions of the software are voikkospell 3.3, hunspell
-1.2.14, and foma 0.9.14\_alpha.
+1.2.14, and foma 0.9.16alpha.
 
 In the Table~\ref{table:error-model-vs-language-speed} we measure the speeds of
 the spell-checking process of the native language Wikipedia with real-world
@@ -492,10 +492,9 @@ codes to denote the languages: \emph{en} for English, \emph{fi} for Finnish and
 \hline
 \bf Error model & \bf En & \bf Fi & \bf Kl \\ 
 \hline
-\hline
 Reference impl. &
-9.93&0.00
-& --- \\
+9.93&7.96&11.42
+\\
 Generate all edits 2 & 
 37.75&1177.55&362.03
 \\

@@ -12,6 +12,7 @@ BIBTEX=bibtex
 WGET=wget
 BZCAT=bzcat
 
+FOMA=foma
 HUNSPELL=hunspell -1 -a
 VOIKKOSPELL=voikkospell -s
 
@@ -206,6 +207,11 @@ hfst/kl/kl.hfst:
 	unzip 2/mor-hfst-kl/speller.zhfst
 	mv acceptor.default.hfst $@
 
+hfst/kl/kl.foma: hfst/kl/kl.hfst
+	hfst-fst2fst -i $< -o $@.unzipped -f foma -b -v
+	gzip $@.unzipped
+	mv -v $@.unzipped.gz $@
+	
 # create all error models here
 
 # Basic ED 1
@@ -386,7 +392,7 @@ results/en/table1.dict-norvig.errm-ed1.corp-wiki.profile: corp/en/enwiki.$(WORDS
 results/fi/table1.dict-voikko.errm-voikko.corp-wiki.times: corp/fi/fiwiki.$(WORDS).words
 	echo > $@
 	for i in $(TESTS) ; do \
-		/usr/bin/time -f %U -a -o $@. \
+		/usr/bin/time -f %U -a -o $@ \
 			$(VOIKKOSPELL) -d fi_FI < corp/fi/fiwiki.$(WORDS).words > /dev/null ;\
 	done
 
@@ -401,6 +407,17 @@ results/kl/table1.dict-kl.errm-ed1.corp-wiki.profile: corp/kl/klwiki.$(WORDS).wo
 	for i in $(TESTS) ; do \
 		hfst-ospell-fsmnlp-2012 --profile $@ hfst/kl/errmodel.edit-distance-1.hfst $(KL_DICT) < corp/kl/klwiki.$(WORDS).words > /dev/null ;\
 	done
+
+results/kl/table1.dict-kl.errm-foma.corp-wiki.times: corp/kl/klwiki.$(WORDS).words hfst/kl/kl.foma
+	echo > $@
+	printf "load stack hfst/kl/kl.foma\napply med\n" > fomascript
+	cat corp/kl/klwiki.$(WORDS).words >> fomascript
+	echo "quit" >> fomascript
+	for i in $(TESTS) ; do \
+		/usr/bin/time -f %U -a -o $@ \
+			$(FOMA) -f fomascript > /dev/null ;\
+	done
+	-rm -f fomascript
 
 # Table 1, ED 2
 
@@ -684,15 +701,17 @@ TABLE1_DATA=\
  			results/kl/table1.dict-kl.errm-ed3-no-redundant.corp-wiki.tex \
  			results/en/table1.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
  			results/fi/table1.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
- 			results/kl/table1.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex
+ 			results/kl/table1.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
+			results/kl/table1.dict-kl.errm-foma.corp-wiki.tex
 
 
 
 results/table1.tex: $(TABLE1_DATA)
 	echo "Reference impl. &" > $@
 	paste -d '&' results/en/table1.dict-hunspell.errm-hunspell.corp-wiki.tex \
-		results/fi/table1.dict-voikko.errm-voikko.corp-wiki.tex >> $@
-	echo "& --- \\\\\\\\" >> $@
+		results/fi/table1.dict-voikko.errm-voikko.corp-wiki.tex \
+		results/kl/table1.dict-kl.errm-foma.corp-wiki.tex >> $@
+	echo "\\\\\\\\" >> $@
 	echo "Generate all edits 2 & " >> $@
 	paste -d '&' results/en/table1.dict-norvig.errm-ed2.corp-wiki.generate-all.tex \
 		results/fi/table1.dict-omorfi.errm-ed2.corp-wiki.generate-all.tex \
@@ -1222,8 +1241,9 @@ results/kl/table4.%.tex: results/kl/table4.%.profile
 results/kl/table4.%.tex: results/kl/table4.%.times
 	awk -f timelist2tex.awk < $< > $@
 
-results/kl/table1.%.tex: results/kl/table1.%.2times
+results/kl/table4.%.tex: results/kl/table4.%.2times
 	awk --assign SCALE=100 -f 2timeslist2tex.awk < $< > $@
+
 # table 5 and such
 TABLE5_DATA=\
 			results/en/table5.norvig.sigmasetsize \
