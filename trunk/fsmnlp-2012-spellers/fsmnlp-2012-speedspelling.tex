@@ -284,8 +284,22 @@ input string of length $n$, there are
 \end{displaymath}
 ways to choose the edit site, and each site is subject to a choice of
 $|\Sigma| - 1$ edits (the
-entire alphabet except for the actual input). This results in an $O(n^d \cdot
-|\Sigma|)$ algorithm, or for an English 26-letter lowercase alphabet, swap
+entire alphabet except for the actual input). This expression has no closed
+form, but as $d$ grows to $n$, the number of choices has the form $2^n$,
+so the altogether complexity is exponential in input length and linear
+in alphabet size (quadratic if swaps are considered).
+
+In practice
+(when $d$ is small relative to $n$) it is useful to observe that an
+increase of $1$ in distance results
+in an additional term to the aforementioned sum,
+the ratio of which to the previously greatest term is
+\begin{displaymath}
+\frac{n!/(d!\cdot(n-d!))}{n!/((d-1)!\cdot(n-d+1)!)} = \frac{n-d+1}{d}
+\end{displaymath}
+indicating that when $d$ is small, increases in it produce an
+exponential increase in complexity.
+For an English 26-letter lowercase alphabet, swap
 distance $2$ and the $8$-letter word ``spelling'', $700$ strings that are
 stored in a transducer. With transpositions, deletions, insertions and edit
 weights this grows to $100,215$ different combinations of output and weight. We
@@ -309,11 +323,12 @@ in \newcite{hfst/2012/cla}.
 \section{Material}
 \label{sec:materials}
 
-For language models we have selected to get suitable dictionaries from the
-Internet by seeking freely available dictionaries for languages of
-typologically varied languages.
+For language models we have acquired suitable free-to-use
+dictionaries for three languages with a great degree of
+typological variation between them. The dictionaries
+are readily obtainable on the Internet.
 
-For creating error models we have created new implementations of the algorithms
+For error models we have created new implementations of the algorithms
 to create and modify finite-state error models. For baseline we have created
 the basic edit distance error models by hand and then modified them
 automatically to test different variants.
