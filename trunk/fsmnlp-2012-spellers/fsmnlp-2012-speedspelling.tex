@@ -37,8 +37,8 @@ FI-00014 Univ. of Helsinki, PO box 24\\
 
 \maketitle
 \begin{abstract}
-In this paper we inspect the effects of different finite-state language and
-error models to speed of finite-state spell-checking. We evaluate the speed and
+In this paper we inspect the effects of various finite-state language and
+error models on the speed of finite-state spell-checking. We evaluate the speed and
 memory consumption of full-scale real-world finite-state spell checkers for
 three languages covering the broadest available spectrum of morphological
 complexity; English, Finnish and Greenlandic. We evaluate the effects of
@@ -51,49 +51,49 @@ software-driven spell-checkers with same or equivalent spell-checking features.
 
 In most applications of spell-checking, efficiency is the key factor for
 selecting or discarding spell-checking solutions. In case of finite-state
-spell-checking it is well-known and well-researched, that finite-state language
+spell-checking it is known that finite-state language
 models can efficiently encode dictionaries of natural
 languages~\cite{beesley/2003}, even for languages with rich and complex
 morphological systems, such as polysynthetic languages. The efficiency of
 finite-state approaches to spelling correction, however, has often been seen as
-a problem, and therefore most of the contemporary spell-checking and correction
-system are still based on programmatic solutions (e.g.
+a problem, and therefore most contemporary spell-checking and correction
+systems are still based on programmatic solutions (e.g.
 hunspell\footnote{\url{http://hunspell.sf.net}}, and its *spell relatives), or
 at most specialised algorithms for implementing error-tolerant traversal of the
-finite-state dictionaries~\cite{oflazer/1996,hulden/2009}. There has also been
+finite-state dictionaries~\cite{oflazer/1996,hulden/2009}. There have also been
 few implementations of using fully finite-state implementations for both the
 error-detection and corrections~\cite{schulz/2002,pirinen/2010/lrec}. In this
 paper we further evaluate the use of finite-state dictionaries with two-tape
 finite-state automatons for mechanism to correct misspellings, and how to
 optimise the finite-state error models.
 
-To evaluate general usability and efficiency of finite-state spell-checking we
+To evaluate the general usability and efficiency of finite-state spell-checking we
 test the system with three languages of typologically different morphological
 features and different reference implementations for contemporary
-spell-checking applications: We use English as a sample for morphologically
-poor language with basically plain word-list approach to spell-checking; for
-reference implementation we use the hunspell's en-US
+spell-checking applications: English as a sample of a morphologically
+poor language with a basically word-list approach to spell-checking; as a
+reference implementation we use hunspell's en-US
 dictionary\footnote{\url{http://wiki.services.openoffice.org/wiki/Dictionaries}}
-and for finite-state version we use weighted word-list
-from \newcite{norvig/2010}.  The second language we test is Finnish, a
-morphologically more rich language which is still agglutinative. Finnish is
+and for a finite-state version we use a weighted word-list
+from \newcite{norvig/2010}. The second language we test is Finnish, a
+morphologically richer language which is still agglutinative. Finnish is
 among the morphologically simpler languages that have no working implementation
-under hunspell, and for reference implementation we use
-voikko\footnote{\url{http://voikko.sf.net}}, with LAG-based dictionary using
+under hunspell, and for a reference implementation we use
+voikko\footnote{\url{http://voikko.sf.net}}, with a LAG-based dictionary using
 malaga\footnote{\url{http://home.arcor.de/bjoern-beutel/malaga/}}. Our third
 test language is Greenlandic, a polysynthetic language which is implemented as
 finite-state system using Xerox's original finite-state morphology
 formalism~\cite{beesley/2003}. For open source implementation we use
-HFST\footnote{\url{http://hfst.sf.net}}. There are no free software for
-reference implementation apart from our solution, as far as we know.
+HFST\footnote{\url{http://hfst.sf.net}}. There is no free software for
+us as a reference implementation apart from our solution, as far as we know.
 
-The baseline feature-set and the efficiency of spell-checking we are targeting
+The baseline featureset and the efficiency of spell-checking we are targeting
 is defined by the currently de facto standard spelling suite in open source
 systems, hunspell. As neither Finnish nor Greenlandic have been successfully
-implemented in hunspell formalism, we mainly use them to evaluate how complexity
-of language model affects the efficiency of finite-state spell-checking. For
-full-scale survey on the state-of-the-art non-finite-state spell-checking we
-refer to \newcite{mitton/2009}.
+implemented in the hunspell formalism, we mainly use them to evaluate how
+the complexity of a language model affects the efficiency of finite-state
+spell-checking. For a full-scale survey on the state-of-the-art
+non-finite-state spell-checking we refer to \newcite{mitton/2009}.
 
 The efficiency results are contrasted to the existing research on the
 finite-state spell-checking in \newcite{hassan/2008} and the theoretical
