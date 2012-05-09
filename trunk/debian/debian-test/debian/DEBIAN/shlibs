@@ -1,4 +1,4 @@
-libhfst HFST_LIBNUMBER
+libhfst ?
 libhfstospell 1
 libhfstlexc 0
 libfst 0
