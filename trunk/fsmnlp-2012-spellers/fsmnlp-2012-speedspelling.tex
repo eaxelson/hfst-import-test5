@@ -35,21 +35,27 @@ Spell-Checking~and~Correction}
 
 \begin{document}
 
-\maketitle \begin{abstract} In this paper we inspect the effects of various
-finite-state language and error models on the speed of finite-state
-spell-checking for case of contextless correction of non-word errors. We
-evaluate the speed and memory consumption of full-scale real-world finite-state
-spell checkers for three languages covering the broadest available spectrum of
-morphological complexity; English, Finnish and Greenlandic. We evaluate the
-effects of different finite-state error models and optimisations against
-contemporary software-driven spell-checkers with same or equivalent
-spell-checking features.  \end{abstract}
+\maketitle \begin{abstract} We inspect the viability of finite-state
+spell-checking and contextless correction of non-word errors in morphologically
+rich languages. Overviewing previous
+work, we conduct large-scale tests involving three languages
+--- covering a broad spectrum of morphological complexity;
+English, Finnish and Greenlandic --- and a variety of
+error models and algorithms, including proposed
+improvements of our own. Special reference is made to on-line
+three-way composition of the input, the error model and the language model.
+Tests are run on real-world text acquired from
+freely available sources.
+We show that the finite-state approaches discussed are sufficiently fast
+for high-quality correction, even for Greenlandic which, due to its morphological
+complexity, is a difficult task for non-finite-state approaches.
+\end{abstract}
 
 \section{Introduction}
 \label{sec:introduction}
 
-In most applications of spell-checking, efficiency is the key factor for
-selecting or discarding spell-checking solutions. In case of finite-state
+In most applications of spell-checking, efficiency is a limiting factor for
+selecting or discarding spell-checking solutions. In the case of finite-state
 spell-checking it is known that finite-state language
 models can efficiently encode dictionaries of natural
 languages~\cite{beesley/2003}, even for languages with rich and complex
@@ -60,8 +66,8 @@ systems are still based on programmatic solutions (e.g.
 hunspell\footnote{\url{http://hunspell.sf.net}}, and its *spell relatives), or
 at most specialised algorithms for implementing error-tolerant traversal of the
 finite-state dictionaries~\cite{oflazer/1996,hulden/2009}. There have also been
-few implementations of using fully finite-state implementations for both the
-error-detection and corrections~\cite{schulz/2002,pirinen/2010/lrec}. In this
+few fully finite-state implementations for both the detecting and correcting
+errors~\cite{schulz/2002,pirinen/2010/lrec}. In this
 paper we further evaluate the use of finite-state dictionaries with two-tape
 finite-state automatons for mechanism to correct misspellings, and how to
 optimise the finite-state error models.
@@ -82,8 +88,11 @@ voikko\footnote{\url{http://voikko.sf.net}}, with a LAG-based dictionary using
 malaga\footnote{\url{http://home.arcor.de/bjoern-beutel/malaga/}}. Our third
 test language is Greenlandic, a polysynthetic language which is implemented as
 finite-state system using Xerox's original finite-state morphology
-formalism~\cite{beesley/2003}. For open source implementation we use
-HFST\footnote{\url{http://hfst.sf.net}}. There is no free software for us as a
+formalism~\cite{beesley/2003}. We use foma for performing the correction
+task\footnote{\url{http://code.google.com/p/foma/}}.
+As a general purpose finite-state library we use
+HFST\footnote{\url{http://hfst.sf.net}}, which also comprises our spell-checking
+code. There is no free software for us as a
 reference implementation apart from our solution, as far as we know.
 
 The baseline featureset and the efficiency of spell-checking we are targeting
@@ -96,23 +105,26 @@ non-finite-state spell-checking, refer to \newcite{mitton/2009}.
 
 The efficiency results are contrasted with the existing research on
 finite-state spell-checking in \newcite{hassan/2008} and the theoretical
-results on finite-state error-models in \newcite{mitankin/2005} with the
-additions of morphologically complex languages with actual cyclic
-dictionary automata and more complex structure in general, than those of
-English and Arabic. In particular we show that the previous approaches have
+results on finite-state error-models in \newcite{mitankin/2005}.
+Our addition primarily comprises the
+addition of morphologically complex languages with actual cyclic
+dictionary automata and more complex structure in general, compared to those of
+English and Arabic. We also point out that previous approaches have
 neglected to simultaneously constrain the error model and the dictionary with
 each other in on-line composition, which affords a significant speed benefit.
 
 The rest of the paper is organised as follows. In Section~\ref{sec:methods} we
-introduce methods used by current non-finite-state spell-checkers and
+discuss the spell-checking task, current non-finite-state spell-checkers and
 previously used finite-state methods for spell-checking and correction and
-propose some possible speed optimisations for the error models. In
-Section~\ref{sec:materials} we present the language models, error models, the
-testing corpora and the earlier work. In Section~\ref{sec:evaluation} we
+propose some possible speed optimisations for the error models.
+We also investigate algorithmic limitations of finite-state approaches and
+ways to remedy them. In
+Section~\ref{sec:materials} we present the language models, error models and the
+testing corpora. In Section~\ref{sec:evaluation} we
 present the comparisons of speed and quality with combinations of different
 language and error models and corpora for spell-checking. In
-Section~\ref{sec:conclusions} we summarise our findings and results for use
-of finite-state spell-checking.
+Section~\ref{sec:conclusions} we summarise our findings and results,
+and outline future goals.
 
 
 \section{Methods}
@@ -143,7 +155,8 @@ spell-checker is collecting the word forms from reasonably large corpus of
 and use that as the likelihood $P=\frac{c(\mathrm{wordform})}{\mathrm{Corpus size}}$.
 For morphologically poor languages such as English, this is often sufficient
 approach~\cite{norvig/2010}, and we use it to create dictionary for our English
-spell-checking dictionary as well.
+spell-checking dictionary as well. As a non-finite-state reference point we use
+hunspell.
 
 For morphologically slightly richer languages like Finnish, for which the
 word-list approach is likely to miss much greater amount of words, one of the
@@ -153,19 +166,18 @@ alterations~\cite{koskenniemi/1983}. This approach also applies to the newest
 available free open source and full fledged finite-state Finnish morphological
 dictionary we found~\cite{pirinen/2011/nodalida}. This language model features
 productive derivations, compounding and rudimentary probabilistic models.
-The reference non-finite state language model for Finnish we found
-used in a spell-checker is implemented in a left-associative grammar
-formalism, a potentially slightly less efficient system with more expressive
-power and similar featureset as a finite-state formulation, in terms of
-linguistic coverage.
+We take as a reference non-finite state language model for Finnish Voikko's
+implementation in Malaga, which is currently used as a spell-checking component
+in open source software. It is implemented in a left-associative grammar
+formalism, which is a potentially less efficient system with more expressive
+power. It's similar to finite-state formulations in terms of linguistic coverage.
 
 For polysynthetic languages it will be obvious that coverage of any
 word-list-based approach will be even lower. Furthermore, most simple extensions
-to it such as affix stripping of hunspell are not adequate for describing
-word forms of the language. To our knowledge, the only approaches that have
+to it such as affix stripping (as in hunspell) are not adequate for describing
+word forms. To our knowledge, the only approaches that have
 been widely used for spell-checking and morphological analysis of Greenlandic
-have been based on traditional finite-state solutions, such as the Xerox formalisms,
-as with Finnish finite-state dictionaries.
+have been based on traditional finite-state solutions, such as the Xerox formalisms.
 
 \subsection{Error Models}
 \label{subsec:error-models}
@@ -230,6 +242,17 @@ traditional spell checkers will not attempt to correct the very first letter of
 the word form. We investigated whether this decision is a particularly
 effective way to limit the search space, but it does not appear to
 significantly differ from restricting edits at any other position in the input.
+
+Dividing the states of a dictionary automaton into classes corresponding to
+the minimum number of input symbols consumed by that state, we found that
+the average ambiguity in a particular class does not dramatically drop off after
+the first input symbols.
+The size of a dictionary automaton that is restricted to have
+a particular symbol in a particular position does not apparently depend on the
+choice of position. This is in line with the rather obvious finding that the
+size of the restricted dictionary in terms of number of strings is similarily
+position-agnostic.
+
 Presumably, the rationale is a belief that errors predominately occur at other
 positions in the input. As far as we know, the complete justification for this
 belief remains to be made with a high-quality, hand-checked error corpus.
@@ -243,7 +266,7 @@ rudimentary classification of the errors in the small error corpus of
 333 entries from~\newcite{pirinen/2012/cicling}, and found errors at
 first position in 1.2~\% of the entries, furthermore we noticed that
 when evenly splitting the word forms in three parts, 15~\% of the errors are
-in the first third of the word form, while second has 47~\% and third 58~\%,
+in the first third of the word form, while second has 47~\% and third 38~\%,
 which would be in favor of selecting the error model to discard initial
 errors\footnote{by crude classification we mean that all errors were
 forced to one of the three classes at weight of one, e.g. a series of
@@ -408,7 +431,7 @@ is provided for reference only.
 \begin{table}[h]
 \begin{center}
 \begin{scriptsize}
-\begin{tabular}{|l|rrrr|}
+\begin{tabular}{|l|rrr|}
 \hline
 \bf Automaton & \bf En & \bf Fi & \bf Kl  \\ 
 \hline
@@ -419,13 +442,13 @@ Edit distance 1 nodes &
  652& 3308& 3784
 \\
 Edit distance 1 arcs &
- 2081& 10209& 11657
+ 2081& 10,209& 11,657
 \\
 Edit distance 2 nodes &
  1303& 6615& 7567
 \\
 Edit distance 2 arcs &
- 4136& 20360& 23252
+ 4136& 20,360& 23,252
 \\
 %% Edit distance 3 nodes &
 %%  1954& 9922& 11350
@@ -437,13 +460,13 @@ No firsts ed 1 nodes &
  652& 3308& 3784
 \\
 No firsts ed 1 arcs & 
- 2107& 10267& 11719
+ 2107& 10,267& 11,719
 \\
 No firsts ed 2 nodes &
- 1303& 6615& 7567
+ 1303& 6,615& 7567
 \\
 No firsts ed 2 arcs &
- 4162& 20418& 23314
+ 4,162& 20,418& 23,314
 \\
 %% No firsts ed 3 nodes &
 %%  1954& 9922& 11350
@@ -455,13 +478,13 @@ No redundancy and 1.s ed 2 nodes &
  1303& 6615& 7567
 \\
 No redundancy and 1.s ed 2 arcs &
- 4162& 20418& 23314
+ 4162& 20,418& 23,314
 \\
 Lower order first ed 1 to 2 arcs &
-add & above & rows
+6217 & 30,569 & 34,909
 \\
 Lower order first ed 1 to 2 nodes &
-add & above & rows
+1955 & 9923 & 11,351
 \\
 \hline
 \end{tabular}
@@ -477,8 +500,8 @@ The sizes of error models as automata}
 
 The evaluations in this section are performed on quad-core Intel Xeon E5450
 running at 3~GHz with 64~GiB of RAM memory. The times are averaged over five
-test runs in stable server environment with no server processes or running
-graphical interfaces or other uses. The test results are measured using the
+test runs of 10,000 words in a stable server environment with no server processes
+or running graphical interfaces or other uses. The test results are measured using the
 \texttt{getrusage} C function on a system that supports the maximum resident
 stack size \texttt{ru\_maxrss} and user time \texttt{ru\_utime} fields. The
 times are also verified with GNU \texttt{time} command. The results for
@@ -524,24 +547,24 @@ Edit distance 1 &
 Edit distance 2 &
 7.55&220.42&568.36
 \\
-Edit distance 3 &
-140.96&2649.29&---
-\\
+%% Edit distance 3 &
+%% 140.96&2649.29&---
+%% \\
 No firsts ed 1 & 
 0.44&3.19&3.52
 \\
 No firsts ed 2 &
 1.38&61.88&386.06
 \\
-No firsts ed 3 &
-8.25&824.05&---
-\\
+%% No firsts ed 3 &
+%% 8.25&824.05&---
+%% \\
 No redundancy ed 2 &
 7.52&4230.94&6420.66
 \\
-No redundancy ed 3 &
-143.64&78517.63&---
-\\
+%% No redundancy ed 3 &
+%% 143.64&78517.63&---
+%% \\
 No redundancy and firsts ed 2 &
 1.51&62.05&386.63
 \\
@@ -562,13 +585,13 @@ error models to speed (time in seconds per 10000 word forms)}
 The results show that not editing the first position does indeed give
 significant boost to the speed, regardless of language model, which is of course
 caused by the significant reduction in search space. However, the
-redundancy avoidance does not seem to make reasonable difference, this is most
+redundancy avoidance does not seem to make a significant difference. This is most
 likely because the amount of duplicate paths in the search space is not so
 proportionally large and their traversal will be relatively fast. The separate
 application of error models gives the expected timing result between its
 relevant primary and secondary error models. It should be noteworthy, that, when
 thinking of real world applications, the speed of the most of the models
-described here is greater than 1 word per second (i.e. 10000 seconds per 10000
+described here is greater than 1 word per second (i.e. 10,000 seconds per 10,000
 words).
 
 
@@ -733,27 +756,35 @@ speed of spell-checking is indeed in the correcting of wrong results.
 In this article, we built a full-fledged finite-state spell-checking system from
 existing finite-state language models and generated error models. We showed
 that using online serial composition of the word form, error model and
-dictionary instead is usable for morphologically complex language. Furthermore
+dictionary instead of previous approaches is usable for morphologically
+complex languages. Furthermore
 we showed that the error models can be automatically optimised in several ways
-to gain some speed at cost of recall. We noticed that the often unfounded
-assumption of leaving the first letter of the word form unmodified while
-correcting the word form may cause the least drop in the recall figures even
-in Finnish language, and it does gain significant improvement in the correction
-speed.
+to gain some speed at cost of recall.
 
 We showed that the memory consumption of the spell-checking process is mainly
-unaffected by the selection of error model to the extent as the error model
-doesn't generate measurably greater set of corrections per word, which means
-that error models can be more freely changed in real world applications as
-needed.
+unaffected by the selection of error model, apart from the need to store
+a greater result set. The error models may therefore be quite freely changed
+in real world applications as needed.
+
+We verified that correcting only the first input letter affords a significant
+speed improvement, but that this improvement is not dependent on the position
+of such a restriction. This practice is somewhat supported by our tentative
+finding that it may cause the least drop in practical recall figures, at least
+in Finnish. It is promising especially in conjunction with a fallback model
+that does correct the first letter.
+
+We described a way to avoid having a finite-state error model perform
+redundant work, such as deleting and inserting the same letter in succession.
+The practical improvement from doing this is extremely modest, and it increases
+the size of the error model.
 
 In this research we focused on differences in automatically generated error
-models and their optimisations, in case of morphologically complex languages.
-For future research we intent to study more realistic error models induced from
-actual error corpora (e.g. \newcite{brill/2000}). Also we need to research
-different statistical versions of the language models, as well as further use
+models and their optimisations in the case of morphologically complex languages.
+For future research we intend to study more realistic error models induced from
+actual error corpora (e.g. \newcite{brill/2000}). Research into
+different ways to induce weights into the language models, as well as further use
 of context in finite-state spell-checking (as in
-\newcite{pirinen/2012/cicling}).
+\newcite{pirinen/2012/cicling}), is warranted.
 
 % \section*{Acknowledgements} 
 
