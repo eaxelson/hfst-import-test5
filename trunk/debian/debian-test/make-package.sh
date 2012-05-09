@@ -11,6 +11,8 @@ SFST_PREFIX=$BACKEND_PREFIX
 OPENFST_PREFIX=$BACKEND_PREFIX
 FOMA_PREFIX=$BACKEND_PREFIX
 
+HFST_LIBNUMBER="18"
+
 # -------------------
 # Copy the HFST tools
 # -------------------
@@ -19,7 +21,7 @@ cd debian/usr/bin;
 
 for tool in $HFST_PREFIX/bin/hfst-*;
 do
-    if (ldd $tool | grep "libhfst.so.17" > /dev/null) ; then
+    if (ldd $tool | grep "libhfst\.so\.""$HFST_LIBNUMBER" > /dev/null) ; then
 	if ! (echo $tool | grep "2$" > /dev/null) && \
 	    ! (echo $tool | grep "3$" > /dev/null) && \
 	     ! (echo $tool | grep "\~" > /dev/null) ; then
@@ -49,9 +51,9 @@ cd ../../..
 
 cd debian/usr/lib/
 
-cp $HFST_PREFIX/lib/libhfst.so.17.0.0 .
-ln -s -T libhfst.so.17.0.0 libhfst.so.17
-ln -s -T libhfst.so.17 libhfst.so
+cp $HFST_PREFIX/lib/libhfst.so."$HFST_LIBNUMBER".0.0 .
+ln -s -T libhfst.so."$HFST_LIBNUMBER".0.0 libhfst.so."$HFST_LIBNUMBER"
+ln -s -T libhfst.so."$HFST_LIBNUMBER" libhfst.so
 
 #cp -P $HFST_PREFIX/lib/libhfstlexc.so.0.0.0 .
 #ln -s -T libhfstlexc.so.0.0.0 libhfstlexc.so.0
@@ -77,18 +79,20 @@ rm -f libsfst.so libsfst.so.0
 ln -s -T libsfst.so.0.0.0 libsfst.so.0
 ln -s -T libsfst.so.0 libsfst.so
 
-if ! (readelf -a libsfst.so.0.0.0 | grep "SONAME" | \
-      grep "libsfst.so.0" 2>&1 > /dev/null); then
-    echo "ERROR: missing or wrong SONAME in libsfst.so.0.0.0"
-    echo "try recompiling SFST with option '-Wl,-soname,libsfst.so.0'"
-    exit 1;
-fi
+#if ! (readelf -a libsfst.so.0.0.0 | grep "SONAME" | \
+#      grep "libsfst.so.0" 2>&1 > /dev/null); then
+#    echo "ERROR: missing or wrong SONAME in libsfst.so.0.0.0"
+#    echo "try recompiling SFST with option '-Wl,-soname,libsfst.so.0'"
+#    exit 1;
+#fi
 
 # foma
 cp $BACKEND_PREFIX/lib/libfoma.so.0.9.16 .
 rm --force libfoma.so.0 libfoma.so
 ln -s -T libfoma.so.0.9.16 libfoma.so.0
 ln -s -T libfoma.so.0 libfoma.so
+
+cp $BACKEND_PREFIX/bin/foma ../bin/foma
 
 strip *.so
 chmod 0644 *
