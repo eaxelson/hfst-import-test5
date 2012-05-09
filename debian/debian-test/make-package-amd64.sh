@@ -13,6 +13,26 @@ FOMA_PREFIX=$BACKEND_PREFIX
 
 HFST_LIBNUMBER="18"
 
+if grep "Version: \?" debian/DEBIAN/control > /dev/null; then
+    echo "Version number must be defined in control file!";
+    exit 1;
+fi
+
+if grep "Architecture: \?" debian/DEBIAN/control > /dev/null; then
+    echo "Architecture must be defined in control file!";
+    exit 1;
+fi
+
+if grep "Provides: \?" debian/DEBIAN/control > /dev/null; then
+    echo "Provided libraries must be defined in control file!";
+    exit 1;
+fi
+
+if grep "libhfst ?" debian/DEBIAN/shlibs > /dev/null; then
+    echo "Version number must be defined in shlibs file!";
+    exit 1;
+fi
+
 # -------------------
 # Copy the HFST tools
 # -------------------
@@ -30,7 +50,7 @@ do
     fi
 done
 
-for tool in hfst-foma-wrapper.sh hfst-twolc hfst-twolc-loc hfst-xfst;
+for tool in hfst-twolc hfst-twolc-loc hfst-xfst; # hfst-foma-wrapper.sh
 do
     cp -P $HFST_PREFIX/bin/$tool . ;
 done
@@ -91,8 +111,6 @@ cp $BACKEND_PREFIX/lib/libfoma.so.0.9.16 .
 rm --force libfoma.so.0 libfoma.so
 ln -s -T libfoma.so.0.9.16 libfoma.so.0
 ln -s -T libfoma.so.0 libfoma.so
-
-cp $BACKEND_PREFIX/bin/foma ../bin/foma
 
 strip *.so
 chmod 0644 *
