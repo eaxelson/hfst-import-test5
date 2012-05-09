@@ -37,10 +37,12 @@ fi
 for library_mentioned in `cat debian/DEBIAN/shlibs | cut -f1 -d' '`;
 do 
     if (! grep "$library_mentioned" debian/DEBIAN/control > /dev/null); then 
-	echo "ERROR:" $library_mentioned \
-	    "not found in control file but mentioned in shlibs file";
-	exit 1;
-    fi; 
+	if [ "$library_mentioned" != "libhfst" ]; then
+	    echo "ERROR:" $library_mentioned \
+		"not found in control file but mentioned in shlibs file";
+	    exit 1;
+	fi; 
+    fi;
 done
 
 # -------------------
@@ -104,10 +106,12 @@ ln -s -T libfst.so.0.0.0 libfst.so.0
 ln -s -T libfst.so.0 libfst.so
 
 # SFST
-cp $BACKEND_PREFIX/lib/libsfst.so.0.0.0 .
-rm -f libsfst.so libsfst.so.0
-ln -s -T libsfst.so.0.0.0 libsfst.so.0
-ln -s -T libsfst.so.0 libsfst.so
+if (grep "Provides" debian/DEBIAN/control | grep "libsfst" > /dev/null); then
+    cp $BACKEND_PREFIX/lib/libsfst.so.0.0.0 .
+    rm -f libsfst.so libsfst.so.0
+    ln -s -T libsfst.so.0.0.0 libsfst.so.0
+    ln -s -T libsfst.so.0 libsfst.so;
+fi
 
 #if ! (readelf -a libsfst.so.0.0.0 | grep "SONAME" | \
 #      grep "libsfst.so.0" 2>&1 > /dev/null); then
@@ -117,10 +121,12 @@ ln -s -T libsfst.so.0 libsfst.so
 #fi
 
 # foma
-cp $BACKEND_PREFIX/lib/libfoma.so.0.9.16 .
-rm --force libfoma.so.0 libfoma.so
-ln -s -T libfoma.so.0.9.16 libfoma.so.0
-ln -s -T libfoma.so.0 libfoma.so
+if (grep "Provides" debian/DEBIAN/control | grep "libfoma" > /dev/null); then
+    cp $BACKEND_PREFIX/lib/libfoma.so.0.9.16 .
+    rm --force libfoma.so.0 libfoma.so
+    ln -s -T libfoma.so.0.9.16 libfoma.so.0
+    ln -s -T libfoma.so.0 libfoma.so;
+fi
 
 strip *.so
 chmod 0644 *
