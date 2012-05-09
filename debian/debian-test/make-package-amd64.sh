@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 #  -------------------------------------------------
 #  A script for creating the debian package for HFST
@@ -13,18 +13,18 @@ FOMA_PREFIX=$BACKEND_PREFIX
 
 HFST_LIBNUMBER="18"
 
-if grep "Version: \?" debian/DEBIAN/control > /dev/null; then
+if grep "Version: ?" debian/DEBIAN/control > /dev/null; then
     echo "Version number must be defined in control file!";
     exit 1;
 fi
 
-if grep "Architecture: \?" debian/DEBIAN/control > /dev/null; then
+if grep "Architecture: ?" debian/DEBIAN/control > /dev/null; then
     echo "Architecture must be defined in control file!";
     exit 1;
 fi
 
-if grep "Provides: \?" debian/DEBIAN/control > /dev/null; then
-    echo "Provided libraries must be defined in control file!";
+if grep "Provides" debian/DEBIAN/control | grep "?" > /dev/null; then
+    echo "Check provided libraries in control file!";
     exit 1;
 fi
 
@@ -32,6 +32,16 @@ if grep "libhfst ?" debian/DEBIAN/shlibs > /dev/null; then
     echo "Version number must be defined in shlibs file!";
     exit 1;
 fi
+
+
+for library_mentioned in `cat debian/DEBIAN/shlibs | cut -f1 -d' '`;
+do 
+    if (! grep "$library_mentioned" debian/DEBIAN/control > /dev/null); then 
+	echo "ERROR:" $library_mentioned \
+	    "not found in control file but mentioned in shlibs file";
+	exit 1;
+    fi; 
+done
 
 # -------------------
 # Copy the HFST tools
