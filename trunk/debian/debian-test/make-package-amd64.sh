@@ -5,7 +5,7 @@
 #  -------------------------------------------------
 #
 
-HFST_PREFIX="/usr/local/"
+HFST_PREFIX="/home/eaxelson/hfst-installation/"
 BACKEND_PREFIX="/usr/local/"
 SFST_PREFIX=$BACKEND_PREFIX
 OPENFST_PREFIX=$BACKEND_PREFIX
@@ -62,13 +62,20 @@ do
     fi
 done
 
-for tool in hfst-twolc hfst-twolc-loc hfst-xfst; # hfst-foma-wrapper.sh
+for tool in hfst-twolc hfst-twolc-loc htwolcpre1 htwolcpre2 htwolcpre3;
 do
+    if (grep "local" $HFST_PREFIX/bin/$tool > /dev/null); then
+	echo "ERROR: '"$tool"' uses prefix other than '/usr/bin/'!" ;
+	echo "Fix manually before creating package";
+	exit 1;
+    fi
     cp -P $HFST_PREFIX/bin/$tool . ;
 done
 
+# hfst-xfst depends on foma tools
+rm -f hfst-foma-wrapper.sh hfst-xfst 1> /dev/null 2> /dev/null
 
-for tool in hfst-*;
+for tool in hfst-* htwolcpre*;
 do
     if (readelf -a $tool 1> /dev/null 2> /dev/null); then
 	strip $tool;
@@ -91,7 +98,7 @@ ln -s -T libhfst.so."$HFST_LIBNUMBER" libhfst.so
 #ln -s -T libhfstlexc.so.0.0.0 libhfstlexc.so.0
 #ln -s -T libhfstlexc.so.0 libhfstlexc.so
 
-cp -P $HFST_PREFIX/lib/libhfstospell.so.1.0.0 .
+cp -P $BACKEND_PREFIX/lib/libhfstospell.so.1.0.0 .
 ln -s -T libhfstospell.so.1.0.0 libhfstospell.so.1
 ln -s -T libhfstospell.so.1 libhfstospell.so
 
@@ -106,7 +113,8 @@ ln -s -T libfst.so.0.0.0 libfst.so.0
 ln -s -T libfst.so.0 libfst.so
 
 # SFST
-if (grep "Provides" debian/DEBIAN/control | grep "libsfst" > /dev/null); then
+if (grep "Provides" ../../../debian/DEBIAN/control | \
+    grep "libsfst" > /dev/null); then
     cp $BACKEND_PREFIX/lib/libsfst.so.0.0.0 .
     rm -f libsfst.so libsfst.so.0
     ln -s -T libsfst.so.0.0.0 libsfst.so.0
@@ -121,7 +129,8 @@ fi
 #fi
 
 # foma
-if (grep "Provides" debian/DEBIAN/control | grep "libfoma" > /dev/null); then
+if (grep "Provides" ../../../debian/DEBIAN/control \
+    | grep "libfoma" > /dev/null); then
     cp $BACKEND_PREFIX/lib/libfoma.so.0.9.16 .
     rm --force libfoma.so.0 libfoma.so
     ln -s -T libfoma.so.0.9.16 libfoma.so.0
