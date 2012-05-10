@@ -4,7 +4,7 @@ check:
 	../../../../tools/src/  #--test-full
 
 EXTRA_DIST=BrazilianPortuguese1.hfst.script BrazilianPortuguese1.xfst.script \
-	BrazilianPortuguese1.xfst.att
+	BrazilianPortuguese1.xfst.att README
 
 clean-local:
 	$(top_srcdir)/test/tools/fsmbook-examples/remove-complement.sh \
