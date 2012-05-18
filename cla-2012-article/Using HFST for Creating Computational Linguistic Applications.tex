@@ -520,6 +520,12 @@ e.g. lexc notation.
 \subsection{Performance}
 % Erik
 
+The HFST toolkit has been implemented using three back-end libraries:
+SFST, OpenFst and foma. Usually one library is chosen
+and used throughout the compilation of a given morphology.
+In this way, we can compare how different back-end libraries perform
+in the same task.
+
 In Table~\ref{tab:compilation_times}, we show compilation times for different 
 morphologies using different HFST back-ends. The morphologies are OMorFi 
 \cite{pirinen/2008} for Finnish, Morphisto \cite{zielinski/2009} for German,
@@ -554,7 +560,7 @@ Finnish and German. We also show the back-end versions used.
 \begin{table} [h!]
   \centering
   \caption{Compilation times for different morphologies with
-    different HFST back ends and their versions. 
+    different HFST back-ends and their versions. 
     The times are given in minutes and seconds.}
   \begin{tabular}{| c | c | c | c |}
     \hline
