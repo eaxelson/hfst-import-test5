@@ -405,7 +405,7 @@ would not be allowed in XFST, but is valid in HFST.
 Popular formalisms for describing the morphotactics of a language tend to be some variation 
 of the item and arrangement scheme. We build on this to generalize from \verb!lexc! into other
 item-and-arrangement notations such as Hunmorph and Apertium. This gives us the option to describe 
-morpholgoy in a notation that is compiled into finite-state transducers which we can continue to process with other
+morphology in a notation that is compiled into finite-state transducers which we can continue to process with other
 HFST tools. We demonstrate how compilation could proceed when reducing a \verb!lexc! lexicon into a sequence of
 finite-state operations. A morphological programming language like \verb!SFST-PL! forgoes a standard lexicon interface
 like \verb!lexc! and only offers the end user an option to construct the lexicon using finite-state operations. 
@@ -640,7 +640,7 @@ determining the most likely tags, the taggers use
 lexical probabilities ${\rm p}(w|t)$ for each word $w$ and each tag
 $t$ together with \emph{transition probabilities} for the tag of a
 word at a given position given the tags of the preceding words ${\rm
-  p}(t_i | t_{i - 1},\ ...\, t_{i-n})$. The integer $n$ determines how
+  p}(t_i | t_{i - 1},\ ...\, t_{i-n})$~\cite{silfverberg/2011/nodalida}. The integer $n$ determines how
 many preceding tags are considered when estimating the probability of
 tags. It is called the \emph{order} of the HMM tagger. Second order HMM
 taggers are the most common in POS tagging.
@@ -658,7 +658,7 @@ component of the tagger. Both models are trained using tagged
 training data.
 
 Both components can be modified to suit the needs of a particular
-language. In \cite{silfverberg/2011/nodalida} it is explained how the sequence
+language. In~\cite{silfverberg/2011/nodalida} it is explained how the sequence
 model can be modified to include preceding and succeeding words in
 the estimates of the probabilities of tags and how suffix guessers
 can be modified to better suit agglutinative languages. In the present paper
@@ -670,61 +670,79 @@ out-of-vocabulary words.
 \subsection{The Lexical Model of HFST Taggers}
 % Miikka
 
-The accuracy of traditional POS taggers suffers greatly
-because of out-of-vocabulary (OOV) words, i.e. word forms which were
-not observed during training of the tagger. For languages like
-English with few morphological phenomena and where compound words are written separately, this
-is not a big problem when the genres of the training data and the data
-that is tagged are sufficiently similar. When the genres differ
-considerably there are more OOV words and consequently accuracy
-is reduced. When building taggers for morphologically rich languages
-such as Turkish, Finnish or Hungarian OOV words become a major
-problem even when no change of genre is involved. In these cases
-OOV words arise from inflection, derivation and
-compounding.
+The accuracy of traditional POS taggers suffers greatly because of
+out of vocabulary (OOV) words, i.e. word forms which were not
+observed during training of the tagger. For languages like English
+with few productive morphological phenomena, this is not a big problem
+when the genres of the training data and the data that is tagged are
+sufficiently similar. When the genres differ considerably there are
+more OOV words and consequently accuracy is reduced. When building
+taggers for morphologically rich languages such as Turkish, Finnish or
+Hungarian, OOV words become a major problem even when no change of
+genre is involved. In these cases OOV words arise from inflection,
+derivation and compounding.
 
-HFST taggers offer two ways to tackle the problem of OOV words: (1) the
-tagger builder can adjust the way the probability distribution for
-different length suffixes are combined to form estimates for the
-probabilities of tags, and (2) the tagger builder has the option to combine taggers with
-morphological analyzers.
+Usually, e.g. in~\cite{Brants:2000}, OOV words are handled using
+suffix guessers, which combine estimates of all suffixes of the OOV
+word whose length does not exceed a given threshold. E.g. the POS tag
+for {\it ameliorate} can be guessed based on the distribution of tags
+for the suffixes {\it -e}, {\it -te}, ..., {\it -liorate} if the
+threshold or the length of the suffixes is 7.
 
-E.g. in Finnish the suffix guesser proposed by \cite{Brants:2000} gives
-poor results. Such a suffix guesser computes tag probabilities for
-each suffix of a word which is shorter than a given threshold and
-combines the estimates to give a probability for the OOV word and
-each tag. In \cite{silfverberg/2011/nodalida}, it was observed that a guesser
-which only uses the longest suffix of the OOV word found in the
-training data gives better results for Finnish. It thus appears that the type of suffix
-guesser which gives the best results is language dependent. HFST
-allows for changing the way the suffix probabilities are combined.
+HFST taggers offer two improvements for handling of OOV words: (1) the
+tagger builder can adjust the way in which the probability
+distribution for different length suffixes are combined to form
+probability estimates for the OOV word, and (2) the tagger builder has
+the option to combine taggers with morphological analyzers, whose tag
+set does not need to equal the tag set of the training data of
+the tagger.
 
-Research in tagging morphologically complex languages has utilized
-morphological analyzers e.g. \cite{Tzoukerman:1996,Oravecz:2002}, but
-the tag set of the POS tagger and the tag set of the
-morphological analyzer has remained the same. In such approaches, a
-lexical model is constructed from the analysis sets given by the
-morphological analyzer for each word. E.g. the English word "man" is
-ambiguous between the interpretation singular noun "+Noun+Sg" and
-infinitive verb "+Verb+Inf". In the training data, each occurrence of
-the word "man" could thus be substituted by the set $S_{man} = \{$
-"+Noun+Sg", "+Verb+Inf" $\}$. The lexical model would thus give
-probabilities ${\rm p}(S_{man}|t)$ for each tag $t$. 
+Adjusting the way suffix estimates are combined is useful e.g. in
+Finnish, where the suffix guesser proposed by \cite{Brants:2000} gives
+poor results. For Finnish, the accuracy of the guesser improves, when
+the only suffix considered is the longest suffix of the word which was
+seen during training. This is probably a result of the high number of
+compound words, where the final part of the compound is known, but the
+compound itself is an OOV word. The final part of the compound is
+generally a very good predictor of the word-class of the compound, so
+suffixes of the OOV word containing the final part are very
+informative.
 
-Previous research has focused on the case where the tag set of the
-morphological analyzer and the tag set of the training corpus are the
-same. We note here that this is not necessary.
-It is still possible to train a lexical model based on
-ambiguity classes. When an OOV word is encountered, its ambiguity
-class is constructed using the morphological analyzer and the lexical
-probabilities of the ambiguity class are retrieved.
+The idea of incorporating a morphological analyzer in a tagger is not
+new. E.g.  \cite{Tzoukerman:1996,Oravecz:2002} use morphological
+analyzers as part of statistical taggers. The novel aspect of HFST
+taggers is that they can incorporate morphological analyzers whose
+morphological description differs from the morphological description
+used in the training data of the statistical tagger. This is useful,
+because it allows utilizing ready-made linguistic utilities in tagging
+without the need to address problems such as differences in the
+coarseness of the morphological descriptions between the utilities and
+the training data of the tagger.
 
-It is a practical problem if the tag sets are required to be the
-same, since conventions for tagging a
-language vary and there is not always a straightforward conversion
-between the tag set of the training corpus and the tag set of the
-POS tagger. Such a conversion can be difficult if the tag
-set of either resource is coarser than that of the other.
+In approaches such as \cite{Tzoukerman:1996,Oravecz:2002}, the tag set
+of the morphological analyzer and the statistical tagger have to be
+the same. When an OOV word is encountered, the morphological analyzer
+is used to look up the possible analyzes for the OOV word. These
+analyzes are used directly by the tagger. In contrast, HFST taggers
+keep track of {\it ambiguity classes}, which are the sets of
+morphological analyzes emitted by the morphological analyzer for words
+in the training data. The taggers use the tag distributions of all
+training data words in a given ambiguity class to determine the tag
+distribution of an OOV word in the same ambiguity class.
+
+Given an English morphological analyzer, which emits two analyzes {\it
+  dog\-+N\-+SG} and {\it dog\-+V\-+INF} for the word form {\it dog},
+the ambiguity class of {\it dog} is {\it \{+N\-+SG, +V\-+INF\}}. In
+the training data, {\it dog} might receive Penn Treebank tags like 
+{\tt NN} and {\tt VB}. When the tagger encounters an OOV word in the same
+ambiguity class such as {\it man}, it first maps {\it man} onto its
+ambiguity class {\it \{+N\-+SG, +V\-+INF\}} using the morphological
+analyzer. It then uses the tag distribution of all words in the
+ambiguity class {\it \{+N\-+SG, +V\-+INF\}} (a.o. {\it dog}) to
+estimate the probabilities for {\it man} given tags like {\tt NN} and
+  {\tt VB}. Note that this does not require that the tag sets of the
+  training data and the morphological analyzer are the same.
+
 
 \subsection{Experiments with HFST taggers}
 
