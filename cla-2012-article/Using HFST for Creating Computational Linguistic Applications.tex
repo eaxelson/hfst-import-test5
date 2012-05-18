@@ -103,12 +103,10 @@ on a lexicon compiled with \textbf{hfst-lexc}. The difference between the tools 
 lexicon whereas \textbf{hfst-twolc} rules are applied as parallel constraints limiting
 the realizations of morphophonemes used in the \textbf{hfst-lexc} lexicon.
 
-\subsection{Parallel Rules with Negative Contexts and Regular Expression Centers}
+\subsection{Parallel Rules with Negative Contexts}
 
 The rule compiler \textbf{hfst-twolc} provides backward compatibility with the
-Xerox tool twolc, but it augments the twolc functionality by providing two
-new types of rules. In \textbf{hfst-twolc}, rules can have centers which are
-regular expressions and can have negative contexts.
+Xerox tool twolc, but it augments twolc functionality by providing a new type of rules. In \textbf{hfst-twolc}, rules can have can have negative contexts.
 \begin{figure}
 {\footnotesize
 \begin{verbatim}
@@ -128,12 +126,29 @@ x:y <=> a b _ [ ? - [ c | d ] | c [ ? - d ] | .#. ] ;
 \end{figure}
 
 In traditional two-level rules, it can be very difficult to express
-that a certain alternation should not occur in a given
-context. Sometimes conflict resolution~\cite{silfverberg/2009/2} of
-two-level rules handles this, but conflict resolution works only if
-rules can be ordered into chains of sub cases. Often this can be
-difficult to accomplish, especially for grammar writers who are not
-especially well acquainted with writing regular expressions.
+that a certain alternation should not occur in a given context. Such
+restrictions are required because of rule conflicts, i.e. clashes of
+two or more contradicting rules. When a rule conflict occurs, the
+contexts of some of the contradicting rules need to be restricted in
+order to resolve the
+conflict.~\footnote{\url{http://www.cis.upenn.edu/~cis639/docs/twolc.html}}
+
+Sometimes an automated mechanism called conflict resolution of
+two-level rules~\cite{silfverberg/2009/2} can be used to resolve rule
+conflicts, but conflict resolution works only if the conflicting rules
+can be ordered into chains of sub cases. Often this can be difficult
+to accomplish, especially for grammar writers who are not especially
+well acquainted with writing regular expressions.
+
+In twolc syntax, prohibition rules such as {\tt x:y /<= C1 \_ C2 ;}
+can be used to forbid a pair {\tt x:y} in a context where the left
+context matches the regular expression {\tt C1} and the right context
+matches {\tt C2}. Unfortunately prohibition rules do not solve the
+problem of conflicting rules, because they do not participate in conflict
+resolution and simply adding new rules to a two-level grammar does not
+remove rule conflicts.~\footnote{Not that, if prohibition rules would
+  participate in conflict resolution it would still be challenging to
+  write them in such a manner that conflict resolution could apply.}
 
 Using an extension to the Xerox two-level rule syntax in
 \verb|hfst-twolc|, it is possible to formulate rules with negative
