@@ -917,15 +917,15 @@ $L$ was implemented (distributed as \verb!hfst-ospell!
 under the GPL and Apache licenses) (for a more general and complex algorithm,
 see \cite{allauzen/2009}).
 
-We write $I = (Q^I, 0^I, T^I, E^I)$, where $Q$
+We write $I = (Q^I, 0^I, T^I, \Delta^I)$, where $Q$
 is the set of states, $0$ is the starting state, $T$ is the set of terminal
-states and $E$ is the set of transitions (triples of (state, symbol pair
+states and $\Delta$ is the set of transitions (triples of (state, symbol pair
 (input and output), state)), and similarity for $E$ and $L$.
 
 Eliding for the time being weights and flag diacritics, states in the
 composition transducer are triples of states of the component transducers.
 Analogously with two-way composition, the starting state is $(0^I, 0^E, 0^L)$
-and the edge $e = (q_1, (\sigma_1, \sigma_2), q_2)$ exists if edges
+and the edge $\delta = (q_1, (\sigma_1, \sigma_2), q_2)$ exists if edges
 $(q^I_1, (\sigma_1, \sigma'), q^I_2)$,
 $(q^E_1, (\sigma', \sigma''), q^E_2)$ and
 $(q^L_1, (\sigma'', \sigma_2), q^L_2)$ exist in the respective transducers
