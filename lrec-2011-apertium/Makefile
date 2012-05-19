@@ -13,8 +13,11 @@ XELATEX=xelatex
 BIBTEX=bibtex
 UPLOAD=ruuvi:public_html/tmp
 ARTICLE=lrec-2011-apertium.pdf
+BEAMER=lrec-2011-apertium-beamer.pdf
 WIKISIZE=102400
 SPELLWORDS=1000
+
+paper: $(ARTICLE) $(BEAMER)
 
 # article
 $(ARTICLE): lrec-2011-apertium.tex lrec2011.bib
@@ -24,8 +27,14 @@ $(ARTICLE): lrec-2011-apertium.tex lrec2011.bib
 	$(XELATEX) lrec-2011-apertium.tex
 	$(XELATEX) lrec-2011-apertium.tex
 
+$(BEAMER): lrec-2011-apertium-beamer.tex
+	$(XELATEX) $<
+	$(XELATEX) $<
+	$(XELATEX) $<
+
+
 upload:
-	scp $(ARTICLE) $(UPLOAD)
+	scp $(BEAMER) $(ARTICLE) $(UPLOAD)
 
 #  apertium-cy-kw.kw.dix:9: parser error : XML declaration allowed only at the start of the document
 #  apertium-sw-en.sw.dix: empty <alphabet>
