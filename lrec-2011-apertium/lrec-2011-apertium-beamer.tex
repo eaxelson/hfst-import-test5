@@ -5,10 +5,14 @@
 
 \usepackage{url}
 
+\usetheme{Madrid}
 
-\title{Compiling Apertium dictionaries with HFST---leveraging generalised compilation formulas to get more and better end applications with fewer language description}
-\author[Tommi A Pirinen]{Tommi A Pirinen \guilsinglleft{}tommi.pirinen@helsinki.fi\guilsinglright{}, Francis Tyers}
-\institute{University of Helsinki, Universitat d'Alacant\\Department of Modern languages}
+\title[Compiling apertium monodix with HFST]{Compiling Apertium dictionaries with HFST}
+\subtitle{leveraging generalised compilation formulas to get more and better
+end applications with fewer language description}
+\author[Tommi A Pirinen]{Tommi A Pirinen, Francis Tyers\\
+\url{tommi.pirinen@helsinki.fi}}
+\institute[Helsinki]{University of Helsinki, Universitat d'Alacant}
 \date{\today}
 
 \begin{document}
@@ -20,18 +24,8 @@
     \tableofcontents
 \end{frame}
 
-
-\AtBeginSection[]
-{
-  \begin{frame}<beamer>
-    \frametitle{Outline}
-    \tableofcontents[currentsection]
-  \end{frame}
-}
-
 \section{Introduction}
 
-% I wonder if this is needed
 \begin{frame}
     \frametitle{Finite-state automata and HFST and apertium}
     \begin{itemize}
@@ -51,7 +45,7 @@
 \end{frame}
 
 \begin{frame}
-    \frametitle{Compiling apertium dictionaries with HFST}
+    \frametitle{Compiling apertium dictionaries with HFST---rationale}
     \begin{itemize}
         \item ``just an engineering exercise''
         \item getting all language descriptions to compile natively in HFST (as
@@ -64,6 +58,8 @@
         \item possibility to integrate more complex features in of finite-state
             morphology in apertium dictionaries---morphophonetics, reduplication
             etc. that may be supported by other HFST tools
+        \item this paper fits nicely in my PhD thesis under ``State of the art of
+            in language models''
     \end{itemize}
 \end{frame}
 
@@ -116,7 +112,13 @@
 \begin{frame}
     \frametitle{What now?}
     \begin{itemize}
-        \item 
+        \item The reference material for the article is in our svn
+            \url{http://hfst.svn.sf.net/svnroot/hfst/trunk/lrec-2011-apertium},
+            includes compilation of spell-checkers for most apertium
+            dictionaries
+        \item what do we do to remove duplicate work, duplicate versions of
+            dictionaries, conversion scripts\ldots
+        \item more compilers? Conversion scripts? New programming languages?
     \end{itemize}
 \end{frame}
 
