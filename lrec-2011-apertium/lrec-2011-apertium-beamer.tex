@@ -33,11 +33,16 @@ end applications with fewer language description}
             dictionaries, morphological analysers etc.
         \item HFST stands for Helsinki Finite-State \alert{Technology}---
             consisting of a library working as a compatibility layer between
-            different open source finite-state implementations, and a set of
-            finite-state tools built on top of the library, and set of end
+            different open-source finite-state implementations, 
+				\begin{itemize}
+					\item SFST
+					\item OpenFST
+					\item Foma
+				\end{itemize}
+			\item	Also a set of finite-state tools built on top of the library, and set of end
             products using the automata in real-world applications (sold
             separately)
-        \item HFST is still a research project in computational linguistics'
+        \item HFST is still a research project in a computational linguistics'
             research group---not computer science or engineering
         \item apertium is a machine-translation platform that uses finite-state
             dictionaries
@@ -68,7 +73,7 @@ end applications with fewer language description}
 \begin{frame}
     \frametitle{Examples of immediate benefits to dictionary writers}
     \begin{itemize}
-        \item Lot of current work in building NLP software involves management
+        \item A lot of current work in building NLP software involves management
             of huge amounts of lexical data
         \item ...like generating different language models in different
             \emph{morphology} programming formalisms: apertium, hunspell,
@@ -85,10 +90,10 @@ end applications with fewer language description}
     \begin{itemize}
         \item Spell-checkers! A basic spell-checker with generic edit distance
             suggestion generator can be automatically generated---and used in
-            majority of current open source software without any extra effort
+            majority of current open-source software without any extra effort
         \item Predictive text entry, for mobiles, such T9, XT9, possibly swype
             and keyboard as well
-        \item Morphological analysers, lemmatizers, segmenters, tokenizers,
+        \item Morphological analysers, lemmatisers, segmenters, tokenisers,
             etc., obviously
     \end{itemize}
 \end{frame}
@@ -121,9 +126,9 @@ end applications with fewer language description}
         \item more compilers? Conversion scripts? New programming languages?
         \item I'll throw you this: I need more linguistic data and less
             engineering in the language model implementations to compile
-            more applications from one source dictionary. Example: LR concept
+            more applications from one source dictionary. Example: LR/RL concept
             in apertium or asymmetric flags in Xerox FSM is engineering hack 
-            pov; had the description
+            POV; had the description
             called it \emph{substandard} or \emph{dialectal} word form it would
             already be usable in all applications!
     \end{itemize}
