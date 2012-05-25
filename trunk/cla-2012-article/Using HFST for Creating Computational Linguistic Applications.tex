@@ -953,8 +953,15 @@ precompute, will be very large (see table \ref{composed_error_table}).
 
 To circumvent these problems, a three-way on-line composition of $I$, $E$ and
 $L$ was implemented (distributed as \verb!hfst-ospell!
-under the GPL and Apache licenses) (for a more general and complex algorithm,
-see \cite{allauzen/2009}).
+under the GPL and Apache licenses). It is along the lines of a more general
+n-way composition described by Allauzen and Mohri in (\cite{allauzen/2009}).
+The present algorithm is, however, considerably simpler, due to certain
+implementation details. Firstly, we use an efficient and compact indexing
+transducer format (\verb!hfst-optimized-lookup!, documented in
+\cite{conf/fsmnlp/2009} by Silfverberg and Lind\'{e}n), obviating the
+need to process the transducers involved into hash tables. Secondly,
+in the present application it may be guaranteed that no special handling
+of epsilons is necessary.
 
 We write $I = (Q^I, 0^I, T^I, \Delta^I)$, where $Q$
 is the set of states, $0$ is the starting state, $T$ is the set of terminal
@@ -978,11 +985,22 @@ $Q^I \times Q^E \times Q^L$.
 
 If in a given state any of the component transducers has an edge involving
 epsilon and the other symbols match as above, the resulting composed edges
-go to states such that any state to the left of an input epsilon or to the
-right of an output epsilon is unchanged, eg. if we have
-$(q^I_1, (\sigma, \sigma'), q^{I'})$, $(q^E_1, (\epsilon, \sigma''), q^{E'})$ and
-$(q^L_1, (\sigma'', \sigma'''), q^{L'})$, a successor state of $q_1$ will be
+go to states such that any state in a transducer to the left of an input
+epsilon or to the right of an output epsilon is unchanged, eg. if we have
+$(q^I_1, (\sigma, \sigma'), q^{I'})$, $(q^E_1, (\epsilon, \sigma''), q^E_2)$ and
+$(q^L_1, (\sigma'', \sigma'''), q^L_2)$, a successor state of $q_1$ will be
 $(q^I_1, q^E_2, q^L_2)$.
+
+There is no special handling of cases where an epsilon output and an epsilon
+input occur simultaneously in consecutively acting transducers. The algorithm
+is however guaranteed to terminate in the present application as long as
+epsilon cycles do not occur on the input side of the transducers and $I$
+is acyclic. That being the case, the state reached in $I$ is a loop variant
+that increases (towards termination) whenever $E$ consumes input. For this
+not to happen for an indefinitely large number of iterations, either $E$
+itself would have to have an input epsilon cycle, or indefinitely many states
+in the composition would have to be created such that the state of $E$ is
+unchanged. This would require $L$ to have an input epsilon cycle.
 
 The final states are the reachable subset of $T = T^I \times T^E \times T^L$.
 
