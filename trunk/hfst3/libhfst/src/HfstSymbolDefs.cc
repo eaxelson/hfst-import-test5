@@ -31,6 +31,11 @@ bool is_identity(std::string const & str)
     return str == internal_identity;
 }
 
+bool is_default(std::string const & str)
+{
+    return str == internal_default;
+}
+
 bool is_epsilon(const char * str)
 {
   return std::string(str) == internal_epsilon;
@@ -44,6 +49,11 @@ bool is_unknown(const char * str)
 bool is_identity(const char * str)
 {
   return std::string(str) == internal_identity;
+}
+
+bool is_default(const char * str)
+{
+  return std::string(str) == internal_default;
 }
 
   namespace symbols {
