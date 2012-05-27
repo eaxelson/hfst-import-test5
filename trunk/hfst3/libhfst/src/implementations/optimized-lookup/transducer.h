@@ -353,7 +353,8 @@ public:
     }
     SymbolNumber get_unknown_symbol(void) const
         { return unknown_symbol; }
-
+    SymbolNumber get_default_symbol(void) const
+	{ return default_symbol; }
     
 };
 
@@ -739,6 +740,8 @@ protected:
     SymbolNumber * input_tape;
     SymbolNumber * output_tape;
     hfst::FdState<SymbolNumber> flag_state;
+    // This is to keep track of whether we're going to take a default transition
+    bool found_index;
 
     void try_epsilon_transitions(SymbolNumber * input_symbol,
                  SymbolNumber * output_symbol,
@@ -767,7 +770,7 @@ protected:
               SymbolNumber * original_output_tape,
               TransitionTableIndex i);
 
-
+    
 
 public:
     Transducer(std::istream& is);
