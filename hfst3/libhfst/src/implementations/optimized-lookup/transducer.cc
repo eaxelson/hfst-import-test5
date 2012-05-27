@@ -25,6 +25,7 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
                        SymbolNumber symbol_count)
 {
     unknown_symbol = NO_SYMBOL_NUMBER;
+    default_symbol = NO_SYMBOL_NUMBER;
     for(SymbolNumber i=0; i<symbol_count; i++)
     {
     std::string str;
@@ -34,6 +35,8 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
         fd_table.define_diacritic(i, str);
     } else if (hfst::is_unknown(str)) {
         unknown_symbol = i;
+    } else if (hfst::is_default(str)) {
+	default_symbol = i;
     }
     if(!is) {
       HFST_THROW(TransducerHasWrongTypeException);
@@ -45,6 +48,7 @@ TransducerAlphabet::TransducerAlphabet(const SymbolTable& st):
     symbol_table(st)
 {
     unknown_symbol = NO_SYMBOL_NUMBER;
+    default_symbol = NO_SYMBOL_NUMBER;
     for(SymbolNumber i=0; i<symbol_table.size(); i++)
     {
         if(hfst::FdOperation::is_diacritic(symbol_table[i])) {
