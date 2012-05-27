@@ -24,12 +24,15 @@
 \begin{abstract}
   \sloppy HFST – Helsinki Finite-State Technology (\url{hfst.sf.net})
   is a framework for compiling and applying linguistic descriptions
-  with finite-state methods. HFST currently connects some of the most 
+  with finite-state methods. HFST currently collects some of the most 
   important finite-state tools for creating morphologies and spellcheckers into 
   one open-source platform and supports extending and improving 
   the descriptions with weights to accommodate the modeling of 
   statistical information. HFST offers a path from language descriptions 
-  to efficient language applications.
+  to efficient language applications. In this article, we focus 
+  on aspects of HFST that are new to the end user, i.e. new tools, new features in
+  existing tools, or new language applications, in addition to some revised algorithms 
+  that increase performance.
 
   \keywords{finite-state applications, morphology, tagging, HFST}
 \end{abstract}
@@ -51,26 +54,28 @@ There are a number of tools for describing morphologies. Many of them
 start with the item-and-arrangement approach in which an arrangement of 
 sublexicons contain lists of items that may continue in other sublexicons. A formula
 for compiling such lexical descriptions was documented in \cite{linden/2009/sfcm}.
-In Section~\ref{MorphTools}, we demonstrate a general process for how such morphotactic descriptions 
+In Section~\ref{MorphTools}, we demonstrate a simplified procedure 
+for how such morphotactic descriptions 
 can be compiled into finite-state lexicons using finite-state operations. 
 To realize the morphological processes, rules may be applied to the finite-state lexicon. 
-In addition, HFST offers the capability to train and apply part-of-speech
-taggers on top of the morphologies using parallel weighted finite-state transducers, 
-which is outlined and evaluated in Section~\ref{PosTools}.
+In addition, HFST now also offers the capability to train and apply part-of-speech
+taggers on top of the morphologies using parallel weighted finite-state transducers on 
+text corpora, which is outlined and evaluated in Section~\ref{PosTools}.
 
 Using compiled morphologies, a number of applications
 have been created, e.g. spellcheckers for close to 100 languages and
 hyphenators for approximately 40 different languages. The spellcheckers were
 derived from open-source dictionaries and integrated with OpenOffice and
 LibreOffice, e.g. a full-fledged Greenlandic spellchecker, which is a
-polyagglutinating language, is currently available for OpenOffice via HFST. 
+polyagglutinative language, is currently available for OpenOffice via HFST. 
 By adding the tagger capability, we have also created an
 improved spelling suggestion mechanism for words in context.
 The spellchecker applications and some of their theoretical underpinnings are described 
 in Section~\ref{Applications}.
 
-Finally  in Section~\ref{Discussion}, we discuss some additional applications such as synonym and translation dictionaries 
-as well as a framework for recognizing multi-word expressions for information extraction and how this can be created 
+Finally  in Section~\ref{Discussion}, we discuss some additional applications such as 
+synonym and translation dictionaries as well as a framework for recognizing 
+multi-word expressions for information extraction and how this can be created 
 using finite-state technologies.
 
 \section{Building Morphologies}\label{LexiconTools}
@@ -94,7 +99,8 @@ compatibility with Xerox tools and augment their functionality.
 Lexicon files for the lexicon compiler \textbf{hfst-lexc} describe the morphotactics of a
 language using sub-lexicons containing lists of morphs. A rule
 component can be used for realizing phonological changes occurring 
-within the morphs or at their boundaries.
+within the morphs or at their boundaries. In this article, we do not introduce new features 
+of \textbf{hfst-lexc}. How to add weights to lexicons using \textbf{hfst-lexc}, is described in \cite{linden/2009/fsmnlp}.
 
 The rule compilers \textbf{hfst-xfst} and \textbf{hfst-twolc} provide almost the same
 functionality. Both are used to realize morphophonological variations
@@ -106,7 +112,8 @@ the realizations of morphophonemes used in the \textbf{hfst-lexc} lexicon.
 \subsection{Parallel Rules with Negative Contexts}
 
 The rule compiler \textbf{hfst-twolc} provides backward compatibility with the
-Xerox tool twolc, but it augments twolc functionality by providing a new type of rules. In \textbf{hfst-twolc}, rules can have can have negative contexts.
+Xerox tool twolc, but it augments twolc functionality by providing a new type of rules. 
+In \textbf{hfst-twolc}, rules can have negative contexts.
 \begin{figure}
 {\footnotesize
 \begin{verbatim}
@@ -131,7 +138,7 @@ restrictions are required because of rule conflicts, i.e. clashes of
 two or more contradicting rules. When a rule conflict occurs, the
 contexts of some of the contradicting rules need to be restricted in
 order to resolve the
-conflict.~\footnote{\url{http://www.cis.upenn.edu/~cis639/docs/twolc.html}}
+conflict.\footnote{\url{http://www.cis.upenn.edu/~cis639/docs/twolc.html}}
 
 Sometimes an automated mechanism called conflict resolution of
 two-level rules~\cite{silfverberg/2009/2} can be used to resolve rule
@@ -146,8 +153,8 @@ context matches the regular expression {\tt C1} and the right context
 matches {\tt C2}. Unfortunately prohibition rules do not solve the
 problem of conflicting rules, because they do not participate in conflict
 resolution and simply adding new rules to a two-level grammar does not
-remove rule conflicts.~\footnote{Not that, if prohibition rules would
-  participate in conflict resolution it would still be challenging to
+remove rule conflicts.\footnote{Note that, if prohibition rules would
+  participate in conflict resolution, it would still be challenging to
   write them in such a manner that conflict resolution could apply.}
 
 Using an extension to the Xerox two-level rule syntax in
@@ -158,9 +165,9 @@ a negative context rule and a traditional Xerox style rule, which has
 the same effect as the rule with the negative context.
 
 Rules with negative contexts are used in the Kyrgyz morphology
-developed in the Apertium project~\footnote{http://www.apertium.org/}.
+developed in the Apertium project\footnote{\url{http://www.apertium.org/}}.
 They significantly shorten the two-level
-grammar~\footnote{Personal communication with Francis Tyers.}.
+grammar\footnote{Personal communication with Francis Tyers.}.
 
 \subsection{Cascaded Rules: Explanations and Examples}
 % Senka
@@ -171,9 +178,8 @@ Although they share the same notation, the HFST replace rules differ in that
 they were developed from the concept of Generalized Lenient Composition, 
 described in \cite{ylijyra/2008b}.
 
-We present here a general account of using replace rules with HFST.
-for a detailed description of each rule, see
-The Finite State Morphology book \cite{beesley/2003}.
+We present a general account of using replace rules with the \verb!hfst-regexp2fst! command-line tool.
+For a detailed description of each rule, see The Finite State Morphology book \cite{beesley/2003}.
 
 % Simple rules
 
@@ -221,10 +227,9 @@ $ hfst-fst2txt transducer
 Rules can be applied to any language by using composition.  By
 composing a word \verb!ABCD! with the previous rule \verb!A -> B!, the
 result is the transducer in Figure~\ref{fig:replace_compose}.  It has
-5 states (0 -- 4), and only state 4 is final. The default output of
-\verb!hfst-regexp2fst! is weighted. Since weights are
-not used in replace rules, the weights get the value 0.0 when
-compiled. 
+5 states (0 -- 4), and only state 4 is final. The transitions go from a state in the first column to a state in the second column. The input label of a transition is displayed in the third column and the output label in the fourth. The default output of \verb!hfst-regexp2fst! is weighted. Since weights are
+not used in replace rules, the weights get the value 0.0 when the rule is
+compiled. The weights are displayed in the final column.
 
 \begin{figure} [h!]
 {\footnotesize
@@ -237,7 +242,7 @@ $ echo "A B C D .o. A -> B ;" | hfst-regexp2fst | hfst-fst2txt
 4       0.000000
 \end{verbatim}
 }
-\caption{Composing rule to a word}
+\caption{Composing a rule with a word}
 \label{fig:replace_compose}
 \end{figure}
 
@@ -321,7 +326,7 @@ This is shown in Figure~\ref{fig:context_orientation}.
 \begin{figure} [h!]
 {\footnotesize
 \begin{verbatim}
-  $ echo " b a a .o. a -> b // b _ ;" | ./hfst-regexp2fst | hfst-fst2txt
+  $ echo " b a a .o. a -> b // b _ ;" | hfst-regexp2fst | hfst-fst2txt
   0       1       b       b       0.000000
   1       2       a       b       0.000000
   2       3       a       b       0.000000
@@ -381,24 +386,23 @@ consists of individual replace rules separated by two commas.
   A_1 \rightarrow\ B_1\ ||\ L_1 \_\  R_1\ ,,\ \ldots\ ,,\ A_i \rightarrow\ B_i\ ||\ L_i \_\ R_i
 \end{equation}
 
-In XFST, all rules in a parallel rule expression have to have the same format. 
-They need to have the same arrow and the same context layout. 
+In XFST, all rules in a parallel rule expression have to have the same format, i.e. 
+they need to have the same arrow and the same context layout. 
 In HFST, the constraint that all the rules should have the same arrow is kept, 
-but the context formats can freely differ. 
+but the context layout can differ freely. 
 Therefore, the rule expression in Figure~\ref{fig:parallel_rules} 
 would not be allowed in XFST, but is valid in HFST.
 \begin{figure}
 {\footnotesize
 \begin{verbatim}
-  $  echo " a -> b || m _ n ,, c -> d ;" | ./hfst-regexp2fst | hfst-fst2txt
+  $  echo " a -> b || m _ n ,, c -> d ;" | hfst-regexp2fst | hfst-fst2txt
 \end{verbatim}
 }
-\caption{Parallel rules with different contexts}
+\caption{Parallel rules with different context layouts}
 \label{fig:parallel_rules}
 \end{figure}
 
 \section{Morphological Descriptions}\label{MorphTools}
-
 
 % Krister
 
@@ -462,13 +466,13 @@ Both the disjunction of morphs and the morphotactic filter can be described in f
 
 In Figure~\ref{fig:morphology1}, we demonstrate how the lexicon in
 Figure~\ref{fig:morph0} is compiled into a loop of a disjunction of any of the
-morphs. Note that we customarily encode special symbols in at-signs `@'. In
-this case we use special joiner symbols to calculate morphotactics, and
-at-signs give end user a hint that they are not supposed to end up in the final
-result. In naming, the \texttt{@NumberES@} style markers are used to match up
-the morphs, and \texttt{@LEX@} to bound morphemes, which simplifies the filter
-algorithm a bit\footnote{As in \cite{linden/2009/sfcm} the algorithm without
-boundaries requires a term complement of the disjunctive closure of the special
+morphs in the lexicon. Note that we bracket special symbols with at-signs `@'. In
+this case, we use special joiner symbols to calculate the morphotactics, and the
+at-signs give the user a hint that they are not supposed to end up in the final
+result. The sublexicon symbols like \texttt{@NumberES@} are used for lining up 
+the sublexicons, and the symbol \texttt{@LEX@} is used as a boundary symbol, which simplifies the filter
+algorithm\footnote{In \cite{linden/2009/sfcm}, the algorithm without a separate
+boundary symbol requires a term complement of the disjunctive closure of the sublexicon
 symbols.}.
 
 \begin{figure} [h!]
@@ -485,16 +489,16 @@ symbols.}.
   hfst-repeat -f 1 > bag_of_morphs
 \end{verbatim}
 }
-\caption{Compiling a disjunction of morphs}
+\caption{Compiling a disjunction of all the morphs in the lexicon}
 \label{fig:morphology1}
 \end{figure}
 
 In Figure~\ref{fig:morphology2}, we show the command-line simulation for
 creating the morphotactic filter and how this filter is composed with the
-disjunction of morphs to create the lexicon. In effect we here create filter
-that ensures that e.g. the \emph{es} morph only follows the morph that
-was asking for it on right, i.e. we match the \texttt{@NumberES@} on both
-sides. For full algorithm refer to e.g.~\cite{linden/2009/sfcm}.
+disjunction of morphs to create the final lexicon. In effect, we create a filter
+that ensures that each morph, e.g. \emph{es}, only follows the morph that
+was asking for it on the right, i.e. we require that the same sublexicon symbol, e.g. \texttt{@NumberES@},
+occurs on both sides of the boundary symbol \texttt{@LEX@}. For a full algorithm, see e.g.~\cite{linden/2009/sfcm}.
 
 \begin{figure} [h!]
 {\footnotesize
@@ -503,12 +507,16 @@ sides. For full algorithm refer to e.g.~\cite{linden/2009/sfcm}.
   $ echo "%@END%@ %@LEX%@"  |  hfst-regexp2fst > end
 
   # We create one continuation restriction for each lexicon
-  $ echo "%@NumberS%@ %@LEX%@ %@NumberS%@ [\%@LEX%@]*"  |  hfst-regexp2fst > cont1
-  $ echo "%@NumberES%@ %@LEX%@ %@NumberES%@  [\%@LEX%@]*"  |  hfst-regexp2fst > cont2
+  $ echo "%@Nouns%@ %@LEX%@ %@Nouns%@ [\%@LEX%@]*"  |  
+  hfst-regexp2fst > cont0
+  $ echo "%@NumberS%@ %@LEX%@ %@NumberS%@ [\%@LEX%@]*"  |  
+  hfst-regexp2fst > cont1
+  $ echo "%@NumberES%@ %@LEX%@ %@NumberES%@  [\%@LEX%@]*"  | 
+  hfst-regexp2fst > cont2
 
   # All restrictions are disjuncted and then anchored globally
-  $ hfst-disjunct cont1 cont2  |  hfst-repeat -f 1 > conts
-  $ hfst-concatenation start conts end > morphotactics
+  $ hfst-disjunct cont0 cont1 cont2  |  hfst-repeat -f 1 > conts
+  $ hfst-concatenate start conts end > morphotactics
 
   # Local morphotactic restrictions together with locally anchored morphs 
   # create the lexicon
@@ -536,7 +544,7 @@ e.g. lexc notation.
 % Erik
 
 The HFST toolkit has been implemented using three back-end libraries:
-SFST, OpenFst and foma. Usually one library is chosen
+SFST, OpenFst and foma. The libraries are linked with HFST. Usually one library is chosen
 and used throughout the compilation of a given morphology.
 In this way, we can compare how different back-end libraries perform
 in the same task.
@@ -591,7 +599,7 @@ Finnish and German. We also show the back-end versions used.
   \label{tab:compilation_times_versions}
 \end{table}
 
-It can be clearly seen that the performance of HFST with SFST as a back-end 
+It can clearly be seen that the performance of HFST with SFST as a back-end 
 has improved: the compilation time of the Finnish morphology has almost
 halved and the compilation time of the German morphology is only one third of the
 time at the previous benchmarking. 
@@ -651,7 +659,7 @@ t_{i-n})$. Together with preceding tags, succeeding tags and word
 forms can be used when deciding the probability of a tag at a given
 position. These estimates are combined using finite-state calculus.
 
-In HFST taggers the lexical probabilities ${\rm p}(w|t)$ are given by
+In HFST taggers, the lexical probabilities ${\rm p}(w|t)$ are given by
 the lexical component of the tagger and the transition probabilities
 ${\rm p}(t_i | t_{i - 1},\ ...\, t_{i-n})$ are given by the sequence
 component of the tagger. Both models are trained using tagged
@@ -756,7 +764,7 @@ The English training data and test data come from the Penn
 Treebank. Sections 1 to 18 were used for training and sections 22 to
 24 for testing. The Finnish training and test data come from Finnish
 newspaper text which has been automatically tagged using the
-Textmorfo parser~\footnote{http://www.csc.fi/kielipankki/}. The data
+Textmorfo parser\footnote{http://www.csc.fi/kielipankki/}. The data
 is described in Table~\ref{data-taggers}.
 
 \begin{table}
@@ -784,7 +792,7 @@ known words the accuracies are nearly identical.
   \begin{center}
     \begin{tabular}{lccc}
       \hline
-      Model       & ~~~~Seen & ~~~~Unseen & ~~~~All \\
+      English Model       & ~~~~Seen & ~~~~Unseen & ~~~~All \\
       \hline
       TNT         & 96.77\%  &    85.19\% & 96.46\% \\
       Basic HFST  & 96.68\%  &    80.71\% & 96.23\% \\
@@ -814,7 +822,7 @@ negligible for known words, but significant for unknown words.
   \begin{center}
     \begin{tabular}{lccc}
       \hline 
-      Model            & ~~~~Seen & ~~~~Unseen & ~~~~All \\
+      Finnish Model            & ~~~~Seen & ~~~~Unseen & ~~~~All \\
       \hline 
       Basic HFST       &  97.51\% &    77.51\% & 95.23\% \\
       With Morph HFST  &  97.53\% &    83.65\% & 95.90\% \\
@@ -830,7 +838,7 @@ negligible for known words, but significant for unknown words.
 % Tommi
 
 Automata technology is a general framework for describing language models
-and phenomena from a wide range of linguistic fields from phonology to
+and phenomena in a wide range of linguistic fields from phonology to
 morphology, as well as certain areas of syntax and semantics (in POS tagging and
 machine translation).  The practical applications cover spell-checking, 
 as demonstrated in Voikko\footnote{\url{voikko.sf.net}} with
@@ -853,12 +861,13 @@ demonstrated on our web page.\footnote{The examples are available at
 
 It can be noted about the general applicability of finite-state
 language models in practical applications that we can now generate
-e.g. spell-checkers for languages that lack such tools but have machine
-readable dictionaries (such as Manx) or morphological analyzers (such as
-Greenlandic, which is not easily implemented in other spell-checking formalisms). 
-The adaptation of such models to baseline spell-checkers (with a homogeneous 
-Damerau-Levenshtein edit distance as error model) can be performed without 
-feedback from linguists or native speakers.
+e.g. spell-checkers for a language that has a machine
+readable dictionary (such as Manx) or a morphological analyzer (such as
+Greenlandic, which is not easily implemented in other formalisms). 
+The transformation of a dictionary or analyzer in transducer format 
+to a baseline spell-checker (with a homogeneous 
+Damerau-Levenshtein edit distance as an error model) can be performed using finite-state tools 
+without  feedback from linguists or native speakers.
 
 \subsection{Spellcheckers}
 
@@ -912,12 +921,12 @@ input and $L$ is the lexical automaton. If the result is empty, the
 string is absent from the lexicon and the correction set must be calculated.
 
 A corrected string is a string that can be generated by transforming the
-input string with the error source and is present in the lexicon.
+input string with the error model and is present in the lexicon.
 These strings are thus the output language of the composition
-$I \circ \ E \circ L$, where $E$ is the error source.
+$I \circ \ E \circ L$, where $E$ is the error model.
 
 The desired behavior, or result set $R$, of a spellchecker given input $I$, a
-lexicon $L$ and an error source $E$ is thus given by equation \ref{result_set_eqn},
+lexicon $L$ and an error model $E$ is thus given by equation \ref{result_set_eqn},
 where $\pi_2$ is the output projection.
 
 \begin{equation}
@@ -1049,7 +1058,7 @@ one operation) distance error models, a tool (\verb!editdist.py!) and
 definition format was developed.
 
 The definition format serves the purposes of minimizing the number of symbols
-used in the error source (the number of transitions is $\mathrm{O}(|\Sigma|^2)$)
+used in the error model (the number of transitions is $\mathrm{O}(|\Sigma|^2)$)
 and introducing weights for edits. Typical
 morphologies have a number of unusual characters (punctuation, special symbols)
 or internally used symbols (eg. flag diacritics) that should be filtered for
@@ -1066,7 +1075,7 @@ Certain characteristics of the spelling correction task permit
 efficiency-oriented improvements to error models. A naive Levenshtein error
 model with edit distance 2 in \verb!ospell! would, when given the word
 word \verb!arrivew! where the French word \verb!arriver! was intended,
-do the following useless work:
+do the following useless work, where e.g. a:0 means output epsilon for input a:
 
 {\footnotesize
 \begin{verbatim}
@@ -1104,9 +1113,9 @@ analyses to re-rank the corrections \cite{pirinen/2012/cicling}.
 Other finite-state applications created with HFST include inflecting thesauri and translation dictionaries.
 These applications have been created from the bilingual parallel Princeton WordNet and FinnWordNet. 
 The creation of FinnWordNet is documented in \cite{linden/2010}. FinnWordNet contains roughly 150,000 
-word meainings in Finnish with their English translations. The synonym dictionaries for Finnish and English and the Finnish-English and English-Finnish translation dictionaries as well as their demos can be found on \url{hfst.sf.net}.
+word meanings in Finnish with their English translations. The synonym dictionaries for Finnish and English and the Finnish-English and English-Finnish translation dictionaries as well as their demos can be found on \url{hfst.sf.net}.
 
-They inflecting synonym dictionaries were created as a composition of three transducers: (1) a morphological analyzer, (2) a transducer that replaces one word with another while coping the inflection tags and (3) a morphological generator as an inversion of the morphological analyzer. The translation dictionaries only have components (1) and (2). In the future, we intend to take advantage of the weighted transducers to introduce contexts so as to be able to suggest the most likely synonym or the most likely translation in context.
+The inflecting synonym dictionaries were created as a composition of three transducers: (1) a morphological analyzer, (2) a transducer that replaces one word with another while copying the inflection tags and (3) a morphological generator as an inversion of the morphological analyzer. The translation dictionaries only have components (1) and (2). In the future, we intend to take advantage of the weighted transducers to introduce contexts so as to be able to suggest the most likely synonym or the most likely translation in context.
 
 \subsection{Extending Transducers for Pattern Matching}
 % Sam
