@@ -51,7 +51,9 @@ TransducerAlphabet::TransducerAlphabet(const SymbolTable& st):
             fd_table.define_diacritic(i, symbol_table[i]);
         } else if (hfst::is_unknown(symbol_table[i])) {
             unknown_symbol = i;
-        }
+        } else if (hfst::is_default(symbol_table[i])) {
+	    default_symbol = i;
+	}
     }
 }
 
