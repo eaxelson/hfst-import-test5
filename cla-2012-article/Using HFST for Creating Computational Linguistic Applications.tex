@@ -230,7 +230,10 @@ $ hfst-fst2txt transducer
 Rules can be applied to any language by using composition.  By
 composing a word \verb!ABCD! with the previous rule \verb!A -> B!, the
 result is the transducer in Figure~\ref{fig:replace_compose}.  It has
-5 states (0 -- 4), and only state 4 is final. The transitions go from a state in the first column to a state in the second column. The input label of a transition is displayed in the third column and the output label in the fourth. The default output of \verb!hfst-regexp2fst! is weighted. Since weights are
+5 states (0 -- 4), and only state 4 is final. The transitions go from a state in the
+first column to a state in the second column. The input label of a transition is
+displayed in the third column and the output label in the fourth. The default
+output of \verb!hfst-regexp2fst! is weighted. Since weights are
 not used in replace rules, the weights get the value 0.0 when the rule is
 compiled. The weights are displayed in the final column.
 
