@@ -662,7 +662,7 @@ taggers are the most common in POS tagging.
 
 HFST taggers extend traditional HMM taggers by allowing modifications
 to the traditional estimate ${\rm p}(t_i | t_{i - 1},\ ...\,
-t_{i-n})$. Together with preceding tags, succeeding tags and word
+t_{i-n})$. In addition to preceding tags also succeeding tags and word
 forms can be used when deciding the probability of a tag at a given
 position. These estimates are combined using finite-state calculus.
 
@@ -675,7 +675,7 @@ training data.
 Both components can be modified to suit the needs of a particular
 language. In~\cite{silfverberg/2011/nodalida} it is explained how the sequence
 model can be modified to include preceding and succeeding words in
-the estimates of the probabilities of tags and how suffix guessers
+the estimates of the probabilities of tags, and how suffix guessers
 can be modified to better suit agglutinative languages. In the present paper
 we show how a morphological analyzer can be integrated with an HFST
 tagger to improve the accuracy of the tagger when there are a lot of
