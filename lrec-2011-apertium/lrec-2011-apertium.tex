@@ -5,15 +5,17 @@
 \usepackage{latexsym}
 \usepackage[small,bf]{caption}
 \usepackage{xltxtra}
+\usepackage{hyperref}
 
 % lrec2006 seems borked so here's the margins again:
-\usepackage[margin=1.9cm,top=2.5cm]{geometry}
+% \usepackage[margin=1.9cm,top=2.5cm]{geometry}
 
 %\setlength\titlebox{6.5cm}    % You can expand the title box if you
 % really have to
 
 \title{Compiling Apertium morphological dictionaries with HFST and using them
-in HFST applications}
+in HFST applications*
+}
 
 \name{Tommi A Pirinen, Francis M. Tyers}
 \address{University of Helsinki,
@@ -40,16 +42,17 @@ FST-based spell-checking system.\\
 
 \section{Introduction}
 
-Finite-state automata are one of the most effective format for representing
-natural language morphologies in computational format. The finite-state
-automata, once compiled and optimised via process of minimisation are very
-effective for parsing running text. This format is also used when running
-morphological dictionaries in machine-translation system
+{}\footnote{this is post-print author's draft, the appearance may differ from
+the print version; specifically it uses hyperref package}Finite-state automata
+are one of the most effective format for representing natural language
+morphologies in computational format. The finite-state automata, once compiled
+and optimised via process of minimisation are very effective for parsing
+running text. This format is also used when running morphological dictionaries
+in machine-translation system
 Apertium~\cite{Apertium/2011}\footnote{\url{http://www.apertium.org}}. In this
-paper we propose a generic compilation formula  to compile the
-dictionaries into weighted finite state automata for use with any FST 
-tool or application.  We implement this system using a free/libre
-open-source finite-state API
+paper we propose a generic compilation formula  to compile the dictionaries
+into weighted finite state automata for use with any FST tool or application.
+We implement this system using a free/libre open-source finite-state API
 HFST~\cite{hfst/2011}\footnote{\url{http://hfst.sf.net}}. HFST is a general
 purpose programming interface using a selection of freely-available
 finite-state libraries for the handling of finite-state automata.
