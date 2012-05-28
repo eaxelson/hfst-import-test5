@@ -437,19 +437,19 @@ Figure~\ref{fig:morph0} using lexc notation.
 {\footnotesize
 \begin{verbatim}
   LEXICON Root
-  Nouns;
+  Nouns ;
 
   LEXICON Nouns
-  cat NumberS;
-  ax NumberES;
+  cat NumberS ;
+  ax NumberES ;
 
   LEXICON NumberS
-  END;
-  s END;
+  # ;
+  s # ;
 
   LEXICON NumberES
-  END;
-  es END;
+  # ;
+  es # ;
 \end{verbatim}
 }
 \caption{Lexicon in lexc notation}
@@ -478,15 +478,16 @@ symbols.}.
 \begin{figure} [h!]
 {\footnotesize
 \begin{verbatim}
-  $ echo "@Root@ @Nouns@ @LEX@" > strings
-  $ echo "@Nouns@ c a t @NumberS@ @LEX@" >> strings
-  $ echo "@Nouns@ a x @NumberES@ @LEX@" >> strings
-  $ echo "@NumberS@ @END@ @LEX@" >> strings
-  $ echo "@NumberS@ s @END@ @LEX@" >> strings
-  $ echo "@NumberES@ @END@ @LEX@" >> strings
-  $ echo "@NumberES@ e s @END@ @LEX@" >> strings
-  $ hfst-strings2fst --has-spaces --disjunct-strings < strings  | 
-  hfst-repeat -f 1 > bag_of_morphs
+echo "@Root@ @Nouns@ @LEX@" > strings
+echo "@Nouns@ c a t @NumberS@ @LEX@" >> strings
+echo "@Nouns@ a x @NumberES@ @LEX@" >> strings
+echo "@NumberS@ @END@ @LEX@" >> strings
+echo "@NumberS@ s @END@ @LEX@" >> strings
+echo "@NumberES@ @END@ @LEX@" >> strings
+echo "@NumberES@ e s @END@ @LEX@" >> strings
+hfst-strings2fst --has-spaces --disjunct-strings < strings  | 
+    hfst-repeat -f 1 > bag_of_morphs
+
 \end{verbatim}
 }
 \caption{Compiling a disjunction of all the morphs in the lexicon}
@@ -495,7 +496,10 @@ symbols.}.
 
 In Figure~\ref{fig:morphology2}, we show the command-line simulation for
 creating the morphotactic filter and how this filter is composed with the
-disjunction of morphs to create the final lexicon. In effect, we create a filter
+disjunction of morphs to create the final lexicon\footnote{Whole process is
+also available from our SVN in
+\url{https://hfst.svn.sf.net/svnroot/hfst/trunk/cla-2012-article/morphtest.bash
+}}. In effect, we create a filter
 that ensures that each morph, e.g. \emph{es}, only follows the morph that
 was asking for it on the right, i.e. we require that the same sublexicon symbol, e.g. \texttt{@NumberES@},
 occurs on both sides of the boundary symbol \texttt{@LEX@}. For a full algorithm, see e.g.~\cite{linden/2009/sfcm}.
@@ -503,24 +507,16 @@ occurs on both sides of the boundary symbol \texttt{@LEX@}. For a full algorithm
 \begin{figure} [h!]
 {\footnotesize
 \begin{verbatim}
-  $ echo "%@Root%@ [\%@LEX%@]*"  |  hfst-regexp2fst > start
-  $ echo "%@END%@ %@LEX%@"  |  hfst-regexp2fst > end
+echo "%@Root%@ [? - %@LEX%@]*"  |  hfst-regexp2fst > start
+echo "%@END%@ %@LEX%@"  |  hfst-regexp2fst > end
 
-  # We create one continuation restriction for each lexicon
-  $ echo "%@Nouns%@ %@LEX%@ %@Nouns%@ [\%@LEX%@]*"  |  
-  hfst-regexp2fst > cont0
-  $ echo "%@NumberS%@ %@LEX%@ %@NumberS%@ [\%@LEX%@]*"  |  
-  hfst-regexp2fst > cont1
-  $ echo "%@NumberES%@ %@LEX%@ %@NumberES%@  [\%@LEX%@]*"  | 
-  hfst-regexp2fst > cont2
-
-  # All restrictions are disjuncted and then anchored globally
-  $ hfst-disjunct cont0 cont1 cont2  |  hfst-repeat -f 1 > conts
-  $ hfst-concatenate start conts end > morphotactics
-
-  # Local morphotactic restrictions together with locally anchored morphs 
-  # create the lexicon
-  $ hfst-compose bag_of_morphs  morphotactics > lexicon
+echo "%@NumberS%@ %@LEX%@ %@NumberS%@ [? - %@LEX%@]*"  |  hfst-regexp2fst > cont1
+echo "%@NumberES%@ %@LEX%@ %@NumberES%@  [? - %@LEX%@]*"  |  hfst-regexp2fst > cont2
+echo "%@Nouns%@ %@LEX%@ %@Nouns%@  [? - %@LEX%@]*"  |  hfst-regexp2fst > cont3
+hfst-disjunct cont1 cont2 | hfst-disjunct - cont3 |
+    hfst-repeat -f 1 > conts
+hfst-concatenate start conts | hfst-concatenate - end > morphotactics
+hfst-compose bag_of_morphs  morphotactics > lexicon
 \end{verbatim}
 }
 \caption{Composing the morphotactics with the disjunction of morphs into a lexicon}
