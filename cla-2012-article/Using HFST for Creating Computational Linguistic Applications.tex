@@ -143,7 +143,7 @@ conflict.\footnote{\url{http://www.cis.upenn.edu/~cis639/docs/twolc.html}}
 Sometimes an automated mechanism called conflict resolution of
 two-level rules~\cite{silfverberg/2009/2} can be used to resolve rule
 conflicts, but conflict resolution works only if the conflicting rules
-can be ordered into chains of sub cases. Often this can be difficult
+can be ordered into chains of subcases. Often this can be difficult
 to accomplish, especially for grammar writers who are not especially
 well acquainted with writing regular expressions.
 
@@ -159,7 +159,7 @@ remove rule conflicts.\footnote{Note that, if prohibition rules would
 
 Using an extension to the Xerox two-level rule syntax in
 \verb|hfst-twolc|, it is possible to formulate rules with negative
-context, i.e. context which prohibit the triggering of the
+contexts, i.e. contexts that prohibit the triggering of the
 rule. Figure~\ref{negative-context-rule} shows a schematic example of
 a negative context rule and a traditional Xerox style rule, which has
 the same effect as the rule with the negative context.
@@ -695,7 +695,7 @@ suffix guessers, which combine estimates of all suffixes of the OOV
 word whose length does not exceed a given threshold. E.g. the POS tag
 for {\it ameliorate} can be guessed based on the distribution of tags
 for the suffixes {\it -e}, {\it -te}, ..., {\it -liorate} if the
-threshold or the length of the suffixes is 7.
+threshold for the length of suffixes is 7.
 
 HFST taggers offer two improvements for handling of OOV words: (1) the
 tagger builder can adjust the way in which the probability
@@ -730,26 +730,28 @@ the training data of the tagger.
 In approaches such as \cite{Tzoukerman:1996,Oravecz:2002}, the tag set
 of the morphological analyzer and the statistical tagger have to be
 the same. When an OOV word is encountered, the morphological analyzer
-is used to look up the possible analyzes for the OOV word. These
-analyzes are used directly by the tagger. In contrast, HFST taggers
+is used to look up the possible analyses for the OOV word. These
+analyses are used directly by the tagger. In contrast, HFST taggers
 keep track of {\it ambiguity classes}, which are the sets of
-morphological analyzes emitted by the morphological analyzer for words
+morphological analyses emitted by the morphological analyzer for words
 in the training data. The taggers use the tag distributions of all
 training data words in a given ambiguity class to determine the tag
 distribution of an OOV word in the same ambiguity class.
 
-Given an English morphological analyzer, which emits two analyzes {\it
+Given an English morphological analyzer, which emits two analyses {\it
   dog\-+N\-+SG} and {\it dog\-+V\-+INF} for the word form {\it dog},
-the ambiguity class of {\it dog} is {\it \{+N\-+SG, +V\-+INF\}}. In
-the training data, {\it dog} might receive Penn Treebank tags like 
-{\tt NN} and {\tt VB}. When the tagger encounters an OOV word in the same
-ambiguity class such as {\it man}, it first maps {\it man} onto its
-ambiguity class {\it \{+N\-+SG, +V\-+INF\}} using the morphological
-analyzer. It then uses the tag distribution of all words in the
-ambiguity class {\it \{+N\-+SG, +V\-+INF\}} (a.o. {\it dog}) to
-estimate the probabilities for {\it man} given tags like {\tt NN} and
-  {\tt VB}. Note that this does not require that the tag sets of the
-  training data and the morphological analyzer are the same.
+the ambiguity class of {\it dog} is the set of its analyses {\it
+  \{+N\-+SG, +V\-+INF\}}. In the training data, {\it dog} might
+receive Penn Treebank tags like {\tt NN} and {\tt VB}. When the tagger
+encounters an OOV word in the same ambiguity class as {\it dog}, such
+as {\it man}, it first maps {\it man} onto its ambiguity class {\it
+  \{+N\-+SG, +V\-+INF\}} using the morphological analyzer. It then
+uses the tag distribution of all words in the ambiguity class {\it
+  \{+N\-+SG, +V\-+INF\}} to estimate the probabilities $P(man|tag)$
+for {\it man} given each tag (e.g. {\tt NN} and {\tt VB}). Note that
+this does not require that the tag sets of the training data and the
+morphological analyzer are the same. It also does not require that
+their morphological descripitions are equally fine-grained.
 
 
 \subsection{Experiments with HFST taggers}
