@@ -685,17 +685,23 @@ out-of-vocabulary words.
 \subsection{The Lexical Model of HFST Taggers}
 % Miikka
 
-The accuracy of traditional POS taggers suffers greatly because of
-out of vocabulary (OOV) words, i.e. word forms which were not
-observed during training of the tagger. For languages like English
-with few productive morphological phenomena, this is not a big problem
-when the genres of the training data and the data that is tagged are
-sufficiently similar. When the genres differ considerably there are
-more OOV words and consequently accuracy is reduced. When building
-taggers for morphologically rich languages such as Turkish, Finnish or
-Hungarian, OOV words become a major problem even when no change of
-genre is involved. In these cases OOV words arise from inflection,
-derivation and compounding.
+The accuracy of traditional POS taggers suffers greatly because of out
+of vocabulary (OOV) words, i.e. word forms which were not observed
+during training of the tagger. OOV words effect the accuracy, since
+POS taggers generally rely heavily on lexical probabilities
+$P(word|tag)$ computed for the words occurring in a training corpus.
+
+For languages like English with few productive morphological
+phenomena, OOV words are not a big problem when there is a lot of
+training data and the genres of the training data and the data that is
+tagged are sufficiently similar. When the genres differ considerably
+there are more OOV words and consequently accuracy is reduced. When
+building taggers for morphologically rich languages such as Turkish,
+Finnish or Hungarian, OOV words become a major problem even when no
+change of genre is involved and even when there is a lot of training
+data. In agglutinative languages OOV words arise from productive
+morphological phenomena such as inflection, derivation and
+compounding.
 
 Usually, e.g. in~\cite{Brants:2000}, OOV words are handled using
 suffix guessers, which combine estimates of all suffixes of the OOV
