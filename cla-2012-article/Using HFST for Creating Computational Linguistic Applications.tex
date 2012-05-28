@@ -1086,11 +1086,12 @@ The configuration file allows specifying weights to be added to any edit
 involving a particular character or a particular edit operation (for example,
 assigning a low weight to the edit o $\rightarrow$ ö for an OCR application).
 
-Certain characteristics of the spelling correction task permit
-efficiency-oriented improvements to error models. A naive Levenshtein error
-model with edit distance 2 in \verb!ospell! would, when given the word
-word \verb!arrivew! where the French word \verb!arriver! was intended,
-do the following useless work, where e.g. a:0 means output epsilon for input a:
+Certain characteristics of the correction task permit
+efficiency-oriented improvements to error models. A naive Levenshtein
+error model with edit distance 2 in \verb!ospell! would, when given
+the word word \verb!arrivew! where the French word \verb!arriver! was
+intended, do the following useless work, where e.g. a:0 means output
+epsilon for input a:
 
 {\footnotesize
 \begin{verbatim}
