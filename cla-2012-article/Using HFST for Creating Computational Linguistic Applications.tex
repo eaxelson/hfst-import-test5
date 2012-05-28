@@ -227,8 +227,9 @@ $ hfst-fst2txt transducer
 \end{figure}
 
 
-Rules can be applied to any language by using composition.  By
-composing a word \verb!ABCD! with the previous rule \verb!A -> B!, the
+Rules can be applied to any language by using composition.
+The result of composing a word \verb!ABCD! with the aforementioned rule
+\verb!A -> B!, the
 result is the transducer in Figure~\ref{fig:replace_compose}.  It has
 5 states (0 -- 4), and only state 4 is final. The transitions go from a state in the
 first column to a state in the second column. The input label of a transition is
