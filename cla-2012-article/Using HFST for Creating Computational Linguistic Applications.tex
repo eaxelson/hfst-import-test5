@@ -173,7 +173,7 @@ grammar\footnote{Personal communication with Francis Tyers.}.
 % Senka
 
 HFST replace rules provide backward compatibility with XFST replace rules, 
-described in \cite{Kempe96parallelreplacement, beesley/2003}. 
+described in \cite{Kempe96parallelreplacement,beesley/2003}. 
 Although they share the same notation, the HFST replace rules differ in that
 they were developed from the concept of Generalized Lenient Composition, 
 described in \cite{ylijyra/2008b}.
@@ -510,12 +510,16 @@ occurs on both sides of the boundary symbol \texttt{@LEX@}. For a full algorithm
 echo "%@Root%@ [? - %@LEX%@]*"  |  hfst-regexp2fst > start
 echo "%@END%@ %@LEX%@"  |  hfst-regexp2fst > end
 
-echo "%@NumberS%@ %@LEX%@ %@NumberS%@ [? - %@LEX%@]*"  |  hfst-regexp2fst > cont1
-echo "%@NumberES%@ %@LEX%@ %@NumberES%@  [? - %@LEX%@]*"  |  hfst-regexp2fst > cont2
-echo "%@Nouns%@ %@LEX%@ %@Nouns%@  [? - %@LEX%@]*"  |  hfst-regexp2fst > cont3
+echo "%@NumberS%@ %@LEX%@ %@NumberS%@ [? - %@LEX%@]*"  |
+    hfst-regexp2fst > cont1
+echo "%@NumberES%@ %@LEX%@ %@NumberES%@  [? - %@LEX%@]*"  |
+      hfst-regexp2fst > cont2
+echo "%@Nouns%@ %@LEX%@ %@Nouns%@  [? - %@LEX%@]*"  |
+      hfst-regexp2fst > cont3
 hfst-disjunct cont1 cont2 | hfst-disjunct - cont3 |
     hfst-repeat -f 1 > conts
-hfst-concatenate start conts | hfst-concatenate - end > morphotactics
+hfst-concatenate start conts |
+    hfst-concatenate - end > morphotactics
 hfst-compose bag_of_morphs  morphotactics > lexicon
 \end{verbatim}
 }
