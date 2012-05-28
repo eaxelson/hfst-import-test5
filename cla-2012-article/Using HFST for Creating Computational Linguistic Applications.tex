@@ -169,17 +169,16 @@ developed in the Apertium project\footnote{\url{http://www.apertium.org/}}.
 They significantly shorten the two-level
 grammar\footnote{Personal communication with Francis Tyers.}.
 
+
 \subsection{Cascaded Rules: Explanations and Examples}
 % Senka
 
 HFST replace rules provide backward compatibility with XFST replace rules, 
-described in \cite{Kempe96parallelreplacement,beesley/2003}. 
+described in \cite{Kempe96parallelreplacement, beesley/2003}. 
 Although they share the same notation, the HFST replace rules differ in that
-they were developed from the concept of Generalized Lenient Composition, 
-described in \cite{ylijyra/2008b}.
+they were compiled with .r-glc. operator \cite{Gerdemann/1999} and preference relations described in \cite{ylijyra/2008b}. This approach allows to more freely define contexts in parallel rules and to easily add new functionalities in future.
 
-We present a general account of using replace rules with the \verb!hfst-regexp2fst! command-line tool.
-For a detailed description of each rule, see The Finite State Morphology book \cite{beesley/2003}.
+We present a general account of using replace rules with the \verb!hfst-regexp2fst! command-line tool. Since these rules mostly behaviour of the XFST rules, for a detailed description of each rule, see The Finite State Morphology book \cite{beesley/2003}.
 
 % Simple rules
 
@@ -306,11 +305,12 @@ because they occur between corresponding contexts, but the second \verb!a! is ke
 \begin{table} [h!]
   \centering
   \caption{Different context directions in Replace Rules}
-  \begin{tabular}{ | c | c | }
+  \begin{tabular}{ c c }
     \hline
-    \ \verb!||!\ & \ both contexts are taken from the upper language \\ \hline
-    \ \verb!//!\ & \ the left context is taken from the lower language, the right from the upper \\ \hline
-    \ \verb!\\!\ & \ the left context is taken from the upper language, the right from the lower \\ \hline
+    Operator & Operator description \\ \hline
+    \ \verb!||!\ & \ both contexts are taken from the upper language \\ 
+    \ \verb!//!\ & \ the left context is taken from the lower language, the right from the upper \\ 
+    \ \verb!\\!\ & \ the left context is taken from the upper language, the right from the lower \\ 
     \ \verb!\/!\ & \ both contexts are taken from the lower language. \\ \hline
   \end{tabular}
   \label{tab:context_directions}
@@ -350,15 +350,15 @@ many epsilons, while the markup operator is used to insert markers around a word
 \begin{table} [h!]
   \centering
   \caption{List of right replace operators that can be used in HFST}
-  \begin{tabular}{| c | c |} 
+  \begin{tabular}{c  c} 
     \hline
-    Right replace operators & Replace function \\ \hline\hline
-    \verb!->!   & Replace \\ \hline
-    \verb!(->)! & Replace optional \\ \hline
-    \verb!@->!  & Longest match from left to right \\ \hline
-    \verb!->@!  & Longest match from right to left \\ \hline
-    \verb!@>!   & Shortest match from left to right \\ \hline
-    \verb!>@!   & Shortest match from right to left \\ \hline
+    Right replace operators & Replace function \\ \hline
+    \verb!->!   & Replace \\ 
+    \verb!(->)! & Replace optional \\
+    \verb!@->!  & Longest match from left to right \\ 
+    \verb!->@!  & Longest match from right to left \\ 
+    \verb!@>!   & Shortest match from left to right \\
+    \verb!>@!   & Shortest match from right to left \\  \hline
   \end{tabular}
   \label{tab:replace_operators}
 \end{table}
@@ -1213,9 +1213,11 @@ the descriptions with statistical information to allow the applications
 to take advantage of context. HFST offers a path from language descriptions 
 to efficient language applications.
 
+
 \subsection*{Acknowledgments}
 We wish to acknowledge the FIN-CLARIN and META-NORD projects for their financial support 
-as well as HFST users for their many constructive suggestions. 
+as well as HFST users for their many constructive suggestions. Addititonally, the research leading to some of these results has received funding from the European Commission’s 7th Framework Program under grant agreement n° 238405 (CLARA).
+
 
 \bibliographystyle{splncs03}
 
