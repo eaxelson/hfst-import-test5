@@ -1135,9 +1135,14 @@ analyses to re-rank the corrections \cite{pirinen/2012/cicling}.
 Other finite-state applications created with HFST include inflecting thesauri and translation dictionaries.
 These applications have been created from the bilingual parallel Princeton WordNet and FinnWordNet. 
 The creation of FinnWordNet is documented in \cite{linden/2010}. FinnWordNet contains roughly 150,000 
-word meanings in Finnish with their English translations. The synonym dictionaries for Finnish and English and the Finnish-English and English-Finnish translation dictionaries as well as their demos can be found on \url{hfst.sf.net}.
+word meanings in Finnish with their English translations. The synonym dictionaries for Finnish and English
+and the Finnish-English and English-Finnish translation dictionaries as well as their demos can be found on \url{hfst.sf.net}.
 
-The inflecting synonym dictionaries were created as a composition of three transducers: (1) a morphological analyzer, (2) a transducer that replaces one word with another while copying the inflection tags and (3) a morphological generator as an inversion of the morphological analyzer. The translation dictionaries only have components (1) and (2). In the future, we intend to take advantage of the weighted transducers to introduce contexts so as to be able to suggest the most likely synonym or the most likely translation in context.
+The inflecting synonym dictionaries were created as a composition of three transducers: (1) a morphological analyzer,
+(2) a transducer that replaces one word with another while copying the inflection tags and (3) a morphological
+generator as an inversion of the morphological analyzer. The translation dictionaries only have components (1) and (2).
+In the future, we intend to take advantage of the weighted transducers to introduce contexts so as to be able to
+suggest the most likely synonym or the most likely translation in context.
 
 \subsection{Extending Transducers for Pattern Matching}
 % Sam
