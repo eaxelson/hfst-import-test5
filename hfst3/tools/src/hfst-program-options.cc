@@ -22,7 +22,8 @@ void print_common_program_options(FILE *file) {
           "  -h, --help             Print help message\n"  
           "  -V, --version          Print version info\n"  
           "  -v, --verbose          Print verbosely while processing\n"
-          "  -q, --quiet            Do not print output\n"  
+          "  -q, --quiet            Only print fatal erros and requested "
+          "output\n"
           "  -s, --silent           Alias of --quiet\n");
    
 }
