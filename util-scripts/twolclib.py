@@ -116,6 +116,7 @@ class twolclib:
 
 	def add_inputs(self, inputForms):
 		for inputList in inputForms:
+			print("IL: ",inputList)
 			#print("a: "+inputForm)
 			if isinstance(inputList, tuple):
 				if len(inputList)==2:
@@ -127,7 +128,8 @@ class twolclib:
 				inputForm = inputList
 				lexcForm = None
 				outputForm = None
-			if not self.input_in_forms(inputForm):
+			print(self.input_in_forms(inputForm), self.lexc_in_forms(lexcForm))
+			if not self.input_in_forms(inputForm) or not self.lexc_in_forms(lexcForm):
 				thisForm = self.form.copy()
 				thisForm["input"] = inputForm
 				thisForm["lexc"] = lexcForm
@@ -210,6 +212,12 @@ class twolclib:
 				return True
 		return False
 	
+	def lexc_in_forms(self, lexcForm):
+		for form in self.forms:
+			if form["lexc"] == lexcForm:
+				return True
+		return False
+
 	#def process_form(inputForm, twolcFile):
 	def process_output_forms(self):
 		for formDict in self.forms:
@@ -335,6 +343,7 @@ class twolclib:
 		self.lexc = lexcFile
 	
 	def get_phonolforms(self):
+		print("forms:", self.forms)
 		for form in self.forms:
 			lexcForm = form["lexc"]
 			p1 = Popen(["echo", lexcForm], stdout=PIPE)

@@ -2,3 +2,5 @@
 # twolc input form, expected output, input to lexc
 
 , музея, музей<n><dat>
+, училище, училище<n><nom>
+, училищӗн, училище<n><gen>
