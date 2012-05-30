@@ -164,6 +164,24 @@ lexc_streams(LexcCompiler& lexc, HfstOutputStream& outstream)
       }
     verbose_printf("Compiling... ");
     HfstTransducer* res = lexc.compileLexical();
+    if (0 == res)
+      {
+        if (lexccount == 1)
+          {
+            error(EXIT_FAILURE, 0, "The file %s did not compile cleanly.\n"
+                  "(if there are no error messages above, try -v or -d to "
+                  "get more info)",
+                  lexcfilenames[0]);
+          }
+        else
+          {
+            error(EXIT_FAILURE, 0, "The files %s... did not compile cleanly.\n"
+                  "(if there are no error messages above, try -v or -d to "
+                  "get more info)",
+                  lexcfilenames[0]);
+          }
+        return EXIT_FAILURE;
+      }
     hfst_set_name(*res, lexcfilenames[0], "lexc");
     hfst_set_formula(*res, lexcfilenames[0], "L");
     verbose_printf("\nWriting... ");
