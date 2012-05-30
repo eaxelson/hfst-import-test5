@@ -3703,7 +3703,8 @@ HfstTransducer * HfstTransducer::read_lexc(const std::string &filename,
       {
         hfst::lexc::LexcCompiler compiler(type);
         compiler.parse(filename.c_str());
-        return compiler.compileLexical();
+        retval = compiler.compileLexical();
+        return retval;
         break;
       }
 #endif

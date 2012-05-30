@@ -116,6 +116,7 @@ LexcCompiler& LexcCompiler::parse(const char* filename)
     if (hlexcin == NULL)
       {
         fprintf(stderr, "could not open %s for reading\n", filename);
+        parseErrors_ = true;
         return *this;
       }
     hlexcparse();
