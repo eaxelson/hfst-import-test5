@@ -23,9 +23,10 @@ for line in open(inputfile, 'r'):
 		else:
 			forms[0] = forms[0].strip()
 		newinput = (forms[0], forms[1].strip(), forms[2].strip())
-		print(newinput)
+		#print(newinput)
 		inputs += [newinput]
 
+print(inputs)
 cvTwolc.add_inputs(inputs)
 cvTwolc.get_phonolforms()
 #print(cvTwolc.forms, cvTwolc.rules)
