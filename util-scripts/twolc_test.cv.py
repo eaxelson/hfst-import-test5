@@ -26,7 +26,8 @@ for line in open(inputfile, 'r'):
 		#print(newinput)
 		inputs += [newinput]
 
-print(inputs)
+if cvTwolc.debug:
+	print(inputs)
 cvTwolc.add_inputs(inputs)
 cvTwolc.get_phonolforms()
 #print(cvTwolc.forms, cvTwolc.rules)
@@ -47,9 +48,12 @@ print("====")
 outputs = cvTwolc.get_rules_excluding_correct()
 for output in outputs:
 	rules = outputs[output]
-	print("The following rules prevent the correct output of %s:" % output)
+	print("The following rule(s) prevent the correct output of %s:" % output)
 	for rule in rules:
-		print("rule %s: %s" % ( rule, cvTwolc.rules[rule]['name'])) 
+		print("--> rule %s: %s" % ( rule, cvTwolc.rules[rule]['name'])) 
+	if len(rules)==0:
+		print("    no rules prevent correct output!")
+
 
 #for inputform in inputs:
 #	print(inputform)
