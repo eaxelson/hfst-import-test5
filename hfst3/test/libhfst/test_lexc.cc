@@ -11,19 +11,27 @@ int main(int argc, char **argv)
                        /*LOG_OPENFST_TYPE,*/ 
                        FOMA_TYPE};
 
+   const char* srcdirc = getenv("srcdir");
+   if (srcdirc == 0)
+     {
+       srcdirc = "./";
+     }
+   std::string srcdir(srcdirc);
   /* For all transducer implementation types, perform the following tests: */
   for (unsigned int i=0; i<TYPES_SIZE; i++)
     {
 
       if (not HfstTransducer::is_implementation_type_available(types[i]))
-	continue;
+        {
+          continue;
+        }
 
       // Test the lexc parser:
-
+      fprintf(stderr, "Testing type %d... ", i);
       // (1) A file in valid lexc format
+      fprintf(stderr, "valid file, parse... ", i);
       LexcCompiler compiler(types[i]);
-      compiler.parse((std::string(getenv("srcdir")) + 
-              std::string("/test_lexc.lexc")).c_str());
+      compiler.parse((srcdir + std::string("/test_lexc.lexc")).c_str());
       HfstTransducer * parsed = compiler.compileLexical();
       assert(parsed != 0);
       HfstTokenizer tok;
@@ -39,27 +47,35 @@ int main(int argc, char **argv)
       assert(animals.compare(*parsed));
       delete parsed;
   
-      // (2) A file that does not follow lexc format
-      // No exception thrown..
-
-      // (3) A file that does not exist
-      // No exception thrown..
       
 
-      // Test the fast foma implementation:
+      try 
+        {
+          fprintf(stderr, "valid file, read_lexc... ", i);
+          HfstTransducer * rlexc 
+             = HfstTransducer::read_lexc(srcdir + "/test_lexc.lexc", types[i]);
+          assert(rlexc != 0);
+          assert(animals.compare(*rlexc));
+          delete rlexc;
+        }
+      catch (FunctionNotImplementedException e) 
+        {
+          assert(false);
+        }
 
-      // (1) A file in valid lexc format
-      try {
-    HfstTransducer * rlexc 
-      = HfstTransducer::read_lexc
-      (std::string(getenv("srcdir")) + "/test_lexc.lexc", types[i]);
-    assert(animals.compare(*rlexc));
-    delete rlexc;
-      }
-      catch (FunctionNotImplementedException e) {
-    assert(false);
-      }
+      // (2) A file that does not follow lexc format
+      LexcCompiler compiler2(types[i]);
+      fprintf(stderr, "invalid file, parse... ", i);
+      compiler2.parse((srcdir + std::string("/test_lexc_fail.lexc")).c_str());
+      parsed = compiler2.compileLexical();
+      assert(parsed == 0);
 
+      // (3) A file that does not exist
+      LexcCompiler compiler3(types[i]);
+      fprintf(stderr, "missing file, parse... ", i);
+      compiler3.parse((srcdir + std::string("/nonexistent.lexc")).c_str());
+      parsed = compiler3.compileLexical();
+      assert(parsed == 0);
       // (2) A file that does not follow lexc format
       /*try {
     HfstTransducer * rlexc
