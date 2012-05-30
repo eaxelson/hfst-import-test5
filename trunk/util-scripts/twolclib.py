@@ -22,6 +22,7 @@ class twolclib:
 	twolcFileName = "twol.%s.hfst"
 	processAll = True
 	lexc = None
+	debug = False
 
 	def __init__(self, twolcFile):
 		self.twolcFile = twolcFile
@@ -116,7 +117,7 @@ class twolclib:
 
 	def add_inputs(self, inputForms):
 		for inputList in inputForms:
-			print("IL: ",inputList)
+			#print("IL: ",inputList)
 			#print("a: "+inputForm)
 			if isinstance(inputList, tuple):
 				if len(inputList)==2:
@@ -128,7 +129,7 @@ class twolclib:
 				inputForm = inputList
 				lexcForm = None
 				outputForm = None
-			print(self.input_in_forms(inputForm), self.lexc_in_forms(lexcForm))
+			#print(self.input_in_forms(inputForm), self.lexc_in_forms(lexcForm))
 			if not self.input_in_forms(inputForm) or not self.lexc_in_forms(lexcForm):
 				thisForm = self.form.copy()
 				thisForm["input"] = inputForm
@@ -148,6 +149,7 @@ class twolclib:
 		#print(isinstance(self.rules, dict))
 		#thisForm["input"] = inputForm
 	def process_input_forms(self):
+		print("rule (forms):")
 		for formDict in self.forms:
 			inputForm = formDict["input"]
 			#print(inputForm)
@@ -159,7 +161,8 @@ class twolclib:
 				#print(ruleNum, ruleData)
 				#print(ruleNum)
 				#print(inputForm, ruleData["name"])
-				print(ruleNum,": ",ruleData["name"])
+				if self.debug:
+					print(ruleNum,": ",ruleData["name"])
 				p1 = Popen(["echo", inputForm], stdout=PIPE)
 				p2 = Popen(["hfst-strings2fst", "-S"], stdin=p1.stdout, stdout=PIPE)
 				p3 = Popen(["hfst-compose-intersect", ruleData["filename"]], stdin=p2.stdout, stdout=PIPE)
@@ -187,7 +190,13 @@ class twolclib:
 							formDict["outputs"][ruleNum].add(outputForm)
 						
 				#print("rule %s: %s forms" % (str(ruleNum), str(len(ruleSet))))
-				print("rule %s: %s forms" % (str(ruleNum), str(len(formDict["outputs"][ruleNum]))))
+				if self.debug:
+					print("rule %s: %s forms" % (str(ruleNum), str(len(formDict["outputs"][ruleNum]))))
+					print('')
+				else:
+					print("%s (%s), " % (str(ruleNum), str(len(formDict["outputs"][ruleNum]))), end="")
+					if ruleNum % 5 == 0:
+						print('')
 				#formDict["outputs"][ruleNum] = ruleSet
 				#print(output)
 			#thisForm["outputs"] += [forms]
@@ -343,7 +352,7 @@ class twolclib:
 		self.lexc = lexcFile
 	
 	def get_phonolforms(self):
-		print("forms:", self.forms)
+		#print("forms:", self.forms)
 		for form in self.forms:
 			lexcForm = form["lexc"]
 			p1 = Popen(["echo", lexcForm], stdout=PIPE)
@@ -358,4 +367,5 @@ class twolclib:
 				#outForm = re.sub("\s*", " ", outForm)
 			outForm = re.sub('\s{1,2}', ' ', outForm)
 			form["input"] = outForm
-		print(self.forms)
+		if self.debug:
+			print(self.forms)
