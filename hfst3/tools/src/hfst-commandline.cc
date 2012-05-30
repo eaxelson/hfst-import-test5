@@ -497,6 +497,18 @@ hfst_mkstemp(char* templ)
   return rv;
 }
 
+int
+hfst_remove(const char* filename)
+  {
+    errno = 0;
+    int rv = remove(filename);
+    if (rv == -1)
+      {
+        error(EXIT_FAILURE, errno, "remove %s failed", filename);
+      }
+    return rv;
+  }
+
 // str functions
 #ifndef HAVE_STRNDUP
 char*

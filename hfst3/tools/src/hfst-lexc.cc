@@ -51,6 +51,7 @@ static unsigned int lexccount = 0;
 static bool is_input_stdin = true;
 static ImplementationType format = hfst::UNSPECIFIED_TYPE;
 static bool start_readline = false;
+static char* tempfilename = 0;
 
 int lexc_readline_loop(ImplementationType format);
 
@@ -233,7 +234,7 @@ parse_options(int argc, char** argv)
                   "backends;\n"
                   "concatenating to temporary file");
         }
-        char* tempfilename = hfst_strdup("/tmp/hfst-lexcXXXXXX");
+        tempfilename = hfst_strdup("/tmp/hfst-lexcXXXXXX");
         int temporary_fd = hfst_mkstemp(tempfilename);
         for (unsigned int i = 0; i < lexccount; i++)
           {
@@ -324,6 +325,11 @@ int main( int argc, char **argv ) {
     delete outstream;
     free(lexcfilenames);
     free(outfilename);
+    if (tempfilename != 0)
+      {
+        verbose_printf("Deleting temporary files on succesful exit\n");
+        hfst_remove(tempfilename);
+      }
     return retval;
 }
 
