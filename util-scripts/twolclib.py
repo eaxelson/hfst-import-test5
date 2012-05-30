@@ -21,6 +21,7 @@ class twolclib:
 	reTwolcNum = re.compile('twol\.(.*)\.hfst')
 	twolcFileName = "twol.%s.hfst"
 	processAll = True
+	lexc = None
 
 	def __init__(self, twolcFile):
 		self.twolcFile = twolcFile
@@ -93,7 +94,8 @@ class twolclib:
 			fileInfo = p2.communicate()[0].decode('utf-8')
 			for line in fileInfo.split('\n'):
 				if ':' in line:
-					(param, value) = line.split(': ')
+					#if len(line.split(': '))==2:
+					(param, value) = line.split(': ', 1)
 					rule[param] = value.strip(' "')
 			rule["filename"] = os.path.join(self.tempDir, self.twolcFileName % str(ruleNum))
 			self.rules[ruleNum] = rule
@@ -154,14 +156,17 @@ class twolclib:
 				#thisForm = self.form
 				#print(ruleNum, ruleData)
 				#print(ruleNum)
+				#print(inputForm, ruleData["name"])
+				print(ruleNum,": ",ruleData["name"])
 				p1 = Popen(["echo", inputForm], stdout=PIPE)
 				p2 = Popen(["hfst-strings2fst", "-S"], stdin=p1.stdout, stdout=PIPE)
 				p3 = Popen(["hfst-compose-intersect", ruleData["filename"]], stdin=p2.stdout, stdout=PIPE)
-				p4 = Popen(["hfst-fst2strings"], stdin=p3.stdout, stdout=PIPE)
+				p4 = Popen(["hfst-fst2strings", "-c1"], stdin=p3.stdout, stdout=PIPE)
 				p1.stdout.close()
 				p2.stdout.close()
 				p3.stdout.close()
 				output = p4.communicate()[0].decode('utf-8')
+				#print(output)
 				####print(output)
 				#forms[ruleNum] = set(output.split('\n'))
 				formDict["outputs"][ruleNum] = set()
@@ -214,7 +219,7 @@ class twolclib:
 			p1 = Popen(["echo", inputForm], stdout=PIPE)
 			p2 = Popen(["hfst-strings2fst", "-S"], stdin=p1.stdout, stdout=PIPE)
 			p3 = Popen(["hfst-compose-intersect", self.twolcFile], stdin=p2.stdout, stdout=PIPE)
-			p4 = Popen(["hfst-fst2strings"], stdin=p3.stdout, stdout=PIPE)
+			p4 = Popen(["hfst-fst2strings", "-c1"], stdin=p3.stdout, stdout=PIPE)
 			p1.stdout.close()
 			p2.stdout.close()
 			p3.stdout.close()
@@ -326,3 +331,22 @@ class twolclib:
 			outputForms = process_form(inputForm, twolcFile)
 			print(outputForms)
 
+	def lexc(self, lexcFile):
+		self.lexc = lexcFile
+	
+	def get_phonolforms(self):
+		for form in self.forms:
+			lexcForm = form["lexc"]
+			p1 = Popen(["echo", lexcForm], stdout=PIPE)
+			p2 = Popen(["hfst-lookup", "-Xprint-space", "-q", self.lexc], stdin=p1.stdout, stdout=PIPE)
+			output = p2.communicate()[0].decode('utf-8')
+			for line in output.split('\n'):
+				if '\t' in line:
+					(inForm, outForm, time) = line.split('\t')
+				#outForm = re.sub("{(.*?)}", " {\1} ", outForm)
+				#outForm = re.sub(">", " > ", outForm)
+				#outForm = re.sub("([Ѐ-Ӿ])([Ѐ-Ӿ])", "\1 \2", outForm)
+				#outForm = re.sub("\s*", " ", outForm)
+			outForm = re.sub('\s{1,2}', ' ', outForm)
+			form["input"] = outForm
+		print(self.forms)
