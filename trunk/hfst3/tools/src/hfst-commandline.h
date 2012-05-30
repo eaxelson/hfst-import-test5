@@ -271,6 +271,12 @@ ssize_t hfst_write(int fd, const void* buf, size_t count);
  */
 int hfst_mkstemp(char* templ);
 
+/**
+ * @brief remove a file or print an informative error message and exit on
+ *        failure.
+ */
+int hfst_remove(const char* filename);
+
 #ifndef HAVE_GETDELIM
 ssize_t getdelim(char** lineptr, size_t* n, int delim, FILE* stream);
 #endif
