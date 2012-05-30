@@ -125,6 +125,7 @@ class LexcCompiler
   std::string currentLexiconName_;
   size_t totalEntries_;
   size_t currentEntries_;
+  bool parseErrors_;
 }
 ;
 

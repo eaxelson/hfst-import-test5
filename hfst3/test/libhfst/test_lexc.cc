@@ -25,7 +25,7 @@ int main(int argc, char **argv)
       compiler.parse((std::string(getenv("srcdir")) + 
               std::string("/test_lexc.lexc")).c_str());
       HfstTransducer * parsed = compiler.compileLexical();
-
+      assert(parsed != 0);
       HfstTokenizer tok;
       HfstTransducer cat("cat", tok, types[i]);
       HfstTransducer dog("dog", tok, types[i]);

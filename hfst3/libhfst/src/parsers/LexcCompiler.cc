@@ -48,9 +48,10 @@ using hfst::implementations::HfstBasicTransition;
 using hfst::ImplementationType;
 using hfst::xre::XreCompiler;
 
-// stupid flex§
+// stupid flex and yacc
 extern FILE* hlexcin;
 extern int hlexcparse();
+extern int hlexcnerrs;
 
 #ifndef DEBUG_MAIN
 
@@ -65,7 +66,8 @@ LexcCompiler::LexcCompiler() :
     xre_(TROPICAL_OPENFST_TYPE),
     initialLexiconName_("Root"),
     totalEntries_(0),
-    currentEntries_(0)
+    currentEntries_(0),
+    parseErrors_(false)
 {}
 
 LexcCompiler::LexcCompiler(ImplementationType impl) :
@@ -75,7 +77,8 @@ LexcCompiler::LexcCompiler(ImplementationType impl) :
     xre_(impl),
     initialLexiconName_("Root"),
     totalEntries_(0),
-    currentEntries_(0)
+    currentEntries_(0),
+    parseErrors_(false)
 {
     tokenizer_.add_multichar_symbol("@0@");
     tokenizer_.add_multichar_symbol("@ZERO@");
@@ -98,6 +101,10 @@ LexcCompiler& LexcCompiler::parse(FILE* infile)
       }
     hlexcin = infile;
     hlexcparse();
+    if (hlexcnerrs > 0)
+      {
+        parseErrors_ = true;
+      }
     return *this;
 }
 
@@ -112,6 +119,10 @@ LexcCompiler& LexcCompiler::parse(const char* filename)
         return *this;
       }
     hlexcparse();
+    if (hlexcnerrs > 0)
+      {
+        parseErrors_ = true;
+      }
     return *this;
 }
 
@@ -291,7 +302,11 @@ LexcCompiler::setInitialLexiconName(const string& lexiconName)
 
 HfstTransducer*
 LexcCompiler::compileLexical()
-{
+  {
+    if (parseErrors_)
+      {
+        return 0;
+      }
     printConnectedness();
     HfstTransducer lexicons(format_);
     // combine tries with reg.exps and minimize

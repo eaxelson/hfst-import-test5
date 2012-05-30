@@ -3701,10 +3701,10 @@ HfstTransducer * HfstTransducer::read_lexc(const std::string &filename,
 #endif
 #if HAVE_SFST || HAVE_OPENFST
       {
-    hfst::lexc::LexcCompiler compiler(type);
-    compiler.parse(filename.c_str());
-    return compiler.compileLexical();
-    break;
+        hfst::lexc::LexcCompiler compiler(type);
+        compiler.parse(filename.c_str());
+        return compiler.compileLexical();
+        break;
       }
 #endif
     /* Add here your implementation. */
