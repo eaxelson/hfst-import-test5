@@ -168,12 +168,11 @@ LEXC_TXTS=basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc \
 		  xre.any-variations.lexc xre.at-file.lexc \
 		  xre.automatic-multichar-symbols.lexc xre.basic.lexc \
 		  xre.definitions.lexc xre.months.lexc xre.nested-definitions.lexc \
-		  xre.numeric-star.lexc xre.sharp.lexc xre.star-plus-optional.lexc
+		  xre.numeric-star.lexc xre.sharp.lexc xre.quotations.lexc \
+		  xre.star-plus-optional.lexc
 #XFST_TXTS=cat-regex.xfst
 ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
 		$(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TEXTS)
-
-.SUFFIXES= .txt .hfst .hfst.sfst .hfst.ofst .hfst.foma .hfstol .genhfstol
 
 # this compilation is used by check target before running the tests
 #%.hfst: %.txt
