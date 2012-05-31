@@ -11,28 +11,35 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
           xre.any-variations.lexc
           xre.automatic-multichar-symbols.lexc xre.basic.lexc 
           xre.definitions.lexc xre.months.lexc xre.nested-definitions.lexc 
-          xre.numeric-star.lexc xre.sharp.lexc xre.star-plus-optional.lexc"
+          xre.numeric-star.lexc xre.sharp.lexc xre.quotations.lexc
+          xre.star-plus-optional.lexc"
 LEXCXFAIL="xfail.bogus.lexc xfail.ISO-8859-1.lexc xfail.lexicon-semicolon.lexc"
+
+if ! test -x ../../tools/src/hfst-lexc2fst ; then
+    echo missing hfst-lexc2fst, assuming configured off, skipping
+    exit 73
+fi
+
 for i in .sfst .ofst .foma ; do
     FFLAG=
     FNAME=
     case $i in
         .sfst)
-	    FNAME="sfst";
-            FFLAG="-f sfst";;	
+            FNAME="sfst";
+            FFLAG="-f sfst";;
         .ofst)
-	    FNAME="openfst-tropical";
+            FNAME="openfst-tropical";
             FFLAG="-f openfst-tropical";;
         .foma)
-	    FNAME="foma";
+            FNAME="foma";
             FFLAG="-f foma";;
         *)
-	    FNAME=;
+            FNAME=;
             FFLAG=;;
     esac
 
     if ! (../../tools/src/hfst-format --test-format $FNAME ) ; then
-	continue;
+        continue;
     fi
 
     if test -f cat$i ; then
