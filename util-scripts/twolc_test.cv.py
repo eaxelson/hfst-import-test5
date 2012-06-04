@@ -4,8 +4,8 @@ from twolclib import twolclib
 
 inputfile = "twolc_test.cv.dat"
 
-#ROOT = '/home/jonathan/quick/apertium/svn/incubator/apertium-cv-tr/'
-ROOT = '/home/fran/source/apertium/incubator/apertium-cv-tr/'
+ROOT = '/home/jonathan/quick/apertium/svn/incubator/apertium-cv-tr/'
+#ROOT = '/home/fran/source/apertium/incubator/apertium-cv-tr/'
 cvTwolc = twolclib(ROOT + '.deps/cv.LR.twol.hfst')
 cvTwolc.lexc(ROOT + '.deps/cv.LR.lexc.hfst')
 cvTwolc.load_rules()
