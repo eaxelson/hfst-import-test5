@@ -1,6 +1,6 @@
-#ifndef MAIN_TEST
-
 #include "WeightedStringVectorCollection.h"
+
+#ifndef MAIN_TEST
 
 #include <string>
 
@@ -81,8 +81,6 @@ const std::string &WeightedStringVectorCollection::get_name(void) const
 #include <string>
 #include <sstream>
 #include <cassert>
-
-#include "WeightedStringVectorCollection.h"
 
 int main(void)
 {

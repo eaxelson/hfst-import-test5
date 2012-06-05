@@ -1,5 +1,7 @@
 #include "FstBuilder.h"
 
+#ifndef MAIN_TEST
+
 using hfst::implementations::HfstBasicTransition;
 
 FstBuilder::FstBuilder(ImplementationType type,
@@ -131,7 +133,8 @@ HfstState FstBuilder::add_sequence
     return target_state;
 }
 
-#ifdef HFST_TAGGER_TEST_FstBuilder
+#else // MAIN_TEST
+
 #include <cassert>
 #include <iostream>
 int main(void)
@@ -146,4 +149,4 @@ int main(void)
 
   std::cerr << "PASSED" << std::endl;
 }
-#endif // HFST_TAGGER_TEST_FstBuilder
+#endif // MAIN_TEST
