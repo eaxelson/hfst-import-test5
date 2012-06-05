@@ -22,6 +22,66 @@ hfst-build-tagger_SOURCES:hfst-build-tagger.cc \
 			  $(BUILD_MODEL_SRC)/string_handling.h \
 			  $(BUILD_MODEL_SRC)/string_handling.cc
 
-check_PROGRAMS=FstBuilder LexicalModelBuilder LexicalModelBuilder ModelBuilder\
+check_PROGRAMS=FstBuilder LexicalModelBuilder ModelBuilder\
                SequenceModelBuilder TaggerBuilder \
                WeightedStringVectorCollection string_handling
+
+FstBuilder_SOURCES=$(BUILD_MODEL_SRC)/FstBuilder.h \
+		   $(BUILD_MODEL_SRC)/FstBuilder.cc \
+		   $(BUILD_MODEL_SRC)/string_handling.h \
+		   $(BUILD_MODEL_SRC)/string_handling.cc
+
+LexicalModelBuilder_SOURCES=$(BUILD_MODEL_SRC)/LexicalModelBuilder.h \
+			    $(BUILD_MODEL_SRC)/LexicalModelBuilder.cc \
+			    $(BUILD_MODEL_SRC)/FstBuilder.cc \
+			    $(BUILD_MODEL_SRC)/FstBuilder.h \
+			    $(BUILD_MODEL_SRC)/ModelBuilder.cc \
+			    $(BUILD_MODEL_SRC)/ModelBuilder.h \
+			    $(BUILD_MODEL_SRC)/string_handling.cc \
+			    $(BUILD_MODEL_SRC)/string_handling.h \
+			 $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc \
+			 $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.h
+
+ModelBuilder_SOURCES=$(BUILD_MODEL_SRC)/ModelBuilder.h \
+		     $(BUILD_MODEL_SRC)/ModelBuilder.cc \
+		     $(BUILD_MODEL_SRC)/FstBuilder.cc \
+		     $(BUILD_MODEL_SRC)/FstBuilder.h \
+		     $(BUILD_MODEL_SRC)/string_handling.cc \
+	             $(BUILD_MODEL_SRC)/string_handling.h \
+	             $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc \
+	             $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.h
+
+SequenceModelBuilder_SOURCES=$(BUILD_MODEL_SRC)/SequenceModelBuilder.h \
+			     $(BUILD_MODEL_SRC)/SequenceModelBuilder.cc \
+			     $(BUILD_MODEL_SRC)/FstBuilder.cc \
+			     $(BUILD_MODEL_SRC)/FstBuilder.h \
+			     $(BUILD_MODEL_SRC)/ModelBuilder.cc \
+			     $(BUILD_MODEL_SRC)/ModelBuilder.h \
+			     $(BUILD_MODEL_SRC)/string_handling.cc \
+			     $(BUILD_MODEL_SRC)/string_handling.h \
+			 $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc \
+			 $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.h
+
+TaggerBuilder_SOURCES=$(BUILD_MODEL_SRC)/TaggerBuilder.h \
+		      $(BUILD_MODEL_SRC)/TaggerBuilder.c \
+                      $(BUILD_MODEL_SRC)/SequenceModelBuilder.h \
+		      $(BUILD_MODEL_SRC)/SequenceModelBuilder.cc \
+		      $(BUILD_MODEL_SRC)/FstBuilder.cc \
+		      $(BUILD_MODEL_SRC)/FstBuilder.h \
+		      $(BUILD_MODEL_SRC)/ModelBuilder.cc \
+		      $(BUILD_MODEL_SRC)/ModelBuilder.h \
+		      $(BUILD_MODEL_SRC)/string_handling.cc \
+		      $(BUILD_MODEL_SRC)/string_handling.h \
+	              $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc \
+		      $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.h
+
+WeightedStringVectorCollection= \
+                         $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc \
+                         $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.h \
+                         $(BUILD_MODEL_SRC)/string_handling.h \
+                         $(BUILD_MODEL_SRC)/string_handling.cc
+
+string_handling_SOURCES=$(BUILD_MODEL_SRC)/string_handling.h \
+			$(BUILD_MODEL_SRC)/string_handling.cc
+
+TESTS=$(check_PROGRAMS)
