@@ -20,4 +20,8 @@ hfst-build-tagger_SOURCES:hfst-build-tagger.cc \
 			  $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.h \
 			  $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc\
 			  $(BUILD_MODEL_SRC)/string_handling.h \
-			  $(BUILD_MODEL_SRC)/string_handling.cc \
+			  $(BUILD_MODEL_SRC)/string_handling.cc
+
+check_PROGRAMS=FstBuilder LexicalModelBuilder LexicalModelBuilder ModelBuilder\
+               SequenceModelBuilder TaggerBuilder \
+               WeightedStringVectorCollection string_handling
