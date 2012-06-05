@@ -284,7 +284,7 @@ void Transducer::try_epsilon_indices(SymbolNumber * input_symbol,
 //    std::cerr << "try_epsilon_indices, index " << i << std::endl;
     if (tables->get_index_input(i) == 0)
     {
-    found_index = true;
+    found_transition = true;
     try_epsilon_transitions(input_symbol,
                 output_symbol,
                 original_output_tape,
@@ -304,8 +304,14 @@ void Transducer::find_transitions(SymbolNumber input,
     {
     if (tables->get_transition_input(i) == input)
     {
-      
-        *output_symbol = tables->get_transition_output(i);
+	SymbolNumber output = tables->get_transition_output(i);
+	if (input == alphabet->get_default_symbol()) {
+	    // we got here via default, so look back in the
+	    // input tape to find the symbol we want to write
+	    output = *(input_symbol - 1);
+	}
+	
+        *output_symbol = output;
         current_weight += tables->get_weight(i);
         get_analyses(input_symbol,
              output_symbol+1,
@@ -329,7 +335,7 @@ void Transducer::find_index(SymbolNumber input,
 {
     if (tables->get_index_input(i+input) == input)
     {
-    found_index = true;
+    found_transition = true;
     find_transitions(input,
              input_symbol,
              output_symbol,
@@ -381,7 +387,7 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
     }
     else
     {
-    found_index = false;
+    found_transition = false;
     try_epsilon_indices(input_symbol,
                 output_symbol,
                 original_output_tape,
@@ -410,12 +416,10 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
            i+1);
     // If we have a default symbol defined and we didn't find an index,
     // check for that
-    if (alphabet->get_default_symbol() != NO_SYMBOL_NUMBER && !found_index) {
-	--input_symbol;
+    if (alphabet->get_default_symbol() != NO_SYMBOL_NUMBER && !found_transition) {
 	find_index(alphabet->get_default_symbol(),
 		   input_symbol, output_symbol, original_output_tape, i+1);
     }
-    ++input_symbol;
     }
     *output_symbol = NO_SYMBOL_NUMBER;
 }
@@ -436,7 +440,7 @@ void Transducer::note_analysis(SymbolNumber * whole_output_tape)
 Transducer::Transducer():
     header(NULL), alphabet(NULL), tables(NULL),
     current_weight(0.0), lookup_paths(NULL), encoder(NULL),
-    input_tape(NULL), output_tape(NULL), flag_state(), found_index(false){}
+    input_tape(NULL), output_tape(NULL), flag_state(), found_transition(false){}
 
 Transducer::Transducer(std::istream& is):
     header(new TransducerHeader(is)),
@@ -446,7 +450,7 @@ Transducer::Transducer(std::istream& is):
             header->input_symbol_count())),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    flag_state(alphabet->get_fd_table()), found_index(false)
+    flag_state(alphabet->get_fd_table()), found_transition(false)
 {
     load_tables(is);
 }
@@ -461,7 +465,7 @@ Transducer::Transducer(bool weighted):
             header->input_symbol_count())),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    flag_state(alphabet->get_fd_table()), found_index(false)
+    flag_state(alphabet->get_fd_table()), found_transition(false)
 {
     if(weighted)
     tables = new TransducerTables<TransitionWIndex,TransitionW>();
@@ -483,7 +487,7 @@ Transducer::Transducer(const TransducerHeader& header,
             header.input_symbol_count())),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    flag_state(alphabet.get_fd_table()), found_index(false)
+    flag_state(alphabet.get_fd_table()), found_transition(false)
 {}
 
 Transducer::Transducer(const TransducerHeader& header,
@@ -500,7 +504,7 @@ Transducer::Transducer(const TransducerHeader& header,
             header.input_symbol_count())),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    flag_state(alphabet.get_fd_table()), found_index(false)
+    flag_state(alphabet.get_fd_table()), found_transition(false)
 {}
 
 Transducer::~Transducer()
