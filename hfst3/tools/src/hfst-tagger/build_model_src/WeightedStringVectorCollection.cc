@@ -1,0 +1,145 @@
+#ifndef MAIN_TEST
+
+#include "WeightedStringVectorCollection.h"
+
+#include <string>
+
+size_t WeightedStringVectorCollection::line_number = 0;
+
+size_t WeightedStringVectorCollection::get_line_number(void)
+{ return line_number; }
+
+size_t WeightedStringVectorCollection::init_line_number(void)
+{ line_number = 0; }
+
+WeightedStringVectorCollection::WeightedStringVectorCollection
+(std::istream &in, bool lexical_model):
+  is_lexical_model(lexical_model)
+{
+  this->name = read_model_start_tag(getline(in));
+  
+  if (in.eof())
+    { throw EmptyFile(); }
+
+  std::string line;
+
+  while (1)
+    {
+      line = getline(in);
+      
+      try
+	{
+	  WeightedStringVector entry = 
+	    (lexical_model ? 
+	     tokenize_lexicon_line(line,tokenizer) :
+	     tokenize_grammar_line(line,tokenizer));
+
+	  data.push_back(entry);
+	}
+      catch (InvalidLine &e)
+	{
+	  std::string stop_name = read_model_stop_tag(line);
+	  
+	  if (name != stop_name)
+	    { throw InvalidLine(e,STR(__LINE__)); }
+
+	  break;
+	}
+    }
+}
+  
+std::string WeightedStringVectorCollection::getline(std::istream &in)
+{
+  std::string line;
+  std::getline(in,line);
+
+  ++WeightedStringVectorCollection::line_number;
+  return line;
+}
+
+WeightedStringVectorCollection::const_iterator 
+WeightedStringVectorCollection::begin(void) const
+{ return this->data.begin(); }
+
+WeightedStringVectorCollection::const_iterator 
+WeightedStringVectorCollection::end(void) const
+{ return this->data.end(); }
+
+WeightedStringVectorCollection::iterator 
+WeightedStringVectorCollection::begin(void)
+{ return this->data.begin(); }
+
+WeightedStringVectorCollection::iterator 
+WeightedStringVectorCollection::end(void)
+{ return this->data.end(); }
+
+const std::string &WeightedStringVectorCollection::get_name(void) const
+{ return this->name; }
+
+#else // MAIN_TEST
+
+#include <string>
+#include <sstream>
+#include <cassert>
+
+#include "WeightedStringVectorCollection.h"
+
+int main(void)
+{
+  std::string line1 = "START LEX MODEL\n";
+  std::string line2 = "a\tDT\t1.0\n";
+  std::string line3 = "oof\tNN\t2.0\n";
+  std::string line4 = "STOP LEX MODEL\n";
+
+  std::string line5 = "START SEQ MODEL\n";
+  std::string line6 = "DT\tNN\t1.5\n";
+  std::string line7 = "STOP SEQ MODEL";
+
+  std::string file = line1 + line2 + line3 + line4 + line5 + line6 + line7;
+
+  std::istringstream in(file);
+
+  WeightedStringVectorCollection c1(in,true);
+
+  WeightedStringVectorCollection::const_iterator it = c1.begin();
+  
+  assert(it != c1.end());
+  assert(it->string_vector.size() == 2);
+  assert(it->string_vector[0] == "a");
+  assert(it->string_vector[1] == "DT");
+
+  ++it;
+  assert(it != c1.end());
+  assert(it->string_vector.size() == 4);
+  assert(it->string_vector[0] == "o");
+  assert(it->string_vector[1] == "o");
+  assert(it->string_vector[2] == "f");
+  assert(it->string_vector[3] == "NN");
+
+  ++it;
+
+  assert(it == c1.end());
+
+  WeightedStringVectorCollection c2(in,false);
+
+  it = c2.begin();
+
+  assert(it != c2.end());
+  assert(it->string_vector.size() == 2);
+  assert(it->string_vector[0] == "DT");
+  assert(it->string_vector[1] == "NN");
+  
+  ++it;
+
+  assert(it == c2.end());
+
+  try
+    { 
+      static_cast<void>(WeightedStringVectorCollection(in,false)); 
+      assert(false);
+    }
+  catch (...)
+    {}
+}
+
+#endif // MAIN_TEST
