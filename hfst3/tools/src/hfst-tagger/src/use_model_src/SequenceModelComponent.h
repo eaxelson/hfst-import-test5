@@ -1,6 +1,10 @@
 #ifndef HEADER_SequenceModelComponent_h
 #define HEADER_SequenceModelComponent_h
 
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include <vector>
 #include <unordered_map>
 

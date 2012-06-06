@@ -1,6 +1,10 @@
 #ifndef HEADER_STRING_HANDLING_H
 #define HEADER_STRING_HANDLING_H
 
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include <string>
 
 #include <hfst/HfstTransducer.h>

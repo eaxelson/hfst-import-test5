@@ -1,6 +1,10 @@
 #ifndef HEADER_SequenceModelComponentPair_h
 #define HEADER_SequenceModelComponentPair_h
 
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include <utility>
 #include <map>
 

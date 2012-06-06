@@ -1,6 +1,10 @@
 #ifndef HEADER_DataTypes_h
 #define HEADER_DataTypes_h
 
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include <unordered_map>
 #include <string>
 #include <vector>

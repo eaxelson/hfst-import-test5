@@ -1,6 +1,10 @@
 #ifndef HFST_TAGGER_HEADER_FST_BUILDER_H
 #define HFST_TAGGER_HEADER_FST_BUILDER_H
 
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include <vector>
 #include <map>
 #include <string>

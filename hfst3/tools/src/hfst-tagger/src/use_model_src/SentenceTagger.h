@@ -1,6 +1,10 @@
 #ifndef HEADER_SentenceTagger_h
 #define HEADER_SentenceTagger_h
 
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include "SequenceTagger.h"
 #include "NewLexicalModel.h"
 

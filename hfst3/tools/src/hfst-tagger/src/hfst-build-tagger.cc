@@ -21,7 +21,6 @@
 #  include <config.h>
 #endif
 
-
 #include <iostream>
 #include <fstream>
 
@@ -39,25 +38,11 @@
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
 
-#include "TaggerBuilder.h"
+#include "build_model_src/TaggerBuilder.h"
 
 void
 print_usage()
-{
-    // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-    fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-        "Compile training data file into an hfst pos tagger.\n"
-        "\n", program_name);
-
-    print_common_program_options(message_out);
-    print_common_unary_program_options(message_out);
-    fprintf(message_out, "\n");
-    );
-    fprintf(message_out, "\n");
-    print_report_bugs();
-    fprintf(message_out, "\n");
-    print_more_info();
-}
+{ /* nothing */ }
 
 int
 parse_options(int argc, char** argv)
@@ -92,67 +77,45 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-error.h"
         }
     }
+
+#include "inc/check-params-common.h"
+#include "inc/check-params-unary.h"
+    return EXIT_CONTINUE;
 }
 
-void read_input_file(const char * filename)
+void read_input_file(std::string filename)
 {
-  std::ofstream out(filename);
-
+  StringVector file_contents;
   std::string line;
 
   while (std::getline(std::cin,line))
-    { out << line; }
+    { file_contents.push_back(line); }
+
+  std::ofstream out(filename.c_str());
+
+  for (StringVector::const_iterator it = file_contents.begin();
+       it != file_contents.end();
+       ++it)
+    { out << *it << std::endl; }
 
   out.close();
 }
 
-void process_input_data(const char * input_file_name,
-		        const char * output_file_name)
+int process_input_data(std::string output_file_prefix)
 {
-  // Construct system call, which will read the training data from the
-  // correct file and process it using compute_data_statistics.py and
-  // write the result into the file output_file_name ".temp_stats".
-  const char * system_call = NULL;
-  
-  if (std::string(input_file_name) == "<stdin>")
+  // Read training statistics from STDIN.
+  try
     {
-      system_call = "cat " outputfilename 
-	".temp_input_data | compute_data_statistics.py > " 
-	output_file_name ".temp_stats";
+      TaggerBuilder tagger_builder;
+      
+      // Write the result in STDOUT or files depending on command-line args.
+      if (std::string(output_file_prefix) == "<stdout>")
+	{ tagger_builder.store(); }
+      else
+	{ tagger_builder.store(output_file_prefix); }
     }
-  else
-    {
-      system_call = "cat " input_file_name " | compute_data_statistics.py > " 
-	output_file_name ".temp_stats";
-    }
-
-  verbose_printf("Running system call:\n" 
-		 system_call);
-
-  int data_statistics_exit_code = 
-    system(system_call);
-
-  // If the input originally came from STDIN, remove the temporary
-  // input file which was created.
-  if (std::string(input_file_name) == "<stdin>")
-    { system("rm -f " outputfilename ".temp_input_data"); }
-  
-  // If there was a problem during compute_data_statistics.py, halt.
-  if (data_statistics_exit_code != EXIT_CONTINUE)
-    { return data_statistics_exit_code; }
-
-  // Construct the tagger builder, which will compile the final tagger.
-  TaggerBuilder tagger_builder(output_file_name ".temp_stats");
-
-  // Remove the temporary statistics file outputfilename ".temp_stats".
-  system("rm -f " outputfilename ".temp_stats");
-    
-  // Write the result in STDOUT or a file.
-  if (std::string(output_file_name) == "<stdout>")
-    { tagger_builder.store(); }
-  else
-    { tagger_builder.store(output_file_name); }
-  
+  catch (...)
+    { return EXIT_FAILURE; }
  
   return EXIT_CONTINUE;
 }
@@ -177,9 +140,13 @@ int main( int argc, char **argv )
 		   inputfilename, outfilename);
 
     if (std::string(inputfilename) == "<stdin>")
-      { read_input_file(outputfilename ".temp_input_data"); }
+      {
+	std::string temp_data_file_name = std::string(argv[0]) + 
+	  ".temp_input_data";
+	read_input_file(temp_data_file_name); 
+      }
 
-    retval = process_input_data(inputfilename,outputfilename);
+    retval = process_input_data(outfilename);
 
     free(inputfilename);
     free(outfilename);
