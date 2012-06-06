@@ -134,9 +134,9 @@ A finite-state spell-checker is typically composed of at least two finite-state
 automata; one for dictionary of the language, or the \emph{language model},
 which contains valid strings of the language, and one automaton to map misspelt
 words into correct strings, or the \emph{error model}. Both the language models
-and the error models are usually weighted as finite-state automata, in which
-case it is probability of word being correctly spelled in the language model
-and the probability of specific misspellings that are assigned by the automata.
+and the error models are usually weighted finite-state automata, in which
+case the probabilities are of a word being correctly spelled in the language
+model and of specific misspellings, respectively.
 We evaluate here the effect of both the language model automaton's structure
 and complexity, and the error models structure and complexity to the efficiency
 of the finite-state spelling.\footnote{The methods introduced in this research
