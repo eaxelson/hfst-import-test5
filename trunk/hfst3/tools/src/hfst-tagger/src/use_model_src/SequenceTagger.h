@@ -1,6 +1,10 @@
 #ifndef HEADER_SequenceTagger_h
 #define HEADER_SequenceTagger_h
 
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include <queue>
 
 #include "SequenceModelComponent.h"

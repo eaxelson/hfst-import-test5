@@ -1,6 +1,10 @@
 #ifndef HEADER_NewLexicalModel_h
 #define HEADER_NewLexicalModel_h
 
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include <hfst/HfstTransducer.h>
 #include <unordered_map> 
 #include <unordered_set> 

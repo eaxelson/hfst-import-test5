@@ -1,6 +1,10 @@
 #ifndef HEADER_WEIGHTED_STRING_VECTOR_COLLECTION_H
 #define HEADER_WEIGHTED_STRING_VECTOR_COLLECTION_H
 
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include <iostream>
 
 #include "string_handling.h"

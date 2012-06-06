@@ -1,6 +1,10 @@
 #ifndef HEADER_SEQUENCE_MODEL_BUILDER_H
 #define HEADER_SEQUENCE_MODEL_BUILDER_H
 
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include <iostream>
 #include <vector>
 

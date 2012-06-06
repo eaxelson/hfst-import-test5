@@ -1,6 +1,10 @@
 #ifndef HEADER_AcyclicAutomaton_h
 #define HEADER_AcyclicAutomaton_h
 
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include "DataTypes.h"
 
 #include <vector>
