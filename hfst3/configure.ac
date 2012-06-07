@@ -217,6 +217,18 @@ AC_ARG_ENABLE([lexc],
               [enable_lexc=$enableval],
               [enable_lexc=no])
 AM_CONDITIONAL([WANT_LEXC], [test "x$enable_lexc" != xno])
+AC_ARG_ENABLE([twolc],
+              [AS_HELP_STRING([--enable-twolc],
+                              [build twolc @<:@default=yes@:>@])],
+              [enable_twolc=$enableval],
+              [enable_twolc=yes])
+AM_CONDITIONAL([WANT_TWOLC], [test "x$enable_twolc" != xno])
+AC_ARG_ENABLE([tagger],
+              [AS_HELP_STRING([--enable-tagger],
+                              [build tagger utilities @<:@default=no@:>@])],
+              [enable_tagger=$enableval],
+              [enable_tagger=no])
+AM_CONDITIONAL([WANT_TAGGER], [test "x$enable_tagger" != xno])
 AC_ARG_ENABLE([lexc2fst],
               [AS_HELP_STRING([--enable-lexc2fst],
                               [build lexc2fst cli @<:@default=yes@:>@])],
@@ -399,6 +411,7 @@ AC_PROG_LEX
 AC_PATH_PROG([FOMACLI], [foma], [false])
 AC_PATH_PROG([GETOPT], [getopts], [false])
 AM_CONDITIONAL([CAN_FOMAWRAP], [test x$FOMACLI != xfalse])
+AM_PATH_PYTHON([2.4],[],[false])
 # if flex 3.X ever comes out, this breaks :)
 LEX_VERSION=`$LEX --version`
 AS_IF([test -z "`echo "$LEX_VERSION" | grep 'flex 2\.[[5-9]]\.[[3-9][4-9]]'`"],
@@ -505,6 +518,9 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 tools/src/hfst-twolc/Makefile
 		 tools/src/hfst-twolc/src/Makefile
 		 tools/src/hfst-twolc/test/Makefile
+		 tools/src/hfst-tagger/Makefile
+		 tools/src/hfst-tagger/src/Makefile
+		 tools/src/hfst-tagger/test/Makefile
 		 man/Makefile 
                  scripts/Makefile scripts/hfst-foma-wrapper.sh],
                  [chmod +x scripts/hfst-foma-wrapper.sh])
@@ -562,6 +578,8 @@ cat <<EOF
     *                 summarize: $enable_summarize (summarise)
     *                 tail: $enable_tail
     *                 test: $enable_test
+    *                 twolc: $enable_twolc
+    *                 tagger: $enable_tagger
     *                 txt2fst: $enable_txt2fst
     * foma used for xfst: -> $FOMACLI
     * unicode parsed in corpus tools with: $with_unicode_handler
@@ -586,6 +604,8 @@ AS_IF([test "x$enable_lexc" == "xno"],
       [AC_MSG_WARN([hfst-lexc is not enabled; hfst-lexc2fst toy will only offer limited support to compile lexc lexicons; enable with --enable-lexc])])
 AS_IF([test "x$enable_twolc" == "xno"],
       [AC_MSG_WARN([hfst-twolc is not enabled; you will not be able to compile xerox twolc grammars; enable using --enable-twolc])])
+AS_IF([test "x$enable_tagger" == "xno"],
+      [AC_MSG_WARN([hfst-train-tagger and hfst-tag are not enabled; you will not be able to train and use taggers; enable using --enable-tagger])])
 AS_IF([test "x$enable_calculate" == "xno"],
       [AC_MSG_WARN([hfst-calculate is not enabled; you will not be able to compile SFST-PL scripts; enable using --enable-calculate])])
 
