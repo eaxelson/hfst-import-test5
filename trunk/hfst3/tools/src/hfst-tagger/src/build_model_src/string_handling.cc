@@ -65,15 +65,24 @@ WeightedStringVector tokenize_lexicon_line(const std::string &line,
 {
   StringVector split_line = split(line,'\t');  
  
-  if (split_line.size() != 3)
-    { throw InvalidLine(STR(__LINE__)); }
+  if (split_line.size() != 2 and split_line.size() != 3)
+    { throw InvalidLine(__FILE__ " " STR(__LINE__)); }
 
   std::string word = split_line[0];
-  std::string tag = split_line[1];
-  std::string weight_str = split_line[2];
+
+  std::string tag;
+  std::string weight_str = split_line[1];
+
+  if (split_line.size() == 3)
+    { 
+      tag = split_line[1]; 
+      weight_str = split_line[2];
+    }
 
   StringVector entry = tokenizer.tokenize_one_level(word);
-  entry.push_back(tag);
+  
+  if (tag != "")
+    { entry.push_back(tag); }
 
   float weight = get_non_negative_float(weight_str);
 
@@ -88,16 +97,19 @@ WeightedStringVector tokenize_grammar_line(const std::string &line,
 {
   StringVector split_line = split(line, '\t');
 
-  if (split_line.size() / 2 != 1)
-    { throw InvalidLine(STR(__LINE__)); }
+  if ((split_line.size() % 2) != 1 or split_line.size() < 3)
+    { throw InvalidLine(__FILE__ " " STR(__LINE__)); }
 
   StringVector entry(split_line.begin(), split_line.end() - 1);
+
   std::string weight_str = split_line.back();
 
   float weight = get_non_negative_float(split_line.back());
 
   if (weight == -1)
-    { throw InvalidFloat(weight_str); }
+    { 
+      throw InvalidFloat(weight_str); 
+    }
 
   return WeightedStringVector(entry, weight); 
 }
@@ -105,12 +117,14 @@ WeightedStringVector tokenize_grammar_line(const std::string &line,
 std::string read_model_start_tag(const std::string &line)
 {
   if (line.find("START ") != 0)
-    { throw InvalidLine(STR(__LINE__)); }
+    {
+      throw InvalidLine(__FILE__ " " STR(__LINE__)); 
+    }
 
   std::string model_name = line.substr(6);
 
   if (model_name.find("\t") != std::string::npos)
-    { throw InvalidLine(STR(__LINE__)); }
+    { throw InvalidLine(__FILE__ " " STR(__LINE__)); }
 
   return model_name;
 }
@@ -118,12 +132,12 @@ std::string read_model_start_tag(const std::string &line)
 std::string read_model_stop_tag(const std::string &line)
 {
   if (line.find("STOP ") != 0)
-    { throw InvalidLine(STR(__LINE__)); }
+    { throw InvalidLine(__FILE__ " " STR(__LINE__)); }
 
   std::string model_name = line.substr(5);
 
   if (model_name.find("\t") != std::string::npos)
-    { throw InvalidLine(STR(__LINE__)); }
+    { throw InvalidLine(__FILE__ " " STR(__LINE__)); }
 
   return model_name;
 }
@@ -201,11 +215,11 @@ int main(void)
       WeightedStringVector v = tokenize_lexicon_line("oof\tNN\t0.5",
 						     tokenizer);
       if (v.string_vector.size() != 4)
-	{ throw InvalidLine(STR(__LINE__)); }
+	{ throw InvalidLine(__FILE__ " " STR(__LINE__)); }
 
       if (v.string_vector[0] != "o" or v.string_vector[1] != "o" or 
 	  v.string_vector[2] != "f" or v.weight != 0.5)
-	{ throw InvalidLine(STR(__LINE__)); }
+	{ throw InvalidLine(__FILE__ " " STR(__LINE__)); }
     }
   catch (const InvalidLine &e)
     { 
@@ -229,10 +243,10 @@ int main(void)
       WeightedStringVector v = tokenize_lexicon_line("\tNN\t0.5", tokenizer);
       
       if (v.string_vector.size() != 1)
-	{ throw InvalidLine(STR(__LINE__)); }
+	{ throw InvalidLine(__FILE__ " " STR(__LINE__)); }
 
       if (v.string_vector[0] != "NN" and v.weight != 0.5)
-	{ throw InvalidLine(STR(__LINE__)); }
+	{ throw InvalidLine(__FILE__ " " STR(__LINE__)); }
     }
   catch (const InvalidLine &e)
     {
@@ -257,11 +271,11 @@ int main(void)
 						     tokenizer);
       
       if (v.string_vector.size() != 4)
-	{ throw InvalidLine(STR(__LINE__)); }
+	{ throw InvalidLine(__FILE__ " " STR(__LINE__)); }
 
       if (v.string_vector[0] != "ä" and v.string_vector[1] != "l" and 
 	  v.string_vector[2] != "ä" and v.weight != 0.5)
-	{ throw InvalidLine(STR(__LINE__)); }
+	{ throw InvalidLine(__FILE__ " " STR(__LINE__)); }
     }
   catch (const InvalidLine &e)
     { 
@@ -342,11 +356,11 @@ int main(void)
 						     tokenizer);
 
       if (v.string_vector.size() != 2)
-	{ throw InvalidLine(STR(__LINE__)); }
+	{ throw InvalidLine(__FILE__ " " STR(__LINE__)); }
 
       if (v.string_vector[0] != "DT" or v.string_vector[1] != "NN" or 
 	  v.weight != 0.5)
-	{ throw InvalidLine(STR(__LINE__)); }
+	{ throw InvalidLine(__FILE__ " " STR(__LINE__)); }
     }
   catch (const InvalidLine &e)
     { 
@@ -409,7 +423,7 @@ int main(void)
       std::string name = read_model_start_tag("START MODEL");
       
       if (name != "MODEL")
-	{ throw InvalidLine(STR(__LINE__)); }
+	{ throw InvalidLine(__FILE__ " " STR(__LINE__)); }
     }
   catch (const InvalidLine &e)
     { 
@@ -472,7 +486,7 @@ int main(void)
       std::string name = read_model_stop_tag("STOP MODEL");
       
       if (name != "MODEL")
-	{ throw InvalidLine(STR(__LINE__)); }
+	{ throw InvalidLine(__FILE__ " " STR(__LINE__)); }
     }
   catch (const InvalidLine &e)
     { 

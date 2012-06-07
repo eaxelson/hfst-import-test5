@@ -9,7 +9,7 @@ size_t WeightedStringVectorCollection::line_number = 0;
 size_t WeightedStringVectorCollection::get_line_number(void)
 { return line_number; }
 
-size_t WeightedStringVectorCollection::init_line_number(void)
+void WeightedStringVectorCollection::init_line_number(void)
 { line_number = 0; }
 
 WeightedStringVectorCollection::WeightedStringVectorCollection
@@ -26,7 +26,7 @@ WeightedStringVectorCollection::WeightedStringVectorCollection
   while (1)
     {
       line = getline(in);
-      
+
       try
 	{
 	  WeightedStringVector entry = 
@@ -53,6 +53,11 @@ std::string WeightedStringVectorCollection::getline(std::istream &in)
   std::string line;
   std::getline(in,line);
 
+  if (in.eof())
+    { 
+      throw EmptyFile(); 
+    }
+  
   ++WeightedStringVectorCollection::line_number;
   return line;
 }

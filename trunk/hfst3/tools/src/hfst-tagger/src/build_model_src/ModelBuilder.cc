@@ -24,10 +24,16 @@ void ModelBuilder::add_sequence(const WeightedStringVector &v,
 {
   StringVector symbol_sequence = v.string_vector;
   float weight = v.weight;
-    
+
+  if (symbol_sequence.empty())
+    {
+      model_fst.set_final_weight(START_STATE,weight);
+      return;
+    }
+
   HfstState target_state =
-   FstBuilder::add_sequence(symbol_sequence.begin(),
-			      symbol_sequence.end() - 1);
+    FstBuilder::add_sequence(symbol_sequence.begin(),
+			     symbol_sequence.end() - 1);     
   
   std::string last_output_symbol = symbol_sequence.back();
   std::string last_input_symbol = 

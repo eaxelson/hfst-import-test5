@@ -23,7 +23,7 @@ class WeightedStringVectorCollection
   const bool is_lexical_model;
 
   static size_t get_line_number(void);
-  static size_t init_line_number(void);
+  static void init_line_number(void);
 
   WeightedStringVectorCollection(std::istream &in, bool lexical_model);
   
