@@ -24,9 +24,11 @@ void FstBuilder::add_transition
  HfstState target_state,
  const std::string &symbol,
  float weight)
-{ model_fst.add_transition(initial_state,
+{ 
+  model_fst.add_transition(initial_state,
 			   HfstBasicTransition
-			   (target_state,symbol,symbol,weight)); }
+			   (target_state,symbol,symbol,weight)); 
+}
 
 void FstBuilder::add_transition
 (HfstState initial_state,
@@ -34,9 +36,11 @@ void FstBuilder::add_transition
  const std::string &isymbol,
  const std::string &osymbol,
  float weight)
-{ model_fst.add_transition(initial_state,
+{
+  model_fst.add_transition(initial_state,
 			   HfstBasicTransition
-			   (target_state,isymbol,osymbol,weight)); }
+			   (target_state,isymbol,osymbol,weight)); 
+}
 
 HfstState FstBuilder::get_target(HfstState s,
 				   const std::string &symbol,
@@ -112,11 +116,11 @@ HfstState FstBuilder::add_sequence
  FstBuilder::StringVector::const_iterator end)
 {
   HfstState initial_state = START_STATE;
-  HfstState target_state  = NO_STATE;
+  HfstState target_state  = START_STATE;
 
   bool new_transition_required = false;
 
-    for ( ; it != end; ++it)
+  for ( ; it != end; ++it)
     {
       target_state = get_target(initial_state,
 				*it,

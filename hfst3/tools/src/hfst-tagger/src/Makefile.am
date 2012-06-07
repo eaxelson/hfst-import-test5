@@ -9,6 +9,8 @@ USE_MODEL_SRC=$(srcdir)/use_model_src
 AM_CPPFLAGS=-I${top_srcdir}/libhfst/src
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 
+python_PYTHON=tagger_aux.py hfst_tagger_compute_data_statistics.py
+
 HFST_COMMON_SRC=$(top_srcdir)/tools/src/hfst-program-options.cc \
                 $(top_srcdir)/tools/src/hfst-commandline.cc \
 	        $(top_srcdir)/tools/src/hfst-tool-metadata.cc

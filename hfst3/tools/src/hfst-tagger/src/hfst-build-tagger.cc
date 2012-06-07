@@ -83,24 +83,6 @@ parse_options(int argc, char** argv)
     return EXIT_CONTINUE;
 }
 
-void read_input_file(std::string filename)
-{
-  StringVector file_contents;
-  std::string line;
-
-  while (std::getline(std::cin,line))
-    { file_contents.push_back(line); }
-
-  std::ofstream out(filename.c_str());
-
-  for (StringVector::const_iterator it = file_contents.begin();
-       it != file_contents.end();
-       ++it)
-    { out << *it << std::endl; }
-
-  out.close();
-}
-
 int process_input_data(std::string output_file_prefix)
 {
   // Read training statistics from STDIN.
@@ -113,10 +95,17 @@ int process_input_data(std::string output_file_prefix)
 	{ tagger_builder.store(); }
       else
 	{ tagger_builder.store(output_file_prefix); }
+        }
+  catch (const InvalidLine &e)
+    { 
+      std::cerr << e.representation << std::endl;
+      throw e;
     }
-  catch (...)
-    { return EXIT_FAILURE; }
- 
+  catch (const EmptyFile &e)
+    { throw e; }
+  //catch (...)
+  //  { return EXIT_FAILURE; }
+      
   return EXIT_CONTINUE;
 }
 
@@ -130,21 +119,14 @@ int main( int argc, char **argv )
     }
 
     // close buffers, we use streams
-    if (inputfile != stdin)
-    {
-        fclose(inputfile);
-    }
+    //    if (inputfile != stdin)
+    //{
+    //   fclose(inputfile);
+    //}
     
     verbose_printf("Reading training data from %s, writing tagger to\n"
 		   "%s.{lex,seq}", 
 		   inputfilename, outfilename);
-
-    if (std::string(inputfilename) == "<stdin>")
-      {
-	std::string temp_data_file_name = std::string(argv[0]) + 
-	  ".temp_input_data";
-	read_input_file(temp_data_file_name); 
-      }
 
     retval = process_input_data(outfilename);
 
