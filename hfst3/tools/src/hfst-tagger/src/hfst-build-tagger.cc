@@ -80,32 +80,20 @@ parse_options(int argc, char** argv)
 
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
-    return EXIT_CONTINUE;
+    return EXIT_SUCCESS;
 }
 
 int process_input_data(std::string output_file_prefix)
 {
   // Read training statistics from STDIN.
-  try
-    {
-      TaggerBuilder tagger_builder;
+  TaggerBuilder tagger_builder;
       
-      // Write the result in STDOUT or files depending on command-line args.
-      if (std::string(output_file_prefix) == "<stdout>")
-	{ tagger_builder.store(); }
-      else
-	{ tagger_builder.store(output_file_prefix); }
-        }
-  catch (const InvalidLine &e)
-    { 
-      std::cerr << e.representation << std::endl;
-      throw e;
-    }
-  catch (const EmptyFile &e)
-    { throw e; }
-  //catch (...)
-  //  { return EXIT_FAILURE; }
-      
+  // Write the result in STDOUT or files depending on command-line args.
+  if (std::string(output_file_prefix) == "<stdout>")
+    { tagger_builder.store(); }
+  else
+    { tagger_builder.store(output_file_prefix); }
+
   return EXIT_CONTINUE;
 }
 
@@ -124,13 +112,7 @@ int main( int argc, char **argv )
     //   fclose(inputfile);
     //}
     
-    verbose_printf("Reading training data from %s, writing tagger to\n"
-		   "%s.{lex,seq}", 
-		   inputfilename, outfilename);
-
     retval = process_input_data(outfilename);
 
-    free(inputfilename);
-    free(outfilename);
     return retval;
 }
