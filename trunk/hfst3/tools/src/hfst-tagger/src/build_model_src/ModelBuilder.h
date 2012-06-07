@@ -16,6 +16,9 @@ class ModelBuilder : public FstBuilder
 {
  public:
 
+  static bool verbose;
+  static void verbose_printf(const std::string &message);
+
   ModelBuilder(const WeightedStringVectorCollection &model_weights);
 
  protected:

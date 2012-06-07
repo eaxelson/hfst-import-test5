@@ -5,11 +5,25 @@
 
 import sys
 import tagger_aux
+import re
+import string
 
 # The maximal length of suffixes used in the guesser.
 MAX_SUFFIX_LENGTH = 10
 
+# If verbose is true, the program prints info about what is ahppening.
+verbose=False
+
+arg_string = " " + string.join(sys.argv, " ") + " "
+
+if re.search("-v[^\w]",arg_string) != None or \
+   re.search("--verbose[^\w]",arg_string) != None:
+    verbose = True
+
+
 # Read from stdin.
+tagger_aux.verbose_print("Reading input file.",verbose)
+
 file_contents = sys.stdin.read()
 
 # Maps (word_form,tag) to its count in training data.
@@ -48,6 +62,8 @@ sequence = []
 # For each input line, check that the line consists of two fields
 # separated by a tab. For each input word form and tag, check that
 # they are wellformed utf-8.
+tagger_aux.verbose_print("Computing lexical statistics.",verbose)
+
 for line in file_contents.split("\n"):
 
     # Increment line number counter.
@@ -96,21 +112,29 @@ for line in file_contents.split("\n"):
 
 # Compute and display the penalties for word form and tag
 # combinations.
+tagger_aux.verbose_print("Storing lexical statistics.",verbose)
+tagger_aux.verbose_print("P(WORD_FORM | TAG)",verbose)
+
 print "START P(WORD_FORM | TAG)"
 tagger_aux.print_conditional_penalties(word_form_and_tag_map,entry_tag_map)
 print "STOP P(WORD_FORM | TAG)"
 
 # Compute and display the penalties for suffix and tag combinations.
+tagger_aux.verbose_print("P(SUFFIX_AND_TAG | SUFFIX)",verbose)
+
 print "START P(SUFFIX_AND_TAG | SUFFIX)"
 tagger_aux.print_conditional_penalties(suffix_and_tag_count_map, tag_count_map)
 print "STOP P(SUFFIX_AND_TAG | SUFFIX)"
 
 # Compute and display the penalties for suffixes.
+tagger_aux.verbose_print("P(SUFFIX)",verbose)
+
 print "START P(SUFFIX)"
 tagger_aux.print_penalties(suffix_count_map, number_of_suffixes)
 print "STOP P(SUFFIX)"
 
 # Compute and display the penalties for tags.
+tagger_aux.verbose_print("P(TAG)",verbose)
 print "START P(TAG)"
 number_of_tags = number_of_suffixes
 tagger_aux.print_penalties(tag_count_map, number_of_suffixes)
@@ -145,6 +169,7 @@ unigram_denominator_simplifier = tagger_aux.SequenceSimplifier\
 unigram_enumerator_counter = tagger_aux.get_pair_counter()
 unigram_denominator_counter = tagger_aux.get_object_counter()
 
+tagger_aux.verbose_print("Computing sequence statistics.",verbose)
 for i in range(len(sequence)):
 
     try:
@@ -174,18 +199,22 @@ for i in range(len(sequence)):
 
         break
 
+tagger_aux.verbose_print("Storing sequence statistics.",verbose)
+tagger_aux.verbose_print("P(T_1, T_2, T_3 | T_1, T_2)",verbose)
 print "START P(T_1, T_2, T_3 | T_1, T_2)"
 tagger_aux.print_conditional_penalties(trigram_enumerator_counter,
                                        trigram_denominator_counter)
 print "STOP P(T_1, T_2, T_3 | T_1, T_2)"
 
 # Compute and display the penalties for suffix and tag combinations.
+tagger_aux.verbose_print("P(T_1, T_2 | T_1)",verbose)
 print "START P(T_1, T_2 | T_1)"
 tagger_aux.print_conditional_penalties(bigram_enumerator_counter,
                                        bigram_denominator_counter)
 print "STOP P(T_1, T_2 | T_1)"
 
 # Compute and display the penalties for suffixes.
+tagger_aux.verbose_print("P(T_1)",verbose)
 print "START P(T_1)"
 tagger_aux.print_conditional_penalties(unigram_enumerator_counter,
                                        unigram_denominator_counter)

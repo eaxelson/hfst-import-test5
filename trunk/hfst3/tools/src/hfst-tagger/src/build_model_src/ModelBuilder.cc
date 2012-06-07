@@ -6,6 +6,14 @@ using hfst::internal_epsilon;
 
 using hfst::TROPICAL_OPENFST_TYPE;
 
+bool ModelBuilder::verbose=false;
+
+void ModelBuilder::verbose_printf(const std::string &message)
+{
+  if (ModelBuilder::verbose)
+    { std::cerr << message; }
+}
+
 ModelBuilder::ModelBuilder
 (const WeightedStringVectorCollection &model_weights):
   FstBuilder(TROPICAL_OPENFST_TYPE,
