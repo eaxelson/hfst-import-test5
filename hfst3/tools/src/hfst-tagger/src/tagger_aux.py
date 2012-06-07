@@ -1,6 +1,7 @@
 import math
 import collections
 import string
+import sys
 
 class InvalidPattern(Exception):
     def __init__(self):
@@ -134,3 +135,7 @@ def print_penalties(object_counter, total_count):
     for object, penalty in penalty_map.iteritems():
         print object + "\t" + str(penalty)
 
+
+def verbose_print(str,verbose):
+    if verbose:
+        print >> sys.stderr, str 

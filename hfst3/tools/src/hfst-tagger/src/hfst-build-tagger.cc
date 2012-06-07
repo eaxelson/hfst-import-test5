@@ -80,12 +80,13 @@ parse_options(int argc, char** argv)
 
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
-    return EXIT_SUCCESS;
+    return EXIT_CONTINUE;
 }
 
 int process_input_data(std::string output_file_prefix)
 {
   // Read training statistics from STDIN.
+  verbose_printf("Compiling word and sequence statistics to transducers.");
   TaggerBuilder tagger_builder;
       
   // Write the result in STDOUT or files depending on command-line args.
@@ -94,24 +95,19 @@ int process_input_data(std::string output_file_prefix)
   else
     { tagger_builder.store(output_file_prefix); }
 
-  return EXIT_CONTINUE;
+  return EXIT_SUCCESS;
 }
 
 int main( int argc, char **argv ) 
 {
     hfst_set_program_name(argv[0], "0.1", "HfstBuildTagger");
     int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
 
-    // close buffers, we use streams
-    //    if (inputfile != stdin)
-    //{
-    //   fclose(inputfile);
-    //}
-    
+    ModelBuilder::verbose = verbose;
+
+    if (retval != EXIT_CONTINUE)
+    { return retval; }
+
     retval = process_input_data(outfilename);
 
     return retval;
