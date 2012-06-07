@@ -7,7 +7,7 @@
 
 #include <string>
 
-#include <hfst/HfstTransducer.h>
+#include "HfstTransducer.h"
 
 using hfst::HfstTokenizer;
 using hfst::StringVector;

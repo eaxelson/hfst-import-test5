@@ -9,7 +9,7 @@
 #include <map>
 #include <string>
 
-#include <hfst/HfstTransducer.h>
+#include "HfstTransducer.h"
 
 using hfst::implementations::HfstBasicTransducer;
 using hfst::HfstTransducer;
