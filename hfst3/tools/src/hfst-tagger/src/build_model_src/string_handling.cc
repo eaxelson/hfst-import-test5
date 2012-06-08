@@ -154,8 +154,7 @@ int main(void)
 
   HfstTokenizer tokenizer;
 
-  /* Empty lines, strings without tags and strings without weights
-     should throw an exception. */
+  /* Empty lines, strings without weights should throw an exception. */
   try
     { 
       static_cast<void>(tokenize_lexicon_line("", tokenizer)); 
@@ -174,20 +173,7 @@ int main(void)
       static_cast<void>(tokenize_lexicon_line("oof\tNN", tokenizer)); 
       fail_test(__FILE__,__LINE__);
     }
-  catch (const InvalidLine &e)
-    { static_cast<void>(e); }
-  catch (const std::exception &e)
-    { 
-      std::cerr << "Caught: " << e.what() << std::endl;
-      fail_test(__FILE__,__LINE__); 
-    }
-
-  try 
-    {
-      static_cast<void>(tokenize_lexicon_line("oof\t0.5", tokenizer)); 
-      fail_test(__FILE__,__LINE__);
-    }
-  catch (const InvalidLine &e)
+  catch (const InvalidFloat &e)
     { static_cast<void>(e); }
   catch (const std::exception &e)
     { 
@@ -314,19 +300,6 @@ int main(void)
       static_cast<void>(tokenize_lexicon_line("0.5", tokenizer)); 
       fail_test(__FILE__,__LINE__);
       
-    }
-  catch (const InvalidLine &e)
-    { static_cast<void>(e); }
-  catch (const std::exception &e)
-    { 
-      std::cerr << "Caught: " << e.what() << std::endl;
-      fail_test(__FILE__,__LINE__); 
-    }
-
-  try
-    {
-      static_cast<void>(tokenize_lexicon_line("NN\t0.5", tokenizer)); 
-      fail_test(__FILE__,__LINE__);
     }
   catch (const InvalidLine &e)
     { static_cast<void>(e); }
