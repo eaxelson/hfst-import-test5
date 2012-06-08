@@ -3,6 +3,7 @@
 #ifndef MAIN_TEST
 
 #include <string>
+#include <cstdio>
 
 size_t WeightedStringVectorCollection::line_number = 0;
 
@@ -18,7 +19,7 @@ WeightedStringVectorCollection::WeightedStringVectorCollection
 {
   this->name = read_model_start_tag(getline(in));
   
-  if (in.eof())
+  if (in.peek() == EOF)
     { throw EmptyFile(); }
 
   std::string line;
@@ -51,12 +52,13 @@ WeightedStringVectorCollection::WeightedStringVectorCollection
 std::string WeightedStringVectorCollection::getline(std::istream &in)
 {
   std::string line;
-  std::getline(in,line);
 
-  if (in.eof())
+  if (in.peek() == EOF)
     { 
       throw EmptyFile(); 
     }
+
+  std::getline(in,line);
   
   ++WeightedStringVectorCollection::line_number;
   return line;
