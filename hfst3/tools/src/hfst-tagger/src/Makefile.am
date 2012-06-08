@@ -52,66 +52,101 @@ clean-local:
 hfst_open_input_file_for_tagger_SOURCES=hfst-open-input-file-for-tagger.cc \
 			  $(HFST_COMMON_SRC)
 
-check_PROGRAMS=FstBuilder LexicalModelBuilder ModelBuilder\
+check_PROGRAMS=FstBuilder LexicalModelBuilder ModelBuilder \
                SequenceModelBuilder TaggerBuilder \
-               WeightedStringVectorCollection string_handling
+               WeightedStringVectorCollection \
+               string_handling
 
-FstBuilder_SOURCES=$(BUILD_MODEL_SRC)/FstBuilder.h \
-		   $(BUILD_MODEL_SRC)/FstBuilder.cc \
-		   $(BUILD_MODEL_SRC)/string_handling.h \
-		   $(BUILD_MODEL_SRC)/string_handling.cc
+FstBuilder_SOURCES=$(BUILD_MODEL_SRC)/FstBuilder.cc
+FstBuilder_LDADD=string_handling.o FstBuilder.o \
+                 $(top_srcdir)/libhfst/src/libhfst.la
+FstBuilder_CXXFLAGS=-DMAIN_TEST
 
-LexicalModelBuilder_SOURCES=$(BUILD_MODEL_SRC)/LexicalModelBuilder.h \
-			    $(BUILD_MODEL_SRC)/LexicalModelBuilder.cc \
-			    $(BUILD_MODEL_SRC)/FstBuilder.cc \
-			    $(BUILD_MODEL_SRC)/FstBuilder.h \
-			    $(BUILD_MODEL_SRC)/ModelBuilder.cc \
-			    $(BUILD_MODEL_SRC)/ModelBuilder.h \
-			    $(BUILD_MODEL_SRC)/string_handling.cc \
-			    $(BUILD_MODEL_SRC)/string_handling.h \
-			 $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc \
-			 $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.h
+LexicalModelBuilder_SOURCES=$(BUILD_MODEL_SRC)/LexicalModelBuilder.cc
+LexicalModelBuilder_LDADD=string_handling.o FstBuilder.o ModelBuilder.o \
+			  WeightedStringVectorCollection.o \
+	                  LexicalModelBuilder.o \
+                          $(top_srcdir)/libhfst/src/libhfst.la
+LexicalModelBuilder_CXXFLAGS=-DMAIN_TEST
 
-ModelBuilder_SOURCES=$(BUILD_MODEL_SRC)/ModelBuilder.h \
-		     $(BUILD_MODEL_SRC)/ModelBuilder.cc \
-		     $(BUILD_MODEL_SRC)/FstBuilder.cc \
-		     $(BUILD_MODEL_SRC)/FstBuilder.h \
-		     $(BUILD_MODEL_SRC)/string_handling.cc \
-	             $(BUILD_MODEL_SRC)/string_handling.h \
-	             $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc \
-	             $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.h
+SequenceModelBuilder_SOURCES=$(BUILD_MODEL_SRC)/SequenceModelBuilder.cc
+SequenceModelBuilder_LDADD=string_handling.o FstBuilder.o ModelBuilder.o \
+			  WeightedStringVectorCollection.o \
+	                  SequenceModelBuilder.o \
+                          $(top_srcdir)/libhfst/src/libhfst.la
+SequenceModelBuilder_CXXFLAGS=-DMAIN_TEST
 
-SequenceModelBuilder_SOURCES=$(BUILD_MODEL_SRC)/SequenceModelBuilder.h \
-			     $(BUILD_MODEL_SRC)/SequenceModelBuilder.cc \
-			     $(BUILD_MODEL_SRC)/FstBuilder.cc \
-			     $(BUILD_MODEL_SRC)/FstBuilder.h \
-			     $(BUILD_MODEL_SRC)/ModelBuilder.cc \
-			     $(BUILD_MODEL_SRC)/ModelBuilder.h \
-			     $(BUILD_MODEL_SRC)/string_handling.cc \
-			     $(BUILD_MODEL_SRC)/string_handling.h \
-			 $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc \
-			 $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.h
+ModelBuilder_SOURCES=$(BUILD_MODEL_SRC)/ModelBuilder.cc
+ModelBuilder_LDADD=string_handling.o FstBuilder.o ModelBuilder.o \
+		   WeightedStringVectorCollection.o \
+                   $(top_srcdir)/libhfst/src/libhfst.la
+ModelBuilder_CXXFLAGS=-DMAIN_TEST
 
-TaggerBuilder_SOURCES=$(BUILD_MODEL_SRC)/TaggerBuilder.h \
-		      $(BUILD_MODEL_SRC)/TaggerBuilder.cc \
-                      $(BUILD_MODEL_SRC)/SequenceModelBuilder.h \
-		      $(BUILD_MODEL_SRC)/SequenceModelBuilder.cc \
-		      $(BUILD_MODEL_SRC)/FstBuilder.cc \
-		      $(BUILD_MODEL_SRC)/FstBuilder.h \
-		      $(BUILD_MODEL_SRC)/ModelBuilder.cc \
-		      $(BUILD_MODEL_SRC)/ModelBuilder.h \
-		      $(BUILD_MODEL_SRC)/string_handling.cc \
-		      $(BUILD_MODEL_SRC)/string_handling.h \
-	              $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc \
-		      $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.h
+WeightedStringVectorCollection_SOURCES=\
+	$(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc
+WeightedStringVectorCollection_LDADD=string_handling.o \
+	WeightedStringVectorCollection.o \
+	$(top_srcdir)/libhfst/src/libhfst.la
+WeightedStringVectorCollection_CXXFLAGS=-DMAIN_TEST
 
-WeightedStringVectorCollection_SOURCES= \
-                         $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc \
-                         $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.h \
-                         $(BUILD_MODEL_SRC)/string_handling.h \
-                         $(BUILD_MODEL_SRC)/string_handling.cc
+TaggerBuilder_SOURCES=$(BUILD_MODEL_SRC)/TaggerBuilder.cc
+TaggerBuilder_LDADD=string_handling.o TaggerBuilder.o \
+	LexicalModelBuilder.o SequenceModelBuilder.o \
+	WeightedStringVectorCollection.o ModelBuilder.o FstBuilder.o \
+	$(top_srcdir)/libhfst/src/libhfst.la
+TaggerBuilder_CXXFLAGS=-DMAIN_TEST
 
-string_handling_SOURCES=$(BUILD_MODEL_SRC)/string_handling.h \
-			$(BUILD_MODEL_SRC)/string_handling.cc
+string_handling_SOURCES=$(BUILD_MODEL_SRC)/string_handling.cc
+string_handling_LDADD=string_handling.o $(top_srcdir)/libhfst/src/libhfst.la \
+		      unit_test_aux.o
+string_handling_CXXFLAGS=-DMAIN_TEST
 
+
+#ModelBuilder_SOURCES=$(BUILD_MODEL_SRC)/ModelBuilder.h \
+#		     $(BUILD_MODEL_SRC)/ModelBuilder.cc \
+#		     $(BUILD_MODEL_SRC)/FstBuilder.cc \
+#		     $(BUILD_MODEL_SRC)/FstBuilder.h \
+#		     $(BUILD_MODEL_SRC)/string_handling.cc \
+#	             $(BUILD_MODEL_SRC)/string_handling.h \
+#	             $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc \
+#	             $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.h
+#ModelBuilder_CXXFLAGS=-DMAIN_TEST
+#
+#SequenceModelBuilder_SOURCES=$(BUILD_MODEL_SRC)/SequenceModelBuilder.h \
+#			     $(BUILD_MODEL_SRC)/SequenceModelBuilder.cc \
+#			     $(BUILD_MODEL_SRC)/FstBuilder.cc \
+#			     $(BUILD_MODEL_SRC)/FstBuilder.h \
+#			     $(BUILD_MODEL_SRC)/ModelBuilder.cc \
+#			     $(BUILD_MODEL_SRC)/ModelBuilder.h \
+#			     $(BUILD_MODEL_SRC)/string_handling.cc \
+#			     $(BUILD_MODEL_SRC)/string_handling.h \
+#			 $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc \
+#			 $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.h
+#SequenceModelBuilder_CXXFLAGS=-DMAIN_TEST
+#
+#TaggerBuilder_SOURCES=$(BUILD_MODEL_SRC)/TaggerBuilder.h \
+#		      $(BUILD_MODEL_SRC)/TaggerBuilder.cc \
+#                      $(BUILD_MODEL_SRC)/SequenceModelBuilder.h \
+#		      $(BUILD_MODEL_SRC)/SequenceModelBuilder.cc \
+#		      $(BUILD_MODEL_SRC)/FstBuilder.cc \
+#		      $(BUILD_MODEL_SRC)/FstBuilder.h \
+#		      $(BUILD_MODEL_SRC)/ModelBuilder.cc \
+#		      $(BUILD_MODEL_SRC)/ModelBuilder.h \
+#		      $(BUILD_MODEL_SRC)/string_handling.cc \
+#		      $(BUILD_MODEL_SRC)/string_handling.h \
+#	              $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc \
+#		      $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.h
+#TaggerBuilder_CXXFLAGS=-DMAIN_TEST
+#
+#WeightedStringVectorCollection_SOURCES= \
+#                         $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.cc \
+#                         $(BUILD_MODEL_SRC)/WeightedStringVectorCollection.h \
+#                         $(BUILD_MODEL_SRC)/string_handling.h \
+#                         $(BUILD_MODEL_SRC)/string_handling.cc
+#WeightedStringVectorCollection_CXXFLAGS=-DMAIN_TEST
+#
+#string_handling_SOURCES=$(BUILD_MODEL_SRC)/string_handling.h \
+#			$(BUILD_MODEL_SRC)/string_handling.cc
+#string_handling_CXXFLAGS=-DMAIN_TEST
+#
 TESTS=$(check_PROGRAMS)
