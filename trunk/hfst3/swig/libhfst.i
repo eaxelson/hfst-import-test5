@@ -80,7 +80,8 @@ public:
     // Then everything else, in the (alphabetic) order in the API manual
     bool compare(const HfstTransducer &another) const;
     HfstTransducer & compose(const HfstTransducer &another);
-    HfstTransducer & compose_intersect(const HfstTransducerVector &v);
+    HfstTransducer & compose_intersect(const HfstTransducerVector &v,
+                                       bool invert=false);
     HfstTransducer & concatenate(const HfstTransducer &another);
     HfstTransducer & convert(ImplementationType type, std::string options="");
     HfstTransducer & determinize(void);
