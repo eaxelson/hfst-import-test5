@@ -143,14 +143,11 @@ HfstState FstBuilder::add_sequence
 #include <iostream>
 int main(void)
 {
-  std::cerr << "Unit test for: " << __FILE__ << "   \t";
-
   // Unit test begins.
 
   
 
   // Unit test ends.
 
-  std::cerr << "PASSED" << std::endl;
 }
 #endif // MAIN_TEST
