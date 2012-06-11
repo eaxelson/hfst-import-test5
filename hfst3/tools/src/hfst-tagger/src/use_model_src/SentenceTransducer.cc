@@ -1,5 +1,7 @@
 #include "SentenceTransducer.h"
 
+#ifndef MAIN_TEST
+
 #define LEX_K 1.0
 
 SentenceTransducer::SentenceTransducer(void):
@@ -56,7 +58,8 @@ State SentenceTransducer::get_max_state(void) const
 void SentenceTransducer::finalize(void)
 { state_final_weight_map[current_max_state] = 0; }
 
-#ifdef TEST_SentenceTransducer
+#else // MAIN_TEST
+
 #include <cassert>
 #include <iostream>
 
@@ -166,4 +169,6 @@ int main(void)
 
   assert(sentence_transducer.get_max_state() == 5);
 }
-#endif // TEST_SentenceTransducer
+
+#endif // MAIN_TEST
+

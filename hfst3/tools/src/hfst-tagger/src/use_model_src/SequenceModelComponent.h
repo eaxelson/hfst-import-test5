@@ -6,7 +6,6 @@
 #endif
 
 #include <vector>
-#include <unordered_map>
 
 #include <hfst/HfstTransducer.h>
 
