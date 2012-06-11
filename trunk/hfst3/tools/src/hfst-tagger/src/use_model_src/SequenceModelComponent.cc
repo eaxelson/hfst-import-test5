@@ -2,7 +2,7 @@
 
 #include "SequenceModelComponent.h"
 
-#ifdef // MAIN_TEST
+#ifndef MAIN_TEST
 
 typedef HfstBasicTransducer::HfstTransitionGraphAlphabet
 HfstTransitionGraphAlphabet;

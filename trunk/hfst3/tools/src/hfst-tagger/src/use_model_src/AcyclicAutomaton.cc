@@ -1,6 +1,8 @@
 #include "AcyclicAutomaton.h"
 #include "SequenceModelComponent.h"
 
+#ifndef MAIN_TEST
+
 #define FINAL_SYMBOL -1
 
 #include <iostream>
@@ -69,14 +71,6 @@ void AcyclicAutomaton::add_transition
   size_t source_id = state_to_id_map[source];
   size_t target_id = state_to_id_map[target];
 
-  /*  std::cerr << "Position: " << current_position
-    << "State: " << source << " id: " << source_id << " Target: " << target
-    << " id: " << target_id << " Symbol: " 
-    << SequenceModelComponent::get_string_symbol(symbol) << " Weight: " 
-    << weight << " + " 
-    << data[current_position - 1][source_id].get_weight() << std::endl;
-  */
-  
   data[current_position][target_id].add_transition
     (source_id,
      symbol,
@@ -183,7 +177,8 @@ SymbolVector AcyclicAutomaton::get_path(size_t id) const
   return result;
 }
 
-#ifdef TEST_AcyclicAutomaton
+#else // MAIN_TEST
+
 #include <iostream>
 
 int main(void)
@@ -218,4 +213,5 @@ int main(void)
        ++it)
     { std::cerr << "symbol: " << *it << std::endl; }
 }
-#endif // TEST_AcyclicAutomaton
+#endif // MAIN_TEST
+

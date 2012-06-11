@@ -5,7 +5,7 @@
 #  include <config.h>
 #endif
 
-#include <unordered_map>
+#include <tr1/unordered_map>
 #include <string>
 #include <vector>
 
@@ -19,18 +19,18 @@ struct TransitionData
   State  target;
 };
 
-typedef std::unordered_map<std::string,Symbol> Symbol2NumberMap;
+typedef std::tr1::unordered_map<std::string,Symbol> Symbol2NumberMap;
 typedef std::vector<std::string>               Number2SymbolMap;
 
 typedef std::vector<Weight> StateFinalWeightMap;
 
-typedef std::unordered_map<Symbol,TransitionData> Symbol2TransitionDataMap;
+typedef std::tr1::unordered_map<Symbol,TransitionData> Symbol2TransitionDataMap;
 typedef std::vector<Symbol2TransitionDataMap>     TransitionMap;
 
 typedef std::pair<size_t,Weight> IdWeightPair;
-typedef std::unordered_map<std::string,IdWeightPair> StringWeightMap;
+typedef std::tr1::unordered_map<std::string,IdWeightPair> StringWeightMap;
 
-typedef std::unordered_map<std::string,float> ProbabilityMap;
+typedef std::tr1::unordered_map<std::string,float> ProbabilityMap;
 
 #define DEFAULT_SYMBOL "<DEFAULT>"
 #define DEFAULT 1

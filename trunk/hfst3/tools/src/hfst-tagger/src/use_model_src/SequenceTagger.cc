@@ -1,6 +1,8 @@
 #include "SequenceTagger.h"
 #include "AcyclicAutomaton.h"
 
+#ifndef MAIN_TEST
+
 using hfst::implementations::HfstBasicTransition;
 using hfst::HfstTwoLevelPaths;
 using hfst::HfstTwoLevelPath;
@@ -198,13 +200,16 @@ SequenceTagger::get_weighted_analysis(AcyclicAutomaton &result) const
   return tagging;
 }
 
-#ifdef TEST_SequenceTagger
+#else // MAIN_TEST
+
 #include "SequenceModelComponentPair.h"
 #include "DelayedSequenceModelComponent.h"
 #include <cassert>
 #include <iostream>
 
 using hfst::implementations::HfstState;
+using hfst::HfstTransducer;
+using hfst::TROPICAL_OPENFST_TYPE;
 
 int main(void)
 {
@@ -302,4 +307,5 @@ int main(void)
   std::cerr << result.first << std::endl;
   assert(result.first == static_cast<float>(55.0));
 }
-#endif // TEST_SequenceTagger
+#endif //MAIN_TEST
+

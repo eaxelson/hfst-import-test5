@@ -1,5 +1,7 @@
 #include "NewLexicalModel.h"
 
+#ifndef MAIN_TEST
+
 #include <algorithm>
 #include <queue>
 
@@ -545,41 +547,11 @@ void NewLexicalModel::bayesian_invert(WeightedStringVector &word_analyses,
     }
 }
 
-#ifdef TEST_NewLexicalModel
+#else // MAIN_TEST
 int main(void)
 {
-  //NewLexicalModel lexical_model("test_lexical_model.lex");
-  NewLexicalModel lexical_model("foo.lex");
-  std::cerr << "dog:" << std::endl;
-
-  const WeightedStringVector &dog_analyses = lexical_model["dog"];
-  for (WeightedStringVector::const_iterator it = dog_analyses.begin();
-       it != dog_analyses.end();
-       ++it)
-    { std::cout << it->first << "\t" << it->second << std::endl; }
-
-  std::cerr << "dog:" << std::endl;
-
-  const WeightedStringVector &dog_analyses_2 = lexical_model["dog"];
-  for (WeightedStringVector::const_iterator it = dog_analyses_2.begin();
-       it != dog_analyses_2.end();
-       ++it)
-    { std::cout << it->first << "\t" << it->second << std::endl; }
-
-  std::cerr << "man:" << std::endl;
-
-  const WeightedStringVector &man_analyses = lexical_model["man"];
-  for (WeightedStringVector::const_iterator it = man_analyses.begin();
-       it != man_analyses.end();
-       ++it)
-    { std::cout << it->first << "\t" << it->second << std::endl; }
-
-  std::cerr << "blman:" << std::endl;
-
-  const WeightedStringVector &blman_analyses = lexical_model["blman"];
-  for (WeightedStringVector::const_iterator it = blman_analyses.begin();
-       it != blman_analyses.end();
-       ++it)
-    { std::cout << it->first << "\t" << it->second << std::endl; }
+  /*
+    Skipped.
+   */
 }
-#endif // TEST_NewLexicalModel
+#endif // MAIN_TEST

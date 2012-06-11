@@ -6,8 +6,8 @@
 #endif
 
 #include <hfst/HfstTransducer.h>
-#include <unordered_map> 
-#include <unordered_set> 
+#include <tr1/unordered_map> 
+#include <tr1/unordered_set> 
 #include <iostream>
 
 #include "DataTypes.h"
@@ -30,7 +30,7 @@ class NewLexicalModel
   bool is_oov(const std::string &word);
   bool is_lexicon_oov(const std::string &word);
  private:
-  typedef std::unordered_map<std::string,WeightedStringVector> AnalysisCache;
+  typedef std::tr1::unordered_map<std::string,WeightedStringVector> AnalysisCache;
 
   AnalysisCache   analysis_cache;  
   AnalysisCache   upper_case_suffix_cache;  
@@ -54,8 +54,8 @@ class NewLexicalModel
   size_t id;
   bool lexical_model_is_broken;
   std::istream * paradigm_guess_stream;
-  std::unordered_set<std::string> o_o_v_words;
-  std::unordered_set<std::string> lexicon_o_o_v_words;
+  std::tr1::unordered_set<std::string> o_o_v_words;
+  std::tr1::unordered_set<std::string> lexicon_o_o_v_words;
 
   void initialize_tag_probabilities(void);
 
