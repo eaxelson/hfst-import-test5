@@ -19,8 +19,7 @@ SequenceTagger::SequenceTagger
 {}
 
 SequenceTagger::~SequenceTagger(void)
-{ /* std::cerr << "On average " << states * 1.0 / sentences 
-     << " states per sentence." << std::endl;*/ }
+{}
 
 WeightedStringPairVector SequenceTagger::operator[]
 (const SentenceTransducer &sentence_transducer)
@@ -57,7 +56,6 @@ WeightedStringPairVector SequenceTagger::operator[]
 	(sentence_transducer,configuration,result_state,result);
     }
   
-  //states += result.get_max_state();
   ++sentences;
 
   return get_weighted_analysis(result);
@@ -86,8 +84,6 @@ inline void SequenceTagger::process_configuration
        ++it)
     {
       Symbol symbol             = it->first;
-      //std::string string_symbol = 
-      //	SequenceModelComponent::get_string_symbol(symbol);
 
       Weight sentence_weight = it->second.weight;
       State  sentence_target = it->second.target;
@@ -104,15 +100,6 @@ inline void SequenceTagger::process_configuration
 
       if (result_target == -1)
 	{ continue; }
-
-      /*
-      result.add_transition
-	(result_state,
-	 HfstBasicTransition(result_target,
-			     string_symbol,
-			     string_symbol,
-			     sentence_weight+model_weight));
-      */
 
       result.add_transition
 	(result_state,symbol,sentence_weight+model_weight,result_target);
@@ -160,20 +147,7 @@ inline State SequenceTagger::get_state
 WeightedStringPairVector 
 SequenceTagger::get_weighted_analysis(AcyclicAutomaton &result) const
 {
-  /*
-  HfstTransducer fst(result,TROPICAL_OPENFST_TYPE);
-
-  fst.n_best(1);
-  HfstTwoLevelPaths paths;
-  fst.extract_paths(paths);
-  assert(paths.size() == 1);
-
-  HfstTwoLevelPath path = *(paths.begin());
-  */
   WeightedStringPairVector tagging;
-  /*
-  tagging.first = path.first;
-  */
 
   WeightedSymbolVector path = result.get_best_path();
 
@@ -182,7 +156,6 @@ SequenceTagger::get_weighted_analysis(AcyclicAutomaton &result) const
 
   // We know that each word should have exactly one tag, so there should
   // be an even number or entries.
-  //assert(path.second.size() % 2 == 0);
 
   // Go from format 
   // word1:word1 tag1:tag1 word2:word2 tag2:tag2 ...
@@ -218,38 +191,6 @@ using hfst::implementations::HfstBasicTransition;
 
 int main(void)
 {
-  /*
-  HfstTransducer a(DEFAULT_SYMBOL,TROPICAL_OPENFST_TYPE);
-  HfstTransducer b(DEFAULT_SYMBOL,TROPICAL_OPENFST_TYPE);
-
-  HfstTransducer a_tag("A",TROPICAL_OPENFST_TYPE);
-  HfstTransducer b_tag("B",TROPICAL_OPENFST_TYPE);
-  HfstTransducer def_tag(DEFAULT_SYMBOL,TROPICAL_OPENFST_TYPE);
-
-  def_tag.set_final_weights(10.0);
-  a_tag.set_final_weights(1.0);
-  b_tag.set_final_weights(2.0);
-
-  a_tag.disjunct(def_tag).minimize();
-  b_tag.disjunct(def_tag).minimize();
-
-  a.concatenate(a_tag).
-    concatenate(b).
-    concatenate(b_tag).
-    repeat_star().
-    minimize();
-
-  HfstBasicTransducer b_a(a);
-  for (HfstState s = 0; s <= b_a.get_max_state(); ++s)
-    {
-      if (not b_a.is_final_state(s))
-	{ b_a.set_final_weight(s,0.0); }
-    }
-  a = HfstTransducer(b_a,TROPICAL_OPENFST_TYPE);
-
-  std::c
-*/
-
   HfstBasicTransducer b_a;
   b_a.add_state();
   b_a.add_state();
