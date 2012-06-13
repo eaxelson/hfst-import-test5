@@ -51,12 +51,6 @@ Weight SequenceModelComponentPair::get_final_weight(State state) const
   return 
     component1.get_final_weight(state_pair.first) + 
     component2.get_final_weight(state_pair.second); 
-  
-  /*
-  return 
-    -log(exp(-component1.get_final_weight(state_pair.first)) + 
-	 exp(-component2.get_final_weight(state_pair.second))); 
-  */
 }
 
 TransitionData SequenceModelComponentPair::get_transition
@@ -82,7 +76,7 @@ TransitionData SequenceModelComponentPair::get_transition
   TransitionData transition_data;
   transition_data.target = target;
   transition_data.weight = transition_data1.weight + transition_data2.weight;
-  //transition_data.weight = -log(exp(-transition_data1.weight) + exp(-transition_data2.weight));
+
   return transition_data;
 }
 

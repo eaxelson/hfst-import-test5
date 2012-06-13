@@ -87,7 +87,6 @@ std::string NewLexicalModel::to_lower_case(const std::string &word) const
 const WeightedStringVector &NewLexicalModel::get_first_word_analysis
 (const std::string &word)
 {
-  //std::cerr << "here" << std::endl;
   StringVector rev_tokenized_word = tokenizer.tokenize_one_level(word);
   std::reverse(rev_tokenized_word.begin(),rev_tokenized_word.end());
 
@@ -115,7 +114,6 @@ const WeightedStringVector &NewLexicalModel::get_first_word_analysis
 const WeightedStringVector &NewLexicalModel::operator[] 
 (const std::string &word)
 {
-  //  std::cerr << word << std::endl;
   if (lexical_model_is_broken)
     { throw BrokenLexicalModel(); }
 
@@ -124,26 +122,9 @@ const WeightedStringVector &NewLexicalModel::operator[]
   if (word_it == analysis_cache.end())
     { 
       const WeightedStringVector & v = cache_word_analyses(word);
-      //  for (WeightedStringVector::const_iterator it = v.begin();
-      //	   it != v.end();
-      //	   ++it)
-      //	{ std::cerr << it->first << it->second << std::endl; }
-      //std::cerr << std::endl;
       return v; 
     }
 
-  if (paradigm_guess_stream != 0)
-    {
-      //std::string line;
-      //std::getline(*paradigm_guess_stream,line);
-    }
-
-  //for (WeightedStringVector::const_iterator it = word_it->second.begin();
-  //     it != word_it->second.end();
-  //     ++it)
-  //  { std::cerr << it->first << it->second << std::endl; }
-  //std::cerr << std::endl;
-  
   return word_it->second;
 }
 
@@ -179,8 +160,6 @@ const WeightedStringVector &NewLexicalModel::paradigm_guess
 {
   WeightedStringVector &word_guesses = analysis_cache[word];
   
-  //  if (guess_vector[0] != word)
-  // { std::cerr << "Words: " << word << " " << guess_vector[0] << std::endl; }
   assert(guess_vector[0] == word);
   
   for (size_t i = 1; i < guess_vector.size(); ++(++i))
@@ -231,10 +210,6 @@ const WeightedStringVector &NewLexicalModel::cache_word_analyses
 	    }
 	  if (line.find("+?") == std::string::npos)
 	    { 
-	      //if ((guesses.size() + 1) % 2 != 0)
-	      //	{
-	      //	  std::cerr << word << ", " << line << std::endl;;
-	      //	}
 	      assert((guesses.size() + 1) % 2 == 0);	      
 	      return paradigm_guess(word,guesses); 
 	    }
@@ -244,11 +219,6 @@ const WeightedStringVector &NewLexicalModel::cache_word_analyses
     }
   else
     { 
-      //if (paradigm_guess_stream != 0)
-      //	{
-      //	  std::string line;
-      //	  std::getline(*paradigm_guess_stream,line);
-      //	}
       return cache_analyses(word,paths,analysis_cache); 
     }
 }
@@ -385,8 +355,7 @@ const WeightedStringVector &NewLexicalModel::cache_suffix_analyses
 	}
     }
  
-  //  std::cerr << (upper_case ? "<guess_uc>" : "<guess_lc>") << " " 
-  //	    << suffix << " " << word << std::endl;
+
   StringVector guess_string_vector(begin,end);
   guess_string_vector.push_back(upper_case ? "<guess_uc>" : "<guess_lc>");
   
@@ -446,16 +415,10 @@ void NewLexicalModel::merge_analyses
 	suffix_tag_probability_hash[it->second];
 
       // Check this.
-      //std::cerr << "here" << std::endl;
       it->first = 
 	((upper_case ? upper_case_interpolator : lower_case_interpolator) * it->first + 
 	 (id == id_weight_pair.first ? id_weight_pair.second : 0.0)) /
 	(1 + (upper_case ? upper_case_interpolator : lower_case_interpolator)); 
-
-      //std::cerr << (id == id_weight_pair.first ? id_weight_pair.second : 0.0) << std::endl;
-      //if (id == id_weight_pair.first)
-      //	{ std::cerr << id_weight_pair.second << std::endl; }
-
     }
 }
 
@@ -505,7 +468,8 @@ struct OrderWeightedStrings
 {
   bool operator() (const WeightedString &w1,const WeightedString &w2) const
   {
-    // w1 should be earlier if it's more probable than w2 or alphabetically precedes it.
+    // w1 should be earlier if it's more probable than w2 or
+    // alphabetically precedes it.
     return w1.first > w2.first or (w1.first == w2.first and w1.second < w2.second);
   }
 };
