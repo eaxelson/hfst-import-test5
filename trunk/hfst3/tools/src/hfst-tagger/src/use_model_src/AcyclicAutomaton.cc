@@ -60,9 +60,6 @@ void AcyclicAutomaton::initialize(void)
   // Add the start state.
   static_cast<void>(add_state());
   data[0][0].set_weight(0.0);
-
-  // All future added states belong to position 1+.
-  //finalize_position();
 }
 
 void AcyclicAutomaton::add_transition
@@ -79,9 +76,6 @@ void AcyclicAutomaton::add_transition
 
 State AcyclicAutomaton::add_state(void)
 {
-  //if (data[current_position].size() >= 1000)
-  //  { return -1; }
-
   state_to_id_map.push_back(current_id);
   ++current_id;
 
@@ -104,8 +98,6 @@ void AcyclicAutomaton::set_final_weight(State s, Weight weight)
 {
   if (weight != infinity)
     {
-      //State target = add_state();
-      //add_transition(s,FINAL_SYMBOL,weight,target);
       size_t source_id = state_to_id_map[s];
       size_t target_id = 0;
 
@@ -136,7 +128,6 @@ void AcyclicAutomaton::clear(void)
 
   static_cast<void>(add_state());
   data[0][0].set_weight(0.0);
-  //finalize_position();
 
   state_to_id_map.clear();
 }
@@ -144,25 +135,10 @@ void AcyclicAutomaton::clear(void)
 
 WeightedSymbolVector AcyclicAutomaton::get_best_path(void)
 {
-  finalize_position();
+  float best_weight = data[current_position].at(0).get_weight();
+  SymbolVector best_path = get_path(0);
 
-  //Weight minimum = std::numeric_limits<float>::infinity();
-  //size_t id = -1;
-
-  return WeightedSymbolVector(data[current_position].at(0).get_weight(),get_path(0));
-  /*
-  for (size_t i = 0; i < data[current_position].size(); ++i)
-    {
-      const AcyclicState &state = data[current_position].at(i);
-
-      if (state.get_weight() < minimum)
-	{
-	  minimum = state.get_weight();
-	  id = i;
-	}
-    }
-  */
-
+  return WeightedSymbolVector(best_weight, best_path);
 }
 
 SymbolVector AcyclicAutomaton::get_path(size_t id) const
@@ -174,6 +150,10 @@ SymbolVector AcyclicAutomaton::get_path(size_t id) const
       result.at(i - 1) = state.get_symbol();
       id = state.get_source();
     }
+
+  if (not result.empty() and result.back() == FINAL_SYMBOL)
+    { result.pop_back(); }
+
   return result;
 }
 
@@ -185,6 +165,8 @@ int main(void)
 {
   AcyclicAutomaton acyclic_automaton1;
   State s0 = 0;
+
+  acyclic_automaton1.finalize_position();
 
   State s1 = acyclic_automaton1.add_state();
   State s1_5 = acyclic_automaton1.add_state();
@@ -203,15 +185,13 @@ int main(void)
   acyclic_automaton1.set_final_weight(s2,2.0);
   acyclic_automaton1.set_final_weight(s3,0.3);
 
+  acyclic_automaton1.finalize_position();
 
   WeightedSymbolVector weight_2_0_path_1_1 = 
     acyclic_automaton1.get_best_path();
 
-  std::cerr << weight_2_0_path_1_1.first << std::endl;
-  for (SymbolVector::const_iterator it = weight_2_0_path_1_1.second.begin();
-       it != weight_2_0_path_1_1.second.end();
-       ++it)
-    { std::cerr << "symbol: " << *it << std::endl; }
+  assert(weight_2_0_path_1_1.second.size() == 2);
+  assert(weight_2_0_path_1_1.first - static_cast<float>(0.825) < 0.01);
 }
 #endif // MAIN_TEST
 

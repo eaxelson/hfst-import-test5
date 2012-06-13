@@ -177,6 +177,9 @@ SequenceTagger::get_weighted_analysis(AcyclicAutomaton &result) const
 
   WeightedSymbolVector path = result.get_best_path();
 
+  // Set tagging weight.
+  tagging.first = path.first;
+
   // We know that each word should have exactly one tag, so there should
   // be an even number or entries.
   //assert(path.second.size() % 2 == 0);
@@ -210,9 +213,12 @@ SequenceTagger::get_weighted_analysis(AcyclicAutomaton &result) const
 using hfst::implementations::HfstState;
 using hfst::HfstTransducer;
 using hfst::TROPICAL_OPENFST_TYPE;
+using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstBasicTransition;
 
 int main(void)
 {
+  /*
   HfstTransducer a(DEFAULT_SYMBOL,TROPICAL_OPENFST_TYPE);
   HfstTransducer b(DEFAULT_SYMBOL,TROPICAL_OPENFST_TYPE);
 
@@ -240,7 +246,32 @@ int main(void)
 	{ b_a.set_final_weight(s,0.0); }
     }
   a = HfstTransducer(b_a,TROPICAL_OPENFST_TYPE);
-  
+
+  std::c
+*/
+
+  HfstBasicTransducer b_a;
+  b_a.add_state();
+  b_a.add_state();
+  b_a.add_state();
+
+  b_a.add_transition(0,HfstBasicTransition(1,"<DEFAULT>","<DEFAULT>",0.0));
+
+  b_a.add_transition(1,HfstBasicTransition(2,"A","A",1.0));
+  b_a.add_transition(1,HfstBasicTransition(2,"B","B",10.0));
+  b_a.add_transition(1,HfstBasicTransition(2,"<DEFAULT>","<DEFAULT>",10.0));
+
+  b_a.add_transition(2,HfstBasicTransition(3,"<DEFAULT>","<DEFAULT>",0.0));
+
+  b_a.add_transition(3,HfstBasicTransition(0,"A","A",10.0));
+  b_a.add_transition(3,HfstBasicTransition(0,"B","B",2.0));
+  b_a.add_transition(3,HfstBasicTransition(0,"<DEFAULT>","<DEFAULT>",10.0));
+
+  for (HfstState s = 0; s <= b_a.get_max_state(); ++s)
+    { b_a.set_final_weight(s,0.0); }
+
+  HfstTransducer a(b_a,TROPICAL_OPENFST_TYPE);
+
   SequenceModelComponent m(a);
 
   SequenceModelComponentPair mp(m,m);
@@ -301,11 +332,10 @@ int main(void)
   result = sequence_tagger2[sentence_transducer];
 
   assert(result.second.size() == 6);
-  
-  std::cerr << result.second[0].second << " " << result.second[1].second << " " << result.second[2].second << " " << result.second[3].second << " " << result.second[4].second << " " << result.second[5].second << std::endl;
 
-  std::cerr << result.first << std::endl;
-  assert(result.first == static_cast<float>(55.0));
+  // There are multiple paths with the best weight, but the best
+  // possible weight is 79.
+  assert(result.first == static_cast<float>(79.0));
 }
 #endif //MAIN_TEST
 

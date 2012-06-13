@@ -304,13 +304,11 @@ const WeightedStringVector &NewLexicalModel::guess
   merge_analyses(upper_case ? upper_case_empty_suffix_guesses : lower_case_empty_suffix_guesses,word_analyses,upper_case);
  
   
-  ///*
   // For Finnish
   word_analyses = get_suffix_analyses(word,
 				      rev_tokenized_word.begin(),
 				      rev_tokenized_word.begin() + last_found_suffix_length,
 				      upper_case);
-  //*/
 
   bayesian_invert
     (word_analyses,
