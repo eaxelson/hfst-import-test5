@@ -54,7 +54,6 @@ WeightedStringPairVector SentenceTagger::operator[]
 
   // Add the analyses for initial buffer symbols.
   sentence_transducer.add_word(BUFFER,buffer_analyses);
-  //sentence_transducer.add_word(BUFFER,buffer_analyses);
 
   for (StringVector::const_iterator it = sentence.begin() + 1;
        it != sentence.end() - 1;
@@ -63,8 +62,9 @@ WeightedStringPairVector SentenceTagger::operator[]
       const std::string &word = *it;
 
       const WeightedStringVector &unigram_analyses =
-      	first ? lexical_model.get_first_word_analysis(word) : lexical_model[word];
-      //const WeightedStringVector &unigram_analyses = lexical_model[word];
+      	(first ? 
+	 lexical_model.get_first_word_analysis(word) : 
+	 lexical_model[word]);
 
       sentence_transducer.add_word(word,unigram_analyses);
       
@@ -73,7 +73,6 @@ WeightedStringPairVector SentenceTagger::operator[]
     }
 
   // Add the analyses for final buffer symbols.
-  //sentence_transducer.add_word(BUFFER,buffer_analyses);
   sentence_transducer.add_word(BUFFER,buffer_analyses);
 
   sentence_transducer.finalize();
@@ -144,6 +143,9 @@ size_t SentenceTagger::get_model_order(const HfstTransducer &model_fst)
 
 int main(int argc, char * argv[])
 {
+  /* FIX ME */
+  exit(0);
+
   if (argc != 3 and argc != 4)
     {
       std::cerr << "Usage: cat input | " << argv[0] 
