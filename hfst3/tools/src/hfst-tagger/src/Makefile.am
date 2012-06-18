@@ -69,6 +69,8 @@ hfst-train-tagger-loc$(EXEEXT): hfst-train-tagger.sh
 clean-local:
 	-rm -f hfst-train-tagger$(EXEEXT) hfst-train-tagger-loc$(EXEEXT)
 
+unit_test_aux.o:unit_test_aux.cc
+
 hfst_open_input_file_for_tagger_SOURCES=hfst-open-input-file-for-tagger.cc \
 			  $(HFST_COMMON_SRC)
 
