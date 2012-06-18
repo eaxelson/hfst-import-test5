@@ -119,7 +119,8 @@ TaggerBuilder_LDADD=string_handling.o TaggerBuilder.o \
 	$(top_srcdir)/libhfst/src/libhfst.la
 TaggerBuilder_CXXFLAGS=-DMAIN_TEST
 
-string_handling_SOURCES=$(BUILD_MODEL_SRC)/string_handling.cc
+string_handling_SOURCES=$(BUILD_MODEL_SRC)/string_handling.cc \
+                        unit_test_aux.h
 string_handling_LDADD=string_handling.o $(top_srcdir)/libhfst/src/libhfst.la \
 		      unit_test_aux.o
 string_handling_CXXFLAGS=-DMAIN_TEST

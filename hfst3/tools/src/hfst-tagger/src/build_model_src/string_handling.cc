@@ -146,7 +146,7 @@ std::string read_model_stop_tag(const std::string &line)
 
 /* UNIT TESTS */
 
-#include "unit_test_aux.h"
+#include "../unit_test_aux.h"
 
 int main(void)
 {
