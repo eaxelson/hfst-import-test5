@@ -5,7 +5,7 @@
 #  include <config.h>
 #endif
 
-#include <hfst/HfstTransducer.h>
+#include "HfstTransducer.h"
 #include <tr1/unordered_map> 
 #include <tr1/unordered_set> 
 #include <iostream>
