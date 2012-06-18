@@ -39,6 +39,7 @@ hfst_build_tagger_SOURCES=hfst-build-tagger.cc \
 			  $(HFST_COMMON_SRC)
 
 hfst_tag_SOURCES=hfst-tag.cc \
+		 $(USE_MODEL_SRC)/DataTypes.h \
 	         $(USE_MODEL_SRC)/DelayedSequenceModelComponent.h \
 	         $(USE_MODEL_SRC)/DelayedSequenceModelComponent.cc \
 	         $(USE_MODEL_SRC)/AcyclicAutomaton.h \
@@ -123,52 +124,61 @@ string_handling_LDADD=string_handling.o $(top_srcdir)/libhfst/src/libhfst.la \
 		      unit_test_aux.o
 string_handling_CXXFLAGS=-DMAIN_TEST
 
-AcyclicAutomaton_SOURCES=$(USE_MODEL_SRC)/AcyclicAutomaton.cc
+AcyclicAutomaton_SOURCES=$(USE_MODEL_SRC)/AcyclicAutomaton.cc \
+                         $(USE_MODEL_SRC)/DataTypes.h
 AcyclicAutomaton_LDADD=AcyclicAutomaton.o $(top_srcdir)/libhfst/src/libhfst.la\
 		       SequenceModelComponent.o unit_test_aux.o
 AcyclicAutomaton_CXXFLAGS=-DMAIN_TEST
 
 DelayedSequenceModelComponent_SOURCES= \
-                       $(USE_MODEL_SRC)/DelayedSequenceModelComponent.cc
+                       $(USE_MODEL_SRC)/DelayedSequenceModelComponent.cc \
+                       $(USE_MODEL_SRC)/DataTypes.h
 DelayedSequenceModelComponent_LDADD=DelayedSequenceModelComponent.o \
                        $(top_srcdir)/libhfst/src/libhfst.la \
 		       SequenceModelComponent.o unit_test_aux.o
 DelayedSequenceModelComponent_CXXFLAGS=-DMAIN_TEST
 
-NewLexicalModel_SOURCES=$(USE_MODEL_SRC)/NewLexicalModel.cc
+NewLexicalModel_SOURCES=$(USE_MODEL_SRC)/NewLexicalModel.cc\
+                        $(USE_MODEL_SRC)/DataTypes.h
 NewLexicalModel_LDADD=NewLexicalModel.o $(top_srcdir)/libhfst/src/libhfst.la \
 		      unit_test_aux.o
 NewLexicalModel_CXXFLAGS=-DMAIN_TEST
 
-SentenceTagger_SOURCES=$(USE_MODEL_SRC)/SentenceTagger.cc
+SentenceTagger_SOURCES=$(USE_MODEL_SRC)/SentenceTagger.cc\
+                       $(USE_MODEL_SRC)/DataTypes.h
 SentenceTagger_LDADD=SentenceTagger.o $(top_srcdir)/libhfst/src/libhfst.la \
 		     DelayedSequenceModelComponent.o SequenceModelComponent.o \
 		     SentenceTransducer.o NewLexicalModel.o \
                      SequenceModelComponentPair.o unit_test_aux.o \
-                     SequenceTagger.o AcyclicAutomaton.o
+                     SequenceTagger.o AcyclicAutomaton.o \
+                     $(USE_MODEL_SRC)/DataTypes.h
 SentenceTagger_CXXFLAGS=-DMAIN_TEST
 
-SentenceTransducer_SOURCES=$(USE_MODEL_SRC)/SentenceTransducer.cc
+SentenceTransducer_SOURCES=$(USE_MODEL_SRC)/SentenceTransducer.cc\
+                           $(USE_MODEL_SRC)/DataTypes.h
 SentenceTransducer_LDADD=SentenceTransducer.o \
                        $(top_srcdir)/libhfst/src/libhfst.la \
 		       SequenceModelComponent.o unit_test_aux.o
 SentenceTransducer_CXXFLAGS=-DMAIN_TEST
 
-SequenceModelComponent_SOURCES=$(USE_MODEL_SRC)/SequenceModelComponent.cc
+SequenceModelComponent_SOURCES=$(USE_MODEL_SRC)/SequenceModelComponent.cc\
+                               $(USE_MODEL_SRC)/DataTypes.h
 SequenceModelComponent_LDADD=SequenceModelComponent.o \
                              $(top_srcdir)/libhfst/src/libhfst.la \
 		             unit_test_aux.o
 SequenceModelComponent_CXXFLAGS=-DMAIN_TEST
 
 SequenceModelComponentPair_SOURCES= \
-                                $(USE_MODEL_SRC)/SequenceModelComponentPair.cc
+                                $(USE_MODEL_SRC)/SequenceModelComponentPair.cc\
+                                $(USE_MODEL_SRC)/DataTypes.h
 SequenceModelComponentPair_LDADD=SequenceModelComponentPair.o \
                                  $(top_srcdir)/libhfst/src/libhfst.la \
                                  DelayedSequenceModelComponent.o \
 				 SequenceModelComponent.o unit_test_aux.o
 SequenceModelComponentPair_CXXFLAGS=-DMAIN_TEST
 
-SequenceTagger_SOURCES=$(USE_MODEL_SRC)/SequenceTagger.cc
+SequenceTagger_SOURCES=$(USE_MODEL_SRC)/SequenceTagger.cc\
+                       $(USE_MODEL_SRC)/DataTypes.h
 SequenceTagger_LDADD=SequenceTagger.o $(top_srcdir)/libhfst/src/libhfst.la\
 		     SequenceModelComponent.o SentenceTransducer.o \
                      unit_test_aux.o AcyclicAutomaton.o \
