@@ -247,6 +247,12 @@ AC_ARG_ENABLE([pair-test],
 			  [enable_pair_test=$enableval],
 			  [enable_pair_test=yes])
 AM_CONDITIONAL([WANT_PAIR_TEST], [test x$enable_pair_test != xno])
+AC_ARG_ENABLE([pmatch],
+			  [AS_HELP_STRING([--enable-pmatch],
+							  [build pmatch utility @<:@default=yes@:>@])],
+			  [enable_pmatch=$enableval],
+			  [enable_pmatch=yes])
+AM_CONDITIONAL([WANT_PMATCH], [test x$enable_pmatch != xno])
 AC_ARG_ENABLE([minimize],
 			  [AS_HELP_STRING([--enable-minimize],
 							  [build minimize tool @<:@default=yes@:>@])],
@@ -561,6 +567,7 @@ cat <<EOF
     *                 minimize: $enable_minimize (minimise)
     *                 name: $enable_name
     *                 optimized-lookup: $enable_optimized_lookup
+    *                 pmatch: $enable_pmatch
     *                 proc: $enable_proc
     *                 project: $enable_project
     *                 push-weights: $enable_push_weights

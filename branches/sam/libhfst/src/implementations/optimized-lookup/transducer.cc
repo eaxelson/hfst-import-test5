@@ -44,6 +44,11 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
     }
 }
 
+TransducerAlphabet::add_symbol(char * symbol)
+{
+    symbol_table.push_back(symbol);
+}
+
 TransducerAlphabet::TransducerAlphabet(const SymbolTable& st):
     symbol_table(st)
 {
@@ -161,15 +166,17 @@ SymbolNumber OlLetterTrie::find_key(char ** p)
 
 void Encoder::read_input_symbols(const SymbolTable & kt)
 {
-    for (SymbolNumber k = 0; k < number_of_input_symbols; ++k)
-    {
-    const char * p = kt[k].c_str();
-    if ((strlen(p) == 1) && should_ascii_tokenize((unsigned char)(*p)))
-    {
-        ascii_symbols[(unsigned char)(*p)] = k;
+    for (SymbolNumber k = 0; k < number_of_input_symbols; ++k) {
+	read_input_symbol(kt[k].c_str(), k);
     }
-    letters.add_string(p,k);
+}
+
+void Encoder::read_input_symbol(const char * s, const int s_num)
+{
+    if ((strlen(s) == 1) && should_ascii_tokenize((unsigned char)(*s))) {
+	ascii_symbols[(unsigned char)(*s)] = s_num;
     }
+    letters.add_string(s, s_num);
 }
 
 SymbolNumber Encoder::find_key(char ** p)

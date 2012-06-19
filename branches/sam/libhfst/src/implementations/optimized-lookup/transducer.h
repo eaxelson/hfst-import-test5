@@ -216,6 +216,8 @@ public:
     SymbolNumber input_symbol_count(void) const {
     return number_of_input_symbols;
     }
+    void add_symbol(void) const
+	{++number_of_symbols; ++number_of_input_symbols;}
   
     TransitionTableIndex index_table_size(void) const
     { return size_of_transition_index_table; }
@@ -355,6 +357,7 @@ public:
         { return unknown_symbol; }
     SymbolNumber get_default_symbol(void) const
 	{ return default_symbol; }
+    void add_symbol(char * symbol);
     
 };
 
@@ -707,6 +710,7 @@ private:
     SymbolNumberVector ascii_symbols;
     
     void read_input_symbols(const SymbolTable & kt);
+    void read_input_symbol(const char * symbol);
     
 public:
     Encoder(const SymbolTable & st, SymbolNumber input_symbol_count):
