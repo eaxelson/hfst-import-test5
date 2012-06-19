@@ -32,6 +32,9 @@ AC_INIT([hfst], [3.3.11], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall -Werror std-options foreign check-news])
 
+# For automake >= 1.12
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([libhfst/src/HfstTransducer.h])
 AC_CONFIG_HEADERS([config.h])
