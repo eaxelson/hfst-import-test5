@@ -299,7 +299,7 @@ void Transducer::find_transitions(SymbolNumber input,
                   SymbolNumber * original_output_tape,
                   TransitionTableIndex i)
 {
-
+    bool trap_transition = false;
     while (tables->get_transition_input(i) != NO_SYMBOL_NUMBER)
     {
     if (tables->get_transition_input(i) == input)
@@ -318,13 +318,16 @@ void Transducer::find_transitions(SymbolNumber input,
              original_output_tape,
              tables->get_transition_target(i));
         current_weight -= tables->get_weight(i);
+        trap_transition = true;
     }
     else
     {
+        found_transition = trap_transition;
         return;
     }
     ++i;
     }
+    found_transition = trap_transition;
 }
 
 void Transducer::find_index(SymbolNumber input,
@@ -335,13 +338,13 @@ void Transducer::find_index(SymbolNumber input,
 {
     if (tables->get_index_input(i+input) == input)
     {
-    found_transition = true;
     find_transitions(input,
              input_symbol,
              output_symbol,
              original_output_tape,
              tables->get_index_target(i+input) - 
              TRANSITION_TARGET_TABLE_START);
+    found_transition = true;
     }
 }
 
@@ -356,6 +359,8 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
     if (indexes_transition_table(i))
     {
     i -= TRANSITION_TARGET_TABLE_START;
+
+    found_transition = false;
 
     try_epsilon_transitions(input_symbol,
                 output_symbol,
@@ -384,6 +389,10 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
              output_symbol,
              original_output_tape,
              i+1);
+    if (alphabet->get_default_symbol() != NO_SYMBOL_NUMBER && !found_transition) {
+        find_transitions(alphabet->get_default_symbol(),
+                         input_symbol, output_symbol, original_output_tape, i+1);
+    }
     }
     else
     {
