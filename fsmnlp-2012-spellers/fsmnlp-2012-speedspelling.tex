@@ -75,10 +75,25 @@ models.
 
 To evaluate the general usability and efficiency of finite-state spell-checking
 we test the system with three languages of typologically different
-morphological features and different reference implementations for contemporary
-spell-checking applications: English as a sample of a morphologically more
-isolating language with a basically word-list approach to spell-checking; as a
-reference implementation we use hunspell's en-US
+morphological features\footnote{we will not go deep into detail of morphological
+features of these languages. We thank the anonymous reviewer for pointing us
+to make this rough comparison using translated text piece. We measure from the translations of the
+\emph{Universal Declaration of Human Rights} (with pre-amble included) thusly:
+the number of word-like tokens for English is 1746, for Finnish 1275 and for§
+Greenlandic 1063. The count of 15 most frequent tokens are for English 120---28,
+for Finnish 85---10 and for Greenlandic 38---7. 
+
+%The number of morphemes per word-forms are roughly X for English, Y for Finnish
+% and Z for Greenlandic
+
+The average word length is 5.0 for English, 7.8 for Finnish and 14.9 for
+Greenlandic. For complexity of computational models refer to the 
+Table~\ref{table:dictionary-sizes} in this article.
+
+} and \emph{different reference implementations for
+contemporary spell-checking applications}: English as a sample of a
+morphologically more isolating language with a basically word-list approach to
+spell-checking; as a reference implementation we use hunspell's en-US
 dictionary\footnote{\url{http://wiki.services.openoffice.org/wiki/Dictionaries}}
 and for a finite-state version we use a weighted word-list from
 \newcite{norvig/2010}. The second language we test is Finnish, whose
