@@ -39,9 +39,9 @@ FI-00014 Univ. of Helsinki, PO box 24\\
 
 \begin{abstract} We inspect the viability of finite-state
 spell-checking and contextless correction of non-word errors in morphologically
-less isolating languages. Overviewing previous
+different languages. Overviewing previous
 work, we conduct large-scale tests involving three languages
---- covering a broad spectrum of morphological complexity;
+--- covering a broad spectrum of morphological features;
 English, Finnish and Greenlandic --- and a variety of
 error models and algorithms, including proposed
 improvements of our own. Special reference is made to on-line
@@ -99,13 +99,13 @@ and for a finite-state version we use a weighted word-list from
 \newcite{norvig/2010}. The second language we test is Finnish, whose
 computational complexity has been just beyond the edge of being too hard to
 implement nicely in hunspell system for example~\cite{pitkanen/2006}. For a
-reference implementation we use voikko\footnote{\url{http://voikko.sf.net}},
+reference implementation we use Voikko\footnote{\url{http://voikko.sf.net}},
 with a LAG-based dictionary using
-malaga\footnote{\url{http://home.arcor.de/bjoern-beutel/malaga/}}. Our third
+Malaga\footnote{\url{http://home.arcor.de/bjoern-beutel/malaga/}}. Our third
 test language is Greenlandic, a polysynthetic language which is implemented as
 finite-state system using Xerox's original finite-state morphology
-formalism~\cite{beesley/2003}. We use foma~\cite{foma} for performing the
-correction task\footnote{\url{http://code.google.com/p/foma/}}.  As a general
+formalism~\cite{beesley/2003}. We use Foma~\cite{foma} for performing the
+correction task\footnote{\url{http://code.google.com/p/Foma/}}.  As a general
 purpose finite-state library we use HFST\footnote{\url{http://hfst.sf.net}},
 which also provides our spell-checking code. There is no free software for us
 as a reference implementation apart from our solution, as far as we know.
@@ -173,61 +173,64 @@ approach~\cite{norvig/2010}, and we use it to create dictionary for our English
 spell-checking dictionary as well. As a non-finite-state reference point we use
 hunspell.
 
-For agglutinative languages like Finnish, for which the
-word-list approach is likely to miss much greater amount of words, one of the
-commonest approaches is to use right-linear grammars, possibly combined with
-finite-state rule languages to implement morphophonological
-alterations~\cite{koskenniemi/1983}. This approach also applies to the newest
-available free open source and full fledged finite-state Finnish morphological
-dictionary we found~\cite{pirinen/2011/nodalida}. This language model features
-productive derivations, compounding and rudimentary probabilistic models.
-We take as a reference non-finite state language model for Finnish Voikko's
-implementation in Malaga, which is currently used as a spell-checking component
-in open source software. It is implemented in a left-associative grammar
-formalism, which is a potentially less efficient system with more expressive
-power. It's similar to finite-state formulations in terms of linguistic coverage.
+For agglutinative languages like Finnish, for which the word-list approach is
+likely to miss much greater amount of words, one of the commonest approaches is
+to use right-linear grammars, possibly combined with finite-state rule
+languages to implement morphophonological alterations~\cite{koskenniemi/1983}.
+This approach also applies to the newest available free open source and full
+fledged finite-state Finnish morphological dictionary we
+found~\cite{pirinen/2011/nodalida}. This language model features productive
+derivations, compounding and rudimentary probabilistic models.  We take as a
+reference non-finite state language model for Finnish Voikko's implementation
+in Malaga, which is currently used as a spell-checking component in open source
+software. It is implemented in a left-associative grammar formalism, which is a
+potentially less efficient system with more expressive power. It's similar to
+finite-state formulations in terms of linguistic coverage.
 
 For polysynthetic languages it will be obvious that coverage of any
-word-list-based approach will be even lower. Furthermore, most simple extensions
-to it such as affix stripping (as in hunspell) are not adequate for describing
-word forms. To our knowledge, the only approaches that have
-been widely used for spell-checking and morphological analysis of Greenlandic
-have been based on traditional finite-state solutions, such as the Xerox formalisms.
+word-list-based approach will be even lower. Furthermore, most simple
+extensions to it such as affix stripping (as in hunspell) are not adequate for
+describing word forms. To our knowledge, the only approaches that have been
+widely used for spell-checking and morphological analysis of Greenlandic have
+been based on traditional finite-state solutions, such as the Xerox formalisms.
+In our case we have obtained one from the Internet, that was based on freely
+available finite-state morphology
+implementation\footnote{\url{https://victorio.uit.no/langtech/trunk/st/kal}}.
+For further details we refer to the authors' website
+\url{http://oqaaserpassualeriffik.org/}.
 
 \subsection{Error Models}
 \label{subsec:error-models}
 
 The ubiquitous formula for modeling typing errors since the computer-assisted
 spelling correction began has been the edit distance metric sometimes
-attributed to \newcite{levenshtein/1966} and/or
-\newcite{damerau/1964}. It maps four
-typical slips of the fingers on a keyboard to events in the fuzzy matching of the
-misspelt word forms to correct ones, that is, the deletion of a character
-(i.e. failing to
-press a key), addition of a character (i.e. hitting an extra key
-accidentally), changing a character (i.e. hitting the wrong key) and swapping
-adjacent characters (i.e. hitting two keys in the wrong order).
+attributed to \newcite{levenshtein/1966} and/or \newcite{damerau/1964}. It maps
+four typical slips of the fingers on a keyboard to events in the fuzzy matching
+of the misspelt word forms to correct ones, that is, the deletion of a
+character (i.e. failing to press a key), addition of a character (i.e. hitting
+an extra key accidentally), changing a character (i.e. hitting the wrong key)
+and swapping adjacent characters (i.e. hitting two keys in the wrong order).
 
-When modeling edit
-distance as finite-state automaton, a relatively simple two-tape automaton is
-sufficient to implement the algorithm~\cite{hassan/2008}. The automaton
-will consist of one arc for each type of error, and additionally one state for each
-swapping of character type of error is needed to keep the character pair to be
-swapped in memory. This means that the trivial NFA implementing the algorithm
-is of space complexity $S(V, E, \Sigma) = O(|\Sigma|^2 |V| + |\Sigma|^2 |E|)$,
-where $\Sigma$ is the alphabet of language, $V$ is the set vertices in
-automaton and $E$ is the set of edges in automaton.  This edit distance
-formulation is roughly feature equivalent to hunspell's \texttt{TRY} mechanism.
+When modeling edit distance as finite-state automaton, a relatively simple
+two-tape automaton is sufficient to implement the algorithm~\cite{hassan/2008}.
+The automaton will consist of one arc for each type of error, and additionally
+one state for each swapping of character type of error is needed to keep the
+character pair to be swapped in memory. This means that the trivial
+nondetermistic finite-state automaton implementing the algorithm is of space
+complexity $S(V, E, \Sigma) = O(|\Sigma|^2 |V| + |\Sigma|^2 |E|)$, where
+$\Sigma$ is the alphabet of language, $V$ is the set vertices in automaton and
+$E$ is the set of edges in automaton.  This edit distance formulation is
+roughly feature equivalent to hunspell's \texttt{TRY} mechanism.
 
 To further fine-tune this finite-state formulation of edit distance algorithm,
 it is possible to attach a probability to each of the error events as a weight
-in weighted finite-state automaton, which corresponds the likelihood of an error,
-or a confusion factor. This can be used to implement features like keyboard
-adjacency or OCR confusion factor to the error correction model. This will not
-modify the structure of the finite-state error models or the search space, but
-introduction of non-homogenous weights to resulting finite-state network may
-have an effect on search time. This addition is equivalent to hunspell's
-\texttt{KEY} mechanism.
+in weighted finite-state automaton, which corresponds the likelihood of an
+error, or a confusion factor. This can be used to implement features like
+keyboard adjacency or OCR confusion factor to the error correction model. This
+will not modify the structure of the finite-state error models or the search
+space---which is why we did not test in this article---, but introduction of
+non-homogenous weights to resulting finite-state network may have an effect on
+search time. This addition is equivalent to hunspell's \texttt{KEY} mechanism.
 
 For English language spelling correction there is also an additional form of
 error model to deal with competence related misspellings, as opposed to these
@@ -381,7 +384,8 @@ corrections along them. Finally we have used a text corpus from language
 different than the one being spelled to ensure that majority of words are not
 in vocabulary and not fixable by standard error models.
 
-The corpora statistics are as follows: the English Wikipedia
+The corpora statistics are provided here for verification and reproducability:
+the English Wikipedia
 dump\footnote{\url{http://dumps.wikimedia.org/enwiki/20120211/enwiki-20120211-pages-articles.xml.bz2}}
 is 34 GiB, the Finnish
 Wikipedia\footnote{\url{http://dumps.wikimedia.org/fiwiki/20120213/fiwiki-20120213-pages-articles.xml.bz2}}
@@ -418,7 +422,7 @@ Dictionary FSM nodes &
 Dictionary FSM arcs &
  86,523& 783,461& 11,596,911
 \\
-Dictionary FSM on HDD & 
+Dictionary FSM on disk & 
 2.3 MiB &
 43 MiB &
 290 MiB
@@ -520,15 +524,17 @@ or running graphical interfaces or other uses. The test results are measured usi
 \texttt{getrusage} C function on a system that supports the maximum resident
 stack size \texttt{ru\_maxrss} and user time \texttt{ru\_utime} fields. The
 times are also verified with GNU \texttt{time} command. The results for
-hunspell, voikkospell and foma processes are only measured with time and top.
-The respective versions of the software are voikkospell 3.3, hunspell
-1.2.14, and foma 0.9.16alpha.
+hunspell, Voikkospell and Foma processes are only measured with time and top.
+The respective versions of the software are Voikkospell 3.3, hunspell
+1.2.14, and Foma 0.9.16alpha. The reference systems are tested with default
+settings, this means that they will give some first suggestions whereas
+our system will calculate all strings within given error model.
 
 In the Table~\ref{table:error-model-vs-language-speed} we measure the speed of
 the spell-checking process of the native language Wikipedia with real-world
 spelling errors and unknown strings. The error model rows are defined as
 follows: on the \emph{Reference impl.} row, we test the spell-checking speed of
-the hunspell tool for English, and voikkospell tool for Finnish. On the
+the hunspell tool for English, and Voikkospell tool for Finnish. On the
 \emph{edit distance 2} row we use the basic traditional edit distance 2 without
 any modifications. On the row \emph{lower order first}, we apply a
 lower order edit distance model first, then if no results are found,
@@ -663,15 +669,16 @@ regardless of the selected error model. We assume that the memory figures shown
 in the table are dominated by the memory stamp of the dictionary automaton and
 the error model automaton loaded into memory, and the intermediate structures
 used by the error-applying traversal of the automaton will not typically
-contribute much (approx. half mebibyte for each larger edit distance), since
-they are created and deleted on-the-fly. Notable discrepancy to this pattern is
-Greenlandic with larger edit distances, it seems to exhaust whole memory which
-may be caused an inadvertent (epsilon) loop in the morphology. One practical
-thing to note here is, the memory footstamp does give suggestion of how much
-available RAM is needed to get speed measurements of the
-table~\ref{table:error-model-vs-language-speed}, as our experience shows that
-if the dictionary automaton is partially in swap memory, the speed will
-decrease by order of magnitude in current operating systems.
+contribute much (approx. half mebibyte\footnote{this is a standard SI measure
+unit, if unfamiliar, refer to \url{http://en.wikipedia.org/wiki/Mebibyte}} for
+each larger edit distance), since they are created and deleted on-the-fly.
+Notable discrepancy to this pattern is Greenlandic with larger edit distances,
+it seems to exhaust whole memory which may be caused an inadvertent (epsilon)
+loop in the morphology. One practical thing to note here is, the memory
+footstamp does give suggestion of how much available RAM is needed to get speed
+measurements of the table~\ref{table:error-model-vs-language-speed}, as our
+experience shows that if the dictionary automaton is partially in swap memory,
+the speed will decrease by order of magnitude in current operating systems.
 
 To measure the degradation of quality when using different error models we
 count the proportion of suggestion sets that contain the correct correction
@@ -727,15 +734,17 @@ Finally we measure how the text type used will effect the speed of the
 spell-checking. As the best-case scenario we use the unmodified texts of
 Wikipedia, which contain probably the most realistic native language
 speaker-like typing error distribution. For text with some more errors, where
-majority of errors should be recoverable we use our automatically generated
-errors in the Wikipedia texts. Finally to see the performance on worst case
-scenario where most of the words have unrecoverable spelling errors we use the
-texts from other language, in this case English texts for Finnish and 
-Greenlandic spell-checking and Finnish texts for English spell-checking, which
-will likely give us the nearly lower bounds of the performance. All of the
-tests in this category were performed with error models under row
-\emph{avoid redundancy and firsts ed 2} in previous tables, which gave us 
-the best speed/quality ratio in the previous tests.
+majority of errors should be recoverable we introduce more automatically
+generated errors in the Wikipedia texts. Finally to see the performance on
+worst case scenario where most of the words have unrecoverable spelling errors
+we use the texts from other language, in this case English texts for Finnish
+and Greenlandic spell-checking and Finnish texts for English spell-checking,
+which will likely give us the nearly lower bounds of the performance. The
+effects of text type (i.e. frequency of non-words) to speed of spell-checking
+is given in table~\ref{table:language-vs-text-type}. All of
+the tests in this category were performed with error models under row
+\emph{avoid redundancy and firsts ed 2} in previous tables, which gave us the
+best speed/quality ratio in the previous tests.
 
 \begin{table}[h]
 \begin{center}
@@ -758,7 +767,7 @@ Text in another language &
 \end{scriptsize}
 \end{center}
 \caption{\label{table:language-vs-text-type} Effect of text type on
-error models to speed}
+error models to speed (in seconds per 10000 word-forms)}
 \end{table}
 
 Here we chiefly note that the amount of non-words in text reflects directly to
@@ -802,10 +811,13 @@ different ways to induce weights into the language models, as well as further us
 of context in finite-state spell-checking (as in
 \newcite{pirinen/2012/cicling}), is warranted.
 
-% \section*{Acknowledgements} 
+\section*{Acknowledgements} 
 
-% We thank the anonymous reviewers for their comments and the HFST research
-% team for fruitless discussions on the article's topics.
+We thank the anonymous reviewers for their comments and the HFST research
+team for fruity discussions on the article's topics. First author thanks the 
+people of \emph{Oqaaserpassualeriffik} for introducing the problems and 
+possibilities of finite-state applications to morphologically complex language
+of Greenlandic.
 
 \bibliographystyle{acl2012}
 \bibliography{fsmnlp2012}
