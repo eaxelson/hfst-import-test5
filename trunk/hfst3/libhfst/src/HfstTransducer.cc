@@ -195,6 +195,7 @@ StringSet HfstTransducer::get_alphabet() const
         HFST_THROW(TransducerHasWrongTypeException);
     case HFST_OL_TYPE:
     case HFST_OLW_TYPE:
+	return hfst_ol_interface.get_alphabet(implementation.hfst_ol);
     default:
         HFST_THROW_MESSAGE(FunctionNotImplementedException, "get_alphabet");
     }    
