@@ -435,12 +435,7 @@ void HfstOlInputStream::ignore(unsigned int n)
 StringSet HfstOlTransducer::get_alphabet(hfst_ol::Transducer * t)
 {
     hfst_ol::SymbolTable symbol_table = t->get_alphabet().get_symbol_table();
-    StringSet retval;
-    for (hfst_ol::SymbolTable::const_iterator it = symbol_table.begin();
-	 it != symbol_table.end(); ++it) {
-	retval.insert(*it);
-    }
-    return retval;
+    return StringSet(symbol_table.begin(), symbol_table.end());
 }
 
 } }
