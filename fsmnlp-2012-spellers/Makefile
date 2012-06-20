@@ -1534,3 +1534,30 @@ results/kl/table5.%.arcs: hfst/kl/%.hfst
 		sed -e 's/^.*://' > $@
 
 
+
+## misc: proof of morphological complexity
+
+UNDHR_EN=undhr.txt.en
+UNDHR_FI=undhr.txt.fi
+UNDHR_KL=undhr.txt.kl
+UNDHR_TARGETS=undhr.wordforms.fi undhr.wordforms.en undhr.wordforms.kl\
+			  undhr.tokencounts.fi undhr.tokencounts.en undhr.tokencounts.kl\
+			  undhr.wordlengths.fi undhr.wordlengths.en undhr.wordlengths.kl
+
+morphological-complexity: $(UNDHR_TARGETS)
+
+undhr.norm.%: undhr.txt.%
+	tr [:upper:] [:lower:] < $< |\
+		tr -s [:space:] '\n' > $@
+
+undhr.wordforms.%: undhr.norm.%
+	wc -l < $< > $@
+
+undhr.wordlengths.%: undhr.norm.%
+	python3 countwordlengths.py $< $@
+
+undhr.tokencounts.%: undhr.norm.%
+	sort < $< | uniq -c | sort -nr > $@
+
+undhr.morphcount.fi: undhr.txt.fi
+	omorfi-analyse.sh $< > $@
