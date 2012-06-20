@@ -39,7 +39,7 @@ FI-00014 Univ. of Helsinki, PO box 24\\
 
 \begin{abstract} We inspect the viability of finite-state
 spell-checking and contextless correction of non-word errors in morphologically
-rich languages. Overviewing previous
+less isolating languages. Overviewing previous
 work, we conduct large-scale tests involving three languages
 --- covering a broad spectrum of morphological complexity;
 English, Finnish and Greenlandic --- and a variety of
@@ -58,44 +58,42 @@ complexity, is a difficult task for non-finite-state approaches.
 
 In most applications of spell-checking, efficiency is a limiting factor for
 selecting or discarding spell-checking solutions. In the case of finite-state
-spell-checking it is known that finite-state language
-models can efficiently encode dictionaries of natural
-languages~\cite{beesley/2003}, even for languages with rich and complex
-morphological systems, such as polysynthetic languages. The efficiency of
-finite-state approaches to spelling correction, however, has often been seen as
-a problem, and therefore most contemporary spell-checking and correction
-systems are still based on programmatic solutions (e.g.
-hunspell\footnote{\url{http://hunspell.sf.net}}, and its *spell relatives), or
-at most specialised algorithms for implementing error-tolerant traversal of the
-finite-state dictionaries~\cite{oflazer/1996,hulden/2009}. There have also been
-few fully finite-state implementations for both the detecting and correcting
-errors~\cite{schulz/2002,pirinen/2010/lrec}. In this
-paper we further evaluate the use of finite-state dictionaries with two-tape
-finite-state automatons for mechanism to correct misspellings, and how to
-optimise the finite-state error models.
+spell-checking it is known that finite-state language models can efficiently
+encode dictionaries of natural languages~\cite{beesley/2003}, even for
+polysynthetic languages. The efficiency of finite-state approaches to spelling
+correction, however, has often been seen as a problem, and therefore most
+contemporary spell-checking and correction systems are still based on
+programmatic solutions (e.g.  hunspell\footnote{\url{http://hunspell.sf.net}},
+and its *spell relatives), or at most specialised algorithms for implementing
+error-tolerant traversal of the finite-state
+dictionaries~\cite{oflazer/1996,hulden/2009}. There have also been few fully
+finite-state implementations for both the detecting and correcting
+errors~\cite{schulz/2002,pirinen/2010/lrec}. In this paper we further evaluate
+the use of finite-state dictionaries with two-tape finite-state automatons for
+mechanism to correct misspellings, and how to optimise the finite-state error
+models.
 
 To evaluate the general usability and efficiency of finite-state spell-checking
 we test the system with three languages of typologically different
 morphological features and different reference implementations for contemporary
-spell-checking applications: English as a sample of a morphologically poor
-language with a basically word-list approach to spell-checking; as a reference
-implementation we use hunspell's en-US
+spell-checking applications: English as a sample of a morphologically more
+isolating language with a basically word-list approach to spell-checking; as a
+reference implementation we use hunspell's en-US
 dictionary\footnote{\url{http://wiki.services.openoffice.org/wiki/Dictionaries}}
 and for a finite-state version we use a weighted word-list from
-\newcite{norvig/2010}. The second language we test is Finnish, a
-morphologically richer language which is still agglutinative. Finnish is among
-the morphologically simpler languages that have no working implementation under
-hunspell, and for a reference implementation we use
-voikko\footnote{\url{http://voikko.sf.net}}, with a LAG-based dictionary using
+\newcite{norvig/2010}. The second language we test is Finnish, whose
+computational complexity has been just beyond the edge of being too hard to
+implement nicely in hunspell system for example~\cite{pitkanen/2006}. For a
+reference implementation we use voikko\footnote{\url{http://voikko.sf.net}},
+with a LAG-based dictionary using
 malaga\footnote{\url{http://home.arcor.de/bjoern-beutel/malaga/}}. Our third
 test language is Greenlandic, a polysynthetic language which is implemented as
 finite-state system using Xerox's original finite-state morphology
-formalism~\cite{beesley/2003}. We use foma for performing the correction
-task\footnote{\url{http://code.google.com/p/foma/}}.
-As a general purpose finite-state library we use
-HFST\footnote{\url{http://hfst.sf.net}}, which also provides our spell-checking
-code. There is no free software for us as a
-reference implementation apart from our solution, as far as we know.
+formalism~\cite{beesley/2003}. We use foma~\cite{foma} for performing the
+correction task\footnote{\url{http://code.google.com/p/foma/}}.  As a general
+purpose finite-state library we use HFST\footnote{\url{http://hfst.sf.net}},
+which also provides our spell-checking code. There is no free software for us
+as a reference implementation apart from our solution, as far as we know.
 
 The baseline feature set and the efficiency of spell-checking we are targeting
 is defined by the currently de facto standard spelling suite in open source
@@ -155,12 +153,12 @@ correctly spelled word forms. One of the easiest way to create such
 spell-checker is collecting the word forms from reasonably large corpus of
 (mostly) correctly spelt texts; additionally we can count the frequency of words
 and use that as the likelihood $P=\frac{c(\mathrm{wordform})}{\mathrm{Corpus size}}$.
-For morphologically poor languages such as English, this is often sufficient
+For morphologically more isolating such as English, this is often sufficient
 approach~\cite{norvig/2010}, and we use it to create dictionary for our English
 spell-checking dictionary as well. As a non-finite-state reference point we use
 hunspell.
 
-For morphologically slightly richer languages like Finnish, for which the
+For agglutinative languages like Finnish, for which the
 word-list approach is likely to miss much greater amount of words, one of the
 commonest approaches is to use right-linear grammars, possibly combined with
 finite-state rule languages to implement morphophonological
@@ -386,8 +384,8 @@ arcs of the finite-state automaton encoding the dictionary. Finally we give the
 size of the automaton as serialised on the hard disk. While this is not the
 same amount of memory as its loaded data structures, it gives some indication
 of memory usage of the automaton in running program. As can be clearly
-seen from the table, the morphological complexity correlates quite directly
-in all of structural elements of automaton.
+seen from the table, the morphologically less isolating languages have quite
+directly more in all of structural elements of automaton.
 
 \begin{table}[h]
 \begin{center}
