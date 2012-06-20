@@ -120,13 +120,14 @@ non-finite-state spell-checking, refer to \newcite{mitton/2009}.
 
 The efficiency results are contrasted with the existing research on
 finite-state spell-checking in \newcite{hassan/2008} and the theoretical
-results on finite-state error-models in \newcite{mitankin/2005}.
-Our addition primarily comprises the
-addition of morphologically complex languages with actual cyclic
-dictionary automata and more complex structure in general, compared to those of
-English and Arabic. We also point out that previous approaches have
-neglected to simultaneously constrain the error model and the dictionary with
-each other in on-line composition, which affords a significant speed benefit.
+results on finite-state error-models in \newcite{mitankin/2005}.  Our addition
+primarily comprises the addition of morphologically complex languages with
+actual cyclic dictionary automata (i.e. infinite dictionaries formed by
+compounding and recurring derivation) and more complex structure in general,
+compared to those of English and Arabic. We also point out that previous
+approaches have neglected to simultaneously constrain the error model and the
+dictionary with each other in on-line composition, which affords a significant
+speed benefit.
 
 The rest of the paper is organised as follows. In Section~\ref{sec:methods} we
 discuss the spell-checking task, current non-finite-state spell-checkers and
@@ -185,7 +186,9 @@ reference non-finite state language model for Finnish Voikko's implementation
 in Malaga, which is currently used as a spell-checking component in open source
 software. It is implemented in a left-associative grammar formalism, which is a
 potentially less efficient system with more expressive power. It's similar to
-finite-state formulations in terms of linguistic coverage.
+finite-state formulations in terms of linguistic coverage---the main rationale
+of original implementation, however, was that it was first openly available
+approach at that time.
 
 For polysynthetic languages it will be obvious that coverage of any
 word-list-based approach will be even lower. Furthermore, most simple
@@ -397,7 +400,7 @@ picked 100,000 first word tokens for evaluation purposes.
 In Table~\ref{table:dictionary-sizes} we summarize the sizes of automata in
 terms of structural elements. On the first row, we give the effective size of
 alphabet needed to represent the whole dictionary, this is all the Unicode
-code points that have been used in the dictionary, including alphabets, 
+code points that have been used in the dictionary, including alphabets,
 punctuation and spaces. Next we give the sizes of automata as nodes and
 arcs of the finite-state automaton encoding the dictionary. Finally we give the
 size of the automaton as serialised on the hard disk. While this is not the
@@ -678,16 +681,13 @@ loop in the morphology. One practical thing to note here is, the memory
 footstamp does give suggestion of how much available RAM is needed to get speed
 measurements of the table~\ref{table:error-model-vs-language-speed}, as our
 experience shows that if the dictionary automaton is partially in swap memory,
-the speed will decrease by order of magnitude in current operating systems.
+the speed will decrease by order of magnitude in current operating systems,
+e.g. on low-end minilaptops and Greenlandic dictionaries.
 
 To measure the degradation of quality when using different error models we
 count the proportion of suggestion sets that contain the correct correction
 among the corrected strings. For this test we use automatically generated corpus
-of spelling errors to get the large-scale results. For English and Finnish we
-have also used smaller set of original errors in the unmodified corpora that
-were hand-corrected by native speaker; for Greenlandic we did not have a native
-speaker available for this purpose. The numbers from real-world errors are 
-indicated in parentheses.
+of spelling errors to get the large-scale results.
 
 \begin{table}[h]
 \begin{center}
@@ -721,13 +721,15 @@ No firsts ed 3 &
 \end{scriptsize}
 \end{center}
 \caption{\label{table:error-model-vs-language} Effect of language and 
-error models to quality}
+error models to quality (recall, correct suggestion found per
+correction set)}
 \end{table}
 
 This test with automatically introduced errors shows us that with uniformly
 distributed errors the penalty of changing error model to ignore the
 word-initial could be significant. This contrasts to our findings with real
 world errors, that the distribution of errors tends towards the end of the word,
+described in~\ref{subsec:error-models} and ~\cite{Bhagat/2007},
 but it should be noted that degradation can be as bad as given here.
 
 Finally we measure how the text type used will effect the speed of the
