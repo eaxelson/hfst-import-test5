@@ -1,6 +1,25 @@
 #ifndef HFST_TAGGER_HEADER_FST_BUILDER_H
 #define HFST_TAGGER_HEADER_FST_BUILDER_H
 
+//! @file FstBuilder.h
+//!
+//! @author Miikka Silfverberg
+//!
+//! @brief A base-class for other classes which read training data
+//! from files and build fsts. Can't be used directly.
+
+//   This program is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, version 3 of the Licence.
+//
+//   This program is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//   GNU General Public License for more details.
+//
+//   You should have received a copy of the GNU General Public License
+//   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
@@ -25,9 +44,13 @@ class FstBuilder
 {
  public:
 
+  // Construct an fst of implementation type @a type with final
+  // weights @a default_final_weight and whose name is @a name.
   FstBuilder(ImplementationType type,
 	     float default_final_weight,
 	     const std::string &name);
+
+  // Return the transducer which was constructed.
   HfstTransducer get_model(void);
 
  protected:

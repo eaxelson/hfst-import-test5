@@ -29,7 +29,8 @@ struct InvalidLine
   std::string representation;
 };
 
-// Thrown when an encountering something that cannot be interpreted as a float.
+// Thrown when encountering something that cannot be interpreted as a
+// positive float.
 struct InvalidFloat
 {
   InvalidFloat(const std::string &representation);
