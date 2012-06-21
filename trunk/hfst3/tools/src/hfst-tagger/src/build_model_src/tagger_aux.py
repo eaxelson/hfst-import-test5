@@ -1,3 +1,22 @@
+# @file tagger_aux.py
+#
+# @author Miikka Silfverberg
+#
+# @brief Auxiliary functions for computing statistics from a POS
+# tagger training file.
+
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, version 3 of the Licence.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import math
 import collections
 import string
@@ -15,9 +34,7 @@ class SequenceSimplifier:
     def __init__(self,pattern):
 
         for line in pattern:
-            
-            if len(line) != 2 or (not line[0] in [0,1]):
-                
+            if len(line) != 2 or (not line[0] in [0,1]):    
                 raise InvalidPattern()
 
         self.pattern = pattern
@@ -25,13 +42,11 @@ class SequenceSimplifier:
     def simplify(self,i,sequence):
 
         if i + len(self.pattern) >= len(sequence):
-            
             raise ReachesSequenceEnd()
 
         simplified_subsequence = []
 
         for pair in self.pattern:
-            
             simplified_entry = ["<NONE>","<NONE>"]
             
             if pair[0] == 1:
@@ -49,8 +64,10 @@ class SequenceSimplifier:
 # Unless line is a utf-8 encoded line of number_of_fields tab
 # separated fields, raise an exception.
 def check_line(line,number_of_fields):
+
     try:
         line.decode("utf-8")
+
     except UnicodeDecodeError:
         raise Exception("Invalid utf-8 encoding on line")
 

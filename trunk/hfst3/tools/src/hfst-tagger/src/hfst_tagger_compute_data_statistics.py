@@ -1,7 +1,25 @@
 #! /usr/bin/python
 
-# Program for computing the penalties needed for the lexical model of
-# an HFST tagger.
+# @file hfst_tagger_compute_data_statistics.py
+#
+# @author Miikka Silfverberg
+#
+# @brief Program for computing the penalties needed for the lexical
+# model of an HFST tagger.
+
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, version 3 of the Licence.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
 
 import sys
 import tagger_aux
@@ -14,6 +32,7 @@ MAX_SUFFIX_LENGTH = 10
 # If verbose is true, the program prints info about what is ahppening.
 verbose=False
 
+# Commandline arguments.
 arg_string = " " + string.join(sys.argv, " ") + " "
 
 if re.search("-v[^\w]",arg_string) != None or \
