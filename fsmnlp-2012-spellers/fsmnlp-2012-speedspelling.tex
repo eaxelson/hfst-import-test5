@@ -169,9 +169,11 @@ correctly spelled word forms. One of the easiest way to create such
 spell-checker is collecting the word forms from reasonably large corpus of
 (mostly) correctly spelt texts; additionally we can count the frequency of words
 and use that as the likelihood $P=\frac{c(\mathrm{wordform})}{\mathrm{Corpus size}}$.
-For morphologically more isolating such as English, this is often sufficient
-approach~\cite{norvig/2010}, and we use it to create dictionary for our English
-spell-checking dictionary as well. As a non-finite-state reference point we use
+For morphologically more isolating languages such as English, this is
+often a sufficient
+approach~\cite{norvig/2010}, and we use it to create a dictionary
+for our English
+spell-checker as well. As a non-finite-state reference point we use
 hunspell.
 
 For agglutinative languages like Finnish, for which the word-list approach is
