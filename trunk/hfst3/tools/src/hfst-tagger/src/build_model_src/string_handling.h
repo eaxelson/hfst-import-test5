@@ -49,13 +49,13 @@ struct WeightedStringVector
   float weight;
 };
 
-// Tokeniza lines of the form "foo\tNN\t1.0" to a weighted string vector,
+// Tokenize lines of the form "foo\tNN\t1.0" to a weighted string vector,
 // whose string vector is {f,o,o,NN} and whose weight is 1.0.
 WeightedStringVector tokenize_lexicon_line(const std::string &line,
 					   HfstTokenizer &tokenizer);
 
-// Tokeniza lines of the form "(foo\tbar\t)+1.0" to a weighted string vector,
-// whose string vector is {(foo,bar,)+,NN} and whose weight is 1.0.
+// Tokenize lines of the form "(foo\tbar\t)+1.0" to a weighted string vector,
+// whose string vector is {(foo,bar,)+} and whose weight is 1.0.
 WeightedStringVector tokenize_grammar_line(const std::string &line,
 					   HfstTokenizer &tokenizer);
 
