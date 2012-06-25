@@ -1,6 +1,6 @@
-//! @file hfst-fst2txt.cc
+//! @file hfst-build-tagger.cc
 //!
-//! @brief Transducer array printing command line tool
+//! @brief Tool for training taggers.
 //!
 //! @author HFST Team
 
