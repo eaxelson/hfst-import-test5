@@ -18,10 +18,12 @@
 //! Two kinds of training data can be read:
 //! 
 //! 1. Lexical training data lines have the form "WORDFORM\tTAG\tWEIGHT" 
-//! e.g. "cat\tNN\t1.0", which is stored as (("c", "a", "t", "NN"),1.0).
+//!    e.g. "cat\tNN\t1.0", which is stored as (("c", "a", "t", "NN"),1.0).
+//!
 //! 2. Sequence training data lines have the form 
-//! "WORDFORM1\tTAG1\tWORDFORM2\tTAG2\t...\tWORDFORMM\tTAGM\tWEIGHT", e.g.
-//! "the\tDT\tcar\tNN\t1.0" which is stored as (("the","DT","car","NN"),1.0).
+//!    "WORDFORM1\tTAG1\tWORDFORM2\tTAG2\t...\tWORDFORMM\tTAGM\tWEIGHT", e.g.
+//!    "the\tDT\tcar\tNN\t1.0" which is stored as 
+//!    (("the","DT","car","NN"),1.0).
 //!
 //! Lexical training data lines have to have 3 fields. Sequence training data
 //! lines have to have at least three fields and an odd number of fields.  
@@ -50,6 +52,10 @@
 struct EmptyFile
 {};
 
+// The type is LEXICAL for lexicon strings and SEQUENCE for sequence
+// model strings.
+enum weighted_string_type { LEXICAL, SEQUENCE };
+
 class WeightedStringVectorCollection
 {
  public:
@@ -68,8 +74,8 @@ class WeightedStringVectorCollection
 
   //! Read training data from @a in. The parameter @a lexical model
   //! specifies whether we should read lexical or sequence training data.
-  WeightedStringVectorCollection(std::istream &in, bool lexical_model);
-  
+  WeightedStringVectorCollection(std::istream &in, weighted_string_type type);
+
   //! Const iterators to pairs of string vectors and weights.
   const_iterator begin(void) const;
   const_iterator end(void) const;

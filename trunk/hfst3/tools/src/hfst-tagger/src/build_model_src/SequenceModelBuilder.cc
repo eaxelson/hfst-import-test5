@@ -13,7 +13,8 @@ SequenceModelBuilder::SequenceModelBuilder(std::istream &in)
     {
       try
 	{
-	  ModelBuilder model_builder(WeightedStringVectorCollection(in,false));
+	  ModelBuilder model_builder(WeightedStringVectorCollection(in,
+								    SEQUENCE));
 	  
 	  model_vector.push_back(model_builder.get_model());
 	}

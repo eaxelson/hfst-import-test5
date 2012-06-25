@@ -13,7 +13,7 @@ LexicalModelBuilder::LexicalModelBuilder(std::istream &in)
   ModelBuilder::verbose_printf("Compiling lexical model.\n");
   for (size_t i = 0; i < NUMBER_OF_LEXICAL_MODELS; ++i)
     {
-      ModelBuilder model_builder(WeightedStringVectorCollection(in,true));
+      ModelBuilder model_builder(WeightedStringVectorCollection(in,LEXICAL));
       model_vector.push_back(model_builder.get_model());
     }
 }
