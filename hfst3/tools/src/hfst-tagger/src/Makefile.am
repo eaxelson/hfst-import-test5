@@ -167,7 +167,7 @@ SentenceTransducer_CXXFLAGS=-DMAIN_TEST
 
 SequenceModelComponent_SOURCES=$(USE_MODEL_SRC)/SequenceModelComponent.cc\
                                $(USE_MODEL_SRC)/DataTypes.h \
-			       $(USE_MODEL_SRC)/unit_test_aux.cc
+			       unit_test_aux.cc
 SequenceModelComponent_LDADD=SequenceModelComponent.o \
                              $(top_srcdir)/libhfst/src/libhfst.la
 SequenceModelComponent_CXXFLAGS=-DMAIN_TEST

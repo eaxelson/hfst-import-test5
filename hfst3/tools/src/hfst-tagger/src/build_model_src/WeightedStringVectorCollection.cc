@@ -104,7 +104,7 @@ int main(void)
 
   std::istringstream in(file);
 
-  WeightedStringVectorCollection c1(in,true);
+  WeightedStringVectorCollection c1(in,LEXICAL);
 
   WeightedStringVectorCollection::const_iterator it = c1.begin();
   
@@ -125,7 +125,7 @@ int main(void)
 
   assert(it == c1.end());
 
-  WeightedStringVectorCollection c2(in,false);
+  WeightedStringVectorCollection c2(in,SEQUENCE);
 
   it = c2.begin();
 
@@ -140,7 +140,7 @@ int main(void)
 
   try
     { 
-      static_cast<void>(WeightedStringVectorCollection(in,false)); 
+      static_cast<void>(WeightedStringVectorCollection(in,SEQUENCE)); 
       assert(false);
     }
   catch (...)

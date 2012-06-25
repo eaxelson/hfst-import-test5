@@ -86,7 +86,7 @@ int main(void)
 
   std::istringstream in1(file1);
 
-  WeightedStringVectorCollection c1(in1,true);
+  WeightedStringVectorCollection c1(in1,LEXICAL);
 
   ModelBuilder model_builder1(c1);
 
