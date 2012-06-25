@@ -266,8 +266,9 @@ significantly differ from restricting edits at any other position in the input.
 
 Dividing the states of a dictionary automaton into classes corresponding to
 the minimum number of input symbols consumed by that state, we found that
-the average ambiguity in a particular class does not dramatically drop off after
-the first input symbols. This was accomplished by performing the following
+the average ambiguity in a particular class is somewhat higher for the first
+input symbols, but then stabilises quickly. This was accomplished by
+performing the following
 state-categorisation procedure:
 
 \begin{enumerate}
@@ -290,11 +291,74 @@ if there are no unreachable states in the automaton.
 Having this categorisation, we tallied the total number of arcs from states in
 each class and divided this total by the number of states in the class. This
 is intended as an approximate measure of the ambiguity present at a particular
-point in the input.
+point in the input. Some results are summarized in tables
+\ref{table:en-state-classification} and \ref{table:fi-state-classification}.
+
+\begin{table}[h]
+\begin{center}
+\begin{scriptsize}
+\begin{tabular}{|l|rrr|}
+\hline
+\bf Class & \bf Transitions & \bf States & \bf Average \\ 
+\hline
+0 & 84 & 1 & 84 \\
+1 & 620 & 39 & 15.9 \\
+2 & 3,999 & 575 & 7.0 \\
+3 & 11,498 & 3,578 & 3.2 \\
+4 & 16165 & 8432 & 1.917102 \\
+5 & 15380 & 9811 & 1.567628 \\
+6 & 12817 & 8591 & 1.491910 \\
+7 & 9566 & 6616 & 1.445889 \\
+8 & 6474 & 4532 & 1.428508 \\
+9 & 3981 & 2875 & 1.384696 \\
+10 & 2487 & 1814 & 1.371003 \\
+11 & 1398 & 1068 & 1.308989 \\
+12 & 738 & 582 & 1.268041 \\
+\hline
+\end{tabular}
+\end{scriptsize}
+\end{center}
+\caption{\label{table:en-state-classification}
+State classification by minimum input consumed for the English dictionary
+\end{table}
+
+\begin{table}[h]
+\begin{center}
+\begin{scriptsize}
+\begin{tabular}{|l|rrr|}
+\hline
+\bf Class & \bf Transitions & \bf States & \bf Average \\ 
+\hline
+0 & 156 & 3 & 52.000000 \\
+1 & 1015 & 109 & 9.311927 \\
+2 & 6439 & 1029 & 6.257532 \\
+3 & 22436 & 5780 & 3.881661 \\
+4 & 38899 & 12785 & 3.042550 \\
+5 & 44973 & 15481 & 2.905045 \\
+6 & 47808 & 17014 & 2.809921 \\
+7 & 47495 & 18866 & 2.517492 \\
+8 & 39835 & 17000 & 2.343235 \\
+9 & 36786 & 14304 & 2.571728 \\
+10 & 45092 & 14633 & 3.081528 \\
+11 & 66598 & 22007 & 3.026219 \\
+12 & 86206 & 30017 & 2.871906 \\
+\hline
+\end{tabular}
+\end{scriptsize}
+\end{center}
+\caption{\label{table:fi-state-classification}
+State classification by minimum input consumed for the Finnish dictionary
+\end{table}
 
 The size of a dictionary automaton that is restricted to have
 a particular symbol in a particular position does not apparently depend on the
-choice of position. This is in line with the rather obvious finding that the
+choice of position. This result was acquired by intersecting eg. the automaton
+\begin{verbatim}e.+\end{verbatim} with the dictionary to restrict the first
+position to have the symbol
+\begin{verbatim}e\end{verbatim}, the automaton
+\begin{verbatim}.e.+\end{verbatim} to restrict the second position, and so on.
+
+This is in line with the rather obvious finding that the
 size of the restricted dictionary in terms of number of strings is similarily
 position-agnostic.
 
