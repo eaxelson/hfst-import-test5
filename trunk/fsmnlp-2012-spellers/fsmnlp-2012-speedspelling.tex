@@ -267,7 +267,25 @@ significantly differ from restricting edits at any other position in the input.
 Dividing the states of a dictionary automaton into classes corresponding to
 the minimum number of input symbols consumed by that state, we found that
 the average ambiguity in a particular class does not dramatically drop off after
-the first input symbols.
+the first input symbols. This was accomplished by performing the following
+state-categorisation procedure:
+\begin{enumerate}
+\item The start state is assigned to class $0$, and all other states are
+assigned to a candidate pool.
+\item All states to which there is an (input) epsilon transition from the
+start state are assigned to class $0$ and removed from the candidate pool.
+\item The above is repeated for each state in class $0$ until no more states
+are added to class $0$. This completes class $0$ as the set of states in which
+the automaton can be before consuming any input.
+\item For each state in class $0$, states in the candidate pool to which there
+is a non-epsilon transition are assigned to class $1$ and removed from the
+candidate pool.
+\item Class $1$ is epsilon-completed as in (2-3).
+\item After the completion of class $n$, class $n+1$ is constructed. This
+continues until the candidate pool is empty, which is guaranteed to happen
+if there are no unreachable states in the automaton.
+\end{enumerate}
+
 The size of a dictionary automaton that is restricted to have
 a particular symbol in a particular position does not apparently depend on the
 choice of position. This is in line with the rather obvious finding that the
