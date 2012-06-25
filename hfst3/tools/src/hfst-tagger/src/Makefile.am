@@ -10,7 +10,8 @@ USE_MODEL_SRC=$(srcdir)/use_model_src
 AM_CPPFLAGS=-I${top_srcdir}/libhfst/src
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 
-python_PYTHON=tagger_aux.py hfst_tagger_compute_data_statistics.py
+python_PYTHON=$(BUILD_MODEL_SRC)/tagger_aux.py \
+              hfst_tagger_compute_data_statistics.py
 
 HFST_COMMON_SRC=$(top_srcdir)/tools/src/hfst-program-options.cc \
                 $(top_srcdir)/tools/src/hfst-commandline.cc \
@@ -165,10 +166,10 @@ SentenceTransducer_LDADD=SentenceTransducer.o \
 SentenceTransducer_CXXFLAGS=-DMAIN_TEST
 
 SequenceModelComponent_SOURCES=$(USE_MODEL_SRC)/SequenceModelComponent.cc\
-                               $(USE_MODEL_SRC)/DataTypes.h
+                               $(USE_MODEL_SRC)/DataTypes.h \
+			       $(USE_MODEL_SRC)/unit_test_aux.cc
 SequenceModelComponent_LDADD=SequenceModelComponent.o \
-                             $(top_srcdir)/libhfst/src/libhfst.la \
-		             unit_test_aux.o
+                             $(top_srcdir)/libhfst/src/libhfst.la
 SequenceModelComponent_CXXFLAGS=-DMAIN_TEST
 
 SequenceModelComponentPair_SOURCES= \

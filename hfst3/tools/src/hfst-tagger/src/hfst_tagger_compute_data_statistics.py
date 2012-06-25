@@ -29,21 +29,19 @@ import string
 # The maximal length of suffixes used in the guesser.
 MAX_SUFFIX_LENGTH = 10
 
-# If verbose is true, the program prints info about what is ahppening.
+# If verbose is true, the program prints info about what is happening.
 verbose=False
 
 # Commandline arguments.
 arg_string = " " + string.join(sys.argv, " ") + " "
 
+# FIXME! use python argument parser.
 if re.search("-v[^\w]",arg_string) != None or \
    re.search("--verbose[^\w]",arg_string) != None:
     verbose = True
 
-
 # Read from stdin.
 tagger_aux.verbose_print("Reading input file.",verbose)
-
-file_contents = sys.stdin.read()
 
 # Maps (word_form,tag) to its count in training data.
 word_form_and_tag_map = tagger_aux.get_pair_counter()
@@ -69,10 +67,10 @@ number_of_suffixes = 0.0
 # the file.
 line_number = 0
 
-# The entire sequence of tags and word forms in the training data.
+# The entire sequence of word forms and tags in the training data.
 sequence = []
 
-## CONSTRUCTY LEXICAL TABLE.
+## CONSTRUCT LEXICAL TABLE.
 
 # Loop through the training data file on line at a time. For each line
 # generate all suffixes of the word form and increase suffix and tag
@@ -83,7 +81,9 @@ sequence = []
 # they are wellformed utf-8.
 tagger_aux.verbose_print("Computing lexical statistics.",verbose)
 
-for line in file_contents.split("\n"):
+for line in sys.stdin:
+    # Get rid of trailing ws.
+    line = line.strip()
 
     # Increment line number counter.
     line_number += 1
@@ -120,11 +120,13 @@ for line in file_contents.split("\n"):
     # Increment suffix and tag count, suffix count and tag
     # count. Consider only suffixes that are maximally as long as
     # MAX_SUFFIX_LENGTH.
-    for i in range(0,min(len(rev_word_form),MAX_SUFFIX_LENGTH) + 1):
+    word_maximal_suffix_length = min(len(rev_word_form),MAX_SUFFIX_LENGTH)
+
+    for i in range(0,word_maximal_suffix_length + 1):
 
         suffix = rev_word_form[:i]
 
-        suffix_and_tag_count_map[suffix][tag] += 1.0
+        suffix_and_tag_count_map[tag][suffix] += 1.0
         suffix_count_map[suffix]              += 1.0
         tag_count_map[tag]                    += 1.0
         number_of_suffixes                    += 1.0
@@ -142,7 +144,8 @@ print "STOP P(WORD_FORM | TAG)"
 tagger_aux.verbose_print("P(SUFFIX_AND_TAG | SUFFIX)",verbose)
 
 print "START P(SUFFIX_AND_TAG | SUFFIX)"
-tagger_aux.print_conditional_penalties(suffix_and_tag_count_map, tag_count_map)
+tagger_aux.print_conditional_penalties(suffix_and_tag_count_map, 
+                                       suffix_count_map,True)
 print "STOP P(SUFFIX_AND_TAG | SUFFIX)"
 
 # Compute and display the penalties for suffixes.
@@ -162,8 +165,8 @@ print "STOP P(TAG)"
 ## CONSTRUCT TAG SEQUENCE TABLE.
 
 # Typical HMM simplifiers.
-trigram_enumerator = [[0,1]] * 3
-trigram_denominator = [[0,1]] * 2 + [[0,0]]
+trigram_enumerator = [[0,1], [0,1], [0,1]]
+trigram_denominator = [[0,1], [0,1], [0,0]]
 trigram_enumerator_simplifier = tagger_aux.SequenceSimplifier\
     (trigram_enumerator)
 trigram_denominator_simplifier = tagger_aux.SequenceSimplifier\
@@ -171,8 +174,8 @@ trigram_denominator_simplifier = tagger_aux.SequenceSimplifier\
 trigram_enumerator_counter = tagger_aux.get_pair_counter()
 trigram_denominator_counter = tagger_aux.get_object_counter()
 
-bigram_enumerator = [[0,1]] * 2
-bigram_denominator = [[0,1]] + [[0,0]]
+bigram_enumerator = [[0,1], [0,1]]
+bigram_denominator = [[0,1], [0,0]]
 bigram_enumerator_simplifier = tagger_aux.SequenceSimplifier(bigram_enumerator)
 bigram_denominator_simplifier = tagger_aux.SequenceSimplifier\
     (bigram_denominator)
