@@ -61,8 +61,7 @@ In most applications of spell-checking, efficiency is a limiting factor for
 selecting or discarding spell-checking solutions. In the case of finite-state
 spell-checking it is known that finite-state language models can efficiently
 encode dictionaries of natural languages~\cite{beesley/2003}, even for
-polysynthetic languages. The efficiency of finite-state approaches to spelling
-correction, however, has often been seen as a problem, and therefore most
+polysynthetic languages. Most
 contemporary spell-checking and correction systems are still based on
 programmatic solutions (e.g.  hunspell\footnote{\url{http://hunspell.sf.net}},
 and its *spell relatives), or at most specialised algorithms for implementing
@@ -72,49 +71,40 @@ finite-state implementations for both the detecting and correcting
 errors~\cite{schulz/2002,pirinen/2010/lrec}. In this paper we further evaluate
 the use of finite-state dictionaries with two-tape finite-state automatons for
 mechanism to correct misspellings, and how to optimise the finite-state error
-models.
+models, intending to demonstrate that purely finite-state algorithms can
+be made sufficiently efficient.
 
 To evaluate the general usability and efficiency of finite-state spell-checking
 we test the system with three languages of typologically different
-morphological features\footnote{we will not go deep into detail of morphological
-features of these languages. We thank the anonymous reviewer for pointing us
-to make this rough comparison using translated text piece. We measure from the translations of the
-\emph{Universal Declaration of Human Rights} (with pre-amble included) thusly:
-the number of word-like tokens for English is 1,746, for Finnish 1,275 and for§
-Greenlandic 1,063. The count of 15 most frequent tokens are for English
+morphological features\footnote{We will not go into details regarding the morphological
+features of these languages. We thank the anonymous reviewer for guiding us
+to make a rough comparison using a piece of translated text. We observe from the translations of the
+\emph{Universal Declaration of Human Rights} (with pre-amble included) as follows:
+the number of word-like tokens for English is 1,746, for Finnish 1,275 and for
+Greenlandic 1,063. The count of the 15 most frequent tokens are for English
 120---28,
 for Finnish 85---10 and for Greenlandic 38---7. 
 
 %The number of morphemes per word-forms are roughly X for English, Y for Finnish
 % and Z for Greenlandic
 
-The average word length is 5.0 for English, 7.8 for Finnish and 14.9 for
-Greenlandic. For complexity of computational models refer to the 
-Table~\ref{table:dictionary-sizes} in this article.
+The average word length is 5.0 characters for English, 7.8 for Finnish and 14.9 for
+Greenlandic. For the complexity of computational models refer to 
+Table~\ref{table:dictionary-sizes} in this article.}
 
-} and \emph{different reference implementations for
+and \emph{different reference implementations for
 contemporary spell-checking applications}: English as a sample of a
 morphologically more isolating language with a basically word-list approach to
-spell-checking; as a reference implementation we use hunspell's en-US
-dictionary\footnote{\url{http://wiki.services.openoffice.org/wiki/Dictionaries}}
-and for a finite-state version we use a weighted word-list from
-\newcite{norvig/2010}. The second language we test is Finnish, whose
+spell-checking; Finnish, whose
 computational complexity has been just beyond the edge of being too hard to
-implement nicely in hunspell system for example~\cite{pitkanen/2006}. For a
-reference implementation we use Voikko\footnote{\url{http://voikko.sf.net}},
-with a LAG-based dictionary using
-Malaga\footnote{\url{http://home.arcor.de/bjoern-beutel/malaga/}}. Our third
-test language is Greenlandic, a polysynthetic language which is implemented as
+implement nicely in hunspell system for example~\cite{pitkanen/2006}; and
+Greenlandic, a polysynthetic language which is implemented as a
 finite-state system using Xerox's original finite-state morphology
-formalism~\cite{beesley/2003}. We use Foma~\cite{foma} for performing the
-correction task\footnote{\url{http://code.google.com/p/Foma/}}.  As a general
+formalism~\cite{beesley/2003}. As a general
 purpose finite-state library we use HFST\footnote{\url{http://hfst.sf.net}},
-which also provides our spell-checking code. There is no free software for us
-as a reference implementation apart from our solution, as far as we know.
+which also contains our spell-checking code.
 
-The baseline feature set and the efficiency of spell-checking we are targeting
-is defined by the currently de facto standard spelling suite in open source
-systems, hunspell. As neither Finnish nor Greenlandic have been successfully
+As neither Finnish nor Greenlandic have been successfully
 implemented in the hunspell formalism, we mainly use them to evaluate how
 the complexity of a language model affects the efficiency of finite-state
 spell-checking. For a full-scale survey on the state-of-the-art
@@ -122,13 +112,16 @@ non-finite-state spell-checking, refer to \newcite{mitton/2009}.
 
 The efficiency results are contrasted with the existing research on
 finite-state spell-checking in \newcite{hassan/2008} and the theoretical
-results on finite-state error-models in \newcite{mitankin/2005}.  Our addition
+results on finite-state error-models in \newcite{mitankin/2005}. Our addition
 primarily comprises the addition of morphologically complex languages with
 actual cyclic dictionary automata (i.e. infinite dictionaries formed by
 compounding and recurring derivation) and more complex structure in general,
-compared to those of English and Arabic. We also point out that previous
+compared to those of English and Arabic. Our goal is to demonstrate that
+finite-state spelling is tractable for these complex languages, to document
+their implications for performance and to present an algorithm for the task.
+We also point out that previous
 approaches have neglected to simultaneously constrain the error model and the
-dictionary with each other in on-line composition, which affords a significant
+dictionary with each other in on-line composition, affords a significant
 speed benefit compared to generating the two component compositions.
 
 The rest of the paper is organised as follows. In Section~\ref{sec:methods} we
@@ -148,11 +141,13 @@ and outline future goals.
 \section{Methods}
 \label{sec:methods}
 
-A finite-state spell-checker is typically composed of at least two finite-state
+A finite-state spell-checker is typically~\cite{pirinen/2010/lrec}
+composed of at least two finite-state
 automata; one for the dictionary of the language, or the \emph{language model},
 which contains valid strings of the language, and one automaton to map misspelt
 words into correct strings, or the \emph{error model}. Both the language models
-and the error models are usually weighted finite-state automata, in which
+and the error models are usually~\cite{pirinen/2010/lrec}
+weighted finite-state automata, in which
 case the probabilities are of a word being correctly spelled in the language
 model and of specific misspellings, respectively.
 We evaluate here the effect of both the language and error model automatons'
@@ -167,10 +162,12 @@ results.}
 \label{subsec:language-models}
 
 The most basic language model for a spell-checking dictionary is a list of
-correctly spelled word forms. One of the easiest way to create such 
-spell-checker is collecting the word forms from reasonably large corpus of
+correctly spelled word forms. One of the easiest ways of creating such a
+spell-checker is collecting the word forms from a reasonably large corpus of
 (mostly) correctly spelt texts; additionally we can count the frequency of words
-and use that as the likelihood $P=\frac{c(\mathrm{wordform})}{\mathrm{Corpus size}}$.
+and use that as the likelihood,
+$P(w)=\frac{c(w)}{\sum_{w \in \mathcal{D} } c(w)}$ where $c(w)$ is the
+count of the word $w$ and $\mathcal{D}$ is the set of corpus word forms.
 For morphologically more isolating languages such as English, this is
 often a sufficient
 approach~\cite{norvig/2010}, and we use it to create a dictionary
@@ -200,7 +197,7 @@ extensions to it such as affix stripping (as in hunspell) are not adequate for
 describing word forms. To our knowledge, the only approaches that have been
 widely used for spell-checking and morphological analysis of Greenlandic have
 been based on traditional finite-state solutions, such as the Xerox formalisms.
-In our case we have obtained one from the Internet, that was based on freely
+In our case we have obtained one from the Internet, that was based on a freely
 available finite-state morphology
 implementation\footnote{\url{https://victorio.uit.no/langtech/trunk/st/kal}}.
 For further details we refer to the authors' website
@@ -235,8 +232,8 @@ in weighted finite-state automaton, which corresponds the likelihood of an
 error, or a confusion factor. This can be used to implement features like
 keyboard adjacency or OCR confusion factor to the error correction model. This
 will not modify the structure of the finite-state error models or the search
-space---which is why we did not test in this article---, but introduction of
-non-homogenous weights to resulting finite-state network may have an effect on
+space---which is why we did not test their effects in this article---, but introduction of
+non-homogenous weights to the resulting finite-state network may have an effect on
 search time. This addition is equivalent to hunspell's \texttt{KEY} mechanism.
 
 For English language spelling correction there is also an additional form of
@@ -654,6 +651,21 @@ The respective versions of the software are Voikkospell 3.3, hunspell
 1.2.14, and Foma 0.9.16alpha. The reference systems are tested with default
 settings, this means that they will give some first suggestions whereas
 our system will calculate all strings within given error model.
+
+As a reference implementation for English we use hunspell's en-US
+dictionary\footnote{\url{http://wiki.services.openoffice.org/wiki/Dictionaries}}
+and for a finite-state implementation we use a weighted word-list from
+\newcite{norvig/2010}. As a Finnish reference implementation we use
+Voikko\footnote{\url{http://voikko.sf.net}},
+with a LAG-based dictionary using
+Malaga\footnote{\url{http://home.arcor.de/bjoern-beutel/malaga/}}. The
+reference correction task for Greenlandic is done with foma's~\cite{foma}
+\texttt{apply med} function with default
+settings\footnote{\url{http://code.google.com/p/Foma/}}.  
+
+The baseline feature set and the efficiency of spell-checking we are targeting
+is defined by the currently de facto standard spelling suite in open source
+systems, hunspell.
 
 In the Table~\ref{table:error-model-vs-language-speed} we measure the speed of
 the spell-checking process of the native language Wikipedia with real-world
