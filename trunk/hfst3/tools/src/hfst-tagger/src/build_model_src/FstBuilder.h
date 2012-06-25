@@ -29,6 +29,7 @@
 #include <string>
 
 #include "HfstTransducer.h"
+#include "WeightedStringVectorCollection.h"
 
 using hfst::implementations::HfstBasicTransducer;
 using hfst::HfstTransducer;
@@ -80,7 +81,7 @@ class FstBuilder
 		       bool &new_transition_required);
   StringVector split_at_tabs(const std::string &str);
   virtual void add_sequence(const WeightedStringVector &c,
-			    bool is_lexical_model) = 0;
+			    weighted_string_type type) = 0;
   HfstState add_sequence(StringVector::const_iterator it,
 			 StringVector::const_iterator end);
 };

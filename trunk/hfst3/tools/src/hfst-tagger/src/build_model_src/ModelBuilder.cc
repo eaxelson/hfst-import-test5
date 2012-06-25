@@ -24,15 +24,19 @@ ModelBuilder::ModelBuilder
 	 model_weights.begin();
        it != model_weights.end();
        ++it)
-    { add_sequence(*it,model_weights.is_lexical_model); }
+    { 
+      add_sequence(*it,
+		   (model_weights.is_lexical_model ? LEXICAL : SEQUENCE)); 
+    }
 }
 
 void ModelBuilder::add_sequence(const WeightedStringVector &v,
-			       bool is_lexical_model)
+				weighted_string_type string_type)
 {
   StringVector symbol_sequence = v.string_vector;
   float weight = v.weight;
 
+  // This should only happen once with the prob of the empty suffix.
   if (symbol_sequence.empty())
     {
       model_fst.set_final_weight(START_STATE,weight);
@@ -45,10 +49,10 @@ void ModelBuilder::add_sequence(const WeightedStringVector &v,
   
   std::string last_output_symbol = symbol_sequence.back();
   std::string last_input_symbol = 
-    (is_lexical_model ? internal_epsilon : symbol_sequence.back());
+    ((string_type == LEXICAL) ? internal_epsilon : symbol_sequence.back());
   
   HfstState final_state = 
-    (is_lexical_model ? model_fst.add_state() : 0);
+    ((string_type == LEXICAL) ? model_fst.add_state() : START_STATE);
 
   FstBuilder::add_transition(target_state,
 			       final_state,
