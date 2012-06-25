@@ -14,8 +14,8 @@ void WeightedStringVectorCollection::init_line_number(void)
 { line_number = 0; }
 
 WeightedStringVectorCollection::WeightedStringVectorCollection
-(std::istream &in, bool lexical_model):
-  is_lexical_model(lexical_model)
+(std::istream &in, weighted_string_type type):
+  is_lexical_model(type == LEXICAL)
 {
   this->name = read_model_start_tag(getline(in));
   
@@ -31,7 +31,7 @@ WeightedStringVectorCollection::WeightedStringVectorCollection
       try
 	{
 	  WeightedStringVector entry = 
-	    (lexical_model ? 
+	    (this->is_lexical_model ? 
 	     tokenize_lexicon_line(line,tokenizer) :
 	     tokenize_grammar_line(line,tokenizer));
 
