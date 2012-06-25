@@ -505,15 +505,10 @@ corrections along them. Finally we have used a text corpus from language
 different than the one being spelled to ensure that majority of words are not
 in vocabulary and not fixable by standard error models.
 
-The corpora statistics are provided here for verification and reproducability:
-the English Wikipedia
-dump\footnote{\url{http://dumps.wikimedia.org/enwiki/20120211/enwiki-20120211-pages-articles.xml.bz2}}
-is 34 GiB, the Finnish
-Wikipedia\footnote{\url{http://dumps.wikimedia.org/fiwiki/20120213/fiwiki-20120213-pages-articles.xml.bz2}}
-is 1 GiB, and the Greenlandic
-Wikipedia\footnote{\url{http://dumps.wikimedia.org/klwiki/20120214/klwiki-20120214-pages-articles.xml.bz2}}
-is only 7 MiB. From these we have extracted the contents of the articles and
-picked the first 100,000 word tokens for evaluation purposes.
+The Wikipedia corpora were sourced from \texttt{wikimedia.org}. For exact
+references, see our previously mentioned repository.
+From the dumps we extracted the contents of the articles and
+picked the first 100,000 word tokens for evaluation.
 
 In Table~\ref{table:dictionary-sizes} we summarize the sizes of automata in
 terms of structural elements. On the first row, we give the size of
@@ -805,23 +800,22 @@ model, giving consumptions of 13-7 MiB for English, 0.2 GiB for Finnish and
 %% error models to memory consumption}
 %% \end{table}
 
-The memory measurements show an interesting feature of our method of applying
-the spell-checking and correction here; the memory usage stays nearly same
-regardless of the selected error model. We assume that the memory figures shown
-in the table are dominated by the memory stamp of the dictionary automaton and
-the error model automaton loaded into memory, and the intermediate structures
-used by the error-applying traversal of the automaton will not typically
-contribute much (approx. half mebibyte\footnote{This is a standard SI measure
-unit, see \url{http://en.wikipedia.org/wiki/Mebibyte}} for
-each larger edit distance), since they are created and deleted on-the-fly.
-Notable discrepancy to this pattern is Greenlandic with larger edit distances,
-it seems to exhaust whole memory which may be caused an inadvertent (epsilon)
-loop in the morphology. One practical thing to note here is, the memory
-footstamp does give suggestion of how much available RAM is needed to get speed
-measurements of the table~\ref{table:error-model-vs-language-speed}, as our
-experience shows that if the dictionary automaton is partially in swap memory,
-the speed will decrease by order of magnitude in current operating systems,
-e.g. on low-end minilaptops and Greenlandic dictionaries.
+%% The memory measurements show an interesting feature of our method of applying
+%% the spell-checking and correction here; the memory usage stays nearly same
+%% regardless of the selected error model. We assume that the memory figures shown
+%% in the table are dominated by the memory stamp of the dictionary automaton and
+%% the error model automaton loaded into memory, and the intermediate structures
+%% used by the error-applying traversal of the automaton will not typically
+%% contribute much (approx. half a mebibyte) for
+%% each larger edit distance), since they are created and deleted on-the-fly.
+%% Notable discrepancy to this pattern is Greenlandic with larger edit distances,
+%% it seems to exhaust whole memory which may be caused an inadvertent (epsilon)
+%% loop in the morphology. One practical thing to note here is, the memory
+%% footstamp does give suggestion of how much available RAM is needed to get speed
+%% measurements of the table~\ref{table:error-model-vs-language-speed}, as our
+%% experience shows that if the dictionary automaton is partially in swap memory,
+%% the speed will decrease by order of magnitude in current operating systems,
+%% e.g. on low-end minilaptops and Greenlandic dictionaries.
 
 To measure the degradation of quality when using different error models we
 count the proportion of suggestion sets that contain the correct correction
