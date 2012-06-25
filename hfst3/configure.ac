@@ -403,6 +403,15 @@ AC_ARG_ENABLE([stress-tests],
                               [enable_stress_tests=no])
 AM_CONDITIONAL([WANT_STRESSTESTS], [test x$enable_stress_tests != xno])
 
+# Disable compiling on windows by default
+AC_ARG_ENABLE([windows],
+		[AS_HELP_STRING([--enable-windows],
+				[compile on windows @<:@default=no@:>@])],
+				[enable_windows=$enableval],
+				[enable_windows=no])
+AM_CONDITIONAL([WANT_WINDOWS], [test x$enable_windows != xno])
+
+
 # Checks for programs
 AC_PROG_CC
 AC_PROG_CXX
