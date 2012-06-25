@@ -20,6 +20,7 @@
 import math
 import collections
 import string
+import sys
 
 class InvalidPattern(Exception):
     def __init__(self):
@@ -81,25 +82,21 @@ def get_penalty(suffix_and_tag_count, suffix_count):
     return math.log(suffix_count) - math.log(suffix_and_tag_count)
 
 
+def verbose_print(message, is_verbose):
+    if is_verbose:
+        print sys.stderr >> message
+
 # Return the utf-8 string str reversed. utf-8 symbols are not
 # internally reversed.
-def reverse(str):
-
-    u_str = unicode(str, "utf-8")
-
-    u_str_array = list(u_str)
-    u_str_array.reverse()
-
-    return string.join(u_str_array, "")
+def reverse(str):    
+    return unicode(str, "utf-8")[::-1]
 
 # Return a map for counting pairs e.g. word form and tag pairs.
 def get_object_counter():
-
     return collections.defaultdict(lambda : 0.0)
 
 # Return a map for counting objects, e.g. word forms.
 def get_pair_counter():
-
     return collections.defaultdict(lambda : get_object_counter())
 
 # Return a mapping from pairs in pair_counter to their conditional
@@ -132,13 +129,18 @@ def get_penalty_map(object_counter, total_count):
 
     return penalty_map
 
-def print_conditional_penalties(pair_counter, object_counter):
+def print_conditional_penalties(pair_counter, object_counter, 
+                                invert_fields=False):
 
     penalty_map = get_conditional_penalty_map(pair_counter, object_counter) 
 
     for pair, penalty in penalty_map.iteritems():
         if type(pair[0]) == type(u"") or type(pair[0]) == type(""):
-            print string.join([pair[0], pair[1], str(penalty)],"\t")
+
+            if not invert_fields:
+                print string.join([pair[0], pair[1], str(penalty)],"\t")
+            else:
+                print string.join([pair[1], pair[0], str(penalty)],"\t")
         else:
             for entry in pair[0]:
                 print entry[0] + "\t" + entry[1] + "\t",
@@ -147,8 +149,6 @@ def print_conditional_penalties(pair_counter, object_counter):
 def print_penalties(object_counter, total_count):
 
     penalty_map = get_penalty_map(object_counter, total_count) 
-
-    print penalty_map
 
     for object, penalty in penalty_map.iteritems():
         print object + "\t" + str(penalty)
