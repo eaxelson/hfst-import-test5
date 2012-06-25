@@ -7,6 +7,7 @@
 \usepackage{amsmath}
 \usepackage{multirow}
 \usepackage{url}
+\usepackage{algpseudocode}
 \DeclareMathOperator*{\argmax}{arg\,max}
 
 \usepackage{ifpdf}
@@ -79,8 +80,9 @@ morphological features\footnote{we will not go deep into detail of morphological
 features of these languages. We thank the anonymous reviewer for pointing us
 to make this rough comparison using translated text piece. We measure from the translations of the
 \emph{Universal Declaration of Human Rights} (with pre-amble included) thusly:
-the number of word-like tokens for English is 1746, for Finnish 1275 and for§
-Greenlandic 1063. The count of 15 most frequent tokens are for English 120---28,
+the number of word-like tokens for English is 1,746, for Finnish 1,275 and for§
+Greenlandic 1,063. The count of 15 most frequent tokens are for English
+120---28,
 for Finnish 85---10 and for Greenlandic 38---7. 
 
 %The number of morphemes per word-forms are roughly X for English, Y for Finnish
@@ -273,12 +275,40 @@ input symbols, but then stabilises quickly. This was accomplished by
 performing the following
 state-categorisation procedure:
 
-\begin{enumerate} \itemsep1pt \parskip0pt \parsep0pt
-\item The start state is assigned to class $0$, and all other states are
+%% \begin{algorithmic}
+%% \State $i\gets 0$
+%% \State $class[i]\gets q_s$
+%% \State $candidate\_pool\gets Q \setminus q_s$
+%% \While{$candidate\_pool$ is nonempty}
+%% \While{some states were added to $class[i]$}
+%% \ForAll{state $s$ in $candidate\_pool$}
+%% \If{there is an epsilon transition from a state in $class[i]$ to $s$}
+%% \State add $s$ to $class[i]$
+%% \State remove $s$ from $candidate\_pool$
+%% \EndIf
+%% \EndFor
+%% \EndWhile
+%% \While{some states were added to $class[i+1]$}
+%% \ForAll{state $s$ in $candidate\_pool$}
+%% \If{there is a non-epsilon transition from a state in $class[i]$ to $s$}
+%% \State add $s$ to $class[i+1]$
+%% \State remove $s$ from $candidate\_pool$
+%% \EndIf
+%% \EndFor
+%% \EndWhile
+%% \State $i\gets i+1$
+%% \EndWhile
+%% \end{algorithmic}
+
+\begin{enumerate} \itemsep0pt \parskip0pt \parsep0pt
+\item The start state is assigned to class $0$,
+and all other states are
 assigned to a candidate pool.
-\item All states to which there is an (input) epsilon transition from the
-start state are assigned to class $0$ and removed from the candidate pool.
-\item The above is repeated for each state in class $0$ until no more states
+\item All states to which there is an (input)
+epsilon transition from the start state are assigned to class $0$ and
+removed from the candidate pool.
+\item This is repeated for each state in
+class $0$ until no more states
 are added to class $0$. This completes class $0$ as the set of states in which
 the automaton can be before consuming any input.
 \item For each state in class $0$, states in the candidate pool to which there
@@ -286,15 +316,43 @@ is a non-epsilon transition are assigned to class $1$ and removed from the
 candidate pool.
 \item Class $1$ is epsilon-completed as in (2-3).
 \item After the completion of class $n$, class $n+1$ is constructed. This
-continues until the candidate pool is empty, which is guaranteed to happen
-if there are no unreachable states in the automaton.
+continues until the candidate pool is empty, which will happen
+as long as there are no unreachable states.
 \end{enumerate}
 
 Having this categorisation, we tallied the total number of arcs from states in
 each class and divided this total by the number of states in the class. This
 is intended as an approximate measure of the ambiguity present at a particular
-point in the input. Some results are summarized in tables
-\ref{table:en-state-classification} and \ref{table:fi-state-classification}.
+point in the input. Some results are summarized in
+table~\ref{table:fi-state-classification}.
+
+%% \begin{table}[h]
+%% \begin{center}
+%% \begin{scriptsize}
+%% \begin{tabular}{|l|rrr|}
+%% \hline
+%% \bf Class & \bf Transitions & \bf States & \bf Average \\ 
+%% \hline
+%% 0 & 84 & 1 & 84 \\
+%% 1 & 620 & 39 & 15.9 \\
+%% 2 & 3,999 & 575 & 7.0 \\
+%% 3 & 11,498 & 3,578 & 3.2 \\
+%% 4 & 16,165 & 8,432 & 1.917102 \\
+%% 5 & 15,380 & 9,811 & 1.567628 \\
+%% 6 & 12,817 & 8,591 & 1.491910 \\
+%% 7 & 9,566 & 6,616 & 1.445889 \\
+%% 8 & 6,474 & 4,532 & 1.428508 \\
+%% 9 & 3,981 & 2,875 & 1.384696 \\
+%% 10 & 2,487 & 1,814 & 1.371003 \\
+%% 11 & 1,398 & 1,068 & 1.308989 \\
+%% 12 & 738 & 582 & 1.268041 \\
+%% \hline
+%% \end{tabular}
+%% \end{scriptsize}
+%% \end{center}
+%% \caption{\label{table:en-state-classification}
+%% State classification by minimum input consumed for the English dictionary}
+%% \end{table}
 
 \begin{table}[h]
 \begin{center}
@@ -303,47 +361,19 @@ point in the input. Some results are summarized in tables
 \hline
 \bf Class & \bf Transitions & \bf States & \bf Average \\ 
 \hline
-0 & 84 & 1 & 84 \\
-1 & 620 & 39 & 15.9 \\
-2 & 3,999 & 575 & 7.0 \\
-3 & 11,498 & 3,578 & 3.2 \\
-4 & 16,165 & 8,432 & 1.917102 \\
-5 & 15,380 & 9,811 & 1.567628 \\
-6 & 12,817 & 8,591 & 1.491910 \\
-7 & 9,566 & 6,616 & 1.445889 \\
-8 & 6,474 & 4,532 & 1.428508 \\
-9 & 3,981 & 2,875 & 1.384696 \\
-10 & 2,487 & 1,814 & 1.371003 \\
-11 & 1,398 & 1,068 & 1.308989 \\
-12 & 738 & 582 & 1.268041 \\
-\hline
-\end{tabular}
-\end{scriptsize}
-\end{center}
-\caption{\label{table:en-state-classification}
-State classification by minimum input consumed for the English dictionary}
-\end{table}
-
-\begin{table}[h]
-\begin{center}
-\begin{scriptsize}
-\begin{tabular}{|l|rrr|}
-\hline
-\bf Class & \bf Transitions & \bf States & \bf Average \\ 
-\hline
-0 & 156 & 3 & 52.000000 \\
-1 & 1,015 & 109 & 9.311927 \\
-2 & 6,439 & 1,029 & 6.257532 \\
-3 & 22,436 & 5,780 & 3.881661 \\
-4 & 38,899 & 12,785 & 3.042550 \\
-5 & 44,973 & 15,481 & 2.905045 \\
-6 & 47,808 & 17,014 & 2.809921 \\
-7 & 47,495 & 18,866 & 2.517492 \\
-8 & 39,835 & 17,000 & 2.343235 \\
-9 & 36,786 & 14,304 & 2.571728 \\
-10 & 45,092 & 14,633 & 3.081528 \\
-11 & 66,598 & 22,007 & 3.026219 \\
-12 & 86,206 & 30,017 & 2.871906 \\
+0 & 156 & 3 & 52 \\
+1 & 1,015 & 109 & 9.3 \\
+2 & 6,439 & 1,029 & 6.3 \\
+3 & 22,436 & 5,780 & 3.9 \\
+4 & 38,899 & 12,785 & 3.0 \\
+5 & 44,973 & 15,481 & 2.9 \\
+6 & 47,808 & 17,014 & 2.8 \\
+7 & 47,495 & 18,866 & 2.5 \\
+8 & 39,835 & 17,000 & 2.3 \\
+9 & 36,786 & 14,304 & 2.6 \\
+10 & 45,092 & 14,633 & 3.1 \\
+11 & 66,598 & 22,007 & 3.0 \\
+12 & 86,206 & 30,017 & 2.9 \\
 \hline
 \end{tabular}
 \end{scriptsize}
@@ -553,13 +583,13 @@ $\Sigma$ set size &
  28& 60& 64
 \\
 Edit distance 1 nodes &
- 652& 3308& 3784
+ 652& 3,308& 3,784
 \\
 Edit distance 1 arcs &
- 2081& 10,209& 11,657
+ 2,081& 10,209& 11,657
 \\
 Edit distance 2 nodes &
- 1303& 6615& 7567
+ 1,303& 6,615& 7,567
 \\
 Edit distance 2 arcs &
  4136& 20,360& 23,252
@@ -571,13 +601,13 @@ Edit distance 2 arcs &
 %%  6191& 30511& 34847
 %% \\
 No firsts ed 1 nodes & 
- 652& 3308& 3784
+ 652& 3,308& 3,784
 \\
 No firsts ed 1 arcs & 
- 2107& 10,267& 11,719
+ 2,107& 10,267& 11,719
 \\
 No firsts ed 2 nodes &
- 1303& 6,615& 7567
+ 1,303& 6,615& 7,567
 \\
 No firsts ed 2 arcs &
  4,162& 20,418& 23,314
@@ -589,16 +619,16 @@ No firsts ed 2 arcs &
 %%  6217& 30569& 34909
 %% \\
 No redundancy and 1.s ed 2 nodes &
- 1303& 6615& 7567
+ 1,303& 6,615& 7,567
 \\
 No redundancy and 1.s ed 2 arcs &
- 4162& 20,418& 23,314
+ 4,162& 20,418& 23,314
 \\
 Lower order first ed 1 to 2 arcs &
-6217 & 30,569 & 34,909
+6,217 & 30,569 & 34,909
 \\
 Lower order first ed 1 to 2 nodes &
-1955 & 9923 & 11,351
+1,955 & 9,923 & 11,351
 \\
 \hline
 \end{tabular}
@@ -711,52 +741,53 @@ described here is greater than 1 word per second (i.e. 10,000 seconds per 10,000
 words).
 
 
-In the Table~\ref{table:error-model-vs-language-memory} we measure the memory
-consumption when performing the same tests. The tests here are also performed
-using unmodified native language corpora and with same language and error
-models as with previous tests.
+We measured the memory
+consumption when performing the same tests. Varying the error model had little
+to no effect. Memory consumption was almost entirely determined by the language
+model, giving consumptions of 13-7 MiB for English, 0.2 GiB for Finnish and
+1.6 GiB for Greenlandic.
 
-\begin{table}[h]
-\begin{center}
-\begin{scriptsize}
-\begin{tabular}{|l|rrr|}
-\hline
-\bf Error model & \bf En & \bf Fi & \bf Kl \\ 
-\hline
-Edit distance 1 &
-13.5 MiB&0.2 GiB&1.6 GiB
-\\
-Edit distance 2 &
-13.6 MiB&0.2 GiB&1.6 GiB
-\\
-Edit distance 3 &
-17.1 MiB&0.3 GiB&---
-\\
-No firsts ed 1 & 
-13.5 MiB&0.2 GiB&1.6 GiB
-\\
-No firsts ed 2 &
-13.6 MiB&0.2 GiB&1.6 GiB
-\\
-No firsts ed 3 &
-13.7 MiB&0.2 GiB&---
-\\
-No redundancy or firsts ed 2 &
-13.6 MiB&0.2 GiB&1.6 GiB
-\\
-%No redundancy or firsts ed 3 &
-%---&---&---
-%\\
-Lower order first ed 1 to 2 &
-13.8 MiB&0.2 GiB&1.6 GiB
-\\
-\hline
-\end{tabular}
-\end{scriptsize}
-\end{center}
-\caption{\label{table:error-model-vs-language-memory} Effect of language and 
-error models to memory consumption}
-\end{table}
+%% \begin{table}[h]
+%% \begin{center}
+%% \begin{scriptsize}
+%% \begin{tabular}{|l|rrr|}
+%% \hline
+%% \bf Error model & \bf En & \bf Fi & \bf Kl \\ 
+%% \hline
+%% Edit distance 1 &
+%% 13.5 MiB&0.2 GiB&1.6 GiB
+%% \\
+%% Edit distance 2 &
+%% 13.6 MiB&0.2 GiB&1.6 GiB
+%% \\
+%% Edit distance 3 &
+%% 17.1 MiB&0.3 GiB&---
+%% \\
+%% No firsts ed 1 & 
+%% 13.5 MiB&0.2 GiB&1.6 GiB
+%% \\
+%% No firsts ed 2 &
+%% 13.6 MiB&0.2 GiB&1.6 GiB
+%% \\
+%% No firsts ed 3 &
+%% 13.7 MiB&0.2 GiB&---
+%% \\
+%% No redundancy or firsts ed 2 &
+%% 13.6 MiB&0.2 GiB&1.6 GiB
+%% \\
+%% %No redundancy or firsts ed 3 &
+%% %---&---&---
+%% %\\
+%% Lower order first ed 1 to 2 &
+%% 13.8 MiB&0.2 GiB&1.6 GiB
+%% \\
+%% \hline
+%% \end{tabular}
+%% \end{scriptsize}
+%% \end{center}
+%% \caption{\label{table:error-model-vs-language-memory} Effect of language and 
+%% error models to memory consumption}
+%% \end{table}
 
 The memory measurements show an interesting feature of our method of applying
 the spell-checking and correction here; the memory usage stays nearly same
@@ -909,10 +940,10 @@ of context in finite-state spell-checking (as in
 \section*{Acknowledgements} 
 
 We thank the anonymous reviewers for their comments and the HFST research
-team for fruity discussions on the article's topics. First author thanks the 
-people of \emph{Oqaaserpassualeriffik} for introducing the problems and 
-possibilities of finite-state applications to morphologically complex language
-of Greenlandic.
+team for fruity discussions on the article's topics. The first author thanks
+the  people of \emph{Oqaaserpassualeriffik} for introducing the problems and 
+possibilities of finite-state applications to the morphologically complex
+language of Greenlandic.
 
 \bibliographystyle{acl2012}
 \bibliography{fsmnlp2012}
