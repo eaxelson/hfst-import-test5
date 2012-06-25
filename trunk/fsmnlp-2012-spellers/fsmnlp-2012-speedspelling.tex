@@ -75,7 +75,8 @@ models, intending to demonstrate that purely finite-state algorithms can
 be made sufficiently efficient.
 
 To evaluate the general usability and efficiency of finite-state spell-checking
-we test the system with three languages of typologically different
+we test a number of possible implementations of such a system
+with three languages of typologically different
 morphological features\footnote{We will not go into details regarding the morphological
 features of these languages. We thank the anonymous reviewer for guiding us
 to make a rough comparison using a piece of translated text. We observe from the translations of the
@@ -94,7 +95,7 @@ Table~\ref{table:dictionary-sizes} in this article.}
 
 and \emph{different reference implementations for
 contemporary spell-checking applications}: English as a sample of a
-morphologically more isolating language with a basically word-list approach to
+morphologically more isolating language with essentially a word-list approach to
 spell-checking; Finnish, whose
 computational complexity has been just beyond the edge of being too hard to
 implement nicely in hunspell system for example~\cite{pitkanen/2006}; and
@@ -187,9 +188,7 @@ reference non-finite state language model for Finnish Voikko's implementation
 in Malaga, which is currently used as a spell-checking component in open source
 software. It is implemented in a left-associative grammar formalism, which is a
 potentially less efficient system with more expressive power. It's similar to
-finite-state formulations in terms of linguistic coverage---the main rationale
-of original implementation, however, was that it was first openly available
-approach at that time.
+finite-state formulations in terms of linguistic coverage.
 
 For polysynthetic languages it will be obvious that coverage of any
 word-list-based approach will be even lower. Furthermore, most simple
@@ -213,13 +212,12 @@ four typical slips of the fingers on a keyboard to events in the fuzzy matching
 of the misspelt word forms to correct ones, that is, the deletion of a
 character (i.e. failing to press a key), addition of a character (i.e. hitting
 an extra key accidentally), changing a character (i.e. hitting the wrong key)
-and swapping adjacent characters (i.e. hitting two keys in the wrong order).
+and transposing adjacent characters (i.e. hitting two keys in the wrong order).
 
 When modeling edit distance as finite-state automaton, a relatively simple
 two-tape automaton is sufficient to implement the algorithm~\cite{hassan/2008}.
 The automaton will consist of one arc for each type of error, and additionally
-one state for each swapping of character type of error is needed to keep the
-character pair to be swapped in memory. This means that the trivial
+one state for each transposition pair. This means that the trivial
 nondetermistic finite-state automaton implementing the algorithm is of space
 complexity $S(V, E, \Sigma) = O(|\Sigma|^2 |V| + |\Sigma|^2 |E|)$, where
 $\Sigma$ is the alphabet of language, $V$ is the set vertices in automaton and
@@ -408,7 +406,7 @@ first position in 1.2~\% of the entries, furthermore we noticed that
 when evenly splitting the word forms in three parts, 15~\% of the errors are
 in the first third of the word form, while second has 47~\% and third 38~\%,
 which would be in favor of selecting the error model to discard initial
-errors\footnote{by crude classification we mean that all errors were
+errors\footnote{By crude classification we mean that all errors were
 forced to one of the three classes at weight of one, e.g. a series of
 three consecutive instances of the same letters was counted as deletion at
 the first position.}.
@@ -449,7 +447,7 @@ $|\Sigma| - 1$ edits (the
 entire alphabet except for the actual input). This expression has no closed
 form, but as $d$ grows to $n$, the number of choices has the form $2^n$,
 so the altogether complexity is exponential in input length and linear
-in alphabet size (quadratic if swaps are considered).
+in alphabet size (quadratic if transpositions are considered).
 
 In practice
 (when $d$ is small relative to $n$) it is useful to observe that an
@@ -461,10 +459,10 @@ the ratio of which to the previously greatest term is
 \end{displaymath}
 indicating that when $d$ is small, increases in it produce an
 exponential increase in complexity.
-For an English 26-letter lowercase alphabet, swap
+For an English 26-letter lowercase alphabet, edit
 distance $2$ and the $8$-letter word ``spelling'', $700$ strings are
 stored in a transducer. With transpositions, deletions, insertions and edit
-weights this grows to $100,215$ different combinations of output and weight. We
+weights this grows to $100,215$ different outputs. We
 have implemented this algorithm for our results by generating the edited
 strings by lookup, and performing another lookup with the language model on
 these strings.
@@ -497,10 +495,11 @@ automatically to test different variants.
 
 To test the effect of correctness of the source text to speed of
 spelling-checker we have retrieved of largest freely available open source text
-materials from the internet, i.e. Wikipedia. The Wikipedia text as itself is
-an appropriate real-world material as it contains a wide variety of spelling
+materials from the internet, i.e. Wikipedia. The Wikipedia text is
+an appropriate real-world material as it is a large body of text
+authored by many individuals, and may be expected to contain a wide variety of spelling
 errors. For material with more errors, we have used a simple script to
-introduce the (further) errors at uniform probability of 1/33 per character;
+introduce (further, arbitrary) errors at a uniform probability of 1/33 per character;
 using this method we can also obtain a corpus of errors with correct
 corrections along them. Finally we have used a text corpus from language
 different than the one being spelled to ensure that majority of words are not
@@ -514,13 +513,11 @@ Wikipedia\footnote{\url{http://dumps.wikimedia.org/fiwiki/20120213/fiwiki-201202
 is 1 GiB, and the Greenlandic
 Wikipedia\footnote{\url{http://dumps.wikimedia.org/klwiki/20120214/klwiki-20120214-pages-articles.xml.bz2}}
 is only 7 MiB. From these we have extracted the contents of the articles and
-picked 100,000 first word tokens for evaluation purposes.
+picked the first 100,000 word tokens for evaluation purposes.
 
 In Table~\ref{table:dictionary-sizes} we summarize the sizes of automata in
-terms of structural elements. On the first row, we give the effective size of
-alphabet needed to represent the whole dictionary, this is all the Unicode
-code points that have been used in the dictionary, including alphabets,
-punctuation and spaces. Next we give the sizes of automata as nodes and
+terms of structural elements. On the first row, we give the size of
+alphabet needed to represent the entire dictionary. Next we give the sizes of automata as nodes and
 arcs of the finite-state automaton encoding the dictionary. Finally we give the
 size of the automaton as serialised on the hard disk. While this is not the
 same amount of memory as its loaded data structures, it gives some indication
@@ -558,9 +555,9 @@ The sizes of dictionaries as automata}
 \end{table}
 
 In the Table~\ref{table:error-sizes} we give the same figures for the
-sizes of error models we've generated. The sigma set size row here shows the
-amount of alphabets left, when we have removed the parts of alphabet from the
-error models that is usually not considered to be part of spell-checking
+sizes of error models we've generated. The $\Sigma$ size row here shows the
+number of symbols left when we have removed the symbols that are usually not
+considered to be a part of a spell-checking
 mechanism, such as all punctuation that does not occur word-internally and
 white-space characters\footnote{The method described here does not handle
 run-on words or extraneous spaces, as they introduce lot of programmatic
@@ -615,10 +612,10 @@ No firsts ed 2 arcs &
 %% No firsts ed 3 arcs &
 %%  6217& 30569& 34909
 %% \\
-No redundancy and 1.s ed 2 nodes &
+No redundancy and 1st ed 2 nodes &
  1,303& 6,615& 7,567
 \\
-No redundancy and 1.s ed 2 arcs &
+No redundancy and 1st ed 2 arcs &
  4,162& 20,418& 23,314
 \\
 Lower order first ed 1 to 2 arcs &
@@ -639,6 +636,13 @@ The sizes of error models as automata}
 \section{Evaluation}
 \label{sec:evaluation}
 
+We ran various combinations of language and error
+models on the corpora described in section~\ref{sec:materials}. We give
+tabular results of the speed of the system and the effect of the error model
+on recall. The latter is to establish that simpler error models lead
+to degraded recall---and not to more generally evaluate the present system
+as a spell-checker.
+
 The evaluations in this section are performed on quad-core Intel Xeon E5450
 running at 3~GHz with 64~GiB of RAM memory. The times are averaged over five
 test runs of 10,000 words in a stable server environment with no server processes
@@ -646,7 +650,7 @@ or running graphical interfaces or other uses. The test results are measured usi
 \texttt{getrusage} C function on a system that supports the maximum resident
 stack size \texttt{ru\_maxrss} and user time \texttt{ru\_utime} fields. The
 times are also verified with GNU \texttt{time} command. The results for
-hunspell, Voikkospell and Foma processes are only measured with time and top.
+hunspell, Voikkospell and Foma processes are only measured with \texttt{time} and \texttt{top}.
 The respective versions of the software are Voikkospell 3.3, hunspell
 1.2.14, and Foma 0.9.16alpha. The reference systems are tested with default
 settings, this means that they will give some first suggestions whereas
@@ -673,15 +677,15 @@ spelling errors and unknown strings. The error model rows are defined as
 follows: on the \emph{Reference impl.} row, we test the spell-checking speed of
 the hunspell tool for English, and Voikkospell tool for Finnish. On the
 \emph{edit distance 2} row we use the basic traditional edit distance 2 without
-any modifications. On the row \emph{lower order first}, we apply a
-lower order edit distance model first, then if no results are found,
-a higher order model is used. On the \emph{No first edits} row we
-use the error model that may not modify the first character of the word or the
-first character after compound word boundary. On the \emph{Avoid redundancy}
+any modifications. On the \emph{No first edits} row we
+use the error model that does not modify the first character of the word.
+On the \emph{No redundancy}
 row we use the error model edit distance 2 with the redundant edit combinations
-removed. On the \emph{Avoid redundancy and first edits} rows we use combined
-error model of \emph{No first edits} and \emph{Avoid redundancy}
-functionalities.  In the tables and formulae we routinely use the language
+removed. On the \emph{No redundancy and firsts} rows we use the combined
+error model of \emph{No first edits} and \emph{No redundancy}
+functionalities.  On the row \emph{Lower order first} we apply a
+lower order edit distance model first, then if no results are found,
+a higher order model is used. In the tables and formulae we routinely use the language
 codes to denote the languages: \emph{en} for English, \emph{fi} for Finnish and
 \emph{kl} for Greenlandic (Kalaallisut). 
 
@@ -708,7 +712,7 @@ Edit distance 2 &
 %% Edit distance 3 &
 %% 140.96&2649.29&---
 %% \\
-No firsts ed 1 & 
+No first edits 1 & 
 0.44&3.19&3.52
 \\
 No firsts ed 2 &
@@ -807,8 +811,8 @@ regardless of the selected error model. We assume that the memory figures shown
 in the table are dominated by the memory stamp of the dictionary automaton and
 the error model automaton loaded into memory, and the intermediate structures
 used by the error-applying traversal of the automaton will not typically
-contribute much (approx. half mebibyte\footnote{this is a standard SI measure
-unit, if unfamiliar, refer to \url{http://en.wikipedia.org/wiki/Mebibyte}} for
+contribute much (approx. half mebibyte\footnote{This is a standard SI measure
+unit, see \url{http://en.wikipedia.org/wiki/Mebibyte}} for
 each larger edit distance), since they are created and deleted on-the-fly.
 Notable discrepancy to this pattern is Greenlandic with larger edit distances,
 it seems to exhaust whole memory which may be caused an inadvertent (epsilon)
@@ -821,7 +825,11 @@ e.g. on low-end minilaptops and Greenlandic dictionaries.
 
 To measure the degradation of quality when using different error models we
 count the proportion of suggestion sets that contain the correct correction
-among the corrected strings. For this test we use automatically generated corpus
+among the corrected strings. The suggestion sets are the entire (unrestricted
+by number) results of correction, with no attempt to evaluate precision\footnote{Which,
+in the absence of suitable error corpora and a more full-fledged language model
+taking context into account, would be irrelevant for the goal at hand.}.
+For this test we use automatically generated corpus
 of spelling errors to get the large-scale results.
 
 \begin{table}[h]
@@ -856,8 +864,8 @@ No firsts ed 3 &
 \end{scriptsize}
 \end{center}
 \caption{\label{table:error-model-vs-language} Effect of language and 
-error models to quality (recall, correct suggestion found per
-correction set)}
+error models to quality (recall, proportion of suggestion sets containing a
+correctly suggested word)}
 \end{table}
 
 This test with automatically introduced errors shows us that with uniformly
@@ -916,8 +924,13 @@ speed of spell-checking is indeed in the correcting of wrong results.
 \label{sec:conclusions}
 
 In this article, we built a full-fledged finite-state spell-checking system from
-existing finite-state language models and generated error models. We showed
-that using online serial composition of the word form, error model and
+existing finite-state language models and generated error models. This work
+uses the system initially described in \newcite{pirinen/2010/lrec} and an
+algorithm described in \newcite{hfst/2012/cla}, providing
+an extensive quantitative evaluation of various combinations of constituents
+for such a system, and applying it to the most challenging linguistic environments
+available for testing.
+We showed that using on-line composition of the word form, error model and
 dictionary instead of previous approaches is usable for morphologically
 complex languages. Furthermore
 we showed that the error models can be automatically optimised in several ways
