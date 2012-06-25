@@ -5,6 +5,20 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.3.12
+----------------------------
+
+* Support for default symbol @_DEFAULT_SYMBOL_@
+
+* A tagger tool hfst-tagger
+
+* Improvements to hfst-lexc
+
+* Removed warning messages and XFAIL tests that may confuse users
+
+* Updated Doxygen documentation.
+
+
 Noteworthy changes in 3.3.11
 ----------------------------
 
