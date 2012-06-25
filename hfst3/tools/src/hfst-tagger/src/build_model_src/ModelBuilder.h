@@ -47,7 +47,8 @@ class ModelBuilder : public FstBuilder
 
  protected:
 
-  void add_sequence(const WeightedStringVector &v, bool is_lexical_model);
+  void add_sequence(const WeightedStringVector &v,
+		    weighted_string_type string_type);
 };
 
 #endif // HEADER_MODEL_BUILDER_H
