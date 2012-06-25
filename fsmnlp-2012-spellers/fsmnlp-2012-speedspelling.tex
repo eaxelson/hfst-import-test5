@@ -269,6 +269,7 @@ the minimum number of input symbols consumed by that state, we found that
 the average ambiguity in a particular class does not dramatically drop off after
 the first input symbols. This was accomplished by performing the following
 state-categorisation procedure:
+
 \begin{enumerate}
 \item The start state is assigned to class $0$, and all other states are
 assigned to a candidate pool.
@@ -285,6 +286,11 @@ candidate pool.
 continues until the candidate pool is empty, which is guaranteed to happen
 if there are no unreachable states in the automaton.
 \end{enumerate}
+
+Having this categorisation, we tallied the total number of arcs from states in
+each class and divided this total by the number of states in the class. This
+is intended as an approximate measure of the ambiguity present at a particular
+point in the input.
 
 The size of a dictionary automaton that is restricted to have
 a particular symbol in a particular position does not apparently depend on the
