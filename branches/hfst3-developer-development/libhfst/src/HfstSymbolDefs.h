@@ -75,25 +75,32 @@ namespace hfst
   typedef std::set<StringPair> StringPairSet;
 
   /** \brief A map of substitutions used when performing multiple
-      symbol-to-symbol substitutions. */
+      symbol-to-symbol substitutions. 
+
+      @see HfstTransducer::substitute(const HfstSymbolSubstitutions&) */
   typedef std::map<String, String> HfstSymbolSubstitutions;
 
   /** \brief A map of substitutions used when performing multiple
-      symbol pair-to-symbol pair substitutions. */
+      symbol pair-to-symbol pair substitutions. 
+
+      @see HfstTransducer::substitute(const HfstSymbolPairSubstitutions&) */
   typedef std::map<StringPair, StringPair> HfstSymbolPairSubstitutions;
   
 /* The internal representations */
   const std::string internal_epsilon = "@_EPSILON_SYMBOL_@";
   const std::string internal_unknown = "@_UNKNOWN_SYMBOL_@";
   const std::string internal_identity = "@_IDENTITY_SYMBOL_@";
+  const std::string internal_default = "@_DEFAULT_SYMBOL_@";
   
   /* Check whether a string is equal to reserved internal representation. */
   bool is_epsilon(std::string const & str);
   bool is_unknown(std::string const & str);
   bool is_identity(std::string const & str);
+  bool is_default(std::string const & str);
   bool is_epsilon(const char * str);
   bool is_unknown(const char * str);
   bool is_identity(const char * str);
+  bool is_default(const char * str);
 
   /* For internal use */
   typedef std::pair<unsigned int, unsigned int> NumberPair;

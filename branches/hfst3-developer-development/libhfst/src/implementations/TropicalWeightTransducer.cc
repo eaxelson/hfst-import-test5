@@ -628,7 +628,6 @@ namespace hfst { namespace implementations
         char a1 [100]; char a2 [100]; char a3 [100]; 
         char a4 [100]; char a5 [100];
         int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
-        //printf("number of arguments: (%i)\n", n);
 
         // set value of weight
         float weight = 0;
@@ -802,7 +801,6 @@ namespace hfst { namespace implementations
           }
       }
 
-    //result->SetInputSymbols(t->InputSymbols());
     return result;
   }
 
@@ -913,16 +911,7 @@ namespace hfst { namespace implementations
   void TropicalWeightInputStream::skip_hfst_header(void)
   {
     input_stream.ignore(6);
-    //char c;
-    //i_stream.get(c);
-    //switch (c)
-    //{
-    //case 0:
     skip_identifier_version_3_0();
-    //break;
-    //default:
-    //assert(false);
-    //}
   }
   
   void TropicalWeightInputStream::close(void)
@@ -1005,7 +994,7 @@ namespace hfst { namespace implementations
           { 
             HFST_THROW(TransducerHasWrongTypeException); }
       }
-    //catch (TransducerHasWrongTypeException e)
+
     catch (const HfstException e )
       { throw e; }
 
@@ -1013,7 +1002,7 @@ namespace hfst { namespace implementations
       {
         return t;
       }
-    //catch (HfstInterfaceException e)
+
     catch (const HfstException e )
       { throw e; }
   }
@@ -1500,11 +1489,6 @@ namespace hfst { namespace implementations
    std::string &osymbol, float w, StateId target)
   {
     SymbolTable *st = t->InputSymbols()->Copy();
-    /*if (t->InputSymbols() != t->OutputSymbols()) {
-      fprintf(stderr, "ERROR:  TropicalWeightTransducer::add_transition:
-      input and output symbols are not the same\n"); 
-      throw ErrorException(); 
-      }*/
     unsigned int ilabel = st->AddSymbol(isymbol);
     unsigned int olabel = st->AddSymbol(osymbol);
     t->AddArc(source, StdArc(ilabel, olabel, w, target));
@@ -1558,9 +1542,9 @@ namespace hfst { namespace implementations
       { return create_epsilon_transducer(); }
 
     StdVectorFst * repetition = create_epsilon_transducer();
-    for (int i = 0; i < n; ++i)
-      { Concat(repetition,*t); }
     repetition->SetInputSymbols(t->InputSymbols());
+    for (unsigned int i = 0; i < n; ++i)
+      { Concat(repetition,*t); }
     return repetition;
   }
 
@@ -1571,13 +1555,15 @@ namespace hfst { namespace implementations
       { return create_epsilon_transducer(); }
 
     StdVectorFst * repetition = create_epsilon_transducer();
-    for (int i = 0; i < n; ++i)
+    repetition->SetInputSymbols(t->InputSymbols());
+
+    for (unsigned int i = 0; i < n; ++i)
       {
         StdVectorFst * optional_t = optionalize(t);
+	optional_t->SetInputSymbols(t->InputSymbols());
         Concat(repetition,*optional_t);
         delete optional_t;
       }
-    repetition->SetInputSymbols(t->InputSymbols());
     return repetition;
   }
 
@@ -1585,8 +1571,8 @@ namespace hfst { namespace implementations
   TropicalWeightTransducer::optionalize(StdVectorFst * t)
   {
     StdVectorFst * eps = create_epsilon_transducer();
-    Union(eps,*t);
     eps->SetInputSymbols(t->InputSymbols());
+    Union(eps,*t);
     return eps;
   }
 
@@ -1635,15 +1621,6 @@ namespace hfst { namespace implementations
   typedef std::pair<int,int> LabelPair;
   typedef std::vector<LabelPair> LabelPairVector;
 
-
-
-  static StdVectorFst * substitute(StdVectorFst * t,
-                                   StringPair old_symbol_pair,
-                                   StringPair new_symbol_pair);
-  static StdVectorFst * substitute(StdVectorFst * t,
-                                   const StringPair old_symbol_pair,
-                                   StdVectorFst *transducer);
-
   StdVectorFst * TropicalWeightTransducer::insert_freely
   (StdVectorFst * t, const StringPair &symbol_pair)
   {
@@ -1658,19 +1635,6 @@ namespace hfst { namespace implementations
     }
     t->SetInputSymbols(st);
     delete st;
-    return t;
-  }
-
-  static StdVectorFst * insert_freely
-  (StdVectorFst * t, const NumberPair &number_pair) 
-  {
-    for (fst::StateIterator<fst::StdFst> siter(*t); 
-         !siter.Done(); siter.Next()) {
-      StateId state_id = siter.Value();
-      t->AddArc(state_id, 
-                fst::StdArc(number_pair.first, number_pair.second, 
-                            0, state_id));
-    }
     return t;
   }
 
@@ -1900,7 +1864,7 @@ namespace hfst { namespace implementations
   {
 
     int states = t->NumStates();
-    for( int i = 0; i < states; ++i ) {
+    for( unsigned int i = 0; i < (unsigned int)states; ++i ) {
 
       for (fst::MutableArcIterator<fst::StdVectorFst> it(t,i);
            not it.Done();
@@ -1909,8 +1873,8 @@ namespace hfst { namespace implementations
         fst::StdArc arc = it.Value();
 
         // find arcs that must be replaced
-        if ( arc.ilabel == old_number_pair.first && 
-             arc.olabel == old_number_pair.second ) 
+        if ( arc.ilabel == (int)old_number_pair.first && 
+             arc.olabel == (int)old_number_pair.second ) 
           {
 
           StateId destination_state = arc.nextstate;
@@ -1985,9 +1949,24 @@ namespace hfst { namespace implementations
     // is the same as t1's
     // (else OpenFst complains about non-matching check sums... )
     StdVectorFst * t2_ = expand_arcs(t2, foo, false);
-    t2_->SetInputSymbols(t1->InputSymbols());
     t1->SetOutputSymbols(t1->InputSymbols());
-    
+    t2_->SetInputSymbols(t1->OutputSymbols());
+
+#ifdef FOO
+    std::cerr << "t1 output symbols" << std::endl;
+    for ( fst::SymbolTableIterator it 
+            = fst::SymbolTableIterator(*(t1->OutputSymbols()));
+          not it.Done(); it.Next() ) {
+      std::cerr << it.Value() << it.Symbol() << std::endl;
+    }
+    std::cerr << "t2_ input symbols" << std::endl;
+    for ( fst::SymbolTableIterator it 
+            = fst::SymbolTableIterator(*(t2_->InputSymbols()));
+          not it.Done(); it.Next() ) {
+      std::cerr << it.Value() << it.Symbol() << std::endl;
+    }
+#endif
+
     ArcSort(t1, StdOLabelCompare());
     ArcSort(t2_, StdILabelCompare());
 
@@ -1995,32 +1974,18 @@ namespace hfst { namespace implementations
     Compose(*t1, *t2_, result);
     delete t2_;
 
+    t1->SetOutputSymbols(NULL);
+
     result->SetInputSymbols(t1->InputSymbols());
     return result;
   }
-
-#ifdef FOO
-  StdVectorFst * TropicalWeightTransducer::compose_intersect
-  (StdVectorFst * t, Grammar * grammar)
-  {
-    fst::ArcSort<StdArc,fst::OLabelCompare<StdArc> > 
-      (t,OLabelCompare<StdArc>());    
-
-    ComposeIntersectFst cif(t,*grammar);
-    StdVectorFst * result = cif();
-    result->SetInputSymbols(NULL);
-    result->SetOutputSymbols(NULL);
-    result->SetInputSymbols(t->InputSymbols() );
-    return result;
-  }
-#endif
 
   StdVectorFst * TropicalWeightTransducer::concatenate(StdVectorFst * t1,
                                                        StdVectorFst * t2)
   {
     StdVectorFst * result = new StdVectorFst(*t1);
-    Concat(result,*t2);
     result->SetInputSymbols(t1->InputSymbols());
+    Concat(result,*t2);
     return result;
   }
 
@@ -2028,8 +1993,8 @@ namespace hfst { namespace implementations
                                                     StdVectorFst * t2)
   {
     StdVectorFst * result = new StdVectorFst(*t1);
-    Union(result,*t2);
     result->SetInputSymbols(t1->InputSymbols());
+    Union(result,*t2);
     return result;
   }
 
@@ -2051,7 +2016,7 @@ namespace hfst { namespace implementations
         for(fst::ArcIterator<StdVectorFst> it(*t,s); !it.Done(); it.Next())
           {
             const StdArc& a = it.Value();
-            if (a.ilabel == inumber && a.olabel == onumber) {
+            if (a.ilabel == (int)inumber && a.olabel == (int)onumber) {
               transition_found=true;
               s = a.nextstate;
               break;
@@ -2086,7 +2051,7 @@ namespace hfst { namespace implementations
         for(fst::ArcIterator<StdVectorFst> it(*t,s); !it.Done(); it.Next())
           {
             const StdArc& a = it.Value();
-            if (a.ilabel == inumber && a.olabel == onumber) {
+            if (a.ilabel == (int)inumber && a.olabel == (int)onumber) {
               transition_found=true;
               s = a.nextstate;
               break;
@@ -2129,6 +2094,10 @@ namespace hfst { namespace implementations
     DecodeFst<StdArc> decode(*foo, encoder);
     delete foo;
     StdVectorFst *result = new StdVectorFst(decode);
+
+    t1->SetOutputSymbols(NULL);
+    t2->SetOutputSymbols(NULL);
+
     result->SetInputSymbols(t1->InputSymbols());
     return result;
   }
@@ -2191,6 +2160,9 @@ namespace hfst { namespace implementations
     delete difference;
 
     if (DEBUG) printf("  ..subtracted\n");
+
+    t1->SetOutputSymbols(NULL);
+    t2->SetOutputSymbols(NULL);
 
     StdVectorFst *result = new StdVectorFst(subtract); 
     result->SetInputSymbols(t1->InputSymbols());
@@ -2296,38 +2268,17 @@ namespace hfst { namespace implementations
   (StdVectorFst * t, StdArc::StateId s,
    std::map<StateId,unsigned short> all_visitations, 
    std::map<StateId, unsigned short> path_visitations,
-   /*std::vector<char>& lbuffer, int lpos, 
-     std::vector<char>& ubuffer, int upos,*/ float weight_sum,
+   float weight_sum,
    hfst::ExtractStringsCb& callback, int cycles,
    std::vector<hfst::FdState<int64> >* fd_state_stack, 
    bool filter_fd, 
-   /*bool include_spv,*/ StringPairVector &spv)
+   StringPairVector &spv)
   { 
     if(cycles >= 0 && path_visitations[s] > cycles)
       return true;
     all_visitations[s]++;
     path_visitations[s]++;
 
-    /*
-    if(lpos > 0 && upos > 0)
-    {
-      lbuffer[lpos]=0;
-      ubuffer[upos]=0;
-      bool final = t->Final(s) != TropicalWeight::Zero();
-      hfst::WeightedPath<float> path
-        (&lbuffer[0],&ubuffer[0],weight_sum+(final?t->Final(s).Value():0));
-      if (include_spv) {
-        path.spv = spv;
-        path.is_spv_in_use = true;
-      }
-      hfst::ExtractStringsCb::RetVal ret = callback(path, final);
-      if(!ret.continueSearch || !ret.continuePath)
-      {
-        path_visitations[s]--;
-        return ret.continueSearch;
-      }
-    }
-    */
 
     if (spv.size() != 0)
       {
@@ -2435,6 +2386,7 @@ namespace hfst { namespace implementations
   static HfstTwoLevelPath random_path(StdVectorFst *t) {
     
     HfstTwoLevelPath path;    
+    path.first=0; // zero weight
     StateId current_state = t->Start();
 
     /* If the transducer is empty, return. */
@@ -2497,10 +2449,12 @@ namespace hfst { namespace implementations
       (StringPair
        (t->InputSymbols()->Find(arc.ilabel),
         t->InputSymbols()->Find(arc.olabel)));
-    
+    path.first = path.first + arc.weight.Value();
+
     /* If the target state is final, */
     if ( t->Final(t_target) != TropicalWeight::Zero() ) {
       if ( (rand() % 4) == 0 ) {  // randomly return the path so far,
+	path.first = path.first + t->Final(t_target).Value();
         return path;
       } // or continue.
       last_index = (int)path.second.size();  
@@ -2523,9 +2477,6 @@ namespace hfst { namespace implementations
     break;
       }     
     }
-
-    //free(visited);
-    //free(broken);
 
     return path;
   };
@@ -2602,7 +2553,7 @@ namespace hfst { namespace implementations
     /* When writing a transducer in the backend format,
        both input and output symbol tables are included. */
     fst::SymbolTable *output_st=NULL;
-    if (hfst_format) {
+    if (not hfst_format) {
       output_st = new fst::SymbolTable(*(transducer->InputSymbols()));
       transducer->SetOutputSymbols(output_st);
     }

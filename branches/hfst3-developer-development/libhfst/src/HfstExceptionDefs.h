@@ -268,6 +268,18 @@ hfst::rules::replace_up(contexts, mapping, true, alphabet);
 HFST_EXCEPTION_CHILD_DECLARATION(ContextTransducersAreNotAutomataException);
 
 
+
+
+/** \brief Transducers are not automata.
+
+    This exception is thrown by
+    hfst::cross_product( HfstTransducer&)
+
+    when either input transducer does not have equivalent input and
+    output symbols in all its transitions.
+*/
+HFST_EXCEPTION_CHILD_DECLARATION(TransducersAreNotAutomataException);
+
 /** \brief The StateId argument is not valid.
 
     An example:

@@ -432,6 +432,12 @@ void HfstOlInputStream::ignore(unsigned int n)
     return &(t->get_alphabet().get_fd_table());
   }
 
+StringSet HfstOlTransducer::get_alphabet(hfst_ol::Transducer * t)
+{
+    hfst_ol::SymbolTable symbol_table = t->get_alphabet().get_symbol_table();
+    return StringSet(symbol_table.begin(), symbol_table.end());
+}
+
 } }
 
 #else // MAIN_TEST was defined

@@ -23,10 +23,15 @@
 #include <cstring>
 #include <climits>
 #include <utility>
+#include <deque>
+#include <queue>
+#include <stdexcept>
 
 #include "../../HfstExceptionDefs.h"
 #include "../../HfstFlagDiacritics.h"
+#include "../../HfstSymbolDefs.h"
 
+/** \brief A namespace for optimized-lookup functions and datatypes.*/
 namespace hfst_ol {
 using hfst::FdOperation;
 using hfst::FdState;
@@ -50,6 +55,12 @@ typedef std::vector<std::string> SymbolTable;
 typedef std::pair<Weight, std::vector<std::string> > HfstOneLevelPath;
 typedef std::set<HfstOneLevelPath> HfstOneLevelPaths;
 typedef std::vector<std::string> StringVector;
+
+// for ospell
+typedef std::vector<short> FlagDiacriticState;
+typedef std::map<SymbolNumber, hfst::FdOperation> OperationMap;
+typedef std::map<std::string, SymbolNumber> StringSymbolMap;
+class STransition;
 
 const SymbolNumber NO_SYMBOL_NUMBER = std::numeric_limits<SymbolNumber>::max();
 const TransitionTableIndex NO_TABLE_INDEX =
@@ -298,11 +309,15 @@ class TransducerAlphabet
 protected:
     SymbolTable symbol_table;
     hfst::FdTable<SymbolNumber> fd_table;
+    SymbolNumber unknown_symbol;
+    SymbolNumber default_symbol;
   
 public:
     TransducerAlphabet()
     {
         symbol_table.push_back("@_EPSILON_SYMBOL_@");
+        unknown_symbol = NO_SYMBOL_NUMBER;
+	default_symbol = NO_SYMBOL_NUMBER;
     }
     TransducerAlphabet(std::istream& is, SymbolNumber symbol_count);
     TransducerAlphabet(const SymbolTable& st);
@@ -329,12 +344,18 @@ public:
     const std::string string_from_symbol(const SymbolNumber symbol) const
     // represent epsilon as blank string
     { return (symbol == 0) ? "" : symbol_table[symbol]; }
+    StringSymbolMap build_string_symbol_map(void) const;
     const hfst::FdTable<SymbolNumber>& get_fd_table() const
     { return fd_table; }
     const hfst::FdOperation * get_operation(SymbolNumber symbol) const
     {
         return fd_table.get_operation(symbol);
     }
+    SymbolNumber get_unknown_symbol(void) const
+        { return unknown_symbol; }
+    SymbolNumber get_default_symbol(void) const
+	{ return default_symbol; }
+    
 };
 
 class TransitionIndex
@@ -440,12 +461,11 @@ public:
         sizeof(TransitionTableIndex);
     Transition(SymbolNumber input, SymbolNumber output,
            TransitionTableIndex target, Weight bogus=0.0f):
-    input_symbol(input), output_symbol(output), target_index(target),
-    unused(bogus)
-      {}
+    input_symbol(input), output_symbol(output), target_index(target)
+  {(void)bogus; bogus=0.0f;}
     Transition(bool final, Weight bogus=0.0f):
     input_symbol(NO_SYMBOL_NUMBER), output_symbol(NO_SYMBOL_NUMBER),
-    target_index(final?1:NO_TABLE_INDEX), unused(bogus) {}
+    target_index(final?1:NO_TABLE_INDEX) {(void)bogus; bogus=0.0f;}
     Transition(std::istream& is):
     input_symbol(NO_SYMBOL_NUMBER), output_symbol(NO_SYMBOL_NUMBER),
     target_index(0)
@@ -702,6 +722,8 @@ public:
     SymbolNumber find_key(char ** p);
 };
 
+/** \brief A compiled transducer format, suitable for fast lookup operations.
+ */
 class Transducer
 {
 protected:
@@ -720,6 +742,8 @@ protected:
     SymbolNumber * input_tape;
     SymbolNumber * output_tape;
     hfst::FdState<SymbolNumber> flag_state;
+    // This is to keep track of whether we're going to take a default transition
+    bool found_transition;
 
     void try_epsilon_transitions(SymbolNumber * input_symbol,
                  SymbolNumber * output_symbol,
@@ -748,7 +772,7 @@ protected:
               SymbolNumber * original_output_tape,
               TransitionTableIndex i);
 
-
+    
 
 public:
     Transducer(std::istream& is);
@@ -773,6 +797,14 @@ public:
     { return *header; }
     const TransducerAlphabet& get_alphabet() const
     { return *alphabet; }
+    const Encoder& get_encoder(void) const
+	{ return *encoder; }
+    const hfst::FdTable<SymbolNumber>& get_fd_table() const
+        { return alphabet->get_fd_table(); }
+    const SymbolTable& get_symbol_table() const
+        { return alphabet->get_symbol_table(); }
+
+
     const TransitionIndex& get_index(TransitionTableIndex i) const
     { return tables->get_index(i); }
     const Transition& get_transition(TransitionTableIndex i) const
@@ -806,11 +838,310 @@ public:
 
     bool initialize_input(const char * input_str);
     HfstOneLevelPaths * lookup_fd(const StringVector & s);
+    /* Tokenize and lookup, accounting for flag diacritics, the surface string
+       \a s. The return value, a pointer to HfstOneLevelPaths
+       (which is a set) of analyses, is newly allocated.
+     */
     HfstOneLevelPaths * lookup_fd(const std::string & s);
     HfstOneLevelPaths * lookup_fd(const char * s);
     void note_analysis(SymbolNumber * whole_output_tape);
 
+    // Methods for supporting ospell
+    SymbolNumber get_unknown_symbol(void) const
+        { return alphabet->get_unknown_symbol(); }
+    StringSymbolMap get_string_symbol_map(void) const
+        { return alphabet->build_string_symbol_map(); }
+    STransition take_epsilons(const TransitionTableIndex i) const;
+    STransition take_epsilons_and_flags(const TransitionTableIndex i);
+    STransition take_non_epsilons(const TransitionTableIndex i,
+				  const SymbolNumber symbol) const;
+    TransitionTableIndex next(const TransitionTableIndex i,
+			      const SymbolNumber symbol) const;
+    TransitionTableIndex next_e(const TransitionTableIndex i) const;
+    bool has_transitions(const TransitionTableIndex i,
+			 const SymbolNumber symbol) const;
+    bool has_epsilons_or_flags(const TransitionTableIndex i);
+    Weight final_weight(const TransitionTableIndex i) const;
+    bool is_flag(const SymbolNumber symbol)
+	{ return alphabet->is_flag_diacritic(symbol); }
+    bool is_weighted(void)
+	{ return header->probe_flag(Weighted);}
+
+    
     friend class ConvertTransducer;
+};
+
+class STransition{
+public:
+    TransitionTableIndex index;
+    SymbolNumber symbol;
+    Weight weight;
+
+    STransition(TransitionTableIndex i,
+		SymbolNumber s):
+	index(i),
+	symbol(s),
+	weight(0.0)
+	{}
+
+    STransition(TransitionTableIndex i,
+		SymbolNumber s,
+		Weight w):
+	index(i),
+	symbol(s),
+	weight(w)
+	{}
+
+};
+
+typedef std::pair<std::string, Weight> StringWeightPair;
+
+class StringWeightComparison
+/* results are reversed by default because greater weights represent
+   worse results - to reverse the reversal, give a true argument*/
+
+{
+    bool reverse;
+public:
+    StringWeightComparison(bool reverse_result=false):
+	reverse(reverse_result)
+	{}
+    
+    bool operator() (StringWeightPair lhs, StringWeightPair rhs)
+	{ // return true when we want rhs to appear before lhs
+	    if (reverse) {
+		return (lhs.second < rhs.second);
+	    } else {
+		return (lhs.second > rhs.second);
+	    }
+	}
+};
+
+typedef std::priority_queue<StringWeightPair,
+			    std::vector<StringWeightPair>,
+			    StringWeightComparison> CorrectionQueue;
+typedef std::priority_queue<StringWeightPair,
+			    std::vector<StringWeightPair>,
+			    StringWeightComparison> AnalysisQueue;
+typedef std::priority_queue<StringWeightPair,
+			    std::vector<StringWeightPair>,
+			    StringWeightComparison> HyphenationQueue;
+
+/*class STransducer: public Transducer
+{
+protected:
+    bool final_transition(TransitionTableIndex i)
+	{
+	    return transitions[i]->final();
+	}
+    
+    bool final_index(TransitionTableIndex i)
+	{
+	    return indices[i]->final();
+	}
+
+  
+public:
+    Transducer(FILE * f):
+	header(TransducerHeader(f)),
+	alphabet(TransducerAlphabet(f, header.symbol_count())),
+	keys(alphabet.get_key_table()),
+	index_reader(f,header.index_table_size()),
+	transition_reader(f,header.target_table_size()),
+	encoder(keys,header.input_symbol_count()),
+	indices(index_reader()),
+	transitions(transition_reader())
+	{}
+
+    TransitionIndexVector &indices;
+  
+    TransitionVector &transitions;
+    
+    SymbolNumber find_next_key(char ** p)
+	{
+	    return encoder.find_key(p);
+	}
+
+
+    unsigned int get_state_size(void)
+	{
+	    return alphabet.get_state_size();
+	}
+
+    std::vector<const char*> * get_symbol_table(void)
+	{
+	    return &symbol_table;
+	}
+
+    SymbolNumber get_other(void)
+	{
+	    return alphabet.get_other();
+	}
+
+    TransducerAlphabet * get_alphabet(void)
+	{
+	    return &alphabet;
+	}
+
+    OperationMap * get_operations(void)
+	{
+	    return alphabet.get_operation_map();
+	}
+
+    STransition take_epsilons(const TransitionTableIndex i) const;
+    STransition take_epsilons_and_flags(const TransitionTableIndex i);
+    STransition take_non_epsilons(const TransitionTableIndex i,
+				  const SymbolNumber symbol) const;
+    TransitionTableIndex next(const TransitionTableIndex i,
+			      const SymbolNumber symbol) const;
+    TransitionTableIndex next_e(const TransitionTableIndex i) const;
+    bool has_transitions(const TransitionTableIndex i,
+			 const SymbolNumber symbol) const;
+    bool has_epsilons_or_flags(const TransitionTableIndex i);
+    bool is_final(const TransitionTableIndex i);
+    Weight final_weight(const TransitionTableIndex i) const;
+    bool is_flag(const SymbolNumber symbol)
+	{ return alphabet.is_flag(symbol); }
+    bool is_weighted(void)
+	{ return header.probe_flag(Weighted);}
+
+        };*/
+
+class TreeNode
+{
+public:
+    SymbolNumberVector string;
+    unsigned int input_state;
+    TransitionTableIndex mutator_state;
+    TransitionTableIndex lexicon_state;
+    hfst::FdState<SymbolNumber> flag_state;
+    Weight weight;
+
+    TreeNode(SymbolNumberVector prev_string,
+	     unsigned int i,
+	     TransitionTableIndex mutator,
+	     TransitionTableIndex lexicon,
+	     hfst::FdState<SymbolNumber> state,
+	     Weight w):
+	string(prev_string),
+	input_state(i),
+	mutator_state(mutator),
+	lexicon_state(lexicon),
+	flag_state(state),
+	weight(w)
+	{ }
+
+    TreeNode(hfst::FdState<SymbolNumber> start_state): // starting state node
+	string(SymbolNumberVector()),
+	input_state(0),
+	mutator_state(0),
+	lexicon_state(0),
+	flag_state(start_state),
+	weight(0.0)
+	{ }
+
+    TreeNode update_lexicon(SymbolNumber next_symbol,
+			    TransitionTableIndex next_lexicon,
+			    Weight weight);
+
+    TreeNode update_mutator(SymbolNumber next_symbol,
+			    TransitionTableIndex next_mutator,
+			    Weight weight);
+
+    void increment_mutator(void);
+
+    TreeNode update(SymbolNumber next_symbol,
+		    unsigned int next_input,
+		    TransitionTableIndex next_mutator,
+		    TransitionTableIndex next_lexicon,
+		    Weight weight);
+
+    TreeNode update(SymbolNumber next_symbol,
+		    TransitionTableIndex next_mutator,
+		    TransitionTableIndex next_lexicon,
+		    Weight weight);
+
+
+};
+
+typedef std::deque<TreeNode> TreeNodeQueue;
+
+int nByte_utf8(unsigned char c);
+
+class InputString
+{
+  
+private:
+    SymbolNumberVector s;
+
+public:
+    InputString():
+	s(SymbolNumberVector())
+	{ }
+
+    bool initialize(const Encoder & encoder, char * input, SymbolNumber other);
+    
+    unsigned int len(void)
+	{
+	    return s.size();
+	}
+
+    SymbolNumber operator[](unsigned int i)
+	{
+	    return s[i];
+	}
+
+};
+
+    class AlphabetTranslationException: public std::runtime_error
+{ // "what" should hold the first untranslatable symbol
+public:
+    
+    AlphabetTranslationException(const std::string what):
+	std::runtime_error(what)
+	{ }
+};
+
+/** \brief A spellchecker, constructed from two optimized-lookup transducer
+    instances. An alphabet translator is built at construction time.
+ */
+class Speller
+{
+public:
+    Transducer * mutator;
+    Transducer * lexicon;
+    InputString input;
+    TreeNodeQueue queue;
+    SymbolNumberVector alphabet_translator;
+//    hfst::FdTable<SymbolNumber> operations;
+    std::vector<std::string> symbol_table;
+    
+    Speller(Transducer * mutator_ptr, Transducer * lexicon_ptr):
+	mutator(mutator_ptr),
+	lexicon(lexicon_ptr),
+	input(InputString()),
+	queue(TreeNodeQueue()),
+	alphabet_translator(SymbolNumberVector()),
+//	operations(lexicon->get_fd_table()),
+	symbol_table(lexicon->get_symbol_table())
+	{
+	    build_alphabet_translator();
+	}
+    
+    bool init_input(char * str, const Encoder & encoder, SymbolNumber other);
+
+    void build_alphabet_translator(void);
+    void lexicon_epsilons(void);
+    void mutator_epsilons(void);
+    void consume_input(void);
+    void lexicon_consume(void);
+    /** See if \a line is in the lexicon.
+     */
+    bool check(char * line);
+    /** Return a priority queue of corrections of \a line.
+     */
+    CorrectionQueue correct(char * line);
+    std::string stringify(SymbolNumberVector symbol_vector);
 };
 
 }

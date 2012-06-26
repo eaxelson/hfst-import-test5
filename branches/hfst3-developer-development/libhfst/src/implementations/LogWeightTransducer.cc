@@ -1427,7 +1427,7 @@ namespace hfst { namespace implementations
       { return create_epsilon_transducer(); }
 
     LogFst * repetition = create_epsilon_transducer();
-    for (int i = 0; i < n; ++i)
+    for (unsigned int i = 0; i < n; ++i)
       { Concat(repetition,*t); }
     repetition->SetInputSymbols(t->InputSymbols());
     return repetition;
@@ -1440,7 +1440,7 @@ namespace hfst { namespace implementations
       { return create_epsilon_transducer(); }
 
     LogFst * repetition = create_epsilon_transducer();
-    for (int i = 0; i < n; ++i)
+    for (unsigned int i = 0; i < n; ++i)
       {
         LogFst * optional_t = optionalize(t);
         Concat(repetition,*optional_t);
@@ -1496,12 +1496,12 @@ namespace hfst { namespace implementations
 
 
 
-  static LogFst * substitute(LogFst * t,
+  /*static LogFst * substitute(LogFst * t,
                                    StringPair old_symbol_pair,
                                    StringPair new_symbol_pair);
   static LogFst * substitute(LogFst * t,
                                    const StringPair old_symbol_pair,
-                                   LogFst *transducer);
+                                   LogFst *transducer);*/
 
   LogFst * LogWeightTransducer::insert_freely
   (LogFst * t, const StringPair &symbol_pair)
@@ -1517,9 +1517,9 @@ namespace hfst { namespace implementations
     t->SetInputSymbols(st);
     delete st;
     return t;
-  }
+    }
 
-  static LogFst * insert_freely(LogFst * t, const NumberPair &number_pair) 
+  /*static LogFst * insert_freely(LogFst * t, const NumberPair &number_pair) 
   {
     for (fst::StateIterator<LogFst> siter(*t); !siter.Done(); siter.Next()) {
       StateId state_id = siter.Value();
@@ -1527,7 +1527,7 @@ namespace hfst { namespace implementations
                                       0, state_id));
     }
     return t;
-  }
+    }*/
 
   /*
   LogFst * LogWeightTransducer::substitute
@@ -1785,8 +1785,8 @@ namespace hfst { namespace implementations
         fst::LogArc arc = it.Value();
 
         // find arcs that must be replaced
-        if ( arc.ilabel == old_number_pair.first && 
-             arc.olabel == old_number_pair.second ) 
+        if ( arc.ilabel == (int)old_number_pair.first && 
+             arc.olabel == (int)old_number_pair.second ) 
           {
 
           StateId destination_state = arc.nextstate;
@@ -1911,7 +1911,7 @@ namespace hfst { namespace implementations
         for(fst::ArcIterator<LogFst> it(*t,s); !it.Done(); it.Next())
           {
             const LogArc& a = it.Value();
-            if (a.ilabel == inumber && a.olabel == onumber) {
+            if (a.ilabel == (int)inumber && a.olabel == (int)onumber) {
               transition_found=true;
               s = a.nextstate;
               break;
@@ -1946,7 +1946,7 @@ namespace hfst { namespace implementations
         for(fst::ArcIterator<LogFst> it(*t,s); !it.Done(); it.Next())
           {
             const LogArc& a = it.Value();
-            if (a.ilabel == inumber && a.olabel == onumber) {
+            if (a.ilabel == (int)inumber && a.olabel == (int)onumber) {
               transition_found=true;
               s = a.nextstate;
               break;

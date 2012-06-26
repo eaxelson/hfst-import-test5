@@ -154,42 +154,11 @@ void HfstTransducer::insert_to_alphabet(const std::string &symbol)
       = convert_to_basic_transducer();
     net->add_symbol_to_alphabet(symbol);
     convert_to_hfst_transducer(net);
-    //return *this;
-
-#ifdef FOO
-    switch(type)
-    {
-#if HAVE_SFST
-    case SFST_TYPE:
-        sfst_interface.insert_to_alphabet(implementation.sfst, symbol);
-#endif
-#if HAVE_OPENFST
-    case TROPICAL_OPENFST_TYPE:
-        tropical_ofst_interface.insert_to_alphabet
-        (implementation.tropical_ofst, symbol);
-    case LOG_OPENFST_TYPE:
-        log_ofst_interface.insert_to_alphabet
-        (implementation.log_ofst, symbol);
-#endif
-#if HAVE_FOMA
-    case FOMA_TYPE:
-        foma_interface.insert_to_alphabet(implementation.foma, symbol);
-#endif
-    case ERROR_TYPE:
-        HFST_THROW(TransducerHasWrongTypeException);
-    case HFST_OL_TYPE:
-    case HFST_OLW_TYPE:
-    default:
-        HFST_THROW_MESSAGE(FunctionNotImplementedException,
-                           "insert_to_alphabet");
-    }    
-#endif // FOO
 }
 
 
 void HfstTransducer::remove_from_alphabet(const std::string &symbol) 
 {
-  //HFST_THROW_MESSAGE(FunctionNotImplementedException, "remove_from_alphabet");
 
   HfstTokenizer::check_utf8_correctness(symbol);
 
@@ -200,36 +169,6 @@ void HfstTransducer::remove_from_alphabet(const std::string &symbol)
       = convert_to_basic_transducer();
     net->remove_symbol_from_alphabet(symbol);
     convert_to_hfst_transducer(net);
-    //return *this;
-
-#ifdef FOO
-  switch(type)
-    {
-#if HAVE_SFST
-    case SFST_TYPE:
-      sfst_interface.remove_from_alphabet(implementation.sfst, symbol);
-#endif
-#if HAVE_OPENFST
-    case TROPICAL_OPENFST_TYPE:
-      tropical_ofst_interface.remove_from_alphabet
-    (implementation.tropical_ofst, symbol);
-    case LOG_OPENFST_TYPE:
-      log_ofst_interface.remove_from_alphabet
-    (implementation.log_ofst, symbol);
-#endif
-#if HAVE_FOMA
-    case FOMA_TYPE:
-      foma_interface.remove_from_alphabet(implementation.foma, symbol);
-#endif
-    case ERROR_TYPE:
-      HFST_THROW(TransducerHasWrongTypeException);
-    case HFST_OL_TYPE:
-    case HFST_OLW_TYPE:
-    default:
-      HFST_THROW_MESSAGE(FunctionNotImplementedException,
-             "remove_from_alphabet");
-    }    
-#endif // FOO
 }
 
 
@@ -256,6 +195,7 @@ StringSet HfstTransducer::get_alphabet() const
         HFST_THROW(TransducerHasWrongTypeException);
     case HFST_OL_TYPE:
     case HFST_OLW_TYPE:
+	return hfst_ol_interface.get_alphabet(implementation.hfst_ol);
     default:
         HFST_THROW_MESSAGE(FunctionNotImplementedException, "get_alphabet");
     }    
@@ -1095,8 +1035,7 @@ HfstTransducer::set_property(const string& property, const string& name)
       }
   }
 
-const string&
-HfstTransducer::get_property(const string& property) const
+string HfstTransducer::get_property(const string& property) const
   {
     if (this->props.find(property) != this->props.end())
       {
@@ -1104,7 +1043,7 @@ HfstTransducer::get_property(const string& property) const
       }
     else
       {
-        return *(new string(""));
+        return "";
       }
   }
 const std::map<string,string>&
@@ -2190,22 +2129,18 @@ HfstTransducer &HfstTransducer::substitute
 {
   hfst::implementations::HfstBasicTransducer * net 
     = convert_to_basic_transducer();
-  // TODO: optimize when HfstTropicalTransducer supports this function
-  for (HfstSymbolSubstitutions::const_iterator it =
-	 substitutions.begin(); it != substitutions.end(); it++)
-    {
+
+  try  {
+    net->substitute(substitutions);
+  } 
+  catch (const FunctionNotImplementedException & e) {
+    for (HfstSymbolSubstitutions::const_iterator it =
+	   substitutions.begin(); it != substitutions.end(); it++) {
       net->substitute(it->first, it->second, true, true);
     }
+  }
+  
   return convert_to_hfst_transducer(net);  
-
-  /*
-  hfst::implementations::HfstBasicTransducer * net 
-    = convert_to_basic_transducer();
-  net->substitute(substitutions);
-  return convert_to_hfst_transducer(net);  
-  return *this;
-  */
-
 }
 
 HfstTransducer &HfstTransducer::substitute
@@ -2531,9 +2466,10 @@ HfstTransducer &HfstTransducer::cross_product( const HfstTransducer &another )
 	t1_proj.input_project();
 	HfstTransducer t2_proj(automata2);
 	t2_proj.input_project();
+
 	if ( not t1_proj.compare(automata1) || not t2_proj.compare(automata2) )
 	{
-		HFST_THROW(ContextTransducersAreNotAutomataException);
+		HFST_THROW_MESSAGE(TransducersAreNotAutomataException, "HfstTransducer::cross_product");
 	}
 
 	// Put MARK all over lower part of automata1 and upper part of automata2,
@@ -2578,6 +2514,159 @@ HfstTransducer &HfstTransducer::cross_product( const HfstTransducer &another )
 	return *this;
 
 }
+
+//
+// -------------------- Shuffle functions --------------------
+//
+
+// A flag to indicate that there was an error during shuffle.
+static bool shuffle_failed=false;
+// Possible cases for function code_symbols_for_shuffle. 
+enum ShuffleCoding { ENCODE_FIRST_SHUFFLE_ARGUMENT, 
+		     ENCODE_SECOND_SHUFFLE_ARGUMENT, 
+		     DECODE_AFTER_SHUFFLE }; 
+// The current case in function code_symbols_for_shuffle.
+static ShuffleCoding shuffle_coding_case;
+
+// A function that is given as a parameter to substitute function
+// during the shuffle operation. The purpose of this function is (1)
+// to encode symbols in the two argument transducers so that no symbol
+// is present at both transducers or (2) to decode the symbols
+// in the shuffled transducer back to the original ones.
+bool code_symbols_for_shuffle(const StringPair &sp, StringPairSet &sps)
+{
+  // not automaton, shuffle fails
+  if (sp.first != sp.second) {
+    shuffle_failed=true;
+    return false;
+  }
+  // special symbols are not coded, except identities
+  if (is_epsilon(sp.first) ||
+      is_unknown(sp.first)) {
+    return false;
+  }
+  switch (shuffle_coding_case)
+    {
+      // substitute each symbol foo in the first argument transducer 
+      // with a symbol @1foo
+    case ENCODE_FIRST_SHUFFLE_ARGUMENT:
+	{
+	  std::string symbol_escaped = "@1" + sp.first;
+	  StringPair new_sp(symbol_escaped, symbol_escaped);
+	  sps.insert(new_sp);
+	  break;
+	}	
+	// substitute each symbol bar in the second argument transducer
+	// with a symbol @2bar
+    case ENCODE_SECOND_SHUFFLE_ARGUMENT:
+	{
+	  std::string symbol_escaped = "@2" + sp.first;
+	  StringPair new_sp(symbol_escaped, symbol_escaped);
+	  sps.insert(new_sp);
+	  break;
+	}
+	// substitute each symbol @1foo or @2bar in the shuffled transducer
+	// with the original foo or bar.
+    case DECODE_AFTER_SHUFFLE:
+	{
+	  std::string symbol_unescaped = sp.first.substr(2);
+	  StringPair new_sp(symbol_unescaped, symbol_unescaped);
+	  sps.insert(new_sp);
+	  break;
+	}
+    default:
+      assert(false);
+    }
+  
+  return true;
+}
+
+HfstTransducer &HfstTransducer::shuffle(const HfstTransducer &another)
+{
+  if (this->type != another.type)
+    HFST_THROW_MESSAGE(TransducerTypeMismatchException,
+		       "HfstTransducer::shuffle(const HfstTransducer&)");
+
+  // We use HfstBasicTransducers for efficiency
+  HfstBasicTransducer this_basic(*this);
+  HfstBasicTransducer another_basic(another);
+
+  // Expand (unknowns and) identities
+  this_basic.harmonize(another_basic);
+
+  // Find out the original alphabets of both transducers
+  StringSet this_alphabet = this_basic.get_alphabet();
+  StringSet another_alphabet = another_basic.get_alphabet();
+
+  // Encode first transducer, i.e. prefix each symbol with "@1"
+  shuffle_coding_case=ENCODE_FIRST_SHUFFLE_ARGUMENT;
+  this_basic.substitute(&code_symbols_for_shuffle);
+  // also remember to remove the unprefixed symbols from the alphabet
+  this_basic.remove_symbols_from_alphabet(this_alphabet);
+
+  // Encode second transducer, i.e. prefix each symbol with "@2"
+  shuffle_coding_case=ENCODE_SECOND_SHUFFLE_ARGUMENT;
+  another_basic.substitute(&code_symbols_for_shuffle);
+  // also remember to remove the unprefixed symbols from the alphabet
+  another_basic.remove_symbols_from_alphabet(another_alphabet);
+
+  // See if shuffle failed, i.e. either transducer is not an automaton
+  if (shuffle_failed) {
+    shuffle_failed=false;
+    HFST_THROW_MESSAGE(TransducersAreNotAutomataException,
+		       "HfstTransducer::shuffle(const HfstTransducer&)");
+  }  
+
+  // The new alphabets of transducers where each symbol is prefixed
+  // with "@1" or "@2"
+  this_alphabet = this_basic.get_alphabet();
+  another_alphabet = another_basic.get_alphabet();
+
+  // Transform alphabets of transducers into string pair sets for function
+  // insert_freely
+  StringPairSet this_alphabet_pairset;
+  for (StringSet::const_iterator it = this_alphabet.begin();
+       it != this_alphabet.end(); it++) {
+    this_alphabet_pairset.insert(StringPair(*it, *it));
+  }
+  StringPairSet another_alphabet_pairset;
+  for (StringSet::const_iterator it = another_alphabet.begin();
+       it != another_alphabet.end(); it++) {
+    another_alphabet_pairset.insert(StringPair(*it, *it));
+  }
+
+  // Freely insert any number of any symbol in the first transducer
+  // to the second transducer and vice versa
+  this_basic.insert_freely(another_alphabet_pairset, 0);
+  another_basic.insert_freely(this_alphabet_pairset, 0);
+
+  // We use HfstTransducers for intersection
+  HfstTransducer this1(this_basic, this->get_type());
+  HfstTransducer another1(another_basic, another.get_type());
+
+  this1.intersect(another1);
+  this1.minimize();
+  
+  // We use HfstBasicTransducers again
+  HfstBasicTransducer this1_basic(this1);
+
+  // Decode the shuffled transducer, i.e. remove the prefixes
+  // "@1" and "@2" from symbols
+  shuffle_coding_case=DECODE_AFTER_SHUFFLE;
+  this1_basic.substitute(&code_symbols_for_shuffle);
+  // also remember to remove the prefixed symbols from the alphabet
+  this1_basic.remove_symbols_from_alphabet(this_alphabet);
+  this1_basic.remove_symbols_from_alphabet(another_alphabet);
+
+  // Convert once again to HfstTransducer
+  HfstTransducer this_finally(this1_basic, this->get_type());
+  this->operator=(this_finally);
+
+  return *this;
+}
+
+// ---------------------- Shuffle functions end --------------------
+
 
 
 HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
@@ -2658,71 +2747,170 @@ HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
 }
 
 HfstTransducer &HfstTransducer::compose_intersect
-(const HfstTransducerVector &v)
+(const HfstTransducerVector &v, bool invert)
 {
-    if (v.empty())
-    { *this = HfstTransducer(type); }
-    
-    const HfstTransducer &first = *v.begin();
-
-    // If rule transducers contain word boundaries, add word boundaries to 
-    // the lexicon unless the lexicon already contains them. 
-    std::set<std::string> rule_alphabet = first.get_alphabet();
-
-    if (rule_alphabet.find("@#@") != rule_alphabet.end())
+  // Foma transducers don't harmonize porperly. If the input is foma
+  // transducers, convert to openfst type.
+  bool convert_to_openfst = false;
+  if (get_type() == FOMA_TYPE)
     { 
-    std::set<std::string> lexicon_alphabet = get_alphabet();
-    HfstTokenizer tokenizer;
-    tokenizer.add_multichar_symbol("@#@");
-    tokenizer.add_multichar_symbol(internal_epsilon);
-    HfstTransducer wb(internal_epsilon,"@#@",tokenizer,type);
-    HfstTransducer wb_copy(wb);
-
-    wb.concatenate(*this).concatenate(wb_copy).minimize();
-    *this = wb;
+      convert_to_openfst = true; 
+      this->convert(TROPICAL_OPENFST_TYPE);
     }
+  
+  // The intersection of an empty set of rules is the empty language,
+  // which makes the result empty.
+  if (v.empty())
+    { *this = HfstTransducer(type); }
+  
+  const HfstTransducer &first = *v.begin();
+  
+  // If rule transducers contain word boundaries, add word boundaries to 
+  // the lexicon unless the lexicon already contains them. 
+  std::set<std::string> rule_alphabet = first.get_alphabet();
+
+  if (rule_alphabet.find("@#@") != rule_alphabet.end())
+    { 
+      std::set<std::string> lexicon_alphabet = get_alphabet();
+      HfstTokenizer tokenizer;
+      tokenizer.add_multichar_symbol("@#@");
+      tokenizer.add_multichar_symbol(internal_epsilon);
+      HfstTransducer wb(internal_epsilon,"@#@",tokenizer,type);
+      HfstTransducer wb_copy(wb);
+
+      // Add the word boundary symbol to the alphabet so harmonization
+      // won't touch it.
+      HfstBasicTransducer basic_this(*this);
+      basic_this.add_symbol_to_alphabet("@#@");
+      *this = HfstTransducer(basic_this,this->get_type());
+
+      wb.concatenate(*this).concatenate(wb_copy).minimize();
+      *this = wb;
+    }
+
+    HfstTransducer rule_1 = v.at(0);
+    
+    if (convert_to_openfst)
+      { rule_1.convert(TROPICAL_OPENFST_TYPE); }
+
+    HfstTransducer * harmonized_lexicon = rule_1.harmonize_(*this);
+
+    if (harmonized_lexicon == NULL)
+      { harmonized_lexicon = new HfstTransducer(*this); }
+
+    if (invert)
+      { 
+	harmonized_lexicon->invert(); 
+	harmonized_lexicon->substitute(StringPair("@#@",internal_epsilon),
+				       StringPair(internal_epsilon,"@#@"));
+      }
+
+    harmonized_lexicon->substitute(internal_identity,"||_IDENTITY_SYMBOL_||");
+    harmonized_lexicon->substitute(internal_unknown,"||_UNKNOWN_SYMBOL_||");
 
     if (v.size() == 1) 
     {
-    // In case there is only onw rule, compose with that.
-    implementations::ComposeIntersectRule rule(v.at(0));
-    // Create a ComposeIntersectLexicon from *this. 
-    implementations::ComposeIntersectLexicon lexicon(*this);
-    hfst::implementations::HfstBasicTransducer res = 
+      HfstTransducer rule_fst = v.at(0);
+      if (convert_to_openfst)
+	{ rule_fst.convert(TROPICAL_OPENFST_TYPE); }
+
+      if (invert)
+	{ 
+	  rule_fst.invert(); 
+	  rule_fst.substitute(StringPair(internal_epsilon,"@#@"),
+			      StringPair("@#@",internal_epsilon));
+	}
+      
+      // In case there is only onw rule, compose with that.
+      implementations::ComposeIntersectRule rule(rule_fst);
+      // Create a ComposeIntersectLexicon from *this. 
+      
+      //implementations::ComposeIntersectLexicon lexicon(*this);
+      implementations::ComposeIntersectLexicon lexicon(*harmonized_lexicon);
+      
+      hfst::implementations::HfstBasicTransducer res = 
         lexicon.compose_with_rules(&rule);
-    res.prune_alphabet();
-    *this = HfstTransducer(res,type);
+      
+      res.prune_alphabet();
+      *this = HfstTransducer(res,type);
     }
     else
-    {
+      {
 
-    // In case there are many rules, build a ComposeIntersectRulePair 
-    // recursively and compose with that.
-    std::vector<implementations::ComposeIntersectRule*> rule_vector;
-    implementations::ComposeIntersectRule * first_rule = 
-        new implementations::ComposeIntersectRule(*v.begin());
-    implementations::ComposeIntersectRule * second_rule = 
-        new implementations::ComposeIntersectRule(*(v.begin() + 1));
+	// In case there are many rules, build a ComposeIntersectRulePair 
+	// recursively and compose with that.
+	
+	HfstTransducer first_rule_fst = v.at(0);
+	if (convert_to_openfst)
+	  { first_rule_fst.convert(TROPICAL_OPENFST_TYPE); }
 
+	if (invert)
+	  { 
+	    first_rule_fst.invert(); 
+	    first_rule_fst.substitute(StringPair(internal_epsilon,"@#@"),
+				      StringPair("@#@",internal_epsilon));
+	  }
+
+	HfstTransducer second_rule_fst = v.at(1);
+	if (convert_to_openfst)
+	  { second_rule_fst.convert(TROPICAL_OPENFST_TYPE); }
+
+	if (invert)
+	  { 
+	    second_rule_fst.invert(); 
+	    second_rule_fst.substitute(StringPair(internal_epsilon,"@#@"),
+				       StringPair("@#@",internal_epsilon));
+	  }
+
+	std::vector<implementations::ComposeIntersectRule*> rule_vector;
+	implementations::ComposeIntersectRule * first_rule = 
+	  new implementations::ComposeIntersectRule(first_rule_fst);
+	implementations::ComposeIntersectRule * second_rule = 
+	  new implementations::ComposeIntersectRule(second_rule_fst);
+	
         implementations::ComposeIntersectRulePair * rules = 
-        new implementations::ComposeIntersectRulePair
-        (first_rule,second_rule);
+	  new implementations::ComposeIntersectRulePair
+	  (first_rule,second_rule);
+	
+	for (HfstTransducerVector::const_iterator it = v.begin() + 2;
+	     it != v.end();
+	     ++it)
+	  { 
+	    HfstTransducer rule_fst(*it);
+	    if (convert_to_openfst)
+	      { rule_fst.convert(TROPICAL_OPENFST_TYPE); }
 
-    for (HfstTransducerVector::const_iterator it = v.begin() + 2;
-         it != v.end();
-         ++it)
-    { 
-rules = new implementations::ComposeIntersectRulePair
-        (new implementations::ComposeIntersectRule(*it),rules); }
-    // Create a ComposeIntersectLexicon from *this. 
-    implementations::ComposeIntersectLexicon lexicon(*this);
-    hfst::implementations::HfstBasicTransducer res = 
-        lexicon.compose_with_rules(rules);
+	    if (invert)
+	      { 
+		rule_fst.invert(); 
+		rule_fst.substitute(StringPair(internal_epsilon,"@#@"),
+				    StringPair("@#@",internal_epsilon));
+	      }
+	
+	    rules = new implementations::ComposeIntersectRulePair
+	      (new implementations::ComposeIntersectRule(rule_fst),rules); 
+	  }
+	// Create a ComposeIntersectLexicon from *this. 
+	implementations::ComposeIntersectLexicon lexicon(*harmonized_lexicon);
+	hfst::implementations::HfstBasicTransducer res = 
+	  lexicon.compose_with_rules(rules);
+	
+	res.prune_alphabet();
+	*this = HfstTransducer(res,type);
+	
+	if (invert)
+	  { this->invert(); }
 
-    res.prune_alphabet();
-    *this = HfstTransducer(res,type);
-    delete rules;
-    }
+	delete rules;
+      }
+    
+    delete harmonized_lexicon;
+    
+    this->substitute("||_IDENTITY_SYMBOL_||",internal_identity);
+    this->substitute("||_UNKNOWN_SYMBOL_||",internal_unknown);
+
+    if (convert_to_openfst)
+      { this->convert(FOMA_TYPE); }
 
     return *this;
 }
@@ -3194,6 +3382,13 @@ void HfstTransducer::write_in_att_format
     fclose(ofile);
 }
 
+void HfstTransducer::write_in_att_format_number
+(FILE * ofile, bool print_weights) const
+{
+  hfst::implementations::HfstBasicTransducer net(*this);
+  net.write_in_att_format_number(ofile, print_weights);
+}
+
 void HfstTransducer::write_in_att_format
 (FILE * ofile, bool print_weights) const
 {
@@ -3507,10 +3702,11 @@ HfstTransducer * HfstTransducer::read_lexc(const std::string &filename,
 #endif
 #if HAVE_SFST || HAVE_OPENFST
       {
-    hfst::lexc::LexcCompiler compiler(type);
-    compiler.parse(filename.c_str());
-    return compiler.compileLexical();
-    break;
+        hfst::lexc::LexcCompiler compiler(type);
+        compiler.parse(filename.c_str());
+        retval = compiler.compileLexical();
+        return retval;
+        break;
       }
 #endif
     /* Add here your implementation. */
@@ -3837,13 +4033,6 @@ void priority_union_test ( ImplementationType type )
     // normal transducer .p. normal transducer
     testTr = tr1;
 
-    /*
-    std::cerr << testTr.priority_union( tr2 )
-          << "--\n"
-          << result2
-          << std::endl;
-    */
-
     assert ( testTr.priority_union( tr2 ).compare( result2 ) );
 
     // normal transducer .p. normal transducer without priority string
@@ -3985,7 +4174,7 @@ int main(int argc, char * argv[])
 	continue;
 
 	// One case that fails with FOMA_TYPE
-	HfstTransducer a("a", FOMA_TYPE);
+	HfstTransducer a("a", types[i]);
 	a.repeat_n(2);
 
     	// Test alphabet after substitute

@@ -16,17 +16,17 @@ using namespace hfst::xeroxRules;
 using namespace hfst::implementations;
 
 
-#include "xre_utils.h"
+#include "pmatch_utils.h"
 
-extern void xreerror(const char * text);
-extern int xrelex();
+extern void pmatcherror(const char * text);
+extern int pmatchlex();
 
 
 
 
 %}
 
-%name-prefix="xre"
+%name-prefix="pmatch"
 %error-verbose
 %debug
 
@@ -65,7 +65,7 @@ extern int xrelex();
 
 %type <replaceArrow> REPLACE_ARROW
 
-%type <transducer> XRE REGEXP1 REGEXP2  REGEXP4 REGEXP5 REGEXP6 REGEXP7
+%type <transducer> PMATCH REGEXP1 REGEXP2  REGEXP4 REGEXP5 REGEXP6 REGEXP7
                     REGEXP8 REGEXP9 REGEXP10 REGEXP11 REGEXP12 LABEL
                    REPLACE REGEXP3
 %type <replaceRuleVectorWithArrow> PARALLEL_RULES
@@ -78,7 +78,7 @@ extern int xrelex();
 %type <transducerPair> CONTEXT
 %type <replType>  CONTEXT_MARK
 
-
+%type <transducer> INSERT RIGHT_CONTEXT LEFT_CONTEXT
 
 
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
@@ -129,28 +129,31 @@ extern int xrelex();
        PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
+
+%nonassoc DEFINE INS_LEFT LC_LEFT RC_LEFT
 %%
 
 
 
 
-XRE: REGEXP1 { }
+PMATCH: REGEXP1 { }
      ;
+
 REGEXP1: REGEXP2 END_OF_EXPRESSION {
       // std::cerr << "regexp1:regexp2 end of expr \n"<< std::endl; 
-       hfst::xre::last_compiled = & $1->minimize();
-       $$ = hfst::xre::last_compiled;
+       hfst::pmatch::last_compiled = & $1->minimize();
+       $$ = hfst::pmatch::last_compiled;
    }
    | REGEXP2 END_OF_WEIGHTED_EXPRESSION {
         //std::cerr << "regexp1:regexp2 end of wighted expr \n"<< std::endl; 
-        hfst::xre::last_compiled = & $1->minimize().set_final_weights($2);
-        $$ = hfst::xre::last_compiled;
+        hfst::pmatch::last_compiled = & $1->minimize().set_final_weights($2);
+        $$ = hfst::pmatch::last_compiled;
    }
    | REGEXP2 {
    
         //std::cerr << "regexp1:regexp2\n"<< std::endl; 
-        hfst::xre::last_compiled = & $1->minimize();
-        $$ = hfst::xre::last_compiled;
+        hfst::pmatch::last_compiled = & $1->minimize();
+        $$ = hfst::pmatch::last_compiled;
    }
    ;
 
@@ -165,15 +168,30 @@ REGEXP2: REPLACE
         }
        | REGEXP2 CROSS_PRODUCT REPLACE {
             $$ = & $1->cross_product(*$3);
-            // xreerror("No crossproduct");
+            // pmatcherror("No crossproduct");
             // $$ = $1;
             delete $3;
         }
        | REGEXP2 LENIENT_COMPOSITION REPLACE {
-            xreerror("No lenient composition");
+            pmatcherror("No lenient composition");
             $$ = $1;
             delete $3;
         }
+       | DEFINE SYMBOL REGEXP2 {
+            //std::cerr << "matched Define " << $2 << std::endl;
+            $3->set_name($2);
+            hfst::pmatch::named_transducers.insert(
+               std::pair<std::string,hfst::HfstTransducer*>($2,$3));
+            $$ = $3;
+        }
+       | REPLACE RIGHT_CONTEXT {
+            $$ = & $1->disjunct(*$2);
+            delete $2;
+       }
+       | REPLACE LEFT_CONTEXT {
+            $$ = & $1->disjunct(*$2);
+            delete $2;
+       }
        ;
 
 
@@ -266,7 +284,7 @@ MAPPING_VECTOR: MAPPING_VECTOR COMMA MAPPING
          // check if new Arrow is the same as the first one
          if ($1->first != $3->first)
          {
-            xreerror("Replace arrows should be the same. Calculated as if all replacements had the fist arrow.");
+            pmatcherror("Replace arrows should be the same. Calculated as if all replacements had the fist arrow.");
             //exit(1);
          }
          $1->second.push_back($3->second);
@@ -309,7 +327,7 @@ MAPPING: REPLACE REPLACE_ARROW REPLACE
       | REPLACE REPLACE_ARROW REPLACE MARKUP_MARKER
       {
       
-          HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+          HfstTransducer epsilon(hfst::internal_epsilon, hfst::pmatch::format);
           HfstTransducerPair marks(*$3, epsilon);
           HfstTransducer mapping = create_mapping_for_mark_up_replace( *$1, marks );
           
@@ -320,7 +338,7 @@ MAPPING: REPLACE REPLACE_ARROW REPLACE
       }
       | REPLACE REPLACE_ARROW MARKUP_MARKER REPLACE
       {
-          HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+          HfstTransducer epsilon(hfst::internal_epsilon, hfst::pmatch::format);
           HfstTransducerPair marks(epsilon, *$4);
           HfstTransducer mapping = create_mapping_for_mark_up_replace( *$1, marks );
           
@@ -334,7 +352,7 @@ MAPPING: REPLACE REPLACE_ARROW REPLACE
       
        | LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED REPLACE_ARROW REPLACE
       {
-          HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+          HfstTransducer epsilon(hfst::internal_epsilon, hfst::pmatch::format);
           HfstTransducer mappingTr(epsilon);
           mappingTr.cross_product(*$4);
           
@@ -392,7 +410,7 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
          {
            // std::cerr << "Mapping: \n" << *$1  << std::endl;
             
-            HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+            HfstTransducer epsilon(hfst::internal_epsilon, hfst::pmatch::format);
             
            // std::cerr << "Epsilon: \n" << epsilon  << std::endl;
             $$ = new HfstTransducerPair(*$1, epsilon);
@@ -400,7 +418,7 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
          }
       | CENTER_MARKER REPLACE
          {
-            HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+            HfstTransducer epsilon(hfst::internal_epsilon, hfst::pmatch::format);
             $$ = new HfstTransducerPair(epsilon, *$2);
             delete $2; 
          }
@@ -470,17 +488,17 @@ REPLACE_ARROW: REPLACE_RIGHT
 
 REGEXP3: REGEXP4 { }
        | REGEXP3 SHUFFLE REGEXP4 {
-            xreerror("No shuffle");
+            pmatcherror("No shuffle");
             $$ = $1;
             delete $3;
         }
        | REGEXP3 BEFORE REGEXP4 {
-            xreerror("No before");
+            pmatcherror("No before");
             $$ = $1;
             delete $3;
         }
        | REGEXP3 AFTER REGEXP4 {
-            xreerror("No after");
+            pmatcherror("No after");
             $$ = $1;
             delete $3;
         }
@@ -489,19 +507,19 @@ REGEXP3: REGEXP4 { }
 
 REGEXP4: REGEXP5 { }
        | REGEXP4 LEFT_ARROW REGEXP5 CENTER_MARKER REGEXP5 {
-            xreerror("No Arrows");
+            pmatcherror("No Arrows");
             $$ = $1;
             delete $3;
             delete $5;
         }
        | REGEXP4 RIGHT_ARROW REGEXP5 CENTER_MARKER REGEXP5 {
-            xreerror("No Arrows");
+            pmatcherror("No Arrows");
             $$ = $1;
             delete $3;
             delete $5;
         }
        | REGEXP4 LEFT_RIGHT_ARROW REGEXP5 CENTER_MARKER REGEXP5 {
-            xreerror("No Arrows");
+            pmatcherror("No Arrows");
             $$ = $1;
             delete $3;
             delete $5;
@@ -522,22 +540,22 @@ REGEXP5: REGEXP6 { }
             delete $3;
         }
        | REGEXP5 UPPER_MINUS REGEXP6 {
-            xreerror("No upper minus");
+            pmatcherror("No upper minus");
             $$ = $1;
             delete $3;
         }
        | REGEXP5 LOWER_MINUS REGEXP6 {
-            xreerror("No lower minus");
+            pmatcherror("No lower minus");
             $$ = $1;
             delete $3;
         }
        | REGEXP5 UPPER_PRIORITY_UNION REGEXP6 {
-            xreerror("No upper priority union");
+            pmatcherror("No upper priority union");
             $$ = $1;
             delete $3;
         }
        | REGEXP5 LOWER_PRIORITY_UNION REGEXP6 {
-            xreerror("No lower priority union");
+            pmatcherror("No lower priority union");
             $$ = $1;
             delete $3;
         }
@@ -552,34 +570,35 @@ REGEXP6: REGEXP7 { }
 
 REGEXP7: REGEXP8 { }
        | REGEXP7 IGNORING REGEXP8 {
-            xreerror("No ignoring");
+            pmatcherror("No ignoring");
             $$ = $1;
             delete $3;
         }
        | REGEXP7 IGNORE_INTERNALLY REGEXP8 {
-            xreerror("No ignoring internally");
+            pmatcherror("No ignoring internally");
             $$ = $1;
             delete $3;
         }
        | REGEXP7 LEFT_QUOTIENT REGEXP8 {
-            xreerror("No left quotient");
+            pmatcherror("No left quotient");
             $$ = $1;
             delete $3;
         }
+
        ;
 
 REGEXP8: REGEXP9 { }
        | COMPLEMENT REGEXP8 {
-            xreerror("No complement");
+            pmatcherror("No complement");
             $$ = $2;
         }
        | CONTAINMENT REGEXP8 {
             HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
                                     hfst::internal_unknown,
-                                    hfst::xre::format);
+                                    hfst::pmatch::format);
             HfstTransducer* right = new HfstTransducer(hfst::internal_unknown,
                                     hfst::internal_unknown,
-                                    hfst::xre::format);
+                                    hfst::pmatch::format);
             right->repeat_star();
             left->repeat_star();
             HfstTransducer* contain_once = 
@@ -591,10 +610,10 @@ REGEXP8: REGEXP9 { }
        | CONTAINMENT_ONCE REGEXP8 {
             HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
                                     hfst::internal_unknown,
-                                    hfst::xre::format);
+                                    hfst::pmatch::format);
             HfstTransducer* right = new HfstTransducer(hfst::internal_unknown,
                                     hfst::internal_unknown,
-                                    hfst::xre::format);
+                                    hfst::pmatch::format);
             right->repeat_star();
             left->repeat_star();
             HfstTransducer* contain_once = 
@@ -606,10 +625,10 @@ REGEXP8: REGEXP9 { }
        | CONTAINMENT_OPT REGEXP8 {
             HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
                                     hfst::internal_unknown,
-                                    hfst::xre::format);
+                                    hfst::pmatch::format);
             HfstTransducer* right = new HfstTransducer(hfst::internal_unknown,
                                     hfst::internal_unknown,
-                                    hfst::xre::format);
+                                    hfst::pmatch::format);
             right->repeat_star();
             left->repeat_star();
             HfstTransducer* contain_once = 
@@ -652,18 +671,20 @@ REGEXP9: REGEXP10 { }
             $$ = & $1->repeat_n_to_k($2[0], $2[1]);
             free($2);
         }
+       | INSERT { }
+
        ;
 
 REGEXP10: REGEXP11 { }
        | TERM_COMPLEMENT REGEXP10 {
             HfstTransducer* any = new HfstTransducer(hfst::internal_unknown,
                                         hfst::internal_unknown,
-                                        hfst::xre::format);
+                                        hfst::pmatch::format);
             $$ = & ( any->subtract(*$2));
             delete $2;
         }
        | SUBSTITUTE_LEFT REGEXP10 COMMA REGEXP10 COMMA REGEXP10 RIGHT_BRACKET {
-            xreerror("no substitute");
+            pmatcherror("no substitute");
             $$ = $2;
         }
        ;
@@ -691,102 +712,150 @@ REGEXP12: LABEL { }
             free($1);
         }
         | READ_TEXT {
-            xreerror("no read text");
+            pmatcherror("no read text");
         }
         | READ_SPACED {
-            xreerror("no read spaced");
+            pmatcherror("no read spaced");
         }
         | READ_PROLOG {
-            xreerror("no read prolog");
+            pmatcherror("no read prolog");
         }
         | READ_RE {
-            xreerror("Definitely no read regex");
+            pmatcherror("Definitely no read regex");
         }
         ;
 
 LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
-        $$ = new HfstTransducer($1, $3, hfst::xre::format);
+        $$ = new HfstTransducer($1, $3, hfst::pmatch::format);
         free($1);
         free($3);
      }
      | SYMBOL PAIR_SEPARATOR EPSILON_TOKEN {
-        $$ = new HfstTransducer($1, hfst::internal_epsilon, hfst::xre::format);
+        $$ = new HfstTransducer($1, hfst::internal_epsilon, hfst::pmatch::format);
         free($1);
      }
      | SYMBOL PAIR_SEPARATOR ANY_TOKEN {
-        $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::xre::format);
+        $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::pmatch::format);
         free($1);
      }
      | EPSILON_TOKEN PAIR_SEPARATOR EPSILON_TOKEN {
         $$ = new HfstTransducer(hfst::internal_epsilon, 
-                                hfst::internal_epsilon, hfst::xre::format);
+                                hfst::internal_epsilon, hfst::pmatch::format);
      }
      | EPSILON_TOKEN PAIR_SEPARATOR SYMBOL {
-        $$ = new HfstTransducer(hfst::internal_epsilon, $3, hfst::xre::format);
+        $$ = new HfstTransducer(hfst::internal_epsilon, $3, hfst::pmatch::format);
         free($3);
      }
      | EPSILON_TOKEN PAIR_SEPARATOR ANY_TOKEN {
         $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_unknown,
-                                hfst::xre::format);
+                                hfst::pmatch::format);
      }
      | ANY_TOKEN PAIR_SEPARATOR ANY_TOKEN {
         $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
-                                hfst::xre::format);
+                                hfst::pmatch::format);
      }
      | ANY_TOKEN PAIR_SEPARATOR SYMBOL {
-        $$ = new HfstTransducer(hfst::internal_unknown, $3, hfst::xre::format);
+        $$ = new HfstTransducer(hfst::internal_unknown, $3, hfst::pmatch::format);
         free($3);
      }
      | ANY_TOKEN PAIR_SEPARATOR EPSILON_TOKEN {
         $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_epsilon,
-                                hfst::xre::format);
+                                hfst::pmatch::format);
      }
      | SYMBOL PAIR_SEPARATOR_WO_RIGHT {
-        $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::xre::format);
+        $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::pmatch::format);
         free($1);
      }
      | EPSILON_TOKEN PAIR_SEPARATOR_WO_RIGHT {
         $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_unknown,
-                                hfst::xre::format);
+                                hfst::pmatch::format);
      }
      | ANY_TOKEN PAIR_SEPARATOR_WO_RIGHT {
         $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
-                                hfst::xre::format);
+                                hfst::pmatch::format);
      }
      | PAIR_SEPARATOR_WO_LEFT SYMBOL {
-        $$ = new HfstTransducer(hfst::internal_unknown, $2, hfst::xre::format);
+        $$ = new HfstTransducer(hfst::internal_unknown, $2, hfst::pmatch::format);
         free($2);
      }
      | PAIR_SEPARATOR_WO_LEFT ANY_TOKEN {
         $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
-                                hfst::xre::format);
+                                hfst::pmatch::format);
      }
      | PAIR_SEPARATOR_WO_LEFT EPSILON_TOKEN {
         $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_epsilon,
-                                hfst::xre::format);
+                                hfst::pmatch::format);
      }
      | SYMBOL {
-        $$ = new HfstTransducer($1, $1, hfst::xre::format);
+        $$ = new HfstTransducer($1, $1, hfst::pmatch::format);
         free($1);
      }
      | PAIR_SEPARATOR_SOLE {
         $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
-                                hfst::xre::format);
+                                hfst::pmatch::format);
      }
      | EPSILON_TOKEN {
         $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_epsilon,
-                                hfst::xre::format);
+                                hfst::pmatch::format);
      }
      | ANY_TOKEN {
         $$ = new HfstTransducer(hfst::internal_identity,
-                                hfst::xre::format);
+                                hfst::pmatch::format);
      }
      | QUOTED_LITERAL {
-        $$ = new HfstTransducer($1, $1, hfst::xre::format);
+        $$ = new HfstTransducer($1, $1, hfst::pmatch::format);
         free($1);
      }
      | BOUNDARY_MARKER {
-        $$ = new HfstTransducer("@#@", "@#@", hfst::xre::format);
+        $$ = new HfstTransducer("@#@", "@#@", hfst::pmatch::format);
+     }
+     ;
+
+INSERT: INS_LEFT SYMBOL RIGHT_PARENTHESIS {
+        if(hfst::pmatch::named_transducers.count($2) != 0) {
+//           std::cerr << "Ins " << $2 << " found" << std::endl;
+             char * Ins_trans = hfst::pmatch::get_Ins_transition($2);
+             $$ = new HfstTransducer(
+                Ins_trans, Ins_trans, hfst::pmatch::format);
+             $$->set_name($2);
+             free(Ins_trans);
+        } else {
+             pmatcherror("Named transducer not previously Defined");
+        }
+        }
+     ;
+
+RIGHT_CONTEXT: RC_LEFT INSERT RIGHT_PARENTHESIS {
+        char * RC_trans = hfst::pmatch::get_RC_transition($2->get_name().c_str());
+        $$ = new HfstTransducer(RC_trans, RC_trans, hfst::pmatch::format);
+        free(RC_trans);
+     }
+     ;
+
+RIGHT_CONTEXT: RC_LEFT REPLACE RIGHT_PARENTHESIS {
+        char * RC_trans = hfst::pmatch::get_RC_transition("");
+	HfstTransducer * rc_transducer = new HfstTransducer(
+            RC_trans, RC_trans, hfst::pmatch::format);
+        $$ = & rc_transducer->concatenate(*$2);
+        delete $2;
+        free(RC_trans);
+     }
+     ;
+
+//LEFT_CONTEXT: LC_LEFT INSERT LEFT_PARENTHESIS {
+//        char * LC_trans = hfst::pmatch::get_LC_transition($2->get_name().c_str());
+//        $$ = new HfstTransducer(LC_trans, LC_trans, hfst::pmatch::format);
+//        free(LC_trans);
+//     }
+//     ;
+
+LEFT_CONTEXT: LC_LEFT REPLACE RIGHT_PARENTHESIS {
+        char * LC_trans = hfst::pmatch::get_LC_transition("");
+	HfstTransducer * lc_transducer = new HfstTransducer(
+            LC_trans, LC_trans, hfst::pmatch::format);
+        $$ = & lc_transducer->concatenate($2->reverse());
+        delete $2;
+        free(LC_trans);
      }
      ;
 

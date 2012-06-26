@@ -1,23 +1,23 @@
-%option 8Bit batch noyylineno noyywrap nounput prefix="xre"
+%option 8Bit batch noyylineno noyywrap nounput prefix="pmatch"
 
 %{
 
 
 #include <string.h>
 
-#include "hfst.hpp"
+#include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstXeroxRules.h"
 
-#include "xre_parse.h"
-#include "xre_utils.h"
+#include "pmatch_parse.h"
+#include "pmatch_utils.h"
 
 
 #undef YY_INPUT
-#define YY_INPUT(buf, retval, maxlen)   (retval = hfst::xre::getinput(buf, maxlen))
+#define YY_INPUT(buf, retval, maxlen)   (retval = hfst::pmatch::getinput(buf, maxlen))
 
 extern
-void xreerror(char *text);
+void pmatcherror(char *text);
 
 %}
 
@@ -40,7 +40,7 @@ EC "%"{U8C}
 
 /* any ASCII */
 A7 [\x00-\x7e]
-/* special meaning in xre */
+/* special meaning in pmatch */
 A7RESTRICTED [- |<>%!:;@0~\\&?$+*/_(){}\]\[-]
 /* non-restricted ASCII */
 A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%!:;@0~\\&?$+*/_(){}\]\[-]
@@ -54,6 +54,23 @@ INTEGER -?[1-9][0-9]*
 WSP [\t ]
 LWSP [\t\r\n ]
 %%
+
+"Define" {
+    return DEFINE;
+}
+
+"Ins(" {
+    return INS_LEFT;
+}
+
+"LC(" {
+    return LC_LEFT;
+}
+
+"RC(" {
+    return RC_LEFT;
+}
+
 
 "~"   { return COMPLEMENT; }
 "\\"  { return TERM_COMPLEMENT; }
@@ -111,27 +128,27 @@ LWSP [\t\r\n ]
 "\\\\\\" { return LEFT_QUOTIENT; }
 
 "^"{UINTEGER}","{UINTEGER} { 
-    xrelval.values = hfst::xre::get_n_to_k(xretext);
+    pmatchlval.values = hfst::pmatch::get_n_to_k(pmatchtext);
     return CATENATE_N_TO_K;
 }
 
 "^{"{UINTEGER}","{UINTEGER}"}" {
-    xrelval.values = hfst::xre::get_n_to_k(xretext);
+    pmatchlval.values = hfst::pmatch::get_n_to_k(pmatchtext);
     return CATENATE_N_TO_K;
 }
 
 "^>"{UINTEGER} { 
-    xrelval.value = strtol(xretext + 2, 0, 10);
+    pmatchlval.value = strtol(pmatchtext + 2, 0, 10);
     return CATENATE_N_PLUS; 
 }
 
 "^<"{UINTEGER} { 
-    xrelval.value = strtol(xretext + 2, 0, 10);
+    pmatchlval.value = strtol(pmatchtext + 2, 0, 10);
     return CATENATE_N_MINUS;
 }
 
 "^"{UINTEGER}                  { 
-    xrelval.value = strtol(xretext + 1, 0, 10);
+    pmatchlval.value = strtol(pmatchtext + 1, 0, 10);
     return CATENATE_N;
 }
 
@@ -141,27 +158,27 @@ LWSP [\t\r\n ]
 ".l" { return LOWER; }
 
 "@bin\""[^""]+"\""|"@\""[^""]+"\"" { 
-    xrelval.label = hfst::xre::get_quoted(xretext);
+    pmatchlval.label = hfst::pmatch::get_quoted(pmatchtext);
     return READ_BIN;
 }
 
 "@txt\""[^""]+"\"" {
-    xrelval.label = hfst::xre::get_quoted(xretext);
+    pmatchlval.label = hfst::pmatch::get_quoted(pmatchtext);
     return READ_TEXT;
 }
 
 "@stxt\""[^""]+"\"" {
-    xrelval.label = hfst::xre::get_quoted(xretext);
+    pmatchlval.label = hfst::pmatch::get_quoted(pmatchtext);
     return READ_SPACED;
 }
 
 "@pl\""[^""]+"\"" {
-    xrelval.label = hfst::xre::get_quoted(xretext);
+    pmatchlval.label = hfst::pmatch::get_quoted(pmatchtext);
     return READ_PROLOG;
 }
 
 "@re\""[^""]+"\"" {
-    xrelval.label = hfst::xre::get_quoted(xretext);
+    pmatchlval.label = hfst::pmatch::get_quoted(pmatchtext);
     return READ_RE;
 }
 
@@ -181,12 +198,12 @@ LWSP [\t\r\n ]
 ":" { return PAIR_SEPARATOR; }
 
 "::"{WEIGHT} {
-    xrelval.weight = hfst::xre::get_weight(xretext + 2);
+    pmatchlval.weight = hfst::pmatch::get_weight(pmatchtext + 2);
     return WEIGHT;
 }
 
 "\""[^""]+"\"" {
-    xrelval.label = hfst::xre::parse_quoted(xretext); 
+    pmatchlval.label = hfst::pmatch::parse_quoted(pmatchtext); 
     return QUOTED_LITERAL;
 }
 
@@ -199,12 +216,12 @@ LWSP [\t\r\n ]
 "?" { return ANY_TOKEN; }
 
 {NAME_CH}+ {
-    xrelval.label = hfst::xre::strip_percents(xretext);
+    pmatchlval.label = hfst::pmatch::strip_percents(pmatchtext);
     return SYMBOL;
 }  
 
 ";\t"{WEIGHT} {
-    xrelval.weight = hfst::xre::get_weight(xretext + 2);
+    pmatchlval.weight = hfst::pmatch::get_weight(pmatchtext + 2);
     return END_OF_WEIGHTED_EXPRESSION;
 }
 
@@ -219,4 +236,5 @@ LWSP [\t\r\n ]
 . { 
     return LEXER_ERROR;
 }
+
 %%

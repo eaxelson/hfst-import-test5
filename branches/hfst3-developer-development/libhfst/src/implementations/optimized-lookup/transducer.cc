@@ -24,27 +24,50 @@ bool should_ascii_tokenize(unsigned char c)
 TransducerAlphabet::TransducerAlphabet(std::istream& is,
                        SymbolNumber symbol_count)
 {
+    unknown_symbol = NO_SYMBOL_NUMBER;
+    default_symbol = NO_SYMBOL_NUMBER;
     for(SymbolNumber i=0; i<symbol_count; i++)
     {
     std::string str;
     std::getline(is, str, '\0');
     symbol_table.push_back(str.c_str());
-    if(hfst::FdOperation::is_diacritic(str))
+    if(hfst::FdOperation::is_diacritic(str)) {
         fd_table.define_diacritic(i, str);
+    } else if (hfst::is_unknown(str)) {
+        unknown_symbol = i;
+    } else if (hfst::is_default(str)) {
+	default_symbol = i;
     }
     if(!is) {
       HFST_THROW(TransducerHasWrongTypeException);
+    }
     }
 }
 
 TransducerAlphabet::TransducerAlphabet(const SymbolTable& st):
     symbol_table(st)
 {
+    unknown_symbol = NO_SYMBOL_NUMBER;
+    default_symbol = NO_SYMBOL_NUMBER;
     for(SymbolNumber i=0; i<symbol_table.size(); i++)
     {
-    if(hfst::FdOperation::is_diacritic(symbol_table[i]))
-        fd_table.define_diacritic(i, symbol_table[i]);
+        if(hfst::FdOperation::is_diacritic(symbol_table[i])) {
+            fd_table.define_diacritic(i, symbol_table[i]);
+        } else if (hfst::is_unknown(symbol_table[i])) {
+            unknown_symbol = i;
+        } else if (hfst::is_default(symbol_table[i])) {
+	    default_symbol = i;
+	}
     }
+}
+
+StringSymbolMap TransducerAlphabet::build_string_symbol_map(void) const
+{
+    StringSymbolMap ss_map;
+    for(SymbolNumber i = 0; i < symbol_table.size(); ++i) {
+        ss_map[symbol_table[i]] = i;
+    }
+    return ss_map;
 }
 
 void TransducerAlphabet::display() const
@@ -261,6 +284,7 @@ void Transducer::try_epsilon_indices(SymbolNumber * input_symbol,
 //    std::cerr << "try_epsilon_indices, index " << i << std::endl;
     if (tables->get_index_input(i) == 0)
     {
+    found_transition = true;
     try_epsilon_transitions(input_symbol,
                 output_symbol,
                 original_output_tape,
@@ -275,26 +299,35 @@ void Transducer::find_transitions(SymbolNumber input,
                   SymbolNumber * original_output_tape,
                   TransitionTableIndex i)
 {
-
+    bool trap_transition = false;
     while (tables->get_transition_input(i) != NO_SYMBOL_NUMBER)
     {
     if (tables->get_transition_input(i) == input)
     {
-      
-        *output_symbol = tables->get_transition_output(i);
+	SymbolNumber output = tables->get_transition_output(i);
+	if (input == alphabet->get_default_symbol()) {
+	    // we got here via default, so look back in the
+	    // input tape to find the symbol we want to write
+	    output = *(input_symbol - 1);
+	}
+	
+        *output_symbol = output;
         current_weight += tables->get_weight(i);
         get_analyses(input_symbol,
              output_symbol+1,
              original_output_tape,
              tables->get_transition_target(i));
         current_weight -= tables->get_weight(i);
+        trap_transition = true;
     }
     else
     {
+        found_transition = trap_transition;
         return;
     }
     ++i;
     }
+    found_transition = trap_transition;
 }
 
 void Transducer::find_index(SymbolNumber input,
@@ -311,6 +344,7 @@ void Transducer::find_index(SymbolNumber input,
              original_output_tape,
              tables->get_index_target(i+input) - 
              TRANSITION_TARGET_TABLE_START);
+    found_transition = true;
     }
 }
 
@@ -325,6 +359,8 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
     if (indexes_transition_table(i))
     {
     i -= TRANSITION_TARGET_TABLE_START;
+
+    found_transition = false;
 
     try_epsilon_transitions(input_symbol,
                 output_symbol,
@@ -353,9 +389,14 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
              output_symbol,
              original_output_tape,
              i+1);
+    if (alphabet->get_default_symbol() != NO_SYMBOL_NUMBER && !found_transition) {
+        find_transitions(alphabet->get_default_symbol(),
+                         input_symbol, output_symbol, original_output_tape, i+1);
+    }
     }
     else
     {
+    found_transition = false;
     try_epsilon_indices(input_symbol,
                 output_symbol,
                 original_output_tape,
@@ -382,6 +423,12 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
            output_symbol,
            original_output_tape,
            i+1);
+    // If we have a default symbol defined and we didn't find an index,
+    // check for that
+    if (alphabet->get_default_symbol() != NO_SYMBOL_NUMBER && !found_transition) {
+	find_index(alphabet->get_default_symbol(),
+		   input_symbol, output_symbol, original_output_tape, i+1);
+    }
     }
     *output_symbol = NO_SYMBOL_NUMBER;
 }
@@ -399,19 +446,20 @@ void Transducer::note_analysis(SymbolNumber * whole_output_tape)
 
 
 
-Transducer::Transducer(): header(NULL), alphabet(NULL), tables(NULL),
-              current_weight(0.0), lookup_paths(NULL), input_tape(NULL),
-              output_tape(NULL), encoder(NULL), flag_state() {}
+Transducer::Transducer():
+    header(NULL), alphabet(NULL), tables(NULL),
+    current_weight(0.0), lookup_paths(NULL), encoder(NULL),
+    input_tape(NULL), output_tape(NULL), flag_state(), found_transition(false){}
 
 Transducer::Transducer(std::istream& is):
     header(new TransducerHeader(is)),
     alphabet(new TransducerAlphabet(is, header->symbol_count())),
     tables(NULL), current_weight(0.0), lookup_paths(NULL),
-    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet->get_symbol_table(),
             header->input_symbol_count())),
-    flag_state(alphabet->get_fd_table())
+    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
+    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
+    flag_state(alphabet->get_fd_table()), found_transition(false)
 {
     load_tables(is);
 }
@@ -422,11 +470,11 @@ Transducer::Transducer(bool weighted):
     alphabet(new TransducerAlphabet()),
     current_weight(0.0),
     lookup_paths(NULL),
-    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet->get_symbol_table(),
             header->input_symbol_count())),
-    flag_state(alphabet->get_fd_table())
+    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
+    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
+    flag_state(alphabet->get_fd_table()), found_transition(false)
 {
     if(weighted)
     tables = new TransducerTables<TransitionWIndex,TransitionW>();
@@ -444,11 +492,11 @@ Transducer::Transducer(const TransducerHeader& header,
            index_table, transition_table)),
     current_weight(0.0),
     lookup_paths(NULL),
-    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet.get_symbol_table(),
             header.input_symbol_count())),
-    flag_state(alphabet.get_fd_table())
+    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
+    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
+    flag_state(alphabet.get_fd_table()), found_transition(false)
 {}
 
 Transducer::Transducer(const TransducerHeader& header,
@@ -461,11 +509,11 @@ Transducer::Transducer(const TransducerHeader& header,
            index_table, transition_table)),
     current_weight(0.0),
     lookup_paths(NULL),
-    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet.get_symbol_table(),
             header.input_symbol_count())),
-    flag_state(alphabet.get_fd_table())
+    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
+    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
+    flag_state(alphabet.get_fd_table()), found_transition(false)
 {}
 
 Transducer::~Transducer()
@@ -651,6 +699,80 @@ TransitionTableIndexSet Transducer::get_transitions_from_state(
     }
     return transitions;
 }
+
+TransitionTableIndex Transducer::next(const TransitionTableIndex i,
+				      const SymbolNumber symbol) const
+{
+    if (i >= TRANSITION_TARGET_TABLE_START) {
+	return i - TRANSITION_TARGET_TABLE_START + 1;
+    } else {
+	return get_index(i+1+symbol).get_target() - TRANSITION_TARGET_TABLE_START;
+    }
+}
+
+bool Transducer::has_transitions(const TransitionTableIndex i,
+				 const SymbolNumber symbol) const
+{
+    if (i >= TRANSITION_TARGET_TABLE_START) {
+	return (get_transition(i - TRANSITION_TARGET_TABLE_START).get_input_symbol() == symbol);
+    } else {
+	return (get_index(i+symbol).get_input_symbol() == symbol);
+    }
+}
+
+bool Transducer::has_epsilons_or_flags(const TransitionTableIndex i)
+{
+    if (i >= TRANSITION_TARGET_TABLE_START) {
+	return(get_transition(i - TRANSITION_TARGET_TABLE_START)
+               .get_input_symbol() == 0 ||
+	       is_flag(get_transition(i - TRANSITION_TARGET_TABLE_START)
+                       .get_input_symbol()));
+    } else {
+	return (get_index(i).get_input_symbol() == 0);
+    }
+}
+
+STransition Transducer::take_epsilons(const TransitionTableIndex i) const
+{
+    if (get_transition(i).get_input_symbol() != 0) {
+	return STransition(0, NO_SYMBOL_NUMBER);
+    }
+    return STransition(get_transition(i).get_target(),
+		       get_transition(i).get_output_symbol(),
+		       get_transition(i).get_weight());
+}
+
+STransition Transducer::take_epsilons_and_flags(const TransitionTableIndex i)
+{
+    if (get_transition(i).get_input_symbol() != 0&&
+	!is_flag(get_transition(i).get_input_symbol())) {
+	return STransition(0, NO_SYMBOL_NUMBER);
+    }
+    return STransition(get_transition(i).get_target(),
+		       get_transition(i).get_output_symbol(),
+		       get_transition(i).get_weight());
+}
+
+STransition Transducer::take_non_epsilons(const TransitionTableIndex i,
+					  const SymbolNumber symbol) const
+{
+    if (get_transition(i).get_input_symbol() != symbol) {
+	return STransition(0, NO_SYMBOL_NUMBER);
+    }
+    return STransition(get_transition(i).get_target(),
+		       get_transition(i).get_output_symbol(),
+		       get_transition(i).get_weight());
+}
+
+Weight Transducer::final_weight(const TransitionTableIndex i) const
+{
+    if (i >= TRANSITION_TARGET_TABLE_START) {
+	return get_transition(i - TRANSITION_TARGET_TABLE_START).get_weight();
+    } else {
+	return get_index(i).final_weight();
+    }
+}
+
 
 }
 

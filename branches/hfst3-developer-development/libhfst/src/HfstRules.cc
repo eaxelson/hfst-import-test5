@@ -18,33 +18,11 @@ namespace hfst
   namespace rules
   {
 
-    /*    static void make_optional(HfstTransducer &t, ReplaceType repl_type)
-    {
-      HfstTransducer tc(t);      
-      if (repl_type == REPL_DOWN) {
-    tc.output_project(); }
-      else { 
-    tc.input_project(); }
-      t.disjunct(tc);
-      return;
-      }*/
-
     HfstTransducer replace( HfstTransducer &t, 
                             ReplaceType repl_type, 
                             bool optional, 
                             StringPairSet &alphabet ) 
     {
-
-      //if (optional)
-      //	make_optional(t, repl_type);
-
-      bool DEBUG=false;
-
-      if (DEBUG) printf("replace..\n");
-
-      if (DEBUG) t.write_in_att_format("replace_t.att", true);
-
-      if (DEBUG) t.print_alphabet();
 
       ImplementationType type = t.get_type();
 
@@ -58,26 +36,16 @@ namespace hfst
         exit(1);
       }
 
-      if (DEBUG) t_proj.write_in_att_format("replace_t_proj.att", true);
-      if (DEBUG) t_proj.print_alphabet();
-
       HfstTransducer pi_star(alphabet, type, true);
-
-      if (DEBUG) pi_star.write_in_att_format("replace_pi_star.att", true);
-      if (DEBUG) pi_star.print_alphabet();
 
       // tc = ( .* t_proj .* )
       HfstTransducer tc(pi_star);
       tc.concatenate(t_proj);
       tc.concatenate(pi_star);
-                     
-      if (DEBUG) tc.write_in_att_format("replace_tc.att", true);
 
       // tc_neg = ! ( .* t_proj .* )
       HfstTransducer tc_neg(pi_star);
       tc_neg.subtract(tc);
-
-      if (DEBUG) tc_neg.write_in_att_format("replace_tc_neg.att", true);
 
       // retval = ( tc_neg t )* tc_neg
       HfstTransducer retval(tc_neg);
@@ -85,12 +53,8 @@ namespace hfst
       retval.repeat_star();
       retval.concatenate(tc_neg);
 
-      if (DEBUG) retval.write_in_att_format("replace_retval.att", true);
-
       if (optional)
         retval.disjunct(pi_star);
-
-      if (DEBUG) printf("..replace\n");
 
       return retval;
     }
@@ -100,12 +64,8 @@ namespace hfst
                                       ReplaceType repl_type, 
                                       StringPairSet &alphabet)
     {
-      bool DEBUG=false;
 
       t.minimize();
-      if (DEBUG) t.write_in_att_format("compiler_t.att",true);
-
-      if (DEBUG) printf("replace_transducer..\n");
 
       ImplementationType type = t.get_type();
 
@@ -120,14 +80,9 @@ namespace hfst
 
       tm.minimize();
       
-      if (DEBUG) tm.write_in_att_format("replace_up_tm.att", true);
-
       HfstTransducer retval = replace(tm, repl_type, false, alphabet);
 
-      if (DEBUG) printf("..replace_transducer\n");
-
       retval.minimize();
-
       return retval;
     }
 
@@ -139,31 +94,17 @@ namespace hfst
     {
       // ct = .* ( m1 >> ( m2 >> t ))  ||  !(.* m1)
 
-      // TEST
-      //fprintf(stderr, "replace_context: HfstTransducer t:\n");
-      //cerr << t << "--\n";
-
-      bool DEBUG=false;
-
-      if (DEBUG) printf("    replace_context..\n");
-
       // m1 >> ( m2 >> t )
       HfstTransducer t_copy(t);
       t_copy.insert_freely(StringPair(m1,m1));
       t_copy.insert_freely(StringPair(m2,m2));
-
-      if (DEBUG) printf("    (1)\n");
 
       HfstTransducer pi_star(alphabet, t.get_type(), true);
  
       // arg1 = .* ( m1 >> ( m2 >> t ))
       HfstTransducer arg1(pi_star);
 
-      if (DEBUG) printf("    (2)\n");
-      
       arg1.concatenate(t_copy);
-
-      if (DEBUG) printf("    (3)\n");
 
       // arg2 = !(.* m1)
       HfstTransducer m1_tr(m1, t.get_type());
@@ -175,8 +116,6 @@ namespace hfst
       // ct = .* ( m1 >> ( m2 >> t ))  ||  !(.* m1)
       HfstTransducer ct = arg1.compose(arg2);
 
-      if (DEBUG) printf("    (4)\n");
-
       // mt = m2* m1 .*
       HfstTransducer mt(m2, t.get_type());
       mt.repeat_star();
@@ -186,8 +125,6 @@ namespace hfst
 
       // !( (!ct mt) | (ct !mt) )
 
-      if (DEBUG) printf("    (5)\n");
-
       // ct !mt
       HfstTransducer tmp2(pi_star);
       tmp2.subtract(mt);
@@ -195,33 +132,21 @@ namespace hfst
       ct_neg_mt.concatenate(tmp2);
 
 
-      if (DEBUG) printf("    (6)\n");
-
       // !ct mt
       HfstTransducer neg_ct_mt(pi_star);
       neg_ct_mt.subtract(ct);
       neg_ct_mt.concatenate(mt);
 
 
-      if (DEBUG) printf("    (7)\n");
-
       // disjunction
       HfstTransducer disj = neg_ct_mt.disjunct(ct_neg_mt);
 
-      if (DEBUG) printf("    (8)\n");
 
       // negation
       HfstTransducer retval(pi_star);
       retval.subtract(disj);
 
-      if (DEBUG) printf("    (9)\n");
-
       retval.minimize();
-
-      // TEST
-      //fprintf(stderr, "replace_context:\n");
-      //cerr << retval << "--\n";
-
       return retval;
     }
 
@@ -238,9 +163,7 @@ namespace hfst
       }
       ImplementationType type = context.first.get_type();
 
-      //assert(context.first.get_type() != UNSPECIFIED_TYPE);
       assert(context.second.get_type() != ERROR_TYPE);
-      //assert(context.first.get_type() != UNSPECIFIED_TYPE);
       assert(context.second.get_type() != ERROR_TYPE);
 
       // calculate [ a:. ]
@@ -300,9 +223,7 @@ namespace hfst
       }
       ImplementationType type = context.first.get_type();
 
-      //assert(context.first.get_type() != UNSPECIFIED_TYPE);
       assert(context.second.get_type() != ERROR_TYPE);
-      //assert(context.first.get_type() != UNSPECIFIED_TYPE);
       assert(context.second.get_type() != ERROR_TYPE);
 
       // center = a:b
@@ -353,13 +274,6 @@ namespace hfst
                                       StringPairSet &alphabet)
     {
 
-      //if (optional)
-      //	make_optional(t, repl_type);
-
-      bool DEBUG=false;
-
-      if (DEBUG) printf("replace_in_context...\n");
-
       // test that all transducers have the same type
       if (context.first.get_type() != context.second.get_type() || 
           context.first.get_type() != t.get_type() ) {
@@ -368,17 +282,12 @@ namespace hfst
       }
       ImplementationType type = t.get_type();      
 
-      if (DEBUG) printf("  ..transducers have the same type\n");
-
       // test that both context transducers are automata
       // this could be done more efficiently...
       HfstTransducer t1_proj(context.first);
       t1_proj.input_project();
       HfstTransducer t2_proj(context.second);
       t2_proj.input_project();
-
-      if (DEBUG) 
-    printf("  testing if context transducers are automata..\n");
 
       if ( not t1_proj.compare(context.first) ||
            not t2_proj.compare(context.second) ) {
@@ -396,29 +305,17 @@ namespace hfst
       pi1.insert(StringPair(internal_epsilon, rightm));
       HfstTransducer ibt(pi1, type, true);
 
-      if (DEBUG) { 
-    printf("  ..ibt created:\n");
-    //std::cerr << ibt << std::endl;
-      }
-
       // Create the remove boundary transducer (.|<L>:<>|<R>:<>)*    
       StringPairSet pi2 = alphabet;
       pi2.insert(StringPair(leftm, internal_epsilon));
       pi2.insert(StringPair(rightm, internal_epsilon));
       HfstTransducer rbt(pi2, type, true);
 
-      if (DEBUG) { 
-    printf("  ..rbt created\n");
-    //std::cerr << rbt << std::endl;
-      }
-
       // Add the markers to the alphabet
       alphabet.insert(StringPair(leftm,leftm));
       alphabet.insert(StringPair(rightm,rightm));
 
       HfstTransducer pi_star(alphabet,type,true);
-
-      if (DEBUG) pi_star.write_in_att_format("FOO",false); // TEST IF FAILS
 
       // Create the constrain boundary transducer !(.*<L><R>.*)
       HfstTransducer leftm_to_leftm(leftm, leftm, type);
@@ -430,42 +327,23 @@ namespace hfst
       HfstTransducer cbt(pi_star);
       cbt.subtract(tmp);
       cbt.minimize();
-      if (DEBUG) cbt.write_in_att_format("replace_up_cbt.att",false);
-      if (DEBUG) printf("  ..cbt created\n");
 
       // left context transducer .* (<R> >> (<L> >> LEFT_CONTEXT)) || !(.*<L>) 
       HfstTransducer lct = replace_context
         (context.first, leftm, rightm, alphabet); 
 
       lct.minimize();
-      if (DEBUG) lct.write_in_att_format("replace_up_lct.att",false);
-      if (DEBUG) printf("  ..lct created\n");
 
       // right context transducer:  
       // reversion( (<R> >> (<L> >> reversion(RIGHT_CONTEXT))) .* || !(<R>.*) )
       HfstTransducer right_rev(context.second);
 
-      if (DEBUG) right_rev.write_in_att_format("FOO",true);  // FAILS
-
-      if (DEBUG) printf("(1)\n");
       right_rev.reverse();
-      if (DEBUG) printf("(#1)\n");
-
-      if (DEBUG) right_rev.write_in_att_format("FOO",true);
-
-      if (DEBUG) printf("(2)\n");
       right_rev.minimize();
 
-      if (DEBUG) right_rev.write_in_att_format("replace_up_right_rev.att",true);
-
       HfstTransducer rct = replace_context(right_rev, rightm, leftm, alphabet);
-      if (DEBUG) printf("(3)\n");
       rct.reverse();
-      if (DEBUG) printf("(4)\n");
       rct.minimize();
-      if (DEBUG) printf("(5)\n");
-      if (DEBUG) rct.write_in_att_format("replace_up_rct.att",false);
-      if (DEBUG) printf("  ..rct created\n");
 
       // unconditional replace transducer      
       HfstTransducer rt(type);
@@ -474,38 +352,24 @@ namespace hfst
         rt = replace_transducer( t, leftm, rightm, REPL_UP, alphabet );
       else
         rt = replace_transducer( t, leftm, rightm, REPL_DOWN, alphabet );
-      if (DEBUG) printf("  minimizing rt\n");
       rt.minimize();
-      if (DEBUG) printf("  ..rt createD\n");
-      if (DEBUG) rt.write_in_att_format("replace_up_rt.att", true);
-
 
       // build the conditional replacement transducer
       HfstTransducer result(ibt);
-      if (DEBUG) printf("#0\n");
+
       result.compose(cbt);
       result.minimize(); // added
       
-      if (DEBUG) result.write_in_att_format("replace_up1.att", true);
-
-      if (DEBUG) printf("#1\n");
-
       if (repl_type == REPL_UP || repl_type == REPL_RIGHT)
         result.compose(rct);
 
       if (repl_type == REPL_UP || repl_type == REPL_LEFT)
         result.compose(lct);
       
-      if (DEBUG) printf("#2\n");
-
       result.minimize();  // ADDED
-
-      if (DEBUG) result.write_in_att_format("replace_up2.att", true);
 
       result.compose(rt);
       
-      if (DEBUG) printf("#3\n");
-
       if (repl_type == REPL_DOWN || repl_type == REPL_RIGHT ||
       repl_type == REPL_DOWN_KARTTUNEN)
         result.compose(lct);
@@ -514,15 +378,9 @@ namespace hfst
       repl_type == REPL_DOWN_KARTTUNEN)
         result.compose(rct);
       
-      if (DEBUG) printf("#4\n");
-
       result.minimize();  // ADDED
 
-      if (DEBUG) result.write_in_att_format("replace_up4.att", true);
-
       result.compose(rbt);
-
-      if (DEBUG) printf("#5\n");
 
       // Remove the markers from the alphabet
       alphabet.erase(StringPair(leftm,leftm));
@@ -534,10 +392,6 @@ namespace hfst
       }
 
       result.minimize();
-      if (DEBUG) result.write_in_att_format("replace_up_result.att",true);
-
-      if (DEBUG) printf("...replace_in_context\n");
-
       return result;
     }
 
@@ -601,94 +455,98 @@ namespace hfst
     }
 
     // Left arrow replace up without context
-    HfstTransducer left_replace_up(	HfstTransducer		&mapping,
-    								bool				optional,
-    								StringPairSet		&alphabet)
+    HfstTransducer left_replace_up(HfstTransducer &mapping,
+				   bool	optional,
+				   StringPairSet &alphabet)
     {
+      
+      if ( optional )
+    	{
+	  return replace_up(mapping, 1, alphabet).invert();
+    	}
+      else
+    	{
+	  return replace_up(mapping, 0, alphabet).invert();
+    	}
+    }
 
-    	if ( optional )
-    	{
-    		return replace_up(mapping, 1, alphabet).invert();
-    	}
-    	else
-    	{
-    		return replace_up(mapping, 0, alphabet).invert();
-    	}
-    }
     // Left arrow replace up
-    HfstTransducer left_replace_up (	HfstTransducerPair	&context,
-                              	  		HfstTransducer		&mapping,
-                              	  		bool				optional,
-                              	  		StringPairSet		&alphabet)
+    HfstTransducer left_replace_up (HfstTransducerPair &context,
+				    HfstTransducer &mapping,
+				    bool optional,
+				    StringPairSet &alphabet)
     {
-    	if ( optional )
+      if ( optional )
     	{
-    		return replace_up(context, mapping, 1, alphabet).invert();
+	  return replace_up(context, mapping, 1, alphabet).invert();
     	}
-    	else
+      else
     	{
-    		return replace_up(context, mapping, 0, alphabet).invert();
+	  return replace_up(context, mapping, 0, alphabet).invert();
     	}
     }
+
     // Left arrow replace down (XFST's version)
-    HfstTransducer left_replace_down_karttunen(	HfstTransducerPair	&context,
-    										HfstTransducer		&mapping,
-    										bool 				optional,
-    										StringPairSet		&alphabet)
+    HfstTransducer left_replace_down_karttunen(	HfstTransducerPair &context,
+						HfstTransducer &mapping,
+						bool optional,
+						StringPairSet &alphabet)
     {
-    	if ( optional )
+      if ( optional )
     	{
-    		return replace_down_karttunen(context, mapping, 1, alphabet).invert();
+	  return replace_down_karttunen(context, mapping, 1, alphabet).invert();
     	}
-    	else
+      else
     	{
-    		return replace_down_karttunen(context, mapping, 0, alphabet).invert();
+	  return replace_down_karttunen(context, mapping, 0, alphabet).invert();
     	}
     }
 
     // Left arrow replace down (SFST's version)
-    HfstTransducer left_replace_down (	HfstTransducerPair	&context,
-                              	  	  	HfstTransducer		&mapping,
-                              	  	  	bool 				optional,
-                              	  	  	StringPairSet		&alphabet)
+    HfstTransducer left_replace_down (	HfstTransducerPair &context,
+					HfstTransducer &mapping,
+					bool optional,
+					StringPairSet &alphabet)
     {
-    	if ( optional )
+      if ( optional )
     	{
-    		return replace_down(context, mapping, 1, alphabet).invert();
+	  return replace_down(context, mapping, 1, alphabet).invert();
     	}
-    	else
+      else
     	{
-    		return replace_down(context, mapping, 0, alphabet).invert();
+	  return replace_down(context, mapping, 0, alphabet).invert();
     	}
     }
+
     // Left arrow replace left
-    HfstTransducer left_replace_left (	HfstTransducerPair	&context,
-                              	  	  	HfstTransducer		&mapping,
-                              	  	  	bool				optional,
-                              	  	  	StringPairSet		&alphabet)
+    HfstTransducer left_replace_left ( HfstTransducerPair &context,
+				       HfstTransducer &mapping,
+				       bool optional,
+				       StringPairSet &alphabet)
     {
-    	if ( optional )
-    	{
-    		return replace_left(context, mapping, 1, alphabet).invert();
+      if ( optional )
+	{
+	  return replace_left(context, mapping, 1, alphabet).invert();
     	}
-    	else
-    	{
-    		return replace_left(context, mapping, 0, alphabet).invert();
+      else
+	{
+	  return replace_left(context, mapping, 0, alphabet).invert();
     	}
     }
+
     // Left arrow replace right
-    HfstTransducer left_replace_right (	HfstTransducerPair	&context,
-                              	  	  	HfstTransducer 		&mapping,
-                              	  	  	bool				optional,
-                              	  	  	StringPairSet		&alphabet)
+    HfstTransducer left_replace_right (	HfstTransducerPair &context,
+					HfstTransducer &mapping,
+					bool optional,
+					StringPairSet &alphabet)
     {
-    	if ( optional )
+      if ( optional )
     	{
-    		return replace_right(context, mapping, 1, alphabet).invert();
+	  return replace_right(context, mapping, 1, alphabet).invert();
     	}
-    	else
+      else
     	{
-    		return replace_right(context, mapping, 0, alphabet).invert();
+	  return replace_right(context, mapping, 0, alphabet).invert();
     	}
     }
 

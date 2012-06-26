@@ -1,37 +1,37 @@
 /**
- * @file xre.cc
+ * @file pmatch.cc
  *
- * @brief implements xre routines.
+ * @brief implements pmatch routines.
  */
 
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
 
-#include "xre_utils.h"
+#include "pmatch_utils.h"
 #include "HfstTransducer.h"
 
 using std::string;
 using std::map;
 
-extern char* xretext;
-extern int xreparse();
-extern int xrenerrs;
+extern char* pmatchtext;
+extern int pmatchparse();
+extern int pmatchnerrs;
 
 int
-xreerror(const char *msg)
+pmatcherror(const char *msg)
 {
 #ifndef NDEBUG
-    fprintf(stderr, "*** xre parsing failed: %s\n", msg);
-    if (strlen(hfst::xre::data) < 60)
+    fprintf(stderr, "*** pmatch parsing failed: %s\n", msg);
+    if (strlen(hfst::pmatch::data) < 60)
     {
-        fprintf(stderr, "***    parsing %s [near %s]\n", hfst::xre::data,
-                xretext);
+        fprintf(stderr, "***    parsing %s [near %s]\n", hfst::pmatch::data,
+                pmatchtext);
     }
     else
     {
         fprintf(stderr, "***    parsing %60s [near %s]...\n", 
-                hfst::xre::data, xretext);
+                hfst::pmatch::data, pmatchtext);
     }
 #endif
     return 0;
@@ -39,7 +39,7 @@ xreerror(const char *msg)
 
 namespace hfst 
 { 
-namespace xre 
+namespace pmatch 
 {
 
 char* data;
@@ -48,6 +48,8 @@ char* startptr;
 hfst::HfstTransducer* last_compiled;
 hfst::ImplementationType format;
 size_t len;
+
+std::map<std::string,hfst::HfstTransducer*> named_transducers;
 
 
 int*
@@ -145,6 +147,36 @@ add_percents(const char *s)
   }
 
 char *
+get_Ins_transition(const char *s)
+{
+    char* rv = static_cast<char*>(malloc(sizeof(char)*(strlen(s) + 4 + 1)));
+    rv = strcpy(rv, "@I.");
+    rv = strcat(rv, s);
+    rv = strcat(rv, "@");
+    return rv;
+}
+
+char *
+get_RC_transition(const char *s)
+{
+    char* rv = static_cast<char*>(malloc(sizeof(char)*(strlen(s) + 5 + 1)));
+    rv = strcpy(rv, "@RC.");
+    rv = strcat(rv, s);
+    rv = strcat(rv, "@");
+    return rv;
+}
+
+char *
+get_LC_transition(const char *s)
+{
+    char* rv = static_cast<char*>(malloc(sizeof(char)*(strlen(s) + 5 + 1)));
+    rv = strcpy(rv, "@LC.");
+    rv = strcat(rv, s);
+    rv = strcat(rv, "@");
+    return rv;
+}
+
+char *
 get_quoted(const char *s)
 {
     const char *qstart = strchr((char*) s, '"') + 1;
@@ -181,7 +213,7 @@ parse_quoted(const char *s)
               case '5':
               case '6':
               case '7':
-                fprintf(stderr, "*** XRE unimplemented: "
+                fprintf(stderr, "*** PMATCH unimplemented: "
                         "parse octal escape in %s", p);
                 *r = '\0';
                 p = p + 5;
@@ -237,7 +269,7 @@ parse_quoted(const char *s)
                       }
                     else
                       {
-                        fprintf(stderr, "*** XRE unimplemented: "
+                        fprintf(stderr, "*** PMATCH unimplemented: "
                                 "parse \\x%d\n", i);
                         *r = '\0';
                       }
@@ -283,20 +315,20 @@ get_weight(const char *s)
 }
 
 HfstTransducer*
-compile(const string& xre, map<string,HfstTransducer*>& defs,
+compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         ImplementationType impl)
 {
     // lock here?
-    data = strdup(xre.c_str());
+    data = strdup(pmatch.c_str());
     startptr = data;
     len = strlen(data);
     definitions = defs;
     format = impl;
-    xreparse();
+    pmatchparse();
     free(startptr);
     data = 0;
     len = 0;
-    if (xrenerrs == 0)
+    if (pmatchnerrs == 0)
       {
         HfstTransducer* rv = new HfstTransducer(*last_compiled);
         delete last_compiled;

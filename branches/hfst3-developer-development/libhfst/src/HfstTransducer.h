@@ -14,9 +14,6 @@
 
 #if HAVE_CONFIG_H
 #  include <config.h>
-#  ifndef HAVE_MALLOC
-#    error "your configure failed to find malloc, check README for further instructions"
-#  endif
 #endif
 
 #include "HfstDataTypes.h"
@@ -640,7 +637,7 @@ in \a ifile.
      * @brief Get arbitrary string propert @a property.
      *        get_property("name") works like get_name.
      */
-    const std::string& get_property(const std::string& property) const;
+    std::string get_property(const std::string& property) const;
     /**
      *  @brief Get all properties form transducer.
      */
@@ -759,6 +756,9 @@ This will yield a file "testfile.att" that looks as follows:
         @see operator<<(std::ostream &out, const HfstTransducer &t)
         @see HfstTransducer(FILE*, ImplementationType, const std::string&) */
     void write_in_att_format(FILE * ofile, bool write_weights=true) const;
+
+    void write_in_att_format_number
+      (FILE * ofile, bool write_weights=true) const;
 
 
     /** \brief \brief Write the transducer in AT&T format to FILE 
@@ -1155,8 +1155,9 @@ ccc : ddd
     /** \brief Compose this transducer with \a another. */
     HfstTransducer &compose(const HfstTransducer &another);
 
-    /** \brief Compose this transducer with the intersection of 
-        transducers in \a v. 
+    /** \brief Compose this transducer with the intersection of
+        transducers in \a v. If \a invert is true, then compose the
+        intersection of the transducers in \a v with this transducer.
 
         The algorithm used by this function is faster than intersecting 
         all transducers one by one and then composing this transducer 
@@ -1164,7 +1165,8 @@ ccc : ddd
 
         @pre The transducers in \a v are deterministic and epsilon-free.
     */
-    HfstTransducer &compose_intersect(const HfstTransducerVector &v);
+    HfstTransducer &compose_intersect(const HfstTransducerVector &v,
+				      bool invert=false);
 
     /** \brief Concatenate this transducer with \a another. */
     HfstTransducer &concatenate(const HfstTransducer &another);
@@ -1209,6 +1211,18 @@ ccc : ddd
      */
     HfstTransducer &cross_product(const HfstTransducer &another);
 
+
+    /*
+     *  \brief Shuffle this transducer with transducer \@ another.
+     *
+     *  If transducer A accepts string "foo" and transducer B string "bar",
+     *  the transducer that results from shuffling A and B accepts all strings
+     *  [(f|b)(o|a)(o|r)].
+     *  
+     *  @pre Both transducers must be automata, i.e. map strings onto themselves.
+     *
+     */
+    HfstTransducer &shuffle(const HfstTransducer &another);
 
     /** \brief Create universal pair transducer of \a type.
      *
@@ -1366,8 +1380,27 @@ t.substitute(&function);
     HfstTransducer &substitute(const StringPair &old_symbol_pair,
                                const StringPairSet &new_symbol_pair_set);
 
+    /** \brief Substitute all transition symbols as defined in \a substitutions.
+
+	Each symbol old_symbol is substituted with symbol new_symbol, iff 
+	substitutions.find(old_symbol) == new_symbol != substitutions.end(). 
+	Otherwise, old_symbol remains the same.
+
+	This function performs all substitutions at the same time, so it is
+	more efficient than calling substitute separately for each substitution.
+     */
     HfstTransducer &substitute(const HfstSymbolSubstitutions &substitutions);
 
+    /** \brief Substitute all transition symbol pairs as defined in \a substitutions.
+
+	Each symbol pair old_isymbol:old_osymbol is substituted with symbol pair
+	new_isymbol:new_osymbol, iff substitutions.find(old_isymbol:old_osymbol) == 
+	new_isymbol:new_osymbol != substitutions.end(). 
+	Otherwise, old_isymbol:old_osymbol remains the same.
+
+	This function performs all substitutions at the same time, so it is
+	more efficient than calling substitute separately for each substitution.
+     */
     HfstTransducer &substitute(const HfstSymbolPairSubstitutions &substitutions);
 
     /** \brief Substitute all transitions equal to \a symbol_pair 

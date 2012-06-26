@@ -143,10 +143,10 @@ namespace hfst { namespace implementations
 	StateId s = siter.Value();
 	
 	HfstState origin = s;
-	if (origin == initial_state)
+	if (origin == (unsigned int)initial_state)
 	  origin = 0;
 	else if (origin == 0)
-	  origin = initial_state;
+	  origin = (unsigned int)initial_state;
 	
 	unsigned int number_of_arcs = t->NumArcs(s);
 	net->initialize_transition_vector(s, number_of_arcs);
@@ -158,10 +158,10 @@ namespace hfst { namespace implementations
 	    const fst::StdArc &arc = aiter.Value();
 	    
 	    HfstState target = arc.nextstate;
-	    if (target == initial_state)
+	    if (target == (unsigned int)initial_state)
 	      target = 0;
 	    else if (target == 0)
-	      target = initial_state;
+	      target = (unsigned int)initial_state;
 	    
 	    net->add_transition(origin, 
 				HfstBasicTransition

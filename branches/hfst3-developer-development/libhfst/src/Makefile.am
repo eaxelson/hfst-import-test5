@@ -35,41 +35,40 @@ libhfst_la_LIBADD = implementations/libhfstimplementations.la \
 # structure for various headers, so we do this
 hfstincludedir = $(includedir)/hfst
 
-HFST_HDRS=\
-		  hfst.hpp \
-		  HfstTransducer.h \
-		  hfst_apply_schemas.h \
-		  HfstDataTypes.h \
-		  HfstSymbolDefs.h \
-		  implementations/SfstTransducer.h \
-		  implementations/TropicalWeightTransducer.h \
-		  implementations/LogWeightTransducer.h \
-		  implementations/FomaTransducer.h \
-		  implementations/HfstOlTransducer.h \
-		  HfstTokenizer.h \
-		  implementations/ConvertTransducerFormat.h \
-		  implementations/HfstTransitionGraph.h \
-		  implementations/HfstTransition.h \
-		  implementations/HfstTropicalTransducerTransitionData.h \
-		  implementations/HfstFastTransitionData.h \
-		  implementations/compose_intersect/ComposeIntersectRulePair.h \
-		  implementations/compose_intersect/ComposeIntersectLexicon.h \
-		  implementations/compose_intersect/ComposeIntersectRule.h \
-		  implementations/compose_intersect/ComposeIntersectFst.h \
-		  HarmonizeUnknownAndIdentitySymbols.h \
-		  HfstExceptionDefs.h \
-		  HfstExtractStrings.h \
-		  HfstFlagDiacritics.h \
-		  HfstInputStream.h \
-		  HfstOutputStream.h \
-		  HfstXeroxRules.h \
-		  parsers/LexcCompiler.h parsers/XreCompiler.h
+HFST_HDRS = \
+	HfstTransducer.h \
+	hfst_apply_schemas.h \
+	HfstDataTypes.h \
+	HfstSymbolDefs.h \
+	implementations/SfstTransducer.h \
+	implementations/TropicalWeightTransducer.h \
+	implementations/LogWeightTransducer.h \
+	implementations/FomaTransducer.h \
+	implementations/HfstOlTransducer.h \
+	HfstTokenizer.h \
+	implementations/ConvertTransducerFormat.h \
+	implementations/HfstTransitionGraph.h \
+	implementations/HfstTransition.h \
+	implementations/HfstTropicalTransducerTransitionData.h \
+	implementations/HfstFastTransitionData.h \
+	implementations/compose_intersect/ComposeIntersectRulePair.h \
+	implementations/compose_intersect/ComposeIntersectLexicon.h \
+	implementations/compose_intersect/ComposeIntersectRule.h \
+	implementations/compose_intersect/ComposeIntersectFst.h \
+	HarmonizeUnknownAndIdentitySymbols.h \
+	HfstExceptionDefs.h \
+	HfstExtractStrings.h \
+	HfstFlagDiacritics.h \
+	HfstInputStream.h \
+	HfstOutputStream.h \
+	HfstXeroxRules.h \
+	parsers/LexcCompiler.h parsers/XreCompiler.h parsers/PmatchCompiler.h
 ### Add your library here ###
 #	implementations/MyTransducerLibraryTransducer.h
 
 hfstinclude_HEADERS = $(HFST_HDRS)
 
-libhfst_la_LDFLAGS = -no-undefined -version-info 9:1:0
+libhfst_la_LDFLAGS = -no-undefined -version-info 19:0:0
 
 LIBHFST_TSTS=HfstApply HfstInputStream HfstTransducer \
 		HfstOutputStream HfstXeroxRules HfstRules HfstSymbolDefs \
@@ -113,3 +112,5 @@ TESTS=$(LIBHFST_TSTS)
 
 valgrind: valgrind-unit-tests.sh $(LIBHFST_TSTS)
 	$(SH) $(srcdir)/valgrind-unit-tests.sh $^
+
+EXTRA_DIST=HfstXeroxRulesTest.cc

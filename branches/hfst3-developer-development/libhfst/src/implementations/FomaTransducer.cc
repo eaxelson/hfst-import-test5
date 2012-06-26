@@ -471,8 +471,12 @@ namespace hfst { namespace implementations {
    bool filter_fd, 
    StringPairVector &spv)
   {
+
+    // Number of cycles exceeded
     if(cycles >= 0 && path_visitations[state] > cycles)
       return true;
+
+    // Increment number of visitations
     all_visitations[state]++;
     path_visitations[state]++;
     
@@ -518,7 +522,6 @@ namespace hfst { namespace implementations {
         sorted_arcs[j] = s;
       }
     }
-    
 
     bool res = true;
     for(size_t i=0; i<sorted_arcs.size() && res == true; i++)
@@ -599,15 +602,23 @@ namespace hfst { namespace implementations {
     std::vector<hfst::FdState<int> >* fd_state_stack 
       = (fd==NULL) ? NULL : new std::vector<hfst::FdState<int> >
       (1, hfst::FdState<int>(*fd));
+
+    std::set<int> initial_states;
     
     StringPairVector spv;
     bool res = true;
     for (int i=0; ((t->states)+i)->state_no != -1 && res == true; i++) {
-      if (((t->states)+i)->start_state == 1)
+      if (((t->states)+i)->start_state == 1 && 
+	  (initial_states.find(((t->states)+i)->state_no)
+	   == initial_states.end()) ) {
+
+	initial_states.insert(((t->states)+i)->state_no);
+		
         res = hfst::implementations::extract_paths
           (t, ((t->states)+i)->state_no, all_visitations, path_visitations,
            callback, cycles, fd_state_stack, 
            filter_fd, spv);
+      }
     }
   }
 
@@ -843,11 +854,7 @@ namespace hfst { namespace implementations {
       io_gets(infile, buf);
         if (buf[0] == '#') break;
 
-	// DEBUG
-	//fprintf(stderr, "  state line number %i: %s\n", i, buf);
-
         /* scanf is just too slow here */
-
         //items = sscanf(buf, "%i %i %i %i %i",&lineint[0], 
         //&lineint[1], &lineint[2], &lineint[3], &lineint[4]);
 
@@ -1028,6 +1035,12 @@ static inline int explode_line (char *buf, int *values) {
 
     /* End */
     fprintf(outfile, "%s","##end##\n");
+    if (fflush(outfile) != 0) {
+      HFST_THROW_MESSAGE
+        (HfstFatalException,
+         "an error happened when writing a foma transducer");
+    }
+      
     return(1);
 
     }
@@ -1047,10 +1060,12 @@ int main(int, char**)
     fsm * epsilon 
       = FomaTransducer::define_transducer("@_EPSILON_SYMBOL_@");
     fsm * epsilon_i = FomaTransducer::extract_input_language(epsilon);
-    /*fsm * epsilon_i_min = */FomaTransducer::minimize(fsm_copy(epsilon_i));
+    fsm * epsilon_i_min = FomaTransducer::minimize(fsm_copy(epsilon_i));
+    (void)epsilon_i_min;
 
     fsm * a = FomaTransducer::define_transducer("a");
     fsm * a2 = FomaTransducer::repeat_n(a, 2);
+    (void)a2;
     
     std::cout << std::endl << "ok" << std::endl;
     return EXIT_SUCCESS;

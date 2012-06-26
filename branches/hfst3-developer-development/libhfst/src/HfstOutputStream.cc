@@ -366,11 +366,7 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
         fprintf(stderr, "ERROR: transducer header is too long\n");
         exit(1);
       }
-      /*
-        short length = (short)header_length;
-        char first_byte = (short)(header_length/255);
-        char second_byte = (short)(header_length%255);
-       */
+
       char first_byte = *((char*)(&header_length));
       char second_byte = *((char*)(&header_length)+1);
       write(first_byte);

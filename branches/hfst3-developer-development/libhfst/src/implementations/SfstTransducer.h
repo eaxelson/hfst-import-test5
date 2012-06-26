@@ -17,8 +17,8 @@
 #include "HfstFlagDiacritics.h"
 #include "HfstSymbolDefs.h"
 #include "HfstExtractStrings.h"
-#include "sfst/interface.h"
-#include "sfst/fst.h"
+#include <sfst/interface.h>
+#include <sfst/fst.h>
 #include <cstdio>
 #include <string>
 #include <sstream>
