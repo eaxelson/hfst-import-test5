@@ -34,6 +34,12 @@ libhfst_la_SOURCES = $(HFST_SRCS)
 libhfst_la_LIBADD = implementations/libhfstimplementations.la \
 			parsers/libhfstparsers.la
 
+if WANT_WINDOWS	
+  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include
+  libhfst_la_LIBADD += ../../windows/dlfcn/libdl.la \
+			../../windows/openfst/src/lib/libfst.la
+endif
+
 # we only have one library target but would like a particular includedir
 # structure for various headers, so we do this
 hfstincludedir = $(includedir)/hfst

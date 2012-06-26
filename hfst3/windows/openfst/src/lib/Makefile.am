@@ -16,7 +16,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 AUTOMAKE_OPTIONS=subdir-objects
-AM_CPPFLAGS = -I $(srcdir)/../include -I $(srcdir)/../../../dlfcn \ 
+AM_CPPFLAGS = -I $(srcdir)/../include -I $(srcdir)/../../../dlfcn \
 		$(ICU_CPPFLAGS) -DMSC_VER -DOPENFSTEXPORT
 noinst_LTLIBRARIES = libfst.la
 libfst_la_SOURCES = compat.cc flags.cc fst.cc properties.cc \
