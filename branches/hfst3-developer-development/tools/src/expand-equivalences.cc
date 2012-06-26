@@ -29,6 +29,10 @@
 #include <cstring>
 #include <getopt.h>
 
+#include <libxml/tree.h>
+#include <libxml/parser.h>
+#include <libxml/xmlmemory.h>
+
 #include <hfst.hpp>
 
 using hfst::HfstTransducer;
@@ -335,7 +339,67 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           } // if tsv_file
         else if (acx_file)
           {
-            error(EXIT_FAILURE, 0, "ACX not implemented");
+            verbose_printf("Reading ACX from %s...\n", acx_file_name);
+            xmlDocPtr doc;
+            xmlNodePtr node;
+            doc = xmlParseFile(acx_file_name);
+            node = xmlDocGetRootElement(doc);
+            if (NULL == node)
+              {
+                xmlFreeDoc(doc);
+                error(EXIT_FAILURE, 0, "Libxml could not parse %s",
+                      acx_file_name);
+              }
+            if (xmlStrcmp(node->name,
+                          reinterpret_cast<const xmlChar*>("analysis-chars"))
+                          != 0)
+              {
+                xmlFreeDoc(doc);
+                error(EXIT_FAILURE, 0, "Root element of %s is not "
+                      "analysis-chars", acx_file_name);
+              }
+            // The tree should look like:
+            // analysis-chars
+            // + char
+            //   + equiv-char
+            //   + ...
+            // + ...
+            xmlNodePtr charNode = node->xmlChildrenNode;
+            while (charNode != NULL)
+              {
+                if (xmlStrcmp(charNode->name,
+                              reinterpret_cast<const xmlChar*>("char")) == 0)
+                  {
+                    xmlChar* from = xmlGetProp(charNode,
+                                               reinterpret_cast<const xmlChar*>("value"));
+                    xmlNodePtr equivNode = charNode->xmlChildrenNode;
+                    while (equivNode != NULL)
+                      {
+                        if (xmlStrcmp(equivNode->name,
+                                      reinterpret_cast<const xmlChar*>("equiv-char")) == 0)
+                          {
+                            xmlChar* to = xmlGetProp(equivNode,
+                                                     reinterpret_cast<const xmlChar*>("value"));
+                            add_extension(extensions, 
+                                          reinterpret_cast<const char*>(from),
+                                          reinterpret_cast<const char*>(to));
+                          }
+                        else if (!xmlIsBlankNode(equivNode) && (equivNode->type != XML_COMMENT_NODE))
+                          {
+                            error(0, 0, "Unrecognised %s in char",
+                                  reinterpret_cast<const char*>(equivNode->name));
+                          }
+                        equivNode = equivNode->next;
+                      } // while equivNode
+                  } // if node->name == char
+                else if (!xmlIsBlankNode(charNode) && (charNode->type != XML_COMMENT_NODE))
+                  {
+                    error(0, 0, "Unrecognised %s in analysis-chars",
+                          reinterpret_cast<const char*>(charNode->name));
+                  }
+                charNode = charNode->next;
+              } // while charNode
+            xmlFreeDoc(doc);
           } // if acx_file
         else
           {

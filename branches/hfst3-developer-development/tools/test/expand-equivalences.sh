@@ -19,5 +19,8 @@ for i in "" .sfst .ofst .foma; do
         if ! ../src/hfst-compare test.hfst cat_or_dog2cat.hfst$i ; then
             exit 1
         fi
+        if ! ../src/hfst-expand-equivalences romanian.hfst$i -a $srcdir/apertium-es-ro.ro.acx > test.hfst ; then
+            exit 1
+        fi
     fi
 done
