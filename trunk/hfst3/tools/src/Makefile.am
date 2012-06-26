@@ -21,6 +21,10 @@ LDADD = $(top_builddir)/libhfst/src/libhfst.la
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/tools/src/parsers 
 AM_CXXFLAGS = -Wno-deprecated
 
+if WANT_WINDOWS
+  AM_CPPFLAGS += -I{top_srcdir}/windows/openfst/src/include
+endif
+
 # sort alphabetically:
 if WANT_AFFIX_GUESSIFY
 MAYBE_AFFIX_GUESSIFY=hfst-affix-guessify

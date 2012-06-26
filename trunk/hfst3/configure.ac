@@ -411,7 +411,7 @@ AC_ARG_ENABLE([windows],
 				[enable_windows=no])
 AM_CONDITIONAL([WANT_WINDOWS], [test x$enable_windows != xno])
 
-AS_IF([test "x$enable_windows" != xno],
+AS_IF([test x$enable_windows != xno],
       [AC_MSG_FAILURE([windows compilation not supported yet (requested with --enable-windows)])])
 
 # Checks for programs
@@ -440,7 +440,7 @@ AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
 # Checks for libraries
 
 AC_LANG_PUSH([C++])
-AS_IF([test "x$with_openfst" != "xno"], 
+AS_IF([test "x$with_openfst" != "xno" -a "x$enable_windows" == "xno"], 
       [AC_CHECK_LIB([pthread], [main])]
       [AC_CHECK_LIB([dl], [main])]
       [AC_CHECK_LIB([fst], [main], [],
@@ -483,7 +483,7 @@ AS_IF([test "x$with_sfst" != "xno"],
       [AC_CHECK_HEADERS([sfst/fst.h sfst1/fst.h])]
       [AC_CHECK_HEADERS([backward/hash_set ext/hash_set hash_set])]
       [AC_CHECK_HEADERS([backward/hash_map ext/hash_map hash_map])])
-AS_IF([test "x$with_openfst" != "xno"],
+AS_IF([test "x$with_openfst" != "xno" -a "x$enable_windows" == "xno"],
       [AC_CHECK_HEADERS([fst/fstlib.h])])
 AC_LANG_POP
 AC_LANG_PUSH([C])
