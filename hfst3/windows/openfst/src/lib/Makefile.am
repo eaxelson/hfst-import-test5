@@ -1,6 +1,6 @@
-## Process this file with automake to produce Makefile.in
+# Process this file with automake to produce Makefile.in
 
-## Copyright (C) 2010 University of Helsinki
+## Copyright (C) 2012 University of Helsinki
 
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -15,23 +15,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = libhfst tools test doc man scripts
+AUTOMAKE_OPTIONS=subdir-objects
+AM_CPPFLAGS = -I$(srcdir)/../include -I$(srcdir)/../../../dlfcn $(ICU_CPPFLAGS) \
+        -DMSC_VER -DOPENFSTEXPORT
 
-if WANT_WINDOWS
-  SUBDIRS += windows
-endif
+noinst_LTLIBRARIES = libfst.la
+libfst_la_SOURCES = compat.cc flags.cc fst.cc properties.cc \
+symbol-table.cc util.cc symbol-table-ops.cc
 
-# for external projects to use HFST from auto*
-m4dir=$(datadir)/aclocal
-m4_DATA=hfst.m4
-
-EXTRA_DIST=hfst.m4
-
-if CAN_DOXYGEN
-doxygen:
-	doxygen Doxyfile
-endif
-valgrind:
-	$(MAKE) -C libhfst/src/ valgrind
-	$(MAKE) -C test/tools/ valgrind
