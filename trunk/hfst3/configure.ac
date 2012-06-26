@@ -411,6 +411,8 @@ AC_ARG_ENABLE([windows],
 				[enable_windows=no])
 AM_CONDITIONAL([WANT_WINDOWS], [test x$enable_windows != xno])
 
+AS_IF([test "x$enable_windows" != xno],
+      [AC_MSG_FAILURE([windows compilation not supported yet (requested with --enable-windows)])])
 
 # Checks for programs
 AC_PROG_CC
@@ -533,6 +535,11 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 tools/src/hfst-tagger/Makefile
 		 tools/src/hfst-tagger/src/Makefile
 		 tools/src/hfst-tagger/test/Makefile
+		 windows/Makefile
+		 windows/dlfcn/Makefile
+		 windows/openfst/Makefile
+		 windows/openfst/src/Makefile
+		 windows/openfst/src/lib/Makefile
 		 man/Makefile 
                  scripts/Makefile scripts/hfst-foma-wrapper.sh],
                  [chmod +x scripts/hfst-foma-wrapper.sh])
