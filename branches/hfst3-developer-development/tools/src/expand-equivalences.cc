@@ -1,6 +1,6 @@
-//! @file extend-equivalences.cc
+//! @file expand-equivalences.cc
 //!
-//! @brief Transducer label modification
+//! @brief Transducer label modification for equivalence classes
 //!
 //! @author HFST Team
 
@@ -74,7 +74,7 @@ print_usage()
             "  -t, --to=OSYM       convert to OSYM\n"
             "  -a, --acx=ACXFILE   read extensions in acx format "
             "from ACXFILE\n"
-            "  -t, --tsv=TSVFILE   read extensions in tsv format "
+            "  -T, --tsv=TSVFILE   read extensions in tsv format "
             "from TSVFILE\n"
             "  -l, --level=LEVEL   perform extensions on LEVEL of fsa\n"
            );
@@ -203,6 +203,19 @@ parse_options(int argc, char** argv)
               "Only one of parameters -a, -t, must be used.");
         return EXIT_FAILURE;
     }
+    else if (tsv_file_name != 0)
+      {
+        tsv_file = hfst_fopen(tsv_file_name, "r");
+      }
+    else if (acx_file_name != 0)
+      {
+        acx_file = hfst_fopen(acx_file_name, "r");
+      }
+    else
+      {
+        error(EXIT_FAILURE, 0, "Logic error again!");
+      }
+
 #include "conventions/check-params-common.h"
 #include "conventions/check-params-unary.h"
     return EXIT_CONTINUE;
@@ -304,7 +317,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                     tab = strstr(endstr, "\t");
                   }
                 tab = endstr;
-                while (endstr != '\0')
+                while ((*endstr != '\0') && (*endstr != '\n'))
                   {
                     endstr++;
                   }
@@ -324,6 +337,11 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           {
             error(EXIT_FAILURE, 0, "ACX not implemented");
           } // if acx_file
+        else
+          {
+            error(EXIT_FAILURE, 0, "DANGER TERROR HORROR !!!!!!");
+          }
+        extensions->minimize().repeat_star().minimize();
         switch (level)
           {
           case FSA_LEVEL_BOTH:
@@ -370,14 +388,14 @@ int main( int argc, char **argv )
 
     // here starts the buffer handling part
     HfstInputStream* instream = NULL;
-    try {
+//    try {
       instream = (inputfile != stdin) ?
         new HfstInputStream(inputfilename) : new HfstInputStream();
-    } catch(const HfstException e)  {
-            error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-          inputfilename);
-            return EXIT_FAILURE;
-    }
+  //  } catch(const HfstException e)  {
+    //        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+      //    inputfilename);
+        //    return EXIT_FAILURE;
+    //}
     HfstOutputStream* outstream = (outfile != stdout) ?
             new HfstOutputStream(outfilename, instream->get_type()) :
             new HfstOutputStream(instream->get_type());

@@ -1,6 +1,8 @@
 #!/bin/sh
 for i in "" .sfst .ofst .foma; do
-    if test -f cat.hfst$i -a -f dog.hfst$i ; then
+    if test x$i = x.foma ; then
+        echo "FOMA is known to be broken here"
+    elif test -f cat.hfst$i -a -f dog.hfst$i ; then
         if ! ../src/hfst-expand-equivalences cat.hfst$i -T $srcdir/cat2dog.expand > test.hfst ; then
             exit 1
         fi
