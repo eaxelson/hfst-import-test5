@@ -26,8 +26,6 @@ MAYBE_AFFIX_GUESSIFY=hfst-affix-guessify
 endif
 if WANT_APERTIUM2FST
 MAYBE_APERTIUM2FST=hfst-apertium2fst
-hfst_apertium2fst_CXXFLAGS=$(AM_CXXFLAGS) $(CXXFLAGS) $(LIBXML_CFLAGS)
-hfst_apertium2fst_LDADD=$(LIBXML_LIBS) $(HFST_LIBS)
 endif
 if WANT_APERTIUM_PROC
 MAYBE_APERTIUM_PROC=hfst-apertium-proc
@@ -58,6 +56,9 @@ MAYBE_DUPLICATE=hfst-duplicate
 endif
 if WANT_EDIT_METADATA
 MAYBE_EDIT_METADATA=hfst-edit-metadata
+endif
+if WANT_EXPAND_EQUIVALENCES
+MAYBE_EXPAND_EQUIVALENCES=hfst-expand-equivalences
 endif
 if WANT_FORMAT
 MAYBE_FORMAT=hfst-format
@@ -185,6 +186,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_CONCATENATE)     \
 			 $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)   \
 			 $(MAYBE_DUPLICATE) $(MAYBE_EDIT_METADATA)                  \
+			 $(MAYBE_EXPAND_EQUIVALENCES)                               \
 			 $(MAYBE_FORMAT) $(MAYBE_FST2FST) $(MAYBE_FST2STRINGS)      \
 			 $(MAYBE_FST2TXT) $(MAYBE_GREP) $(MAYBE_HEAD)               \
 			 $(MAYBE_INFO) $(MAYBE_INVERT)                              \
@@ -220,6 +222,8 @@ endif
 hfst_affix_guessify_SOURCES=affix-guessify.cc $(HFST_COMMON_SRC)
 hfst_apertium2fst_SOURCES=apertium2fst.cc $(HFST_COMMON_SRC) \
 						 utils/edit-distance.cc
+hfst_apertium2fst_CXXFLAGS=$(AM_CXXFLAGS) $(CXXFLAGS) $(LIBXML_CFLAGS)
+hfst_apertium2fst_LDADD=$(LIBXML_LIBS) $(HFST_LIBS)
 hfst_apertium_proc_SOURCES=apertium-proc.cc $(HFST_COMMON_SRC) \
 						   utils/ProcAlphabet.cc \
 						   utils/ProcTransducer.cc \
@@ -240,6 +244,9 @@ hfst_determinize_SOURCES=determinize.cc $(HFST_COMMON_SRC)
 hfst_disjunct_SOURCES=disjunct.cc $(HFST_COMMON_SRC)
 hfst_duplicate_SOURCES=duplicate.cc $(HFST_COMMON_SRC)
 hfst_edit_metadata_SOURCES=edit-metadata.cc $(HFST_COMMON_SRC)
+hfst_expand_equivalences_SOURCES=expand-equivalences.cc $(HFST_COMMON_SRC)
+hfst_expand_equivalences_CXXFLAGS=$(AM_CXXFLAGS) $(CXXFLAGS) $(LIBXML_CFLAGS)
+hfst_expand_equivalences_LDADD=$(LIBXML_LIBS) $(HFST_LIBS)
 hfst_flag_diacritics_SOURCES=flag-diacritics.cc $(HFST_COMMON_SRC)
 hfst_format_SOURCES=format.cc $(HFST_COMMON_SRC)
 hfst_fst2fst_SOURCES=fst2fst.cc $(HFST_COMMON_SRC)

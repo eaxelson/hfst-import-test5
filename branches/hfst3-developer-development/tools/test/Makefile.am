@@ -19,8 +19,6 @@
 # prefer alphabetical order, except for core tests others depend upon
 # If compare doesn't function 99 % of other tests will fail anyways
 
-# SUBDIRS=fsmbook-examples
-
 if WANT_STRESSTESTS
 STRESSES=lexc2fst-stress.sh lookup-stress.sh proc-stress.sh 
 if CAN_VALGRIND
@@ -35,13 +33,14 @@ TESTS=hfst-check-version.sh hfst-check-help.sh hfst-check-environment.sh \
 	  compose-functionality.sh \
 	  conjunct-functionality.sh \
 	  disjunct-functionality.sh \
-	  subtract-functionality.sh \
+	  expand-equivalences.sh \
 	  determinize-functionality.sh minimize-functionality.sh \
 	  remove-epsilons-functionality.sh \
 	  invert-functionality.sh \
 	  info-functionality.sh \
 	  project-functionality.sh repeat-functionality.sh \
 	  reverse-functionality.sh reweight-functionality.sh \
+	  subtract-functionality.sh \
 	  substitute-functionality.sh \
 	  strings2fst-functionality.sh fst2strings-functionality.sh\
 	  txt2fst-functionality.sh fst2txt-functionality.sh \
@@ -59,6 +58,7 @@ XFAIL_TESTS=incompatible-formats.sh latin-1-strings.sh
 DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   cat2cat_or_CAT_uppercased.hfst cat2CAT_uppercased.hfst cat2dog.hfst \
 		   cat+dog.hfst catdog.hfst cat_or_dog.hfst cat.hfst \
+		   cat_or_dog2cat.hfst \
 		   CAT_uppercased2cat.hfst CAT_uppercased.hfst cat_weight_final.hfst \
 		   cat_weight_initial.hfst cat_weight_middle.hfst dog2cat.hfst \
 		   dog.hfst infinitely_ambiguous.hfst non_minimal.hfst rule1.hfst \
@@ -76,6 +76,7 @@ SFST_CHECKS=0to3cats.hfst.sfst 2to4cats.hfst.sfst 4cats.hfst.sfst\
 			4toINFcats.hfst.sfst cat2cat_or_CAT_uppercased.hfst.sfst \
 			cat2CAT_uppercased.hfst.sfst cat2dog.hfst.sfst \
 			cat+dog.hfst.sfst catdog.hfst.sfst cat_or_dog.hfst.sfst \
+			cat_or_dog2cat.hfst.sfst \
 			cat.hfst.sfst CAT_uppercased2cat.hfst.sfst CAT_uppercased.hfst.sfst\
 			cat_weight_final.hfst.sfst cat_weight_initial.hfst.sfst \
 			cat_weight_middle.hfst.sfst dog2cat.hfst.sfst dog.hfst.sfst \
@@ -91,6 +92,7 @@ OFST_CHECKS=0to3cats.hfst.ofst \
 			cat2cat_or_CAT_uppercased.hfst.ofst cat2CAT_uppercased.hfst.ofst \
 			cat2dog.hfst.ofst cat+dog.hfst.ofst catdog.hfst.ofst \
 			cat_or_dog.hfst.ofst cat.hfst.ofst CAT_uppercased2cat.hfst.ofst \
+			cat_or_dog2cat.hfst.ofst \
 			CAT_uppercased.hfst.ofst cat_weight_final.hfst.ofst \
 			cat_weight_initial.hfst.ofst cat_weight_middle.hfst.ofst \
 			dog2cat.hfst.ofst dog.hfst.ofst infinitely_ambiguous.hfst.ofst \
@@ -105,6 +107,7 @@ FOMA_CHECKS=0to3cats.hfst.foma 2to4cats.hfst.foma 4cats.hfst.foma \
 			4toINFcats.hfst.foma cat2cat_or_CAT_uppercased.hfst.foma \
 			cat2CAT_uppercased.hfst.foma cat2dog.hfst.foma \
 			cat+dog.hfst.foma catdog.hfst.foma cat_or_dog.hfst.foma \
+			cat_or_dog2cat.hfst.foma \
 			cat.hfst.foma CAT_uppercased2cat.hfst.foma \
 			CAT_uppercased.hfst.foma cat_weight_final.hfst.foma \
 			cat_weight_initial.hfst.foma cat_weight_middle.hfst.foma \

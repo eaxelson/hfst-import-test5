@@ -123,6 +123,12 @@ AC_ARG_ENABLE([edit_metadata],
               [enable_edit_metadata=$enableval],
               [enable_edit_metadata=yes])
 AM_CONDITIONAL([WANT_EDIT_METADATA], [test x$enable_edit_metadata != xno])
+AC_ARG_ENABLE([expand_equivalences],
+              [AS_HELP_STRING([--enable-expand-equivalences],
+                              [build metadata tool @<:@default=yes@:>@])],
+              [enable_expand_equivalences=$enableval],
+              [enable_expand_equivalences=yes])
+AM_CONDITIONAL([WANT_EXPAND_EQUIVALENCES], [test x$enable_expand_equivalences != xno])
 AC_ARG_ENABLE([flag_diacritics],
               [AS_HELP_STRING([--enable-flag-diacritics],
                               [build flag diacritic tool @<:@default=no@:>@])],
