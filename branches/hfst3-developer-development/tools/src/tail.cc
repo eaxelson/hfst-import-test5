@@ -47,7 +47,7 @@ using hfst::HfstOutputStream;
 
 
 // add tools-specific variables here
-unsigned long tail_count = 1;
+long tail_count = -1;
 
 void
 print_usage()
@@ -60,11 +60,14 @@ print_usage()
     print_common_program_options();
     print_common_unary_program_options();
     fprintf(message_out, "Archive options:\n"
-            "  -n, --n-last=NUMBER   Read last NUMBER transducers\n");
+            "  -n, --n-last=[+]K   Print the last K transducers;\n"
+            "                      use +K to print transducers starting from "
+            "the Kth\n");
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions();
-    fprintf(message_out, "NUMBER must be a positive integer as parsed by "
-            "strtoul base 10\n");
+    fprintf(message_out, "K must be an integer, as parsed by "
+            "strtoul base 10, and not 0.\n"
+            "if K is omitted, it defaults to +1 (all except the first)\n");
     fprintf(message_out, "\n");
     print_report_bugs();
     fprintf(message_out, "\n");
@@ -102,7 +105,15 @@ parse_options(int argc, char** argv)
 #include "conventions/getopt-cases-common.h"
 #include "conventions/getopt-cases-unary.h"
         case 'n':
-          tail_count = hfst_strtoul(optarg, 10);
+          if (*optarg == '+')
+            {
+              // swap sign haha lol
+              tail_count = -hfst_strtol(optarg, 10);
+            }
+          else
+            {
+              tail_count = hfst_strtol(optarg, 10);
+            }
           break;
 #include "conventions/getopt-cases-error.h"
         }
@@ -115,45 +126,51 @@ parse_options(int argc, char** argv)
 
 int
 process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
-{
-  //instream.open();
-  //outstream.open();
-  queue<HfstTransducer> last_n;
-    
+  {
+    queue<HfstTransducer> last_n;
     size_t transducer_n=0;
-    while (instream.is_good())
-    {
-        transducer_n++;
-        HfstTransducer trans(instream);
-        char* inputname = strdup(trans.get_name().c_str());
-        if (strlen(inputname) <= 0)
+    if (tail_count > 0)
+      {
+        verbose_printf("Counting last %zu transducers...\n", tail_count);
+        while (instream.is_good())
           {
-            inputname = strdup(inputfilename);
+            transducer_n++;
+            HfstTransducer trans(instream);
+            last_n.push(trans);
+            if (last_n.size() > tail_count)
+              {
+                last_n.pop();
+              }
+        }
+        if (tail_count < transducer_n)
+          {
+            transducer_n -= (tail_count + 1);
           }
-
-        
-        verbose_printf("Counting %s...%zu\n", inputname, transducer_n); 
-        
-        last_n.push(trans);
-        if (last_n.size() > tail_count)
+        else
           {
+            transducer_n = 0;
+          }
+        while (!last_n.empty())
+          {
+            transducer_n++;
+            verbose_printf("Forwarding %s...%zu\n", inputfilename, transducer_n);
+            outstream << last_n.front();
             last_n.pop();
           }
-    }
-    if (tail_count < transducer_n)
-      {
-        transducer_n -= (tail_count + 1);
       }
-    else
+    else if (tail_count < 0)
       {
-        transducer_n = 0;
-      }
-    while (!last_n.empty())
-      {
-        transducer_n++;
-        verbose_printf("Forwarding %s...%zu\n", inputfilename, transducer_n);
-        outstream << last_n.front();
-        last_n.pop();
+        verbose_printf("Skipping %zu transducers...\n", -tail_count);
+        while (instream.is_good())
+          {
+            transducer_n++;
+            HfstTransducer trans(instream);
+            if (transducer_n >= -tail_count)
+              {
+                verbose_printf("Forwarding %s...%zu\n", inputfilename, transducer_n);
+                outstream << trans;
+              }
+          }
       }
     instream.close();
     outstream.close();
@@ -162,7 +179,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 
 
 int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstTail");
+    hfst_set_program_name(argv[0], "0.2", "HfstTail");
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)
     {

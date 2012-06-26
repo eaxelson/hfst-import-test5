@@ -147,14 +147,14 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
               {
                 if (not silent) 
                   {
-                    warning(0, 0, "At least one of the argumentes contains "
-			    "flag diacritics. Use -F to harmonize them.", 
-			    secondname, firstname);
-		  }
+                    warning(0, 0, "At least one of the arguments contains "
+                    "flag diacritics. Use -F to harmonize them.", 
+                    secondname, firstname);
+          }
               }
             else
               {
-		first.harmonize_flag_diacritics(second);
+                first.harmonize_flag_diacritics(second);
               }
         }
 

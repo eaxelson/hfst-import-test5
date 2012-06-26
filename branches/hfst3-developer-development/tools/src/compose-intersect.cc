@@ -29,6 +29,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <getopt.h>
+#include <set>
 
 #include <hfst.hpp>
 
@@ -46,6 +47,11 @@ using hfst::HfstTransducerVector;
 #include "conventions/globals-binary.h"
 
 
+// If invert is true, the intersection of the rules is composed eith
+// the lexicon. Otherwise the lexicon is composed with the
+// intersection of the rules.
+static bool invert=false;
+
 void
 print_usage()
 {
@@ -56,6 +62,13 @@ print_usage()
         print_common_program_options();
         print_common_binary_program_options();
         print_common_binary_program_parameter_instructions();
+       fprintf(message_out, "Composition options:\n"
+               "  -I, --invert                 Compose the intersection of"
+               " the\n"
+               "                               rules with the lexicon instead\n"
+               "                               of composing the lexicon with\n"
+               "                               the intersection of the rules.\n"
+           );
         fprintf(message_out, "\n");
         fprintf(message_out,
             "\n"
@@ -80,11 +93,12 @@ parse_options(int argc, char** argv)
         {
           HFST_GETOPT_COMMON_LONG,
           HFST_GETOPT_BINARY_LONG,
+      {"invert", no_argument, 0, 'I'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_BINARY_SHORT "F",
+                             HFST_GETOPT_BINARY_SHORT "FI",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -94,6 +108,9 @@ parse_options(int argc, char** argv)
         {
 #include "conventions/getopt-cases-common.h"
 #include "conventions/getopt-cases-binary.h"
+        case 'I':
+          invert = true;
+          break;
 #include "conventions/getopt-cases-error.h"
         }
     }
@@ -101,6 +118,101 @@ parse_options(int argc, char** argv)
 #include "conventions/check-params-common.h"
 #include "conventions/check-params-binary.h"
     return EXIT_CONTINUE;
+}
+
+using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstState;
+using hfst::HfstTokenizer;
+
+typedef std::set<std::string> StringSet;
+
+bool is_special_symbol(const std::string &symbol)
+{ return symbol.size() > 2 and symbol[0] == '@' and *(symbol.rbegin()) == '@';}
+
+std::string check_all_symbols(const HfstTransducer &lexicon,
+                  const HfstTransducer &rule)
+{
+  HfstBasicTransducer rule_b(rule);
+
+  StringSet rule_input_symbols;
+
+  for (HfstState s = 0; s <= rule_b.get_max_state(); ++s)
+    {
+      for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
+         rule_b[s].begin();
+       it != rule_b[s].end();
+       ++it)
+    { 
+      const std::string &input_symbol = it->get_input_symbol();
+      rule_input_symbols.insert(input_symbol); 
+    }
+    }
+
+  if (rule_input_symbols.count(hfst::internal_identity) != 0)
+    { return ""; }
+
+  HfstBasicTransducer lexicon_b(lexicon);
+
+  for (HfstState s = 0; s <= lexicon_b.get_max_state(); ++s)
+    {
+      for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
+         lexicon_b[s].begin();
+       it != lexicon_b[s].end();
+       ++it)
+    { 
+      const std::string &output_symbol = it->get_output_symbol();
+
+      if (rule_input_symbols.count(output_symbol) == 0)
+        { return output_symbol; }
+    }
+    }
+  
+  return "";
+}
+
+std::string check_multi_char_symbols
+(const HfstTransducer &lexicon, const HfstTransducer &rule)
+{
+  HfstBasicTransducer lexicon_b(lexicon);
+  HfstBasicTransducer rule_b(rule);
+
+  HfstTokenizer tokenizer;
+
+  StringSet rule_input_symbols;
+
+  for (HfstState s = 0; s <= rule_b.get_max_state(); ++s)
+    {
+      for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
+         rule_b[s].begin();
+       it != rule_b[s].end();
+       ++it)
+    { 
+      const std::string &input_symbol = it->get_input_symbol();
+      rule_input_symbols.insert(input_symbol); 
+    }
+    }
+
+  for (HfstState s = 0; s <= lexicon_b.get_max_state(); ++s)
+    {
+      for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
+         lexicon_b[s].begin();
+       it != lexicon_b[s].end();
+       ++it)
+    { 
+      const std::string &output_symbol = it->get_output_symbol();
+
+      if (rule_input_symbols.count(output_symbol) == 0)
+        {
+          if (is_special_symbol(output_symbol))
+        { continue; }
+
+          if (tokenizer.tokenize_one_level(output_symbol).size() > 1)
+        { return output_symbol; }
+        }
+    }
+    }
+  
+  return "";
 }
 
 int
@@ -139,9 +251,32 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
       rule.minimize();
       rules.push_back(rule);      
     }
-    
+ 
     verbose_printf("Computing intersecting composition...\n");
-    lexicon.compose_intersect(rules);
+
+    if (rules.size() > 0)
+      {
+    std::string symbol;
+    if ((symbol = check_all_symbols(lexicon,rules[0])) != "")
+      {
+        warning(0, 0, 
+            "\nFound output symbol \"%1s\" in transducer in\n"
+            "file %2$s which will be filtered out because they are\n"
+            "not found on the output tapes of transducers in file\n"
+            "%3$s.",
+            symbol.c_str(), firstfilename, secondfilename);
+      }
+      else if ((symbol = check_multi_char_symbols(lexicon,rules[0])) != "")
+      { 
+        warning(0, 0, 
+            "\nFound output multi-char symbol \"%1s\" in \n"
+            "transducer in file %2$s which are not found on the\n"
+            "output tape of transducers in file %3$s.",
+            symbol.c_str(), firstfilename, secondfilename);
+      }
+      }
+    
+    lexicon.compose_intersect(rules, invert);
     char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
                                              (strlen(lexiconname) +
                                               strlen(secondfilename) +

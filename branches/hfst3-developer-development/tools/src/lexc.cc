@@ -49,6 +49,7 @@ static unsigned int lexccount = 0;
 static bool is_input_stdin = true;
 static ImplementationType format = hfst::UNSPECIFIED_TYPE;
 static bool start_readline = false;
+static char* tempfilename = 0;
 
 int lexc_readline_loop(ImplementationType format);
 
@@ -190,7 +191,7 @@ parse_options(int argc, char** argv)
                 "be removed in next versions;\n"
                 "this is not even supported by the original lexc");
           }
-        char* tempfilename = hfst_strdup("/tmp/hfst-lexcXXXXXX");
+        tempfilename = hfst_strdup("/tmp/hfst-lexcXXXXXX");
         int temporary_fd = hfst_mkstemp(tempfilename);
         verbose_printf("Copying data from <stdin> to temporary file\n");
         char* fdata = 0;
@@ -279,6 +280,12 @@ lexc_streams(HfstOutputStream& outstream)
         else
           {
             trans = HfstTransducer::read_lexc(lexcfilenames[i], format);
+            if (0 == trans)
+              {
+                error(EXIT_FAILURE, 0, "Could not parse %s correctly.\n"
+                      "If there is no further info about the error, try "
+                      "-v or -d.", lexcfilenames[i]);
+              }
           }
       }
     hfst_set_name(*trans, lexcfilenames[0], "lexc");
@@ -334,6 +341,11 @@ int main( int argc, char **argv ) {
     delete outstream;
     free(lexcfilenames);
     free(outfilename);
+    if (tempfilename != 0)
+      {
+        verbose_printf("Deleting temporary files on succesful exit\n");
+        hfst_remove(tempfilename);
+      }
     return retval;
 }
 

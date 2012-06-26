@@ -28,6 +28,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <unistd.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -168,7 +169,25 @@ hfst_strtoul(char *s, int base)
       }
     else
       {
-        error(EXIT_FAILURE, errno, "%s not a weight", s);
+        error(EXIT_FAILURE, errno, "%s is not a valid unsigned number string",
+              s);
+        return rv;
+      }
+}
+
+long
+hfst_strtol(char *s, int base)
+{
+    errno = 0;
+    char *endptr;
+    long rv = strtol(s, &endptr, base);
+    if (*endptr == '\0')
+      {
+        return rv;
+      }
+    else
+      {
+        error(EXIT_FAILURE, errno, "%s is not a valid signed number string", s);
         return rv;
       }
 }
@@ -417,6 +436,18 @@ hfst_mkstemp(char* templ)
     }
   return rv;
 }
+
+int
+hfst_remove(const char* filename)
+  {
+    errno = 0;
+    int rv = remove(filename);
+    if (rv == -1)
+      {
+        error(EXIT_FAILURE, errno, "remove %s failed", filename);
+      }
+    return rv;
+  }
 
 // str functions
 

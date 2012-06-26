@@ -177,6 +177,12 @@ int hfst_strtonumber(const char *s, bool *infinite);
  */
 unsigned long hfst_strtoul(char *s, int base);
 
+/**
+ * @brief parse @c long from string @a s or print error message on failure.
+ */
+long hfst_strtol(char* s, int base);
+
+
 /** @brief parse string naming transducer format @c s or exit.
  */
 hfst::ImplementationType hfst_parse_format_name(const char* s);
@@ -253,6 +259,12 @@ ssize_t hfst_write(int fd, const void* buf, size_t count);
  *        message and exit on failrue.
  */
 int hfst_mkstemp(char* templ);
+
+/**
+ * @brief remove a file or print an informative error message and exit on
+ *        failure.
+ */
+int hfst_remove(const char* filename);
 
 /**
  * @brief safely read one @a delim delimited char array or print informative

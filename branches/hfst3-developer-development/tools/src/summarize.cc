@@ -110,6 +110,7 @@ process_stream(HfstInputStream& instream)
   size_t transducer_n = 0;
   while (instream.is_good())
     {
+      transducer_n++;
       if (transducer_n < 2)
         {
           verbose_printf("Summarizing...\n");
@@ -316,6 +317,10 @@ process_stream(HfstInputStream& instream)
     static_cast<double>(arcs)/static_cast<double>(uniq_input_arcs);
       double average_output_ambiguity = 
     static_cast<double>(arcs)/static_cast<double>(uniq_output_arcs);
+      double expected_arcs_per_symbol = 
+          static_cast<double>(average_arcs_per_state)/
+          static_cast<float>(foundAlphabet.size());
+
       if (transducer_n > 1)
         {
           fprintf(outfile, "-- \nTransducer #%zu:\n", transducer_n);
@@ -395,6 +400,7 @@ process_stream(HfstInputStream& instream)
               weighted? "yes": "no",
               cyclic? "yes": "no",
               cyclic_at_initial_state? "yes": "no");
+      // all above here are for OpenFst compatibility ^^
       if (verbose)
         {
           // our extensions for nice statistics maybe
@@ -406,13 +412,16 @@ process_stream(HfstInputStream& instream)
                   "most ambiguous input: %s %u\n"
                   "most ambiguous output: %s %u\n"
                   "average input ambiguity: %f\n"
-                  "average output ambiguity: %f\n",
+                  "average output ambiguity: %f\n"
+                  "expected arcs per symbol: %f\n",
                   sparsest_arcs, densest_arcs,
                   average_arcs_per_state,
                   average_input_epsilons,
                   most_ambiguous_input.first.c_str(), most_ambiguous_input.second,
                   most_ambiguous_output.first.c_str(), most_ambiguous_output.second,
-                  average_input_ambiguity, average_output_ambiguity);
+                  average_input_ambiguity, average_output_ambiguity,
+                  expected_arcs_per_symbol
+              );
           // alphabets
           fprintf(outfile,
                   "sigma set:\n");
@@ -431,6 +440,8 @@ process_stream(HfstInputStream& instream)
                   first = false;
                 }
               fprintf(outfile, "\n");
+              fprintf(outfile, "sigma set size: %lu\n",
+                      transducerAlphabet.size());
             }
           else
             {
@@ -450,6 +461,7 @@ process_stream(HfstInputStream& instream)
               first = false;
             }
           fprintf(outfile, "\n");
+          fprintf(outfile, "sigma set size: %lu\n", foundAlphabet.size());
           fprintf(outfile, "sigma symbols missing from transducer:\n");
           if (transducerKnowsAlphabet)
             {
@@ -474,6 +486,9 @@ process_stream(HfstInputStream& instream)
                   first = false;
                 }
               fprintf(outfile, "\n");
+              fprintf(outfile, "sigma missing from transducer alphabet size:"
+                      " %lu\n",
+                      transducerMinusSet.size());
             }
           else
             {
@@ -481,6 +496,7 @@ process_stream(HfstInputStream& instream)
             }
         }
     }
+  fprintf(outfile, "\n# of automata in archive: %zu\n", transducer_n);
   return EXIT_SUCCESS;
 }
 
