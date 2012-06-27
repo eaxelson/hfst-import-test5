@@ -17,6 +17,10 @@
 
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib $(GLIB_CPPFLAGS)
 
+if WANT_WINDOWS
+  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include
+endif
+
 if WANT_PROC
 MAYBE_PROC=hfst-apertium-proc
 endif

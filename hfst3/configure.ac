@@ -411,8 +411,8 @@ AC_ARG_ENABLE([windows],
 				[enable_windows=no])
 AM_CONDITIONAL([WANT_WINDOWS], [test x$enable_windows != xno])
 
-AS_IF([test x$enable_windows != xno],
-      [AC_MSG_FAILURE([windows compilation not supported yet (requested with --enable-windows)])])
+#AS_IF([test x$enable_windows != xno],
+#      [AC_MSG_FAILURE([windows compilation not supported yet (requested with --enable-windows)])])
 
 # Checks for programs
 AC_PROG_CC

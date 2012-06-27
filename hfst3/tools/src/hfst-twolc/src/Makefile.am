@@ -1,7 +1,7 @@
 AM_YFLAGS= -d -o y.tab.c
 AM_CXXFLAGS= -O3 -g -Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors
 bin_PROGRAMS=htwolcpre1 htwolcpre2 htwolcpre3
-bin_SCRIPTS=hfst-twolc hfst-twolc-loc
+bin_SCRIPTS=hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT)
 EXTRA_DIST=hfst-twolc.sh
 IO_SRC=$(srcdir)/io_src
 STRING_SRC=$(srcdir)/string_src
@@ -12,10 +12,14 @@ CL_SRC=$(srcdir)/commandline_src
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 
+if WANT_WINDOWS
+  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include
+endif
+
 # the preprocessor scripts do not support options per se, so we whitelist
 # them here
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=htwolcpre1 htwolcpre2 htwolcpre3 \
-								   hfst-twolc hfst-twolc-loc
+				hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT)
 
 htwolcpre1_SOURCES=htwolcpre1.yy scanner1.ll HfstTwolcDefs.h \
 		   $(CL_SRC)/CommandLine.h $(CL_SRC)/CommandLine.cc \
@@ -82,11 +86,11 @@ BUILT_SOURCES=htwolcpre1.h htwolcpre2.h htwolcpre3.h
 
 hfst-twolc$(EXEEXT): hfst-twolc.sh
 	cat $< | sed -e 's|BINDIR|$(bindir)|' > $@
-	chmod ogu+rx hfst-twolc
+	chmod ogu+rx hfst-twolc$(EXEEXT)
 
 hfst-twolc-loc$(EXEEXT): hfst-twolc.sh
 	cat $< | sed -e 's|BINDIR|$(PWD)|' > $@
-	chmod ogu+rx hfst-twolc-loc
+	chmod ogu+rx hfst-twolc-loc$(EXEEXT)
 
 clean-local:
 	-rm -f hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT)

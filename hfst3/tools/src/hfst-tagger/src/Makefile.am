@@ -10,6 +10,10 @@ USE_MODEL_SRC=$(srcdir)/use_model_src
 AM_CPPFLAGS=-I${top_srcdir}/libhfst/src
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 
+if WANT_WINDOWS
+  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include
+endif
+
 python_PYTHON=$(BUILD_MODEL_SRC)/tagger_aux.py \
               hfst_tagger_compute_data_statistics.py
 
