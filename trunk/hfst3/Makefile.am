@@ -21,7 +21,7 @@ if WANT_WINDOWS
   SUBDIRS = windows libhfst tools test doc man scripts
 else
   SUBDIRS = libhfst tools test doc man scripts
-fi
+endif
 
 # for external projects to use HFST from auto*
 m4dir=$(datadir)/aclocal
