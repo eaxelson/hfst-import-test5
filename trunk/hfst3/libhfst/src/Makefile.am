@@ -36,8 +36,8 @@ libhfst_la_LIBADD = implementations/libhfstimplementations.la \
 
 if WANT_WINDOWS	
   AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include
-  libhfst_la_LIBADD += ../../windows/dlfcn/libdl.la \
-			../../windows/openfst/src/lib/libfst.la
+  libhfst_la_LIBADD += $(top_srcdir)/windows/dlfcn/libdl.la \
+			$(top_srcdir)/windows/openfst/src/lib/libfst.la
 endif
 
 # we only have one library target but would like a particular includedir
