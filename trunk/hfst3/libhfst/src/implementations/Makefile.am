@@ -34,6 +34,11 @@ IMPLEMENTATION_SRCS=HfstTransitionGraph.cc \
 
 AM_CXXFLAGS=-Wno-deprecated -g
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
+
+if WANT_WINDOWS
+  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include
+endif
+
 # the bridges
 if WANT_SFST
 MAYBE_SFST=SfstTransducer.cc
