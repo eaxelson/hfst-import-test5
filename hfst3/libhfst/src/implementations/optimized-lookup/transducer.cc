@@ -235,6 +235,18 @@ HfstOneLevelPaths * Transducer::lookup_fd(const char * s)
     return results;
 }
 
+/*
+ * Loop through the transition table beginning from i, trying to take
+ * epsilon and flag diacritic transitions as long as possible.
+ *
+ * This function doesn't set trap_transition and found_transition
+ * unlike find_transitions, because it should never be the case
+ * that we end up here without going through the index table and
+ * would still like to consider default transitions. That can only
+ * happen when there are only epsilon transitions, in which case
+ * there obviously aren't default transitions.
+ */
+
 void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
                      SymbolNumber * output_symbol,
                      SymbolNumber * original_output_tape,
@@ -267,6 +279,7 @@ void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
                  original_output_tape,
                  tables->get_transition_target(i));
         current_weight -= tables->get_weight(i);
+	trap_transition = true;
         }
         flag_state.assign_values(old_values);
         ++i;
@@ -284,12 +297,12 @@ void Transducer::try_epsilon_indices(SymbolNumber * input_symbol,
 //    std::cerr << "try_epsilon_indices, index " << i << std::endl;
     if (tables->get_index_input(i) == 0)
     {
-    found_transition = true;
     try_epsilon_transitions(input_symbol,
                 output_symbol,
                 original_output_tape,
                 tables->get_index_target(i) - 
                 TRANSITION_TARGET_TABLE_START);
+    found_transition = true;
     }
 }
 
