@@ -279,7 +279,6 @@ void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
                  original_output_tape,
                  tables->get_transition_target(i));
         current_weight -= tables->get_weight(i);
-	trap_transition = true;
         }
         flag_state.assign_values(old_values);
         ++i;
