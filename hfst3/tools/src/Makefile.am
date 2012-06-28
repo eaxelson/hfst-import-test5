@@ -27,136 +27,136 @@ endif
 
 # sort alphabetically:
 if WANT_AFFIX_GUESSIFY
-MAYBE_AFFIX_GUESSIFY=hfst-affix-guessify
+MAYBE_AFFIX_GUESSIFY=hfst-affix-guessify$(EXEEXT)
 endif
 if WANT_COMPARE
-MAYBE_COMPARE=hfst-compare
+MAYBE_COMPARE=hfst-compare$(EXEEXT)
 endif
 if WANT_COMPOSE
-MAYBE_COMPOSE=hfst-compose
+MAYBE_COMPOSE=hfst-compose$(EXEEXT)
 endif
 if WANT_COMPOSE_INTERSECT
-MAYBE_COMPOSE_INTERSECT=hfst-compose-intersect
+MAYBE_COMPOSE_INTERSECT=hfst-compose-intersect$(EXEEXT)
 endif
 if WANT_CONCATENATE
-MAYBE_CONCATENATE=hfst-concatenate
+MAYBE_CONCATENATE=hfst-concatenate$(EXEEXT)
 endif
 if WANT_CONJUNCT
-MAYBE_CONJUNCT=hfst-conjunct
+MAYBE_CONJUNCT=hfst-conjunct$(EXEEXT)
 endif
 if WANT_DETERMINIZE
-MAYBE_DETERMINIZE=hfst-determinize
+MAYBE_DETERMINIZE=hfst-determinize$(EXEEXT)
 endif
 if WANT_DISJUNCT
-MAYBE_DISJUNCT=hfst-disjunct
+MAYBE_DISJUNCT=hfst-disjunct$(EXEEXT)
 endif
 if WANT_DUPLICATE
-MAYBE_DUPLICATE=hfst-duplicate
+MAYBE_DUPLICATE=hfst-duplicate$(EXEEXT)
 endif
 if WANT_EDIT_METADATA
-MAYBE_EDIT_METADATA=hfst-edit-metadata
+MAYBE_EDIT_METADATA=hfst-edit-metadata$(EXEEXT)
 endif
 if WANT_FORMAT
-MAYBE_FORMAT=hfst-format
+MAYBE_FORMAT=hfst-format$(EXEEXT)
 endif
 if WANT_FST2FST
-MAYBE_FST2FST=hfst-fst2fst
+MAYBE_FST2FST=hfst-fst2fst$(EXEEXT)
 endif
 if WANT_FST2STRINGS
-MAYBE_FST2STRINGS=hfst-fst2strings
+MAYBE_FST2STRINGS=hfst-fst2strings$(EXEEXT)
 endif
 if WANT_FST2TXT
-MAYBE_FST2TXT=hfst-fst2txt
+MAYBE_FST2TXT=hfst-fst2txt$(EXEEXT)
 endif
 if WANT_GREP
-MAYBE_GREP=hfst-grep
+MAYBE_GREP=hfst-grep$(EXEEXT)
 endif
 if WANT_HEAD
-MAYBE_HEAD=hfst-head
+MAYBE_HEAD=hfst-head$(EXEEXT)
 endif
 if WANT_INVERT
-MAYBE_INVERT=hfst-invert
+MAYBE_INVERT=hfst-invert$(EXEEXT)
 endif
 if WANT_LEXC
-MAYBE_LEXC=hfst-lexc
+MAYBE_LEXC=hfst-lexc$(EXEEXT)
 endif
 if WANT_LEXC2FST
-MAYBE_LEXC2FST=hfst-lexc2fst
+MAYBE_LEXC2FST=hfst-lexc2fst$(EXEEXT)
 endif
 if WANT_LOOKUP
-MAYBE_LOOKUP=hfst-lookup
+MAYBE_LOOKUP=hfst-lookup$(EXEEXT)
 endif
 if WANT_PAIR_TEST
-MAYBE_PAIR_TEST=hfst-pair-test
+MAYBE_PAIR_TEST=hfst-pair-test$(EXEEXT)
 endif
 if WANT_MINIMIZE
-MAYBE_MINIMIZE=hfst-minimize
+MAYBE_MINIMIZE=hfst-minimize$(EXEEXT)
 endif
 if WANT_NAME
-MAYBE_NAME=hfst-name
+MAYBE_NAME=hfst-name$(EXEEXT)
 endif
 if WANT_OPTIMIZED_LOOKUP
-MAYBE_OPTIMIZED_LOOKUP=hfst-optimized-lookup
+MAYBE_OPTIMIZED_LOOKUP=hfst-optimized-lookup$(EXEEXT)
 endif
 if WANT_PREPROCESS_FOR_OPTIMIZED_LOOKUP
-MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP=hfst-preprocess-for-optimized-lookup-format
+MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP=hfst-preprocess-for-optimized-lookup-format$(EXEEXT)
 endif
 if WANT_PROJECT
-MAYBE_PROJECT=hfst-project
+MAYBE_PROJECT=hfst-project$(EXEEXT)
 endif
 if WANT_PUSH_WEIGHTS
-MAYBE_PUSH_WEIGHTS=hfst-push-weights
+MAYBE_PUSH_WEIGHTS=hfst-push-weights$(EXEEXT)
 endif
 if WANT_REGEXP2FST
-MAYBE_REGEXP2FST=hfst-regexp2fst
+MAYBE_REGEXP2FST=hfst-regexp2fst$(EXEEXT)
 endif
 if WANT_PMATCH2FST
-MAYBE_PMATCH2FST=hfst-pmatch2fst
+MAYBE_PMATCH2FST=hfst-pmatch2fst$(EXEEXT)
 endif
 if WANT_REMOVE_EPSILONS
-MAYBE_REMOVE_EPSILONS=hfst-remove-epsilons
+MAYBE_REMOVE_EPSILONS=hfst-remove-epsilons$(EXEEXT)
 endif
 if WANT_REPEAT
-MAYBE_REPEAT=hfst-repeat
+MAYBE_REPEAT=hfst-repeat$(EXEEXT)
 endif
 if WANT_REVERSE
-MAYBE_REVERSE=hfst-reverse
+MAYBE_REVERSE=hfst-reverse$(EXEEXT)
 endif
 if WANT_REWEIGHT
-MAYBE_REWEIGHT=hfst-reweight
+MAYBE_REWEIGHT=hfst-reweight$(EXEEXT)
 endif
 if WANT_SHUFFLE
-MAYBE_SHUFFLE=hfst-shuffle
+MAYBE_SHUFFLE=hfst-shuffle$(EXEEXT)
 endif
 if WANT_SPLIT
-MAYBE_SPLIT=hfst-split
+MAYBE_SPLIT=hfst-split$(EXEEXT)
 endif
 if WANT_STRINGS2FST
-MAYBE_STRINGS2FST=hfst-strings2fst
+MAYBE_STRINGS2FST=hfst-strings2fst$(EXEEXT)
 endif
 if WANT_STRIP_HEADER
-MAYBE_STRIP_HEADER=hfst-strip-header
+MAYBE_STRIP_HEADER=hfst-strip-header$(EXEEXT)
 endif
 if WANT_SUBTRACT
-MAYBE_SUBTRACT=hfst-subtract
+MAYBE_SUBTRACT=hfst-subtract$(EXEEXT)
 endif
 if WANT_SUMMARIZE
-MAYBE_SUMMARIZE=hfst-summarize
+MAYBE_SUMMARIZE=hfst-summarize$(EXEEXT)
 endif
 if WANT_TAIL
-MAYBE_TAIL=hfst-tail
+MAYBE_TAIL=hfst-tail$(EXEEXT)
 endif
 if WANT_TRAVERSE
-MAYBE_TRAVERSE=hfst-traverse
+MAYBE_TRAVERSE=hfst-traverse$(EXEEXT)
 endif
 if WANT_TXT2FST
-MAYBE_TXT2FST=hfst-txt2fst
+MAYBE_TXT2FST=hfst-txt2fst$(EXEEXT)
 endif
 if WANT_CALCULATE
-MAYBE_CALCULATE=hfst-calculate
+MAYBE_CALCULATE=hfst-calculate$(EXEEXT)
 endif
 if WANT_SUBSTITUTE
-MAYBE_SUBSTITUTE=hfst-substitute
+MAYBE_SUBSTITUTE=hfst-substitute$(EXEEXT)
 endif
 
 noinst_HEADERS= \
