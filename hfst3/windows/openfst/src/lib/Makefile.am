@@ -19,5 +19,5 @@ AUTOMAKE_OPTIONS=subdir-objects
 AM_CPPFLAGS = -I $(srcdir)/../include -I $(srcdir)/../../../dlfcn \
 		$(ICU_CPPFLAGS) -DMSC_VER -DOPENFSTEXPORT
 noinst_LTLIBRARIES = libfst.la
-libfst_la_SOURCES = compat.cc flags.cc fst.cc properties.cc \
+nodist_libfst_la_SOURCES = compat.cc flags.cc fst.cc properties.cc \
 			symbol-table.cc symbol-table-ops.cc util.cc
