@@ -775,7 +775,7 @@ namespace hfst
 
   int HfstInputStream::get_header_size(int &bytes_read)
   {
-    short header_size=0;
+    int header_size=0;
     stream_get(header_size);
     char c = stream_get();
     if (c != 0) {
