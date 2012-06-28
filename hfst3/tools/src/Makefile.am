@@ -22,7 +22,7 @@ AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/libhfst/src/parsers -I
 AM_CXXFLAGS = -Wno-deprecated
 
 if WANT_WINDOWS
-  AM_CPPFLAGS += -I{top_srcdir}/windows/openfst/src/include
+  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include
 endif
 
 # sort alphabetically:
