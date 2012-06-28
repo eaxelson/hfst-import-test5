@@ -88,6 +88,41 @@ getinput(char *buf, int maxlen)
 }
 
 char*
+strip_curly(const char *s)
+{
+    const char *c = s;
+    char *stripped = (char*)calloc(sizeof(char),strlen(s)+1);
+    int i = 0;
+    while (*c != '\0')
+    {
+    	// If first char is { or last one }, then skip it
+    	if ( ( *c == '{' && i == 0 ) || ( *c == '}' && *(c + 1) == '\0' ) )
+		{
+    		if (*(c + 1) == '\0')
+			{
+				break;
+			}
+			else
+			{
+				stripped[i] = *(c + 1);
+				i++;
+				c += 2;
+			}
+		}
+        else
+        {
+        	stripped[i] = *c;
+            i++;
+            c++;
+        }
+
+    }
+    stripped[i] = '\0';
+    return stripped;
+}
+
+
+char*
 strip_percents(const char *s)
 {
     const char *c = s;

@@ -20,6 +20,8 @@ using namespace hfst::implementations;
 
 extern void xreerror(const char * text);
 extern int xrelex();
+extern int yylex();
+
 
 
 
@@ -63,6 +65,8 @@ extern int xrelex();
 
 /* some parts have been ripped from foma’s parser now */
 
+
+
 %type <replaceArrow> REPLACE_ARROW
 
 %type <transducer> XRE REGEXP1 REGEXP2  REGEXP4 REGEXP5 REGEXP6 REGEXP7
@@ -82,7 +86,7 @@ extern int xrelex();
 
 
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
-%nonassoc <label> QUOTED_LITERAL SYMBOL
+%nonassoc <label> QUOTED_LITERAL SYMBOL CURLY_BRACKETS
 
 %left  CROSS_PRODUCT COMPOSITION LENIENT_COMPOSITION INTERSECTION
 %left  CENTER_MARKER MARKUP_MARKER
@@ -92,7 +96,7 @@ extern int xrelex();
        OPTIONAL_REPLACE_RIGHT OPTIONAL_REPLACE_LEFT
        REPLACE_LEFT_RIGHT OPTIONAL_REPLACE_LEFT_RIGHT
        RTL_LONGEST_MATCH RTL_SHORTEST_MATCH
-       LTR_LONGEST_MATCH LTR_SHORTEST_MATCH 
+       LTR_LONGEST_MATCH LTR_SHORTEST_MATCH
       
 %right REPLACE_CONTEXT_UU REPLACE_CONTEXT_LU 
        REPLACE_CONTEXT_UL REPLACE_CONTEXT_LL
@@ -120,7 +124,7 @@ extern int xrelex();
 
 %nonassoc <label> READ_BIN READ_TEXT READ_SPACED READ_PROLOG READ_RE
 %token LEFT_BRACKET RIGHT_BRACKET LEFT_PARENTHESIS RIGHT_PARENTHESIS
-       LEFT_CURLY RIGHT_CURLY LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED
+       LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED
        PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
@@ -148,7 +152,7 @@ REGEXP1: REGEXP2 END_OF_EXPRESSION {
    }
    | REGEXP2 {
    
-        //std::cerr << "regexp1:regexp2\n"<< std::endl; 
+    //    std::cerr << "regexp1:regexp2\n"<< *$1 << std::endl; 
         hfst::xre::last_compiled = & $1->minimize();
         $$ = hfst::xre::last_compiled;
    }
@@ -675,9 +679,6 @@ REGEXP11: REGEXP12 { }
         | LEFT_PARENTHESIS REGEXP2 RIGHT_PARENTHESIS {
             $$ = & $2->optionalize();
         }
-        | LEFT_CURLY REGEXP2 RIGHT_CURLY {
-            $$ = & $2->minimize();
-        }
         ;
 
 REGEXP12: LABEL { }
@@ -787,6 +788,11 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
      }
      | BOUNDARY_MARKER {
         $$ = new HfstTransducer("@#@", "@#@", hfst::xre::format);
+     }
+     | CURLY_BRACKETS {
+     	HfstTokenizer TOK;
+     	$$ = new HfstTransducer($1, TOK, hfst::xre::format);
+        free($1);
      }
      ;
 
