@@ -88,8 +88,8 @@ print_usage()
 	"                                  generated model forms is read\n"
 	"                                  from this file.\n"
         "  -n, --max-number-of-guesses     Maximal number of analysis\n"
-        "                                  per word form (5 by default)."
-	"  -m  --max-number-of-forms       Maximal number of generated model"
+        "                                  per word form (5 by default).\n"
+	"  -m  --max-number-of-forms       Maximal number of generated model\n"
 	"                                  forms per guess (2 by default).\n"
 	    );
     fprintf(message_out, "\n");
@@ -323,6 +323,6 @@ int main( int argc, char **argv )
     delete guesser;
     delete generator;
 
-    return retval;
+    return EXIT_SUCCESS;
 }
 
