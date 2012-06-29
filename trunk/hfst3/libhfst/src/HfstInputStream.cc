@@ -775,8 +775,10 @@ namespace hfst
 
   int HfstInputStream::get_header_size(int &bytes_read)
   {
-    int header_size=0;
-    stream_get(header_size);
+    short tmp_header_size = 0;
+    // We don't have functions to read unsigned shorts, so do this
+    stream_get(tmp_header_size);
+    unsigned short header_size = (unsigned short) tmp_header_size;
     char c = stream_get();
     if (c != 0) {
       debug_error("#6");
