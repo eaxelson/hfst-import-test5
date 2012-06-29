@@ -1,5 +1,4 @@
 %{
-
 #define YYDEBUG 1 
 
 #include <stdio.h>
@@ -15,31 +14,19 @@ using hfst::HfstTransducer;
 using namespace hfst::xeroxRules;
 using namespace hfst::implementations;
 
-
 #include "xre_utils.h"
 
 extern void xreerror(const char * text);
 extern int xrelex();
 extern int yylex();
 
-
-
-
-
 %}
 
 %name-prefix="xre"
 %error-verbose
 %debug
-
-           
-
-
-
+  
 %union {
-
-
-
 
     int value;
     int* values;
@@ -53,19 +40,15 @@ extern int yylex();
    std::pair< hfst::xeroxRules::ReplaceArrow, hfst::xeroxRules::Rule>* replaceRuleWithArrow;   
    std::pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducerVector>* mappingVectorWithArrow;
    std::pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducer>* mappingWithArrow;
-    
-   
+       
    std::pair<hfst::xeroxRules::ReplaceType, hfst::HfstTransducerPairVector>* contextWithMark;
    
    hfst::xeroxRules::ReplaceType replType;
    hfst::xeroxRules::ReplaceArrow replaceArrow; 
-    
-     
+         
 }
 
 /* some parts have been ripped from foma’s parser now */
-
-
 
 %type <replaceArrow> REPLACE_ARROW
 
@@ -81,8 +64,6 @@ extern int yylex();
 %type <transducerPairVector> CONTEXTS_VECTOR
 %type <transducerPair> CONTEXT
 %type <replType>  CONTEXT_MARK
-
-
 
 
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
@@ -106,15 +87,11 @@ extern int yylex();
 
 %left  IGNORING IGNORE_INTERNALLY LEFT_QUOTIENT
 
-
 %left  COMMACOMMA
 
- 
-          
 %left  COMMA 
        
 %left  BEFORE AFTER
-
 
 %nonassoc SUBSTITUTE_LEFT TERM_COMPLEMENT
 %nonassoc COMPLEMENT CONTAINMENT CONTAINMENT_ONCE CONTAINMENT_OPT
@@ -134,8 +111,6 @@ extern int yylex();
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
 %%
-
-
 
 
 XRE: REGEXP1 { }
@@ -180,10 +155,6 @@ REGEXP2: REPLACE
         }
        ;
 
-
-       
-       
-       
 ////////////////////////////
 // Replace operators
 ///////////////////////////
@@ -354,11 +325,7 @@ MAPPING: REPLACE REPLACE_ARROW REPLACE
           delete $2, $5;
       }
       ;    
-  
-   
-      
 
-        
 // Contexts: ( ie. || k _ f , ... , f _ s )
 CONTEXTS_WITH_MARK:  CONTEXT_MARK CONTEXTS_VECTOR
          {
@@ -409,10 +376,7 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
             delete $2; 
          }
       ;
-      
-
-
-CONTEXT_MARK: REPLACE_CONTEXT_UU
+ CONTEXT_MARK: REPLACE_CONTEXT_UU
          {
             $$ = REPL_UP;
          }
@@ -430,11 +394,6 @@ CONTEXT_MARK: REPLACE_CONTEXT_UU
          }
          ;
      
-     
-     
-     
-
-
 REPLACE_ARROW: REPLACE_RIGHT
          {
             $$ = E_REPLACE_RIGHT;
@@ -461,16 +420,7 @@ REPLACE_ARROW: REPLACE_RIGHT
          }
          ;
 
-
-
-
-
-
-
-
 ////////////////
-
-
 
 REGEXP3: REGEXP4 { }
        | REGEXP3 SHUFFLE REGEXP4 {
@@ -574,8 +524,12 @@ REGEXP7: REGEXP8 { }
 
 REGEXP8: REGEXP9 { }
        | COMPLEMENT REGEXP8 {
-            xreerror("No complement");
-            $$ = $2;
+       		// TODO: forbid pair complement (ie ~a:b)
+       		HfstTransducer complement = HfstTransducer::identity_pair( hfst::xre::format );
+       		complement.repeat_star().minimize();
+       		complement.subtract(*$2);
+       		$$ = new HfstTransducer(complement);
+   			delete $2;
         }
        | CONTAINMENT REGEXP8 {
             HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
