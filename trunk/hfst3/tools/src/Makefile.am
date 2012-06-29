@@ -68,6 +68,9 @@ endif
 if WANT_FST2TXT
 MAYBE_FST2TXT=hfst-fst2txt$(EXEEXT)
 endif
+if WANT_GUESSIFY
+MAYBE_GUESSIFY=hfst-guessify$(EXEEXT)
+endif
 if WANT_GREP
 MAYBE_GREP=hfst-grep$(EXEEXT)
 endif
@@ -179,7 +182,7 @@ noinst_HEADERS= \
 # finish with xyz
 # see <http://en.wikipedia.org/wiki/Alphabets#Alphabetic_order> for details
 bin_PROGRAMS= \
-			  $(MAYBE_AFFIX_GUESSIFY)              \
+			 $(MAYBE_AFFIX_GUESSIFY)              \
 			 $(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_CONCATENATE)     \
 			 $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)   \
 			 $(MAYBE_DUPLICATE) $(MAYBE_EDIT_METADATA)                  \
@@ -199,7 +202,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_LEXC2FST) $(MAYBE_LEXC)   \
 			 $(MAYBE_FORMAT)                     \
 			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)\
-			 $(MAYBE_TRAVERSE)
+			 $(MAYBE_TRAVERSE) $(MAYBE_GUESSIFY)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc \
 				hfst-tool-metadata.cc
@@ -219,6 +222,8 @@ hfst_format_SOURCES=hfst-format.cc $(HFST_COMMON_SRC)
 hfst_fst2fst_SOURCES=hfst-fst2fst.cc $(HFST_COMMON_SRC)
 hfst_fst2strings_SOURCES=hfst-fst2strings.cc $(HFST_COMMON_SRC)
 hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
+hfst_guessify_SOURCES=hfst-guessify.cc guessify_fst.cc \
+HfstLookupFlagDiacritics.cc $(HFST_COMMON_SRC)
 hfst_grep_SOURCES=hfst-grep.cc $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
