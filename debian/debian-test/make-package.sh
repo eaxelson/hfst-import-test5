@@ -11,7 +11,7 @@ SFST_PREFIX=$BACKEND_PREFIX
 OPENFST_PREFIX=$BACKEND_PREFIX
 FOMA_PREFIX=$BACKEND_PREFIX
 
-HFST_LIBNUMBER="18"
+HFST_LIBNUMBER="19"
 
 if grep "Version: ?" debian/DEBIAN/control > /dev/null; then
     echo "Version number must be defined in control file!";
