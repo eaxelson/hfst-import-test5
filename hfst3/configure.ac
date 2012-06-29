@@ -196,18 +196,24 @@ AC_ARG_ENABLE([fst2txt],
 			  [enable_fst2txt=$enableval],
 			  [enable_fst2txt=yes])
 AM_CONDITIONAL([WANT_FST2TXT], [test x$enable_fst2txt != xno])
-AC_ARG_ENABLE([guessify],
-			  [AS_HELP_STRING([--enable-guessify],
-							  [build guessify tool @<:@default=yes@:>@])],
-			  [enable_guessify=$enableval],
-			  [enable_guessify=yes])
-AM_CONDITIONAL([WANT_GUESSIFY], [test x$enable_guessify != xno])
 AC_ARG_ENABLE([grep],
 			  [AS_HELP_STRING([--enable-grep],
 							  [build grep tool @<:@default=yes@:>@])],
 			  [enable_grep=$enableval],
 			  [enable_grep=yes])
 AM_CONDITIONAL([WANT_GREP], [test x$enable_grep != xno])
+AC_ARG_ENABLE([guess],
+			  [AS_HELP_STRING([--enable-guess],
+							  [build guess tool @<:@default=yes@:>@])],
+			  [enable_guess=$enableval],
+			  [enable_guess=yes])
+AM_CONDITIONAL([WANT_GUESS], [test x$enable_guess != xno])
+AC_ARG_ENABLE([guessify],
+			  [AS_HELP_STRING([--enable-guessify],
+							  [build guessify tool @<:@default=yes@:>@])],
+			  [enable_guessify=$enableval],
+			  [enable_guessify=yes])
+AM_CONDITIONAL([WANT_GUESSIFY], [test x$enable_guessify != xno])
 AC_ARG_ENABLE([head],
 			  [AS_HELP_STRING([--enable-head],
 							  [build head tool @<:@default=yes@:>@])],
@@ -579,6 +585,7 @@ cat <<EOF
     *                 fst2txt: $enable_fst2txt
     *                 grep: $enable_grep
     *                 guessify: $enable_guessify
+    *                 guess: $enable_guess
     *                 head: $enable_head
     *                 invert: $enable_invert
     *                 lexc: $enable_lexc

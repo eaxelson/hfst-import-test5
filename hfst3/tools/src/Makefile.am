@@ -68,11 +68,14 @@ endif
 if WANT_FST2TXT
 MAYBE_FST2TXT=hfst-fst2txt$(EXEEXT)
 endif
-if WANT_GUESSIFY
-MAYBE_GUESSIFY=hfst-guessify$(EXEEXT)
-endif
 if WANT_GREP
 MAYBE_GREP=hfst-grep$(EXEEXT)
+endif
+if WANT_GUESS
+MAYBE_GUESS=hfst-guess$(EXEEXT)
+endif
+if WANT_GUESSIFY
+MAYBE_GUESSIFY=hfst-guessify$(EXEEXT)
 endif
 if WANT_HEAD
 MAYBE_HEAD=hfst-head$(EXEEXT)
@@ -202,7 +205,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_LEXC2FST) $(MAYBE_LEXC)   \
 			 $(MAYBE_FORMAT)                     \
 			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)\
-			 $(MAYBE_TRAVERSE) $(MAYBE_GUESSIFY)
+			 $(MAYBE_TRAVERSE) $(MAYBE_GUESSIFY) $(MAYBE_GUESS)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc \
 				hfst-tool-metadata.cc
@@ -222,9 +225,11 @@ hfst_format_SOURCES=hfst-format.cc $(HFST_COMMON_SRC)
 hfst_fst2fst_SOURCES=hfst-fst2fst.cc $(HFST_COMMON_SRC)
 hfst_fst2strings_SOURCES=hfst-fst2strings.cc $(HFST_COMMON_SRC)
 hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
+hfst_grep_SOURCES=hfst-grep.cc $(HFST_COMMON_SRC)
+hfst_guess_SOURCES=hfst-guess.cc generate_model_forms.cc guessify_fst.cc \
+HfstLookupFlagDiacritics.cc $(HFST_COMMON_SRC)
 hfst_guessify_SOURCES=hfst-guessify.cc guessify_fst.cc \
 HfstLookupFlagDiacritics.cc $(HFST_COMMON_SRC)
-hfst_grep_SOURCES=hfst-grep.cc $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
 hfst_lexc_SOURCES=hfst-lexc.cc lexc-readline-ui.cc $(HFST_COMMON_SRC)
