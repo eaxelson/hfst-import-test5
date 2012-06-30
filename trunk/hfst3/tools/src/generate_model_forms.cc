@@ -272,8 +272,6 @@ StringVectorVector get_paradigms(const std::string &word_form,
 			      model_form.end());
 	    }
       
-      paradigm.push_back("\n");
-
       paradigm_guesses.push_back(paradigm);
     }
 
@@ -332,7 +330,7 @@ int main(int argc, char * argv[])
 							   model_forms,
 							   MAX_GENERATED_FORMS)
 	;
-
+      
 
       for (StringVectorVector::const_iterator it = guess_model_forms.begin();
 	   it != guess_model_forms.end();
