@@ -200,7 +200,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream &out)
 
 int main( int argc, char **argv ) 
 {
-    hfst_set_program_name(argv[0], "0.3", "HfstFst2Txt");
+    hfst_set_program_name(argv[0], "0.3", "HfstGuessify");
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)
     {
