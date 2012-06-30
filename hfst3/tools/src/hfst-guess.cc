@@ -300,16 +300,24 @@ int main( int argc, char **argv )
 							 model_forms,
 							 max_number_of_forms);
 
-	    guesses = paradigms;
+	    for (StringVectorVector::const_iterator it = paradigms.begin();
+		 it != paradigms.end();
+		 ++it)
+	      {
+		(*out) << *it << std::endl;
+	      }
 	  }
-
-	for (StringVectorVector::const_iterator it = guesses.begin();
-	     it != guesses.end();
-	     ++it)
+	else
 	  {
-	    (*out) << *it << std::endl;
-	  }
-	
+	    for (StringVectorVector::iterator it = guesses.begin();
+		 it != guesses.end();
+		 ++it)
+	      {
+		std::reverse(it->begin(), it->end());
+
+		(*out) << line << "\t" << *it << std::endl;
+	      }
+	  }	
       }
 
     delete instream;
