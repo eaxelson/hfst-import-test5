@@ -62,5 +62,9 @@ for i in "" .sfst .ofst .foma; do
             exit 1
         fi
     fi
+    if ! ../src/hfst-strings2fst $FFLAG -p $srcdir/long.strings > test.hfst ; then
+        exit 1
+    fi
+    rm test.hfst
 done
 
