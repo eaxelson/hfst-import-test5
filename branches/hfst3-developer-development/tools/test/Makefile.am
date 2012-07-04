@@ -33,6 +33,7 @@ TESTS=hfst-check-version.sh hfst-check-help.sh hfst-check-environment.sh \
 	  compose-functionality.sh \
 	  conjunct-functionality.sh \
 	  disjunct-functionality.sh \
+	  edit-metadata.sh \
 	  expand-equivalences.sh \
 	  determinize-functionality.sh minimize-functionality.sh \
 	  remove-epsilons-functionality.sh \
