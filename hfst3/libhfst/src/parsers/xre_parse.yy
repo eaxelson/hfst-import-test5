@@ -532,6 +532,19 @@ REGEXP8: REGEXP9 { }
    			delete $2;
         }
        | CONTAINMENT REGEXP8 {
+       
+            HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
+                                    hfst::internal_identity,
+                                    hfst::xre::format);
+            HfstTransducer* right = new HfstTransducer(hfst::internal_identity,
+                                    hfst::internal_identity,
+                                    hfst::xre::format);
+            right->repeat_star();
+            left->repeat_star();
+
+            $$ = & ((right->concatenate(*$2).concatenate(*left)));
+            
+       /*
             HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
                                     hfst::internal_unknown,
                                     hfst::xre::format);
@@ -543,10 +556,13 @@ REGEXP8: REGEXP9 { }
             HfstTransducer* contain_once = 
                 & ((right->concatenate(*$2).concatenate(*left)));
             $$ = & (contain_once->repeat_star());
+            
+         */
             delete $2;
             delete left;
         }
        | CONTAINMENT_ONCE REGEXP8 {
+                                 
             HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
                                     hfst::internal_unknown,
                                     hfst::xre::format);
@@ -560,6 +576,7 @@ REGEXP8: REGEXP9 { }
             $$ = contain_once;
             delete $2;
             delete left;
+
         }
        | CONTAINMENT_OPT REGEXP8 {
             HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
