@@ -337,6 +337,10 @@ process_stream(HfstOutputStream& outstream)
             {
               nameline = hfst_strndup(orig_line, 79);
               char* p = nameline + 76;
+              while (((*p) & (128 + 64)) == 128)
+                {
+                  p--;
+                }
               *p = '.';
               p++;
               *p = '.';
@@ -345,9 +349,13 @@ process_stream(HfstOutputStream& outstream)
               p++;
               *p = '\0';
             }
-          else
+          else if (strchr(orig_line, '\n') != NULL)
             {
               nameline = hfst_strndup(orig_line, strlen(orig_line) - 1);
+            }
+          else
+            {
+              nameline = hfst_strdup(orig_line);
             }
           hfst_set_name(res, nameline, "string");
           hfst_set_formula(res, orig_line, "S");
