@@ -320,7 +320,8 @@ AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c 
 
 # tests
-TOOL_TSTS=utils/ucd_data utils/utf8 conventions/unicode_portability
+TOOL_TSTS=utils/ucd_data utils/utf8 conventions/unicode_portability \
+		  utils/TsvPathPrinter
 check_PROGRAMS=$(TOOL_TSTS)
 hfstsharedir=$(prefix)/share/hfst/
 hfstshare_DATA=utils/UnicodeData.txt
@@ -328,6 +329,9 @@ utils_ucd_data_SOURCES=utils/ucd_data.cc
 utils_ucd_data_CPPFLAGS=-DUNIT_TEST_UCD_DATA -DUCD_DATA_PATH='"$(abs_top_srcdir)/src/utils/UnicodeData.txt"'
 utils_utf8_SOURCES=utils/utf8.cc
 utils_utf8_CPPFLAGS=-DUNIT_TEST_UTF8
+utils_TsvPathPrinter_SOURCES=utils/PathPrinter.cc utils/TsvPathPrinter.cc
+utils_TsvPathPrinter_CPPFLAGS=-DUNIT_TEST_MAIN $(HFST_CFLAGS)
+utils_TsvPathPrinter_LDADD=$(HFST_LIBS)
 if WANT_HFST_UNICODE
 conventions_unicode_portability_SOURCES=conventions/unicode_portability.cc \
 										utils/ucd_data.cc utils/utf8.cc
