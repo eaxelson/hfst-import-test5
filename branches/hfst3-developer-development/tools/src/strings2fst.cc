@@ -204,9 +204,9 @@ parse_options(int argc, char** argv)
     case 'm':
         multichar_symbol_filename = hfst_strdup(optarg);
         break;
-        case 'f':
-            output_format = hfst_parse_format_name(optarg);
-            break;
+    case 'f':
+        output_format = hfst_parse_format_name(optarg);
+        break;
 #include "conventions/getopt-cases-error.h"
         }
     }
@@ -332,7 +332,24 @@ process_stream(HfstOutputStream& outstream)
           HfstBasicTransducer tr;
           tr.disjunct(spv, path_weight);
           HfstTransducer res(tr, output_format);
-          hfst_set_name(res, orig_line, "string");
+          char* nameline = 0;
+          if (strlen(orig_line) >= 79)
+            {
+              nameline = hfst_strndup(orig_line, 79);
+              char* p = nameline + 76;
+              *p = '.';
+              p++;
+              *p = '.';
+              p++;
+              *p = '.';
+              p++;
+              *p = '\0';
+            }
+          else
+            {
+              nameline = hfst_strndup(orig_line, strlen(orig_line) - 1);
+            }
+          hfst_set_name(res, nameline, "string");
           hfst_set_formula(res, orig_line, "S");
           outstream << res;
           free(orig_line);
