@@ -246,6 +246,16 @@ process_stream(HfstOutputStream& outstream)
       line_n++;
       verbose_printf("Parsing line %u...\n", line_n);
       char* orig_line = hfst_strdup(line);
+      if (strchr(line, '\r') != 0)
+        {
+          char* cr = strchr(line, '\r');
+          if (*(cr + 1) == '\n')
+            {
+              error_at_line(EXIT_FAILURE, 0, inputfilename, line_n,
+                            "There was a WINDOWS line ending!\n"
+                            "Please use dos2unix or fromdos to fix it");
+            }
+        }
       // parse line end and weight
       char* tab = strstr(line, "\t");
       char* string_end = tab;
@@ -261,13 +271,13 @@ process_stream(HfstOutputStream& outstream)
         }
       else
         {
-      // change '\n' to '\0'
-      char *p = tab;
-      while (*p != '\0') {
-        if (*p == '\n')
-          *p = '\0';
-        p++;
-      }
+          // change '\n' to '\0'
+          char *p = tab;
+          while (*p != '\0') {
+            if (*p == '\n')
+              *p = '\0';
+            p++;
+          }
 
           weight = hfst_strtoweight(tab+1);
           weighted = true;
