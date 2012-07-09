@@ -162,7 +162,8 @@ namespace hfst
   {
       char byte_1 = stream_get();
       char byte_2 = stream_get();
-      return  i = (((unsigned short) byte_2) << 8) + ((unsigned short) byte_1);
+      return  i = (unsigned short)
+          (((unsigned char) byte_2) << 8) + ((unsigned char) byte_1);
   }
 
   char HfstInputStream::stream_get()
