@@ -25,4 +25,5 @@ s/).//
 s/final(net_[a-z0-9]* //
 
 /#/,$ d
+/^symbol/ d
 '
