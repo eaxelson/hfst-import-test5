@@ -10,11 +10,19 @@ TESTS=english-numerals-test.sh \
 	numbers-to-numerals-test.sh finnish-numerals-test.sh \
 	einsteins-puzzle-test.sh esperanto-test.sh \
 	brazilian-portuguese1-test.sh \
-	brazilian-portuguese2-test.sh
-# finnish-ot-prosody.sh 
-# yale-shooting.sh - containment and cmplement are not developed, testing => rules
-# brazilian-portuguese1-test.sh - xfst has OTHER - not comparable with hfst 
-# date-parser-test.sh
+	brazilian-portuguese2-test.sh monish-guesser-analyzer-test.sh
+ # better-cola-machine
+ # date-parser-test.sh
+ # finnish-ot-prosody.sh 
+ # finnish-prosody.sh
+ # lingala
+ # monish-analysis
+ # monish-guesser-analyzer
+ # palindromes - there is no xfst.script!
+ # plus-or-minus - missing <- , =>
+ # yale-shooting.sh - no "=>" rules
+
+
 
 EXTRA_DIST=xfst-att-to-hfst-att.sh remove-complement.sh test-example.sh \
 	foma-att-to-hfst-att.sh $(TESTS)
