@@ -50,18 +50,32 @@ word_form_and_tag_map = tagger_aux.get_pair_counter()
 entry_tag_map = tagger_aux.get_object_counter()
 
 # Maps (reversed_suffix,tag) to its count in training data.
-suffix_and_tag_count_map = tagger_aux.get_pair_counter()
+upper_suffix_and_tag_count_map = tagger_aux.get_pair_counter()
 
 # Maps reversed_suffix to its count in training data.
-suffix_count_map = tagger_aux.get_object_counter()
+upper_suffix_count_map = tagger_aux.get_object_counter()
 
 # Maps reversed_suffix to its count in training data. Each tag is
 # counted as many times as the corresponding word has suffixes of
 # length < MAX_SUFFIX_LENGTH.
-tag_count_map = tagger_aux.get_object_counter()
+upper_tag_count_map = tagger_aux.get_object_counter()
 
 # The total number of suffix occurrences in the training data.
-number_of_suffixes = 0.0
+number_of_upper_suffixes = 0.0
+
+# Maps (reversed_suffix,tag) to its count in training data.
+lower_suffix_and_tag_count_map = tagger_aux.get_pair_counter()
+
+# Maps reversed_suffix to its count in training data.
+lower_suffix_count_map = tagger_aux.get_object_counter()
+
+# Maps reversed_suffix to its count in training data. Each tag is
+# counted as many times as the corresponding word has suffixes of
+# length < MAX_SUFFIX_LENGTH.
+lower_tag_count_map = tagger_aux.get_object_counter()
+
+# The total number of suffix occurrences in the training data.
+number_of_lower_suffixes = 0.0
 
 # We loop through the file. line_number is the current line number in
 # the file.
@@ -122,14 +136,26 @@ for line in sys.stdin:
     # MAX_SUFFIX_LENGTH.
     word_maximal_suffix_length = min(len(rev_word_form),MAX_SUFFIX_LENGTH)
 
-    for i in range(0,word_maximal_suffix_length + 1):
+    if not word_form.islower():
+        for i in range(0,word_maximal_suffix_length + 1):
 
-        suffix = rev_word_form[:i]
+            suffix = rev_word_form[:i]
+            
+            upper_suffix_and_tag_count_map[tag][suffix] += 1.0
+            upper_suffix_count_map[suffix]              += 1.0
+            upper_tag_count_map[tag]                    += 1.0
+            number_of_upper_suffixes                    += 1.0
 
-        suffix_and_tag_count_map[tag][suffix] += 1.0
-        suffix_count_map[suffix]              += 1.0
-        tag_count_map[tag]                    += 1.0
-        number_of_suffixes                    += 1.0
+    else:
+        for i in range(0,word_maximal_suffix_length + 1):
+
+            suffix = rev_word_form[:i]
+            
+            lower_suffix_and_tag_count_map[tag][suffix] += 1.0
+            lower_suffix_count_map[suffix]              += 1.0
+            lower_tag_count_map[tag]                    += 1.0
+            number_of_lower_suffixes                    += 1.0
+
 
 # Compute and display the penalties for word form and tag
 # combinations.
@@ -137,30 +163,66 @@ tagger_aux.verbose_print("Storing lexical statistics.",verbose)
 tagger_aux.verbose_print("P(WORD_FORM | TAG)",verbose)
 
 print "START P(WORD_FORM | TAG)"
-tagger_aux.print_conditional_penalties(word_form_and_tag_map,entry_tag_map)
+tagger_aux.print_conditional_penalties(word_form_and_tag_map,
+                                       entry_tag_map,
+                                       "<word_and_tag>")
 print "STOP P(WORD_FORM | TAG)"
 
 # Compute and display the penalties for suffix and tag combinations.
-tagger_aux.verbose_print("P(SUFFIX_AND_TAG | SUFFIX)",verbose)
+tagger_aux.verbose_print("P(LOWER_SUFFIX_AND_TAG | LOWER_SUFFIX)",verbose)
 
-print "START P(SUFFIX_AND_TAG | SUFFIX)"
-tagger_aux.print_conditional_penalties(suffix_and_tag_count_map, 
-                                       suffix_count_map,True)
-print "STOP P(SUFFIX_AND_TAG | SUFFIX)"
+print "START P(LOWER_SUFFIX_AND_TAG | LOWER_SUFFIX)"
+tagger_aux.print_conditional_penalties(lower_suffix_and_tag_count_map, 
+                                       lower_suffix_count_map,
+                                       "<lower_suffix_and_tag>",
+                                       True)
+print "STOP P(LOWER_SUFFIX_AND_TAG | LOWER_SUFFIX)"
 
 # Compute and display the penalties for suffixes.
-tagger_aux.verbose_print("P(SUFFIX)",verbose)
+tagger_aux.verbose_print("P(LOWER_SUFFIX)",verbose)
 
-print "START P(SUFFIX)"
-tagger_aux.print_penalties(suffix_count_map, number_of_suffixes)
-print "STOP P(SUFFIX)"
+print "START P(LOWER_SUFFIX)"
+tagger_aux.print_penalties(lower_suffix_count_map, 
+                           number_of_lower_suffixes,
+                           "<lower_suffix>")
+print "STOP P(LOWER_SUFFIX)"
 
 # Compute and display the penalties for tags.
-tagger_aux.verbose_print("P(TAG)",verbose)
-print "START P(TAG)"
-number_of_tags = number_of_suffixes
-tagger_aux.print_penalties(tag_count_map, number_of_suffixes)
-print "STOP P(TAG)"
+tagger_aux.verbose_print("P(LOWER_TAG)",verbose)
+print "START P(LOWER_TAG)"
+number_of_lower_tags = number_of_lower_suffixes
+tagger_aux.print_penalties(lower_tag_count_map, 
+                           number_of_lower_suffixes,
+                           "<lower_tag>")
+print "STOP P(LOWER_TAG)"
+
+
+# Compute and display the penalties for suffix and tag combinations.
+print "START P(UPPER_SUFFIX_AND_TAG | UPPER_SUFFIX)"
+tagger_aux.print_conditional_penalties(upper_suffix_and_tag_count_map, 
+                                       upper_suffix_count_map,
+                                       "<upper_suffix_and_tag>",
+                                       True)
+print "STOP P(UPPER_SUFFIX_AND_TAG | UPPER_SUFFIX)"
+
+# Compute and display the penalties for suffixes.
+tagger_aux.verbose_print("P(UPPER_SUFFIX)",verbose)
+
+print "START P(UPPER_SUFFIX)"
+tagger_aux.print_penalties(upper_suffix_count_map, 
+                           number_of_upper_suffixes,
+                           "<upper_suffix>")
+print "STOP P(UPPER_SUFFIX)"
+
+# Compute and display the penalties for tags.
+tagger_aux.verbose_print("P(UPPER_TAG)",verbose)
+print "START P(UPPER_TAG)"
+number_of_tags = number_of_upper_suffixes
+tagger_aux.print_penalties(upper_tag_count_map, 
+                           number_of_upper_suffixes,
+                           "<upper_tag>")
+print "STOP P(UPPER_TAG)"
+
 
 ## CONSTRUCT TAG SEQUENCE TABLE.
 
@@ -225,21 +287,24 @@ tagger_aux.verbose_print("Storing sequence statistics.",verbose)
 tagger_aux.verbose_print("P(T_1, T_2, T_3 | T_1, T_2)",verbose)
 print "START P(T_1, T_2, T_3 | T_1, T_2)"
 tagger_aux.print_conditional_penalties(trigram_enumerator_counter,
-                                       trigram_denominator_counter)
+                                       trigram_denominator_counter,
+                                       "")
 print "STOP P(T_1, T_2, T_3 | T_1, T_2)"
 
 # Compute and display the penalties for suffix and tag combinations.
 tagger_aux.verbose_print("P(T_1, T_2 | T_1)",verbose)
 print "START P(T_1, T_2 | T_1)"
 tagger_aux.print_conditional_penalties(bigram_enumerator_counter,
-                                       bigram_denominator_counter)
+                                       bigram_denominator_counter,
+                                       "")
 print "STOP P(T_1, T_2 | T_1)"
 
 # Compute and display the penalties for suffixes.
 tagger_aux.verbose_print("P(T_1)",verbose)
 print "START P(T_1)"
 tagger_aux.print_conditional_penalties(unigram_enumerator_counter,
-                                       unigram_denominator_counter)
+                                       unigram_denominator_counter,
+                                       "")
 print "STOP P(T_1)"
 
 

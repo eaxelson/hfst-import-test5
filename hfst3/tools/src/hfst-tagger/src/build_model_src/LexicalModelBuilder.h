@@ -30,6 +30,7 @@
 #include "HfstTransducer.h"
 
 using hfst::HfstTransducer;
+using hfst::HfstOutputStream;
 
 #include "ModelBuilder.h"
 
@@ -49,6 +50,7 @@ class LexicalModelBuilder
   typedef std::vector<HfstTransducer> TransducerVector;
   TransducerVector model_vector;
 
+  void store(HfstOutputStream &out, const std::string &file_name);
 };
 
 #endif // HEADER_LEXICAL_MODEL_BUILDER_H
