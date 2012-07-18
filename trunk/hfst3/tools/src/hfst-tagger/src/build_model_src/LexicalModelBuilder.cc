@@ -6,7 +6,11 @@ using hfst::HfstOutputStream;
 using hfst::HFST_OLW_TYPE;
 using hfst::TROPICAL_OPENFST_TYPE;
 
-#define NUMBER_OF_LEXICAL_MODELS 4
+// The models are P(word | tag), P(lower_case_suffix_tag |
+// lower_case_suffix), P(lower_case_suffix), P(lower_case_suffix_tag),
+// P(upper_case_suffix_tag | upper_case_suffix), P(upper_case_suffix)
+// and P(upper_case_suffix_tag)
+#define NUMBER_OF_LEXICAL_MODELS 7
 
 LexicalModelBuilder::LexicalModelBuilder(std::istream &in)
 {
@@ -18,47 +22,44 @@ LexicalModelBuilder::LexicalModelBuilder(std::istream &in)
     }
 }
 
-void LexicalModelBuilder::store(const std::string &file_name)
+void LexicalModelBuilder::store(HfstOutputStream &out, const std::string &file_name)
 {
-  HfstOutputStream out(file_name,HFST_OLW_TYPE);
-
   HfstTransducer lexical_model(TROPICAL_OPENFST_TYPE);
 
-  ModelBuilder::verbose_printf("Disjuncting lexical models and transforming "
-			       "to optimized format.\n");
+  ModelBuilder::verbose_printf("Disjuncting the lexical sub models.\n");
 
   for (TransducerVector::iterator it = model_vector.begin();
        it != model_vector.end();
        ++it)
     { lexical_model.disjunct(*it); }
   
+  ModelBuilder::verbose_printf("Minimizing the lexical model.\n");
+
+  lexical_model.minimize();
+
+  ModelBuilder::verbose_printf("Transforming the lexical model to "
+			       "optimized format.\n");
+
   lexical_model.convert(HFST_OLW_TYPE); 
  
-  ModelBuilder::verbose_printf(std::string("Storing lexical model in") +
+  ModelBuilder::verbose_printf(std::string("Storing the lexical model in") +
 			       file_name + ".\n");
  
   out << lexical_model;
 }
 
+void LexicalModelBuilder::store(const std::string &file_name)
+{
+  HfstOutputStream out(file_name,HFST_OLW_TYPE);
+
+  store(out,file_name);
+}
+
 void LexicalModelBuilder::store(void)
 {
   HfstOutputStream out(HFST_OLW_TYPE);
-
-  HfstTransducer lexical_model(TROPICAL_OPENFST_TYPE);
-
-  ModelBuilder::verbose_printf("Disjuncting lexical models and transforming "
-			       "to optimized format.\n");
-
-  for (TransducerVector::iterator it = model_vector.begin();
-       it != model_vector.end();
-       ++it)
-    { lexical_model.disjunct(*it); }
   
-  lexical_model.convert(HFST_OLW_TYPE); 
- 
-  ModelBuilder::verbose_printf("Storing lexical model in <stdout>.\n");
- 
-  out << lexical_model;
+  store(out,"<stdout>");
 }
 
 #else // MAIN_TEST

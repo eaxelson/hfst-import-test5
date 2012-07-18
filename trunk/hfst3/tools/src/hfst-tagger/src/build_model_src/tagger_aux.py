@@ -129,7 +129,7 @@ def get_penalty_map(object_counter, total_count):
 
     return penalty_map
 
-def print_conditional_penalties(pair_counter, object_counter, 
+def print_conditional_penalties(pair_counter, object_counter, appended_suffix,
                                 invert_fields=False):
 
     penalty_map = get_conditional_penalty_map(pair_counter, object_counter) 
@@ -138,18 +138,22 @@ def print_conditional_penalties(pair_counter, object_counter,
         if type(pair[0]) == type(u"") or type(pair[0]) == type(""):
 
             if not invert_fields:
-                print string.join([pair[0], pair[1], str(penalty)],"\t")
+                print string.join([pair[0] + appended_suffix, 
+                                   pair[1], 
+                                   str(penalty)],"\t")
             else:
-                print string.join([pair[1], pair[0], str(penalty)],"\t")
+                print string.join([pair[1] + appended_suffix, 
+                                   pair[0], 
+                                   str(penalty)],"\t")
         else:
             for entry in pair[0]:
                 print entry[0] + "\t" + entry[1] + "\t",
             print penalty
 
-def print_penalties(object_counter, total_count):
+def print_penalties(object_counter, total_count, appended_suffix):
 
     penalty_map = get_penalty_map(object_counter, total_count) 
 
     for object, penalty in penalty_map.iteritems():
-        print object + "\t" + str(penalty)
+        print object + appended_suffix + "\t" + str(penalty)
 
