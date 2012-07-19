@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include <hfst/HfstTransducer.h>
+#include "HfstTransducer.h"
 
 using hfst::HfstTransducer;
 using hfst::StringVector;
