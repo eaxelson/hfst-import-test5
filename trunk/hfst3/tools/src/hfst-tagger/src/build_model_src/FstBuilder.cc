@@ -42,9 +42,28 @@ void FstBuilder::add_transition
 			   (target_state,isymbol,osymbol,weight)); 
 }
 
+bool FstBuilder::has_target(HfstState s, const std::string &symbol)
+{
+  if (s == START_STATE)
+    { return start_state_targets.count(symbol) != 0; }
+
+  const HfstBasicTransducer::HfstTransitions &transitions = model_fst[s];
+
+  for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
+	 transitions.begin();
+       it != transitions.end();
+       ++it)
+    {
+      if (it->get_input_symbol() == symbol)
+	{ return true; }
+    }
+
+  return false;
+}
+
 HfstState FstBuilder::get_target(HfstState s,
-				   const std::string &symbol,
-				   bool &new_transition_required)
+				 const std::string &symbol,
+				 bool &new_transition_required)
 {
   HfstState target = NO_STATE;
 

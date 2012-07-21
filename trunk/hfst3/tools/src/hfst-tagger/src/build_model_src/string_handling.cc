@@ -80,7 +80,7 @@ WeightedStringVector tokenize_lexicon_line(const std::string &line,
     }
 
   StringVector entry = tokenizer.tokenize_one_level(word);
-  
+
   if (tag != "")
     { entry.push_back(tag); }
 
@@ -140,6 +140,15 @@ std::string read_model_stop_tag(const std::string &line)
     { throw InvalidLine(__FILE__ " " STR(__LINE__)); }
 
   return model_name;
+}
+
+float read_model_penalty_weight(const std::string &line)
+{
+  if (line.find("PENALTY_WEIGHT=") != 0)
+    { throw InvalidLine(line); }
+
+  return get_non_negative_float
+    (line.substr(std::string("PENALTY_WEIGHT=").size()));
 }
 
 #else // MAIN_TEST was defined

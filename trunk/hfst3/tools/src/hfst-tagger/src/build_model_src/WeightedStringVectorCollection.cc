@@ -19,6 +19,13 @@ WeightedStringVectorCollection::WeightedStringVectorCollection
 {
   this->name = read_model_start_tag(getline(in));
   
+  if (not is_lexical_model)
+    { 
+      this->penalty_weight = read_model_penalty_weight(getline(in)); 
+    }
+
+
+
   if (in.peek() == EOF)
     { throw EmptyFile(); }
 
@@ -82,6 +89,9 @@ WeightedStringVectorCollection::end(void)
 
 const std::string &WeightedStringVectorCollection::get_name(void) const
 { return this->name; }
+
+float WeightedStringVectorCollection::get_penalty_weight(void) const
+{ return this->penalty_weight; }
 
 #else // MAIN_TEST
 

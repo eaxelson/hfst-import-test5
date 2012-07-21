@@ -6,6 +6,8 @@ using hfst::internal_epsilon;
 
 using hfst::TROPICAL_OPENFST_TYPE;
 
+#define DEFAULT_SYMBOL "<NONE>"
+
 bool ModelBuilder::verbose=false;
 
 void ModelBuilder::verbose_printf(const std::string &message)
@@ -18,7 +20,8 @@ ModelBuilder::ModelBuilder
 (const WeightedStringVectorCollection &model_weights):
   FstBuilder(TROPICAL_OPENFST_TYPE,
 	     std::numeric_limits<float>::infinity(),
-	     model_weights.get_name())
+	     model_weights.get_name()),
+  depth(0)
 {
   for (WeightedStringVectorCollection::const_iterator it = 
 	 model_weights.begin();
@@ -28,12 +31,18 @@ ModelBuilder::ModelBuilder
       add_sequence(*it,
 		   (model_weights.is_lexical_model ? LEXICAL : SEQUENCE)); 
     }
+
+  if (not model_weights.is_lexical_model)
+    { complete_model(model_weights.get_penalty_weight()); }
 }
 
 void ModelBuilder::add_sequence(const WeightedStringVector &v,
 				weighted_string_type string_type)
 {
   StringVector symbol_sequence = v.string_vector;
+
+  this->depth = symbol_sequence.size();
+
   float weight = v.weight;
 
   // This should only happen once with the prob of the empty suffix.
@@ -55,12 +64,74 @@ void ModelBuilder::add_sequence(const WeightedStringVector &v,
     ((string_type == LEXICAL) ? model_fst.add_state() : START_STATE);
 
   FstBuilder::add_transition(target_state,
-			       final_state,
-			       last_input_symbol,
-			       last_output_symbol,
-			       weight);
+			     final_state,
+			     last_input_symbol,
+			     last_output_symbol,
+			     weight);
 
   model_fst.set_final_weight(final_state,0.0);
+}
+
+void ModelBuilder::complete_model
+(HfstState s,
+ StateVector::const_iterator default_state_vector_it,
+ float penalty_weight)
+{
+  const HfstBasicTransducer::HfstTransitions &transitions = model_fst[s];
+  
+  for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
+	 transitions.begin();
+       it != transitions.end();
+       ++it)
+    {
+      if (it->get_target_state() == START_STATE)
+	{ continue; }
+
+      complete_model(it->get_target_state(),
+		     default_state_vector_it + 1,
+		     penalty_weight);
+    }
+
+  if (not FstBuilder::has_target(s,DEFAULT_SYMBOL))
+    {
+      FstBuilder::add_transition(s,
+				 *default_state_vector_it,
+				 DEFAULT_SYMBOL,
+                                 DEFAULT_SYMBOL,
+				 (*default_state_vector_it == START_STATE ?
+				  penalty_weight :
+				  0.0));
+    }
+}
+
+void ModelBuilder::complete_model(float penalty_weight)
+{
+  StateVector default_states;
+
+  for (size_t i = 1; i < depth; ++i)
+    { 
+      default_states.push_back(model_fst.add_state()); 
+    }
+
+  default_states.push_back(START_STATE);
+
+  for (size_t i = 0; i < depth - 1; ++i)
+    {
+      FstBuilder::add_transition(default_states[i],
+				 default_states[i+1],
+				 DEFAULT_SYMBOL,
+				 DEFAULT_SYMBOL,
+				 (default_states[i+1] == START_STATE ? 
+				  penalty_weight :
+				  0.0));
+    }
+
+
+
+  complete_model(START_STATE,
+		 default_states.begin(),
+  		 penalty_weight);
+
 }
 
 #else // MAIN_TEST

@@ -87,12 +87,15 @@ class WeightedStringVectorCollection
   //! Return the name of the training data.
   const std::string &get_name(void) const;
 
+  float get_penalty_weight(void) const;
+
  private:
   static size_t line_number;
 
   HfstTokenizer tokenizer;
   WeightedStringVectorVector data;
   std::string name;
+  float penalty_weight;
 
   std::string getline(std::istream &in);
 };

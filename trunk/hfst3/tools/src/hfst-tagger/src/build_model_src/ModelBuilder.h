@@ -32,6 +32,8 @@
 
 #include "WeightedStringVectorCollection.h"
 
+typedef std::vector<HfstState> StateVector;
+
 class ModelBuilder : public FstBuilder
 {
  public:
@@ -49,6 +51,14 @@ class ModelBuilder : public FstBuilder
 
   void add_sequence(const WeightedStringVector &v,
 		    weighted_string_type string_type);
+
+  size_t depth;
+
+  void complete_model(float penalty_weight);
+
+  void complete_model(HfstState s,
+		      StateVector::const_iterator default_state_vector_it,
+		      float penalty_weight);
 };
 
 #endif // HEADER_MODEL_BUILDER_H

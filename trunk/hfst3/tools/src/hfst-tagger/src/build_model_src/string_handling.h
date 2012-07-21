@@ -69,4 +69,7 @@ std::string read_model_start_tag(const std::string &line);
 // FOO". FOO can't contain tabs.
 std::string read_model_stop_tag(const std::string &line);
 
+// Read the penalty weight X as a float from string "PENALTY_WEIGHT=X". 
+float read_model_penalty_weight(const std::string &line);
+
 #endif // HEADER_STRING_HANDLING_H
