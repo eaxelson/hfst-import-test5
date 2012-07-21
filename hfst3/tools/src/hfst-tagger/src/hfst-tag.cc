@@ -160,14 +160,12 @@ void print_analysis(const WeightedStringPairVector &res,std::ostream * out)
       if (std::string(it->first) == "||")
 	{ continue; }
 
-      if (out == NULL)
-	{ std::cout << it->first << "\t" << it->second << std::endl; }
-      else
-	{ (*out) << it->first << "\t" << it->second << std::endl; }
+      (out == NULL ? std::cout : *out) << it->first << "\t" << it->second 
+				       << std::endl;
     }
 
   // Print an empty line at the end to signal sentence boundary.
-  (*out) << std::endl;
+  (out == NULL ? std::cout : *out) << std::endl;
 }
 
 int main(int argc, char * argv[])
@@ -185,7 +183,7 @@ int main(int argc, char * argv[])
 
   std::ostream * out = NULL;
 
-  if (output_file_name == "<stdout>")
+  if (output_file_name != "<stdout>")
     { out = new std::ofstream(output_file_name.c_str()); }
 
   while (std::cin.peek() != EOF)
@@ -197,5 +195,5 @@ int main(int argc, char * argv[])
 
   delete out;
 
-  return EXIT_CONTINUE;
+  return EXIT_SUCCESS;
 }
