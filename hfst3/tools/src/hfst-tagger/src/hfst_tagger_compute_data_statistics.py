@@ -40,6 +40,13 @@ if re.search("-v[^\w]",arg_string) != None or \
    re.search("--verbose[^\w]",arg_string) != None:
     verbose = True
 
+tagger_aux.verbose_print("Parsing config file hfst_tagger_config.", verbose)
+
+statistics_patterns = tagger_aux.read_config_file("hfst_tagger_config")
+
+counters = [ [tagger_aux.get_pair_counter(), tagger_aux.get_object_counter()] 
+             for pattern in statistics_patterns ]
+
 # Read from stdin.
 tagger_aux.verbose_print("Reading input file.",verbose)
 
@@ -230,91 +237,46 @@ print "STOP P(UPPER_TAG)"
 
 ## CONSTRUCT TAG SEQUENCE TABLE.
 
-# Typical HMM simplifiers.
-trigram_enumerator = [[0,1], [0,1], [0,1]]
-trigram_denominator = [[0,1], [0,1], [0,0]]
-trigram_enumerator_simplifier = tagger_aux.SequenceSimplifier\
-    (trigram_enumerator)
-trigram_denominator_simplifier = tagger_aux.SequenceSimplifier\
-    (trigram_denominator)
-trigram_enumerator_counter = tagger_aux.get_pair_counter()
-trigram_denominator_counter = tagger_aux.get_object_counter()
-
-bigram_enumerator = [[0,1], [0,1]]
-bigram_denominator = [[0,1], [0,0]]
-bigram_enumerator_simplifier = tagger_aux.SequenceSimplifier(bigram_enumerator)
-bigram_denominator_simplifier = tagger_aux.SequenceSimplifier\
-    (bigram_denominator)
-bigram_enumerator_counter = tagger_aux.get_pair_counter()
-bigram_denominator_counter = tagger_aux.get_object_counter()
-
-unigram_enumerator = [[0,1]]
-unigram_denominator = [[0,0]]
-unigram_enumerator_simplifier = tagger_aux.SequenceSimplifier\
-    (unigram_enumerator)
-unigram_denominator_simplifier = tagger_aux.SequenceSimplifier\
-    (unigram_denominator)
-unigram_enumerator_counter = tagger_aux.get_pair_counter()
-unigram_denominator_counter = tagger_aux.get_object_counter()
-
 tagger_aux.verbose_print("Computing sequence statistics.",verbose)
 for i in range(len(sequence)):
 
     try:
 
-        trigram_enumerator_counter \
-            [trigram_enumerator_simplifier.simplify(i,sequence)] \
-            [trigram_denominator_simplifier.simplify(i,sequence)] += 1.0
+        for j in range(len(statistics_patterns)):
 
-        trigram_denominator_counter \
-            [trigram_denominator_simplifier.simplify(i,sequence)] += 1.0
+            num_simplified_seq = \
+                statistics_patterns[j].numerator.simplify(i,sequence)
 
-        bigram_enumerator_counter \
-            [bigram_enumerator_simplifier.simplify(i,sequence)] \
-            [bigram_denominator_simplifier.simplify(i,sequence)] += 1.0
+            den_simplified_seq = \
+                statistics_patterns[j].denominator.simplify(i,sequence)
 
-        bigram_denominator_counter \
-            [bigram_denominator_simplifier.simplify(i,sequence)] += 1.0
+            counters[j][0][num_simplified_seq][den_simplified_seq] += 1.0
+            counters[j][1][den_simplified_seq]                     += 1.0
 
-        unigram_enumerator_counter \
-            [unigram_enumerator_simplifier.simplify(i,sequence)] \
-            [unigram_denominator_simplifier.simplify(i,sequence)] += 1.0
-
-        unigram_denominator_counter \
-            [unigram_denominator_simplifier.simplify(i,sequence)] += 1.0
-    
     except tagger_aux.ReachesSequenceEnd:
 
         break
 
 tagger_aux.verbose_print("Storing sequence statistics.",verbose)
-tagger_aux.verbose_print("P(T_1, T_2, T_3 | T_1, T_2)",verbose)
-print "START SEQUENCE-MODEL:N=3 P(T_1, T_2, T_3 | T_1, T_2)"
-tagger_aux.print_conditional_penalties(trigram_enumerator_counter,
-                                       trigram_denominator_counter,
-                                       "",
-                                       False,
-                                       True)
-print "STOP SEQUENCE-MODEL:N=3 P(T_1, T_2, T_3 | T_1, T_2)"
 
-# Compute and display the penalties for suffix and tag combinations.
-tagger_aux.verbose_print("P(T_1, T_2 | T_1)",verbose)
-print "START SEQUENCE-MODEL:N=2 P(T_1, T_2 | T_1)"
-tagger_aux.print_conditional_penalties(bigram_enumerator_counter,
-                                       bigram_denominator_counter,
-                                       "",
-                                       False,
-                                       True)
-print "STOP SEQUENCE-MODEL:N=2 P(T_1, T_2 | T_1)"
+for i in range(len(statistics_patterns)):
+    tagger_aux.verbose_print(statistics_patterns[i].name,verbose)
 
-# Compute and display the penalties for suffixes.
-tagger_aux.verbose_print("P(T_1)",verbose)
-print "START SEQUENCE-MODEL:N=1 P(T_1)"
-tagger_aux.print_conditional_penalties(unigram_enumerator_counter,
-                                       unigram_denominator_counter,
-                                       "",
-                                       False,
-                                       True)
-print "STOP SEQUENCE-MODEL:N=1 P(T_1)"
+    model_order_tag = \
+        "SEQUENCE-MODEL:N=" + str(statistics_patterns[i].order + 1)
+
+    start_tag = "START " + model_order_tag + " " + statistics_patterns[i].name
+    stop_tag  = "STOP "  + model_order_tag + " " + statistics_patterns[i].name
+
+    print start_tag
+
+    tagger_aux.print_conditional_penalties(counters[i][0], 
+                                           counters[i][1],
+                                           "",
+                                           False,
+                                           True)
+
+    print stop_tag
+
 
 
