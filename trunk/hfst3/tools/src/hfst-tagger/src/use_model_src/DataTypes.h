@@ -32,7 +32,7 @@ typedef std::tr1::unordered_map<std::string,IdWeightPair> StringWeightMap;
 
 typedef std::tr1::unordered_map<std::string,float> ProbabilityMap;
 
-#define DEFAULT_SYMBOL "<DEFAULT>"
+#define DEFAULT_SYMBOL "<NONE>"
 #define DEFAULT 1
 
 class InvalidState

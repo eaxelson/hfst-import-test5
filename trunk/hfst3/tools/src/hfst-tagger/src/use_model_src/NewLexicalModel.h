@@ -30,7 +30,8 @@ class NewLexicalModel
   bool is_oov(const std::string &word);
   bool is_lexicon_oov(const std::string &word);
  private:
-  typedef std::tr1::unordered_map<std::string,WeightedStringVector> AnalysisCache;
+  typedef std::tr1::unordered_map<std::string,WeightedStringVector> 
+    AnalysisCache;
 
   AnalysisCache   analysis_cache;  
   AnalysisCache   upper_case_suffix_cache;  

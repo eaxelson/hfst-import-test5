@@ -146,7 +146,10 @@ TransitionData SequenceModelComponent::get_transition(State state,
   if (symbol_to_transition.count(symbol) == 0)
     { 
       if (symbol_to_transition.count(DEFAULT) == 0)
-	{ throw InvalidKey(); }
+	{ 
+	  std::cerr << state << " " << symbol << std::endl;
+	  throw InvalidKey(); 
+	}
       
       // Can't use the regular []-operator, since symbol_to_transition
       // is const.
@@ -191,7 +194,7 @@ int main(void)
   fst.add_transition(2,HfstBasicTransition(1,"b","b",1.3));
   fst.add_transition(1,HfstBasicTransition(0,"b","b",1.4));
 
-  // Add an extra <DEFAULT>-transition from state 1 to state 2.
+  // Add an extra <NONE>-transition from state 1 to state 2.
   fst.add_transition(1,HfstBasicTransition(2,
 					   DEFAULT_SYMBOL,
 					   DEFAULT_SYMBOL,
