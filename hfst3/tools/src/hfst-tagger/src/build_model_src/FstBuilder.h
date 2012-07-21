@@ -76,6 +76,9 @@ class FstBuilder
 		      const std::string &osymbol,
 		      float weight);
 
+  bool has_target(HfstState s,
+		  const std::string &symbol);
+
   HfstState get_target(HfstState s,
 		       const std::string &symbol, 
 		       bool &new_transition_required);
