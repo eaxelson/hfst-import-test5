@@ -22,10 +22,10 @@ NewLexicalModel::NewLexicalModel(const std::string &filename, std::istream * par
 void NewLexicalModel::initialize_tag_probabilities(void)
 {
   HfstOneLevelPaths * upper_case_tag_paths = 
-    lexical_model.lookup("<guess_tag_uc>");
+    lexical_model.lookup("<upper_suffix_and_tag>");
 
   HfstOneLevelPaths * lower_case_tag_paths = 
-    lexical_model.lookup("<guess_tag_lc>");
+    lexical_model.lookup("<lower_suffix_and_tag>");
 
   if (upper_case_tag_paths->empty())
     { lexical_model_is_broken = true; }
@@ -357,7 +357,7 @@ const WeightedStringVector &NewLexicalModel::cache_suffix_analyses
  
 
   StringVector guess_string_vector(begin,end);
-  guess_string_vector.push_back(upper_case ? "<guess_uc>" : "<guess_lc>");
+  guess_string_vector.push_back(upper_case ? "<upper_suffix_and_tag>" : "<lower_suffix_and_tag>");
   
   HfstOneLevelPaths * paths = lexical_model.lookup(guess_string_vector);
 
@@ -430,10 +430,11 @@ float NewLexicalModel::get_suffix_penalty(const std::string &suffix,
   if (it == (upper_case ? upper_case_suffix_penalties.end() : lower_case_suffix_penalties.end()))
     {
       HfstOneLevelPaths * suffix_penalty_paths = 
-	lexical_model.lookup(suffix + (upper_case ? "<wf_uc>" : "<wf_lc>"));
+	lexical_model.lookup(suffix + (upper_case ? "<upper_suffix>" : "<lower_suffix>"));
       
       if (suffix_penalty_paths->empty())
 	{ 
+	  std::cerr <<  suffix << std::endl;
 	  delete suffix_penalty_paths;
 	  throw InvalidKey(); 
 	}

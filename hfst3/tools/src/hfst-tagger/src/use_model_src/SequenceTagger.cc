@@ -196,17 +196,17 @@ int main(void)
   b_a.add_state();
   b_a.add_state();
 
-  b_a.add_transition(0,HfstBasicTransition(1,"<DEFAULT>","<DEFAULT>",0.0));
+  b_a.add_transition(0,HfstBasicTransition(1,DEFAULT_SYMBOL,DEFAULT_SYMBOL,0.0));
 
   b_a.add_transition(1,HfstBasicTransition(2,"A","A",1.0));
   b_a.add_transition(1,HfstBasicTransition(2,"B","B",10.0));
-  b_a.add_transition(1,HfstBasicTransition(2,"<DEFAULT>","<DEFAULT>",10.0));
+  b_a.add_transition(1,HfstBasicTransition(2,DEFAULT_SYMBOL,DEFAULT_SYMBOL,10.0));
 
-  b_a.add_transition(2,HfstBasicTransition(3,"<DEFAULT>","<DEFAULT>",0.0));
+  b_a.add_transition(2,HfstBasicTransition(3,DEFAULT_SYMBOL,DEFAULT_SYMBOL,0.0));
 
   b_a.add_transition(3,HfstBasicTransition(0,"A","A",10.0));
   b_a.add_transition(3,HfstBasicTransition(0,"B","B",2.0));
-  b_a.add_transition(3,HfstBasicTransition(0,"<DEFAULT>","<DEFAULT>",10.0));
+  b_a.add_transition(3,HfstBasicTransition(0,DEFAULT_SYMBOL,DEFAULT_SYMBOL,10.0));
 
   for (HfstState s = 0; s <= b_a.get_max_state(); ++s)
     { b_a.set_final_weight(s,0.0); }
