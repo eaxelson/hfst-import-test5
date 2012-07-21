@@ -1,4 +1,4 @@
-//! @file hfst-tag.cc
+//! @file hfst-reweight-tagger.cc
 //!
 //! @brief Transducer array printing command line tool
 //!
@@ -23,6 +23,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include <cstdio>
 #include <cstdlib>
@@ -38,16 +39,21 @@
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
 
-#include "use_model_src/SentenceTagger.h"
+typedef std::vector<float> FloatVector;
 
-SentenceTagger * tagger = NULL;
+using hfst::HfstInputStream;
+using hfst::HfstOutputStream;
+using hfst::HfstTransducer;
+using hfst::HFST_OLW_TYPE;
+using hfst::TROPICAL_OPENFST_TYPE;
 
 void
 print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-        "Tag a text file given from stdin using an hfst tagger.\n"
+	    "Reweight a tagger accoring to a configuration file\n"
+	    "hfst_tagger_config.\n"
         "\n", program_name);
 
     print_common_program_options(message_out);
@@ -98,74 +104,109 @@ parse_options(int argc, char** argv)
     return EXIT_CONTINUE;
 }
 
-int process_input_data(std::string tagger_file_prefix)
-{
-  // Read fst files from stdin.
-  verbose_printf("Read tagger.");
+float coeff;
 
-  tagger = new SentenceTagger(tagger_file_prefix + ".lex",
-			      tagger_file_prefix + ".seq");
-      
+float reweight(float w)
+{ return coeff*w; }
+
+void reweight_fst(HfstInputStream &in,
+		  HfstOutputStream &out,
+		  float coefficient)
+{
+  HfstTransducer fst(in);
+  coeff = coefficient;
+  fst.transform_weights(&reweight);
+  out << fst;
+}
+
+int process_input_data(const std::string &tagger_file_name,
+		       const std::string &output_file_name,
+		       const FloatVector &coefficients)
+{
+  // Read sequence model fsts and reweight.
+  verbose_printf("Reading models and rewighting.");
+
+  HfstInputStream seq_in(tagger_file_name + ".seq");
+
+  if (not seq_in.is_good())
+    { error(EXIT_FAILURE, 0, "Sequence model file cannot be opened."); }
+
+  HfstOutputStream seq_out(output_file_name + ".seq",TROPICAL_OPENFST_TYPE);
+  
+  for (FloatVector::const_iterator it = coefficients.begin();
+       it != coefficients.end();
+       ++it)
+    {
+      if (not seq_in.is_good())
+	{ error(EXIT_FAILURE, 0, "Config file has too many patterns."); }
+
+      reweight_fst(seq_in, seq_out, *it);
+    }
+
+  if (seq_in.is_good())
+    { error(EXIT_FAILURE, 0, "Config file has too few patterns."); }
+
+  // Rename lexicon.
+  HfstInputStream lex_in(tagger_file_name + ".lex");
+
+  if (not lex_in.is_good())
+    { error(EXIT_FAILURE, 0, "Lexical model file cannot be opened."); }
+
+  HfstTransducer lex(lex_in);
+
+  HfstOutputStream lex_out(output_file_name + ".lex",
+			   HFST_OLW_TYPE);
+  lex_out << lex;
+
   return EXIT_SUCCESS;
 }
 
-StringVector get_sentence_vector(void)
+float get_coefficient(const std::string &line)
 {
-  StringVector sentence_vector;
-
-  // Add initial buffer symbols.
-  sentence_vector.push_back("||");
-  sentence_vector.push_back("||");
-
-  std::string word;
+  size_t last_tab_pos = line.find_last_of('\t');
   
-  bool read_non_empty_word = false;
+  if (last_tab_pos == std::string::npos)
+    { return -1; }
 
-  while (std::cin.peek() != EOF)
-    {
-      std::getline(std::cin,word);
+  std::istringstream in(line.substr(last_tab_pos));
 
-      // Skip initial empty lines. The first empty line preceeded by a
-      // non emtpy line marks the end of the sentence.
-      if (word == "")
-	{
-	  if (read_non_empty_word)
-	    { break; }
-	  else
-	    { continue; }
-	}
-      
-      read_non_empty_word = true;
+  float coefficient;
 
-      sentence_vector.push_back(word);
-    }
+  in >> coefficient;
 
-  // Add final buffer symbols.
-  sentence_vector.push_back("||");
-  sentence_vector.push_back("||");
+  if (in.fail())
+    { return -1; }
 
-  return sentence_vector;
+  return coefficient;
 }
 
-void print_analysis(const WeightedStringPairVector &res,std::ostream * out)
-{
-  const StringPairVector &v = res.second;
+FloatVector parse_coefficients(void)
+{ 
+  std::ifstream coeff_in("hfst_tagger_config");
 
-  for (StringPairVector::const_iterator it = v.begin();
-       it != v.end();
-       ++it)
+  if (coeff_in.peek() == EOF)
+    { error(EXIT_FAILURE, 0, "Couldn't open configuration file."); }
+
+  FloatVector coefficients;
+
+  while (coeff_in.peek() != EOF)
     {
-      // Skip buffer symbols, since the user doesn't want to see
-      // those.
-      if (std::string(it->first) == "||")
+      std::string line;
+
+      std::getline(coeff_in,line);
+      
+      if (line == "")
 	{ continue; }
 
-      (out == NULL ? std::cout : *out) << it->first << "\t" << it->second 
-				       << std::endl;
+      float coefficient = get_coefficient(line);
+
+      if (coefficient == -1)
+	{ error(EXIT_FAILURE, 0, "Invalid configuration file."); }
+
+      coefficients.push_back(coefficient);
     }
 
-  // Print an empty line at the end to signal sentence boundary.
-  (out == NULL ? std::cout : *out) << std::endl;
+  return coefficients;
 }
 
 int main(int argc, char * argv[])
@@ -179,21 +220,12 @@ int main(int argc, char * argv[])
   if (tagger_file_name == "<stdin>")
     { error(EXIT_FAILURE, 0, "Tagger cannot be given in STDIN."); }
 
-  process_input_data(tagger_file_name);
+  if (output_file_name == "<stdout>")
+    { error(EXIT_FAILURE, 0, "Output file cannot be STDOUT."); }
 
-  std::ostream * out = NULL;
+  FloatVector coefficients = parse_coefficients();
 
-  if (output_file_name != "<stdout>")
-    { out = new std::ofstream(output_file_name.c_str()); }
-
-  while (std::cin.peek() != EOF)
-    {
-      StringVector v = get_sentence_vector();
-      WeightedStringPairVector res = (*tagger)[v];
-      print_analysis(res, out);
-    }
-
-  delete out;
+  process_input_data(tagger_file_name,output_file_name,coefficients);
 
   return EXIT_SUCCESS;
 }
