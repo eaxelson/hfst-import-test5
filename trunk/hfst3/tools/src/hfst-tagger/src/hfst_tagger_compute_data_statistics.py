@@ -165,7 +165,9 @@ tagger_aux.verbose_print("P(WORD_FORM | TAG)",verbose)
 print "START P(WORD_FORM | TAG)"
 tagger_aux.print_conditional_penalties(word_form_and_tag_map,
                                        entry_tag_map,
-                                       "<word_and_tag>")
+                                       "",
+                                       False,
+                                       False)
 print "STOP P(WORD_FORM | TAG)"
 
 # Compute and display the penalties for suffix and tag combinations.
@@ -175,7 +177,8 @@ print "START P(LOWER_SUFFIX_AND_TAG | LOWER_SUFFIX)"
 tagger_aux.print_conditional_penalties(lower_suffix_and_tag_count_map, 
                                        lower_suffix_count_map,
                                        "<lower_suffix_and_tag>",
-                                       True)
+                                       True,
+                                       False)
 print "STOP P(LOWER_SUFFIX_AND_TAG | LOWER_SUFFIX)"
 
 # Compute and display the penalties for suffixes.
@@ -202,7 +205,8 @@ print "START P(UPPER_SUFFIX_AND_TAG | UPPER_SUFFIX)"
 tagger_aux.print_conditional_penalties(upper_suffix_and_tag_count_map, 
                                        upper_suffix_count_map,
                                        "<upper_suffix_and_tag>",
-                                       True)
+                                       True,
+                                       False)
 print "STOP P(UPPER_SUFFIX_AND_TAG | UPPER_SUFFIX)"
 
 # Compute and display the penalties for suffixes.
@@ -285,26 +289,32 @@ for i in range(len(sequence)):
 
 tagger_aux.verbose_print("Storing sequence statistics.",verbose)
 tagger_aux.verbose_print("P(T_1, T_2, T_3 | T_1, T_2)",verbose)
-print "START P(T_1, T_2, T_3 | T_1, T_2)"
+print "START SEQUENCE-MODEL:N=3 P(T_1, T_2, T_3 | T_1, T_2)"
 tagger_aux.print_conditional_penalties(trigram_enumerator_counter,
                                        trigram_denominator_counter,
-                                       "")
-print "STOP P(T_1, T_2, T_3 | T_1, T_2)"
+                                       "",
+                                       False,
+                                       True)
+print "STOP SEQUENCE-MODEL:N=3 P(T_1, T_2, T_3 | T_1, T_2)"
 
 # Compute and display the penalties for suffix and tag combinations.
 tagger_aux.verbose_print("P(T_1, T_2 | T_1)",verbose)
-print "START P(T_1, T_2 | T_1)"
+print "START SEQUENCE-MODEL:N=2 P(T_1, T_2 | T_1)"
 tagger_aux.print_conditional_penalties(bigram_enumerator_counter,
                                        bigram_denominator_counter,
-                                       "")
-print "STOP P(T_1, T_2 | T_1)"
+                                       "",
+                                       False,
+                                       True)
+print "STOP SEQUENCE-MODEL:N=2 P(T_1, T_2 | T_1)"
 
 # Compute and display the penalties for suffixes.
 tagger_aux.verbose_print("P(T_1)",verbose)
-print "START P(T_1)"
+print "START SEQUENCE-MODEL:N=1 P(T_1)"
 tagger_aux.print_conditional_penalties(unigram_enumerator_counter,
                                        unigram_denominator_counter,
-                                       "")
-print "STOP P(T_1)"
+                                       "",
+                                       False,
+                                       True)
+print "STOP SEQUENCE-MODEL:N=1 P(T_1)"
 
 
