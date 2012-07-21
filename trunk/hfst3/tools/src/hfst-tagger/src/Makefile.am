@@ -1,7 +1,8 @@
 AM_CXXFLAGS= -O3 -g -Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors \
              -I$(top_builddir)/tools/src/inc -I$(top_builddir)/tools/src 
 
-bin_PROGRAMS=hfst-build-tagger hfst-open-input-file-for-tagger hfst-tag
+bin_PROGRAMS=hfst-build-tagger hfst-open-input-file-for-tagger hfst-tag \
+hfst-reweight-tagger
 bin_SCRIPTS=hfst_tagger_compute_data_statistics.py hfst-train-tagger \
 hfst-train-tagger-loc
 EXTRA_DIST=hfst-train-tagger.sh
@@ -62,6 +63,9 @@ hfst_tag_SOURCES=hfst-tag.cc \
 	         $(USE_MODEL_SRC)/SequenceTagger.h \
                  $(USE_MODEL_SRC)/SequenceTagger.cc \
 		 $(HFST_COMMON_SRC)
+
+hfst_reweight_tagger_SOURCES=hfst-reweight-tagger.cc \
+		             $(HFST_COMMON_SRC)
 
 hfst-train-tagger$(EXEEXT): hfst-train-tagger.sh
 	cat $< | sed -e 's|BINDIR|$(bindir)|' > $@

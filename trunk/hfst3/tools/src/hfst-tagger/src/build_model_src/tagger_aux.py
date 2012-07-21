@@ -87,6 +87,8 @@ def read_config_file(config_file_name):
     patterns = []
 
     for line in config_data:
+        if line == "":
+            continue
         patterns.append(parse_config_line(line))
 
     return patterns
