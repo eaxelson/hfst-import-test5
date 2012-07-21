@@ -1,0 +1,148 @@
+\documentclass[t,12pt,pdftex]{beamer}
+\usepackage{helvet}
+\usepackage{times}
+\usepackage{courier}
+
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{url}
+\usepackage{textpos}
+\usepackage{xspace}
+\usepackage{array}
+
+\graphicspath{{./fig/}}
+
+% theme options: hy/ml/hum, rovio/sinetti, hiit
+% default: hy,rovio
+
+%\usetheme[hy]{HY}
+%\usetheme[hy,sinetti]{HY}
+\usetheme[hum,rovio]{HY}
+%\usetheme[ml,rovio]{HY}
+%\usetheme[ml,rovio,hiit]{HY}
+
+
+\title{Building Real-World Finite-State Spell-Checkers With HFST\\
+in FSMNLP 2012 at Donostia}
+%[Tut: HFST Spellers]
+\author{Tommi A Pirinen \scriptsize \guilsinglleft{}tommi.pirinen@helsinki.fi\guilsinglright{}}
+\institute{University of Helsinki\\Department of Modern Languages}
+\date{\today}
+
+\begin{document}
+
+\selectlanguage{english}
+
+\HyTitle
+
+\begin{frame}
+    \frametitle{Outline}
+    \tableofcontents
+\end{frame}
+
+
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\section{Introduction}
+
+\begin{frame}
+    \frametitle{Finite-State Spell-Checking}
+    
+    \begin{itemize}
+        \item A simple task: go through all words in text to see if they
+            belong to language LL, if not, modify them with relation
+            EE to fit into language LL
+        \item In Finite-State world language model LL is any (weighted) single
+            tape finite-state automaton recognising the words of the
+            language
+        \item The error model EE is any (weighted) two-tape automaton, that
+            describes spelling errors, i.e. mapping from misspelt word into
+            the correct one
+        \item In this tutorial we build simple language model and piece
+            together error model from different error types
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{With HFST Tools (but mostly generic FST algebra)}
+    
+    \begin{itemize}
+        \item The tools we use to build the automata are from HFST project
+            \url{http://hfst.sf.net}
+        \item but most what I show here is finite-state algebra, which your
+            favorite fst tools should support as well
+        \item The chain of libraries to get HFST automata spellers to any
+            desktop application is HFST 
+            ospell$\rightarrow$voikko$\rightarrow$enchant (with few
+            exceptional application not supporting this). 
+            \url{https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstUseAsSpellChecker}
+    \end{itemize}
+\end{frame}
+
+\section{Languege Models}
+
+\begin{frame}
+    \frametitle{The very simplest of language models---list of words}
+    
+\end{frame}
+
+\begin{frame}
+    \frametitle{Other language models}
+\end{frame}
+
+\section{Error Models}
+
+\begin{frame}
+    \frametitle{Basic component 1: Run of correctly spelled characters}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Basic component 2: Typing error}
+\end{frame}
+
+\begin{frame}
+    \frametitle{1 + 2 = 3: Edit Distance Automata}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Basic component 4: Confusion set of words}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Basic Component 5: Common Phonemic Mispellings (simple)}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Component 6: Misspelling in context}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Finally: hacking all these together}
+
+\end{frame}
+
+\section{Misc. practicalities}
+
+\begin{frame}
+    \frametitle{Metadata}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Zipping and Installation Location}
+
+\end{frame}
+
+\end{document}
