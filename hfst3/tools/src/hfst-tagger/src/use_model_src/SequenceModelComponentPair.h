@@ -28,6 +28,7 @@ class SequenceModelComponentPair : public SequenceModelComponent
   public:
     size_t count(const StatePair &p);
     State &operator[](const StatePair &p);
+    size_t size(void);
   private:
     typedef std::vector<State> StateVector;
     typedef std::vector<StateVector> StateVectorVector;

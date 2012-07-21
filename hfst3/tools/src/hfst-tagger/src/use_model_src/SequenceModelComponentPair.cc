@@ -31,6 +31,9 @@ SequenceModelComponentPair::StatePair2StateMap::operator[](const StatePair &p)
   return state_vector[p.second];
 }
 
+size_t SequenceModelComponentPair::StatePair2StateMap::size(void)
+{ return state_pair_to_state_map_.size(); }
+
 SequenceModelComponentPair::SequenceModelComponentPair
 (SequenceModelComponent &component1,
  SequenceModelComponent &component2):
