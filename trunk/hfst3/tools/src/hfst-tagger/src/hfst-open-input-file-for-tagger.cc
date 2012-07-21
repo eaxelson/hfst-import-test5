@@ -106,6 +106,8 @@ void echo_stream_to_stdout(std::istream &in)
 
 int main( int argc, char **argv ) 
 {
+  message_out = stderr;
+
   int retval = (parse_options(argc, argv));
 
   if (retval != EXIT_CONTINUE)

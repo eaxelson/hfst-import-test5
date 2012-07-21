@@ -21,10 +21,18 @@ import math
 import collections
 import string
 import sys
+import re
+
+valid_pattern_str = \
+"^(((NONE)|(WORD)) ((NONE)|(TAG)) )*((NONE)|(WORD)) ((NONE)|(TAG))$"
 
 class InvalidPattern(Exception):
     def __init__(self):
         super(InvalidPattern, self).__init__()
+
+class InvalidConfigLine(Exception):
+    def __init__(self):
+        super(InvalidConfigLine, self).__init__()
 
 class ReachesSequenceEnd(Exception):
     def __init__(self):
@@ -35,7 +43,8 @@ class SequenceSimplifier:
     def __init__(self,pattern):
 
         for line in pattern:
-            if len(line) != 2 or (not line[0] in [0,1]):    
+            if len(line) != 2 or (not line[0] in [0,1]) or \
+                    (not line[1] in [0,1]):    
                 raise InvalidPattern()
 
         self.pattern = pattern
@@ -62,6 +71,63 @@ class SequenceSimplifier:
 
         return tuple(simplified_subsequence)
 
+class Pattern:
+    def __init__(self,numerator, denominator, name):
+        self.numerator   = numerator
+        self.denominator = denominator
+        self.name        = name
+        self.order       = len(numerator.pattern) - 1 
+
+# Read statistics patterns from file config_file_name.
+def read_config_file(config_file_name):
+    config_file = open(config_file_name)
+    
+    config_data = config_file.read().split("\n")
+
+    patterns = []
+
+    for line in config_data:
+        patterns.append(parse_config_line(line))
+
+    return patterns
+
+def parse_config_pattern(pattern_str):
+    
+    if re.match(valid_pattern_str,pattern_str) == None:
+        raise InvalidConfigLine()
+
+    field_strings = pattern_str.split(" ")
+
+    pattern = []
+
+    i = 0
+
+    while i < len(field_strings) - 1:
+        word_string = field_strings[i]
+        tag_string = field_strings[i+1]
+
+        pattern.append([(lambda x: x == "WORD" and 1 or 0)(word_string),
+                        (lambda x: x == "TAG"  and 1 or 0)(tag_string)])
+        i += 2
+
+    return SequenceSimplifier(pattern)
+
+def parse_config_line(line):
+    fields = re.split("\t+",line)
+
+    if len(fields) != 4:
+        raise InvalidConfigLine()
+
+    name                    = fields[0]
+    numerator_pattern_str   = fields[1]
+    denominator_pattern_str = fields[2]
+    weigth_str              = fields[3]
+
+    numerator_simplifier   = parse_config_pattern(numerator_pattern_str)
+    denominator_simplifier = parse_config_pattern(denominator_pattern_str)
+
+    return Pattern(numerator_simplifier, denominator_simplifier, name)
+                              
 # Unless line is a utf-8 encoded line of number_of_fields tab
 # separated fields, raise an exception.
 def check_line(line,number_of_fields):
@@ -84,7 +150,7 @@ def get_penalty(suffix_and_tag_count, suffix_count):
 
 def verbose_print(message, is_verbose):
     if is_verbose:
-        print sys.stderr >> message
+        sys.stderr.write(message + "\n")
 
 # Return the utf-8 string str reversed. utf-8 symbols are not
 # internally reversed.
