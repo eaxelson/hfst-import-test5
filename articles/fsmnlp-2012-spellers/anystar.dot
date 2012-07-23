@@ -2,5 +2,5 @@
 digraph H {
 rankdir = LR;
 node [shape=doublecircle,style=filled] 0
-0 -> 0 [label="?? "];
+0 -> 0 [label="? "];
 }
