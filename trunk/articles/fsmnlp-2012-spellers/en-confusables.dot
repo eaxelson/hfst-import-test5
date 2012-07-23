@@ -1,55 +1,55 @@
 // This graph generated with hfst-fst2txt blah
 digraph H {
 rankdir = LR;
-node [style=filled] 0
+node [shape=doublecircle,style=filled] 12
+node [shape=doublecircle,style=filled] 25
+node [shape=doublecircle,style=filled] 3
+node [shape=circle,style=filled] 0
+node [shape=circle,style=filled] 1
+node [shape=circle,style=filled] 10
+node [shape=circle,style=filled] 11
+node [shape=circle,style=filled] 13
+node [shape=circle,style=filled] 14
+node [shape=circle,style=filled] 15
+node [shape=circle,style=filled] 16
+node [shape=circle,style=filled] 17
+node [shape=circle,style=filled] 18
+node [shape=circle,style=filled] 19
+node [shape=circle,style=filled] 2
+node [shape=circle,style=filled] 20
+node [shape=circle,style=filled] 21
+node [shape=circle,style=filled] 22
+node [shape=circle,style=filled] 23
+node [shape=circle,style=filled] 24
+node [shape=circle,style=filled] 4
+node [shape=circle,style=filled] 5
+node [shape=circle,style=filled] 6
+node [shape=circle,style=filled] 7
+node [shape=circle,style=filled] 8
+node [shape=circle,style=filled] 9
+0 -> 13 [label="c "];
 0 -> 1 [label="t "];
 0 -> 4 [label="m "];
-0 -> 13 [label="c "];
-node [style=filled] 1
-1 -> 2 [label="e:h "];
-node [style=filled] 2
-2 -> 3 [label="h:e "];
-node [shape=doublecircle,style=filled] 3
-node [style=filled] 4
-4 -> 5 [label="i "];
-node [style=filled] 5
-5 -> 6 [label="s "];
-node [style=filled] 6
-6 -> 7 [label="p:s "];
-node [style=filled] 7
-7 -> 8 [label="e:p "];
-node [style=filled] 8
-8 -> 9 [label="l:e "];
-node [style=filled] 9
-9 -> 10 [label="l "];
-node [style=filled] 10
 10 -> 11 [label="e:t "];
-node [style=filled] 11
-11 -> 12 [label="d:\epsilon "];
-node [shape=doublecircle,style=filled] 12
-node [style=filled] 13
+11 -> 12 [label="d:0 "];
+1 -> 2 [label="e:h "];
 13 -> 14 [label="o "];
-node [style=filled] 14
 14 -> 15 [label="n "];
-node [style=filled] 15
 15 -> 16 [label="s "];
-node [style=filled] 16
 16 -> 17 [label="c "];
-node [style=filled] 17
 17 -> 18 [label="i "];
-node [style=filled] 18
 18 -> 19 [label="e "];
-node [style=filled] 19
 19 -> 20 [label="n "];
-node [style=filled] 20
 20 -> 21 [label="c:t "];
-node [style=filled] 21
 21 -> 22 [label="h:i "];
-node [style=filled] 22
 22 -> 23 [label="o "];
-node [style=filled] 23
 23 -> 24 [label="u "];
-node [style=filled] 24
+2 -> 3 [label="h:e "];
 24 -> 25 [label="s "];
-node [shape=doublecircle,style=filled] 25
+4 -> 5 [label="i "];
+5 -> 6 [label="s "];
+6 -> 7 [label="p:s "];
+7 -> 8 [label="e:p "];
+8 -> 9 [label="l:e "];
+9 -> 10 [label="l "];
 }

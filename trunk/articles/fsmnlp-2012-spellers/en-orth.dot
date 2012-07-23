@@ -1,19 +1,19 @@
 // This graph generated with hfst-fst2txt blah
 digraph H {
 rankdir = LR;
-node [style=filled] 0
+node [shape=circle,style=filled] 0
+node [shape=doublecircle,style=filled] 4
+node [shape=doublecircle,style=filled] 7
+node [shape=circle,style=filled] 1
+node [shape=circle,style=filled] 2
+node [shape=circle,style=filled] 3
+node [shape=circle,style=filled] 5
+node [shape=circle,style=filled] 6
 0 -> 1 [label="o "];
 0 -> 5 [label="i:e "];
-node [style=filled] 1
 1 -> 2 [label="f:u "];
-node [style=filled] 2
-2 -> 3 [label="\epsilon:g "];
-node [style=filled] 3
-3 -> 4 [label="\epsilon:h "];
-node [shape=doublecircle,style=filled] 4
-node [style=filled] 5
+2 -> 3 [label="0:g "];
+3 -> 4 [label="0:h "];
 5 -> 6 [label="e:i "];
-node [style=filled] 6
 6 -> 7 [label="r "];
-node [shape=doublecircle,style=filled] 7
 }
