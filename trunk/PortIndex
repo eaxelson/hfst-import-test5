@@ -1,0 +1,2 @@
+hfst 549
+variants universal portdir devel/hfst description {C++ finite-state transducer interoperability library} homepage http://hfst.sourceforge.net/ epoch 0 platforms darwin name hfst depends_lib {port:openfst port:bison port:flex} long_description {Helsinki Finite-State Technology is designed to make various finite-state libraries interoperable within one library. It consists of a API bridge library and a set of tools cloning various functions of legacy software.} maintainers flammie@iki.fi license GPL-3+ categories devel version 3.3.12 revision 0
