@@ -1,0 +1,359 @@
+## Process this file with automake to produce Makefile.in
+
+## Copyright (C) 2010 University of Helsinki
+
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+SUBDIRS=hfst-twolc
+AUTOMAKE_OPTIONS=std-options subdir-objects
+AM_CPPFLAGS=-Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors $(HFST_CFLAGS)
+LDADD=$(HFST_LIBS)
+
+# sort alphabetically:
+if WANT_AFFIX_GUESSIFY
+MAYBE_AFFIX_GUESSIFY=hfst-affix-guessify
+endif
+if WANT_APERTIUM2FST
+MAYBE_APERTIUM2FST=hfst-apertium2fst
+endif
+if WANT_APERTIUM_PROC
+MAYBE_APERTIUM_PROC=hfst-apertium-proc
+endif
+if WANT_COMPARE
+MAYBE_COMPARE=hfst-compare
+endif
+if WANT_COMPOSE
+MAYBE_COMPOSE=hfst-compose
+endif
+if WANT_COMPOSE_INTERSECT
+MAYBE_COMPOSE_INTERSECT=hfst-compose-intersect
+endif
+if WANT_CONCATENATE
+MAYBE_CONCATENATE=hfst-concatenate
+endif
+if WANT_CONJUNCT
+MAYBE_CONJUNCT=hfst-conjunct
+endif
+if WANT_DETERMINIZE
+MAYBE_DETERMINIZE=hfst-determinize
+endif
+if WANT_DISJUNCT
+MAYBE_DISJUNCT=hfst-disjunct
+endif
+if WANT_DUPLICATE
+MAYBE_DUPLICATE=hfst-duplicate
+endif
+if WANT_EDIT_METADATA
+MAYBE_EDIT_METADATA=hfst-edit-metadata
+endif
+if WANT_EXPAND_EQUIVALENCES
+MAYBE_EXPAND_EQUIVALENCES=hfst-expand-equivalences
+endif
+if WANT_FORMAT
+MAYBE_FORMAT=hfst-format
+endif
+if WANT_FST2FST
+MAYBE_FST2FST=hfst-fst2fst
+endif
+if WANT_FST2STRINGS
+MAYBE_FST2STRINGS=hfst-fst2strings
+endif
+if WANT_FST2TXT
+MAYBE_FST2TXT=hfst-fst2txt
+endif
+if WANT_GREP
+MAYBE_GREP=hfst-grep
+endif
+if WANT_HEAD
+MAYBE_HEAD=hfst-head
+endif
+if WANT_INVERT
+MAYBE_INVERT=hfst-invert
+endif
+if WANT_INFO
+MAYBE_INFO=hfst-info
+endif
+if WANT_LEXC
+MAYBE_LEXC=hfst-lexc
+endif
+if WANT_LEXC2FST
+MAYBE_LEXC2FST=hfst-lexc2fst
+endif
+if WANT_LOOKUP
+MAYBE_LOOKUP=hfst-lookup
+endif
+if WANT_PAIR_TEST
+MAYBE_PAIR_TEST=hfst-pair-test
+endif
+if WANT_MINIMIZE
+MAYBE_MINIMIZE=hfst-minimize
+endif
+if WANT_NAME
+MAYBE_NAME=hfst-name
+endif
+if WANT_PREPROCESS_FOR_OPTIMIZED_LOOKUP
+MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP=hfst-preprocess-for-optimized-lookup-format
+endif
+if WANT_PROJECT
+MAYBE_PROJECT=hfst-project
+endif
+if WANT_PUSH_WEIGHTS
+MAYBE_PUSH_WEIGHTS=hfst-push-weights
+endif
+if WANT_REGEXP2FST
+MAYBE_REGEXP2FST=hfst-regexp2fst
+endif
+if WANT_REMOVE_EPSILONS
+MAYBE_REMOVE_EPSILONS=hfst-remove-epsilons
+endif
+if WANT_REPEAT
+MAYBE_REPEAT=hfst-repeat
+endif
+if WANT_REVERSE
+MAYBE_REVERSE=hfst-reverse
+endif
+if WANT_REWEIGHT
+MAYBE_REWEIGHT=hfst-reweight
+endif
+if WANT_SPLIT
+MAYBE_SPLIT=hfst-split
+endif
+if WANT_STRINGS2FST
+MAYBE_STRINGS2FST=hfst-strings2fst
+endif
+if WANT_STRIP_HEADER
+MAYBE_STRIP_HEADER=hfst-strip-header
+endif
+if WANT_SUBTRACT
+MAYBE_SUBTRACT=hfst-subtract
+endif
+if WANT_SUMMARIZE
+MAYBE_SUMMARIZE=hfst-summarize
+endif
+if WANT_TAIL
+MAYBE_TAIL=hfst-tail
+endif
+if WANT_TRAVERSE
+MAYBE_TRAVERSE=hfst-traverse
+endif
+if WANT_TXT2FST
+MAYBE_TXT2FST=hfst-txt2fst
+endif
+if WANT_SFSTPL2FST
+MAYBE_SFSTPL2FST=hfst-sfstpl2fst
+endif
+if WANT_SUBSTITUTE
+MAYBE_SUBSTITUTE=hfst-substitute
+endif
+if WANT_FLAG_DIACRITICS
+MAYBE_FLAG_DIACRITICS=hfst-flag-diacritics
+endif
+if WANT_XFST_COMPILER
+MAYBE_XFST_COMPILER=hfst-xfst2fst
+endif
+
+noinst_HEADERS= \
+	conventions/commandline.h conventions/options.h conventions/portability.h \
+	sfst/Compiler.h sfst/HfstAlphabet.h sfst/HfstUtf8.h                       \
+	conventions/check-params-binary.h conventions/check-params-common.h       \
+	conventions/check-params-unary.h  conventions/getopt-cases-binary.h       \
+	conventions/getopt-cases-common.h conventions/getopt-cases-error.h        \
+	conventions/getopt-cases-unary.h  conventions/globals-binary.h            \
+	conventions/globals-common.h      conventions/globals-unary.h             \
+	utils/HfstStrings2FstTokenizer.h utils/HfstLookupFlagDiacritics.h
+
+# sort alphabetically
+# sort alphabetically
+# sort alphabetically
+# sort alphabetically
+# sort in abc order
+# finish with xyz
+# see <http://en.wikipedia.org/wiki/Alphabets#Alphabetic_order> for details
+bin_PROGRAMS= \
+			 $(MAYBE_AFFIX_GUESSIFY) $(MAYBE_APERTIUM2FST)              \
+			 $(MAYBE_APERTIUM_PROC)                                     \
+			 $(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_CONCATENATE)     \
+			 $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)   \
+			 $(MAYBE_DUPLICATE) $(MAYBE_EDIT_METADATA)                  \
+			 $(MAYBE_EXPAND_EQUIVALENCES)                               \
+			 $(MAYBE_FORMAT) $(MAYBE_FST2FST) $(MAYBE_FST2STRINGS)      \
+			 $(MAYBE_FST2TXT) $(MAYBE_GREP) $(MAYBE_HEAD)               \
+			 $(MAYBE_INFO) $(MAYBE_INVERT)                              \
+			 $(MAYBE_LOOKUP) $(MAYBE_MINIMIZE) $(MAYBE_NAME)            \
+			 $(MAYBE_PROJECT) $(MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP)  \
+			 $(MAYBE_PUSH_WEIGHTS) $(MAYBE_REGEXP2FST)                  \
+			 $(MAYBE_REMOVE_EPSILONS) $(MAYBE_REPEAT) $(MAYBE_REVERSE)  \
+			 $(MAYBE_REWEIGHT) $(MAYBE_SFSTPL2FST)                      \
+			 $(MAYBE_SPLIT) $(MAYBE_STRINGS2FST) $(MAYBE_STRIP_HEADER)  \
+			 $(MAYBE_SUBTRACT) $(MAYBE_SUMMARIZE) $(MAYBE_TAIL)         \
+			 $(MAYBE_TXT2FST) $(MAYBE_CALCULATE) $(MAYBE_SUBSTITUTE)    \
+			 $(MAYBE_FLAG_DIACRITICS) $(MAYBE_LEXC2FST) $(MAYBE_LEXC)   \
+			 $(MAYBE_XFST_COMPILER)                                     \
+			 $(MAYBE_COMPOSE_INTERSECT)  $(MAYBE_PAIR_TEST)             \
+			 $(MAYBE_TRAVERSE)
+
+HFST_COMMON_SRC=conventions/options.cc \
+				conventions/commandline.cc \
+				conventions/metadata.cc \
+				conventions/portability.cc
+if WANT_HFST_UNICODE
+HFST_UNICODE_SRC=conventions/unicode_portability.cc \
+				 utils/utf8.cc utils/ucd_data.cc
+HFST_UNICODE_CPPFLAGS=$(AM_CPPFLAGS)
+HFST_UNICODE_LIBS=$(HFST_LIBS)
+endif
+if WANT_GLIB_UNICODE
+HFST_UNICODE_SRC=conventions/unicode_portability.cc
+HFST_UNICODE_CPPFLAGS=$(AM_CPPFLAGS) $(GLIB_CFLAGS)
+HFST_UNICODE_LIBS=$(HFST_LIBS) $(GLIB_LIBS)
+endif
+# sort alphabetically
+hfst_affix_guessify_SOURCES=affix-guessify.cc $(HFST_COMMON_SRC)
+hfst_apertium2fst_SOURCES=apertium2fst.cc $(HFST_COMMON_SRC) \
+						 utils/edit-distance.cc
+hfst_apertium2fst_CXXFLAGS=$(AM_CXXFLAGS) $(CXXFLAGS) $(LIBXML_CFLAGS)
+hfst_apertium2fst_LDADD=$(LIBXML_LIBS) $(HFST_LIBS)
+hfst_apertium_proc_SOURCES=apertium-proc.cc $(HFST_COMMON_SRC) \
+						   utils/ProcAlphabet.cc \
+						   utils/ProcTransducer.cc \
+						   utils/ProcApplicators.cc \
+						   utils/ProcFormatters.cc \
+						   utils/ProcLookupPath.cc \
+						   utils/ProcLookupState.cc \
+						   utils/ProcTokenizer.cc \
+						   $(HFST_UNICODE_SRC)
+hfst_apertium_proc_CPPFLAGS=$(HFST_UNICODE_CPPFLAGS)
+hfst_apertium_proc_LDADD=$(HFST_UNICODE_LIBS)
+hfst_compare_SOURCES=compare.cc $(HFST_COMMON_SRC)
+hfst_compose_intersect_SOURCES=compose-intersect.cc $(HFST_COMMON_SRC)
+hfst_compose_SOURCES=compose.cc $(HFST_COMMON_SRC)
+hfst_concatenate_SOURCES=concatenate.cc $(HFST_COMMON_SRC)
+hfst_conjunct_SOURCES=conjunct.cc $(HFST_COMMON_SRC)
+hfst_determinize_SOURCES=determinize.cc $(HFST_COMMON_SRC)
+hfst_disjunct_SOURCES=disjunct.cc $(HFST_COMMON_SRC)
+hfst_duplicate_SOURCES=duplicate.cc $(HFST_COMMON_SRC)
+hfst_edit_metadata_SOURCES=edit-metadata.cc $(HFST_COMMON_SRC)
+hfst_expand_equivalences_SOURCES=expand-equivalences.cc $(HFST_COMMON_SRC)
+hfst_expand_equivalences_CXXFLAGS=$(AM_CXXFLAGS) $(CXXFLAGS) $(LIBXML_CFLAGS)
+hfst_expand_equivalences_LDADD=$(HFST_LIBS) $(LIBXML_LIBS)
+hfst_flag_diacritics_SOURCES=flag-diacritics.cc $(HFST_COMMON_SRC)
+hfst_format_SOURCES=format.cc $(HFST_COMMON_SRC)
+hfst_fst2fst_SOURCES=fst2fst.cc $(HFST_COMMON_SRC)
+hfst_fst2strings_SOURCES=fst2strings.cc $(HFST_COMMON_SRC)
+hfst_fst2txt_SOURCES=fst2txt.cc $(HFST_COMMON_SRC)
+hfst_grep_SOURCES=grep.cc $(HFST_COMMON_SRC)
+hfst_head_SOURCES=head.cc $(HFST_COMMON_SRC)
+hfst_info_SOURCES=info.cc $(HFST_COMMON_SRC)
+hfst_invert_SOURCES=invert.cc $(HFST_COMMON_SRC)
+hfst_lexc2fst_SOURCES=lexc2fst.cc $(HFST_COMMON_SRC)
+hfst_lexc_SOURCES=lexc.cc lexc-readline-ui.cc $(HFST_COMMON_SRC)
+hfst_lookup_SOURCES=lookup.cc $(HFST_COMMON_SRC) \
+					utils/HfstStrings2FstTokenizer.cc\
+					utils/HfstLookupFlagDiacritics.cc
+hfst_minimize_SOURCES=minimize.cc $(HFST_COMMON_SRC)
+hfst_name_SOURCES=name.cc $(HFST_COMMON_SRC)
+hfst_pair_test_SOURCES=pair-test.cc $(HFST_COMMON_SRC) \
+					   utils/HfstStrings2FstTokenizer.cc 
+hfst_preprocess_for_optimized_lookup_format_SOURCES=preprocess-for-optimized-lookup-format.cc\
+													 $(HFST_COMMON_SRC)
+hfst_project_SOURCES=project.cc $(HFST_COMMON_SRC)
+hfst_push_weights_SOURCES=push-weights.cc $(HFST_COMMON_SRC)
+hfst_regexp2fst_SOURCES=regexp2fst.cc $(HFST_COMMON_SRC)
+hfst_remove_epsilons_SOURCES=remove-epsilons.cc $(HFST_COMMON_SRC)
+hfst_repeat_SOURCES=repeat.cc $(HFST_COMMON_SRC)
+hfst_reverse_SOURCES=reverse.cc $(HFST_COMMON_SRC)
+hfst_reweight_SOURCES=reweight.cc $(HFST_COMMON_SRC)
+hfst_sfstpl2fst_SOURCES=sfst/scanner.ll sfst/compiler.yy\
+						sfst/Compiler.cc sfst/HfstBasic.cc\
+						sfst/HfstAlphabet.cc sfst/HfstUtf8.cc\
+						$(HFST_COMMON_SRC)
+hfst_split_SOURCES=split.cc $(HFST_COMMON_SRC)
+hfst_strings2fst_SOURCES=strings2fst.cc $(HFST_COMMON_SRC) \
+						 utils/HfstStrings2FstTokenizer.cc
+hfst_strip_header_SOURCES=strip-header.cc $(HFST_COMMON_SRC)
+hfst_substitute_SOURCES=substitute.cc $(HFST_COMMON_SRC)
+hfst_subtract_SOURCES=subtract.cc $(HFST_COMMON_SRC)
+hfst_summarize_SOURCES=summarize.cc $(HFST_COMMON_SRC)
+hfst_tail_SOURCES=tail.cc $(HFST_COMMON_SRC)
+hfst_traverse_SOURCES=traverse.cc $(HFST_COMMON_SRC)
+hfst_txt2fst_SOURCES=txt2fst.cc $(HFST_COMMON_SRC)
+hfst_xfst2fst_SOURCES=xfst2fst.cc $(HFST_COMMON_SRC) \
+					  parsers/XfstCompiler.cc parsers/xfst-parser.yy \
+					  parsers/xfst-lexer.ll parsers/xfst-utils.cc
+
+# aliases:
+hfst-determinise$(EXEEXT): hfst-determinize$(EXEEXT)
+install-exec-hook:
+	cd $(DESTDIR)$(bindir) && \
+		$(LN_S) -f hfst-determinize$(EXEEXT) hfst-determinise$(EXEEXT) && \
+		$(LN_S) -f hfst-fst2strings$(EXEEXT) hfst-expand$(EXEEXT) && \
+		$(LN_S) -f hfst-conjunct$(EXEEXT) hfst-intersect$(EXEEXT) && \
+		$(LN_S) -f hfst-minimize$(EXEEXT) hfst-minimise$(EXEEXT) && \
+		$(LN_S) -f hfst-subtract$(EXEEXT) hfst-minus$(EXEEXT) && \
+		$(LN_S) -f hfst-lookup$(EXEEXT) hfst-optimized-lookup$(EXEEXT) && \
+		$(LN_S) -f hfst-lookup$(EXEEXT) hfst-optimised-lookup$(EXEEXT) && \
+		$(LN_S) -f hfst-preprocess-for-optimized-lookup-format$(EXEEXT) hfst-preprocess-for-optimised-lookup-format$(EXEEXT) && \
+		$(LN_S) -f hfst-sfstpl2fst$(EXEEXT) hfst-calculate$(EXEEXT) && \
+		$(LN_S) -f hfst-summarize$(EXEEXT) hfst-summarise$(EXEEXT) && \
+		$(LN_S) -f hfst-disjunct$(EXEEXT) hfst-union$(EXEEXT)
+
+BUILT_SOURCES=$(hfst_sfstpl2fst_BUILT) $(hfst_lexc2fst_BUILT)
+
+# make make realise headers automatically follow from flexing
+hfst-scanner.h: hfst-scanner.cc
+
+hfst_calculate_CXXFLAGS= -Wall -Wno-error
+
+## YACC and FLEX with autotools argh
+AM_YFLAGS=-d
+AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c 
+
+# tests
+TOOL_TSTS=utils/ucd_data utils/utf8 conventions/unicode_portability \
+		  utils/TsvPathPrinter
+check_PROGRAMS=$(TOOL_TSTS)
+hfstsharedir=$(prefix)/share/hfst/
+hfstshare_DATA=utils/UnicodeData.txt
+utils_ucd_data_SOURCES=utils/ucd_data.cc
+utils_ucd_data_CPPFLAGS=-DUNIT_TEST_UCD_DATA -DUCD_DATA_PATH='"$(abs_top_srcdir)/src/utils/UnicodeData.txt"'
+utils_utf8_SOURCES=utils/utf8.cc
+utils_utf8_CPPFLAGS=-DUNIT_TEST_UTF8
+utils_TsvPathPrinter_SOURCES=utils/PathPrinter.cc utils/TsvPathPrinter.cc
+utils_TsvPathPrinter_CPPFLAGS=-DUNIT_TEST_MAIN $(HFST_CFLAGS)
+utils_TsvPathPrinter_LDADD=$(HFST_LIBS)
+if WANT_HFST_UNICODE
+conventions_unicode_portability_SOURCES=conventions/unicode_portability.cc \
+										utils/ucd_data.cc utils/utf8.cc
+conventions_unicode_portability_CPPFLAGS=-DUNIT_TEST_UNICODE_PORTABILITY -DUCD_DATA_PATH='"$(abs_top_srcdir)/src/utils/UnicodeData.txt"'
+endif
+if WANT_GLIB_UNICODE
+conventions_unicode_portability_SOURCES=conventions/unicode_portability.cc
+conventions_unicode_portability_CPPFLAGS=-DUNIT_TEST_UNICODE_PORTABILITY $(GLIB_CFLAGS)
+conventions_unicode_portability_LDADD=$(GLIB_LIBS)
+endif
+
+TESTS=$(TOOL_TSTS)
+
+EXTRA_DIST=utils/UnicodeData.txt
+
+if CAN_VALGRIND
+valgrind: $(TOOL_TSTS)
+	for f in $^ ; do \
+		libtool --mode=execute valgrind --leak-check=full --log-file=$$f.valgrind $$f ;\
+	done
+else
+valgrind:
+	@echo to valgrind install valgrind and reconfigure
+endif
+

@@ -1,0 +1,1898 @@
+2011-11-21 10:01  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Don't lose the name
+
+2011-11-21 10:01  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Use whole string as "lemma" if cannot figure out split point
+
+2011-11-21 07:39  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Merge reasonable trunk changes
+
+2011-11-15 15:59  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Reorganise tools a bit
+
+2011-11-07 03:04  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* print only if verbose or no tests taken
+
+2011-11-07 00:23  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Add tsv format for old proc
+
+2011-11-07 00:09  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Add info tool for showing and testing versions and features
+
+2011-10-14 10:24  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Add speller creating capability to apertium compiler
+
+2011-10-12 01:13  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* refactor and optimize
+
+2011-10-11 22:45  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Add <b> and <j> everywhere, fix multiwords somewhere
+
+2011-10-06 11:19  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Merge through newest development
+
+2011-10-06 09:48  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Disallow empty <alphabet>
+
+2011-10-04 15:51  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* New branch for my development
+
+2011-09-12 07:24  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Use basic transducer and trie disjunction
+
+2011-09-11 17:37  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Works minus regexps
+
+2011-09-09 14:39  moshagen
+
+	* Ignore generated binaries.
+
+2011-09-09 14:06  mpsilfve
+
+	* Removed file training_data, which was accidentally added.
+
+2011-09-09 13:57  mpsilfve
+
+	* Initial add of hfst-tagger. A lot of stuff is still missing and
+	  the tool needs to be integrated in the build system.
+
+2011-09-07 22:40  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* make compilation work without inclusions leaking from backend
+	  headers
+
+2011-09-06 07:50  spectre360
+
+	* add include for std::map
+
+2011-09-06 07:35  spectre360
+
+	* add include for std::set
+
+2011-09-05 22:16  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* apertium2fst tool added
+
+2011-09-01 23:47  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Fix UTF-8 bugs in strings:
+	  * use error_at_line instead of error when linens are known
+	  * remove bogus double try blocks
+	  * throw UTF-8 errors with messages
+
+2011-09-01 23:45  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Fix formulae for filenames and data starting with non-ASCII
+
+2011-09-01 23:23  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Revert tab-containing commit r1576
+
+2011-09-01 22:21  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Use new metadata handling in tools
+	  * fix signedness in -grep
+	  * fix erroneous error printout in -compose-intersect
+	  * add few features to summarize
+
+2011-09-01 22:18  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* * common practices headers and utils for metadata in cli tools
+	  * a simple cli tool to edit metadata
+
+2011-08-29 14:16  mpsilfve
+
+	* Fixed bug that caused hfst-twolc to segfault when variable rules
+	  with keyword matched had unequal value lists. Now it will give an
+	  error message and terminate compilation.
+
+2011-08-24 17:16  hardwick
+
+	* Don't do foma-SFST conversion if we don't HAVE_SFST
+
+2011-08-24 17:10  hardwick
+
+	* Warning about broken foma handling
+
+2011-08-24 14:09  hardwick
+
+	* More accurate comment
+
+2011-08-24 13:28  hardwick
+
+	* Do foma-sfst -conversion for substitute also (not just pruning);
+	  HfstTransducer doesn't know about foma's substitute.
+
+2011-08-24 13:07  hardwick
+
+	* Swing foma substitutions through sfst to prevent horrible leaks
+
+2011-08-23 13:11  hardwick
+
+	* Don't leak "fallback" transducer for each label
+
+2011-08-18 19:09  spectre360
+
+	* add 'using std::set' to fix compilation problem in
+	  hfst-affix-guessify.cc
+
+2011-08-18 13:56  eaxelson
+
+	* Standardized the transducer format options of commandline tools.
+
+2011-08-17 13:37  mpsilfve
+
+	* Fixed bug in tokenizing string with lonely backslashes. Backslash
+	  can now escape any symbol and it is ignored when it occurs as the
+	  last symbol in the input.
+
+2011-08-16 18:13  moshagen
+
+	* Ignore generated files.
+
+2011-08-15 22:44  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* iterators can no longer be used...
+
+2011-08-15 19:50  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Resurrect the affix guesser maker
+
+2011-08-15 14:42  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* apparently mac os x "readline" does not support
+	  rl_completion_matches...
+
+2011-08-15 14:33  eaxelson
+
+	* HfstTransitionGraph::iterator is now protected, the public
+	  HfstTransitionGraph::const_iterator should be used instead.
+
+2011-08-15 14:22  mpsilfve
+
+	* Replaced all mentions of HfstBasicTransducer::iterator with
+	  HfstBasicTransducer::const_iterator in OtherSymbolTransducer.cc.
+
+2011-08-15 14:15  mpsilfve
+
+	* Changed syntax of negative context rules.
+
+2011-08-15 13:52  mpsilfve
+
+	* Modified OtherSymbolTransducer::harmonize_diacritics, so
+	  HfstBasicTransducer::add_transition is used instead of adding
+	  transitions directly to the transition vector.
+
+2011-08-15 13:50  mpsilfve
+
+	* Enabled sfst tests.
+
+2011-08-15 10:25  hardwick
+
+	* detab hfst3 tree - feel free to revert (and report) if this
+	  causes any problems
+
+2011-08-15 04:10  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* add few trivial features to list
+
+2011-08-15 03:30  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Be more verbose about type mismatch
+
+2011-08-14 21:43  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* check for empty strings
+
+2011-08-14 08:50  mpsilfve
+
+	* Modified test script so that it runs tests for all backend
+	  formats. Disabled tests for sfst and log-openfst formats, since
+	  sfst segaults and log-openfst gives weird results. These are
+	  errors from the library.
+
+2011-08-12 17:55  mpsilfve
+
+	* Added test for negative rule contexts in rules with variables.
+
+2011-08-12 09:20  mpsilfve
+
+	* Added negative context rules.
+
+2011-08-12 09:19  mpsilfve
+
+	* Added tests for negative contexts in twolc rules.
+
+2011-08-10 20:16  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Fallback to anything or nothing from settings; resolves bug
+	  #1061990
+
+2011-08-08 00:18  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* * Save temporary files for foma in /tmp/
+	  * import old readline UI from 2nd branch
+	  * deprecation warning if input = stdin
+	  * error if output = stdout
+
+2011-08-07 18:07  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Another readline editline libedit fix maybe
+
+2011-08-07 17:43  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* CHECK_DECLs to support mac os X's fake cripple readline
+
+2011-08-02 18:29  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* debugging tool
+
+2011-08-01 17:46  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* help messages to message_out instead of stderr
+
+2011-08-01 17:22  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Do not cut unknown word forms from first non-alphabetic character
+	  in
+	  analysis, test case added
+
+2011-08-01 11:17  eaxelson
+
+	* Now extract_random_paths works for an empty tropical transducer.
+	  A test case also added.
+
+2011-08-01 07:20  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* print more than fstinfo only if verbose
+
+2011-07-31 22:57  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Make old lexc default lexc again; fixes: 100000000 Mac OS X bugs
+
+2011-07-31 17:53  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* allow options to be passed via env.var. HFST_OPTIONS
+
+2011-07-31 05:06  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* works but leaks
+
+2011-07-27 21:32  spectre360
+
+	* fix how compound words are generated
+
+2011-07-27 20:34  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* try generating first without compound interpretations; possible
+	  fix for
+	  bug #3290585
+
+2011-07-26 01:32  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* calculate spaces in length of print forms; fixes #3296854
+
+2011-07-26 00:33  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Allow use of glib for proc unicode casing (most likely breaks all
+	  Macs
+	  because of pkg-config and all that)
+
+2011-07-25 19:03  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Implement type mismatch error messages for all binary tools
+
+2011-07-25 16:07  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* add quotation and neat printing in twolc tests
+
+2011-07-25 15:58  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* incompatible format messages in composition
+
+2011-07-25 15:00  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Neat error output when incompatible formats; bug #3287458
+
+2011-07-18 11:31  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Implement print-sigma and acceptor
+
+2011-07-09 14:40  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Disable reserved characters and escapes in raw mode.
+
+2011-07-06 13:09  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* hfst-lexc around lexc_read
+
+2011-07-06 12:07  spectre360
+
+	* more alphabet hacks, i should really fix this properly as opposed
+	  to just
+	  patching the bugs i find
+
+2011-07-05 01:07  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* New analysis mode for finntreebank people:
+	  * no lowercase
+	  * no uppercases
+	  * no compounds
+	  * probably some ohter things
+
+2011-06-29 12:01  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* here here
+
+2011-06-29 11:27  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* possibly hippu-compatible alias installation
+
+2011-06-22 13:06  mpsilfve
+
+	* Removed check for null-termination of string in the test of
+	  string_mainpultion.cc, because it fails on Mac.
+
+2011-06-13 15:51  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* kill some warnings by settings
+
+2011-06-13 11:50  mpsilfve
+
+	* Changed the test script so that it removes temp.twolc.hfst0, when
+	  it's done
+
+2011-06-13 11:04  mpsilfve
+
+	* Changed [[ ... ]] in regular expression center rules to <[ ... ]>
+	  to avoid introducing syntax errors in previously working
+	  twolc-grammars.
+
+2011-06-10 20:24  mpsilfve
+
+	* Added new tests in Makefile.am.
+
+2011-06-10 19:56  mpsilfve
+
+	* Added support for rules which have centers that are regular
+	  expressions of pairs.
+
+2011-06-10 19:52  mpsilfve
+
+	* Added tests for rules with regular expression centers.
+
+2011-06-10 19:51  mpsilfve
+
+	* Improved test script so it won't exit normally if hfst-twolc
+	  crashes.
+
+2011-06-05 17:48  spectre360
+
+	* some more hacks to alphabet.cc
+
+2011-06-03 11:46  mpsilfve
+
+	* Added support for rule centers which have the form 'X:a' where
+	  'X' is a set and 'a' is a symbol.
+
+2011-06-03 11:45  mpsilfve
+
+	* Added tests for rules with centers 'X:a' where 'X' is a set and
+	  'a' is a symbol.
+
+2011-06-03 11:11  mpsilfve
+
+	* Undid some changes that stopped working after the interface of
+	  HfstBasicTransducer apparently changed. Also changed
+	  HfstTransducer OtherSymbolTransducer::get_transducer(void) to
+	  const and added the function void
+	  OtherSymbolTransducer::get_initial_transition_pairs(SymbolPairVector
+	  &pair_container) const.
+
+2011-06-03 08:38  mpsilfve
+
+	* hfst-twolc unit tests added.
+
+2011-05-30 19:21  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* check locale in some tools
+
+2011-05-26 13:51  eaxelson
+
+	* HfstTransitionGraph now has a vector of states instead of a set.
+	  All programs and functions updated accordingly.
+
+2011-05-26 12:22  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Reword slow lookup warning
+
+2011-05-24 19:51  moshagen
+
+	* Ignore generated items.
+
+2011-05-24 14:37  mpsilfve
+
+	* Fixed test script so that it should work in distcheck
+
+2011-05-23 17:49  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* simple archive tool for duplicating repeats
+
+2011-05-23 08:40  hardwick
+
+	* Changed lookup functions to return pointer to HfstOneLevelPaths,
+	  and take no
+	  argument for it. Calling functions are (still) responsible for
+	  freeing memory.
+
+2011-05-17 19:13  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Remove obvious memory leaks
+
+2011-05-17 10:17  eaxelson
+
+	* LexC and regexp functionalities moved from tools/src/parsers
+	  under the HFST interface at libhfst/src/parsers.
+
+2011-05-11 14:56  eaxelson
+
+	* Including HfstTransducer.h and HfstTransitionGraph.h into header
+	  files avoided in most cases by using HfstDataTypes.h instead.
+
+2011-05-11 12:58  eaxelson
+
+	* Made some changes to header files in order to avoid cyclic
+	  dependencies.
+
+2011-05-05 14:30  eaxelson
+
+	* The library now uses is_epsilon, internal_epsilon etc. instead of
+	  string literals.
+
+2011-05-03 08:29  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Print --version and --help to stdout in standard style
+
+2011-05-03 08:28  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* clean generated scripts
+
+2011-05-03 07:56  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Skip broken aliases
+
+2011-05-03 02:33  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* exempt scripts and tools with broken option parsing from
+	  distcheck
+
+2011-04-28 08:22  eaxelson
+
+	* Tests added for hfst-lookup with transducers that contain
+	  identitites.
+
+2011-04-27 14:38  eaxelson
+
+	* An error in harmonization fixed: now flags are excluded when
+	  expanding unknowns. A test also added that checks this case.
+
+2011-04-26 00:43  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* print verbosely tokenization and blocked flags unless ol
+
+2011-04-25 20:07  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* declare more built sources
+
+2011-04-25 19:51  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* More sanity checks for escaped colons
+
+2011-04-23 18:35  spectre360
+
+	* partial fix for 3269636
+
+2011-04-23 15:08  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* remove debug printout
+
+2011-04-23 14:28  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* filenames and line numbers in error reporting again
+
+2011-04-23 13:14  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Build obsolete lexc compiler by default:
+	  * remove handbuilt lexicon combinatorics and revert to sfcm2009
+	  algo
+	  * use pretty name for lexicons
+	  * more verbose printing instead of xerox style again
+
+2011-04-22 10:47  mpsilfve
+
+	* Now hfst-twolc rule names are unquoted.
+
+2011-04-12 09:41  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* s/warning: Warning/warning: /
+
+2011-04-10 12:51  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Fix ; separated regexps:
+	  * add compatibility function for mac OS X missing getdelim
+	  * use delim for all cases in regexp2fst
+
+2011-04-07 13:38  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Make fallback dependent on fnie
+
+2011-04-06 17:23  moshagen
+
+	* Ignore generated items.
+
+2011-04-06 14:46  mpsilfve
+
+	* Added hfst-pair-test for testing hfst-twolc rule files.
+
+2011-04-05 14:24  eaxelson
+
+	* Some optimizations done on conversion functions. Class
+	  HfstConversionTransducer added, it will be soon used in a more
+	  efficient conversion.
+
+2011-04-04 10:49  moshagen
+
+	* Ignore generated items.
+
+2011-04-04 05:53  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Alias hfst-optimized-lookup -> hfst-lookup for compatibility
+
+2011-04-03 19:50  moshagen
+
+	* Ignore generated items.
+
+2011-04-03 16:18  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* use default names to trace hfst operations neatly
+
+2011-04-03 14:51  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Allow name truncation for neater names
+
+2011-04-03 05:21  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* New tool for preprocessing automata before optimizing
+
+2011-03-31 11:55  eaxelson
+
+	* A state in an HfstTransitionGraph now has a vector of transitions
+	  intead of a set of transitions.
+
+2011-03-31 11:42  hardwick
+
+	* ...I meant HfstException
+
+2011-03-31 11:39  hardwick
+
+	* Catch HfstFatalException in convertion
+
+2011-03-31 11:10  eaxelson
+
+	* hfst-lookup now handles flag diacritics correctly
+
+2011-03-30 13:24  eaxelson
+
+	* hfst-fst2strings now implements option --random for sfst and
+	  openfst transducers
+
+2011-03-29 14:47  mpsilfve
+
+	* Run twolc tests in numerical order.
+
+2011-03-29 14:45  mpsilfve
+
+	* Fixed problem with word boundries breaking the alphabet.
+
+2011-03-29 14:44  mpsilfve
+
+	* Added tests for ensuring that word boundary conversions wonät
+	  break the alphabet.
+
+2011-03-29 14:20  mpsilfve
+
+	* Changed word boundaries so that they perhaps emulate what xerox
+	  does. A "#" in a rule file is always compiled to both an absolute
+	  word boundary (which is an internal symbol in hfst-twolc) and a
+	  relative word boundary "#". The absolute word boundary will
+	  always correspond to zero in output strings and the relative one
+	  will correspond to whatever it corresponded to in the rule file.
+
+2011-03-29 14:18  mpsilfve
+
+	* Word bounadry tests added.
+
+2011-03-28 12:03  eaxelson
+
+	* option --random added to hfst-fst2strings, not yet implemented
+
+2011-03-24 18:37  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Fix lexc tests:
+	  * make script in build dir +x
+	  * put script dir in beginning of PATH in tests
+
+2011-03-23 12:45  hardwick
+
+	* Turned option passing back on for convert function
+
+2011-03-22 16:16  mpsilfve
+
+	* test-script fixed. Previously it required installed hfst-compare,
+	  hfst-txt2fst and hfst-fst2txt
+
+2011-03-21 07:13  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* fix partial commit of portability c xfunctions
+
+2011-03-21 01:27  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* remove unnecessary read
+
+2011-03-21 01:19  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* use pretty names by default
+
+2011-03-21 00:28  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Fix name tool installation
+
+2011-03-21 00:22  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Use automata names from metadata instead of filenames
+
+2011-03-18 12:51  mpsilfve
+
+	* Fixed a bug with %-escaped variable values, which weren't
+	  properly unescaped previously.
+
+2011-03-18 12:50  mpsilfve
+
+	* Added tests for %-escaped variable values.
+
+2011-03-18 10:46  eaxelson
+
+	* hfst-fst2strings help message and special character printing
+	  fixed
+
+2011-03-18 09:19  eaxelson
+
+	* hfst-fst2strings fixed
+
+2011-03-18 07:06  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* filter flags should've defaulted true
+
+2011-03-17 12:53  hardwick
+
+	* Typo in usage message
+
+2011-03-17 09:20  mpsilfve
+
+	* Added some files for a transducer testing environment.
+
+2011-03-16 23:10  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* fix spacing in examples and describe
+
+2011-03-16 14:20  mpsilfve
+
+	* Fixed a bug in compiling <=>-rules with list centers.
+
+2011-03-16 14:19  mpsilfve
+
+	* Added test for compiling <=>-rules with list centers.
+
+2011-03-16 13:31  eaxelson
+
+	* hfst-lookup should now work correctly
+
+2011-03-16 11:30  hardwick
+
+	* Added deprecated (and undocumented) -w switch to hfst-calculate
+	  for backwards
+	  compatibility
+
+2011-03-16 11:08  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Update substitute documentation
+
+2011-03-16 10:28  eaxelson
+
+	* hfst-lookup should now work, still some problems in printing
+	  strings
+
+2011-03-15 15:42  eaxelson
+
+	* A more organized version of lookup function added to hfst-lookup.
+	  It will soon replace the original function.
+
+2011-03-15 14:40  hardwick
+
+	* Added a way for ol-conversion to be done really lazily (for when
+	  you want it
+	  done quickly - should still be faster, honestly). Also to pass a
+	  string
+	  parameter to conversion functions if they ever want a hint about
+	  something.
+
+2011-03-15 10:38  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* more distcheck fixes
+
+2011-03-15 08:43  eaxelson
+
+	* small changes made to hfst-lookup
+
+2011-03-15 06:02  moshagen
+
+	* Added single quotes around and space after the filename for
+	  file-not-found errors. Makes it easier to read the filename
+	  (earlier the cause of the error was printed flush after the
+	  filename, with no space between).
+
+2011-03-14 16:27  eaxelson
+
+	* Small changes made to helps and arguments in tools that convert
+	  between text, string and binary formats.
+
+2011-03-14 14:56  hardwick
+
+	* Maybe INFINITY will be defined more portably this way
+
+2011-03-14 13:49  mpsilfve
+
+	* INFINTY in hfst-lookup was not defined properly. fixed it.
+
+2011-03-14 13:33  mpsilfve
+
+	* string::npos changed to std::string::npos
+
+2011-03-14 13:14  eaxelson
+
+	* More utf-8 checks added. Command line tool helps also updated.
+
+2011-03-14 13:12  mpsilfve
+
+	* Fixed Makefile.am so that make dist works.
+
+2011-03-14 12:21  hardwick
+
+	* Enlightened hfst-proc as to the true nature of HFST3 headers
+
+2011-03-13 17:28  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Do not print all multicharacter symbols unless in verbose mode
+
+2011-03-12 02:45  mpsilfve
+
+	* Fixed a bug in compiling rules with word boundaries and added
+	  test45.
+
+2011-03-11 15:25  mpsilfve
+
+	* @_SPACE_@, @_TAB_@ and @_COLON_@ added to
+	  HfstStrings2FstTokenizer.cc
+
+2011-03-11 14:46  moshagen
+
+	* Ignore more generated items.
+
+2011-03-11 14:10  eaxelson
+
+	* hfst-lookup now uses HfstFst2StringsTokenizer to tokenize the
+	  input strings.
+
+2011-03-11 08:31  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* workaround mac''s missing strndup
+
+2011-03-11 04:19  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Allow pair substitutions...
+
+2011-03-11 02:38  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Fix test for Mac OS
+
+2011-03-11 01:49  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Replace tabs with random number of spaces
+
+2011-03-10 17:06  mpsilfve
+
+	* Fixed hfst-string2fst parsing of input strings and reading of
+	  multichar symbols.
+
+2011-03-10 17:02  eaxelson
+
+	* hfst-strings2fst should now be able to handle all kind of string
+	  formats.
+
+2011-03-10 13:47  mpsilfve
+
+	* # is no longer a special symbol, because it is not a special
+	  symbol in xerox twolc.
+
+2011-03-10 13:45  mpsilfve
+
+	* Fixed print in left arrow rule conflict warnings.
+
+2011-03-10 13:10  eaxelson
+
+	* Special symbol handling changed in the commandline tools.
+
+2011-03-09 13:25  mpsilfve
+
+	* Added printing the conflicting context in left a row rule
+	  conflict warnings.
+
+2011-03-08 20:01  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Use unknowns and identities in regexp2fst
+
+2011-03-08 17:25  eaxelson
+
+	* Documentation added. Exceptions now throw a message.
+
+2011-03-08 14:08  mpsilfve
+
+	* Modified test so that the script does not have to be changed when
+	  new tests are added.
+
+2011-03-08 13:48  mpsilfve
+
+	* Removed a unnecessary newline printed when not reporting left
+	  arrow conflicts.
+
+2011-03-08 13:47  mpsilfve
+
+	* Added a rule for compiling a local version of hfst-twolc used in
+	  tests.
+
+2011-03-08 13:46  mpsilfve
+
+	* Added hfst-twolc tests.
+
+2011-03-08 13:45  mpsilfve
+
+	* Added hfst-twolc tsts.
+
+2011-03-07 16:46  mpsilfve
+
+	* Cahnged order of arguments so that 'cat fst1 | hfst-binary-tool
+	  fst2' will treat fst1 as the first and fst2 as the second
+	  argument.
+
+2011-03-07 14:47  eaxelson
+
+	* Now hfst-compare does not print anything in silent mode. More
+	  tests added to test/libhfst.
+
+2011-03-07 14:13  mpsilfve
+
+	* Fixed definitions
+
+2011-03-07 13:36  mpsilfve
+
+	* Fixed d:0 where d is a diacritic.
+
+2011-03-07 11:57  mpsilfve
+
+	* Fixed problem with diacritic pair syntax. Now d d: and d:0 are
+	  equivalent for the diacritic d and d:x will give a warning.
+
+2011-03-07 08:54  mpsilfve
+
+	* Fixed a bug with definitions
+
+2011-03-06 01:01  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* follow print-epsilons in all formats
+
+2011-03-06 00:37  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* format options like other tools have them
+
+2011-03-03 10:41  moshagen
+
+	* Ignore generated files.
+
+2011-03-02 16:56  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Use "HfstTransducer.hh" instead of <hfst/HfstTransducer.hh> for
+	  in tree builds
+
+2011-03-02 14:45  eaxelson
+
+	* hfst-strings2fst fixed
+
+2011-03-02 14:30  eaxelson
+
+	* Now hfst-strings2fst should handle escaping correctly.
+
+2011-03-02 14:01  eaxelson
+
+	* A bug in hfst-strings2fst fixed: now the backslash is reserved
+	  for escaping characters. Now the library also throws more
+	  informative exceptions.
+
+2011-02-26 15:40  mpsilfve
+
+	* Removed some more debug prints.
+
+2011-02-26 15:01  mpsilfve
+
+	* Removed some debugging prints
+
+2011-02-26 14:55  mpsilfve
+
+	* Fixed bug in defining lista using other lists and another bug
+	  which prevented variable rules unless there was a Definitions
+	  section.
+
+2011-02-26 00:16  mpsilfve
+
+	* Fixed diacritics handling.
+
+2011-02-24 22:58  mpsilfve
+
+	* Fixed output file handling.
+
+2011-02-24 22:22  mpsilfve
+
+	* Gave up on making }, ] and ) literal if they are not preceeded by
+	  opening {, [ and [, since this is too difficult in flex when
+	  brackets get nested. Fixed commandline argument handling properly
+	  and separated { and } from [ and ] i.e. they get their own bison
+	  symbols.
+
+2011-02-24 21:39  mpsilfve
+
+	* Fixed handling of commandline paramters so that the input
+	  filename can be given as a free argument without -i or --input.
+
+2011-02-24 21:36  mpsilfve
+
+	* Fixed syntax so that a lonely }, ] or ) is not interpreted as
+	  abracket, parenthesis and so on. Fixed numbers so that they need
+	  not be quoted unless preceeded by ^
+
+2011-02-24 18:58  mpsilfve
+
+	* Added hfst-compose-intersect.cc
+
+2011-02-23 15:23  mpsilfve
+
+	* Removed file hfst-twolc/.txt_fst which was added by mistake.
+
+2011-02-23 15:22  mpsilfve
+
+	* Removed geerated dir hfst-twolc/src/.deps which was added by
+	  mistake
+
+2011-02-23 15:18  mpsilfve
+
+	* Added hfst-twolc.
+
+2011-02-21 15:07  eaxelson
+
+	* A bug in hfst-lookup fixed: reading input strings in spaced
+	  format now works.
+
+2011-02-21 13:02  eaxelson
+
+	* Exception classes refined
+
+2011-02-18 12:38  eaxelson
+
+	* All exceptions changed to HFST_THROW(HfstException).
+
+2011-02-17 10:28  moshagen
+
+	* Ignore the latest binary file.
+
+2011-02-17 10:07  eaxelson
+
+	* The order of weight and string/string pair changed in
+	  HfstOneLevelPath and HfstTwoLevelPath. Now the elements of a set
+	  are sorted in ascending weight order.
+
+2011-02-16 16:37  eaxelson
+
+	* HfstLookupPath(s) is now replaced with HfstOneLevelPath(s)
+
+2011-02-16 13:09  eaxelson
+
+	* HfstTransducer::lookup now takes a StringVector as argument and
+	  HfstTransducer::extract_strings stores its results in an
+	  'HfstTwoLevelPaths'
+
+2011-02-15 11:08  hardwick
+
+	* More more more OFST->OPENFST renaming
+
+2011-02-14 12:18  eaxelson
+
+	* TROPICAL_OFST_TYPE and LOG_OFST_TYPE changed to
+	  TROPICAL_OPENFST_TYPE and LOG_OPENFST_TYPE.
+
+2011-02-14 11:32  mpsilfve
+
+	* Fixed a bug in reading binary SFST and FOMA transducers.
+
+2011-02-11 14:49  eaxelson
+
+	* AT&T format now accepts all whitespace characters as field
+	  separators.
+
+2011-02-10 15:20  hardwick
+
+	* Fixed typo and clarified help message
+
+2011-02-02 16:03  eaxelson
+
+	* Documentation updated. Tool hfst-name added.
+
+2011-02-02 13:49  eaxelson
+
+	* Now conversion from OpenFst and SFST to HFST handles special
+	  symbols correctly. How special symbols should be handled in the
+	  reverse case is still an open question.
+
+2011-02-01 13:47  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* remove deprecated conversions and unused parameters
+
+2011-01-31 10:42  mpsilfve
+
+	* Fixed two typedefs in trunk/hfst3/tools/src/hfst-summarize.cc
+
+2011-01-30 22:51  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Fix verbose messages about HFST3 headers
+
+2011-01-28 14:20  eaxelson
+
+	* hfst-lookup now prints the results in the FILE requested instead
+	  of stderr
+
+2011-01-28 11:09  eaxelson
+
+	* hfst-lookup has two options more. It is possible to print results
+	  in pairstring format (not implemented for optimized lookup
+	  format) and defined how the epsilon is printed.
+
+2011-01-27 04:00  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* implement flags and epsilons and xfst options print-space
+	  print-flag obey-flags etc.
+
+2011-01-26 15:45  eaxelson
+
+	* Documentation added. Thrown exception types changed for some
+	  functions.
+
+2011-01-25 17:18  eaxelson
+
+	* Documentation improved and added. Keyword 'const' added to
+	  functions and their arguments when appropriate.
+
+2011-01-24 16:18  eaxelson
+
+	* Documentation added.
+
+2011-01-19 15:18  eaxelson
+
+	* HfstFileException changed to HfstStreamException
+
+2011-01-19 11:50  eaxelson
+
+	* Missing flag diacritics now yield a warning in hfst-compose,
+	  hfst-conjunct and hfst-subtract, unless freely inserted by option
+	  -F.
+
+2011-01-18 14:23  hardwick
+
+	* One more portability fix... could be the last one!
+
+2011-01-18 14:20  hardwick
+
+	* Yet another without-openfst portability fix
+
+2011-01-18 14:17  hardwick
+
+	* Another without-openfst portability fix
+
+2011-01-18 14:14  hardwick
+
+	* Another without-openfst portability fix
+
+2011-01-18 14:12  hardwick
+
+	* Added using-directives to hfst-lookup.cc - apparently they don't
+	  get
+	  included from somewhere else when not HAVE_OPENFST, so this is
+	  necessary
+	  for portability
+
+2011-01-17 16:45  eaxelson
+
+	* Documentation added.
+
+2011-01-17 15:08  eaxelson
+
+	* HfstAlphabet, HfstBasic and HfstUtf8 cc and h files moved to
+	  tools/src. Some functions in HfstTransducer decalred as
+	  protected.
+
+2011-01-15 13:27  hardwick
+
+	* Added parsers/xre_utils.h to noist_HEADERS in
+	  tools/src/Makefile.am
+	  
+	  This commit is also to celebrate that hfst3 will now actually
+	  build on a clean
+	  system!
+
+2011-01-15 12:40  hardwick
+
+	* Added parsers/XreCompiler.h to noinst_HEADERS in
+	  tools/src/Makefile.am
+
+2011-01-12 16:23  eaxelson
+
+	* Intersecting composition functionalities removed, they will be
+	  implemented using HfstBasicTransducer format in the future.
+
+2011-01-12 14:12  hardwick
+
+	* Deleted unneeded Makefile.am in tools/src/parsers
+
+2011-01-12 12:32  eaxelson
+
+	* A bug in reading transducers in AT&T format fixed. Also an
+	  alphabet bug in converting HfstBasicTransducers into SFST
+	  transducers fixed.
+
+2011-01-10 16:47  eaxelson
+
+	* Redundant code removed from class HfstTransitionGraph.
+
+2011-01-10 15:21  eaxelson
+
+	* HfstNet renamed to HfstTransitionGraph, HfstFsm to
+	  HfstBasicTransducer and HfstArc to HfstBasicTransition
+
+2011-01-06 02:59  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* fix VPATH _build_
+
+2011-01-05 11:53  hardwick
+
+	* HfstCompiler.h in noinst_HEADERS
+
+2011-01-05 11:30  hardwick
+
+	* Added items to noinst_HEADERS in tools/src/parsers/Makefile.am,
+	  evidently needed
+	  for building
+
+2011-01-05 08:50  moshagen
+
+	* Ignore more generated files.
+
+2011-01-04 10:46  eaxelson
+
+	* A bug in transducer conversion functions fixed.
+
+2011-01-03 17:00  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* * some new autoconfiscate features (silent make!)
+	  * misc. stylistic changes
+
+2011-01-03 11:15  eaxelson
+
+	* Conversions between transducer formats updated so that they use
+	  HfstFsm
+
+2011-01-02 20:15  moshagen
+
+	* Ignore generated files.
+
+2011-01-02 19:37  moshagen
+
+	* Ignore generated files.
+
+2011-01-01 13:28  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Fix the missing includes and linkage
+
+2010-12-31 14:22  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Remove hfst's lexc, xfst and xre parsers and use foma's instead
+	  of reinventing
+	  wheel and doubling update burden
+
+2010-12-28 14:17  eaxelson
+
+	* 
+
+2010-12-28 13:28  eaxelson
+
+	* A bug in FomaTransducer::define_transducer fixed.
+
+2010-12-21 02:52  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* don't fclose infile too early
+
+2010-12-21 01:29  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* * Separate bug report from further info by newline
+	  * remove old and deprecated tools
+
+2010-12-14 16:09  eaxelson
+
+	* Files renamed and deleted.
+
+2010-12-10 16:53  eaxelson
+
+	* hfst-strings2fst now tokenizes multicharacter symbols
+
+2010-12-10 16:01  eaxelson
+
+	* A bug in hfst-strings2fst with (not pairstrings && not spaces)
+	  fixed.
+
+2010-12-10 15:39  eaxelson
+
+	* hfst-strings2fst now uses the internal trie transducer format and
+	  converts to the format requested before writing the output. This
+	  should make hfst-strings2fst faster.
+
+2010-12-09 17:52  eaxelson
+
+	* An implementation type FOO_TYPE added for testing, by default it
+	  is not included in HFST.
+
+2010-12-09 13:00  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Fix lookup_printf and test it
+
+2010-12-07 15:09  eaxelson
+
+	* A bug in hfst-strings2fst fixed, now the newline character is
+	  discarded before converting the weight string into a float. More
+	  Doxygen documentation also added.
+
+2010-12-04 16:58  eaxelson
+
+	* hfst-lookup should now work correctly for transducers having
+	  epsilon input cycles. Also added some documentation.
+
+2010-12-04 04:17  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* fix more of mac os x getline substitute
+
+2010-12-03 18:12  moshagen
+
+	* New item to ignore.
+
+2010-12-03 14:31  eaxelson
+
+	* hfst-lookup fixed, still allows too many cycles although limits
+	  the results to a finite number
+
+2010-12-03 10:52  eaxelson
+
+	* A bug in hfst-lexc-compiler fixed, still some errors in help2man
+	  and tool tests.
+
+2010-12-03 10:01  eaxelson
+
+	* File added.
+
+2010-12-02 15:14  eaxelson
+
+	* Outputs of help commands of commandline tools fixed.
+
+2010-11-30 13:57  eaxelson
+
+	* A bug in HfstTransducer(StringPairVector&, type==FOMA_TYPE)
+	  fixed.
+
+2010-11-30 09:30  hardwick
+
+	* Removed conditional compilation guards from non-template
+	  lookup-performing function (which way do we want it to be?)
+
+2010-11-30 01:58  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* enable lexc, missing ) added
+
+2010-11-29 17:26  eaxelson
+
+	* Tests added.
+
+2010-11-25 14:29  eaxelson
+
+	* Files renamed
+
+2010-11-25 13:20  eaxelson
+
+	* Now libhfst/src/implementations contains files that modify
+	  backend transducers directly and libhfst/src other files
+
+2010-11-24 18:15  eaxelson
+
+	* HfstCompiler.cc and HfstCompiler.h added to tools/src/
+
+2010-11-24 17:59  eaxelson
+
+	* Files moved.
+
+2010-11-24 14:58  eaxelson
+
+	* hfst-lookup updated, handling flag diacritics and multiple paths
+	  with the same weights not yet implemented
+
+2010-11-24 13:23  eaxelson
+
+	* hfst-lookup no works on unweighted acyclic transducers
+
+2010-11-24 08:42  moshagen
+
+	* Ignore compiled binary tools.
+
+2010-11-24 08:02  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* set type after exiting error for mac compiler
+
+2010-11-24 02:27  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Fix -o handling
+
+2010-11-23 17:44  eaxelson
+
+	* hfst-lookup implementation continued, works not yet
+
+2010-11-23 16:37  eaxelson
+
+	* beginning to implement hfst-lookup
+
+2010-11-22 01:54  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Clean up few minor details
+
+2010-11-17 00:16  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Catch stuff to provide meaningful error messages, provide better
+	  error replacement
+
+2010-11-16 14:22  eaxelson
+
+	* Small changes done, documentation added.
+
+2010-11-15 05:18  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Lookup and related functions
+
+2010-11-14 22:49  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Update string_to_format and some polishing
+
+2010-11-11 11:54  eaxelson
+
+	* harmonization function optimized
+
+2010-11-10 23:41  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* don't use bsd err functions
+
+2010-11-08 14:08  eaxelson
+
+	* A name field added to hfst header. Doxygen documentation updated.
+
+2010-11-05 14:02  eaxelson
+
+	* HfstInputStream changed
+
+2010-11-03 13:53  moshagen
+
+	* Ignore generated source and binary files.
+
+2010-11-01 14:44  eaxelson
+
+	* A bug in HFST header handling fixed. Todo: update HFST code to
+	  work with the newest version of SFST.
+
+2010-10-31 23:52  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Fix lexc compiler
+
+2010-10-29 15:40  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Make compiler tools dependent on relevant features in library
+
+2010-10-29 14:50  eaxelson
+
+	* Function open() removed from HfstInputStream and
+	  HfstOutputStream. HFST transducer header structure changed.
+
+2010-10-29 12:04  moshagen
+
+	* Ignore generated items.
+
+2010-10-28 16:37  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Mergefail→delete duplicate lines
+
+2010-10-28 16:15  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Add preliminary xfst compiler for offline compilation of static
+	  files
+
+2010-10-28 09:58  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* add replacement strndup and error_at_line for mac again
+
+2010-10-20 14:17  eaxelson
+
+	* more tests added to tools, SFST_TYPE transducer header now has an
+	  optional field that tells if the transducer is minimal
+
+2010-10-19 12:14  eaxelson
+
+	* more tests added to test/tools and small bugs fixed in
+	  commandline programs
+
+2010-10-18 15:28  eaxelson
+
+	* HfstInputStream and HfstOutputStream now work correctly with
+	  tropical and log weight transducers if their file argument is an
+	  empty string
+
+2010-10-04 13:53  eaxelson
+
+	* 
+
+2010-09-27 14:15  eaxelson
+
+	* 
+
+2010-09-22 15:36  eaxelson
+
+	* now hfst-calculate does not unnecessarily handle unknown symbols
+	  in composition
+
+2010-09-17 14:58  eaxelson
+
+	* HfstCompiler::new_transducer is now faster
+
+2010-09-15 15:39  eaxelson
+
+	* some bugs in command line programs fixed
+
+2010-09-14 13:54  eaxelson
+
+	* some bugs fixed in tests and hfst library
+
+2010-09-13 14:42  eaxelson
+
+	* a bug in function 'harmonize' fixed
+
+2010-09-10 14:22  moshagen
+
+	* Ignore generated autotools stuff.
+
+2010-09-10 12:17  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Commit missing inputNamed
+
+2010-09-06 18:46  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Make --without-foma work
+
+2010-09-06 13:13  hardwick
+
+	* optimized-lookup bigfix wrt weights in flagged transducers
+
+2010-09-02 15:36  eaxelson
+
+	* Function HfstTransducer::push_weights added. Foma is now
+	  dynamically linked to hfst, option -fvisibility must not be used
+	  when compiling foma, because then some of foma's functions will
+	  not be visible to hfst.
+
+2010-09-01 01:55  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* move things around
+
+2010-08-31 22:56  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Add space separated strings2fst; parse - as filename in
+	  hfst_fopen
+
+2010-08-31 15:37  eaxelson
+
+	* hfst now works without making any changes in sfst files
+
+2010-08-29 22:36  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Configuring out broken parts
+
+2010-08-29 18:19  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Add preliminary lexc compiler
+
+2010-08-29 17:18  eaxelson
+
+	* HfstMutableTransducer defined in namespace hfst, small bugs fixed
+	  in TropicalWeightTransducer
+
+2010-08-28 18:38  eaxelson
+
+	* HfstMutableTransducer replaced with HfstInternalTransducer
+
+2010-08-27 16:17  eaxelson
+
+	* some modifications made to HfstInternalTransducer
+
+2010-08-25 00:54  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Enable XRE parser
+
+2010-08-24 14:24  eaxelson
+
+	* conversions between SFST and internal transducers added
+
+2010-08-23 23:25  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* summarize more statistics
+
+2010-08-23 16:26  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Enable basic compose-intersect again; no flags, no #'s
+
+2010-08-23 14:07  eaxelson
+
+	* HFST code updated so that it works with OpenFst version 1.2. New
+	  internal transducer format added.
+
+2010-08-22 22:58  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* fix signs when wno-sign-compare fails
+
+2010-08-22 22:56  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Delete generated files
+
+2010-08-19 15:47  eaxelson
+
+	* Now hfst-calculate does not depend on SFST.
+
+2010-08-18 13:43  eaxelson
+
+	* hfst-calculate now does not depend on SFST, function
+	  implementations not yet written
+
+2010-08-16 15:54  eaxelson
+
+	* a bug in substitute(StringPair, HfstTransducer) fixed, agreement
+	  variables added to hfst-calculate
+
+2010-08-15 18:27  bcroom
+
+	* Remove obsolete source files of hfst-proc predecessors
+
+2010-08-15 18:27  bcroom
+
+	* Fix bug causing final weights not to be included in weight
+	  calculations
+
+2010-08-15 18:26  bcroom
+
+	* Remove obsolete flag diacritics code from hfst-proc
+
+2010-08-15 18:25  bcroom
+
+	* Add license information to hfst-proc and optimized-lookup files
+
+2010-08-15 18:24  bcroom
+
+	* Perform initial migration of hfst-proc into its new home in the
+	  proper HFST tools directory, while refactoring to share as much
+	  code as possible with the optimized-lookup library backend
+
+2010-08-15 18:22  bcroom
+
+	* Add 'exclude' option to hfst-fst2strings
+
+2010-08-12 16:45  eaxelson
+
+	* Composition can soon handle identity and unknown symbols
+	  correctly. Substitute can now also modify symbol pairs through a
+	  function pointer.
+
+2010-08-12 06:06  bcroom
+
+	* Refactor extract_strings to invoke a callback on paths, allowing
+	  neat features in hfst-fst2strings
+
+2010-08-10 15:04  eaxelson
+
+	* SFST updated to new test version, some modifications still needed
+	  to HFST library so that it will work with the new version
+
+2010-08-09 19:31  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* error_at_line for parsing errors
+
+2010-08-09 19:15  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Allow empty lines and comment lines starting with # except when
+	  followed
+	  by a tab.
+
+2010-08-09 18:49  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Add the basic summarize functionality and the test
+
+2010-08-06 14:49  eaxelson
+
+	* rule operators added to hfst-calculate
+
+2010-08-06 06:43  bcroom
+
+	* Reimplement extract_strings in all backends with cycle-limiting
+	  functionality
+
+2010-08-05 23:00  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* substitute and test
+
+2010-08-05 15:04  eaxelson
+
+	* more functions added to hfst-calculate
+
+2010-08-05 12:27  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Make string pair implementation work
+
+2010-08-05 07:26  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Ignore generated files§
+
+2010-08-05 07:17  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Add lexc compiler's old skeleton
+
+2010-08-04 17:46  eaxelson
+
+	* more functions added to hfst-calculate
+
+2010-08-04 11:25  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* test strings2fst and fail
+
+2010-08-02 20:53  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Fix bug in binary op parameter handling and add test for it
+
+2010-08-02 18:54  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Fix no parameters parsing for unary tools and project
+
+2010-08-02 15:12  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Fix fst2strings to use set_program_name and rest of the basic
+	  tools
+
+2010-08-02 14:38  eaxelson
+
+	* small changes done in functions that are needed for
+	  hfst-calculate
+
+2010-08-01 20:39  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Default to -Wall -Wextra -Werror for developers
+
+2010-08-01 19:31  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Convert txt2fst;
+	  * use const for global char-*
+	  * default stdin, stdout for global FILE*
+
+2010-08-01 18:39  bcroom
+
+	* Add initial support for evaluating and filtering flag diacritics
+	  when extracting transducer paths
+
+2010-08-01 18:38  bcroom
+
+	* Port and enable fst2strings
+
+2010-07-28 12:01  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Use warn and err if warnc, errc, error are not available
+
+2010-07-28 11:35  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Instead of gnulib-tool, handle gnulib manually
+
+2010-07-27 01:41  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Missing file
+
+2010-07-27 01:15  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Convert some simpler command line tools to HFST3 (preliminary)
+
+2010-07-26 12:05  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Perhaps gnulib for portability problems? Temp. disabled few
+	  tools.
+
+2010-07-25 00:04  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Include licensing blurb in every single file since it's very
+	  important
+
+2010-07-24 23:37  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Update docs a bit
+
+2010-07-22 00:14  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* First steps towards unbundling backend libraries
+
+2010-07-14 19:45  bcroom
+
+	* Add support for the HFST-optimized-lookup implementation in the
+	  tool for format conversion
+
+2010-07-03 05:21  bcroom
+
+	* Add hfst-strip-header tool for removing any HFST3 headers from a
+	  file
+
+2010-07-03 05:13  bcroom
+
+	* Port hfst-compare to the new library
+
+2010-07-03 05:11  bcroom
+
+	* Pass the correct output type when creating the output stream
+
+2010-06-30 14:28  bcroom
+
+	* Port hfst-fst2txt
+
+2010-06-30 14:27  bcroom
+
+	* Fix the already-ported tools to properly handle IO using the
+	  standard streams
+
+2010-06-30 12:53  eaxelson
+
+	* 
+
+2010-06-30 11:31  eaxelson
+
+	* HfstCompiler class added
+
+2010-06-29 04:22  bcroom
+
+	* Fix fst2fst to correctly handle inputs with multiple transducers
+
+2010-06-29 03:46  bcroom
+
+	* Port hfst-invert to HFST3
+
+2010-06-28 19:53  bcroom
+
+	* Port hfst-fst2fst to work with HFST3
+
+2010-06-28 19:48  bcroom
+
+	* Add call to open the output stream so the tool doesn't crash
+
+2010-06-28 14:29  bcroom
+
+	* Remove HFST2 include from file with helper functions for tools
+
+2010-06-28 13:51  eaxelson
+
+	* hfst-calculate files updated to hfst version 3. At the moment,
+	  hfst-calculate only parses single transition expressions and
+	  produces a dummy transducer as a result.
+
+2010-06-03 08:18  moshagen
+
+	* Ignore the content of the m4 dirs, it is generated (by autoreconf
+	  -i, see the README file).
+
+2010-06-02 11:56  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* * Remove openfst from source directory because bundling Apache
+	  licenced
+	  software with GNU GPL softare is a bad thing
+	  * Add licence disclaimers to auxiliary files because FSF suggests
+	  so
+
+2010-05-26 10:59  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* sgi.h is visible outside libhfst
+
+2010-05-24 21:51  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* copy hfst-proc verbatim to 3
+
+2010-05-24 21:49  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Swap stable old trunk to branches and proposition to trunk
+
+2010-05-21 15:18  moshagen
+
+	* Ignore generated files. Please check that I haven't ignored too
+	  much. There are probably also other generated files that are
+	  presently stored in svn.
+
+2010-05-15 17:47  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* converted hfst-concatenate to hfst3?
+
+2010-05-11 13:47  eaxelson
+
+	* Test file updated to new directory structure. Repeat and
+	  optionalize functions should now work.
+
+2010-05-11 05:23  Tommi A Pirinen <tommi.pirinen@helsinki.fi>
+
+	* Initial autocorrupted version
+

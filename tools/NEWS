@@ -1,0 +1,202 @@
+=================================
+ NEWS for hfst-tools and library
+=================================
+
+This file contains all noteworthy changes in HFST development between releases.
+For full listing of changes see ChangeLog.
+
+
+Noteworthy changes in 3.3.2
+---------------------------
+
+* Forward compatibility with OpenFst 1.2.8 is achieved.
+
+* PKG_ macros removed from end user builds since they do not work nicely on
+  all platforms.
+
+Noteworthy changes in 3.3.1
+---------------------------
+
+* Handling of flag diacritics improved.
+
+* More examples in fsmbook-examples included in tests.
+
+* Extra files created during tests as well as generated autotools files 
+  are now ignored by svn.
+
+Noteworthy changes in 3.3.0
+---------------------------
+
+* HFST updated to work with the newest versions of backend libraries
+
+* a new replace down function by Karttunen added
+
+* HfstTransitionGraph and conversions between formats made less error-prone
+
+* protected/public changes in API
+
+* SFST and foma libraries are disabled from default build
+
+Noteworthy changes in 3.2.0
+---------------------------
+
+* Numerous improvements to hfst-proc, including better uppercasing via glib,
+  better compound handling, new analysis mode for raw analysis without case
+  changes or special symbols etc.
+
+* old slow lexc (not built by default)
+
+* numerous scripting fixes for mac os x compatibility with foma
+
+* constness changes in API
+
+Noteworthy changes in 3.1.1
+---------------------------
+
+* Numerous bugfixes, in particular regarding a broken assumption in
+  compose-intersect
+
+Noteworthy changes in 3.1.0
+---------------------------
+
+* api for lookup and lookdown changed, previously memory didn't get initialized
+  anywhere, causing a serious bug
+
+Noteworthy changes in 3.0.3
+---------------------------
+
+* numerous internal improvements, eg. distcheck is now functional
+
+* many bugfixes, especially wrt. INDENTITY_PAIR & OTHER SYMBOL, composition,
+  final weights in ol-converted transducers
+
+Noteworthy changes in 3.0.2
+---------------------------
+
+* some fixes to OSX compatibility
+
+* no more license conflict problems wrt foma
+
+* better memory use in compose-intersect
+
+* new implementation of internal transducer
+
+Noteworthy changes in 3.0.1
+---------------------------
+
+* this is a bugfix release
+
+* conversion to hfst-optimized-lookup format was fundamentally broken in the
+  original release; this should provide a fix and considerable speedup
+
+* compose-intersect memory use is much improved
+
+Noteworthy changes in 3.0
+-------------------------
+
+* all new API in object oriented form
+
+* brand new foma backend for unweighted transducer handling
+
+* the FST libraries used for automata handling are now dynamically linked to
+  HFST
+
+    * this requires end users to install needed backends themselves
+
+* hfst-lexc and hfst-xfst based on foma's compiler
+
+  * xfst is now also fully supported
+
+  * the obsolete command line clients for HFST-based compilation of lexc and
+    xfst scripts are hidden in hfst-lexc2fst and hfst-xfst2fst
+
+* preliminary support for unknown character classes
+
+* optimized-lookup backend supported in library
+
+  * dropped special tools for optimised handling since optimised lookup is
+    included in library: hfst-optimised-lookup -> hfst-lookup; 
+    hfst-lookup-optimize -> hfst-fst2fst
+
+* hfst-proc tool to emulate lt-proc, cg-proc
+
+* Slightly improved string and text formats to support weights uniformly and
+  parsing tabs and spaces as automata arcs: see `wiki page for text and string
+  formats
+  <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstStringAndTextFormats>`
+
+* better error handling using exceptions
+
+* The argument handling order of binary tools changed: stdin is first if not
+  specified
+
+* The automata are now packed in HFST automaton container format (akin to AVI
+  for videos); this supports arbitrary metadata and underlying FST formats
+
+* the symbol handling is more implicit; no more symbol table arguments for tools
+  or hfst-symbols command
+
+* converted to new autotools: silent rules and color tests
+
+* Hfst's internal automata format for fallback on some unsupported operations
+  and for conversions
+
+Noteworthy changes in 2.4.1
+---------------------------
+
+* Fixed inclusion path in pkg-config file
+
+* Fixed extraneous epsilon path in hfst-lexc transducers
+
+Noteworthy changes in release 2.4
+---------------------------------
+
+* Multiple compilation issued fixed w.r.t string.h inclusion inside hfst source
+  tree without installed headers
+
+* Added preliminary pkg-config support
+
+* Optimizations for flag diacritics in optimized format; NB. the optimized
+  format in 2.4 is not compatible with optimized format of previous releases
+
+* More input and output formatting options for hfst-lookup
+
+* New tool hfst-omor-evaluate for testing morphological transducers
+  (an overblown glorified hfst-diff-test)
+
+* Preliminary tool for killing evil flag diacritics
+
+* Several minor bug fixes in composing intersection and flag diacritics
+
+Noteworthy changes in release 2.3
+---------------------------------
+
+* Major fixes in flag diacritic handling for lookup and lookup-optimize
+
+* New tool hfst-substitute for safe relabeling
+
+* Bug fixes in hfst-compose-intersect w.r.t. any symbol and #
+
+* Remove gettext support because of numerous portability issues
+
+Noteworthy changes in release 2.2
+---------------------------------
+
+* Bug fixes in intersecting composition,  is_subset, negation, 
+
+* Handling of flag diacritics included in lookup
+
+* Remove readline because of numerous portability issues
+
+* Remove alphabet and metadata from hfst-lexc
+
+* hfst-lookup support for custom formatting of readings
+
+* fixed hfst-twolc escaping in set constructions
+
+Noteworthy changes in release 2.1
+---------------------------------
+
+* hfst-twolc and hfst-compose-intersect understand # like xerox originals
+
+.. vim: set ft=rst:
