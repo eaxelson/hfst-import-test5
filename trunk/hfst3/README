@@ -1,4 +1,5 @@
 .. -*- mode: rst -*-
+
 ==================================================================
  Helsinki Finite-State Technology (library and application suite)
 ==================================================================
@@ -12,8 +13,59 @@ authors specified in AUTHORS file may be contacted about licencing issues.
 There's an online wiki-based information source about HFST in
 `Kitwiki HFST pages <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_.
 
+Installation
+============
+
+Installation method depends on operating system and the version you want to
+install. For stable versions there exists packages for some of the better
+operating system and package manager combinations. For bleeding edge newest
+versions, development and non-supported operating systems and versions you
+will have to perform `installation from the sources`_.
+
+Installation for MacPorts
+-------------------------
+
+The port tree for HFST and related software can be downloaded from `HFST
+download directory <https://sourceforge.net/projects/hfst/files/hfst/>`_.
+To add this port tree to your macports installation, unpack it to wherever
+and insert that directory to your ``sources.conf``, e.g. in the default
+installation to ``/opt/local/etc/macports/sources.conf``::
+
+    [...]
+    # If an rsync URL points to a .tar file, a signed .rmd160 must exist next to
+    # it on the server and will be used to verify its integrity.
+    
+    file:///Users/flammie/Sources/hfst-macport/
+    rsync://rsync.macports.org/release/tarballs/ports.tar [default]
+
+Now you can install hfst and related software using port commands::
+
+  sudo port install hfst
+
+Installation for Gentoo Linux
+-----------------------------
+
+HFST software is available in *science* overlay. For portage, use::
+
+  layman -a science
+
+To add the repository. Then::
+
+  emerge -av hfst
+
+to install. Parts of the spell-checking tools are in *Finnish* overlay. If you
+use Paludis, just try to ``cave resolve sci-misc/hfst`` to get the current
+instructions.
+
+Installation for other systems
+------------------------------
+
+For rest of the systems, HFST needs to be installed from the source, the
+traditional GNU/linux way. To begin your installation, you need to start by
+gathering the dependencies, as adviced in the following chapter.
+
 Dependencies
-------------
+============
 
 Please note that the dependencies for the library can be set during the compile
 time. Settings that determine dependencies relate to features the resulting
@@ -30,7 +82,8 @@ interfaces require a compatible version of libreadline_ to be installed in
 order to work; notably the supplement library distributed with Mac OS X does not
 suffice, since it cannot even handle unicode properly.
 
-Compilation requirements:
+Compilation requirements
+------------------------
 
 - To use the OpenFST_ backend (default):
 
@@ -42,6 +95,9 @@ Compilation requirements:
 
     - the version 1.1 or older uses const char* type where 1.2 has string, so
       you cannot use this API incompatible version with HFST
+
+    - the version 1.3 is slightly incompatible with 1.2, generally newer HFST's
+      will work with newer OpenFst's though
 
   - compiling against OpenFST library and linking may require recent
     GCC version and pthread and m libraries, check OpenFST site for details
@@ -157,7 +213,7 @@ When running HFST software or using HFST libraries from HFST-enabled software:
 
 - If you install the libraries in non-standard paths, you need to ensure
   that operating system is aware of this; In linux this may happen by setting
-  LD_LIBRARY_PATH.
+  ``LD_LIBRARY_PATH``, on Mac ``DYLD_LIBRARY_PATH``
 
 - the *hfst-xfst* frontend **requires** foma binary
 
@@ -168,8 +224,8 @@ When running HFST software or using HFST libraries from HFST-enabled software:
   binaries, you do **not** need to install SFST libraries or binaries in
   order to compile SFST-PL scripts to HFST automata.
 
-Installation
-------------
+Installation from the sources
+-----------------------------
 
 INSTALL describes the GNU build system in detail, but for most users the usual::
 
@@ -215,14 +271,15 @@ the standard installation instructions for GNU autoconf based software.
 
 
 Troubleshooting
----------------
+===============
 
-In this section we list the errors that pop up commonly on our support channel,
-<irc://FreeNode/#hfst>, in the bug tracker <> or on the mailing lists
-<hfst-development@lists.sf.net>.
+In this section we list the errors that pop up commonly on `our support channel
+<irc://FreeNode/#hfst>`_, in `our bug tracker
+<https://sourceforge.net/tracker/?group_id=224521&atid=1061990>`_ or `on our
+development mailing list <hfst-development@lists.sf.net>`_.
 
 \::malloc has not been declared
-'''''''''''''''''''''''''''''''
+-------------------------------
 
 **During the compilation** errors of form::
 
@@ -280,7 +337,7 @@ See also:
 the gory details.
 
 Error while loading shared libraries: libhfst.so.0: cannot open shared object file: No such file or directory
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+-------------------------------------------------------------------------------------------------------------
 
 **After installing HFST and running programs**, the installed programs should
 on most systems be able to find and use the shared libraries that just got
@@ -301,8 +358,8 @@ applies for libraries installed to e.g. home directory.
 
 See also the previous error description.
 
-undefined reference to `dlopen'
-'''''''''''''''''''''''''''''''
+undefined reference to dlopen
+-----------------------------
 
 This error is encountered when compiling OpenFst on recently updated Ubuntus,
 see
@@ -322,7 +379,7 @@ to::
 and comment out (or remove) all the tool-specific LDADD lines.
 
 Request for member c_str in ... which is of non-class type const char*
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+----------------------------------------------------------------------
 
 **During the compilation**, the errors of form::
 
@@ -335,7 +392,7 @@ type instead of strings, as in openfst 1.2. Update or downgrade your openfst
 installation to 1.2 and ensure that older (or newer?) headers are not around.
 
 chmod: cannot access 'scripts/hfst-foma-wrapper.sh': No such file or directory
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+------------------------------------------------------------------------------
 
 **During the configuration phase.** This is a case of autoconf being silly; the
 commands for creating a script and making it executable from autoconf are ran
@@ -344,7 +401,7 @@ of the files it creates. The script for doing this is copied to configure.ac
 from autoconf manual so it supposably will always work correctly...
 
 ....libs/lt-hfst-strings2fst: Incorrect utf-8 coding
-''''''''''''''''''''''''''''''''''''''''''''''''''''
+----------------------------------------------------
 
 **During the make check phase**. This indicates that a test that tests for
 expected failure fails expectedly, which is also indicated by a green word
@@ -367,7 +424,7 @@ bug tracker in sf.net infrastructure
 <https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>`_.
 
 openfst tests failed (--without-openfst to disable)
-'''''''''''''''''''''''''''''''''''''''''''''''''''
+---------------------------------------------------
 
 **During the configuration phase**. This indicates that you did not succeed in
 installing compatible version of OpenFst to your computer. To install openfst
@@ -382,7 +439,7 @@ configure. This will, however, result in loss of all weighted finite-state
 technology at the moment, as OpenFst is the only weighted FST library we use.
 
 sfst tests failed (--without-sfst to disable)
-'''''''''''''''''''''''''''''''''''''''''''''
+---------------------------------------------
 
 **During the configuration phase**. This indicates that you did not succeed in
 installing compatible version of SFST to your computer. To install sfst library
@@ -399,7 +456,7 @@ SFST is only used to handle SFST format automata and to use SFST automata
 algorithms on lower level.
 
 foma tests failed (--without-foma to disable)
-'''''''''''''''''''''''''''''''''''''''''''''
+---------------------------------------------
 
 **During the configuration phase**. This indicates that you did not succeed in
 installing compatible version of foma to your computer. The foma library
@@ -414,7 +471,7 @@ format automata.  The support for foma-based scripts is not dependent on
 --without-foma option, it uses the ``foma`` binary directly if available.
 
 cat: hvVqf:o:l:u:: No such file or directory
-''''''''''''''''''''''''''''''''''''''''''''
+--------------------------------------------
 **During use of bash-based scripts**, an error message including things like::
 
 
@@ -436,7 +493,7 @@ must be last parameters on commandline with it, so its use is strongly
 discouraged.
 
 error: ‘class SFST::Node’ has no member named ‘index’
-'''''''''''''''''''''''''''''''''''''''''''''''''''''
+-----------------------------------------------------
 **During compilation phase**, error messages of form::
 
   ConvertTransducerFormat.h:106: error: "SFST::NodeNumbering" has not been declared
@@ -458,14 +515,14 @@ support without any loss of functionality using the configure option
 
 
 Further information
--------------------
+===================
 
 The `Hfst wiki site
 <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_ contains further
 details of the HFST system.
 
 Reporting bugs
---------------
+==============
 
 Bugs can be reported via email to `HFST team bug mail address
 <hfst-bugs@helsinki.fi>`_, or preferably to `HFST's bug tracking system
@@ -481,5 +538,11 @@ When reporting, please include at least following:
 
 * information about platform used (e.g. uname -a)
 
+.. _libxml2: http://www.xmlsoft.org/
+.. _libreadline: http://www.gnu.org/software/readline/
+.. _openfst: http://www.openfst.org/
+.. _sfst: http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html
+.. _foma: http://www.googlecode.com/p/foma/
+.. _apertium: http://apertium.sf.net/
 
 .. vim: set ft=rst:
