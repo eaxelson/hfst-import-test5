@@ -30,6 +30,9 @@
 #include <cstring>
 #include <cstdio>
 
+// for internal epsilon
+#include "HfstSymbolDefs.h"
+
 #include "lexc-utils.h"
 #include "lexc-parser.h"
 
@@ -232,7 +235,20 @@ strdup_token_part()
 char*
 strip_percents(const char* s, bool do_zeros)
 {
-    char* rv = (char*)malloc(sizeof(char)*strlen(s)*6+1);
+    char* rv = 0;
+    if (do_zeros)
+      {
+        // worst case scenario is string of 0's...
+        rv = (char*)malloc(sizeof(char) * 
+                             strlen(s) * strlen("@0@")
+                             + 1);
+      }
+    else
+      {
+        // worst case scenario is string of %0's...
+        rv = (char*)malloc(sizeof(char) *
+                           ((strlen(s) / 2) + 1) * strlen("@ZERO@") + 1);
+      }
     char* p = rv;
     const char* c = s;
     bool escaping = false;
@@ -243,23 +259,19 @@ strip_percents(const char* s, bool do_zeros)
             if (*c != '0')
             {
                 *p = *c;
+                p++;
             }
             else
-            {
-                *p = '@';
-                p++;
-                *p = 'Z';
-                p++;
-                *p = 'E';
-                p++;
-                *p = 'R';
-                p++;
-                *p = 'O';
-                p++;
-                *p = '@';
+              {
+                const char* escaped = "@ZERO@";
+                while (*escaped != '\0')
+                  {
+                    *p = *escaped;
+                    p++;
+                    escaped++;
+                  }
             }
             escaping = false;
-            ++p;
             ++c;
         }
         else if (*c == '%')
@@ -268,15 +280,16 @@ strip_percents(const char* s, bool do_zeros)
             ++c;
         }
         else if (do_zeros && (*c == '0'))
-        {
-            *p = '@';
-            p++;
-            *p = '0';
-            p++;
-            *p = '@';
-            p++;
+          {
+            const char* escaped = "@0@";
+            while (*escaped != '\0')
+              {
+                *p = *escaped;
+                p++;
+                escaped++;
+              }
             c++;
-        }
+          }
         else
         {
             *p = *c;

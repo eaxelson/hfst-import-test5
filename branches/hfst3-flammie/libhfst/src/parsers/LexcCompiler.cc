@@ -381,7 +381,7 @@ LexcCompiler::compileLexical()
         string endEnc = "#";
         joinerEncode(endEnc);
         HfstTransducer end(endEnc, endEnc, format_);
-        HfstTransducer sigmaStar("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@",
+        HfstTransducer sigmaStar(hfst::internal_identity, hfst::internal_identity,
                                  format_);
         sigmaStar = sigmaStar.subtract(start).subtract(end).subtract(joiner);
         sigmaStar.repeat_star();
@@ -390,7 +390,7 @@ LexcCompiler::compileLexical()
         morphotax.repeat_star();
         morphotax = start.concatenate(morphotax).concatenate(end).minimize();
         lexicons = lexicons.compose(morphotax);
-        lexicons.substitute(joinerEnc, "@_EPSILON_SYMBOL_@").minimize();
+        lexicons.substitute(joinerEnc, hfst::internal_epsilon).minimize();
       }
       {
         // now same for initial lexicon
@@ -401,7 +401,8 @@ LexcCompiler::compileLexical()
         string endEnc = "#";
         joinerEncode(endEnc);
         HfstTransducer end(endEnc, endEnc, format_);
-        HfstTransducer sigmaStar("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@",
+        HfstTransducer sigmaStar(hfst::internal_identity,
+                                 hfst::internal_identity,
                                  format_);
         sigmaStar = sigmaStar.subtract(start).subtract(end).subtract(joiner);
         sigmaStar.repeat_star();
@@ -410,14 +411,19 @@ LexcCompiler::compileLexical()
         morphotax.repeat_star();
         morphotax = start.concatenate(morphotax).concatenate(end).minimize();
         lexicons = lexicons.compose(morphotax);
-        lexicons.substitute(startEnc, "@_EPSILON_SYMBOL_@").minimize();
+        lexicons.substitute(startEnc, hfst::internal_epsilon).minimize();
       }
     string endEnc = "#";
     joinerEncode(endEnc);
-    lexicons.substitute(endEnc, "@_EPSILON_SYMBOL_@");
+    lexicons.substitute(endEnc, hfst::internal_epsilon);
     lexicons.substitute("@ZERO@", "0");
+    lexicons.substitute("@0@", hfst::internal_epsilon);
     HfstTransducer* rv = new HfstTransducer(lexicons);
     rv->minimize();
+    if (!quiet_)
+      {
+        fprintf(stderr, "\n");
+      }
     return rv;
 }
 
