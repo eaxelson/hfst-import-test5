@@ -7,7 +7,7 @@ PYTHON=python3
 HFST_EDIT_DISTANCE=hfst-edit-distance
 HFST_OSPELL=hfst-ospell
 HFST_FST2FST=hfst-fst2fst
-XELATEX=pdflatex
+XELATEX=xelatex
 BIBTEX=bibtex
 WGET=wget
 BZCAT=bzcat
@@ -87,7 +87,27 @@ TABLES=results/table1.tex results/table2.tex \
 	   results/table3.tex results/table4.tex results/table5.tex \
 	   results/table6.tex
 
+# generic targets
+.PHONY: all results dictionaries models corpora tables clean-results clean-corpora clean-models clean-tables
+
+
 # article
+articles: fsmnlp-2012-speedspelling.pdf fsmnlp-2012-spelling-tutorial.pdf
+
+TUTORIAL_GRAPHICS=anystar.pdf cat.pdf catses.pdf cta2cat.pdf \
+				  cta.pdf demo-lm.pdf edit1-ab10.pdf \
+				  edit1+en-orth.pdf edit1swap-ab10.pdf \
+				  en-confusables.pdf en-orth.pdf \
+				  errm-ed1.pdf errm.edit1+en-orth.pdf
+
+%.pdf: %.dot
+	dot -Tpdf -o$@ $<
+
+fsmnlp-2012-spelling-tutorial.pdf: fsmnlp-2012-spelling-tutorial.tex $(TUTORIAL_GRAPHICS)
+	$(XELATEX) $<
+	$(XELATEX) $<
+	$(XELATEX) $<
+
 fsmnlp-2012-speedspelling.pdf: fsmnlp-2012-speedspelling.tex fsmnlp2012.bib
 	$(XELATEX) fsmnlp-2012-speedspelling.tex
 	$(BIBTEX)  fsmnlp-2012-speedspelling
@@ -95,11 +115,10 @@ fsmnlp-2012-speedspelling.pdf: fsmnlp-2012-speedspelling.tex fsmnlp2012.bib
 	$(XELATEX) fsmnlp-2012-speedspelling.tex
 	$(XELATEX) fsmnlp-2012-speedspelling.tex
 
-# generic targets
-.PHONY: all results dictionaries models corpora tables clean-results clean-corpora clean-models clean-tables
+# generic target
+all: results articles
 
-all: results fsmnlp-2012-speedspelling.pdf
-
+# test results
 results: corpora dictionaries models tables
 
 dictionaries: $(DICTIONARIES)
