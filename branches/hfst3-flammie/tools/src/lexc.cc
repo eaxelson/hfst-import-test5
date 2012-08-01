@@ -249,13 +249,13 @@ parse_options(int argc, char** argv)
             long file_length = hfst_ftell(lexcfiles[i]);
             rewind(lexcfiles[i]);
             char* fdata = static_cast<char*>(malloc(sizeof(char) * 
-                                                    (file_length +1)));
+                                                    (file_length + 1)));
             hfst_fread(fdata, sizeof(char), file_length,
                                    lexcfiles[i]);
-            fdata[file_length] = '\0';
+            fdata[file_length] = '\n';
             fclose(lexcfiles[i]);
             free(lexcfilenames[i]);
-            hfst_write(temporary_fd, fdata, file_length);
+            hfst_write(temporary_fd, fdata, file_length + 1);
           }
         hfst_close(temporary_fd);
         lexccount = 1;
