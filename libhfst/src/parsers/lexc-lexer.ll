@@ -162,7 +162,7 @@ LWSP [\r\n\t ]
 
 <LEXICONS>{STRINGTOKEN} {
 	hfst::lexc::token_update_positions(hlexctext);
-	hlexclval.name = hfst::lexc::strip_percents(hlexctext, false);
+	hlexclval.name = hfst::lexc::strip_percents(hlexctext, true);
 	return ULSTRING;
 }
 
