@@ -69,7 +69,8 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   heavycat.hfst abid.hfst unk2unk.hfst unk_or_id_star.hfst a2b.hfst \
 		   a2b_complement.hfst a2b_input_projection_complement.hfst empty.hfst \
 		   walk_or_dog.hfst \
-		   romanian.hfst
+		   romanian.hfst \
+		   basic.zeros-epsilons.hfst
 OL_CHECKS=cat2dog.hfst.ol cat2dog.gen.hfst.ol cat_weight_final.hfst.ol \
 			proc-caps.hfst.ol proc-caps.gen.hfst.ol \
 			compounds.hfst.ol bashkir.hfst.ol \
@@ -89,7 +90,8 @@ SFST_CHECKS=0to3cats.hfst.sfst 2to4cats.hfst.sfst 4cats.hfst.sfst\
 			a2b.hfst.sfst a2b_complement.hfst.sfst a2b_input_projection_complement.hfst.sfst \
 			empty.hfst.sfst \
 			walk_or_dog.hfst.sfst \
-			romanian.hfst.sfst
+			romanian.hfst.sfst \
+			basic.zeros-epsilons.hfst.sfst
 OFST_CHECKS=0to3cats.hfst.ofst \
 			2to4cats.hfst.ofst 4cats.hfst.ofst 4toINFcats.hfst.ofst \
 			cat2cat_or_CAT_uppercased.hfst.ofst cat2CAT_uppercased.hfst.ofst \
@@ -106,7 +108,8 @@ OFST_CHECKS=0to3cats.hfst.ofst \
 			cat2dog_0.3.hfst.ofst cat2dog_0.5.hfst.ofst empty.hfst.ofst unk_or_id_star.hfst.ofst \
 			a2b.hfst.ofst a2b_complement.hfst.ofst a2b_input_projection_complement.hfst.ofst \
 			walk_or_dog.hfst.ofst \
-			romanian.hfst.ofst
+			romanian.hfst.ofst \
+			basic.zeros-epsilons.hfst.ofst
 FOMA_CHECKS=0to3cats.hfst.foma 2to4cats.hfst.foma 4cats.hfst.foma \
 			4toINFcats.hfst.foma cat2cat_or_CAT_uppercased.hfst.foma \
 			cat2CAT_uppercased.hfst.foma cat2dog.hfst.foma \
@@ -122,7 +125,8 @@ FOMA_CHECKS=0to3cats.hfst.foma 2to4cats.hfst.foma 4cats.hfst.foma \
 			a2b.hfst.foma a2b_complement.hfst.foma a2b_input_projection_complement.hfst.foma \
 			empty.hfst.foma \
 			walk_or_dog.hfst.foma \
-			romanian.hfst.foma
+			romanian.hfst.foma \
+			basic.zeros-epsilons.hfst.foma
 
 check_DATA=$(DEFAULT_CHECKS) $(SFST_CHECKS) $(OFST_CHECKS) $(FOMA_CHECKS) $(OL_CHECKS)
 
@@ -143,7 +147,8 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 compounds.txt\
 		 bashkir.txt\
 		 proc-cg-compund-boundary-without-tags.txt\
-		 romanian.txt
+		 romanian.txt \
+		 basic.zeros-epsilons.hfst
 FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-gen.strings \
 			proc-caps-out1.strings proc-caps-out2.strings \
 			proc-caps-out3.strings proc-caps-out4.strings \
