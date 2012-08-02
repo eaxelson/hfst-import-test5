@@ -339,6 +339,7 @@ int main( int argc, char **argv ) {
         hfst_print_profile_line();
       }
     delete outstream;
+    free(lexcfilenames[0]);
     free(lexcfilenames);
     free(outfilename);
     if (tempfilename != 0)
