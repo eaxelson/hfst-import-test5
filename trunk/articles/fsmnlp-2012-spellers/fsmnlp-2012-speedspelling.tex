@@ -1,11 +1,10 @@
 \documentclass[11pt]{article}
 
-\usepackage{acl2012}
-
 \usepackage{times}
 \usepackage{latexsym}
 \usepackage{amsmath}
 \usepackage{multirow}
+\usepackage{hyperref}
 \usepackage{url}
 \usepackage{algpseudocode}
 \DeclareMathOperator*{\argmax}{arg\,max}
@@ -17,14 +16,14 @@
 \fi
 
 \title{Effect~of~Language~and~Error~Models on Efficiency~of~Finite-State
-Spell-Checking~and~Correction}
+Spell-Checking~and~Correction*}
 
 \author{
 Tommi A Pirinen\\
 University of Helsinki\\
 Department of Modern Languages\\
 FI-00014 Univ. of Helsinki, PO box 24\\
-{\tt tommi.pirinen@helsinki.fi} \\\And
+{\tt tommi.pirinen@helsinki.fi} \\
 Sam Hardwick\\
 University of Helsinki\\
 Department of Modern Languages\\
@@ -57,13 +56,14 @@ complexity, is a difficult task for non-finite-state approaches.
 \section{Introduction}
 \label{sec:introduction}
 
-In most applications of spell-checking, efficiency is a limiting factor for
-selecting or discarding spell-checking solutions. In the case of finite-state
-spell-checking it is known that finite-state language models can efficiently
-encode dictionaries of natural languages~\cite{beesley/2003}, even for
-polysynthetic languages. The efficiency of finite-state approaches to spelling
-correction, however, has often been seen as a problem, and therefore most
-contemporary spell-checking and correction systems are still based on
+\footnote{This is author's pre-print draft and it may differ from the final
+publication.} In most applications of spell-checking, efficiency is a limiting
+factor for selecting or discarding spell-checking solutions. In the case of
+finite-state spell-checking it is known that finite-state language models can
+efficiently encode dictionaries of natural languages~\cite{beesley/2003}, even
+for polysynthetic languages. The efficiency of finite-state approaches to
+spelling correction, however, has often been seen as a problem, and therefore
+most contemporary spell-checking and correction systems are still based on
 programmatic solutions (e.g.  hunspell\footnote{\url{http://hunspell.sf.net}},
 and its *spell relatives), or at most specialised algorithms for implementing
 error-tolerant traversal of the finite-state
@@ -98,7 +98,7 @@ morphologically more isolating language with a basically word-list approach to
 spell-checking; as a reference implementation we use hunspell's en-US
 dictionary\footnote{\url{http://wiki.services.openoffice.org/wiki/Dictionaries}}
 and for a finite-state version we use a weighted word-list from
-\newcite{norvig/2010}. The second language we test is Finnish, whose
+\cite{norvig/2010}. The second language we test is Finnish, whose
 computational complexity has been just beyond the edge of being too hard to
 implement nicely in hunspell system for example~\cite{pitkanen/2006}. For a
 reference implementation we use Voikko\footnote{\url{http://voikko.sf.net}},
@@ -118,11 +118,11 @@ systems, hunspell. As neither Finnish nor Greenlandic have been successfully
 implemented in the hunspell formalism, we mainly use them to evaluate how
 the complexity of a language model affects the efficiency of finite-state
 spell-checking. For a full-scale survey on the state-of-the-art
-non-finite-state spell-checking, refer to \newcite{mitton/2009}.
+non-finite-state spell-checking, refer to \cite{mitton/2009}.
 
 The efficiency results are contrasted with the existing research on
-finite-state spell-checking in \newcite{hassan/2008} and the theoretical
-results on finite-state error-models in \newcite{mitankin/2005}.  Our addition
+finite-state spell-checking in \cite{hassan/2008} and the theoretical
+results on finite-state error-models in \cite{mitankin/2005}.  Our addition
 primarily comprises the addition of morphologically complex languages with
 actual cyclic dictionary automata (i.e. infinite dictionaries formed by
 compounding and recurring derivation) and more complex structure in general,
@@ -211,7 +211,7 @@ For further details we refer to the authors' website
 
 The ubiquitous formula for modeling typing errors since the computer-assisted
 spelling correction began has been the edit distance metric sometimes
-attributed to \newcite{levenshtein/1966} and/or \newcite{damerau/1964}. It maps
+attributed to \cite{levenshtein/1966} and/or \cite{damerau/1964}. It maps
 four typical slips of the fingers on a keyboard to events in the fuzzy matching
 of the misspelt word forms to correct ones, that is, the deletion of a
 character (i.e. failing to press a key), addition of a character (i.e. hitting
@@ -406,7 +406,7 @@ the word, depending on the text type~\cite{Bhagat/2007};
 the 1.5~\% from small corpus of academic texts~\cite{Yannakoudakis/1983}
 and 15~\% from dictated corpora~\cite{Kukich/1992}. We also performed a
 rudimentary classification of the errors in the small error corpus of
-333 entries from~\newcite{pirinen/2012/cicling}, and found errors at
+333 entries from~\cite{pirinen/2012/cicling}, and found errors at
 first position in 1.2~\% of the entries, furthermore we noticed that
 when evenly splitting the word forms in three parts, 15~\% of the errors are
 in the first third of the word form, while second has 47~\% and third 38~\%,
@@ -435,7 +435,7 @@ quality of results.
 The obvious baseline algorithm for the task of finding which strings can be
 altered by the error model in such a way that the alteration is present in the
 language model is generating all the possible alterations and checking which
-ones are present in the language model. This was done in \newcite{hassan/2008}
+ones are present in the language model. This was done in \cite{hassan/2008}
 by first calculating the composition of the input string with the error
 model and then composing the result with the language model.
 
@@ -483,7 +483,7 @@ any remaining edits on the remaining $7$-character word - can be ignored.
 This is accomplished with a three-way composition, in which the input, the
 error model and the language model simultaneously constrain each other to
 produce the legal correction set. This algorithm is presented in some detail
-in \newcite{hfst/2012/cla}.
+in \cite{hfst/2012/cla}.
 
 \section{Material}
 \label{sec:materials}
@@ -932,10 +932,10 @@ the size of the error model.
 In this research we focused on differences in automatically generated error
 models and their optimisations in the case of morphologically complex languages.
 For future research we intend to study more realistic error models induced from
-actual error corpora (e.g. \newcite{brill/2000}). Research into
+actual error corpora (e.g. \cite{brill/2000}). Research into
 different ways to induce weights into the language models, as well as further use
 of context in finite-state spell-checking (as in
-\newcite{pirinen/2012/cicling}), is warranted.
+\cite{pirinen/2012/cicling}), is warranted.
 
 \section*{Acknowledgements} 
 
@@ -945,7 +945,7 @@ the  people of \emph{Oqaaserpassualeriffik} for introducing the problems and
 possibilities of finite-state applications to the morphologically complex
 language of Greenlandic.
 
-\bibliographystyle{acl2012}
+\bibliographystyle{unsrt}
 \bibliography{fsmnlp2012}
 
 \end{document}
