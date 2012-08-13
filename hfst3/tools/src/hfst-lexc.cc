@@ -32,6 +32,7 @@
 
 #include "HfstTransducer.h"
 #include "HfstOutputStream.h"
+#include "HfstExceptionDefs.h"
 #include "parsers/LexcCompiler.h"
 
 using hfst::HfstTransducer;
@@ -263,7 +264,7 @@ parse_options(int argc, char** argv)
 int
 lexc_streams(HfstOutputStream& outstream)
 {
-    HfstTransducer* trans;
+    HfstTransducer* trans = 0;
     for (unsigned int i = 0; i < lexccount; i++)
       {
         verbose_printf("Parsing lexc file %s\n", lexcfilenames[i]);
@@ -324,11 +325,22 @@ int main( int argc, char **argv ) {
       }
     verbose_printf("writing to %s\n", outfilename);
     // here starts the buffer handling part
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, format) :
-        new HfstOutputStream(format);
-    retval = lexc_streams(*outstream);
-    delete outstream;
+    try
+      {
+        HfstOutputStream* outstream = (outfile != stdout) ?
+            new HfstOutputStream(outfilename, format) :
+            new HfstOutputStream(format);
+        retval = lexc_streams(*outstream);
+        delete outstream;
+      }
+    catch (ImplementationTypeNotAvailableException itnae)
+      {
+        verbose_printf("Caught exception like this:\n%s\n", 
+                       itnae().c_str());
+        error(EXIT_FAILURE, 0, "You were trying to compile with format "
+              "that has been turned off from libhfst\n"
+              "try using (other) -f argument, such as openfst:\n");
+      }
     free(lexcfilenames);
     free(outfilename);
     if (tempfilename != 0)
