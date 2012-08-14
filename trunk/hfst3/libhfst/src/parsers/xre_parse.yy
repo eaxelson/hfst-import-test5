@@ -64,7 +64,7 @@ extern int yylex();
 %type <transducerPairVector> CONTEXTS_VECTOR
 %type <transducerPair> CONTEXT
 %type <replType>  CONTEXT_MARK
-
+%type <label>     HALFARC
 
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
 %nonassoc <label> QUOTED_LITERAL SYMBOL CURLY_BRACKETS
@@ -189,6 +189,10 @@ REPLACE : REGEXP3 {}
                case E_LTR_SHORTEST_MATCH:
                  $$ = new HfstTransducer( replace_leftmost_shortest_match( $1->second ) );
                  break;
+               case E_REPLACE_RIGHT_MARKUP:
+               default:
+                xreerror("Unhandled arrow stuff I suppose");
+                break;
             }
        
             delete $1;
@@ -676,94 +680,53 @@ REGEXP12: LABEL { }
         }
         ;
 
-LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
+LABEL: HALFARC {
+        if (strcmp($1, hfst::internal_unknown.c_str()) == 0)
+          {
+            $$ = new HfstTransducer(hfst::internal_identity,
+                                    hfst::internal_identity, hfst::xre::format);
+          }
+        else
+          {
+            $$ = new HfstTransducer($1, $1, hfst::xre::format);
+          }
+        free($1);
+     }
+     |
+     HALFARC PAIR_SEPARATOR HALFARC {
         $$ = new HfstTransducer($1, $3, hfst::xre::format);
         free($1);
         free($3);
      }
-     | SYMBOL PAIR_SEPARATOR EPSILON_TOKEN {
-        $$ = new HfstTransducer($1, hfst::internal_epsilon, hfst::xre::format);
-        free($1);
-     }
-     | SYMBOL PAIR_SEPARATOR ANY_TOKEN {
+     | HALFARC PAIR_SEPARATOR_WO_RIGHT {
         $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::xre::format);
         free($1);
      }
-     | EPSILON_TOKEN PAIR_SEPARATOR EPSILON_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_epsilon, 
-                                hfst::internal_epsilon, hfst::xre::format);
-     }
-     | EPSILON_TOKEN PAIR_SEPARATOR SYMBOL {
-        $$ = new HfstTransducer(hfst::internal_epsilon, $3, hfst::xre::format);
-        free($3);
-     }
-     | EPSILON_TOKEN PAIR_SEPARATOR ANY_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_unknown,
-                                hfst::xre::format);
-     }
-     | ANY_TOKEN PAIR_SEPARATOR ANY_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
-                                hfst::xre::format);
-     }
-     | ANY_TOKEN PAIR_SEPARATOR SYMBOL {
-        $$ = new HfstTransducer(hfst::internal_unknown, $3, hfst::xre::format);
-        free($3);
-     }
-     | ANY_TOKEN PAIR_SEPARATOR EPSILON_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_epsilon,
-                                hfst::xre::format);
-     }
-     | SYMBOL PAIR_SEPARATOR_WO_RIGHT {
-        $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::xre::format);
-        free($1);
-     }
-     | EPSILON_TOKEN PAIR_SEPARATOR_WO_RIGHT {
-        $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_unknown,
-                                hfst::xre::format);
-     }
-     | ANY_TOKEN PAIR_SEPARATOR_WO_RIGHT {
-        $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
-                                hfst::xre::format);
-     }
-     | PAIR_SEPARATOR_WO_LEFT SYMBOL {
+     | PAIR_SEPARATOR_WO_LEFT HALFARC {
         $$ = new HfstTransducer(hfst::internal_unknown, $2, hfst::xre::format);
         free($2);
-     }
-     | PAIR_SEPARATOR_WO_LEFT ANY_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
-                                hfst::xre::format);
-     }
-     | PAIR_SEPARATOR_WO_LEFT EPSILON_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_epsilon,
-                                hfst::xre::format);
-     }
-     | SYMBOL {
-        $$ = new HfstTransducer($1, $1, hfst::xre::format);
-        free($1);
      }
      | PAIR_SEPARATOR_SOLE {
         $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
                                 hfst::xre::format);
      }
+     | CURLY_BRACKETS {
+        HfstTokenizer TOK;
+        $$ = new HfstTransducer($1, TOK, hfst::xre::format);
+        free($1);
+     }
+     ;
+
+HALFARC: SYMBOL
      | EPSILON_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_epsilon,
-                                hfst::xre::format);
+        $$ = strdup(hfst::internal_epsilon.c_str());
      }
      | ANY_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_identity,
-                                hfst::xre::format);
+        $$ = strdup(hfst::internal_unknown.c_str());
      }
-     | QUOTED_LITERAL {
-        $$ = new HfstTransducer($1, $1, hfst::xre::format);
-        free($1);
-     }
+     | QUOTED_LITERAL 
      | BOUNDARY_MARKER {
-        $$ = new HfstTransducer("@#@", "@#@", hfst::xre::format);
-     }
-     | CURLY_BRACKETS {
-     	HfstTokenizer TOK;
-     	$$ = new HfstTransducer($1, TOK, hfst::xre::format);
-        free($1);
+        $$ = strdup("@#@");
      }
      ;
 
