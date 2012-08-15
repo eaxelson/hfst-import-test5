@@ -44,7 +44,7 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
     }
 }
 
-TransducerAlphabet::add_symbol(char * symbol)
+void TransducerAlphabet::add_symbol(char * symbol)
 {
     symbol_table.push_back(symbol);
 }
@@ -64,6 +64,17 @@ TransducerAlphabet::TransducerAlphabet(const SymbolTable& st):
 	    default_symbol = i;
 	}
     }
+}
+
+SymbolNumber TransducerAlphabet::symbol_from_string(
+    const std::string symbol_string) const
+{
+    for(SymbolNumber i = 0; i < symbol_table.size(); ++i) {
+        if (symbol_table[i] == symbol_string) {
+            return i;
+        }
+    }
+    return NO_SYMBOL_NUMBER;
 }
 
 StringSymbolMap TransducerAlphabet::build_string_symbol_map(void) const
@@ -369,7 +380,6 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
                 original_output_tape,
                 i+1);
     
-    
     // input-string ended.
     if (*input_symbol == NO_SYMBOL_NUMBER)
     {
@@ -399,7 +409,6 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
                 output_symbol,
                 original_output_tape,
                 i+1);
-      
       
     if (*input_symbol == NO_SYMBOL_NUMBER)
     { // input-string ended.

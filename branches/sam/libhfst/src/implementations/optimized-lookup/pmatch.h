@@ -11,166 +11,143 @@ typedef std::map<std::string, PmatchTransducer *> NameRtnMap;
 
 class PmatchContainer
 {
+protected:
     TransducerAlphabet alphabet;
+    Encoder * encoder;
+    SymbolNumber symbol_count;
     PmatchTransducer * toplevel;
     std::string toplevel_name;
     std::map<std::string, PmatchTransducer *> rtns;
     SymbolNumber * input_tape;
     SymbolNumber * orig_input_tape;
-    SymbolNumber symbol_count;
+    SymbolNumber * output_tape;
+    SymbolNumber * orig_output_tape;
     SymbolNumberVector output;
 
+    SymbolNumber entry_marker;
+    SymbolNumber exit_marker;
+
+
 public:
-PmatchContainer(TransducerAlphabet alpha,
-		PmatchTransducer * tl,
-		std::string tl_name):
-    alphabet(alpha),
-	toplevel(tl),
-	toplevel_name(tl_name),
-        rtns(std::map<std::string, PmatchTransducer *>()),
-	input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber) * MAX_IO_LEN))),
-	output()
-        { }
+    PmatchContainer(std::istream & is);
+    ~PmatchContainer(void);
 
-    ~PmatchContainer()
-    {
-	delete toplevel;
-	for (std::map<std::string, PmatchTransducer *>::iterator it = rtns.begin();
-	     it != rtns.end(); ++it) {
-	    delete it->second;
-	}
-    }
-
-    initialize_input(const char * input_str);
+    void initialize_input(const char * input);
     bool has_unsatisfied_rtns(void) const;
     std::string get_unsatisfied_rtn_name(void) const;
     std::string match(std::string & input);
     void add_rtn(PmatchTransducer * rtn, std::string & name);
     bool has_queued_input(void);
+    void copy_to_output(SymbolNumberVector & best_result);
+    std::string stringify_output(void);
 
+    static std::string parse_name_from_hfst3_header(std::istream & f);
+
+};
+
+struct SimpleTransition
+{
+    SymbolNumber input;
+    SymbolNumber output;
+    TransitionTableIndex target;
+    static const size_t SIZE = sizeof(input) + sizeof(output) + sizeof(target);
+    SimpleTransition(
+        SymbolNumber i, SymbolNumber o, TransitionTableIndex t):
+    input(i), output(o), target(t) {}
+    bool final(void) const {
+        return input == NO_SYMBOL_NUMBER &&
+            output == NO_SYMBOL_NUMBER &&
+            target == 1;
+    }
+};
+
+struct SimpleIndex
+{
+    SymbolNumber input;
+    TransitionTableIndex target;
+    static const size_t SIZE = sizeof(input) + sizeof(target);
+    SimpleIndex(
+        SymbolNumber i, TransitionTableIndex t):
+    input(i), target(t) {}
+    bool final(void) const {
+        return input == NO_SYMBOL_NUMBER &&
+            target != NO_TABLE_INDEX;
+    }
 };
 
 class PmatchTransducer
 {
 protected:
-    TransducerTablesInterface* tables;
-    void load_tables(std::istream& is);
+    std::vector<SimpleTransition> transition_table;
+    std::vector<SimpleIndex> index_table;
 
-    Weight current_weight;
-    SymbolNumber * best_result;
-    SymbolNumber * output_tape;
-    SymbolNumber * input_pointer;
+    TransducerAlphabet & alphabet;
+    
+    SymbolNumberVector best_result;
+    SymbolNumber * candidate_input_pos;
+    SymbolNumber * output_tape_head;
     hfst::FdState<SymbolNumber> flag_state;
+    std::map<std::string, PmatchTransducer *> & rtns;
+    SymbolNumber & entry_marker;
+    SymbolNumber & exit_marker;
 
-    void try_epsilon_transitions(SymbolNumber * input_symbol,
-                 SymbolNumber * output_symbol,
-                 SymbolNumber * original_output_tape,
-                 TransitionTableIndex i);
+    void try_epsilon_transitions(SymbolNumber * input_tape,
+                                 SymbolNumber * output_tape,
+                                 TransitionTableIndex i);
   
-    void try_epsilon_indices(SymbolNumber * input_symbol,
-                 SymbolNumber * output_symbol,
-                 SymbolNumber * original_output_tape,
-                 TransitionTableIndex i);
+    void try_epsilon_indices(SymbolNumber * input_tape,
+                             SymbolNumber * output_tape,
+                             TransitionTableIndex i);
 
     void find_transitions(SymbolNumber input,
-              SymbolNumber * input_symbol,
-              SymbolNumber * output_symbol,
-              SymbolNumber * original_output_tape,
-              TransitionTableIndex i);
+                          SymbolNumber * input_tape,
+                          SymbolNumber * output_tape,
+                          TransitionTableIndex i);
 
     void find_index(SymbolNumber input,
-            SymbolNumber * input_symbol,
-            SymbolNumber * output_symbol,
-            SymbolNumber * original_output_tape,
-            TransitionTableIndex i);
+                    SymbolNumber * input_tape,
+                    SymbolNumber * output_tape,
+                    TransitionTableIndex i);
 
-    void get_analyses(SymbolNumber * input_symbol,
-              SymbolNumber * output_symbol,
-              SymbolNumber * original_output_tape,
-              TransitionTableIndex i);
+    void get_analyses(SymbolNumber * input_tape,
+                      SymbolNumber * output_tape,
+                      TransitionTableIndex index);
 
 
 
 public:
-    PmatchTransducer(std::istream& is);
-    SymbolNumber * get_best_result(void)
+    PmatchTransducer(std::istream& is,
+                     TransitionTableIndex index_table_size,
+                     TransitionTableIndex transition_table_size,
+                     TransducerAlphabet & alphabet,
+                     std::map<std::string, PmatchTransducer *> & rtns,
+                     SymbolNumber & entry_marker,
+                     SymbolNumber & exit_marker);
+        
+    SymbolNumberVector & get_best_result(void)
     { return best_result; }
 
-    void write(std::ostream& os) const;
-    Transducer * copy(Transducer * t, bool weighted = false);
     void display() const;
 
-    const TransducerHeader& get_header() const
-    { return *header; }
-    const TransducerAlphabet& get_alphabet() const
-    { return *alphabet; }
-    const Encoder& get_encoder(void) const
-	{ return *encoder; }
-    const hfst::FdTable<SymbolNumber>& get_fd_table() const
-        { return alphabet->get_fd_table(); }
-    const SymbolTable& get_symbol_table() const
-        { return alphabet->get_symbol_table(); }
-
-
-    const TransitionIndex& get_index(TransitionTableIndex i) const
-    { return tables->get_index(i); }
-    const Transition& get_transition(TransitionTableIndex i) const
-    { return tables->get_transition(i); }
+    // const SimpleIndex& get_index(TransitionTableIndex i) const
+    // { return index_table[i] }
+    // const Transition& get_transition(TransitionTableIndex i) const
+    // { return tables->get_transition(i); }
     bool final_index(TransitionTableIndex i) const
     {
         if (indexes_transition_table(i)) {
-        return tables->get_transition_finality(i);
+	    return transition_table[i].final();
         } else {
-        return tables->get_index_finality(i);
+	    return index_table[i].final();
         }
     }
-    TransducerTable<TransitionWIndex> & copy_windex_table();
-    TransducerTable<TransitionW> & copy_transitionw_table();
-    TransducerTable<TransitionIndex> & copy_index_table();
-    TransducerTable<Transition> & copy_transition_table();
 
-    // state_index must be an index to a state which is defined as either:
-    // (1) the start of a set of entries in the transition index table, or
-    // (2) the boundary before a set of entries in the transition table, in
-    //     which case the following entries will all have the same input symbol
-    // This function will return a vector of indices to the transition table,
-    // i.e. the arcs from the given state
-    TransitionTableIndexSet get_transitions_from_state(
-    TransitionTableIndex state_index) const;
-
-
-    HfstOneLevelPaths * lookup_fd(const StringVector & s);
-    /* Tokenize and lookup, accounting for flag diacritics, the surface string
-       \a s. The return value, a pointer to HfstOneLevelPaths
-       (which is a set) of analyses, is newly allocated.
-     */
-    HfstOneLevelPaths * lookup_fd(const std::string & s);
-    HfstOneLevelPaths * lookup_fd(const char * s);
-    std::string pmatch(const std::string & s);
-    void note_analysis(SymbolNumber * whole_output_tape);
-
-    // Methods for supporting ospell
-    SymbolNumber get_unknown_symbol(void) const
-        { return alphabet->get_unknown_symbol(); }
-    StringSymbolMap get_string_symbol_map(void) const
-        { return alphabet->build_string_symbol_map(); }
-    STransition take_epsilons(const TransitionTableIndex i) const;
-    STransition take_epsilons_and_flags(const TransitionTableIndex i);
-    STransition take_non_epsilons(const TransitionTableIndex i,
-				  const SymbolNumber symbol) const;
-    TransitionTableIndex next(const TransitionTableIndex i,
-			      const SymbolNumber symbol) const;
-    TransitionTableIndex next_e(const TransitionTableIndex i) const;
-    bool has_transitions(const TransitionTableIndex i,
-			 const SymbolNumber symbol) const;
-    bool has_epsilons_or_flags(const TransitionTableIndex i);
-    Weight final_weight(const TransitionTableIndex i) const;
-    bool is_flag(const SymbolNumber symbol)
-	{ return alphabet->is_flag_diacritic(symbol); }
-    bool is_weighted(void)
-	{ return header->probe_flag(Weighted);}
-
+    static bool indexes_transition_table(TransitionTableIndex i)
+	{ return  i >= TRANSITION_TARGET_TABLE_START; }
     
+    void match(SymbolNumber ** input_tape_entry, SymbolNumber ** output_tape_entry);
+    void note_analysis(SymbolNumber * input_tape, SymbolNumber * output_tape);
+
 };
 
 

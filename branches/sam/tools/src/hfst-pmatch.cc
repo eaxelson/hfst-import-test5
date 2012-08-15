@@ -27,89 +27,25 @@ print_usage()
     print_more_info();
 }
 
-
-std::string parse_name_from_hfst3_header(std::ifstream & f)
-{
-    const char* header1 = "HFST";
-    unsigned int header_loc = 0; // how much of the header has been found
-    int c;
-    for(header_loc = 0; header_loc < strlen(header1) + 1; header_loc++)
-    {
-	c = f.get();
-	if(c != header1[header_loc]) {
-	    break;
-	}
-    }
-    if(header_loc == strlen(header1) + 1)
-    {
-	unsigned short remaining_header_len;
-	f.read((char*) &remaining_header_len, sizeof(remaining_header_len));
-	if (f.get() != '\0') {
-	    HFST_THROW(TransducerHeaderException);
-	}
-	char * headervalue = new char[remaining_header_len];
-	f.read(headervalue, remaining_header_len);
-	if (headervalue[remaining_header_len - 1] != '\0') {
-	    HFST_THROW(TransducerHeaderException);
-	}
-	char type[remaining_header_len];
-	char name[remaining_header_len];
-	int i = 0;
-	while (i < remaining_header_len) {
-	    if (strstr(headervalue + i, "type")) {
-		strcpy(type, headervalue + i + strlen("type") + 1);
-	    } else if (strstr(headervalue + i, "name")) {
-		strcpy(name, headervalue + i + strlen("name") + 1);
-	    }
-	    while (i < remaining_header_len &&
-		   headervalue[i] != '\0') {
-		++i;
-	    }
-	    ++i;
-	}
-	delete headervalue;
-	if (strcmp(type, "HFST_OL") && strcmp(type, "HFST_OLW")) {
-	    HFST_THROW(TransducerHeaderException);
-	}
-	return std::string(name);
-    } else // nope. put back what we've taken
-    {
-	f.unget(); // first the non-matching character
-	for(int i = header_loc - 1; i>=0; i--) {
-       // then the characters that did match (if any)
-	    f.unget();
-	}
-	HFST_THROW(TransducerHeaderException);
-    }
-}
-
-hfst_ol::PmatchContainer process_transducers(std::ifstream & inputstream)
-{
-    std::string transducer_name;
-    try {
-	transducer_name = parse_hfst3_header(inputstream);
-    } HFST_CATCH(TransducerHeaderException);
-    hfst_ol::TransducerHeader header(inputstream);
-    hfst_ol::TransducerAlphabet alphabet(inputstream, header.symbol_count());
-    hfst_ol::PmatchTransducer * toplevel =
-	new hfst_ol::PmatchTransducer(inputstream, true);
-    hfst_ol::PmatchContainer container(toplevel, transducer_name);
-    while (inputstream.good()) {
-	try {
-	    transducer_name = parse_hfst3_header(inputstream);
-	} catch (TransducerHeaderException & e) {
-	    break;
-	}
-        container.add_rtn(
-	    new hfst_ol::PmatchTransducer(inputstream, false), transducer_name);
-    }
-    find_rtns(container);
-    return container;
-}
+// hfst_ol::PmatchContainer process_transducers(std::ifstream & inputstream)
+// {
+//     hfst_ol::PmatchContainer container(inputstream);
+//     while (inputstream.good()) {
+// 	try {
+// 	    transducer_name = parse_hfst3_header(inputstream);
+// 	} catch (TransducerHeaderException & e) {
+// 	    break;
+// 	}
+//         container.add_rtn(
+// 	    new hfst_ol::PmatchTransducer(inputstream, false), transducer_name);
+//     }
+//     find_rtns(container);
+//     return container;
+// }
 
 void print_result(std::string res)
 {
-    std::cout << res;
+    std::cout << res << std::endl;;
 }
 
 void process_input(hfst_ol::PmatchContainer & container)
@@ -118,7 +54,7 @@ void process_input(hfst_ol::PmatchContainer & container)
     while (std::cin) {
 	getline(std::cin, input_line);
 	print_result(container.match(input_line));
-    }
+ }
 
     // std::istream user_input = std::cin;
     // while(!getline(user_input, input_line).failbit) {
@@ -230,8 +166,8 @@ int main(int argc, char ** argv)
     }
     std::ifstream instream(input_file_name.c_str(),
 			   std::ifstream::binary);
-    hfst_ol::PmatchContainer cont = process_transducers(instream);
+    hfst_ol::PmatchContainer container(instream);
 							
-    process_input(cont);
+    process_input(container);
     return EXIT_SUCCESS;
 }

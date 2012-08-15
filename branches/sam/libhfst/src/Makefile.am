@@ -65,7 +65,8 @@ HFST_HDRS = \
 	HfstInputStream.h \
 	HfstOutputStream.h \
 	HfstXeroxRules.h \
-	parsers/LexcCompiler.h parsers/XreCompiler.h parsers/PmatchCompiler.h
+	parsers/LexcCompiler.h parsers/XreCompiler.h parsers/PmatchCompiler.h \
+	hfst.h
 ### Add your library here ###
 #	implementations/MyTransducerLibraryTransducer.h
 

@@ -27,9 +27,9 @@ using hfst::HFST_OL_TYPE;
 using hfst::HFST_OLW_TYPE;
 
 void print_usage(void);
-hfst_ol::PmatchContainer process_transducers(std::ifstream & inputstream);
+//hfst_ol::PmatchContainer process_transducers(std::ifstream & inputstream);
 void print_result(std::string res);
 void process_input(hfst_ol::PmatchContainer & container);
 void find_rtns(hfst_ol::PmatchContainer & cont);
 int parse_options(int argc, char** argv);
-std::string parse_name_from_hfst3_header(std::ifstream & inputstream);
+
