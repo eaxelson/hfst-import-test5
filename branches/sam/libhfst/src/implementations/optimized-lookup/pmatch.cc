@@ -20,8 +20,14 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
     TransducerHeader header(inputstream);
     symbol_count = header.symbol_count();
     alphabet = TransducerAlphabet(inputstream, header.symbol_count());
+    
+    StringSymbolMap string2symbol = alphabet.build_string_symbol_map();
+    entry_marker = NO_SYMBOL_NUMBER;
+    exit_marker = NO_SYMBOL_NUMBER;
+    
     entry_marker = alphabet.symbol_from_string("@_PMATCH_ENTRY_@");
     exit_marker = alphabet.symbol_from_string("@_PMATCH_EXIT_@");
+    
     encoder = new Encoder(alphabet.get_symbol_table(), header.input_symbol_count());
     toplevel = new hfst_ol::PmatchTransducer(
         inputstream,
@@ -235,18 +241,22 @@ void PmatchContainer::initialize_input(const char * input)
     char * input_str = const_cast<char *>(input);
     char ** input_str_ptr = &input_str;
     while (**input_str_ptr != 0) {
+        char * original_input_loc = *input_str_ptr;
 	k = encoder->find_key(input_str_ptr);
-	input_tape[i] = k;
 	if (k == NO_SYMBOL_NUMBER) {
+            // the encoder moves as far as it can during tokenization,
+            // we want to go back to be in position to add one utf-8 char
+            *input_str_ptr = original_input_loc;
 	    // Regular tokenization failed
 	    int bytes_to_tokenize = nByte_utf8(**input_str_ptr);
 	    if (bytes_to_tokenize == 0) {
 		// even if it's not utf-8, tokenize a byte at a time
 		bytes_to_tokenize = 1;
 	    }
-	    char new_symbol[bytes_to_tokenize];
+	    char new_symbol[bytes_to_tokenize + 1];
 	    memcpy(new_symbol, *input_str_ptr, bytes_to_tokenize);
-	    *input_str_ptr += bytes_to_tokenize;
+            new_symbol[bytes_to_tokenize] = '\0';
+	    (*input_str_ptr) += bytes_to_tokenize;
 	    alphabet.add_symbol(new_symbol);
 	    encoder->read_input_symbol(new_symbol, symbol_count);
 	    k = symbol_count;
