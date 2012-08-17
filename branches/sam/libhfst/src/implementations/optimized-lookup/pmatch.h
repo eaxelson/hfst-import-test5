@@ -26,7 +26,10 @@ protected:
 
     SymbolNumber entry_marker;
     SymbolNumber exit_marker;
+    SymbolNumber unknown_symbol;
+    std::map<SymbolNumber, std::string> end_tag_map;
 
+    void add_special_symbol(const std::string & str, SymbolNumber symbol_number);
 
 public:
     PmatchContainer(std::istream & is);
@@ -42,6 +45,10 @@ public:
     std::string stringify_output(void);
 
     static std::string parse_name_from_hfst3_header(std::istream & f);
+    static bool is_end_tag(const std::string & symbol);
+    bool is_end_tag(const SymbolNumber symbol) const;
+    std::string end_tag(const SymbolNumber symbol);
+    std::string start_tag(const SymbolNumber symbol);
 
 };
 

@@ -20,13 +20,16 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
     TransducerHeader header(inputstream);
     symbol_count = header.symbol_count();
     alphabet = TransducerAlphabet(inputstream, header.symbol_count());
-    
-    StringSymbolMap string2symbol = alphabet.build_string_symbol_map();
+
+    // Retrieve extra special symbols from the alphavet
+
+    const SymbolTable & symbol_table = alphabet.get_symbol_table();
     entry_marker = NO_SYMBOL_NUMBER;
     exit_marker = NO_SYMBOL_NUMBER;
+    for (SymbolNumber i = 1; i < symbol_table.size(); ++i) {
+        add_special_symbol(symbol_table[i], i);
+    }
     
-    entry_marker = alphabet.symbol_from_string("@_PMATCH_ENTRY_@");
-    exit_marker = alphabet.symbol_from_string("@_PMATCH_EXIT_@");
     
     encoder = new Encoder(alphabet.get_symbol_table(), header.input_symbol_count());
     toplevel = new hfst_ol::PmatchTransducer(
@@ -56,6 +59,49 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
                                           exit_marker),
             transducer_name);
     }
+}
+
+void PmatchContainer::add_special_symbol(const std::string & str,
+                                         SymbolNumber symbol_number)
+{
+    if (str == "@_PMATCH_ENTRY_@") {
+        entry_marker = symbol_number;
+    } else if (str == "@_PMATCH_EXIT_@") {
+        exit_marker = symbol_number;
+    } else if (is_end_tag(str)) {
+        end_tag_map[symbol_number] = str.substr(16, str.size() - 18);
+    }
+        
+}
+
+bool PmatchContainer::is_end_tag(const std::string & symbol)
+{
+    return symbol.find("@_PMATCH_ENDTAG_") == 0 &&
+        symbol.rfind("_@") == symbol.size() - 2;
+}
+
+bool PmatchContainer::is_end_tag(const SymbolNumber symbol) const
+{
+    return end_tag_map.count(symbol) == 1;
+}
+
+std::string PmatchContainer::end_tag(const SymbolNumber symbol)
+{
+    if (end_tag_map.count(symbol) == 0) {
+        return "";
+    } else {
+        return "</" + end_tag_map[symbol] + ">";
+    }
+}
+
+std::string PmatchContainer::start_tag(const SymbolNumber symbol)
+{
+    if (end_tag_map.count(symbol) == 0) {
+        return "";
+    } else {
+        return "<" + end_tag_map[symbol] + ">";
+    }
+    
 }
 
 PmatchContainer::~PmatchContainer(void)
@@ -150,18 +196,21 @@ std::string PmatchContainer::match(std::string & input)
 
 void PmatchContainer::copy_to_output(SymbolNumberVector & best_result)
 {
-    for (SymbolNumberVector::const_iterator it = best_result.begin();
-         it != best_result.end(); ++it) {
-	output.push_back(*it);
-    }
+    output.assign(best_result.begin(), best_result.end());
 }
 
 std::string PmatchContainer::stringify_output(void)
 {
     std::string retval;
+    size_t start_tag_pos = 0;
     for (SymbolNumberVector::const_iterator it = output.begin();
-	 it != output.end(); ++it) {
-	retval.append(alphabet.string_from_symbol(*it));
+         it != output.end(); ++it) {
+        if (is_end_tag(*it)) {
+            retval.insert(start_tag_pos, start_tag(*it));
+            retval.append(end_tag(*it));
+        } else {
+            retval.append(alphabet.string_from_symbol(*it));
+        }
     }
     return retval;
 }
