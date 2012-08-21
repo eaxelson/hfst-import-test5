@@ -188,12 +188,14 @@ print_dot(FILE* out, HfstTransducer& t)
       {
         if (mutt->is_final_state(s))
           {
-            fprintf(out, "node [shape=doublecircle,style=filled] %d\n",
-                    s);
+            fprintf(out, "node [shape=doublecircle,style=filled,"
+                    "label=\"q%d/%.2f\"] %d\n",
+                    s, mutt->get_final_weight(s), s);
           }
         else
           {
-            fprintf(out, "node [shape=circle,style=filled] %d\n", s);
+            fprintf(out, "node [shape=circle,style=filled,label=\"q%d\"] %d\n", 
+                    s, s);
           }
         ++s;
       } // each state
@@ -236,12 +238,13 @@ print_dot(FILE* out, HfstTransducer& t)
               }
             if (first == second)
               {
-                fprintf(out, "[label=\"%s \"];\n", first.c_str());
+                fprintf(out, "[label=\"%s/%.2f \"];\n", first.c_str(),
+                        arc->get_weight());
               }
             else
               {
-                fprintf(out, "[label=\"%s:%s \"];\n", first.c_str(),
-                        second.c_str());
+                fprintf(out, "[label=\"%s:%s/%.2f \"];\n", first.c_str(),
+                        second.c_str(), arc->get_weight());
               }
           } // each arc
         ++s;
