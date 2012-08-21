@@ -174,12 +174,14 @@ static
 void
 print_dot(FILE* out, HfstTransducer& t)
   {
-    fprintf(out, "// This graph generated with hfst-fst2txt blah\n");
+    fprintf(out, "// This graph generated with %s %s\n",
+            program_short_name, hfst_tool_version);
     fprintf(out, "digraph H {\n");
     fprintf(out, "rankdir = LR;\n");
 
     HfstBasicTransducer* mutt = new HfstBasicTransducer(t);
     HfstState s = 0;
+    // for some reason, dot works nicer if I first have all nodes, then arcs
     for (HfstBasicTransducer::const_iterator state = mutt->begin();
          state != mutt->end();
          ++state)
@@ -191,8 +193,15 @@ print_dot(FILE* out, HfstTransducer& t)
           }
         else
           {
-            fprintf(out, "node [style=filled] %d\n", s);
+            fprintf(out, "node [shape=circle,style=filled] %d\n", s);
           }
+        ++s;
+      } // each state
+    s = 0;
+    for (HfstBasicTransducer::const_iterator state = mutt->begin();
+         state != mutt->end();
+         ++state)
+      {
         for (HfstBasicTransducer::HfstTransitions::const_iterator arc = 
              state->begin();
              arc != state->end();
@@ -203,21 +212,27 @@ print_dot(FILE* out, HfstTransducer& t)
             string second = arc->get_output_symbol();
             if (first == hfst::internal_epsilon)
               {
-                first = string("\\epsilon");
+                first = string("0");
               }
-            else if ((first == hfst::internal_unknown) || 
-                     (first == hfst::internal_identity))
+            else if (first == hfst::internal_identity)
               {
-                first = string("??");
+                first = string("?");
+              }
+            else if (first == hfst::internal_unknown)
+              { 
+                first = string("?1");
               }
             if (second == hfst::internal_epsilon)
               {
-                second = string("\\epsilon");
+                second = string("0");
               }
-            else if ((second == hfst::internal_unknown) || 
-                     (second == hfst::internal_identity))
+            else if (second == hfst::internal_identity)
               {
-                second = string("??");
+                second = string("?");
+              }
+            else if (second == hfst::internal_unknown)
+              {
+                second = string("?2");
               }
             if (first == second)
               {
@@ -230,7 +245,7 @@ print_dot(FILE* out, HfstTransducer& t)
               }
           } // each arc
         ++s;
-      } // ech state
+      } // each state
     fprintf(out, "}\n");
   }
 
