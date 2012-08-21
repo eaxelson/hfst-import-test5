@@ -1,5 +1,4 @@
 %{
-
 #define YYDEBUG 1 
 
 #include <stdio.h>
@@ -15,29 +14,19 @@ using hfst::HfstTransducer;
 using namespace hfst::xeroxRules;
 using namespace hfst::implementations;
 
-
 #include "xre_utils.h"
 
 extern void xreerror(const char * text);
 extern int xrelex();
-
-
-
+extern int yylex();
 
 %}
 
 %name-prefix="xre"
 %error-verbose
 %debug
-
-           
-
-
-
+  
 %union {
-
-
-
 
     int value;
     int* values;
@@ -51,14 +40,12 @@ extern int xrelex();
    std::pair< hfst::xeroxRules::ReplaceArrow, hfst::xeroxRules::Rule>* replaceRuleWithArrow;   
    std::pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducerVector>* mappingVectorWithArrow;
    std::pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducer>* mappingWithArrow;
-    
-   
+       
    std::pair<hfst::xeroxRules::ReplaceType, hfst::HfstTransducerPairVector>* contextWithMark;
    
    hfst::xeroxRules::ReplaceType replType;
    hfst::xeroxRules::ReplaceArrow replaceArrow; 
-    
-     
+         
 }
 
 /* some parts have been ripped from foma’s parser now */
@@ -77,12 +64,10 @@ extern int xrelex();
 %type <transducerPairVector> CONTEXTS_VECTOR
 %type <transducerPair> CONTEXT
 %type <replType>  CONTEXT_MARK
-
-
-
+%type <label>     HALFARC
 
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
-%nonassoc <label> QUOTED_LITERAL SYMBOL
+%nonassoc <label> QUOTED_LITERAL SYMBOL CURLY_BRACKETS
 
 %left  CROSS_PRODUCT COMPOSITION LENIENT_COMPOSITION INTERSECTION
 %left  CENTER_MARKER MARKUP_MARKER
@@ -92,7 +77,7 @@ extern int xrelex();
        OPTIONAL_REPLACE_RIGHT OPTIONAL_REPLACE_LEFT
        REPLACE_LEFT_RIGHT OPTIONAL_REPLACE_LEFT_RIGHT
        RTL_LONGEST_MATCH RTL_SHORTEST_MATCH
-       LTR_LONGEST_MATCH LTR_SHORTEST_MATCH 
+       LTR_LONGEST_MATCH LTR_SHORTEST_MATCH
       
 %right REPLACE_CONTEXT_UU REPLACE_CONTEXT_LU 
        REPLACE_CONTEXT_UL REPLACE_CONTEXT_LL
@@ -102,15 +87,11 @@ extern int xrelex();
 
 %left  IGNORING IGNORE_INTERNALLY LEFT_QUOTIENT
 
-
 %left  COMMACOMMA
 
- 
-          
 %left  COMMA 
        
 %left  BEFORE AFTER
-
 
 %nonassoc SUBSTITUTE_LEFT TERM_COMPLEMENT
 %nonassoc COMPLEMENT CONTAINMENT CONTAINMENT_ONCE CONTAINMENT_OPT
@@ -120,7 +101,7 @@ extern int xrelex();
 
 %nonassoc <label> READ_BIN READ_TEXT READ_SPACED READ_PROLOG READ_RE
 %token LEFT_BRACKET RIGHT_BRACKET LEFT_PARENTHESIS RIGHT_PARENTHESIS
-       LEFT_CURLY RIGHT_CURLY LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED
+       LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED
        PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
@@ -130,8 +111,6 @@ extern int xrelex();
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
 %%
-
-
 
 
 XRE: REGEXP1 { }
@@ -148,7 +127,7 @@ REGEXP1: REGEXP2 END_OF_EXPRESSION {
    }
    | REGEXP2 {
    
-        //std::cerr << "regexp1:regexp2\n"<< std::endl; 
+    //    std::cerr << "regexp1:regexp2\n"<< *$1 << std::endl; 
         hfst::xre::last_compiled = & $1->minimize();
         $$ = hfst::xre::last_compiled;
    }
@@ -176,10 +155,6 @@ REGEXP2: REPLACE
         }
        ;
 
-
-       
-       
-       
 ////////////////////////////
 // Replace operators
 ///////////////////////////
@@ -214,6 +189,10 @@ REPLACE : REGEXP3 {}
                case E_LTR_SHORTEST_MATCH:
                  $$ = new HfstTransducer( replace_leftmost_shortest_match( $1->second ) );
                  break;
+               case E_REPLACE_RIGHT_MARKUP:
+               default:
+                xreerror("Unhandled arrow stuff I suppose");
+                break;
             }
        
             delete $1;
@@ -350,11 +329,7 @@ MAPPING: REPLACE REPLACE_ARROW REPLACE
           delete $2, $5;
       }
       ;    
-  
-   
-      
 
-        
 // Contexts: ( ie. || k _ f , ... , f _ s )
 CONTEXTS_WITH_MARK:  CONTEXT_MARK CONTEXTS_VECTOR
          {
@@ -405,10 +380,7 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
             delete $2; 
          }
       ;
-      
-
-
-CONTEXT_MARK: REPLACE_CONTEXT_UU
+ CONTEXT_MARK: REPLACE_CONTEXT_UU
          {
             $$ = REPL_UP;
          }
@@ -426,11 +398,6 @@ CONTEXT_MARK: REPLACE_CONTEXT_UU
          }
          ;
      
-     
-     
-     
-
-
 REPLACE_ARROW: REPLACE_RIGHT
          {
             $$ = E_REPLACE_RIGHT;
@@ -457,16 +424,7 @@ REPLACE_ARROW: REPLACE_RIGHT
          }
          ;
 
-
-
-
-
-
-
-
 ////////////////
-
-
 
 REGEXP3: REGEXP4 { }
        | REGEXP3 SHUFFLE REGEXP4 {
@@ -570,10 +528,27 @@ REGEXP7: REGEXP8 { }
 
 REGEXP8: REGEXP9 { }
        | COMPLEMENT REGEXP8 {
-            xreerror("No complement");
-            $$ = $2;
+       		// TODO: forbid pair complement (ie ~a:b)
+       		HfstTransducer complement = HfstTransducer::identity_pair( hfst::xre::format );
+       		complement.repeat_star().minimize();
+       		complement.subtract(*$2);
+       		$$ = new HfstTransducer(complement);
+   			delete $2;
         }
        | CONTAINMENT REGEXP8 {
+       
+            HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
+                                    hfst::internal_identity,
+                                    hfst::xre::format);
+            HfstTransducer* right = new HfstTransducer(hfst::internal_identity,
+                                    hfst::internal_identity,
+                                    hfst::xre::format);
+            right->repeat_star();
+            left->repeat_star();
+
+            $$ = & ((right->concatenate(*$2).concatenate(*left)));
+            
+       /*
             HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
                                     hfst::internal_unknown,
                                     hfst::xre::format);
@@ -585,10 +560,13 @@ REGEXP8: REGEXP9 { }
             HfstTransducer* contain_once = 
                 & ((right->concatenate(*$2).concatenate(*left)));
             $$ = & (contain_once->repeat_star());
+            
+         */
             delete $2;
             delete left;
         }
        | CONTAINMENT_ONCE REGEXP8 {
+                                 
             HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
                                     hfst::internal_unknown,
                                     hfst::xre::format);
@@ -602,6 +580,7 @@ REGEXP8: REGEXP9 { }
             $$ = contain_once;
             delete $2;
             delete left;
+
         }
        | CONTAINMENT_OPT REGEXP8 {
             HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
@@ -675,9 +654,6 @@ REGEXP11: REGEXP12 { }
         | LEFT_PARENTHESIS REGEXP2 RIGHT_PARENTHESIS {
             $$ = & $2->optionalize();
         }
-        | LEFT_CURLY REGEXP2 RIGHT_CURLY {
-            $$ = & $2->minimize();
-        }
         ;
 
 REGEXP12: LABEL { }
@@ -704,89 +680,53 @@ REGEXP12: LABEL { }
         }
         ;
 
-LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
+LABEL: HALFARC {
+        if (strcmp($1, hfst::internal_unknown.c_str()) == 0)
+          {
+            $$ = new HfstTransducer(hfst::internal_identity,
+                                    hfst::internal_identity, hfst::xre::format);
+          }
+        else
+          {
+            $$ = new HfstTransducer($1, $1, hfst::xre::format);
+          }
+        free($1);
+     }
+     |
+     HALFARC PAIR_SEPARATOR HALFARC {
         $$ = new HfstTransducer($1, $3, hfst::xre::format);
         free($1);
         free($3);
      }
-     | SYMBOL PAIR_SEPARATOR EPSILON_TOKEN {
-        $$ = new HfstTransducer($1, hfst::internal_epsilon, hfst::xre::format);
-        free($1);
-     }
-     | SYMBOL PAIR_SEPARATOR ANY_TOKEN {
+     | HALFARC PAIR_SEPARATOR_WO_RIGHT {
         $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::xre::format);
         free($1);
      }
-     | EPSILON_TOKEN PAIR_SEPARATOR EPSILON_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_epsilon, 
-                                hfst::internal_epsilon, hfst::xre::format);
-     }
-     | EPSILON_TOKEN PAIR_SEPARATOR SYMBOL {
-        $$ = new HfstTransducer(hfst::internal_epsilon, $3, hfst::xre::format);
-        free($3);
-     }
-     | EPSILON_TOKEN PAIR_SEPARATOR ANY_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_unknown,
-                                hfst::xre::format);
-     }
-     | ANY_TOKEN PAIR_SEPARATOR ANY_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
-                                hfst::xre::format);
-     }
-     | ANY_TOKEN PAIR_SEPARATOR SYMBOL {
-        $$ = new HfstTransducer(hfst::internal_unknown, $3, hfst::xre::format);
-        free($3);
-     }
-     | ANY_TOKEN PAIR_SEPARATOR EPSILON_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_epsilon,
-                                hfst::xre::format);
-     }
-     | SYMBOL PAIR_SEPARATOR_WO_RIGHT {
-        $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::xre::format);
-        free($1);
-     }
-     | EPSILON_TOKEN PAIR_SEPARATOR_WO_RIGHT {
-        $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_unknown,
-                                hfst::xre::format);
-     }
-     | ANY_TOKEN PAIR_SEPARATOR_WO_RIGHT {
-        $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
-                                hfst::xre::format);
-     }
-     | PAIR_SEPARATOR_WO_LEFT SYMBOL {
+     | PAIR_SEPARATOR_WO_LEFT HALFARC {
         $$ = new HfstTransducer(hfst::internal_unknown, $2, hfst::xre::format);
         free($2);
-     }
-     | PAIR_SEPARATOR_WO_LEFT ANY_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
-                                hfst::xre::format);
-     }
-     | PAIR_SEPARATOR_WO_LEFT EPSILON_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_epsilon,
-                                hfst::xre::format);
-     }
-     | SYMBOL {
-        $$ = new HfstTransducer($1, $1, hfst::xre::format);
-        free($1);
      }
      | PAIR_SEPARATOR_SOLE {
         $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
                                 hfst::xre::format);
      }
-     | EPSILON_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_epsilon,
-                                hfst::xre::format);
-     }
-     | ANY_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_identity,
-                                hfst::xre::format);
-     }
-     | QUOTED_LITERAL {
-        $$ = new HfstTransducer($1, $1, hfst::xre::format);
+     | CURLY_BRACKETS {
+        HfstTokenizer TOK;
+        $$ = new HfstTransducer($1, TOK, hfst::xre::format);
         free($1);
      }
+     ;
+
+HALFARC: SYMBOL
+     | EPSILON_TOKEN {
+        $$ = strdup(hfst::internal_epsilon.c_str());
+     }
+     | ANY_TOKEN {
+        $$ = strdup(hfst::internal_unknown.c_str());
+     }
+     | QUOTED_LITERAL 
      | BOUNDARY_MARKER {
-        $$ = new HfstTransducer("@#@", "@#@", hfst::xre::format);
+        $$ = strdup("@#@");
      }
      ;
 

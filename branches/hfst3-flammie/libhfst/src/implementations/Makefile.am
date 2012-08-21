@@ -33,6 +33,7 @@ IMPLEMENTATION_SRCS=HfstTransitionGraph.cc \
 #                    HfstConstantTransducer.cc
 
 AM_CPPFLAGS = -I${top_srcdir}/src
+
 # the bridges
 if WANT_SFST
 MAYBE_SFST=SfstTransducer.cc
