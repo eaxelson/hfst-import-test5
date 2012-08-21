@@ -21,7 +21,7 @@
 AC_PREREQ([2.62])
 
 # init must be at the start
-AC_INIT([libhfst], [3.3.4f], [hfst-bugs@helsinki.fi], [libhfst], [http://hfst.sf.net])
+AC_INIT([libhfst], [3.3.12f], [hfst-bugs@helsinki.fi], [libhfst], [http://hfst.sf.net])
 AC_CONFIG_AUX_DIR([build-aux])
 
 # automake >= 1.11 required for color-tests, silent-rules
@@ -104,7 +104,7 @@ AC_DEFINE([HFST_LONGVERSION], [3000300012L],
           [Define to hfst version vector as long in base 10000])
 AC_DEFINE([HFST_REVISION], ["$Revision: 1950 $"],
           [Automatically substitute to configure.ac revision])
-AC_DEFINE([HFST_STRING], [$PACKAGE_STRING],
+AC_DEFINE_UNQUOTED([HFST_STRING], ["$PACKAGE_STRING"],
           [Define to libhfst pretty name for programs to print])
 
 # Checks for programs
