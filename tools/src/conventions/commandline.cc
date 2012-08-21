@@ -588,8 +588,8 @@ void
 print_version()
 {
   // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
-    fprintf(message_out, "%s %s (" PACKAGE_STRING ")\n"
-             "Copyright (C) 2010 University of Helsinki,\n"
+    fprintf(message_out, "%s %s (" PACKAGE_STRING "; " HFST_STRING ")\n"
+             "Copyright (C) 2012 University of Helsinki,\n"
              "License GPLv3: GNU GPL version 3 "
              "<http://gnu.org/licenses/gpl.html>\n"
              "This is free software: you are free to change and "
