@@ -513,6 +513,26 @@ SFST's specific algorithms, you have the option of disabling SFST backend
 support without any loss of functionality using the configure option
 ``without-sfst``.
 
+libc++-abi.dylib: terminate called throwing an exception
+--------------------------------------------------------
+
+**During program execution** *(Mac OS X only)*, errors of form::
+
+  terminate called throwing an exception
+  Abort trap: 6
+
+Can be caused by, just about any exceptional situation that does not have
+specific handler. On Linux it will read::
+
+  terminate called after throwing an instance of 'ImplementationTypeNotAvailableException'
+
+And then you'll know that this specific exception is about backend that was disabled during `configure` phase. Or it might read::
+
+ terminate called after throwing an instance of 'UndefinedSymbolPairsFound'
+
+And you'd know it's something with the alphabet. But OS X won't tell us this. So
+it is an unexpected error situation. Usual suspects are still: missing library
+in configure, empty file, reading error, writing error...
 
 Further information
 ===================
