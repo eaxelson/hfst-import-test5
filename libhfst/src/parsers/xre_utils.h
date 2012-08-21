@@ -26,6 +26,12 @@ extern ImplementationType format;
  */
 int getinput(char *buf, int maxlen);
 
+
+/**
+ * @brief remove starting and ending curly bracket from given string @a.
+ */
+char* strip_curly(const char *s);
+
 /**
  * @brief remove percent escaping from given string @a s.
  */

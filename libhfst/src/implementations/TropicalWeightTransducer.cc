@@ -33,10 +33,12 @@ namespace hfst { namespace implementations
   TropicalWeightInputStream::TropicalWeightInputStream(void):
     i_stream(),input_stream(cin)
   {}
+
   TropicalWeightInputStream::TropicalWeightInputStream
     (const std::string &filename_):
-    filename(std::string(filename_)),i_stream(filename.c_str()),
-    input_stream(i_stream)
+      filename(std::string(filename_)),
+      i_stream(filename.c_str(), std::ios::in | std::ios::binary),
+      input_stream(i_stream)
   {}
 
   char TropicalWeightInputStream::stream_get() {
@@ -2537,7 +2539,7 @@ namespace hfst { namespace implementations
 
   TropicalWeightOutputStream::TropicalWeightOutputStream
   (const std::string &str, bool hfst_format):
-    filename(std::string(str)),o_stream(str.c_str(),std::ios::out),
+    filename(std::string(str)),o_stream(str.c_str(),std::ios::out | std::ios::binary),
     output_stream(o_stream),hfst_format(hfst_format)
   {}
 
@@ -2552,6 +2554,11 @@ namespace hfst { namespace implementations
       fprintf(stderr, "TropicalWeightOutputStream: ERROR: failbit set (1).\n");
     /* When writing a transducer in the backend format,
        both input and output symbol tables are included. */
+
+    if (transducer->InputSymbols() == NULL) {
+      fprintf(stderr, "### Missing Input Symbol Table when writing! ###\n");
+    }
+
     fst::SymbolTable *output_st=NULL;
     if (not hfst_format) {
       output_st = new fst::SymbolTable(*(transducer->InputSymbols()));

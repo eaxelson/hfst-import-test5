@@ -21,7 +21,7 @@
 AC_PREREQ([2.62])
 
 # init must be at the start
-AC_INIT([libhfst], [3.3.4], [hfst-bugs@helsinki.fi], [libhfst], [http://hfst.sf.net])
+AC_INIT([libhfst], [3.3.4f], [hfst-bugs@helsinki.fi], [libhfst], [http://hfst.sf.net])
 AC_CONFIG_AUX_DIR([build-aux])
 
 # automake >= 1.11 required for color-tests, silent-rules
@@ -94,13 +94,13 @@ AM_CONDITIONAL([WANT_STRESSTESTS], [test x$enable_stress_tests != xno])
 # subst in hfst.pc.in
 AC_SUBST([HFST_MAJOR], [3])
 AC_SUBST([HFST_MINOR], [3])
-AC_SUBST([HFST_EXTENSION], [4])
-AC_SUBST([HFST_VERSION], [3.3.4])
+AC_SUBST([HFST_EXTENSION], [12f])
+AC_SUBST([HFST_VERSION], [3.3.12f])
 AC_SUBST([HFST_NAME], [hfst])
 
 # long version = version vector cast in base 10000, for automatic comparisons
 # e.g.: 3.3.2 = 0003 0000 0000 + 0003 0000 + 0002
-AC_DEFINE([HFST_LONGVERSION], [300030004L],
+AC_DEFINE([HFST_LONGVERSION], [3000300012L],
           [Define to hfst version vector as long in base 10000])
 AC_DEFINE([HFST_REVISION], ["$Revision: 1950 $"],
           [Automatically substitute to configure.ac revision])

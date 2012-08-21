@@ -16,6 +16,7 @@
 #undef YY_INPUT
 #define YY_INPUT(buf, retval, maxlen)   (retval = hfst::xre::getinput(buf, maxlen))
 
+
 extern
 void xreerror(char *text);
 
@@ -53,7 +54,21 @@ UINTEGER [1-9][0-9]*
 INTEGER -?[1-9][0-9]*
 WSP [\t ]
 LWSP [\t\r\n ]
+
+/* curly brackets */
+BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
+
 %%
+
+
+
+
+{BRACED} {
+  xrelval.label = hfst::xre::strip_curly(xretext);
+  return CURLY_BRACKETS;
+}
+
+
 
 "~"   { return COMPLEMENT; }
 "\\"  { return TERM_COMPLEMENT; }
@@ -171,8 +186,7 @@ LWSP [\t\r\n ]
 "]" { return RIGHT_BRACKET; }
 "(" { return LEFT_PARENTHESIS; }
 ")" { return RIGHT_PARENTHESIS; }
-"{" { return LEFT_CURLY; }
-"}" { return RIGHT_CURLY; }
+
 
 {LWSP}":"{LWSP} { return PAIR_SEPARATOR_SOLE; }
 ^":"$ { return PAIR_SEPARATOR_SOLE; }

@@ -158,6 +158,14 @@ namespace hfst
       }
   }
 
+  unsigned short &HfstInputStream::stream_get(unsigned short &i)
+  {
+      char byte_1 = stream_get();
+      char byte_2 = stream_get();
+      return  i = (unsigned short)
+          (((unsigned char) byte_2) << 8) + ((unsigned char) byte_1);
+  }
+
   char HfstInputStream::stream_get()
   {
     if (input_stream != NULL)
@@ -775,7 +783,7 @@ namespace hfst
 
   int HfstInputStream::get_header_size(int &bytes_read)
   {
-    short header_size=0;
+    unsigned short header_size = 0;
     stream_get(header_size);
     char c = stream_get();
     if (c != 0) {

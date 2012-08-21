@@ -217,6 +217,9 @@ namespace hfst
 		return retval;
 	  }
 
+	  /*
+	   * Generalized Lenient Composition, described in Anssi Yli-Jyrä 2008b
+	   */
 	  // tmp = t.1 .o. Constr .o. t.1
 	  // (t.1 - tmp.2) .o. t
 	  HfstTransducer constraintComposition( const HfstTransducer &t, const HfstTransducer &Constraint )
@@ -450,7 +453,7 @@ namespace hfst
 	  	if ( optional != true )
 	  	{
 	  		// non - optional
-	  		// mapping = T<a:b>T u T<2a:a>2T
+	  		// mapping = <a:b> u <2a:a>2
 
 	  		// needed in case of ? -> x replacement
 		  	//mapping.insert_to_alphabet(leftMarker2);
@@ -1844,10 +1847,11 @@ namespace hfst
 
 	  	// for epenthesis rules
 	  	// it can't have more than one epsilon repetition in a row
-	  	retval = noRepetitionConstraint( retval );
 
-	  	//printf("noRepetitionConstraint: \n");
-	  	//retval.write_in_att_format(stdout, 1);
+	  	//retval = noRepetitionConstraint( retval );
+
+		//printf("noRepetitionConstraint: \n");
+		//retval.write_in_att_format(stdout, 1);
 
 	  	if ( !optional )
 	  	{
@@ -1863,9 +1867,14 @@ namespace hfst
 
 
 	  	retval = removeMarkers( retval );
-	  	retval = removeB2Constraint(retval);
+
 
 	  	//printf("after remove markers: \n");
+	  	//retval.write_in_att_format(stdout, 1);
+
+	  	retval = removeB2Constraint(retval);
+
+	  	//printf("after remove B2: \n");
 	  	//retval.write_in_att_format(stdout, 1);
 
 	  	// deals with boundary symbol
@@ -1927,7 +1936,7 @@ namespace hfst
 		  return replace( newRule, optional);
 	  }
 	  // replace left parallel
-    HfstTransducer replace_left( const std::vector<Rule> &ruleVector, bool optional)
+	  HfstTransducer replace_left( const std::vector<Rule> &ruleVector, bool optional)
 	  {
 		  return replace( ruleVector, optional).invert();
 	  }
@@ -1939,7 +1948,7 @@ namespace hfst
 	  	HfstTransducer uncondidtionalTr( bracketedReplace(rule, true) );
 	  	//uncondidtionalTr = bracketedReplace(rule, true);
 
-	  	//printf("uncondidtionalTr: \n");
+	  	//printf("LM uncondidtionalTr: \n");
 	  	//uncondidtionalTr.write_in_att_format(stdout, 1);
 
 
@@ -2422,6 +2431,7 @@ int main(int argc, char * argv[])
 	      ImplementationType types[] = {SFST_TYPE, TROPICAL_OPENFST_TYPE, FOMA_TYPE};
 	      unsigned int NUMBER_OF_TYPES=3;
 
+
 	      for (unsigned int i=0; i < NUMBER_OF_TYPES; i++)
 	      {
 	        if (! HfstTransducer::is_implementation_type_available(types[i]))
@@ -2444,7 +2454,6 @@ int main(int argc, char * argv[])
 			test2c( types[i] );
 
 			// testing unconditional replace with and without contexts
-
 
 			test3a( types[i] );
 			test3b( types[i] );
@@ -2483,14 +2492,8 @@ int main(int argc, char * argv[])
 
 			// a -> b b , a -> b
 			test7g( types[i] );
-
-
 			test8( types[i] );
-
-
 	      }
-
-
 
 	      std::cout << "ok" << std::endl;
 	      return 0;
