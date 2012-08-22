@@ -35,7 +35,7 @@ libhfst_la_LIBADD = implementations/libhfstimplementations.la \
 			parsers/libhfstparsers.la
 
 if WANT_WINDOWS	
-  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include
+  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include -DWINDOWS
   libhfst_la_LIBADD += $(top_srcdir)/windows/dlfcn/libdl.la \
 			$(top_srcdir)/windows/openfst/src/lib/libfst.la
 endif
