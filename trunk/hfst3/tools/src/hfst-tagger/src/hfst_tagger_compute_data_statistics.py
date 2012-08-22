@@ -234,7 +234,6 @@ tagger_aux.print_penalties(upper_tag_count_map,
                            "<upper_tag>")
 print "STOP P(UPPER_TAG)"
 
-
 ## CONSTRUCT TAG SEQUENCE TABLE.
 
 tagger_aux.verbose_print("Computing sequence statistics.",verbose)

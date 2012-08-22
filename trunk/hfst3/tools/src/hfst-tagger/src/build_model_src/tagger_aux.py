@@ -134,13 +134,15 @@ def parse_config_line(line):
 # separated fields, raise an exception.
 def check_line(line,number_of_fields):
 
+    line_copy = line
+
     try:
-        line.decode("utf-8")
+        line_copy.decode("utf-8")
 
     except UnicodeDecodeError:
         raise Exception("Invalid utf-8 encoding on line")
 
-    if len(line.split("\t")) != number_of_fields:
+    if len(line_copy.split("\t")) != number_of_fields:
         raise Exception("Wrong number of fields on line")
 
 # Return tropical penalty corresponding to the probability
@@ -157,7 +159,7 @@ def verbose_print(message, is_verbose):
 # Return the utf-8 string str reversed. utf-8 symbols are not
 # internally reversed.
 def reverse(str):    
-    return unicode(str, "utf-8")[::-1]
+    return str.decode("utf-8")[::-1]
 
 # Return a map for counting pairs e.g. word form and tag pairs.
 def get_object_counter():
@@ -215,17 +217,47 @@ def print_conditional_penalties(pair_counter, object_counter,
     for pair, penalty in penalty_map.iteritems():
         if type(pair[0]) == type(u"") or type(pair[0]) == type(""):
 
+            p = list(pair)
+            
+            try:
+                p[0] = p[0].decode("utf-8")
+            except UnicodeEncodeError:
+                pass
+            
+            try:
+                p[1] = p[1].decode("utf-8")
+            except UnicodeEncodeError:
+                pass
+            
+
             if not invert_fields:
-                print string.join([pair[0] + appended_suffix, 
-                                   pair[1], 
-                                   str(penalty)],"\t")
+                s = string.join([p[0] + appended_suffix, 
+                                 p[1], 
+                                 str(penalty)],"\t")
+                print s.encode("utf-8")
             else:
-                print string.join([pair[1] + appended_suffix, 
-                                   pair[0], 
-                                   str(penalty)],"\t")
+                
+                s = string.join([p[1] + appended_suffix, 
+                                 p[0], 
+                                 str(penalty)],"\t")
+                print s.encode("utf-8")
         else:
             for entry in pair[0]:
-                print entry[0] + "\t" + entry[1] + "\t",
+                e = list(entry)
+                
+                try:
+                    e[0] = e[0].decode("utf-8")
+                except UnicodeEncodeError:
+                    pass
+
+                try:
+                    e[1] = e[1].decode("utf-8")
+                except UnicodeEncodeError:
+                    pass
+                
+                s = e[0] + "\t" + e[1] + "\t"
+                print s.encode("utf-8"),
+
             print penalty
 
 def print_penalties(object_counter, total_count, appended_suffix):
@@ -233,5 +265,13 @@ def print_penalties(object_counter, total_count, appended_suffix):
     penalty_map = get_penalty_map(object_counter, total_count) 
 
     for object, penalty in penalty_map.iteritems():
-        print object + appended_suffix + "T\t" + str(penalty)
+        
+        o = object
+        try:
+            o = o.decode("utf-8")
+        except UnicodeEncodeError:
+            pass
 
+        s = o + appended_suffix + "T\t" + str(penalty)
+
+        print s.encode("utf-8")
