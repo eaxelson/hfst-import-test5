@@ -178,7 +178,7 @@ print_dot(FILE* out, HfstTransducer& t)
             program_short_name, hfst_tool_version);
     fprintf(out, "digraph H {\n");
     fprintf(out, "rankdir = LR;\n");
-
+    fprintf(out, "node [shape=circle,style=filled,fillcolor=yellow]\n");
     HfstBasicTransducer* mutt = new HfstBasicTransducer(t);
     HfstState s = 0;
     // for some reason, dot works nicer if I first have all nodes, then arcs
@@ -188,13 +188,13 @@ print_dot(FILE* out, HfstTransducer& t)
       {
         if (mutt->is_final_state(s))
           {
-            fprintf(out, "node [shape=doublecircle,style=filled,"
-                    "label=\"q%d/%.2f\"] %d\n",
-                    s, mutt->get_final_weight(s), s);
+            fprintf(out, "q%d [shape=doublecircle,"
+                    "label=\"q%d/\\n%.2f\"] \n",
+                    s, s, mutt->get_final_weight(s));
           }
         else
           {
-            fprintf(out, "node [shape=circle,style=filled,label=\"q%d\"] %d\n", 
+            fprintf(out, "q%d [label=\"q%d\"] \n", 
                     s, s);
           }
         ++s;
@@ -209,7 +209,7 @@ print_dot(FILE* out, HfstTransducer& t)
              arc != state->end();
              ++arc)
           {
-            fprintf(out, "%d -> %d ", s, arc->get_target_state());
+            fprintf(out, "q%d -> q%d ", s, arc->get_target_state());
             string first = arc->get_input_symbol();
             string second = arc->get_output_symbol();
             if (first == hfst::internal_epsilon)
