@@ -70,6 +70,9 @@ static float sum_of_weights=0;
 static bool normalize_weights=false;
 static bool logarithmic_weights=false;
 
+static bool use_basics = false;
+static unsigned long cleanup_threshold = 1;
+
 static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
 
 float divide_by_sum_of_weights(float weight) {
@@ -168,11 +171,13 @@ parse_options(int argc, char** argv)
           {"has-spaces", no_argument, 0, 'S'},
           {"multichar-symbols", required_argument, 0, 'm'},
           {"format", required_argument, 0, 'f'},
+          {"basic", no_argument, 0, 'X'},
+          {"optimise", required_argument, 0, 'O'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "je:23pSm:f:",
+                             HFST_GETOPT_UNARY_SHORT "je:23pSm:f:XO:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -201,12 +206,18 @@ parse_options(int argc, char** argv)
         case 'p':
             pairstrings = true;
             break;
-    case 'm':
-        multichar_symbol_filename = hfst_strdup(optarg);
-        break;
-    case 'f':
-        output_format = hfst_parse_format_name(optarg);
-        break;
+        case 'm':
+            multichar_symbol_filename = hfst_strdup(optarg);
+            break;
+        case 'f':
+            output_format = hfst_parse_format_name(optarg);
+            break;
+        case 'X':
+            use_basics = true;
+            break;
+        case 'O':
+            cleanup_threshold = hfst_strtoul(optarg, 10);
+            break;
 #include "conventions/getopt-cases-error.h"
         }
     }
@@ -234,7 +245,8 @@ process_stream(HfstOutputStream& outstream)
   char* line = 0;
   size_t len = 0;
   HfstTokenizer tok;
-  HfstBasicTransducer disjunction;
+  HfstTransducer disjunction(output_format);
+  HfstBasicTransducer basic_disjunction;
   size_t line_n = 0;
 
   HfstStrings2FstTokenizer
@@ -339,9 +351,8 @@ process_stream(HfstOutputStream& outstream)
 
       if (!disjunct_strings) // each string into a transducer
         {
-          HfstBasicTransducer tr;
-          tr.disjunct(spv, path_weight);
-          HfstTransducer res(tr, output_format);
+          HfstTransducer res(spv, output_format);
+          res.set_final_weights(path_weight);
           char* nameline = 0;
           if (strlen(orig_line) >= 79)
             {
@@ -374,25 +385,39 @@ process_stream(HfstOutputStream& outstream)
         }
       else // disjunct all strings into a single transducer
         {
-          disjunction.disjunct(spv, path_weight);
+          if (use_basics)
+            {
+              basic_disjunction.disjunct(spv, path_weight);
+            }
+          else
+            {
+              HfstTransducer res(spv, output_format);
+              res.set_final_weights(path_weight);
+              disjunction.disjunct(res);
+              if (line_n % cleanup_threshold == 0)
+                {
+                  disjunction.minimize();
+                }
+            }
         }
     }
   free(line);
   if (disjunct_strings)
     {
-      HfstTransducer res(disjunction, output_format);
-
-      if (normalize_weights) 
+      if (use_basics)
         {
-          verbose_printf("Normalising weights...\n");
-          if (!logarithmic_weights)
-            res.transform_weights(&divide_by_sum_of_weights);
-          else
-            res.transform_weights(&divide_by_sum_of_weights_log);
+          HfstTransducer res(basic_disjunction, output_format);
+          hfst_set_name(res, inputfilename, "strings");
+          hfst_set_formula(res, inputfilename, "S");
+          outstream << res;
         }
-      hfst_set_name(res, inputfilename, "strings");
-      hfst_set_formula(res, inputfilename, "S");
-      outstream << res;
+      else
+        {
+          disjunction.minimize();
+          hfst_set_name(disjunction, inputfilename, "strings");
+          hfst_set_formula(disjunction, inputfilename, "S");
+          outstream << disjunction;
+        }
     }
   return EXIT_SUCCESS;
 }
