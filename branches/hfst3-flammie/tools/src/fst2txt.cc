@@ -177,7 +177,15 @@ print_dot(FILE* out, HfstTransducer& t)
   {
     fprintf(out, "// This graph generated with %s %s\n",
             program_short_name, hfst_tool_version);
-    fprintf(out, "digraph H {\n");
+    if (t.get_name() != "")
+      {
+        fprintf(out, "digraph \"%s\" {\n", t.get_name().c_str());
+      }
+    else
+      {
+        fprintf(out, "digraph H {\n");
+      }
+    fprintf(out, "charset = UTF8;\n");
     fprintf(out, "rankdir = LR;\n");
     fprintf(out, "node [shape=circle,style=filled,fillcolor=yellow]\n");
     HfstBasicTransducer* mutt = new HfstBasicTransducer(t);
@@ -189,9 +197,18 @@ print_dot(FILE* out, HfstTransducer& t)
       {
         if (mutt->is_final_state(s))
           {
-            fprintf(out, "q%d [shape=doublecircle,"
-                    "label=\"q%d/\\n%.2f\"] \n",
-                    s, s, mutt->get_final_weight(s));
+            if (mutt->get_final_weight(s) > 0)
+              {
+                fprintf(out, "q%d [shape=doublecircle,"
+                       "label=\"q%d/\\n%.2f\"] \n",
+                        s, s, mutt->get_final_weight(s));
+              }
+            else
+              {
+                fprintf(out, "q%d [shape=doublecircle,"
+                       "label=\"q%d\"] \n",
+                        s, s);
+              }
           }
         else
           {
@@ -216,11 +233,11 @@ print_dot(FILE* out, HfstTransducer& t)
             string second = arc->get_output_symbol();
             if (first == hfst::internal_epsilon)
               {
-                first = string("0");
+                first = string("00");
               }
             else if (first == hfst::internal_identity)
               {
-                first = string("?");
+                first = string("??");
               }
             else if (first == hfst::internal_unknown)
               { 
@@ -228,11 +245,11 @@ print_dot(FILE* out, HfstTransducer& t)
               }
             if (second == hfst::internal_epsilon)
               {
-                second = string("0");
+                second = string("00");
               }
             else if (second == hfst::internal_identity)
               {
-                second = string("?");
+                second = string("??");
               }
             else if (second == hfst::internal_unknown)
               {
