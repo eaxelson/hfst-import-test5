@@ -64,6 +64,10 @@ print_usage()
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out, "\n");
+    fprintf(message_out, 
+	    "The parameter --verbose gives more extensive information on\n"
+	    "the properties of a transducer.\n");
+    fprintf(message_out, "\n");
     print_report_bugs();
     fprintf(message_out, "\n");
     print_more_info();
