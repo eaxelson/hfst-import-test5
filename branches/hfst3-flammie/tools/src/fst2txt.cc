@@ -33,6 +33,7 @@ using std::map;
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <errno.h>
 #include <getopt.h>
 
 #include <hfst.hpp>
@@ -204,12 +205,13 @@ print_dot(FILE* out, HfstTransducer& t)
          state != mutt->end();
          ++state)
       {
+        map<HfstState, string> target_labels;
         for (HfstBasicTransducer::HfstTransitions::const_iterator arc = 
              state->begin();
              arc != state->end();
              ++arc)
           {
-            fprintf(out, "q%d -> q%d ", s, arc->get_target_state());
+            string old_label = target_labels[arc->get_target_state()];
             string first = arc->get_input_symbol();
             string second = arc->get_output_symbol();
             if (first == hfst::internal_epsilon)
@@ -236,17 +238,123 @@ print_dot(FILE* out, HfstTransducer& t)
               {
                 second = string("?2");
               }
+#define DOT_MAX_LABEL_SIZE 64
+            char* l = static_cast<char*>(malloc(sizeof(char) * 
+                                                DOT_MAX_LABEL_SIZE));
             if (first == second)
               {
-                fprintf(out, "[label=\"%s/%.2f \"];\n", first.c_str(),
-                        arc->get_weight());
-              }
+                if (arc->get_weight() > 0)
+                  {
+                    errno = 0;
+                    if (old_label != "")
+                      {
+                        if (snprintf(l, DOT_MAX_LABEL_SIZE,
+                             "%s, %s/%.2f", old_label.c_str(),
+                             first.c_str(),
+                             arc->get_weight()) < 0)
+                          {
+                            error(EXIT_FAILURE, errno, 
+                                 "sprinting dot arc label");
+                          }
+                      }
+                    else 
+                      {
+                        if (snprintf(l, DOT_MAX_LABEL_SIZE,
+                                     "%s/%.2f", first.c_str(),
+                                     arc->get_weight()) < 0)
+                          {
+                            error(EXIT_FAILURE, errno, 
+                                 "sprinting dot arc label");
+                          }
+                      }  // if old label empty
+                  } // if weighted
+                else
+                  {
+                    errno = 0;
+                    if (old_label != "")
+                      {
+                        if (snprintf(l, DOT_MAX_LABEL_SIZE,
+                             "%s, %s", old_label.c_str(),
+                             first.c_str()) < 0)
+                          {
+                            error(EXIT_FAILURE, errno, 
+                                 "sprinting dot arc label");
+                          }
+                      }
+                    else 
+                      {
+                        if (snprintf(l, DOT_MAX_LABEL_SIZE,
+                                     "%s", first.c_str()) < 0)
+                          {
+                            error(EXIT_FAILURE, errno, 
+                                 "sprinting dot arc label");
+                          }
+                      } // if old label empty
+                  } // if weighted 
+              } // if id pair
             else
               {
-                fprintf(out, "[label=\"%s:%s/%.2f \"];\n", first.c_str(),
-                        second.c_str(), arc->get_weight());
-              }
+                if (arc->get_weight() > 0)
+                  {
+                    errno = 0;
+                    if (old_label != "")
+                      {
+                        if (snprintf(l, DOT_MAX_LABEL_SIZE,
+                                     "%s, %s:%s/%.2f", old_label.c_str(),
+                                    first.c_str(), second.c_str(),
+                                    arc->get_weight()) < 0)
+                          {
+                            error(EXIT_FAILURE, errno, 
+                                  "sprinting dot arc label");
+                          }
+                      }
+                    else
+                      {
+                        if (snprintf(l, DOT_MAX_LABEL_SIZE,
+                                     "%s:%s/%.2f",
+                                    first.c_str(), second.c_str(),
+                                    arc->get_weight()) < 0)
+                          {
+                            error(EXIT_FAILURE, errno, 
+                                  "sprinting dot arc label");
+                          }
+                      }  // old label empty
+                  } // if weighted
+                else
+                  {
+                    errno = 0;
+                    if (old_label != "")
+                      {
+                        if (snprintf(l, DOT_MAX_LABEL_SIZE,
+                                     "%s, %s:%s", old_label.c_str(),
+                                    first.c_str(), second.c_str()) < 0)
+                          {
+                            error(EXIT_FAILURE, errno, 
+                                  "sprinting dot arc label");
+                          }
+                      }
+                    else
+                      {
+                        if (snprintf(l, DOT_MAX_LABEL_SIZE,
+                                     "%s:%s",
+                                    first.c_str(), second.c_str()) < 0)
+                          {
+                            error(EXIT_FAILURE, errno, 
+                                  "sprinting dot arc label");
+                          }
+                      } // if old label empty
+                  } // if weighted
+              } // if id pair
+            target_labels[arc->get_target_state()] = l;
+            free(l);
           } // each arc
+        for (map<HfstState,string>::const_iterator tl = target_labels.begin();
+             tl != target_labels.end();
+             ++tl)
+          {
+            fprintf(out, "q%d -> q%d ", s, tl->first);
+            fprintf(out, "[label=\"%s \"];\n", tl->second.c_str());
+          }
         ++s;
       } // each state
     fprintf(out, "}\n");
