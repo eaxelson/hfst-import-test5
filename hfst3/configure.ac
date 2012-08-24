@@ -39,11 +39,20 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([libhfst/src/HfstTransducer.h])
 AC_CONFIG_HEADERS([config.h])
 
-AC_SUBST(LIBHFST_MAJOR)
-AC_SUBST(LIBHFST_MINOR)
-AC_SUBST(LIBHFST_EXTENSION)
-AC_SUBST(LIBHFST_VERSION)
-AC_SUBST(LIBHFST_NAME)
+AC_SUBST([LIBHFST_MAJOR], [3])
+AC_SUBST([LIBHFST_MINOR], [3])
+AC_SUBST([LIBHFST_EXTENSION], [12])
+AC_SUBST([LIBHFST_VERSION], [3.3.12])
+AC_SUBST([LIBHFST_NAME], [hfst])
+
+# long version = version vector cast in base 10000, for automatic comparisons
+# e.g.: 3.3.2 = 0003 0000 0000 + 0003 0000 + 0002
+AC_DEFINE([HFST_LONGVERSION], [300030012L],
+          [Define to hfst version vector as long in base 10000])
+AC_DEFINE([HFST_REVISION], ["$Revision: 1950 $"],
+          Automatically substitute to configure.ac revision])
+AC_DEFINE_UNQUOTED([HFST_STRING], ["$PACKAGE_STRING"],
+                   [Define to libhfst pretty name for programs to print])
 
 # allow backends to be removed
 AC_ARG_WITH([sfst],
@@ -513,6 +522,9 @@ AS_IF([test "x$with_unicode_handler" = "xglib"],
              ],
              [AC_CHECK_HEADERS([glib.h], [], 
                         [AC_MSG_ERROR([glib headers not found; set CPPFLAGS to -I glib install directiories or use other unicode handler instead])])])])
+# remove if not needed
+AS_IF([test "x$with_unicode_handler" != "xglib"],
+      [AC_SUBST([GLIB_CFLAGS])])
 
 ### Add here your library ###
 #AS_IF([test "x$with_my_transducer_library" != "xno"],
@@ -540,7 +552,7 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  libhfst/Makefile libhfst/src/Makefile
                  libhfst/src/implementations/Makefile
 		 libhfst/src/parsers/Makefile 
-                 libhfst/hfst.pc
+                 libhfst/hfst.pc libhfst/src/hfst.hpp
 		 tools/Makefile tools/src/Makefile tools/src/hfst-proc/Makefile
 		 tools/src/hfst-twolc/Makefile
 		 tools/src/hfst-twolc/src/Makefile
