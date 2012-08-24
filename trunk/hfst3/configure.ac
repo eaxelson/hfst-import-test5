@@ -50,7 +50,7 @@ AC_SUBST([LIBHFST_NAME], [hfst])
 AC_DEFINE([HFST_LONGVERSION], [300030012L],
           [Define to hfst version vector as long in base 10000])
 AC_DEFINE([HFST_REVISION], ["$Revision: 1950 $"],
-          Automatically substitute to configure.ac revision])
+          [Automatically substitute to configure.ac revision])
 AC_DEFINE_UNQUOTED([HFST_STRING], ["$PACKAGE_STRING"],
                    [Define to libhfst pretty name for programs to print])
 
