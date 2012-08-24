@@ -501,7 +501,7 @@ read_matcher(HfstInputStream& instream)
         }
         else
         {
-          verbose_printf("Reading matcher %s...%zu\n", inputname,
+          verbose_printf("Reading matcher %s..." SIZE_T_SPECIFIER "\n", inputname,
                          transducer_n); 
         }
         if (transducer_n > 1)
@@ -718,7 +718,7 @@ match_lines(FILE* infile, char* infilename)
           }
         else if (results->size() >= 1)
           {
-            verbose_printf("%zu match combinations\n", results->size());
+            verbose_printf("" SIZE_T_SPECIFIER " match combinations\n", results->size());
             if (!invert_matches)
               {
                 // only print one of the matches for now

@@ -148,7 +148,7 @@ concatenate_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         }
         else
         {
-            verbose_printf("Concatenating %s and %s... %zu\n", firstname,
+            verbose_printf("Concatenating %s and %s... " SIZE_T_SPECIFIER "\n", firstname,
                            secondname, transducer_n_first);
         }
         if (first->has_flag_diacritics() and second->has_flag_diacritics()) 
@@ -173,7 +173,7 @@ concatenate_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
           }
         catch (TransducerTypeMismatchException ttme)
           {
-            error(EXIT_FAILURE, 0, "Could not concatenate %s and %s [%zu]\n"
+            error(EXIT_FAILURE, 0, "Could not concatenate %s and %s [" SIZE_T_SPECIFIER "]\n"
                   "types %s and %s are not compatible for concatenation",
                   firstname, secondname, transducer_n_first,
                   hfst_strformat(firststream.get_type()),

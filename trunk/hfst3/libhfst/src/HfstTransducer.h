@@ -16,6 +16,8 @@
 #  include <config.h>
 #endif
 
+#include "FormatSpecifiers.h"
+
 #include "HfstDataTypes.h"
 #include "HfstSymbolDefs.h"
 #include "implementations/HfstTransitionGraph.h"

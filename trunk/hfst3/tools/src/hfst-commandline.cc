@@ -463,7 +463,7 @@ hfst_read(int fd, void* buf, size_t count)
 {
   if (count > SSIZE_MAX)
     {
-      error(EXIT_FAILURE, 0, "cannot read %zu bytes in one read(2)", count);
+      error(EXIT_FAILURE, 0, "cannot read " SIZE_T_SPECIFIER " bytes in one read(2)", count);
     }
   errno = 0;
   ssize_t rv = read(fd, buf, count);

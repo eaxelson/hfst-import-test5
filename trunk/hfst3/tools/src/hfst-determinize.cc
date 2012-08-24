@@ -123,7 +123,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         }
         else
         {
-          verbose_printf("Determinizing %s...%zu\n", inputname,
+          verbose_printf("Determinizing %s..." SIZE_T_SPECIFIER "\n", inputname,
                          transducer_n); 
         }
         trans.determinize();

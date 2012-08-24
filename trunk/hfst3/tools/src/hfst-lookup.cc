@@ -1112,7 +1112,7 @@ lookup_simple(const HfstOneLevelPath& s, HfstTransducer& t, bool* infinity)
   if (t.is_lookup_infinitely_ambiguous(s.second))
     {
       if (!silent && infinite_cutoff > 0) {
-    warning(0, 0, "Got infinite results, number of cycles limited to %zu",
+    warning(0, 0, "Got infinite results, number of cycles limited to " SIZE_T_SPECIFIER "",
         infinite_cutoff);
       }
       results = t.lookup_fd(s.second, infinite_cutoff);
@@ -1501,7 +1501,7 @@ lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity)
   if (is_lookup_infinitely_ambiguous(t,s))
     {
       if (!silent && infinite_cutoff > 0) {
-    warning(0, 0, "Got infinite results, number of cycles limited to %zu",
+    warning(0, 0, "Got infinite results, number of cycles limited to " SIZE_T_SPECIFIER "",
         infinite_cutoff);
       }
       lookup_fd(t, *results, s, infinite_cutoff);
@@ -1541,12 +1541,12 @@ lookup_cascading(const HfstOneLevelPath& s, vector<T> cascade,
                              infinity);
           if (infinity)
             {
-              verbose_printf("Inf results @ level %u, using %zu\n",
+              verbose_printf("Inf results @ level %u, using " SIZE_T_SPECIFIER "\n",
                              i, xyzkvs->size());
             }
           else
             {
-              verbose_printf("%zu results @ level %u\n", xyzkvs->size(), i);
+              verbose_printf("" SIZE_T_SPECIFIER " results @ level %u\n", xyzkvs->size(), i);
             }
           for (HfstOneLevelPaths::const_iterator xyzkv = xyzkvs->begin();
                xyzkv != xyzkvs->end();
@@ -1665,7 +1665,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
           }
         else
           {
-            verbose_printf("Reading %s...%zu\n", inputname,
+            verbose_printf("Reading %s..." SIZE_T_SPECIFIER "\n", inputname,
                            transducer_n); 
           }
 

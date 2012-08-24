@@ -137,14 +137,14 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
               {
                 inputname = strdup(inputfilename);
               }
-            verbose_printf("Forwarding %s...%zu\n", inputname, transducer_n); 
+            verbose_printf("Forwarding %s..." SIZE_T_SPECIFIER "\n", inputname, transducer_n); 
             outstream << trans;
           }
       }
     else if (head_count < 0)
       {
         deque<HfstTransducer> first_but_n;
-        verbose_printf("Counting all but last %zu\n", head_count);
+        verbose_printf("Counting all but last " SIZE_T_SPECIFIER "\n", head_count);
         while (instream.is_good())
           {
             transducer_n++;
@@ -153,7 +153,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           }
         if (-head_count > first_but_n.size())
           {
-            warning(0, 0, "Stream in %s has less than %zu automata; "
+            warning(0, 0, "Stream in %s has less than " SIZE_T_SPECIFIER " automata; "
                     "Nothing will be written to output",
                     inputfilename, -head_count);
           }
@@ -172,7 +172,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
               {
                 inputname = strdup(inputfilename);
               }
-            verbose_printf("Forwarding %s...%zu\n", inputname, transducer_n); 
+            verbose_printf("Forwarding %s..." SIZE_T_SPECIFIER "\n", inputname, transducer_n); 
             outstream << trans;
             first_but_n.pop_front();
           }

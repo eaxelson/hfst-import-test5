@@ -122,7 +122,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         }
         else
         {
-          verbose_printf("Minimizing %s...%zu\n", inputname, transducer_n); 
+          verbose_printf("Minimizing %s..." SIZE_T_SPECIFIER "\n", inputname, transducer_n); 
         }
         trans.minimize();
         hfst_set_name(trans, trans, "minimize");

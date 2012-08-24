@@ -123,7 +123,7 @@ binaryoperate_streams(HfstInputStream& firststream, HfstInputStream& secondstrea
         }
         else
         {
-            verbose_printf("Doing things with %s and %s... %zu\n",
+            verbose_printf("Doing things with %s and %s... " SIZE_T_SPECIFIER "\n",
                            firstfilename, secondfilename, transducer_n);
         }
         HfstTransducer first(firststream);

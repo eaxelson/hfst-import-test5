@@ -126,7 +126,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         }
         else
         {
-          verbose_printf("Removing epsilons %s...%zu\n", inputname, transducer_n); 
+          verbose_printf("Removing epsilons %s..." SIZE_T_SPECIFIER "\n", inputname, transducer_n); 
         }
         trans.remove_epsilons();
         hfst_set_name(trans, trans, "remove-epsilons");

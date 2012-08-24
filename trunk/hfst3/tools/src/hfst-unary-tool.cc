@@ -119,7 +119,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         }
         else
         {
-          verbose_printf("Doing things %s...%zu\n", inputfilename, transducer_n); 
+          verbose_printf("Doing things %s..." SIZE_T_SPECIFIER "\n", inputfilename, transducer_n); 
         }
         
         HfstTransducer trans(instream);

@@ -365,7 +365,7 @@ process_stream(HfstInputStream& instream, FILE* outf)
         }
         else
         { 
-          verbose_printf("Converting %s...%zu\n", inputname,
+          verbose_printf("Converting %s..." SIZE_T_SPECIFIER "\n", inputname,
                          transducer_n); 
         }
 

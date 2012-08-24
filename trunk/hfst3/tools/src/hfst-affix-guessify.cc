@@ -168,7 +168,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         }
       else
         {
-          verbose_printf("Guessifying %s... %zu\n", inputname, transducer_n);
+          verbose_printf("Guessifying %s... " SIZE_T_SPECIFIER "\n", inputname, transducer_n);
         }
       HfstBasicTransducer* repl = 0;
       HfstTransducer* t = 0;

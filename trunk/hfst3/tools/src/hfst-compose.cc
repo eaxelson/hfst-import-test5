@@ -146,7 +146,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         }
         else
         {
-            verbose_printf("Composing %s and %s... %zu\n",
+            verbose_printf("Composing %s and %s... " SIZE_T_SPECIFIER "\n",
                            firstname, secondname, transducer_n_first);
         }
 
@@ -176,7 +176,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         }
         catch (HfstTransducerTypeMismatchException)
           {
-            error(EXIT_FAILURE, 0, "Could not compose %s and %s [%zu]\n"
+            error(EXIT_FAILURE, 0, "Could not compose %s and %s [" SIZE_T_SPECIFIER "]\n"
                   "types %s and %s are not compatible for composition",
                   firstname, secondname, transducer_n_first,
                   hfst_strformat(firststream.get_type()),
