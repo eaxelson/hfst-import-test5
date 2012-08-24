@@ -229,6 +229,12 @@ AC_ARG_ENABLE([head],
 			  [enable_head=$enableval],
 			  [enable_head=yes])
 AM_CONDITIONAL([WANT_HEAD], [test x$enable_head != xno])
+AC_ARG_ENABLE([info],
+			  [AS_HELP_STRING([--enable-info],
+							  [build info tool @<:@default=yes@:>@])],
+			  [enable_info=$enableval],
+			  [enable_info=yes])
+AM_CONDITIONAL([WANT_INFO], [test x$enable_info != xno])
 AC_ARG_ENABLE([invert],
 			  [AS_HELP_STRING([--enable-invert],
 							  [build invert tool @<:@default=yes@:>@])],
