@@ -32,6 +32,7 @@
 using std::string;
 using std::vector;
 using std::pair;
+using std::map;
 
 #include <cstdio>
 #include <cstdlib>
@@ -57,6 +58,7 @@ using hfst::xre::XreCompiler;
 static char *epsilonname=NULL;
 static bool disjunct_expressions=false;
 static bool line_separated = true;
+static map<string,string> definitions;
 
 //static unsigned int sum_of_weights=0;
 static bool sum_weights=false;
@@ -80,7 +82,8 @@ print_usage()
                     "transforming each regexp into a separate transducer\n"
                 "  -l, --line                Input is line separated\n"
                 "  -S, --semicolon           Input is semicolon separated\n"
-                "  -e, --epsilon=EPS         Map EPS as zero.\n");
+                "  -e, --epsilon=EPS         Map EPS as zero.\n"
+                "  -D, --define=VAR=XRE      Map variable VAR to regex XRE\n");
         fprintf(message_out, "\n");
 
         fprintf(message_out, 
@@ -89,12 +92,12 @@ print_usage()
             "openfst-tropical, sfst, foma or hfst-optimized-weighted\n"
             "If EPS is not defined, the default representation of 0 is used\n"
             "If neither -l nor -S is specified, default is line separated\n"
+            "XRE must be compilable xerox regular expression\n"
             );
 
         fprintf(message_out, "Examples:\n"
-            "  echo \"c:d a:o t:g\" | %s -l      create cat:dog fst\n"
-            "  echo \"c:d a:o t:g ;\" | %s -S    same as pairstring\n"
-            "\n", program_name, program_name);
+            "  echo \"?* ;\" | %s     compile universal language\n"
+            "\n", program_name);
         print_report_bugs();
         fprintf(message_out, "\n");
         print_more_info();
@@ -120,11 +123,12 @@ parse_options(int argc, char** argv)
           {"line", no_argument, 0, 'l'},
           {"semicolon", no_argument, 0, 'S'},
           {"format", required_argument, 0, 'f'},
+          {"define", required_argument, 0, 'D'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "je:123lSf:",
+                             HFST_GETOPT_UNARY_SHORT "je:123lSf:D:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -159,6 +163,26 @@ parse_options(int argc, char** argv)
         case 'f':
             output_format = hfst_parse_format_name(optarg);
             break;
+        case 'D':
+          {
+            const char* eqsign = strchr(optarg, '=');
+            if (0 == eqsign)
+              {
+                error(EXIT_FAILURE, 0, "There must be `=' in definition: %s",
+                      optarg);
+              }
+            const char* endstr = eqsign;
+            while (*endstr != '\0')
+              {
+                endstr++;
+              }
+            char* name = strndup(optarg, eqsign - optarg);
+            char* val = strndup(eqsign + 1, endstr - eqsign - 1);
+            definitions[name] = val;
+            free(name);
+            free(val);
+            break;
+          }
 #include "conventions/getopt-cases-error.h"
         }
     }
@@ -183,7 +207,14 @@ process_stream(HfstOutputStream& outstream)
   unsigned int line_count = 0;
   XreCompiler comp(output_format);
   HfstTransducer disjunction(output_format);
-  //outstream.open();
+  for (map<string,string>::const_iterator def = definitions.begin();
+       def != definitions.end();
+       ++def)
+    {
+      verbose_printf("Defining variable %s as `%s'\n", def->first.c_str(),
+                     def->second.c_str());
+      comp.define(def->first, def->second);
+    }
   int delim = '\n';
   if (line_separated)
     {
