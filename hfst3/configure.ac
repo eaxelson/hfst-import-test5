@@ -37,7 +37,7 @@ m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([libhfst/src/HfstTransducer.h])
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_HEADERS([config.h libhfst/src/hfst.hpp])
 
 AC_SUBST([LIBHFST_MAJOR], [3])
 AC_SUBST([LIBHFST_MINOR], [3])
@@ -552,7 +552,7 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  libhfst/Makefile libhfst/src/Makefile
                  libhfst/src/implementations/Makefile
 		 libhfst/src/parsers/Makefile 
-                 libhfst/hfst.pc libhfst/src/hfst.hpp
+                 libhfst/hfst.pc 
 		 tools/Makefile tools/src/Makefile tools/src/hfst-proc/Makefile
 		 tools/src/hfst-twolc/Makefile
 		 tools/src/hfst-twolc/src/Makefile
