@@ -27,16 +27,18 @@
 #include <getopt.h>
 
 #include "hfst.hpp"
-#include "conventions/commandline.h"
-#include "conventions/options.h"
-
-#include "conventions/globals-common.h"
 
 #include <set>
 #include <string>
 
 using std::set;
 using std::string;
+
+#include "hfst-commandline.h"
+#include "hfst-program-options.h"
+#include "hfst-tool-metadata.h"
+#include "inc/globals-common.h"
+
 
 static long min_version = -1L;
 static long exact_version = -1L;
@@ -86,7 +88,7 @@ print_usage()
            "show or test HFST versions and features\n"
             "\n", program_name);
 
-    print_common_program_options();
+    print_common_program_options(stderr);
     fprintf(message_out, "Test features:\n"
             "  -a, --atleast-version=MVER   require at least MVER version "
             "of HFST\n"
@@ -134,7 +136,6 @@ parse_options(int argc, char** argv)
         }
         switch (c)
         {
-#include "conventions/getopt-cases-common.h"
         case 'a':
           min_version = parse_version_string(optarg);
           break;
@@ -148,10 +149,8 @@ parse_options(int argc, char** argv)
           required_features.insert(optarg);
           break;
 
-#include "conventions/getopt-cases-error.h"
         }
     }
-#include "conventions/check-params-common.h"
     if ((min_version == -1L) && (max_version == -1L) && (exact_version == -1L)
         && (required_features.size() == 0) && (verbose == false))
       {
