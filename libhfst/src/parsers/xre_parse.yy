@@ -686,6 +686,12 @@ LABEL: HALFARC {
             $$ = new HfstTransducer(hfst::internal_identity,
                                     hfst::internal_identity, hfst::xre::format);
           }
+        else if (hfst::xre::definitions.find($1) != 
+                 hfst::xre::definitions.end())
+          {
+            $$ = new HfstTransducer(*(hfst::xre::definitions.find($1)->second),
+                                    hfst::xre::format);
+          }
         else
           {
             $$ = new HfstTransducer($1, $1, hfst::xre::format);
