@@ -80,6 +80,9 @@ endif
 if WANT_HEAD
 MAYBE_HEAD=hfst-head$(EXEEXT)
 endif
+if WANT_INFO
+MAYBE_INFO=hfst-info$(EXEEXT)
+endif
 if WANT_INVERT
 MAYBE_INVERT=hfst-invert$(EXEEXT)
 endif
@@ -205,7 +208,9 @@ bin_PROGRAMS= \
 			 $(MAYBE_LEXC2FST) $(MAYBE_LEXC)   \
 			 $(MAYBE_FORMAT)                     \
 			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)\
-			 $(MAYBE_TRAVERSE) $(MAYBE_GUESSIFY) $(MAYBE_GUESS)
+			 $(MAYBE_TRAVERSE) $(MAYBE_GUESSIFY) $(MAYBE_GUESS) \
+			 $(MAYBE_INFO)
+# fuck the alphabets!
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc \
 				hfst-tool-metadata.cc
@@ -231,6 +236,7 @@ HfstLookupFlagDiacritics.cc $(HFST_COMMON_SRC)
 hfst_guessify_SOURCES=hfst-guessify.cc guessify_fst.cc \
 HfstLookupFlagDiacritics.cc $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
+hfst_info_SOURCES=hfst-info.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
 hfst_lexc_SOURCES=hfst-lexc.cc lexc-readline-ui.cc $(HFST_COMMON_SRC)
 hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
