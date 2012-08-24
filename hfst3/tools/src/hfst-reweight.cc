@@ -320,7 +320,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         }
         else
         {
-          verbose_printf("Reweighting %s...%zu\n", inputname, transducer_n); 
+          verbose_printf("Reweighting %s..." SIZE_T_SPECIFIER "\n", inputname, transducer_n); 
         }
         HfstBasicTransducer original(trans);
         HfstBasicTransducer replication;

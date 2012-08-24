@@ -122,7 +122,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         }
         else
         {
-          verbose_printf("Inverting %s...%zu\n", inputname, transducer_n); 
+          verbose_printf("Inverting %s..." SIZE_T_SPECIFIER "\n", inputname, transducer_n); 
         }
 	free(inputname);
         trans.invert();

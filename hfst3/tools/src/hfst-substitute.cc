@@ -324,7 +324,7 @@ do_substitute(HfstBasicTransducer& trans, size_t transducer_n)
         }
       else
         {
-          verbose_printf("Substituting label %s with label %s... %zu\n",
+          verbose_printf("Substituting label %s with label %s... " SIZE_T_SPECIFIER "\n",
                          from_label, to_label, transducer_n);
         }
       trans.substitute(from_label, to_label);
@@ -345,7 +345,7 @@ do_substitute(HfstBasicTransducer& trans, size_t transducer_n)
         }
       else
         {
-          verbose_printf("Substituting pair %s:%s with transducer %s... %zu\n", 
+          verbose_printf("Substituting pair %s:%s with transducer %s... " SIZE_T_SPECIFIER "\n", 
                          from_pair->first.c_str(), 
                          from_pair->second.c_str(), to_name,
                          transducer_n);
@@ -367,7 +367,7 @@ do_substitute(HfstBasicTransducer& trans, size_t transducer_n)
         }
       else
         {
-          verbose_printf("Substituting id. label %s with transducer %s... %zu\n", 
+          verbose_printf("Substituting id. label %s with transducer %s... " SIZE_T_SPECIFIER "\n", 
                          from_label, to_name,
                          transducer_n);
         }
@@ -414,7 +414,7 @@ do_substitute(HfstTransducer& trans, size_t transducer_n)
           else
             {
               verbose_printf("Delaying substitution of label %s with "
-                             "label %s... %zu\n",
+                             "label %s... " SIZE_T_SPECIFIER "\n",
                              from_label, to_label, transducer_n);
             
             }
@@ -433,7 +433,7 @@ do_substitute(HfstTransducer& trans, size_t transducer_n)
           else
             {
               verbose_printf("Substituting label %s with "
-                             "label %s... %zu\n",
+                             "label %s... " SIZE_T_SPECIFIER "\n",
                              from_label, to_label, transducer_n);
             
             }
@@ -456,7 +456,7 @@ do_substitute(HfstTransducer& trans, size_t transducer_n)
         }
       else
         {
-          verbose_printf("Substituting pair %s:%s with transducer %s... %zu\n", 
+          verbose_printf("Substituting pair %s:%s with transducer %s... " SIZE_T_SPECIFIER "\n", 
                          from_pair->first.c_str(), 
                          from_pair->second.c_str(), to_name,
                          transducer_n);
@@ -478,7 +478,7 @@ do_substitute(HfstTransducer& trans, size_t transducer_n)
         }
       else
         {
-          verbose_printf("Substituting id. label %s with transducer %s... %zu\n", 
+          verbose_printf("Substituting id. label %s with transducer %s... " SIZE_T_SPECIFIER "\n", 
                          from_label, to_name,
                          transducer_n);
         }
@@ -567,7 +567,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         }
       else
         {
-          verbose_printf("performing substitutions in %s... %zu\n", inputname,
+          verbose_printf("performing substitutions in %s... " SIZE_T_SPECIFIER "\n", inputname,
                          transducer_n);
         }
       // initialize delayed substitutor automaton

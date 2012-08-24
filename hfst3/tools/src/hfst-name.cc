@@ -145,7 +145,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         }
         else
           {
-            verbose_printf("Naming %s...%zu\n", 
+            verbose_printf("Naming %s..." SIZE_T_SPECIFIER "\n", 
                    inputfilename, transducer_n); 
           }
         

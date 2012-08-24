@@ -157,7 +157,7 @@ process_stream(HfstOutputStream& outstream)
         }
       else
         {
-          verbose_printf("Reading transducer table %zu...\n", transducer_n);
+          verbose_printf("Reading transducer table " SIZE_T_SPECIFIER "...\n", transducer_n);
         }
         HfstTransducer t(inputfile,
              output_format,

@@ -132,7 +132,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
     size_t transducer_n=0;
     if (tail_count > 0)
       {
-        verbose_printf("Counting last %zu transducers...\n", tail_count);
+        verbose_printf("Counting last " SIZE_T_SPECIFIER " transducers...\n", tail_count);
         while (instream.is_good())
           {
             transducer_n++;
@@ -154,21 +154,21 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         while (!last_n.empty())
           {
             transducer_n++;
-            verbose_printf("Forwarding %s...%zu\n", inputfilename, transducer_n);
+            verbose_printf("Forwarding %s..." SIZE_T_SPECIFIER "\n", inputfilename, transducer_n);
             outstream << last_n.front();
             last_n.pop();
           }
       }
     else if (tail_count < 0)
       {
-        verbose_printf("Skipping %zu transducers...\n", -tail_count);
+        verbose_printf("Skipping " SIZE_T_SPECIFIER " transducers...\n", -tail_count);
         while (instream.is_good())
           {
             transducer_n++;
             HfstTransducer trans(instream);
             if (transducer_n >= -tail_count)
               {
-                verbose_printf("Forwarding %s...%zu\n", inputfilename, transducer_n);
+                verbose_printf("Forwarding %s..." SIZE_T_SPECIFIER "\n", inputfilename, transducer_n);
                 outstream << trans;
               }
           }

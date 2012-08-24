@@ -174,7 +174,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         }
         else
           {
-            verbose_printf("Metadata %s...%zu\n", 
+            verbose_printf("Metadata %s..." SIZE_T_SPECIFIER "\n", 
                    inputfilename, transducer_n); 
           }
         

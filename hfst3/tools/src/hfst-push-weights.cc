@@ -158,12 +158,12 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         {
           if (push_initial)
             {
-              verbose_printf("Pushing towards start %s... %zu\n", inputname,
+              verbose_printf("Pushing towards start %s... " SIZE_T_SPECIFIER "\n", inputname,
                              transducer_n);
             }
           else
             {
-              verbose_printf("Pushing towards end %s... %zu\n", inputname,
+              verbose_printf("Pushing towards end %s... " SIZE_T_SPECIFIER "\n", inputname,
                              transducer_n);
             }
         }

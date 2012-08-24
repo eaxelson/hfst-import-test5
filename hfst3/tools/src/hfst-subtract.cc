@@ -147,7 +147,7 @@ subtract_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         }
         else
         {
-            verbose_printf("Subtracting %s from %s... %zu\n",
+            verbose_printf("Subtracting %s from %s... " SIZE_T_SPECIFIER "\n",
                            secondname, firstname, transducer_n_first);
         }
 
@@ -178,7 +178,7 @@ subtract_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
           }
         catch (TransducerTypeMismatchException ttme)
           {
-            error(EXIT_FAILURE, 0, "Could not subtract %s from %s [%zu]\n"
+            error(EXIT_FAILURE, 0, "Could not subtract %s from %s [" SIZE_T_SPECIFIER "]\n"
                   "formats %s and %s are not compatible for subtraction",
                   secondname, firstname, transducer_n_first,
                   hfst_strformat(secondstream.get_type()),

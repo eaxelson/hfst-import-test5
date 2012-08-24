@@ -125,7 +125,7 @@ process_stream(HfstInputStream& instream)
         }
       else
         {
-          verbose_printf("Summarizing... %zu\n", transducer_n);
+          verbose_printf("Summarizing... " SIZE_T_SPECIFIER "\n", transducer_n);
         }
       HfstTransducer *trans = new HfstTransducer(instream);
       HfstBasicTransducer *mutt = new HfstBasicTransducer(*trans);
@@ -331,7 +331,7 @@ process_stream(HfstInputStream& instream)
 
       if (transducer_n > 1)
         {
-          fprintf(outfile, "-- \nTransducer #%zu:\n", transducer_n);
+          fprintf(outfile, "-- \nTransducer #" SIZE_T_SPECIFIER ":\n", transducer_n);
         }
       fprintf(outfile, "name: \"%s\"\n", trans->get_name().c_str());
       // next is printed as in OpenFST's fstinfo
@@ -370,13 +370,13 @@ process_stream(HfstInputStream& instream)
       delete trans;
       fprintf(outfile, "input symbol table: yes\n"
               "output symbol table: yes\n"
-              "# of states: %zu\n"
-              "# of arcs: %zu\n"
+              "# of states: " SIZE_T_SPECIFIER "\n"
+              "# of arcs: " SIZE_T_SPECIFIER "\n"
               "initial state: %ld\n"
-              "# of final states: %zu\n"
-              "# of input/output epsilons: %zu\n"
-              "# of input epsilons: %zu\n"
-              "# of output epsilons: %zu\n"
+              "# of final states: " SIZE_T_SPECIFIER "\n"
+              "# of input/output epsilons: " SIZE_T_SPECIFIER "\n"
+              "# of input epsilons: " SIZE_T_SPECIFIER "\n"
+              "# of output epsilons: " SIZE_T_SPECIFIER "\n"
               "# of ... accessible states: ???\n"
               "# of ... coaccessible states: ???\n"
               "# of ... connected states: ???\n"
@@ -412,8 +412,8 @@ process_stream(HfstInputStream& instream)
         {
           // our extensions for nice statistics maybe
           fprintf(outfile,
-                  "number of arcs in sparsest state: %zu\n"
-                  "number of arcs in densest state: %zu\n"
+                  "number of arcs in sparsest state: " SIZE_T_SPECIFIER "\n"
+                  "number of arcs in densest state: " SIZE_T_SPECIFIER "\n"
                   "average arcs per state: %f\n"
                   "average input epsilons per state: %f\n"
                   "most ambiguous input: %s %u\n"
@@ -498,7 +498,7 @@ process_stream(HfstInputStream& instream)
         }
     }
 
-    fprintf(outfile, "\nRead %zu transducers in total.\n", transducer_n);
+    fprintf(outfile, "\nRead " SIZE_T_SPECIFIER " transducers in total.\n", transducer_n);
 
   return EXIT_SUCCESS;
 }

@@ -140,7 +140,7 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
           }
         else
           {
-            verbose_printf("Comparing %s and %s... %zu\n",
+            verbose_printf("Comparing %s and %s... " SIZE_T_SPECIFIER "\n",
                            firstname, secondname, transducer_n_first);
         }
         try
@@ -155,7 +155,7 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
                 else
                   {
                     if (not silent)
-                      fprintf(outfile, "%s[%zu] == %s[%zu]\n",
+                      fprintf(outfile, "%s[" SIZE_T_SPECIFIER "] == %s[%zu]\n",
                               firstname, transducer_n_first,
                               secondname, transducer_n_second);
                   }
@@ -170,7 +170,7 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
                 else
                   {
                     if (not silent)
-                      fprintf(outfile, "%s[%zu] != %s[%zu]\n",
+                      fprintf(outfile, "%s[" SIZE_T_SPECIFIER "] != %s[%zu]\n",
                               firstname, transducer_n_first, 
                               secondname, transducer_n_second);
                   }
@@ -180,7 +180,7 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
         catch (TransducerTypeMismatchException ttme)
           {
             // cannot recover yet, but beautify error messages
-            error(2, 0, "Cannot compare `%s' and `%s' [%zu]\n"
+            error(2, 0, "Cannot compare `%s' and `%s' [" SIZE_T_SPECIFIER "]\n"
                   "the formats %s and %s are not compatible for comparison\n",
                   firstname, secondname, transducer_n_first,
                   hfst_strformat(firststream.get_type()),
@@ -217,12 +217,12 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
     fclose(outfile);
     if (mismatches == 0)
       {
-        verbose_printf("All %zu transducers matched\n", transducer_n_first);
+        verbose_printf("All " SIZE_T_SPECIFIER " transducers matched\n", transducer_n_first);
         return EXIT_SUCCESS;
       }
     else
       {
-        verbose_printf("%zu/%zu were not equal\n", mismatches, transducer_n_first);
+        verbose_printf("" SIZE_T_SPECIFIER "/%zu were not equal\n", mismatches, transducer_n_first);
         return EXIT_FAILURE;
       }
 }

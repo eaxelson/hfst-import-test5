@@ -252,7 +252,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         }
       else
         {
-          verbose_printf("Reading and minimizing rule %zu...\n",
+          verbose_printf("Reading and minimizing rule " SIZE_T_SPECIFIER "...\n",
                          rule_n);
         }
       rule.minimize();

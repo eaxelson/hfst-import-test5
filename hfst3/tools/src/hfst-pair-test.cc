@@ -441,7 +441,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
           }
         else
           {
-            verbose_printf("Reading %s...%zu\n", inputfilename,
+            verbose_printf("Reading %s..." SIZE_T_SPECIFIER "\n", inputfilename,
                            transducer_n); 
           }
         HfstTransducer trans(inputstream);

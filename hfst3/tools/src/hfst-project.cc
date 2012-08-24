@@ -162,12 +162,12 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         {
           if (project_input)
             {
-              verbose_printf("Projecting first %s... %zu\n", inputname,
+              verbose_printf("Projecting first %s... " SIZE_T_SPECIFIER "\n", inputname,
                              transducer_n);
             }
           else
             {
-              verbose_printf("Projecting second %s... %zu\n", inputname,
+              verbose_printf("Projecting second %s... " SIZE_T_SPECIFIER "\n", inputname,
                              transducer_n);
             }
         }

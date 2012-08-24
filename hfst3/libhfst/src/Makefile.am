@@ -49,6 +49,7 @@ HFST_HDRS = \
 	hfst_apply_schemas.h \
 	HfstDataTypes.h \
 	HfstSymbolDefs.h \
+	FormatSpecifiers.h \
 	implementations/SfstTransducer.h \
 	implementations/TropicalWeightTransducer.h \
 	implementations/LogWeightTransducer.h \

@@ -126,7 +126,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         }
         else
         {
-          verbose_printf("Removing epsilons %s...%zu\n", inputname, transducer_n); 
+          verbose_printf("Removing epsilons %s..." SIZE_T_SPECIFIER "\n", inputname, transducer_n); 
         }
         trans.remove_epsilons();
         if (transducer_n==1)
@@ -135,7 +135,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         }
         else
         {
-          verbose_printf("Rebuilding and fisting %s...%zu\n", inputname, transducer_n); 
+          verbose_printf("Rebuilding and fisting %s..." SIZE_T_SPECIFIER "\n", inputname, transducer_n); 
         }
         HfstBasicTransducer original(trans);
         HfstBasicTransducer replication;

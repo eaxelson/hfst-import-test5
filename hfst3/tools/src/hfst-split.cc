@@ -148,9 +148,9 @@ process_stream(HfstInputStream& instream)
         outfilename = static_cast<char*>(hfst_malloc(sizeof(char) *
                              strlen(prefix) + strlen(extension) +
                              strlen("123456789012345678901234567890")));
-        sprintf(outfilename, "%s%zu%s", prefix, transducer_n,
+        sprintf(outfilename, "%s" SIZE_T_SPECIFIER "%s", prefix, transducer_n,
                               extension);
-        verbose_printf("Writing %zu of %s to %s...\n", transducer_n,
+        verbose_printf("Writing " SIZE_T_SPECIFIER " of %s to %s...\n", transducer_n,
                        inputfilename, outfilename); 
         HfstOutputStream* outstream = new HfstOutputStream(outfilename,
                                                            instream.get_type());

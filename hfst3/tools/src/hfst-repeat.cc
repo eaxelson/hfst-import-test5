@@ -170,17 +170,17 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         {
           if (!from_infinity && !to_infinity)
             {
-              verbose_printf("Repeating [%lu..%lu] %s... %zu\n", 
+              verbose_printf("Repeating [%lu..%lu] %s... " SIZE_T_SPECIFIER "\n", 
                              at_least, at_most, inputname, transducer_n);
             }
           else if (from_infinity && to_infinity)
             {
-              verbose_printf("Repeating star %s... %zu\n", inputname,
+              verbose_printf("Repeating star %s... " SIZE_T_SPECIFIER "\n", inputname,
                              transducer_n);
             }
           else if (!from_infinity && to_infinity)
             {
-              verbose_printf("Repeating [%lu..*] %s... %zu\n", at_least,
+              verbose_printf("Repeating [%lu..*] %s... " SIZE_T_SPECIFIER "\n", at_least,
                              inputname, transducer_n);
             }
           else if (from_infinity && to_infinity)

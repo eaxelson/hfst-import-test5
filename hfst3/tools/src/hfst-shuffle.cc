@@ -137,7 +137,7 @@ shuffle_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         }
         else
         {
-            verbose_printf("Shuffling %s and %s... %zu\n",
+            verbose_printf("Shuffling %s and %s... " SIZE_T_SPECIFIER "\n",
                            firstname, secondname, transducer_n_first);
         }
         try
@@ -146,7 +146,7 @@ shuffle_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
           }
         catch (TransducerTypeMismatchException ttme)
           {
-            error(EXIT_FAILURE, 0, "Could not shuffle %s and %s [%zu]\n"
+            error(EXIT_FAILURE, 0, "Could not shuffle %s and %s [" SIZE_T_SPECIFIER "]\n"
                   "formats %s and %s are not compatible for shuffling",
                   firstname, secondname, transducer_n_first,
                   hfst_strformat(firststream.get_type()),
@@ -154,7 +154,7 @@ shuffle_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
           }
 	catch (TransducersAreNotAutomataException tanae)
 	  {
-	    error(EXIT_FAILURE, 0, "Could not shuffle %s and %s [%zu]\n"
+	    error(EXIT_FAILURE, 0, "Could not shuffle %s and %s [" SIZE_T_SPECIFIER "]\n"
 		  "at least one of the input arguments is not an automaton",
 		  firstname, secondname, transducer_n_first);
 	  }
