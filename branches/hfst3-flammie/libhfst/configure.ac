@@ -31,7 +31,7 @@ AM_SILENT_RULES([yes])
 # libtool 2 required since some distros totally hose their libtoolses
 LT_PREREQ([2.2.6])
 
-AC_REVISION([$Revision: 1950 $])
+AC_REVISION([$Revision$])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/HfstTransducer.h])
 AC_CONFIG_HEADERS([config.h src/hfst.hpp])
@@ -99,10 +99,10 @@ AC_SUBST([HFST_VERSION], [3.3.12f])
 AC_SUBST([HFST_NAME], [hfst])
 
 # long version = version vector cast in base 10000, for automatic comparisons
-# e.g.: 3.3.2 = 0003 0000 0000 + 0003 0000 + 0002
-AC_DEFINE([HFST_LONGVERSION], [3000300012L],
+# e.g.: 3.3.12 = 0003 0000 0000 + 0003 0000 + 0012
+AC_DEFINE([HFST_LONGVERSION], [300030012L],
           [Define to hfst version vector as long in base 10000])
-AC_DEFINE([HFST_REVISION], ["$Revision: 1950 $"],
+AC_DEFINE([HFST_REVISION], ["$Revision$"],
           [Automatically substitute to configure.ac revision])
 AC_DEFINE_UNQUOTED([HFST_STRING], ["$PACKAGE_STRING"],
           [Define to libhfst pretty name for programs to print])
