@@ -3,7 +3,8 @@ for f in ../../tools/src/hfst-* ; do
     if [ "$f" != "../../tools/src/hfst-lexc" -a \
          "$f" != "../../tools/src/hfst-lexc2fst" -a \
          "$f" != "../../tools/src/hfst-xfst2fst" -a \
-	 "$f" != "../../tools/src/hfst-lexc-compiler" ] ; then
+	 "$f" != "../../tools/src/hfst-lexc-compiler" -a \
+	 "$f" != "../../tools/src/hfst-info" ] ; then
         if [ -x "$f" -a ! -d "$f" ] ; then
             if ! "$f" --version > version.out ; then
                 rm version.out

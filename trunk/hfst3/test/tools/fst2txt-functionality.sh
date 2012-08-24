@@ -1,4 +1,9 @@
 #!/bin/sh
+
+if [ "$srcdir" = "" ]; then
+    srcdir="./";
+fi
+
 for i in "" .sfst .ofst .foma; do
     if test -f cat$i ; then
         if ! ../../tools/src/hfst-fst2txt -D < cat$i > test.txt ; then
