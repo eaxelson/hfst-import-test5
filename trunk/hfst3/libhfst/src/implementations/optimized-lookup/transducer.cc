@@ -655,19 +655,24 @@ TransitionTableIndexSet Transducer::get_transitions_from_state(
 	    if (!get_index(state_index+1).matches(0)) {
 		continue;
 	    }
-	    while(true) {
-		// First skip any epsilons
-		if(get_transition(transition_i).matches(0)) {
+            while(true) {
+                // First skip any epsilons
+                if(get_transition(transition_i).matches(0)) {
 		    ++transition_i;
 		    continue;
+                // Add relevant flags
 		} else if (get_transition(transition_i).matches(symbol)) {
 		    transitions.insert(transition_i);
 		    ++transition_i;
 		    continue;
-		} else {
-		    break;
-		}
-	    }
+                // In case of irrelevant flags, keep looking
+                // otherwise, were beyond the flag area so break
+		} else if (!alphabet->is_flag_diacritic(
+                               get_transition(transition_i).
+                               get_input_symbol())) {
+                    break;
+                }
+            }
 	} else { // not a flag
 	    const TransitionIndex& test_transition_index =
 		get_index(state_index+1+symbol);
