@@ -121,12 +121,12 @@ parse_options(int argc, char** argv)
 #include "conventions/check-params-unary.h"
     if (at_least > at_most)
       {
-        error(EXIT_FAILURE, 0, "Cannot repeat from %lu to %lu times\n",
+        hfst_error(EXIT_FAILURE, 0, "Cannot repeat from %lu to %lu times\n",
               at_least, at_most);
       }
     if (from_infinity && !to_infinity)
       {
-        error(EXIT_FAILURE, 0, "Cannot repeat from infinity to %lu times\n",
+        hfst_error(EXIT_FAILURE, 0, "Cannot repeat from infinity to %lu times\n",
               at_most);
       }
     return EXIT_CONTINUE;
@@ -162,7 +162,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
             }
           else if (from_infinity && to_infinity)
             {
-              error(EXIT_FAILURE, 0, "Repeating *..%lu?", at_most);
+              hfst_error(EXIT_FAILURE, 0, "Repeating *..%lu?", at_most);
             }
         }
         else
@@ -184,7 +184,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
             }
           else if (from_infinity && to_infinity)
             {
-              error(EXIT_FAILURE, 0, "Repeating *..%lu?", at_most);
+              hfst_error(EXIT_FAILURE, 0, "Repeating *..%lu?", at_most);
             }
         }
         
@@ -238,7 +238,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           }
         else if (from_infinity && !to_infinity)
           {
-             error(EXIT_FAILURE, 0, "Repeating *..%lu?", at_most);
+             hfst_error(EXIT_FAILURE, 0, "Repeating *..%lu?", at_most);
           }
         outstream << trans;
     }
@@ -282,7 +282,7 @@ int main( int argc, char **argv ) {
             }
           else if (from_infinity && !to_infinity)
             {
-              error(EXIT_FAILURE, 0, "Repeating at least infinite but"
+              hfst_error(EXIT_FAILURE, 0, "Repeating at least infinite but"
                     "no more than %lu times?", at_most);
             }
 
@@ -292,7 +292,7 @@ int main( int argc, char **argv ) {
       instream = (inputfile != stdin) ?
         new HfstInputStream(inputfilename) : new HfstInputStream();
     } catch(const HfstException e)  {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
     }

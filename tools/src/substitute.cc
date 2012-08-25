@@ -220,7 +220,7 @@ parse_options(int argc, char** argv)
             from_pair = label_to_stringpair(from_label);
             if (strlen(from_label) == 0)
               {
-                error(EXIT_FAILURE, 0, "argument of source label option is "
+                hfst_error(EXIT_FAILURE, 0, "argument of source label option is "
                       "empty;\n"
                       "if you REALLY want to replace epsilons with something, "
                       "use @0@ or %s", hfst::internal_epsilon.c_str());
@@ -239,7 +239,7 @@ parse_options(int argc, char** argv)
             to_pair = label_to_stringpair(to_label);
             if (strlen(to_label) == 0)
               {
-                error(EXIT_FAILURE, 0, "argument of target label option is "
+                hfst_error(EXIT_FAILURE, 0, "argument of target label option is "
                       "empty;\n"
                       "if you want to substitute something with epsilons, "
                       "use @0@ or %s", hfst::internal_epsilon.c_str());
@@ -255,7 +255,7 @@ parse_options(int argc, char** argv)
             fclose(f);
             break;
 	case 'R':
-	    error(EXIT_FAILURE, 0, "option --in-order is not implemented\n");
+	    hfst_error(EXIT_FAILURE, 0, "option --in-order is not implemented\n");
 	    break;
         case '9':
             compose = true;
@@ -266,14 +266,14 @@ parse_options(int argc, char** argv)
     
     if ((from_label == 0) && (from_file_name == 0))
     {
-        error(EXIT_FAILURE, 0,
+        hfst_error(EXIT_FAILURE, 0,
               "Must state name of labels to rewrite with -f or -F");
         return EXIT_FAILURE;
     }
     if ((to_label == 0) && (to_transducer_filename == 0) && 
             (from_file_name == 0))
     {
-        error(EXIT_FAILURE, 0,
+        hfst_error(EXIT_FAILURE, 0,
               "Must give target labels with -t, -T or -F");
         return EXIT_FAILURE;
     }
@@ -517,7 +517,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         to_transducer = new HfstTransducer(tostream);
       } catch (NotTransducerStreamException ntse)  
         {
-          error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+          hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
                 to_transducer_filename);
           return EXIT_FAILURE;
         }
@@ -835,7 +835,7 @@ int main( int argc, char **argv )
       instream = (inputfile != stdin) ?
         new HfstInputStream(inputfilename) : new HfstInputStream();
     } catch(const HfstException e)  {
-            error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+            hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
           inputfilename);
             return EXIT_FAILURE;
     }

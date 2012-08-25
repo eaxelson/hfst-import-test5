@@ -166,7 +166,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         }
         catch (HfstTransducerTypeMismatchException)
           {
-            error(EXIT_FAILURE, 0, "Could not compose %s and %s [%zu]\n"
+            hfst_error(EXIT_FAILURE, 0, "Could not compose %s and %s [%zu]\n"
                   "types %s and %s are not compatible for composition",
                   firstname, secondname, transducer_n,
                   hfst_strformat(firststream.get_type()),
@@ -222,14 +222,14 @@ int main( int argc, char **argv ) {
         firststream = (firstfile != stdin) ?
             new HfstInputStream(firstfilename) : new HfstInputStream();
     } catch(const HfstException e)   {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               firstfilename);
     }
     try {
         secondstream = (secondfile != stdin) ?
             new HfstInputStream(secondfilename) : new HfstInputStream();
     } catch(const HfstException e)   {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               secondfilename);
     }
     HfstOutputStream* outstream = (outfile != stdout) ?

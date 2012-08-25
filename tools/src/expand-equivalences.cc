@@ -166,7 +166,7 @@ parse_options(int argc, char** argv)
                 }
               else 
                 {
-                  error(EXIT_FAILURE, 0, "The option for level parameter must"
+                  hfst_error(EXIT_FAILURE, 0, "The option for level parameter must"
                         " be one of:\n"
                         "upper, first, input, second, lower, output, both, "
                         "1 or 2.");
@@ -181,29 +181,29 @@ parse_options(int argc, char** argv)
       {
         if ((tsv_file_name != 0) || (acx_file_name != 0))
           {
-            error(EXIT_FAILURE, 0,
+            hfst_error(EXIT_FAILURE, 0,
                   "Only one of -a, -T or -f and -t may be given");
           }
         else if (only_from_label == 0)
           {
-            error(EXIT_FAILURE, 0,
+            hfst_error(EXIT_FAILURE, 0,
                   "option -t requires -f");
           }
         else if (only_to_label == 0)
           {
-            error(EXIT_FAILURE, 0,
+            hfst_error(EXIT_FAILURE, 0,
                   "option -f requires -t");
           }
       }
     else if ((tsv_file_name == 0) && (acx_file_name == 0))
     {
-        error(EXIT_FAILURE, 0,
+        hfst_error(EXIT_FAILURE, 0,
               "Must give extension specification file with either -a or -t.");
         return EXIT_FAILURE;
     }
     else if ((tsv_file_name != 0) && (acx_file_name != 0))
     {
-        error(EXIT_FAILURE, 0,
+        hfst_error(EXIT_FAILURE, 0,
               "Only one of parameters -a, -t, must be used.");
         return EXIT_FAILURE;
     }
@@ -217,7 +217,7 @@ parse_options(int argc, char** argv)
       }
     else
       {
-        error(EXIT_FAILURE, 0, "Logic error again!");
+        hfst_error(EXIT_FAILURE, 0, "Logic error again!");
       }
 
 #include "conventions/check-params-common.h"
@@ -347,7 +347,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
             if (NULL == node)
               {
                 xmlFreeDoc(doc);
-                error(EXIT_FAILURE, 0, "Libxml could not parse %s",
+                hfst_error(EXIT_FAILURE, 0, "Libxml could not parse %s",
                       acx_file_name);
               }
             if (xmlStrcmp(node->name,
@@ -355,7 +355,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                           != 0)
               {
                 xmlFreeDoc(doc);
-                error(EXIT_FAILURE, 0, "Root element of %s is not "
+                hfst_error(EXIT_FAILURE, 0, "Root element of %s is not "
                       "analysis-chars", acx_file_name);
               }
             // The tree should look like:
@@ -386,7 +386,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                           }
                         else if (!xmlIsBlankNode(equivNode) && (equivNode->type != XML_COMMENT_NODE))
                           {
-                            error(0, 0, "Unrecognised %s in char",
+                            hfst_error(0, 0, "Unrecognised %s in char",
                                   reinterpret_cast<const char*>(equivNode->name));
                           }
                         equivNode = equivNode->next;
@@ -394,7 +394,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                   } // if node->name == char
                 else if (!xmlIsBlankNode(charNode) && (charNode->type != XML_COMMENT_NODE))
                   {
-                    error(0, 0, "Unrecognised %s in analysis-chars",
+                    hfst_error(0, 0, "Unrecognised %s in analysis-chars",
                           reinterpret_cast<const char*>(charNode->name));
                   }
                 charNode = charNode->next;
@@ -403,7 +403,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           } // if acx_file
         else
           {
-            error(EXIT_FAILURE, 0, "DANGER TERROR HORROR !!!!!!");
+            hfst_error(EXIT_FAILURE, 0, "DANGER TERROR HORROR !!!!!!");
           }
         extensions->minimize().repeat_star().minimize();
         switch (level)
@@ -456,7 +456,7 @@ int main( int argc, char **argv )
       instream = (inputfile != stdin) ?
         new HfstInputStream(inputfilename) : new HfstInputStream();
   //  } catch(const HfstException e)  {
-    //        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+    //        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
       //    inputfilename);
         //    return EXIT_FAILURE;
     //}

@@ -120,7 +120,7 @@ parse_options(int argc, char** argv)
           format = hfst_parse_format_name(optarg);
           break;
         case 'l':
-          error(EXIT_FAILURE, 0, "Latin1 encoding not supported, please use "
+          hfst_error(EXIT_FAILURE, 0, "Latin1 encoding not supported, please use "
                 "iconv, recode, uconv or similar utility to convert legacy "
                 "lexicons into Unicode UTF-8 format");
           return EXIT_FAILURE;
@@ -158,20 +158,20 @@ parse_options(int argc, char** argv)
           }
         format = hfst::TROPICAL_OPENFST_TYPE;
 #else
-        error(EXIT_FAILURE, 0, "Format not given and cannot deduce sensible "
+        hfst_error(EXIT_FAILURE, 0, "Format not given and cannot deduce sensible "
               "defaults with current setup;\n"
               "Use command-line option --format to define format");
 #endif
       }
     if (outfile == stdout)
       {
-        error(EXIT_FAILURE, 0, "Cannot write result to <stdout> since backend "
+        hfst_error(EXIT_FAILURE, 0, "Cannot write result to <stdout> since backend "
               "libraries will pollute it;\n"
               "Use command-line option --output meanwhile");
       }
     if (start_readline && (argc - optind > 0))
       {
-        error(EXIT_FAILURE, 0, "Trailing arguments not allowed for interactive "
+        hfst_error(EXIT_FAILURE, 0, "Trailing arguments not allowed for interactive "
               "mode");
         return EXIT_FAILURE;
       }
@@ -274,7 +274,7 @@ lexc_streams(HfstOutputStream& outstream)
         verbose_printf("Parsing lexc file %s\n", lexcfilenames[i]);
         if (lexcfiles[i] == stdin)
           {
-            error(EXIT_FAILURE, 0, "Cannot read from stdin");
+            hfst_error(EXIT_FAILURE, 0, "Cannot read from stdin");
             return EXIT_FAILURE;
           }
         else
@@ -282,7 +282,7 @@ lexc_streams(HfstOutputStream& outstream)
             trans = HfstTransducer::read_lexc(lexcfilenames[i], format);
             if (0 == trans)
               {
-                error(EXIT_FAILURE, 0, "Could not parse %s correctly.\n"
+                hfst_error(EXIT_FAILURE, 0, "Could not parse %s correctly.\n"
                       "If there is no further info about the error, try "
                       "-v or -d.", lexcfilenames[i]);
               }

@@ -71,7 +71,7 @@ static bool normalize_weights=false;
 static bool logarithmic_weights=false;
 
 static bool use_basics = false;
-static unsigned long cleanup_threshold = 1;
+static unsigned long cleanup_threshold = 16;
 
 static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
 
@@ -95,7 +95,7 @@ float take_negative_logarithm(float weight) {
       result = -log(weight);
       if (errno != 0)
         {
-          error(EXIT_FAILURE, errno, "unable to take negative logarithm");
+          hfst_error(EXIT_FAILURE, errno, "unable to take negative logarithm");
         }
     }
   return result;
@@ -439,7 +439,7 @@ int main( int argc, char **argv )
       std::ifstream multichar_in(multichar_symbol_filename);
       (void)multichar_in.peek();
       if (not multichar_in.good())
-        { error(EXIT_FAILURE, errno,"Multichar symbol file can't be read."); }
+        { hfst_error(EXIT_FAILURE, errno,"Multichar symbol file can't be read."); }
       char multichar_line[1000];
       while (multichar_in.good())
         { 

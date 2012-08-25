@@ -302,7 +302,7 @@ parse_options(int argc, char** argv)
             }
             else
               {
-                error(EXIT_FAILURE, 0,
+                hfst_error(EXIT_FAILURE, 0,
                       "Unknown output format %s; valid values are: "
                       "xerox, cg, apertium\n", optarg);
                 return EXIT_FAILURE;
@@ -323,7 +323,7 @@ parse_options(int argc, char** argv)
               }
             else
               {
-                error(EXIT_FAILURE, 0,
+                hfst_error(EXIT_FAILURE, 0,
                       "Unknown input format %s; valid values are:"
                        "utf8, spaced, apertium\n", optarg);
                 return EXIT_FAILURE;
@@ -340,7 +340,7 @@ parse_options(int argc, char** argv)
             if (strcmp(optarg, "print-pairs") == 0)
               {
                 print_pairs = true;
-                /* error(EXIT_FAILURE, 0, "Unimplemented pair printing"); */
+                /* hfst_error(EXIT_FAILURE, 0, "Unimplemented pair printing"); */
               }
             else if (strcmp(optarg, "print-space") == 0)
               {
@@ -361,7 +361,7 @@ parse_options(int argc, char** argv)
           }
             else 
               {
-                error(EXIT_FAILURE, 0, "Xfst variable %s unrecognised",
+                hfst_error(EXIT_FAILURE, 0, "Xfst variable %s unrecognised",
                       optarg);
               }
         case 'c':
@@ -1703,7 +1703,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     if (print_pairs && 
         (inputstream.get_type() == HFST_OL_TYPE || 
          inputstream.get_type() == HFST_OLW_TYPE) ) {
-      error(EXIT_FAILURE, 0, "pair printing not supported on "
+      hfst_error(EXIT_FAILURE, 0, "pair printing not supported on "
               "optimized lookup transducers");
     }
 
@@ -1840,7 +1840,7 @@ int main( int argc, char **argv ) {
       } 
     catch(const HfstException e)
       {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
       }

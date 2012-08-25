@@ -57,6 +57,21 @@ extern bool debug;
  *         @e may have option to log these messages to a file instead.
  */
 extern FILE* message_out;
+/**
+ * @brief whether we want to determine if color setting is sensible.
+ */
+extern bool auto_colors;
+/**
+ * @brief if output is colorable and it is wise to print colors there.
+ */
+extern bool print_colors;
+#define COLOR_RESET "\033[0m"
+#define COLOR_ERROR "\033[21;31m"
+#define COLOR_INFO "\033[22;32m"
+#define COLOR_WARNING "\033[22;33m"
+#define COLOR_DEBUG "\033[22;34m"
+#define COLOR_VERBOSE "\033[22;35m"
+#define COLOR_PROGRAM_NAME "\033[22;37m"
 /** 
  *  @brief set @a hfst_tool_version to version specific to the tool.
  *  @sa hfst_set_program_name
@@ -74,16 +89,8 @@ extern FILE* profile_file;
  * @brief set @a profile_start to @c clock() when starting profiling.
  */
 extern clock_t profile_start;
-/* hfst tools generic helper print functions */
 
-/** save current transducer @c t to file @c filename if debug is @a true. */
-void debug_save_transducer(hfst::HfstTransducer t, const char* name);
-
-/** print message @c s with parameters @c __VA_ARGS__ if debug is @a true. */
-void debug_printf(const char* format, ...);
-
-/** print message @c s with parameters @c __VA_ARGS__ if debug is @a true. */
-void verbose_printf(const char* format, ...);
+/* hfst tools initialisation */
 
 /** 
  * @brief set program's name and other infos for reusable messages defined
@@ -100,6 +107,34 @@ void hfst_set_program_name(const char* argv0, const char* version,
  * analysing and other linguistic data.
  */
 char* hfst_setlocale();
+
+/**
+ * @brief initialise a command line program with full capabilities.
+ * This command calls both @c hfst_set_program_name and @c hfst_setlocale,
+ * as well as ncurses and gettext initialisation. If you want to create
+ * a command line program you need to call these parts individually in the
+ * very beginning of the @c main function.
+ * @sa hfst_set_program_name(const char*, const char*, const char*)
+ */
+void hfst_init_commandline(const char* argv0, const char* version,
+                           const char* wikipage);
+
+/* hfst tools generic helper print functions */
+
+/** save current transducer @c t to file @c filename if debug is @a true. */
+void debug_save_transducer(hfst::HfstTransducer t, const char* name);
+
+/** print message @c s with parameters @c __VA_ARGS__ if debug is @a true. */
+void debug_printf(const char* format, ...);
+
+/** print message @c s with parameters @c __VA_ARGS__ if debug is @a true. */
+void verbose_printf(const char* format, ...);
+
+void hfst_error(int status, int errnum, const char* format, ...);
+void hfst_warning(const char* format, ...);
+void hfst_info(const char* format, ...);
+void hfst_verbose(const char* format, ...);
+void hfst_debug(const char* format, ...);
 
 /**
  *

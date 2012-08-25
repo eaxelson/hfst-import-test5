@@ -158,7 +158,7 @@ parse_options(int argc, char** argv)
           }
         else
           {
-            error(EXIT_FAILURE, 0, "Cannot parse %s as text format; Use one of "
+            hfst_error(EXIT_FAILURE, 0, "Cannot parse %s as text format; Use one of "
                   "att, pckimmo, dot", optarg);
           }
         break;
@@ -270,7 +270,7 @@ print_dot(FILE* out, HfstTransducer& t)
                              first.c_str(),
                              arc->get_weight()) < 0)
                           {
-                            error(EXIT_FAILURE, errno, 
+                            hfst_error(EXIT_FAILURE, errno, 
                                  "sprinting dot arc label");
                           }
                       }
@@ -280,7 +280,7 @@ print_dot(FILE* out, HfstTransducer& t)
                                      "%s/%.2f", first.c_str(),
                                      arc->get_weight()) < 0)
                           {
-                            error(EXIT_FAILURE, errno, 
+                            hfst_error(EXIT_FAILURE, errno, 
                                  "sprinting dot arc label");
                           }
                       }  // if old label empty
@@ -294,7 +294,7 @@ print_dot(FILE* out, HfstTransducer& t)
                              "%s, %s", old_label.c_str(),
                              first.c_str()) < 0)
                           {
-                            error(EXIT_FAILURE, errno, 
+                            hfst_error(EXIT_FAILURE, errno, 
                                  "sprinting dot arc label");
                           }
                       }
@@ -303,7 +303,7 @@ print_dot(FILE* out, HfstTransducer& t)
                         if (snprintf(l, DOT_MAX_LABEL_SIZE,
                                      "%s", first.c_str()) < 0)
                           {
-                            error(EXIT_FAILURE, errno, 
+                            hfst_error(EXIT_FAILURE, errno, 
                                  "sprinting dot arc label");
                           }
                       } // if old label empty
@@ -321,7 +321,7 @@ print_dot(FILE* out, HfstTransducer& t)
                                     first.c_str(), second.c_str(),
                                     arc->get_weight()) < 0)
                           {
-                            error(EXIT_FAILURE, errno, 
+                            hfst_error(EXIT_FAILURE, errno, 
                                   "sprinting dot arc label");
                           }
                       }
@@ -332,7 +332,7 @@ print_dot(FILE* out, HfstTransducer& t)
                                     first.c_str(), second.c_str(),
                                     arc->get_weight()) < 0)
                           {
-                            error(EXIT_FAILURE, errno, 
+                            hfst_error(EXIT_FAILURE, errno, 
                                   "sprinting dot arc label");
                           }
                       }  // old label empty
@@ -346,7 +346,7 @@ print_dot(FILE* out, HfstTransducer& t)
                                      "%s, %s:%s", old_label.c_str(),
                                     first.c_str(), second.c_str()) < 0)
                           {
-                            error(EXIT_FAILURE, errno, 
+                            hfst_error(EXIT_FAILURE, errno, 
                                   "sprinting dot arc label");
                           }
                       }
@@ -356,7 +356,7 @@ print_dot(FILE* out, HfstTransducer& t)
                                      "%s:%s",
                                     first.c_str(), second.c_str()) < 0)
                           {
-                            error(EXIT_FAILURE, errno, 
+                            hfst_error(EXIT_FAILURE, errno, 
                                   "sprinting dot arc label");
                           }
                       } // if old label empty
@@ -545,7 +545,7 @@ process_stream(HfstInputStream& instream, FILE* outf)
         print_pckimmo(outf, t);
         break;
       default:
-        error(EXIT_FAILURE, 0, "Unknown print format");
+        hfst_error(EXIT_FAILURE, 0, "Unknown print format");
       }    
     }
     instream.close();
@@ -579,7 +579,7 @@ int main( int argc, char **argv )
       instream = (inputfile != stdin) ?
         new HfstInputStream(inputfilename) : new HfstInputStream();
     } catch(const HfstException e)  {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
     }

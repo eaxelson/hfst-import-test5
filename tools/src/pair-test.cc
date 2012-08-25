@@ -181,7 +181,7 @@ parse_options(int argc, char** argv)
 
     if (inputfilename == std::string("<stdin>"))
       { 
-        error(EXIT_FAILURE, 0, 
+        hfst_error(EXIT_FAILURE, 0, 
           "The rule transducer file needs to be given using option -i");
       }
     return EXIT_CONTINUE;
@@ -503,7 +503,7 @@ process_stream(HfstInputStream& inputstream, FILE*)
       }
     catch (const UnescapedColsFound &e)
       {
-        error(EXIT_FAILURE, 0, 
+        hfst_error(EXIT_FAILURE, 0, 
           "The correspondence %s contains unquoted colon-symbols. If "
           "you want to input pairs where either symbol is epsilon, "
           "use 0 e.g. \"m a s s 0:e s\".\n",
@@ -546,7 +546,7 @@ int main( int argc, char **argv ) {
       } 
     catch(const HfstException e)
       {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
       }

@@ -148,7 +148,7 @@ parse_options(int argc, char** argv)
             }
           else
             {
-              error(EXIT_FAILURE, 0, 
+              hfst_error(EXIT_FAILURE, 0, 
                     "-%c and -%c conflict; only one processing mode is allowed",
                     cmd, c);
               return EXIT_FAILURE;
@@ -164,7 +164,7 @@ parse_options(int argc, char** argv)
             }
           else
             {
-              error(EXIT_FAILURE, 0,
+              hfst_error(EXIT_FAILURE, 0,
                     "-%c and -%c conflict; only one output mode is allowed",
                     output_type, c);
               return EXIT_FAILURE;
@@ -195,7 +195,7 @@ parse_options(int argc, char** argv)
             }
           else
             {
-              error(EXIT_FAILURE, 0,
+              hfst_error(EXIT_FAILURE, 0,
                     "-%c and -%c conflict; only one capitalisation mode is "
                     "allowed", capitalization, c);
               return EXIT_FAILURE;
@@ -221,18 +221,18 @@ parse_options(int argc, char** argv)
       }
     else if (optind < (argc-3))
       {
-        error(EXIT_FAILURE, 0, "No more than three file names can be given");
+        hfst_error(EXIT_FAILURE, 0, "No more than three file names can be given");
         return EXIT_FAILURE;
       }
     else
       {
-        error(EXIT_FAILURE, 0, "At least transducer file name must be given");
+        hfst_error(EXIT_FAILURE, 0, "At least transducer file name must be given");
         return EXIT_FAILURE;
       }
     in = new std::ifstream(argv[(fst_arg)], std::ios::in | std::ios::binary);
     if (!*in)
       {
-        error(EXIT_FAILURE, 0, "Could not open transducer file %s", 
+        hfst_error(EXIT_FAILURE, 0, "Could not open transducer file %s", 
               argv[(optind)]);
         return EXIT_FAILURE;
       }
@@ -243,7 +243,7 @@ parse_options(int argc, char** argv)
                                   std::ios::in | std::ios::binary);
         if (!(*input))
           {
-            error(EXIT_FAILURE, 0, "Could not open input file %s",
+            hfst_error(EXIT_FAILURE, 0, "Could not open input file %s",
                   argv[in_arg]);
             return EXIT_FAILURE;
           }
@@ -260,7 +260,7 @@ parse_options(int argc, char** argv)
                                    std::ios::out | std::ios::binary);
         if (!(*output))
           {
-            error(EXIT_FAILURE, 0, "Could not open output file %s",
+            hfst_error(EXIT_FAILURE, 0, "Could not open output file %s",
                   argv[out_arg]);
             return EXIT_FAILURE;
           }

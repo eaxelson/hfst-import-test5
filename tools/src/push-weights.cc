@@ -114,7 +114,7 @@ parse_options(int argc, char** argv)
             }
             else
             {
-                error(EXIT_FAILURE, 0,
+                hfst_error(EXIT_FAILURE, 0,
                       "unknown push direction %s\n"
                       "should be one of start, initial, begin, end or final.\n",
                       optarg);
@@ -211,7 +211,7 @@ int main( int argc, char **argv ) {
       instream = (inputfile != stdin) ?
         new HfstInputStream(inputfilename) : new HfstInputStream();
     } catch(const HfstException e)  {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
     }

@@ -139,7 +139,7 @@ disjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
           }
         catch (TransducerTypeMismatchException ttme)
           {
-            error(EXIT_FAILURE, 0, "Could not disjunct %s and %s [%zu]\n"
+            hfst_error(EXIT_FAILURE, 0, "Could not disjunct %s and %s [%zu]\n"
                   "formats %s and %s are not compatible for conjunction",
                   firstname, secondname, transducer_n,
                   hfst_strformat(firststream.get_type()),
@@ -197,14 +197,14 @@ int main( int argc, char **argv ) {
         firststream = (firstfile != stdin) ?
             new HfstInputStream(firstfilename) : new HfstInputStream();
     } catch(const HfstException e)   {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               firstfilename);
     }
     try {
         secondstream = (secondfile != stdin) ?
             new HfstInputStream(secondfilename) : new HfstInputStream();
     } catch(const HfstException e)   {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               secondfilename);
     }
     HfstOutputStream* outstream = (outfile != stdout) ?

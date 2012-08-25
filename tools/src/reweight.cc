@@ -223,7 +223,7 @@ parse_options(int argc, char** argv)
             }
           else
             {
-              error(EXIT_FAILURE, 0, "Cannot parse %s as function name",
+              hfst_error(EXIT_FAILURE, 0, "Cannot parse %s as function name",
                     optarg);
               return EXIT_FAILURE;
             }
@@ -422,7 +422,7 @@ int main( int argc, char **argv ) {
       instream = (inputfile != stdin) ?
         new HfstInputStream(inputfilename) : new HfstInputStream();
     } catch(const HfstException e)  {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
     }

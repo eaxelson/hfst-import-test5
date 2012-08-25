@@ -120,7 +120,7 @@ parse_options(int argc, char** argv)
           char* equals = strstr(optarg, "=");
           if (equals == NULL)
             {
-              error(EXIT_FAILURE, 0, "Equals sign `=' missing from %s",
+              hfst_error(EXIT_FAILURE, 0, "Equals sign `=' missing from %s",
                     optarg);
             }
           char* property = hfst_strndup(optarg, equals-optarg);
@@ -199,7 +199,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                 else if (prop->first == "character-encoding" && 
                     !((prop->second == "utf-8") || (prop->second == "UTF-8")))
                   {
-                    error(EXIT_FAILURE, 0, "Cannot set `character-encoding' "
+                    hfst_error(EXIT_FAILURE, 0, "Cannot set `character-encoding' "
                           "to unsupported value;\n"
                           "consider recoding sources of automaton");
                   }
@@ -267,7 +267,7 @@ int main( int argc, char **argv ) {
       instream = (inputfile != stdin) ?
         new HfstInputStream(inputfilename) : new HfstInputStream();
     } catch(const HfstException e)  {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
     }
