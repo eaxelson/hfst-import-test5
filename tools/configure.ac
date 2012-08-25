@@ -43,6 +43,26 @@ AC_ARG_WITH([readline],
                             [use readline for interactive programs @<:@default=yes@:>@])],
             [with_readline=$withval],
             [with_readline=yes])
+AC_ARG_WITH([ncurses],
+            [AS_HELP_STRING([--with-ncurses],
+                            [use ncurses for color better color support @<:@default=yes@:>@])],
+            [with_ncurses=$withval],
+            [with_ncurses=yes])
+AC_ARG_WITH([libxml],
+            [AS_HELP_STRING([--with-libxml],
+                            [use libxml2 and libxml++ to parse XML formats @<:@default=yes@:>@])],
+            [with_libxml=$withval],
+            [with_libxml=yes])
+AC_ARG_WITH([glib],
+            [AS_HELP_STRING([--with-glib],
+                            [use glib and glibmm for various things @<:@default=yes@:>@])],
+            [with_glib=$withval],
+            [with_glib=yes])
+AC_ARG_WITH([icu],
+            [AS_HELP_STRING([--with-icu],
+                            [use ICU to parse unicode @<:@default=no@:>@])],
+            [with_icu=$withval],
+            [with_icu=no])
 
 # allow programs to be built separately (sort alphabetically)
 AC_ARG_ENABLE([affix_guessify],
@@ -382,11 +402,11 @@ AS_IF([test "x$with_unicode_handler" = "xhfst"],
                  [if using HFST builitins for unicode string handling])
       AC_DEFINE([UCD_DATA_PATH], ["$prefix/share/hfst/UnicodeData.txt"],
                 [define to final location of UnicodeData.txt if needed])])
-AS_IF([test "x$with_unicode_handler" = "xglib"],
+AS_IF([test "x$with_glib" != xno],
       [PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.12])
        AC_DEFINE([USE_GLIB_UNICODE], 1, 
                  [if using glib for unicode string handling])])
-AS_IF([test "x$with_unicode_handler" = "xicu"],
+AS_IF([test "x$with_icu" != "xno"],
       [PKG_CHECK_MODULES([ICU], [icu-uc >= 4.6])
        AC_DEFINE([USE_ICU_UNICODE], 1, 
                  [if using ICU for unicode string handling])])
@@ -396,14 +416,12 @@ AS_IF([test "x$with_readline" = "xyes"],
       [AC_SEARCH_LIBS([readline], [readline editline], 
                       [AC_DEFINE([HAVE_READLINE], 1, [if readline can be used])], 
                       [AC_MSG_FAILURE([readline test failed (--without-readline to disable)])])])
+AS_IF([test x$with_ncurses = xyes],
+      [AC_CHECK_LIB([ncurses], [main], ,
+                    [AC_MSG_FAILURE([ncurses test failed (--without-ncurses to disable)])])])
 
-AS_IF([test "x$enable_apertium2fst" != "xno"],
+AS_IF([test "x$with_libxml" != "xno"],
       [PKG_CHECK_MODULES([LIBXML], [libxml-2.0 >= 2.6.19])])
-
-### Add here your library ###
-#AS_IF([test "x$with_my_transducer_library" != "xno"],
-#      [AC_CHECK_LIB([my_transducer_library], [main], [],
-#                [AC_MSG_FAILURE([my transducer library test failed (--without-my-transducer-library to disable)])])])
 
 # Checks for header files
 AC_CHECK_HEADERS([limits.h stdlib.h string.h])
@@ -414,10 +432,8 @@ AC_CHECK_HEADERS([time.h sys/time.h sys/resource.h])
 
 AS_IF([test "x$with_readline" = "xyes"],
       [AC_CHECK_HEADERS([readline/readline.h readline/history.h])])
-
-### Add here your library ###
-#AS_IF([test "x$with_my_transducer_library" != "xno"],
-#      [AC_CHECK_HEADERS([my_transducer_library/MyTransducerLibrary.h])])
+AS_IF([test x$with_ncurses = xyes],
+      [AC_CHECK_HEADERS([curses.h])])
 
 AC_HEADER_STDBOOL
 AC_HEADER_ASSERT
@@ -454,8 +470,7 @@ AC_CONFIG_FILES([Makefile test/Makefile
                  src/hfst-twolc/test/Makefile
                  man/Makefile 
                  src/scripts/Makefile src/scripts/hfst-foma-wrapper.sh],
-                 [chmod +x src/scripts/hfst-foma-wrapper.sh])
-#        test/fsmbook-examples/Makefile
+                 [if test -r src/scripts/hfst-foma-wrapper.sh -a ! -x src/scripts/foma-wrapper.sh ; then chmod +x src/scripts/hfst-foma-wrapper.sh ; fi])
 
 # output
 AC_OUTPUT
@@ -465,6 +480,11 @@ AC_OUTPUT
 #    *         with my transducer library: $with_my_transducer_library
 cat <<EOF
 -- Building $PACKAGE_STRING:
+    * using libraries:
+    *                 glib: $with_glib
+    *                 icu: $with_icu
+    *                 readline: $with_readline
+    *                 ncurses: $with_ncurses
     * tools including (the arrows to the right are aliases):
     *                 sfstpl2fst: $enable_sfstpl2fst ←sfst-compiler
     *                 apertium2fst: $enable_apertium2fst
@@ -507,7 +527,7 @@ cat <<EOF
     * foma used for xfst: -> $FOMACLI
     * unicode parsed in corpus tools with: $with_unicode_handler
 EOF
-#stick important warnings to bottom
+# stick important warnings to bottom
 # without gnu getopt, shell scripts cannot support long options or option 
 # permutation
 AS_IF([test "x$GNU_GETOPT" = xno], 
