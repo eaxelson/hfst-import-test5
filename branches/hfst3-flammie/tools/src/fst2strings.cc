@@ -207,7 +207,7 @@ parse_options(int argc, char** argv)
               }
             else
               {
-                error(0, EXIT_FAILURE, "Unrecognised xfst option. "
+                hfst_error(0, EXIT_FAILURE, "Unrecognised xfst option. "
                      "available options are obey-flags, print-flags\n");
               }
           break;
@@ -480,7 +480,7 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
      && max_output_length <= 0 &&
      cycles < 0 && t.is_cyclic())
       {
-        error(EXIT_FAILURE, 0,
+        hfst_error(EXIT_FAILURE, 0,
               "Transducer is cyclic. Use one or more of these options: "
               "-n, -N, -r, -l, -L, -c");
         return EXIT_FAILURE;

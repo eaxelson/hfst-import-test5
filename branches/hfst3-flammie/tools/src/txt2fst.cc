@@ -208,7 +208,7 @@ int main( int argc, char **argv )
         verbose_printf("Using optimized lookup weighted output\n");
         break;
       default:
-        error(EXIT_FAILURE, 0, "Unknown format cannot be used as output\n");
+        hfst_error(EXIT_FAILURE, 0, "Unknown format cannot be used as output\n");
         return EXIT_FAILURE;
       }
     // here starts the buffer handling part

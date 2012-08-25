@@ -163,7 +163,7 @@ parse_alphabet(xmlDocPtr doc, xmlNodePtr alphabet)
                                         alphabet->xmlChildrenNode, 1);
   if (alpha == NULL)
     {
-      error(EXIT_FAILURE, 0, "A transducer collection with empty "
+      hfst_error(EXIT_FAILURE, 0, "A transducer collection with empty "
             "alphabet would not be able to analyse anything;\n"
             "refusing to create broken automata");
     }
@@ -277,7 +277,7 @@ parse_l(xmlDocPtr doc, xmlNodePtr l, string& left, string&)
         }
       else if (!xmlIsBlankNode(lc) && (lc->type != XML_COMMENT_NODE))
         {
-          error(0, 0,
+          hfst_error(0, 0,
                 "Unrecognised %s in <l>",
                 reinterpret_cast<const char*>(lc->name));
         }
@@ -324,7 +324,7 @@ parse_r(xmlDocPtr doc, xmlNodePtr r, string&, string& right)
         }
       else if (!xmlIsBlankNode(rc) && (rc->type != XML_COMMENT_NODE))
         {
-          error(0, 0,
+          hfst_error(0, 0,
                 "Unrecognised %s in <r>",
                 reinterpret_cast<const char*>(rc->name));
         }
@@ -375,7 +375,7 @@ parse_i(xmlDocPtr doc, xmlNodePtr i, string& left, string& right)
         }
       else if (!xmlIsBlankNode(ic) && (ic->type != XML_COMMENT_NODE))
         {
-          error(0, 0,
+          hfst_error(0, 0,
                 "Unrecognised %s in <i>",
                 reinterpret_cast<const char*>(ic->name));
         }
@@ -409,7 +409,7 @@ parse_p(xmlDocPtr doc, xmlNodePtr p, string& left, string& right)
         } // if r
       else if (!xmlIsBlankNode(rl) && (rl->type != XML_COMMENT_NODE))
         {
-          error(0, 0, "Unrecognised %s in <p>",
+          hfst_error(0, 0, "Unrecognised %s in <p>",
                 reinterpret_cast<const char*>(rl->name));
         }
       rl = rl->next;
@@ -437,7 +437,7 @@ parse_re(xmlDocPtr doc, xmlNodePtr re, string& left, string& right)
   xmlChar* regex = xmlNodeListGetString(doc, 
                                      re->children,
                                      1);
-  error(0, 0, "regexps unsupported, %s is left as is",
+  hfst_error(0, 0, "regexps unsupported, %s is left as is",
         reinterpret_cast<char*>(regex));
   left += string("@ERE<@") + 
       reinterpret_cast<char*>(regex)
@@ -485,7 +485,7 @@ parse_e(xmlDocPtr doc, xmlNodePtr e, vector<pair<string,string> >& es)
         }
       else
         {
-          error(0, 0, "unrecognised @r in <e>: %s",
+          hfst_error(0, 0, "unrecognised @r in <e>: %s",
                 reinterpret_cast<char*>(oneway));
         }
       xmlFree(oneway);
@@ -516,7 +516,7 @@ parse_e(xmlDocPtr doc, xmlNodePtr e, vector<pair<string,string> >& es)
         } // if re
       else if (!xmlIsBlankNode(pair) && (pair->type != XML_COMMENT_NODE))
         {
-          error(0, 0, "unrecognised %s in <e>",
+          hfst_error(0, 0, "unrecognised %s in <e>",
                 reinterpret_cast<const char*>(pair->name));
         }
       pair = pair->next;
@@ -550,7 +550,7 @@ parse_pardef(xmlDocPtr doc, xmlNodePtr pardef)
     }
   else
     {
-      error(0, 0, "unnamed pardef?");
+      hfst_error(0, 0, "unnamed pardef?");
       pardef = pardef->next;
       return;
     }
@@ -564,7 +564,7 @@ parse_pardef(xmlDocPtr doc, xmlNodePtr pardef)
         } // if e
       else if (!xmlIsBlankNode(e) && (e->type != XML_COMMENT_NODE))
         {
-          error(0, 0, "Unrecognised %s in pardef",
+          hfst_error(0, 0, "Unrecognised %s in pardef",
                 reinterpret_cast<const char*>(e->name));
         }
       e = e->next;
@@ -592,7 +592,7 @@ parse_pardefs(xmlDocPtr doc, xmlNodePtr pardefs)
         } // if pardef
       else if (!xmlIsBlankNode(pardef) && (pardef->type != XML_COMMENT_NODE))
         {
-          error(0, 0, "Unrecognised %s in pardefs",
+          hfst_error(0, 0, "Unrecognised %s in pardefs",
                 reinterpret_cast<const xmlChar*>(pardef->name));
         }
       pardef = pardef->next;
@@ -622,7 +622,7 @@ parse_section(xmlDocPtr doc, xmlNodePtr section)
         } // if e
       else if (!xmlIsBlankNode(e) && (e->type != XML_COMMENT_NODE))
         {
-          error(0, 0, "Unrecognised %s in section",
+          hfst_error(0, 0, "Unrecognised %s in section",
                 reinterpret_cast<const char*>(e->name));
         }
       e = e->next;
@@ -663,14 +663,14 @@ process_stream(HfstOutputStream& outstream, HfstOutputStream* errstream)
   if (NULL == node)
     {
       xmlFreeDoc(doc);
-      error(EXIT_FAILURE, 0, "Libxml could not parse %s",
+      hfst_error(EXIT_FAILURE, 0, "Libxml could not parse %s",
             inputfilename);
     }
   if (xmlStrcmp(node->name, 
                 reinterpret_cast<const xmlChar*>("dictionary")) != 0)
     {
       xmlFreeDoc(doc);
-      error(EXIT_FAILURE, 0, "Root element of %s is not monodix",
+      hfst_error(EXIT_FAILURE, 0, "Root element of %s is not monodix",
             inputfilename);
     }
   // this is a veryvery veryvery simple approach of XML parsing in tree
@@ -724,7 +724,7 @@ process_stream(HfstOutputStream& outstream, HfstOutputStream* errstream)
         } // if section
       else if (!xmlIsBlankNode(node) && (node->type != XML_COMMENT_NODE))
         {
-          error(0, 0, "unrecognised %s in dictionary",
+          hfst_error(0, 0, "unrecognised %s in dictionary",
                 reinterpret_cast<const char*>(node->name));
         }
       node = node->next;
@@ -980,7 +980,7 @@ int main( int argc, char **argv )
         verbose_printf("Using optimized lookup weighted output\n");
         break;
       default:
-        error(EXIT_FAILURE, 0, "Unknown format cannot be used as output\n");
+        hfst_error(EXIT_FAILURE, 0, "Unknown format cannot be used as output\n");
         return EXIT_FAILURE;
       }
     // here starts the buffer handling part

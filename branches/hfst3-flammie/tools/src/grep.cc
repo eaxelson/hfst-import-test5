@@ -205,7 +205,6 @@ int
 parse_options(int argc, char** argv)
 {
     // use of this function requires options are settable on global scope
-    static const short LINEBUFFER_OPT =20;
     static const short LABEL_OPT = 21;
     static const short BINARYFILES_OPT = 22;
     static const short INCLUDE_OPT = 23;
@@ -214,6 +213,7 @@ parse_options(int argc, char** argv)
     static const short EXCLUDEFROM_OPT = 26;
     static const short COLOR_OPT = 27;
     static const short INVERT_OPT = 28;
+    static const short LINEBUFFER_OPT =29;
     while (true)
     {
         static const struct option long_options[] =
@@ -282,7 +282,7 @@ parse_options(int argc, char** argv)
           format = hfst_parse_format_name(optarg);
           break;
         case 'E':
-          error(EXIT_FAILURE, 0, "POSIX ERE syntax not yet "
+          hfst_error(EXIT_FAILURE, 0, "POSIX ERE syntax not yet "
                      "supported");
           dialect_posix_ere = true;
           break;
@@ -290,11 +290,11 @@ parse_options(int argc, char** argv)
           dialect_fixed_strings = true;
           break;
         case 'G':
-          error(EXIT_FAILURE, 0, "POSIX BRE syntax not yet supported");
+          hfst_error(EXIT_FAILURE, 0, "POSIX BRE syntax not yet supported");
           dialect_posix_bre = true;
           break;
         case 'P':
-          error(EXIT_FAILURE, 0, "Perl syntax not yet supported");
+          hfst_error(EXIT_FAILURE, 0, "Perl syntax not yet supported");
           dialect_perl = true;
           break;
         case 'X':
@@ -307,7 +307,7 @@ parse_options(int argc, char** argv)
           expfile = hfst_fopen(optarg, "r");
           break;
         case 'I':
-          error(EXIT_FAILURE, 0, "Ignore case not supported");
+          hfst_error(EXIT_FAILURE, 0, "Ignore case not supported");
           break;
         case 'w':
           match_word = true;
@@ -341,22 +341,22 @@ parse_options(int argc, char** argv)
           print_only_matches = true;
           break;
         case BINARYFILES_OPT:
-          error(EXIT_FAILURE, 0, "No binary handling implemented");
+          hfst_error(EXIT_FAILURE, 0, "No binary handling implemented");
           break;
         case 'a':
           warning(0, 0, "All files are always handled as text");
           break;
         case 'D':
-          error(EXIT_FAILURE, 0, "No directory handling implemented");
+          hfst_error(EXIT_FAILURE, 0, "No directory handling implemented");
           break;
         case 'r':
-          error(EXIT_FAILURE, 0, "No directory handling implemented");
+          hfst_error(EXIT_FAILURE, 0, "No directory handling implemented");
           break;
         case INCLUDE_OPT:
         case EXCLUDE_OPT:
         case INCLUDEFROM_OPT:
         case EXCLUDEFROM_OPT:
-          error(EXIT_FAILURE, 0, "No directory/globbing implemented");
+          hfst_error(EXIT_FAILURE, 0, "No directory/globbing implemented");
           break;
         case 'L':
           print_only_unmatching_filenames = true;
@@ -386,7 +386,7 @@ parse_options(int argc, char** argv)
           break;
         case 'u':
         case 'U':
-          error(EXIT_FAILURE, 0, "MSDOS binary format not supported; use "
+          hfst_error(EXIT_FAILURE, 0, "MSDOS binary format not supported; use "
                 "fromdos or dos2unix");
           break;
 
@@ -537,7 +537,7 @@ read_matcher(const char* expression)
       }
     else
       {
-        error(EXIT_FAILURE, 0, "dialect unsupported");
+        hfst_error(EXIT_FAILURE, 0, "dialect unsupported");
       }
     verbose_printf("minimizing...\n");
     matcher->minimize();

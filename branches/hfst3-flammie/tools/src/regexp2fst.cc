@@ -168,7 +168,7 @@ parse_options(int argc, char** argv)
             const char* eqsign = strchr(optarg, '=');
             if (0 == eqsign)
               {
-                error(EXIT_FAILURE, 0, "There must be `=' in definition: %s",
+                hfst_error(EXIT_FAILURE, 0, "There must be `=' in definition: %s",
                       optarg);
               }
             const char* endstr = eqsign;

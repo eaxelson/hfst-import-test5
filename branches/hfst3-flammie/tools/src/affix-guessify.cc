@@ -131,7 +131,7 @@ parse_options(int argc, char** argv)
             }
           else
             {
-              error(EXIT_FAILURE, 0, "Unable to parse guessing direction "
+              hfst_error(EXIT_FAILURE, 0, "Unable to parse guessing direction "
                     "from %s;\n"
                     "please use one of `prefix' or `suffix'",
                     optarg);
@@ -271,7 +271,7 @@ int main( int argc, char **argv ) {
         new HfstInputStream(inputfilename) : new HfstInputStream();
     } // NotTransducerStreamException
     catch (const HfstException e) {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
     }

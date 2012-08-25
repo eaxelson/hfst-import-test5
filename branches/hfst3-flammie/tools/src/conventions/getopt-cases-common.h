@@ -46,3 +46,25 @@ case PROFILE_OPT:
   profile_file = hfst_fopen(profile_file_name, "a");
   profile_start = clock();
   break;
+case COLOUR_OPT:
+  if (strcmp(optarg, "always") == 0)
+    {
+      auto_colors = false;
+      print_colors = true;
+    }
+  else if(strcmp(optarg, "never") == 0)
+    {
+      auto_colors = false;
+      print_colors = false;
+    }
+  else if (strcmp(optarg, "auto") == 0)
+    {
+      auto_colors = true;
+      print_colors = true;
+    }
+  else
+    {
+      error(EXIT_FAILURE, 0, "--colour must be one of `always', `never' or "
+            "`auto'");
+    }
+  break;

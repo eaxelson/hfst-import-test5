@@ -66,7 +66,7 @@ parse_version_string(const char* s)
         }
       else
         {
-          error(EXIT_FAILURE, 0, "Cannot parse %s as version string;\n"
+          hfst_error(EXIT_FAILURE, 0, "Cannot parse %s as version string;\n"
                 " please currently only use ASCII digits and full stops",
                 s);
         }
@@ -172,7 +172,7 @@ int main (int argc, char * argv[])
                      HFST_LONGVERSION, min_version);
       if (HFST_LONGVERSION < min_version)
         {
-          error(EXIT_FAILURE, 0, "Version requirements not met");
+          hfst_error(EXIT_FAILURE, 0, "Version requirements not met");
         }
     }
   if (exact_version != -1L)
@@ -181,7 +181,7 @@ int main (int argc, char * argv[])
                      HFST_LONGVERSION, exact_version);
       if (HFST_LONGVERSION != exact_version)
         {
-          error(EXIT_FAILURE, 0, "Version requirements not met");
+          hfst_error(EXIT_FAILURE, 0, "Version requirements not met");
         }
     }
   if (max_version != -1L)
@@ -190,7 +190,7 @@ int main (int argc, char * argv[])
                      HFST_LONGVERSION, max_version);
       if (HFST_LONGVERSION < max_version)
         {
-          error(EXIT_FAILURE, 0, "Version requirements not met");
+          hfst_error(EXIT_FAILURE, 0, "Version requirements not met");
         }
     }
   for (set<string>::const_iterator f = required_features.begin();
@@ -201,34 +201,34 @@ int main (int argc, char * argv[])
         {
           verbose_printf("Requiring SFST support from library");
 #ifndef HAVE_SFST
-          error(EXIT_FAILURE, 0, "Required SFST support not present");
+          hfst_error(EXIT_FAILURE, 0, "Required SFST support not present");
 #endif
         }
       else if ((*f == "foma") || (*f == "FOMA") || (*f == "HAVE_FOMA"))
         {
           verbose_printf("Requiring foma support from library");
 #ifndef HAVE_FOMA
-          error(EXIT_FAILURE, 0, "Required foma support not present");
+          hfst_error(EXIT_FAILURE, 0, "Required foma support not present");
 #endif
         }
       else if ((*f == "openfst") || (*f == "OPENFST") || (*f == "HAVE_OPENFST"))
         {
           verbose_printf("Requiring OpenFst support from library");
 #ifndef HAVE_OPENFST
-          error(EXIT_FAILURE, 0, "Required OpenFst support not present");
+          hfst_error(EXIT_FAILURE, 0, "Required OpenFst support not present");
 #endif
         }
       else if ((*f == "glib") || (*f == "USE_GLIB_UNICODE"))
         {
           verbose_printf("Requiring Unicode parsed by Glib");
 #ifndef USE_GLIB_UNICODE
-          error(EXIT_FAILURE, 0,
+          hfst_error(EXIT_FAILURE, 0,
                 "Required GLIB-based Unicode handling not presesnt");
 #endif
         }
       else
         {
-          error(EXIT_FAILURE, 0, "Required %s support is unrecognised "
+          hfst_error(EXIT_FAILURE, 0, "Required %s support is unrecognised "
                 "and therefore assumed to be missing", f->c_str());
         }
     }

@@ -440,7 +440,7 @@ process_stream(HfstInputStream& instream)
                   first = false;
                 }
               fprintf(outfile, "\n");
-              fprintf(outfile, "sigma set size: %lu\n",
+              fprintf(outfile, "sigma set size: %zu\n",
                       transducerAlphabet.size());
             }
           else
@@ -461,7 +461,7 @@ process_stream(HfstInputStream& instream)
               first = false;
             }
           fprintf(outfile, "\n");
-          fprintf(outfile, "sigma set size: %lu\n", foundAlphabet.size());
+          fprintf(outfile, "sigma set size: %zu\n", foundAlphabet.size());
           fprintf(outfile, "sigma symbols missing from transducer:\n");
           if (transducerKnowsAlphabet)
             {
@@ -487,7 +487,7 @@ process_stream(HfstInputStream& instream)
                 }
               fprintf(outfile, "\n");
               fprintf(outfile, "sigma missing from transducer alphabet size:"
-                      " %lu\n",
+                      " %zu\n",
                       transducerMinusSet.size());
             }
           else
@@ -522,7 +522,7 @@ int main( int argc, char **argv ) {
         new HfstInputStream(inputfilename) : new HfstInputStream();
     } // NotTransducerStreamException
     catch (const HfstException e) {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
     }

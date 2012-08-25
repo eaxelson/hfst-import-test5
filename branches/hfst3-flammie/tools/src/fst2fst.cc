@@ -143,7 +143,7 @@ parse_options(int argc, char** argv)
     
     if (output_type == hfst::UNSPECIFIED_TYPE)
     {
-        error(EXIT_FAILURE, 0, 
+        hfst_error(EXIT_FAILURE, 0, 
               "You must specify an output format with -f");
     }
 
@@ -221,7 +221,7 @@ int main( int argc, char **argv ) {
       instream = (inputfile != stdin) ?
         new HfstInputStream(inputfilename) : new HfstInputStream();
     } catch(const HfstException e)  {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
     }

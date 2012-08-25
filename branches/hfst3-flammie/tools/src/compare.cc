@@ -173,7 +173,7 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
         catch (TransducerTypeMismatchException ttme)
           {
             // cannot recover yet, but beautify error messages
-            error(2, 0, "Cannot compare `%s' and `%s' [%zu]\n"
+            hfst_error(2, 0, "Cannot compare `%s' and `%s' [%zu]\n"
                   "the formats %s and %s are not compatible for comparison\n",
                   firstname, secondname, transducer_n,
                   hfst_strformat(firststream.get_type()),
@@ -252,7 +252,7 @@ int main( int argc, char **argv ) {
             new HfstInputStream(firstfilename) : new HfstInputStream();
     } //catch(const HfstException e)   {
     catch (const HfstException e) {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               firstfilename);
     }
     try {
@@ -260,7 +260,7 @@ int main( int argc, char **argv ) {
             new HfstInputStream(secondfilename) : new HfstInputStream();
     } //catch(const HfstException e)   {
     catch (const HfstException e) {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               secondfilename);
     }
 

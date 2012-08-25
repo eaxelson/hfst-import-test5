@@ -328,14 +328,14 @@ int main( int argc, char **argv ) {
         firststream = (firstfile != stdin) ?
             new HfstInputStream(firstfilename) : new HfstInputStream();
     } catch(const HfstException e)   {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               firstfilename);
     }
     try {
         secondstream = (secondfile != stdin) ?
             new HfstInputStream(secondfilename) : new HfstInputStream();
     } catch(const HfstException e)   {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               secondfilename);
     }
     HfstOutputStream* outstream = (outfile != stdout) ?

@@ -29,6 +29,7 @@ void print_common_program_options();
 //! for long options without corresponding short options we use reserved
 //! character codes <32.
 #define PROFILE_OPT 19
+#define COLOUR_OPT 20
 //! declaration of standard HFST options for getopt optstring. Must be used at
 //!     the beginning of the optstring.
 #define HFST_GETOPT_COMMON_SHORT ":hVvqsd"
@@ -39,7 +40,9 @@ void print_common_program_options();
   {"quiet", no_argument, 0, 'q'},\
   {"silent", no_argument, 0, 's'},\
   {"debug", no_argument, 0, 'd'},\
-  {"profile", required_argument, 0, PROFILE_OPT}
+  {"profile", required_argument, 0, PROFILE_OPT},\
+  {"color", required_argument, 0, COLOUR_OPT},\
+  {"colour", required_argument, 0, COLOUR_OPT}
 
 
 // unary fst-to-fst programs:
