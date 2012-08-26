@@ -258,7 +258,7 @@ parse_options(int argc, char** argv)
       }
     if (upper_bound < lower_bound)
       {
-        warning(0, 0, "Lower bound %f exceeds upper bound %f so reweight will"
+        hfst_warning( "Lower bound %f exceeds upper bound %f so reweight will"
                 " never apply", lower_bound, upper_bound);
       }
     return EXIT_CONTINUE;

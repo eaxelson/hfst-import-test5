@@ -116,7 +116,7 @@ parse_options(int argc, char** argv)
 #include "conventions/check-params-unary.h"
     if (head_count == 0)
       {
-        warning(0, 0, "Argument 0 for count is not sensible");
+        hfst_warning( "Argument 0 for count is not sensible");
       }    
     return EXIT_CONTINUE;
 }
@@ -152,7 +152,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
            }
         if (-head_count > first_but_n.size())
           {
-            warning(0, 0, "Stream in %s has less than %zu automata; "
+            hfst_warning( "Stream in %s has less than %zu automata; "
                     "Nothing will be written to output",
                     inputfilename, -head_count);
           }

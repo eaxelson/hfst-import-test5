@@ -117,7 +117,7 @@ parse_options(int argc, char** argv)
 #include "conventions/check-params-common.h"
     if (format == hfst::UNSPECIFIED_TYPE)
       {
-        warning(0, 0, "Defaulting to OpenFst tropical type");
+        hfst_warning( "Defaulting to OpenFst tropical type");
         format = hfst::TROPICAL_OPENFST_TYPE;
       }
     if (argc - optind > 0)

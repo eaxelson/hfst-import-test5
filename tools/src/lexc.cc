@@ -128,7 +128,7 @@ parse_options(int argc, char** argv)
         case 'u':
           if (!silent)
             {
-              warning(0, 0, "UTF-8 is always the default in HFST tools");
+              hfst_warning( "UTF-8 is always the default in HFST tools");
             }
           break;
         case 'X':
@@ -144,7 +144,7 @@ parse_options(int argc, char** argv)
 #if HAVE_FOMA
         if (!silent)
           {
-            warning(0, 0, "Defaulting to foma type "
+            hfst_warning( "Defaulting to foma type "
                 "(since it has native lexc support);\n"
                 "Use command-line option --format to override");
           }
@@ -152,7 +152,7 @@ parse_options(int argc, char** argv)
 #elif HAVE_OPENFST
         if (!silent)
           {
-            warning(0, 0, "Defaulting to using OpenFst with legacy lexc "
+            hfst_warning( "Defaulting to using OpenFst with legacy lexc "
                 "compilation scheme\n"
                 "Use command-line option --format to override");
           }
@@ -180,14 +180,14 @@ parse_options(int argc, char** argv)
 #if AT_END_OF_DEPRECATION_PERIOD
         if (!silent)
           {
-            warning(0, 0, "Reading lexc script (not a lexicon) "
+            hfst_warning( "Reading lexc script (not a lexicon) "
                 "from stdin with readline");
           }
         start_readline = true;
 #else
         if (!silent)
           {
-            warning(0, 0, "Reading lexicons from stdin is deprecated and will "
+            hfst_warning( "Reading lexicons from stdin is deprecated and will "
                 "be removed in next versions;\n"
                 "this is not even supported by the original lexc");
           }
@@ -235,7 +235,7 @@ parse_options(int argc, char** argv)
       {
         if (!silent)
           {
-            warning(0, 0, "multiple file handling is not supported by all "
+            hfst_warning( "multiple file handling is not supported by all "
                 "backends;\n"
                 "concatenating to temporary file");
           }

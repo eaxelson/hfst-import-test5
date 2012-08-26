@@ -540,7 +540,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         {
           if (!silent)
             {
-              warning(0, 0, "NB: substitution for foma transducers will be done "
+              hfst_warning( "NB: substitution for foma transducers will be done "
                     "via conversion to\n"
                     "SFST and back (if available)\n");
             }
@@ -644,7 +644,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                        {
                          if (!silent)
                            {
-                             warning(0, 0, "substitution is not supported for "
+                             hfst_warning( "substitution is not supported for "
                                      "this transducer type falling back to "
                                      "internal formats and trying...");
                            }
@@ -685,7 +685,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                 {
                   if (!silent)
                     {
-                      warning(0, 0, "substitution is not supported for this "
+                      hfst_warning( "substitution is not supported for this "
                               "transducer type falling back to internal format "
                               " and trying...");
                     }

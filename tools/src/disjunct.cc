@@ -112,7 +112,7 @@ disjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     bool bothInputs = firststream.is_good() && secondstream.is_good();
     if (firststream.get_type() != secondstream.get_type())
       {
-        warning(0, 0, "Tranducer type mismatch in %s and %s; "
+        hfst_warning( "Tranducer type mismatch in %s and %s; "
               "using former type as output",
               firstfilename, secondfilename);
       }
@@ -153,12 +153,12 @@ disjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     
     if (firststream.is_good())
     {
-      warning(0, 0, "Warning: %s contains more transducers than %s; "
+      hfst_warning("%s contains more transducers than %s; "
                      "residue skipped\n", firstfilename, secondfilename);
     }
     else if (secondstream.is_good())
     {
-      warning(0, 0, "Warning: %s contains fewer transducers than %s; "
+      hfst_warning("%s contains fewer transducers than %s; "
                      "residue skipped\n", firstfilename, secondfilename);
     }
     firststream.close();
