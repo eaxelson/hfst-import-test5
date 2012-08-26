@@ -344,7 +344,7 @@ parse_options(int argc, char** argv)
           hfst_error(EXIT_FAILURE, 0, "No binary handling implemented");
           break;
         case 'a':
-          warning(0, 0, "All files are always handled as text");
+          hfst_warning( "All files are always handled as text");
           break;
         case 'D':
           hfst_error(EXIT_FAILURE, 0, "No directory handling implemented");
@@ -396,7 +396,7 @@ parse_options(int argc, char** argv)
     if (!dialect_fixed_strings && !dialect_xerox && !dialect_posix_bre &&
         !dialect_posix_ere && !dialect_perl)
       {
-        warning(0, 0, "Dialect not defined, defaulting to Xerox for now!");
+        hfst_warning( "Dialect not defined, defaulting to Xerox for now!");
         dialect_xerox = true;
       }
     if (format == hfst::UNSPECIFIED_TYPE)

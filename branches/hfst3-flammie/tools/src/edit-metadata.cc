@@ -185,14 +185,14 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
               {
                 if (prop->first == "type")
                   {
-                    warning(0, 0, "Changing `type' metadata will not change "
+                    hfst_warning( "Changing `type' metadata will not change "
                             "type of transducer in file;\n"
                             "having wrong type may cause breakage, use with "
                             "caution");
                   }
                 else if (prop->first == "version")
                   {
-                    warning(0, 0, "Changing `version' changes parsing "
+                    hfst_warning( "Changing `version' changes parsing "
                             "semantics for header;\n"
                             "use with caution");
                   }

@@ -221,7 +221,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
 {
     if (firststream.get_type() != secondstream.get_type())
       {
-        warning(0, 0, "Transducer type mismatch in %1$s and %2$s "
+        hfst_warning( "Transducer type mismatch in %1$s and %2$s "
                   "(types %3$s and %4$s);\n"
                   "using type %3$s as output",
                   firstfilename, secondfilename,
@@ -259,7 +259,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     std::string symbol;
     if ((symbol = check_all_symbols(lexicon,rules[0])) != "")
       {
-        warning(0, 0, 
+        hfst_warning( 
             "\nFound output symbol \"%1s\" in transducer in\n"
             "file %2$s which will be filtered out because they are\n"
             "not found on the output tapes of transducers in file\n"
@@ -268,7 +268,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
       }
       else if ((symbol = check_multi_char_symbols(lexicon,rules[0])) != "")
       { 
-        warning(0, 0, 
+        hfst_warning( 
             "\nFound output multi-char symbol \"%1s\" in \n"
             "transducer in file %2$s which are not found on the\n"
             "output tape of transducers in file %3$s.",

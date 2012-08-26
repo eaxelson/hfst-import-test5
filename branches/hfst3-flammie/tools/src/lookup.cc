@@ -1110,7 +1110,7 @@ lookup_simple(const HfstOneLevelPath& s, HfstTransducer& t, bool* infinity)
   if (t.is_lookup_infinitely_ambiguous(s.second))
     {
       if (!silent && infinite_cutoff > 0) {
-    warning(0, 0, "Got infinite results, number of cycles limited to %zu",
+    hfst_warning( "Got infinite results, number of cycles limited to %zu",
         infinite_cutoff);
       }
       results = t.lookup_fd(s.second, infinite_cutoff);
@@ -1499,7 +1499,7 @@ lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity)
   if (is_lookup_infinitely_ambiguous(t,s))
     {
       if (!silent && infinite_cutoff > 0) {
-    warning(0, 0, "Got infinite results, number of cycles limited to %zu",
+    hfst_warning( "Got infinite results, number of cycles limited to %zu",
         infinite_cutoff);
       }
       lookup_fd(t, *results, s, infinite_cutoff);
@@ -1763,7 +1763,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                   {
                     char* format_string = 
                         hfst_strformat(cascade[0].get_type());
-                    warning(0, 0, 
+                    hfst_warning( 
                         "It is not possible to perform fast lookups with %s "
                         "format automata.\n"
                         "Converting to HFST basic transducer format "

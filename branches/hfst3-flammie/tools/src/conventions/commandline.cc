@@ -110,9 +110,7 @@ debug_printf(const char* fmt, ...)
 {
   if (debug)
     {
-      print_color(stderr, COLOR_DEBUG);
       fprintf(stderr, "DEBUG: ");
-      print_color(stderr, COLOR_RESET);
       va_list ap;
       va_start(ap, fmt);
       vfprintf(stderr, fmt, ap);
@@ -126,8 +124,6 @@ verbose_printf(const char* fmt, ...)
 {
   if (verbose)
     {
-      print_color(message_out, COLOR_INFO);
-      fprintf(message_out, "***");
       va_list ap;
       va_start(ap, fmt);
       vfprintf(message_out, fmt, ap);
