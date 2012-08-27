@@ -3301,6 +3301,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 	  (implementation.log_ofst);
         delete implementation.log_ofst;
 	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	internal =
@@ -3308,12 +3309,12 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 	  (implementation.hfst_ol);
 	delete implementation.hfst_ol;
 	break;
-#endif
     case ERROR_TYPE:
     default:
       HFST_THROW(TransducerHasWrongTypeException);
       break;
     }
+    
     this->type = type;
     switch (this->type)
     {
@@ -3346,6 +3347,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 	ConversionFunctions::hfst_basic_transducer_to_log_ofst(internal);
       delete internal;
       break;
+#endif
     case HFST_OL_TYPE:
     case HFST_OLW_TYPE:
       implementation.hfst_ol = 
@@ -3353,7 +3355,6 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 	(internal, this->type==HFST_OLW_TYPE?true:false, options);
       delete internal;
       break;
-#endif
 #if HAVE_FOMA
     case FOMA_TYPE:
       implementation.foma =

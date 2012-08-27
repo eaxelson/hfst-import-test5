@@ -20,7 +20,7 @@ extern std::map<std::string,hfst::HfstTransducer*> definitions;
 extern HfstTransducer* last_compiled;
 extern ImplementationType format;
 
-extern std::map<std::string,hfst::HfstTransducer*> named_transducers;
+extern std::map<std::string, hfst::HfstTransducer> named_transducers;
 
 /**
  * @brief input handling function for flex that parses strings.
@@ -43,6 +43,11 @@ char* add_percents(const char* s);
 char* get_Ins_transition(const char *s);
 char* get_RC_transition(const char *s);
 char* get_LC_transition(const char *s);
+
+/**
+ * @brief add special beginning and ending arcs for pmatch compatibility
+ */
+HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex);
 
 /**
  * @brief find first quoted segment from strign @a s.
