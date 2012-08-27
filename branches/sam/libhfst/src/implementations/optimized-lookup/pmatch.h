@@ -82,6 +82,12 @@ struct SimpleIndex
     }
 };
 
+struct ContextMatchedTrap
+{
+    bool polarity;
+ContextMatchedTrap(bool p): polarity(p) {}
+};
+
 class PmatchTransducer
 {
 protected:
@@ -97,6 +103,8 @@ protected:
     std::map<std::string, PmatchTransducer *> & rtns;
     SymbolNumber & entry_marker;
     SymbolNumber & exit_marker;
+
+    // The mutually recursive lookup-handling functions
 
     void try_epsilon_transitions(SymbolNumber * input_tape,
                                  SymbolNumber * output_tape,
@@ -119,6 +127,36 @@ protected:
     void get_analyses(SymbolNumber * input_tape,
                       SymbolNumber * output_tape,
                       TransitionTableIndex index);
+
+    // A similar but slightly different set of mutually recursive functions
+    // for checking contexts
+
+    void check_context_try_epsilon_transitions(SymbolNumber * input_tape,
+                                               TransitionTableIndex i,
+                                               int step,
+                                               bool polarity);
+  
+    void check_context_try_epsilon_indices(SymbolNumber * input_tape,
+                                           TransitionTableIndex i,
+                                           int step,
+                                           bool polarity);
+
+    void check_context_find_transitions(SymbolNumber input,
+                                        SymbolNumber * input_tape,
+                                        TransitionTableIndex i,
+                                        int step,
+                                        bool polarity);
+
+    void check_context_find_index(SymbolNumber input,
+                                  SymbolNumber * input_tape,
+                                  TransitionTableIndex i,
+                                  int step,
+                                  bool polarity);
+
+    void check_context(SymbolNumber * input_tape,
+                       TransitionTableIndex index,
+                       int step,
+                       bool polarity);
 
 
 

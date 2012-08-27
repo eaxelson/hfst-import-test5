@@ -196,17 +196,24 @@ std::string PmatchContainer::match(std::string & input)
 
 void PmatchContainer::copy_to_output(SymbolNumberVector & best_result)
 {
-    output.assign(best_result.begin(), best_result.end());
+    for (SymbolNumberVector::const_iterator it = best_result.begin();
+         it != best_result.end(); ++it) {
+        output.push_back(*it);
+    }
 }
 
 std::string PmatchContainer::stringify_output(void)
 {
     std::string retval;
-    size_t start_tag_pos = 0;
+    std::stack<unsigned int> start_tag_pos;
     for (SymbolNumberVector::const_iterator it = output.begin();
          it != output.end(); ++it) {
-        if (is_end_tag(*it)) {
-            retval.insert(start_tag_pos, start_tag(*it));
+        if (*it == entry_marker) {
+            start_tag_pos.push(retval.size());
+        } else if (*it == exit_marker) {
+            start_tag_pos.pop();
+        } else if (is_end_tag(*it)) {
+            retval.insert(start_tag_pos.top(), start_tag(*it));
             retval.append(end_tag(*it));
         } else {
             retval.append(alphabet.string_from_symbol(*it));
@@ -285,10 +292,12 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
 void PmatchContainer::initialize_input(const char * input)
 {
     input_tape = orig_input_tape;
-    int i = 0;
     SymbolNumber k = NO_SYMBOL_NUMBER;
     char * input_str = const_cast<char *>(input);
     char ** input_str_ptr = &input_str;
+    input_tape[0] = NO_SYMBOL_NUMBER;
+    ++input_tape;
+    int i = 1;
     while (**input_str_ptr != 0) {
         char * original_input_loc = *input_str_ptr;
 	k = encoder->find_key(input_str_ptr);
@@ -473,6 +482,138 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
                output_tape,
                i+1);
 
+    }
+}
+
+void PmatchTransducer::check_context(SymbolNumber * input_tape,
+                                     TransitionTableIndex i,
+                                     int step,
+                                     bool polarity) {
+    if (indexes_transition_table(i))
+    {
+        i -= TRANSITION_TARGET_TABLE_START;
+        
+        check_context_try_epsilon_transitions(input_tape,
+                                              i+1,
+                                              step,
+                                              polarity);
+        
+        if (transition_table[i].final()) {
+            throw ContextMatchedTrap(polarity);
+        }
+
+        if (*input_tape != NO_SYMBOL_NUMBER) {
+            SymbolNumber input = *input_tape;
+            input_tape += step;
+            check_context_find_transitions(input,
+                                           input_tape,
+                                           i+1,
+                                           step,
+                                           polarity);
+        }
+    } else {
+        check_context_try_epsilon_indices(input_tape,
+                                          i+1,
+                                          step,
+                                          polarity);
+
+        if (index_table[i].final()) {
+            throw ContextMatchedTrap(polarity);
+        }
+
+        if (*input_tape != NO_SYMBOL_NUMBER) {
+            SymbolNumber input = *input_tape;
+            input_tape += step;
+            check_context_find_index(input,
+                                     input_tape,
+                                     i+1,
+                                     step,
+                                     polarity);
+        }
+
+    }
+    throw ContextMatchedTrap(!polarity);
+}
+
+void PmatchTransducer::check_context_try_epsilon_transitions(SymbolNumber * input_tape,
+                                                             TransitionTableIndex i,
+                                                             int step,
+                                                             bool polarity)
+{
+    while (true) {
+        if (transition_table[i].input == 0) {
+            check_context(input_tape,
+                          transition_table[i].target,
+                          step,
+                          polarity);
+            ++i;
+        } else if (alphabet.is_flag_diacritic(
+                       transition_table[i].input)) {
+            std::vector<short> old_values(flag_state.get_values());
+            if (flag_state.apply_operation(
+                    *(alphabet.get_operation(
+                          transition_table[i].input)))) {
+                // flag diacritic allowed
+                check_context(input_tape,
+                              transition_table[i].target,
+                              step,
+                              polarity);
+            }
+            flag_state.assign_values(old_values);
+            ++i;
+        } else { // it's not epsilon and it's not a flag, so nothing to do
+            return;
+        }
+    }
+
+}
+
+void PmatchTransducer::check_context_try_epsilon_indices(SymbolNumber * input_tape,
+                                                         TransitionTableIndex i,
+                                                         int step,
+                                                         bool polarity)
+{
+    if (index_table[i].input == 0) {
+    check_context_try_epsilon_transitions(input_tape,
+                                          index_table[i].target -
+                                          TRANSITION_TARGET_TABLE_START,
+                                          step,
+                                          polarity);
+    }
+
+}
+
+void PmatchTransducer::check_context_find_transitions(SymbolNumber input,
+                                                      SymbolNumber * input_tape,
+                                                      TransitionTableIndex i,
+                                                      int step,
+                                                      bool polarity)
+{
+    while (transition_table[i].input != NO_SYMBOL_NUMBER) {
+        if (transition_table[i].input == input) {
+            check_context(input_tape,
+                          transition_table[i].target,
+                          step,
+                          polarity);
+        } else {
+            return;
+        }
+        ++i;
+    }
+}
+
+void PmatchTransducer::check_context_find_index(SymbolNumber input,
+                                                SymbolNumber * input_tape,
+                                                TransitionTableIndex i,
+                                                int step,
+                                                bool polarity)
+{
+    if (index_table[i+input].input == input) {
+        check_context_find_transitions(input,
+                                       input_tape,
+                                       index_table[i+input].target - TRANSITION_TARGET_TABLE_START,
+                                       step,
+                                       polarity);
     }
 }
 
