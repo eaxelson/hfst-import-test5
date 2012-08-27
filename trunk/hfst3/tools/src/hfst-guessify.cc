@@ -81,7 +81,7 @@ print_usage()
     print_common_program_options(message_out);
     print_common_unary_program_options(message_out);
     fprintf(message_out, "Guesser options:\n"
-        "  -p, --default-penalty           Give penalty for skipping one"
+        "  -p, --default-penalty           Give penalty for skipping one\n"
 	"                                  symbol of input (1.0 by default).\n"
         "  -G, --do-not-compile-generator  When compiling the guesser, do\n"
 	"                                  not compile a model form\n"
