@@ -181,6 +181,17 @@ parse_options(int argc, char** argv)
     return EXIT_CONTINUE;
 }
 
+bool is_comment(char * line)
+{
+    do {
+        if (*line == '!') {
+            return true;
+        }
+        ++line;
+    } while ((*line == ' ' || *line == '\t') && *line != '0');
+    return false;
+}
+
 int
 process_stream(HfstOutputStream& outstream)
 {
@@ -204,12 +215,15 @@ process_stream(HfstOutputStream& outstream)
   char* first_line = 0;
   while (hfst_getdelim(&line, &len, delim, inputfile) != -1)
     {
+        line_count++;
       if (first_line == 0)
         {
           first_line = strdup(line);
         }
+      if (is_comment(line)) {
+          continue;
+      }
       transducer_n++;
-      line_count++;
       HfstTransducer* compiled;
       verbose_printf("Compiling expression %u\n", line_count);
       compiled = comp.compile(line);
