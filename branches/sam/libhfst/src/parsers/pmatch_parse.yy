@@ -701,8 +701,9 @@ REGEXP11: REGEXP12 { }
 | LEFT_PARENTHESIS REGEXP2 RIGHT_PARENTHESIS {
     $$ = & $2->optionalize();
  }
-| LEFT_CURLY REGEXP2 RIGHT_CURLY {
-    $$ = & $2->minimize();
+| LEFT_CURLY SYMBOL RIGHT_CURLY {
+    HfstTokenizer tok;
+    $$ = new HfstTransducer($2, tok, hfst::pmatch::format);
  }
 ;
 

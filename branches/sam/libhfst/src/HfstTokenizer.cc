@@ -251,7 +251,7 @@ StringPairVector HfstTokenizer::tokenize
     }
     }
 }
-  
+
 }
 
 #else // MAIN_TEST was defined
