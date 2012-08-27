@@ -130,7 +130,7 @@ PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
 
-%nonassoc DEFINE INS_LEFT LC_LEFT RC_LEFT
+%nonassoc DEFINE INS_LEFT ENDTAG_LEFT LC_LEFT RC_LEFT
 %%
 
 
@@ -169,6 +169,10 @@ REGEXP2: REPLACE
 { 
 //          std::cerr << "regexp2:replace \n"<< std::endl; 
 }
+| REGEXP2 ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
+    hfst::pmatch::add_end_tag($1, $3);
+    $$ = $1;
+ }
 | REGEXP2 COMPOSITION REPLACE {
        
     $$ = & $1->compose(*$3);

@@ -50,6 +50,11 @@ char* get_LC_transition(const char *s);
 HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex);
 
 /**
+ * @brief concatenate with an appropriate end tag transducer
+ */
+void add_end_tag(HfstTransducer * regex, std::string tag);
+
+/**
  * @brief find first quoted segment from strign @a s.
  */
 char* get_quoted(const char *s);

@@ -63,6 +63,10 @@ LWSP [\t\r\n ]
     return INS_LEFT;
 }
 
+"EndTag(" {
+    return ENDTAG_LEFT;
+}
+
 "LC(" {
     return LC_LEFT;
 }
