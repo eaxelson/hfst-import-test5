@@ -278,10 +278,20 @@ int main( int argc, char **argv )
       {
 	verbose_printf("Reading inflectional information for model forms\n"
 		       "from %s.\n",model_form_filename.c_str());
-
-	model_forms = read_model_forms(model_form_filename,tokenizer);
+	
+	try
+	  {
+	    model_forms = read_model_forms(model_form_filename,tokenizer);
+	  }
+	catch (const InvalidModelLine &e)
+	  {
+	    std::cerr << "Invalid model form line in model form file:"
+		      << std::endl
+		      << e.line
+		      << std::endl;
+	    return EXIT_FAILURE;
+	  }
       }
-
     while (std::cin.peek() != EOF)
       {
 	std::string line;

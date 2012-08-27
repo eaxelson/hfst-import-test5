@@ -11,7 +11,7 @@ using hfst::HfstTokenizer;
 using hfst::StringPair;
 using hfst::HfstOneLevelPaths;
 
-#define MODEL_FORM_PREFIX "ANALYSIS_SUFFIX="
+#define MODEL_FORM_PREFIX ""
 
 #define MAX_ANALYSES 5
 #define MAX_GENERATED_FORMS 1
