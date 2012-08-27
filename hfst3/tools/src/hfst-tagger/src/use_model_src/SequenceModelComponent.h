@@ -20,7 +20,7 @@ class SequenceModelComponent
   SequenceModelComponent(const HfstBasicTransducer &fst);
   virtual ~SequenceModelComponent(void);
 
-  static const State START_STATE = 0;
+  static const State START_STATE;
 
   virtual Weight get_final_weight(State state) const;
   virtual TransitionData get_transition(State state, Symbol symbol); 
