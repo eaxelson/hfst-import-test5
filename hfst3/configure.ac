@@ -295,6 +295,12 @@ AC_ARG_ENABLE([optimized_lookup],
 			  [enable_optimized_lookup=$enableval],
 			  [enable_optimized_lookup=yes])
 AM_CONDITIONAL([WANT_OPTIMIZED_LOOKUP], [test x$enable_optimized_lookup != xno])
+AC_ARG_ENABLE([pmatch],
+			  [AS_HELP_STRING([--enable-pmatch],
+							  [build pmatch tool @<:@default=yes@:>@])],
+			  [enable_pmatch=$enableval],
+			  [enable_pmatch=yes])
+AM_CONDITIONAL([WANT_PMATCH], [test x$enable_pmatch != xno])
 AC_ARG_ENABLE([preprocess_for_optimized_lookup],
 			  [AS_HELP_STRING([--enable-remove-epsilons],
 							  [build remove-epsilons tool @<:@default=yes@:>@])],
@@ -613,6 +619,7 @@ cat <<EOF
     *                 minimize: $enable_minimize (minimise)
     *                 name: $enable_name
     *                 optimized-lookup: $enable_optimized_lookup
+    *                 pmatch: $enable_pmatch
     *                 proc: $enable_proc
     *                 project: $enable_project
     *                 push-weights: $enable_push_weights
