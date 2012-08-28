@@ -216,6 +216,8 @@ public:
     SymbolNumber input_symbol_count(void) const {
     return number_of_input_symbols;
     }
+    void increment_symbol_count(void)
+	{++number_of_symbols; ++number_of_input_symbols;}
   
     TransitionTableIndex index_table_size(void) const
     { return size_of_transition_index_table; }
@@ -311,6 +313,7 @@ protected:
     hfst::FdTable<SymbolNumber> fd_table;
     SymbolNumber unknown_symbol;
     SymbolNumber default_symbol;
+    
   
 public:
     TransducerAlphabet()
@@ -341,9 +344,12 @@ public:
     
     const SymbolTable& get_symbol_table() const
     { return symbol_table; }
+    
     const std::string string_from_symbol(const SymbolNumber symbol) const
     // represent epsilon as blank string
     { return (symbol == 0) ? "" : symbol_table[symbol]; }
+
+    SymbolNumber symbol_from_string(const std::string symbol_string) const;
     StringSymbolMap build_string_symbol_map(void) const;
     const hfst::FdTable<SymbolNumber>& get_fd_table() const
     { return fd_table; }
@@ -355,6 +361,7 @@ public:
         { return unknown_symbol; }
     SymbolNumber get_default_symbol(void) const
 	{ return default_symbol; }
+    void add_symbol(char * symbol);
     
 };
 
@@ -701,12 +708,13 @@ public:
 
 class Encoder {
     
-private:
+protected:
     SymbolNumber number_of_input_symbols;
     OlLetterTrie letters;
     SymbolNumberVector ascii_symbols;
     
     void read_input_symbols(const SymbolTable & kt);
+    void read_input_symbol(const char * symbol, const int symbol_number);
     
 public:
     Encoder(const SymbolTable & st, SymbolNumber input_symbol_count):
@@ -715,9 +723,10 @@ public:
     {
         read_input_symbols(st);
     }
-    
-    
+
     SymbolNumber find_key(char ** p);
+
+    friend class PmatchContainer;
 };
 
 /** \brief A compiled transducer format, suitable for fast lookup operations.

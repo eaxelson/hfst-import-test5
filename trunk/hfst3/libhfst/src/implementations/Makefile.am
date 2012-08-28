@@ -61,7 +61,8 @@ BRIDGE_SRCS=$(MAYBE_SFST) $(MAYBE_OPENFST) $(MAYBE_FOMA) $(MAYBE_HFSTOL) # $(MAY
 
 if WANT_HFSTOL
 HFST_OL_SRCS=\
-optimized-lookup/transducer.cc optimized-lookup/convert.cc optimized-lookup/ospell.cc
+optimized-lookup/transducer.cc optimized-lookup/convert.cc \
+	optimized-lookup/ospell.cc optimized-lookup/pmatch.cc
 endif
 
 libhfstimplementations_la_SOURCES=$(IMPLEMENTATION_SRCS) $(BRIDGE_SRCS) \
@@ -104,7 +105,8 @@ if WANT_HFSTOL
 hfstolincludedir = $(implincludedir)/optimized-lookup
 hfstolinclude_HEADERS = \
 		optimized-lookup/transducer.h \
-		optimized-lookup/convert.h
+		optimized-lookup/convert.h \
+		optimized-lookup/pmatch.h
 endif
 
 if WANT_FOMA
@@ -169,7 +171,7 @@ ConvertFomaTransducer_LDADD=../libhfst.la
 ConvertOlTransducer_SOURCES=ConvertOlTransducer.cc
 ConvertOlTransducer_CXXFLAGS=-DMAIN_TEST
 ConvertOlTransducer_LDADD=../libhfst.la
-optimized_lookup_transducer_SOURCES=optimized-lookup/transducer.cc optimized-lookup/ospell.cc
+optimized_lookup_transducer_SOURCES=optimized-lookup/transducer.cc optimized-lookup/ospell.cc optimized-lookup/pmatch.cc
 optimized_lookup_transducer_CXXFLAGS=-DMAIN_TEST
 optimized_lookup_transducer_LDADD=../libhfst.la
 optimized_lookup_convert_SOURCES=optimized-lookup/convert.cc
