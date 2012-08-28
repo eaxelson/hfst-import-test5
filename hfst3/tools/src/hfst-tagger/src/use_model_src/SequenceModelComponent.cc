@@ -2,9 +2,10 @@
 
 #include "SequenceModelComponent.h"
 
-const State SequenceModelComponent::START_STATE = 0;
 
 #ifndef MAIN_TEST
+
+const State SequenceModelComponent::START_STATE = 0;
 
 typedef HfstBasicTransducer::HfstTransitionGraphAlphabet
 HfstTransitionGraphAlphabet;
