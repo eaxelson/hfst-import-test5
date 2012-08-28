@@ -46,7 +46,7 @@ print_usage()
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
         "Compile training data file into an hfst part-of-speech tagger.\n"
-        "\n", program_name);
+        "\n", "hfst-train-tagger");
 
     print_common_program_options(message_out);
     print_common_unary_program_options(message_out);
