@@ -45,6 +45,7 @@ endif
 hfstincludedir = $(includedir)/hfst
 
 HFST_HDRS = \
+	hfst.h \
 	HfstTransducer.h \
 	hfst_apply_schemas.h \
 	HfstDataTypes.h \
