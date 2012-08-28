@@ -44,6 +44,11 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
     }
 }
 
+void TransducerAlphabet::add_symbol(char * symbol)
+{
+    symbol_table.push_back(symbol);
+}
+
 TransducerAlphabet::TransducerAlphabet(const SymbolTable& st):
     symbol_table(st)
 {
@@ -59,6 +64,17 @@ TransducerAlphabet::TransducerAlphabet(const SymbolTable& st):
 	    default_symbol = i;
 	}
     }
+}
+
+SymbolNumber TransducerAlphabet::symbol_from_string(
+    const std::string symbol_string) const
+{
+    for(SymbolNumber i = 0; i < symbol_table.size(); ++i) {
+        if (symbol_table[i] == symbol_string) {
+            return i;
+        }
+    }
+    return NO_SYMBOL_NUMBER;
 }
 
 StringSymbolMap TransducerAlphabet::build_string_symbol_map(void) const
@@ -161,15 +177,17 @@ SymbolNumber OlLetterTrie::find_key(char ** p)
 
 void Encoder::read_input_symbols(const SymbolTable & kt)
 {
-    for (SymbolNumber k = 0; k < number_of_input_symbols; ++k)
-    {
-    const char * p = kt[k].c_str();
-    if ((strlen(p) == 1) && should_ascii_tokenize((unsigned char)(*p)))
-    {
-        ascii_symbols[(unsigned char)(*p)] = k;
+    for (SymbolNumber k = 0; k < number_of_input_symbols; ++k) {
+	read_input_symbol(kt[k].c_str(), k);
     }
-    letters.add_string(p,k);
+}
+
+void Encoder::read_input_symbol(const char * s, const int s_num)
+{
+    if ((strlen(s) == 1) && should_ascii_tokenize((unsigned char)(*s))) {
+	ascii_symbols[(unsigned char)(*s)] = s_num;
     }
+    letters.add_string(s, s_num);
 }
 
 SymbolNumber Encoder::find_key(char ** p)
@@ -235,18 +253,6 @@ HfstOneLevelPaths * Transducer::lookup_fd(const char * s)
     return results;
 }
 
-/*
- * Loop through the transition table beginning from i, trying to take
- * epsilon and flag diacritic transitions as long as possible.
- *
- * This function doesn't set trap_transition and found_transition
- * unlike find_transitions, because it should never be the case
- * that we end up here without going through the index table and
- * would still like to consider default transitions. That can only
- * happen when there are only epsilon transitions, in which case
- * there obviously aren't default transitions.
- */
-
 void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
                      SymbolNumber * output_symbol,
                      SymbolNumber * original_output_tape,
@@ -296,12 +302,12 @@ void Transducer::try_epsilon_indices(SymbolNumber * input_symbol,
 //    std::cerr << "try_epsilon_indices, index " << i << std::endl;
     if (tables->get_index_input(i) == 0)
     {
+    found_transition = true;
     try_epsilon_transitions(input_symbol,
                 output_symbol,
                 original_output_tape,
                 tables->get_index_target(i) - 
                 TRANSITION_TARGET_TABLE_START);
-    found_transition = true;
     }
 }
 
@@ -311,7 +317,7 @@ void Transducer::find_transitions(SymbolNumber input,
                   SymbolNumber * original_output_tape,
                   TransitionTableIndex i)
 {
-    bool trap_transition = false;
+
     while (tables->get_transition_input(i) != NO_SYMBOL_NUMBER)
     {
     if (tables->get_transition_input(i) == input)
@@ -330,16 +336,13 @@ void Transducer::find_transitions(SymbolNumber input,
              original_output_tape,
              tables->get_transition_target(i));
         current_weight -= tables->get_weight(i);
-        trap_transition = true;
     }
     else
     {
-        found_transition = trap_transition;
         return;
     }
     ++i;
     }
-    found_transition = trap_transition;
 }
 
 void Transducer::find_index(SymbolNumber input,
@@ -350,13 +353,13 @@ void Transducer::find_index(SymbolNumber input,
 {
     if (tables->get_index_input(i+input) == input)
     {
+    found_transition = true;
     find_transitions(input,
              input_symbol,
              output_symbol,
              original_output_tape,
              tables->get_index_target(i+input) - 
              TRANSITION_TARGET_TABLE_START);
-    found_transition = true;
     }
 }
 
@@ -372,13 +375,10 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
     {
     i -= TRANSITION_TARGET_TABLE_START;
 
-    found_transition = false;
-
     try_epsilon_transitions(input_symbol,
                 output_symbol,
                 original_output_tape,
                 i+1);
-    
     
     // input-string ended.
     if (*input_symbol == NO_SYMBOL_NUMBER)
@@ -401,10 +401,6 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
              output_symbol,
              original_output_tape,
              i+1);
-    if (alphabet->get_default_symbol() != NO_SYMBOL_NUMBER && !found_transition) {
-        find_transitions(alphabet->get_default_symbol(),
-                         input_symbol, output_symbol, original_output_tape, i+1);
-    }
     }
     else
     {
@@ -413,7 +409,6 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
                 output_symbol,
                 original_output_tape,
                 i+1);
-      
       
     if (*input_symbol == NO_SYMBOL_NUMBER)
     { // input-string ended.
@@ -655,24 +650,19 @@ TransitionTableIndexSet Transducer::get_transitions_from_state(
 	    if (!get_index(state_index+1).matches(0)) {
 		continue;
 	    }
-            while(true) {
-                // First skip any epsilons
-                if(get_transition(transition_i).matches(0)) {
+	    while(true) {
+		// First skip any epsilons
+		if(get_transition(transition_i).matches(0)) {
 		    ++transition_i;
 		    continue;
-                // Add relevant flags
 		} else if (get_transition(transition_i).matches(symbol)) {
 		    transitions.insert(transition_i);
 		    ++transition_i;
 		    continue;
-                // In case of irrelevant flags, keep looking
-                // otherwise, were beyond the flag area so break
-		} else if (!alphabet->is_flag_diacritic(
-                               get_transition(transition_i).
-                               get_input_symbol())) {
-                    break;
-                }
-            }
+		} else {
+		    break;
+		}
+	    }
 	} else { // not a flag
 	    const TransitionIndex& test_transition_index =
 		get_index(state_index+1+symbol);
