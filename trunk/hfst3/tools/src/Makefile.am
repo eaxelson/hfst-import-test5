@@ -107,6 +107,12 @@ endif
 if WANT_OPTIMIZED_LOOKUP
 MAYBE_OPTIMIZED_LOOKUP=hfst-optimized-lookup$(EXEEXT)
 endif
+if WANT_PMATCH
+MAYBE_PMATCH=hfst-pmatch$(EXEEXT)
+endif
+if WANT_PMATCH2FST
+MAYBE_PMATCH2FST=hfst-pmatch2fst$(EXEEXT)
+endif
 if WANT_PREPROCESS_FOR_OPTIMIZED_LOOKUP
 MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP=hfst-preprocess-for-optimized-lookup-format$(EXEEXT)
 endif
@@ -118,9 +124,6 @@ MAYBE_PUSH_WEIGHTS=hfst-push-weights$(EXEEXT)
 endif
 if WANT_REGEXP2FST
 MAYBE_REGEXP2FST=hfst-regexp2fst$(EXEEXT)
-endif
-if WANT_PMATCH2FST
-MAYBE_PMATCH2FST=hfst-pmatch2fst$(EXEEXT)
 endif
 if WANT_REMOVE_EPSILONS
 MAYBE_REMOVE_EPSILONS=hfst-remove-epsilons$(EXEEXT)
@@ -177,7 +180,7 @@ noinst_HEADERS= \
 	inc/getopt-cases-unary.h  inc/globals-binary.h      \
 	inc/globals-common.h      inc/globals-unary.h \
 	HfstStrings2FstTokenizer.h HfstLookupFlagDiacritics.h \
-	hfst-tool-metadata.h hfst-optimized-lookup.h
+	hfst-tool-metadata.h hfst-optimized-lookup.h hfst-pmatch.h
 # parsers/XreCompiler.h parsers/xre_utils.h
 
 # sort alphabetically
@@ -196,10 +199,10 @@ bin_PROGRAMS= \
 			 $(MAYBE_FST2TXT) $(MAYBE_GREP) $(MAYBE_HEAD)               \
 			 $(MAYBE_INVERT)                                            \
 			 $(MAYBE_LOOKUP) $(MAYBE_MINIMIZE) $(MAYBE_NAME)            \
-			 $(MAYBE_OPTIMIZED_LOOKUP)                                  \
+			 $(MAYBE_OPTIMIZED_LOOKUP) $(MAYBE_PMATCH)                  \
+			 $(MAYBE_PMATCH2FST)                                        \
 			 $(MAYBE_PROJECT) $(MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP)  \
 			 $(MAYBE_PUSH_WEIGHTS) $(MAYBE_REGEXP2FST)                  \
-			 $(MAYBE_PMATCH2FST)					    \
 			 $(MAYBE_REMOVE_EPSILONS) $(MAYBE_REPEAT) $(MAYBE_REVERSE)  \
 			 $(MAYBE_REWEIGHT) $(MAYBE_SHUFFLE)                         \
 			 $(MAYBE_SPLIT) $(MAYBE_STRINGS2FST) $(MAYBE_STRIP_HEADER)  \
@@ -253,8 +256,9 @@ HfstStrings2FstTokenizer.cc
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_name_SOURCES=hfst-name.cc $(HFST_COMMON_SRC)
 hfst_optimized_lookup_SOURCES=hfst-optimized-lookup.cc
-hfst_preprocess_for_optimized_lookup_format_SOURCES=hfst-preprocess-for-optimized-lookup-format.cc\
-													 $(HFST_COMMON_SRC)
+hfst_pmatch_SOURCES=hfst-pmatch.cc $(HFST_COMMON_SRC)
+hfst_preprocess_for_optimized_lookup_format_SOURCES=hfst-preprocess-for-optimized-lookup-format.cc \
+	$(HFST_COMMON_SRC)
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
 hfst_push_weights_SOURCES=hfst-push-weights.cc $(HFST_COMMON_SRC)
 hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc $(HFST_COMMON_SRC)

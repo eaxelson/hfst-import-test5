@@ -43,7 +43,7 @@ using std::pair;
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
-#include "parsers/XreCompiler.h"
+#include "parsers/PmatchCompiler.h"
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 #include "hfst-tool-metadata.h"
@@ -54,7 +54,7 @@ using std::pair;
 using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
 using hfst::HfstTransducer;
-using hfst::xre::XreCompiler;
+using hfst::pmatch::PmatchCompiler;
 
 static char *epsilonname=NULL;
 static bool disjunct_expressions=false;
@@ -181,6 +181,17 @@ parse_options(int argc, char** argv)
     return EXIT_CONTINUE;
 }
 
+bool is_comment(char * line)
+{
+    do {
+        if (*line == '!') {
+            return true;
+        }
+        ++line;
+    } while ((*line == ' ' || *line == '\t') && *line != '0');
+    return false;
+}
+
 int
 process_stream(HfstOutputStream& outstream)
 {
@@ -188,8 +199,9 @@ process_stream(HfstOutputStream& outstream)
   char* line = 0;
   size_t len = 0;
   unsigned int line_count = 0;
-  XreCompiler comp(output_format);
+  PmatchCompiler comp(output_format);
   HfstTransducer disjunction(output_format);
+  std::map<std::string, HfstTransducer *> named_transducers;
   //outstream.open();
   int delim = '\n';
   if (line_separated)
@@ -203,12 +215,15 @@ process_stream(HfstOutputStream& outstream)
   char* first_line = 0;
   while (hfst_getdelim(&line, &len, delim, inputfile) != -1)
     {
+        line_count++;
       if (first_line == 0)
         {
           first_line = strdup(line);
         }
+      if (is_comment(line)) {
+          continue;
+      }
       transducer_n++;
-      line_count++;
       HfstTransducer* compiled;
       verbose_printf("Compiling expression %u\n", line_count);
       compiled = comp.compile(line);
@@ -228,9 +243,24 @@ process_stream(HfstOutputStream& outstream)
             {
 //              hfst_set_formula(*compiled, line, "X");
             }
-          outstream << *compiled;
+          if (compiled->get_name() != "") {
+              named_transducers[compiled->get_name()] = compiled;
+          } else {
+              delete compiled;
+          }
         }
-      delete compiled;
+    }
+
+  // When done compiling everything, look for TOP and output it first
+        if (named_transducers.count("TOP") == 1) {
+          outstream << (*named_transducers["TOP"]).convert(hfst::HFST_OL_TYPE);
+          delete named_transducers["TOP"];
+          named_transducers.erase("TOP");
+      }
+        for (std::map<std::string, HfstTransducer *>::iterator it = named_transducers.begin();
+           it != named_transducers.end(); ++it) {
+          outstream << (*(it->second)).convert(hfst::HFST_OL_TYPE);
+          delete it->second;
     }
   if (disjunct_expressions)
     {
@@ -251,12 +281,12 @@ process_stream(HfstOutputStream& outstream)
   return EXIT_SUCCESS;
 }
 
-extern int xredebug;
+extern int pmatchdebug;
 
 int main( int argc, char **argv ) 
 {
 
-//	xredebug = 1;
+//	pmatchdebug = 1;
 
   hfst_set_program_name(argv[0], "0.1", "Pmatch2Fst");
   int retval = parse_options(argc, argv);
@@ -273,8 +303,8 @@ int main( int argc, char **argv )
                  inputfilename, outfilename);
   // here starts the buffer handling part
   HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, output_format) :
-        new HfstOutputStream(output_format);
+      new HfstOutputStream(outfilename, hfst::HFST_OL_TYPE) :
+      new HfstOutputStream(hfst::HFST_OL_TYPE);
   process_stream(*outstream);
   free(inputfilename);
   free(outfilename);
