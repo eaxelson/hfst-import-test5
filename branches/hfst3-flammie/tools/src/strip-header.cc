@@ -26,35 +26,28 @@
 #include <getopt.h>
 
 #include "conventions/commandline.h"
-#include "conventions/options.h"
-
-#include "conventions/globals-common.h"
-#include "conventions/globals-unary.h"
 
 void
 print_usage()
-{
+  {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
         "Remove any HFST3 headers\n"
         "\n", program_name);
 
     print_common_program_options();
-    print_common_unary_program_options();
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions();
+    print_common_parameter_instructions();
     fprintf(message_out, "\n");
     print_report_bugs();
-    fprintf(message_out, "\n");
     print_more_info();
-}
+  }
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    // use of this function requires options are settable on global scope
+  {
     while (true)
-    {
+      {
         static const struct option long_options[] =
         {
         HFST_GETOPT_COMMON_LONG,
@@ -70,78 +63,33 @@ parse_options(int argc, char** argv)
         {
             break;
         }
-
-
-        switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-unary.h"
-#include "conventions/getopt-cases-error.h"
-        }
-    }
-    
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-unary.h"
-    return EXIT_CONTINUE;
-}
-
-int
-process_stream(FILE* f_in, FILE* f_out)
-{
-  const char* header = "HFST3";
-  int header_loc = 0; // how much of the header has been found
-  while(true)
-  {
-    int c = getc(f_in);
-    if(c == EOF)
-      return EXIT_SUCCESS;
-    verbose_printf("Stripping...\n");
-    if(c == header[header_loc])
-    {
-      if(header_loc == 5) // we've found the whole header (incl. null terminator)
-      {
-        // eat text until the next null terminator
-        do
-        {
-          c = getc(f_in);
-        } while (c != '\0' && c != EOF);
-        header_loc = 0;
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
+        else
+          {
+            parse_getopt_error_value(c);
+          }
       }
-      else
-        header_loc++; // look for the next character now
-    }
-    else
-    {
-      if(header_loc > 0)
-      { // flush the characters that could have been header but turned out not to be
-        for(int i=0; i<header_loc; i++)
-          putc(header[i], f_out);
-        header_loc = 0;
-        
-        ungetc(c, f_in); // the character we just grabbed could be the start of the header, so put it back
-      }
-      else
-        putc(c, f_out);
-    }
   }
-  return EXIT_SUCCESS;
-}
+
+void
+strip_headers()
+  {
+    hfst_error(EXIT_FAILURE, 0, "This was not right");
+  }
 
 int main(int argc, char* argv[])
-{
-  hfst_set_program_name(argv[0], "0.1", "HfstStripHeader");
-  int retval = parse_options(argc, argv);
-  if (retval != EXIT_CONTINUE)
   {
-    return retval;
+    hfst_init_commandline(argv[0], "0.1", "HfstStripHeader",
+                          AUTOM_IN_AUTOM_OUT, READ_ONE);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    strip_headers();
+    hfst_uninit_commandline();
+    return EXIT_SUCCESS;
   }
-  verbose_printf("Reading from %s, writing to %s\n", 
-    inputfilename, outfilename);
-  
-  retval = process_stream(inputfile, outfile);
-    
-  free(inputfilename);
-  free(outfilename);
-  return retval;
-}
 

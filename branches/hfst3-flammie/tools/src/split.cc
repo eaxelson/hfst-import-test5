@@ -33,10 +33,6 @@
 #include <hfst.hpp>
 
 #include "conventions/commandline.h"
-#include "conventions/options.h"
-
-#include "conventions/globals-common.h"
-#include "conventions/globals-unary.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
@@ -44,12 +40,12 @@ using hfst::HfstOutputStream;
 
 
 // add tools-specific variables here
-char *prefix;
-char *extension;
+char *prefix = 0;
+char *extension = 0;
 
 void
 print_usage()
-{
+  {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
            "Extract transducers from archive with systematic file names\n"
@@ -62,6 +58,7 @@ print_usage()
             "  -e, --extension=EXT   Use the extension EXT in "
             "naming output files\n");
     fprintf(message_out, "\n");
+    print_common_parameter_instructions();
     fprintf(message_out, 
         "If INFILE is omitted or -, stdin is used.\n"
             "If PRE is omitted, no prefix is used.\n"
@@ -74,20 +71,15 @@ print_usage()
         "and \"rule2.tr\" (equivalent to transducer_b). \n");
     fprintf(message_out, "\n");
     print_report_bugs();
-    fprintf(message_out, "\n");
     print_more_info();
-}
+  }
 
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
-    // use of this function requires options are settable on global scope
-    extension = hfst_strdup(".hfst");
-    prefix = hfst_strdup("");
+  {
     while (true)
-    {
+      {
         static const struct option long_options[] =
         {
           HFST_GETOPT_COMMON_LONG,
@@ -102,47 +94,50 @@ parse_options(int argc, char** argv)
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "i:p:e:",
                              long_options, &option_index);
         if (-1 == c)
-        {
+          {
             break;
-        }
-
+          }
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-        case 'i':
-          inputfilename = hfst_strdup(optarg);
-          inputfile = hfst_fopen(inputfilename, "r");
-          if (inputfile == stdin) 
-            {
-              free(inputfilename);
-              inputfilename = hfst_strdup("<stdin>");
-            }
-          break;
-        case 'p':
-          free(prefix);
-          prefix = hfst_strdup(optarg);
-          break;
-        case 'e':
-          free(extension);
-          extension = hfst_strdup(optarg);
-          break;
-#include "conventions/getopt-cases-error.h"
-        }
-    }
+          {
+          case 'p':
+            prefix = hfst_strdup(optarg);
+            break;
+          case 'e':
+            free(extension);
+            extension = hfst_strdup(optarg);
+            break;
+          default:
+            parse_getopt_error_value(c);
+            break;
+          }
+      }
+  }
 
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-unary.h"
-    return EXIT_CONTINUE;
-}
+void
+check_options(int, char**)
+  {
+    if (NULL == extension)
+      {
+        hfst_warning("Extension not set, defaulting to .hfst");
+        extension = hfst_strdup(".hfst");
+      }
+    if (NULL == prefix)
+      {
+        hfst_verbose("Prefix not set, leaving empty");
+        prefix = hfst_strdup("");
+      }
+  }
 
-int
-process_stream(HfstInputStream& instream)
-{
-  //instream.open();
-    
+void
+make_splits()
+  {
     size_t transducer_n=0;
-    while(instream.is_good())
-    {
+    while (instream->is_good())
+      {
         transducer_n++;
         outfilename = static_cast<char*>(hfst_malloc(sizeof(char) *
                              strlen(prefix) + strlen(extension) +
@@ -151,52 +146,25 @@ process_stream(HfstInputStream& instream)
                               extension);
         verbose_printf("Writing %zu of %s to %s...\n", transducer_n,
                        inputfilename, outfilename); 
-        HfstOutputStream* outstream = new HfstOutputStream(outfilename,
-                                                           instream.get_type());
-        //outstream->open();
-        HfstTransducer trans(instream);
+        outstream = new HfstOutputStream(outfilename,
+                                         instream->get_type());
+        HfstTransducer trans(*instream);
         *outstream << trans;
-        outstream->close();
-        delete outstream;
         free(outfilename);
-    }
-    instream.close();
-    return EXIT_SUCCESS;
-}
+     }
+  }
 
 
 int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstSplit");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (inputfile != stdin)
-    {
-        fclose(inputfile);
-    }
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    verbose_printf("Reading from %s, writing to %s...%s\n", 
-        inputfilename, prefix, extension);
-    // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
-    try {
-      instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
-    } catch(const HfstException e)  {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
-        return EXIT_FAILURE;
-    }
-    
-    retval = process_stream(*instream);
-    delete instream;
-    free(inputfilename);
-    return retval;
+    hfst_init_commandline(argv[0], "0.1", "HfstSplit",
+                          AUTOM_IN_FILE_OUT, READ_ONE);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    check_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    make_splits();
+    hfst_uninit_commandline();
+    return EXIT_SUCCESS;
 }
 

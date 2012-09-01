@@ -54,22 +54,17 @@ static bool invert=false;
 
 void
 print_usage()
-{
+  {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1 [INFILE2]]\n"
              "Compose a lexicon with one or more rule transducers.\n"
         "\n", program_name );
         print_common_program_options();
-        print_common_binary_program_options();
-        print_common_binary_program_parameter_instructions();
        fprintf(message_out, "Composition options:\n"
-               "  -I, --invert                 Compose the intersection of"
-               " the\n"
-               "                               rules with the lexicon instead\n"
-               "                               of composing the lexicon with\n"
-               "                               the intersection of the rules.\n"
+               "  -I, --invert   Invert composition order\n"
            );
         fprintf(message_out, "\n");
+        print_common_parameter_instructions();
         fprintf(message_out,
             "\n"
             "Examples:\n"
@@ -78,14 +73,12 @@ print_usage()
             "\n",
             program_name );
         print_report_bugs();
-        fprintf(message_out, "\n");
         print_more_info();
-}
+  }
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
+  {
     // use of this function requires options are settable on global scope
     while (true)
     {
@@ -104,21 +97,20 @@ parse_options(int argc, char** argv)
         {
             break;
         }
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-binary.h"
-        case 'I':
-          invert = true;
-          break;
-#include "conventions/getopt-cases-error.h"
-        }
-    }
-
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-binary.h"
-    return EXIT_CONTINUE;
-}
+          {
+          case 'I':
+            invert = true;
+            break;
+          default:
+            parse_getopt_error_value(c);
+          }
+      }
+  }
 
 using hfst::implementations::HfstBasicTransducer;
 using hfst::implementations::HfstState;
@@ -215,67 +207,64 @@ std::string check_multi_char_symbols
   return "";
 }
 
-int
-compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
-                HfstOutputStream& outstream)
-{
-    if (firststream.get_type() != secondstream.get_type())
+void
+make_composections()
+  {
+    if (firststream->get_type() != secondstream->get_type())
       {
         hfst_warning( "Transducer type mismatch in %1$s and %2$s "
                   "(types %3$s and %4$s);\n"
                   "using type %3$s as output",
                   firstfilename, secondfilename,
-                  hfst_strformat(firststream.get_type()),
-                  hfst_strformat(secondstream.get_type()));
+                  hfst_strformat(firststream->get_type()),
+                  hfst_strformat(secondstream->get_type()));
       }
 
     verbose_printf("Reading lexicon...");
-    HfstTransducer lexicon(firststream);
-    char* lexiconname = hfst_get_name(lexicon, firstfilename);
+    HfstTransducer lexicon(*firststream);
+    const char* lexiconname = hfst_get_name(lexicon, firstfilename);
     verbose_printf(" %s read\n", lexiconname);
     HfstTransducerVector rules;
     size_t transducer_n = 1;
-    while (secondstream.is_good()) {
-      HfstTransducer rule(secondstream);
-      const char* rulename = rule.get_name().c_str();
-      if (strlen(rulename) > 0)
-        {
-          verbose_printf("Reading and minimizing rule %s...\n",
-                         rulename);
-        }
-      else
-        {
-          verbose_printf("Reading and minimizing rule %zu...\n",
-                         transducer_n);
-        }
-      rule.minimize();
-      rules.push_back(rule);      
-    }
- 
+    while (secondstream->is_good()) 
+      {
+        HfstTransducer rule(*secondstream);
+        const char* rulename = rule.get_name().c_str();
+        if (strlen(rulename) > 0)
+          {
+            verbose_printf("Reading and minimizing rule %s...\n",
+                           rulename);
+          }
+        else
+          {
+            verbose_printf("Reading and minimizing rule %zu...\n",
+                           transducer_n);
+          }
+        rule.minimize();
+        rules.push_back(rule);      
+      } 
     verbose_printf("Computing intersecting composition...\n");
-
     if (rules.size() > 0)
       {
-    std::string symbol;
-    if ((symbol = check_all_symbols(lexicon,rules[0])) != "")
-      {
-        hfst_warning( 
-            "\nFound output symbol \"%1s\" in transducer in\n"
-            "file %2$s which will be filtered out because they are\n"
-            "not found on the output tapes of transducers in file\n"
-            "%3$s.",
-            symbol.c_str(), firstfilename, secondfilename);
+        std::string symbol;
+        if ((symbol = check_all_symbols(lexicon,rules[0])) != "")
+          {
+            hfst_warning( 
+                "\nFound output symbol \"%1s\" in transducer in\n"
+                "file %2$s which will be filtered out because they are\n"
+                "not found on the output tapes of transducers in file\n"
+                "%3$s.",
+                symbol.c_str(), firstfilename, secondfilename);
+          }
+          else if ((symbol = check_multi_char_symbols(lexicon,rules[0])) != "")
+          { 
+            hfst_warning( 
+                "\nFound output multi-char symbol \"%1s\" in \n"
+                "transducer in file %2$s which are not found on the\n"
+                "output tape of transducers in file %3$s.",
+                symbol.c_str(), firstfilename, secondfilename);
+          }
       }
-      else if ((symbol = check_multi_char_symbols(lexicon,rules[0])) != "")
-      { 
-        hfst_warning( 
-            "\nFound output multi-char symbol \"%1s\" in \n"
-            "transducer in file %2$s which are not found on the\n"
-            "output tape of transducers in file %3$s.",
-            symbol.c_str(), firstfilename, secondfilename);
-      }
-      }
-    
     lexicon.compose_intersect(rules, invert);
     char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
                                              (strlen(lexiconname) +
@@ -288,71 +277,20 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         lexicon.set_name(composed_name);
       }
     hfst_set_formula(lexicon, lexicon, " ∘ ⋂R");
-
     verbose_printf("Storing result in %s...\n", outfilename);
-    outstream << lexicon;
+    *outstream << lexicon;
+  }
 
-    firststream.close();
-    secondstream.close();
-    outstream.close();
+
+int main( int argc, char **argv) {
+    hfst_init_commandline(argv[0], "0.1", "HfstComposeIntersect",
+                          AUTOM_IN_AUTOM_OUT, READ_TWO);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    make_composections();
+    hfst_uninit_commandline();
     return EXIT_SUCCESS;
-}
-
-
-int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstComposeIntersect");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (firstfile != stdin)
-    {
-        fclose(firstfile);
-    }
-    if (secondfile != stdin)
-    {
-        fclose(secondfile);
-    }
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    verbose_printf("Reading from %s and %s, writing to %s\n", 
-        firstfilename, secondfilename, outfilename);
-    // here starts the buffer handling part
-    HfstInputStream* firststream = NULL;
-    HfstInputStream* secondstream = NULL;
-    try {
-        firststream = (firstfile != stdin) ?
-            new HfstInputStream(firstfilename) : new HfstInputStream();
-    } catch(const HfstException e)   {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              firstfilename);
-    }
-    try {
-        secondstream = (secondfile != stdin) ?
-            new HfstInputStream(secondfilename) : new HfstInputStream();
-    } catch(const HfstException e)   {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              secondfilename);
-    }
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, firststream->get_type()) :
-        new HfstOutputStream(firststream->get_type());
-
-    retval = compose_streams(*firststream, *secondstream, *outstream);
-    delete firststream;
-    delete secondstream;
-    delete outstream;
-    if (profile_file != 0)
-      {
-        hfst_print_profile_line();
-      }
-    free(firstfilename);
-    free(secondfilename);
-    free(outfilename);
-    return retval;
-}
+  }
 

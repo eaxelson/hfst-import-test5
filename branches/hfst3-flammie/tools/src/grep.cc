@@ -33,6 +33,7 @@ using std::vector;
 using std::pair;
 using std::map;
 
+#include <errno.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -57,10 +58,6 @@ using hfst::xre::XreCompiler;
 using hfst::is_epsilon;
 
 // add tools-specific variables here
-char** infilenames = 0;
-FILE** infiles = 0;
-unsigned int infile_n = 0;
-char* inputfilename = 0;
 unsigned long linen = 0;
 char* regexp = 0;
 FILE* expfile = 0;
@@ -94,11 +91,9 @@ unsigned long matches = 0;
 HfstTransducer* matcher = 0;
 HfstTransducer* optimised_matcher = 0;
 
-hfst::ImplementationType format = hfst::UNSPECIFIED_TYPE;
-
 void
 print_usage()
-{
+  {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     // Usage line
     fprintf(message_out, "Usage: %s [OPTIONS...] PATTERN [FILE...]\n"
@@ -192,18 +187,15 @@ print_usage()
             "\n");
 
 
-    // parameter details
     fprintf(message_out, "\n");
-    // bug report address
     print_report_bugs();
-    // external docs
     print_more_info();
 }
 
 
-int
+void
 parse_options(int argc, char** argv)
-{
+  {
     // use of this function requires options are settable on global scope
     static const short LABEL_OPT = 21;
     static const short BINARYFILES_OPT = 22;
@@ -213,7 +205,7 @@ parse_options(int argc, char** argv)
     static const short EXCLUDEFROM_OPT = 26;
     static const short COLOR_OPT = 27;
     static const short INVERT_OPT = 28;
-    static const short LINEBUFFER_OPT =29;
+    static const short LINEBUFFER_OPT = 29;
     while (true)
     {
         static const struct option long_options[] =
@@ -271,128 +263,138 @@ parse_options(int argc, char** argv)
                              "EFGPXe:f:IwxzqmbnOad:D:rLlcZA:B:C:uU9:",
                              long_options, &option_index);
         if (-1 == c)
-        {
+          {
             break;
-        }
-
+          }
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-        case '9':
-          format = hfst_parse_format_name(optarg);
-          break;
-        case 'E':
-          hfst_error(EXIT_FAILURE, 0, "POSIX ERE syntax not yet "
-                     "supported");
-          dialect_posix_ere = true;
-          break;
-        case 'F':
-          dialect_fixed_strings = true;
-          break;
-        case 'G':
-          hfst_error(EXIT_FAILURE, 0, "POSIX BRE syntax not yet supported");
-          dialect_posix_bre = true;
-          break;
-        case 'P':
-          hfst_error(EXIT_FAILURE, 0, "Perl syntax not yet supported");
-          dialect_perl = true;
-          break;
-        case 'X':
-          dialect_xerox = true;
-          break;
-        case 'e':
-          regexp = hfst_strdup(optarg);
-          break;
-        case 'f':
-          expfile = hfst_fopen(optarg, "r");
-          break;
-        case 'I':
-          hfst_error(EXIT_FAILURE, 0, "Ignore case not supported");
-          break;
-        case 'w':
-          match_word = true;
-          break;
-        case 'x':
-          match_full_line = true;
-          break;
-        case 'z':
-          linesep = 0;
-          break;
-        case INVERT_OPT:
-          invert_matches = true;
-          break;
-        case 'm':
-          max_count = hfst_strtoul(optarg, 10);
-          count_matches = true;
-          break;
-        case 'b':
-          print_offset = true;
-          break;
-        case 'n':
-          print_linenumbers = true;
-          break;
-        case LINEBUFFER_OPT:
-          flush_newlines = true;
-          break;
-        case 'H':
-          print_filenames = true;
-          break;
-        case 'O':
-          print_only_matches = true;
-          break;
-        case BINARYFILES_OPT:
-          hfst_error(EXIT_FAILURE, 0, "No binary handling implemented");
-          break;
-        case 'a':
-          hfst_warning( "All files are always handled as text");
-          break;
-        case 'D':
-          hfst_error(EXIT_FAILURE, 0, "No directory handling implemented");
-          break;
-        case 'r':
-          hfst_error(EXIT_FAILURE, 0, "No directory handling implemented");
-          break;
-        case INCLUDE_OPT:
-        case EXCLUDE_OPT:
-        case INCLUDEFROM_OPT:
-        case EXCLUDEFROM_OPT:
-          hfst_error(EXIT_FAILURE, 0, "No directory/globbing implemented");
-          break;
-        case 'L':
-          print_only_unmatching_filenames = true;
-          break;
-        case 'l':
-          print_only_matching_filenames = true;
-          break;
-        case 'c':
-          count_matches = true;
-          print_only_count = true;
-          break;
-        case 'Z':
-          print_filename_null = true;
-          break;
-        case 'A':
-          before_context = hfst_strtoul(optarg, 10);
-          break;
-        case 'B':
-          after_context = hfst_strtoul(optarg, 10);
-          break;
-        case 'C':
-          before_context = hfst_strtoul(optarg, 10);
-          after_context = hfst_strtoul(optarg, 10);
-          break;
-        case COLOR_OPT:
-          color_matches = true;
-          break;
-        case 'u':
-        case 'U':
-          hfst_error(EXIT_FAILURE, 0, "MSDOS binary format not supported; use "
-                "fromdos or dos2unix");
-          break;
+          {
+          case '9':
+            format = hfst_parse_format_name(optarg);
+            break;
+          case 'E':
+            hfst_error(EXIT_FAILURE, 0, "POSIX ERE syntax not yet "
+                       "supported");
+            dialect_posix_ere = true;
+            break;
+          case 'F':
+            dialect_fixed_strings = true;
+            break;
+          case 'G':
+            hfst_error(EXIT_FAILURE, 0, "POSIX BRE syntax not yet supported");
+            dialect_posix_bre = true;
+            break;
+          case 'P':
+            hfst_error(EXIT_FAILURE, 0, "Perl syntax not yet supported");
+            dialect_perl = true;
+            break;
+          case 'X':
+            dialect_xerox = true;
+            break;
+          case 'e':
+            regexp = hfst_strdup(optarg);
+            break;
+          case 'f':
+            expfile = hfst_fopen(optarg, "r");
+            break;
+          case 'I':
+            hfst_error(EXIT_FAILURE, 0, "Ignore case not supported");
+            break;
+          case 'w':
+            match_word = true;
+            break;
+          case 'x':
+            match_full_line = true;
+            break;
+          case 'z':
+            linesep = 0;
+            break;
+          case INVERT_OPT:
+            invert_matches = true;
+            break;
+          case 'm':
+            max_count = hfst_strtoul(optarg, 10);
+            count_matches = true;
+            break;
+          case 'b':
+            print_offset = true;
+            break;
+          case 'n':
+            print_linenumbers = true;
+            break;
+          case LINEBUFFER_OPT:
+            flush_newlines = true;
+            break;
+          case 'H':
+            print_filenames = true;
+            break;
+          case 'O':
+            print_only_matches = true;
+            break;
+          case BINARYFILES_OPT:
+            hfst_error(EXIT_FAILURE, 0, "No binary handling implemented");
+            break;
+          case 'a':
+            hfst_warning( "All files are always handled as text");
+            break;
+          case 'D':
+            hfst_error(EXIT_FAILURE, 0, "No directory handling implemented");
+            break;
+          case 'r':
+            hfst_error(EXIT_FAILURE, 0, "No directory handling implemented");
+            break;
+          case INCLUDE_OPT:
+          case EXCLUDE_OPT:
+          case INCLUDEFROM_OPT:
+          case EXCLUDEFROM_OPT:
+            hfst_error(EXIT_FAILURE, 0, "No directory/globbing implemented");
+            break;
+          case 'L':
+            print_only_unmatching_filenames = true;
+            break;
+          case 'l':
+            print_only_matching_filenames = true;
+            break;
+          case 'c':
+            count_matches = true;
+            print_only_count = true;
+            break;
+          case 'Z':
+            print_filename_null = true;
+            break;
+          case 'A':
+            before_context = hfst_strtoul(optarg, 10);
+            break;
+          case 'B':
+            after_context = hfst_strtoul(optarg, 10);
+            break;
+          case 'C':
+            before_context = hfst_strtoul(optarg, 10);
+            after_context = hfst_strtoul(optarg, 10);
+            break;
+          case COLOR_OPT:
+            color_matches = true;
+            break;
+          case 'u':
+          case 'U':
+            hfst_error(EXIT_FAILURE, 0, "MSDOS binary format not supported; use "
+                  "fromdos or dos2unix");
+            break;
+  
+          default:
+            parse_getopt_error_value(c);
+            break;
+          }
+      }
+#include "conventions/check-params-common.h"
+}
 
-#include "conventions/getopt-cases-error.h"
-        }
-    }
+void
+check_options(int argc, char** argv)
+  {
     if (!dialect_fixed_strings && !dialect_xerox && !dialect_posix_bre &&
         !dialect_posix_ere && !dialect_perl)
       {
@@ -409,7 +411,7 @@ parse_options(int argc, char** argv)
           {
             print_usage();
             print_short_help();
-            return EXIT_FAILURE;
+            exit(EXIT_FAILURE);
           }
         else 
           {
@@ -417,28 +419,7 @@ parse_options(int argc, char** argv)
             optind++;
           }
       }
-    if ((argc - optind) == 0)
-      {
-        infilenames = static_cast<char**>(malloc(sizeof(char*) * 1));
-        infiles = static_cast<FILE**>(malloc(sizeof(FILE*) * 1));
-        infile_n = 1;
-        infilenames[0] = strdup("<stdin>");
-        infiles[0] = stdin;
-      }
-    else
-      {
-        infilenames = static_cast<char**>(malloc(sizeof(char*) * (argc - optind)));
-        infiles = static_cast<FILE**>(malloc(sizeof(FILE*) * (argc - optind)));
-        infile_n = (argc - optind);
-        for (int i = 0; i < (argc - optind); i++)
-          {
-            infilenames[i] = strdup(argv[optind+i]);
-            infiles[i] = hfst_fopen(infilenames[i], "r");
-          }
-      }
-#include "conventions/check-params-common.h"
-    return EXIT_CONTINUE;
-}
+  }
 
 vector<string>*
 string_to_utf8(char* p)
@@ -482,7 +463,6 @@ string_to_utf8(char* p)
 int
 read_matcher(HfstInputStream& instream)
 {
-    
     size_t transducer_n=0;
     matcher = new HfstTransducer(instream.get_type());
     while (instream.is_good())
@@ -614,7 +594,12 @@ print_match_line(const HfstOneLevelPath& path)
       if (print_filename_null)
         {
           uint8_t zero = 0;
-          fwrite(&zero, 1, 1, outfile);
+          errno = 0;
+          if (fwrite(&zero, 1, 1, outfile) != 1)
+            {
+              hfst_error(EXIT_FAILURE, errno, 
+                         "Unable to write 0 after filename");
+            }
         }
       else
         {
@@ -774,28 +759,26 @@ optimise_matcher()
     optimised_matcher = new HfstTransducer(*matcher, hfst::HFST_OL_TYPE);
   }
 
-int main( int argc, char **argv ) {
-    hfst_setlocale();
-    hfst_set_program_name(argv[0], "0.1", "HfstGrep");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    verbose_printf("Writing to %s\n", outfilename);
+int main(int argc, char **argv) 
+  {
+    hfst_init_commandline(argv[0], "0.1", "HfstGrep",
+                          FILE_IN_FILE_OUT, READ_MANY);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    check_options(argc, argv);
+    parse_options_getenv();
     read_matcher(regexp);
     extend_matcher_with_options();
 #if HFST_OPTIMISED_LOOKUP_CAN_IDENTITY_SYMBOL
     optimise_matcher();
 #endif
-    for (unsigned int i = 0; i < infile_n; i++)
+    for (unsigned int i = 0; i < inputs_named; i++)
       {
-        inputfilename = infilenames[i];
+        inputfilename = inputfilenames[i];
         linen = 0;
-        match_lines(infiles[i], infilenames[i]);
+        match_lines(inputfiles[i], inputfilenames[i]);
       }
-
-    free(outfilename);
-    return retval;
+    hfst_uninit_commandline();
+    return EXIT_SUCCESS;
 }
 

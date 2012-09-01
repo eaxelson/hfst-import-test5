@@ -33,15 +33,10 @@
 #include <math.h>
 
 #include <hfst.hpp>
+#include <HfstSymbolDefs.h>
 
 #include "conventions/commandline.h"
-#include "conventions/options.h"
-
-#include "conventions/globals-common.h"
-#include "conventions/globals-unary.h"
-
 #include "utils/HfstStrings2FstTokenizer.h"
-#include "HfstSymbolDefs.h"
 
 static char*  pair_test_file_name;
 static FILE*  pair_test_file;
@@ -74,67 +69,25 @@ print_usage()
     print_common_program_options();
     fprintf(message_out, 
         "Input/Output options:\n"
-        "  -i, --input=INFILE     Read input rule file from INFILE\n"
-        "  -o, --output=OUTFILE   Write test output to OUTFILE\n"
-    "  -N  --negative-test    Test fails if any of the pair strings is\n"
-    "                         accepted.\n");
-
-    fprintf(message_out, "Pair test options:\n"
-            "  -I, --input-strings=SFILE        Read pair test strings from\n"
-        "                                   SFILE\n");
+        "  -N  --negative-test         Test fails if any of the pair strings "
+        "is accepted.\n"
+        "  -I, --input-strings=SFILE   Read pair test strings from "
+        "SFILE\n");
     fprintf(message_out, "\n");
+    print_common_parameter_instructions();
     fprintf(message_out,
-        "If SFILE is missing, the test pair strings are read from STDIN.\n"
-        "If OUTFILE is missing, test output is written to STDOUT.\n");
-    fprintf(message_out, "\n");
-    fprintf(message_out,
-        "The rule file is tested using correspondences given as\n"
-        "pair strings, e.g. \"e a r l y:i e r\". Every pair string is\n"
-        "tested using every rule and the program prints information\n"
-        "about correspondences that are incorrectly allowed or\n"
-        "disallowed.\n");
-    fprintf(message_out, "\n");
-    fprintf(message_out,
-        "The test pair string files contain one pair string/line. Lines\n"
-        "where the first non-white-space character is \"!\" are\n"
-        "considered comment lines and skipped.\n");
-    fprintf(message_out, "\n");
-    fprintf(message_out,
-        "There are two test modes positive and negative. In positive\n"
-        "mode, all of the pair strings should be allowed and in negative\n"
-        "mode they should be disallowed.\n"
-        );
-    fprintf(message_out, "\n");
-    fprintf(message_out,
-       "Ordinarily, positive test mode is in use. Option -N switches to\n" 
-        "negative test mode. The exit code for a successful test is 0. \n"
-        "The exit code is 1 otherwise. A successful test will print\n"
-        "\"Test passed\". A failing test prints \"Test failed\" and\n"
-        "information about pair strings that are handled incorrectly.\n");
-    fprintf(message_out, "\n");
-    fprintf(message_out,
-        "In positive test mode (i.e. without option -N), if a pair\n"
-        "string is not accepted, the names of the rules that reject\n"
-        "it are printed as well as the positions in the string where the\n"
-        "rules run out of possible transitions. In negative mode, only\n"
-        "the strings that are allowed are printed.\n");
-    fprintf(message_out, "\n");
-    fprintf(message_out,
-        "In silent mode (-s), the program won't print anything. Only the\n"
-        "exit code tells whether the test was successful or not.\n");
+        "If SFILE is missing, the test pair strings are read from STDIN.\n");
     fprintf(message_out, "\n");
     print_report_bugs();
-    fprintf(message_out, "\n");
     print_more_info();
-}
+  }
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
+  {
     // use of this function requires options are settable on global scope
     while (true)
-    {
+      {
         static const struct option long_options[] =
         {
         HFST_GETOPT_COMMON_LONG,
@@ -150,42 +103,44 @@ parse_options(int argc, char** argv)
                              HFST_GETOPT_UNARY_SHORT "I:N",
                              long_options, &option_index);
         if (-1 == c)
-        {
+          {
             break;
-        }
-
+          }
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-unary.h"
-          // add tool-specific cases here
-        case 'I':
+          {
+          case 'I':
             pair_test_file_name = hfst_strdup(optarg);
             pair_test_file = hfst_fopen(pair_test_file_name, "r");
             pair_test_given = true;
             break;
-        case 'N':
-        positive_test = false;
-        break;
-#include "conventions/getopt-cases-error.h"
-        }
-    }
+          case 'N':
+            positive_test = false;
+            break;
+          default:
+            parse_getopt_error_value(c);
+            break;
+          }
+      }
+  }
 
+void
+check_options(int, char**)
+  {
     if (!pair_test_given)
       {
         pair_test_file = stdin;
         pair_test_file_name = strdup("<stdin>");
       }
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-unary.h"
-
-    if (inputfilename == std::string("<stdin>"))
+    if (inputfile == stdin)
       { 
         hfst_error(EXIT_FAILURE, 0, 
           "The rule transducer file needs to be given using option -i");
       }
-    return EXIT_CONTINUE;
-}
+  }
 
 HfstState get_target(const std::string &isymbol,
              const std::string &osymbol,
@@ -417,15 +372,15 @@ void get_symbols(HfstBasicTransducer &t,SymbolSet &known_symbols)
     }
 }
 
-int
-process_stream(HfstInputStream& inputstream, FILE*)
-{
+void
+make_pairs()
+  {
     BasicTransducerVector grammar;
     StringVector rule_names;
 
     // Read transducers in rule file.
     size_t transducer_n=0;
-    while (inputstream.is_good())
+    while (instream->is_good())
       {
         transducer_n++;
         if (transducer_n==1)
@@ -437,34 +392,30 @@ process_stream(HfstInputStream& inputstream, FILE*)
             verbose_printf("Reading %s...%zu\n", inputfilename,
                            transducer_n); 
           }
-        HfstTransducer trans(inputstream);
-    rule_transducer_type = trans.get_type();
+        HfstTransducer trans(*instream);
+        rule_transducer_type = trans.get_type();
         grammar.push_back(trans);
-    rule_names.push_back(demangle(trans.get_name()));
+        rule_names.push_back(demangle(trans.get_name()));
       }
-
-    inputstream.close();
 
     SymbolSet known_symbols;
     if (not grammar.empty())
       {
-    verbose_printf("Defining known symbols.\n");
-    get_symbols(grammar[0],known_symbols);
-    for (SymbolSet::const_iterator it = known_symbols.begin();
-         it != known_symbols.end();
-         ++it)
-      { verbose_printf("Symbol %s\n",it->c_str()); }
-      }
-
+        verbose_printf("Defining known symbols.\n");
+        get_symbols(grammar[0],known_symbols);
+        for (SymbolSet::const_iterator it = known_symbols.begin();
+             it != known_symbols.end();
+             ++it)
+          {
+            verbose_printf("Symbol %s\n",it->c_str()); }
+          }
     char* line = 0;
     size_t llen = 0;
-
     // Define tokenizer with no multi character symbols and an
     // empty epsilon representation.
     StringVector empty_v;
     HfstStrings2FstTokenizer input_tokenizer
       (empty_v, std::string("0"));
-
     int exit_code = 0;
     while (hfst_getline(&line, &llen, pair_test_file) != -1)
       {
@@ -489,17 +440,14 @@ process_stream(HfstInputStream& inputstream, FILE*)
       {
         StringPairVector tokenized_pair_string =
           input_tokenizer.tokenize_pair_string(line,true);
-        
         tokenized_pair_string.insert
           (tokenized_pair_string.begin(),
            StringPair("@#@",hfst::internal_epsilon));
         tokenized_pair_string.insert
           (tokenized_pair_string.end(),
            StringPair("@#@",hfst::internal_epsilon));
-
         test(tokenized_pair_string,line,grammar,rule_names,
            positive_test,outfile,known_symbols);
-        
       }
     catch (const UnescapedColsFound &e)
       {
@@ -508,65 +456,27 @@ process_stream(HfstInputStream& inputstream, FILE*)
           "you want to input pairs where either symbol is epsilon, "
           "use 0 e.g. \"m a s s 0:e s\".\n",
           line);
-        
       }
 
-    
     if (exit_code == 0)
       { exit_code = new_exit_code; }
 
       } // while lines in input
     free(line);	
 
-    return exit_code;
+    exit(exit_code);
 }
 
 int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.6", "HfstPairTest");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (inputfile != stdin)
-    {
-        fclose(inputfile);
-    }
-    verbose_printf("Reading from %s, writing to %s\n", 
-        inputfilename, outfilename);
-
-    // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
-    try 
-      {
-        instream = (inputfile != stdin) ?
-          new HfstInputStream(inputfilename) :
-          new HfstInputStream();
-      } 
-    catch(const HfstException e)
-      {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
-        return EXIT_FAILURE;
-      }
-    int exit_code = process_stream(*instream, outfile);
-
-    if (not silent)
-      {
-    if (exit_code == 0)
-      { fprintf(outfile,"Test passed.\n"); }
-    else
-      { fprintf(outfile,"Test failed.\n"); }
-      }
-
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    free(inputfilename);
-    free(outfilename);
-
-    return exit_code;
+    hfst_init_commandline(argv[0], "0.6", "HfstPairTest",
+                          AUTOM_IN_FILE_OUT, READ_ONE);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    check_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    make_pairs();
+    hfst_uninit_commandline();
+    return EXIT_SUCCESS;
 }
 

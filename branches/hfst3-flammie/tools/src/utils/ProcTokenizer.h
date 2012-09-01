@@ -15,7 +15,10 @@
 
 #include "utils/ProcTypes.h"
 #include "utils/buffer.h"
-
+namespace hfst
+  {
+    namespace proc
+      {
 /**
  * The recognized types of tokens.
  *
@@ -229,4 +232,5 @@ class TokenIOStream
   static std::string read_utf8_char(std::istream& is);
 };
 
+}} // namespaced
 #endif

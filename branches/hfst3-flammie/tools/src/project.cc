@@ -33,11 +33,6 @@
 #include <hfst.hpp>
 
 #include "conventions/commandline.h"
-#include "conventions/options.h"
-#include "conventions/metadata.h"
-
-#include "conventions/globals-common.h"
-#include "conventions/globals-unary.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
@@ -49,7 +44,7 @@ bool project_input = false;
 
 void
 print_usage()
-{
+  {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     // Usage line
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
@@ -57,24 +52,21 @@ print_usage()
         "\n", program_name);
 
     print_common_program_options();
-    print_common_unary_program_options();
     fprintf(message_out, "Projection options:\n"
             "  -p, --project=LEVEL   project extracting tape LEVEL\n");
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions();
+    print_common_parameter_instructions();
     fprintf(message_out, "LEVEL must be one of upper, input, first, analysis "
             "or lower, output, second, generation\n");
     fprintf(message_out, "\n");
     print_report_bugs();
-    fprintf(message_out, "\n");
     print_more_info();
-}
+  }
 
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
+  {
     // use of this function requires options are settable on global scope
     while (true)
     {
@@ -95,57 +87,52 @@ parse_options(int argc, char** argv)
         {
             break;
         }
-
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-unary.h"
-        case 'p':
+          {
+          case 'p':
             if ( (strncasecmp(optarg, "upper", 1) == 0) ||
                  (strncasecmp(optarg, "input", 1) == 0) ||
                  (strncasecmp(optarg, "first", 1) == 0) ||
                  (strncasecmp(optarg, "analysis", 1) == 0) )
-            {
+              {
                 project_input = true;
-            }
+              }
             else if ( (strncasecmp(optarg, "lower", 1) == 0) ||
                       (strncasecmp(optarg, "output", 1) == 0) ||
                       (strncasecmp(optarg, "second", 1) == 0) ||
                       (strncasecmp(optarg, "generation", 1) == 0) )
-            {
+              {
                 project_input = false;
-            }
+              }
             else
-            {
+              {
                 hfst_error(EXIT_FAILURE, 0,
                       "unknown project direction %s\n"
                       "should be one of upper, input, analysis, first, "
                       "lower, output, second or generation\n",
                       optarg);
-                return EXIT_FAILURE;
-            }
+              }
             break;
-#include "conventions/getopt-cases-error.h"
-        }
-    }
+          default:
+            parse_getopt_error_value(c);
+            break;
+          }
+      }
+  }
 
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-unary.h"
-    return EXIT_CONTINUE;
-}
-
-int
-process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
-{
-  //instream.open();
-  //outstream.open();
-    
+void
+make_projections()
+  {
     size_t transducer_n=0;
-    while(instream.is_good())
+    while (instream->is_good())
     {
         transducer_n++;
-        HfstTransducer trans(instream);
-        char* inputname = hfst_get_name(trans, inputfilename);
+        HfstTransducer trans(*instream);
+        const char* inputname = hfst_get_name(trans, inputfilename);
         if (transducer_n==1)
         {
           if (project_input)
@@ -170,7 +157,6 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                              transducer_n);
             }
         }
-        
         if (project_input)
           {
             trans.input_project();
@@ -183,51 +169,21 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
             hfst_set_name(trans, trans, "project-2nd");
             hfst_set_formula(trans, trans, "²");
           }
-        outstream << trans;
-    }
-    instream.close();
-    outstream.close();
-    return EXIT_SUCCESS;
-}
+        *outstream << trans;
+      }
+  }
+
 
 
 int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstProject");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (inputfile != stdin)
-    {
-        fclose(inputfile);
-    }
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    verbose_printf("Reading from %s, writing to %s\n", 
-        inputfilename, outfilename);
-    // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
-    try {
-      instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
-    } catch(const HfstException e)  {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
-        return EXIT_FAILURE;
-    }
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, instream->get_type()) :
-        new HfstOutputStream(instream->get_type());
-    
-    retval = process_stream(*instream, *outstream);
-    delete instream;
-    delete outstream;
-    free(inputfilename);
-    free(outfilename);
-    return retval;
-}
+    hfst_init_commandline(argv[0], "0.1", "HfstProject",
+                          AUTOM_IN_AUTOM_OUT, READ_ONE);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    make_projections();
+    hfst_uninit_commandline();
+    return EXIT_SUCCESS;
+  }
 

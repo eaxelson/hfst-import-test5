@@ -40,11 +40,6 @@ using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 
 #include "conventions/commandline.h"
-#include "conventions/options.h"
-#include "conventions/metadata.h"
-
-#include "conventions/globals-common.h"
-#include "conventions/globals-unary.h"
 
 static char* only_from_label = 0;
 static char* only_to_label = 0;
@@ -65,14 +60,13 @@ static fsa_level_t level = FSA_LEVEL_FIRST;
 
 void
 print_usage()
-{
+  {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
            "Extend transducer arcs for equivalence classes\n"
         "\n", program_name);
 
     print_common_program_options();
-    print_common_unary_program_options();
     fprintf(message_out, "Eqv. class extension options:\n"
             "  -f, --from=ISYM     convert single symbol ISYM to allow OSYM\n"
             "  -t, --to=OSYM       convert to OSYM\n"
@@ -83,7 +77,7 @@ print_usage()
             "  -l, --level=LEVEL   perform extensions on LEVEL of fsa\n"
            );
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions();
+    print_common_parameter_instructions();
     fprintf(message_out, "Either ACXFILE, TSVFILE or both ISYM and OSYM "
             "must be specified.\n"
             "LEVEL should be either {upper, first, 1, input, surface}, "
@@ -95,23 +89,18 @@ print_usage()
            "equivalences\n"
            "\n", program_name);
     print_report_bugs();
-    fprintf(message_out, "\n");
     print_more_info();
+  }
 
-}
-
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
-    // use of this function requires options are settable on global scope
+  {
     while (true)
     {
         static const struct option long_options[] =
         {
         HFST_GETOPT_COMMON_LONG,
         HFST_GETOPT_UNARY_LONG,
-          // add tool-specific options here
             {"from",  required_argument, 0, 'f'},
             {"to",    required_argument, 0, 't'},
             {"acx",   required_argument, 0, 'a'},
@@ -120,7 +109,6 @@ parse_options(int argc, char** argv)
             {0,0,0,0}
         };
         int option_index = 0;
-        // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT "f:t:a:T:l:",
                              long_options, &option_index);
@@ -128,11 +116,12 @@ parse_options(int argc, char** argv)
         {
             break;
         }
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
         {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-unary.h"
-          // add tool-specific cases here
             case 'f':
               only_from_label = hfst_strdup(optarg);
               break;
@@ -166,17 +155,24 @@ parse_options(int argc, char** argv)
                 }
               else 
                 {
-                  hfst_error(EXIT_FAILURE, 0, "The option for level parameter must"
+                  hfst_error(EXIT_FAILURE, 0, 
+                             "The option for level parameter must"
                         " be one of:\n"
-                        "upper, first, input, second, lower, output, both, "
+                        "upper, first, input; second, lower, output; both, "
                         "1 or 2.");
                 }
               break;
-#include "conventions/getopt-cases-error.h"
+            default:
+              parse_getopt_error_value(c);
+              break;
         }
     }
-    // handling erroneous input combinations:
-    // one of(-f & -t), -a, -T
+}
+
+static
+void
+check_options(int, char**)
+  {
     if ((only_from_label != 0) || (only_to_label != 0))
       {
         if ((tsv_file_name != 0) || (acx_file_name != 0))
@@ -199,13 +195,11 @@ parse_options(int argc, char** argv)
     {
         hfst_error(EXIT_FAILURE, 0,
               "Must give extension specification file with either -a or -t.");
-        return EXIT_FAILURE;
     }
     else if ((tsv_file_name != 0) && (acx_file_name != 0))
     {
         hfst_error(EXIT_FAILURE, 0,
               "Only one of parameters -a, -t, must be used.");
-        return EXIT_FAILURE;
     }
     else if (tsv_file_name != 0)
       {
@@ -219,11 +213,7 @@ parse_options(int argc, char** argv)
       {
         hfst_error(EXIT_FAILURE, 0, "Logic error again!");
       }
-
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-unary.h"
-    return EXIT_CONTINUE;
-}
+  }
 
 static
 void
@@ -235,30 +225,19 @@ add_extension(HfstTransducer* t, const char* from, const char* to)
   }
 
 static
-int
-process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
+void
+make_expansions()
   {
     size_t transducer_n = 0;
-    while (instream.is_good())
+    while (instream->is_good())
       {
         transducer_n++;
-        HfstTransducer trans(instream);
+        HfstTransducer trans(*instream);
         HfstTransducer* extensions = new HfstTransducer(hfst::internal_identity,
                                   hfst::internal_identity, trans.get_type());
-        char* inputname = strdup(trans.get_name().c_str());
-        if (strlen(inputname) <= 0)
-          {
-            inputname = strdup(inputfilename);
-          }
-        if (transducer_n == 1)
-          {
-            verbose_printf("performing extensions to %s...\n", inputname);
-          }
-        else
-          {
-            verbose_printf("performing extensions to %s... %zu\n", inputname,
-                           transducer_n);
-          }
+        const char* inputname = hfst_get_name(trans, inputfilename);
+        hfst_begin_processing(inputname, transducer_n, 
+                              "Extending");
         if (only_from_label != 0)
           {
             verbose_printf("using single commandline extension %s with %s\n",
@@ -423,53 +402,23 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
             trans = trans.compose(*extensions);
             break;
           }
-        outstream << trans;
+        *outstream << trans;
         delete extensions;
       } // for each automaton
-    return EXIT_SUCCESS;
   }
 
 
 int main( int argc, char **argv ) 
   {
-    hfst_set_program_name(argv[0], "0.1", "HfstExpandEquivalences");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (inputfile != stdin)
-    {
-        fclose(inputfile);
-    }
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    verbose_printf("Reading from %s, writing to %s\n", 
-        inputfilename, outfilename);
-
-    // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
-//    try {
-      instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
-  //  } catch(const HfstException e)  {
-    //        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-      //    inputfilename);
-        //    return EXIT_FAILURE;
-    //}
-    HfstOutputStream* outstream = (outfile != stdout) ?
-            new HfstOutputStream(outfilename, instream->get_type()) :
-            new HfstOutputStream(instream->get_type());
-    process_stream(*instream, *outstream);
-    if (profile_file != 0)
-      {
-        hfst_print_profile_line();
-      }
-    free(inputfilename);
-    free(outfilename);  
+    hfst_init_commandline(argv[0], "0.1", "HfstExpandEquivalences",
+                          AUTOM_IN_AUTOM_OUT, READ_ONE);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    check_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    make_expansions();
+    hfst_uninit_commandline();
     return EXIT_SUCCESS;
 }
 

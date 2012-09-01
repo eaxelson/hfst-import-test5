@@ -39,10 +39,6 @@ using std::map;
 #include <hfst.hpp>
 
 #include "conventions/commandline.h"
-#include "conventions/options.h"
-
-#include "conventions/globals-common.h"
-#include "conventions/globals-unary.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
@@ -62,26 +58,24 @@ enum fst_text_format {
     PROLOG_TEXT, // prolog format
 };
 
-static fst_text_format format=ATT_TEXT;
+static fst_text_format text_format=ATT_TEXT;
 
 
 
 void
 print_usage()
-{
+  {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-        "Print transducer in AT&T tabular format\n"
+        "Print transducer in text format\n"
         "\n", program_name);
 
     print_common_program_options();
-    print_common_unary_program_options();
     fprintf(message_out, "Text format options:\n"
         "  -w, --print-weights          If weights are printed in all cases\n"
         "  -D, --do-not-print-weights   If weights are not printed in any "
         "case\n"
-        "  -f, --format=TFMT            Print output in TFMT format "
-        "[default=att]\n");
+        "  -F, --text-format=TFMT       Print output in TFMT format\n");
     fprintf(message_out, "\n");
     fprintf(message_out,
           "If OUTFILE or INFILE is missing or -, "
@@ -89,21 +83,19 @@ print_usage()
           "Unless explicitly requested with option -w or -D, "
       "weights are printed\n" 
           "if and only if the transducer is in weighted format.\n"
-          "TFMT is one of {att, dot, pckimmo}\n"
+          "TFMT is one of {att, dot, pckimmo}; if omitted, default is att.\n"
     );
     fprintf(message_out, "\n");
     print_report_bugs();
-    fprintf(message_out, "\n");
     print_more_info();
 }
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
+  {
     // use of this function requires options are settable on global scope
     while (true)
-    {
+      {
         static const struct option long_options[] =
         {
         HFST_GETOPT_COMMON_LONG,
@@ -112,64 +104,62 @@ parse_options(int argc, char** argv)
             {"print-weights",        no_argument,       0, 'w'},
             {"do-not-print-weights", no_argument,       0, 'D'},
             {"use-numbers",          no_argument,       0, 'n'},
-            {"format",               required_argument, 0, 'f'},
+            {"text-format",          required_argument, 0, 'F'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "wDnf:",
+                             HFST_GETOPT_UNARY_SHORT "wDnF:",
                              long_options, &option_index);
         if (-1 == c)
-        {
+          {
             break;
-        }
-
+          }
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-unary.h"
-          // add tool-specific cases here
-        case 'w':
+          {
+          case 'w':
             print_weights = true;
             break;
-    case 'D':
-        do_not_print_weights = true;
-        break;
-    case 'n':
-        use_numbers = true;
-        break;
-    case 'f':
-        if ((strcmp(optarg, "att") == 0) || (strcmp(optarg, "AT&T") == 0) ||
-            (strcmp(optarg, "openfst") == 0) || 
-            (strcmp(optarg, "OpenFst") == 0))
-          {
-            format = ATT_TEXT;
+          case 'D':
+            do_not_print_weights = true;
+           break;
+          case 'n':
+            use_numbers = true;
+            break;
+          case 'F':
+            if ((strcmp(optarg, "att") == 0) || (strcmp(optarg, "AT&T") == 0) ||
+                (strcmp(optarg, "openfst") == 0) || 
+                (strcmp(optarg, "OpenFst") == 0))
+              {
+                text_format = ATT_TEXT;
+              }
+            else if ((strcmp(optarg, "dot") == 0) || 
+                (strcmp(optarg, "graphviz") == 0) || 
+                (strcmp(optarg, "GraphViz") == 0))
+              {
+                text_format = DOT_TEXT;
+              }
+            else if (strcmp(optarg, "pckimmo") == 0)
+              {
+                text_format = PCKIMMO_TEXT;
+              }
+            else
+              {
+                hfst_error(EXIT_FAILURE, 0, "Cannot parse %s as text format; "
+                           "Use one of att, pckimmo, dot", optarg);
+              }
+            break;
+          default:
+            parse_getopt_error_value(c);
+            break;
           }
-        else if ((strcmp(optarg, "dot") == 0) || 
-            (strcmp(optarg, "graphviz") == 0) || 
-            (strcmp(optarg, "GraphViz") == 0))
-          {
-            format = DOT_TEXT;
-          }
-        else if (strcmp(optarg, "pckimmo") == 0)
-          {
-            format = PCKIMMO_TEXT;
-          }
-        else
-          {
-            hfst_error(EXIT_FAILURE, 0, "Cannot parse %s as text format; Use one of "
-                  "att, pckimmo, dot", optarg);
-          }
-        break;
-#include "conventions/getopt-cases-error.h"
-        }
-    }
-
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-unary.h"
-    return EXIT_CONTINUE;
-}
+      }
+  }
 
 static
 void
@@ -490,34 +480,21 @@ print_pckimmo(FILE* out, HfstTransducer& t)
       } // for each state
   }
 
-int
-process_stream(HfstInputStream& instream, FILE* outf)
-{
-  //instream.open();
+void
+print_automata()
+  {
     size_t transducer_n = 0;
-    while(instream.is_good())
+    while(instream->is_good())
     {
         transducer_n++;
-        HfstTransducer t(instream);
-        char* inputname = strdup(t.get_name().c_str());
-        if (strlen(inputname) <= 0)
+        HfstTransducer t(*instream);
+        const char* inputname = hfst_get_name(t, inputfilename);
+        hfst_begin_processing(inputname, transducer_n, "Converting to text");
+
+        if (transducer_n > 1)
           {
-            inputname = strdup(inputfilename);
+            fprintf(outfile, "-- \n");
           }
-        if (transducer_n == 1)
-        {
-          verbose_printf("Converting %s...\n", inputname); 
-        }
-        else
-        { 
-          verbose_printf("Converting %s...%zu\n", inputname,
-                         transducer_n); 
-        }
-
-
-        if(transducer_n > 1)
-            fprintf(outf, "--\n");
-
         bool printw; // whether weights are printed
         hfst::ImplementationType type = t.get_type();
         if (print_weights)
@@ -530,69 +507,36 @@ process_stream(HfstInputStream& instream, FILE* outf)
           printw = true;
         else  // this should not happen
           printw = true;
-    switch (format)
-      {
-      case ATT_TEXT:
-        if (use_numbers)
-          t.write_in_att_format_number(outf,printw);
-        else
-          t.write_in_att_format(outf,printw);
-        break;
-      case DOT_TEXT:
-        print_dot(outf, t);
-        break;
-      case PCKIMMO_TEXT:
-        print_pckimmo(outf, t);
-        break;
-      default:
-        hfst_error(EXIT_FAILURE, 0, "Unknown print format");
-      }    
-    }
-    instream.close();
-    if (outf != stdout)
-      {
-        fclose(outf);
+        switch (text_format)
+          {
+          case ATT_TEXT:
+            if (use_numbers)
+              t.write_in_att_format_number(outfile, printw);
+            else
+              t.write_in_att_format(outfile, printw);
+            break;
+          case DOT_TEXT:
+            print_dot(outfile, t);
+            break;
+          case PCKIMMO_TEXT:
+            print_pckimmo(outfile, t);
+            break;
+          default:
+            hfst_error(EXIT_FAILURE, 0, "Unknown print format");
+          }
       }
-    return EXIT_SUCCESS;
-}
+  }
 
 
 int main( int argc, char **argv ) 
-{
-    hfst_set_program_name(argv[0], "0.3", "HfstFst2Txt");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (inputfile != stdin)
-    {
-        fclose(inputfile);
-    }
-    
-    verbose_printf("Reading from %s, writing to %s\n", 
-        inputfilename, outfilename);
-    // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
-    try {
-      instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
-    } catch(const HfstException e)  {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
-        return EXIT_FAILURE;
-    }
-    
-    retval = process_stream(*instream, outfile);
-    if (profile_file != 0)
-      {
-        hfst_print_profile_line();
-      }
-
-    delete instream;
-    free(inputfilename);
-    free(outfilename);
-    return retval;
-}
+  {
+    hfst_init_commandline(argv[0], "0.3", "HfstFst2Txt",
+                          AUTOM_IN_FILE_OUT, READ_ONE);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    print_automata();
+    return EXIT_SUCCESS;
+  }
 

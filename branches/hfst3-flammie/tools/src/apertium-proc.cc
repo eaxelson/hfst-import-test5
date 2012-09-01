@@ -17,6 +17,8 @@
 #  include <config.h>
 #endif
 
+#undef HAVE_SFST
+
 #include <getopt.h>
 #include <fstream>
 #include <cstdlib>

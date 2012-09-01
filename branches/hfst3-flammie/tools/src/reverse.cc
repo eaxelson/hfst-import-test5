@@ -33,11 +33,6 @@
 #include <hfst.hpp>
 
 #include "conventions/commandline.h"
-#include "conventions/options.h"
-#include "conventions/metadata.h"
-
-#include "conventions/globals-common.h"
-#include "conventions/globals-unary.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
@@ -48,30 +43,26 @@ using hfst::HfstOutputStream;
 
 void
 print_usage()
-{
+  {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
            "Reverse a transducer\n"
         "\n", program_name);
-
     print_common_program_options();
-    print_common_unary_program_options();
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions();
+    print_common_parameter_instructions();
     fprintf(message_out, "\n");
     print_report_bugs();
-    fprintf(message_out, "\n");
     print_more_info();
-}
+  }
 
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
+  {
     // use of this function requires options are settable on global scope
     while (true)
-    {
+      {
         static const struct option long_options[] =
         {
           HFST_GETOPT_COMMON_LONG,
@@ -88,89 +79,44 @@ parse_options(int argc, char** argv)
         {
             break;
         }
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
+        else
+          {
+            parse_getopt_error_value(c);
+          }
+      }
+  }
 
-        switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-unary.h"
-#include "conventions/getopt-cases-error.h"
-        }
-    }
-
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-unary.h"
-    return EXIT_CONTINUE;
-}
-
-int
-process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
-{
-  //instream.open();
-  //outstream.open();
-    
+void
+make_reversions()
+  {
     size_t transducer_n=0;
-    while(instream.is_good())
+    while (instream->is_good())
     {
         transducer_n++;
-        HfstTransducer trans(instream);
-        char* inputname = hfst_get_name(trans, inputfilename);
-        if (transducer_n==1)
-        {
-          verbose_printf("Reversing %s...\n", inputname); 
-        }
-        else
-        {
-          verbose_printf("Reversing %s...%zu\n", inputname, transducer_n); 
-        }
-        
+        HfstTransducer trans(*instream);
+        const char* inputname = hfst_get_name(trans, inputfilename);
+        hfst_begin_processing(inputname, transducer_n, "Reversing");
         trans.reverse();
         hfst_set_name(trans, trans, "reverse");
         hfst_set_formula(trans, trans, "⇆");
-        outstream << trans;
+        *outstream << trans;
     }
-    instream.close();
-    outstream.close();
+  }
+
+
+int main(int argc, char **argv) {
+    hfst_init_commandline(argv[0], "0.1", "HfstReverse",
+                          AUTOM_IN_AUTOM_OUT, READ_ONE);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    make_reversions();
+    hfst_uninit_commandline();
     return EXIT_SUCCESS;
-}
-
-
-int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstReverse");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (inputfile != stdin)
-    {
-        fclose(inputfile);
-    }
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    verbose_printf("Reading from %s, writing to %s\n", 
-        inputfilename, outfilename);
-    // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
-    try {
-      instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
-    } catch(const HfstException e)  {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
-        return EXIT_FAILURE;
-    }
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, instream->get_type()) :
-        new HfstOutputStream(instream->get_type());
-    
-    retval = process_stream(*instream, *outstream);
-    delete instream;
-    delete outstream;
-    free(inputfilename);
-    free(outfilename);
-    return retval;
-}
+  }
 

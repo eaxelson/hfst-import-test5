@@ -1,28 +1,28 @@
 #!/bin/sh
 if [ -x ../src/hfst-compare ] ; then
     # well, not all permutations, but reasonable
-    if ../src/hfst-compare -1 cat.hfst -2 dog.hfst  ; then
+    if ../src/hfst-compare -q -1 cat.hfst -2 dog.hfst  ; then
        exit 1
     fi
-    if ../src/hfst-compare -1 cat.hfst dog.hfst  ; then
+    if ../src/hfst-compare -q -1 cat.hfst dog.hfst  ; then
        exit 1
     fi
-    if ../src/hfst-compare -2 dog.hfst cat.hfst  ; then
+    if ../src/hfst-compare -q -2 dog.hfst cat.hfst  ; then
        exit 1
     fi
-    if ../src/hfst-compare dog.hfst -1 cat.hfst  ; then
+    if ../src/hfst-compare -q dog.hfst -1 cat.hfst  ; then
        exit 1
     fi
-    if ../src/hfst-compare cat.hfst -2 dog.hfst  ; then
+    if ../src/hfst-compare -q cat.hfst -2 dog.hfst  ; then
        exit 1
     fi
-    if ../src/hfst-compare cat.hfst < dog.hfst  ; then
+    if ../src/hfst-compare -q cat.hfst < dog.hfst  ; then
         exit 1
     fi
-    if ../src/hfst-compare -1 cat.hfst < dog.hfst  ; then
+    if ../src/hfst-compare -q -1 cat.hfst < dog.hfst  ; then
         exit 1
     fi
-    if ../src/hfst-compare -2 dog.hfst < cat.hfst  ; then
+    if ../src/hfst-compare -q -2 dog.hfst < cat.hfst  ; then
         exit 1
     fi
 fi
@@ -50,7 +50,7 @@ for f in ../src/hfst-{conjunct,disjunct,compose,subtract,compose,compose-interse
         $f -2 dog.hfst -o test_named2stdin1namedout.hfst < cat.hfst  || exit 1
         for g in test_*.hfst ; do
             for h in test_*.hfst ; do
-                if ! ../src/hfst-compare $g $h  ; then
+                if ! ../src/hfst-compare -q $g $h  ; then
                     echo "$f builds $g and $h differently from same sources"
                     exit 1
                 fi
@@ -68,7 +68,7 @@ for f in ../src/hfst-{determinize,invert,minimize,remove-epsilons,reverse} ; do
         $f cat.hfst -o test_fileinnamedout.hfst || exit 1
         for g in test_*.hfst ; do
             for h in test_*.hfst ; do
-                if ! ../src/hfst-compare $g $h  ; then
+                if ! ../src/hfst-compare -q $g $h  ; then
                     echo "$f builds $g and $h differently from same sources"
                     exit 1
                 fi

@@ -33,15 +33,12 @@
 #include <math.h>
 
 #include <hfst.hpp>
+#include <HfstSymbolDefs.h>
 
 #include "conventions/commandline.h"
-#include "conventions/options.h"
-#include "utils/HfstLookupFlagDiacritics.h"
 
-#include "conventions/globals-common.h"
-#include "conventions/globals-unary.h"
+#include "utils/HfstLookupFlagDiacritics.h"
 #include "utils/HfstStrings2FstTokenizer.h"
-#include "HfstSymbolDefs.h"
 
 using hfst::internal_epsilon;
 using hfst::internal_identity;
@@ -188,7 +185,7 @@ static const char* APERTIUM_INFINITE_LOOKUPF = "/%l";
 static const char* APERTIUM_INFINITE_END_SETF = "/...$%n";
 
 // statistic counting
-static unsigned long inputs = 0;
+static unsigned long input_strings = 0;
 static unsigned long no_analyses = 0;
 static unsigned long analysed = 0;
 static unsigned long analyses = 0;
@@ -216,7 +213,7 @@ print_usage()
             "  -X, --xfst=VARIABLE              Toggle xfst VARIABLE\n"
             "  -c, --cycles=INT                 How many times to follow input epsilon cycles\n");
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions();
+    print_common_parameter_instructions();
     fprintf(message_out, 
             "OFORMAT is one of {xerox,cg,apertium}, xerox being default\n"
             "IFORMAT is one of {text,spaced,apertium}, default being text,\n"
@@ -229,6 +226,7 @@ print_usage()
 
     fprintf(message_out, 
             "Todo:\n"
+            "  Bloody rewrite all\n"
             "  For optimized lookup format, only strings that pass "
             "flag diacritic checks\n"
             "  are printed and flag diacritic symbols are not printed.\n"
@@ -240,17 +238,15 @@ print_usage()
 
     fprintf(message_out, "\n");
     print_report_bugs();
-    fprintf(message_out, "\n");
     print_more_info();
 }
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
+  {
     // use of this function requires options are settable on global scope
     while (true)
-    {
+      {
         static const struct option long_options[] =
         {
         HFST_GETOPT_COMMON_LONG,
@@ -272,43 +268,42 @@ parse_options(int argc, char** argv)
                              HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:",
                              long_options, &option_index);
         if (-1 == c)
-        {
+          {
             break;
-        }
-
+          }
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-unary.h"
-          // add tool-specific cases here
-        case 'I':
+          {
+          case 'I':
             lookup_file_name = hfst_strdup(optarg);
             lookup_file = hfst_fopen(lookup_file_name, "r");
             lookup_given = true;
             break;
-        case 'O':
+          case 'O':
             if (strcmp(optarg, "xerox") == 0)
-            {
+              {
               output_format = XEROX_OUTPUT;
-            }
+              }
             else if (strcmp(optarg, "cg") == 0)
-            {
+              {
               output_format = CG_OUTPUT;
-            }
+              }
             else if (strcmp(optarg, "apertium") == 0)
-            {
+              {
               output_format = APERTIUM_OUTPUT;
               input_format = APERTIUM_INPUT;
-            }
+              }
             else
               {
                 hfst_error(EXIT_FAILURE, 0,
                       "Unknown output format %s; valid values are: "
                       "xerox, cg, apertium\n", optarg);
-                return EXIT_FAILURE;
               }
             break;
-        case 'F':
+          case 'F':
             if (strcmp(optarg, "text") == 0)
               {
                 input_format = UTF8_TOKEN_INPUT;
@@ -326,21 +321,19 @@ parse_options(int argc, char** argv)
                 hfst_error(EXIT_FAILURE, 0,
                       "Unknown input format %s; valid values are:"
                        "utf8, spaced, apertium\n", optarg);
-                return EXIT_FAILURE;
               }
             break;
-        case 'e':
-        case 'E':
+          case 'e':
+          case 'E':
             epsilon_format = hfst_strdup(optarg);
             break;
-        case 'x':
+          case 'x':
             print_statistics = true;
             break;
-        case 'X':
+          case 'X':
             if (strcmp(optarg, "print-pairs") == 0)
               {
                 print_pairs = true;
-                /* hfst_error(EXIT_FAILURE, 0, "Unimplemented pair printing"); */
               }
             else if (strcmp(optarg, "print-space") == 0)
               {
@@ -355,23 +348,28 @@ parse_options(int argc, char** argv)
               {
                 quote_special = true;
               }
-        else if (strcmp(optarg, "obey-flags") == 0)
-          {
-        obey_flags = false;
-          }
+            else if (strcmp(optarg, "obey-flags") == 0)
+              {
+                obey_flags = false;
+              }
             else 
               {
                 hfst_error(EXIT_FAILURE, 0, "Xfst variable %s unrecognised",
                       optarg);
               }
-        case 'c':
-            infinite_cutoff = (size_t)atoi(hfst_strdup(optarg));
+          case 'c':
+            infinite_cutoff = hfst_strtoul(optarg, 10);
             break;
+          default:
+            parse_getopt_error_value(c);
+            break;
+          }
+      }
+  }
 
-#include "conventions/getopt-cases-error.h"
-        }
-    }
-
+void
+check_options(int, char**)
+  {
     switch (output_format)
       {
       case XEROX_OUTPUT:
@@ -418,21 +416,18 @@ parse_options(int argc, char** argv)
         break;
     default:
       fprintf(stderr, "Unknown output format\n");
-      return EXIT_FAILURE;
+      exit(EXIT_FAILURE);
       break;
     }
-
     if (!lookup_given)
       {
         lookup_file = stdin;
-        lookup_file_name = strdup("<stdin>");
+        lookup_file_name = hfst_strdup("<stdin>");
       }
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-unary.h"
-    return EXIT_CONTINUE;
-}
+  }
 
 
+// THIS CRAP NEEDS TO GO
 static std::string get_print_format(const std::string &s) ;
 
 // local flag handling
@@ -904,7 +899,7 @@ line_to_lookup_path(char** s, HfstStrings2FstTokenizer& tok,
     HfstOneLevelPath* rv = new HfstOneLevelPath;
     rv->first = 0;
     *outside_sigma = false;
-    inputs++;
+    input_strings++;
     switch (input_format)
       {
       case SPACE_SEPARATED_TOKEN_INPUT:
@@ -1633,8 +1628,8 @@ perform_lookups(HfstOneLevelPath& origin, std::vector<T>& cascade,
     return kvs;
 }
 
-int
-process_stream(HfstInputStream& inputstream, FILE* outstream)
+void
+make_lookups()
 {
     std::vector<HfstTransducer> cascade;
     std::vector<HfstBasicTransducer> cascade_mut;
@@ -1644,10 +1639,10 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     
     size_t transducer_n=0;
     StringVector mc_symbols;
-    while (inputstream.is_good())
+    while (instream->is_good())
     {
         transducer_n++;
-        HfstTransducer trans(inputstream);
+        HfstTransducer trans(*instream);
         if (trans.get_type() != HFST_OL_TYPE and
             trans.get_type() != HFST_OLW_TYPE) {
             only_optimized_lookup = false;
@@ -1695,14 +1690,14 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         cascade.push_back(trans);
       }
 
-    inputstream.close();
+    instream->close();
 
     // if transducer type is other than optimized_lookup,
     // convert to HfstBasicTransducer
 
     if (print_pairs && 
-        (inputstream.get_type() == HFST_OL_TYPE || 
-         inputstream.get_type() == HFST_OLW_TYPE) ) {
+        (instream->get_type() == HFST_OL_TYPE || 
+         instream->get_type() == HFST_OLW_TYPE) ) {
       hfst_error(EXIT_FAILURE, 0, "pair printing not supported on "
               "optimized lookup transducers");
     }
@@ -1784,7 +1779,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
           }
         if (not print_pairs) { 
           // printing was already done in function lookup_fd
-          print_lookups(*kvs, *kv, markup, unknown, infinite, outstream);
+          print_lookups(*kvs, *kv, markup, unknown, infinite, outfile);
         }
         delete kv;
         delete kvs;
@@ -1792,33 +1787,25 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     free(line);
     if (print_statistics)
       {
-        fprintf(outstream, "Strings\tFound\tMissing\tResults\n"
+        fprintf(outfile, "Strings\tFound\tMissing\tResults\n"
                 "%lu\t%lu\t%lu\t%lu\n", 
-                inputs, analysed, no_analyses, analyses);
-        fprintf(outstream, "Coverage\tAmbiguity\n"
+                input_strings, analysed, no_analyses, analyses);
+        fprintf(outfile, "Coverage\tAmbiguity\n"
                 "%f\t%f\n",
-                (float)analysed/(float)inputs,
-                (float)analyses/(float)inputs);
+                (float)analysed/(float)input_strings,
+                (float)analyses/(float)input_strings);
       }
-    return EXIT_SUCCESS;
 }
 
 
 int main( int argc, char **argv ) {
-    hfst_setlocale();
-    hfst_set_program_name(argv[0], "0.6", "HfstLookup");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (inputfile != stdin)
-    {
-        fclose(inputfile);
-    }
-    verbose_printf("Reading from %s, writing to %s\n", 
-        inputfilename, outfilename);
+    hfst_init_commandline(argv[0], "0.6", "HfstLookup",
+                          AUTOM_IN_FILE_OUT, READ_ONE);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    check_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
     verbose_printf("Output formats:\n"
             "  regular:`%s'`%s...'`%s',\n"
             "  unanalysed:`%s'`%s'`%s',\n"
@@ -1830,27 +1817,8 @@ int main( int argc, char **argv ) {
             unknown_begin_setf, unknown_lookupf, unknown_end_setf,
             infinite_begin_setf, infinite_lookupf, infinite_end_setf,
             epsilon_format, space_format, show_flags);
-    // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
-    try 
-      {
-        instream = (inputfile != stdin) ?
-          new HfstInputStream(inputfilename) :
-          new HfstInputStream();
-      } 
-    catch(const HfstException e)
-      {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
-        return EXIT_FAILURE;
-      }
-    process_stream(*instream, outfile);
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    free(inputfilename);
-    free(outfilename);
+    make_lookups();
+    hfst_uninit_commandline();
     return EXIT_SUCCESS;
 }
 

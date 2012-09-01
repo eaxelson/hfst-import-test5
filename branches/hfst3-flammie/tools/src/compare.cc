@@ -51,9 +51,10 @@ print_usage()
              "Compare two transducers\n"
         "\n", program_name );
         print_common_program_options();
-        print_common_binary_program_options();
         fprintf(message_out, "\n");
-        print_common_binary_program_parameter_instructions();
+        print_common_parameter_instructions();
+        fprintf(message_out, "Exit status is 0 if inputs are the same, "
+                "1 if different, 2 if trouble.\n");
         fprintf(message_out, "\n");
         fprintf(message_out,
             "\n"
@@ -65,17 +66,14 @@ print_usage()
             "\n",
                 program_name, program_name );
         print_report_bugs();
-        fprintf(message_out, "\n");
         print_more_info();
 }
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
-    // use of this function requires options are settable on global scope
+  {
     while (true)
-    {
+      {
         static const struct option long_options[] =
         {
           HFST_GETOPT_COMMON_LONG,
@@ -87,85 +85,72 @@ parse_options(int argc, char** argv)
                              HFST_GETOPT_BINARY_SHORT,
                              long_options, &option_index);
         if (-1 == c)
-        {
+          {
             break;
-        }
-        switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-binary.h"
-#include "conventions/getopt-cases-error.h"
-        }
-    }
-
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-binary.h"
-    return EXIT_CONTINUE;
-}
+          }
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
+        else 
+          {
+            parse_getopt_error_value(c);
+          }
+      }
+  }
 
 int
-compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
+make_comparisons()
 {
-  //firststream.open();
-  //secondstream.open();
-    // should be is_good? 
-    bool bothInputs = firststream.is_good() && secondstream.is_good();
+    bool bothInputs = firststream->is_good() && secondstream->is_good();
     size_t transducer_n = 0;
     size_t mismatches = 0;
     while (bothInputs) {
         transducer_n++;
-        HfstTransducer first(firststream);
-        HfstTransducer second(secondstream);
-        char* firstname = strdup(first.get_name().c_str());
-        char* secondname = strdup(second.get_name().c_str());
-        if (strlen(firstname) == 0)
-          {
-            firstname = strdup(firstfilename);
-          }
-        if (strlen(secondname) == 0)
-          {
-           secondname = strdup(secondfilename);
-          } 
-        if (transducer_n == 1)
-          {
-            verbose_printf("Comparing %s and %s...\n", firstname, 
-                           secondname);
-          }
-        else
-          {
-            verbose_printf("Comparing %s and %s... %zu\n",
-                           firstname, secondname, transducer_n);
-        }
+        HfstTransducer first(*firststream);
+        HfstTransducer second(*secondstream);
+        const char* firstname = hfst_get_name(first, firstfilename);
+        const char* secondname = hfst_get_name(second, secondfilename);
+        hfst_begin_processing(firstname, secondname, transducer_n,
+                              "Comparing");
         try
           {
             if (first.compare(second))
               {
                 if (transducer_n == 1)
                   {
-                    if (not silent)
-                      fprintf(outfile, "%s == %s\n", firstname, secondname);
+                    if (!silent)
+                      {
+                        fprintf(outfile, "%s == %s\n", firstname, secondname);
+                      }
                   }
                 else
                   {
-                    if (not silent)
-                      fprintf(outfile, "%s[%zu] == %s[%zu]\n",
-                              firstname, transducer_n,
-                              secondname, transducer_n);
+                    if (!silent)
+                      {
+                        fprintf(outfile, "%s[%zu] == %s[%zu]\n",
+                                firstname, transducer_n,
+                                secondname, transducer_n);
+                      }
                   }
               }
             else
               {
                 if (transducer_n == 1)
                   {
-                    if (not silent)
-                      fprintf(outfile, "%s != %s\n", firstname, secondname);
+                    if (!silent)
+                      {
+                        fprintf(outfile, "%s != %s\n", firstname, secondname);
+                      }
                   }
                 else
                   {
-                    if (not silent)
-                      fprintf(outfile, "%s[%zu] != %s[%zu]\n",
-                              firstname, transducer_n, 
-                              secondname, transducer_n);
+                    if (!silent)
+                      {
+                        fprintf(outfile, "%s[%zu] != %s[%zu]\n",
+                                firstname, transducer_n, 
+                                secondname, transducer_n);
+                      }
                   }
                 mismatches++;
               }
@@ -176,104 +161,66 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
             hfst_error(2, 0, "Cannot compare `%s' and `%s' [%zu]\n"
                   "the formats %s and %s are not compatible for comparison\n",
                   firstname, secondname, transducer_n,
-                  hfst_strformat(firststream.get_type()),
-                  hfst_strformat(secondstream.get_type()));
+                  hfst_strformat(firststream->get_type()),
+                  hfst_strformat(secondstream->get_type()));
           }
-
-
-        bothInputs = firststream.is_good() && secondstream.is_good();
+        bothInputs = firststream->is_good() && secondstream->is_good();
     }
-    
-    if (firststream.is_good())
+    if (firststream->is_good())
     {
-      while (firststream.is_good())
+      while (firststream->is_good())
         {
           transducer_n++;
-          HfstTransducer dummy(firststream);
-          verbose_printf("Cannot compare %s %zu to non-existent transducer",
-                         firstfilename, transducer_n);
-          if (not silent)
-            fprintf(outfile, "%s[%zu] != ?\n", firstfilename, transducer_n);
+          HfstTransducer dummy(*firststream);
+          const char* firstname = hfst_get_name(dummy, firstfilename);
+          hfst_verbose("Cannot compare %s %zu to non-existent transducer",
+                       firstname, transducer_n);
+          if (!silent)
+            {
+              fprintf(outfile, "%s[%zu] != ?\n", firstname, transducer_n);
+            }
           mismatches++;
         }
     }
-    else if (secondstream.is_good())
+    else if (secondstream->is_good())
     {
-      while (secondstream.is_good())
+      while (secondstream->is_good())
         {
           transducer_n++;
-          HfstTransducer dummy(secondstream);
+          HfstTransducer dummy(*secondstream);
+          const char* secondname = hfst_get_name(dummy, secondfilename);
           verbose_printf("Cannot compare %s %zu to non-existent transducer",
-                         secondfilename, transducer_n);
-          if (not silent)
-            fprintf(outfile, "? != %s[%zu]\n", secondfilename, transducer_n);
+                         secondname, transducer_n);
+          if (!silent)
+            {
+              fprintf(outfile, "? != %s[%zu]\n", secondname, transducer_n);
+            }
           mismatches++;
         }
     }
-    firststream.close();
-    secondstream.close();
-    fclose(outfile);
     if (mismatches == 0)
       {
-        verbose_printf("All %zu transducers matched\n", transducer_n);
+        hfst_verbose("All %zu transducers matched", transducer_n);
         return EXIT_SUCCESS;
       }
     else
       {
-        verbose_printf("%zu/%zu were not equal\n", mismatches, transducer_n);
+        hfst_verbose("%zu/%zu were not equal", mismatches, transducer_n);
         return EXIT_FAILURE;
       }
 }
 
 
-int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstCompare");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (firstfile != stdin)
-    {
-        fclose(firstfile);
-    }
-    if (secondfile != stdin)
-    {
-        fclose(secondfile);
-    }
-    verbose_printf("Reading from %s and %s, writing log to %s\n", 
-        firstfilename, secondfilename, outfilename);
-    // here starts the buffer handling part
-    HfstInputStream* firststream = NULL;
-    HfstInputStream* secondstream = NULL;
-    try {
-        firststream = (firstfile != stdin) ?
-            new HfstInputStream(firstfilename) : new HfstInputStream();
-    } //catch(const HfstException e)   {
-    catch (const HfstException e) {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              firstfilename);
-    }
-    try {
-        secondstream = (secondfile != stdin) ?
-            new HfstInputStream(secondfilename) : new HfstInputStream();
-    } //catch(const HfstException e)   {
-    catch (const HfstException e) {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              secondfilename);
-    }
-
-    retval = compare_streams(*firststream, *secondstream);
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    delete firststream;
-    delete secondstream;
-    free(firstfilename);
-    free(secondfilename);
-    free(outfilename);
-    return retval;
-}
+int main(int argc, char **argv)
+  {
+    hfst_init_commandline(argv[0], "0.1", "HfstCompare",
+                          AUTOM_IN_FILE_OUT, READ_TWO);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    int rv = make_comparisons();
+    hfst_uninit_commandline();
+    return rv;
+  }
 

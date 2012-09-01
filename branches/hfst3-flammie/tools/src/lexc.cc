@@ -39,15 +39,6 @@ using hfst::ImplementationType;
 
 
 #include "conventions/commandline.h"
-#include "conventions/options.h"
-#include "conventions/metadata.h"
-
-#include "conventions/globals-common.h"
-static char** lexcfilenames = 0;
-static FILE** lexcfiles = 0;
-static unsigned int lexccount = 0;
-static bool is_input_stdin = true;
-static ImplementationType format = hfst::UNSPECIFIED_TYPE;
 static bool start_readline = false;
 static char* tempfilename = 0;
 
@@ -55,24 +46,17 @@ int lexc_readline_loop(ImplementationType format);
 
 void
 print_usage()
-{
+  {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-    fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1...]]\n"
+    fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1...]\n"
              "Compile lexc files into transducer or imitate Xerox lexc\n"
         "\n", program_name );
         print_common_program_options();
         fprintf(message_out, "Input/Output options:\n"
-               "  -f, --format=FORMAT       compile into FORMAT transducer\n"
-               "  -o, --output=OUTFILE      write result into OUTFILE\n"
                "  -X, --xerox, --readline   imitate Xerox lexc user interface\n"
         );
         fprintf(message_out, "\n");
-        fprintf(message_out,
-                "If INFILE or OUTFILE are omitted or -, standard streams will "
-                "be used\n"
-        "The possible values for FORMAT are { sfst, openfst-tropical, "
-        "openfst-log,\n"
-       	"foma, optimized-lookup-unweighted, optimized-lookup-weighted }.\n");
+        print_common_parameter_instructions();
         fprintf(message_out,
             "\n"
             "Examples:\n"
@@ -83,22 +67,18 @@ print_usage()
             "\n",
             program_name, program_name );
         print_report_bugs();
-        fprintf(message_out, "\n");
         print_more_info();
 }
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
+  {
     // use of this function requires options are settable on global scope
     while (true)
     {
         static const struct option long_options[] =
         {
           HFST_GETOPT_COMMON_LONG,
-          {"format",   required_argument, 0, 'f'},
-          {"output",   required_argument, 0, 'o'},
           {"latin1",   optional_argument, 0, 'l'},
           {"utf8",     optional_argument, 0, 'u'},
           {"readline", no_argument,       0, 'X'},
@@ -110,58 +90,43 @@ parse_options(int argc, char** argv)
                              "f:o:l::u::X",
                              long_options, &option_index);
         if (-1 == c)
-        {
+          {
             break;
-        }
+          }
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-        case 'f':
-          format = hfst_parse_format_name(optarg);
-          break;
-        case 'l':
-          hfst_error(EXIT_FAILURE, 0, "Latin1 encoding not supported, please use "
+          {
+          case 'l':
+            hfst_error(EXIT_FAILURE, 0, 
+                       "Latin1 encoding not supported, please use "
                 "iconv, recode, uconv or similar utility to convert legacy "
                 "lexicons into Unicode UTF-8 format");
-          return EXIT_FAILURE;
-          break;
-        case 'u':
-          if (!silent)
-            {
-              hfst_warning( "UTF-8 is always the default in HFST tools");
-            }
-          break;
-        case 'X':
-          start_readline = true;
-          break;
-#include "conventions/getopt-cases-error.h"
-        }
-    }
+            break;
+          case 'u':
+            if (!silent)
+              {
+                hfst_warning( "UTF-8 is always the default in HFST tools");
+              }
+            break;
+          case 'X':
+            start_readline = true;
+            break;
+          default:
+            parse_getopt_error_value(c);
+            break;
+          }
+      }
+  }
 
-#include "conventions/check-params-common.h"
-    if (format == hfst::UNSPECIFIED_TYPE)
+void
+check_options(int argc,char** argv)
+  {
+    if (format == hfst::FOMA_TYPE)
       {
-#if HAVE_FOMA
-        if (!silent)
-          {
-            hfst_warning( "Defaulting to foma type "
-                "(since it has native lexc support);\n"
-                "Use command-line option --format to override");
-          }
-        format = hfst::FOMA_TYPE;
-#elif HAVE_OPENFST
-        if (!silent)
-          {
-            hfst_warning( "Defaulting to using OpenFst with legacy lexc "
-                "compilation scheme\n"
-                "Use command-line option --format to override");
-          }
-        format = hfst::TROPICAL_OPENFST_TYPE;
-#else
-        hfst_error(EXIT_FAILURE, 0, "Format not given and cannot deduce sensible "
-              "defaults with current setup;\n"
-              "Use command-line option --format to define format");
-#endif
+        hfst_warning("Note that compilation in other than -f foma is SLOW");
       }
     if (outfile == stdout)
       {
@@ -173,65 +138,25 @@ parse_options(int argc, char** argv)
       {
         hfst_error(EXIT_FAILURE, 0, "Trailing arguments not allowed for interactive "
               "mode");
-        return EXIT_FAILURE;
       }
-    else if (!start_readline && (argc == optind))
+    else if (!start_readline && (inputs_named == 1) && 
+             (strcmp(inputfilenames[0], "<stdin>") == 0))
       {
-#if AT_END_OF_DEPRECATION_PERIOD
         if (!silent)
           {
             hfst_warning( "Reading lexc script (not a lexicon) "
                 "from stdin with readline");
           }
         start_readline = true;
-#else
-        if (!silent)
-          {
-            hfst_warning( "Reading lexicons from stdin is deprecated and will "
-                "be removed in next versions;\n"
-                "this is not even supported by the original lexc");
-          }
-        tempfilename = hfst_strdup("/tmp/hfst-lexcXXXXXX");
-        int temporary_fd = hfst_mkstemp(tempfilename);
-        verbose_printf("Copying data from <stdin> to temporary file\n");
-        char* fdata = 0;
-        size_t len = 0;
-        while (hfst_getline(&fdata, &len, stdin) != -1)
-          {
-            hfst_write(temporary_fd, fdata, strlen(fdata));
-          }
-        hfst_close(temporary_fd);
-        lexccount = 1;
-        lexcfiles = static_cast<FILE**>(malloc(sizeof(FILE*) * lexccount));
-        lexcfilenames = static_cast<char**>(malloc(sizeof(char*) * lexccount));
-        lexcfiles[0] = hfst_fopen(tempfilename, "r");
-        lexcfilenames[0] = hfst_strdup(tempfilename);
-#endif
       }
-    else if (argc - optind > 0)
-      {
-        lexcfilenames = static_cast<char**>(malloc(sizeof(char*)*(argc-optind)));
-        lexcfiles = static_cast<FILE**>(malloc(sizeof(char*)*(argc-optind)));
-        while (optind < argc)
-          {
-            lexcfilenames[lexccount] = hfst_strdup(argv[optind]);
-            lexcfiles[lexccount] = hfst_fopen(argv[optind], "r");
-            lexccount++;
-            optind++;
-          }
-        is_input_stdin = false;
-      }
-    else
-      {
-        lexcfilenames = static_cast<char**>(malloc(sizeof(char*)));
-        lexcfiles = static_cast<FILE**>(malloc(sizeof(FILE*)));
-        lexcfilenames[0] = hfst_strdup("<stdin>");
-        lexcfiles[0] = stdin;
-        is_input_stdin = true;
-        lexccount++;
-      }
+  }
 
-    if (lexccount > 1)
+void
+make_lexcs()
+  {
+    HfstTransducer* trans = 0;
+    bool delete_temporaries = false;
+    if (inputs_named > 1)
       {
         if (!silent)
           {
@@ -241,112 +166,77 @@ parse_options(int argc, char** argv)
           }
         char* tempfilename = hfst_strdup("/tmp/hfst-lexcXXXXXX");
         int temporary_fd = hfst_mkstemp(tempfilename);
-        for (unsigned int i = 0; i < lexccount; i++)
+        for (unsigned int i = 0; i < inputs_named; i++)
           {
             verbose_printf("Copying data from %s to temporary file\n",
-                           lexcfilenames[i]);
-            hfst_fseek(lexcfiles[i], -1, SEEK_END);
-            long file_length = hfst_ftell(lexcfiles[i]);
-            rewind(lexcfiles[i]);
+                           inputfilenames[i]);
+            hfst_fseek(inputfiles[i], -1, SEEK_END);
+            long file_length = hfst_ftell(inputfiles[i]);
+            rewind(inputfiles[i]);
             char* fdata = static_cast<char*>(malloc(sizeof(char) * 
                                                     (file_length + 1)));
             hfst_fread(fdata, sizeof(char), file_length,
-                                   lexcfiles[i]);
+                                   inputfiles[i]);
             fdata[file_length] = '\n';
-            fclose(lexcfiles[i]);
-            free(lexcfilenames[i]);
+            fclose(inputfiles[i]);
+            free(inputfilenames[i]);
             hfst_write(temporary_fd, fdata, file_length + 1);
           }
         hfst_close(temporary_fd);
-        lexccount = 1;
-        lexcfiles[0] = hfst_fopen(tempfilename, "r");
-        lexcfilenames[0] = hfst_strdup(tempfilename);
+        inputs_named = 1;
+        inputfiles[0] = hfst_fopen(tempfilename, "r");
+        inputfilenames[0] = hfst_strdup(tempfilename);
+        delete_temporaries = true;
       }
-    return EXIT_CONTINUE;
-}
-
-int
-lexc_streams(HfstOutputStream& outstream)
-{
-    HfstTransducer* trans = 0;
-    for (unsigned int i = 0; i < lexccount; i++)
+    for (unsigned int i = 0; i < inputs_named; i++)
       {
-        verbose_printf("Parsing lexc file %s\n", lexcfilenames[i]);
-        if (lexcfiles[i] == stdin)
+        verbose_printf("Parsing lexc file %s\n", inputfilenames[i]);
+        if (inputfiles[i] == stdin)
           {
             hfst_error(EXIT_FAILURE, 0, "Cannot read from stdin");
-            return EXIT_FAILURE;
           }
         else
           {
-            trans = HfstTransducer::read_lexc(lexcfilenames[i], format);
+            trans = HfstTransducer::read_lexc(inputfilenames[i], format);
             if (0 == trans)
               {
                 hfst_error(EXIT_FAILURE, 0, "Could not parse %s correctly.\n"
                       "If there is no further info about the error, try "
-                      "-v or -d.", lexcfilenames[i]);
+                      "-v or -d.", inputfilenames[i]);
               }
           }
       }
-    hfst_set_name(*trans, lexcfilenames[0], "lexc");
-    hfst_set_formula(*trans, lexcfilenames[0], "L");
+    hfst_set_name(*trans, inputfilenames[0], "lexc");
+    hfst_set_formula(*trans, inputfilenames[0], "L");
     verbose_printf("\nWriting... ");
-    outstream << *trans;
+    *outstream << *trans;
     verbose_printf("done\n");
     delete trans;
-    outstream.close();
-    return EXIT_SUCCESS;
-}
+    if (delete_temporaries)
+      {
+        verbose_printf("Deleting temporary files on succesful exit\n");
+        hfst_remove(inputfilenames[0]);
+      }
+  }
 
 
 int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstLexc");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use filenames
-    for (unsigned int i = 0; i < lexccount; i++)
-      {
-        if (lexcfiles[i] != stdin)
-          {
-            fclose(lexcfiles[i]);
-          }
-      }
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    if (start_readline) 
+    hfst_init_commandline(argv[0], "0.1", "HfstLexc",
+                          FILE_IN_AUTOM_OUT, READ_MANY);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    check_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    if (start_readline)
       {
         lexc_readline_loop(format);
-        return EXIT_FAILURE;
       }
-    verbose_printf("Reading from ");
-    for (unsigned int i = 0; i < lexccount; i++)
+    else
       {
-        verbose_printf("%s, ", lexcfilenames[i]);
+        make_lexcs();
       }
-    verbose_printf("writing to %s\n", outfilename);
-    // here starts the buffer handling part
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, format) :
-        new HfstOutputStream(format);
-    retval = lexc_streams(*outstream);
-    if (profile_file != 0)
-      {
-        hfst_print_profile_line();
-      }
-    delete outstream;
-    free(lexcfilenames[0]);
-    free(lexcfilenames);
-    free(outfilename);
-    if (tempfilename != 0)
-      {
-        verbose_printf("Deleting temporary files on succesful exit\n");
-        hfst_remove(tempfilename);
-      }
-    return retval;
-}
+    hfst_uninit_commandline();
+    return EXIT_SUCCESS;
+  }
 

@@ -36,10 +36,6 @@ using std::deque;
 #include <hfst.hpp>
 
 #include "conventions/commandline.h"
-#include "conventions/options.h"
-
-#include "conventions/globals-common.h"
-#include "conventions/globals-unary.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
@@ -51,7 +47,7 @@ long head_count = 1;
 
 void
 print_usage()
-{
+  {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     // Usage line
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
@@ -59,30 +55,27 @@ print_usage()
         "\n", program_name);
 
     print_common_program_options();
-    print_common_unary_program_options();
     fprintf(message_out, "Archive options:\n"
             "  -n, --n-first=[-]K   print the first K transducers;\n"
             "                       with the leading `-', print all but "
             "last K transducers\n");
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions();
+    print_common_parameter_instructions();
     fprintf(message_out, "K must be an integer, as parsed by "
             "strtoul base 10, and not 0.\n"
             "If K is omitted default is 1.");
     fprintf(message_out, "\n");
     print_report_bugs();
-    fprintf(message_out, "\n");
     print_more_info();
 }
 
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
+  {
     // use of this function requires options are settable on global scope
     while (true)
-    {
+      {
         static const struct option long_options[] =
         {
           HFST_GETOPT_COMMON_LONG,
@@ -97,57 +90,58 @@ parse_options(int argc, char** argv)
                              HFST_GETOPT_UNARY_SHORT "n:",
                              long_options, &option_index);
         if (-1 == c)
-        {
+          {
             break;
-        }
-
+          }
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-unary.h"
-        case 'n':
-          head_count = hfst_strtol(optarg, 10);
-          break;
-#include "conventions/getopt-cases-error.h"
-        }
-    }
+          {
+          case 'n':
+            head_count = hfst_strtol(optarg, 10);
+            break;
+          default:
+            parse_getopt_error_value(c);
+            break;
+          }
+      }
+  }
 
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-unary.h"
+void
+check_options()
+  {
     if (head_count == 0)
       {
         hfst_warning( "Argument 0 for count is not sensible");
-      }    
-    return EXIT_CONTINUE;
-}
+      }
+  }
 
-int
-process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
+
+void
+forward_heads()
   {
     size_t transducer_n=0;
     if (head_count > 0)
       {
-        while (instream.is_good() && (transducer_n < head_count))
+        while (instream->is_good() && (transducer_n < head_count))
         {
             transducer_n++;
-            HfstTransducer trans(instream);
-            char* inputname = strdup(trans.get_name().c_str());
-            if (strlen(inputname) <= 0)
-              {
-                inputname = strdup(inputfilename);
-              }
+            HfstTransducer trans(*instream);
+            const char* inputname = hfst_get_name(trans, inputfilename);
             verbose_printf("Forwarding %s...%zu\n", inputname, transducer_n); 
-            outstream << trans;
+            *outstream << trans;
           }
       }
     else if (head_count < 0)
       {
         deque<HfstTransducer> first_but_n;
         verbose_printf("Counting all but last %zu\n", head_count);
-        while (instream.is_good())
+        while (instream->is_good())
           {
             transducer_n++;
-            HfstTransducer trans(instream);
+            HfstTransducer trans(*instream);
             first_but_n.push_back(trans);
            }
         if (-head_count > first_but_n.size())
@@ -156,7 +150,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                     "Nothing will be written to output",
                     inputfilename, -head_count);
           }
-        for (unsigned int i = 0; i < -head_count; i++)
+        for (int i = 0; i < -head_count; i++)
           {
             if (!first_but_n.empty())
               {
@@ -166,59 +160,26 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         while (!first_but_n.empty())
           {
             HfstTransducer trans = first_but_n.front();
-            char* inputname = strdup(trans.get_name().c_str());
-            if (strlen(inputname) <= 0)
-              {
-                inputname = strdup(inputfilename);
-              }
+            const char* inputname = hfst_get_name(trans, inputfilename);
             verbose_printf("Forwarding %s...%zu\n", inputname, transducer_n); 
-            outstream << trans;
+            *outstream << trans;
             first_but_n.pop_front();
           }
       }
-    instream.close();
-    outstream.close();
-    return EXIT_SUCCESS;
   }
 
 
-int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.2", "HfstHead");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (inputfile != stdin)
-    {
-        fclose(inputfile);
-    }
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    verbose_printf("Reading from %s, writing to %s\n", 
-        inputfilename, outfilename);
-    // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
-    try {
-      instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
-    } catch(const HfstException e)    {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
-        return EXIT_FAILURE;
-    }
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, instream->get_type()) :
-        new HfstOutputStream(instream->get_type());
-    
-    retval = process_stream(*instream, *outstream);
-    delete instream;
-    delete outstream;
-    free(inputfilename);
-    free(outfilename);
-    return retval;
-}
+int main(int argc, char **argv) 
+  {
+    hfst_init_commandline(argv[0], "0.2", "HfstHead",
+                          AUTOM_IN_AUTOM_OUT, READ_ONE);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    check_options();
+    parse_options_getenv();
+    hfst_open_streams();
+    forward_heads();
+    hfst_uninit_commandline();
+    return EXIT_SUCCESS;
+  }
 

@@ -48,21 +48,15 @@ typedef pair<string,string> StringPair;
 
 #include <hfst.hpp>
 
-#include "conventions/commandline.h"
-#include "conventions/options.h"
-#include "conventions/metadata.h"
-#include "utils/edit-distance.h"
-
 using hfst::HfstBasicTransducer;
 using hfst::HfstTransducer;
 using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
 using hfst::StringSet;
 
-#include "conventions/globals-common.h"
-#include "conventions/globals-unary.h"
-// add tools-specific variables here
-static hfst::ImplementationType format = hfst::UNSPECIFIED_TYPE;
+#include "conventions/commandline.h"
+#include "utils/edit-distance.h"
+
 static set<string> tags;
 static map<string, vector<pair<string,string> > > pardefs;
 static map<string, vector<pair<string,string> > > sections;
@@ -73,83 +67,54 @@ static HfstTokenizer tok;
 
 static set<string> alphabets;
 
-static char* error_filename = 0;
-static FILE* error_file = 0;
-
 
 void
 print_usage()
-{
+  {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
            "Convert apertium XML files into a binary transducer\n"
            "\n", program_name);
 
     print_common_program_options();
-    print_common_creational_program_options();
-    // fprintf(message_out, (tool-specific options and short descriptions)
-    fprintf(message_out, "Format options:\n"
-            "  -e, --errmodel=ERR   Write error model for spelller to ERR\n");
     fprintf(message_out, "\n");
-    print_common_creational_program_parameter_instructions();
+    print_common_parameter_instructions();
     fprintf(message_out, "\n");
     print_report_bugs();
     fprintf(message_out, "\n");
     print_more_info();
-}
+  }
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
+  {
     // use of this function requires options are settable on global scope
     while (true)
-    {
+      {
         static const struct option long_options[] =
         {
         HFST_GETOPT_COMMON_LONG,
-        HFST_GETOPT_UNARY_LONG,
-          // add tool-specific options here
-            {"format", required_argument, 0, 'f'},
-            {"errmodel", required_argument, 0, 'e'},
+        HFST_GETOPT_CREATIONAL_LONG,
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "e:f:",
+                             HFST_GETOPT_CREATIONAL_SHORT,
                              long_options, &option_index);
         if (-1 == c)
-        {
-break;
-        }
-
-        switch (c)
           {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-unary.h"
-          // add tool-specific cases here
-        case 'f':
-            format = hfst_parse_format_name(optarg);
             break;
-        case 'e':
-            error_filename = hfst_strdup(optarg);
-            error_file = hfst_fopen(error_filename, "w");
-            break;
-#include "conventions/getopt-cases-error.h"
+          }
+        else if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
+        else
+          {
+            parse_getopt_error_value(c);
           }
     }
-
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-unary.h"
-    if (format == hfst::UNSPECIFIED_TYPE)
-      {
-        format = hfst::TROPICAL_OPENFST_TYPE;
-        verbose_printf("Using default output format OpenFst "
-                "with tropical weight class\n");
-      }
-
-    return EXIT_CONTINUE;
 }
 
 static
@@ -651,361 +616,299 @@ parse_section(xmlDocPtr doc, xmlNodePtr section)
   xmlFree(secid);
   xmlFree(sectype);
 }
-int
-process_stream(HfstOutputStream& outstream, HfstOutputStream* errstream)
-{
-  verbose_printf("Reading apertium XML...\n");
-  xmlDocPtr doc;
-  xmlNodePtr node;
-  doc = xmlParseFile(inputfilename);
-  node = xmlDocGetRootElement(doc);
-  tok.add_skip_symbol(hfst::internal_epsilon);
-  if (NULL == node)
-    {
-      xmlFreeDoc(doc);
-      hfst_error(EXIT_FAILURE, 0, "Libxml could not parse %s",
-            inputfilename);
-    }
-  if (xmlStrcmp(node->name, 
-                reinterpret_cast<const xmlChar*>("dictionary")) != 0)
-    {
-      xmlFreeDoc(doc);
-      hfst_error(EXIT_FAILURE, 0, "Root element of %s is not monodix",
-            inputfilename);
-    }
-  // this is a veryvery veryvery simple approach of XML parsing in tree
-  // order with level per level control structures:
-  // dictionary
-  // + alphabet
-  // + sdefs
-  //   + sdef
-  //   + ...
-  // + pardefs
-  //   + pardef
-  //     + e
-  //       + p
-  //         + i
-  //         + l
-  //         + r
-  //         + par
-  //         + ...
-  //   + ...
-  // + section
-  //   + e
-  //     + (like above)
-  // + ...
-  // 
-  // a + is if statement
-  // a ... is while statement
-      // we're under dictionary; expect
-      // alphabet sdefs pardefs section+
-  node = node->xmlChildrenNode;
-  while (node != NULL)
-    {
-      if (xmlStrcmp(node->name, 
-                    reinterpret_cast<const xmlChar*>("alphabet")) == 0)
-        {
-          alphabets = *(parse_alphabet(doc, node));
-        }
-      else if (xmlStrcmp(node->name,
-                         reinterpret_cast<const xmlChar*>("sdefs")) == 0)
-        {
-          parse_sdefs(doc, node);
-        }
-      else if (xmlStrcmp(node->name, 
-                         reinterpret_cast<const xmlChar*>("pardefs")) == 0)
-        {
-          parse_pardefs(doc, node);
-        } // if pardefs
-      else if (xmlStrcmp(node->name, 
-                         reinterpret_cast<const xmlChar*>("section")) == 0)
-        {
-          parse_section(doc, node);
-        } // if section
-      else if (!xmlIsBlankNode(node) && (node->type != XML_COMMENT_NODE))
-        {
-          hfst_error(0, 0, "unrecognised %s in dictionary",
-                reinterpret_cast<const char*>(node->name));
-        }
-      node = node->next;
-    } // while node
-  xmlFreeDoc(doc);
-  // create PARDEF* ROOT PARDEF*
-  verbose_printf("Turning parsed string into HFST automaton...\n");
-  HfstTransducer t(format);
-  HfstTransducer prefixPardefsTrans(format);
-  HfstTransducer suffixPardefsTrans(format);
-  verbose_printf("Joining pardefs... ");
-  for (map<string, vector<StringPair> >::const_iterator par = pardefs.begin();
-       par != pardefs.end();
-       ++par)
-    {
-      string parJoinerString("@APERTIUM_JOINER.");
-      verbose_printf("%s... ", par->first.c_str());
-      parJoinerString.append(par->first);
-      parJoinerString.append("@");
-      HfstTransducer parJoinerLeft(parJoinerString, parJoinerString, format);
-      HfstTransducer parJoinerRight(parJoinerLeft);
-      HfstBasicTransducer morphs;
-      for (vector<StringPair>::const_iterator morph = par->second.begin();
-           morph != par->second.end();
-           ++morph)
-        {
-          hfst::StringPairVector spv = tok.tokenize(morph->first, morph->second);
-          morphs.disjunct(spv, 0);
-        }
-      HfstTransducer suffixPardefTrans(parJoinerLeft);
-      suffixPardefTrans.concatenate(HfstTransducer(morphs, format));
-      suffixPardefTrans.minimize();
-      suffixPardefsTrans.disjunct(suffixPardefTrans);
-      HfstTransducer prefixPardefTrans(HfstTransducer(morphs, format));
-      prefixPardefTrans.concatenate(parJoinerRight);
-      prefixPardefTrans.minimize();
-      prefixPardefsTrans.disjunct(prefixPardefTrans);
-    }
-  verbose_printf("\nRepeating and minimising...\n");
-  prefixPardefsTrans.repeat_star().minimize();
-  suffixPardefsTrans.repeat_star().minimize();
-  if (debug)
-    {
-      std::cerr << "prefix pardefs:" << std::endl << prefixPardefsTrans << std::endl;
-      std::cerr << "suffix pardefs:" << std::endl << suffixPardefsTrans << std::endl;
-    }
-  verbose_printf("Joining standard sections... ");
-  HfstTransducer sectionsTrans(format);
-  for (map<string, vector<StringPair> >::const_iterator root = sections.begin();
-       root != sections.end();
-       ++root)
-    {
-      verbose_printf("%s... ", root->first.c_str());
-      HfstBasicTransducer roots;
-      unsigned long root_count = 0;
-      for (vector<StringPair>::const_iterator morph = root->second.begin();
-           morph != root->second.end();
-           ++morph)
-        {
-          root_count++;
-          if ((root_count % 1000) == 0)
-            {
-              verbose_printf("%lu... ", root_count);
-            }
-          hfst::StringPairVector spv = tok.tokenize(morph->first, morph->second);
-          roots.disjunct(spv, 0);
-        }
-      sectionsTrans.disjunct(HfstTransducer(roots, format));
-    }
-  verbose_printf("\npreblanks... ");
-  HfstTransducer preblanksTrans(hfst::internal_epsilon, hfst::internal_epsilon,
-                                format);
-  for (map<string, vector<StringPair> >::const_iterator root = preblanks.begin();
-       root != preblanks.end();
-       ++root)
-    {
-      verbose_printf("%s... ", root->first.c_str());
-      HfstTransducer roots(format);
-      for (vector<StringPair>::const_iterator morph = root->second.begin();
-           morph != root->second.end();
-           ++morph)
-        {
-          HfstTransducer morphTrans(morph->first, morph->second, tok, format);
-          roots.disjunct(morphTrans);
-        }
-      preblanksTrans.disjunct(roots);
-    }
-  preblanksTrans.optionalize();
-  verbose_printf("\npostblanks... ");
-  HfstTransducer postblanksTrans(hfst::internal_epsilon, hfst::internal_epsilon,
-                                 format);
-  for (map<string, vector<StringPair> >::const_iterator root = postblanks.begin();
-       root != postblanks.end();
-       ++root)
-    {
-      verbose_printf("%s... ", root->first.c_str());
-      HfstTransducer roots(format);
-      for (vector<StringPair>::const_iterator morph = root->second.begin();
-           morph != root->second.end();
-           ++morph)
-        {
-          HfstTransducer morphTrans(morph->first, morph->second, tok, format);
-          roots.disjunct(morphTrans);
-        }
-      postblanksTrans.disjunct(roots);
-    }
-  postblanksTrans.optionalize();
-  verbose_printf("\ninconditionals... ");
-  HfstTransducer inconditionalsTrans(format);
-  for (map<string, vector<StringPair> >::const_iterator root = inconditionals.begin();
-       root != inconditionals.end();
-       ++root)
-    {
-      verbose_printf("%s... ", root->first.c_str());
-      HfstTransducer roots(format);
-      for (vector<StringPair>::const_iterator morph = root->second.begin();
-           morph != root->second.end();
-           ++morph)
-        {
-          HfstTransducer morphTrans(morph->first, morph->second, tok, format);
-          roots.disjunct(morphTrans);
-        }
-      inconditionalsTrans.disjunct(roots);
-    }
-  verbose_printf("\nMinimising...\n");
-  sectionsTrans.minimize();
-  preblanksTrans.minimize();
-  postblanksTrans.minimize();
-  inconditionalsTrans.minimize();
-  if (debug)
-    {
-      std::cerr << "Standard sections:" << std::endl << sectionsTrans << std::endl;
-      std::cerr << "Postblanks:" << std::endl << postblanksTrans << std::endl;
-      std::cerr << "Preblanks:" << std::endl << preblanksTrans << std::endl;
-      std::cerr << "Inconditionals:" << std::endl << inconditionalsTrans << std::endl;
-    }
-  verbose_printf("Concatenating...\n");
-  HfstTransducer result(prefixPardefsTrans);
-  result.concatenate(sectionsTrans);
-  result.concatenate(suffixPardefsTrans);
-  if (debug)
-    {
-      std::cerr << "prefixes-root-suffixes:" <<
-                    std::endl << result << std::endl;
-    }
-  verbose_printf("Creating morphotax...");
-  HfstTransducer joiners(format);
-  HfstTransducer joinerPairs(format);
-  for (map<string, vector<StringPair> >::const_iterator pardef = pardefs.begin();
-       pardef != pardefs.end();
-       ++pardef)
-    {
-      string parJoinerString("@APERTIUM_JOINER.");
-      verbose_printf("%s... ", pardef->first.c_str());
-      parJoinerString.append(pardef->first);
-      parJoinerString.append("@");
-      HfstTransducer parJoiner(parJoinerString, parJoinerString, format);
-      joiners.disjunct(parJoiner);
-      joinerPairs.disjunct(parJoiner.repeat_n(2));
-    }
-  HfstTransducer sigmaMinusJoiners(hfst::internal_identity,
-                                   hfst::internal_identity,
-                                   format);
-  sigmaMinusJoiners.subtract(joiners);
-  HfstTransducer morphotax(joinerPairs.disjunct(sigmaMinusJoiners));
-  morphotax.repeat_star();
-  morphotax.minimize();
-  morphotax.insert_freely_missing_flags_from(result);
-  morphotax.minimize();
-  if (debug)
-    {
-      std::cerr << "morphotax:" << std::endl << morphotax << std::endl;
-    }
-  verbose_printf("\nApplying morphotax...\n");
-  t = morphotax.compose(result);
-  verbose_printf("Minimising...\n");
-  t.minimize();
-  verbose_printf("Adding other sections...\n");
-  t = postblanksTrans.concatenate(t).concatenate(preblanksTrans);
-  t.disjunct(inconditionalsTrans);
-  verbose_printf("Discarding joiners... ");
-  for (map<string, vector<StringPair> >::const_iterator pardef = pardefs.begin();
-       pardef != pardefs.end();
-       ++pardef)
-    {
-      string parJoinerString("@APERTIUM_JOINER.");
-      verbose_printf("%s... ", pardef->first.c_str());
-      parJoinerString.append(pardef->first);
-      parJoinerString.append("@");
-      t.substitute(parJoinerString, hfst::internal_epsilon);
-    }
-  t.substitute("@@EMPTY_MORPH_DONT_LEAK@@", hfst::internal_epsilon);
-  verbose_printf("\nMinimising...\n");
-  t.minimize();
-  if (debug)
-    {
-      std::cerr << "result:" << std::endl << t << std::endl;
-    }
-  hfst_set_name(t, inputfilename, "apertium");
-  hfst_set_formula(t, inputfilename, "A");
-  outstream << t;
-  outstream.close();
-  if (errstream != 0)
-    {
-      HfstTransducer* errmodel = create_edit_distance(alphabets, 1, 1.0f,
-                                                      format);
 
-      errstream->operator<<(*errmodel);
-      errstream->close();
-    }
-  return EXIT_SUCCESS;
-}
+void
+compile_apertium_monodix()
+  {
+    verbose_printf("Reading apertium XML...\n");
+    xmlDocPtr doc;
+    xmlNodePtr node;
+    doc = xmlParseFile(inputfilename);
+    node = xmlDocGetRootElement(doc);
+    tok.add_skip_symbol(hfst::internal_epsilon);
+    if (NULL == node)
+      {
+        xmlFreeDoc(doc);
+        hfst_error(EXIT_FAILURE, 0, "Libxml could not parse %s",
+              inputfilename);
+      }
+    if (xmlStrcmp(node->name, 
+                  reinterpret_cast<const xmlChar*>("dictionary")) != 0)
+      {
+        xmlFreeDoc(doc);
+        hfst_error(EXIT_FAILURE, 0, "Root element of %s is not monodix",
+              inputfilename);
+      }
+    // this is a veryvery veryvery simple approach of XML parsing in tree
+    // order with level per level control structures:
+    // dictionary
+    // + alphabet
+    // + sdefs
+    //   + sdef
+    //   + ...
+    // + pardefs
+    //   + pardef
+    //     + e
+    //       + p
+    //         + i
+    //         + l
+    //         + r
+    //         + par
+    //         + ...
+    //   + ...
+    // + section
+    //   + e
+    //     + (like above)
+    // + ...
+    // 
+    // a + is if statement
+    // a ... is while statement
+        // we're under dictionary; expect
+        // alphabet sdefs pardefs section+
+    node = node->xmlChildrenNode;
+    while (node != NULL)
+      {
+        if (xmlStrcmp(node->name, 
+                      reinterpret_cast<const xmlChar*>("alphabet")) == 0)
+          {
+            alphabets = *(parse_alphabet(doc, node));
+          }
+        else if (xmlStrcmp(node->name,
+                           reinterpret_cast<const xmlChar*>("sdefs")) == 0)
+          {
+            parse_sdefs(doc, node);
+          }
+        else if (xmlStrcmp(node->name, 
+                           reinterpret_cast<const xmlChar*>("pardefs")) == 0)
+          {
+            parse_pardefs(doc, node);
+          } // if pardefs
+        else if (xmlStrcmp(node->name, 
+                           reinterpret_cast<const xmlChar*>("section")) == 0)
+          {
+            parse_section(doc, node);
+          } // if section
+        else if (!xmlIsBlankNode(node) && (node->type != XML_COMMENT_NODE))
+          {
+            hfst_error(0, 0, "unrecognised %s in dictionary",
+                  reinterpret_cast<const char*>(node->name));
+          }
+        node = node->next;
+      } // while node
+    xmlFreeDoc(doc);
+    // create PARDEF* ROOT PARDEF*
+    verbose_printf("Turning parsed string into HFST automaton...\n");
+    HfstTransducer t(format);
+    HfstTransducer prefixPardefsTrans(format);
+    HfstTransducer suffixPardefsTrans(format);
+    verbose_printf("Joining pardefs... ");
+    for (map<string, vector<StringPair> >::const_iterator par = pardefs.begin();
+         par != pardefs.end();
+         ++par)
+      {
+        string parJoinerString("@APERTIUM_JOINER.");
+        verbose_printf("%s... ", par->first.c_str());
+        parJoinerString.append(par->first);
+        parJoinerString.append("@");
+        HfstTransducer parJoinerLeft(parJoinerString, parJoinerString, format);
+        HfstTransducer parJoinerRight(parJoinerLeft);
+        HfstBasicTransducer morphs;
+        for (vector<StringPair>::const_iterator morph = par->second.begin();
+             morph != par->second.end();
+             ++morph)
+          {
+            hfst::StringPairVector spv = tok.tokenize(morph->first, morph->second);
+            morphs.disjunct(spv, 0);
+          }
+        HfstTransducer suffixPardefTrans(parJoinerLeft);
+        suffixPardefTrans.concatenate(HfstTransducer(morphs, format));
+        suffixPardefTrans.minimize();
+        suffixPardefsTrans.disjunct(suffixPardefTrans);
+        HfstTransducer prefixPardefTrans(HfstTransducer(morphs, format));
+        prefixPardefTrans.concatenate(parJoinerRight);
+        prefixPardefTrans.minimize();
+        prefixPardefsTrans.disjunct(prefixPardefTrans);
+      }
+    verbose_printf("\nRepeating and minimising...\n");
+    prefixPardefsTrans.repeat_star().minimize();
+    suffixPardefsTrans.repeat_star().minimize();
+    if (debug)
+      {
+        std::cerr << "prefix pardefs:" << std::endl << prefixPardefsTrans << std::endl;
+        std::cerr << "suffix pardefs:" << std::endl << suffixPardefsTrans << std::endl;
+      }
+    verbose_printf("Joining standard sections... ");
+    HfstTransducer sectionsTrans(format);
+    for (map<string, vector<StringPair> >::const_iterator root = sections.begin();
+         root != sections.end();
+         ++root)
+      {
+        verbose_printf("%s... ", root->first.c_str());
+        HfstBasicTransducer roots;
+        unsigned long root_count = 0;
+        for (vector<StringPair>::const_iterator morph = root->second.begin();
+             morph != root->second.end();
+             ++morph)
+          {
+            root_count++;
+            if ((root_count % 1000) == 0)
+              {
+                verbose_printf("%lu... ", root_count);
+              }
+            hfst::StringPairVector spv = tok.tokenize(morph->first, morph->second);
+            roots.disjunct(spv, 0);
+          }
+        sectionsTrans.disjunct(HfstTransducer(roots, format));
+        sectionsTrans.minimize();
+      }
+    verbose_printf("\npreblanks... ");
+    HfstTransducer preblanksTrans(hfst::internal_epsilon, hfst::internal_epsilon,
+                                  format);
+    for (map<string, vector<StringPair> >::const_iterator root = preblanks.begin();
+         root != preblanks.end();
+         ++root)
+      {
+        verbose_printf("%s... ", root->first.c_str());
+        HfstTransducer roots(format);
+        for (vector<StringPair>::const_iterator morph = root->second.begin();
+             morph != root->second.end();
+             ++morph)
+          {
+            HfstTransducer morphTrans(morph->first, morph->second, tok, format);
+            roots.disjunct(morphTrans);
+          }
+        preblanksTrans.disjunct(roots);
+        preblanksTrans.minimize();
+      }
+    preblanksTrans.optionalize();
+    verbose_printf("\npostblanks... ");
+    HfstTransducer postblanksTrans(hfst::internal_epsilon, hfst::internal_epsilon,
+                                   format);
+    for (map<string, vector<StringPair> >::const_iterator root = postblanks.begin();
+         root != postblanks.end();
+         ++root)
+      {
+        verbose_printf("%s... ", root->first.c_str());
+        HfstTransducer roots(format);
+        for (vector<StringPair>::const_iterator morph = root->second.begin();
+             morph != root->second.end();
+             ++morph)
+          {
+            HfstTransducer morphTrans(morph->first, morph->second, tok, format);
+            roots.disjunct(morphTrans);
+          }
+        postblanksTrans.disjunct(roots);
+        postblanksTrans.minimize();
+      }
+    postblanksTrans.optionalize();
+    verbose_printf("\ninconditionals... ");
+    HfstTransducer inconditionalsTrans(format);
+    for (map<string, vector<StringPair> >::const_iterator root = inconditionals.begin();
+         root != inconditionals.end();
+         ++root)
+      {
+        verbose_printf("%s... ", root->first.c_str());
+        HfstTransducer roots(format);
+        for (vector<StringPair>::const_iterator morph = root->second.begin();
+             morph != root->second.end();
+             ++morph)
+          {
+            HfstTransducer morphTrans(morph->first, morph->second, tok, format);
+            roots.disjunct(morphTrans);
+          }
+        inconditionalsTrans.disjunct(roots);
+        inconditionalsTrans.minimize();
+      }
+    verbose_printf("\nMinimising...\n");
+    sectionsTrans.minimize();
+    preblanksTrans.minimize();
+    postblanksTrans.minimize();
+    inconditionalsTrans.minimize();
+    if (debug)
+      {
+        std::cerr << "Standard sections:" << std::endl << sectionsTrans << std::endl;
+        std::cerr << "Postblanks:" << std::endl << postblanksTrans << std::endl;
+        std::cerr << "Preblanks:" << std::endl << preblanksTrans << std::endl;
+        std::cerr << "Inconditionals:" << std::endl << inconditionalsTrans << std::endl;
+      }
+    verbose_printf("Concatenating...\n");
+    HfstTransducer result(prefixPardefsTrans);
+    result.concatenate(sectionsTrans);
+    result.concatenate(suffixPardefsTrans);
+    if (debug)
+      {
+        std::cerr << "prefixes-root-suffixes:" <<
+                      std::endl << result << std::endl;
+      }
+    verbose_printf("Creating morphotax...");
+    HfstTransducer joiners(format);
+    HfstTransducer joinerPairs(format);
+    for (map<string, vector<StringPair> >::const_iterator pardef = pardefs.begin();
+         pardef != pardefs.end();
+         ++pardef)
+      {
+        string parJoinerString("@APERTIUM_JOINER.");
+        verbose_printf("%s... ", pardef->first.c_str());
+        parJoinerString.append(pardef->first);
+        parJoinerString.append("@");
+        HfstTransducer parJoiner(parJoinerString, parJoinerString, format);
+        joiners.disjunct(parJoiner);
+        joinerPairs.disjunct(parJoiner.repeat_n(2));
+      }
+    HfstTransducer sigmaMinusJoiners(hfst::internal_identity,
+                                     hfst::internal_identity,
+                                     format);
+    sigmaMinusJoiners.subtract(joiners);
+    HfstTransducer morphotax(joinerPairs.disjunct(sigmaMinusJoiners));
+    morphotax.repeat_star();
+    morphotax.minimize();
+    morphotax.insert_freely_missing_flags_from(result);
+    morphotax.minimize();
+    if (debug)
+      {
+        std::cerr << "morphotax:" << std::endl << morphotax << std::endl;
+      }
+    verbose_printf("\nApplying morphotax...\n");
+    t = morphotax.compose(result);
+    verbose_printf("Minimising...\n");
+    t.minimize();
+    verbose_printf("Adding other sections...\n");
+    t = postblanksTrans.concatenate(t).concatenate(preblanksTrans);
+    t.disjunct(inconditionalsTrans);
+    verbose_printf("Discarding joiners... ");
+    for (map<string, vector<StringPair> >::const_iterator pardef = pardefs.begin();
+         pardef != pardefs.end();
+         ++pardef)
+      {
+        string parJoinerString("@APERTIUM_JOINER.");
+        verbose_printf("%s... ", pardef->first.c_str());
+        parJoinerString.append(pardef->first);
+        parJoinerString.append("@");
+        t.substitute(parJoinerString, hfst::internal_epsilon);
+      }
+    t.substitute("@@EMPTY_MORPH_DONT_LEAK@@", hfst::internal_epsilon);
+    verbose_printf("\nMinimising...\n");
+    t.minimize();
+    if (debug)
+      {
+        std::cerr << "result:" << std::endl << t << std::endl;
+      }
+    hfst_set_name(t, inputfilename, "apertium");
+    hfst_set_formula(t, inputfilename, "A");
+    *outstream << t;
+    outstream->close();
+  }
 
 
 int main( int argc, char **argv ) 
-{
-  hfst_set_program_name(argv[0], "0.1", "HfstApertium2Fst");
-    int retval = parse_options(argc, argv);
-
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    if ((error_file != 0) && (error_file != stdout))
-      {
-        fclose(error_file);
-      }
-    verbose_printf("Reading from %s, writing to %s\n", 
-        inputfilename, outfilename);
-    switch (format)
-      {
-      case hfst::SFST_TYPE:
-        verbose_printf("Using SFST as output handler\n");
-        break;
-      case hfst::TROPICAL_OPENFST_TYPE:
-        verbose_printf("Using OpenFst's tropical weights as output\n");
-        break;
-      case hfst::LOG_OPENFST_TYPE:
-        verbose_printf("Using OpenFst's log weight output\n");
-        break;
-      case hfst::FOMA_TYPE:
-        verbose_printf("Using foma as output handler\n");
-        break;
-      case hfst::HFST_OL_TYPE:
-        verbose_printf("Using optimized lookup output\n");
-        break;
-      case hfst::HFST_OLW_TYPE:
-        verbose_printf("Using optimized lookup weighted output\n");
-        break;
-      default:
-        hfst_error(EXIT_FAILURE, 0, "Unknown format cannot be used as output\n");
-        return EXIT_FAILURE;
-      }
-    // here starts the buffer handling part
-    HfstOutputStream* outstream = (outfile != stdout) ?
-                new HfstOutputStream(outfilename, format) :
-                new HfstOutputStream(format);
-    HfstOutputStream* errstream = 0;
-    if (error_file != 0)
-      {
-        errstream = (error_file != stdout) ?
-            new HfstOutputStream(error_filename, format):
-            new HfstOutputStream(format);
-      }
-    process_stream(*outstream, errstream);
-    if (profile_file != 0)
-      {
-        hfst_print_profile_line();
-      }
-    if (inputfile != stdin)
-      {
-        fclose(inputfile);
-      }
-    free(inputfilename);
-    free(outfilename);
-    free(profile_file_name);
+  {
+    hfst_init_commandline(argv[0], "0.1", "HfstApertium2Fst",
+                          FILE_IN_AUTOM_OUT, READ_ONE);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    parse_options_getenv();
+    compile_apertium_monodix();
+    hfst_uninit_commandline();
     return EXIT_SUCCESS;
 }
 

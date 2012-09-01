@@ -3,7 +3,13 @@
  *
  * @brief common practices for HFST command-line tools.
  * This file contains macros and declarations for variables and functions that
- * should be used in all command-line programs in HFST. Using same 
+ * should be used in all command-line programs in HFST.
+ *  You might think that implementing command-line tools with lot of global
+ *  variables is nasty or whatnot, but in fact it is quite reasonable model
+ *  for a simple command-line tool that needs to hold those certain pieces of
+ *  data available throughout the program, there's no need to pass the file
+ *  handles for every single function call and no point in encapsulating this
+ *  all to an object that could never be more than a singleton.
  */
 //       This program is free software: you can redistribute it and/or modify
 //       it under the terms of the GNU General Public License as published by
@@ -33,72 +39,15 @@
 #endif
 
 #include "portability.h"
+#include "pretty-printing.h"
+#include "io-handling.h"
+#include "profiling.h"
+#include "options.h"
+#include "metadata.h"
 #include "HfstDataTypes.h"
 
 
-/* These variables should be used in all command line programs.
- * In some cases they may be nonsensical; just define something then.
- */
-/** 
- * @brief set @c verbose when program should print before and after every
- *        non-trivial step it takes.
- */
-extern bool verbose;
-/** @brief set @c silent when program should not print anything at all. */
-extern bool silent;
-/** @brief set @c debug when program should dump all the intermediate results
- *         to terminal and/or save them to files in @c CWD.
- */
-extern bool debug;
-/** @brief set @c message_out to stream that is usable for non-error message
- *         print-outs.
- *         This @e should be stdout in all cases, except when transducer 
- *         binaries are being transmitted through @c stdout. Some programs 
- *         @e may have option to log these messages to a file instead.
- */
-extern FILE* message_out;
-/**
- * @brief whether we want to determine if color setting is sensible.
- */
-extern bool auto_colors;
-/**
- * @brief if output is colorable and it is wise to print colors there.
- */
-extern bool print_colors;
-#define COLOR_RESET "\033[0m"
-#define COLOR_ERROR "\033[21;31m"
-#define COLOR_INFO "\033[22;32m"
-#define COLOR_WARNING "\033[22;33m"
-#define COLOR_DEBUG "\033[22;34m"
-#define COLOR_VERBOSE "\033[22;35m"
-#define COLOR_PROGRAM_NAME "\033[22;37m"
-/** 
- *  @brief set @a hfst_tool_version to version specific to the tool.
- *  @sa hfst_set_program_name
- */
-extern char* hfst_tool_version;
-/** 
- * @brief set @a hfst_tool_wikiname to name of the kitwiki page for this tool.
- */
-extern char* hfst_tool_wikiname;
-/**
- * @brief set @a profile_fle to target of profiling info writes
- */
-extern FILE* profile_file;
-/**
- * @brief set @a profile_start to @c clock() when starting profiling.
- */
-extern clock_t profile_start;
 
-/* hfst tools initialisation */
-
-/** 
- * @brief set program's name and other infos for reusable messages defined
- * below. This function must be called in beginning of main as the values are
- * used in all error messages as well.
- */
-void hfst_set_program_name(const char* argv0, const char* version,
-                           const char* wikipage);
 
 /**
  * @brief set locale according to environment if UTF-8-capable or
@@ -113,85 +62,40 @@ char* hfst_setlocale();
  * This command calls both @c hfst_set_program_name and @c hfst_setlocale,
  * as well as ncurses and gettext initialisation. If you want to create
  * a command line program you need to call these parts individually in the
- * very beginning of the @c main function.
+ * very beginning of the @c main function. The @a hti determines what tool
+ * does with its file arguments and @a hic determines how many inputs will
+ * it accept.
  * @sa hfst_set_program_name(const char*, const char*, const char*)
  */
 void hfst_init_commandline(const char* argv0, const char* version,
-                           const char* wikipage);
+                           const char* wikipage,
+                           hfst_tool_io hti, hfst_input_count hic);
+
+/**
+ * @brief on successful exit, free all globals and destroy everything.
+ */
+void hfst_uninit_commandline();
 
 /* hfst tools generic helper print functions */
 
-/** save current transducer @c t to file @c filename if debug is @a true. */
+/** save current transducer @c t to file @c filename if @c debug is @c true. */
 void debug_save_transducer(hfst::HfstTransducer t, const char* name);
-
-/** print message @c s with parameters @c __VA_ARGS__ if debug is @a true. */
-void debug_printf(const char* format, ...);
-
-/** print message @c s with parameters @c __VA_ARGS__ if debug is @a true. */
-void verbose_printf(const char* format, ...);
-
-void hfst_error(int status, int errnum, const char* format, ...);
-void hfst_warning(const char* format, ...);
-void hfst_info(const char* format, ...);
-void hfst_verbose(const char* format, ...);
-void hfst_debug(const char* format, ...);
-
-/**
- *
- * @brief print standard usage message.
- *
- * @sa http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
- * @sa http://www.gnu.org/software/womb/gnits/Help-Output.html
- */
-void print_usage();
-
-/**
- * @brief print standard version message.
- *
- * @sa http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
- * @sa http://www.gnu.org/software/womb/gnits/Version-Output.html
- */
-void print_version();
-
-/**
- * @brief print standard short help message.
- * 
- * @sa http://www.gnu.org/software/womb/gnits/Help-Output.html#Help-Output
- */
-void print_short_help();
-
-#define KITWIKI_URL "https://kitwiki.csc.fi/twiki/bin/view/KitWiki/"
-/**
- * @brief print link to wiki pages.
- */
-void print_more_info();
-
-/**
- * @brief print bug reporting message.
- */
-void print_report_bugs();
 
 /* command line argument handling */
 
-/** successful return value for argument parsing routine */
-#define EXIT_CONTINUE 42
-
 /**
  * @brief define function for parsing whole command line.
- * Each program should define this on its own, you may use includable templates
- * for standard options though.
+ * Each program should define this on its own, although most will
+ * manage with minimal standard getopt loop and cases from options header
  *
  * @sa http://www.gnu.org/prep/standards/standards.html#Command_002dLine-Interfaces
  * @sa http://www.gnu.org/software/womb/gnits/File-Arguments.html
  */
-int parse_options(int argc, char** argv);
+void parse_options(int argc, char** argv);
 
-/**
- * @brief extend the options in argv by parsing standard hfst environment
- *        variables.
- */
-void extend_options_getenv(int* argc, char*** argv);
 
+
+/* hfst versions of other standard functions with error handling */
 /**
  * @brief parse weight from string, or print error message and return zero
  * weight on failure.
@@ -318,14 +222,6 @@ ssize_t hfst_getline(char** lineptr, size_t* n, FILE* stream);
  *        message adn exit on failure.
  */
 char* hfst_readline(const char* prompt);
-
-/**
- * @brief print profiling results to @a stream in neat TSV format.
- *  The results of the profiling match the fields of struct rusage from
- *  sys/resource.h, except for first field which is accumulated @c clock() time.
- */
-void hfst_print_profile_line();
-
 
 #endif
 // vim: set ft=cpp.doxygen:
