@@ -54,9 +54,8 @@ void hfst_set_commandline_def(hfst::HfstTransducer& dest,
                               const hfst::HfstTransducer& rhs,
                               int argc, const char** argv);
 
-char* hfst_get_name(const hfst::HfstTransducer& arg,
-                    const std::string& filename);
-   
+const char* hfst_get_name(const hfst::HfstTransducer& arg,
+                          const char* filename);
 
 
 #endif

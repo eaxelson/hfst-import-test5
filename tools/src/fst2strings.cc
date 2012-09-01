@@ -33,7 +33,6 @@
 #include <hfst.hpp>
 
 #include "conventions/commandline.h"
-#include "conventions/options.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
@@ -48,8 +47,6 @@ using hfst::HfstTwoLevelPaths;
 using hfst::HFST_OL_TYPE;
 using hfst::HFST_OLW_TYPE;
 
-#include "conventions/globals-common.h"
-#include "conventions/globals-unary.h"
 
 // the maximum number of strings printed for each transducer
 static int max_strings = 0;
@@ -69,46 +66,54 @@ static std::string input_exclude;
 static std::string output_exclude;
 
 static bool print_in_pairstring_format=false;
-static char * epsilon_format=0;
+static char* epsilon_format=0;
 
 void
 print_usage()
-{
+  {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
         "Display the strings recognized by a transducer\n"
         "\n", program_name);
     print_common_program_options();
-    fprintf(message_out, "Fst2strings options:\n"
-"  -n, --max-strings=NSTR     print at most NSTR strings\n"
-"  -N, --nbest=NBEST          print at most NBEST best strings\n"
-"  -r, --random=NRAND         print at most NRAND random strings\n"
-"  -c, --cycles=NCYC          follow cycles at most NCYC times\n"
-"  -w, --print-weights        display the weight for each string\n"
-"  -e, --epsilon-format=EPS   print epsilon as EPS\n"
-/*"  -a, --print-pairstrings    print result in pairstring format\n"*/
-/*"  -S, --print-spaces         print spaces between symbols/symbol pairs\n"*/
-"  -X, --xfst=VARIABLE        toggle xfst compatibility option VARIABLE\n");
-    fprintf(message_out, "Ignore paths if:\n"
-"  -l, --max-in-length=MIL    input string longer than MIL\n"
-"  -L, --max-out-length=MOL   output string longer than MOL\n"
-"  -p, --in-prefix=OPREFIX    input string not beginning with IPREFIX\n"
-"  -P, --out-prefix=OPREFIX   output string not beginning with OPREFIX\n"
-"  -u, --in-exclude=IXSTR     input string containing IXSTR\n"
-"  -U, --out-exclude=OXST     output string containing OXSTR\n");
+    fprintf(message_out, "Traversal options:\n"
+            "  -n, --max-strings=NSTR     print at most NSTR strings\n"
+            "  -N, --nbest=NBEST          print at most NBEST best strings\n"
+            "  -r, --random=NRAND         print at most NRAND random strings\n"
+            "  -c, --cycles=NCYC          follow cycles at most NCYC times\n");
+    fprintf(message_out, "Output options:\n"
+            "  -F, --path-format=PFMT     print paths using PFMT format\n"
+            "  -w, --print-weights        display the weight for each string\n"
+            "  -e, --epsilon-format=EPS   print epsilon as EPS\n"
+            "  -X, --xfst=VARIABLE        toggle xfst compatibility option "
+            "VARIABLE\n");
+    fprintf(message_out, "Pruning options; print if:\n"
+            "  -l, --max-in-length=MIL    first level shorter or "
+            "equal to MIL bytes\n"
+            "  -L, --max-out-length=MOL   second level shorter or "
+            "equal to MOL bytes\n"
+            "  -p, --in-prefix=OPREFIX    first level begins with IPREFIX\n"
+            "  -P, --out-prefix=OPREFIX   second level begins with OPREFIX\n"
+            "  -u, --in-exclude=IXSTR     first level does not "
+            "contain IXSTR\n"
+            "  -U, --out-exclude=OXST     second level does not "
+            "contain OXSTR\n");
 
     fprintf(message_out, "\n");
 
-    print_common_unary_program_parameter_instructions();
-    fprintf(message_out, "If all NSTR, NBEST and NCYC are omitted, "
+    print_common_parameter_instructions();
+    fprintf(message_out, "PFMT is one of `xerox'; if omitted, it defaults to "
+            "`xerox'\n."
+            "If all NSTR, NBEST and NCYC are omitted, "
             "all possible paths are printed:\n"
             "NSTR, NBEST and NCYC default to infinity.\n"
             "NBEST overrides NSTR and NCYC\n"
-        "NRAND overrides NBEST, NSTR and NCYC\n"
+            "NRAND overrides NBEST, NSTR and NCYC\n"
             "If EPS is not given, default is empty string.\n"
             "Numeric options are parsed with strtod(3).\n"
-        "Xfst variables supported are { obey-flags, print-flags,\n"
-        "print-pairs, print-space, quote-special }.\n");
+            "Xfst variables supported are { obey-flags, print-flags,\n"
+            "print-pairs, print-space, quote-special }.\n"
+            "Xfst variables only have effect if PFMT is xerox\n");
     fprintf(message_out,
         "\n"
         "Examples:\n"
@@ -123,14 +128,12 @@ print_usage()
         );
 
     print_report_bugs();
-    fprintf(message_out, "\n");
     print_more_info();
 }
 
-int
+void
 parse_options(int argc, char** argv)
 {
-    extend_options_getenv(&argc, &argv);
     // use of this function requires options are settable on global scope
     while (true)
     {
@@ -146,45 +149,47 @@ parse_options(int argc, char** argv)
             {"max-out-length", required_argument, 0, 'L'},
             {"max-strings", required_argument, 0, 'n'},
             {"nbest", required_argument, 0, 'N'},
-        {"random", required_argument, 0, 'r'},
+            {"random", required_argument, 0, 'r'},
             {"out-exclude", required_argument, 0, 'U'},
             {"out-prefix", required_argument, 0, 'P'},
             {"print-pairstrings", no_argument, 0, 'a'},
-        {"print-spaces", no_argument, 0, 'S'},
+            {"print-spaces", no_argument, 0, 'S'},
             {"print-weights", no_argument, 0, 'w'},
             {"xfst", required_argument, 0, 'X'},
+            {"path-format", required_argument, 0, 'F'},
             {0,0,0,0}
           };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT
-                             "Sawc:e:u:p:l:L:n:r:N:U:P:X:",
+                             "Sawc:e:u:F:p:l:L:n:r:N:U:P:X:",
                              long_options, &option_index);
         if (-1 == c)
         {
             break;
         }
-        //char *level = NULL;
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-unary.h"
-        case 'n':
+          {
+          case 'n':
             max_strings = hfst_strtoul(optarg, 10);
             break;
-        case 'N':
+          case 'N':
             nbest_strings = hfst_strtoul(optarg, 10);
             break;
-        case 'r':
+          case 'r':
             max_random_strings = hfst_strtoul(optarg, 10);
             break;
-        case 'c':
+          case 'c':
             cycles = hfst_strtoul(optarg, 10);
             break;
-        case 'w':
+          case 'w':
             display_weights = true;
             break;
-        case 'X':
+          case 'X':
             if (strcmp(optarg, "obey-flags") == 0)
               {
                 eval_fd = true;
@@ -210,41 +215,41 @@ parse_options(int argc, char** argv)
                 hfst_error(0, EXIT_FAILURE, "Unrecognised xfst option. "
                      "available options are obey-flags, print-flags\n");
               }
-          break;
-        case 'l':
+            break;
+          case 'l':
             max_input_length = hfst_strtoul(optarg, 10);
             break;
-        case 'L':
+          case 'L':
             max_output_length = hfst_strtoul(optarg, 10);
             break;
-        case 'p':
+          case 'p':
             input_prefix = optarg;
             break;
-        case 'P':
+          case 'P':
             output_prefix = optarg;
             break;
-        case 'u':
+          case 'u':
             input_exclude = optarg;
             break;
-        case 'U':
-          output_exclude = optarg;
-          break;
-        case 'e':
-          epsilon_format = hfst_strdup(optarg);
-          break;
-        case 'a':
-          print_in_pairstring_format = true;
-          break;
-    case 'S':
-      print_spaces = true;
-      break;
-#include "conventions/getopt-cases-error.h"
-        }
+          case 'U':
+            output_exclude = optarg;
+            break;
+          case 'e':
+            epsilon_format = hfst_strdup(optarg);
+            break;
+          case 'a':
+            print_in_pairstring_format = true;
+            break;
+          case 'S':
+            print_spaces = true;
+            break;
+          case 'F':
+            break;
+          default:
+            parse_getopt_error_value(c);
+            break;
+          }
     }
-
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-unary.h"
-    return EXIT_CONTINUE;
 }
 
 /* Replace all strings \a str1 in \a symbol with \a str2. */
@@ -441,153 +446,118 @@ public:
   }
 };
 
-int
-process_stream(HfstInputStream& instream, std::ostream& outstream)
-{
-  //instream.open();
-  
-  bool first_transducer=true;
-  while(instream.is_good())
+void
+print_paths()
   {
-    if (!first_transducer)
-      outstream << "--\n";
-    first_transducer=false;
-    
-    HfstTransducer t(instream);
-
-    /* Pairstring format is not supported on optimized lookup format. */
-    if (print_in_pairstring_format && 
-    (instream.get_type() == HFST_OL_TYPE || 
-     instream.get_type() == HFST_OLW_TYPE) ) {
-      fprintf(stderr, 
-          "Error: option --print-in-pairstring-format not supported on "
-          "       optimized lookup transducers, exiting program\n" );
-      exit(1);
-    }
- 
-    if(input_prefix != "")
-      verbose_printf("input_prefix: '%s'\n", input_prefix.c_str());
-    
-    if(nbest_strings > 0)
-    {
-      verbose_printf("Pruning transducer to %i best path(s)...\n", 
-             nbest_strings);
-      t.n_best(nbest_strings);
-    }
-    else
-    {
-      if(max_random_strings <= 0 && max_strings <= 0 && max_input_length <= 0 
-     && max_output_length <= 0 &&
-     cycles < 0 && t.is_cyclic())
+    size_t n_transducer = 0;
+    while(instream->is_good())
       {
-        hfst_error(EXIT_FAILURE, 0,
-              "Transducer is cyclic. Use one or more of these options: "
-              "-n, -N, -r, -l, -L, -c");
-        return EXIT_FAILURE;
-      }
+        n_transducer++;
+        if (n_transducer > 1)
+          {
+            // FIXME: it is up to formatter to emit this...?
+            fprintf(outfile, "-- \n");
+          }
+        HfstTransducer t(*instream);
+        /* Pairstring format is not supported on optimized lookup format. */
+        if (print_in_pairstring_format && 
+        (instream->get_type() == HFST_OL_TYPE || 
+         instream->get_type() == HFST_OLW_TYPE) ) {
+          fprintf(stderr, 
+              "Error: option --print-in-pairstring-format not supported on "
+              "       optimized lookup transducers, exiting program\n" );
+          exit(1);
+        }
+        if(input_prefix != "")
+          verbose_printf("input_prefix: '%s'\n", input_prefix.c_str());
+        if(nbest_strings > 0)
+        {
+          verbose_printf("Pruning transducer to %i best path(s)...\n", 
+                 nbest_strings);
+          t.n_best(nbest_strings);
+        }
+        else
+        {
+          if(max_random_strings <= 0 && max_strings <= 0 && max_input_length <= 0 
+         && max_output_length <= 0 &&
+         cycles < 0 && t.is_cyclic())
+          {
+            hfst_error(EXIT_FAILURE, 0,
+                  "Transducer is cyclic. Use one or more of these options: "
+                  "-n, -N, -r, -l, -L, -c");
+          }
+        }
+        if(max_strings > 0)
+          verbose_printf("Finding at most %i path(s)...\n", max_strings);
+        else if(max_random_strings > 0)
+          verbose_printf("Finding at most %i random path(s)...\n", 
+                 max_random_strings);
+        else
+          verbose_printf("Finding strings...\n");
+        /* not random strings */
+        if (max_random_strings <= 0)
+          {
+        Callback cb(max_strings, &cout);
+        if(eval_fd)
+          t.extract_paths_fd(cb, cycles, filter_fd);
+        else
+          t.extract_paths(cb, cycles);    
+        verbose_printf("Printed %i string(s)\n", cb.count);
+          }
+        /* random strings */
+        else
+          {
+            HfstTwoLevelPaths results;
+            try {
+              if (eval_fd) {
+                t.extract_random_paths_fd(results, max_random_strings, filter_fd);
+              }
+              else {
+                t.extract_random_paths(results, max_random_strings);
+              }
+            }
+            catch (const HfstException e) {
+              fprintf(stderr, "option --random not implemented\n");
+            }
+            Callback cb(max_random_strings, &cout);
+            for (HfstTwoLevelPaths::const_iterator it = results.begin();
+                 it != results.end(); it++)
+              {
+                HfstTwoLevelPath path = *it;
+                cb(path, true /*final*/);
+              }
+            verbose_printf("Printed %i random string(s)\n", cb.count);
+          }
     }
-    
-    if(max_strings > 0)
-      verbose_printf("Finding at most %i path(s)...\n", max_strings);
-    else if(max_random_strings > 0)
-      verbose_printf("Finding at most %i random path(s)...\n", 
-             max_random_strings);
-    else
-      verbose_printf("Finding strings...\n");
-    
-    /* not random strings */
-    if (max_random_strings <= 0)
-      {
-    Callback cb(max_strings, &outstream);
-    if(eval_fd)
-      t.extract_paths_fd(cb, cycles, filter_fd);
-    else
-      t.extract_paths(cb, cycles);    
-    verbose_printf("Printed %i string(s)\n", cb.count);
-      }
-    /* random strings */
-    else
-      {
-    HfstTwoLevelPaths results;
-    try {
-      if (eval_fd) {
-        t.extract_random_paths_fd(results, max_random_strings, filter_fd);
-      }
-      else {
-        t.extract_random_paths(results, max_random_strings);
-      }
-    }
-    catch (const HfstException e) {
-      fprintf(stderr, "option --random not implemented\n");
-      return EXIT_FAILURE;
-    }
-      
-    Callback cb(max_random_strings, &outstream);
-    for (HfstTwoLevelPaths::const_iterator it = results.begin();
-         it != results.end(); it++)
-      {
-        HfstTwoLevelPath path = *it;
-        cb(path, true /*final*/);
-      }
-    verbose_printf("Printed %i random string(s)\n", cb.count);
-      }
-    
   }
-    
-  instream.close();
-  return EXIT_SUCCESS;
-}
 
-
-int main( int argc, char **argv ) {
-  hfst_set_program_name(argv[0], "0.1", "HfstFst2Strings");
-  epsilon_format = hfst_strdup("");
-    int retval = parse_options(argc, argv);
-
-    if (max_strings > 0 && max_random_strings > 0 && !silent)
+void
+check_options(int, char**)
+  {
+    if (NULL == epsilon_format)
       {
-    fprintf(stderr, 
-        "warning: option --max_strings ignored, --random used\n");
-    max_strings = -1;
+        epsilon_format = hfst_strdup("");
+        hfst_verbose("Epsilon format defaults to `' (empty string);"
+                     "to see epsilons, use -e");
       }
+    if ((max_strings > 0) && (max_random_strings > 0))
+      {
+        hfst_warning("option --max-strings ignored when --random used");
+        max_strings = -1;
+      }
+  }
 
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (inputfile != stdin)
-    {
-        fclose(inputfile);
-    }
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    verbose_printf("Reading from %s, writing to %s\n", 
-        inputfilename, outfilename);
-    // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
-    try {
-      instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
-    } catch(const HfstException e)   {
-        fprintf(stderr, "%s is not a valid transducer file\n", inputfilename);
-        return EXIT_FAILURE;
-    }
-    
-    if (outfile != stdout)
-    {
-      std::ofstream outstream(outfilename);
-      retval = process_stream(*instream, outstream);
-    }
-    else
-      retval = process_stream(*instream, std::cout);
-    
-    delete instream;
-    free(inputfilename);
-    free(outfilename);
-    free(epsilon_format);
-    return retval;
+int main(int argc, char **argv)
+  {
+    hfst_init_commandline(argv[0], "0.1", "HfstFst2Strings",
+                          AUTOM_IN_FILE_OUT, READ_ONE);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    check_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    print_paths();
+    hfst_uninit_commandline();
+    return EXIT_SUCCESS;
 }
 

@@ -17,7 +17,7 @@
 
 SUBDIRS=hfst-twolc
 AUTOMAKE_OPTIONS=std-options subdir-objects
-AM_CPPFLAGS=-Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors $(HFST_CFLAGS)
+AM_CPPFLAGS=-Wno-deprecated $(HFST_CFLAGS)
 LDADD=$(HFST_LIBS)
 
 # sort alphabetically:
@@ -206,7 +206,10 @@ bin_PROGRAMS= \
 HFST_COMMON_SRC=conventions/options.cc \
 				conventions/commandline.cc \
 				conventions/metadata.cc \
-				conventions/portability.cc
+				conventions/portability.cc \
+				conventions/pretty-printing.cc \
+				conventions/profiling.cc \
+				conventions/io-handling.cc
 if WANT_HFST_UNICODE
 HFST_UNICODE_SRC=conventions/unicode_portability.cc \
 				 utils/utf8.cc utils/ucd_data.cc

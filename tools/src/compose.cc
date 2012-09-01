@@ -39,10 +39,6 @@ using hfst::ImplementationType;
 
 
 #include "conventions/commandline.h"
-#include "conventions/metadata.h"
-#include "conventions/options.h"
-#include "conventions/globals-common.h"
-#include "conventions/globals-binary.h"
 
 static bool harmonize_flags=false;
 
@@ -54,12 +50,11 @@ print_usage()
              "Compose two transducers\n"
         "\n", program_name );
         print_common_program_options();
-        print_common_binary_program_options();
         fprintf(message_out,
                 "Flag diacritics:\n"
                 "  -F, --harmonize-flags  Harmonize flag diacritics.");
         fprintf(message_out, "\n");
-        print_common_binary_program_parameter_instructions();
+        print_common_parameter_instructions();
         fprintf(message_out, "\n");
         fprintf(message_out,
             "\n"
@@ -69,15 +64,12 @@ print_usage()
             "\n",
             program_name );
         print_report_bugs();
-        fprintf(message_out, "\n");
         print_more_info();
 }
 
-int
+void
 parse_options(int argc, char** argv)
 {
-    extend_options_getenv(&argc, &argv);
-    // use of this function requires options are settable on global scope
     while (true)
     {
         static const struct option long_options[] =
@@ -95,158 +87,94 @@ parse_options(int argc, char** argv)
         {
             break;
         }
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
         {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-binary.h"
         case 'F':
           harmonize_flags=true;
           break;
-#include "conventions/getopt-cases-error.h"
+        default:
+          parse_getopt_error_value(c);
+          break;
         }
     }
-
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-binary.h"
-    return EXIT_CONTINUE;
 }
 
-int
-compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
-                HfstOutputStream& outstream)
-{
-    bool bothInputs = firststream.is_good() && secondstream.is_good();
-    if (firststream.get_type() != secondstream.get_type())
+void
+make_compositions()
+  {
+    bool bothInputs = firststream->is_good() && secondstream->is_good();
+    if (firststream->get_type() != secondstream->get_type())
       {
         hfst_warning( "Tranducer type mismatch in %s and %s; "
-              "using former type as output\n",
+              "trying former type as output\n",
               firstfilename, secondfilename);
       }
     size_t transducer_n = 0;
     while (bothInputs) {
         transducer_n++;
-        HfstTransducer first(firststream);
-        HfstTransducer second(secondstream);
-        char* firstname = hfst_get_name(first, firstfilename);
-        char* secondname = hfst_get_name(second, secondfilename);
-        if (transducer_n == 1)
-        {
-            verbose_printf("Composing %s and %s...\n", firstname, 
-                           secondname);
-        }
-        else
-        {
-            verbose_printf("Composing %s and %s... %zu\n",
-                           firstname, secondname, transducer_n);
-        }
-
-        try {
-        if (first.has_flag_diacritics() or second.has_flag_diacritics()) 
+        HfstTransducer first(*firststream);
+        HfstTransducer second(*secondstream);
+        const char* firstname = hfst_get_name(first, firstfilename);
+        const char* secondname = hfst_get_name(second, secondfilename);
+        hfst_begin_processing(firstname, secondname, transducer_n,
+                              "Composing");
+        try 
           {
-            if (not harmonize_flags)
+            if (first.has_flag_diacritics() || second.has_flag_diacritics()) 
               {
-                if (not silent) 
+                if (!harmonize_flags)
                   {
                     hfst_warning( "At least one of the arguments contains "
                     "flag diacritics. Use -F to harmonize them.", 
                     secondname, firstname);
+                  }
+                else
+                  {
+                    first.harmonize_flag_diacritics(second);
+                  }
+              }
+            hfst_set_name(first, first, second, "compose");
+            hfst_set_formula(first, first, second, "∘");
+            first.compose(second);
+            *outstream << first;
           }
-              }
-            else
-              {
-                first.harmonize_flag_diacritics(second);
-              }
-        }
-
-        hfst_set_name(first, first, second, "compose");
-        hfst_set_formula(first, first, second, "∘");
-        first.compose(second);
-        outstream << first;
-
-        }
         catch (HfstTransducerTypeMismatchException)
           {
             hfst_error(EXIT_FAILURE, 0, "Could not compose %s and %s [%zu]\n"
                   "types %s and %s are not compatible for composition",
                   firstname, secondname, transducer_n,
-                  hfst_strformat(firststream.get_type()),
-                  hfst_strformat(secondstream.get_type()));
+                  hfst_strformat(firststream->get_type()),
+                  hfst_strformat(secondstream->get_type()));
           }
 
-        bothInputs = firststream.is_good() && secondstream.is_good();
-    }
-    
-    if (firststream.is_good())
-    {
-      hfst_warning( "%s contains more transducers than %s; "
+        bothInputs = firststream->is_good() && secondstream->is_good();
+      }
+    if (firststream->is_good())
+      {
+        hfst_warning("%s contains more transducers than %s; "
                      "residue skipped", firstfilename, secondfilename);
-    }
-    else if (secondstream.is_good())
-    {
-      hfst_warning( "%s contains fewer transducers than %s; "
+      }
+    else if (secondstream->is_good())
+      {
+        hfst_warning("%s contains fewer transducers than %s; "
                      "residue skipped", firstfilename, secondfilename);
-    }
-    firststream.close();
-    secondstream.close();
-    outstream.close();
-    return EXIT_SUCCESS;
+      }
 }
 
 
 int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstCompose");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (firstfile != stdin)
-    {
-        fclose(firstfile);
-    }
-    if (secondfile != stdin)
-    {
-        fclose(secondfile);
-    }
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    verbose_printf("Reading from %s and %s, writing to %s\n", 
-        firstfilename, secondfilename, outfilename);
-    // here starts the buffer handling part
-    HfstInputStream* firststream = NULL;
-    HfstInputStream* secondstream = NULL;
-    try {
-        firststream = (firstfile != stdin) ?
-            new HfstInputStream(firstfilename) : new HfstInputStream();
-    } catch(const HfstException e)   {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              firstfilename);
-    }
-    try {
-        secondstream = (secondfile != stdin) ?
-            new HfstInputStream(secondfilename) : new HfstInputStream();
-    } catch(const HfstException e)   {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              secondfilename);
-    }
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, firststream->get_type()) :
-        new HfstOutputStream(firststream->get_type());
-
-    retval = compose_streams(*firststream, *secondstream, *outstream);
-    if (profile_file != 0)
-      {
-        hfst_print_profile_line();
-      }
-    delete firststream;
-    delete secondstream;
-    delete outstream;
-    free(firstfilename);
-    free(secondfilename);
-    free(outfilename);
-    return retval;
+    hfst_init_commandline(argv[0], "0.1", "HfstCompose",
+                          AUTOM_IN_AUTOM_OUT, READ_TWO);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    make_compositions();
+    hfst_uninit_commandline();
+    return EXIT_SUCCESS;
 }
 

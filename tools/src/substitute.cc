@@ -44,11 +44,6 @@ typedef std::map<String, String> HfstSymbolSubstitutions;
 typedef std::map<StringPair, StringPair> HfstSymbolPairSubstitutions;
 
 #include "conventions/commandline.h"
-#include "conventions/options.h"
-#include "conventions/metadata.h"
-
-#include "conventions/globals-common.h"
-#include "conventions/globals-unary.h"
 
 // Added this to accommodate checking for SFST to handle foma better;
 // SH 24.8.2011
@@ -142,32 +137,32 @@ label_to_stringpair(const char* label)
 
 void
 print_usage()
-{
+  {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
            "Relabel transducer arcs\n"
         "\n", program_name);
 
     print_common_program_options();
-    print_common_unary_program_options();
     fprintf(message_out, "Relabeling options:\n"
             "  -f, --from-label=FLABEL      replace FLABEL\n"
             "  -t, --to-label=TLABEL        replace with TLABEL\n"
             "  -T, --to-transducer=TFILE    replace with transducer "
             "read from TFILE\n"
             "  -F, --from-file=LABELFILE    read replacements from LABELFILE\n"
-	    "  -R,  --in-order              keep the order of the replacements\n"
+            "  -R,  --in-order              keep the order of the "
+            "replacements\n"
             "Transient optimisation schemes:\n"
             "  -9, --compose                compose substitutions when possible\n"
            );
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions();
+    print_common_parameter_instructions();
     fprintf(message_out, "LABEL must be a symbol name in single arc in "
             "transducer,"
             " or colon separated pair defining an arc\n"
             "if TFILE is specified, FLABEL must be a pair\n"
             "LABELFILE is a 2 column tsv file where col 1 is FLABEL and"
-            "col 2 TLABEL specifications");
+            "col 2 TLABEL specifications\n");
     fprintf(message_out,
            "\n"
            "Examples:\n"
@@ -175,18 +170,16 @@ print_usage()
            "cg \n"
            "\n", program_name);
     print_report_bugs();
-    fprintf(message_out, "\n");
     print_more_info();
 
 }
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
+  {
     // use of this function requires options are settable on global scope
     while (true)
-    {
+      {
         static const struct option long_options[] =
         {
         HFST_GETOPT_COMMON_LONG,
@@ -196,7 +189,7 @@ parse_options(int argc, char** argv)
             {"from-file", required_argument, 0, 'F'},
             {"to-label", required_argument, 0, 't'},
             {"to-transducer", required_argument, 0, 'T'},
-	    {"in-order", no_argument, 0, 'R'},
+            {"in-order", no_argument, 0, 'R'},
             {"compose", no_argument, 0, '9'},
             {0,0,0,0}
         };
@@ -206,81 +199,84 @@ parse_options(int argc, char** argv)
                              HFST_GETOPT_UNARY_SHORT "f:F:t:T:R9",
                              long_options, &option_index);
         if (-1 == c)
-        {
+          {
             break;
-        }
-        FILE* f = 0;
+          }
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-unary.h"
-          // add tool-specific cases here
-        case 'f':
+          {
+          case 'f':
             from_label = hfst_strdup(optarg);
             from_pair = label_to_stringpair(from_label);
             if (strlen(from_label) == 0)
               {
-                hfst_error(EXIT_FAILURE, 0, "argument of source label option is "
+                hfst_error(EXIT_FAILURE, 0, 
+                           "argument of source label option is "
                       "empty;\n"
                       "if you REALLY want to replace epsilons with something, "
                       "use @0@ or %s", hfst::internal_epsilon.c_str());
               }
             break;
-        case 'F':
+          case 'F':
             from_file_name = hfst_strdup(optarg);
             from_file = hfst_fopen(from_file_name, "r");
-            if (from_file == NULL)
-            {
-                return EXIT_FAILURE;
-            }
             break;
-        case 't':
+          case 't':
             to_label = hfst_strdup(optarg);
             to_pair = label_to_stringpair(to_label);
             if (strlen(to_label) == 0)
               {
-                hfst_error(EXIT_FAILURE, 0, "argument of target label option is "
+                hfst_error(EXIT_FAILURE, 0,
+                           "argument of target label option is "
                       "empty;\n"
                       "if you want to substitute something with epsilons, "
                       "use @0@ or %s", hfst::internal_epsilon.c_str());
               }
             break;
-        case 'T':
+          case 'T':
+              {
             to_transducer_filename = hfst_strdup(optarg);
-            f = hfst_fopen(to_transducer_filename, "r");
-            if (f == NULL)
-            {
-                return EXIT_FAILURE;
-            }
+            FILE* f = hfst_fopen(to_transducer_filename, "r");
             fclose(f);
             break;
-	case 'R':
-	    hfst_error(EXIT_FAILURE, 0, "option --in-order is not implemented\n");
-	    break;
-        case '9':
+              }
+          case 'R':
+            hfst_error(EXIT_FAILURE, 0, 
+                       "option --in-order is not implemented\n");
+            break;
+          case '9':
             compose = true;
             break;
-#include "conventions/getopt-cases-error.h"
-        }
-    }
-    
+          default:
+            parse_getopt_error_value(c);
+            break;
+          }
+      }
+  }
+
+void
+check_options(int, char**)
+  {
     if ((from_label == 0) && (from_file_name == 0))
-    {
+      {
         hfst_error(EXIT_FAILURE, 0,
               "Must state name of labels to rewrite with -f or -F");
-        return EXIT_FAILURE;
-    }
+      }
     if ((to_label == 0) && (to_transducer_filename == 0) && 
             (from_file_name == 0))
-    {
+      {
         hfst_error(EXIT_FAILURE, 0,
               "Must give target labels with -t, -T or -F");
-        return EXIT_FAILURE;
-    }
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-unary.h"
-    return EXIT_CONTINUE;
-}
+      }
+    if (from_file != NULL)
+      {
+        label_substitution_map = new HfstSymbolSubstitutions();
+        pair_substitution_map = new HfstSymbolPairSubstitutions();
+      }
+  }
 
 static
 HfstBasicTransducer&
@@ -503,352 +499,300 @@ perform_delayed(HfstTransducer& trans)
   trans.minimize();
 }
 
-int
-process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
-{
-  bool symbol_pair_map_in_use=false;
-  bool symbol_map_in_use=false;
-
-  size_t transducer_n = 0;
-  if (to_transducer_filename)
-    {
-      try {
-        HfstInputStream tostream(to_transducer_filename);
-        to_transducer = new HfstTransducer(tostream);
-      } catch (NotTransducerStreamException ntse)  
-        {
-          hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-                to_transducer_filename);
-          return EXIT_FAILURE;
-        }
-    }
-  HfstBasicTransducer* fallback = 0;
-  bool warnedAlready = false;
-  bool fellback = false;
-  while (instream.is_good())
-    {
-    // SH 24.8.2011:
-    // for some reason converting between foma and basic transducer
-    // for substitution can leak lots and lots of space.
-    // For this reason we currently do substitution in sfst and finally
-    // convert back to foma.
-    bool got_foma = false;
-      transducer_n++;
-      HfstTransducer trans(instream);
-#if HAVE_SFST
-      if (trans.get_type() == hfst::FOMA_TYPE) 
-        {
-          if (!silent)
-            {
-              hfst_warning( "NB: substitution for foma transducers will be done "
-                    "via conversion to\n"
-                    "SFST and back (if available)\n");
-            }
-      got_foma = true;
-      trans = trans.convert(hfst::SFST_TYPE);
+void
+make_substitutions()
+  {
+    bool symbol_pair_map_in_use=false;
+    bool symbol_map_in_use=false;
+    size_t transducer_n = 0;
+    if (to_transducer_filename)
+      {
+        try 
+          {
+            HfstInputStream tostream(to_transducer_filename);
+            to_transducer = new HfstTransducer(tostream);
+          }
+        catch (NotTransducerStreamException ntse)  
+          {
+            hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+                  to_transducer_filename);
+          }
       }
-#endif
-      char* inputname = strdup(trans.get_name().c_str());
-      if (strlen(inputname) <= 0)
-        {
-          inputname = strdup(inputfilename);
-        }
-      if (transducer_n == 1)
-        {
-          verbose_printf("performing substitutions in %s...\n", inputname);
-        }
-      else
-        {
-          verbose_printf("performing substitutions in %s... %zu\n", inputname,
-                         transducer_n);
-        }
-      // initialize delayed substitutor automaton
-      substitution_trans = new HfstTransducer(trans.get_type());
-      if (from_file)
-        {
-          char* line = NULL;
-          size_t len = 0;
-          size_t line_n = 0;
-          verbose_printf("reading substitutions from %s...\n", from_file_name);
-          while (hfst_getline(&line, &len, from_file) != -1)
-            {
-              line_n++;
-              if (*line == '\n')
-                {
-                  continue;
-                }
-              const char* tab = strstr(line, "\t");
-              if (tab == NULL)
-                {
-                  if (*line == '#')
-                    {
-                      continue;
-                    }
-                  else
-                    {
-                      error_at_line(EXIT_FAILURE, 0, from_file_name, line_n,
-                                    "At least one tab required per line");
-                    }
-                }
-              const char* endstr = tab+1;
-              while ((*endstr != '\0') && (*endstr != '\n'))
-                {
-                  endstr++;
-                }
-              from_label = hfst_strndup(line, tab-line);
-              to_label = hfst_strndup(tab+1, endstr-tab-1);
-              from_pair = label_to_stringpair(from_label);
-              to_pair = label_to_stringpair(to_label);
-              if (strlen(from_label) == 0)
-                {
-                  error_at_line(EXIT_FAILURE, 0, from_file_name, line_n,
-                                "First field is empty;\n"
-                                "if you REALLY want to replace epsilons with"
-                                "something, use @0@ or %s",
-                                hfst::internal_epsilon.c_str());
-                }
-              if (strlen(to_label) == 0)
-                {
-                  error_at_line(EXIT_FAILURE, 0, from_file_name, line_n,
-                                "Second field seems empty;\n"
-                                "if you want to substitute something with "
-                                "epsilons, use @0@ or %s",
-                                hfst::internal_epsilon.c_str());
-                }
-             if (from_pair && to_pair) 
-               {
-                 verbose_printf("Adding substitution pair %s to pair %s "
-                                "to delayed substitutions\n",
-                                from_pair, to_pair);
-                 pair_substitution_map->operator[](*from_pair) = *to_pair;
-                 symbol_pair_map_in_use=true;
-               }
-             else if (from_label && to_label) 
-               {
-                 verbose_printf("Adding substitution label %s to label %s "
-                                "to delayed substitutions\n",
-                                from_label, to_label);
-                 label_substitution_map->operator[](std::string(from_label)) = 
-                     std::string(to_label);
-                 symbol_map_in_use=true;
-               }
-             else 
-               {
-                 try 
-                   {
-                     do_substitute(trans, transducer_n);
-                   }
-                 catch (FunctionNotImplementedException fnse)
-                   {
-                     if (!warnedAlready)
-                       {
-                         if (!silent)
-                           {
-                             hfst_warning( "substitution is not supported for "
-                                     "this transducer type falling back to "
-                                     "internal formats and trying...");
-                           }
-                         fallback = new HfstBasicTransducer(trans);
-                         warnedAlready = true;
-                       }
-                     do_substitute(*fallback, transducer_n);
-                     fellback = true;
-                   }
-                 free(from_label);
-                 free(to_label);
-               }
-            } // while getline
-          free(line);
-          if (symbol_map_in_use) 
-            {
-              verbose_printf("Performing delayed label substitutions...\n");
-              trans.substitute(*label_substitution_map);
-              symbol_map_in_use=false;
-            }
-          if (symbol_pair_map_in_use) 
-            {
-              verbose_printf("Performing delayed pair substitutions...\n");
-              trans.substitute(*pair_substitution_map);
-              symbol_pair_map_in_use=false;
-            }
-
-        }
-      else
-        {
-          try
-            {
-              do_substitute(trans, transducer_n);
-            }
-          catch (FunctionNotImplementedException fnse)
-            {
-              if (!warnedAlready)
-                {
-                  if (!silent)
-                    {
-                      hfst_warning( "substitution is not supported for this "
-                              "transducer type falling back to internal format "
-                              " and trying...");
-                    }
-                  fallback = new HfstBasicTransducer(trans);
-                }
-              do_substitute(*fallback, transducer_n);
-              fellback = true;
-            }
-        }
-      if (fellback)
-        {
-          trans = HfstTransducer(*fallback, trans.get_type());
-        }
-      else if (delayed)
-        {
-          perform_delayed(trans);
-        }
-      if (from_file)
-        {
-            char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                         (strlen(from_file_name) +
-                                          strlen("substitutions-from-%s")) 
-                                          + 1));
-            if (sprintf(composed_name, "substitute-from-%s",
-                        from_file_name) > 0)
+    HfstBasicTransducer* fallback = 0;
+    bool warnedAlready = false;
+    bool fellback = false;
+    while (instream->is_good())
+      {
+      // SH 24.8.2011:
+      // for some reason converting between foma and basic transducer
+      // for substitution can leak lots and lots of space.
+      // For this reason we currently do substitution in sfst and finally
+      // convert back to foma.
+        bool got_foma = false;
+        transducer_n++;
+        HfstTransducer trans(*instream);
+#   if HAVE_FOMA
+        if (trans.get_type() == hfst::FOMA_TYPE) 
+          {
+#       if HAVE_SFST
+            if (!silent)
               {
-                hfst_set_name(trans, trans, composed_name);
-                free(composed_name);
+                hfst_warning("substitution for foma transducers will be done\n"
+                      "via conversion to SFST and back");
               }
-            composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                         (strlen(from_file_name) +
-                                          strlen("♲%s")) 
-                                          + 1));
-            if (sprintf(composed_name, "♲%s",
-                        from_file_name) > 0)
+            got_foma = true;
+            trans = trans.convert(hfst::SFST_TYPE);
+#       else
+            hfst_warning("There may be some bugs in foma's substitution...");
+#       endif
+          }
+#   endif
+        const char* inputname = hfst_get_name(trans, inputfilename);
+        hfst_begin_processing(inputname, transducer_n, "Substituting");
+        // initialize delayed substitutor automaton
+        substitution_trans = new HfstTransducer(trans.get_type());
+        if (from_file)
+          {
+            char* line = NULL;
+            size_t len = 0;
+            size_t line_n = 0;
+            verbose_printf("reading substitutions from %s...\n", from_file_name);
+            while (hfst_getline(&line, &len, from_file) != -1)
               {
-                hfst_set_formula(trans, trans, composed_name);
-                free(composed_name);
-              }
-        }
-      else if (from_label && to_label)
-        {
-            char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                         (strlen(from_label) +
-                                          strlen(to_label) +
-                                          strlen("substitute-%s-with-%s")) 
-                                          + 1));
-            if (sprintf(composed_name, "substitute-%s-with-%s",
-                        from_label, to_label) > 0)
+                line_n++;
+                if (*line == '\n')
+                  {
+                    continue;
+                  }
+                const char* tab = strstr(line, "\t");
+                if (tab == NULL)
+                  {
+                    if (*line == '#')
+                      {
+                        continue;
+                      }
+                    else
+                      {
+                        error_at_line(EXIT_FAILURE, 0, from_file_name, line_n,
+                                      "At least one tab required per line");
+                      }
+                  }
+                const char* endstr = tab+1;
+                while ((*endstr != '\0') && (*endstr != '\n'))
+                  {
+                    endstr++;
+                  }
+                from_label = hfst_strndup(line, tab-line);
+                to_label = hfst_strndup(tab+1, endstr-tab-1);
+                from_pair = label_to_stringpair(from_label);
+                to_pair = label_to_stringpair(to_label);
+                if (strlen(from_label) == 0)
+                  {
+                    error_at_line(EXIT_FAILURE, 0, from_file_name, line_n,
+                                  "First field is empty;\n"
+                                  "if you REALLY want to replace epsilons with"
+                                  "something, use @0@ or %s",
+                                  hfst::internal_epsilon.c_str());
+                  }
+                if (strlen(to_label) == 0)
+                  {
+                    error_at_line(EXIT_FAILURE, 0, from_file_name, line_n,
+                                  "Second field seems empty;\n"
+                                  "if you want to substitute something with "
+                                  "epsilons, use @0@ or %s",
+                                  hfst::internal_epsilon.c_str());
+                  }
+               if (from_pair && to_pair) 
+                 {
+                   verbose_printf("Adding substitution pair %s to pair %s "
+                                  "to delayed substitutions\n",
+                                  from_pair, to_pair);
+                   pair_substitution_map->operator[](*from_pair) = *to_pair;
+                   symbol_pair_map_in_use=true;
+                 }
+               else if (from_label && to_label) 
+                 {
+                   verbose_printf("Adding substitution label %s to label %s "
+                                  "to delayed substitutions\n",
+                                  from_label, to_label);
+                   label_substitution_map->operator[](std::string(from_label)) = 
+                       std::string(to_label);
+                   symbol_map_in_use=true;
+                 }
+               else 
+                 {
+                   try 
+                     {
+                       do_substitute(trans, transducer_n);
+                     }
+                   catch (FunctionNotImplementedException fnse)
+                     {
+                       if (!warnedAlready)
+                         {
+                           if (!silent)
+                             {
+                               hfst_warning( "substitution is not supported for "
+                                       "this transducer type falling back to "
+                                       "internal formats and trying...");
+                             }
+                           fallback = new HfstBasicTransducer(trans);
+                           warnedAlready = true;
+                         }
+                       do_substitute(*fallback, transducer_n);
+                       fellback = true;
+                     }
+                   free(from_label);
+                   free(to_label);
+                 }
+              } // while getline
+            free(line);
+            if (symbol_map_in_use) 
               {
-                hfst_set_name(trans, trans, composed_name);
-                free(composed_name);
+                verbose_printf("Performing delayed label substitutions...\n");
+                trans.substitute(*label_substitution_map);
+                symbol_map_in_use=false;
               }
-            composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                         (strlen(from_label) +
-                                          strlen(to_label) +
-                                          strlen("%s ♲ %s")) 
-                                          + 1));
-            if (sprintf(composed_name, "%s ♲ %s",
-                        from_label, to_label) > 0)
+            if (symbol_pair_map_in_use) 
               {
-                hfst_set_formula(trans, trans, composed_name);
-                free(composed_name);
+                verbose_printf("Performing delayed pair substitutions...\n");
+                trans.substitute(*pair_substitution_map);
+                symbol_pair_map_in_use=false;
               }
-            
-        }
-      else if (to_transducer_filename)
-        {
-            char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                         (strlen(from_label) +
-                                          strlen(to_transducer_filename) +
-                                          strlen("substitute-%s-with-net-%s")) 
-                                         + 1));
-            if (sprintf(composed_name, "substitute-%s-with-net-%s",
-                        from_label, to_transducer_filename) > 0)
+  
+          }
+        else
+          {
+            try
               {
-                hfst_set_name(trans, trans, composed_name);
-                free(composed_name);
+                do_substitute(trans, transducer_n);
               }
-            composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                         (strlen(from_label) +
-                                          strlen(to_transducer_filename) +
-                                          strlen("%s ♲ %s")) 
-                                         + 1));
-            if (sprintf(composed_name, "%s ♲ %s",
-                        from_label, to_transducer_filename) > 0)
+            catch (FunctionNotImplementedException fnse)
               {
-                hfst_set_formula(trans, trans, composed_name);
-                free(composed_name);
+                if (!warnedAlready)
+                  {
+                    if (!silent)
+                      {
+                        hfst_warning( "substitution is not supported for this "
+                                "transducer type falling back to internal format "
+                                " and trying...");
+                      }
+                    fallback = new HfstBasicTransducer(trans);
+                  }
+                do_substitute(*fallback, transducer_n);
+                fellback = true;
               }
-
-
-        }
-      delete fallback;
-      // TODO: remove this, this should be taken care in the interface
-      verbose_printf("Pruning removed alphabet...\n");
-      fallback = new HfstBasicTransducer(trans);
-      fallback->prune_alphabet();
-      trans = HfstTransducer(*fallback, trans.get_type());
-#if HAVE_SFST
-      if (got_foma) {
-      trans = trans.convert(hfst::FOMA_TYPE);
+          }
+        if (fellback)
+          {
+            trans = HfstTransducer(*fallback, trans.get_type());
+          }
+        else if (delayed)
+          {
+            perform_delayed(trans);
+          }
+        if (from_file)
+          {
+              char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                           (strlen(from_file_name) +
+                                            strlen("substitutions-from-%s")) 
+                                            + 1));
+              if (sprintf(composed_name, "substitute-from-%s",
+                          from_file_name) > 0)
+                {
+                  hfst_set_name(trans, trans, composed_name);
+                  free(composed_name);
+                }
+              composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                           (strlen(from_file_name) +
+                                            strlen("♲%s")) 
+                                            + 1));
+              if (sprintf(composed_name, "♲%s",
+                          from_file_name) > 0)
+                {
+                  hfst_set_formula(trans, trans, composed_name);
+                  free(composed_name);
+                }
+          }
+        else if (from_label && to_label)
+          {
+              char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                           (strlen(from_label) +
+                                            strlen(to_label) +
+                                            strlen("substitute-%s-with-%s")) 
+                                            + 1));
+              if (sprintf(composed_name, "substitute-%s-with-%s",
+                          from_label, to_label) > 0)
+                {
+                  hfst_set_name(trans, trans, composed_name);
+                  free(composed_name);
+                }
+              composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                           (strlen(from_label) +
+                                            strlen(to_label) +
+                                            strlen("%s ♲ %s")) 
+                                            + 1));
+              if (sprintf(composed_name, "%s ♲ %s",
+                          from_label, to_label) > 0)
+                {
+                  hfst_set_formula(trans, trans, composed_name);
+                  free(composed_name);
+                }
+          }
+        else if (to_transducer_filename)
+          {
+              char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                           (strlen(from_label) +
+                                            strlen(to_transducer_filename) +
+                                            strlen("substitute-%s-with-net-%s")) 
+                                           + 1));
+              if (sprintf(composed_name, "substitute-%s-with-net-%s",
+                          from_label, to_transducer_filename) > 0)
+                {
+                  hfst_set_name(trans, trans, composed_name);
+                  free(composed_name);
+                }
+              composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                           (strlen(from_label) +
+                                            strlen(to_transducer_filename) +
+                                            strlen("%s ♲ %s")) 
+                                           + 1));
+              if (sprintf(composed_name, "%s ♲ %s",
+                          from_label, to_transducer_filename) > 0)
+                {
+                  hfst_set_formula(trans, trans, composed_name);
+                  free(composed_name);
+                }
+          }
+        delete fallback;
+        // TODO: remove this, this should be taken care in the interface
+        verbose_printf("Pruning removed alphabet...\n");
+        fallback = new HfstBasicTransducer(trans);
+        fallback->prune_alphabet();
+        trans = HfstTransducer(*fallback, trans.get_type());
+#   if HAVE_FOMA && HAVE_SFST
+        if (got_foma) 
+          {
+            trans = trans.convert(hfst::FOMA_TYPE);
+          }
+#   endif
+        *outstream << trans;
+        delete fallback;
       }
-#endif
-      outstream << trans;
-      delete fallback;
-      free(inputname);
-    }
-  delete to_transducer;
-  return EXIT_SUCCESS;
-}
+    delete to_transducer;
+  }
 
 
 int main( int argc, char **argv ) 
-{
-  hfst_set_program_name(argv[0], "0.1", "HfstSubstitute");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (inputfile != stdin)
-    {
-        fclose(inputfile);
-    }
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    verbose_printf("Reading from %s, writing to %s\n", 
-        inputfilename, outfilename);
-
-    if (from_file != NULL)
-      {
-#ifdef DEBUG_SUBSTITUTE
-	std::cerr << "from_file != NULL\n" << std::endl;
-#endif
-	label_substitution_map = new HfstSymbolSubstitutions();
-	pair_substitution_map = new HfstSymbolPairSubstitutions();
-	// TODO: delete
-      }
-
-    // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
-    try {
-      instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
-    } catch(const HfstException e)  {
-            hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-          inputfilename);
-            return EXIT_FAILURE;
-    }
-    HfstOutputStream* outstream = (outfile != stdout) ?
-            new HfstOutputStream(outfilename, instream->get_type()) :
-            new HfstOutputStream(instream->get_type());
-    process_stream(*instream, *outstream);
-    if (profile_file != 0)
-      {
-        hfst_print_profile_line();
-      }
-    free(inputfilename);
-    free(outfilename);
+  {
+    hfst_init_commandline(argv[0], "0.1", "HfstSubstitute",
+                          AUTOM_IN_AUTOM_OUT, READ_ONE);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    check_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    make_substitutions();
+    hfst_uninit_commandline();
     return EXIT_SUCCESS;
 }
 

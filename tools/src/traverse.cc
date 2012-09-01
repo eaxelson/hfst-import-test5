@@ -47,10 +47,6 @@ using std::pair;
 #include <hfst.hpp>
 
 #include "conventions/commandline.h"
-#include "conventions/options.h"
-
-#include "conventions/globals-common.h"
-#include "conventions/globals-unary.h"
 
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
@@ -109,9 +105,8 @@ print_usage()
 
     // options, grouped
     print_common_program_options();
-    print_common_unary_program_options();
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions();
+    print_common_parameter_instructions();
     fprintf(message_out, "\n");
     print_report_bugs();
     fprintf(message_out, "\n");
@@ -119,10 +114,9 @@ print_usage()
 }
 
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
+  {
     // use of this function requires options are settable on global scope
     while (true)
     {
@@ -143,26 +137,24 @@ parse_options(int argc, char** argv)
         {
             break;
         }
-
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-unary.h"
-        case 'X':
-          cave_mode = true;
-          break;
-#include "conventions/getopt-cases-error.h"
-        }
-    }
+          {
+          case 'X':
+            cave_mode = true;
+            break;
+          default:
+            parse_getopt_error_value(c);
+          }
+      }
+  }
 
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-unary.h"
-    return EXIT_CONTINUE;
-}
-
-int
+void
 main_loop(HfstBasicTransducer trans)
-{
+  {
     fprintf(message_out, 
             "Enter labels to seek all paths\n");
     // record current paths with their end states
@@ -210,7 +202,7 @@ main_loop(HfstBasicTransducer trans)
         char* label = hfst_readline("traverse> ");
         if (NULL == label)
           {
-            return EXIT_SUCCESS;
+            return;
           }
         multimap<string, HfstState> new_paths;
         for (multimap<string, HfstState>::const_iterator p = paths.begin();
@@ -250,25 +242,17 @@ main_loop(HfstBasicTransducer trans)
         add_history(label);
 #endif
       } // while paths not empty
-    return EXIT_SUCCESS;
-}
+  }
 
-int
-process_stream(HfstInputStream& instream)
-{
-  //instream.open();
-  //outstream.open();
-    
+void
+make_traversals()
+  {
     size_t transducer_n=0;
-    while(instream.is_good())
+    while (instream->is_good())
     {
         transducer_n++;
-        HfstTransducer trans(instream);
+        HfstTransducer trans(*instream);
         string trans_name = trans.get_name();
-        if (trans_name == "")
-          {
-            trans_name = inputfilename;
-          }
         HfstBasicTransducer walkable(trans);
         if (cave_mode)
           {
@@ -305,52 +289,23 @@ process_stream(HfstInputStream& instream)
         if (walkable.begin() == walkable.end())
           {
             fprintf(message_out, "Nowhere to go\n");
-            return EXIT_SUCCESS;
           }
-        return main_loop(walkable);
+        main_loop(walkable);
     }
-    instream.close();
+    instream->close();
+}
+
+
+int main( int argc, char **argv ) 
+  {
+    hfst_init_commandline(argv[0], "0.1", "HfstTraverse",
+                          AUTOM_IN_FILE_OUT, READ_ONE);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    make_traversals();
+    hfst_uninit_commandline();
     return EXIT_SUCCESS;
-}
-
-
-int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstDeterminize");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (inputfile != stdin)
-    {
-        fclose(inputfile);
-    }
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    verbose_printf("Reading from %s, writing to %s\n", 
-        inputfilename, outfilename);
-    // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
-    try {
-      instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
-    } catch(const HfstException e)    {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
-        return EXIT_FAILURE;
-    }
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, instream->get_type()) :
-        new HfstOutputStream(instream->get_type());
-    
-    retval = process_stream(*instream);
-    delete instream;
-    delete outstream;
-    free(inputfilename);
-    free(outfilename);
-    return retval;
-}
+  }
 

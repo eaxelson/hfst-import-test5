@@ -1,20 +1,35 @@
 #!/bin/bash
 old_opts="$HFST_OPTIONS"
 export HFST_OPTIONS="--version"
-for f in ../src/hfst-{compare,compose,compose-intersect,concatenate,disjunct,duplicate,fst2fst,fst2strings,fst2txt,head,invert,lexc2fst,lookup,minimize,name,pair-test,project,push-weights,regexp2fst,remove-epsilons,repeat,reverse,split,strings2fst,substitute,subtract,summarize,tail,txt2fst} ; do
+for f in ../src/hfst-{conjunct,disjunct,compose,subtract,compose,compose-intersect} ; do
     if [ -x "$f" -a ! -d "$f" ] ; then
-        if !  "$f" > version.out ; then
+        if !  "$f" -1 $srcdir/cat.hfst -2 $srcdir/dog.hfst -o /dev/null > version.out ; then
             rm version.out
-            echo $f has broken version
+            echo "$f has broken version (when asking from env. var)"
             exit 1
         fi
         if ! grep -m 1 '^hfst-[^ ]\+ [0-9.]\+' version.out > /dev/null \
         ; then
             rm version.out
-            echo $f has malformed version
+            echo "$f has malformed version (when asking from env. var)"
+            exit 1
+        fi
+    fi
+done
+for f in ../src/hfst-{determinize,invert,minimize,remove-epsilons,reverse,fst2strings,fst2txt,fst2fst,duplicate,name,summarize} ; do
+    if [ -x "$f" -a ! -d "$f" ] ; then
+        if !  "$f" -i $srcdir/cat.hfst  -o /dev/null > version.out ; then
+            rm version.out
+            echo "$f has broken version (when asking from env. var)"
+            exit 1
+        fi
+        if ! grep -m 1 '^hfst-[^ ]\+ [0-9.]\+' version.out > /dev/null \
+        ; then
+            rm version.out
+            echo "$f has malformed version (when asking from env. var)"
             exit 1
         fi
     fi
 done
 rm version.out
-HFST_OPTIONS="$old_opts"
+export HFST_OPTIONS="$old_opts"

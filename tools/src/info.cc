@@ -1,6 +1,6 @@
-//! @file hfst-format.cc
+//! @file info.cc
 //!
-//! @brief Format checking command line tool
+//! @brief HFST debug and version info tool
 //!
 //! @author HFST Team
 
@@ -26,17 +26,17 @@
 #include <cstring>
 #include <getopt.h>
 
-#include "hfst.hpp"
-#include "conventions/commandline.h"
-#include "conventions/options.h"
-
-#include "conventions/globals-common.h"
 
 #include <set>
 #include <string>
 
 using std::set;
 using std::string;
+
+#include <hfst.hpp>
+
+#include "conventions/commandline.h"
+
 
 static long min_version = -1L;
 static long exact_version = -1L;
@@ -46,42 +46,42 @@ static set<string> required_features;
 static
 long
 parse_version_string(const char* s)
-{
-  long l = 0;
-  long multiplier = 10000;
-  unsigned int fullstops = 0;
-  for (const char* p = s; *p != '\0'; p++)
-    {
-      if (('0' <= *p) && (*p <= '9'))
-        {
-          l *= 10;
-          l += *p - '0';
-          multiplier /= 10;
-        }
-      else if (*p == '.')
-        {
-          l *= multiplier;
-          multiplier = 10000;
-          fullstops++;
-        }
-      else
-        {
-          hfst_error(EXIT_FAILURE, 0, "Cannot parse %s as version string;\n"
-                " please currently only use ASCII digits and full stops",
-                s);
-        }
-    }
-  for (int i = fullstops; i < 2; i++)
-    {
-      l *= 10000;
-    }
-  return l;
-}
+  {
+    long l = 0;
+    long multiplier = 10000;
+    unsigned int fullstops = 0;
+    for (const char* p = s; *p != '\0'; p++)
+      {
+        if (('0' <= *p) && (*p <= '9'))
+          {
+            l *= 10;
+            l += *p - '0';
+            multiplier /= 10;
+          }
+        else if (*p == '.')
+          {
+            l *= multiplier;
+            multiplier = 10000;
+            fullstops++;
+          }
+        else
+          {
+            hfst_error(EXIT_FAILURE, 0, "Cannot parse %s as version string;\n"
+                  " please currently only use ASCII digits and full stops",
+                  s);
+          }
+      }
+    for (int i = fullstops; i < 2; i++)
+      {
+        l *= 10000;
+      }
+    return l;
+  }
 
 void
 print_usage()
-{
-        // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
+  {
+    // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
            "show or test HFST versions and features\n"
             "\n", program_name);
@@ -105,16 +105,15 @@ print_usage()
     print_report_bugs();
     fprintf(message_out, "\n");
     print_more_info();
-}
+  }
 
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
+  {
     // use of this function requires options are settable on global scope
     while (true)
-    {
+      {
         static const struct option long_options[] =
         {
           HFST_GETOPT_COMMON_LONG,
@@ -129,135 +128,145 @@ parse_options(int argc, char** argv)
                              "a:e:f:m:",
                              long_options, &option_index);
         if (-1 == c)
-        {
+          {
             break;
-        }
+          }
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-        case 'a':
-          min_version = parse_version_string(optarg);
-          break;
-        case 'e':
-          exact_version = parse_version_string(optarg);
-          break;
-        case 'm':
-          max_version = parse_version_string(optarg);
-          break;
-        case 'f':
-          required_features.insert(optarg);
-          break;
+          {
+            case 'a':
+            min_version = parse_version_string(optarg);
+            break;
+          case 'e':
+            exact_version = parse_version_string(optarg);
+            break;
+          case 'm':
+            max_version = parse_version_string(optarg);
+            break;
+          case 'f':
+            required_features.insert(optarg);
+            break;
+          default:
+            parse_getopt_error_value(c);
+            break;
+          }
+      }
+  }
 
-#include "conventions/getopt-cases-error.h"
-        }
-    }
-#include "conventions/check-params-common.h"
+void
+check_options()
+  {
     if ((min_version == -1L) && (max_version == -1L) && (exact_version == -1L)
         && (required_features.size() == 0) && (verbose == false))
       {
         verbose = true;
         verbose_printf("No tests selected; printing known data\n");
       }
-    return EXIT_CONTINUE;
-}
+  }
 
-
-int main (int argc, char * argv[])
-{
-  hfst_set_program_name(argv[0], "0.1", "HfstInfo");
-  parse_options(argc, argv);
-  if (min_version != -1L)
-    {
-      verbose_printf("Requiring current version %ld to be greater than %ld\n",
-                     HFST_LONGVERSION, min_version);
-      if (HFST_LONGVERSION < min_version)
-        {
-          hfst_error(EXIT_FAILURE, 0, "Version requirements not met");
-        }
-    }
-  if (exact_version != -1L)
-    {
-      verbose_printf("Requiring current version %ld to be exactly %ld\n",
-                     HFST_LONGVERSION, exact_version);
-      if (HFST_LONGVERSION != exact_version)
-        {
-          hfst_error(EXIT_FAILURE, 0, "Version requirements not met");
-        }
-    }
-  if (max_version != -1L)
-    {
-      verbose_printf("Requiring current version %ld to be greater than %ld\n",
-                     HFST_LONGVERSION, max_version);
-      if (HFST_LONGVERSION < max_version)
-        {
-          hfst_error(EXIT_FAILURE, 0, "Version requirements not met");
-        }
-    }
-  for (set<string>::const_iterator f = required_features.begin();
-       f != required_features.end();
-       ++f)
-    {
-      if ((*f == "sfst") || (*f == "SFST") || (*f == "HAVE_SFST"))
-        {
-          verbose_printf("Requiring SFST support from library");
-#ifndef HAVE_SFST
-          hfst_error(EXIT_FAILURE, 0, "Required SFST support not present");
-#endif
-        }
-      else if ((*f == "foma") || (*f == "FOMA") || (*f == "HAVE_FOMA"))
-        {
-          verbose_printf("Requiring foma support from library");
-#ifndef HAVE_FOMA
-          hfst_error(EXIT_FAILURE, 0, "Required foma support not present");
-#endif
-        }
-      else if ((*f == "openfst") || (*f == "OPENFST") || (*f == "HAVE_OPENFST"))
-        {
-          verbose_printf("Requiring OpenFst support from library");
-#ifndef HAVE_OPENFST
-          hfst_error(EXIT_FAILURE, 0, "Required OpenFst support not present");
-#endif
-        }
-      else if ((*f == "glib") || (*f == "USE_GLIB_UNICODE"))
-        {
-          verbose_printf("Requiring Unicode parsed by Glib");
-#ifndef USE_GLIB_UNICODE
-          hfst_error(EXIT_FAILURE, 0,
-                "Required GLIB-based Unicode handling not presesnt");
-#endif
-        }
-      else
-        {
-          hfst_error(EXIT_FAILURE, 0, "Required %s support is unrecognised "
-                "and therefore assumed to be missing", f->c_str());
-        }
-    }
-  verbose_printf("HFST info version: %s\n"
-          "HFST packaging: %s <%s> <mailto:%s>\n"
-          "HFST version: %s\n"
-          "HFST long version: %ld\n"
-          "HFST configuration revision: %s\n",
-          hfst_tool_version,
-          PACKAGE_STRING, PACKAGE_URL, PACKAGE_BUGREPORT,
-          PACKAGE_VERSION,
-          HFST_LONGVERSION,
-          HFST_REVISION);
-#if HAVE_OPENFST
-  verbose_printf("OpenFst supported\n");
-#endif
-#if HAVE_SFST
-  verbose_printf("SFST supported\n");
-#endif
-#if HAVE_FOMA
-  verbose_printf("foma supported\n");
-#endif
-#if USE_GLIB_UNICODE
-  verbose_printf("Unicode support: glib\n");
-#elif USE_ICU_UNICODE
-  verbose_printf("Unicode support: ICU\n");
-#else
-  verbose_printf("Unicode support: no (hfst)\n");
-#endif
+int main(int argc, char * argv[])
+  {
+    hfst_init_commandline(argv[0], "0.1", "HfstInfo",
+                          NO_AUTOMAGIC_IO, NO_AUTOMAGIC_FIlES);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    check_options();
+    parse_options_getenv();
+    if (min_version != -1L)
+      {
+        verbose_printf("Requiring current version %ld to be greater than %ld\n",
+                       HFST_LONGVERSION, min_version);
+        if (HFST_LONGVERSION < min_version)
+          {
+            hfst_error(EXIT_FAILURE, 0, "Version requirements not met");
+          }
+      }
+    if (exact_version != -1L)
+      {
+        verbose_printf("Requiring current version %ld to be exactly %ld\n",
+                       HFST_LONGVERSION, exact_version);
+        if (HFST_LONGVERSION != exact_version)
+          {
+            hfst_error(EXIT_FAILURE, 0, "Version requirements not met");
+          }
+      }
+    if (max_version != -1L)
+      {
+        verbose_printf("Requiring current version %ld to be greater than %ld\n",
+                       HFST_LONGVERSION, max_version);
+        if (HFST_LONGVERSION < max_version)
+          {
+            hfst_error(EXIT_FAILURE, 0, "Version requirements not met");
+          }
+      }
+    for (set<string>::const_iterator f = required_features.begin();
+         f != required_features.end();
+         ++f)
+      {
+        if ((*f == "sfst") || (*f == "SFST") || (*f == "HAVE_SFST"))
+          {
+            verbose_printf("Requiring SFST support from library");
+#   ifndef HAVE_SFST
+            hfst_error(EXIT_FAILURE, 0, "Required SFST support not present");
+#   endif
+          }
+        else if ((*f == "foma") || (*f == "FOMA") || (*f == "HAVE_FOMA"))
+          {
+            verbose_printf("Requiring foma support from library");
+#   ifndef HAVE_FOMA
+            hfst_error(EXIT_FAILURE, 0, "Required foma support not present");
+#   endif
+          }
+        else if ((*f == "openfst") || (*f == "OPENFST") || (*f == "HAVE_OPENFST"))
+          {
+            verbose_printf("Requiring OpenFst support from library");
+#   ifndef HAVE_OPENFST
+            hfst_error(EXIT_FAILURE, 0, "Required OpenFst support not present");
+#   endif
+          }
+        else if ((*f == "glib") || (*f == "USE_GLIB_UNICODE"))
+          {
+            verbose_printf("Requiring Unicode parsed by Glib");
+#   ifndef USE_GLIB_UNICODE
+            hfst_error(EXIT_FAILURE, 0,
+                  "Required GLIB-based Unicode handling not presesnt");
+#   endif
+          }
+        else
+          {
+            hfst_error(EXIT_FAILURE, 0, "Required %s support is unrecognised "
+                  "and therefore assumed to be missing", f->c_str());
+          }
+      }
+    verbose_printf("HFST info version: %s\n"
+            "HFST packaging: %s <%s> <mailto:%s>\n"
+            "HFST version: %s\n"
+            "HFST long version: %lu\n"
+            "HFST configuration revision: %s\n",
+            hfst_tool_version,
+            PACKAGE_STRING, PACKAGE_URL, PACKAGE_BUGREPORT,
+            HFST_STRING,
+            HFST_LONGVERSION,
+            HFST_REVISION);
+#   if HAVE_OPENFST
+    verbose_printf("OpenFst supported\n");
+#   endif
+#   if HAVE_SFST
+    verbose_printf("SFST supported\n");
+#   endif
+#   if HAVE_FOMA
+    verbose_printf("foma supported\n");
+#   endif
+#   if USE_GLIB_UNICODE
+    verbose_printf("Unicode support: glib\n");
+#   elif USE_ICU_UNICODE
+    verbose_printf("Unicode support: ICU\n");
+#   else
+    verbose_printf("Unicode support: no (hfst)\n");
+#   endif
 
   return EXIT_SUCCESS;
 }

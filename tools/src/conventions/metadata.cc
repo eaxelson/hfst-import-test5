@@ -15,12 +15,17 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "conventions/metadata.h"
-
 #include <stdexcept>
 #include <string>
 
 using std::string;
+
+#include <HfstDataTypes.h>
+
+using hfst::HfstTransducer;
+
+#include "conventions/metadata.h"
+
 
 void
 hfst_set_name(hfst::HfstTransducer& dest, const string& src,
@@ -160,7 +165,7 @@ hfst_set_commandline_def(hfst::HfstTransducer& dest,
       }
     if (o == false)
       {
-        cmdline += " > ??? ";
+        cmdline += " > ??? ;";
       }
     dest.set_property("commandline-definition", cmdline);
   }
@@ -200,7 +205,7 @@ hfst_set_commandline_def(hfst::HfstTransducer& dest,
       }
     dest.set_property("commandline-definition", cmdline);
   }
-    
+
 
 void hfst_set_commandline_def(hfst::HfstTransducer& dest,
                               const hfst::HfstTransducer& lhs,
@@ -246,18 +251,19 @@ void hfst_set_commandline_def(hfst::HfstTransducer& dest,
     dest.set_property("commandline-definition", cmdline);
   }
 
-char*
-hfst_get_name(const hfst::HfstTransducer& arg,
-              const std::string& filename)
+const char*
+hfst_get_name(const HfstTransducer& arg,
+              const char* filename)
   {
     if (arg.get_name() != "")
       {
-        return strdup(arg.get_name().c_str());;
+        return arg.get_name().c_str();;
       }
     else
       {
-        return strdup(filename.c_str());
+        return filename;
       }
+    return "ERROR";
   }
 
 

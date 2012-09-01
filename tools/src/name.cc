@@ -33,22 +33,16 @@
 #include <hfst.hpp>
 
 #include "conventions/commandline.h"
-#include "conventions/options.h"
-
-#include "conventions/globals-common.h"
-#include "conventions/globals-unary.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 
 
-// add tools-specific variables here
-
-static char * transducer_name= strdup("");
-static bool name_option_given=false;
-static bool print_name=false;
-static unsigned long truncate_length=0;
+static char* transducer_name = 0;
+static bool name_option_given = false;
+static bool print_name = false;
+static unsigned long truncate_length = 0;
 
 void
 print_usage()
@@ -63,20 +57,17 @@ print_usage()
             "  -p, --print-name     Only print the current name\n"
             "  -t, --truncate_length=LEN   Truncate name length to LEN\n");
     print_common_program_options();
-    print_common_unary_program_options();
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions();
+    print_common_parameter_instructions();
     fprintf(message_out, "\n");
     print_report_bugs();
-    fprintf(message_out, "\n");
     print_more_info();
 }
 
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
+  {
     // use of this function requires options are settable on global scope
     while (true)
     {
@@ -99,57 +90,39 @@ parse_options(int argc, char** argv)
         {
             break;
         }
-
-        switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-unary.h"
-#include "conventions/getopt-cases-error.h"
-        case 'n':
-          transducer_name = hfst_strdup(optarg);
-          name_option_given=true;
-          break;
-        case 'p':
-          print_name = true;
-          break;
-        case 't':
-          truncate_length = hfst_strtoul(optarg, 10);
-          break;
-        }
-    }
-
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-unary.h"
-    return EXIT_CONTINUE;
-}
-
-int
-process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
-{
-  //instream.open();
-  //outstream.open();
-    
-    size_t transducer_n=0;
-    while(instream.is_good())
-    {
-        transducer_n++;
-
-        if ((transducer_n > 1) && print_name) {
-          std::cerr << "---\n";
-        }
-
-        if (transducer_n==1)
-        {
-          verbose_printf("Naming %s...\n", inputfilename); 
-        }
-        else
+        if (parse_common_getopt_value(c))
           {
-            verbose_printf("Naming %s...%zu\n", 
-                   inputfilename, transducer_n); 
+            continue;
           }
-        
-        HfstTransducer trans(instream);
-        if (not print_name) {
+        switch (c)
+          {
+          case 'n':
+            transducer_name = hfst_strdup(optarg);
+            name_option_given=true;
+            break;
+          case 'p':
+            print_name = true;
+            break;
+          case 't':
+            truncate_length = hfst_strtoul(optarg, 10);
+            break;
+          default:
+            parse_getopt_error_value(c);
+          }
+      }
+  }
+
+void
+name_automata()
+  {
+    size_t transducer_n=0;
+    while (instream->is_good())
+      {
+        transducer_n++;
+        hfst_begin_processing(inputfilename, transducer_n, "Naming");
+        HfstTransducer trans(*instream);
+        if (!print_name) 
+          {
             if (truncate_length > 0)
               {
                 trans.set_name(hfst_strndup(transducer_name, truncate_length));
@@ -158,65 +131,40 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
               {
                 trans.set_name(transducer_name);
               }
-          outstream << trans;
-        }
+          *outstream << trans;
+          }
         else
-          std::cerr << "\"" << trans.get_name() << "\"\n";
-    }
-    instream.close();
-    outstream.close();
-    return EXIT_SUCCESS;
-}
+          {
+            hfst_info("Name: %s", trans.get_name().c_str());
+          }
+      }
+  }
 
+void
+check_options(int, char**)
+  {
+    if (!print_name && !name_option_given) 
+      {
+        hfst_error(EXIT_FAILURE, 0, "use either option --print-name "
+                   " or --name");
+      }
+    if (print_name && name_option_given) 
+      {
+        hfst_warning("option --print-name overrides option --name\n");
+      }
+  }
 
-int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstName");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-
-    if (not print_name && not name_option_given) {
-      fprintf(stderr, "Error: hfst-name: use either option --print-name "
-          " or --name\n");
-      exit(1);
-    }
-    if (print_name && name_option_given) {
-      fprintf(stderr, "Warning: option --print-name overrides option "
-          "--name\n");
-    }
-
-    // close buffers, we use streams
-    if (inputfile != stdin)
-    {
-        fclose(inputfile);
-    }
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    verbose_printf("Reading from %s, writing to %s\n", 
-        inputfilename, outfilename);
-    // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
-    try {
-      instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
-    } catch(const HfstException e)  {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
-        return EXIT_FAILURE;
-    }
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, instream->get_type()) :
-        new HfstOutputStream(instream->get_type());
-    
-    retval = process_stream(*instream, *outstream);
-    delete instream;
-    delete outstream;
-    free(inputfilename);
-    free(outfilename);
-    return retval;
-}
+int main(int argc, char **argv) {
+    hfst_init_commandline(argv[0], "0.1", "HfstName",
+                          AUTOM_IN_FILE_OUT, READ_ONE);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    name_automata();
+    hfst_warning("%s is deprecated, use hfst-edit-metadata instead",
+                 program_short_name);
+    hfst_uninit_commandline();
+    return EXIT_FAILURE;
+  }
 

@@ -19,7 +19,7 @@
 AC_PREREQ([2.62])
 
 # init must be at the start
-AC_INIT([hfst-tools], [0.1], [hfst-bugs@helsinki.fi], [hfst-tools], [http://hfst.sf.net])
+AC_INIT([hfst-tools], [0.2], [hfst-bugs@helsinki.fi], [hfst-tools], [http://hfst.sf.net])
 AC_CONFIG_AUX_DIR([build-aux])
 
 # automake >= 1.11 required for color-tests, silent-rules
@@ -79,9 +79,9 @@ AC_ARG_ENABLE([apertium2fst],
 AM_CONDITIONAL([WANT_APERTIUM2FST], [test x$enable_apertium2fst != xno])
 AC_ARG_ENABLE([apertium_proc],
               [AS_HELP_STRING([--enable-apertium-proc],
-                              [build apertium stream processing tool @<:@default=yes@:>@])],
+                              [build apertium stream processing tool @<:@default=no@:>@])],
               [enable_apertium_proc=$enableval],
-              [enable_apertium_proc=yes])
+              [enable_apertium_proc=no])
 AM_CONDITIONAL([WANT_APERTIUM_PROC], [test x$enable_apertium_proc != xno])
 AC_ARG_ENABLE([sfstpl2fst],
               [AS_HELP_STRING([--enable-sfstpl2fst],

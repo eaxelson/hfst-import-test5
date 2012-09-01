@@ -62,25 +62,6 @@
 #include "conventions/portability.h"
 
 // specific printf's wrapped in conditions
-static
-void
-print_color(FILE* out, const char* colors)
-  {
-    if (print_colors)
-      {
-        fprintf(out, "%s", colors);
-      }
-  }
-
-static
-void
-print_program_name(FILE* out)
-  {
-    print_color(out, COLOR_PROGRAM_NAME);
-    fprintf(out, "%s: ", program_invocation_name);
-    print_color(out, COLOR_RESET);
-  }
-
 void
 debug_save_transducer(hfst::HfstTransducer& t, const char* name)
 {
@@ -104,110 +85,10 @@ debug_save_transducer(hfst::HfstTransducer& t, const char* name)
       }
 }
 
-
-void
-debug_printf(const char* fmt, ...)
-{
-  if (debug)
-    {
-      fprintf(stderr, "DEBUG: ");
-      va_list ap;
-      va_start(ap, fmt);
-      vfprintf(stderr, fmt, ap);
-      va_end(ap);
-      fprintf(stderr, "\n");
-    }
-}
-
-void
-verbose_printf(const char* fmt, ...)
-{
-  if (verbose)
-    {
-      va_list ap;
-      va_start(ap, fmt);
-      vfprintf(message_out, fmt, ap);
-      va_end(ap);
-    }
-}
-
-void
-hfst_error(int status, int errnum, const char* fmt, ...)
-  {
-    print_program_name(stderr);
-    print_color(stderr, COLOR_ERROR);
-    fprintf(stderr, "ERROR: ");
-    print_color(stderr, COLOR_RESET);
-    va_list ap;
-    va_start(ap, fmt);
-    vfprintf(stderr, fmt, ap);
-    va_end(ap);
-    fprintf(stderr, "\n");
-    if (errnum != 0)
-      {
-        fprintf(stderr, "%s\n", strerror(errnum));
-      }
-    if (status != 0)
-      {
-        exit(status);
-      }
-  }
-
-void
-hfst_warning(const char* fmt, ...)
-  {
-    if (!silent)
-      {
-        print_program_name(message_out);
-        print_color(message_out, COLOR_WARNING);
-        fprintf(message_out, "WARN: ");
-        print_color(message_out, COLOR_RESET);
-        va_list ap;
-        va_start(ap, fmt);
-        vfprintf(message_out, fmt, ap);
-        va_end(ap);
-        fprintf(message_out, "\n");
-      }
-  }
-
-void
-hfst_info(const char* fmt, ...)
-  {
-    if (!silent)
-      {
-        print_program_name(message_out);
-        print_color(message_out, COLOR_INFO);
-        fprintf(message_out, "*** ");
-        print_color(message_out, COLOR_RESET);
-        va_list ap;
-        va_start(ap, fmt);
-        vfprintf(message_out, fmt, ap);
-        va_end(ap);
-        fprintf(message_out, "\n");
-      }
-  }
-
-void
-hfst_verbose(const char* fmt, ...)
-  {
-    if (!silent && verbose)
-      {
-        print_program_name(message_out);
-        print_color(message_out, COLOR_VERBOSE);
-        fprintf(message_out, "*** ");
-        print_color(message_out, COLOR_RESET);
-        va_list ap;
-        va_start(ap, fmt);
-        vfprintf(message_out, fmt, ap);
-        va_end(ap);
-        fprintf(message_out, "\n");
-      }
-  }
-
 // string functions
 double
 hfst_strtoweight(const char *s)
-{
+  {
     errno = 0;
     char *endptr;
     double rv = strtod(s, &endptr);
@@ -215,12 +96,32 @@ hfst_strtoweight(const char *s)
       {
         return rv;
       }
-    else
+    else 
       {
-        hfst_error(EXIT_FAILURE, errno, "%s not a weight", s);
+#if HAVE_SETLOCALE
+        char* old_numeric = setlocale(LC_NUMERIC, NULL);
+        if (old_numeric != NULL)
+          {
+            hfst_verbose("%s was not a weight for %s, trying POSIX",
+                          s, old_numeric);
+          }
+        if (setlocale(LC_NUMERIC, "C") != NULL)
+          {
+            endptr = 0;
+            rv = strtod(s, &endptr);
+          }
+        if (old_numeric != NULL)
+          {
+            setlocale(LC_NUMERIC, old_numeric);
+          }
+#endif
+        if (*endptr != '\0')
+          {
+            hfst_error(EXIT_FAILURE, errno, "%s not a weight", s);
+          }
         return rv;
       }
-}
+  }
 
 int
 hfst_strtonumber(const char *s, bool *infinite)
@@ -248,7 +149,27 @@ hfst_strtonumber(const char *s, bool *infinite)
       }
     else
     {
-        hfst_error(EXIT_FAILURE, errno, "%s not a number",  s);
+#if HAVE_SETLOCALE
+        char* old_numeric = setlocale(LC_NUMERIC, NULL);
+        if (old_numeric != NULL)
+          {
+            hfst_verbose("%s was not a number for %s, trying POSIX",
+                          s, old_numeric);
+          }
+        if (setlocale(LC_NUMERIC, "C") != NULL)
+          {
+            endptr = 0;
+            rv = strtod(s, &endptr);
+          }
+        if (old_numeric != NULL)
+          {
+            setlocale(LC_NUMERIC, old_numeric);
+          }
+#endif
+        if (*endptr != '\0')
+          {
+            hfst_error(EXIT_FAILURE, errno, "%s not a number", s);
+          }
         return rv;
     }
 }
@@ -291,7 +212,7 @@ hfst_strtol(char *s, int base)
 hfst::ImplementationType
 hfst_parse_format_name(const char* s)
 {
-    hfst::ImplementationType rv; // = hfst::UNSPECIFIED_TYPE;
+    hfst::ImplementationType rv = hfst::UNSPECIFIED_TYPE;
     if (strcasecmp(s, "sfst") == 0)
       {
         rv = hfst::SFST_TYPE;
@@ -336,8 +257,8 @@ hfst_parse_format_name(const char* s)
       }
     else
       {
-        hfst_error(EXIT_FAILURE, 0, "Could not parse format name from string %s",
-              s);
+        hfst_error(EXIT_FAILURE, 0,
+                   "Could not parse format name from string %s", s);
         rv = hfst::UNSPECIFIED_TYPE;
         return rv;
       }
@@ -665,7 +586,8 @@ hfst_set_program_name(const char* argv0, const char* version_vector,
 
 void
 hfst_init_commandline(const char* argv0, const char* version,
-                      const char* wikiname)
+                      const char* wikiname, hfst_tool_io him,
+                      hfst_input_count hic)
   {
     hfst_setlocale();
     hfst_set_program_name(argv0, version, wikiname);
@@ -677,126 +599,29 @@ hfst_init_commandline(const char* argv0, const char* version,
       {
         print_colors = false;
       }
+    hfst_iomode = him;
+    inputs = hic;
   }
 
-void
-print_short_help()
-{
-    fprintf(message_out, "Try ``%s --help'' for more information.\n",
-             program_short_name);
-}
-
-// print web site reference
-void
-print_more_info()
-{
-    fprintf(message_out, "%s home page: \n"
-            "<" KITWIKI_URL "/%s>\n",
-            program_name, hfst_tool_wikiname);
-    fprintf(message_out, "General help using HFST software: \n"
-            "<" KITWIKI_URL "/HfstHome>\n");
-}
-
-// print version message
-void
-print_version()
-{
-  // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
-    fprintf(message_out, "%s %s (" PACKAGE_STRING "; " HFST_STRING ")\n"
-             "Copyright (C) 2012 University of Helsinki,\n"
-             "License GPLv3: GNU GPL version 3 "
-             "<http://gnu.org/licenses/gpl.html>\n"
-             "This is free software: you are free to change and "
-             "redistribute it.\n"
-             "There is NO WARRANTY, to the extent permitted by law.\n",
-             program_short_name, hfst_tool_version);
-}
-
-void
-print_report_bugs()
-{
-  fprintf(message_out, "Report bugs to <" PACKAGE_BUGREPORT "> "
-          "or directly to our bug tracker at:\n"
-          "<https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>\n");
-}
 
 
 void
-extend_options_getenv(int* argc, char*** argv)
-{
-  char* hfstopts = getenv("HFST_OPTIONS");
-  if (NULL == hfstopts)
-    {
-      return;
-    }
-  char* p = hfstopts;
-  unsigned int spaces = 0;
-  while (*p != '\0')
-    {
-      if (' ' == *p)
-        {
-          spaces++;
-        }
-      p++;
-    }
-  // we cannot realloc argv since it's magic
-  char** new_argv = static_cast<char**>(hfst_malloc(sizeof(char*) * 
-                                                    (*argc + spaces + 1)));
-  new_argv = static_cast<char**>(memcpy(new_argv, *argv, sizeof(char*)**argc));
-  // there's this magic stuff with *argv that we shouldn't free it still
-  *argv = new_argv;
-  char* new_arg = strtok(hfstopts, " ");
-  while (new_arg != NULL)
-    {
-      char** new_arg_spot = ((*argv) + *argc);
-      *new_arg_spot = hfst_strdup(new_arg);
-      (*argc)++;
-      new_arg = strtok(NULL, " ");
-    }
-}
-
-void
-hfst_print_profile_line()
+hfst_uninit_commandline()
   {
-    if (profile_file == 0)
+    if (profile_file != 0)
       {
-        return;
+        hfst_print_profile_line();
       }
-    fprintf(profile_file, "%s", program_short_name);
-#   if HAVE_CLOCK
-    clock_t profile_end = clock();
-    fprintf(profile_file, "\t%f", ((float)(profile_end - profile_start))
-                                               / CLOCKS_PER_SEC);
-#   endif
-#   if HAVE_GETRUSAGE
-    struct rusage* usage = static_cast<struct rusage*>
-        (malloc(sizeof(struct rusage)));
-    errno = 0;
-    int rv = getrusage(RUSAGE_SELF, usage);
-    if (rv != -1)
-      {
-        fprintf(profile_file, "\t%lu.%lu\t%lu.%lu"
-                "\t%ld\t%ld\t%ld"
-                "\t%ld"
-                "\t%ld\t%ld\t%ld"
-                "\t%ld\t%ld"
-                "\t%ld\t%ld"
-                "\t%ld"
-                "\t%ld\t%ld",
-                usage->ru_utime.tv_sec, usage->ru_utime.tv_usec,
-                usage->ru_stime.tv_sec, usage->ru_stime.tv_usec,
-                usage->ru_maxrss, usage->ru_ixrss, usage->ru_idrss,
-                usage->ru_isrss,
-                usage->ru_minflt, usage->ru_majflt, usage->ru_nswap,
-                usage->ru_inblock, usage->ru_oublock, 
-                usage->ru_msgsnd, usage->ru_msgrcv,
-                usage->ru_nsignals,
-                usage->ru_nvcsw, usage->ru_nivcsw);
-      }
-    else
-      {
-        fprintf(profile_file, "\tgetrusage: %s", strerror(errno));
-      }
-#   endif
-    fprintf(profile_file, "\n");
+    if ((inputfile != stdin) && (inputfile != NULL))
+    {
+        fclose(inputfile);
+    }
+    if ((outfile != stdout) && (outfile != NULL))
+    {
+        fclose(outfile);
+    }
+    delete instream;
+    delete outstream;
+    free(inputfilename);
+    free(outfilename);
   }

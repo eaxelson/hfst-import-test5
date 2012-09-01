@@ -33,11 +33,6 @@
 #include <hfst.hpp>
 
 #include "conventions/commandline.h"
-#include "conventions/options.h"
-#include "conventions/metadata.h"
-
-#include "conventions/globals-common.h"
-#include "conventions/globals-unary.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
@@ -49,7 +44,7 @@ static bool push_initial = false;
 
 void
 print_usage()
-{
+  {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     // Usage line
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
@@ -57,24 +52,21 @@ print_usage()
         "\n", program_name);
 
     print_common_program_options();
-    print_common_unary_program_options();
     fprintf(message_out, "Push options:\n"
             "  -p, --push=DIRECTION   push to DIRECTION\n");
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions();
+    print_common_parameter_instructions();
     fprintf(message_out, "DIRECTION must be one of start, initial, begin "
             "or end, final\n");
     fprintf(message_out, "\n");
     print_report_bugs();
-    fprintf(message_out, "\n");
     print_more_info();
 }
 
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
+  {
     // use of this function requires options are settable on global scope
     while (true)
     {
@@ -92,56 +84,51 @@ parse_options(int argc, char** argv)
                              HFST_GETOPT_UNARY_SHORT "p:",
                              long_options, &option_index);
         if (-1 == c)
-        {
+          {
             break;
-        }
-
+          }
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-unary.h"
-        case 'p':
+          {
+          case 'p':
             if ( (strncasecmp(optarg, "start", 1) == 0) ||
                  (strncasecmp(optarg, "initial", 1) == 0) ||
                  (strncasecmp(optarg, "begin", 1) == 0) )
-            {
+              {
                 push_initial = true;
-            }
+              }
             else if ( (strncasecmp(optarg, "end", 1) == 0) ||
                       (strncasecmp(optarg, "final", 1) == 0))
-            {
+              {
                 push_initial = false;
-            }
+              }
             else
-            {
+              {
                 hfst_error(EXIT_FAILURE, 0,
                       "unknown push direction %s\n"
                       "should be one of start, initial, begin, end or final.\n",
                       optarg);
-                return EXIT_FAILURE;
-        }
-        break;
-#include "conventions/getopt-cases-error.h"
-        }
-    }
+              }
+            break;
+          default:
+            parse_getopt_error_value(c);
+            break;
+          }
+      }
+  }
 
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-unary.h"
-    return EXIT_CONTINUE;
-}
-
-int
-process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
-{
-  //instream.open();
-  //outstream.open();
-    
+void
+make_pushups()
+  {
     size_t transducer_n=0;
-    while(instream.is_good())
-    {
+    while(instream->is_good())
+      {
         transducer_n++;
-        HfstTransducer trans(instream);
-        char* inputname = hfst_get_name(trans, inputfilename);
+        HfstTransducer trans(*instream);
+        const char* inputname = hfst_get_name(trans, inputfilename);
         if (transducer_n==1)
         {
           if (push_initial)
@@ -166,7 +153,6 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                              transducer_n);
             }
         }
-        
         if (push_initial)
           {
             trans.push_weights(hfst::TO_INITIAL_STATE);
@@ -179,51 +165,20 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
             hfst_set_name(trans, trans, "push-weights-f");
             hfst_set_formula(trans, trans, "Id");
           }
-        outstream << trans;
-    }
-    instream.close();
-    outstream.close();
-    return EXIT_SUCCESS;
-}
+        *outstream << trans;
+      }
+  }
 
 
 int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstPush");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (inputfile != stdin)
-    {
-        fclose(inputfile);
-    }
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    verbose_printf("Reading from %s, writing to %s\n", 
-        inputfilename, outfilename);
-    // here starts the buffer handling part
-    HfstInputStream* instream = NULL;
-    try {
-      instream = (inputfile != stdin) ?
-        new HfstInputStream(inputfilename) : new HfstInputStream();
-    } catch(const HfstException e)  {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              inputfilename);
-        return EXIT_FAILURE;
-    }
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, instream->get_type()) :
-        new HfstOutputStream(instream->get_type());
-    
-    retval = process_stream(*instream, *outstream);
-    delete instream;
-    delete outstream;
-    free(inputfilename);
-    free(outfilename);
-    return retval;
-}
+    hfst_init_commandline(argv[0], "0.1", "HfstPush",
+                          AUTOM_IN_AUTOM_OUT, READ_ONE);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    make_pushups();
+    hfst_uninit_commandline();
+    return EXIT_SUCCESS;
+  }
 

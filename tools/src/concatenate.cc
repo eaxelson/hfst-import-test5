@@ -39,24 +39,18 @@ using hfst::ImplementationType;
 
 
 #include "conventions/commandline.h"
-#include "conventions/options.h"
-#include "conventions/metadata.h"
-#include "conventions/globals-common.h"
-#include "conventions/globals-binary.h"
 
 static bool harmonize_flags=false;
 
 void
 print_usage()
-{
+  {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1 [INFILE2]]\n"
-             "Concatenate two transducers\n"
+             "Concatenate two automata\n"
         "\n", program_name );
         print_common_program_options();
-        print_common_binary_program_options();
-        fprintf(message_out, "\n");
-        print_common_binary_program_parameter_instructions();
+        print_common_parameter_instructions();
         fprintf(message_out,
                 "Flag diacritics:\n"
                 "  -F, --harmonize-flags  Harmonize flag diacritics\n");
@@ -69,17 +63,14 @@ print_usage()
             "\n",
             program_name );
         print_report_bugs();
-        fprintf(message_out, "\n");
         print_more_info();
-}
+  }
 
-int
+void
 parse_options(int argc, char** argv)
-{
-    extend_options_getenv(&argc, &argv);
-    // use of this function requires options are settable on global scope
+  {
     while (true)
-    {
+      {
         static const struct option long_options[] =
         {
           HFST_GETOPT_COMMON_LONG,
@@ -92,71 +83,59 @@ parse_options(int argc, char** argv)
                              HFST_GETOPT_BINARY_SHORT "F",
                              long_options, &option_index);
         if (-1 == c)
-        {
+          {
             break;
-        }
+          }
+        if (parse_common_getopt_value(c))
+          {
+            continue;
+          }
         switch (c)
-        {
-#include "conventions/getopt-cases-common.h"
-#include "conventions/getopt-cases-binary.h"
-        case 'F':
-          harmonize_flags=true;
-          break;
-#include "conventions/getopt-cases-error.h"
-        }
-    }
+          {
+          case 'F':
+            harmonize_flags=true;
+            break;
+          default:
+            parse_getopt_error_value(c);
+            break;
+          }
+      }
+  }
 
-#include "conventions/check-params-common.h"
-#include "conventions/check-params-binary.h"
-    return EXIT_CONTINUE;
-}
-
-int
-concatenate_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
-                    HfstOutputStream& outstream)
-{
-  //firststream.open();
-  // secondstream.open();
-  //outstream.open();
-    // should be is_good? 
-    bool bothInputs = firststream.is_good() && secondstream.is_good();
-    if (firststream.get_type() != secondstream.get_type())
+void
+make_concatenations()
+  {
+    bool bothInputs = firststream->is_good() && secondstream->is_good();
+    if (firststream->get_type() != secondstream->get_type())
       {
         hfst_warning( "Tranducer type mismatch in %s and %s; "
               "using former type as output\n",
               firstfilename, secondfilename);
       }
     size_t transducer_n = 0;
-    while (bothInputs) {
+    while (bothInputs) 
+      {
         transducer_n++;
-        HfstTransducer first(firststream);
-        HfstTransducer second(secondstream);
-        char* firstname = hfst_get_name(first, firstfilename);
-        char* secondname = hfst_get_name(second, secondfilename);
-        if (transducer_n == 1)
-        {
-            verbose_printf("Concatenating %s and %s...\n", firstname, 
-                        secondname);
-        }
-        else
-        {
-            verbose_printf("Concatenating %s and %s... %zu\n", firstname,
-                           secondname, transducer_n);
-        }
-        if (first.has_flag_diacritics() and second.has_flag_diacritics()) 
+        HfstTransducer first(*firststream);
+        HfstTransducer second(*secondstream);
+        const char* firstname = hfst_get_name(first, firstfilename);
+        const char* secondname = hfst_get_name(second, secondfilename);
+        hfst_begin_processing(firstname, secondname, transducer_n,
+                              "Concatenating");
+        if (first.has_flag_diacritics() && second.has_flag_diacritics()) 
           {
-            if (not harmonize_flags)
+            if (!harmonize_flags)
               {
-                if (not silent) 
+                if (!silent) 
                   {
-                    hfst_warning( "The argumentes contain "
-			    "flag diacritics. Use -F to harmonize them.", 
-			    secondname, firstname);
-		  }
+                    hfst_warning("The arguments contain "
+                                 "flag diacritics. Use -F to harmonize them.", 
+                                 secondname, firstname);
+                  }
               }
             else
               {
-		first.harmonize_flag_diacritics(second,false);
+                first.harmonize_flag_diacritics(second,false);
               }
         }
         try
@@ -168,87 +147,38 @@ concatenate_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
             hfst_error(EXIT_FAILURE, 0, "Could not concatenate %s and %s [%zu]\n"
                   "types %s and %s are not compatible for concatenation",
                   firstname, secondname, transducer_n,
-                  hfst_strformat(firststream.get_type()),
-                  hfst_strformat(secondstream.get_type()));
+                  hfst_strformat(firststream->get_type()),
+                  hfst_strformat(secondstream->get_type()));
           }
 
         hfst_set_name(first, first, second, "concatenate");
         hfst_set_formula(first, first, second, "⋅");
-        outstream << first;
-        bothInputs = firststream.is_good() && secondstream.is_good();
+        *outstream << first;
+        bothInputs = firststream->is_good() && secondstream->is_good();
     }
-    
-    if (firststream.is_good())
+    if (firststream->is_good())
     {
       hfst_warning("%s contains more transducers than %s; "
                      "residue skipped\n", firstfilename, secondfilename);
     }
-    else if (secondstream.is_good())
+    else if (secondstream->is_good())
     {
       hfst_warning("%s contains fewer transducers than %s; "
                      "residue skipped\n", firstfilename, secondfilename);
     }
-    firststream.close();
-    secondstream.close();
-    outstream.close();
+}
+
+
+int main(int argc, char **argv) 
+  {
+    hfst_init_commandline(argv[0], "0.1", "HfstConcatenate",
+                          AUTOM_IN_AUTOM_OUT, READ_TWO);
+    parse_options(argc, argv);
+    check_common_options(argc, argv);
+    parse_options_getenv();
+    hfst_open_streams();
+    make_concatenations();
+    hfst_uninit_commandline();
     return EXIT_SUCCESS;
-}
-
-
-int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstConcatenate");
-    int retval = parse_options(argc, argv);
-    if (retval != EXIT_CONTINUE)
-    {
-        return retval;
-    }
-    // close buffers, we use streams
-    if (firstfile != stdin)
-    {
-        fclose(firstfile);
-    }
-    if (secondfile != stdin)
-    {
-        fclose(secondfile);
-    }
-    if (outfile != stdout)
-    {
-        fclose(outfile);
-    }
-    verbose_printf("Reading from %s and %s, writing to %s\n", 
-        firstfilename, secondfilename, outfilename);
-    // here starts the buffer handling part
-    HfstInputStream* firststream = NULL;
-    HfstInputStream* secondstream = NULL;
-    try {
-        firststream = (firstfile != stdin) ?
-            new HfstInputStream(firstfilename) : new HfstInputStream();
-    } catch(const HfstException e)   {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              firstfilename);
-    }
-    try {
-        secondstream = (secondfile != stdin) ?
-            new HfstInputStream(secondfilename) : new HfstInputStream();
-    } catch(const HfstException e)   {
-        hfst_error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              secondfilename);
-    }
-    HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, firststream->get_type()) :
-        new HfstOutputStream(firststream->get_type());
-
-    retval = concatenate_streams(*firststream, *secondstream, *outstream);
-    if (profile_file != 0)
-      {
-        hfst_print_profile_line();
-      }
-    delete firststream;
-    delete secondstream;
-    delete outstream;
-    free(firstfilename);
-    free(secondfilename);
-    free(outfilename);
-    return retval;
-}
+  }
 
