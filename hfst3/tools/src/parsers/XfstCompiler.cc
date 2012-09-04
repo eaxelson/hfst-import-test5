@@ -1811,7 +1811,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       if (verbose_)
         {
-          fprintf(stdout, "hfst[%zu]: ", stack_.size());
+          fprintf(stdout, "hfst[" SIZE_T_SPECIFIER "]: ", stack_.size());
         }
       return *this;
     }

@@ -26,11 +26,14 @@ for i in sfst openfst-tropical foma; do
   if ! ($3/hfst-format --test-format $i); then
       continue;
   fi
+  
+  sh $1/EinsteinsPuzzle.hfst.script $i $3
 
-  bash $1/EinsteinsPuzzle.hfst.script $i $3
-
- if ! ( diff -q $2/result $1/expected_result ); then
-     exit 1;
- fi
-
+  if ! ( diff -q $2/result $1/expected_result 2>1 > /dev/null); then
+      bash $1/EinsteinsPuzzle.hfst.script $i $3
+      if ! ( diff -q $2/result $1/expected_result 2>1 > /dev/null); then	  
+	  exit 1;
+      fi
+  fi
+  
 done

@@ -133,7 +133,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           }
 
         
-        verbose_printf("Duplicate %s times " SIZE_T_SPECIFIER "...%zu\n", inputname, 
+        verbose_printf("Duplicate %s times " SIZE_T_SPECIFIER "..." SIZE_T_SPECIFIER "\n", inputname, 
                        dupe_count, transducer_n); 
         for (unsigned int i = 0; i < dupe_count; i++)
           {

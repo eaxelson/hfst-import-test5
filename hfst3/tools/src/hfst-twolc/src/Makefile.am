@@ -13,8 +13,7 @@ AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 
 if WANT_WINDOWS
-  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include
-  BAT_TO_EXE = Bat_To_Exe_Converter.exe
+  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include -DWINDOWS
 endif
 
 # the preprocessor scripts do not support options per se, so we whitelist
