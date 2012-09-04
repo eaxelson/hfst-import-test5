@@ -28,6 +28,7 @@ WeightedStringPairVector SequenceTagger::operator[]
   state_pair_to_state_map.clear();
   state_to_state_pair_map.clear();
   result.clear();
+  sequence_model_component.clear();
 
   // The first state pair configuration is (0,0).
   StatePair start_pair = StatePair(SequenceModelComponent::START_STATE,

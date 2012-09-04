@@ -19,6 +19,8 @@ class SequenceModelComponentPair : public SequenceModelComponent
   Weight get_final_weight(State state) const;
   TransitionData get_transition(State state, Symbol symbol); 
 
+  virtual void clear(void);
+
  protected:
 
   typedef std::pair<State,State> StatePair;
@@ -29,6 +31,7 @@ class SequenceModelComponentPair : public SequenceModelComponent
     size_t count(const StatePair &p);
     State &operator[](const StatePair &p);
     size_t size(void);
+    void clear(void);
   private:
     typedef std::vector<State> StateVector;
     typedef std::vector<StateVector> StateVectorVector;
