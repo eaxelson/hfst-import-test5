@@ -34,6 +34,22 @@ SequenceModelComponentPair::StatePair2StateMap::operator[](const StatePair &p)
 size_t SequenceModelComponentPair::StatePair2StateMap::size(void)
 { return state_pair_to_state_map_.size(); }
 
+void SequenceModelComponentPair::StatePair2StateMap::clear(void)
+{
+  state_pair_to_state_map_.clear();
+}
+
+void SequenceModelComponentPair::clear(void)
+{
+  component1.clear();
+  component2.clear();
+
+  state_pair_to_state_map.clear();
+  state_to_state_pair_map.clear();
+
+  (void)get_state(StatePair(0,0)); 
+}
+
 SequenceModelComponentPair::SequenceModelComponentPair
 (SequenceModelComponent &component1,
  SequenceModelComponent &component2):

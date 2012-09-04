@@ -27,6 +27,9 @@ class SequenceModelComponent
 
   static Symbol get_symbol(const std::string &string_symbol);
   static std::string get_string_symbol(Symbol symbol);
+  
+  virtual void clear(void);
+
  protected:
   static Symbol2NumberMap symbol_to_number_map;
   static Number2SymbolMap number_to_symbol_map;

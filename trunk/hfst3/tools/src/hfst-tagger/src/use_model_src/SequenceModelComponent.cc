@@ -32,6 +32,9 @@ SequenceModelComponent::SequenceModelComponent(const HfstBasicTransducer &fst):
 SequenceModelComponent::~SequenceModelComponent(void)
 { /* For inheritance */ }
 
+void SequenceModelComponent::clear(void)
+{ /* none */ }
+
 void SequenceModelComponent::add_symbols_from(const HfstBasicTransducer &fst)
 {
   add_symbol(internal_epsilon);
