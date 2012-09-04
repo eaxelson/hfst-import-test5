@@ -651,20 +651,14 @@ TransitionTableIndexSet Transducer::get_transitions_from_state(
 		continue;
 	    }
 	    while(true) {
-		// First skip any epsilons
-		if(get_transition(transition_i).matches(0)) {
-		    continue;
-		} else if (get_transition(transition_i).matches(symbol)) {
+                SymbolNumber input = get_transition(transition_i).
+                    get_input_symbol();
+                if (get_transition(transition_i).matches(symbol)) {
 		    transitions.insert(transition_i);
-		    continue;
-                    // If we're out of flags entirely, it's time to stop looking
-                    // - but even if this is the wrong flag, there may be several
-                    // different flag arcs from the same state
-		} else if (!alphabet->is_flag_diacritic(
-                               get_transition(transition_i).
-                               get_input_symbol())) {
+                    // There could still be epsilons here, or other flags
+                } else if (input != 0 && !alphabet->is_flag_diacritic(input)) {
                     break;
-		}
+                }
                 ++transition_i;
 	    }
 	} else { // not a flag
