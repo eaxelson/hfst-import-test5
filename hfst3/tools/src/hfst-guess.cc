@@ -328,6 +328,7 @@ int main( int argc, char **argv )
 		(*out) << line << "\t" << *it << std::endl;
 	      }
 	  }	
+	(*out) << std::endl;
       }
 
     delete instream;
