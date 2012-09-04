@@ -168,7 +168,7 @@ LexcCompiler::addStringEntry(const string& data,
       {
         if ((currentEntries_ % 10000) == 0)
           {
-            fprintf(stderr, "%zu...", currentEntries_);
+            fprintf(stderr, SIZE_T_SPECIFIER "...", currentEntries_);
           }
       }
     return *this;
@@ -200,7 +200,7 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
       {
         if ((currentEntries_ % 10000) == 0)
           {
-            fprintf(stderr, "%zu...", currentEntries_);
+            fprintf(stderr, SIZE_T_SPECIFIER "...", currentEntries_);
           }
       }
     return *this;
@@ -235,7 +235,7 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
       {
         if ((currentEntries_ % 10000) == 0)
           {
-            fprintf(stderr, "%zu...", currentEntries_);
+            fprintf(stderr, SIZE_T_SPECIFIER "...", currentEntries_);
           }
       }
     return *this;
@@ -282,7 +282,7 @@ LexcCompiler::setCurrentLexiconName(const string& lexiconName)
           }
         if (!firstLexicon)
           {
-            fprintf(stderr, "%zu ", currentEntries_);
+            fprintf(stderr, SIZE_T_SPECIFIER " ", currentEntries_);
           }
         fprintf(stderr, "%s...", lexiconName.c_str());
         firstLexicon = false;

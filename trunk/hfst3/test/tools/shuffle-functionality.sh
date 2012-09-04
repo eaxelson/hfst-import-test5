@@ -4,6 +4,10 @@ if ! [ -x ../../tools/src/hfst-shuffle ]; then
 fi
 
 for i in .sfst .ofst .foma; do
+    if ! ../../tools/src/hfst-format --test-format `echo $i | sed "s/.//"`; then
+	continue;
+    fi
+
     if ! ../../tools/src/hfst-shuffle ab$i bc$i > TMP; then
 	rm TMP;
 	exit 1;

@@ -155,7 +155,7 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
                 else
                   {
                     if (not silent)
-                      fprintf(outfile, "%s[" SIZE_T_SPECIFIER "] == %s[%zu]\n",
+                      fprintf(outfile, "%s[" SIZE_T_SPECIFIER "] == %s[" SIZE_T_SPECIFIER "]\n",
                               firstname, transducer_n_first,
                               secondname, transducer_n_second);
                   }
@@ -170,7 +170,7 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
                 else
                   {
                     if (not silent)
-                      fprintf(outfile, "%s[" SIZE_T_SPECIFIER "] != %s[%zu]\n",
+                      fprintf(outfile, "%s[" SIZE_T_SPECIFIER "] != %s[" SIZE_T_SPECIFIER "]\n",
                               firstname, transducer_n_first, 
                               secondname, transducer_n_second);
                   }
@@ -222,7 +222,7 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
       }
     else
       {
-        verbose_printf("" SIZE_T_SPECIFIER "/%zu were not equal\n", mismatches, transducer_n_first);
+        verbose_printf("" SIZE_T_SPECIFIER "/" SIZE_T_SPECIFIER " were not equal\n", mismatches, transducer_n_first);
         return EXIT_FAILURE;
       }
 }

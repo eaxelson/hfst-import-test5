@@ -201,7 +201,7 @@ bool test_correspondence(KeyPairVector * input_vector,
           {
         if (rule_names == NULL)
           {
-            fprintf(output_file,"Rule %zu rejects\n",i);
+            fprintf(output_file,"Rule " SIZE_T_SPECIFIER " rejects\n",i);
           }
         else
           {
@@ -529,7 +529,7 @@ FstVector * read_rule_transducers(void)
           rules->push_back(read_transducer());
         }
       if ( debug or verbose )
-        fprintf(stderr,"Read rule: %zu   \r",++counter);
+        fprintf(stderr,"Read rule: " SIZE_T_SPECIFIER "   \r",++counter);
     }
     }
   else
@@ -548,7 +548,7 @@ FstVector * read_rule_transducers(void)
           rules->push_back(read_transducer(fst_in));
         }
       if ( debug or verbose )
-        fprintf(stderr,"Read rule: %zu   \r",++counter);
+        fprintf(stderr,"Read rule: " SIZE_T_SPECIFIER "   \r",++counter);
     }
     }
   if ( debug or verbose )

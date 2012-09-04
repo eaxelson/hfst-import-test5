@@ -24,6 +24,7 @@
 #include "variable_src/RuleSymbolVector.h"
 #include "variable_src/RuleVariables.h"
 #include "commandline_src/CommandLine.h"
+#include "common_globals.h"
 
   extern int yylineno;
   extern char * yytext;

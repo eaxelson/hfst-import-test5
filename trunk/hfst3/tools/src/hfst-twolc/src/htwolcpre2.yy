@@ -22,6 +22,7 @@
 #include "commandline_src/CommandLine.h"
 #include "grammar_defs.h"
 #include "HfstTwolcDefs.h"
+#include "common_globals.h"
 
   extern int yylineno;
   extern char * yytext;
