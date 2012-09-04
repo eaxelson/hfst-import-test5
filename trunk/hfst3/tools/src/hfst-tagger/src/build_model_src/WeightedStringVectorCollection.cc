@@ -107,10 +107,12 @@ int main(void)
   std::string line4 = "STOP LEX MODEL\n";
 
   std::string line5 = "START SEQ MODEL\n";
-  std::string line6 = "DT\tNN\t1.5\n";
-  std::string line7 = "STOP SEQ MODEL";
+  std::string line6 = "PENALTY_WEIGHT=1.0\n";
+  std::string line7 = "DT\tNN\t1.5\n";
+  std::string line8 = "STOP SEQ MODEL";
 
-  std::string file = line1 + line2 + line3 + line4 + line5 + line6 + line7;
+  std::string file = line1 + line2 + line3 + line4 + line5 + line6 + line7 + 
+    line8;
 
   std::istringstream in(file);
 
