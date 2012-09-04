@@ -61,7 +61,10 @@ struct SimpleTransition
     SymbolNumber input;
     SymbolNumber output;
     TransitionTableIndex target;
-    static const size_t SIZE = sizeof(input) + sizeof(output) + sizeof(target);
+    static const size_t SIZE = 
+      sizeof(SymbolNumber) + 
+      sizeof(SymbolNumber) + 
+      sizeof(TransitionTableIndex);
     SimpleTransition(
         SymbolNumber i, SymbolNumber o, TransitionTableIndex t):
     input(i), output(o), target(t) {}
@@ -76,7 +79,9 @@ struct SimpleIndex
 {
     SymbolNumber input;
     TransitionTableIndex target;
-    static const size_t SIZE = sizeof(input) + sizeof(target);
+    static const size_t SIZE = 
+      sizeof(SymbolNumber) + 
+      sizeof(TransitionTableIndex);
     SimpleIndex(
         SymbolNumber i, TransitionTableIndex t):
     input(i), target(t) {}
