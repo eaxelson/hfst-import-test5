@@ -10,7 +10,8 @@ TESTS=english-numerals-test.sh \
 	numbers-to-numerals-test.sh finnish-numerals-test.sh \
 	einsteins-puzzle-test.sh esperanto-test.sh \
 	brazilian-portuguese1-test.sh \
-	brazilian-portuguese2-test.sh monish-guesser-analyzer-test.sh
+	brazilian-portuguese2-test.sh 
+ # monish-guesser-analyzer-test.sh
  # better-cola-machine
  # date-parser-test.sh
  # finnish-ot-prosody.sh 
