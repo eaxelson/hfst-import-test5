@@ -2,7 +2,7 @@ AM_YFLAGS= -d -o y.tab.c
 AM_CXXFLAGS= -O3 -g -Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors
 bin_PROGRAMS=htwolcpre1 htwolcpre2 htwolcpre3
 bin_SCRIPTS=hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT)
-EXTRA_DIST=hfst-twolc.sh hfst-twolc-win.bat
+EXTRA_DIST=hfst-twolc.sh
 IO_SRC=$(srcdir)/io_src
 STRING_SRC=$(srcdir)/string_src
 VARIABLE_SRC=$(srcdir)/variable_src
@@ -83,22 +83,6 @@ htwolcpre3_SOURCES=htwolcpre3.yy scanner3.ll HfstTwolcDefs.h \
 # some systems might require all these
 BUILT_SOURCES=htwolcpre1.h htwolcpre2.h htwolcpre3.h
 
-if WANT_WINDOWS
-
-hfst-twolc$(EXEEXT): hfst-twolc-win.bat
-	cat $< | sed -e 's|BINDIR|$(bindir)|' > tmp
-	$(BAT_TO_EXE) tmp > $@
-	rm tmp
-	chmod ogu+rx hfst-twolc$(EXEEXT)
-
-hfst-twolc-loc$(EXEEXT): hfst-twolc-win.bat
-	cat $< | sed -e 's|BINDIR|$(PWD)|' > tmp
-	$(BAT_TO_EXE) tmp > $@
-	rm tmp
-	chmod ogu+rx hfst-twolc-loc$(EXEEXT)
-
-else # UNIX
-
 hfst-twolc$(EXEEXT): hfst-twolc.sh
 	cat $< | sed -e 's|BINDIR|$(bindir)|' > $@
 	chmod ogu+rx hfst-twolc$(EXEEXT)
@@ -106,8 +90,6 @@ hfst-twolc$(EXEEXT): hfst-twolc.sh
 hfst-twolc-loc$(EXEEXT): hfst-twolc.sh
 	cat $< | sed -e 's|BINDIR|$(PWD)|' > $@
 	chmod ogu+rx hfst-twolc-loc$(EXEEXT)
-
-endif # WANT_WINDOWS
 
 clean-local:
 	-rm -f hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT)
