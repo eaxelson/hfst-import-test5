@@ -234,6 +234,12 @@ fakeroot dpkg-deb --build debian
 
 lintian debian.deb
 
+PACKAGE_VERSION=`grep 'Version:' ./debian/DEBIAN/control \
+    | perl -pe "s/^Version: ([0-9.\-]+) *$/\1/"`
+
+if test -e debian.deb; then
+    mv debian.deb "hfst-dev_${PACKAGE_VERSION}_amd64.deb";
+fi
 
 # unzip the changelog file, so that svn is not confused because it is missing
 gunzip debian/usr/share/doc/hfst-dev/changelog.Debian.gz
@@ -249,3 +255,7 @@ gunzip debian/usr/share/doc/hfst-dev/changelog.Debian.gz
 # cd debian-test-copy
 # mv debian-test/* .
 # rmdir debian-test
+#!/bin/bash
+
+
+
