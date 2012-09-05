@@ -63,18 +63,21 @@ do
     fi
 done
 
-for tool in hfst-twolc hfst-twolc-loc htwolcpre1 htwolcpre2 htwolcpre3;
+# copy hfst-twolc scripts and executables that it needs
+for tool in hfst-twolc htwolcpre1 htwolcpre2 htwolcpre3;
 do
     cp -P $HFST_PREFIX/bin/$tool . ;
 done
 
-for tool in hfst-twolc hfst-twolc-loc;
+# remove local version of hfst-twolc
+if test -e $HFST_PREFIX/bin/hfst-twolc-loc; then
+    rm -f $HFST_PREFIX/bin/hfst-twolc-loc;
+fi
+
+# replace prefix /usr/local/bin/ with /usr/bin/
+for tool in hfst-twolc;
 do
-    if (egrep "local|home" $tool > /dev/null); then
-	echo "ERROR: '"$tool"' uses prefix other than '/usr/bin/'!" ;
-	echo "Fix it manually before creating the debian package.";
-	exit 1;
-    fi;
+    sed -i 's/usr\/local\/bin\//usr\/bin\//' $tool;
 done
 
 # hfst-xfst depends on foma tools
