@@ -1,6 +1,6 @@
 Package: hfst-dev
 Source: hfst
-Version: 3.12-1
+Version: 3.13-1
 Section: devel
 Priority: optional
 Architecture: amd64
