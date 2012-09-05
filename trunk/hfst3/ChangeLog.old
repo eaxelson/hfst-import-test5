@@ -1,3 +1,557 @@
+2012-06-25 13:55  mpsilfve
+
+	* tools/src/hfst-tagger/src: Ignore enerated files.
+
+2012-06-25 13:46  mpsilfve
+
+	* tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-tagger/src/build_model_src/ModelBuilder.cc,
+	  tools/src/hfst-tagger/src/build_model_src/WeightedStringVectorCollection.cc:
+	  Maded changes in tests required by previous edit in
+	  WeightedStringVectorCollection.
+
+2012-06-25 13:39  mpsilfve
+
+	* tools/src/hfst-tagger/src: Ignore generated files.
+
+2012-06-25 13:21  mpsilfve
+
+	* tools/src/hfst-tagger/src/build_model_src/FstBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/ModelBuilder.cc,
+	  tools/src/hfst-tagger/src/build_model_src/ModelBuilder.h: Changed
+	  a bool to weighted_string_type in add_sequence function.
+
+2012-06-25 13:07  mpsilfve
+
+	* tools/src/hfst-tagger/src/build_model_src/LexicalModelBuilder.cc,
+	  tools/src/hfst-tagger/src/build_model_src/SequenceModelBuilder.cc,
+	  tools/src/hfst-tagger/src/build_model_src/WeightedStringVectorCollection.cc,
+	  tools/src/hfst-tagger/src/build_model_src/WeightedStringVectorCollection.h:
+	  Changed the bool lexical_model parameter in the constructor of
+	  WeightedStringVectorCollection to an enum.
+
+2012-06-25 12:58  mpsilfve
+
+	* tools/src/hfst-tagger/src/build_model_src/string_handling.h:
+	  Fixed comments
+
+2012-06-25 12:56  mpsilfve
+
+	* tools/src/hfst-tagger/src/hfst-build-tagger.cc: Fixed initial
+	  comments
+
+2012-06-25 11:51  mpsilfve
+
+	* tools/src/hfst-tagger/src/tagger_aux.py: Fixed statistics.
+
+2012-06-25 11:48  mpsilfve
+
+	* tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-tagger/src/build_model_src/tagger_aux.py,
+	  tools/src/hfst-tagger/src/hfst_tagger_compute_data_statistics.py:
+	  Fixed statistics.
+
+2012-06-21 09:03  mpsilfve
+
+	* tools/src/hfst-tagger/src/build_model_src/FstBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/LexicalModelBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/ModelBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/SequenceModelBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/TaggerBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/WeightedStringVectorCollection.h,
+	  tools/src/hfst-tagger/src/build_model_src/string_handling.h,
+	  tools/src/hfst-tagger/src/build_model_src/tagger_aux.py,
+	  tools/src/hfst-tagger/src/hfst_tagger_compute_data_statistics.py:
+	  Added documentation.
+
+2012-06-20 15:17  hardwick
+
+	* libhfst/src/implementations/HfstOlTransducer.cc: Use convenient
+	  STL set constructor with InputIterator objects for returning
+	  alphabet sets
+
+2012-06-20 11:22  mpsilfve
+
+	* tools/src/hfst-tagger/src/Makefile.am: Maybe find
+	  unit_test_aux.cc now...
+
+2012-06-20 11:21  hardwick
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/implementations/HfstOlTransducer.cc,
+	  libhfst/src/implementations/HfstOlTransducer.h: Support StringSet
+	  get_alphabet() for hfst_ol(w) types
+
+2012-06-19 17:05  mie
+
+	* configure.ac: use am_prog_ar for automake >= 1.12
+
+2012-06-19 15:15  mie
+
+	* tools/src/hfst-commandline.cc: include unistd for systems where
+	  it does not leak in
+
+2012-06-19 08:54  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc:
+	  Handle the "only default transitions in state" case
+
+2012-06-18 12:33  mpsilfve
+
+	* tools/src/hfst-tagger/src/Makefile.am: Now perhaps building
+	  unit_test_aux.o properly...
+
+2012-06-18 12:19  mpsilfve
+
+	* tools/src/hfst-tagger/Makefile.am: Build tagger tools only if the
+	  enable-tagger flag has been used during configure.
+
+2012-06-18 11:55  mpsilfve
+
+	* tools/src/hfst-tagger/src/use_model_src/NewLexicalModel.h:
+	  Changed NewLexicalModel.h so that it includes the local header
+	  before instllation.
+
+2012-06-18 11:50  mpsilfve
+
+	* tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-tagger/src/build_model_src/string_handling.cc:
+	  Added unit_test_aux.h to the sources of the test for
+	  string_handling.cc
+
+2012-06-18 11:24  mpsilfve
+
+	* tools/src/hfst-tagger/src/Makefile.am: Added DataTypes.h to the
+	  sources of appropriate testa and hfst-tag.
+
+2012-06-17 21:58  moshagen
+
+	* tools/src/hfst-tagger, tools/src/hfst-tagger/src,
+	  tools/src/hfst-tagger/test: Ignore generated items.
+
+2012-06-14 14:30  mpsilfve
+
+	* tools/src/hfst-tagger/src/hfst-tag.cc: Added version of
+	  hfst-tag.cc that compiles.
+
+2012-06-13 13:26  mpsilfve
+
+	* tools/src/hfst-tagger/src/use_model_src/NewLexicalModel.cc,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceModelComponentPair.cc,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceTagger.cc: Tidied
+	  up code in use_model_src.
+
+2012-06-13 13:18  mpsilfve
+
+	* tools/src/hfst-tagger/src/use_model_src/AcyclicAutomaton.cc,
+	  tools/src/hfst-tagger/src/use_model_src/NewLexicalModel.cc,
+	  tools/src/hfst-tagger/src/use_model_src/SentenceTagger.cc,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceTagger.cc: Now we
+	  pass all use_model_src/ tests.
+
+2012-06-12 13:53  hardwick
+
+	* tools/src/hfst-tagger/src/use_model_src/SequenceModelComponent.h:
+	  #include "HfstTransducer.h" instead of <hfst/HfstTransducer.h>,
+	  since often
+	  people will be building this without having headers already
+	  installed
+
+2012-06-11 19:02  mie
+
+	* test/libhfst/Makefile.am: Remove lexc tests as long as parser is
+	  not reusable
+
+2012-06-11 13:01  mpsilfve
+
+	* tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-tagger/src/hfst-tag.cc,
+	  tools/src/hfst-tagger/src/use_model_src/AcyclicAutomaton.cc,
+	  tools/src/hfst-tagger/src/use_model_src/DataTypes.h,
+	  tools/src/hfst-tagger/src/use_model_src/NewLexicalModel.cc,
+	  tools/src/hfst-tagger/src/use_model_src/NewLexicalModel.h,
+	  tools/src/hfst-tagger/src/use_model_src/SentenceTransducer.cc,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceModelComponent.cc,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceModelComponent.h,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceTagger.cc: Added
+	  skeleton for hfst-tag.cc and got all tests in use_model_src
+	  compiling. Some tests still fail.
+
+2012-06-08 14:33  mpsilfve
+
+	* tools/src/hfst-tagger/src/build_model_src/FstBuilder.cc: Removed
+	  printout from the unit test of FstBuilder.cc
+
+2012-06-08 12:16  mpsilfve
+
+	* tools/src/hfst-tagger/src/build_model_src/WeightedStringVectorCollection.cc,
+	  tools/src/hfst-tagger/src/build_model_src/string_handling.cc:
+	  Fixed WeightedStringVectorCollection.cc and string_handling.cc
+
+2012-06-08 12:00  mpsilfve
+
+	* tools/src/hfst-tagger/src/Makefile.am: Tidied Makefile.am.
+
+2012-06-08 11:59  mpsilfve
+
+	* tools/src/hfst-tagger/src/Makefile.am: Tests are now run using
+	  make check.
+
+2012-06-08 10:25  mpsilfve
+
+	* swig/libhfst.i: Added invert parameter to compose_intersect in
+	  HfstTransducer
+
+2012-06-07 19:51  mpsilfve
+
+	* tools/src/hfst-tagger/src/hfst-open-input-file-for-tagger.cc:
+	  Added hfst-open-input-file-for-tagger.cc, which was missing.
+
+2012-06-07 17:56  mie
+
+	* tools/src/hfst-tagger/src/build_model_src/FstBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/LexicalModelBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/SequenceModelBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/string_handling.h: Use
+	  intree headers for intree build
+
+2012-06-07 14:41  mpsilfve
+
+	* tools/src/hfst-tagger/src/build_model_src/LexicalModelBuilder.cc,
+	  tools/src/hfst-tagger/src/build_model_src/ModelBuilder.cc,
+	  tools/src/hfst-tagger/src/build_model_src/ModelBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/SequenceModelBuilder.cc,
+	  tools/src/hfst-tagger/src/build_model_src/TaggerBuilder.cc,
+	  tools/src/hfst-tagger/src/hfst-build-tagger.cc,
+	  tools/src/hfst-tagger/src/hfst-train-tagger.sh,
+	  tools/src/hfst-tagger/src/hfst_tagger_compute_data_statistics.py,
+	  tools/src/hfst-tagger/src/tagger_aux.py: Added some printouts to
+	  verbose mode.
+
+2012-06-07 13:25  mpsilfve
+
+	* tools/src/hfst-tagger/src/hfst-build-tagger.cc: Fixed issue with
+	  exit value.
+
+2012-06-07 12:50  mpsilfve
+
+	* configure.ac, tools/src/Makefile.am: Updated build files so that
+	  tagger tools can be built. They are not built by default.
+
+2012-06-07 12:41  mpsilfve
+
+	* tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-tagger/src/build_model_src/FstBuilder.cc,
+	  tools/src/hfst-tagger/src/build_model_src/ModelBuilder.cc,
+	  tools/src/hfst-tagger/src/build_model_src/WeightedStringVectorCollection.cc,
+	  tools/src/hfst-tagger/src/build_model_src/WeightedStringVectorCollection.h,
+	  tools/src/hfst-tagger/src/build_model_src/string_handling.cc,
+	  tools/src/hfst-tagger/src/hfst-build-tagger.cc,
+	  tools/src/hfst-tagger/src/hfst-train-tagger.sh: Fixed some in
+	  input handling bugs.
+
+2012-06-07 08:39  mpsilfve
+
+	* tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-tagger/src/compute_data_statistics.py,
+	  tools/src/hfst-tagger/src/hfst-train-tagger.sh,
+	  tools/src/hfst-tagger/src/hfst_tagger_compute_data_statistics.py:
+	  Changed comput_data_statistics.py to
+	  hfst_tagger_data_statistics.py
+
+2012-06-06 14:33  mpsilfve
+
+	* tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-tagger/src/build_model_src/FstBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/LexicalModelBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/ModelBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/SequenceModelBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/TaggerBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/WeightedStringVectorCollection.h,
+	  tools/src/hfst-tagger/src/build_model_src/string_handling.h,
+	  tools/src/hfst-tagger/src/hfst-build-tagger.cc,
+	  tools/src/hfst-tagger/src/hfst-train-tagger.sh,
+	  tools/src/hfst-tagger/src/tagger_aux.py,
+	  tools/src/hfst-tagger/src/unit_test_aux.h,
+	  tools/src/hfst-tagger/src/use_model_src/AcyclicAutomaton.h,
+	  tools/src/hfst-tagger/src/use_model_src/DataTypes.h,
+	  tools/src/hfst-tagger/src/use_model_src/DelayedSequenceModelComponent.h,
+	  tools/src/hfst-tagger/src/use_model_src/NewLexicalModel.h,
+	  tools/src/hfst-tagger/src/use_model_src/SentenceTagger.h,
+	  tools/src/hfst-tagger/src/use_model_src/SentenceTransducer.h,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceModelComponent.h,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceModelComponentPair.h,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceTagger.h,
+	  tools/src/hfst-tagger/test/Makefile.am: Some changes that
+	  actually allow compiling and installing hfst-train-tagger
+
+2012-06-05 10:02  mpsilfve
+
+	* tools/src/hfst-tagger/src/Makefile.am: Added test dependencies.
+
+2012-06-05 09:49  mpsilfve
+
+	* tools/src/hfst-tagger/src/build_model_src/FstBuilder.cc,
+	  tools/src/hfst-tagger/src/build_model_src/WeightedStringVectorCollection.cc:
+	  Fixed test defines in build_model_src/.
+
+2012-06-05 09:45  mpsilfve
+
+	* tools/src/hfst-tagger/src/Makefile.am: Added unit tests to
+	  hfst-tagger.
+
+2012-06-05 09:41  mpsilfve
+
+	* tools/src/hfst-tagger/Makefile.am,
+	  tools/src/hfst-tagger/src/Makefile.am: Added Makefile.am files to
+	  hfst-tagger.
+
+2012-06-05 09:29  mpsilfve
+
+	* tools/src/hfst-tagger/build_model_src,
+	  tools/src/hfst-tagger/compute_data_statistics.py,
+	  tools/src/hfst-tagger/hfst-build-tagger.cc,
+	  tools/src/hfst-tagger/src,
+	  tools/src/hfst-tagger/src/build_model_src,
+	  tools/src/hfst-tagger/src/compute_data_statistics.py,
+	  tools/src/hfst-tagger/src/hfst-build-tagger.cc,
+	  tools/src/hfst-tagger/src/unit_test_aux.cc,
+	  tools/src/hfst-tagger/src/unit_test_aux.h,
+	  tools/src/hfst-tagger/src/use_model_src,
+	  tools/src/hfst-tagger/test,
+	  tools/src/hfst-tagger/unit_test_aux.cc,
+	  tools/src/hfst-tagger/unit_test_aux.h,
+	  tools/src/hfst-tagger/use_model_src: Added src and test subdirs
+	  to hfst-tagger.
+
+2012-06-05 09:21  mpsilfve
+
+	* tools/src/hfst-tagger/CompletedCycleBuilder.cc,
+	  tools/src/hfst-tagger/CompletedCycleBuilder.h,
+	  tools/src/hfst-tagger/ComposeIntersectNGramModel.cc,
+	  tools/src/hfst-tagger/ComposeIntersectNGramModel.h,
+	  tools/src/hfst-tagger/ComposeIntersectNGramModelPair.cc,
+	  tools/src/hfst-tagger/ComposeIntersectNGramModelPair.h,
+	  tools/src/hfst-tagger/CycleBuilder.cc,
+	  tools/src/hfst-tagger/CycleBuilder.h,
+	  tools/src/hfst-tagger/GuesserBuilder.cc,
+	  tools/src/hfst-tagger/GuesserBuilder.h,
+	  tools/src/hfst-tagger/GuesserDivisorTransformer.cc,
+	  tools/src/hfst-tagger/GuesserDivisorTransformer.h,
+	  tools/src/hfst-tagger/GuesserStreamTransformer.cc,
+	  tools/src/hfst-tagger/GuesserStreamTransformer.h,
+	  tools/src/hfst-tagger/HMMTagger.cc,
+	  tools/src/hfst-tagger/HMMTagger.h,
+	  tools/src/hfst-tagger/IdentityTransformer.cc,
+	  tools/src/hfst-tagger/IdentityTransformer.h,
+	  tools/src/hfst-tagger/LanguageModel.cc,
+	  tools/src/hfst-tagger/LanguageModel.h,
+	  tools/src/hfst-tagger/LastEntryRemover.cc,
+	  tools/src/hfst-tagger/LastEntryRemover.h,
+	  tools/src/hfst-tagger/LexicalModel.cc,
+	  tools/src/hfst-tagger/LexicalModel.h,
+	  tools/src/hfst-tagger/LexicalStreamTransformer.cc,
+	  tools/src/hfst-tagger/LexicalStreamTransformer.h,
+	  tools/src/hfst-tagger/LexiconBuilder.cc,
+	  tools/src/hfst-tagger/LexiconBuilder.h,
+	  tools/src/hfst-tagger/LexiconDivisorTransformer.cc,
+	  tools/src/hfst-tagger/LexiconDivisorTransformer.h,
+	  tools/src/hfst-tagger/LogSequenceWeightTable.cc,
+	  tools/src/hfst-tagger/LogSequenceWeightTable.h,
+	  tools/src/hfst-tagger/Makefile,
+	  tools/src/hfst-tagger/ModelBuilder.cc,
+	  tools/src/hfst-tagger/ModelBuilder.h,
+	  tools/src/hfst-tagger/NGramAbstracter.cc,
+	  tools/src/hfst-tagger/NGramAbstracter.h,
+	  tools/src/hfst-tagger/NGramModelConstructor.cc,
+	  tools/src/hfst-tagger/NGramModelConstructor.h,
+	  tools/src/hfst-tagger/SentenceStream.cc,
+	  tools/src/hfst-tagger/SentenceStream.h,
+	  tools/src/hfst-tagger/SequenceCounter.cc,
+	  tools/src/hfst-tagger/SequenceCounter.h,
+	  tools/src/hfst-tagger/SequenceModel.cc,
+	  tools/src/hfst-tagger/SequenceModel.h,
+	  tools/src/hfst-tagger/SequenceWeightTable.cc,
+	  tools/src/hfst-tagger/SequenceWeightTable.h,
+	  tools/src/hfst-tagger/SequenceWeighter.cc,
+	  tools/src/hfst-tagger/SequenceWeighter.h,
+	  tools/src/hfst-tagger/Speller.cc,
+	  tools/src/hfst-tagger/Speller.h,
+	  tools/src/hfst-tagger/StandardHMMLexicalModel.cc,
+	  tools/src/hfst-tagger/StandardHMMLexicalModel.h,
+	  tools/src/hfst-tagger/StreamFieldInverter.cc,
+	  tools/src/hfst-tagger/StreamFieldInverter.h,
+	  tools/src/hfst-tagger/StreamMarkovizer.cc,
+	  tools/src/hfst-tagger/StreamMarkovizer.h,
+	  tools/src/hfst-tagger/StreamReinitializer.cc,
+	  tools/src/hfst-tagger/StreamReinitializer.h,
+	  tools/src/hfst-tagger/StreamTokenizer.cc,
+	  tools/src/hfst-tagger/StreamTokenizer.h,
+	  tools/src/hfst-tagger/StreamTransformer.cc,
+	  tools/src/hfst-tagger/StreamTransformer.h,
+	  tools/src/hfst-tagger/StringTransformer.h,
+	  tools/src/hfst-tagger/StringTransformerList.cc,
+	  tools/src/hfst-tagger/StringTransformerList.h,
+	  tools/src/hfst-tagger/SuggestionsInContext.cc,
+	  tools/src/hfst-tagger/SuggestionsInContext.h,
+	  tools/src/hfst-tagger/Tagger.cc, tools/src/hfst-tagger/Tagger.h,
+	  tools/src/hfst-tagger/ToEmptyStringTransforme.cc,
+	  tools/src/hfst-tagger/ToEmptyStringTransforme.h,
+	  tools/src/hfst-tagger/ToEmptyStringTransformer.cc,
+	  tools/src/hfst-tagger/ToEmptyStringTransformer.h,
+	  tools/src/hfst-tagger/TrieBuilder.cc,
+	  tools/src/hfst-tagger/TrieBuilder.h,
+	  tools/src/hfst-tagger/WordformProbabilityListBuilder.cc,
+	  tools/src/hfst-tagger/WordformProbabilityListBuilder.h,
+	  tools/src/hfst-tagger/WordformProbabilityListTransformer.cc,
+	  tools/src/hfst-tagger/WordformProbabilityListTransformer.h,
+	  tools/src/hfst-tagger/WordformRemover.cc,
+	  tools/src/hfst-tagger/WordformRemover.h,
+	  tools/src/hfst-tagger/build_model_src,
+	  tools/src/hfst-tagger/build_model_src/FstBuilder.cc,
+	  tools/src/hfst-tagger/build_model_src/FstBuilder.h,
+	  tools/src/hfst-tagger/build_model_src/LexicalModelBuilder.cc,
+	  tools/src/hfst-tagger/build_model_src/LexicalModelBuilder.h,
+	  tools/src/hfst-tagger/build_model_src/Makefile,
+	  tools/src/hfst-tagger/build_model_src/ModelBuilder.cc,
+	  tools/src/hfst-tagger/build_model_src/ModelBuilder.h,
+	  tools/src/hfst-tagger/build_model_src/SequenceModelBuilder.cc,
+	  tools/src/hfst-tagger/build_model_src/SequenceModelBuilder.h,
+	  tools/src/hfst-tagger/build_model_src/TaggerBuilder.cc,
+	  tools/src/hfst-tagger/build_model_src/TaggerBuilder.h,
+	  tools/src/hfst-tagger/build_model_src/WeightedStringVectorCollection.cc,
+	  tools/src/hfst-tagger/build_model_src/WeightedStringVectorCollection.h,
+	  tools/src/hfst-tagger/build_model_src/string_handling.cc,
+	  tools/src/hfst-tagger/build_model_src/string_handling.h,
+	  tools/src/hfst-tagger/build_model_src/tagger_aux.py,
+	  tools/src/hfst-tagger/compute_data_statistics.py,
+	  tools/src/hfst-tagger/context_speller.cc,
+	  tools/src/hfst-tagger/hfst-build-tagger.cc,
+	  tools/src/hfst-tagger/hfst_tagger_code_skeleton.cc,
+	  tools/src/hfst-tagger/hfst_tagger_header_skeleton.h,
+	  tools/src/hfst-tagger/tag_with_hmm_tagger.cc,
+	  tools/src/hfst-tagger/train_hmm_tagger.cc,
+	  tools/src/hfst-tagger/unit_test_aux.cc,
+	  tools/src/hfst-tagger/unit_test_aux.h,
+	  tools/src/hfst-tagger/use_model_src,
+	  tools/src/hfst-tagger/use_model_src/AcyclicAutomaton.cc,
+	  tools/src/hfst-tagger/use_model_src/AcyclicAutomaton.h,
+	  tools/src/hfst-tagger/use_model_src/DataTypes.h,
+	  tools/src/hfst-tagger/use_model_src/DelayedSequenceModelComponent.cc,
+	  tools/src/hfst-tagger/use_model_src/DelayedSequenceModelComponent.h,
+	  tools/src/hfst-tagger/use_model_src/NewLexicalModel.cc,
+	  tools/src/hfst-tagger/use_model_src/NewLexicalModel.h,
+	  tools/src/hfst-tagger/use_model_src/SentenceTagger.cc,
+	  tools/src/hfst-tagger/use_model_src/SentenceTagger.h,
+	  tools/src/hfst-tagger/use_model_src/SentenceTransducer.cc,
+	  tools/src/hfst-tagger/use_model_src/SentenceTransducer.h,
+	  tools/src/hfst-tagger/use_model_src/SequenceModelComponent.cc,
+	  tools/src/hfst-tagger/use_model_src/SequenceModelComponent.h,
+	  tools/src/hfst-tagger/use_model_src/SequenceModelComponentPair.cc,
+	  tools/src/hfst-tagger/use_model_src/SequenceModelComponentPair.h,
+	  tools/src/hfst-tagger/use_model_src/SequenceTagger.cc,
+	  tools/src/hfst-tagger/use_model_src/SequenceTagger.h: Initial
+	  commit of new tagger lib architecture.
+
+2012-06-05 06:50  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Copy
+	  input to output for default transitions
+
+2012-05-31 02:35  mie
+
+	* libhfst/src/parsers/lexc-lexer.ll,
+	  test/tools/basic.multi-file-1.lexc,
+	  test/tools/basic.multi-file-2.lexc,
+	  test/tools/basic.multi-file-3.lexc,
+	  tools/src/hfst-lexc-compiler.cc, tools/src/hfst-lexc.cc: Allow
+	  reserved chars between quotation marks, avoid one more segfault
+	  on
+	  parser error
+
+2012-05-31 02:19  mie
+
+	* test/tools/Makefile.am,
+	  test/tools/lexc-compiler-functionality.sh,
+	  test/tools/lexc-functionality.sh, test/tools/xre.quotations.lexc:
+	  Add quotation example that breaks the legacy parser; use all
+	  tests on both
+	  lexc front-ends
+
+2012-05-30 23:04  mie
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/parsers/LexcCompiler.cc, test/libhfst/test_lexc.cc:
+	  Emit parse error on unopenable file...
+
+2012-05-30 21:54  mie
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/LexcCompiler.h, test/libhfst/test_lexc.cc,
+	  tools/src/hfst-lexc-compiler.cc: Pass parse errors upwards from
+	  LexcCompiler
+
+2012-05-30 20:46  mie
+
+	* tools/src/hfst-commandline.cc, tools/src/hfst-commandline.h,
+	  tools/src/hfst-lexc.cc: Remove temporary lexc concatenations on
+	  successful exit
+
+2012-05-30 19:54  mie
+
+	* tools/src/hfst-program-options.cc: Reword -q to "print only fatal
+	  errors and requested output" as it does
+
+2012-05-27 19:40  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc:
+	  Notice @_DEFAULT_SYMBOL_@ in other Alphabet contructors than the
+	  copying one as well
+
+2012-05-27 19:05  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Add an
+	  internal boolean found_index to keep track of whether an index
+	  has been
+	  successfully hit in the current iteration, and try to find a
+	  default symbol
+	  otherwise
+
+2012-05-27 18:42  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Make
+	  alphabet know about default
+
+2012-05-27 18:39  hardwick
+
+	* libhfst/src/HfstSymbolDefs.cc, libhfst/src/HfstSymbolDefs.h:
+	  @_DEFAULT_SYMBOL_@ and hfst::is_default()
+
+2012-05-10 13:51  mie
+
+	* test/tools/Makefile.am, tools/src/hfst-commandline.cc: Remove
+	  warning messages and XFAIL tests that may confuse users.
+	  Fixes bug #3525179
+
+2012-05-10 09:27  eaxelson
+
+	* test/tools/fsmbook-examples/BrazilianPortuguese1/Makefile.am,
+	  test/tools/fsmbook-examples/BrazilianPortuguese2/Makefile.am:
+	  Added READMEs under BrazilianPortuguese 1 and 2 to EXTRA_DIST.
+
+2012-05-08 09:51  eaxelson
+
+	* Doxyfile, api_documentation.dox: Updated Doxygen documentation.
+
+2012-05-04 10:46  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am: Ready for release 3.3.11.
+
 2012-04-27 06:22  moshagen
 
 	* libhfst/src/parsers, tools/src: Ignore generated items.

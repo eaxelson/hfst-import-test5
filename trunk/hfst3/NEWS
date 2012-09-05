@@ -5,6 +5,20 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.3.13
+----------------------------
+
+* Better support for Windows compilation
+
+* Some bugs in replace rules and hfst-regexp2fst fixed
+
+* Bug fixes and updates in command line tools including hfst-tagger, hfst-info, optimized-lookup, hfst-regexp2fst and hfst-guessify
+
+* PCKIMMO output mode for hfst-fst2txt
+
+* Now option --norm precedes --log in hfst-strings2fst
+
+
 Noteworthy changes in 3.3.12
 ----------------------------
 
@@ -304,5 +318,3 @@ Noteworthy changes in release 2.1
 ---------------------------------
 
 * hfst-twolc and hfst-compose-intersect understand # like xerox originals
-
-.. vim: set ft=rst:
