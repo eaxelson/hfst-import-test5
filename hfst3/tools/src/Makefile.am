@@ -180,7 +180,8 @@ noinst_HEADERS= \
 	inc/getopt-cases-unary.h  inc/globals-binary.h      \
 	inc/globals-common.h      inc/globals-unary.h \
 	HfstStrings2FstTokenizer.h HfstLookupFlagDiacritics.h \
-	hfst-tool-metadata.h hfst-optimized-lookup.h hfst-pmatch.h
+	hfst-tool-metadata.h hfst-optimized-lookup.h hfst-pmatch.h \
+	guessify_fst.h generate_model_forms.h
 # parsers/XreCompiler.h parsers/xre_utils.h
 
 # sort alphabetically

@@ -560,7 +560,6 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 test/tools/fsmbook-examples/Esperanto/Makefile
 		 test/tools/fsmbook-examples/BrazilianPortuguese1/Makefile
 		 test/tools/fsmbook-examples/BrazilianPortuguese2/Makefile
-		 test/tools/fsmbook-examples/MonishGuesserAnalyzer/Makefile
                  libhfst/Makefile libhfst/src/Makefile
                  libhfst/src/implementations/Makefile
 		 libhfst/src/parsers/Makefile 
@@ -580,6 +579,7 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 man/Makefile 
                  scripts/Makefile scripts/hfst-foma-wrapper.sh],
                  [chmod +x scripts/hfst-foma-wrapper.sh])
+#		 test/tools/fsmbook-examples/MonishGuesserAnalyzer/Makefile
 #		 test/tools/fsmbook-examples/FinnishOTProsody/Makefile
 #		 test/tools/fsmbook-examples/YaleShooting/Makefile
 #		 test/tools/fsmbook-examples/DateParser/Makefile
