@@ -5,7 +5,7 @@
 #  -------------------------------------------------
 #
 
-HFST_PREFIX="/home/eaxelson/hfst-installation/"
+HFST_PREFIX="/home/$USER/hfst-installation/"
 BACKEND_PREFIX="/usr/local/"
 SFST_PREFIX=$BACKEND_PREFIX
 OPENFST_PREFIX=$BACKEND_PREFIX
