@@ -127,6 +127,7 @@ label_to_stringpair(const char* label)
       {
         return NULL;
       }
+
     if (strcmp(first, "@0@") == 0)
       {
         free(first);
@@ -225,6 +226,11 @@ parse_options(int argc, char** argv)
           // add tool-specific cases here
         case 'f':
             from_label = hfst_strdup(optarg);
+	    if (strcmp(from_label, "@0@") == 0)
+	      {
+		free(from_label);
+		from_label = hfst_strdup(hfst::internal_epsilon.c_str());
+	      }
             from_pair = label_to_stringpair(from_label);
             if (strlen(from_label) == 0)
               {
@@ -244,6 +250,11 @@ parse_options(int argc, char** argv)
             break;
         case 't':
             to_label = hfst_strdup(optarg);
+	    if (strcmp(to_label, "@0@") == 0)
+	      {
+		free(to_label);
+		to_label = hfst_strdup(hfst::internal_epsilon.c_str());
+	      }
             to_pair = label_to_stringpair(to_label);
             if (strlen(to_label) == 0)
               {
