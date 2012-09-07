@@ -4,6 +4,9 @@ if [ "$srcdir" = "" ]; then
     srcdir="./";
 fi
 
+cat $srcdir/cat.txt | tr -d '\r' > TMP;
+mv TMP $srcdir/cat.txt;
+
 for i in "" .sfst .ofst .foma; do
     if test -f cat$i ; then
         if ! ../../tools/src/hfst-fst2txt -D < cat$i > test.txt ; then

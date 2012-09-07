@@ -15,6 +15,10 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
           xre.star-plus-optional.lexc"
 LEXCXFAIL="xfail.bogus.lexc xfail.ISO-8859-1.lexc xfail.lexicon-semicolon.lexc"
 
+if [ "$srcdir" = "" ]; then
+    srcdir="./";
+fi
+
 if ! test -x ../../tools/src/hfst-lexc ; then
     echo hfst-lexc not executable, assumed configured off and skipping
     exit 73
