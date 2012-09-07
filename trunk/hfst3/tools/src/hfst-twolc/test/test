@@ -21,7 +21,7 @@ echo "" | ../../hfst-format --test-format sfst > /dev/null
 SFST_EXISTS=$?
 
 WINDOWS=1
-if ! ( ../src/hfst-twolc-loc --help 2>1 > /dev/null); then
+if ! ( uname | egrep "Linux|linux" 2>1 > /dev/null); then
     WINDOWS=0
 fi
     
