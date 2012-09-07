@@ -230,6 +230,11 @@ parse_options(int argc, char** argv)
 
     if (lexccount > 1)
       {
+#ifdef WINDOWS
+	error(EXIT_FAILURE, 0, "multiple file handling not supported on "
+	      "Windows;\n"
+	      "use a single file");
+#else
         if (!silent) {
           warning(0, 0, "multiple file handling is not supported by all "
                   "backends;\n"
@@ -257,6 +262,7 @@ parse_options(int argc, char** argv)
         lexccount = 1;
         lexcfiles[0] = hfst_fopen(tempfilename, "r");
         lexcfilenames[0] = hfst_strdup(tempfilename);
+#endif
       }
     return EXIT_CONTINUE;
 }
