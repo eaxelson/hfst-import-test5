@@ -1,7 +1,7 @@
 #!/bin/sh
 
 EXT=
-if ! (uname | egrep "Linux|linux" 2>1 > /dev/null); then
+if (uname | egrep "MINGW|mingw" 2>1 > /dev/null); then
     EXT=".exe";
 fi
 
