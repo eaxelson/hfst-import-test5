@@ -61,6 +61,10 @@ for i in "" .sfst .ofst .foma; do
         if ! ../../tools/src/hfst-compare -s test cat2dog$i > /dev/null 1>&1 ; then
             exit 1
         fi
+        if ! ../../src/hfst-strings2fst $srcdir/dos.strings > test.hfst ; then
+            exit 1
+        fi
+        rm test.hfst
     fi
 done
 
