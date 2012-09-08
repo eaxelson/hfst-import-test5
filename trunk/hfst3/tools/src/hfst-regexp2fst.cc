@@ -221,16 +221,12 @@ process_stream(HfstOutputStream& outstream)
           if (delim == '\n')
             {
               hfst_set_name(*compiled, 
-                            string(line).substr(0, strlen(line) - 1),
+                            "?",
                             "xre");
-              hfst_set_formula(*compiled,
-                               string(line).substr(0 ,strlen(line) - 1),
-                               "X");
             }
           else
             {
-              hfst_set_name(*compiled, line, "xre");
-              hfst_set_formula(*compiled, line, "X");
+              hfst_set_name(*compiled, "?", "xre");
             }
           outstream << *compiled;
         }
@@ -241,16 +237,12 @@ process_stream(HfstOutputStream& outstream)
           if (delim == '\n')
             {
               hfst_set_name(disjunction, 
-                            string(line).substr(0, strlen(line) - 1) + "...",
+                            "?",
                             "xre");
-              hfst_set_formula(disjunction,
-                               string(line).substr(0 ,strlen(line) - 1) + "...",
-                               "X");
             }
           else
             {
-              hfst_set_name(disjunction, string(line) + "...", "xre");
-              hfst_set_formula(disjunction, string(line) + "...", "X");
+              hfst_set_name(disjunction, "?", "xre");
             }
       outstream << disjunction;
     }
