@@ -104,9 +104,9 @@ print_usage()
         "\n", program_name); 
         print_common_program_options(message_out);
         fprintf(message_out, 
-	"Input/Output options:\n"
-	"  -i, --input=INFILE     Read input strings from INFILE\n"
-	"  -o, --output=OUTFILE   Write output transducer to OUTFILE\n");
+    "Input/Output options:\n"
+    "  -i, --input=INFILE     Read input strings from INFILE\n"
+    "  -o, --output=OUTFILE   Write output transducer to OUTFILE\n");
         fprintf(message_out, "String and format options:\n"
         "  -f, --format=FMT          Write result in FMT format\n"
         "  -j, --disjunct-strings    Disjunct all strings instead of transforming\n"
@@ -126,7 +126,7 @@ print_usage()
         fprintf(message_out, 
         "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
         "FMT can be { foma, openfst-tropical, openfst-log, sfst, \n"
-	"optimized-lookup-weighted, optimized-lookup-unweighted }.\n"
+    "optimized-lookup-weighted, optimized-lookup-unweighted }.\n"
         "If EPS is not defined, the default representation of @0@ is used.\n"
         "Option --norm precedes option --log.\n"
         "The FILE of option -m lists all multichar-symbols, each symbol\n"
@@ -317,7 +317,7 @@ process_stream(HfstOutputStream& outstream)
       if (weighted)
         {
           sum_of_weights = sum_of_weights + weight;
-	  path_weight=weight;
+      path_weight=weight;
           verbose_printf("Using final weight %f...\n", weight);
         }
 
@@ -325,20 +325,19 @@ process_stream(HfstOutputStream& outstream)
         {
           HfstBasicTransducer tr;
 
-	  if (logarithmic_weights) 
-	    {
-	      path_weight = take_negative_logarithm(weight);
-	    }
+      if (logarithmic_weights) 
+        {
+          path_weight = take_negative_logarithm(weight);
+        }
           tr.disjunct(spv, path_weight);
           HfstTransducer res(tr, output_format);
-          hfst_set_name(res, orig_line, "string");
-          hfst_set_formula(res, orig_line, "S");
+          hfst_set_name(res, "", "string");
           outstream << res;
           free(orig_line);
         }
       else // disjunct all strings into a single transducer
         {
-	  // do not take negative logarithm yet
+      // do not take negative logarithm yet
           disjunction.disjunct(spv, path_weight);
         }
     }
@@ -350,16 +349,15 @@ process_stream(HfstOutputStream& outstream)
       if (normalize_weights) 
         {
           verbose_printf("Normalising weights...\n");
-	  res.transform_weights(&divide_by_sum_of_weights);
+      res.transform_weights(&divide_by_sum_of_weights);
         }
-      if (logarithmic_weights)
-	{
-          verbose_printf("Taking negative logarithm...\n");
-	  res.transform_weights(&take_negative_logarithm);
-	}
+                              if (logarithmic_weights)
+                            {
+                                  verbose_printf("Taking negative logarithm...\n");
+                                  res.transform_weights(&take_negative_logarithm);
+                                }
 
-      hfst_set_name(res, inputfilename, "strings");
-      hfst_set_formula(res, inputfilename, "S");
+      hfst_set_name(res, "?", "strings");
       outstream << res;
     }
   return EXIT_SUCCESS;
