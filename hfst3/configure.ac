@@ -28,7 +28,7 @@ LIBHFST_MINOR=3
 LIBHFST_EXTENSION=13
 LIBHFST_VERSION=$LIBHFST_MAJOR.$LIBHFST_MINOR.$LIBHFST_EXTENSION
 
-AC_INIT([hfst], [3.3.13], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
+AC_INIT([hfst], [3.3.13], [hfst-bugs@helsinki.fi], [hfst])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall -Werror std-options foreign check-news])
 
