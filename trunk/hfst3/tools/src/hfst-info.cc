@@ -232,12 +232,12 @@ int main (int argc, char * argv[])
         }
     }
   verbose_printf("HFST info version: %s\n"
-          "HFST packaging: %s <%s> <mailto:%s>\n"
+          "HFST packaging: %s\n"
           "HFST version: %s\n"
           "HFST long version: %ld\n"
           "HFST configuration revision: %s\n",
           hfst_tool_version,
-          PACKAGE_STRING, PACKAGE_URL, PACKAGE_BUGREPORT,
+          PACKAGE_STRING,
           PACKAGE_VERSION,
           HFST_LONGVERSION,
           HFST_REVISION);
