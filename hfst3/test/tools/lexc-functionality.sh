@@ -26,7 +26,7 @@ fi
 
 if ! test -x ../../tools/src/hfst-lexc ; then
     echo hfst-lexc not executable, assumed configured off and skipping
-    exit 73
+    exit 77
 fi
 
 for i in .sfst .ofst .foma ; do
