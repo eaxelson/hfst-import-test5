@@ -255,7 +255,8 @@ process_stream(HfstOutputStream& outstream)
       if (tab == NULL)
         {
           string_end = line;
-          while ((*string_end != '\0') && (*string_end != '\n'))
+          while ((*string_end != '\0') && (*string_end != '\n') && 
+                 (*string_end != '\r'))
             {
               string_end++;
             }
@@ -265,7 +266,7 @@ process_stream(HfstOutputStream& outstream)
       // change '\n' to '\0'
       char *p = tab;
       while (*p != '\0') {
-        if (*p == '\n')
+        if ((*p == '\n') || (*p == '\r'))
           *p = '\0';
         p++;
       }
