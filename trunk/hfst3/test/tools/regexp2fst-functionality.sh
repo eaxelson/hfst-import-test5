@@ -24,6 +24,9 @@ for i in sfst openfst-tropical foma; do
     if ! ../../tools/src/hfst-regexp2fst -S -f $i $srcdir/not-contains-a-comment-emptyline.xre > test.fst ; then
         exit 1
     fi
+    if ! ../../tools/src/hfst-regexp2fst -f $i $srcdir/parallel-left-arrow.xre > test.fst ; then
+        exit 1
+    fi
 done
 
 rm -f test.fst
