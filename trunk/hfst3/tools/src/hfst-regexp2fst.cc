@@ -51,6 +51,8 @@ using std::pair;
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
 
+extern int xrenerrs;
+
 using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
 using hfst::HfstTransducer;
@@ -212,22 +214,18 @@ process_stream(HfstOutputStream& outstream)
       HfstTransducer* compiled;
       verbose_printf("Compiling expression %u\n", line_count);
       compiled = comp.compile(line);
+      if (xrenerrs > 0)
+        {
+          error_at_line(EXIT_FAILURE, 0, inputfilename, line_count,
+                        "XRE parsing failed");
+        }
       if (disjunct_expressions)
         {
           disjunction.disjunct(*compiled);
         }
       else
         {
-          if (delim == '\n')
-            {
-              hfst_set_name(*compiled, 
-                            "?",
-                            "xre");
-            }
-          else
-            {
-              hfst_set_name(*compiled, "?", "xre");
-            }
+          hfst_set_name(*compiled, "?", "xre");
           outstream << *compiled;
         }
       delete compiled;
