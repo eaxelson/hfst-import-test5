@@ -78,32 +78,32 @@ print_usage()
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
         "Use a guesser (and generator) to guess analyses or inflectional\n"
-	"paradigms of unknown words.\n"
+    "paradigms of unknown words.\n"
         "\n", program_name);
 
     print_common_program_options(message_out);
     print_common_unary_program_options(message_out);
     fprintf(message_out, "Guesser options:\n"
         "  -f, --model-form-filename       Inflectional information for\n"
-	"                                  generated model forms is read\n"
-	"                                  from this file.\n"
+    "                                  generated model forms is read\n"
+    "                                  from this file.\n"
         "  -n, --max-number-of-guesses     Maximal number of analysis\n"
         "                                  per word form (5 by default).\n"
-	"  -m  --max-number-of-forms       Maximal number of generated model\n"
-	"                                  forms per guess (2 by default).\n"
-	    );
+    "  -m  --max-number-of-forms       Maximal number of generated model\n"
+    "                                  forms per guess (2 by default).\n"
+        );
     fprintf(message_out, "\n");
     fprintf(message_out,
-	    "The guesser and generator should be constructed using the tool\n"
-	    "hfst-guessify, which can compile a guesser and generator from a\n"
-	    "morphological analyzer. hfst-guessify packages the guesser and\n"
-	    "generator in the same fst-file.\n");
+        "The guesser and generator should be constructed using the tool\n"
+        "hfst-guessify, which can compile a guesser and generator from a\n"
+        "morphological analyzer. hfst-guessify packages the guesser and\n"
+        "generator in the same fst-file.\n");
     fprintf(message_out, "\n");
     fprintf(message_out,
-	    "If option -f is used, but a generator has not been compiled\n"
-	    "with the guesser, a generator will be compiled, which will\n"
-	    "increase load time.\n"
-	    );
+        "If option -f is used, but a generator has not been compiled\n"
+        "with the guesser, a generator will be compiled, which will\n"
+        "increase load time.\n"
+        );
     fprintf(message_out, "\n");
     fprintf(message_out, "\n");
     fprintf(message_out,
@@ -127,9 +127,9 @@ parse_options(int argc, char** argv)
         HFST_GETOPT_COMMON_LONG,
         HFST_GETOPT_UNARY_LONG,
           // add tool-specific options here
-	    {"model-form-filename", no_argument, 0, 'f'},
-	    {"max-number-of-guesses", no_argument, 0, 'n'},
-	    {"max-number-of-forms", no_argument, 0, 'm'},
+        {"model-form-filename", no_argument, 0, 'f'},
+        {"max-number-of-guesses", no_argument, 0, 'n'},
+        {"max-number-of-forms", no_argument, 0, 'm'},
             {0,0,0,0}
         };
         int option_index = 0;
@@ -147,32 +147,32 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
           // add tool-specific cases here
-	case 'f':
-	  generate_model_forms = true;
-	  model_form_filename = optarg;
-	  break;
+    case 'f':
+      generate_model_forms = true;
+      model_form_filename = optarg;
+      break;
 
-	case 'n':
-	  max_number_of_guesses = get_size_t(optarg);
-	  
-	  if (max_number_of_guesses == -1)
-	    {
-	      error(EXIT_FAILURE, 0, "Invalid maximal number of guesses %s. "
-		    "Give a positive int.", optarg);
-	    }
-	  
-	  break;
+    case 'n':
+      max_number_of_guesses = get_size_t(optarg);
+      
+      if (max_number_of_guesses == -1)
+        {
+          error(EXIT_FAILURE, 0, "Invalid maximal number of guesses %s. "
+            "Give a positive int.", optarg);
+        }
+      
+      break;
 
-	case 'm':
-	  max_number_of_forms = get_size_t(optarg);
-	  
-	  if (max_number_of_forms == -1)
-	    {
-	      error(EXIT_FAILURE, 0, "Invalid maximal number of generated "
-		    "forms %s. Give a positive int.", optarg);
-	    }
-	  
-	  break;
+    case 'm':
+      max_number_of_forms = get_size_t(optarg);
+      
+      if (max_number_of_forms == -1)
+        {
+          error(EXIT_FAILURE, 0, "Invalid maximal number of generated "
+            "forms %s. Give a positive int.", optarg);
+        }
+      
+      break;
 
 #include "inc/getopt-cases-error.h"
         }
@@ -199,16 +199,16 @@ int main( int argc, char **argv )
     }
     
     verbose_printf("Reading from %s, writing to %s\n", 
-		   inputfilename, outfilename);
+           inputfilename, outfilename);
     
     // here starts the buffer handling part
     HfstInputStream * instream = NULL;
 
     try 
       {
-	instream = (inputfile != stdin ?
-		    new HfstInputStream(inputfilename) : 
-		    new HfstInputStream());
+    instream = (inputfile != stdin ?
+            new HfstInputStream(inputfilename) : 
+            new HfstInputStream());
       } 
     catch(const HfstException e)  
       {
@@ -221,9 +221,9 @@ int main( int argc, char **argv )
 
     try 
       {
-	out = (outfile != stdout ?
-	       new std::ofstream(outfilename) :
-	       &std::cout);
+    out = (outfile != stdout ?
+           new std::ofstream(outfilename) :
+           &std::cout);
       } 
     catch(...)  
       {
@@ -236,18 +236,18 @@ int main( int argc, char **argv )
     HfstTransducer * guesser;
     try
       {
-	guesser = new HfstTransducer(*instream);
+    guesser = new HfstTransducer(*instream);
       }
     catch (const HfstException e)
       {
-	error(EXIT_FAILURE, 0, "Error when reading guesser from file %s",
+    error(EXIT_FAILURE, 0, "Error when reading guesser from file %s",
               inputfilename);
         return EXIT_FAILURE;
       }
       
     if (guesser->get_properties().count("reverse input") != 1)
       {
-	error(EXIT_FAILURE, 0, "The transducer in %s is not a guesser.",
+    error(EXIT_FAILURE, 0, "The transducer in %s is not a guesser.",
               inputfilename);
         return EXIT_FAILURE;
       }
@@ -256,18 +256,18 @@ int main( int argc, char **argv )
     
     if (generate_model_forms)
       {
-	if (not instream->is_good())
-	  {
-	    verbose_printf("No generator found in %s. Compiling generator "
-			   "from guesser.\n",inputfilename);
-	    
-	    generator = new HfstTransducer(*guesser);
-	    generator->convert(TROPICAL_OPENFST_TYPE);
-	    generator->invert();
-	    generator->convert(HFST_OLW_TYPE);
-	  }
-	else
-	  { generator = new HfstTransducer(*instream); }
+    if (not instream->is_good())
+      {
+        verbose_printf("No generator found in %s. Compiling generator "
+               "from guesser.\n",inputfilename);
+        
+        generator = new HfstTransducer(*guesser);
+        generator->convert(TROPICAL_OPENFST_TYPE);
+        generator->invert();
+        generator->convert(HFST_OLW_TYPE);
+      }
+    else
+      { generator = new HfstTransducer(*instream); }
       }
 
     HfstTokenizer tokenizer = get_alphabet_string_tokenizer(*guesser);
@@ -276,59 +276,59 @@ int main( int argc, char **argv )
     
     if (generate_model_forms)
       {
-	verbose_printf("Reading inflectional information for model forms\n"
-		       "from %s.\n",model_form_filename.c_str());
-	
-	try
-	  {
-	    model_forms = read_model_forms(model_form_filename,tokenizer);
-	  }
-	catch (const InvalidModelLine &e)
-	  {
-	    std::cerr << "Invalid model form line in model form file:"
-		      << std::endl
-		      << e.line
-		      << std::endl;
-	    return EXIT_FAILURE;
-	  }
+    verbose_printf("Reading inflectional information for model forms\n"
+               "from %s.\n",model_form_filename.c_str());
+    
+    try
+      {
+        model_forms = read_model_forms(model_form_filename,tokenizer);
+      }
+    catch (const InvalidModelLine &e)
+      {
+        std::cerr << "Invalid model form line in model form file:"
+              << std::endl
+              << e.line
+              << std::endl;
+        return EXIT_FAILURE;
+      }
       }
     while (std::cin.peek() != EOF)
       {
-	std::string line;
-	std::getline(std::cin,line);
-	
-	StringVectorVector guesses = get_guesses(line,
-						 *guesser,
-						 max_number_of_guesses,
-						 tokenizer);
-	
-	if (generate_model_forms)
-	  {
-	    StringVectorVector paradigms = get_paradigms(line,
-							 guesses,
-							 *generator,
-							 model_forms,
-							 max_number_of_forms);
+    std::string line;
+    std::getline(std::cin,line);
+    
+    StringVectorVector guesses = get_guesses(line,
+                         *guesser,
+                         max_number_of_guesses,
+                         tokenizer);
+    
+    if (generate_model_forms)
+      {
+        StringVectorVector paradigms = get_paradigms(line,
+                             guesses,
+                             *generator,
+                             model_forms,
+                             max_number_of_forms);
 
-	    for (StringVectorVector::const_iterator it = paradigms.begin();
-		 it != paradigms.end();
-		 ++it)
-	      {
-		(*out) << *it << std::endl;
-	      }
-	  }
-	else
-	  {
-	    for (StringVectorVector::iterator it = guesses.begin();
-		 it != guesses.end();
-		 ++it)
-	      {
-		std::reverse(it->begin(), it->end());
+        for (StringVectorVector::const_iterator it = paradigms.begin();
+         it != paradigms.end();
+         ++it)
+          {
+        (*out) << *it << std::endl;
+          }
+      }
+    else
+      {
+        for (StringVectorVector::iterator it = guesses.begin();
+         it != guesses.end();
+         ++it)
+          {
+        std::reverse(it->begin(), it->end());
 
-		(*out) << line << "\t" << *it << std::endl;
-	      }
-	  }	
-	(*out) << std::endl;
+        (*out) << line << "\t" << *it << std::endl;
+          }
+      } 
+    (*out) << std::endl;
       }
 
     delete instream;

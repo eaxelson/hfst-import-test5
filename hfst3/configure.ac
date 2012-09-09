@@ -175,6 +175,12 @@ AC_ARG_ENABLE([disjunct],
 			  [enable_disjunct=$enableval],
 			  [enable_disjunct=yes])
 AM_CONDITIONAL([WANT_DISJUNCT], [test x$enable_disjunct != xno])
+AC_ARG_ENABLE([expand_equivalences],
+			  [AS_HELP_STRING([--enable-edit-metadata],
+							  [build acx tool @<:@default=no@:>@])],
+			  [enable_expand_equivalences=$enableval],
+			  [enable_expand_equivalences=no])
+AM_CONDITIONAL([WANT_EXPAND_EQUIVALENCES], [test x$enable_expand_equivalences != xno])
 AC_ARG_ENABLE([edit_metadata],
 			  [AS_HELP_STRING([--enable-edit-metadata],
 							  [build metadata tool @<:@default=yes@:>@])],
@@ -476,6 +482,7 @@ AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
 
 # Checks for libraries
 
+AC_CHECK_LIB([xml2], [main])
 AC_LANG_PUSH([C++])
 AS_IF([test "x$with_openfst" != "xno" -a "x$enable_windows" == "xno"], 
       [AC_CHECK_LIB([pthread], [main])]
@@ -513,7 +520,7 @@ AS_IF([test "x$with_readline" = "xyes"],
 
 # Checks for header files
 AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h])
-
+AC_CHECK_HEADERS([libxml/tree.h libxml/mem.h])
 AC_LANG_PUSH([C++])
 
 AS_IF([test "x$with_sfst" != "xno"],
