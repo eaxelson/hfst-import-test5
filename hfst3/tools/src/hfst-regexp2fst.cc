@@ -209,15 +209,34 @@ process_stream(HfstOutputStream& outstream)
         {
           first_line = strdup(line);
         }
-      transducer_n++;
+      char* exp = line;
+      while ((*exp == '\n') || (*exp == '\r') || (*exp == ' '))
+        {
+          exp++;
+        }
       line_count++;
+      if (*exp == '\0')
+        {
+          verbose_printf("Skipping whitespace expression #%u", line_count);
+          continue;
+        }
+      transducer_n++;
       HfstTransducer* compiled;
       verbose_printf("Compiling expression %u\n", line_count);
-      compiled = comp.compile(line);
+      compiled = comp.compile(exp);
       if (xrenerrs > 0)
         {
-          error_at_line(EXIT_FAILURE, 0, inputfilename, line_count,
+          if (line_separated)
+            {
+              error_at_line(EXIT_FAILURE, 0, inputfilename, line_count,
                         "XRE parsing failed");
+            }
+          else
+            {
+              error(EXIT_FAILURE, 0, "%s: XRE parsing failed"
+                   "in expression #%u separated semicolons", inputfilename,
+                   line_count);
+            }
         }
       if (disjunct_expressions)
         {
