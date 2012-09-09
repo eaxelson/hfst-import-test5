@@ -60,10 +60,10 @@ StringVector get_analysis_prefix(const StringVector &reversed_analysis)
       prefix.push_back(*it);
       
       if (is_cathegory_symbol(*it))
-	{ 
-	  // When we return, we have to reverse the result.
-	  return StringVector(prefix.rbegin(), prefix.rend()); 
-	}
+    { 
+      // When we return, we have to reverse the result.
+      return StringVector(prefix.rbegin(), prefix.rend()); 
+    }
     }
   
   // It should actually be impossible to get here, since valid
@@ -85,16 +85,16 @@ bool contains_analysis_symbols(const StringVector &word_form)
     {
       const std::string &symbol = *it;
       if (symbol.size() > 1 and 
-	  symbol[0] == '[' and 
-	  symbol[symbol.size() - 1] == ']')
-	{ return true; }
+      symbol[0] == '[' and 
+      symbol[symbol.size() - 1] == ']')
+    { return true; }
     }
   
   return false;
 }
 
 StringVector generate_word_forms(const StringVector &analysis,
-				 HfstTransducer &form_generator)
+                 HfstTransducer &form_generator)
 {
   HfstOneLevelPaths * word_forms = form_generator.lookup(analysis);
 
@@ -109,15 +109,15 @@ StringVector generate_word_forms(const StringVector &analysis,
        ++it)
     {
       if (num > MAX_GENERATED_FORMS)
-	{ break; }
+    { break; }
 
       const StringVector &word_form = it->second;
       
       if (contains_analysis_symbols(word_form))
-	{ continue; }
+    { continue; }
 
       if (not first_form)
-	{ results.push_back(", "); }
+    { results.push_back(", "); }
             
       // The word form is reversed, so we start from the end and
       // iterate to the beginning.
@@ -141,8 +141,8 @@ StringVector generate_word_forms(const StringVector &analysis,
 }
 
 StringVectorVector get_model_forms(const StringVector &reversed_analysis,
-				   const StringVectorVector &model_forms,
-				   HfstTransducer &form_generator)
+                   const StringVectorVector &model_forms,
+                   HfstTransducer &form_generator)
 {
   StringVector reversed_analysis_prefix = 
     get_analysis_prefix(reversed_analysis);
@@ -156,7 +156,7 @@ StringVectorVector get_model_forms(const StringVector &reversed_analysis,
       StringVector model_analysis = join(*it, reversed_analysis_prefix);
 
       results.push_back(generate_word_forms(model_analysis,
-					    form_generator));
+                        form_generator));
     }
 
   return results;
@@ -167,7 +167,7 @@ StringPair split(const std::string &line,const std::string &separator)
   size_t separator_pos = line.find(separator);
   
   return StringPair(line.substr(0,separator_pos),
-		    line.substr(separator_pos + 1));
+            line.substr(separator_pos + 1));
 }
 
 StringVector read_model_form(std::istream &in, HfstTokenizer &tokenizer)
@@ -187,7 +187,7 @@ StringVector read_model_form(std::istream &in, HfstTokenizer &tokenizer)
 }
 
 StringVectorVector read_model_forms(const std::string &model_form_filename,
-				    HfstTokenizer &tokenizer)
+                    HfstTokenizer &tokenizer)
 {
   std::ifstream in(model_form_filename.c_str());
 
@@ -206,9 +206,9 @@ StringVectorVector read_model_forms(const std::string &model_form_filename,
 
 
 StringVectorVector get_guesses(const std::string &word_form,
-			       HfstTransducer &guesser,
-			       size_t number_of_guesses,
-			       HfstTokenizer &tokenizer)
+                   HfstTransducer &guesser,
+                   size_t number_of_guesses,
+                   HfstTokenizer &tokenizer)
 {
   StringVector tokenized_line = tokenizer.tokenize_one_level(word_form);
   std::reverse(tokenized_line.begin(),tokenized_line.end());
@@ -224,7 +224,7 @@ StringVectorVector get_guesses(const std::string &word_form,
        ++it)
     { 
       if (num > number_of_guesses)
-	{ break; }
+    { break; }
       results.push_back(it->second); 
       ++num;
     }
@@ -233,10 +233,10 @@ StringVectorVector get_guesses(const std::string &word_form,
 }
 
 StringVectorVector get_paradigms(const std::string &word_form,
-				 const StringVectorVector &guesses,
-				 HfstTransducer &generator,
-				 const StringVectorVector &model_forms,
-				 size_t number_of_generated_forms)
+                 const StringVectorVector &guesses,
+                 HfstTransducer &generator,
+                 const StringVectorVector &model_forms,
+                 size_t number_of_generated_forms)
 {
   StringVectorVector paradigm_guesses;
 
@@ -247,9 +247,9 @@ StringVectorVector get_paradigms(const std::string &word_form,
       StringVector analysis_guess = *it;
 
       StringVectorVector results = get_model_forms(analysis_guess,
-						   model_forms,
-						   generator);
-	  
+                           model_forms,
+                           generator);
+      
       StringVector paradigm;
       paradigm.push_back(word_form);
       paradigm.push_back("\t");
@@ -257,20 +257,20 @@ StringVectorVector get_paradigms(const std::string &word_form,
       StringVector rev_analysis_guess(analysis_guess);
       std::reverse(rev_analysis_guess.begin(), rev_analysis_guess.end());
       paradigm.insert(paradigm.end(), 
-		      rev_analysis_guess.begin(), 
-		      rev_analysis_guess.end());
+              rev_analysis_guess.begin(), 
+              rev_analysis_guess.end());
 
       for (StringVectorVector::const_iterator jt = results.begin();
-	   jt != results.end();
-	   ++jt)
-	    {
-	      const StringVector &model_form = *jt;
+       jt != results.end();
+       ++jt)
+        {
+          const StringVector &model_form = *jt;
 
-	      paradigm.push_back("\t");
-	      paradigm.insert(paradigm.end(), 
-			      model_form.begin(), 
-			      model_form.end());
-	    }
+          paradigm.push_back("\t");
+          paradigm.insert(paradigm.end(), 
+                  model_form.begin(), 
+                  model_form.end());
+        }
       
       paradigm_guesses.push_back(paradigm);
     }
@@ -290,7 +290,7 @@ int main(int argc, char * argv[])
 {
   // Open input fst-file for reading the guesser and generator.
   std::cerr << "Reading guesser and generator from file "
-	    << argv[1] << std::endl;
+        << argv[1] << std::endl;
 
   HfstInputStream in(argv[1]);
 
@@ -320,24 +320,24 @@ int main(int argc, char * argv[])
       std::getline(std::cin,line);
       
       StringVectorVector guesses = get_guesses(line,
-					       guesser,
-					       MAX_ANALYSES,
-					       tokenizer);
+                           guesser,
+                           MAX_ANALYSES,
+                           tokenizer);
 
       StringVectorVector guess_model_forms = get_paradigms(line,
-							   guesses,
-							   generator,
-							   model_forms,
-							   MAX_GENERATED_FORMS)
-	;
+                               guesses,
+                               generator,
+                               model_forms,
+                               MAX_GENERATED_FORMS)
+    ;
       
 
       for (StringVectorVector::const_iterator it = guess_model_forms.begin();
-	   it != guess_model_forms.end();
-	   ++it)
-	{
-	  std::cout << *it << std::endl;
-	}
+       it != guess_model_forms.end();
+       ++it)
+    {
+      std::cout << *it << std::endl;
+    }
     }
 }
 #endif // MAIN_TEST

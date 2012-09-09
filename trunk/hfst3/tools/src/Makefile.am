@@ -53,6 +53,9 @@ endif
 if WANT_DUPLICATE
 MAYBE_DUPLICATE=hfst-duplicate$(EXEEXT)
 endif
+if WANT_EXPAND_EQUIVALENCES
+MAYBE_EXPAND_EQUIVALENCES=hfst-expand-equivalences$(EXEEXT)
+endif
 if WANT_EDIT_METADATA
 MAYBE_EDIT_METADATA=hfst-edit-metadata$(EXEEXT)
 endif
@@ -213,7 +216,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_FORMAT)                     \
 			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)\
 			 $(MAYBE_TRAVERSE) $(MAYBE_GUESSIFY) $(MAYBE_GUESS) \
-			 $(MAYBE_INFO)
+			 $(MAYBE_INFO) $(MAYBE_EXPAND_EQUIVALENCES)
 # fuck the alphabets!
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc \
@@ -229,6 +232,7 @@ hfst_conjunct_SOURCES=hfst-conjunct.cc $(HFST_COMMON_SRC)
 hfst_determinize_SOURCES=hfst-determinize.cc $(HFST_COMMON_SRC)
 hfst_disjunct_SOURCES=hfst-disjunct.cc $(HFST_COMMON_SRC)
 hfst_duplicate_SOURCES=hfst-duplicate.cc $(HFST_COMMON_SRC)
+hfst_expand_equivalences_SOURCES=hfst-expand-equivalences.cc $(HFST_COMMON_SRC)
 hfst_edit_metadata_SOURCES=hfst-edit-metadata.cc $(HFST_COMMON_SRC)
 hfst_format_SOURCES=hfst-format.cc $(HFST_COMMON_SRC)
 hfst_fst2fst_SOURCES=hfst-fst2fst.cc $(HFST_COMMON_SRC)
