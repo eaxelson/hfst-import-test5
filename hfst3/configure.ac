@@ -531,7 +531,7 @@ AS_IF([test "x$with_openfst" != "xno" -a "x$enable_windows" == "xno"],
       [AC_CHECK_HEADERS([fst/fstlib.h])])
 AC_LANG_POP
 AC_LANG_PUSH([C])
-AS_IF([test "x$with_foma" != "xno"],
+AS_IF([test "x$with_foma" != "xno" -a "x$enable_windows" == "xno"],
       [AC_CHECK_HEADERS([fomalib.h])])
 AC_LANG_POP
 AC_LANG_PUSH([C])
@@ -587,6 +587,7 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 windows/openfst/Makefile
 		 windows/openfst/src/Makefile
 		 windows/openfst/src/lib/Makefile
+		 windows/foma/Makefile
 		 man/Makefile 
                  scripts/Makefile scripts/hfst-foma-wrapper.sh],
                  [chmod +x scripts/hfst-foma-wrapper.sh])
