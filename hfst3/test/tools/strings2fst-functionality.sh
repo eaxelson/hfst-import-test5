@@ -1,4 +1,9 @@
 #!/bin/sh
+
+if [ "$srcdir" = "" ]; then
+    srcdir="./";
+fi
+
 for i in "" .sfst .ofst .foma; do
     FFLAG=
     case $i in
@@ -61,7 +66,7 @@ for i in "" .sfst .ofst .foma; do
         if ! ../../tools/src/hfst-compare -s test cat2dog$i > /dev/null 1>&1 ; then
             exit 1
         fi
-        if ! ../../tools/src/hfst-strings2fst $srcdir/dos.strings > test.hfst ; then
+        if ! ../../tools/src/hfst-strings2fst $FFLAG $srcdir/dos.strings > test.hfst ; then
             exit 1
         fi
         if ! ../../tools/src/hfst-compare -s test.hfst cat$i ; then
