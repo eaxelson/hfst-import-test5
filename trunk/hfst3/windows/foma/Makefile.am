@@ -1,7 +1,7 @@
 
 
 noinst_LTLIBRARIES = libfoma.la
-nodist_libfst_la_SOURCES = int_stack.c define.c determinize.c apply.c \
+nodist_libfoma_la_SOURCES = int_stack.c define.c determinize.c apply.c \
 	rewrite.c lexcread.c topsort.c flags.c minimize.c reverse.c \
 	extract.c sigma.c io.c structures.c constructions.c \
 	coaccessible.c utf8.c spelling.c dynarray.o mem.c stringhash.c \
