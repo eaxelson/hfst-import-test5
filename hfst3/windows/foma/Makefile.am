@@ -1,4 +1,5 @@
 
+AM_CPPFLAGS= -D_MSC_VER
 
 noinst_LTLIBRARIES = libfoma.la
 nodist_libfoma_la_SOURCES = int_stack.c define.c determinize.c apply.c \

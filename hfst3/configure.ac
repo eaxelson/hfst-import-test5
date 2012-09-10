@@ -497,7 +497,7 @@ AS_IF([test "x$ac_cv_lib_sfst_main" == xno -a "x$ac_cv_lib_sfst1_main" == xno],
       [AC_MSG_FAILURE([sfst tests failed (--without-sfst to disable)])])
 AC_LANG_POP
 AC_LANG_PUSH([C])
-AS_IF([test "x$with_foma" != "xno"],
+AS_IF([test "x$with_foma" != "xno" -a "x$enable_windows" == "xno"],
       [AC_CHECK_LIB([z], [main])]
       [AC_CHECK_LIB([foma], [main], [],
                     [AC_MSG_FAILURE([foma test failed (--without-foma to disable)])])])
