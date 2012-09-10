@@ -2,6 +2,7 @@
 #define HEADER_GENERATE_MODEL_FORMS_H
 
 #include <vector>
+#include <set>
 
 #include "HfstTransducer.h"
 
@@ -14,9 +15,9 @@ using hfst::HfstOneLevelPaths;
 #define MODEL_FORM_PREFIX ""
 
 #define MAX_ANALYSES 5
-#define MAX_GENERATED_FORMS 1
 
 typedef std::vector<StringVector> StringVectorVector;
+typedef std::set<StringVector> StringVectorSet;
 
 struct InvalidModelLine
 {
@@ -51,7 +52,8 @@ StringVectorVector read_model_forms(const std::string &model_form_filename,
 //which can be generated from @a analysis using @a form_generator. The
 //word forms are tokenized and spearated by ", " tokens.
 StringVector generate_word_forms(const StringVector &analysis,
-				 HfstTransducer &form_generator);
+				 HfstTransducer &form_generator,
+				 size_t max_generated_forms);
 
 bool contains_analysis_symbols(const StringVector &word_form);
 
@@ -62,7 +64,8 @@ StringVectorVector get_guesses(const std::string &word_form,
 
 StringVectorVector get_model_forms(const StringVector &reversed_analysis,
 				   const StringVectorVector &model_forms,
-				   HfstTransducer &form_generator);
+				   HfstTransducer &form_generator,
+				   size_t max_generated_forms);
 
 StringVectorVector get_paradigms(const std::string &word_form,
 				 const StringVectorVector &guesses,
