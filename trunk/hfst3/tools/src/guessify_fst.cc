@@ -206,12 +206,14 @@ HfstTransducer guessify_analyzer(HfstTransducer morphological_analyzer,
   // Remove the parts of analyses that precede the last cathegory
   // tag. After the last cathegory tag all input should be echoed as is to 
   // the output.
+  /*
   HfstTransducer analysis_prefix_remover = get_prefix_remover(alphabet);
 
   morphological_analyzer.compose(analysis_prefix_remover);
   rewrite_removed_symbols(morphological_analyzer, alphabet);
 
   morphological_analyzer.minimize();
+  */
 
   // Add a sink state and default transitions from every state
   // (including the sink state) to the sink state. The default
