@@ -58,12 +58,26 @@ static bool generate_model_forms=false;
 static std::string model_form_filename="";
 static size_t max_number_of_guesses = 5;
 static size_t max_number_of_forms = 2;
+static float generate_threshold = 50;
 
-float get_size_t(const std::string &str)
+size_t get_size_t(const std::string &str)
 {
   std::istringstream in(str);
   
   size_t i;
+  in >> i;
+
+  if (in.fail())
+    { return -1; }
+
+  return i;
+}
+
+float get_float(const std::string &str)
+{
+  std::istringstream in(str);
+  
+  float i;
   in >> i;
 
   if (in.fail())
@@ -91,6 +105,10 @@ print_usage()
         "                                  per word form (5 by default).\n"
     "  -m  --max-number-of-forms       Maximal number of generated model\n"
     "                                  forms per guess (2 by default).\n"
+    "  -g  --generate-threshold        Generate only forms whose weight\n"
+    "                                  is better than the weight of the\n"
+    "                                  of the best form plus this threshold.\n"
+    "                                  (50 by default)."
         );
     fprintf(message_out, "\n");
     fprintf(message_out,
@@ -127,15 +145,16 @@ parse_options(int argc, char** argv)
         HFST_GETOPT_COMMON_LONG,
         HFST_GETOPT_UNARY_LONG,
           // add tool-specific options here
-        {"model-form-filename", no_argument, 0, 'f'},
-        {"max-number-of-guesses", no_argument, 0, 'n'},
-        {"max-number-of-forms", no_argument, 0, 'm'},
+        {"generate-threshold", required_argument, 0, 'g'},
+        {"model-form-filename", required_argument, 0, 'f'},
+        {"max-number-of-guesses", required_argument, 0, 'n'},
+        {"max-number-of-forms", required_argument, 0, 'm'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "f:m:n:",
+                             HFST_GETOPT_UNARY_SHORT "f:m:n:g:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -152,10 +171,20 @@ parse_options(int argc, char** argv)
       model_form_filename = optarg;
       break;
 
+    case 'g':
+      generate_threshold = get_float(optarg);
+      if (generate_threshold < 0)
+        {
+          error(EXIT_FAILURE, 0, "Invalid generate threshold %s. "
+		"Give a positive float.", optarg);
+        }
+
+      break;
+
     case 'n':
       max_number_of_guesses = get_size_t(optarg);
       
-      if (max_number_of_guesses == -1)
+      if (max_number_of_guesses < 0)
         {
           error(EXIT_FAILURE, 0, "Invalid maximal number of guesses %s. "
             "Give a positive int.", optarg);
@@ -166,7 +195,7 @@ parse_options(int argc, char** argv)
     case 'm':
       max_number_of_forms = get_size_t(optarg);
       
-      if (max_number_of_forms == -1)
+      if (max_number_of_forms < 0)
         {
           error(EXIT_FAILURE, 0, "Invalid maximal number of generated "
             "forms %s. Give a positive int.", optarg);
@@ -305,11 +334,12 @@ int main( int argc, char **argv )
     if (generate_model_forms)
       {
         StringVectorVector paradigms = get_paradigms(line,
-                             guesses,
-                             *generator,
-                             model_forms,
-                             max_number_of_forms);
-
+						     guesses,
+						     *generator,
+						     model_forms,
+						     max_number_of_forms,
+						     generate_threshold);
+	
         for (StringVectorVector::const_iterator it = paradigms.begin();
          it != paradigms.end();
          ++it)

@@ -53,7 +53,8 @@ StringVectorVector read_model_forms(const std::string &model_form_filename,
 //word forms are tokenized and spearated by ", " tokens.
 StringVector generate_word_forms(const StringVector &analysis,
 				 HfstTransducer &form_generator,
-				 size_t max_generated_forms);
+				 size_t max_generated_forms,
+				 float generate_threshold);
 
 bool contains_analysis_symbols(const StringVector &word_form);
 
@@ -65,13 +66,15 @@ StringVectorVector get_guesses(const std::string &word_form,
 StringVectorVector get_model_forms(const StringVector &reversed_analysis,
 				   const StringVectorVector &model_forms,
 				   HfstTransducer &form_generator,
-				   size_t max_generated_forms);
+				   size_t max_generated_forms,
+				   float generate_threshold);
 
 StringVectorVector get_paradigms(const std::string &word_form,
 				 const StringVectorVector &guesses,
 				 HfstTransducer &generator,
 				 const StringVectorVector &model_forms,
-				 size_t number_of_generated_forms);
+				 size_t number_of_generated_forms,
+				 float generate_threshold);
 
 std::ostream &operator<<(std::ostream &out,const StringVector &v);
 
