@@ -94,13 +94,12 @@ bool contains_analysis_symbols(const StringVector &word_form)
 }
 
 StringVector generate_word_forms(const StringVector &analysis,
-                 HfstTransducer &form_generator)
+				 HfstTransducer &form_generator,
+				 size_t max_generated_forms)
 {
   HfstOneLevelPaths * word_forms = form_generator.lookup(analysis);
 
-  StringVector results;
-
-  bool first_form = true;
+  StringVectorSet result_set;
 
   size_t num = 1;
   
@@ -108,41 +107,50 @@ StringVector generate_word_forms(const StringVector &analysis,
        it != word_forms->end();
        ++it)
     {
-      if (num > MAX_GENERATED_FORMS)
-    { break; }
-
+      if (num > max_generated_forms)
+	{ break; }
+      
       const StringVector &word_form = it->second;
       
       if (contains_analysis_symbols(word_form))
-    { continue; }
-
-      if (not first_form)
-    { results.push_back(", "); }
-            
+	{ continue; }
+      
       // The word form is reversed, so we start from the end and
       // iterate to the beginning.
-      results.insert(results.end(), word_form.rbegin(), word_form.rend());
+      result_set.insert(StringVector(word_form.rbegin(), 
+				     word_form.rend()));
       
-      first_form = false;
-
       ++num;
     }
 
   delete word_forms;
 
-  if (results.empty())
-    { 
-      results.push_back("<no word forms>"); 
-    }
-  
+  StringVector results;
 
+  bool first_form = true;
+
+  for (StringVectorSet::const_iterator it = result_set.begin();
+       it != result_set.end();
+       ++it)
+    {
+      if (not first_form)
+	{ results.push_back(", "); }
+
+      results.insert(results.end(), it->begin(), it->end());
+
+      first_form = false;
+    }
+
+  if (results.empty())
+    { results.push_back("<no word forms>"); }
 
   return results;
 }
 
 StringVectorVector get_model_forms(const StringVector &reversed_analysis,
-                   const StringVectorVector &model_forms,
-                   HfstTransducer &form_generator)
+				   const StringVectorVector &model_forms,
+				   HfstTransducer &form_generator,
+				   size_t max_generated_forms)
 {
   StringVector reversed_analysis_prefix = 
     get_analysis_prefix(reversed_analysis);
@@ -156,7 +164,8 @@ StringVectorVector get_model_forms(const StringVector &reversed_analysis,
       StringVector model_analysis = join(*it, reversed_analysis_prefix);
 
       results.push_back(generate_word_forms(model_analysis,
-                        form_generator));
+					    form_generator,
+					    max_generated_forms));
     }
 
   return results;
@@ -215,9 +224,9 @@ StringVectorVector get_guesses(const std::string &word_form,
 
   HfstOneLevelPaths * paths = guesser.lookup_fd(tokenized_line);
 
-  StringVectorVector results;
-
   size_t num = 1;
+
+  StringVectorVector results;
 
   for (HfstOneLevelPaths::const_iterator it = paths->begin();
        it != paths->end();
@@ -247,8 +256,9 @@ StringVectorVector get_paradigms(const std::string &word_form,
       StringVector analysis_guess = *it;
 
       StringVectorVector results = get_model_forms(analysis_guess,
-                           model_forms,
-                           generator);
+						   model_forms,
+						   generator,
+						   number_of_generated_forms);
       
       StringVector paradigm;
       paradigm.push_back(word_form);
