@@ -8,6 +8,7 @@ namespace hfst_ol {
 
 class PmatchTransducer;
 typedef std::map<std::string, PmatchTransducer *> NameRtnMap;
+enum SpecialSymbol{entry, exit, LC_entry, LC_exit, RC_entry, RC_exit};
 
 class PmatchContainer
 {
@@ -24,13 +25,7 @@ protected:
     SymbolNumber * orig_output_tape;
     SymbolNumberVector output;
 
-    SymbolNumber entry_marker;
-    SymbolNumber exit_marker;
-    SymbolNumber LC_marker;
-    SymbolNumber RC_marker;
-    SymbolNumber NLC_marker;
-    SymbolNumber NRC_MARKER;
-    SymbolNumber unknown_symbol;
+    std::map<SpecialSymbol, SymbolNumber> special_symbols;
     std::map<SymbolNumber, std::string> end_tag_map;
 
     void add_special_symbol(const std::string & str, SymbolNumber symbol_number);
@@ -110,8 +105,11 @@ protected:
     SymbolNumber * output_tape_head;
     hfst::FdState<SymbolNumber> flag_state;
     std::map<std::string, PmatchTransducer *> & rtns;
-    SymbolNumber & entry_marker;
-    SymbolNumber & exit_marker;
+    std::map<SpecialSymbol, SymbolNumber> & markers;
+
+    int tape_step;
+    enum ContextChecking{none, LC, NLC, RC, NRC} context;
+    SymbolNumber * context_placeholder;
 
     // The mutually recursive lookup-handling functions
 
@@ -137,36 +135,10 @@ protected:
                       SymbolNumber * output_tape,
                       TransitionTableIndex index);
 
-    // A similar but slightly different set of mutually recursive functions
-    // for checking contexts
-
-    void check_context_try_epsilon_transitions(SymbolNumber * input_tape,
-                                               TransitionTableIndex i,
-                                               int step,
-                                               bool polarity);
-  
-    void check_context_try_epsilon_indices(SymbolNumber * input_tape,
-                                           TransitionTableIndex i,
-                                           int step,
-                                           bool polarity);
-
-    void check_context_find_transitions(SymbolNumber input,
-                                        SymbolNumber * input_tape,
-                                        TransitionTableIndex i,
-                                        int step,
-                                        bool polarity);
-
-    void check_context_find_index(SymbolNumber input,
-                                  SymbolNumber * input_tape,
-                                  TransitionTableIndex i,
-                                  int step,
-                                  bool polarity);
-
-    void check_context(SymbolNumber * input_tape,
-                       TransitionTableIndex index,
-                       int step,
-                       bool polarity);
-
+    bool checking_context(void) const;
+    bool try_entering_context(SymbolNumber symbol);
+    bool try_exiting_context(SymbolNumber symbol);
+    void exit_context(void);
 
 
 public:
@@ -175,8 +147,7 @@ public:
                      TransitionTableIndex transition_table_size,
                      TransducerAlphabet & alphabet,
                      std::map<std::string, PmatchTransducer *> & rtns,
-                     SymbolNumber & entry_marker,
-                     SymbolNumber & exit_marker);
+                     std::map<SpecialSymbol, SymbolNumber> & markers);
         
     SymbolNumberVector & get_best_result(void)
     { return best_result; }
