@@ -36,7 +36,8 @@ AM_CXXFLAGS=-Wno-deprecated -g
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 
 if WANT_WINDOWS
-  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include -DWINDOWS
+  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include \
+	-I${top_srcdir}/windows/foma -DWINDOWS
 endif
 
 # the bridges
