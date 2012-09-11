@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include "foma.h"
-#ifndef _MSC_VER
+#ifndef WINDOWS
   #include "zlib.h"
 #else
 
@@ -55,35 +55,37 @@ struct io_buf_handle {
 
 struct io_buf_handle *io_init();
 void io_free(struct io_buf_handle *iobh);
-#ifndef _MSC_VER // HFST addition
+#ifndef WINDOWS // HFST addition
   static int io_gets(struct io_buf_handle *iobh, char *target);
   static size_t io_get_gz_file_size(char *filename);
   static size_t io_get_file_size(char *filename);
   static size_t io_get_regular_file_size(char *filename);
 #endif
 size_t io_gz_file_to_mem (struct io_buf_handle *iobh, char *filename);
-#ifndef _MSC_VER // HFST addition
+#ifndef WINDOWS // HFST addition
   int foma_net_print(struct fsm *net, gzFile *outfile);
 #endif
 struct fsm *io_net_read(struct io_buf_handle *iobh, char **net_name);
-#ifndef _MSC_VER // HFST addition
+#ifndef WINDOWS // HFST addition
   static inline int explode_line (char *buf, int *values);
 #endif
 
 // HFST addition; dummy implementations for non-static io functions 
 // that might be called outside io.c.
-#ifdef _MSC_VER
+#ifdef WINDOWS
 static void io_error() { 
   fprintf(stderr, "ERROR: functions in io.c omitted on Windows."); 
   exit(1); }
 struct io_buf_handle *io_init() { 
-  io_error(); return }
+  io_error(); return; }
 void io_free(struct io_buf_handle *iobh) { 
-  io_error(); return }
+  io_error(); return; }
 size_t io_gz_file_to_mem (struct io_buf_handle *iobh, char *filename) { 
-  io_error(); return }
+  io_error(); return; }
 struct fsm *io_net_read(struct io_buf_handle *iobh, char **net_name) { 
-  io_error(); return }
+  io_error(); return; }
+struct fsm *fsm_read_binary_file(char *filename) {
+  io_error(); return; }
 #else
 
 void escape_print(FILE *stream, char* string) {
@@ -421,6 +423,8 @@ void io_free(struct io_buf_handle *iobh) {
     xxfree(iobh);
 }
 
+#endif // if not WINDOWS; HFST addition
+
 char *spacedtext_get_next_line(char **text) {
     char *t, *ret;
     ret = *text;
@@ -503,6 +507,7 @@ struct fsm *fsm_read_spaced_text_file(char *filename) {
     return(fsm_trie_done(th));
 }
 
+
 struct fsm *fsm_read_text_file(char *filename) {
     struct fsm_trie_handle *th;
     char *text, *textp1, *textp2;
@@ -530,6 +535,8 @@ struct fsm *fsm_read_text_file(char *filename) {
     xxfree(text);
     return(fsm_trie_done(th));
 }
+
+#ifndef WINDOWS // HFST addition
 
 int fsm_write_binary_file(struct fsm *net, char *filename) {
     gzFile *outfile;
@@ -1008,6 +1015,8 @@ size_t io_gz_file_to_mem(struct io_buf_handle *iobh, char *filename) {
     return(size);
 }
 
+#endif // if not WINDOWS; HFST addition
+
 char *file_to_mem(char *name) {
 
     FILE    *infile;
@@ -1035,4 +1044,4 @@ char *file_to_mem(char *name) {
     return(buffer);
 }
 
-#endif // if not _MSC_VER; HFST addition
+

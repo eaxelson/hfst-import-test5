@@ -39,7 +39,8 @@ libhfstparsers_la_SOURCES=$(SFST_SRCS) $(XRE_SRCS) $(PMATCH_SRCS) $(LEXC_SRCS)
 AM_CPPFLAGS=-I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/libhfst/src
 
 if WANT_WINDOWS
-  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include
+  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include \
+	-I${top_srcdir}/windows/foma
 endif
 
 # headers of parsers

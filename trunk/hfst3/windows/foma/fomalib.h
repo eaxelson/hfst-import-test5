@@ -297,7 +297,7 @@ FEXPORT int load_defined(char *filename);
 FEXPORT int save_defined();
 FEXPORT int save_stack_att();
 FEXPORT int write_prolog(struct fsm *net, char *filename);
-#ifndef _MSC_VER // HFST addition
+#ifndef WINDOWS // HFST addition
   FEXPORT int foma_net_print(struct fsm *net, gzFile *outfile);
 #endif
 
