@@ -71,6 +71,29 @@ HfstTransducer* compile(const std::string& pmatch,
                         std::map<std::string,hfst::HfstTransducer*>& defs,
                         hfst::ImplementationType type);
 
+/** @brief Return a transducer that accepts one utf-8 symbol that is also a
+    latin-1 alphabetical character. 
+*/
+HfstTransducer latin1_alpha_acceptor(
+    ImplementationType type = TROPICAL_OPENFST_TYPE);
+
+/** @brief Return a transducer that accepts one arabic numeral character. 
+ */
+HfstTransducer latin1_numeral_acceptor(
+    ImplementationType type = TROPICAL_OPENFST_TYPE);
+
+/** @brief Return a transducer that accepts one utf-8 symbol that is also a
+    latin-1 punctuation character.
+*/
+HfstTransducer latin1_punct_acceptor(
+    ImplementationType type = TROPICAL_OPENFST_TYPE);
+
+/** @brief Return a transducer that accepts one utf-8 symbol that is also a
+    latin-1 whitespace character.
+*/
+HfstTransducer latin1_whitespace_acceptor(
+    ImplementationType type = TROPICAL_OPENFST_TYPE);
+
 } } // namespaces
 #endif
 // vim: set ft=cpp.doxygen:
