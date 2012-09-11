@@ -20,7 +20,11 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include "foma.h"
-#include "zlib.h"
+#ifndef _MSC_VER
+  #include "zlib.h"
+#else
+
+#endif
 
 #define TYPE_TRANSITION 1
 #define TYPE_SYMBOL 2
@@ -51,15 +55,36 @@ struct io_buf_handle {
 
 struct io_buf_handle *io_init();
 void io_free(struct io_buf_handle *iobh);
-static int io_gets(struct io_buf_handle *iobh, char *target);
-static size_t io_get_gz_file_size(char *filename);
-static size_t io_get_file_size(char *filename);
-static size_t io_get_regular_file_size(char *filename);
+#ifndef _MSC_VER // HFST addition
+  static int io_gets(struct io_buf_handle *iobh, char *target);
+  static size_t io_get_gz_file_size(char *filename);
+  static size_t io_get_file_size(char *filename);
+  static size_t io_get_regular_file_size(char *filename);
+#endif
 size_t io_gz_file_to_mem (struct io_buf_handle *iobh, char *filename);
-int foma_net_print(struct fsm *net, gzFile *outfile);
+#ifndef _MSC_VER // HFST addition
+  int foma_net_print(struct fsm *net, gzFile *outfile);
+#endif
 struct fsm *io_net_read(struct io_buf_handle *iobh, char **net_name);
-static inline int explode_line (char *buf, int *values);
+#ifndef _MSC_VER // HFST addition
+  static inline int explode_line (char *buf, int *values);
+#endif
 
+// HFST addition; dummy implementations for non-static io functions 
+// that might be called outside io.c.
+#ifdef _MSC_VER
+static void io_error() { 
+  fprintf(stderr, "ERROR: functions in io.c omitted on Windows."); 
+  exit(1); }
+struct io_buf_handle *io_init() { 
+  io_error(); return }
+void io_free(struct io_buf_handle *iobh) { 
+  io_error(); return }
+size_t io_gz_file_to_mem (struct io_buf_handle *iobh, char *filename) { 
+  io_error(); return }
+struct fsm *io_net_read(struct io_buf_handle *iobh, char **net_name) { 
+  io_error(); return }
+#else
 
 void escape_print(FILE *stream, char* string) {
     int i;
@@ -1009,3 +1034,5 @@ char *file_to_mem(char *name) {
     *(buffer+numbytes)='\0';
     return(buffer);
 }
+
+#endif // if not _MSC_VER; HFST addition
