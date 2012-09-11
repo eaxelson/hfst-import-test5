@@ -21,7 +21,7 @@ extern "C" {
 #include <stdio.h>
 #include <inttypes.h>
 #include <string.h>
-#include "zlib.h"
+  //#include "zlib.h"
 
 #define FEXPORT __attribute__((visibility("default")))
 
@@ -282,7 +282,6 @@ FEXPORT int fsm_sigma_destroy(struct sigma *sigma);
 FEXPORT int fsm_destroy(struct fsm *net);
 
 
-
 /* IO functions */
 FEXPORT struct fsm *read_att(char *filename);
 FEXPORT int net_print_att(struct fsm *net, FILE *outfile);
@@ -298,7 +297,9 @@ FEXPORT int load_defined(char *filename);
 FEXPORT int save_defined();
 FEXPORT int save_stack_att();
 FEXPORT int write_prolog(struct fsm *net, char *filename);
-FEXPORT int foma_net_print(struct fsm *net, gzFile *outfile);
+#ifndef _MSC_VER // HFST addition
+  FEXPORT int foma_net_print(struct fsm *net, gzFile *outfile);
+#endif
 
 /* Lookups */
 

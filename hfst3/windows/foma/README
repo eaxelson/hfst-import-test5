@@ -2,7 +2,7 @@
 Note 
 ----
 
-This directory contains files from foma library that are used as a part of the HFST library. Makefile.am is an HFST addition, and some of the original foma files are omitted.
+This directory contains files from foma library that are used as a part of the HFST library. Makefile.am is an HFST addition, and some of the original foma files are omitted. There are small changes in fomalib.h that are indicated in comments.
 
 
 Foma
