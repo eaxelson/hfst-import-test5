@@ -4,6 +4,83 @@ using namespace implementations;
 using namespace hfst::xeroxRules;
 
 
+// replace left d <- ca || ca_c  ( input: c a c a c a c )
+void test9a( ImplementationType type )
+{
+	HfstTokenizer TOK;
+	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+	// Mapping
+	HfstTransducer mapping("d@_EPSILON_SYMBOL_@","ca", TOK, type);
+
+	// Context
+	HfstTransducerPair Context(HfstTransducer("ca", TOK, type), HfstTransducer("c", TOK, type));
+
+	HfstTransducerPairVector ContextVector;
+	ContextVector.push_back(Context);
+
+	Rule rule(mapping, ContextVector, REPL_UP);
+
+	HfstTransducer input1("cacacac", TOK, type);
+	HfstTransducer result1("cad@_EPSILON_SYMBOL_@d@_EPSILON_SYMBOL_@c", "cacacac", TOK, type);
+
+
+	HfstTransducer replaceTr(type);
+	replaceTr = replace_left(rule, false);
+
+	HfstTransducer tmp2(type);
+	tmp2 = replaceTr;
+	tmp2.compose(input1).minimize();
+	//printf("abba optional: \n");
+	//tmp2.write_in_att_format(stdout, 1);
+	assert(tmp2.compare(result1));
+
+}
+
+
+// replace left b <- a ,, a <- b
+void test9b( ImplementationType type )
+{
+	HfstTokenizer TOK;
+	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+	// Mapping
+	HfstTransducer mapping1("b","a", TOK, type);
+	HfstTransducer mapping2("a","b", TOK, type);
+
+	// Context
+	/*
+	HfstTransducerPair Context(HfstTransducer("ca", TOK, type), HfstTransducer("c", TOK, type));
+
+	HfstTransducerPairVector ContextVector;
+	ContextVector.push_back(Context);
+	 */
+	Rule rule1(mapping1);
+	Rule rule2(mapping2);
+
+	vector<Rule> ruleVector;
+
+	ruleVector.push_back(rule1);
+	ruleVector.push_back(rule2);
+
+
+
+	HfstTransducer input1("abba", TOK, type);
+	HfstTransducer result1("baab", "abba", TOK, type);
+
+
+	HfstTransducer replaceTr(type);
+	replaceTr = replace_left(ruleVector, false);
+
+	//printf("tr : \n");
+	//replaceTr.write_in_att_format(stdout, 1);
+
+	HfstTransducer tmp2(type);
+	tmp2 = replaceTr;
+	tmp2.compose(input1).minimize();
+	//printf("abba: \n");
+	//tmp2.write_in_att_format(stdout, 1);
+	assert(tmp2.compare(result1));
+
+}
 
 
 

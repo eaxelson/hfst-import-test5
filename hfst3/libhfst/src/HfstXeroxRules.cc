@@ -1898,7 +1898,6 @@ namespace hfst
 			else
 			{
 				retval = parallelBracketedReplace(ruleVector, optional);
-
 			}
 			//printf("replace tr: \n");
 			//retval.write_in_att_format(stdout, 1);
@@ -1919,26 +1918,41 @@ namespace hfst
 
 			// deals with boundary symbol
 			retval = applyBoundaryMark( retval );
-
-
-
 			return retval;
 
 	  }
-
 
 	  // replace left
 	  HfstTransducer replace_left( const Rule &rule, bool optional)
 	  {
 		  HfstTransducer newMapping = rule.get_mapping();
 		  newMapping.invert().minimize();
+
 		  Rule newRule ( newMapping, rule.get_context(), rule.get_replType());
-		  return replace( newRule, optional);
+		  HfstTransducer retval (replace( newRule, optional));
+
+		  retval.invert().minimize();
+		  return retval;
 	  }
 	  // replace left parallel
 	  HfstTransducer replace_left( const std::vector<Rule> &ruleVector, bool optional)
 	  {
-		  return replace( ruleVector, optional).invert();
+		  std::vector<Rule> leftRuleVector;
+
+		  for ( unsigned int i = 0; i < ruleVector.size(); i++ )
+		  {
+			  HfstTransducer mapping( ruleVector[i].get_mapping() );
+
+		  	  mapping.invert().minimize();
+	  		  Rule newRule(mapping, ruleVector[i].get_context(), ruleVector[i].get_replType());
+
+		  	  leftRuleVector.push_back(newRule);
+		  }
+
+		  HfstTransducer retval(replace(leftRuleVector, optional));
+		  retval.invert().minimize();
+
+		  return retval;
 	  }
 
 	  // left to right
@@ -2493,6 +2507,9 @@ int main(int argc, char * argv[])
 			// a -> b b , a -> b
 			test7g( types[i] );
 			test8( types[i] );
+
+			test9a( types[i] );
+			test9b( types[i] );
 	      }
 
 	      std::cout << "ok" << std::endl;

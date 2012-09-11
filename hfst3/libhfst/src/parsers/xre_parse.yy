@@ -422,6 +422,14 @@ REPLACE_ARROW: REPLACE_RIGHT
           {
             $$ = E_LTR_SHORTEST_MATCH;
          }
+         |  REPLACE_LEFT
+         {
+        	 $$ =  E_REPLACE_LEFT;
+         }
+         |   OPTIONAL_REPLACE_LEFT
+         {
+        	 $$ = E_OPTIONAL_REPLACE_LEFT;
+         }
          ;
 
 ////////////////
