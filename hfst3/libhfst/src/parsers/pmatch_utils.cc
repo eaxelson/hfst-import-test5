@@ -489,7 +489,7 @@ HfstTransducer latin1_whitespace_acceptor(ImplementationType type)
       retval.disjunct(HfstTransducer("\t", tok, type));
       // Non-breaking space, CR
       retval.disjunct(HfstTransducer("\u00A0", tok, type));
-      retval.disjunct(HfstTransducer("\u000D", tok, type));
+      retval.disjunct(HfstTransducer("\r", tok, type));
       // punctuation space, thin space, line separator, par separator
       retval.disjunct(HfstTransducer("\u2008", tok, type));
       retval.disjunct(HfstTransducer("\u2009", tok, type));
