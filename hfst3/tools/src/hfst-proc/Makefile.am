@@ -18,7 +18,7 @@
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib $(GLIB_CPPFLAGS)
 
 if WANT_WINDOWS
-  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include
+  AM_CPPFLAGS+= -I${top_srcdir}/windows/openfst/src/include -I${top_srcdir}/windows/foma -DWINDOWS
 endif
 
 if WANT_PROC

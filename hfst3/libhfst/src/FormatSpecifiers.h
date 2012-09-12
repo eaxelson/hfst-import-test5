@@ -17,10 +17,12 @@
   #define SIZE_T_SPECIFIER    "%Iu"
   #define SSIZE_T_SPECIFIER   "%Id"
   #define PTRDIFF_T_SPECIFIER "%Id"
+  #define LONG_LONG_SPECIFIER "%I64d"
 #else
   #define SIZE_T_SPECIFIER    "%zu"
   #define SSIZE_T_SPECIFIER   "%zd"
   #define PTRDIFF_T_SPECIFIER "%zd"
+  #define LONG_LONG_SPECIFIER "%lld"
 #endif
 
 #endif

@@ -12,7 +12,7 @@ AM_CPPFLAGS=-I${top_srcdir}/libhfst/src
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 
 if WANT_WINDOWS
-  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include
+  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include -I${top_srcdir}/windows/foma -DWINDOWS
 endif
 
 python_PYTHON=$(BUILD_MODEL_SRC)/tagger_aux.py \

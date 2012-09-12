@@ -25,11 +25,15 @@
 #include <fomalib.h>
 #endif
 
-#include <zlib.h>
+#ifndef WINDOWS
+  #include <zlib.h>
+#endif
 #include <cstdio>
 #include <string>
 #include <sstream>
 #include <iostream>
+
+#include "../FormatSpecifiers.h"
 
 /** @file FomaTransducer.h
     \brief Declarations of functions and datatypes that form a bridge between
