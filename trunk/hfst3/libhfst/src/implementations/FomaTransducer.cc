@@ -805,7 +805,7 @@ namespace hfst { namespace implementations {
     }
     /* Properties */
     io_gets(infile, buf);
-    sscanf(buf, "%i %i %i %i %i %lld %i %i %i %i %i %i %s", 
+    sscanf(buf, "%i %i %i %i %i " LONG_LONG_SPECIFIER " %i %i %i %i %i %i %s", 
            &net->arity, 
            &net->arccount, 
            &net->statecount, 
@@ -972,7 +972,7 @@ static inline int explode_line (char *buf, int *values) {
 
     /* Properties */
     fprintf(outfile, "%s","##props##\n");
-    fprintf(outfile, "%i %i %i %i %i %lld %i %i %i %i %i %i %s\n",
+    fprintf(outfile, "%i %i %i %i %i " LONG_LONG_SPECIFIER " %i %i %i %i %i %i %s\n",
             net->arity, 
             net->arccount, 
             net->statecount, 
@@ -1040,7 +1040,7 @@ static inline int explode_line (char *buf, int *values) {
         (HfstFatalException,
          "an error happened when writing a foma transducer");
     }
-      
+
     return(1);
 
     }

@@ -733,7 +733,7 @@ struct fsm *io_net_read(struct io_buf_handle *iobh, char **net_name) {
     /* Properties */
     io_gets(iobh, buf);
     extras = 0;
-    sscanf(buf, "%i %i %i %i %i %lld %i %i %i %i %i %i %s", &net->arity, &net->arccount, &net->statecount, &net->linecount, &net->finalcount, &net->pathcount, &net->is_deterministic, &net->is_pruned, &net->is_minimized, &net->is_epsilon_free, &net->is_loop_free, &extras, buf);
+    sscanf(buf, "%i %i %i %i %i " LONG_LONG_SPECIFIER " %i %i %i %i %i %i %s", &net->arity, &net->arccount, &net->statecount, &net->linecount, &net->finalcount, &net->pathcount, &net->is_deterministic, &net->is_pruned, &net->is_minimized, &net->is_epsilon_free, &net->is_loop_free, &extras, buf);
     strcpy(net->name, buf);
     *net_name = xxstrdup(buf);
     io_gets(iobh, buf);
@@ -876,7 +876,7 @@ int foma_net_print(struct fsm *net, gzFile *outfile) {
     extras = (net->is_completed) | (net->arcs_sorted_in << 2) | (net->arcs_sorted_out << 4);
  
     gzprintf(outfile, 
-	     "%i %i %i %i %i %lld %i %i %i %i %i %i %s\n", net->arity, net->arccount, net->statecount, net->linecount, net->finalcount, net->pathcount, net->is_deterministic, net->is_pruned, net->is_minimized, net->is_epsilon_free, net->is_loop_free, extras, net->name);
+	     "%i %i %i %i %i " LONG_LONG_SPECIFIER " %i %i %i %i %i %i %s\n", net->arity, net->arccount, net->statecount, net->linecount, net->finalcount, net->pathcount, net->is_deterministic, net->is_pruned, net->is_minimized, net->is_epsilon_free, net->is_loop_free, extras, net->name);
     
     /* Sigma */
     gzprintf(outfile, "%s","##sigma##\n");
@@ -923,6 +923,8 @@ int foma_net_print(struct fsm *net, gzFile *outfile) {
     return(1);
 }
 
+#endif // if not WINDOWS; HFST addition
+
 int net_print_att(struct fsm *net, FILE *outfile) {
     struct fsm_state *fsm;
     struct fsm_sigma_list *sl;
@@ -947,6 +949,8 @@ int net_print_att(struct fsm *net, FILE *outfile) {
     xxfree(sl);
     return(1);
 }
+
+#ifndef WINDOWS // HFST addition
 
 static size_t io_get_gz_file_size(char *filename) {
 
