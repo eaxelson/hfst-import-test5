@@ -37,7 +37,7 @@ libhfst_la_LIBADD = implementations/libhfstimplementations.la \
 if WANT_WINDOWS	
   AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include \
 			-I${top_srcdir}/windows/foma \
-		 	-I${top_srcdir}/windows/sfst -DWINDOWS
+		 	-I${top_srcdir}/windows -DWINDOWS
   libhfst_la_LIBADD += $(top_srcdir)/windows/dlfcn/libdl.la \
 			$(top_srcdir)/windows/openfst/src/lib/libfst.la \
 			$(top_srcdir)/windows/foma/libfoma.la \

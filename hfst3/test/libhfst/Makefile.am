@@ -5,7 +5,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/libhfst/src/ -I. -g
 if WANT_WINDOWS
   AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include \
 		-I${top_srcdir}/windows/foma \
-		-I${top_srcdir}/windows/sfst -DWINDOWS
+		-I${top_srcdir}/windows -DWINDOWS
 endif
 
 AM_CXXFLAGS = -Wno-deprecated
