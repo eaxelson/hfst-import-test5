@@ -490,7 +490,7 @@ AS_IF([test "x$with_openfst" != "xno" -a "x$enable_windows" == "xno"],
       [AC_CHECK_LIB([fst], [main], [],
                  [AC_MSG_FAILURE([openfst test failed (--without-openfst to disable)])])]
       [AC_CHECK_LIB([m], [main])])
-AS_IF([test "x$with_sfst" != "xno"],
+AS_IF([test "x$with_sfst" != "xno" -a "x$enable_windows" == "xno"],
       [AC_CHECK_LIB([sfst], [main])]
       [AC_CHECK_LIB([sfst1], [main])])
 AS_IF([test "x$ac_cv_lib_sfst_main" == xno -a "x$ac_cv_lib_sfst1_main" == xno],
@@ -523,7 +523,7 @@ AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h]
 AC_CHECK_HEADERS([libxml/tree.h libxml/mem.h])
 AC_LANG_PUSH([C++])
 
-AS_IF([test "x$with_sfst" != "xno"],
+AS_IF([test "x$with_sfst" != "xno" -a "x$enable_windows" == "xno"],
       [AC_CHECK_HEADERS([sfst/fst.h sfst1/fst.h])]
       [AC_CHECK_HEADERS([backward/hash_set ext/hash_set hash_set])]
       [AC_CHECK_HEADERS([backward/hash_map ext/hash_map hash_map])])
@@ -588,6 +588,7 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 windows/openfst/src/Makefile
 		 windows/openfst/src/lib/Makefile
 		 windows/foma/Makefile
+		 windows/sfst/Makefile
 		 man/Makefile 
                  scripts/Makefile scripts/hfst-foma-wrapper.sh],
                  [chmod +x scripts/hfst-foma-wrapper.sh])
