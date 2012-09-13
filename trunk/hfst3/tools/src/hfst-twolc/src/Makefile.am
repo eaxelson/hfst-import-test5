@@ -15,7 +15,7 @@ LDADD = $(top_builddir)/libhfst/src/libhfst.la
 if WANT_WINDOWS
   AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include \
 		-I${top_srcdir}/windows/foma \
-		-I${top_srcdir}/windows/sfst -DWINDOWS
+		-I${top_srcdir}/windows -DWINDOWS
 endif
 
 # the preprocessor scripts do not support options per se, so we whitelist
