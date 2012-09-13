@@ -2,6 +2,7 @@
 #define _HFST_OL_TRANSDUCER_PMATCH_H_
 
 #include <map>
+#include <stack>
 #include "transducer.h"
 
 namespace hfst_ol {
