@@ -1,7 +1,7 @@
 #!/bin/sh
-#if [ "$srcdir" = "" ] ; then
-#    srcdir=. ;
-#fi
+if [ "$srcdir" = "" ] ; then
+    srcdir=. ;
+fi
 
 for i in sfst openfst-tropical foma; do
     if ! (../../tools/src/hfst-format --list-formats | grep $i > /dev/null) ; then

@@ -41,7 +41,7 @@ if WANT_WINDOWS
   libhfst_la_LIBADD += $(top_srcdir)/windows/dlfcn/libdl.la \
 			$(top_srcdir)/windows/openfst/src/lib/libfst.la \
 			$(top_srcdir)/windows/foma/libfoma.la \
-			$(top_srcdir)/windows/foma/libsfst.la
+			$(top_srcdir)/windows/sfst/libsfst.la
 endif
 
 # we only have one library target but would like a particular includedir
