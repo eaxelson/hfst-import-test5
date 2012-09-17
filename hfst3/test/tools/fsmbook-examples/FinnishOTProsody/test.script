@@ -1,9 +1,10 @@
 #!/bin/bash
+TOOLDIR=../../tools/src
 
 # xfst -f FinnishOTProsody.xfst.script
-# cat FinnishOTProsody | ../xfst-att-to-hfst-att.sh > FinnishOTProsody.xfst.att
+# cat FinnishOTProsody | ../xfst-att-to-$TOOLDIR/hfst-att.sh > FinnishOTProsody.xfst.att
 
-hfst-txt2fst -f openfst-tropical FinnishOTProsody.xfst.att > \
+$TOOLDIR/hfst-txt2fst -f openfst-tropical FinnishOTProsody.xfst.att > \
   FinnishOTProsody.xfst.hfst
 
 for i in sfst openfst-tropical foma; do
@@ -11,6 +12,6 @@ for i in sfst openfst-tropical foma; do
   echo "Testing" $i "..."
   sh FinnishOTProsody.hfst.script
   sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" FinnishOTProsody.hfst.script
-  hfst-fst2fst -f openfst-tropical FinnishOTProsody.hfst.hfst > TMP
-  hfst-compare -q TMP FinnishOTProsody.xfst.hfst && echo "TEST PASSED";
+  $TOOLDIR/hfst-fst2fst -f openfst-tropical FinnishOTProsody.hfst.hfst > TMP
+  $TOOLDIR/hfst-compare -q TMP FinnishOTProsody.xfst.hfst && echo "TEST PASSED";
 done

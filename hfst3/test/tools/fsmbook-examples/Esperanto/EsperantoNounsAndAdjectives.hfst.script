@@ -1,37 +1,38 @@
 #!/bin/bash
+TOOLDIR=../../tools/src
 
 echo "bird
 hund
 kat
-elefant" | hfst-strings2fst -j -f $1 > NounRoots
+elefant" | $TOOLDIR/hfst-strings2fst -j -f $1 > NounRoots
 
 echo "bon
 long
 jun
 alt
-grav" | hfst-strings2fst -j -f $1 > AdjRoots
+grav" | $TOOLDIR/hfst-strings2fst -j -f $1 > AdjRoots
 
-echo '[(g e)]' | hfst-regexp2fst -f $1 > NounPrefix
+echo '[(g e)]' | $TOOLDIR/hfst-regexp2fst -f $1 > NounPrefix
 
-echo '[ ([m a l] | [n e]) ]' | hfst-regexp2fst -f $1 > AdjPrefixes
+echo '[ ([m a l] | [n e]) ]' | $TOOLDIR/hfst-regexp2fst -f $1 > AdjPrefixes
 
-echo '[o]' | hfst-regexp2fst -f $1 -j > Nend
+echo '[o]' | $TOOLDIR/hfst-regexp2fst -f $1 -j > Nend
 
-echo '[a]' | hfst-regexp2fst -f $1 -j > Adjend
+echo '[a]' | $TOOLDIR/hfst-regexp2fst -f $1 -j > Adjend
 
-echo '[(j)]' | hfst-regexp2fst -f $1 -j > Number
+echo '[(j)]' | $TOOLDIR/hfst-regexp2fst -f $1 -j > Number
 
-echo '[(n)]' | hfst-regexp2fst -f $1 -j > Case
+echo '[(n)]' | $TOOLDIR/hfst-regexp2fst -f $1 -j > Case
 
 echo '[ ([i n] | [e t] | [e g])* [@"Nend" | @"Adjend"] ]' | \
-     hfst-regexp2fst -f $1 > Nmf
+     $TOOLDIR/hfst-regexp2fst -f $1 > Nmf
 
 echo '([e g] | [e t])* [@"Adjend" | [e c @"Nend"]]' | \
-     hfst-regexp2fst -f $1 > Adj
+     $TOOLDIR/hfst-regexp2fst -f $1 > Adj
 
-hfst-concatenate NounPrefix NounRoots | hfst-concatenate -2 Nmf > NounStem
-hfst-concatenate AdjPrefixes AdjRoots | hfst-concatenate -2 Adj > AdjectiveStem
-hfst-disjunct NounStem AdjectiveStem > Stems
-hfst-concatenate Number Case | hfst-concatenate -1 Stems > Result
+$TOOLDIR/hfst-concatenate NounPrefix NounRoots | $TOOLDIR/hfst-concatenate -2 Nmf > NounStem
+$TOOLDIR/hfst-concatenate AdjPrefixes AdjRoots | $TOOLDIR/hfst-concatenate -2 Adj > AdjectiveStem
+$TOOLDIR/hfst-disjunct NounStem AdjectiveStem > Stems
+$TOOLDIR/hfst-concatenate Number Case | $TOOLDIR/hfst-concatenate -1 Stems > Result
 
-hfst-minimize Result > EsperantoNounsAndAdjectives.hfst.hfst
+$TOOLDIR/hfst-minimize Result > EsperantoNounsAndAdjectives.hfst.hfst

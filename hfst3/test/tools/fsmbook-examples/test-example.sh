@@ -1,4 +1,5 @@
 #!/bin/bash
+TOOLDIR=../../tools/src
 
 # Perform check in a directory specified by $1.
 #
@@ -32,11 +33,11 @@ fi
 
 
 # Convert the AT&T format into an HFST transducer in format openfst-tropical.
-  $3/hfst-txt2fst -f openfst-tropical $1.xfst.att > $2.xfst.hfst
+  $3/$TOOLDIR/hfst-txt2fst -f openfst-tropical $1.xfst.att > $2.xfst.hfst
 
 if [ "$4" = "--full-test" ] ; then 
-  $3/hfst-txt2fst -f openfst-tropical $1.foma.att > $2.foma.hfst
-  if ! ( $3/hfst-compare -q $2.foma.hfst $2.xfst.hfst ); then
+  $3/$TOOLDIR/hfst-txt2fst -f openfst-tropical $1.foma.att > $2.foma.hfst
+  if ! ( $3/$TOOLDIR/hfst-compare -q $2.foma.hfst $2.xfst.hfst ); then
     exit 1;
   fi
 fi
@@ -47,16 +48,16 @@ fi
   for i in sfst openfst-tropical foma; do
 
     echo "Testing" $i "..."
-    if ! ($3/hfst-format --test-format $i); then
+    if ! ($3/$TOOLDIR/hfst-format --test-format $i); then
    continue;
     fi
 
   # run the HFST script using the implementation type,
     sh $1.hfst.script $i $3
   # convert the result into openfst-tropical type
-    $3/hfst-fst2fst -f openfst-tropical  $2.hfst.hfst > TMP
+    $3/$TOOLDIR/hfst-fst2fst -f openfst-tropical  $2.hfst.hfst > TMP
   # and compare it with the expected result.
-    if ! ( $3/hfst-compare -q TMP $2.xfst.hfst ); then
+    if ! ( $3/$TOOLDIR/hfst-compare -q TMP $2.xfst.hfst ); then
    echo "The result is incorrect!"
    exit 1;
     fi

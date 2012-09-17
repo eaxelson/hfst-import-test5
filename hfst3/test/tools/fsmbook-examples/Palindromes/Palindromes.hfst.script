@@ -5,14 +5,14 @@
 # for example, "madam" and "dog". We wish to keep "madam" (reversed "madam") and
 # eliminate "dog" (reversed "god").
 
-cat words.txt | hfst-strings2fst -f $1 -j > English
+cat words.txt | $TOOLDIR/hfst-strings2fst -f $1 -j > English
 
 # We intersect English with its reverse. We only take into account
 # words that contain at least two characters. (Words like "a"
 # and "I" are not interesting here.)
 
-echo '[? ?+]' | hfst-regexp2fst -f $1 > MinTwoChars
-hfst-reverse English | hfst-conjunct English | hfst-conjunct MinTwoChars > BidirEnglish
+echo '[? ?+]' | $TOOLDIR/hfst-regexp2fst -f $1 > MinTwoChars
+$TOOLDIR/hfst-reverse English | $TOOLDIR/hfst-conjunct English | $TOOLDIR/hfst-conjunct MinTwoChars > BidirEnglish
 
 # Next we print all strings recognized by =BidirPaths= and construct a stream
 # of transducers where each transducer contains one string recognized
@@ -21,13 +21,13 @@ hfst-reverse English | hfst-conjunct English | hfst-conjunct MinTwoChars > Bidir
 # represent a palindrom (e.g. "madam") and empty transducers (e.g. the transducers
 # resulting from the intersection of "dog" and "god" and vice versa).
 
-hfst-fst2strings BidirEnglish | hfst-strings2fst -f $1 > BidirPaths
-hfst-reverse BidirPaths > BidirPathsReversed
-hfst-conjunct BidirPaths BidirPathsReversed > Palindromes
+$TOOLDIR/hfst-fst2strings BidirEnglish | $TOOLDIR/hfst-strings2fst -f $1 > BidirPaths
+$TOOLDIR/hfst-reverse BidirPaths > BidirPathsReversed
+$TOOLDIR/hfst-conjunct BidirPaths BidirPathsReversed > Palindromes
 
 # We finally print all palindroms. Empty conjunctions are printed as empty strings so we only need to
 # filter out the lines that separate strings coming from separate transducers,
 # i.e. lines =--=.
 
-hfst-fst2strings Palindromes | grep -v "\-\-" | sort | uniq > result
+$TOOLDIR/hfst-fst2strings Palindromes | grep -v "\-\-" | sort | uniq > result
 

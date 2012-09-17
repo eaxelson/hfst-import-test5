@@ -1,10 +1,11 @@
 #!/bin/bash
+TOOLDIR=../../tools/src
 
 # xfst -f BetterColaMachine.xfst.script
-# cat BetterColaMachine | ../xfst-att-to-hfst-att.sh 
+# cat BetterColaMachine | ../xfst-att-to-$TOOLDIR/hfst-att.sh 
 #   > BetterColaMachine.xfst.att
 
-hfst-txt2fst -f openfst-tropical BetterColaMachine.xfst.att > \
+$TOOLDIR/hfst-txt2fst -f openfst-tropical BetterColaMachine.xfst.att > \
   BetterColaMachine.xfst.hfst
 
 for i in sfst openfst-tropical foma; do
@@ -12,6 +13,6 @@ for i in sfst openfst-tropical foma; do
   echo "Testing" $i "..."
   sh BetterColaMachine.hfst.script
   sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" BetterColaMachine.hfst.script
-  hfst-fst2fst -f openfst-tropical BetterColaMachine.hfst.hfst > TMP
-  hfst-compare -q TMP BetterColaMachine.xfst.hfst && echo "TEST PASSED";
+  $TOOLDIR/hfst-fst2fst -f openfst-tropical BetterColaMachine.hfst.hfst > TMP
+  $TOOLDIR/hfst-compare -q TMP BetterColaMachine.xfst.hfst && echo "TEST PASSED";
 done

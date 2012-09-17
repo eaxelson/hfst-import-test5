@@ -1,4 +1,5 @@
 #!/bin/bash
+TOOLDIR=../../tools/src
 
 # xfst -f PlusOrMinus.xfst.script
 # rm -f TMP
@@ -7,9 +8,9 @@
 #   echo "--" >> TMP;
 # done
 # cat PlusMinusTen.att >> TMP;
-# cat TMP | ../xfst-att-to-hfst-att.sh > PlusOrMinus.xfst.att
+# cat TMP | ../xfst-att-to-$TOOLDIR/hfst-att.sh > PlusOrMinus.xfst.att
 
-hfst-txt2fst -f openfst-tropical PlusOrMinus.xfst.att > \
+$TOOLDIR/hfst-txt2fst -f openfst-tropical PlusOrMinus.xfst.att > \
   PlusOrMinus.xfst.hfst
 
 for i in sfst openfst-tropical foma; do
@@ -17,6 +18,6 @@ for i in sfst openfst-tropical foma; do
   echo "Testing" $i "..."
   sh PlusOrMinus.hfst.script
   sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" PlusOrMinus.hfst.script
-  hfst-fst2fst -f openfst-tropical PlusOrMinus.hfst.hfst > TMP
-  hfst-compare -q TMP PlusOrMinus.xfst.hfst && echo "TEST PASSED";
+  $TOOLDIR/hfst-fst2fst -f openfst-tropical PlusOrMinus.hfst.hfst > TMP
+  $TOOLDIR/hfst-compare -q TMP PlusOrMinus.xfst.hfst && echo "TEST PASSED";
 done
