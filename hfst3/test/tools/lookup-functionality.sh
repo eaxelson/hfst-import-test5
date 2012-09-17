@@ -1,16 +1,17 @@
 #!/bin/sh
-if ! ../../tools/src/hfst-lookup -s cat.hfst < $srcdir/cat.strings > test.lookups ; then
+TOOLDIR=../../tools/src
+if ! $TOOLDIR/hfst-lookup -s cat.hfst < $srcdir/cat.strings > test.lookups ; then
     exit 1
 fi
 
-../../tools/src/hfst-format -l > TMP;
+$TOOLDIR/hfst-format -l > TMP;
 
 # test what strings the transducer [a:b (ID:ID)*] recognizes
 for i in "" .sfst .ofst .foma; do
 
     if test -f abid$i ; then
 
-	if ! echo "aa" | ../../tools/src/hfst-lookup -s abid$i \
+	if ! echo "aa" | $TOOLDIR/hfst-lookup -s abid$i \
 	    > test.lookups; 
 	then
 	    exit 1
@@ -20,7 +21,7 @@ for i in "" .sfst .ofst .foma; do
 	    exit 1
 	fi
 	
-	if ! echo "ab" | ../../tools/src/hfst-lookup -s abid$i \
+	if ! echo "ab" | $TOOLDIR/hfst-lookup -s abid$i \
 	    > test.lookups; 
 	then
 	    exit 1
@@ -30,7 +31,7 @@ for i in "" .sfst .ofst .foma; do
 	    exit 1
 	fi
 	
-	if ! echo "ac" | ../../tools/src/hfst-lookup -s abid$i \
+	if ! echo "ac" | $TOOLDIR/hfst-lookup -s abid$i \
 	    > test.lookups; 
 	then
 	    exit 1

@@ -1,11 +1,12 @@
 #!/bin/sh
+TOOLDIR=../../tools/src
 
 echo '0 1 a b
 1' > TMP;
 
-if ../../tools/src/hfst-format --test-format sfst; then
-    if echo TMP | ../../tools/src/hfst-txt2fst -f sfst > test ; then
-	if ! ../../tools/src/hfst-format test > TMP1 ; then
+if $TOOLDIR/hfst-format --test-format sfst; then
+    if echo TMP | $TOOLDIR/hfst-txt2fst -f sfst > test ; then
+	if ! $TOOLDIR/hfst-format test > TMP1 ; then
 	    exit 1
 	fi
 	echo "Transducers in test are of type SFST (1.4 compatible)" > TMP2
@@ -15,10 +16,10 @@ if ../../tools/src/hfst-format --test-format sfst; then
     fi
 fi
 
-if ../../tools/src/hfst-format --test-format openfst-tropical; then
-    if echo TMP | ../../tools/src/hfst-txt2fst -f openfst-tropical \
+if $TOOLDIR/hfst-format --test-format openfst-tropical; then
+    if echo TMP | $TOOLDIR/hfst-txt2fst -f openfst-tropical \
 	> test ; then
-	if ! ../../tools/src/hfst-format test > TMP1 ; then
+	if ! $TOOLDIR/hfst-format test > TMP1 ; then
 	    exit 1
 	fi
 	echo "Transducers in test are of type OpenFST, std arc,"\
@@ -29,9 +30,9 @@ if ../../tools/src/hfst-format --test-format openfst-tropical; then
     fi
 fi
 
-if ../../tools/src/hfst-format --test-format foma; then
-    if echo TMP | ../../tools/src/hfst-txt2fst -f foma > test ; then
-	if ! ../../tools/src/hfst-format test > TMP1 ; then
+if $TOOLDIR/hfst-format --test-format foma; then
+    if echo TMP | $TOOLDIR/hfst-txt2fst -f foma > test ; then
+	if ! $TOOLDIR/hfst-format test > TMP1 ; then
 	    exit 1
 	fi
 	echo "Transducers in test are of type foma" > TMP2

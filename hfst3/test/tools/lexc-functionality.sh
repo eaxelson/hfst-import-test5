@@ -1,4 +1,5 @@
 #!/bin/sh
+TOOLDIR=../../tools/src
 LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc 
           basic.empty-sides.lexc basic.end.lexc basic.escapes.lexc 
           basic.infostrings.lexc basic.initial-lexicon-empty.lexc 
@@ -24,7 +25,7 @@ if (uname | egrep "MINGW|mingw" 2>1 > /dev/null); then
     WINDOWS=0;
 fi
 
-if ! test -x ../../tools/src/hfst-lexc ; then
+if ! test -x $TOOLDIR/hfst-lexc ; then
     echo hfst-lexc not executable, assumed configured off and skipping
     exit 77
 fi
@@ -47,35 +48,35 @@ for i in .sfst .ofst .foma ; do
             FFLAG=;;
     esac
 
-    if ! (../../tools/src/hfst-format --test-format $FNAME ) ; then
+    if ! ($TOOLDIR/hfst-format --test-format $FNAME ) ; then
         continue;
     fi
 
     if test -f cat$i ; then
-        if ! ../../tools/src/hfst-lexc $FFLAG $srcdir/cat.lexc -o test ; then
+        if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/cat.lexc -o test ; then
             echo lexc2fst $FFLAG cat.lexc failed with $?
             exit 1
         fi
-        if ! ../../tools/src/hfst-compare -s cat$i test ; then
+        if ! $TOOLDIR/hfst-compare -s cat$i test ; then
             exit 1
         fi
         rm test
     fi
     for f in $LEXCTESTS ; do
-        if ! ../../tools/src/hfst-lexc $FFLAG $srcdir/$f -o test ; then
+        if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/$f -o test ; then
             echo lexc2fst $FFLAG $f failed with $?
             exit 1
         fi
         rm test
     done
     if [ $WINDOWS -eq 1 ]; then
-	if ! ../../tools/src/hfst-lexc $FFLAG $srcdir/basic.multi-file-1.lexc \
+	if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/basic.multi-file-1.lexc \
             $srcdir/basic.multi-file-2.lexc \
             $srcdir/basic.multi-file-3.lexc -o test ; then
             echo lexc2fst $FFLAG basic.multi-file-{1,2,3}.lexc failed with $?
             exit 1
 	fi
-	if ! ../../tools/src/hfst-compare -s walk_or_dog$i test ; then
+	if ! $TOOLDIR/hfst-compare -s walk_or_dog$i test ; then
             exit 1
 	fi
     fi

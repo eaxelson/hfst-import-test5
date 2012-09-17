@@ -1,4 +1,5 @@
 #!/bin/sh
+TOOLDIR=../../tools/src
 LEXCTESTS="stress.random-lexicons-100.lexc"
 for i in "" .sfst .ofst .foma ; do
     FFLAG=
@@ -13,7 +14,7 @@ for i in "" .sfst .ofst .foma ; do
             FFLAG=;;
     esac
     for f in $LEXCTESTS ; do
-        if ! ../../tools/src/hfst-lexc2fst $FFLAG $srcdir/$f > test ; then
+        if ! $TOOLDIR/hfst-lexc2fst $FFLAG $srcdir/$f > test ; then
             exit 1
         fi
         rm test

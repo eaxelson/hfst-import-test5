@@ -1,5 +1,6 @@
 #!/bin/bash
-for f in ../../tools/src/hfst-* ; do
+TOOLDIR=../../tools/src
+for f in $TOOLDIR/hfst-* ; do
     if [ -x "$f" -a ! -d "$f" ] ; then
         $f < $srcdir/empty-file > /dev/null 2>&1
         rv=$?
