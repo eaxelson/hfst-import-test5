@@ -1,4 +1,5 @@
 #!/bin/sh
+TOOLDIR=../../tools/src
 LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc 
           basic.empty-sides.lexc basic.end.lexc basic.escapes.lexc 
           basic.infostrings.lexc basic.initial-lexicon-empty.lexc 
@@ -15,7 +16,7 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
           xre.star-plus-optional.lexc"
 LEXCXFAIL="xfail.bogus.lexc xfail.ISO-8859-1.lexc xfail.lexicon-semicolon.lexc"
 
-if ! test -x ../../tools/src/hfst-lexc2fst ; then
+if ! test -x $TOOLDIR/hfst-lexc2fst ; then
     echo missing hfst-lexc2fst, assuming configured off, skipping
     exit 73
 fi
@@ -38,34 +39,34 @@ for i in .sfst .ofst .foma ; do
             FFLAG=;;
     esac
 
-    if ! (../../tools/src/hfst-format --test-format $FNAME ) ; then
+    if ! ($TOOLDIR/hfst-format --test-format $FNAME ) ; then
         continue;
     fi
 
     if test -f cat$i ; then
-        if ! ../../tools/src/hfst-lexc2fst $FFLAG $srcdir/cat.lexc > test ; then
+        if ! $TOOLDIR/hfst-lexc2fst $FFLAG $srcdir/cat.lexc > test ; then
             echo lexc2fst $FFLAG cat.lexc failed with $?
             exit 1
         fi
-        if ! ../../tools/src/hfst-compare -s cat$i test ; then
+        if ! $TOOLDIR/hfst-compare -s cat$i test ; then
             exit 1
         fi
         rm test
     fi
     for f in $LEXCTESTS ; do
-        if ! ../../tools/src/hfst-lexc2fst $FFLAG $srcdir/$f > test ; then
+        if ! $TOOLDIR/hfst-lexc2fst $FFLAG $srcdir/$f > test ; then
             echo lexc2fst $FFLAG $f failed with $?
             exit 1
         fi
         rm test
     done
-    if ! ../../tools/src/hfst-lexc2fst $FFLAG $srcdir/basic.multi-file-1.lexc \
+    if ! $TOOLDIR/hfst-lexc2fst $FFLAG $srcdir/basic.multi-file-1.lexc \
         $srcdir/basic.multi-file-2.lexc \
         $srcdir/basic.multi-file-3.lexc > test ; then
         echo lexc2fst $FFLAG basic.multi-file-{1,2,3}.lexc failed with $?
         exit 1
     fi
-    if ! ../../tools/src/hfst-compare -s walk_or_dog$i test ; then
+    if ! $TOOLDIR/hfst-compare -s walk_or_dog$i test ; then
         exit 1
     fi
 done

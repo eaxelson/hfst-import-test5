@@ -1,41 +1,42 @@
 #!/bin/sh
-if ! [ -x ../../tools/src/hfst-shuffle ]; then
+TOOLDIR=../../tools/src
+if ! [ -x $TOOLDIR/hfst-shuffle ]; then
     exit 0;
 fi
 
 for i in .sfst .ofst .foma; do
-    if ! ../../tools/src/hfst-format --test-format `echo $i | sed "s/.//"`; then
+    if ! $TOOLDIR/hfst-format --test-format `echo $i | sed "s/.//"`; then
 	continue;
     fi
 
-    if ! ../../tools/src/hfst-shuffle ab$i bc$i > TMP; then
+    if ! $TOOLDIR/hfst-shuffle ab$i bc$i > TMP; then
 	rm TMP;
 	exit 1;
     else
-	if ! ../../tools/src/hfst-compare TMP ab_shuffle_bc$i > /dev/null 2>&1; then
+	if ! $TOOLDIR/hfst-compare TMP ab_shuffle_bc$i > /dev/null 2>&1; then
 	    rm TMP;
 	    exit 1;
 	fi
     fi
-    if ! ../../tools/src/hfst-shuffle id$i id$i > TMP; then
+    if ! $TOOLDIR/hfst-shuffle id$i id$i > TMP; then
 	rm TMP;
 	exit 1;
     else
-	if ! ../../tools/src/hfst-compare TMP id_shuffle_id$i > /dev/null 2>&1; then
+	if ! $TOOLDIR/hfst-compare TMP id_shuffle_id$i > /dev/null 2>&1; then
 	    rm TMP;
 	    exit 1;
 	fi
     fi
-    if ! ../../tools/src/hfst-shuffle aid$i idb$i > TMP; then
+    if ! $TOOLDIR/hfst-shuffle aid$i idb$i > TMP; then
 	rm TMP;
 	exit 1;
     else
-	if ! ../../tools/src/hfst-compare TMP aid_shuffle_idb$i > /dev/null 2>&1; then
+	if ! $TOOLDIR/hfst-compare TMP aid_shuffle_idb$i > /dev/null 2>&1; then
 	    rm TMP;
 	    exit 1;
 	fi
     fi
-    if ../../tools/src/hfst-shuffle a2b$i ab$i > /dev/null 2>&1; then
+    if $TOOLDIR/hfst-shuffle a2b$i ab$i > /dev/null 2>&1; then
 	rm TMP;
 	exit 1;
     fi
