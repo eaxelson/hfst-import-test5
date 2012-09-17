@@ -271,16 +271,18 @@ process_stream(HfstOutputStream& outstream)
 extern int xredebug;
 
 int main( int argc, char **argv ) 
-{
+  {
+    hfst_set_program_name(argv[0], "0.2", "Regexp2Fst");
+    int retval = parse_options(argc, argv);
+    if (retval != EXIT_CONTINUE)
+      {
+        return retval;
+      }
+    if (debug)
+      {
+        xredebug = 1;
+      }
 
-//	xredebug = 1;
-
-  hfst_set_program_name(argv[0], "0.2", "Regexp2Fst");
-  int retval = parse_options(argc, argv);
-  if (retval != EXIT_CONTINUE)
-    {
-      return retval;
-    }
   // close buffers, we use streams
   if (outfile != stdout)
     {
