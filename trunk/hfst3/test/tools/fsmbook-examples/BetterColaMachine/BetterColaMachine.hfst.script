@@ -2,14 +2,14 @@
 # $1 is the transducer format
 
 # identity
-echo "[?]" | hfst-regexp2fst -f $1 > Solution
+echo "[?]" | $TOOLDIR/hfst-regexp2fst -f $1 > Solution
 
 for i in '[ D -> N^2, Q -> N^5 ]' \
          'N^5/\N @-> ...  "[COLA]"' \
   	 'N -> 0 || _ $"[COLA]"' \
 	 'N^2/\N @-> ...  D' \
 	 'N -> 0 || _ $D'; do
-  echo $i | hfst-regexp2fst -f $1 | hfst-compose -1 Solution > TMP;
+  echo $i | $TOOLDIR/hfst-regexp2fst -f $1 | $TOOLDIR/hfst-compose -1 Solution > TMP;
   mv TMP Solution;
 done
 

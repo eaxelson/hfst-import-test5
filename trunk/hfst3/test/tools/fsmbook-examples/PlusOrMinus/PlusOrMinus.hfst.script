@@ -1,7 +1,7 @@
 
 
-echo "[1|2|3|4|5|6|7|8|9]" | hfst-regexp2fst -f $1 > N
-echo '["0" | N]' | hfst-regexp2fst -f $1 > Z
+echo "[1|2|3|4|5|6|7|8|9]" | $TOOLDIR/hfst-regexp2fst -f $1 > N
+echo '["0" | N]' | $TOOLDIR/hfst-regexp2fst -f $1 > Z
 
 # Insert an initial 1 in front of a sequence of zeros. To make
 # this relation functional in both directions, we need two
@@ -9,28 +9,28 @@ echo '["0" | N]' | hfst-regexp2fst -f $1 > Z
 # The composition of the two is a relation that uniquely maps,
 # for example, 100 to 99 and, conversely, 99 to 100.
 
-echo '[ 1 <- [. .] || .#. _ "0"+ .#. ]' | hfst-regexp2fst -f $1 > TMP;
-echo '[ 1 ->   0   || .#. _ "0"+ .#. ]' | hfst-regexp2fst -f $1 | hfst-compose -1 TMP > CarryUp.hfst
+echo '[ 1 <- [. .] || .#. _ "0"+ .#. ]' | $TOOLDIR/hfst-regexp2fst -f $1 > TMP;
+echo '[ 1 ->   0   || .#. _ "0"+ .#. ]' | $TOOLDIR/hfst-regexp2fst -f $1 | $TOOLDIR/hfst-compose -1 TMP > CarryUp.hfst
 
 echo '[1 <- "0", 2 <- 1, 3 <- 2, 4 <- 3,  5  <- 4,' \
      '6 <-  5 , 7 <- 6, 8 <- 7, 9 <- 8, "0" <- 9' \
-     '|| .#. ("+") @"Z"* _ 9* .#.]' | hfst-regexp2fst -f $1 > AddUp.hfst
+     '|| .#. ("+") @"Z"* _ 9* .#.]' | $TOOLDIR/hfst-regexp2fst -f $1 > AddUp.hfst
 
-echo '[ "0" => .#. @"N" @"Z"* _ , .#. _ .#. ]' | hfst-rule2fst -f $1 > NoLeadingZero.hfst
+echo '[ "0" => .#. @"N" @"Z"* _ , .#. _ .#. ]' | $TOOLDIR/hfst-rule2fst -f $1 > NoLeadingZero.hfst
 
 
 # PlusMinusOne.hfst maps any natural number N to (N-1), and vice versa.
 
-hfst-compose CarryUp.hfst AddUp.hfst | hfst-compose -2 NoLeadingZero.hfst > PlusMinusOne.hfst
-hfst-compose PlusMinusOne.hfst PlusMinusOne.hfst > PlusMinusTwo.hfst
-hfst-compose PlusMinusTwo PlusMinusOne > PlusMinusThree.hfst
-hfst-compose PlusMinusThree PlusMinusOne > PlusMinusFour.hfst
-hfst-compose PlusMinusFour PlusMinusOne > PlusMinusFive.hfst
-hfst-compose PlusMinusFive PlusMinusOne > PlusMinusSix.hfst
-hfst-compose PlusMinusSix PlusMinusOne > PlusMinusSeven.hfst
-hfst-compose PlusMinusSeven PlusMinusOne > PlusMinusEight.hfst
-hfst-compose PlusMinusEight PlusMinusOne > PlusMinusNine.hfst
-hfst-compose PlusMinusNine PlusMinusOne > PlusMinusTen.hfst
+$TOOLDIR/hfst-compose CarryUp.hfst AddUp.hfst | $TOOLDIR/hfst-compose -2 NoLeadingZero.hfst > PlusMinusOne.hfst
+$TOOLDIR/hfst-compose PlusMinusOne.hfst PlusMinusOne.hfst > PlusMinusTwo.hfst
+$TOOLDIR/hfst-compose PlusMinusTwo PlusMinusOne > PlusMinusThree.hfst
+$TOOLDIR/hfst-compose PlusMinusThree PlusMinusOne > PlusMinusFour.hfst
+$TOOLDIR/hfst-compose PlusMinusFour PlusMinusOne > PlusMinusFive.hfst
+$TOOLDIR/hfst-compose PlusMinusFive PlusMinusOne > PlusMinusSix.hfst
+$TOOLDIR/hfst-compose PlusMinusSix PlusMinusOne > PlusMinusSeven.hfst
+$TOOLDIR/hfst-compose PlusMinusSeven PlusMinusOne > PlusMinusEight.hfst
+$TOOLDIR/hfst-compose PlusMinusEight PlusMinusOne > PlusMinusNine.hfst
+$TOOLDIR/hfst-compose PlusMinusNine PlusMinusOne > PlusMinusTen.hfst
 
 rm -f PlusOrMinus.hfst.hfst
 

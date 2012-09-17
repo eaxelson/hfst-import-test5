@@ -12,38 +12,38 @@ echo "{kalastelet} | {kalasteleminen} | {ilmoittautuminen} | \
                  {perijä} | {repeämä} | {ergonomia} | {puhelimellani} | \
                  {matematiikka} | {puhelimistani} | {rakastajattariansa} | \
                  {kuningas} | {kainostelijat} | {ravintolat} | \
-                 {merkonomin} ;" | hfst-regexp2fst -f $1 > FinnWords
+                 {merkonomin} ;" | $TOOLDIR/hfst-regexp2fst -f $1 > FinnWords
 
 # Basic definitions
 echo "BASIC DEFINITIONS ---"
 
-echo '[u | y | i]' | hfst-regexp2fst -f $1 > HighV                          # High vowel
-echo '[e | o | ö]' | hfst-regexp2fst -f $1 > MidV                          # Mid vowel
-echo '[a | ä]' | hfst-regexp2fst -f $1 > LowV                             # Low vowel
-echo '[HighV | MidV | LowV]' | hfst-regexp2fst -f $1 > USV                  # Unstressed Vowel
+echo '[u | y | i]' | $TOOLDIR/hfst-regexp2fst -f $1 > HighV                          # High vowel
+echo '[e | o | ö]' | $TOOLDIR/hfst-regexp2fst -f $1 > MidV                          # Mid vowel
+echo '[a | ä]' | $TOOLDIR/hfst-regexp2fst -f $1 > LowV                             # Low vowel
+echo '[HighV | MidV | LowV]' | $TOOLDIR/hfst-regexp2fst -f $1 > USV                  # Unstressed Vowel
 
 echo "[b | c | d | f | g | h | j | k | l | m | \
-          n | p | q | r | s | t | v | w | x | z]" | hfst-regexp2fst -f $1 > C  # Consonant
+          n | p | q | r | s | t | v | w | x | z]" | $TOOLDIR/hfst-regexp2fst -f $1 > C  # Consonant
 
-echo '[á | é | í | ó | ú | ý | ä´ | ö´ ]' | hfst-regexp2fst -f $1 > MSV
-echo '[à | è | ì | ò | ù | y` | ä` | ö`]' | hfst-regexp2fst -f $1 > SSV 
-echo '[@"MSV" | @"SSV"]' | hfst-regexp2fst -f $1 > SV                              # Stressed vowel
-echo '[@"USV" | @"SV"] ' | hfst-regexp2fst -f $1 > V                               # Vowel
+echo '[á | é | í | ó | ú | ý | ä´ | ö´ ]' | $TOOLDIR/hfst-regexp2fst -f $1 > MSV
+echo '[à | è | ì | ò | ù | y` | ä` | ö`]' | $TOOLDIR/hfst-regexp2fst -f $1 > SSV 
+echo '[@"MSV" | @"SSV"]' | $TOOLDIR/hfst-regexp2fst -f $1 > SV                              # Stressed vowel
+echo '[@"USV" | @"SV"] ' | $TOOLDIR/hfst-regexp2fst -f $1 > V                               # Vowel
 
-echo '[@"V" | @"C"]' | hfst-regexp2fst -f $1 > P                                   # Phone
-echo '[[\@"P"+] | .#.]' | hfst-regexp2fst -f $1 > B                             # Boundary
+echo '[@"V" | @"C"]' | $TOOLDIR/hfst-regexp2fst -f $1 > P                                   # Phone
+echo '[[\@"P"+] | .#.]' | $TOOLDIR/hfst-regexp2fst -f $1 > B                             # Boundary
 
-echo '.#. | "."' | hfst-regexp2fst -f $1 > E                                 # Edge
-echo '[~$"." "." ~$"."]' | hfst-regexp2fst -f $1 > SB                        # At most one syllable boundary
+echo '.#. | "."' | $TOOLDIR/hfst-regexp2fst -f $1 > E                                 # Edge
+echo '[~$"." "." ~$"."]' | $TOOLDIR/hfst-regexp2fst -f $1 > SB                        # At most one syllable boundary
 
-echo '[@"C"* @"V"]' | hfst-regexp2fst -f $1 > Light                                # Light syllable
-echo '[Light @"P"+]' | hfst-regexp2fst -f $1 > Heavy                            # Heavy syllable
+echo '[@"C"* @"V"]' | $TOOLDIR/hfst-regexp2fst -f $1 > Light                                # Light syllable
+echo '[Light @"P"+]' | $TOOLDIR/hfst-regexp2fst -f $1 > Heavy                            # Heavy syllable
 
-echo '[@"Heavy" | @"Light"]' | hfst-regexp2fst -f $1 > S                           # Syllable
-echo '[@"S" & $@"SV"]' | hfst-regexp2fst -f $1 > SS                                # Stressed syllable
-echo '[@"S" & ~$@"SV"]' | hfst-regexp2fst -f $1 > US                               # Unstressed syllable
-echo '[@"S" & $@"MSV"] ' | hfst-regexp2fst -f $1 > MSS                             # Syllable with main stress
-echo '[@"S" "." @"S"]' | hfst-regexp2fst -f $1 > BF                                # Binary foot
+echo '[@"Heavy" | @"Light"]' | $TOOLDIR/hfst-regexp2fst -f $1 > S                           # Syllable
+echo '[@"S" & $@"SV"]' | $TOOLDIR/hfst-regexp2fst -f $1 > SS                                # Stressed syllable
+echo '[@"S" & ~$@"SV"]' | $TOOLDIR/hfst-regexp2fst -f $1 > US                               # Unstressed syllable
+echo '[@"S" & $@"MSV"] ' | $TOOLDIR/hfst-regexp2fst -f $1 > MSS                             # Syllable with main stress
+echo '[@"S" "." @"S"]' | $TOOLDIR/hfst-regexp2fst -f $1 > BF                                # Binary foot
 
 
 # Gen
@@ -55,34 +55,34 @@ echo "-- GEN ---"
 # that historically come from long ee, oo, and öö, respectively.
 # All other adjacent vowels must be separated by a syllable boundary.
 
-echo ' [. .] -> "." || [@"HighV" | @"MidV"] _ @"LowV" , i _ [@"MidV" - e] , u _ [@"MidV" - o] , y _ [@"MidV" - ö] ;' | hfst-regexp2fst -f $1 > MarkNonDiphthongs
+echo ' [. .] -> "." || [@"HighV" | @"MidV"] _ @"LowV" , i _ [@"MidV" - e] , u _ [@"MidV" - o] , y _ [@"MidV" - ö] ;' | $TOOLDIR/hfst-regexp2fst -f $1 > MarkNonDiphthongs
 
 # The general syllabification rule has exceptions. In particular, loan
 # words such as ate.isti 'atheist' must be partially syllabified in the
 # lexicon.
 
 echo "1"
-echo '@"C"* @"V"+ @"C"* @-> ... "." || _ @"C" @"V"' | hfst-regexp2fst -f $1 > Syllabify
+echo '@"C"* @"V"+ @"C"* @-> ... "." || _ @"C" @"V"' | $TOOLDIR/hfst-regexp2fst -f $1 > Syllabify
 
 
 # Optionally adds primary or secondary stress to the first vowel
 # of each syllable.
 
-echo 'a (->) á|à , e (->) é|è , i (->) í|ì , o (->) ó|ò , u (->) ú|ù , y (->) ý|y` , ä (->) ä´|ä` , ö (->) ö´|ö` || @"E" @"C"* _ ' | hfst-regexp2fst -f $1 > Stress
+echo 'a (->) á|à , e (->) é|è , i (->) í|ì , o (->) ó|ò , u (->) ú|ù , y (->) ý|y` , ä (->) ä´|ä` , ö (->) ö´|ö` || @"E" @"C"* _ ' | $TOOLDIR/hfst-regexp2fst -f $1 > Stress
               
 echo "3"
 # Scan the word, optionally dividing it to any combination of
 # unary, binary, and ternary feet. Each foot must contain at least
 # one stressed syllable.
 
-echo '[[@"S" ("." @"S" ("." @"S")) & $@"SS"] (->) "(" ... ")" || @"E" _ @"E"]' | hfst-regexp2fst -f $1 > Scan
+echo '[[@"S" ("." @"S" ("." @"S")) & $@"SS"] (->) "(" ... ")" || @"E" _ @"E"]' | $TOOLDIR/hfst-regexp2fst -f $1 > Scan
 
 # In keeping with the idea of "richness of the base", the Gen
 # function produces a great number of output candidates for
 # even short words. Long words have millions of possible outputs.
 
 echo "4"
-echo '[@"MarkNonDiphthongs" .o. @"Syllabify" .o. @"Stress" .o. @"Scan"]' | hfst-regexp2fst -f $1 > Gen
+echo '[@"MarkNonDiphthongs" .o. @"Syllabify" .o. @"Stress" .o. @"Scan"]' | $TOOLDIR/hfst-regexp2fst -f $1 > Gen
 
 
 
@@ -99,7 +99,7 @@ echo "--- OT constraints --- "
 
 # Every instance of * in an output candidate is a violation.
 
-echo '${*}' | hfst-regexp2fst -f $1 > Viol
+echo '${*}' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol
 
 
 echo "1"
@@ -107,22 +107,22 @@ echo "1"
 # candidates that violate the constraint provided that at least
 # one output candidate survives.
 
-echo '~@"Viol"' | hfst-regexp2fst -f $1 > Viol0         # No violations
-echo '~[@"Viol"^2]' | hfst-regexp2fst -f $1 > Viol1     # At most one violation
-echo '~[@"Viol"^3]' | hfst-regexp2fst -f $1 > Viol2     # At most two violations
-echo '~[@"Viol"^4]' | hfst-regexp2fst -f $1 > Viol3     # etc.
-echo '~[@"Viol"^5]' | hfst-regexp2fst -f $1 > Viol4 
-echo '~[@"Viol"^6]' | hfst-regexp2fst -f $1 > Viol5 
-echo '~[@"Viol"^7]' | hfst-regexp2fst -f $1 > Viol6 
-echo '~[@"Viol"^8]' | hfst-regexp2fst -f $1 > Viol7 
-echo '~[@"Viol"^9]' | hfst-regexp2fst -f $1 > Viol8 
-echo '~[@"Viol"^10]' | hfst-regexp2fst -f $1 > Viol9 
-echo '~[@"Viol"^11]' | hfst-regexp2fst -f $1 > Viol10 
-echo '~[@"Viol"^12]' | hfst-regexp2fst -f $1 > Viol11 
-echo '~[@"Viol"^13]' | hfst-regexp2fst -f $1 > Viol12 
-echo '~[@"Viol"^14]' | hfst-regexp2fst -f $1 > Viol13 
-echo '~[@"Viol"^15]' | hfst-regexp2fst -f $1 > Viol14 
-echo '~[@"Viol"^16]' | hfst-regexp2fst -f $1 > Viol15 
+echo '~@"Viol"' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol0         # No violations
+echo '~[@"Viol"^2]' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol1     # At most one violation
+echo '~[@"Viol"^3]' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol2     # At most two violations
+echo '~[@"Viol"^4]' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol3     # etc.
+echo '~[@"Viol"^5]' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol4 
+echo '~[@"Viol"^6]' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol5 
+echo '~[@"Viol"^7]' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol6 
+echo '~[@"Viol"^8]' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol7 
+echo '~[@"Viol"^9]' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol8 
+echo '~[@"Viol"^10]' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol9 
+echo '~[@"Viol"^11]' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol10 
+echo '~[@"Viol"^12]' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol11 
+echo '~[@"Viol"^13]' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol12 
+echo '~[@"Viol"^14]' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol13 
+echo '~[@"Viol"^15]' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol14 
+echo '~[@"Viol"^16]' | $TOOLDIR/hfst-regexp2fst -f $1 > Viol15 
 
 
 
@@ -132,7 +132,7 @@ echo "2"
 # This eliminates the violation marks after the candidate set has
 # been pruned by a constraint.
 
-echo '{*} -> 0' | hfst-regexp2fst -f $1 > Pardon
+echo '{*} -> 0' | $TOOLDIR/hfst-regexp2fst -f $1 > Pardon
 
 
 echo "3"
@@ -151,44 +151,44 @@ echo "CONSTRAINTS---"
 # Main Stress: The primary stress in Finnish is on the first
 #              syllable. This is an inviolable constraint.
 
-echo '[@"B" @"MSS" ~$@"MSS"]' | hfst-regexp2fst -f $1 > MainStress 
+echo '[@"B" @"MSS" ~$@"MSS"]' | $TOOLDIR/hfst-regexp2fst -f $1 > MainStress 
 
 echo "c1"
 # Clash: No stress on adjacent syllables.
 
-echo '@"SS" -> ... {*} || @"SS" @"B" _ ' | hfst-regexp2fst -f $1 > Clash 
+echo '@"SS" -> ... {*} || @"SS" @"B" _ ' | $TOOLDIR/hfst-regexp2fst -f $1 > Clash 
 
 echo "c2"
 
 # Align-Left: The stressed syllable is initial in the foot.
 
-echo '@"SV" -> ... {*} || .#. ~[?* "(" @"C"*] _ ' | hfst-regexp2fst -f $1 > AlignLeft 
+echo '@"SV" -> ... {*} || .#. ~[?* "(" @"C"*] _ ' | $TOOLDIR/hfst-regexp2fst -f $1 > AlignLeft 
 
 echo "c3"
 # Foot-Bin: Feet are minimally bimoraic and maximally bisyllabic.
 
-echo '["(" @"Light" ")" | "(" @"S" ["." @"S"]^>1] -> ... {*} ' | hfst-regexp2fst -f $1 > FootBin 
+echo '["(" @"Light" ")" | "(" @"S" ["." @"S"]^>1] -> ... {*} ' | $TOOLDIR/hfst-regexp2fst -f $1 > FootBin 
 echo "c4"
 
 # Lapse: Every unstressed syllable must be adjacent to a stressed
 # syllable.
 
-echo '@"US" -> ... {*} || [@"B" @"US" @"B"] _ [@"B" @"US" @"B"]' | hfst-regexp2fst -f $1 > Lapse 
+echo '@"US" -> ... {*} || [@"B" @"US" @"B"] _ [@"B" @"US" @"B"]' | $TOOLDIR/hfst-regexp2fst -f $1 > Lapse 
 
 
 # Non-Final: The final syllable is not stressed.
 
-echo '@"SS" -> ... {*} || _ ~@"$S" .#.' | hfst-regexp2fst -f $1 > NonFinal 
+echo '@"SS" -> ... {*} || _ ~@"$S" .#.' | $TOOLDIR/hfst-regexp2fst -f $1 > NonFinal 
 
 
 # Stress-To-Weight: Stressed syllables are heavy.
 
-echo '[@"SS" & @"Light"] -> ... {*} || _ ")"| @"E"' | hfst-regexp2fst -f $1 > StressToWeight 
+echo '[@"SS" & @"Light"] -> ... {*} || _ ")"| @"E"' | $TOOLDIR/hfst-regexp2fst -f $1 > StressToWeight 
 
 
 # License-&#963;: Syllables are parsed into feet.
 
-    echo '@"S" -> ... {*} || @"E" _ @"E"' | hfst-regexp2fst -f $1 > Parse 
+    echo '@"S" -> ... {*} || @"E" _ @"E"' | $TOOLDIR/hfst-regexp2fst -f $1 > Parse 
 
 
 # All-Ft-Left: Every foot starts at the beginning of a
@@ -208,7 +208,7 @@ echo '[ "(" -> ...   {*} || .#. @"SB" _
                                       .o.
                   "(" -> ... {*}^7 || .#. @"SB"^7 _
                                       .o.
-                 "(" -> ... {*}^8 || .#. @"SB"^8 _ ]' | hfst-regexp2fst -f $1 > AllFeetFirst
+                 "(" -> ... {*}^8 || .#. @"SB"^8 _ ]' | $TOOLDIR/hfst-regexp2fst -f $1 > AllFeetFirst
 
 # Evaluation
 
@@ -231,5 +231,5 @@ echo "[FinnWords .o. Gen
            Viol12 .O. Viol11 .O. Viol10 .O. Viol9 .O. Viol8 .O. Viol7 .O.
            Viol6  .O. Viol5  .O. Viol4  .O. Viol3 .O. Viol2 .O. Viol1 .O.
            Viol0 .o. Pardon
-      ]" | hfst-regexp2fst -f $1 > FinnishOTProsody.hfst.hfst
+      ]" | $TOOLDIR/hfst-regexp2fst -f $1 > FinnishOTProsody.hfst.hfst
 

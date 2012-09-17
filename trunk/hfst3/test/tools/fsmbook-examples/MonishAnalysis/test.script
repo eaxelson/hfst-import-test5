@@ -1,10 +1,11 @@
 #!/bin/bash
+TOOLDIR=../../tools/src
 
 xfst -f MonishAnalysis.xfst.script
-cat MonishAnalysis | ../xfst-att-to-hfst-att.sh \
+cat MonishAnalysis | ../xfst-att-to-$TOOLDIR/hfst-att.sh \
   > MonishAnalysis.xfst.att
 
-hfst-txt2fst -f openfst-tropical MonishAnalysis.xfst.att > \
+$TOOLDIR/hfst-txt2fst -f openfst-tropical MonishAnalysis.xfst.att > \
   MonishAnalysis.xfst.hfst
 
 for i in openfst-tropical; do
@@ -13,6 +14,6 @@ for i in openfst-tropical; do
   echo "Testing" $i "..."
   sh MonishAnalysis.hfst.script
   sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" MonishAnalysis.hfst.script
-  hfst-fst2fst -f openfst-tropical MonishAnalysis.hfst.hfst > TMP
-  hfst-compare -q TMP MonishAnalysis.xfst.hfst && echo "TEST PASSED";
+  $TOOLDIR/hfst-fst2fst -f openfst-tropical MonishAnalysis.hfst.hfst > TMP
+  $TOOLDIR/hfst-compare -q TMP MonishAnalysis.xfst.hfst && echo "TEST PASSED";
 done

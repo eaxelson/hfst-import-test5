@@ -1,18 +1,19 @@
 #!/bin/bash
+TOOLDIR=../../tools/src
 
 if [ "$4" = "--test-full" ]; then
 
   # If $1.foma.att does not exist, compile it.
     #if ! [ -f $1/EinsteinsPuzzle.foma.att ]; then
 	foma -f $1/EinsteinsPuzzle.xfst.script 2>1 > /dev/null;
-	cat $1/EinsteinsPuzzle | ../foma-att-to-hfst-att.sh \
+	cat $1/EinsteinsPuzzle | ../foma-att-to-$TOOLDIR/hfst-att.sh \
 	    > $1/EinsteinsPuzzle.foma.att;
 	rm $1/EinsteinsPuzzle;
     #fi
 
   # Test that the result is correct
-    $3/hfst-txt2fst -f openfst-tropical $1/EinsteinsPuzzle.foma.att \
-	| $3/hfst-fst2strings -S > TMP;
+    $3/$TOOLDIR/hfst-txt2fst -f openfst-tropical $1/EinsteinsPuzzle.foma.att \
+	| $3/$TOOLDIR/hfst-fst2strings -S > TMP;
 
     if ! (diff -q TMP $1/expected_result_foma); then
 	exit 1;
@@ -23,7 +24,7 @@ fi
 
 for i in sfst openfst-tropical foma; do
 
-  if ! ($3/hfst-format --test-format $i); then
+  if ! ($3/$TOOLDIR/hfst-format --test-format $i); then
       continue;
   fi
   
