@@ -59,6 +59,22 @@ LWSP [\t\r\n ]
     return DEFINE;
 }
 
+"Alpha" {
+    return ALPHA;
+}
+
+"Num" {
+    return NUM;
+}
+
+"Punct" {
+    return PUNCT;
+}
+
+"Whitespace" {
+    return WHITESPACE;
+}
+
 "Ins(" {
     return INS_LEFT;
 }
