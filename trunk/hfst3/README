@@ -75,13 +75,6 @@ format automata as HFST files and use foma's algorithms to process automata.
 The command ``./configure --help`` lists all features that can be controlled
 with configure switches and whether they are enabled or disabled by default.
 
-The selection of tools may incur additional dependencies; e.g. if you enable
-``apertium2fst`` tool, you will need libxml2_ and its dependencies, since the
-tool must read XML format dictionaries. The tools with interactive, text based
-interfaces require a compatible version of libreadline_ to be installed in
-order to work; notably the supplement library distributed with Mac OS X does not
-suffice, since it cannot even handle unicode properly.
-
 Compilation requirements
 ------------------------
 
@@ -149,13 +142,6 @@ Compilation requirements
 
   - To compile corpus processing tool ``hfst-proc``, you need to use the
     ``configure`` switch ``--enable-proc``.
-
-- For XML based lexicon formats:
-
-  - libxml2_ version 2.2 or newer
-
-  - To compile apertium_ monodix compiler ``hfst-apertium2fst``, use the
-    ``configure`` switch ``--enable-apertium2fst``.
 
 Note that if you did install dependent libraries, such as openfst, sfst, foma,
 libxml or glib to your home directory instead of using your system's package
@@ -563,6 +549,5 @@ When reporting, please include at least following:
 .. _openfst: http://www.openfst.org/
 .. _sfst: http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html
 .. _foma: http://www.googlecode.com/p/foma/
-.. _apertium: http://apertium.sf.net/
 
 .. vim: set ft=rst:
