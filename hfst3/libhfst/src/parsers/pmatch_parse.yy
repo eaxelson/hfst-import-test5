@@ -190,12 +190,12 @@ REGEXP2: REPLACE
     delete $3;
  }
 | REPLACE RIGHT_CONTEXT {
-    $$ = & $1->disjunct(*$2);
+    $$ = & $1->concatenate(*$2);
     delete $2;
  }
 | REPLACE LEFT_CONTEXT {
-    $$ = & $1->disjunct(*$2);
-    delete $2;
+    $$ = & $2->concatenate(*$1);
+    delete $1;
  }
 ;
 
@@ -835,20 +835,16 @@ INSERT: INS_LEFT SYMBOL RIGHT_PARENTHESIS {
  }
 ;
 
-RIGHT_CONTEXT: RC_LEFT INSERT RIGHT_PARENTHESIS {
-    char * RC_trans = hfst::pmatch::get_RC_transition($2->get_name().c_str());
-    $$ = new HfstTransducer(RC_trans, RC_trans, hfst::pmatch::format);
-    free(RC_trans);
- }
-;
-
 RIGHT_CONTEXT: RC_LEFT REPLACE RIGHT_PARENTHESIS {
-    char * RC_trans = hfst::pmatch::get_RC_transition("");
-    HfstTransducer * rc_transducer = new HfstTransducer(
-        RC_trans, RC_trans, hfst::pmatch::format);
-    $$ = & rc_transducer->concatenate(*$2);
+    HfstTransducer * rc_entry = new HfstTransducer(
+        hfst::internal_epsilon, hfst::pmatch::RC_ENTRY_SYMBOL, hfst::pmatch::format);
+    HfstTransducer * rc_exit = new HfstTransducer(
+        hfst::internal_epsilon, hfst::pmatch::RC_EXIT_SYMBOL, hfst::pmatch::format);
+    rc_entry->concatenate(*$2);
+    rc_entry->concatenate(*rc_exit);
+    $$ = rc_entry;
     delete $2;
-    free(RC_trans);
+    delete rc_exit;
  }
 ;
 
@@ -860,12 +856,15 @@ RIGHT_CONTEXT: RC_LEFT REPLACE RIGHT_PARENTHESIS {
 //     ;
 
 LEFT_CONTEXT: LC_LEFT REPLACE RIGHT_PARENTHESIS {
-    char * LC_trans = hfst::pmatch::get_LC_transition("");
-    HfstTransducer * lc_transducer = new HfstTransducer(
-        LC_trans, LC_trans, hfst::pmatch::format);
-    $$ = & lc_transducer->concatenate($2->reverse());
+    HfstTransducer * lc_entry = new HfstTransducer(
+        hfst::internal_epsilon, hfst::pmatch::LC_ENTRY_SYMBOL, hfst::pmatch::format);
+    HfstTransducer * lc_exit = new HfstTransducer(
+        hfst::internal_epsilon, hfst::pmatch::LC_EXIT_SYMBOL, hfst::pmatch::format);
+    lc_entry->concatenate($2->reverse());
+    lc_entry->concatenate(*lc_exit);
+    $$ = lc_entry;
     delete $2;
-    free(LC_trans);
+    delete lc_exit;
  }
 ;
 
