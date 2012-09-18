@@ -130,7 +130,7 @@ PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
 
-%nonassoc DEFINE INS_LEFT ENDTAG_LEFT LC_LEFT RC_LEFT
+%nonassoc DEFINE ALPHA NUM PUNCT WHITESPACE INS_LEFT ENDTAG_LEFT LC_LEFT RC_LEFT
 %%
 
 
@@ -704,6 +704,18 @@ REGEXP11: REGEXP12 { }
 | LEFT_CURLY SYMBOL RIGHT_CURLY {
     HfstTokenizer tok;
     $$ = new HfstTransducer($2, tok, hfst::pmatch::format);
+ }
+| ALPHA {
+    $$ = hfst::pmatch::latin1_alpha_acceptor(hfst::pmatch::format);
+ }
+| NUM {
+    $$ = hfst::pmatch::latin1_numeral_acceptor(hfst::pmatch::format);
+ }
+| PUNCT {
+    $$ = hfst::pmatch::latin1_punct_acceptor(hfst::pmatch::format);
+ }
+| WHITESPACE {
+    $$ = hfst::pmatch::latin1_whitespace_acceptor(hfst::pmatch::format);
  }
 ;
 
