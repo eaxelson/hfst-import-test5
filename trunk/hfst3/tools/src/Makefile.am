@@ -24,7 +24,8 @@ AM_CXXFLAGS = -Wno-deprecated
 if WANT_WINDOWS
   AM_CPPFLAGS+= -I${top_srcdir}/windows/openfst/src/include \
 		-I${top_srcdir}/windows/foma/ \
-		-I${top_srcdir}/windows/ -DWINDOWS
+		-I${top_srcdir}/windows/ \
+		-I${top_srcdir}/windows/dlfcn -DWINDOWS
 endif
 
 # sort alphabetically:
