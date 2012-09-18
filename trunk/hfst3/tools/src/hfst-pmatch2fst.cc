@@ -58,7 +58,7 @@ using hfst::pmatch::PmatchCompiler;
 
 static char *epsilonname=NULL;
 static bool disjunct_expressions=false;
-static bool line_separated = true;
+static bool line_separated = false;
 
 //static unsigned int sum_of_weights=0;
 static bool sum_weights=false;
@@ -84,8 +84,8 @@ print_usage()
 "                            taking minimum\n"
 "      --norm (todo)         Divide each weight by sum of all weights\n"
 "      --log (todo)          Take negative logarithm of each weight\n"
-"  -l, --line                Input is line separated (default)\n"
-"  -S, --semicolon           Input is semicolon separated\n"
+"  -l, --line                Input is line separated\n"
+"  -S, --semicolon           Input is semicolon separated (default)\n"
 "  -e, --epsilon=EPS         Map EPS as zero.\n");
         fprintf(message_out, "\n");
 
