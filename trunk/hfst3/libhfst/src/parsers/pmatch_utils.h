@@ -21,6 +21,10 @@ extern HfstTransducer* last_compiled;
 extern ImplementationType format;
 
 extern std::map<std::string, hfst::HfstTransducer> named_transducers;
+const std::string RC_ENTRY_SYMBOL = "@_PMATCH_RC_ENTRY_@";
+const std::string RC_EXIT_SYMBOL = "@_PMATCH_RC_EXIT_@";
+const std::string LC_ENTRY_SYMBOL = "@_PMATCH_LC_ENTRY_@";
+const std::string LC_EXIT_SYMBOL = "@_PMATCH_LC_EXIT_@";
 
 /**
  * @brief input handling function for flex that parses strings.
