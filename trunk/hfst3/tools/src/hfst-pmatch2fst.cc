@@ -215,7 +215,6 @@ process_stream(HfstOutputStream& outstream)
   char* first_line = 0;
   while (hfst_getdelim(&line, &len, delim, inputfile) != -1)
     {
-        line_count++;
       if (first_line == 0)
         {
           first_line = strdup(line);
@@ -223,6 +222,16 @@ process_stream(HfstOutputStream& outstream)
       if (is_comment(line)) {
           continue;
       }
+      char* exp = line;
+      while ((*exp == '\n') || (*exp == '\r') || (*exp == ' ')) {
+          exp++;
+      }
+      if (*exp == '\0')
+        {
+          verbose_printf("Skipping whitespace expression #%u", line_count);
+          continue;
+        }
+      line_count++;
       transducer_n++;
       HfstTransducer* compiled;
       verbose_printf("Compiling expression %u\n", line_count);
