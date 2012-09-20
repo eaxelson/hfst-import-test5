@@ -21,7 +21,8 @@ namespace hfst { namespace implementations
   {}
   HfstOlInputStream::HfstOlInputStream
   (const std::string &filename, bool weighted):
-    filename(std::string(filename)),i_stream(filename.c_str()),
+    filename(std::string(filename)),
+    i_stream(filename.c_str(), std::ios::in | std::ios::binary),
     input_stream(i_stream),weighted(weighted)
   {}
   
@@ -172,7 +173,7 @@ void HfstOlInputStream::ignore(unsigned int n)
   {}
 
   HfstOlOutputStream::HfstOlOutputStream(const std::string &str, bool weighted):
-    filename(std::string(str)),o_stream(str.c_str(),std::ios::out),
+    filename(std::string(str)),o_stream(str.c_str(),std::ios::out | std::ios::binary),
     output_stream(o_stream), weighted(weighted)
   {
     if (!output_stream)
