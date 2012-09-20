@@ -1721,7 +1721,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         char *p = line;
         while (*p != '\0')
           {
-            if (*p == '\n')
+            if (*p == '\n' || *p == '\r') // '\r' is possible on Windows
               {
                 *p = '\0';
                 break;
