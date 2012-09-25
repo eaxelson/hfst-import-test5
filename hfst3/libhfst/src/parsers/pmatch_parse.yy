@@ -825,7 +825,8 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
                             hfst::pmatch::format);
   }
 | QUOTED_LITERAL {
-    $$ = new HfstTransducer($1, $1, hfst::pmatch::format);
+    HfstTokenizer tok;
+    $$ = new HfstTransducer($1, tok, hfst::pmatch::format);
     free($1);
   }
 | BOUNDARY_MARKER {
