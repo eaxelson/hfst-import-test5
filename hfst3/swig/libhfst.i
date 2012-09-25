@@ -17,10 +17,14 @@
 
 namespace std {
 %template(StringVector) vector<string>;
+%template(StringPairVector) vector<pair<string, string > >;
 %template(OneLevelPath) pair<float, vector<string> >;
 %template(OneLevelPathVector) vector<pair<float, vector<string> > >;
 %template(OneLevelPaths) set<pair<float, vector<string> > >;
 %template(StringFloatVector) vector<pair<string, float> >;
+%template(StringPair) pair<string, string>;
+%template(StringPairSet) set<pair<string, string> >;
+%template(StringSet) set<string>;
 }
 
 namespace hfst
@@ -36,22 +40,96 @@ namespace hfst
 enum ImplementationType;
 enum PushType;
 class HfstInputStream;
-class HfstOneLevelPaths;
+typedef HfstOneLevelPaths std::set<pair<float, vector<string> > >;
 class HfstTwoLevelPaths;
 class HfstOutputStream;
 class HfstTransducer;
 class FdOperation;
 class HfstTokenizer;
-class HfstTransducerVector;
-class StringSet;
-class StringPair;
-class StringPairSet;
-class StringVector;
+typedef std::vector<HfstTransducer> HfstTransducerVector;
+typedef std::set<std::string> StringSet;
+typedef std::pair<std::string, std::string> StringPair;
+typedef std::set<std::pair<std::string, std::string> > StringPairSet;
+typedef std::vector<std::string> StringVector;
+typedef std::vector<std::pair<std::string, std::string> > StringPairVector;
 
-std::vector<std::pair <float, std::vector<std::string> > > vectorize(HfstOneLevelPaths * olps);
+typedef std::map<std::string, std::string> HfstSymbolSubstitutions;
+typedef std::map<std::pair<std::string, std::string>, std::pair<std::string, std::string> > HfstSymbolPairSubstitutions;
+
+namespace implementations {
+class HfstBasicTransducer;
+class HfstBasicTransition;
+//typedef HfstBasicTransducer::HfstTransitionGraphAlphabet;
+typedef std::vector<HfstBasicTransition> HfstTransitions;
+
+//typedef std::vector<std::vector<HfstBasicTransition> >::iterator iterator;
+//typedef std::vector<std::vector<HfstBasicTransition> >::const_iterator const_iterator;
+
+typedef unsigned int HfstState;
+
+class HfstBasicTransducer {
+public:
+
+HfstState add_state (void);
+HfstState add_state (HfstState s);
+void add_symbol_to_alphabet (const std::string &symbol);
+void add_symbols_to_alphabet (const hfst::StringPairSet &symbols);
+void add_transition (unsigned int s, const HfstBasicTransition &transition, bool add_symbols_to_alphabet=true);
+//hfst::implementations::iterator begin();
+//hfst::implementations::const_iterator begin() const;
+HfstBasicTransducer & disjunct(const StringPairVector &spv, float weight);
+//iterator end();
+//const_iterator end() const;
+//const HfstBasicTransducer::HfstTransitionGraphAlphabet &get_alphabet () const;
+float get_final_weight (unsigned int s) const;
+HfstState get_max_state () const;
+HfstBasicTransducer &harmonize (HfstBasicTransducer &another);
+HfstBasicTransducer (void);
+HfstBasicTransducer (const HfstBasicTransducer &graph);
+HfstBasicTransducer (const hfst::HfstTransducer &transducer);
+HfstBasicTransducer & insert_freely (const StringPair &symbol_pair, float weight);
+HfstBasicTransducer & insert_freely (const StringPairSet &symbol_pairs, float weight);
+HfstBasicTransducer & insert_freely (const HfstBasicTransducer &graph);
+bool is_final_state (unsigned int s) const;
+HfstBasicTransducer & operator= (const HfstBasicTransducer &graph);
+%rename(assign) operator=(const HfstBasicTransducer &graph);  // to make the function name legal python
+const HfstTransitions & operator[] (unsigned int s) const;
+void prune_alphabet ();
+void remove_symbol_from_alphabet (const std::string &symbol);
+void set_final_weight (unsigned int s, const float &weight);
+HfstBasicTransducer & sort_arcs (void);
+HfstBasicTransducer & substitute (const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true);
+HfstBasicTransducer & substitute (const HfstSymbolSubstitutions &substitutions);
+HfstBasicTransducer & substitute (const HfstSymbolPairSubstitutions &substitutions);
+HfstBasicTransducer & substitute (const StringPair &sp, const StringPairSet &sps);
+HfstBasicTransducer & substitute (const StringPair &old_pair, const StringPair &new_pair);
+HfstBasicTransducer & substitute (bool(*func)(const StringPair &sp, StringPairSet &sps));
+HfstBasicTransducer & substitute (const StringPair &sp, const HfstBasicTransducer &graph);
+void write_in_att_format (std::ostream &os, bool write_weights=true);
+void write_in_att_format (FILE *file, bool write_weights=true);
+void write_in_att_format_number (FILE *file, bool write_weights=true);
+
+static HfstBasicTransducer read_in_att_format (std::istream &is, std::string epsilon_symbol=std::string("@_EPSILON_SYMBOL_@"));
+static HfstBasicTransducer read_in_att_format (FILE *file, std::string epsilon_symbol=std::string("@_EPSILON_SYMBOL_@"));
+};
+
+class HfstBasicTransition {
+public:
+	HfstBasicTransition(unsigned int s, const std::string &input, const std::string &output, float weight);
+	~HfstBasicTransition();
+};
+
+};
+
+
+std::vector<std::pair <float, std::vector<std::string> > > vectorize(hfst_ol::HfstOneLevelPaths * olps);
 std::vector<std::pair <float, std::vector<std::string> > > purge_flags(std::vector<std::pair<float, std::vector<std::string> > > olpv);
 std::vector<std::pair <std::string, float> > detokenize_vector(OneLevelPathVector olpv);
-std::vector<std::pair <std::string, float > > detokenize_paths(HfstOneLevelPaths * olps);
+std::vector<std::pair <std::string, float > > detokenize_paths(hfst_ol::HfstOneLevelPaths * olps);
+
+ImplementationType sfst_type();
+ImplementationType tropical_openfst_type();
+ImplementationType foma_type();
 
 class HfstInputStream{
 public:
@@ -100,12 +178,12 @@ public:
     bool is_cyclic(void) const;
     bool is_lookdown_infinitely_ambiguous(const StringVector &s) const;
     bool is_lookup_infinitely_ambiguous (const StringVector &s) const;
-    HfstOneLevelPaths *	lookdown(const StringVector &s, ssize_t limit=-1) const;
-    HfstOneLevelPaths *	lookdown_fd(StringVector &s, ssize_t limit=-1) const;
-    HfstOneLevelPaths * lookup(const StringVector &s, ssize_t limit=-1) const;
-    HfstOneLevelPaths *	lookup(const std::string &s, ssize_t limit=-1) const;
-    HfstOneLevelPaths *	lookup(const HfstTokenizer &tok, const std::string &s, ssize_t limit=-1) const;
-    HfstOneLevelPaths * lookup_fd(const std::string & s, ssize_t limit = -1) const;
+    hfst::HfstOneLevelPaths *	lookdown(const StringVector &s, ssize_t limit=-1) const;
+    hfst::HfstOneLevelPaths *	lookdown_fd(StringVector &s, ssize_t limit=-1) const;
+    hfst::HfstOneLevelPaths * lookup(const StringVector &s, ssize_t limit=-1) const;
+    hfst::HfstOneLevelPaths *	lookup(const std::string &s, ssize_t limit=-1) const;
+    hfst::HfstOneLevelPaths *	lookup(const HfstTokenizer &tok, const std::string &s, ssize_t limit=-1) const;
+    hfst::HfstOneLevelPaths * lookup_fd(const std::string & s, ssize_t limit = -1) const;
     HfstTransducer & minimize(void);
     HfstTransducer & n_best(unsigned int n);
     HfstTransducer & operator=(const HfstTransducer & another);
@@ -157,6 +235,7 @@ public:
 };
 
 }
+
 
 %pythoncode %{
 def lookup_clean(transducer, string):
