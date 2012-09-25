@@ -201,25 +201,34 @@ SymbolNumber Encoder::find_key(char ** p)
     return s;
 }
 
-bool Transducer::initialize_input(const char * input_str)
+bool Transducer::initialize_input(const char * input)
 {
-    char * c = strdup(input_str);
-    char * c_orig = c;
+    char * input_str = const_cast<char *>(input);
+    char ** input_str_ptr = &input_str;
     int i = 0;
     SymbolNumber k = NO_SYMBOL_NUMBER;
-    for ( char ** Str = &c; **Str != 0; )
-    {
-    k = encoder->find_key(Str);
-    if (k == NO_SYMBOL_NUMBER)
-    {
-        free(c_orig);
-        return false; // tokenization failed
-    }
-    input_tape[i] = k;
-    ++i;
+    while(**input_str_ptr != 0) {
+        char * original_input_loc = *input_str_ptr;
+        k = encoder->find_key(input_str_ptr);
+        if (k == NO_SYMBOL_NUMBER) {
+            // Add what we assume to be an unknown utf-8 symbol to the alphabet
+            *input_str_ptr = original_input_loc;
+            int bytes_to_tokenize = nByte_utf8(**input_str_ptr);
+            if (bytes_to_tokenize == 0) {
+                return false; // tokenization failed
+            }
+            char new_symbol[bytes_to_tokenize + 1];
+            memcpy(new_symbol, *input_str_ptr, bytes_to_tokenize);
+            new_symbol[bytes_to_tokenize] = '\0';
+            (*input_str_ptr) += bytes_to_tokenize;
+            alphabet->add_symbol(new_symbol);
+            encoder->read_input_symbol(
+                new_symbol, alphabet->get_symbol_table().size() - 1);
+        }
+        input_tape[i] = k;
+        ++i;
     }
     input_tape[i] = NO_SYMBOL_NUMBER;
-    free(c_orig);
     return true;
 }
 
