@@ -50,19 +50,19 @@ namespace hfst
 		class Rule
 		{
 			/* cross product of mapping transducers */
-			HfstTransducer mapping;
+			HfstTransducerPairVector mapping;
 			/* context */
 			HfstTransducerPairVector context;
 			/* if there is a context, it needs to have a direction (up, left, down or right) */
 			ReplaceType replType;
 
 		  public:
-			Rule ( const HfstTransducer& ); // mapping
-			Rule ( const HfstTransducer&, const HfstTransducerPairVector&, ReplaceType); // mapping, context
-			Rule ( const HfstTransducerPair& );
-			Rule ( const HfstTransducerPair&, const HfstTransducerPairVector&, ReplaceType );
+		//	Rule ( const HfstTransducer& ); // mapping
+		//	Rule ( const HfstTransducer&, const HfstTransducerPairVector&, ReplaceType); // mapping, context
+			Rule ( const HfstTransducerPairVector& );
+			Rule ( const HfstTransducerPairVector&, const HfstTransducerPairVector&, ReplaceType );
 
-			HfstTransducer get_mapping() const;
+			HfstTransducerPairVector get_mapping() const;
 			HfstTransducerPairVector get_context() const;
 			ReplaceType get_replType() const;
 		};
@@ -78,10 +78,10 @@ namespace hfst
 		  public:
 			// for mark up replace
 
-			MarkUpRule ( const HfstTransducer&, StringPair ); // mapping
-			MarkUpRule ( const HfstTransducer&,  const HfstTransducerPairVector&, ReplaceType, StringPair); // mapping, context
-			MarkUpRule ( const HfstTransducerPair&, StringPair );
-			MarkUpRule ( const HfstTransducerPair&, const HfstTransducerPairVector&, ReplaceType, StringPair );
+		//	MarkUpRule ( const HfstTransducer&, StringPair ); // mapping
+		//	MarkUpRule ( const HfstTransducer&,  const HfstTransducerPairVector&, ReplaceType, StringPair); // mapping, context
+			MarkUpRule ( const HfstTransducerPairVector&, StringPair );
+			MarkUpRule ( const HfstTransducerPairVector&, const HfstTransducerPairVector&, ReplaceType, StringPair );
 			StringPair get_marks() const;
 		};
 
@@ -207,11 +207,13 @@ namespace hfst
 		//---------------------------------
 		//	INTERFACE HELPING FUNCTIONS
 		//---------------------------------
-
-		HfstTransducer create_mapping_for_mark_up_replace( const HfstTransducer &leftMapping,
+		//used by hfst-regexp parser
+		HfstTransducerPair create_mapping_for_mark_up_replace( const HfstTransducerPair &mappingPair,
+														  const HfstTransducerPair &marks );
+		HfstTransducerPairVector create_mapping_for_mark_up_replace( const HfstTransducerPairVector &mappingPairVector,
 					  	  	  	  	  	  	  	  	  	  	  	  const StringPair &marks );
 
-		HfstTransducer create_mapping_for_mark_up_replace( const HfstTransducer &leftMapping,
+		HfstTransducerPairVector create_mapping_for_mark_up_replace( const HfstTransducerPairVector &mappingPairVector,
 			 			  	  	  	  	  	  	  	  	  	  	  	  const HfstTransducerPair &marks );
 		//---------------------------------
 		//	REPLACE FUNCTIONS - INTERFACE
@@ -240,15 +242,21 @@ namespace hfst
 		HfstTransducer replace_leftmost_shortest_match(const std::vector<Rule> &ruleVector );
 		HfstTransducer replace_rightmost_shortest_match( const Rule &rule );
 		HfstTransducer replace_rightmost_shortest_match( const std::vector<Rule> &ruleVector );
+
+
+
 		HfstTransducer mark_up_replace(	const Rule &rule,
 								const StringPair &marks,
 								bool optional);
+
 		HfstTransducer mark_up_replace(const Rule &rule,
 			 	  						const HfstTransducerPair &marks,
 			 	  						bool optional);
 
+/*
 		HfstTransducer mark_up_replace(	const std::vector<MarkUpRule> &markUpRuleVector,
 								bool optional);
+*/
 		// replace up, left, right, down
 		HfstTransducer replace_epenthesis(	const Rule &rule, bool optional);
 		// replace up, left, right, down

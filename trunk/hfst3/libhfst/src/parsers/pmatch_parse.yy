@@ -49,8 +49,8 @@
     
          std::pair<hfst::xeroxRules::ReplaceArrow, std::vector<hfst::xeroxRules::Rule> >* replaceRuleVectorWithArrow;
          std::pair< hfst::xeroxRules::ReplaceArrow, hfst::xeroxRules::Rule>* replaceRuleWithArrow;   
-         std::pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducerVector>* mappingVectorWithArrow;
-         std::pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducer>* mappingWithArrow;
+         std::pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducerPairVector>* mappingVectorWithArrow;
+         std::pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducerPair>* mappingWithArrow;
     
    
          std::pair<hfst::xeroxRules::ReplaceType, hfst::HfstTransducerPairVector>* contextWithMark;
@@ -70,8 +70,8 @@ REGEXP8 REGEXP9 REGEXP10 REGEXP11 REGEXP12 LABEL
 REPLACE REGEXP3
 %type <replaceRuleVectorWithArrow> PARALLEL_RULES
 %type <replaceRuleWithArrow>  RULE
-%type <mappingVectorWithArrow> MAPPING_VECTOR
-%type <mappingWithArrow> MAPPING
+%type <mappingVectorWithArrow> MAPPINGPAIR_VECTOR
+%type <mappingWithArrow> MAPPINGPAIR
 
 %type <contextWithMark> CONTEXTS_WITH_MARK
 %type <transducerPairVector> CONTEXTS_VECTOR
@@ -262,116 +262,116 @@ PARALLEL_RULES: RULE
 }
 ;
 
-RULE: MAPPING_VECTOR
-{
-    // std::cerr << "rule: mapping_vector"<< std::endl;      
-    HfstTransducer allMappingsDisjuncted = disjunctVectorMembers($1->second);
-         
-    Rule rule( allMappingsDisjuncted );;
-    $$ =  new std::pair< ReplaceArrow, Rule> ($1->first, rule);
-    delete $1;
-}
-| MAPPING_VECTOR CONTEXTS_WITH_MARK
-{
+RULE: MAPPINGPAIR_VECTOR
+  {
+     // std::cerr << "rule: mapping_vector"<< std::endl;      
+    // HfstTransducer allMappingsDisjuncted = disjunctVectorMembers($1->second);
+     
+     Rule rule( $1->second );;
+     $$ =  new std::pair< ReplaceArrow, Rule> ($1->first, rule);
+     delete $1;
+  }
+  | MAPPINGPAIR_VECTOR CONTEXTS_WITH_MARK
+  {
     // std::cerr << "rule: mapping_vector contextsWM"<< std::endl;      
-    HfstTransducer allMappingsDisjuncted = disjunctVectorMembers($1->second);
-        
-    Rule rule( allMappingsDisjuncted, $2->second, $2->first );
+ //   HfstTransducer allMappingsDisjuncted = disjunctVectorMembers($1->second);
+    
+    Rule rule( $1->second, $2->second, $2->first );
     $$ =  new std::pair< ReplaceArrow, Rule> ($1->first, rule);
     delete $1, $2;
-}
+  }
+  ;
 ;
       
 // Mappings: ( ie. a -> b , c -> d , ... , g -> d)
-MAPPING_VECTOR: MAPPING_VECTOR COMMA MAPPING
+MAPPINGPAIR_VECTOR: MAPPINGPAIR_VECTOR COMMA MAPPINGPAIR
 {
     // std::cerr << "mapping_vector : mapping_vector comma mapping"<< std::endl;      
     // check if new Arrow is the same as the first one
+
     if ($1->first != $3->first)
     {
         pmatcherror("Replace arrows should be the same. Calculated as if all replacements had the fist arrow.");
         //exit(1);
     }
-    $1->second.push_back($3->second);
-    $$ =  new std::pair< ReplaceArrow, HfstTransducerVector> ($1->first, $1->second);
-    delete $3; 
+
+	$1->second.push_back($3->second);
+    $$ =  new std::pair< ReplaceArrow, HfstTransducerPairVector> ($1->first, $1->second);
+    delete $3;
             
 }
       
-| MAPPING
+| MAPPINGPAIR
 {
     // std::cerr << "mapping_vector : mapping"<< std::endl;      
-    HfstTransducerVector * mappingVector = new HfstTransducerVector();
-    mappingVector->push_back( $1->second );
-    $$ =  new std::pair< ReplaceArrow, HfstTransducerVector> ($1->first, * mappingVector);
-    delete $1; 
+	 HfstTransducerPairVector * mappingPairVector = new HfstTransducerPairVector();
+	 mappingPairVector->push_back( $1->second );
+	 $$ =  new std::pair< ReplaceArrow, HfstTransducerPairVector> ($1->first, * mappingPairVector);
+	 delete $1; 
 }
      
 ;
 
     
-MAPPING: REPLACE REPLACE_ARROW REPLACE
+MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
 {
-    // std::cerr << "mapping : r2 arrow r2"<< std::endl;      
+        // std::cerr << "mapping : r2 arrow r2"<< std::endl;      
   
-    HfstTransducer mapping(*$1);
-    mapping.cross_product(*$3);
-    $$ =  new std::pair< ReplaceArrow, HfstTransducer> ($2, mapping);
+          HfstTransducerPair mappingPair(*$1, *$3);
+          $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
 
-    delete $1, $3;
-}
-| REPLACE REPLACE_ARROW REPLACE MARKUP_MARKER REPLACE
-{
+          delete $1, $3;
+      }
+  	| REPLACE REPLACE_ARROW REPLACE MARKUP_MARKER REPLACE
+      {
       
-    HfstTransducerPair marks(*$3, *$5);
-    HfstTransducer mapping = create_mapping_for_mark_up_replace( *$1, marks );
+          HfstTransducerPair marks(*$3, *$5);
+          HfstTransducerPair tmpMappingPair(*$1, HfstTransducer(hfst::pmatch::format));
+          HfstTransducerPair mappingPair = create_mapping_for_mark_up_replace( tmpMappingPair, marks );
           
-    $$ =  new std::pair< ReplaceArrow, HfstTransducer> ($2, mapping);
-    delete $1, $3, $5;
-}
-| REPLACE REPLACE_ARROW REPLACE MARKUP_MARKER
-{
-      
-    HfstTransducer epsilon(hfst::internal_epsilon, hfst::pmatch::format);
-    HfstTransducerPair marks(*$3, epsilon);
-    HfstTransducer mapping = create_mapping_for_mark_up_replace( *$1, marks );
+          $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
+         delete $1, $3, $5;
+      }
+      | REPLACE REPLACE_ARROW REPLACE MARKUP_MARKER
+      {
+   
+          HfstTransducer epsilon(hfst::internal_epsilon, hfst::pmatch::format);
+          HfstTransducerPair marks(*$3, epsilon);
+          HfstTransducerPair tmpMappingPair(*$1, HfstTransducer(hfst::pmatch::format));
+          HfstTransducerPair mappingPair = create_mapping_for_mark_up_replace( tmpMappingPair, marks );
+                   
+          $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
+         delete $1, $3;
+      }
+      | REPLACE REPLACE_ARROW MARKUP_MARKER REPLACE
+      {
+          HfstTransducer epsilon(hfst::internal_epsilon, hfst::pmatch::format);
+          HfstTransducerPair marks(epsilon, *$4);
+          HfstTransducerPair tmpMappingPair(*$1, HfstTransducer(hfst::pmatch::format));
+          HfstTransducerPair mappingPair = create_mapping_for_mark_up_replace( tmpMappingPair, marks );
           
-         
-                                
-    $$ =  new std::pair< ReplaceArrow, HfstTransducer> ($2, mapping);
-    delete $1, $3;
-}
-| REPLACE REPLACE_ARROW MARKUP_MARKER REPLACE
-{
-    HfstTransducer epsilon(hfst::internal_epsilon, hfst::pmatch::format);
-    HfstTransducerPair marks(epsilon, *$4);
-    HfstTransducer mapping = create_mapping_for_mark_up_replace( *$1, marks );
-          
-    $$ =  new std::pair< ReplaceArrow, HfstTransducer> ($2, mapping);
-    delete $1, $4;
-}
-      
-      
-      
-      
+          $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
+         delete $1, $4;
+      }     
       
 | LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED REPLACE_ARROW REPLACE
-{
-    HfstTransducer epsilon(hfst::internal_epsilon, hfst::pmatch::format);
-    HfstTransducer mappingTr(epsilon);
-    mappingTr.cross_product(*$4);
-          
-    $$ =  new std::pair< ReplaceArrow, HfstTransducer> ($3, mappingTr);
-    delete $4;
-}
-| LEFT_BRACKET_DOTTED REPLACE RIGHT_BRACKET_DOTTED REPLACE_ARROW REPLACE
-{
-    HfstTransducer mappingTr(*$2);
-    mappingTr.cross_product(*$5);
-
-    $$ =  new std::pair< ReplaceArrow, HfstTransducer> ($4, mappingTr);
-    delete $2, $5;
-}
+  {
+      HfstTransducer epsilon(hfst::internal_epsilon, hfst::pmatch::format);
+      //HfstTransducer mappingTr(epsilon);
+      //mappingTr.cross_product(*$4);
+      HfstTransducerPair mappingPair(epsilon, *$4);
+      
+      $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($3, mappingPair);
+      delete $4;
+  }
+  | LEFT_BRACKET_DOTTED REPLACE RIGHT_BRACKET_DOTTED REPLACE_ARROW REPLACE
+  {
+    //  HfstTransducer mappingTr(*$2);
+    //  mappingTr.cross_product(*$5);
+	  HfstTransducerPair mappingPair(*$2, *$5);
+      $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($4, mappingPair);
+      delete $2, $5;
+  }
 ;    
   
    
