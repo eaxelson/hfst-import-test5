@@ -4,13 +4,89 @@ using namespace implementations;
 using namespace hfst::xeroxRules;
 
 
+
+// empty language replacements
+// a -> ~[?*]
+void test10a( ImplementationType type )
+{
+	HfstTokenizer TOK;
+
+	// Mapping
+	HfstTransducerPair mappingPair(HfstTransducer("a", TOK, type), HfstTransducer(type));
+
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
+
+	// Rule
+	Rule rule(mappingPairVector);
+
+	// result
+	HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+	HfstTransducer result1(identityPair);
+	result1.repeat_star().minimize();
+	result1.insert_to_alphabet("a");
+
+
+	HfstTransducer replaceTr(type);
+	replaceTr = replace(rule, false);
+
+	//printf("replaceTr: \n");
+	//replaceTr.write_in_att_format(stdout, 1);
+
+	//printf("result1: \n");
+	//result1.write_in_att_format(stdout, 1);
+
+	assert(replaceTr.compare(result1));
+}
+// empty language replacements
+// ~[?*] -> a
+/* TODO
+void test10b( ImplementationType type )
+{
+	HfstTokenizer TOK;
+
+	// Mapping
+	HfstTransducerPair mappingPair( HfstTransducer(type), HfstTransducer("a", TOK, type));
+
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
+
+	// Rule
+	Rule rule(mappingPairVector);
+
+	// result
+	HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+	HfstTransducer result1(identityPair);
+	result1.repeat_star().minimize();
+	result1.insert_to_alphabet("a");
+
+
+	HfstTransducer replaceTr(type);
+	replaceTr = replace(rule, false);
+
+printf("replaceTr: \n");
+replaceTr.write_in_att_format(stdout, 1);
+
+printf("result1: \n");
+result1.write_in_att_format(stdout, 1);
+
+	assert(replaceTr.compare(result1));
+}
+*/
+
+
 // replace left d <- ca || ca_c  ( input: c a c a c a c )
 void test9a( ImplementationType type )
 {
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+
 	// Mapping
-	HfstTransducer mapping("d@_EPSILON_SYMBOL_@","ca", TOK, type);
+	HfstTransducerPair mappingPair(HfstTransducer("d@_EPSILON_SYMBOL_@", TOK, type), HfstTransducer("ca", TOK, type));
+
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
+
 
 	// Context
 	HfstTransducerPair Context(HfstTransducer("ca", TOK, type), HfstTransducer("c", TOK, type));
@@ -18,7 +94,7 @@ void test9a( ImplementationType type )
 	HfstTransducerPairVector ContextVector;
 	ContextVector.push_back(Context);
 
-	Rule rule(mapping, ContextVector, REPL_UP);
+	Rule rule(mappingPairVector, ContextVector, REPL_UP);
 
 	HfstTransducer input1("cacacac", TOK, type);
 	HfstTransducer result1("cad@_EPSILON_SYMBOL_@d@_EPSILON_SYMBOL_@c", "cacacac", TOK, type);
@@ -42,19 +118,20 @@ void test9b( ImplementationType type )
 {
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+
+
 	// Mapping
-	HfstTransducer mapping1("b","a", TOK, type);
-	HfstTransducer mapping2("a","b", TOK, type);
+	HfstTransducerPair mappingPair1(HfstTransducer("b", TOK, type), HfstTransducer("a", TOK, type));
+	HfstTransducerPairVector mappingPairVector1;
+	mappingPairVector1.push_back(mappingPair1);
 
-	// Context
-	/*
-	HfstTransducerPair Context(HfstTransducer("ca", TOK, type), HfstTransducer("c", TOK, type));
+	HfstTransducerPair mappingPair2(HfstTransducer("a", TOK, type), HfstTransducer("b", TOK, type));
+	HfstTransducerPairVector mappingPairVector2;
+	mappingPairVector2.push_back(mappingPair2);
 
-	HfstTransducerPairVector ContextVector;
-	ContextVector.push_back(Context);
-	 */
-	Rule rule1(mapping1);
-	Rule rule2(mapping2);
+
+	Rule rule1(mappingPairVector1);
+	Rule rule2(mappingPairVector2);
 
 	vector<Rule> ruleVector;
 
@@ -83,7 +160,7 @@ void test9b( ImplementationType type )
 }
 
 
-
+/*
 // ab->x  ab_a
 void test8( ImplementationType type )
 {
@@ -122,6 +199,8 @@ void test8( ImplementationType type )
 	assert(tmp2.compare(result1));
 
 }
+*/
+
 
 // ab->x  ab_a
 void test1( ImplementationType type )
@@ -140,6 +219,9 @@ void test1( ImplementationType type )
 	HfstTransducer rightMapping("x", TOK, type);
 	HfstTransducerPair mappingPair(leftMapping, rightMapping);
 
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
+
 	// Context
 	HfstTransducerPair Context(HfstTransducer("ab", TOK, type), HfstTransducer("a", TOK, type));
 
@@ -156,7 +238,7 @@ void test1( ImplementationType type )
 	result1.disjunct(r1tmp).disjunct(r2tmp).minimize().disjunct(r3tmp).minimize();
 
 
-	Rule rule(mappingPair, ContextVector, REPL_UP);
+	Rule rule(mappingPairVector, ContextVector, REPL_UP);
 
 	// Unconditional  optional replace
 	HfstTransducer replaceTr(type);
@@ -185,6 +267,7 @@ void test1( ImplementationType type )
 
 
 
+
 // a -> x
 void test1b( ImplementationType type )
 {
@@ -196,6 +279,9 @@ void test1b( ImplementationType type )
 	HfstTransducer leftMapping("a", TOK, type);
 	HfstTransducer rightMapping("x", TOK, type);
 	HfstTransducerPair mappingPair(leftMapping, rightMapping);
+
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
 
 	// Context
 	HfstTransducerPair Context(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type));
@@ -224,7 +310,7 @@ void test1b( ImplementationType type )
 	HfstTransducer result2("aaana", "xxxnx", TOK, type);
 
 
-	Rule rule(mappingPair, ContextVector, REPL_UP);
+	Rule rule(mappingPairVector, ContextVector, REPL_UP);
 
 	// Unconditional  optional replace
 	HfstTransducer replaceTr(type);
@@ -291,29 +377,31 @@ void test1c( ImplementationType type )
 	HfstTransducer rightMapping("x", TOK, type);
 	HfstTransducerPair mappingPair(leftMapping, rightMapping);
 
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
 
 	HfstTransducer input1("s", TOK, type);
 
 	HfstTransducer result1("s", "x", TOK, type);
 
 
-	Rule rule(mappingPair);
+	Rule rule(mappingPairVector);
 
 
 	HfstTransducer replaceTr(type);
 	replaceTr = replace(rule, false);
 
 
-printf("test1c replaceTr: \n");
-replaceTr.write_in_att_format(stdout, 1);
+	//printf("test1c replaceTr: \n");
+	//replaceTr.write_in_att_format(stdout, 1);
 
 
 
 	HfstTransducer tmp2(type);
 	tmp2 = input1;
 	tmp2.compose(replaceTr).minimize();
-printf("test1c: \n");
-tmp2.write_in_att_format(stdout, 1);
+	//printf("test1c: \n");
+	//tmp2.write_in_att_format(stdout, 1);
 	assert(tmp2.compare(result1));
 
 }
@@ -343,6 +431,8 @@ void test2a( ImplementationType type )
 	HfstTransducer rightMapping("x", TOK, type);
 
 	HfstTransducerPair mappingPair(leftMapping, rightMapping);
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
 
 	// Context
 	HfstTransducerPair Context(HfstTransducer("a", TOK, type), HfstTransducer("a", TOK, type));
@@ -396,10 +486,10 @@ void test2a( ImplementationType type )
 
 
 
-	Rule ruleUp(mappingPair, ContextVector, REPL_UP);
-	Rule ruleLeft(mappingPair, ContextVector, REPL_LEFT);
-	Rule ruleRight(mappingPair, ContextVector, REPL_RIGHT);
-	Rule ruleDown(mappingPair, ContextVector, REPL_DOWN);
+	Rule ruleUp(mappingPairVector, ContextVector, REPL_UP);
+	Rule ruleLeft(mappingPairVector, ContextVector, REPL_LEFT);
+	Rule ruleRight(mappingPairVector, ContextVector, REPL_RIGHT);
+	Rule ruleDown(mappingPairVector, ContextVector, REPL_DOWN);
 
 
 
@@ -426,8 +516,8 @@ void test2a( ImplementationType type )
 
 	tmp2 = input1;
 	tmp2.compose(replaceTrLeft).minimize();
-//printf("Unconditional optional replace L: \n");
-//tmp2.write_in_att_format(stdout, 1);
+	//printf("Unconditional optional replace L: \n");
+	//tmp2.write_in_att_format(stdout, 1);
 	assert(tmp2.compare(result1));
 
 	tmp2 = input1;
@@ -565,6 +655,8 @@ void test2b( ImplementationType type )
 	HfstTransducer rightMapping("x", TOK, type);
 
 	HfstTransducerPair mappingPair(leftMapping, rightMapping);
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
 
 	HfstTransducer input1("aabbaa", TOK, type);
 
@@ -576,7 +668,7 @@ void test2b( ImplementationType type )
 
 
 
-	Rule ruleUp(mappingPair);
+	Rule ruleUp(mappingPairVector);
 
 
 	HfstTransducer replaceTr(type);
@@ -626,7 +718,7 @@ void test2b( ImplementationType type )
 	HfstTransducerPairVector ContextVector;
 	ContextVector.push_back(Context);
 
-	Rule ruleDown(mappingPair, ContextVector, REPL_DOWN);
+	Rule ruleDown(mappingPairVector, ContextVector, REPL_DOWN);
 
 	// leftmost longest match in context
 	replaceTr = replace_leftmost_longest_match( ruleDown );
@@ -661,6 +753,8 @@ void test2c( ImplementationType type )
 	HfstTransducer rightMapping("x", TOK, type);
 
 	HfstTransducerPair mappingPair(leftMapping, rightMapping);
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
 
 	// Context
 	HfstTransducerPair Context(HfstTransducer("c", TOK, type), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type));
@@ -676,7 +770,7 @@ void test2c( ImplementationType type )
 	HfstTransducer result1("caav", "cx@_EPSILON_SYMBOL_@v", TOK, type);
 
 
-	Rule ruleUp(mappingPair, ContextVector, REPL_UP);
+	Rule ruleUp(mappingPairVector, ContextVector, REPL_UP);
 
 	HfstTransducer replaceTr = replace_leftmost_longest_match(ruleUp);
 
@@ -688,6 +782,7 @@ void test2c( ImplementationType type )
 
 
 }
+
 // test multiple contexts
 // a -> b ||  x _ x ;
 void test3a( ImplementationType type )
@@ -707,6 +802,8 @@ void test3a( ImplementationType type )
 	HfstTransducer rightMapping("b", TOK, type);
 
 	HfstTransducerPair mappingPair(leftMapping, rightMapping);
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
 
 	// Context
 	HfstTransducerPair Context( HfstTransducer("x",TOK, type),  HfstTransducer("x",TOK, type));
@@ -723,7 +820,7 @@ void test3a( ImplementationType type )
 	HfstTransducer r3tmp("xaxax", "xbxbx", TOK, type);
 	result1.disjunct(r1tmp).disjunct(r2tmp).disjunct(r3tmp).minimize();
 
-	Rule ruleUp(mappingPair, ContextVector, REPL_UP);
+	Rule ruleUp(mappingPairVector, ContextVector, REPL_UP);
 
 
 	// Unconditional  optional replace
@@ -758,6 +855,8 @@ void test3b( ImplementationType type )
 	HfstTransducer rightMapping("b", TOK, type);
 
 	HfstTransducerPair mappingPair(leftMapping, rightMapping);
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
 
 	// Context
 	HfstTransducerPair Context( HfstTransducer("x",TOK, type),  HfstTransducer("y",TOK, type));
@@ -777,7 +876,7 @@ void test3b( ImplementationType type )
 	result1.disjunct(r1tmp).disjunct(r2tmp).disjunct(r3tmp).minimize();
 
 
-	Rule ruleUp(mappingPair, ContextVector, REPL_UP);
+	Rule ruleUp(mappingPairVector, ContextVector, REPL_UP);
 
 
 	// Unconditional  optional replace
@@ -814,6 +913,8 @@ void test3c( ImplementationType type )
 
 
 	HfstTransducerPair mappingPair(leftMapping, rightMapping);
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
 
 	// Context
 	HfstTransducerPair Context( HfstTransducer("xx",TOK, type),  HfstTransducer("yy",TOK, type));
@@ -832,7 +933,7 @@ void test3c( ImplementationType type )
 	HfstTransducer r3tmp("axxayyax", "axxxyyxx", TOK, type);
 	result1.disjunct(r1tmp).disjunct(r2tmp).disjunct(r3tmp).minimize();
 
-	Rule ruleUp(mappingPair, ContextVector, REPL_UP);
+	Rule ruleUp(mappingPairVector, ContextVector, REPL_UP);
 
 
 	// Unconditional  optional replace
@@ -866,6 +967,8 @@ void test3d( ImplementationType type )
 	HfstTransducer rightMapping("b", TOK, type);
 
 	HfstTransducerPair mappingPair(leftMapping, rightMapping);
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
 
 	// Context
 	HfstTransducerPair Context( HfstTransducer("@_EPSILON_SYMBOL_@",TOK, type),
@@ -884,7 +987,7 @@ void test3d( ImplementationType type )
 	result1.disjunct(r1tmp).disjunct(r2tmp).disjunct(r3tmp).minimize();
 
 
-	Rule ruleUp(mappingPair, ContextVector, REPL_UP);
+	Rule ruleUp(mappingPairVector, ContextVector, REPL_UP);
 
 
 	// Unconditional  optional replace
@@ -922,6 +1025,8 @@ void test4a( ImplementationType type )
 	HfstTransducer rightMapping("a", TOK, type);
 
 	HfstTransducerPair mappingPair(leftMapping, rightMapping);
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
 
 	// Context
 	HfstTransducerPair Context(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type), HfstTransducer("a", TOK, type));
@@ -944,15 +1049,10 @@ void test4a( ImplementationType type )
 	result4.disjunct(result2).minimize().disjunct(r1Tmp).minimize();
 
 
-
-
-	Rule ruleUp(mappingPair, ContextVector, REPL_UP);
-	Rule ruleLeft(mappingPair, ContextVector, REPL_LEFT);
-	Rule ruleRight(mappingPair, ContextVector, REPL_RIGHT);
-	Rule ruleDown(mappingPair, ContextVector, REPL_DOWN);
-
-
-
+	Rule ruleUp(mappingPairVector, ContextVector, REPL_UP);
+	Rule ruleLeft(mappingPairVector, ContextVector, REPL_LEFT);
+	Rule ruleRight(mappingPairVector, ContextVector, REPL_RIGHT);
+	Rule ruleDown(mappingPairVector, ContextVector, REPL_DOWN);
 
 
 	HfstTransducer replaceTrUp(type);
@@ -1054,6 +1154,8 @@ void test4b( ImplementationType type )
 	HfstTransducer rightMapping("a", TOK, type);
 
 	HfstTransducerPair mappingPair(leftMapping, rightMapping);
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
 
 	// Context
 	HfstTransducerPair Context(HfstTransducer("a", TOK, type), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type) );
@@ -1062,12 +1164,10 @@ void test4b( ImplementationType type )
 	ContextVector.push_back(Context);
 
 
-
-
-	Rule ruleUp(mappingPair, ContextVector, REPL_UP);
-	Rule ruleLeft(mappingPair, ContextVector, REPL_LEFT);
-	Rule ruleRight(mappingPair, ContextVector, REPL_RIGHT);
-	Rule ruleDown(mappingPair, ContextVector, REPL_DOWN);
+	Rule ruleUp(mappingPairVector, ContextVector, REPL_UP);
+	Rule ruleLeft(mappingPairVector, ContextVector, REPL_LEFT);
+	Rule ruleRight(mappingPairVector, ContextVector, REPL_RIGHT);
+	Rule ruleDown(mappingPairVector, ContextVector, REPL_DOWN);
 
 
 	HfstTransducer replaceTrUp(type);
@@ -1170,6 +1270,8 @@ void test4c( ImplementationType type )
 	HfstTransducer rightMapping("x", TOK, type);
 
 	HfstTransducerPair mappingPair(leftMapping, rightMapping);
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
 
 	// Context
 	HfstTransducerPair Context( HfstTransducer("ab",TOK, type),  HfstTransducer("a",TOK, type));
@@ -1194,12 +1296,10 @@ void test4c( ImplementationType type )
 	HfstTransducer result4(r2tmp);
 	result4.disjunct(r3tmp).minimize();
 
-
-
-	Rule ruleUp(mappingPair, ContextVector, REPL_UP);
-	Rule ruleLeft(mappingPair, ContextVector, REPL_LEFT);
-	Rule ruleRight(mappingPair, ContextVector, REPL_RIGHT);
-	Rule ruleDown(mappingPair, ContextVector, REPL_DOWN);
+	Rule ruleUp(mappingPairVector, ContextVector, REPL_UP);
+	Rule ruleLeft(mappingPairVector, ContextVector, REPL_LEFT);
+	Rule ruleRight(mappingPairVector, ContextVector, REPL_RIGHT);
+	Rule ruleDown(mappingPairVector, ContextVector, REPL_DOWN);
 
 
 	HfstTransducer replaceTrUp(type);
@@ -1285,15 +1385,18 @@ void test5( ImplementationType type )
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-	String LeftMarker("@_LM_@");
-	String RightMarker("@_RM_@");
-	TOK.add_multichar_symbol(LeftMarker);
-	TOK.add_multichar_symbol(RightMarker);
-
 	// Mapping
 	HfstTransducer lmtmp("b", TOK, type);
 	HfstTransducer leftMapping("a", TOK, type);
 	leftMapping.disjunct(lmtmp).minimize();
+
+	HfstTransducer empty(type);
+
+	HfstTransducerPair mappingPair(leftMapping, empty);
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
+
+
 
 	StringPair marks("[","]");
 
@@ -1314,13 +1417,13 @@ void test5( ImplementationType type )
 	HfstTransducer replaceTr(type);
 	HfstTransducer tmp2(type);
 
-	Rule ruleUp(leftMapping, ContextVector, REPL_UP);
+	Rule ruleUp(mappingPairVector, ContextVector, REPL_UP);
+
 
 	replaceTr = mark_up_replace(ruleUp, marks, false);
-
 	tmp2 = input1;
 	tmp2.compose(replaceTr).minimize();
-	//printf("Replace leftmost tr2: \n");
+	//printf("test5: \n");
 	//tmp2.write_in_att_format(stdout, 1);
 	assert(tmp2.compare(result1));
 
@@ -1344,6 +1447,8 @@ void test6a( ImplementationType type )
 
 	HfstTransducer rightMapping("p", TOK, type);
 	HfstTransducerPair mappingPair(leftMapping, rightMapping);
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
 
 
 	// Context
@@ -1360,7 +1465,7 @@ void test6a( ImplementationType type )
 
 
 
-	Rule ruleUp(mappingPair, ContextVector, REPL_UP);
+	Rule ruleUp(mappingPairVector, ContextVector, REPL_UP);
 
 	HfstTransducer replaceTr(type);
 	HfstTransducer tmp2(type);
@@ -1404,6 +1509,8 @@ void test6b( ImplementationType type )
 
 	HfstTransducer rightMapping("p", TOK, type);
 	HfstTransducerPair mappingPair(leftMapping, rightMapping);
+	HfstTransducerPairVector mappingPairVector;
+	mappingPairVector.push_back(mappingPair);
 
 
 	// Context
@@ -1419,7 +1526,7 @@ void test6b( ImplementationType type )
 							"pmpppkp", TOK, type);
 
 
-	Rule ruleUp(mappingPair, ContextVector, REPL_UP);
+	Rule ruleUp(mappingPairVector, ContextVector, REPL_UP);
 
 
 	HfstTransducer replaceTr(type);
@@ -1452,18 +1559,15 @@ void test7a( ImplementationType type )
 	HfstTransducer rightMapping2("c", TOK, type);
 	HfstTransducerPair mappingPair2(leftMapping2, rightMapping2);
 
+	HfstTransducerPairVector mappingPairVector1;
+	mappingPairVector1.push_back(mappingPair1);
 
-	HfstTransducer mapping1(mappingPair1.first);
-	mapping1.cross_product(mappingPair1.second);
-
-	HfstTransducer mapping2(mappingPair2.first);
-	mapping2.cross_product(mappingPair2.second);
-
-
+	HfstTransducerPairVector mappingPairVector2;
+	mappingPairVector2.push_back(mappingPair2);
 
 	// without context
-	Rule rule1(mapping1);
-	Rule rule2(mapping2);
+	Rule rule1(mappingPairVector1);
+	Rule rule2(mappingPairVector2);
 
 	vector<Rule> ruleVector;
 
@@ -1514,17 +1618,16 @@ void test7b( ImplementationType type )
 	HfstTransducer rightMapping2("c", TOK, type);
 	HfstTransducerPair mappingPair2(leftMapping2, rightMapping2);
 
+	HfstTransducerPairVector mappingPairVector1;
+	mappingPairVector1.push_back(mappingPair1);
 
-	HfstTransducer mapping1(mappingPair1.first);
-	mapping1.cross_product(mappingPair1.second);
-
-	HfstTransducer mapping2(mappingPair2.first);
-	mapping2.cross_product(mappingPair2.second);
+	HfstTransducerPairVector mappingPairVector2;
+	mappingPairVector2.push_back(mappingPair2);
 
 
 	// without context
-	Rule rule1(mapping1);
-	Rule rule2(mapping2);
+	Rule rule1(mappingPairVector1);
+	Rule rule2(mappingPairVector2);
 
 	vector<Rule> ruleVector;
 
@@ -1578,11 +1681,11 @@ void test7c( ImplementationType type )
 	HfstTransducerPair mappingPair2(leftMapping2, rightMapping2);
 
 
-	HfstTransducer mapping1(mappingPair1.first);
-	mapping1.cross_product(mappingPair1.second);
+	HfstTransducerPairVector mappingPairVector1;
+	mappingPairVector1.push_back(mappingPair1);
 
-	HfstTransducer mapping2(mappingPair2.first);
-	mapping2.cross_product(mappingPair2.second);
+	HfstTransducerPairVector mappingPairVector2;
+	mappingPairVector2.push_back(mappingPair2);
 
 	//printf("mapping1: \n");
 	//mapping1.write_in_att_format(stdout, 1);
@@ -1591,8 +1694,8 @@ void test7c( ImplementationType type )
 	//mapping2.write_in_att_format(stdout, 1);
 
 	// without context
-	Rule rule1(mapping1);
-	Rule rule2(mapping2);
+	Rule rule1(mappingPairVector1);
+	Rule rule2(mappingPairVector2);
 
 	vector<Rule> ruleVector;
 
@@ -1661,8 +1764,8 @@ void test7c( ImplementationType type )
 	ContextVector2.push_back(Context2);
 
 	// without context replace up
-	Rule rule2aUp(mapping1, ContextVector1, REPL_UP);
-	Rule rule2bUp(mapping2, ContextVector2, REPL_UP);
+	Rule rule2aUp(mappingPairVector1, ContextVector1, REPL_UP);
+	Rule rule2bUp(mappingPairVector2, ContextVector2, REPL_UP);
 
 	vector<Rule> ruleVector2;
 	ruleVector2.push_back(rule2aUp);
@@ -1684,13 +1787,10 @@ void test7c( ImplementationType type )
 	assert(tmp2.compare(result4));
 
 
-
-
-
 	// With context replace down
 
-	Rule rule2aDown(mapping1, ContextVector1, REPL_DOWN);
-	Rule rule2bDown(mapping2, ContextVector2, REPL_DOWN);
+	Rule rule2aDown(mappingPairVector1, ContextVector1, REPL_DOWN);
+	Rule rule2bDown(mappingPairVector2, ContextVector2, REPL_DOWN);
 
 	vector<Rule> ruleVector3;
 	ruleVector3.push_back(rule2aDown);
@@ -1731,24 +1831,14 @@ void test7d( ImplementationType type )
 	HfstTransducer rightMapping2("b", TOK, type);
 	HfstTransducerPair mappingPair2(leftMapping2, rightMapping2);
 
+	HfstTransducerPairVector mappingPairVector1;
+	mappingPairVector1.push_back(mappingPair1);
 
-	HfstTransducer mapping1(mappingPair1.first);
-	mapping1.cross_product(mappingPair1.second);
+	HfstTransducerPairVector mappingPairVector2;
+	mappingPairVector2.push_back(mappingPair2);
 
-	HfstTransducer mapping2(mappingPair2.first);
-	mapping2.cross_product(mappingPair2.second);
+	 //   0 .o. [ [. 0 .] -> a \/ _ b a , a b _ ,, [. 0 .] -> b \/ a _ a ] ;
 
-	//printf("mapping1: \n");
-	//mapping1.write_in_att_format(stdout, 1);
-
-	//printf("mapping2: \n");
-	//mapping2.write_in_att_format(stdout, 1);
-
-
-	//
-	/*
-	 *    0 .o. [ [. 0 .] -> a \/ _ b a , a b _ ,, [. 0 .] -> b \/ a _ a ] ;
-	 */
 
 	// Context
 	HfstTransducerPair Context1a(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type), HfstTransducer("ba", TOK, type));
@@ -1766,8 +1856,8 @@ void test7d( ImplementationType type )
 
 
 	// without context
-	Rule rule1(mapping1, ContextVector1, REPL_DOWN);
-	Rule rule2(mapping2, ContextVector2, REPL_DOWN);
+	Rule rule1(mappingPairVector1, ContextVector1, REPL_DOWN);
+	Rule rule2(mappingPairVector2, ContextVector2, REPL_DOWN);
 
 	vector<Rule> ruleVector;
 
@@ -1796,7 +1886,7 @@ void test7d( ImplementationType type )
 	assert(tmp2.compare(input1));
 }
 
-
+/* markup vector
 void test7e( ImplementationType type )
 {
 	HfstTokenizer TOK;
@@ -1806,21 +1896,23 @@ void test7e( ImplementationType type )
 	// Mapping
 
 	HfstTransducer leftMapping1("a", TOK, type);
-
-
 	HfstTransducer leftMapping2("b", TOK, type);
+	HfstTransducer empty(type);
 
+	HfstTransducerPair mappingPair1(leftMapping1, empty);
+	HfstTransducerPairVector mappingPairVector1;
+	mappingPairVector1.push_back(mappingPair1);
+
+	HfstTransducerPair mappingPair2(leftMapping2, empty);
+	HfstTransducerPairVector mappingPairVector2;
+	mappingPairVector2.push_back(mappingPair2);
 
 	StringPair marks1("[","]");
 	StringPair marks2("|","|");
 
-	// without context
-	Rule rule1(leftMapping1);
-	Rule rule2(leftMapping2);
 
-
-	MarkUpRule markUpRule1(leftMapping1, marks1 );
-	MarkUpRule markUpRule2(leftMapping2, marks2 );
+	MarkUpRule markUpRule1(mappingPairVector1, marks1 );
+	MarkUpRule markUpRule2(mappingPairVector2, marks2 );
 
 	vector<MarkUpRule> markUpRuleVector;
 	markUpRuleVector.push_back(markUpRule1);
@@ -1835,18 +1927,15 @@ void test7e( ImplementationType type )
 	HfstTransducer replaceTr(type);
 	HfstTransducer tmp2(type);
 
-
 	replaceTr = mark_up_replace( markUpRuleVector, false);
-
 
 	tmp2 = input1;
 	tmp2.compose(replaceTr).minimize();
 	//printf("7e: \n");
 	//tmp2.write_in_att_format(stdout, 1);
 	assert(tmp2.compare(result1));
-
 }
-
+*/
 
 
 // a -> b , b -> a
@@ -1865,18 +1954,16 @@ void test7f( ImplementationType type )
 	HfstTransducer rightMapping2("a", TOK, type);
 	HfstTransducerPair mappingPair2(leftMapping2, rightMapping2);
 
+	HfstTransducerPairVector mappingPairVector1;
+	mappingPairVector1.push_back(mappingPair1);
 
-	HfstTransducer mapping1(mappingPair1.first);
-	mapping1.cross_product(mappingPair1.second);
-
-	HfstTransducer mapping2(mappingPair2.first);
-	mapping2.cross_product(mappingPair2.second);
-
+	HfstTransducerPairVector mappingPairVector2;
+	mappingPairVector2.push_back(mappingPair2);
 
 
 	// without context
-	Rule rule1(mapping1);
-	Rule rule2(mapping2);
+	Rule rule1(mappingPairVector1);
+	Rule rule2(mappingPairVector2);
 
 	vector<Rule> ruleVector;
 
@@ -1921,17 +2008,17 @@ void test7g( ImplementationType type )
 	HfstTransducerPair mappingPair2(leftMapping2, rightMapping2);
 
 
-	HfstTransducer mapping1(mappingPair1.first);
-	mapping1.cross_product(mappingPair1.second);
+	HfstTransducerPairVector mappingPairVector1;
+	mappingPairVector1.push_back(mappingPair1);
 
-	HfstTransducer mapping2(mappingPair2.first);
-	mapping2.cross_product(mappingPair2.second);
+	HfstTransducerPairVector mappingPairVector2;
+	mappingPairVector2.push_back(mappingPair2);
 
 
 
 	// without context
-	Rule rule1(mapping1);
-	Rule rule2(mapping2);
+	Rule rule1(mappingPairVector1);
+	Rule rule2(mappingPairVector2);
 
 	vector<Rule> ruleVector;
 
