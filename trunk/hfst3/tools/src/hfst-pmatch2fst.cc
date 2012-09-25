@@ -268,8 +268,8 @@ process_stream(HfstOutputStream& outstream)
       }
         for (std::map<std::string, HfstTransducer *>::iterator it = named_transducers.begin();
            it != named_transducers.end(); ++it) {
-          outstream << (*(it->second)).convert(hfst::HFST_OL_TYPE);
-          delete it->second;
+            outstream << (*(it->second)).convert(hfst::HFST_OL_TYPE);
+            delete it->second;
     }
   if (disjunct_expressions)
     {

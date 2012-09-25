@@ -726,6 +726,7 @@ public:
 
     SymbolNumber find_key(char ** p);
 
+    friend class Transducer;
     friend class PmatchContainer;
 };
 
