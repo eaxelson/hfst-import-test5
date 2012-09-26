@@ -3390,6 +3390,13 @@ void HfstTransducer::write_in_att_format_number
 }
 
 void HfstTransducer::write_in_att_format
+(char * buffer, bool print_weights) const
+{
+  hfst::implementations::HfstBasicTransducer net(*this);
+  net.write_in_att_format(buffer, print_weights);
+}
+
+void HfstTransducer::write_in_att_format
 (FILE * ofile, bool print_weights) const
 {
     // Implemented only for internal transducer format.

@@ -4,6 +4,9 @@
 %include "std_vector.i"
 %include "std_pair.i"
 %include "std_map.i"
+%include "std_iostream.i"
+%include "std_ios.i"
+%include "file.i"
 
 %{
 #define SWIG_FILE_WITH_INIT
@@ -13,7 +16,7 @@
 #include "HfstDataTypes.h"
 #include "HfstFlagDiacritics.h"
 #include "hfst_swig_extensions.h"
-    %}
+%}
 
 namespace std {
 %template(StringVector) vector<string>;
@@ -62,8 +65,7 @@ class HfstBasicTransition;
 //typedef HfstBasicTransducer::HfstTransitionGraphAlphabet;
 typedef std::vector<HfstBasicTransition> HfstTransitions;
 
-//typedef std::vector<std::vector<HfstBasicTransition> >::iterator iterator;
-//typedef std::vector<std::vector<HfstBasicTransition> >::const_iterator const_iterator;
+//class HfstBasicTransducerIterator;
 
 typedef unsigned int HfstState;
 
@@ -74,14 +76,12 @@ HfstState add_state (void);
 HfstState add_state (HfstState s);
 void add_symbol_to_alphabet (const std::string &symbol);
 void add_symbols_to_alphabet (const hfst::StringPairSet &symbols);
-void add_transition (unsigned int s, const HfstBasicTransition &transition, bool add_symbols_to_alphabet=true);
-//hfst::implementations::iterator begin();
-//hfst::implementations::const_iterator begin() const;
+void add_transition (HfstState s, const HfstBasicTransition &transition, bool add_symbols_to_alphabet=true);
+//HfstBasicTransducerIterator begin();
 HfstBasicTransducer & disjunct(const StringPairVector &spv, float weight);
-//iterator end();
-//const_iterator end() const;
+//HfstBasicTransducerIterator end();
 //const HfstBasicTransducer::HfstTransitionGraphAlphabet &get_alphabet () const;
-float get_final_weight (unsigned int s) const;
+float get_final_weight (HfstState s) const;
 HfstState get_max_state () const;
 HfstBasicTransducer &harmonize (HfstBasicTransducer &another);
 HfstBasicTransducer (void);
@@ -90,13 +90,13 @@ HfstBasicTransducer (const hfst::HfstTransducer &transducer);
 HfstBasicTransducer & insert_freely (const StringPair &symbol_pair, float weight);
 HfstBasicTransducer & insert_freely (const StringPairSet &symbol_pairs, float weight);
 HfstBasicTransducer & insert_freely (const HfstBasicTransducer &graph);
-bool is_final_state (unsigned int s) const;
+bool is_final_state (HfstState s) const;
 HfstBasicTransducer & operator= (const HfstBasicTransducer &graph);
 %rename(assign) operator=(const HfstBasicTransducer &graph);  // to make the function name legal python
-const HfstTransitions & operator[] (unsigned int s) const;
+const HfstTransitions & operator[] (HfstState s) const;
 void prune_alphabet ();
 void remove_symbol_from_alphabet (const std::string &symbol);
-void set_final_weight (unsigned int s, const float &weight);
+void set_final_weight (HfstState s, const float &weight);
 HfstBasicTransducer & sort_arcs (void);
 HfstBasicTransducer & substitute (const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true);
 HfstBasicTransducer & substitute (const HfstSymbolSubstitutions &substitutions);
@@ -115,12 +115,11 @@ static HfstBasicTransducer read_in_att_format (FILE *file, std::string epsilon_s
 
 class HfstBasicTransition {
 public:
-	HfstBasicTransition(unsigned int s, const std::string &input, const std::string &output, float weight);
+	HfstBasicTransition(HfstState s, const std::string &input, const std::string &output, float weight);
 	~HfstBasicTransition();
 };
 
 };
-
 
 std::vector<std::pair <float, std::vector<std::string> > > vectorize(hfst_ol::HfstOneLevelPaths * olps);
 std::vector<std::pair <float, std::vector<std::string> > > purge_flags(std::vector<std::pair<float, std::vector<std::string> > > olpv);
@@ -130,6 +129,7 @@ std::vector<std::pair <std::string, float > > detokenize_paths(hfst_ol::HfstOneL
 ImplementationType sfst_type();
 ImplementationType tropical_openfst_type();
 ImplementationType foma_type();
+
 
 class HfstInputStream{
 public:
@@ -212,10 +212,19 @@ public:
     HfstTransducer & transform_weights(float(*func)(float));
     void write_in_att_format(const std::string &filename, bool write_weights=true) const;
     void write_in_att_format(FILE *ofile, bool write_weights=true) const;
+    void write_in_att_format(char * buffer, bool write_weights=true) const;
     virtual ~HfstTransducer(void);
     static HfstTransducer * read_lexc(const std::string &filename, ImplementationType type);
     static HfstTransducer universal_pair(ImplementationType type);
-    
+
+    %extend {
+    char *__str__() {
+    	 static char tmp[1024]; 
+    	 $self->write_in_att_format(tmp);
+	 return tmp;    
+    }
+    }
+
 };
 
 class HfstOutputStream{
