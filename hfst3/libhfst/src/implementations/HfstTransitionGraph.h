@@ -715,6 +715,60 @@ namespace hfst {
             }          
         }
 
+        void write_in_att_format(char * ptr, bool write_weights=true) 
+        {
+      unsigned int source_state=0;
+      int cwt = 0; // characters written in total
+      int cw = 0; // characters written in latest call to sprintf
+          for (iterator it = begin(); it != end(); it++)
+            {
+              for (typename HfstTransitions::iterator tr_it
+                     = it->begin();
+                   tr_it != it->end(); tr_it++)
+                {
+                  C data = tr_it->get_transition_data();
+                   
+                  cw = sprintf(ptr + cwt, "%i\t%i\t%s\t%s",
+                          source_state,
+                          tr_it->get_target_state(),
+                  // replace all spaces and epsilons
+              replace_all
+              (replace_all
+               (replace_all(data.get_input_symbol(), 
+                    " ", "@_SPACE_@"),
+                "@_EPSILON_SYMBOL_@", "@0@"),
+               "\t", "@_TAB_@").c_str(),
+              replace_all
+              (replace_all
+               (replace_all(data.get_output_symbol(),
+                    " ", "@_SPACE_@"),
+                "@_EPSILON_SYMBOL_@", "@0@"),
+               "\t", "@_TAB_@").c_str());
+		  cwt = cwt + cw;
+
+                  if (write_weights)
+                    cw = sprintf(ptr + cwt, "\t%f",
+                            data.get_weight());
+		  cwt = cwt + cw;
+                  cw = sprintf(ptr + cwt, "\n");
+		  cwt = cwt + cw;
+                }
+              if (is_final_state(source_state))
+                {
+                  cw = sprintf(ptr + cwt, "%i", source_state);
+		  cwt = cwt + cw;
+                  if (write_weights)
+                    cw = sprintf(ptr + cwt, "\t%f", 
+                            get_final_weight(source_state));
+		  cwt = cwt + cw;
+                  cw = sprintf(ptr + cwt, "\n");
+		  cwt = cwt + cw;
+                }
+          source_state++;
+            }          
+        }
+
+
         /** @brief Write the graph in AT&T format to FILE \a file using numbers
 	    instead of symbol names.
             \a write_weights defines whether weights are printed. */

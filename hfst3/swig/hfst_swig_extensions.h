@@ -63,4 +63,4 @@ StringFloatVector detokenize_paths(HfstOneLevelPaths * holps)
     return detokenize_vector(vectorize(holps));
 }
 
-}
+  }
