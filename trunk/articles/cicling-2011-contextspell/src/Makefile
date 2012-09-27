@@ -1,5 +1,5 @@
 CXXFLAGS=-Wall -Wextra -Wfatal-errors -O3
-LDFLAGS=-lhfst
+LDLIBS=-lhfst
 TARGETS=context_speller
 
 all:$(TARGETS)
