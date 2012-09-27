@@ -3545,6 +3545,11 @@ HfstTransducer HfstTransducer::identity_pair( ImplementationType type )
 	return Retval;
 }
 
+HfstTransducer &HfstTransducer::assign(const HfstTransducer &another)
+{
+  return this->operator=(another);
+}
+
 HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 {
     // Check for self-assignment.
@@ -3727,6 +3732,11 @@ HfstTransducer * HfstTransducer::read_lexc(const std::string &filename,
       HFST_THROW(TransducerHasWrongTypeException);
     }
   return retval;
+}
+
+std::ostream & redirect(std::ostream &out, const HfstTransducer & t)
+{
+  return operator<<(out, t);
 }
 
 std::ostream & operator<<

@@ -611,6 +611,7 @@ in \a ifile.
         \a another. */
     HfstTransducer &operator=(const HfstTransducer &another);
 
+    HfstTransducer &assign(const HfstTransducer &another);
 
     // ------------------------------------------------------------
     // ----------- Properties, comparison, conversion -------------
@@ -1506,6 +1507,7 @@ transducer.transform_weights(&func);
     // *** Friends **** //
 
     friend std::ostream& operator<<(std::ostream &out, const HfstTransducer &t);
+    friend std::ostream& redirect(std::ostream &out, const HfstTransducer &t);
     friend class HfstInputStream;
     friend class HfstOutputStream;
     friend class hfst::implementations::HfstTransitionGraph<class C>;
@@ -1520,6 +1522,8 @@ transducer.transform_weights(&func);
       #hfst::HfstTransducer::write_in_att_format(FILE*, bool) const 
       with ostreams. Weights are written if the type of \a t is weighted. */
   std::ostream &operator<<(std::ostream &out,const HfstTransducer &t);
+
+  std::ostream &redirect(std::ostream &out,const HfstTransducer &t);
 
   /** \brief A namespace for functions that create two-level, replace, 
       restriction and coercion rule transducers. */

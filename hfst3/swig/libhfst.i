@@ -28,6 +28,7 @@ namespace std {
 %template(StringPair) pair<string, string>;
 %template(StringPairSet) set<pair<string, string> >;
 %template(StringSet) set<string>;
+%template(HfstTransitions) vector<hfst::implementations::HfstBasicTransition>;
 }
 
 namespace hfst
@@ -63,14 +64,14 @@ namespace implementations {
 class HfstBasicTransducer;
 class HfstBasicTransition;
 //typedef HfstBasicTransducer::HfstTransitionGraphAlphabet;
-typedef std::vector<HfstBasicTransition> HfstTransitions;
-
 //class HfstBasicTransducerIterator;
 
 typedef unsigned int HfstState;
 
 class HfstBasicTransducer {
 public:
+
+typedef std::vector<HfstBasicTransition> HfstTransitions;
 
 HfstState add_state (void);
 HfstState add_state (HfstState s);
@@ -91,9 +92,8 @@ HfstBasicTransducer & insert_freely (const StringPair &symbol_pair, float weight
 HfstBasicTransducer & insert_freely (const StringPairSet &symbol_pairs, float weight);
 HfstBasicTransducer & insert_freely (const HfstBasicTransducer &graph);
 bool is_final_state (HfstState s) const;
-HfstBasicTransducer & operator= (const HfstBasicTransducer &graph);
-%rename(assign) operator=(const HfstBasicTransducer &graph);  // to make the function name legal python
-const HfstTransitions & operator[] (HfstState s) const;
+HfstBasicTransducer & assign (const HfstBasicTransducer &graph);
+const HfstTransitions & at (HfstState s) const;
 void prune_alphabet ();
 void remove_symbol_from_alphabet (const std::string &symbol);
 void set_final_weight (HfstState s, const float &weight);
@@ -111,15 +111,41 @@ void write_in_att_format_number (FILE *file, bool write_weights=true);
 
 static HfstBasicTransducer read_in_att_format (std::istream &is, std::string epsilon_symbol=std::string("@_EPSILON_SYMBOL_@"));
 static HfstBasicTransducer read_in_att_format (FILE *file, std::string epsilon_symbol=std::string("@_EPSILON_SYMBOL_@"));
+
+    %extend {
+    char *__str__() {
+    	 static char tmp[1024]; 
+    	 $self->write_in_att_format(tmp);
+	 return tmp;    
+    }
+    };
+
 };
 
 class HfstBasicTransition {
 public:
 	HfstBasicTransition(HfstState s, const std::string &input, const std::string &output, float weight);
 	~HfstBasicTransition();
-};
+	std::string get_input_symbol() const;
+	std::string get_output_symbol() const;
+	HfstState get_target_state() const;
+	float get_weight() const;
+	
+    %extend {
+    char *__str__() {
+    	 static char tmp[1024];
+    	 sprintf(tmp, "%s\t%s\t%i\t%f\n", 
+	 $self->get_input_symbol().c_str(), 
+	 $self->get_output_symbol().c_str(), 
+	 $self->get_target_state(), 
+	 $self->get_weight());
+	 return tmp;    
+    }
+    };
 
 };
+
+}
 
 std::vector<std::pair <float, std::vector<std::string> > > vectorize(hfst_ol::HfstOneLevelPaths * olps);
 std::vector<std::pair <float, std::vector<std::string> > > purge_flags(std::vector<std::pair<float, std::vector<std::string> > > olpv);
@@ -129,6 +155,7 @@ std::vector<std::pair <std::string, float > > detokenize_paths(hfst_ol::HfstOneL
 ImplementationType sfst_type();
 ImplementationType tropical_openfst_type();
 ImplementationType foma_type();
+
 
 
 class HfstInputStream{
@@ -186,8 +213,7 @@ public:
     hfst::HfstOneLevelPaths * lookup_fd(const std::string & s, ssize_t limit = -1) const;
     HfstTransducer & minimize(void);
     HfstTransducer & n_best(unsigned int n);
-    HfstTransducer & operator=(const HfstTransducer & another);
-    %rename(assign) operator=(const HfstTransducer &another); // to make the function name legal python
+    HfstTransducer & assign (const HfstTransducer & another);
     HfstTransducer & optionalize(void);
     HfstTransducer & output_project(void);
     HfstTransducer & priority_union (const HfstTransducer &another);
@@ -223,7 +249,7 @@ public:
     	 $self->write_in_att_format(tmp);
 	 return tmp;    
     }
-    }
+    };
 
 };
 
@@ -232,8 +258,7 @@ class HfstOutputStream{
 		     bool hfst_format=true);
     HfstOutputStream(ImplementationType type, bool hfst_format=true);
     void close(void);
-    HfstOutputStream & operator<<(HfstTransducer & transducer);
-    %rename(redirect) operator<<(HfstTransducer & transducer);
+    HfstOutputStream & redirect (HfstTransducer & transducer);
     ~HfstOutputStream(void);
 };
 

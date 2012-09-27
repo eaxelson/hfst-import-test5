@@ -185,6 +185,11 @@ namespace hfst {
         return *this;
       }
 
+    HfstTransitionGraph &assign(const HfstTransitionGraph &graph)
+      {
+	return this->operator=(graph);
+      }
+
     /** @brief Create a deep copy of HfstTransitionGraph \a graph. */
     HfstTransitionGraph(const HfstTransitionGraph &graph) {
       state_vector = graph.state_vector;
@@ -537,6 +542,10 @@ namespace hfst {
           return state_vector[s];
         }        
 
+	const HfstTransitions & at(HfstState s) const
+	{
+	  return this->operator[](s);
+	}
 
     // --------------------------------------------------
     // -----   Reading and writing in AT&T format   -----
