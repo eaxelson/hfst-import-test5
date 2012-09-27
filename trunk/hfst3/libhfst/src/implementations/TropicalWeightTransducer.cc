@@ -1574,6 +1574,7 @@ namespace hfst { namespace implementations
   {
     StdVectorFst * eps = create_epsilon_transducer();
     eps->SetInputSymbols(t->InputSymbols());
+    eps->SetOutputSymbols(t->OutputSymbols());
     Union(eps,*t);
     return eps;
   }
