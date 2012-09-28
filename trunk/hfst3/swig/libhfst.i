@@ -7,6 +7,7 @@
 %include "std_iostream.i"
 %include "std_ios.i"
 %include "file.i"
+%include "exception.i"
 
 %{
 #define SWIG_FILE_WITH_INIT
@@ -16,6 +17,7 @@
 #include "HfstDataTypes.h"
 #include "HfstFlagDiacritics.h"
 #include "hfst_swig_extensions.h"
+#include "HfstExceptionDefs.h"
 %}
 
 namespace std {
@@ -29,7 +31,21 @@ namespace std {
 %template(StringPairSet) set<pair<string, string> >;
 %template(StringSet) set<string>;
 %template(HfstTransitions) vector<hfst::implementations::HfstBasicTransition>;
+%template(foo) vector<unsigned int>;
 }
+
+class HfstException {
+public:
+HfstException(const std::string&, const std::string&, size_t);
+    %extend {
+    char *__str__() {
+      std::string msg = $self->operator()();
+      return strdup(msg.c_str());
+    }
+    }
+};
+
+class EndOfStreamException: public HfstException {};
 
 namespace hfst
 {
@@ -63,8 +79,6 @@ typedef std::map<std::pair<std::string, std::string>, std::pair<std::string, std
 namespace implementations {
 class HfstBasicTransducer;
 class HfstBasicTransition;
-//typedef HfstBasicTransducer::HfstTransitionGraphAlphabet;
-//class HfstBasicTransducerIterator;
 
 typedef unsigned int HfstState;
 
@@ -75,13 +89,12 @@ typedef std::vector<HfstBasicTransition> HfstTransitions;
 
 HfstState add_state (void);
 HfstState add_state (HfstState s);
+std::vector<unsigned int> states() const;
 void add_symbol_to_alphabet (const std::string &symbol);
 void add_symbols_to_alphabet (const hfst::StringPairSet &symbols);
 void add_transition (HfstState s, const HfstBasicTransition &transition, bool add_symbols_to_alphabet=true);
-//HfstBasicTransducerIterator begin();
 HfstBasicTransducer & disjunct(const StringPairVector &spv, float weight);
-//HfstBasicTransducerIterator end();
-//const HfstBasicTransducer::HfstTransitionGraphAlphabet &get_alphabet () const;
+const StringSet &get_alphabet () const;
 float get_final_weight (HfstState s) const;
 HfstState get_max_state () const;
 HfstBasicTransducer &harmonize (HfstBasicTransducer &another);
@@ -156,8 +169,6 @@ ImplementationType sfst_type();
 ImplementationType tropical_openfst_type();
 ImplementationType foma_type();
 
-
-
 class HfstInputStream{
 public:
     HfstInputStream(const std::string & filename);
@@ -173,7 +184,7 @@ class HfstTransducer {
 public:
     // First all the constructors
     HfstTransducer();
-    HfstTransducer(HfstInputStream & in);
+    HfstTransducer(HfstInputStream & in) throw (EndOfStreamException);
     HfstTransducer(const HfstTransducer &another);
     HfstTransducer(const std::string &input_utf8_str, const std::string &output_utf8_str, const HfstTokenizer &multichar_symbol_tokenizer, ImplementationType type);
     HfstTransducer(const hfst::implementations::HfstBasicTransducer &t, ImplementationType type);
@@ -244,6 +255,7 @@ public:
     static HfstTransducer universal_pair(ImplementationType type);
 
     %extend {
+
     char *__str__() {
     	 static char tmp[1024]; 
     	 $self->write_in_att_format(tmp);
