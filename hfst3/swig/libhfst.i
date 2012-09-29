@@ -206,6 +206,15 @@ public:
     ~HfstInputStream(void);
 };
 
+class HfstOutputStream{
+public:
+    HfstOutputStream(const std::string & filename, ImplementationType type, bool hfst_format=true);
+    HfstOutputStream(ImplementationType type, bool hfst_format=true);
+    void close(void);
+    HfstOutputStream & redirect (HfstTransducer & transducer);
+    ~HfstOutputStream(void);
+};
+
 class HfstTransducer {
 public:
     // First all the constructors
@@ -291,14 +300,6 @@ public:
 
 };
 
-class HfstOutputStream{
-    HfstOutputStream(const std::string & filename, ImplementationType type,
-		     bool hfst_format=true);
-    HfstOutputStream(ImplementationType type, bool hfst_format=true);
-    void close(void);
-    HfstOutputStream & redirect (HfstTransducer & transducer);
-    ~HfstOutputStream(void);
-};
 
 class FdOperation{
 public:
