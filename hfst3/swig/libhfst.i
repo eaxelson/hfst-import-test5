@@ -226,7 +226,7 @@ public:
     HfstTransducer(ImplementationType type);
     HfstTransducer(const std::string &symbol, ImplementationType type);
     HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type);
-    HfstTransducer(FILE *ifile, ImplementationType type, const std::string &epsilon_symbol);
+    HfstTransducer(FILE *ifile, ImplementationType type, const std::string &epsilon_symbol) throw (EndOfStreamException);
     
     // Then everything else, in the (alphabetic) order in the API manual
     bool compare(const HfstTransducer &another) const;
