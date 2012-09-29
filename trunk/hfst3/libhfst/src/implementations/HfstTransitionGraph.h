@@ -845,6 +845,17 @@ namespace hfst {
            std::string epsilon_symbol=
            std::string("@_EPSILON_SYMBOL_@")) {
 
+	  if (file == NULL) {
+	    if (is.eof()) {
+	      HFST_THROW(EndOfStreamException);
+	    }
+	  }
+	  else {
+	    if (feof(file)) {
+	      HFST_THROW(EndOfStreamException);
+	    }
+	  }
+
           HfstTransitionGraph retval;
           char line [255];
           while(true) {
