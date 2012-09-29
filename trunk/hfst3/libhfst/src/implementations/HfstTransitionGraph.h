@@ -105,7 +105,7 @@ namespace hfst {
 @see #HfstBasicTransducer HfstBasicTransition */
     template <class C> class HfstTransitionGraph 
       {
-	
+
     // --- Datatypes and variables ---
 
       public:
@@ -160,6 +160,13 @@ namespace hfst {
             The value pointed by the iterator is of type HfstTransitions. */
         typedef typename HfstStates::const_iterator const_iterator;
 
+	/** @brief The states of the graph. */
+	std::vector<HfstState> states() const {
+	  std::vector<HfstState> retval(this->get_max_state()+1, 0);
+	  for (unsigned int i=0; i<(this->get_max_state()+1); i++)
+	    retval[i] = i;
+	  return retval;
+	}
 
     // --------------------------------------------------------
     // --- Construction, assignment, copying and conversion ---
@@ -167,7 +174,7 @@ namespace hfst {
 
         /** @brief Create a graph with one initial state that has state number
             zero and is not a final state, i.e. create an empty graph. */
-        HfstTransitionGraph(void) {
+      HfstTransitionGraph(void) {
           initialize_alphabet(alphabet);
       HfstTransitions tr;
           state_vector.push_back(tr);
@@ -200,7 +207,7 @@ namespace hfst {
     
     /** @brief Create an HfstTransitionGraph equivalent to HfstTransducer 
 	\a transducer. FIXME: move to a separate file */
-    HfstTransitionGraph(const hfst::HfstTransducer &transducer) {
+      HfstTransitionGraph(const hfst::HfstTransducer &transducer) {
       HfstTransitionGraph<HfstTropicalTransducerTransitionData>
 	*fsm = ConversionFunctions::
 	hfst_transducer_to_hfst_basic_transducer(transducer);
@@ -541,8 +548,14 @@ namespace hfst {
         HFST_THROW(StateIndexOutOfBoundsException); }
           return state_vector[s];
         }        
+	
+	/** @brief Alternative name for operator[].
 
-	const HfstTransitions & at(HfstState s) const
+	    Python interface uses this function as '[]' is not a legal name.
+
+	    @see operator[]
+	 */
+	const HfstTransitions & transitions(HfstState s) const
 	{
 	  return this->operator[](s);
 	}

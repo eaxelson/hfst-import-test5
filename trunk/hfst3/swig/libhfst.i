@@ -45,7 +45,33 @@ HfstException(const std::string&, const std::string&, size_t);
     }
 };
 
+class HfstTransducerTypeMismatchException: public HfstException {};
+class ImplementationTypeNotAvailableException: public HfstException {};
+class FunctionNotImplementedException: public HfstException {};
+class StreamNotReadableException: public HfstException {};
+class StreamCannotBeWrittenException: public HfstException {};
+class StreamIsClosedException: public HfstException {};
 class EndOfStreamException: public HfstException {};
+class TransducerIsCyclicException: public HfstException {};
+class NotTransducerStreamException: public HfstException {};
+class NotValidAttFormatException: public HfstException {};
+class NotValidLexcFormatException: public HfstException {};
+class StateIsNotFinalException: public HfstException {};
+class ContextTransducersAreNotAutomataException: public HfstException {};
+class TransducersAreNotAutomataException: public HfstException {};
+class StateIndexOutOfBoundsException: public HfstException {};
+class TransducerHeaderException: public HfstException {};
+class MissingOpenFstInputSymbolTableException: public HfstException {};
+class TransducerTypeMismatchException: public HfstException {};
+class EmptySetOfContextsException: public HfstException {};
+class SpecifiedTypeRequiredException: public HfstException {};
+class HfstFatalException: public HfstException {};
+class TransducerHasWrongTypeException: public HfstException {};
+class IncorrectUtf8CodingException: public HfstException {};
+class EmptyStringException: public HfstException {};
+class SymbolNotFoundException: public HfstException {};
+class MetadataException: public HfstException {};
+
 
 namespace hfst
 {
@@ -106,7 +132,7 @@ HfstBasicTransducer & insert_freely (const StringPairSet &symbol_pairs, float we
 HfstBasicTransducer & insert_freely (const HfstBasicTransducer &graph);
 bool is_final_state (HfstState s) const;
 HfstBasicTransducer & assign (const HfstBasicTransducer &graph);
-const HfstTransitions & at (HfstState s) const;
+const HfstTransitions & transitions (HfstState s) const;
 void prune_alphabet ();
 void remove_symbol_from_alphabet (const std::string &symbol);
 void set_final_weight (HfstState s, const float &weight);
