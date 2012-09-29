@@ -122,8 +122,7 @@ For more information on HFST transducer structure, see
 
         If the file exists, it is overwritten. 
     */
-    HfstOutputStream(const std::string &filename, ImplementationType type, 
-                     bool hfst_format=true);
+    HfstOutputStream(const std::string &filename, ImplementationType type, bool hfst_format=true);
 
     /** \brief Destructor. */
     ~HfstOutputStream(void);  
@@ -137,6 +136,11 @@ For more information on HFST transducer structure, see
         @throws TransducerTypeMismatchException
     */
     HfstOutputStream &operator<< (HfstTransducer &transducer);
+
+    /** @brief An alias for operator<<. 
+
+     @see operator<< */
+    HfstOutputStream& redirect (HfstTransducer &transducer);
 
     /** \brief Close the stream. 
 

@@ -295,6 +295,11 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
       }
   }
 
+  HfstOutputStream &HfstOutputStream::redirect (HfstTransducer &transducer)
+  {
+    return operator<<(transducer);
+  }
+
   HfstOutputStream &HfstOutputStream::operator<< (HfstTransducer &transducer)
   {
     if (type != transducer.type)

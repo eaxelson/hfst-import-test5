@@ -14,7 +14,7 @@ libhfst_module = Extension('_libhfst',
                            language = "c++",
                            sources = ["libhfst.i"],
                            swig_opts = ["-c++",
-                                        "-I" + absolute_libhfst_src_path],
+                                        "-I" + absolute_libhfst_src_path, "-Wall"],
                            include_dirs = [absolute_libhfst_src_path],
                            library_dirs = [absolute_libhfst_src_path + "/.libs"],
                            libraries = ["hfst"]
