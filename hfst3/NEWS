@@ -5,6 +5,16 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.3.14
+----------------------------
+
+* Bug fixes in tools pmatch2fst, strings2fst, substitute and guessify
+
+* Bug fixes in replace rules
+
+* More functionalities added to the Python interface
+
+
 Noteworthy changes in 3.3.13
 ----------------------------
 
@@ -318,3 +328,5 @@ Noteworthy changes in release 2.1
 ---------------------------------
 
 * hfst-twolc and hfst-compose-intersect understand # like xerox originals
+
+

@@ -1,3 +1,679 @@
+2012-09-04 14:04  eaxelson
+
+	* libhfst/src/parsers/LexcCompiler.cc,
+	  test/tools/fsmbook-examples/EinsteinsPuzzle/test.sh,
+	  test/tools/hfst-check-version.sh,
+	  test/tools/shuffle-functionality.sh, tools/src/hfst-compare.cc,
+	  tools/src/hfst-duplicate.cc,
+	  tools/src/hfst-pair-test-transducers.h,
+	  tools/src/hfst-strings2fst.cc, tools/src/hfst-twolc/Makefile.am,
+	  tools/src/hfst-twolc/src/Makefile.am,
+	  tools/src/hfst-twolc/src/common_globals.h,
+	  tools/src/hfst-twolc/src/htwolcpre1.yy,
+	  tools/src/hfst-twolc/src/htwolcpre2.yy,
+	  tools/src/hfst-twolc/src/htwolcpre3.yy,
+	  tools/src/hfst-twolc/test/test,
+	  tools/src/parsers/XfstCompiler.cc: Merged changes from old
+	  repository.
+
+2012-09-04 13:43  hardwick
+
+	* libhfst/src/parsers/Makefile.am: Undo conditional compilation of
+	  pmatch compiling stuff
+
+2012-09-04 12:08  mpsilfve
+
+	* tools/src/hfst-tagger/src/use_model_src/SequenceModelComponent.cc,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceModelComponent.h,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceModelComponentPair.cc,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceModelComponentPair.h,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceTagger.cc: Limit
+	  memory consumption a bit by clearing SequenceModelComponentPair
+	  state tables between tagging sentences.
+
+2012-09-04 12:06  hardwick
+
+	* libhfst/src/parsers/Makefile.am: Make pmatch parsing code
+	  conditional on WANT_PMATCH2FST
+
+2012-09-04 12:03  mpsilfve
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.h: Changed
+	  sizeof(input_symbol) and so on to sizeof(SymbolNumber) since
+	  sizeof can only be applied to static data members according to
+	  standard (though not all versions of gcc).
+
+2012-09-04 11:51  mpsilfve
+
+	* tools/src/hfst-tagger/src/build_model_src/WeightedStringVectorCollection.cc:
+	  Changed WeightedStringVectorCollection test so that it takes into
+	  account the model penalty weight line.
+
+2012-09-04 10:04  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc: Fixed
+	  incorrect loop condition in previous commit to this file
+
+2012-09-04 08:16  mpsilfve
+
+	* tools/src/hfst-guess.cc: Added newline between results for
+	  different words.
+
+2012-09-04 08:09  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc:
+	  Recommit fix to ol -> basic conversion bug (hopefully)
+
+2012-08-31 21:52  mie
+
+	* libhfst/src/parsers/lexc-utils.cc: missing part of %0 handling
+
+2012-08-29 13:55  eaxelson
+
+	* test/libhfst/Makefile.am, tools/src/hfst-twolc/src/Makefile.am:
+	  Option --enable-windows is passed to Makefiles.
+
+2012-08-29 08:16  eaxelson
+
+	* tools/src/hfst-twolc/Makefile.am: hfst-twolc test is currently
+	  skipped on Windows. hfst-twolc is a bash script that will be
+	  replaced by a batch file on Windows.
+
+2012-08-28 10:13  mpsilfve
+
+	* tools/src/hfst-tagger/src/hfst-open-input-file-for-tagger.cc,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceModelComponent.cc:
+	  Fixed multiple defintions of SequenceModelComponent::START_STATE
+	  in make check
+
+2012-08-28 07:47  hardwick
+
+	* tools/src: Ignore binary
+
+2012-08-28 07:28  hardwick
+
+	* libhfst/src/parsers/PmatchCompiler.cc: Comment out xre-specific
+	  tests for the time being
+
+2012-08-28 06:41  hardwick
+
+	* tools/src/hfst-pmatch.h: Merge missing header file
+
+2012-08-28 06:36  hardwick
+
+	* configure.ac, tools/src/Makefile.am, tools/src/hfst-pmatch.cc,
+	  tools/src/hfst-pmatch2fst.cc: Merge changes to tools pmatch2fst
+	  and pmatch
+
+2012-08-28 06:26  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: Merge pmatch parser changes
+
+2012-08-28 06:23  hardwick
+
+	* libhfst/src/Makefile.am: Merge inclusion of hfst.h in HFST_HDRS
+
+2012-08-28 06:21  hardwick
+
+	* libhfst/src/implementations/Makefile.am,
+	  libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h,
+	  libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Merge
+	  pmatch library parts from devbranch
+
+2012-08-27 14:39  mpsilfve
+
+	* tools/src/generate_model_forms.h, tools/src/hfst-guess.cc,
+	  tools/src/hfst-guessify.cc: Improved error messages and fixed
+	  help message.
+
+2012-08-27 10:39  mpsilfve
+
+	* tools/src/hfst-tagger/src/use_model_src/SequenceModelComponent.cc,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceModelComponent.h:
+	  Maybe fixed undefined ref. to SequenceModelComponent::START_STATE
+	  problem.
+
+2012-08-24 12:26  mie
+
+	* configure.ac: Set revision for info
+
+2012-08-24 11:54  moshagen
+
+	* libhfst/src, tools/src: Even more files to ignore.
+
+2012-08-24 11:52  eaxelson
+
+	* test/tools/fst2txt-functionality.sh,
+	  test/tools/hfst-check-help.sh, test/tools/hfst-check-version.sh,
+	  test/tools/proc-functionality.sh: Newlines are now handled
+	  correctly when testing command line tools on Windows. Version and
+	  help checks also skip the tool hfst-info.
+
+2012-08-24 11:15  mie
+
+	* libhfst/src/hfst.hpp.in, tools/src/hfst-info.cc: Further porting
+	  for info
+
+2012-08-24 10:57  mie
+
+	* configure.ac: Missing square bracket in define
+
+2012-08-24 10:50  mie
+
+	* configure.ac, tools/src/Makefile.am, tools/src/hfst-info.cc: Port
+	  basic info app to trunk.
+
+2012-08-24 10:45  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc: Fix
+	  conversion bug where when converting to BasicTransducer, we would
+	  stop
+	  looking for a particular flag diacritic when seeing symbols that
+	  aren't epsilon or this flag. This caused misses of flags when
+	  they
+	  weren't arranged in a lucky way.
+
+2012-08-24 10:32  mie
+
+	* configure.ac: Uh, actually declare hfst.hpp in headers and not
+	  files to get the meta
+
+2012-08-24 10:19  mie
+
+	* configure.ac, libhfst/src/hfst.hpp.in: Port some versioning and
+	  meta from branch
+
+2012-08-24 09:59  moshagen
+
+	* tools/src: More binary files to ignore.
+
+2012-08-24 08:50  moshagen
+
+	* libhfst/src/parsers, tools/src, tools/src/hfst-twolc/src,
+	  windows/dlfcn, windows/openfst/src/lib: Ignore generatated *.hh
+	  file and .deps directories.
+
+2012-08-24 07:33  eaxelson
+
+	* libhfst/src/FormatSpecifiers.h, libhfst/src/HfstTransducer.h,
+	  libhfst/src/Makefile.am, tools/src/hfst-affix-guessify.cc,
+	  tools/src/hfst-binary-tool.cc, tools/src/hfst-commandline.cc,
+	  tools/src/hfst-compare.cc, tools/src/hfst-compose-intersect.cc,
+	  tools/src/hfst-compose.cc, tools/src/hfst-concatenate.cc,
+	  tools/src/hfst-conjunct.cc, tools/src/hfst-determinize.cc,
+	  tools/src/hfst-disjunct.cc, tools/src/hfst-duplicate.cc,
+	  tools/src/hfst-edit-metadata.cc, tools/src/hfst-fst2fst.cc,
+	  tools/src/hfst-fst2txt.cc, tools/src/hfst-grep.cc,
+	  tools/src/hfst-head.cc, tools/src/hfst-invert.cc,
+	  tools/src/hfst-lookup.cc, tools/src/hfst-minimize.cc,
+	  tools/src/hfst-name.cc, tools/src/hfst-pair-test.cc,
+	  tools/src/hfst-preprocess-for-optimized-lookup-format.cc,
+	  tools/src/hfst-project.cc, tools/src/hfst-push-weights.cc,
+	  tools/src/hfst-remove-epsilons.cc, tools/src/hfst-repeat.cc,
+	  tools/src/hfst-reverse.cc, tools/src/hfst-reweight.cc,
+	  tools/src/hfst-shuffle.cc, tools/src/hfst-split.cc,
+	  tools/src/hfst-substitute.cc, tools/src/hfst-subtract.cc,
+	  tools/src/hfst-summarize.cc, tools/src/hfst-tail.cc,
+	  tools/src/hfst-txt2fst.cc, tools/src/hfst-unary-tool.cc: Replaced
+	  size_t format specifier %zu with a macro that is expanded to %zu
+	  or %Iu (Windows).
+
+2012-08-23 10:35  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/hfst-summarize.cc: Removed debugging prints from
+	  HfstTransitionGraph.h. Added --help information to
+	  hfst-summarize.
+
+2012-08-22 12:55  mpsilfve
+
+	* tools/src/hfst-tagger/src/build_model_src/tagger_aux.py,
+	  tools/src/hfst-tagger/src/hfst_tagger_compute_data_statistics.py:
+	  Fixed python and utf-8 related problems.
+
+2012-08-22 06:34  eaxelson
+
+	* libhfst/src/Makefile.am, libhfst/src/implementations/Makefile.am:
+	  Added preprocessing flag -DWINDOWS to Makefiles if HFST is
+	  compiled on Windows.
+
+2012-08-21 15:41  eaxelson
+
+	* libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  tools/src/inc/globals-common.h: Streams to files in
+	  TropicalWeightInputStream and TropicalWeightOutputStream are now
+	  opened in binary mode. The global variable _CRT_fmode is also set
+	  to binary mode in file globals-common.h when compiling on
+	  Windows. This makes sure that streams are always processed in
+	  binary mode on Windows, with no extra or missing carriage return
+	  or line feed characters.
+
+2012-08-21 12:13  mie
+
+	* README: Add Mac OS X abort trap to faqs
+
+2012-08-14 19:38  mie
+
+	* libhfst/src/parsers/xre_parse.yy: Move "stuff that is next to
+	  colons" to another level to support quoted
+	  literals and some other constructs maybe
+
+2012-08-13 12:51  mie
+
+	* tools/src/hfst-lexc.cc: Provide more info about itnae's in lexc
+	  for mac users
+
+2012-08-13 09:39  hardwick
+
+	* libhfst/src/hfst.h: A convenience header file including HFST
+	  headers
+	  necessary for doing practically anything
+
+2012-08-13 08:12  eaxelson
+
+	* windows/dlfcn/dlfcn.c, windows/dlfcn/dlfcn.h,
+	  windows/openfst/src/include/fst/accumulator.h,
+	  windows/openfst/src/include/fst/add-on.h,
+	  windows/openfst/src/include/fst/arc-map.h,
+	  windows/openfst/src/include/fst/arc.h,
+	  windows/openfst/src/include/fst/arcfilter.h,
+	  windows/openfst/src/include/fst/arcsort.h,
+	  windows/openfst/src/include/fst/bi-table.h,
+	  windows/openfst/src/include/fst/cache.h,
+	  windows/openfst/src/include/fst/closure.h,
+	  windows/openfst/src/include/fst/compact-fst.h,
+	  windows/openfst/src/include/fst/compat.h,
+	  windows/openfst/src/include/fst/complement.h,
+	  windows/openfst/src/include/fst/compose-filter.h,
+	  windows/openfst/src/include/fst/compose.h,
+	  windows/openfst/src/include/fst/concat.h,
+	  windows/openfst/src/include/fst/config.h,
+	  windows/openfst/src/include/fst/connect.h,
+	  windows/openfst/src/include/fst/const-fst.h,
+	  windows/openfst/src/include/fst/determinize.h,
+	  windows/openfst/src/include/fst/dfs-visit.h,
+	  windows/openfst/src/include/fst/difference.h,
+	  windows/openfst/src/include/fst/edit-fst.h,
+	  windows/openfst/src/include/fst/encode.h,
+	  windows/openfst/src/include/fst/epsnormalize.h,
+	  windows/openfst/src/include/fst/equal.h,
+	  windows/openfst/src/include/fst/equivalent.h,
+	  windows/openfst/src/include/fst/expanded-fst.h,
+	  windows/openfst/src/include/fst/expectation-weight.h,
+	  windows/openfst/src/include/fst/factor-weight.h,
+	  windows/openfst/src/include/fst/flags.h,
+	  windows/openfst/src/include/fst/float-weight.h,
+	  windows/openfst/src/include/fst/fst-decl.h,
+	  windows/openfst/src/include/fst/fst.h,
+	  windows/openfst/src/include/fst/fstlib.h,
+	  windows/openfst/src/include/fst/generic-register.h,
+	  windows/openfst/src/include/fst/heap.h,
+	  windows/openfst/src/include/fst/icu.h,
+	  windows/openfst/src/include/fst/intersect.h,
+	  windows/openfst/src/include/fst/interval-set.h,
+	  windows/openfst/src/include/fst/invert.h,
+	  windows/openfst/src/include/fst/label-reachable.h,
+	  windows/openfst/src/include/fst/lexicographic-weight.h,
+	  windows/openfst/src/include/fst/lock.h,
+	  windows/openfst/src/include/fst/log.h,
+	  windows/openfst/src/include/fst/lookahead-filter.h,
+	  windows/openfst/src/include/fst/lookahead-matcher.h,
+	  windows/openfst/src/include/fst/map.h,
+	  windows/openfst/src/include/fst/matcher-fst.h,
+	  windows/openfst/src/include/fst/matcher.h,
+	  windows/openfst/src/include/fst/minimize.h,
+	  windows/openfst/src/include/fst/mutable-fst.h,
+	  windows/openfst/src/include/fst/pair-weight.h,
+	  windows/openfst/src/include/fst/partition.h,
+	  windows/openfst/src/include/fst/power-weight.h,
+	  windows/openfst/src/include/fst/product-weight.h,
+	  windows/openfst/src/include/fst/project.h,
+	  windows/openfst/src/include/fst/properties.h,
+	  windows/openfst/src/include/fst/prune.h,
+	  windows/openfst/src/include/fst/push.h,
+	  windows/openfst/src/include/fst/queue.h,
+	  windows/openfst/src/include/fst/randequivalent.h,
+	  windows/openfst/src/include/fst/randgen.h,
+	  windows/openfst/src/include/fst/random-weight.h,
+	  windows/openfst/src/include/fst/rational.h,
+	  windows/openfst/src/include/fst/register.h,
+	  windows/openfst/src/include/fst/relabel.h,
+	  windows/openfst/src/include/fst/replace-util.h,
+	  windows/openfst/src/include/fst/replace.h,
+	  windows/openfst/src/include/fst/reverse.h,
+	  windows/openfst/src/include/fst/reweight.h,
+	  windows/openfst/src/include/fst/rmepsilon.h,
+	  windows/openfst/src/include/fst/rmfinalepsilon.h,
+	  windows/openfst/src/include/fst/shortest-distance.h,
+	  windows/openfst/src/include/fst/shortest-path.h,
+	  windows/openfst/src/include/fst/signed-log-weight.h,
+	  windows/openfst/src/include/fst/slist.h,
+	  windows/openfst/src/include/fst/sparse-power-weight.h,
+	  windows/openfst/src/include/fst/sparse-tuple-weight.h,
+	  windows/openfst/src/include/fst/state-map.h,
+	  windows/openfst/src/include/fst/state-reachable.h,
+	  windows/openfst/src/include/fst/state-table.h,
+	  windows/openfst/src/include/fst/statesort.h,
+	  windows/openfst/src/include/fst/string-weight.h,
+	  windows/openfst/src/include/fst/string.h,
+	  windows/openfst/src/include/fst/symbol-table-ops.h,
+	  windows/openfst/src/include/fst/symbol-table.h,
+	  windows/openfst/src/include/fst/synchronize.h,
+	  windows/openfst/src/include/fst/test-properties.h,
+	  windows/openfst/src/include/fst/topsort.h,
+	  windows/openfst/src/include/fst/tuple-weight.h,
+	  windows/openfst/src/include/fst/types.h,
+	  windows/openfst/src/include/fst/union-find.h,
+	  windows/openfst/src/include/fst/union.h,
+	  windows/openfst/src/include/fst/unordered_map.h,
+	  windows/openfst/src/include/fst/unordered_set.h,
+	  windows/openfst/src/include/fst/util.h,
+	  windows/openfst/src/include/fst/vector-fst.h,
+	  windows/openfst/src/include/fst/verify.h,
+	  windows/openfst/src/include/fst/visit.h,
+	  windows/openfst/src/include/fst/weight.h,
+	  windows/openfst/src/lib/compat.cc,
+	  windows/openfst/src/lib/flags.cc, windows/openfst/src/lib/fst.cc,
+	  windows/openfst/src/lib/properties.cc,
+	  windows/openfst/src/lib/symbol-table-ops.cc,
+	  windows/openfst/src/lib/symbol-table.cc,
+	  windows/openfst/src/lib/util.cc: Added OpenFst and dlfcn
+	  functionalities as a part of HFST (at least when it is compiled
+	  on Windows).
+
+2012-08-08 09:05  eaxelson
+
+	* test/tools/fsmbook-examples/monish-guesser-analyzer-test.sh:
+	  Added a script for Monish guesser-analyzer test.
+
+2012-08-01 13:53  mie
+
+	* README.deps: Installation instructions for dependencies that are
+	  not in our control...
+
+2012-08-01 13:16  mie
+
+	* README-alpha: No alphas in trunk
+
+2012-07-31 13:17  moshagen
+
+	* test/tools/fsmbook-examples/MonishGuesserAnalyzer: Ignore
+	  generated files.
+
+2012-07-30 00:27  mie
+
+	* README: retab!
+
+2012-07-30 00:21  mie
+
+	* README: Add port and gentoo installation instructions
+
+2012-07-21 20:53  mpsilfve
+
+	* tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-tagger/src/build_model_src/tagger_aux.py,
+	  tools/src/hfst-tagger/src/hfst-reweight-tagger.cc,
+	  tools/src/hfst-tagger/src/hfst-tag.cc: Added reweighting tool.
+
+2012-07-21 14:30  mpsilfve
+
+	* tools/src/hfst-tagger/src/build_model_src/tagger_aux.py,
+	  tools/src/hfst-tagger/src/hfst-open-input-file-for-tagger.cc,
+	  tools/src/hfst-tagger/src/hfst_tagger_compute_data_statistics.py:
+	  Added config-file.
+
+2012-07-21 14:27  mpsilfve
+
+	* tools/src/hfst-tagger/src/use_model_src/SequenceModelComponentPair.cc,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceModelComponentPair.h:
+	  Added size() function.
+
+2012-07-21 09:21  mpsilfve
+
+	* tools/src/hfst-tagger/src/hfst_tagger_compute_data_statistics.py:
+	  Added dummy-tags to guesser and lexicon entries without real
+	  tags, so that the could be parsed in the same way as regular
+	  lexicon and guesser entries.
+
+2012-07-21 09:19  mpsilfve
+
+	* tools/src/hfst-tagger/src/hfst-tag.cc: Fixed output file, so that
+	  output is printed to stdout, when no output file is given instead
+	  of file "<stdout>".
+
+2012-07-21 09:17  mpsilfve
+
+	* tools/src/hfst-tagger/src/use_model_src/DataTypes.h,
+	  tools/src/hfst-tagger/src/use_model_src/NewLexicalModel.cc,
+	  tools/src/hfst-tagger/src/use_model_src/NewLexicalModel.h,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceModelComponent.cc,
+	  tools/src/hfst-tagger/src/use_model_src/SequenceTagger.cc:
+	  Changed guesser tags.
+
+2012-07-21 09:15  mpsilfve
+
+	* tools/src/hfst-tagger/src/build_model_src/FstBuilder.cc,
+	  tools/src/hfst-tagger/src/build_model_src/FstBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/ModelBuilder.cc,
+	  tools/src/hfst-tagger/src/build_model_src/ModelBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/WeightedStringVectorCollection.cc,
+	  tools/src/hfst-tagger/src/build_model_src/WeightedStringVectorCollection.h,
+	  tools/src/hfst-tagger/src/build_model_src/string_handling.cc,
+	  tools/src/hfst-tagger/src/build_model_src/string_handling.h,
+	  tools/src/hfst-tagger/src/build_model_src/tagger_aux.py: Some
+	  default-transitions were missing. Added them.
+
+2012-07-19 20:37  hardwick
+
+	* tools/src/generate_model_forms.h: Another #include
+	  <hfst/HfstTransducer.h> -> #include "HfstTransducer.h"
+
+2012-07-18 19:05  mpsilfve
+
+	* tools/src/hfst-tagger/src/build_model_src/LexicalModelBuilder.cc,
+	  tools/src/hfst-tagger/src/build_model_src/LexicalModelBuilder.h,
+	  tools/src/hfst-tagger/src/build_model_src/tagger_aux.py,
+	  tools/src/hfst-tagger/src/hfst_tagger_compute_data_statistics.py:
+	  Added case sensitivity to suffix counts.
+
+2012-07-12 13:32  sdrobac
+
+	* configure.ac, test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/MonishGuesserAnalyzer/Makefile.am,
+	  test/tools/fsmbook-examples/MonishGuesserAnalyzer/MonishGuesserAnalyzer.hfst.script,
+	  test/tools/fsmbook-examples/MonishGuesserAnalyzer/MonishGuesserAnalyzer.xfst.att,
+	  test/tools/fsmbook-examples/MonishGuesserAnalyzer/MonishGuesserAnalyzer.xfst.script,
+	  test/tools/fsmbook-examples/MonishGuesserAnalyzer/test.script,
+	  test/tools/fsmbook-examples/YaleShooting/test.script,
+	  test/tools/fsmbook-examples/xfst-prolog-to-hfst-att.sh: Added
+	  'MonishGuesserAnalyzer' test for parser
+
+2012-07-09 14:38  hardwick
+
+	* libhfst/src/HfstInputStream.cc: Continued adventures in unsigned
+	  short reading: cast to unsigned char,
+	  not unsigned short, before shifting and adding the bytes.
+
+2012-07-05 11:37  sdrobac
+
+	* libhfst/src/parsers/xre_parse.yy: (Regular) containment fixed in
+	  'Regexp2fst'
+
+2012-06-30 19:57  mpsilfve
+
+	* tools/src/hfst-guess.cc, tools/src/hfst-guessify.cc: Fixed
+	  kitwiki addresses in the help-messages of hfst-guess and
+	  hfst-guessify.
+
+2012-06-30 00:21  mpsilfve
+
+	* tools/src/generate_model_forms.cc, tools/src/hfst-guess.cc: Fixed
+	  printouts so that they match for guesses and generated forms.
+	  Fixed printing of guesses, so that they're not printed reversed.
+
+2012-06-29 20:08  mpsilfve
+
+	* tools/src/hfst-guess.cc: Fixed hfst-guess help-message and exit
+	  value.
+
+2012-06-29 16:40  hardwick
+
+	* libhfst/src/HfstInputStream.cc, libhfst/src/HfstInputStream.h:
+	  Implement a little-endian unsigned short stream-reader on top of
+	  the
+	  char-reader. Use it to read the header size rather than fiddle
+	  around with
+	  signed shorts.
+
+2012-06-29 16:27  mpsilfve
+
+	* configure.ac, tools/src/Makefile.am,
+	  tools/src/generate_model_forms.cc,
+	  tools/src/generate_model_forms.h, tools/src/hfst-guess.cc:
+	  Initial commit of hfst-guess utility.
+
+2012-06-29 14:31  mpsilfve
+
+	* configure.ac, tools/src/Makefile.am, tools/src/guessify_fst.cc,
+	  tools/src/guessify_fst.h, tools/src/hfst-guessify.cc: Initial
+	  commit of the hfst-guessify utility.
+
+2012-06-29 14:20  sdrobac
+
+	* libhfst/src/parsers/xre_parse.yy: Complement added to the
+	  'regexp'
+
+2012-06-29 13:11  hardwick
+
+	* libhfst/src/HfstInputStream.cc: When reading header size, which
+	  on the disk is a two-byte unsigned number,
+	  we need to call stream_get(short &) because it's not implemented
+	  for
+	  unsigned short. Then cast it to unsigned short.
+
+2012-06-28 18:16  hardwick
+
+	* libhfst/src/HfstInputStream.cc: header_size needs to be able to
+	  handle MAX_HEADER_LENGTH=65535 bytes, so
+	  make it an int instead of a short
+
+2012-06-28 14:12  eaxelson
+
+	* windows/dlfcn/Makefile.am, windows/openfst/src/lib/Makefile.am:
+	  Excluded source files under windows directory from distribution.
+
+2012-06-28 13:46  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/parsers/xre_lex.ll,
+	  libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h: Curly brackets added to regexp
+
+2012-06-28 10:37  eaxelson
+
+	* tools/src/Makefile.am: Appended $(EXEEXT) to program names in
+	  Makefile.
+
+2012-06-28 10:28  eaxelson
+
+	* tools/src/Makefile.am, tools/src/hfst-commandline.cc: Temporarily
+	  disabled 'hfst_mkstemp' in windows compilation, because it uses
+	  'mkstemp' that is not standard C++.
+
+2012-06-28 10:06  eaxelson
+
+	* tools/src/Makefile.am: Fixed a typo in Makefile.
+
+2012-06-28 08:42  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc:
+	  Complete purge of trap_transition in try_epsilon_transitions
+
+2012-06-28 08:13  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc: When
+	  following epsilon index, set found_index *after* returning.
+	  Added rather verbose comment to try_epsilon_transitions to
+	  clarify
+	  when transition-taking needs to be trapped and when it doesn't.
+
+2012-06-27 14:29  moshagen
+
+	* test/tools/fsmbook-examples/FinnishOTProsody,
+	  test/tools/fsmbook-examples/YaleShooting, windows, windows/dlfcn,
+	  windows/openfst, windows/openfst/src, windows/openfst/src/lib:
+	  Ignore generated files.
+
+2012-06-27 13:49  eaxelson
+
+	* Makefile.am: if -> endif in Makefile
+
+2012-06-27 13:39  eaxelson
+
+	* Makefile.am, configure.ac, libhfst/src/Makefile.am,
+	  tools/src/hfst-proc/Makefile.am,
+	  tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-twolc/src/Makefile.am,
+	  windows/openfst/get-openfst.sh: Now all Makefiles should be aware
+	  of windows compilation.
+
+2012-06-27 10:33  eaxelson
+
+	* libhfst/src/implementations/Makefile.am,
+	  libhfst/src/parsers/Makefile.am: Added include flags to Makefiles
+	  when using windows compilation.
+
+2012-06-26 15:36  eaxelson
+
+	* configure.ac, libhfst/src/Makefile.am, tools/src/Makefile.am,
+	  windows/openfst/get-openfst.sh,
+	  windows/openfst/src/lib/Makefile.am: Made autotools more aware of
+	  windows compilation.
+
+2012-06-26 14:35  eaxelson
+
+	* windows/openfst/Makefile.am, windows/openfst/src/lib/Makefile.am:
+	  Edited Makefiles.
+
+2012-06-26 14:23  eaxelson
+
+	* windows/openfst/get-openfst.sh, windows/openfst/src/include,
+	  windows/openfst/src/include/fst: Added directories to
+	  windows/openfst and a script to fetch openfst.
+
+2012-06-26 13:00  eaxelson
+
+	* windows/dlfcn/get-dlfcn.sh: Added a script to retrieve dlfcn.
+
+2012-06-26 12:07  eaxelson
+
+	* Makefile.am, configure.ac, windows, windows/Makefile.am,
+	  windows/dlfcn, windows/dlfcn/Makefile.am, windows/openfst,
+	  windows/openfst/Makefile.am, windows/openfst/src,
+	  windows/openfst/src/Makefile.am, windows/openfst/src/lib,
+	  windows/openfst/src/lib/Makefile.am: Tentatively added support
+	  for windows compilation.
+
+2012-06-26 10:11  mie
+
+	* test/tools/fst2txt-functionality.sh, tools/src/hfst-fst2txt.cc:
+	  Implement PCKIMMO output mode for fst2txt
+
+2012-06-25 15:18  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am: Ready for release 3.3.12.
+
+2012-06-25 15:02  eaxelson
+
+	* configure.ac: Tentatively added the possibility to compile hfst
+	  in Windows to configure.ac.
+
 2012-06-25 13:55  mpsilfve
 
 	* tools/src/hfst-tagger/src: Ignore enerated files.

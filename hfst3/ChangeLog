@@ -1,3 +1,554 @@
+2012-09-30 07:12  eaxelson
+
+	* swig/test_std_streams.py, swig/test_std_streams.sh: Added new
+	  testing scripts.
+
+2012-09-29 14:12  eaxelson
+
+	* libhfst/src/HfstOutputStream.cc,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  swig/libhfst.i, swig/test_streams.py: Now
+	  HfstTransitionGraph::read_in_att_format throws an
+	  EndOfFileException if the argument FILE is exhausted. Also fixed
+	  a typo in HfstOutputStream.
+
+2012-09-29 11:44  eaxelson
+
+	* libhfst/src/HfstOutputStream.cc, libhfst/src/HfstOutputStream.h,
+	  swig/libhfst.i, swig/setup.py, swig/test_streams.py: Added an
+	  alias for HfstOutputStream::operator<<,
+	  HfstOutputStream::redirect. Also added a Python test
+	  test_streams.py.
+
+2012-09-29 10:26  eaxelson
+
+	* swig/libhfst.i: Fixed a namespace issue in libhfst.i, now
+	  omor_query.py works.
+
+2012-09-29 10:04  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  swig/libhfst.i: Added HFST exceptions to the Python interface.
+	  Renamed HfstBasicTransducer::at(HfstState) to
+	  transitions(HfstState).
+
+2012-09-28 16:18  eaxelson
+
+	* swig/libhfst.i: Added more functionalities to the swig interface.
+
+2012-09-27 20:21  mpsilfve
+
+	* libhfst/src/implementations/TropicalWeightTransducer.cc: Fixed
+	  missing symbol table in optionalization bug for tropical weight
+	  type transducers.
+
+2012-09-27 13:36  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  swig/libhfst.i: Added wrappers for operators [], = and << so that
+	  they can be used in swig bindings.
+
+2012-09-26 15:09  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  swig/hfst_swig_extensions.h, swig/libhfst.i: Added the function
+	  write_in_att_format(char * buffer, bool) to HfstTransducer. This
+	  makes it possible to call python's print() to a transducer.
+
+2012-09-25 14:53  eaxelson
+
+	* swig/hfst_swig_extensions.h, swig/libhfst.i: Tentatively added
+	  HfstBasicTransducer to the swig interface.
+
+2012-09-25 12:53  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/HfstXeroxRulesTest.cc,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/xre_parse.yy: Changed Replace rules interface
+
+2012-09-25 07:07  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h,
+	  tools/src/hfst-pmatch2fst.cc: Fallback utf-8 tokenization
+
+2012-09-25 06:19  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Tokenize string literals for
+	  pmatch parsing
+
+2012-09-20 15:30  eaxelson
+
+	* tools/src/hfst-lookup.cc: Now hfst-lookup handles the '\r'
+	  character right when parsing input strings on Windows.
+
+2012-09-20 12:12  eaxelson
+
+	* libhfst/src/implementations/HfstOlTransducer.cc: HfstOlTransducer
+	  streams are now opened in binary mode.
+
+2012-09-18 15:20  eaxelson
+
+	* libhfst/src/Makefile.am, libhfst/src/implementations/Makefile.am,
+	  libhfst/src/parsers/Makefile.am, test/libhfst/Makefile.am,
+	  tools/src/Makefile.am, tools/src/hfst-twolc/src/Makefile.am:
+	  Added dlfcn include path to Makefiles.
+
+2012-09-18 14:54  mie
+
+	* README: Remove mentions of apertium and xml stuff
+
+2012-09-18 09:30  hardwick
+
+	* tools/src/hfst-pmatch2fst.cc: Multiline handling like regexp2fst
+
+2012-09-18 09:13  eaxelson
+
+	* tools/src/Makefile.am: Fixed a typo in Makefile.am.
+
+2012-09-18 07:48  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: Tentative names for
+	  charclasses
+
+2012-09-18 07:44  hardwick
+
+	* tools/src/hfst-pmatch2fst.cc: Semicolon separation is default
+
+2012-09-18 06:31  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.h: Context-checking markers in
+	  pmatch2fst parsing
+
+2012-09-17 15:54  moshagen
+
+	* windows/sfst: Ignore generated files.
+
+2012-09-17 14:14  mie
+
+	* libhfst/src/parsers/xre_lex.ll: Make , reserved. Fixes [#134].
+
+2012-09-17 14:12  mie
+
+	* tools/src/hfst-regexp2fst.cc: print yacc debug traces if hidden
+	  sekrit debug mode is on.
+
+2012-09-17 12:03  eaxelson
+
+	* windows/sfst/interface.h: Added missing file sfst/interface.h
+
+2012-09-17 11:15  eaxelson
+
+	* test/tools/fsmbook-examples/BetterColaMachine/BetterColaMachine.hfst.script,
+	  test/tools/fsmbook-examples/BetterColaMachine/test.script,
+	  test/tools/fsmbook-examples/BrazilianPortuguese1/BrazilianPortuguese1.hfst.script,
+	  test/tools/fsmbook-examples/BrazilianPortuguese2/BrazilianPortuguese2.hfst.script,
+	  test/tools/fsmbook-examples/DateParser/DateParser.hfst.script,
+	  test/tools/fsmbook-examples/EinsteinsPuzzle/EinsteinsPuzzle.hfst.script,
+	  test/tools/fsmbook-examples/EinsteinsPuzzle/test.sh,
+	  test/tools/fsmbook-examples/EnglishNumerals/EnglishNumerals.hfst.script,
+	  test/tools/fsmbook-examples/Esperanto/EsperantoAdjectives.hfst.script,
+	  test/tools/fsmbook-examples/Esperanto/EsperantoNouns.hfst.script,
+	  test/tools/fsmbook-examples/Esperanto/EsperantoNounsAdjectivesAndVerbs.hfst.script,
+	  test/tools/fsmbook-examples/Esperanto/EsperantoNounsAndAdjectives.hfst.script,
+	  test/tools/fsmbook-examples/Esperanto/EsperantoNounsAndAdjectivesWithTags.hfst.script,
+	  test/tools/fsmbook-examples/Esperanto/test.sh,
+	  test/tools/fsmbook-examples/FinnishNumerals/FinnishNumerals.hfst.script,
+	  test/tools/fsmbook-examples/FinnishNumerals/test.sh,
+	  test/tools/fsmbook-examples/FinnishOTProsody/FinnishOTProsody.hfst.script,
+	  test/tools/fsmbook-examples/FinnishOTProsody/test.script,
+	  test/tools/fsmbook-examples/FinnishProsody/FinnishProsody.hfst.script,
+	  test/tools/fsmbook-examples/FinnishProsody/test.script,
+	  test/tools/fsmbook-examples/Lingala/Lingala.hfst.script,
+	  test/tools/fsmbook-examples/Lingala/test.script,
+	  test/tools/fsmbook-examples/MonishAnalysis/MonishAnalysis.hfst.script,
+	  test/tools/fsmbook-examples/MonishAnalysis/test.script,
+	  test/tools/fsmbook-examples/MonishGuesserAnalyzer/MonishGuesserAnalyzer.hfst.script,
+	  test/tools/fsmbook-examples/NumbersToNumerals/NumbersToNumerals.hfst.script,
+	  test/tools/fsmbook-examples/NumbersToNumerals/test.sh,
+	  test/tools/fsmbook-examples/Palindromes/Palindromes.hfst.script,
+	  test/tools/fsmbook-examples/PlusOrMinus/PlusOrMinus.hfst.script,
+	  test/tools/fsmbook-examples/PlusOrMinus/test.script,
+	  test/tools/fsmbook-examples/YaleShooting/YaleShooting.hfst.script,
+	  test/tools/fsmbook-examples/test-example.sh: Changed
+	  ../../tools/src to in fsmbook-examples to make tests more
+	  flexible.
+
+2012-09-17 09:26  eaxelson
+
+	* test/tools/calculate-functionality.sh,
+	  test/tools/compare-functionality.sh,
+	  test/tools/compose-functionality.sh,
+	  test/tools/compose-intersect-functionality.sh,
+	  test/tools/concatenate-functionality.sh,
+	  test/tools/conjunct-functionality.sh,
+	  test/tools/determinize-functionality.sh,
+	  test/tools/disjunct-functionality.sh, test/tools/empty-input.sh,
+	  test/tools/format-functionality.sh,
+	  test/tools/fst2strings-functionality.sh,
+	  test/tools/fst2txt-functionality.sh,
+	  test/tools/head-functionality.sh,
+	  test/tools/hfst-check-environment.sh,
+	  test/tools/hfst-check-help.sh, test/tools/hfst-check-version.sh,
+	  test/tools/incompatible-formats.sh,
+	  test/tools/invert-functionality.sh,
+	  test/tools/latin-1-strings.sh,
+	  test/tools/lexc-compiler-functionality.sh,
+	  test/tools/lexc-functionality.sh, test/tools/lexc2fst-stress.sh,
+	  test/tools/lookup-functionality.sh, test/tools/lookup-stress.sh,
+	  test/tools/minimize-functionality.sh,
+	  test/tools/permutate-file-params.sh,
+	  test/tools/proc-functionality.sh, test/tools/proc-stress.sh,
+	  test/tools/project-functionality.sh,
+	  test/tools/push-weights-functionality.sh,
+	  test/tools/regexp2fst-functionality.sh,
+	  test/tools/remove-epsilons-functionality.sh,
+	  test/tools/repeat-functionality.sh,
+	  test/tools/reverse-functionality.sh,
+	  test/tools/reweight-functionality.sh,
+	  test/tools/shuffle-functionality.sh,
+	  test/tools/split-functionality.sh,
+	  test/tools/strings2fst-functionality.sh,
+	  test/tools/substitute-functionality.sh,
+	  test/tools/subtract-functionality.sh,
+	  test/tools/summarize-functionality.sh,
+	  test/tools/tail-functionality.sh,
+	  test/tools/txt2fst-functionality.sh, test/tools/utf-8-strings.sh,
+	  test/tools/valgrind.sh: Changed the pathname ../../tools/src to .
+	  This makes testing more flexible.
+
+2012-09-14 13:58  eaxelson
+
+	* configure.ac, libhfst/src/Makefile.am,
+	  test/tools/regexp2fst-functionality.sh: Fixed a couple of typos.
+
+2012-09-13 14:53  eaxelson
+
+	* windows/sfst/Makefile.am, windows/sfst/alphabet.C,
+	  windows/sfst/alphabet.cc, windows/sfst/basic.C,
+	  windows/sfst/basic.cc, windows/sfst/compact.C,
+	  windows/sfst/compact.cc, windows/sfst/determinise.C,
+	  windows/sfst/determinise.cc, windows/sfst/fst.C,
+	  windows/sfst/fst.cc, windows/sfst/generate.C,
+	  windows/sfst/generate.cc, windows/sfst/hopcroft.C,
+	  windows/sfst/hopcroft.cc, windows/sfst/operators.C,
+	  windows/sfst/operators.cc, windows/sfst/utf8.C,
+	  windows/sfst/utf8.cc: Renamed .c files to .cc so that
+	  c++-compiler is used.
+
+2012-09-13 13:44  eaxelson
+
+	* libhfst/src/Makefile.am, libhfst/src/implementations/Makefile.am,
+	  libhfst/src/parsers/Makefile.am, test/libhfst/Makefile.am,
+	  tools/src/Makefile.am, tools/src/hfst-proc/Makefile.am,
+	  tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-twolc/src/Makefile.am: Fixed sfst include path.
+
+2012-09-13 12:35  eaxelson
+
+	* configure.ac, libhfst/src/Makefile.am,
+	  libhfst/src/implementations/Makefile.am,
+	  libhfst/src/parsers/Makefile.am, test/libhfst/Makefile.am,
+	  tools/src/Makefile.am, tools/src/hfst-proc/Makefile.am,
+	  tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-twolc/src/Makefile.am, windows/Makefile.am,
+	  windows/openfst/README, windows/sfst, windows/sfst/Makefile.am,
+	  windows/sfst/README, windows/sfst/alphabet.C,
+	  windows/sfst/alphabet.h, windows/sfst/basic.C,
+	  windows/sfst/basic.h, windows/sfst/compact.C,
+	  windows/sfst/compact.h, windows/sfst/determinise.C,
+	  windows/sfst/fst.C, windows/sfst/fst.h, windows/sfst/generate.C,
+	  windows/sfst/hopcroft.C, windows/sfst/mem.h,
+	  windows/sfst/operators.C, windows/sfst/sgi.h,
+	  windows/sfst/utf8.C, windows/sfst/utf8.h: Tentatively added SFST
+	  under directory windows.
+
+2012-09-13 11:29  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.h: #include
+	  <stack> (seems to be necessary when compiling without openfst at
+	  least)
+
+2012-09-12 22:48  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.cc: Some compilers don't believe
+	  in universal characters given from the ASCII
+	  range, so instead of \u000D, have \r
+
+2012-09-12 15:44  eaxelson
+
+	* libhfst/src/FormatSpecifiers.h,
+	  libhfst/src/implementations/FomaTransducer.cc,
+	  libhfst/src/implementations/FomaTransducer.h,
+	  libhfst/src/parsers/Makefile.am, tools/src/Makefile.am,
+	  tools/src/hfst-proc/Makefile.am,
+	  tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-twolc/src/Makefile.am, windows/foma/io.c: Fixed
+	  format specifiers when printing long long on Windows. Also
+	  specified windows/foma as include directory in Makefiles.
+
+2012-09-11 16:21  moshagen
+
+	* test/tools: Added one ignore.
+
+2012-09-11 16:20  moshagen
+
+	* test/tools/parallel-left-arrow-multicom-emptyline.xre,
+	  test/tools/regexp2fst-functionality.sh: Added regex test case
+	  from the GT/Divvun sources that presently does not compile with
+	  hfst-regexp2fst.
+
+2012-09-11 15:26  eaxelson
+
+	* libhfst/src/implementations/Makefile.am,
+	  libhfst/src/parsers/Makefile.am, windows/foma/Makefile.am,
+	  windows/foma/fomalib.h, windows/foma/io.c: Made fixes to foma
+	  compilation.
+
+2012-09-11 15:18  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: Add charset-defining
+	  hardcoded transducers to pmatch utilities for now
+
+2012-09-11 12:53  eaxelson
+
+	* windows/foma/Makefile.am, windows/foma/README,
+	  windows/foma/fomalib.h, windows/foma/io.c: Foma's io functions
+	  are now skipped.
+
+2012-09-11 12:38  moshagen
+
+	* windows/foma: Ignore generated files.
+
+2012-09-11 12:01  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRulesTest.cc,
+	  libhfst/src/parsers/xre_parse.yy,
+	  test/tools/parallel-left-arrow.xre: Fixed left replace rule
+
+2012-09-11 07:20  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h: Stateful
+	  context-checking mechanism; remove recursive functions for same
+
+2012-09-10 16:04  eaxelson
+
+	* configure.ac, windows/foma/Makefile.am: OpenFst library check is
+	  now skipped and flag -D_MSC_VER is used when compiling on
+	  Windows.
+
+2012-09-10 14:58  eaxelson
+
+	* windows/foma/Makefile.am: Fixed a typo in library name.
+
+2012-09-10 14:51  eaxelson
+
+	* configure.ac, libhfst/src/Makefile.am, windows/Makefile.am,
+	  windows/foma, windows/foma/CHANGELOG, windows/foma/COPYING,
+	  windows/foma/Makefile.am, windows/foma/README,
+	  windows/foma/README.cmatrix, windows/foma/README.symbols,
+	  windows/foma/apply.c, windows/foma/coaccessible.c,
+	  windows/foma/constructions.c, windows/foma/define.c,
+	  windows/foma/determinize.c, windows/foma/dynarray.c,
+	  windows/foma/extract.c, windows/foma/flags.c,
+	  windows/foma/foma.h, windows/foma/fomalib.h,
+	  windows/foma/fomalibconf.h, windows/foma/int_stack.c,
+	  windows/foma/io.c, windows/foma/lex.lexc.c,
+	  windows/foma/lex.yy.c, windows/foma/lexc.h, windows/foma/lexc.l,
+	  windows/foma/lexcread.c, windows/foma/mem.c,
+	  windows/foma/minimize.c, windows/foma/regex.l,
+	  windows/foma/regex.tab.c, windows/foma/regex.tab.h,
+	  windows/foma/regex.y, windows/foma/reverse.c,
+	  windows/foma/rewrite.c, windows/foma/sigma.c,
+	  windows/foma/spelling.c, windows/foma/stringhash.c,
+	  windows/foma/structures.c, windows/foma/topsort.c,
+	  windows/foma/trie.c, windows/foma/utf8.c: Tentatively added foma
+	  under directory windows.
+
+2012-09-10 13:51  mpsilfve
+
+	* tools/src/generate_model_forms.cc,
+	  tools/src/generate_model_forms.h, tools/src/hfst-guess.cc: Added
+	  generate_threshold parameter to prevent generating suboptimal
+	  forms.
+
+2012-09-10 13:28  mpsilfve
+
+	* tools/src/generate_model_forms.cc,
+	  tools/src/generate_model_forms.h: Generate several forms if
+	  several forms can be generated.
+
+2012-09-10 11:46  eaxelson
+
+	* test/tools/strings2fst-functionality.sh: Added missing --format
+	  flag in hfst-strings2fst functionality test.
+
+2012-09-10 11:35  moshagen
+
+	* tools/src: One more binary file to ignore.
+
+2012-09-10 11:13  mpsilfve
+
+	* tools/src/guessify_fst.cc: Modified guessify to handle gradation
+	  in omofi.
+
+2012-09-09 13:19  mie
+
+	* configure.ac, tools/src/Makefile.am,
+	  tools/src/generate_model_forms.cc,
+	  tools/src/hfst-expand-equivalences.cc, tools/src/hfst-guess.cc:
+	  ACX tool disabled by default, requires libxml/tree.h and -lxml2
+
+2012-09-09 07:56  moshagen
+
+	* libhfst/src, libhfst/src/parsers, test/tools,
+	  test/tools/fsmbook-examples/BrazilianPortuguese1,
+	  test/tools/fsmbook-examples/BrazilianPortuguese2,
+	  test/tools/fsmbook-examples/EinsteinsPuzzle,
+	  test/tools/fsmbook-examples/EnglishNumerals,
+	  test/tools/fsmbook-examples/Esperanto,
+	  test/tools/fsmbook-examples/FinnishNumerals,
+	  test/tools/fsmbook-examples/NumbersToNumerals,
+	  tools/src/hfst-twolc/test: Ignore generated test files.
+
+2012-09-09 07:43  moshagen
+
+	* tools/src/hfst-twolc/test/Makefile.am~: Temporary file - does not
+	  belong in svn.
+
+2012-09-09 00:44  mie
+
+	* test/tools/parallel-left-arrow.xre,
+	  test/tools/regexp2fst-functionality.sh: Test parallel left arrows
+	  [#132] part 2.
+
+2012-09-09 00:30  mie
+
+	* tools/src/hfst-regexp2fst.cc: Ignore expressions that _only_
+	  contain whitespace. Fixes [#132]?
+
+2012-09-09 00:30  mie
+
+	* test/tools/not-contains-a-comment-emptyline.xre,
+	  test/tools/not-contains-a.xre,
+	  test/tools/regexp2fst-functionality.sh: Test not contains and
+	  multiline expressions with comments and emptylines,
+	  Bug [#132]
+
+2012-09-09 00:12  mie
+
+	* tools/src/hfst-regexp2fst.cc: Bail on parse errors
+
+2012-09-09 00:03  mie
+
+	* test/tools/cats_and_dogs_semicolon.xre: No semicolons, huh
+
+2012-09-08 23:41  mie
+
+	* tools/src/hfst-strings2fst.cc: Allow windows or mac legacy \r's
+	  to end strings
+
+2012-09-08 23:37  mie
+
+	* tools/src/hfst-regexp2fst.cc, tools/src/hfst-strings2fst.cc: Stop
+	  recording input data to headers until header support for longer
+	  data
+	  gets fixed
+
+2012-09-08 23:31  mie
+
+	* test/tools/Makefile.am: Only test fsmbook-examples if other tools
+	  actually work...
+
+2012-09-08 22:29  mie
+
+	* configure.ac, tools/src/hfst-info.cc: Do not use AC_PACKAGE_URL
+	  or resp. parameter to support autoconf's
+	  older than 2.63 or so
+
+2012-09-08 22:23  mie
+
+	* test/tools/strings2fst-functionality.sh: Test that dos strings
+	  compile like unix
+
+2012-09-08 22:18  mie
+
+	* test/tools/lexc-functionality.sh: tests should pass 77 if tool is
+	  not available
+
+2012-09-08 21:49  mie
+
+	* test/tools/dos.strings, test/tools/strings2fst-functionality.sh:
+	  Test that strings2fst handles M$-strings
+
+2012-09-07 12:32  eaxelson
+
+	* test/tools/hfst-check-help.sh, test/tools/hfst-check-version.sh,
+	  tools/src/hfst-twolc/test/test: Fixed a bug in testing if
+	  compilation is done on Windows.
+
+2012-09-07 11:25  eaxelson
+
+	* test/tools/lexc-functionality.sh, tools/src/hfst-lexc.cc:
+	  Disabled using hfst-lexc with multiple input files on Windows.
+
+2012-09-07 10:34  eaxelson
+
+	* test/tools/fst2txt-functionality.sh,
+	  test/tools/lexc-functionality.sh: Fixed some problems with
+	  automatic LF-to-CRLF conversion on Windows.
+
+2012-09-07 07:44  eaxelson
+
+	* tools/src/hfst-twolc/test/test: Now hfst-twolc test uses 'uname'
+	  to find out if Windows is used.
+
+2012-09-07 07:40  eaxelson
+
+	* test/tools/hfst-check-help.sh, test/tools/hfst-check-version.sh:
+	  Added excutable file extension '.exe' to tests when running them
+	  on Windows.
+
+2012-09-06 15:46  eaxelson
+
+	* configure.ac: Disabled tagger tools on Windows until they work
+	  there too.
+
+2012-09-06 13:56  eaxelson
+
+	* tools/src/hfst-substitute.cc: hfst-substitute now recognizes
+	  '@0@' as epsilon, fixes bug #133.
+
+2012-09-05 13:04  moshagen
+
+	* tools/src, tools/src/hfst-tagger/src: Ignore generated files.
+
+2012-09-05 12:38  eaxelson
+
+	* configure.ac, test/tools/fsmbook-examples/Makefile.am,
+	  tools/src/Makefile.am, tools/src/hfst-twolc/src/Makefile.am:
+	  Noticed missing files and tests that should be skipped during
+	  distcheck.
+
+2012-09-05 09:05  eaxelson
+
+	* tools/src/hfst-twolc/src/Makefile.am: make dist revealed an extra
+	  file listed in Makefile, skipped that
+
+2012-09-05 09:01  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am: Ready for release 3.3.13.
+
 2012-09-04 14:04  eaxelson
 
 	* libhfst/src/parsers/LexcCompiler.cc,
