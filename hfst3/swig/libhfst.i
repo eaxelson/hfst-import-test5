@@ -31,7 +31,7 @@ namespace std {
 %template(StringPairSet) set<pair<string, string> >;
 %template(StringSet) set<string>;
 %template(HfstTransitions) vector<hfst::implementations::HfstBasicTransition>;
-%template(foo) vector<unsigned int>;
+%template(IntVector) vector<unsigned int>;
 }
 
 class HfstException {
