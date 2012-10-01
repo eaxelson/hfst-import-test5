@@ -4,7 +4,7 @@
 PortSystem          1.0
 
 name                hfst
-version             3.3.12
+version             3.3.14
 categories          devel
 platforms           darwin
 license             GPL-3+
@@ -20,8 +20,8 @@ long_description    Helsinki Finite-State Technology is designed to make \
 homepage            http://hfst.sourceforge.net/
 master_sites        sourceforge:hfst
 
-checksums           rmd160  2f09d7cd2c2259258c8ccf6034371656e437706f \
-                    sha256  6424b3055fa4a96ff1b502a39907d30b3fb5be0e48c2ef4670206ace684d6f7a
+checksums           rmd160  faa2c900471236a88fa39cdc398d186ebebd7d70 \
+                    sha256  28e841014c76ca095783d5f9def47ac7857022c46c1681f7400e832266fedeb1
 
 depends_lib         port:openfst
 depends_build       port:bison \
