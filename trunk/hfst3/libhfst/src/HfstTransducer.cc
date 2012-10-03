@@ -35,7 +35,6 @@ using hfst::implementations::ConversionFunctions;
 namespace hfst
 {
 
-
 // -----------------------------------------------------------------------
 //
 //     Interfaces through which the backend implementations are called   
@@ -61,7 +60,19 @@ hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
 // HfstTransducer::my_transducer_library_interface;
 //#endif
 
+  HfstFile::HfstFile(): file(NULL){};
+  HfstFile::~HfstFile() {};
+  void HfstFile::set_file(FILE * f) { file = f; };
+  FILE * HfstFile::get_file() { return file; };
+  void HfstFile::close() { fclose(file); };
+  void HfstFile::write(const char * str) { fprintf(file, "%s", str); };
 
+  HfstFile hfst_open(const char * filename, const char * mode) { 
+    FILE * f = fopen(filename, mode);
+    HfstFile file;
+    file.set_file(f);
+    return file;
+  };
 
 // -----------------------------------------------------------------------
 //
@@ -3396,6 +3407,10 @@ void HfstTransducer::write_in_att_format
   net.write_in_att_format(buffer, print_weights);
 }
 
+void HfstTransducer::write_in_att_format(HfstFile &ofile, bool write_weights) const {
+  this->write_in_att_format(ofile.get_file(), write_weights);
+}
+
 void HfstTransducer::write_in_att_format
 (FILE * ofile, bool print_weights) const
 {
@@ -3475,6 +3490,79 @@ HfstTransducer::HfstTransducer(FILE * ifile,
         HFST_THROW(TransducerHasWrongTypeException);
     }
 }
+
+HfstTransducer::HfstTransducer(HfstFile & ifile, 
+                               ImplementationType type,
+                               const std::string &epsilon_symbol):
+    type(type),anonymous(false),is_trie(false), name("")
+{
+
+
+    if (not is_implementation_type_available(type))
+    HFST_THROW_MESSAGE(ImplementationTypeNotAvailableException,
+               "HfstTransducer::HfstTransducer"
+               "(FILE*, ImplementationType, const std::string&)");
+
+    HfstTokenizer::check_utf8_correctness(epsilon_symbol);
+
+    // Implemented only for internal transducer format.
+    hfst::implementations::HfstBasicTransducer net =
+    hfst::implementations::HfstTransitionGraph<hfst::implementations::
+    HfstTropicalTransducerTransitionData>::
+      read_in_att_format(ifile.get_file(), std::string(epsilon_symbol));
+
+    // Conversion is done here.
+    switch (type)
+    {
+#if HAVE_SFST
+    case SFST_TYPE:
+        implementation.sfst = 
+        ConversionFunctions::hfst_basic_transducer_to_sfst(&net);
+        break;
+#endif
+#if HAVE_OPENFST
+    case TROPICAL_OPENFST_TYPE:
+        implementation.tropical_ofst 
+        = ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(&net);
+          
+        break;
+    case LOG_OPENFST_TYPE:
+        implementation.log_ofst 
+        = ConversionFunctions::hfst_basic_transducer_to_log_ofst(&net);
+        break;
+#endif
+#if HAVE_FOMA
+    case FOMA_TYPE:
+        implementation.foma = 
+        ConversionFunctions::hfst_basic_transducer_to_foma(&net);
+        break;
+#endif
+#if HAVE_HFSTOL
+    case HFST_OL_TYPE:
+    implementation.hfst_ol 
+            = ConversionFunctions::hfst_basic_transducer_to_hfst_ol
+            (&net, false);
+    break;
+    case HFST_OLW_TYPE:
+    implementation.hfst_ol 
+            = ConversionFunctions::hfst_basic_transducer_to_hfst_ol(&net, true);
+    break;
+#endif
+    /* Add here your implementation. */
+        //#if HAVE_MY_TRANSDUCER_LIBRARY
+        //case MY_TRANSDUCER_LIBRARY_TYPE:
+        //implementation.my_transducer_library = 
+        //  ConversionFunctions::
+        //    hfst_basic_transducer_to_my_transducer_library_transducer(&net);
+        //break;
+        //#endif
+    case ERROR_TYPE:
+        HFST_THROW(SpecifiedTypeRequiredException);
+    default:
+        HFST_THROW(TransducerHasWrongTypeException);
+    }
+}
+
 
 HfstTransducer &HfstTransducer::read_in_att_format
 (const std::string &filename, ImplementationType type, 

@@ -64,7 +64,6 @@
 /** \brief A namespace for HFST functions and datatypes. */
 namespace hfst
 {
-
   namespace implementations {    
     template <class T> class HfstTransitionGraph;
     class HfstTropicalTransducerTransitionData;
@@ -96,6 +95,20 @@ namespace hfst
   //  using hfst::implementations::MyTransducerLibraryTransducer;
   //#endif // #if HAVE_MY_TRANSDUCER_LIBRARY
 
+
+  class HfstFile {
+  private:
+    FILE * file;
+  public:
+    HfstFile();
+    ~HfstFile();
+    void set_file(FILE * f);
+    FILE * get_file();
+    void close();
+    void write(const char * str);
+  };
+
+  HfstFile hfst_open(const char * filename, const char * mode);
 
   // *** TESTING AND OPTIMIZATION...
 
@@ -603,6 +616,9 @@ in \a ifile.
     HfstTransducer(FILE * ifile, ImplementationType type, 
                    const std::string &epsilon_symbol);
 
+    HfstTransducer(HfstFile &ifile, ImplementationType type, 
+                   const std::string &epsilon_symbol);
+
 
     /** \brief Destructor. **/
     virtual ~HfstTransducer(void);
@@ -759,6 +775,8 @@ This will yield a file "testfile.att" that looks as follows:
         @see operator<<(std::ostream &out, const HfstTransducer &t)
         @see HfstTransducer(FILE*, ImplementationType, const std::string&) */
     void write_in_att_format(FILE * ofile, bool write_weights=true) const;
+
+    void write_in_att_format(HfstFile & ofile, bool write_weights=true) const;
 
     void write_in_att_format(char * buffer, bool write_weights=true) const;
 
