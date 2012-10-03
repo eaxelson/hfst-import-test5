@@ -9,7 +9,7 @@ for ttype in (libhfst.sfst_type(), libhfst.tropical_openfst_type(), libhfst.foma
     ostr.redirect(tr1)
     ostr.redirect(tr2)
     ostr.close()
-    att_file = open('foo.att', 'w')
+    att_file = libhfst.hfst_open('foo.att', 'w')
 
     istr = libhfst.HfstInputStream('foo.hfst')
     transducers_read = 0
@@ -25,7 +25,7 @@ for ttype in (libhfst.sfst_type(), libhfst.tropical_openfst_type(), libhfst.foma
                 if not tr.compare(tr2):
                     print "ERROR: transducer 2 changed."
                     sys.exit(1)
-            tr.write_in_att_format(att_file)
+            tr.write_in_att_format(att_file) # FAILS on Windows
             if transducers_read < 2:
                 att_file.write('--\n')
         except libhfst.EndOfStreamException:
@@ -35,7 +35,7 @@ for ttype in (libhfst.sfst_type(), libhfst.tropical_openfst_type(), libhfst.foma
         sys.exit(1)
     att_file.close()
 
-    att_file = open('foo.att', 'r')
+    att_file = libhfst.hfst_open('foo.att', 'r')
     transducers_read = 0
     while True:
         try:

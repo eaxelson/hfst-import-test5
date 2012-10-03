@@ -76,6 +76,15 @@ class MetadataException: public HfstException {};
 namespace hfst
 {
 
+class HfstFile;
+
+class HfstFile {
+public:
+  void close();
+  void write(const char * str);
+};
+HfstFile hfst_open(const char * filename, const char * args);
+
 /*
  * One of the (apparent) peculiarities of swig is that things break in the
  * wrapper very easily if things aren't defined in precisely the right order,
@@ -227,6 +236,7 @@ public:
     HfstTransducer(const std::string &symbol, ImplementationType type);
     HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type);
     HfstTransducer(FILE *ifile, ImplementationType type, const std::string &epsilon_symbol) throw (EndOfStreamException);
+    HfstTransducer(HfstFile &ifile, ImplementationType type, const std::string &epsilon_symbol) throw (EndOfStreamException);
     
     // Then everything else, in the (alphabetic) order in the API manual
     bool compare(const HfstTransducer &another) const;
@@ -284,6 +294,7 @@ public:
     HfstTransducer & transform_weights(float(*func)(float));
     void write_in_att_format(const std::string &filename, bool write_weights=true) const;
     void write_in_att_format(FILE *ofile, bool write_weights=true) const;
+    void write_in_att_format(HfstFile &ofile, bool write_weights=true) const;
     void write_in_att_format(char * buffer, bool write_weights=true) const;
     virtual ~HfstTransducer(void);
     static HfstTransducer * read_lexc(const std::string &filename, ImplementationType type);

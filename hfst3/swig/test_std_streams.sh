@@ -3,6 +3,7 @@
 TOOLDIR=../tools/src/
 CALCULATE="$TOOLDIR"hfst-calculate
 COMPARE="$TOOLDIR"hfst-compare" -s"
+PYTHON=$1
 
 echo "a:b" | $CALCULATE -f sfst > a2b.sfst
 echo "c:d" | $CALCULATE -f sfst > c2d.sfst
@@ -14,7 +15,7 @@ echo "a:b" | $CALCULATE -f foma > a2b.foma
 echo "c:d" | $CALCULATE -f foma > c2d.foma
 cat a2b.foma c2d.foma > tr.foma
 
-if ! (cat tr.sfst | python ./test_std_streams.py sfst 2 > tmp.sfst); then
+if ! (cat tr.sfst | $PYTHON ./test_std_streams.py sfst 2 > tmp.sfst); then
     echo "ERROR: in sfst"
     exit 1
 fi
@@ -22,7 +23,7 @@ if ! ($COMPARE tr.sfst tmp.sfst); then
     echo "ERROR in sfst"
     exit 1
 fi
-if ! (cat tr.ofst | python ./test_std_streams.py openfst 2 > tmp.ofst); then
+if ! (cat tr.ofst | $PYTHON ./test_std_streams.py openfst 2 > tmp.ofst); then
     echo "ERROR: in openfst"
     exit 1
 fi
@@ -30,7 +31,7 @@ if ! ($COMPARE tr.ofst tmp.ofst); then
     echo "ERROR: in openfst"
     exit 1
 fi
-if ! (cat tr.foma | python ./test_std_streams.py foma 2 > tmp.foma); then
+if ! (cat tr.foma | $PYTHON ./test_std_streams.py foma 2 > tmp.foma); then
     echo "ERROR: in foma"
     exit 1
 fi  
