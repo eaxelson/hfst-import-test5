@@ -81,6 +81,12 @@ HfstTransducer* compile(const std::string& pmatch,
 HfstTransducer * latin1_alpha_acceptor(
     ImplementationType type = TROPICAL_OPENFST_TYPE);
 
+HfstTransducer * latin1_lowecase_acceptor(
+    ImplementationType type = TROPICAL_OPENFST_TYPE);
+
+HfstTransducer * latin1_uppercase_acceptor(
+    ImplementationType type = TROPICAL_OPENFST_TYPE);
+
 /** @brief Return a transducer that accepts one arabic numeral character. 
  */
 HfstTransducer * latin1_numeral_acceptor(
