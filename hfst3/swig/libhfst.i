@@ -72,7 +72,6 @@ class EmptyStringException: public HfstException {};
 class SymbolNotFoundException: public HfstException {};
 class MetadataException: public HfstException {};
 
-
 namespace hfst
 {
 
