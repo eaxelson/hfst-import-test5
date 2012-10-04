@@ -25,7 +25,7 @@ for ttype in (libhfst.sfst_type(), libhfst.tropical_openfst_type(), libhfst.foma
                 if not tr.compare(tr2):
                     print "ERROR: transducer 2 changed."
                     sys.exit(1)
-            tr.write_in_att_format(att_file) # FAILS on Windows
+            tr.write_in_att_format(att_file)
             if transducers_read < 2:
                 att_file.write('--\n')
         except libhfst.EndOfStreamException:

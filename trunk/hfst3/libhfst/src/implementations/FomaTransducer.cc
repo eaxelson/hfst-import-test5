@@ -932,6 +932,11 @@ static int io_gets(FILE *infile, char *target) {
         c = getc(infile);
     }   
     *(target+i) = '\0';
+
+    // Windows...
+    if (*(target+i-1) == '\r')
+      *(target+i-1) = '\0';
+
     if (c == '\0')
       ungetc(c, infile);
     return(i);
