@@ -18,6 +18,7 @@
 #include "HfstFlagDiacritics.h"
 #include "hfst_swig_extensions.h"
 #include "HfstExceptionDefs.h"
+unsigned int _CRT_fmode= _O_BINARY;
 %}
 
 namespace std {

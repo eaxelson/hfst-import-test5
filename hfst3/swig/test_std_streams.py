@@ -1,6 +1,10 @@
 import libhfst
 import sys
 
+if sys.platform == "win32":
+    import os, msvcrt
+    msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
+
 ttype = 0
 if sys.argv[1] == 'sfst':
     ttype = libhfst.sfst_type()
