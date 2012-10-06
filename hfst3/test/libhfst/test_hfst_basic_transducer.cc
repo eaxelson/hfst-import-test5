@@ -60,8 +60,10 @@ int main(int argc, char **argv)
   fclose(ofile);
   FILE * ifile = fopen("test.att", "rb");
   try {
+    unsigned int linecount = 0;
     HfstBasicTransducer foo 
-      = HfstBasicTransducer::read_in_att_format(ifile);
+      = HfstBasicTransducer::read_in_att_format(ifile, "@0@", linecount);
+    (void)linecount;
     fclose(ifile);
     remove("test.att");
     assert(false);

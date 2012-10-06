@@ -614,7 +614,7 @@ in \a ifile.
 @see String
 **/
     HfstTransducer(FILE * ifile, ImplementationType type, 
-                   const std::string &epsilon_symbol);
+                   const std::string &epsilon_symbol, unsigned int & linecount);
 
     HfstTransducer(HfstFile &ifile, ImplementationType type, 
                    const std::string &epsilon_symbol);

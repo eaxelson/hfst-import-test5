@@ -109,7 +109,8 @@ int main(int argc, char **argv)
 
       FILE * ifile = fopen("testfile.att", "rb");
       try {
-    HfstTransducer t(ifile, types[i], "@_EPSILON_SYMBOL_@");
+	unsigned int linecount = 0;
+	HfstTransducer t(ifile, types[i], "@_EPSILON_SYMBOL_@", linecount);
     assert(false);
       }
       catch (NotValidAttFormatException e)

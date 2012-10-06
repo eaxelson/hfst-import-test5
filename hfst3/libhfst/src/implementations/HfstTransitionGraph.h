@@ -842,8 +842,8 @@ namespace hfst {
         static HfstTransitionGraph read_in_att_format
           (std::istream &is,
            FILE *file,
-           std::string epsilon_symbol=
-           std::string("@_EPSILON_SYMBOL_@")) {
+           std::string epsilon_symbol,
+	   unsigned int & linecount) {
 
 	  if (file == NULL) {
 	    if (is.eof()) {
@@ -868,6 +868,8 @@ namespace hfst {
               if (NULL == fgets(line, 255, file))
                 break;
             }
+
+	    linecount++;
 
 	    // an empty line signifying an empty transducer,
 	    // a special case that is accepted if it is the only
@@ -958,12 +960,12 @@ namespace hfst {
             the line "--". */
         static HfstTransitionGraph read_in_att_format
           (std::istream &is,
-           std::string epsilon_symbol=
-             std::string("@_EPSILON_SYMBOL_@")) 
+           std::string epsilon_symbol,
+	   unsigned int & linecount) 
         {
           return read_in_att_format
             (is, NULL /* a dummy variable */,
-             epsilon_symbol);
+             epsilon_symbol, linecount);
         }
 
         /** @brief Create an HfstTransitionGraph as defined 
@@ -974,12 +976,12 @@ namespace hfst {
             the line "--". */
         static HfstTransitionGraph read_in_att_format
           (FILE *file, 
-           std::string epsilon_symbol=
-             std::string("@_EPSILON_SYMBOL_@")) 
+           std::string epsilon_symbol,
+	   unsigned int & linecount) 
         {
           return read_in_att_format
             (std::cin /* a dummy variable */,
-             file, epsilon_symbol);
+             file, epsilon_symbol, linecount);
         }	
 
 
