@@ -73,6 +73,8 @@ print_usage()
 	"The possible values for FMT are { foma, openfst-tropical, openfst-log,\n"
 	"sfst, optimized-lookup-weighted, optimized-lookup-unweighted }\n"
         "If EPS is not given, @0@ will be used\n\n"
+	"Space in transition symbols must be escaped as '@_SPACE_@'.\n"
+	"\n"
         );
     fprintf(message_out, "\n");
     print_report_bugs();
@@ -147,6 +149,8 @@ int
 process_stream(HfstOutputStream& outstream)
 {
   size_t transducer_n = 0;
+  unsigned int linecount = 0;
+
   //outstream.open();
   while (!feof(inputfile))
     {
@@ -159,12 +163,19 @@ process_stream(HfstOutputStream& outstream)
         {
           verbose_printf("Reading transducer table " SIZE_T_SPECIFIER "...\n", transducer_n);
         }
+      try {
         HfstTransducer t(inputfile,
-             output_format,
-             std::string(epsilonname));
+			 output_format,
+			 std::string(epsilonname),
+			 linecount);
         hfst_set_name(t, inputfilename, "text");
         hfst_set_formula(t, inputfilename, "T");
         outstream << t;
+      }
+      catch (NotValidAttFormatException e) {
+	error(EXIT_FAILURE, 0, "Error in processing transducer text file on line %u\n", linecount);
+        return EXIT_FAILURE;
+      }
     }
   outstream.close();
   return EXIT_SUCCESS;

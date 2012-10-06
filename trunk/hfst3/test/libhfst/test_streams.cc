@@ -34,7 +34,9 @@ int main(int argc, char **argv)
     {
       while (not feof(file))
         {
-          HfstTransducer t(file, types[i], "<eps>");
+	  unsigned int linecount = 0;
+          HfstTransducer t(file, types[i], "<eps>", linecount);
+	  (void)linecount;
           transducers_read++;
         }
     }

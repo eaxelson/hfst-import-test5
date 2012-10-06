@@ -3421,7 +3421,8 @@ void HfstTransducer::write_in_att_format
 
 HfstTransducer::HfstTransducer(FILE * ifile, 
                                ImplementationType type,
-                               const std::string &epsilon_symbol):
+                               const std::string &epsilon_symbol,
+			       unsigned int & linecount):
     type(type),anonymous(false),is_trie(false), name("")
 {
 
@@ -3437,7 +3438,7 @@ HfstTransducer::HfstTransducer(FILE * ifile,
     hfst::implementations::HfstBasicTransducer net =
     hfst::implementations::HfstTransitionGraph<hfst::implementations::
     HfstTropicalTransducerTransitionData>::
-        read_in_att_format(ifile, std::string(epsilon_symbol));
+      read_in_att_format(ifile, std::string(epsilon_symbol), linecount);
 
     // Conversion is done here.
     switch (type)
@@ -3505,11 +3506,13 @@ HfstTransducer::HfstTransducer(HfstFile & ifile,
 
     HfstTokenizer::check_utf8_correctness(epsilon_symbol);
 
+    unsigned int foo=0;
     // Implemented only for internal transducer format.
     hfst::implementations::HfstBasicTransducer net =
     hfst::implementations::HfstTransitionGraph<hfst::implementations::
     HfstTropicalTransducerTransitionData>::
-      read_in_att_format(ifile.get_file(), std::string(epsilon_symbol));
+      read_in_att_format(ifile.get_file(), std::string(epsilon_symbol), foo);
+    (void)foo;
 
     // Conversion is done here.
     switch (type)
@@ -3589,11 +3592,13 @@ HfstTransducer &HfstTransducer::read_in_att_format
 
     HfstTokenizer::check_utf8_correctness(epsilon_symbol);
 
+    unsigned int foo = 0;
     hfst::implementations::HfstBasicTransducer net =
     hfst::implementations::HfstTransitionGraph<hfst::implementations::
     HfstTropicalTransducerTransitionData>
-        ::read_in_att_format(ifile, std::string(epsilon_symbol));
+      ::read_in_att_format(ifile, std::string(epsilon_symbol), foo);
     HfstTransducer *retval = new HfstTransducer(net,type);
+    (void)foo;
     return *retval;
 }
 

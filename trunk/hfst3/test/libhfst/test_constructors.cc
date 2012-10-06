@@ -68,7 +68,9 @@ int main(int argc, char **argv)
       FILE * file = fopen((std::string(getenv("srcdir")) + 
                std::string("/foobar.att")).c_str(), "rb");
       assert(file != NULL);
-      HfstTransducer foobar_att(file, types[i], "@0@");
+      unsigned int linecount = 0;
+      HfstTransducer foobar_att(file, types[i], "@0@", linecount);
+      (void)linecount;
       fclose(file);
       foobar_att.minimize();
 
