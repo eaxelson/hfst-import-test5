@@ -47,7 +47,7 @@ AC_SUBST([LIBHFST_NAME], [hfst])
 
 # long version = version vector cast in base 10000, for automatic comparisons
 # e.g.: 3.3.2 = 0003 0000 0000 + 0003 0000 + 0002
-AC_DEFINE([HFST_LONGVERSION], [300030012L],
+AC_DEFINE([HFST_LONGVERSION], [300030014L],
           [Define to hfst version vector as long in base 10000])
 AC_DEFINE([HFST_REVISION], ["$Revision$"],
           [Automatically substitute to configure.ac revision])
