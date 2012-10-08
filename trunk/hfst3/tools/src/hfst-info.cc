@@ -48,37 +48,39 @@ static set<string> required_features;
 static
 long
 parse_version_string(const char* s)
-{
-  long l = 0;
-  long multiplier = 10000;
-  unsigned int fullstops = 0;
-  for (const char* p = s; *p != '\0'; p++)
-    {
-      if (('0' <= *p) && (*p <= '9'))
-        {
-          l *= 10;
-          l += *p - '0';
-          multiplier /= 10;
-        }
-      else if (*p == '.')
-        {
-          l *= multiplier;
-          multiplier = 10000;
-          fullstops++;
-        }
-      else
-        {
-          error(EXIT_FAILURE, 0, "Cannot parse %s as version string;\n"
-                " please currently only use ASCII digits and full stops",
-                s);
-        }
-    }
-  for (int i = fullstops; i < 2; i++)
-    {
-      l *= 10000;
-    }
-  return l;
-}
+  {
+    char* endptr;
+    long major = strtoul(s, &endptr, 10L);
+    if (*endptr == '\0')
+      {
+        return (major * 10000 * 10000);
+      }
+    else if (*endptr != '.')
+      {
+        error(EXIT_FAILURE, 0, "cannot parse version string from %s", endptr);
+      }
+    s = endptr + 1;
+    long minor = strtoul(s, &endptr, 10L);
+    if (*endptr == '\0')
+      {
+        return (major * 10000 * 10000) + (minor * 10000);
+      }
+    else if (*endptr != '.')
+      {
+        error(EXIT_FAILURE, 0, "cannot parse version string from %s", endptr);
+      }
+    s = endptr + 1;
+    long patch = strtoul(s, &endptr, 10L);
+    if (*endptr == '\0')
+      {
+        return (major * 10000 * 10000) + (minor * 10000) + patch;
+      }
+    else
+      {
+        error(EXIT_FAILURE, 0, "cannot parse version string from %s", endptr);
+      }
+    return -1L;
+  }
 
 void
 print_usage()
