@@ -18,7 +18,6 @@
 #include "HfstFlagDiacritics.h"
 #include "hfst_swig_extensions.h"
 #include "HfstExceptionDefs.h"
-unsigned int _CRT_fmode= _O_BINARY;
 %}
 
 namespace std {
@@ -157,8 +156,8 @@ void write_in_att_format (std::ostream &os, bool write_weights=true);
 void write_in_att_format (FILE *file, bool write_weights=true);
 void write_in_att_format_number (FILE *file, bool write_weights=true);
 
-static HfstBasicTransducer read_in_att_format (std::istream &is, std::string epsilon_symbol=std::string("@_EPSILON_SYMBOL_@"));
-static HfstBasicTransducer read_in_att_format (FILE *file, std::string epsilon_symbol=std::string("@_EPSILON_SYMBOL_@"));
+static HfstBasicTransducer read_in_att_format (std::istream &is, std::string epsilon_symbol, unsigned int & linecount);
+static HfstBasicTransducer read_in_att_format (FILE *file, std::string epsilon_symbol, unsigned int & linecount);
 
     %extend {
     char *__str__() {
@@ -235,7 +234,7 @@ public:
     HfstTransducer(ImplementationType type);
     HfstTransducer(const std::string &symbol, ImplementationType type);
     HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type);
-    HfstTransducer(FILE *ifile, ImplementationType type, const std::string &epsilon_symbol) throw (EndOfStreamException);
+    HfstTransducer(FILE *ifile, ImplementationType type, const std::string &epsilon_symbol, unsigned int & linecount) throw (EndOfStreamException);
     HfstTransducer(HfstFile &ifile, ImplementationType type, const std::string &epsilon_symbol) throw (EndOfStreamException);
     
     // Then everything else, in the (alphabetic) order in the API manual
