@@ -51,6 +51,7 @@ section
 	File libhfst-21.dll
 
 	File hfst-affix-guessify.exe
+	File hfst-calculate.exe
 	File hfst-compare.exe
 	File hfst-compose.exe
 	File hfst-compose-intersect.exe
@@ -59,8 +60,8 @@ section
 	File hfst-determinize.exe
 	File hfst-disjunct.exe
 	File hfst-duplicate.exe
-	File hfst-expand-equivalences.exe
 	File hfst-edit-metadata.exe
+	File hfst-expand-equivalences.exe
 	File hfst-format.exe
 	File hfst-fst2fst.exe
 	File hfst-fst2strings.exe
@@ -92,13 +93,14 @@ section
 	File hfst-split.exe
 	File hfst-strings2fst.exe
 	File hfst-strip-header.exe
+	File hfst-substitute.exe
 	File hfst-subtract.exe
 	File hfst-summarize.exe
 	File hfst-tail.exe
+	#   -- File hfst-train-tagger.exe
 	File hfst-traverse.exe
+	#   -- File hfst-twolc.exe
 	File hfst-txt2fst.exe
-	File hfst-calculate.exe
-	File hfst-substitute.exe
 
 	
 sectionEnd

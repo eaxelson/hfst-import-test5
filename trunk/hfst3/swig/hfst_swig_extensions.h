@@ -5,8 +5,6 @@
 #include "HfstTransducer.h"
 #include "HfstFlagDiacritics.h"
 
-#include <fcntl.h>
-
 // NO EFFECT in Swig...
 // Make sure that all standard streams are in binary mode.
 // Line feed and carriage return characters are not handled correctly
