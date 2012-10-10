@@ -88,7 +88,6 @@ section
 	File hfst-optimized-lookup.exe
 	File hfst-pmatch.exe
 	File hfst-pmatch2fst.exe
-	File hfst-preprocess-for-optimized-lookup-format.exe
 	File hfst-project.exe
 	File hfst-push-weights.exe
 	File hfst-regexp2fst.exe
@@ -99,7 +98,6 @@ section
 	File hfst-shuffle.exe
 	File hfst-split.exe
 	File hfst-strings2fst.exe
-	File hfst-strip-header.exe
 	File hfst-substitute.exe
 	File hfst-subtract.exe
 	File hfst-summarize.exe

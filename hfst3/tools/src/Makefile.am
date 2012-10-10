@@ -152,9 +152,9 @@ endif
 if WANT_STRINGS2FST
 MAYBE_STRINGS2FST=hfst-strings2fst$(EXEEXT)
 endif
-if WANT_STRIP_HEADER
-MAYBE_STRIP_HEADER=hfst-strip-header$(EXEEXT)
-endif
+#if WANT_STRIP_HEADER
+#MAYBE_STRIP_HEADER=hfst-strip-header$(EXEEXT)
+#endif
 if WANT_SUBTRACT
 MAYBE_SUBTRACT=hfst-subtract$(EXEEXT)
 endif
@@ -280,7 +280,7 @@ hfst_shuffle_SOURCES=hfst-shuffle.cc $(HFST_COMMON_SRC)
 hfst_split_SOURCES=hfst-split.cc $(HFST_COMMON_SRC)
 hfst_strings2fst_SOURCES=hfst-strings2fst.cc $(HFST_COMMON_SRC) \
 HfstStrings2FstTokenizer.cc
-hfst_strip_header_SOURCES=hfst-strip-header.cc $(HFST_COMMON_SRC)
+#hfst_strip_header_SOURCES=hfst-strip-header.cc $(HFST_COMMON_SRC)
 hfst_substitute_SOURCES=hfst-substitute.cc $(HFST_COMMON_SRC)
 hfst_subtract_SOURCES=hfst-subtract.cc $(HFST_COMMON_SRC)
 hfst_summarize_SOURCES=hfst-summarize.cc $(HFST_COMMON_SRC)
