@@ -307,12 +307,12 @@ AC_ARG_ENABLE([pmatch],
 			  [enable_pmatch=$enableval],
 			  [enable_pmatch=yes])
 AM_CONDITIONAL([WANT_PMATCH], [test x$enable_pmatch != xno])
-AC_ARG_ENABLE([preprocess_for_optimized_lookup],
-			  [AS_HELP_STRING([--enable-remove-epsilons],
-							  [build remove-epsilons tool @<:@default=yes@:>@])],
-			  [enable_preprocess_for_optimized_lookup=$enableval],
-			  [enable_preprocess_for_optimized_lookup=yes])
-AM_CONDITIONAL([WANT_PREPROCESS_FOR_OPTIMIZED_LOOKUP], [test x$enable_preprocess_for_optimized_lookup != xno])
+#AC_ARG_ENABLE([preprocess_for_optimized_lookup],
+#			  [AS_HELP_STRING([--enable-remove-epsilons],
+#							  [build remove-epsilons tool @<:@default=no@:>@])],
+#			  [enable_preprocess_for_optimized_lookup=$enableval],
+#			  [enable_preprocess_for_optimized_lookup=no])
+#AM_CONDITIONAL([WANT_PREPROCESS_FOR_OPTIMIZED_LOOKUP], [test x$enable_preprocess_for_optimized_lookup != xno])
 AC_ARG_ENABLE([project],
 			  [AS_HELP_STRING([--enable-project],
 							  [build project tool @<:@default=yes@:>@])],

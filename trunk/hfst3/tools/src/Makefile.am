@@ -119,9 +119,9 @@ endif
 if WANT_PMATCH2FST
 MAYBE_PMATCH2FST=hfst-pmatch2fst$(EXEEXT)
 endif
-if WANT_PREPROCESS_FOR_OPTIMIZED_LOOKUP
-MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP=hfst-preprocess-for-optimized-lookup-format$(EXEEXT)
-endif
+#if WANT_PREPROCESS_FOR_OPTIMIZED_LOOKUP
+#MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP=hfst-preprocess-for-optimized-lookup-format$(EXEEXT)
+#endif
 if WANT_PROJECT
 MAYBE_PROJECT=hfst-project$(EXEEXT)
 endif
@@ -208,7 +208,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_LOOKUP) $(MAYBE_MINIMIZE) $(MAYBE_NAME)            \
 			 $(MAYBE_OPTIMIZED_LOOKUP) $(MAYBE_PMATCH)                  \
 			 $(MAYBE_PMATCH2FST)                                        \
-			 $(MAYBE_PROJECT) $(MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP)  \
+			 $(MAYBE_PROJECT)                                           \
 			 $(MAYBE_PUSH_WEIGHTS) $(MAYBE_REGEXP2FST)                  \
 			 $(MAYBE_REMOVE_EPSILONS) $(MAYBE_REPEAT) $(MAYBE_REVERSE)  \
 			 $(MAYBE_REWEIGHT) $(MAYBE_SHUFFLE)                         \
@@ -220,7 +220,8 @@ bin_PROGRAMS= \
 			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)\
 			 $(MAYBE_TRAVERSE) $(MAYBE_GUESSIFY) $(MAYBE_GUESS) \
 			 $(MAYBE_INFO) $(MAYBE_EXPAND_EQUIVALENCES)
-# fuck the alphabets!
+
+#$(MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc \
 				hfst-tool-metadata.cc
@@ -265,8 +266,8 @@ hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_name_SOURCES=hfst-name.cc $(HFST_COMMON_SRC)
 hfst_optimized_lookup_SOURCES=hfst-optimized-lookup.cc
 hfst_pmatch_SOURCES=hfst-pmatch.cc $(HFST_COMMON_SRC)
-hfst_preprocess_for_optimized_lookup_format_SOURCES=hfst-preprocess-for-optimized-lookup-format.cc \
-	$(HFST_COMMON_SRC)
+#hfst_preprocess_for_optimized_lookup_format_SOURCES=hfst-preprocess-for-optimized-lookup-format.cc
+#	$(HFST_COMMON_SRC)
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
 hfst_push_weights_SOURCES=hfst-push-weights.cc $(HFST_COMMON_SRC)
 hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc $(HFST_COMMON_SRC)
@@ -297,10 +298,10 @@ install-exec-hook:
 		$(LN_S) -f hfst-minimize$(EXEEXT) hfst-minimise$(EXEEXT) && \
 		$(LN_S) -f hfst-optimized-lookup$(EXEEXT) hfst-optimised-lookup$(EXEEXT) && \
 		$(LN_S) -f hfst-subtract$(EXEEXT) hfst-minus$(EXEEXT) && \
-		$(LN_S) -f hfst-preprocess-for-optimized-lookup-format$(EXEEXT) hfst-preprocess-for-optimised-lookup-format$(EXEEXT) && \
 		$(LN_S) -f hfst-calculate$(EXEEXT) hfst-sfstpl2fst$(EXEEXT) && \
 		$(LN_S) -f hfst-summarize$(EXEEXT) hfst-summarise$(EXEEXT) && \
 		$(LN_S) -f hfst-disjunct$(EXEEXT) hfst-union$(EXEEXT)
+#		$(LN_S) -f hfst-preprocess-for-optimized-lookup-format$(EXEEXT) hfst-preprocess-for-optimised-lookup-format$(EXEEXT) &&
 
 BUILT_SOURCES=hfst-scanner.h hfst-compiler.h $(hfst_lexc2fst_BUILT)
 
