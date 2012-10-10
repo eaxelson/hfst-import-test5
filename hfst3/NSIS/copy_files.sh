@@ -9,10 +9,10 @@ SWIGDIR=../SWIG/
 TOOLDIR=../tools/src/.libs/
 
 HFST_LIB=libhfst-21.dll
-DEPENDENCY_DLLS=libgcc_s_dw2-1.dll libstdc++-6.dll
-SWIG_FILES=_libhfst.pyd libhfst.py
+DEPENDENCY_DLLS="libgcc_s_dw2-1.dll libstdc++-6.dll"
+SWIG_FILES="_libhfst.pyd libhfst.py"
 
-TOOLS=hfst-affix-guessify.exe \
+TOOLS="hfst-affix-guessify.exe \
 hfst-calculate.exe \
 hfst-compare.exe \
 hfst-compose.exe \
@@ -23,7 +23,6 @@ hfst-determinize.exe \
 hfst-disjunct.exe \
 hfst-duplicate.exe \
 hfst-edit-metadata.exe \
-hfst-expand-equivalences.exe \
 hfst-format.exe \
 hfst-fst2fst.exe \
 hfst-fst2strings.exe \
@@ -60,11 +59,12 @@ hfst-subtract.exe \
 hfst-summarize.exe \
 hfst-tail.exe \
 hfst-traverse.exe \
-hfst-txt2fst.exe
-# hfst-train-tagger.exe hfst-twolc.exe
+hfst-txt2fst.exe"
+# hfst-train-tagger.exe hfst-twolc.exe hfst-expand-equivalences.exe
 
 
 cp $LIBDIR/$HFST_LIB .
+strip $HFST_LIB
 
 for dependency_dll in $DEPENDENCY_DLLS;
 do
@@ -73,7 +73,8 @@ done
 
 for tool in $TOOLS; 
 do
-    cp $TOOLDIR/$tool .; 
+    cp $TOOLDIR/$tool .;
+    strip $tool;
 done
 
 for swigfile in $SWIG_FILES;

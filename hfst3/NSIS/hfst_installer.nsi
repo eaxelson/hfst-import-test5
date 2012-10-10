@@ -45,6 +45,13 @@ section
 	${EndIf}
 
 
+	# Install Swig/Python bindings
+	# ----------------------------
+
+	File _libhfst.pyd
+	File libhfst.py
+
+
 	# Install libhfst dll and HFST command line tools
 	# -----------------------------------------------
 
@@ -61,7 +68,7 @@ section
 	File hfst-disjunct.exe
 	File hfst-duplicate.exe
 	File hfst-edit-metadata.exe
-	File hfst-expand-equivalences.exe
+	#   -- File hfst-expand-equivalences.exe
 	File hfst-format.exe
 	File hfst-fst2fst.exe
 	File hfst-fst2strings.exe
