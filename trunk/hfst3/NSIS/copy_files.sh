@@ -42,7 +42,6 @@ hfst-name.exe \
 hfst-optimized-lookup.exe \
 hfst-pmatch.exe \
 hfst-pmatch2fst.exe \
-hfst-preprocess-for-optimized-lookup-format.exe \
 hfst-project.exe \
 hfst-push-weights.exe \
 hfst-regexp2fst.exe \
@@ -53,7 +52,6 @@ hfst-reweight.exe \
 hfst-shuffle.exe \
 hfst-split.exe \
 hfst-strings2fst.exe \
-hfst-strip-header.exe \
 hfst-substitute.exe \
 hfst-subtract.exe \
 hfst-summarize.exe \

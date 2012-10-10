@@ -385,12 +385,12 @@ AC_ARG_ENABLE([strings2fst],
 			  [enable_strings2fst=$enableval],
 			  [enable_strings2fst=yes])
 AM_CONDITIONAL([WANT_STRINGS2FST], [test x$enable_strings2fst != xno])
-AC_ARG_ENABLE([strip_header],
-			  [AS_HELP_STRING([--enable-strip-header],
-							  [build strip-header tool @<:@default=yes@:>@])],
-			  [enable_strip_header=$enableval],
-			  [enable_strip_header=yes])
-AM_CONDITIONAL([WANT_STRIP_HEADER], [test x$enable_strip_header != xno])
+#AC_ARG_ENABLE([strip_header],
+#			  [AS_HELP_STRING([--enable-strip-header],
+#							  [build strip-header tool @<:@default=yes@:>@])],
+#			  [enable_strip_header=$enableval],
+#			  [enable_strip_header=yes])
+#AM_CONDITIONAL([WANT_STRIP_HEADER], [test x$enable_strip_header != xno])
 AC_ARG_ENABLE([substitute],
 			  [AS_HELP_STRING([--enable-substitute],
 							  [build substitution tool @<:@default=yes@:>@])],
@@ -646,7 +646,6 @@ cat <<EOF
     *                 shuffle: $enable_shuffle
     *                 split: $enable_split
     *                 strings2fst: $enable_strings2fst
-    *                 strip-header: $enable_strip_header
     *                 substitute: $enable_substitute
     *                 subtract: $enable_subtract (minus)
     *                 summarize: $enable_summarize (summarise)
