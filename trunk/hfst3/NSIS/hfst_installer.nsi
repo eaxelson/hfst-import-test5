@@ -45,6 +45,12 @@ section
 	${EndIf}
 
 
+	# Install the README file
+	# -----------------------
+
+	File README
+
+
 	# Install Swig/Python bindings
 	# ----------------------------
 

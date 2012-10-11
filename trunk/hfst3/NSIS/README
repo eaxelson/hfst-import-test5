@@ -1,0 +1,48 @@
+You have installed HFST command line tools and SWIG/Python bindings
+locally to this directory.
+
+
+HFST command line tools
+-----------------------
+
+There are about 50 different HFST command line tools in this directory.
+The command 
+
+  hfst-some-tool --help
+
+will give information on the purpose of each tool and tell how they 
+are used. To test the tools, you can run for example
+
+  echo a:b | hfst-calculate | hfst-invert | hfst-minimize | hfst-fst2strings
+
+that should print
+
+  b:a
+
+
+Using HFST through Python
+-------------------------
+
+If you want to use HFST through Python, first run Python in this
+directory. The Python interface is compiled with Python 2.7, so
+using the same version is recommended. Run Python with the command
+
+  c:\python27\python.exe
+
+or similar (replace 'c:\python27\' with the path to the directory
+where you have Python installed or leave it out if the environment
+variable %PATH% already contains it).
+
+In Python, import HFST library with the command
+
+  import libhfst
+
+Now you can use HFST, for example in the following way
+
+  tr = libhfst.HfstTransducer('a', 'b', libhfst.foma_type())
+  print tr.invert().minimize()
+
+The above piece of code should print something like
+
+  0    1    b    a    0.0
+  1    0.0
