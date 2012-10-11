@@ -94,13 +94,13 @@ AM_CONDITIONAL([WANT_STRESSTESTS], [test x$enable_stress_tests != xno])
 # subst in hfst.pc.in
 AC_SUBST([HFST_MAJOR], [3])
 AC_SUBST([HFST_MINOR], [3])
-AC_SUBST([HFST_EXTENSION], [12f])
-AC_SUBST([HFST_VERSION], [3.3.12f])
+AC_SUBST([HFST_EXTENSION], [14f])
+AC_SUBST([HFST_VERSION], [3.3.14f])
 AC_SUBST([HFST_NAME], [hfst])
 
 # long version = version vector cast in base 10000, for automatic comparisons
 # e.g.: 3.3.12 = 0003 0000 0000 + 0003 0000 + 0012
-AC_DEFINE([HFST_LONGVERSION], [300030012L],
+AC_DEFINE([HFST_LONGVERSION], [300030014L],
           [Define to hfst version vector as long in base 10000])
 AC_DEFINE([HFST_REVISION], ["$Revision$"],
           [Automatically substitute to configure.ac revision])
