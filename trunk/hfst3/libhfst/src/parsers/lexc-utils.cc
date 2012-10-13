@@ -252,15 +252,26 @@ strip_percents(const char* s, bool do_zeros)
     char* p = rv;
     const char* c = s;
     bool escaping = false;
+    bool in_at = false;
     while (*c != '\0')
-    {
-        if (escaping)
-        {
+      {
+        if (in_at)
+          {
+            if (*p = '@')
+              {
+                in_at = false;
+              }
+            *p = *c;
+            p++;
+            c++;
+          }
+        else if (escaping)
+          {
             if (*c != '0')
-            {
+              {
                 *p = *c;
                 p++;
-            }
+              }
             else
               {
                 const char* escaped = "@ZERO@";
@@ -270,15 +281,22 @@ strip_percents(const char* s, bool do_zeros)
                     p++;
                     escaped++;
                   }
-            }
+              }
             escaping = false;
             ++c;
-        }
+          }
         else if (*c == '%')
-        {
+          {
             escaping = true;
             ++c;
-        }
+          }
+        else if (*c == '@')
+          {
+            in_at = true;
+            *p = *c;
+            p++;
+            c++;
+          }
         else if (do_zeros && (*c == '0'))
           {
             const char* escaped = "@0@";
@@ -291,12 +309,12 @@ strip_percents(const char* s, bool do_zeros)
             c++;
           }
         else
-        {
+          {
             *p = *c;
             ++p;
             ++c;
-        }
-    }
+          }
+      }
     *p = '\0';
     if (escaping)
     {
