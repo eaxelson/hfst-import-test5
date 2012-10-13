@@ -8,7 +8,7 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
           basic.no-Root.lexc basic.punctuation.lexc basic.root-loop.lexc 
           basic.spurious-lexicon.lexc basic.string-pairs.lexc 
           basic.two-lexicons.lexc basic.UTF-8.lexc basic.zeros-epsilons.lexc
-         basic.lowercase-lexicon-end.lexc 
+         basic.lowercase-lexicon-end.lexc basic.multichar-flag-with-zero.lexc
           hfst.weights.lexc 
           xre.any-variations.lexc
           xre.automatic-multichar-symbols.lexc xre.basic.lexc 
