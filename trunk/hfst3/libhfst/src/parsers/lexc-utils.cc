@@ -49,16 +49,16 @@ namespace hfst { namespace lexc {
 static
 string&
 replace_all(string& haystack, const string& needle, const string& replacement)
-{
-        size_t last_needle = haystack.find(needle);
-        size_t needle_len = needle.length();
-        while (last_needle != string::npos)
-        {
-                haystack.replace(last_needle, needle_len, replacement);
-                last_needle = haystack.find(needle);
-        }
-        return haystack;
-}
+  {
+    size_t last_needle = haystack.find(needle);
+    size_t needle_len = needle.length();
+    while (last_needle != string::npos)
+      {
+        haystack.replace(last_needle, needle_len, replacement);
+        last_needle = haystack.find(needle);
+      }
+    return haystack;
+  }
 
 
 string&
