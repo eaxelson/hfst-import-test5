@@ -415,6 +415,7 @@ LexcCompiler::compileLexical()
     string endEnc = "#";
     joinerEncode(endEnc);
     lexicons.substitute(endEnc, "@_EPSILON_SYMBOL_@");
+    lexicons.substitute("@ZERO@", "0");
     HfstTransducer* rv = new HfstTransducer(lexicons);
     rv->minimize();
     return rv;
