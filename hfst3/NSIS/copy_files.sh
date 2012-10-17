@@ -57,9 +57,17 @@ hfst-subtract.exe \
 hfst-summarize.exe \
 hfst-tail.exe \
 hfst-traverse.exe \
-hfst-txt2fst.exe"
-# hfst-train-tagger.exe hfst-twolc.exe hfst-expand-equivalences.exe
+hfst-txt2fst.exe \
+hfst-tagger/src/hfst-open-input-file-for-tagger.exe \
+hfst-tagger/src/hfst_tagger_compute_data_statistics.py \
+hfst-tagger/src/hfst-build-tagger.exe \
+hfst-tagger/src/hfst-train-tagger-system.exe \
+hfst-twolc/src/htwolcpre1.exe \
+hfst-twolc/src/htwolcpre2.exe \
+hfst-twolc/src/htwolcpre3.exe \
+hfst-twolc/src/hfst-twolc-system.exe"
 
+#hfst-expand-equivalences.exe
 
 cp $LIBDIR/$HFST_LIB .
 strip $HFST_LIB
@@ -74,6 +82,9 @@ do
     cp $TOOLDIR/$tool .;
     strip $tool;
 done
+
+mv hfst-train-tagger-system.exe hfst-train-tagger.exe
+mv hfst-twolc-system.exe hfst-twolc.exe
 
 for swigfile in $SWIG_FILES;
 do
