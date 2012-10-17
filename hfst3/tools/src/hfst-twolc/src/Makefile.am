@@ -1,6 +1,6 @@
 AM_YFLAGS= -d -o y.tab.c
 AM_CXXFLAGS= -O3 -g -Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors
-bin_PROGRAMS=htwolcpre1 htwolcpre2 htwolcpre3
+bin_PROGRAMS=htwolcpre1 htwolcpre2 htwolcpre3 hfst-twolc-system
 bin_SCRIPTS=hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT)
 EXTRA_DIST=hfst-twolc.sh common_globals.h
 IO_SRC=$(srcdir)/io_src
@@ -21,7 +21,7 @@ endif
 # the preprocessor scripts do not support options per se, so we whitelist
 # them here
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=htwolcpre1 htwolcpre2 htwolcpre3 \
-				hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT)
+				hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT) hfst-twolc-system$(EXEEXT)
 
 htwolcpre1_SOURCES=htwolcpre1.yy scanner1.ll HfstTwolcDefs.h \
 		   $(CL_SRC)/CommandLine.h $(CL_SRC)/CommandLine.cc \
@@ -82,6 +82,8 @@ htwolcpre3_SOURCES=htwolcpre3.yy scanner3.ll HfstTwolcDefs.h \
 		   $(RULE_SRC)/TwolCGrammar.cc \
 		   $(RULE_SRC)/TwolCGrammar.h
 
+hfst_twolc_system_SOURCES=hfst-twolc-system.cc
+
 # some systems might require all these
 BUILT_SOURCES=htwolcpre1.h htwolcpre2.h htwolcpre3.h
 
@@ -94,7 +96,7 @@ hfst-twolc-loc$(EXEEXT): hfst-twolc.sh
 	chmod ogu+rx hfst-twolc-loc$(EXEEXT)
 
 clean-local:
-	-rm -f hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT)
+	-rm -f hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT) hfst-twolc-system$(EXEEXT)
 
 HFST_TWOLC_TESTS=string_manipulation InputReader Alphabet \
                  OtherSymbolTransducer Rule LeftArrowRule RightArrowRule \
