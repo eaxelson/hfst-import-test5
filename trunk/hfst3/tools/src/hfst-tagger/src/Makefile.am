@@ -2,7 +2,7 @@ AM_CXXFLAGS= -O3 -g -Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors \
              -I$(top_builddir)/tools/src/inc -I$(top_builddir)/tools/src 
 
 bin_PROGRAMS=hfst-build-tagger hfst-open-input-file-for-tagger hfst-tag \
-hfst-reweight-tagger
+hfst-reweight-tagger hfst-train-tagger-system
 bin_SCRIPTS=hfst_tagger_compute_data_statistics.py hfst-train-tagger \
 hfst-train-tagger-loc
 EXTRA_DIST=hfst-train-tagger.sh
@@ -27,7 +27,8 @@ HFST_COMMON_SRC=$(top_srcdir)/tools/src/hfst-program-options.cc \
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=hfst_tagger_compute_data_statistics.py \
                                    hfst-build-tagger \
                                    hfst-open-input-file-for-tagger \
-                                   hfst-train-tagger hfst-train-tagger-loc
+                                   hfst-train-tagger hfst-train-tagger-loc \
+				   hfst-train-tagger-system
 
 hfst_build_tagger_SOURCES=hfst-build-tagger.cc \
 			  $(BUILD_MODEL_SRC)/FstBuilder.h \
@@ -69,6 +70,8 @@ hfst_tag_SOURCES=hfst-tag.cc \
 hfst_reweight_tagger_SOURCES=hfst-reweight-tagger.cc \
 		             $(HFST_COMMON_SRC)
 
+hfst_train_tagger_system_SOURCES=hfst-train-tagger-system.cc
+
 hfst-train-tagger$(EXEEXT): hfst-train-tagger.sh
 	cat $< | sed -e 's|BINDIR|$(bindir)|' > $@
 	chmod ogu+rx $@
@@ -78,7 +81,7 @@ hfst-train-tagger-loc$(EXEEXT): hfst-train-tagger.sh
 	chmod ogu+rx $@
 
 clean-local:
-	-rm -f hfst-train-tagger$(EXEEXT) hfst-train-tagger-loc$(EXEEXT)
+	-rm -f hfst-train-tagger$(EXEEXT) hfst-train-tagger-loc$(EXEEXT) hfst-train-tagger-system$(EXEEXT)
 
 unit_test_aux.o:$(srcdir)/unit_test_aux.cc
 
