@@ -69,6 +69,14 @@ gzip ab.foma
 
 will create a file 'ab.foma.gz' that can be used by foma tools.
 
+The same with command line tools:
+
+\verbatim
+   echo "a:b" | hfst-strings2fst -f foma > ab.hfst
+   hfst-fst2fst --use-backend-format -f foma > ab.foma
+   gzip ab.foma
+\endverbatim
+
 An example of the opposite case follows. Suppose we have a foma transducer
 'transducer.foma' and want to read it inside an HFST program.
 The name of the file must be appended a .gz extension so that the program 
@@ -87,6 +95,14 @@ same file. Now the file can be used by HFST:
    HfstTransducer tr(in);
 \endverbatim
 
+The same with command line tools:
+
+\verbatim
+   mv transducer.foma transducer.foma.gz
+   gunzip transducer.foma.gz
+   hfst-sometool transducer.foma
+\endverbatim
+
 */
 
   /** \page VersionDifferences.html Differences between versions 2 and 3
@@ -94,7 +110,7 @@ same file. Now the file can be used by HFST:
       If you need documentation on HFST version 2, you find it 
       <a href="http://hfst.sourceforge.net/hfst2/index.html">here</a>.
       The page is no longer updated and it is recommended to update
-      to version 3.0.
+      to version 3.
 
       Some changes from version 2 to 3:
 
@@ -890,7 +906,7 @@ The examples given in this documentation use
 
 <br>
 
-\section what_is_new What is new in version 3.0
+\section what_is_new What is new in version 3
 
    - A third transducer library, <a href="http://code.google.com/p/foma/">foma</a>, is included
 

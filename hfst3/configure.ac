@@ -451,8 +451,8 @@ AC_ARG_ENABLE([windows],
 AM_CONDITIONAL([WANT_WINDOWS], [test x$enable_windows != xno])
 
 
-AS_IF([test "x$enable_windows" != "xno" -a "x$enable_tagger" != "xno"],
-      [AC_MSG_FAILURE([hfst-train-tagger and hfst-tag cannot be used on Windows; disable --enable-tagger when using --enable-windows])])
+#AS_IF([test "x$enable_windows" != "xno" -a "x$enable_tagger" != "xno"],
+#      [AC_MSG_FAILURE([hfst-train-tagger and hfst-tag cannot be used on Windows; disable --enable-tagger when using --enable-windows])])
 
 #AS_IF([test x$enable_windows != xno],
 #      [AC_MSG_FAILURE([windows compilation not supported yet (requested with --enable-windows)])])

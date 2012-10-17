@@ -1,10 +1,10 @@
 AM_CXXFLAGS= -O3 -g -Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors \
              -I$(top_builddir)/tools/src/inc -I$(top_builddir)/tools/src 
 
-bin_PROGRAMS=hfst-build-tagger hfst-open-input-file-for-tagger hfst-tag \
-hfst-reweight-tagger hfst-train-tagger-system
-bin_SCRIPTS=hfst_tagger_compute_data_statistics.py hfst-train-tagger \
-hfst-train-tagger-loc
+bin_PROGRAMS=hfst-build-tagger$(EXEEXT) hfst-open-input-file-for-tagger$(EXEEXT) hfst-tag \
+hfst-reweight-tagger$(EXEEXT) hfst-train-tagger-system$(EXEEXT)
+bin_SCRIPTS=hfst_tagger_compute_data_statistics.py hfst-train-tagger$(EXEEXT) \
+hfst-train-tagger-loc$(EXEEXT)
 EXTRA_DIST=hfst-train-tagger.sh
 BUILD_MODEL_SRC=$(srcdir)/build_model_src
 USE_MODEL_SRC=$(srcdir)/use_model_src
@@ -14,7 +14,8 @@ LDADD = $(top_builddir)/libhfst/src/libhfst.la
 if WANT_WINDOWS
   AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include \
 		-I${top_srcdir}/windows/foma \
-		-I${top_srcdir}/windows -DWINDOWS
+		-I${top_srcdir}/windows \
+		-I${top_srcdir}/windows/dlfcn -DWINDOWS
 endif
 
 python_PYTHON=$(BUILD_MODEL_SRC)/tagger_aux.py \
