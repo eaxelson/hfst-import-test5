@@ -1,14 +1,20 @@
 !include LogicLib.nsh
+!include EnvVarUpdate.nsh
 
 outfile "HfstInstaller.exe"
 
 section
 
+	# Tell the user what is going to be installed 
+	# -------------------------------------------
+	
+	messageBox MB_OK "This program will install HFST command line tools and Python/Swig bindings locally to a chosen directory. After installation, you can use the functionalities by opening Command Prompt and moving to that directory. There you will also find a README file that gives more information on the functionalities and some simple examples."
+
 
 	# Define the installation directory
 	# ---------------------------------
 
-	nsDialogs::SelectFolderDialog "Select directory where HFST tools will be installed" "c:\HFST"
+	nsDialogs::SelectFolderDialog "Select a directory where HFST functionalities will be installed" "c:\HFST"
 	Pop $0
 	messageBox MB_OK "Installing HFST to directory: $0."
 	setOutPath $0
@@ -54,8 +60,17 @@ section
 	# Install Swig/Python bindings
 	# ----------------------------
 
+	${If} ${FileExists} "C:\Python27\Lib\site-packages"
+	      messageBox MB_OK "Found Python directory, installing Swig/Python bindings there (to C:\Python27\Lib\site-packages)."
+	      setOutPath "C:\Python27\Lib\site-packages\"
+	${Else}
+	      messageBox MB_OK "Did not find Python, so installing Swig/Python bindings only locally (to $0)."	
+	${EndIf}
+
 	File _libhfst.pyd
 	File libhfst.py
+
+	setOutPath $0
 
 
 	# Install libhfst dll and HFST command line tools
@@ -108,11 +123,30 @@ section
 	File hfst-subtract.exe
 	File hfst-summarize.exe
 	File hfst-tail.exe
-	#   -- File hfst-train-tagger.exe
+
+	File hfst-open-input-file-for-tagger.exe
+	File hfst_tagger_compute_data_statistics.py
+	File hfst-build-tagger.exe
+	File hfst-train-tagger.exe
+
 	File hfst-traverse.exe
-	#   -- File hfst-twolc.exe
+
+	File htwolcpre1.exe
+	File htwolcpre2.exe
+	File htwolcpre3.exe
+	File hfst-twolc.exe
+
 	File hfst-txt2fst.exe
 
+	messageBox MB_OK "Installation complete. HFST functionalities are in directory $0."
+
+
+	# Add HFST directory to the PATH environment variable
+	# ---------------------------------------------------
+
+	${EnvVarUpdate} $1 "PATH" "A" "HKCU" "$0"
+	#  messageBox MB_OK "Test: path is: $1."
 	
+
 sectionEnd
 

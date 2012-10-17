@@ -40,9 +40,10 @@ In Python, import HFST library with the command
 Now you can use HFST, for example in the following way
 
   tr = libhfst.HfstTransducer('a', 'b', libhfst.foma_type())
-  print tr.invert().minimize()
+  print tr.invert()
 
 The above piece of code should print something like
 
   0    1    b    a    0.0
   1    0.0
+
