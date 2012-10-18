@@ -1,9 +1,9 @@
-#!/bin/bash
-function print_usage() {
+#!/bin/sh
+print_usage() {
     echo 'usage: $0 [-utf8|-latin1] [-e "command"] [-f scriptfile] [-h] [-l startscript] [-s binaryfile] [-q] [-v] [-F hfst_format] [-V]'
 }
 
-function print_help() {
+print_help() {
     echo "Imitates xfst using foma and a wrapper script"
     echo
     echo "  -h   print this help"
@@ -13,7 +13,7 @@ function print_help() {
     echo "All other parameters imitate foma/xfst parameters as possible"
 }
 
-function print_version() {
+print_version() {
     echo "hfst-xfst 0.0 (foma 0.9.13)"
     echo "Copyright (c) 2010 University of Helsinki"
     echo "Licence GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>"
