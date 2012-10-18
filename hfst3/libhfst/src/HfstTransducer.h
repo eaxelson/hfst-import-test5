@@ -679,8 +679,7 @@ in \a ifile.
 
     @pre \a symbol does not occur in any transition of the transducer.
     @note Use with care, removing a symbol that occurs in a transition
-    of the transducer can have unexpected results.
-    @todo See that the tests work. */
+    of the transducer can have unexpected results. */
     void remove_from_alphabet(const std::string &symbol);
 
     /** \brief Whether the transducer is cyclic. */
@@ -883,7 +882,7 @@ cc : dd
 ccc : ddd
 \endverbatim
 
-        @bug Does not work for HFST_OL_TYPE or HFST_OLW_TYPE
+        @bug Does not work for HFST_OL_TYPE or HFST_OLW_TYPE?
         @throws TransducerIsCyclicException
         @see #n_best 
         @see hfst::HfstTransducer::extract_paths_fd(hfst::HfstTwoLevelPaths&, int, int, bool) const
@@ -935,7 +934,7 @@ ccc : ddd
         by the flag diacritics so thay will not be included in \a results.
 
 
-        @bug Does not work for HFST_OL_TYPE or HFST_OLW_TYPE
+        @bug Does not work for HFST_OL_TYPE or HFST_OLW_TYPE?
         @throws TransducerIsCyclicException
         @see extract_paths(HfstTwoLevelPaths&, int, int) const */
     void extract_paths_fd
@@ -1069,7 +1068,7 @@ ccc : ddd
     //! is infinitely ambiguous on any lookup path found in the transducer,
     //! i.e. the argument \a s is ignored.
     //!
-    //! @todo todo
+    //! @todo Do not ignore the argument s
     //! @see lookup(HfstOneLevelPaths&, const StringVector&, ssize_t) const
     bool is_lookup_infinitely_ambiguous(const StringVector& s) const;
 
@@ -1189,7 +1188,7 @@ ccc : ddd
         @pre The transducers in \a v are deterministic and epsilon-free.
     */
     HfstTransducer &compose_intersect(const HfstTransducerVector &v,
-				      bool invert=false);
+                                      bool invert=false);
 
     /** \brief Concatenate this transducer with \a another. */
     HfstTransducer &concatenate(const HfstTransducer &another);
@@ -1224,12 +1223,12 @@ ccc : ddd
 
 
     /*
-     *	\brief Make cross product of this transducer with \a.
-     *	It pairs every string of this with every string of \a.
+     *  \brief Make cross product of this transducer with \a.
+     *  It pairs every string of this with every string of \a.
      *
-     *	Both transducers must be automata, i.e. map strings onto themselves.
+     *  Both transducers must be automata, i.e. map strings onto themselves.
      *
-     *	If strings are not the same length, epsilon padding will be added in the end of the shorter string.
+     *  If strings are not the same length, epsilon padding will be added in the end of the shorter string.
      *
      */
     HfstTransducer &cross_product(const HfstTransducer &another);
@@ -1249,19 +1248,19 @@ ccc : ddd
 
     /** \brief Create universal pair transducer of \a type.
      *
-     *	The transducer has only one state, and it accepts:
-     *	Identity:Identity, Unknown:Unknown, Unknown:Epsilon and Epsilon:Unknown
+     *  The transducer has only one state, and it accepts:
+     *  Identity:Identity, Unknown:Unknown, Unknown:Epsilon and Epsilon:Unknown
      *
-     *	Transducer weight is 0.
+     *  Transducer weight is 0.
      */
     static HfstTransducer universal_pair ( ImplementationType type );
 
     /** \brief Create identity pair transducer of \a type.
       *
-      *	The transducer has only one state, and it accepts:
-      *	Identity:Identity
+      * The transducer has only one state, and it accepts:
+      * Identity:Identity
       *
-      *	Transducer weight is 0.
+      * Transducer weight is 0.
       */
     static HfstTransducer identity_pair ( ImplementationType type );
 
@@ -1405,24 +1404,24 @@ t.substitute(&function);
 
     /** \brief Substitute all transition symbols as defined in \a substitutions.
 
-	Each symbol old_symbol is substituted with symbol new_symbol, iff 
-	substitutions.find(old_symbol) == new_symbol != substitutions.end(). 
-	Otherwise, old_symbol remains the same.
+        Each symbol old_symbol is substituted with symbol new_symbol, iff 
+        substitutions.find(old_symbol) == new_symbol != substitutions.end(). 
+        Otherwise, old_symbol remains the same.
 
-	This function performs all substitutions at the same time, so it is
-	more efficient than calling substitute separately for each substitution.
+        This function performs all substitutions at the same time, so it is
+        more efficient than calling substitute separately for each substitution.
      */
     HfstTransducer &substitute(const HfstSymbolSubstitutions &substitutions);
 
     /** \brief Substitute all transition symbol pairs as defined in \a substitutions.
 
-	Each symbol pair old_isymbol:old_osymbol is substituted with symbol pair
-	new_isymbol:new_osymbol, iff substitutions.find(old_isymbol:old_osymbol) == 
-	new_isymbol:new_osymbol != substitutions.end(). 
-	Otherwise, old_isymbol:old_osymbol remains the same.
+        Each symbol pair old_isymbol:old_osymbol is substituted with symbol pair
+        new_isymbol:new_osymbol, iff substitutions.find(old_isymbol:old_osymbol) == 
+        new_isymbol:new_osymbol != substitutions.end(). 
+        Otherwise, old_isymbol:old_osymbol remains the same.
 
-	This function performs all substitutions at the same time, so it is
-	more efficient than calling substitute separately for each substitution.
+        This function performs all substitutions at the same time, so it is
+        more efficient than calling substitute separately for each substitution.
      */
     HfstTransducer &substitute(const HfstSymbolPairSubstitutions &substitutions);
 
@@ -1513,7 +1512,7 @@ transducer.transform_weights(&func);
       inserted freely in \a another and vice versa after replacing.
      */
     void harmonize_flag_diacritics(HfstTransducer &another,
-				   bool insert_renamed_flags=true);
+                                   bool insert_renamed_flags=true);
 
     /* Whether the alphabet of transducer \a another includes flag diacritics
        that are not included in the alphabet of this transducer. */
@@ -1762,64 +1761,64 @@ SFST manual</a>. */
                                 StringPairSet &alphabet);
 
     /** \brief Inversion of the replace_up and the result needs to be composed on the upper side
-     * 	 of the input language.
+     *   of the input language.
      *
-     * 	 B <- A is the inversion of A -> B.
+     *   B <- A is the inversion of A -> B.
      *
-     * 	 \a Mapping is performed in every context.
+     *   \a Mapping is performed in every context.
      *
-     * 	 @see replace_up */
-    HfstTransducer left_replace_up(	HfstTransducer		&mapping,
+     *   @see replace_up */
+    HfstTransducer left_replace_up(     HfstTransducer          &mapping,
                                     bool                optional,
                                     StringPairSet       &alphabet);
 
     /** \brief Inversion of the replace_up and the result needs to be composed on the upper side
-     * 	 of the input language.
+     *   of the input language.
      *
-     * 	 B <- A is the inversion of A -> B.
+     *   B <- A is the inversion of A -> B.
      *
-     * 	 @see replace_up */
+     *   @see replace_up */
     HfstTransducer left_replace_up( HfstTransducerPair  &context,
                                     HfstTransducer      &mapping,
                                     bool                optional,
                                     StringPairSet       &alphabet);
     /** \brief Inversion of the replace_up and the result needs to be composed on the upper side
-     * 	 of the input language. However, matching is done on the output side of \a mapping
+     *   of the input language. However, matching is done on the output side of \a mapping
      *
-     * 	 @see replace_up */
-    HfstTransducer left_replace_down(HfstTransducerPair	&context,
-                                  	 HfstTransducer		&mapping,
-                                  	 bool 				optional,
-                                  	 StringPairSet		&alphabet);
+     *   @see replace_up */
+    HfstTransducer left_replace_down(HfstTransducerPair &context,
+                                         HfstTransducer         &mapping,
+                                         bool                           optional,
+                                         StringPairSet          &alphabet);
 
     /** \brief Inversion of the replace_up and the result needs to be composed on the upper side
-       * 	 of the input language. However, matching is done on the output side of \a mapping
+       *         of the input language. However, matching is done on the output side of \a mapping
        *
-       * 	 @see replace_up */
-    HfstTransducer left_replace_down_karttunen(	HfstTransducerPair	&context,
-    										HfstTransducer		&mapping,
-    										bool 				optional,
-    										StringPairSet		&alphabet);
+       *         @see replace_up */
+    HfstTransducer left_replace_down_karttunen( HfstTransducerPair      &context,
+                                                                                HfstTransducer          &mapping,
+                                                                                bool                            optional,
+                                                                                StringPairSet           &alphabet);
 
     /** \brief Inversion of the replace_up and the result needs to be composed on the upper side
-     * 	 of the input language. However, left context matching is done on the input side of \a mapping
+     *   of the input language. However, left context matching is done on the input side of \a mapping
      *   and right context on the output side of \a mapping.
      *
-     * 	 @see replace_up */
-    HfstTransducer left_replace_left(HfstTransducerPair	&context,
-                                  	 HfstTransducer		&mapping,
-                                  	 bool				optional,
-                                  	 StringPairSet		&alphabet);
+     *   @see replace_up */
+    HfstTransducer left_replace_left(HfstTransducerPair &context,
+                                         HfstTransducer         &mapping,
+                                         bool                           optional,
+                                         StringPairSet          &alphabet);
 
     /** \brief Inversion of the replace_up and the result needs to be composed on the upper side
-     * 	 of the input language. However, left context matching is done on the output side of \a mapping
+     *   of the input language. However, left context matching is done on the output side of \a mapping
      *   and right context on the input side of \a mapping.
      *
-     * 	 @see replace_up */
-    HfstTransducer left_replace_right(HfstTransducerPair	&context,
-                                 	  HfstTransducer 		&mapping,
-                                 	  bool				optional,
-                                 	  StringPairSet		&alphabet);
+     *   @see replace_up */
+    HfstTransducer left_replace_right(HfstTransducerPair        &context,
+                                          HfstTransducer                &mapping,
+                                          bool                          optional,
+                                          StringPairSet         &alphabet);
 
 
 
