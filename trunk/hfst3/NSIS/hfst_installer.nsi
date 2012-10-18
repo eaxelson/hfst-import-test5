@@ -126,8 +126,10 @@ section
 
 	File hfst-open-input-file-for-tagger.exe
 	File hfst_tagger_compute_data_statistics.py
+	File tagger_aux.py
 	File hfst-build-tagger.exe
 	File hfst-train-tagger.exe
+	File hfst-tag.exe
 
 	File hfst-traverse.exe
 

@@ -7,10 +7,27 @@ LIBDIR=../libhfst/src/.libs/
 DLLDIR=/mingw/bin/
 SWIGDIR=../SWIG/
 TOOLDIR=../tools/src/.libs/
+TAGGERDIR=../tools/src/hfst-tagger/src/.libs/
+TAGGERPYTHONDIR1=../tools/src/hfst-tagger/src/
+TAGGERPYTHONDIR2=../tools/src/hfst-tagger/src/build_model_src/
+TWOLCDIR=../tools/src/hfst-twolc/src/.libs/
 
 HFST_LIB=libhfst-21.dll
 DEPENDENCY_DLLS="libgcc_s_dw2-1.dll libstdc++-6.dll"
 SWIG_FILES="_libhfst.pyd libhfst.py"
+
+TAGGER_TOOLS="hfst-open-input-file-for-tagger.exe \
+hfst-build-tagger.exe \
+hfst-train-tagger-system.exe \
+hfst-tag.exe"
+
+TAGGER_PYTHON_FILE1=hfst_tagger_compute_data_statistics.py
+TAGGER_PYTHON_FILE2=tagger_aux.py
+
+TWOLC_TOOLS="htwolcpre1.exe \
+htwolcpre2.exe \
+htwolcpre3.exe \
+hfst-twolc-system.exe"
 
 TOOLS="hfst-affix-guessify.exe \
 hfst-calculate.exe \
@@ -57,15 +74,7 @@ hfst-subtract.exe \
 hfst-summarize.exe \
 hfst-tail.exe \
 hfst-traverse.exe \
-hfst-txt2fst.exe \
-hfst-tagger/src/hfst-open-input-file-for-tagger.exe \
-hfst-tagger/src/hfst_tagger_compute_data_statistics.py \
-hfst-tagger/src/hfst-build-tagger.exe \
-hfst-tagger/src/hfst-train-tagger-system.exe \
-hfst-twolc/src/htwolcpre1.exe \
-hfst-twolc/src/htwolcpre2.exe \
-hfst-twolc/src/htwolcpre3.exe \
-hfst-twolc/src/hfst-twolc-system.exe"
+hfst-txt2fst.exe"
 
 #hfst-expand-equivalences.exe
 
@@ -82,6 +91,21 @@ do
     cp $TOOLDIR/$tool .;
     strip $tool;
 done
+
+for tool in $TWOLC_TOOLS; 
+do
+    cp $TWOLCDIR/$tool .;
+    strip $tool;
+done
+
+for tool in $TAGGER_TOOLS; 
+do
+    cp $TAGGERDIR/$tool .;
+    strip $tool;
+done
+
+cp $TAGGERPYTHONDIR1/$TAGGER_PYTHON_FILE1 .
+cp $TAGGERPYTHONDIR2/$TAGGER_PYTHON_FILE2 .
 
 mv hfst-train-tagger-system.exe hfst-train-tagger.exe
 mv hfst-twolc-system.exe hfst-twolc.exe
