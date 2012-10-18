@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 NUMBER_OF_TESTS=`ls $srcdir | egrep "test[0-9][0-9]*$" | wc -l`
 
@@ -36,7 +36,7 @@ do
 		    ../src/htwolcpre2 -R -s -f foma | \
 		    ../src/htwolcpre3 -R -s -f foma > temp.twolc.hfst0
 	    else
-		cat "$f" | ../src/hfst-twolc-loc -R -s -f foma             > temp.twolc.hfst0
+		cat "$f" | ../src/hfst-twolc-loc -R -s -f foma > temp.twolc.hfst0
 	    fi
 	fi
 
@@ -48,7 +48,7 @@ do
 		    ../src/htwolcpre2 -R -s -f openfst-log | \
 		    ../src/htwolcpre3 -R -s -f openfst-log > temp.twolc.hfst1
 	    else
-		cat "$f" | ../src/hfst-twolc-loc -R -s -f openfst-log      > temp.twolc.hfst1
+		cat "$f" | ../src/hfst-twolc-loc -R -s -f openfst-log > temp.twolc.hfst1
 	    fi
 	fi
 
@@ -92,11 +92,11 @@ do
 		then
 		    cat "$f" | ../src/htwolcpre1 -R -s | \
 			../src/htwolcpre2 -R -s | \
-			../src/htwolcpre3 -R -s &> /dev/null
+			../src/htwolcpre3 -R -s > /dev/null 2>&1
 		else
-		    cat "$f" | ../src/hfst-twolc-loc -R -s &> /dev/null
+		    cat "$f" | ../src/hfst-twolc-loc -R -s > /dev/null 2>&1
 		fi
-		if ! ../../hfst-compare -q -1 temp.hfst -2 temp.twolc.hfst &> /dev/null
+		if ! ../../hfst-compare -q -1 temp.hfst -2 temp.twolc.hfst > /dev/null 2>&1
 		then
 		    echo "hfst-twolc sub$(basename $f) failed."
 		    if [ $n -eq 0 ]

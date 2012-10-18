@@ -92,7 +92,7 @@ hfst-twolc$(EXEEXT): hfst-twolc.sh
 	chmod ogu+rx hfst-twolc$(EXEEXT)
 
 hfst-twolc-loc$(EXEEXT): hfst-twolc.sh
-	cat $< | sed -e 's|BINDIR|$(PWD)|' > $@
+	cat $< | sed -e 's|BINDIR|$(shell pwd)|' > $@
 	chmod ogu+rx hfst-twolc-loc$(EXEEXT)
 
 clean-local:
