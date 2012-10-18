@@ -841,7 +841,7 @@ and printing the string pairs recognized by the resulting transducer.
     }
 \endverbatim
 
-An example of reading binary transducers from stdin,
+An example of reading binary transducers from standard input,
 converting them to SFST format and writing them to stdout
 and in AT&T format to file "testfile.att":
 
@@ -880,8 +880,8 @@ manipulating weighted or unweighted synchronic transducers implementing regular 
 UTF-8 is chosen as the character encoding used in the HFST software.
 Currently, HFST has been implemented using the
 <a href="http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html">SFST</a>, 
-<a href="http:://www.openfst.org">OpenFst</a> and 
-<a href="http://foma.sourceforge.net/">foma</a> software libraries.
+<a href="http://www.openfst.org">OpenFst</a> and 
+<a href="http://code.google.com/p/foma/">foma</a> software libraries.
 Other versions may be added in some future release. 
 SFST and foma implementations are unweighted and OpenFst implementation is weighted.
 
@@ -900,7 +900,7 @@ For a quick start to the HFST interface with examples, see
 <a href="QuickStart.html">here</a>.
 
 The examples given in this documentation use 
-<a href="http://www.xrce.xerox.com/print/Research-Development/Publications/1997-0052">Xerox transducer notation</a>.
+<a href="http://www.fsmbook.com/">Xerox transducer notation</a>.
 
 
 
@@ -946,7 +946,7 @@ The examples given in this documentation use
 
 \section links Links
 
-   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstOutline">Examples</a> of programs implemented using the HFST interface
+   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstCommandLineToolFunctionalities">Examples</a> of programs implemented using the HFST interface
 
    - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome">Documentation</a> of the HFST project
 

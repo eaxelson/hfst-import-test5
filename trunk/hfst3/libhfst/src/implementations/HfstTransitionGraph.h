@@ -142,16 +142,16 @@ namespace hfst {
     /* The alphabet of the graph. */
         HfstTransitionGraphAlphabet alphabet;
 
-	/* Used by substitute function. */
-	typedef unsigned int HfstNumber;
-	typedef std::vector<HfstNumber> HfstNumberVector;
-	typedef std::pair<HfstNumber, HfstNumber> HfstNumberPair;
-	typedef std::map<HfstNumberPair, HfstNumberPair> HfstNumberPairSubstitutions;
+        /* Used by substitute function. */
+        typedef unsigned int HfstNumber;
+        typedef std::vector<HfstNumber> HfstNumberVector;
+        typedef std::pair<HfstNumber, HfstNumber> HfstNumberPair;
+        typedef std::map<HfstNumberPair, HfstNumberPair> HfstNumberPairSubstitutions;
 
       protected:
         /* @brief An iterator type that points to a state in a graph. 
         
-	   The value pointed by the iterator is of type HfstTransitions. */
+           The value pointed by the iterator is of type HfstTransitions. */
         typedef typename HfstStates::iterator iterator;
 
       public:
@@ -160,13 +160,13 @@ namespace hfst {
             The value pointed by the iterator is of type HfstTransitions. */
         typedef typename HfstStates::const_iterator const_iterator;
 
-	/** @brief The states of the graph. */
-	std::vector<HfstState> states() const {
-	  std::vector<HfstState> retval(this->get_max_state()+1, 0);
-	  for (unsigned int i=0; i<(this->get_max_state()+1); i++)
-	    retval[i] = i;
-	  return retval;
-	}
+        /** @brief The states of the graph. */
+        std::vector<HfstState> states() const {
+          std::vector<HfstState> retval(this->get_max_state()+1, 0);
+          for (unsigned int i=0; i<(this->get_max_state()+1); i++)
+            retval[i] = i;
+          return retval;
+        }
 
     // --------------------------------------------------------
     // --- Construction, assignment, copying and conversion ---
@@ -194,7 +194,7 @@ namespace hfst {
 
     HfstTransitionGraph &assign(const HfstTransitionGraph &graph)
       {
-	return this->operator=(graph);
+        return this->operator=(graph);
       }
 
     /** @brief Create a deep copy of HfstTransitionGraph \a graph. */
@@ -206,11 +206,11 @@ namespace hfst {
     }
     
     /** @brief Create an HfstTransitionGraph equivalent to HfstTransducer 
-	\a transducer. FIXME: move to a separate file */
+        \a transducer. FIXME: move to a separate file */
       HfstTransitionGraph(const hfst::HfstTransducer &transducer) {
       HfstTransitionGraph<HfstTropicalTransducerTransitionData>
-	*fsm = ConversionFunctions::
-	hfst_transducer_to_hfst_basic_transducer(transducer);
+        *fsm = ConversionFunctions::
+        hfst_transducer_to_hfst_basic_transducer(transducer);
       state_vector = fsm->state_vector;
       final_weight_map = fsm->final_weight_map;
       alphabet = fsm->alphabet;
@@ -321,8 +321,8 @@ namespace hfst {
       for (typename HfstSymbolSet::const_iterator it = symbols.begin();
            it != symbols.end(); it++)
         {
-	  alphabet.erase(*it);
-	}
+          alphabet.erase(*it);
+        }
     }
 
     /** @brief Same as #add_symbol_to_alphabet for each symbol in
@@ -342,33 +342,33 @@ namespace hfst {
     void prune_alphabet_after_substitution(const std::set<unsigned int> &symbols)
     {
       if (symbols.size() == 0)
-	return;
+        return;
 
       std::vector<bool> symbols_found;
       symbols_found.resize
-	(C::get_max_number()+1, false);
+        (C::get_max_number()+1, false);
 
       // Go through all transitions
       for (iterator it = begin(); it != end(); it++)
-	{
-	  for (typename HfstTransitions::iterator tr_it
-		 = it->begin();
-	       tr_it != it->end(); tr_it++)
-	    {
-	      const C & data = tr_it->get_transition_data();
-	      symbols_found.at(data.get_input_number()) = true;
-	      symbols_found.at(data.get_output_number()) = true;
-	    }
-	}
+        {
+          for (typename HfstTransitions::iterator tr_it
+                 = it->begin();
+               tr_it != it->end(); tr_it++)
+            {
+              const C & data = tr_it->get_transition_data();
+              symbols_found.at(data.get_input_number()) = true;
+              symbols_found.at(data.get_output_number()) = true;
+            }
+        }
 
       // Remove symbols in \a symbols from the alphabet if they did not
       // occur in any transitions
       for (std::set<unsigned int>::const_iterator it = symbols.begin();
-	   it != symbols.end(); it++)
-	{
-	  if (! symbols_found.at(*it))
-	    alphabet.erase(C::get_symbol(*it));
-	}
+           it != symbols.end(); it++)
+        {
+          if (! symbols_found.at(*it))
+            alphabet.erase(C::get_symbol(*it));
+        }
       
     }
 
@@ -467,16 +467,16 @@ namespace hfst {
 
             If state \a s does not exist, it is created. */
     void add_transition(HfstState s, const HfstTransition<C> & transition,
-			bool add_symbols_to_alphabet=true) {
+                        bool add_symbols_to_alphabet=true) {
 
           C data = transition.get_transition_data();
 
           add_state(s);
           add_state(transition.get_target_state());
-	  if (add_symbols_to_alphabet) {
-	    alphabet.insert(data.get_input_symbol());
-	    alphabet.insert(data.get_output_symbol());
-	  }
+          if (add_symbols_to_alphabet) {
+            alphabet.insert(data.get_input_symbol());
+            alphabet.insert(data.get_output_symbol());
+          }
           state_vector[s].push_back(transition);
     }
 
@@ -548,17 +548,17 @@ namespace hfst {
         HFST_THROW(StateIndexOutOfBoundsException); }
           return state_vector[s];
         }        
-	
-	/** @brief Alternative name for operator[].
+        
+        /** @brief Alternative name for operator[].
 
-	    Python interface uses this function as '[]' is not a legal name.
+            Python interface uses this function as '[]' is not a legal name.
 
-	    @see operator[]
-	 */
-	const HfstTransitions & transitions(HfstState s) const
-	{
-	  return this->operator[](s);
-	}
+            @see operator[]
+         */
+        const HfstTransitions & transitions(HfstState s) const
+        {
+          return this->operator[](s);
+        }
 
     // --------------------------------------------------
     // -----   Reading and writing in AT&T format   -----
@@ -567,63 +567,63 @@ namespace hfst {
       protected:
         /* Change state numbers s1 to s2 and vice versa. */
         void swap_state_numbers(HfstState s1, HfstState s2) {
-	  
-	  HfstTransitions s1_copy = state_vector[s1];
-	  state_vector[s1] = state_vector[s2];
-	  state_vector[s2] = s1_copy;
-	  
+          
+          HfstTransitions s1_copy = state_vector[s1];
+          state_vector[s1] = state_vector[s2];
+          state_vector[s2] = s1_copy;
+          
           // ----- Go through all states -----
           for (iterator it = begin(); it != end(); it++)
             {
-	      // Go through all transitions
+              // Go through all transitions
               for (unsigned int i=0; i < it->size(); i++)
                 {
-		  HfstTransition<C> &tr_it = it->operator[](i);
-		  
-		  HfstState new_target=tr_it.get_target_state();
-		  if (tr_it.get_target_state() == s1)
-		    new_target = s2;
-		  if (tr_it.get_target_state() == s2)
-		    new_target = s1;
-		  
-		  if (new_target != tr_it.get_target_state())
-		    {
-		      HfstTransition<C> tr
-			(new_target,
-			 tr_it.get_input_symbol(),
-			 tr_it.get_output_symbol(),
-			 tr_it.get_weight());
-		      
-		      it->operator[](i) = tr;
-		    }
-		  
-		} // all transitions gone through
-	      
-	    } // ----- all states gone through -----
-	  
-	  // Swap final states, if needed
-	  typename FinalWeightMap::iterator s1_it = final_weight_map.find(s1);
-	  typename FinalWeightMap::iterator s2_it = final_weight_map.find(s2);
-	  typename FinalWeightMap::iterator end_it = final_weight_map.end();
+                  HfstTransition<C> &tr_it = it->operator[](i);
+                  
+                  HfstState new_target=tr_it.get_target_state();
+                  if (tr_it.get_target_state() == s1)
+                    new_target = s2;
+                  if (tr_it.get_target_state() == s2)
+                    new_target = s1;
+                  
+                  if (new_target != tr_it.get_target_state())
+                    {
+                      HfstTransition<C> tr
+                        (new_target,
+                         tr_it.get_input_symbol(),
+                         tr_it.get_output_symbol(),
+                         tr_it.get_weight());
+                      
+                      it->operator[](i) = tr;
+                    }
+                  
+                } // all transitions gone through
+              
+            } // ----- all states gone through -----
+          
+          // Swap final states, if needed
+          typename FinalWeightMap::iterator s1_it = final_weight_map.find(s1);
+          typename FinalWeightMap::iterator s2_it = final_weight_map.find(s2);
+          typename FinalWeightMap::iterator end_it = final_weight_map.end();
 
-	  if (s1_it != end_it && s2_it != end_it) {
-	    typename C::WeightType s1_weight = s1_it->second;
-	    final_weight_map[s1] = s2_it->second;
-	    final_weight_map[s2] = s1_weight;
-	  }
-	  if (s1_it != end_it) {
-	    typename C::WeightType w = s1_it->second;
-	    final_weight_map.erase(s1);
-	    final_weight_map[s2] = w;
-	  }
-	  if (s2_it != end_it) {
-	    typename C::WeightType w = s2_it->second;
-	    final_weight_map.erase(s2);
-	    final_weight_map[s1] = w;
-	  }
+          if (s1_it != end_it && s2_it != end_it) {
+            typename C::WeightType s1_weight = s1_it->second;
+            final_weight_map[s1] = s2_it->second;
+            final_weight_map[s2] = s1_weight;
+          }
+          if (s1_it != end_it) {
+            typename C::WeightType w = s1_it->second;
+            final_weight_map.erase(s1);
+            final_weight_map[s2] = w;
+          }
+          if (s2_it != end_it) {
+            typename C::WeightType w = s2_it->second;
+            final_weight_map.erase(s2);
+            final_weight_map[s1] = w;
+          }
 
-	  return;
-	  
+          return;
+          
         }
     
         /* Replace all strings \a str1 in \a symbol with \a str2. */
@@ -766,25 +766,25 @@ namespace hfst {
                     " ", "@_SPACE_@"),
                 "@_EPSILON_SYMBOL_@", "@0@"),
                "\t", "@_TAB_@").c_str());
-		  cwt = cwt + cw;
+                  cwt = cwt + cw;
 
                   if (write_weights)
                     cw = sprintf(ptr + cwt, "\t%f",
                             data.get_weight());
-		  cwt = cwt + cw;
+                  cwt = cwt + cw;
                   cw = sprintf(ptr + cwt, "\n");
-		  cwt = cwt + cw;
+                  cwt = cwt + cw;
                 }
               if (is_final_state(source_state))
                 {
                   cw = sprintf(ptr + cwt, "%i", source_state);
-		  cwt = cwt + cw;
+                  cwt = cwt + cw;
                   if (write_weights)
                     cw = sprintf(ptr + cwt, "\t%f", 
                             get_final_weight(source_state));
-		  cwt = cwt + cw;
+                  cwt = cwt + cw;
                   cw = sprintf(ptr + cwt, "\n");
-		  cwt = cwt + cw;
+                  cwt = cwt + cw;
                 }
           source_state++;
             }          
@@ -792,11 +792,11 @@ namespace hfst {
 
 
         /** @brief Write the graph in AT&T format to FILE \a file using numbers
-	    instead of symbol names.
+            instead of symbol names.
             \a write_weights defines whether weights are printed. */
         void write_in_att_format_number(FILE *file, bool write_weights=true) 
         {
-	  unsigned int source_state=0;
+          unsigned int source_state=0;
           for (iterator it = begin(); it != end(); it++)
             {
               for (typename HfstTransitions::iterator tr_it
@@ -808,26 +808,26 @@ namespace hfst {
                   fprintf(file, "%i\t%i\t%i\t%i",
                           source_state,
                           tr_it->get_target_state(),
-			  tr_it->get_input_number(),
-			  tr_it->get_output_number());
-		  
-		  if (write_weights)
-		    fprintf(file, "\t%f",
-			    data.get_weight()); 
-		  fprintf(file, "\n");
-			  
-		  if (is_final_state(source_state))
-		    {
-		      fprintf(file, "%i", source_state);
-		      if (write_weights)
-			fprintf(file, "\t%f", 
-				get_final_weight(source_state));
-		      fprintf(file, "\n");
-		    }
-		}
-	      source_state++;
-	    }
-	}
+                          tr_it->get_input_number(),
+                          tr_it->get_output_number());
+                  
+                  if (write_weights)
+                    fprintf(file, "\t%f",
+                            data.get_weight()); 
+                  fprintf(file, "\n");
+                          
+                  if (is_final_state(source_state))
+                    {
+                      fprintf(file, "%i", source_state);
+                      if (write_weights)
+                        fprintf(file, "\t%f", 
+                                get_final_weight(source_state));
+                      fprintf(file, "\n");
+                    }
+                }
+              source_state++;
+            }
+        }
 
 
         /* Create an HfstTransitionGraph as defined in AT&T format 
@@ -843,18 +843,18 @@ namespace hfst {
           (std::istream &is,
            FILE *file,
            std::string epsilon_symbol,
-	   unsigned int & linecount) {
+           unsigned int & linecount) {
 
-	  if (file == NULL) {
-	    if (is.eof()) {
-	      HFST_THROW(EndOfStreamException);
-	    }
-	  }
-	  else {
-	    if (feof(file)) {
-	      HFST_THROW(EndOfStreamException);
-	    }
-	  }
+          if (file == NULL) {
+            if (is.eof()) {
+              HFST_THROW(EndOfStreamException);
+            }
+          }
+          else {
+            if (feof(file)) {
+              HFST_THROW(EndOfStreamException);
+            }
+          }
 
           HfstTransitionGraph retval;
           char line [255];
@@ -869,25 +869,25 @@ namespace hfst {
                 break;
             }
 
-	    linecount++;
+            linecount++;
 
-	    // an empty line signifying an empty transducer,
-	    // a special case that is accepted if it is the only
-	    // transducer in the stream
-	    if ( // empty line with or without a newline  
-		(line[0] == '\0') ||
-		(line[0] == '\n' && line[1] == '\0') ||
-		// windows newline
-		(line[0] == '\r' && line[1] == '\n' && line[2] == '\0')
-		 ) {
-	      
-	      // make sure that the end-of-file is reached
-	      if (file == NULL)
-		is.get();
-	      else
-		fgetc(file);
-	      break;
-	    }
+            // an empty line signifying an empty transducer,
+            // a special case that is accepted if it is the only
+            // transducer in the stream
+            if ( // empty line with or without a newline  
+                (line[0] == '\0') ||
+                (line[0] == '\n' && line[1] == '\0') ||
+                // windows newline
+                (line[0] == '\r' && line[1] == '\n' && line[2] == '\0')
+                 ) {
+              
+              // make sure that the end-of-file is reached
+              if (file == NULL)
+                is.get();
+              else
+                fgetc(file);
+              break;
+            }
 
             if (*line == '-') // transducer separator line is "--"
               return retval;
@@ -961,7 +961,7 @@ namespace hfst {
         static HfstTransitionGraph read_in_att_format
           (std::istream &is,
            std::string epsilon_symbol,
-	   unsigned int & linecount) 
+           unsigned int & linecount) 
         {
           return read_in_att_format
             (is, NULL /* a dummy variable */,
@@ -977,12 +977,12 @@ namespace hfst {
         static HfstTransitionGraph read_in_att_format
           (FILE *file, 
            std::string epsilon_symbol,
-	   unsigned int & linecount) 
+           unsigned int & linecount) 
         {
           return read_in_att_format
             (std::cin /* a dummy variable */,
              file, epsilon_symbol, linecount);
-        }	
+        }       
 
 
     // ----------------------------------------------
@@ -993,250 +993,250 @@ namespace hfst {
 
     /* A function that performs in-place-substitution in the graph. */
 
-	void substitute_(HfstSymbol old_symbol,
-			 HfstSymbol new_symbol,
-			 bool input_side=true, 
-			 bool output_side=true)
-	{
+        void substitute_(HfstSymbol old_symbol,
+                         HfstSymbol new_symbol,
+                         bool input_side=true, 
+                         bool output_side=true)
+        {
           // ----- Go through all states -----
           for (iterator it = begin(); it != end(); it++)
             {
-	      // Go through all transitions
+              // Go through all transitions
               for (unsigned int i=0; i < it->size(); i++)
                 {
-		  HfstTransition<C> &tr_it = it->operator[](i);
-		  
-		  // The substituting input and output symbols for the 
-		  // current transition.
-		  HfstSymbol substituting_input_symbol
-		    = tr_it.get_input_symbol();
-		  HfstSymbol substituting_output_symbol
-		    = tr_it.get_output_symbol();
-		  
-		  // Whether a substitution will be performed.
-		  bool substitution_made=false;
-		  
-		  if (input_side &&
-		      tr_it.get_input_symbol() == old_symbol) {
-		    substituting_input_symbol = new_symbol;
-		    substitution_made=true;
-		  }
-		  if (output_side &&
-		      tr_it.get_output_symbol() == old_symbol) {
-		    substituting_output_symbol = new_symbol;
-		    substitution_made=true;
-		  }
-		  
-		  // If a substitution is to be performed,
-		  if (substitution_made) {
-		    
-		    add_symbol_to_alphabet(new_symbol);
-		    
-		    // change the current transition accordingly.
-		    HfstTransition<C> tr
-		      (tr_it.get_target_state(),
-		       substituting_input_symbol,
-		       substituting_output_symbol,
-		       tr_it.get_weight());
-		    
-		    it->operator[](i) = tr;
-		  }
-		  
-		} // all transitions gone through
-	      
-	    } // ----- all states gone through -----
-	  
-	  return;
-	}
+                  HfstTransition<C> &tr_it = it->operator[](i);
+                  
+                  // The substituting input and output symbols for the 
+                  // current transition.
+                  HfstSymbol substituting_input_symbol
+                    = tr_it.get_input_symbol();
+                  HfstSymbol substituting_output_symbol
+                    = tr_it.get_output_symbol();
+                  
+                  // Whether a substitution will be performed.
+                  bool substitution_made=false;
+                  
+                  if (input_side &&
+                      tr_it.get_input_symbol() == old_symbol) {
+                    substituting_input_symbol = new_symbol;
+                    substitution_made=true;
+                  }
+                  if (output_side &&
+                      tr_it.get_output_symbol() == old_symbol) {
+                    substituting_output_symbol = new_symbol;
+                    substitution_made=true;
+                  }
+                  
+                  // If a substitution is to be performed,
+                  if (substitution_made) {
+                    
+                    add_symbol_to_alphabet(new_symbol);
+                    
+                    // change the current transition accordingly.
+                    HfstTransition<C> tr
+                      (tr_it.get_target_state(),
+                       substituting_input_symbol,
+                       substituting_output_symbol,
+                       tr_it.get_weight());
+                    
+                    it->operator[](i) = tr;
+                  }
+                  
+                } // all transitions gone through
+              
+            } // ----- all states gone through -----
+          
+          return;
+        }
 
-	/* A function that performs in-place substitutions in the graph
-	   as defined in \a substitutions.
+        /* A function that performs in-place substitutions in the graph
+           as defined in \a substitutions.
  
-	   substitutions[from_number] = to_number, 
-	   if substitutions[from_number] = no_substitution, no substitution is made */
-	void substitute_(const HfstNumberVector &substitutions,
-			 unsigned int no_substitution)
-	{
+           substitutions[from_number] = to_number, 
+           if substitutions[from_number] = no_substitution, no substitution is made */
+        void substitute_(const HfstNumberVector &substitutions,
+                         unsigned int no_substitution)
+        {
           // ----- Go through all states -----
           for (iterator it = begin(); it != end(); it++)
             {
-	      // Go through all transitions
+              // Go through all transitions
               for (unsigned int i=0; i < it->size(); i++)
                 {
-		  HfstTransition<C> &tr_it = it->operator[](i);
+                  HfstTransition<C> &tr_it = it->operator[](i);
 
-		  HfstNumber old_inumber = tr_it.get_input_number();
-		  HfstNumber old_onumber = tr_it.get_output_number();
-		  
-		  HfstNumber new_inumber = substitutions.at(old_inumber);
-		  HfstNumber new_onumber = substitutions.at(old_onumber);
-		    
-		    // If a substitution is to be performed,
-		  if (new_inumber != no_substitution ||
-		      new_onumber != no_substitution) 
-		    {
-		      if (new_inumber != no_substitution)
-			add_symbol_to_alphabet(C::get_symbol(new_inumber));
-		      else
-			new_inumber = old_inumber;
+                  HfstNumber old_inumber = tr_it.get_input_number();
+                  HfstNumber old_onumber = tr_it.get_output_number();
+                  
+                  HfstNumber new_inumber = substitutions.at(old_inumber);
+                  HfstNumber new_onumber = substitutions.at(old_onumber);
+                    
+                    // If a substitution is to be performed,
+                  if (new_inumber != no_substitution ||
+                      new_onumber != no_substitution) 
+                    {
+                      if (new_inumber != no_substitution)
+                        add_symbol_to_alphabet(C::get_symbol(new_inumber));
+                      else
+                        new_inumber = old_inumber;
 
-		      if (new_onumber != no_substitution)
-			add_symbol_to_alphabet(C::get_symbol(new_onumber));
-		      else
-			new_onumber = old_onumber;
+                      if (new_onumber != no_substitution)
+                        add_symbol_to_alphabet(C::get_symbol(new_onumber));
+                      else
+                        new_onumber = old_onumber;
 
-		      // change the current transition accordingly.
-		      HfstTransition<C> tr
-			(tr_it.get_target_state(),
-			 new_inumber,
-			 new_onumber,
-			 tr_it.get_weight(), false);
-		      
-		    it->operator[](i) = tr;
-		  }
-		  
-		} // all transitions gone through
-	      
-	    } // ----- all states gone through -----
+                      // change the current transition accordingly.
+                      HfstTransition<C> tr
+                        (tr_it.get_target_state(),
+                         new_inumber,
+                         new_onumber,
+                         tr_it.get_weight(), false);
+                      
+                    it->operator[](i) = tr;
+                  }
+                  
+                } // all transitions gone through
+              
+            } // ----- all states gone through -----
 
-	  return;
-	}
+          return;
+        }
 
-	/* A function that performs in-place substitutions in the graph
-	   as defined in \a substitutions. */
-	void substitute_(const HfstNumberPairSubstitutions &substitutions)
-	{
+        /* A function that performs in-place substitutions in the graph
+           as defined in \a substitutions. */
+        void substitute_(const HfstNumberPairSubstitutions &substitutions)
+        {
           // ----- Go through all states -----
           for (iterator it = begin(); it != end(); it++)
             {
-	      // Go through all transitions
+              // Go through all transitions
               for (unsigned int i=0; i < it->size(); i++)
                 {
-		  HfstTransition<C> &tr_it = it->operator[](i);
+                  HfstTransition<C> &tr_it = it->operator[](i);
 
-		  HfstNumberPair old_number_pair
-		    ( tr_it.get_input_number(),
-		      tr_it.get_output_number() );
-		  
-		  HfstNumberPairSubstitutions::const_iterator subst_it
-		    = substitutions.find(old_number_pair);
-		    
-		    // If a substitution is to be performed,
-		  if (subst_it != substitutions.end()) {
-		    
-		    HfstNumber new_input_number = subst_it->second.first;
-		    HfstNumber new_output_number = subst_it->second.second;
+                  HfstNumberPair old_number_pair
+                    ( tr_it.get_input_number(),
+                      tr_it.get_output_number() );
+                  
+                  HfstNumberPairSubstitutions::const_iterator subst_it
+                    = substitutions.find(old_number_pair);
+                    
+                    // If a substitution is to be performed,
+                  if (subst_it != substitutions.end()) {
+                    
+                    HfstNumber new_input_number = subst_it->second.first;
+                    HfstNumber new_output_number = subst_it->second.second;
 
-		    add_symbol_to_alphabet(HfstTropicalTransducerTransitionData::
-					   get_symbol(new_input_number));
-		    add_symbol_to_alphabet(HfstTropicalTransducerTransitionData::
-					   get_symbol(new_output_number));
-		    
-		    // change the current transition accordingly.
-		    HfstTransition<C> tr
-		      (tr_it.get_target_state(),
-		       new_input_number,
-		       new_output_number,
-		       tr_it.get_weight(), false);
-		    
-		    it->operator[](i) = tr;
-		  }
-		  
-		} // all transitions gone through
-	      
-	    } // ----- all states gone through -----
-	  
-	  return;
-	}
+                    add_symbol_to_alphabet(HfstTropicalTransducerTransitionData::
+                                           get_symbol(new_input_number));
+                    add_symbol_to_alphabet(HfstTropicalTransducerTransitionData::
+                                           get_symbol(new_output_number));
+                    
+                    // change the current transition accordingly.
+                    HfstTransition<C> tr
+                      (tr_it.get_target_state(),
+                       new_input_number,
+                       new_output_number,
+                       tr_it.get_weight(), false);
+                    
+                    it->operator[](i) = tr;
+                  }
+                  
+                } // all transitions gone through
+              
+            } // ----- all states gone through -----
+          
+          return;
+        }
 
-	/* A function that performs in-place-substitution in the graph. */
-	void substitute_(const HfstSymbolPair &old_sp, 
-			 const HfstSymbolPairSet &new_sps)
-	{
-	  unsigned int old_input_number = C::get_number(old_sp.first);
-	  unsigned int old_output_number = C::get_number(old_sp.second);
-	  
-	  // Whether any substitution was performed
-	  bool substitution_performed=false;
-	  
+        /* A function that performs in-place-substitution in the graph. */
+        void substitute_(const HfstSymbolPair &old_sp, 
+                         const HfstSymbolPairSet &new_sps)
+        {
+          unsigned int old_input_number = C::get_number(old_sp.first);
+          unsigned int old_output_number = C::get_number(old_sp.second);
+          
+          // Whether any substitution was performed
+          bool substitution_performed=false;
+          
           // ----- Go through all states -----
           for (iterator it = begin(); it != end(); it++)
             {
-	      // The transitions to be added to the current state
-	      HfstTransitions new_transitions;
-	      
-	      // Go through all transitions of the current state
+              // The transitions to be added to the current state
+              HfstTransitions new_transitions;
+              
+              // Go through all transitions of the current state
               for (unsigned int i=0; i < it->size(); i++)
                 {
-		  HfstTransition<C> &tr_it = it->operator[](i);
-		  
-		  // If a match was found, substitute:
-		  if (tr_it.get_input_number() == old_input_number &&
-		      tr_it.get_output_number() == old_output_number)
-		    {
-		      substitution_performed=true;
-		      
-		      // change the current transition so that it is equivalent
-		      // to the first substituting transition in new_sps
-		      typename HfstSymbolPairSet::const_iterator IT 
-			= new_sps.begin();
-		      
-		      HfstTransition<C> tr
-			(tr_it.get_target_state(),
-			 C::get_number(IT->first),
-			 C::get_number(IT->second),
-			 tr_it.get_weight(),
-			 true);
-		      
-		      it->operator[](i) = tr;
-		      
-		      // and schedule the rest of the substituting transitions
-		      // in new_sps to be added to the current state.
-		      while (IT != new_sps.end())
-			{
-			  HfstTransition<C> TR
-			    (tr_it.get_target_state(),
-			     C::get_number(IT->first),
-			     C::get_number(IT->second),
-			     tr_it.get_weight(),
-			     true);
-			  
-			  new_transitions.push_back(TR);
-			  IT++;
-			}
-		      
-		    } // (substitution and scheduling done)       
-		  
-		} // (all transitions of a state gone through)
-	      
-	      // Add the new transitions to the current state
-	      for (typename HfstTransitions
-		     ::const_iterator NIT = new_transitions.begin();
-		   NIT != new_transitions.end(); NIT++)
-		{
-		  it->push_back(*NIT);
-		}
-	      
-	    } // ( ----- all states in the graph gone through ----- )
-	  
-	  // If at least one substitution was performed, add all the
-	  // symbols in the substituting transitions to the alphabet of
-	  // the graph.
-	  if (substitution_performed) {
-	    add_symbols_to_alphabet(new_sps);
-	  }
-	  
-	  // Remove symbols that were removed because of substitutions
-	  // (or didn't occur in the graph in the first place)
-	  std::set<unsigned int> syms;
-	  for (typename HfstSymbolPairSet::const_iterator it = new_sps.begin();
-	       it != new_sps.end(); it++) {
-	    syms.insert(C::get_number(it->first));
-	    syms.insert(C::get_number(it->second));
-	  }
-	  prune_alphabet_after_substitution(syms);
-	  
-	  return;
+                  HfstTransition<C> &tr_it = it->operator[](i);
+                  
+                  // If a match was found, substitute:
+                  if (tr_it.get_input_number() == old_input_number &&
+                      tr_it.get_output_number() == old_output_number)
+                    {
+                      substitution_performed=true;
+                      
+                      // change the current transition so that it is equivalent
+                      // to the first substituting transition in new_sps
+                      typename HfstSymbolPairSet::const_iterator IT 
+                        = new_sps.begin();
+                      
+                      HfstTransition<C> tr
+                        (tr_it.get_target_state(),
+                         C::get_number(IT->first),
+                         C::get_number(IT->second),
+                         tr_it.get_weight(),
+                         true);
+                      
+                      it->operator[](i) = tr;
+                      
+                      // and schedule the rest of the substituting transitions
+                      // in new_sps to be added to the current state.
+                      while (IT != new_sps.end())
+                        {
+                          HfstTransition<C> TR
+                            (tr_it.get_target_state(),
+                             C::get_number(IT->first),
+                             C::get_number(IT->second),
+                             tr_it.get_weight(),
+                             true);
+                          
+                          new_transitions.push_back(TR);
+                          IT++;
+                        }
+                      
+                    } // (substitution and scheduling done)       
+                  
+                } // (all transitions of a state gone through)
+              
+              // Add the new transitions to the current state
+              for (typename HfstTransitions
+                     ::const_iterator NIT = new_transitions.begin();
+                   NIT != new_transitions.end(); NIT++)
+                {
+                  it->push_back(*NIT);
+                }
+              
+            } // ( ----- all states in the graph gone through ----- )
+          
+          // If at least one substitution was performed, add all the
+          // symbols in the substituting transitions to the alphabet of
+          // the graph.
+          if (substitution_performed) {
+            add_symbols_to_alphabet(new_sps);
+          }
+          
+          // Remove symbols that were removed because of substitutions
+          // (or didn't occur in the graph in the first place)
+          std::set<unsigned int> syms;
+          for (typename HfstSymbolPairSet::const_iterator it = new_sps.begin();
+               it != new_sps.end(); it++) {
+            syms.insert(C::get_number(it->first));
+            syms.insert(C::get_number(it->second));
+          }
+          prune_alphabet_after_substitution(syms);
+          
+          return;
     }
     
     /* A function that performs in-place-substitution in the graph. */
@@ -1260,21 +1260,21 @@ namespace hfst {
           HfstSymbolPairSet substituting_transitions;
           
           // If a substitution is to be performed,
-	  bool perform_substitution=false;
-	  try {
-	    perform_substitution = 
-	      (*func)(transition_symbol_pair, substituting_transitions);
-	  }
-	  catch (const HfstException & e)
-	    {
-	      throw e;
-	    }
-	  if (perform_substitution)
+          bool perform_substitution=false;
+          try {
+            perform_substitution = 
+              (*func)(transition_symbol_pair, substituting_transitions);
+          }
+          catch (const HfstException & e)
+            {
+              throw e;
+            }
+          if (perform_substitution)
             {          
               // change the transition to the first element
               // in new_sps
               typename HfstSymbolPairSet::const_iterator IT 
-		= substituting_transitions.begin();
+                = substituting_transitions.begin();
 
               if (not C::is_valid_symbol(IT->first) ||
               not C::is_valid_symbol(IT->second) )
@@ -1343,9 +1343,7 @@ namespace hfst {
 
         /** @brief Substitute \a old_symbol with \a new_symbol in 
             all transitions. \a input_side and \a output_side define
-            whether the substitution is made on input and output sides. 
-
-            @todo Unknown and identity symbols must be handled correctly */
+            whether the substitution is made on input and output sides. */
         HfstTransitionGraph &
           substitute(const HfstSymbol &old_symbol, 
                      const HfstSymbol  &new_symbol,
@@ -1382,69 +1380,69 @@ namespace hfst {
           return *this;
         }
 
-	/** @brief Substitute all transitions as defined in \a substitutions */
-	HfstTransitionGraph &substitute
-	  (const HfstSymbolSubstitutions &substitutions)
-	  {
-	    // add symbols to the global HfstTransition alphabet
-	    for (HfstSymbolSubstitutions::const_iterator it
-		   = substitutions.begin();
-		 it != substitutions.end(); it++)
-	      {
-		(void)get_symbol_number(it->first);
-		(void)get_symbol_number(it->second);
-	      }
+        /** @brief Substitute all transitions as defined in \a substitutions */
+        HfstTransitionGraph &substitute
+          (const HfstSymbolSubstitutions &substitutions)
+          {
+            // add symbols to the global HfstTransition alphabet
+            for (HfstSymbolSubstitutions::const_iterator it
+                   = substitutions.begin();
+                 it != substitutions.end(); it++)
+              {
+                (void)get_symbol_number(it->first);
+                (void)get_symbol_number(it->second);
+              }
 
-	    // how symbol numbers are substituted:
-	    // substitutions_[from_symbol] = to_symbol
-	    std::vector<unsigned int> substitutions_;
-	    // marker that means that no substitution is made
-	    unsigned int no_substitution = C::get_max_number()+substitutions.size()+1;
-	    substitutions_.resize
-	      (C::get_max_number()+1, no_substitution);
-	    for (HfstSymbolSubstitutions::const_iterator it
-		   = substitutions.begin();
-		 it != substitutions.end(); it++)
-	      {
-		HfstNumber from_symbol = get_symbol_number(it->first);
-		HfstNumber to_symbol = get_symbol_number(it->second);
-		
-		substitutions_.at(from_symbol) = to_symbol;
-	      }
-	    
-	    substitute_(substitutions_, no_substitution);
+            // how symbol numbers are substituted:
+            // substitutions_[from_symbol] = to_symbol
+            std::vector<unsigned int> substitutions_;
+            // marker that means that no substitution is made
+            unsigned int no_substitution = C::get_max_number()+substitutions.size()+1;
+            substitutions_.resize
+              (C::get_max_number()+1, no_substitution);
+            for (HfstSymbolSubstitutions::const_iterator it
+                   = substitutions.begin();
+                 it != substitutions.end(); it++)
+              {
+                HfstNumber from_symbol = get_symbol_number(it->first);
+                HfstNumber to_symbol = get_symbol_number(it->second);
+                
+                substitutions_.at(from_symbol) = to_symbol;
+              }
+            
+            substitute_(substitutions_, no_substitution);
 
-	    return *this;
-	  }
+            return *this;
+          }
 
-	/** @brief Substitute all transitions as defined in \a substitutions.
-	    
-	    For each transition x:y, \a substitutions is searched and if 
-	    a mapping x:y -> X:Y is found, the transition x:y is replaced
-	    with X:Y. If no mapping is found, the transition remains the same.
-	 */
-	HfstTransitionGraph &substitute
-	  (const HfstSymbolPairSubstitutions &substitutions)
-	  {
-	    // Convert from symbols to numbers
-	    HfstNumberPairSubstitutions substitutions_;
-	    for (HfstSymbolPairSubstitutions::const_iterator it 
-		   = substitutions.begin();
-		 it != substitutions.end(); it++)
-	      {
-		HfstNumberPair from_transition
-		  (get_symbol_number(it->first.first), 
-		   get_symbol_number(it->first.second));
-		HfstNumberPair to_transition
-		  (get_symbol_number(it->second.first), 
-		   get_symbol_number(it->second.second));
-		substitutions_[from_transition] = to_transition;
-	      }
+        /** @brief Substitute all transitions as defined in \a substitutions.
+            
+            For each transition x:y, \a substitutions is searched and if 
+            a mapping x:y -> X:Y is found, the transition x:y is replaced
+            with X:Y. If no mapping is found, the transition remains the same.
+         */
+        HfstTransitionGraph &substitute
+          (const HfstSymbolPairSubstitutions &substitutions)
+          {
+            // Convert from symbols to numbers
+            HfstNumberPairSubstitutions substitutions_;
+            for (HfstSymbolPairSubstitutions::const_iterator it 
+                   = substitutions.begin();
+                 it != substitutions.end(); it++)
+              {
+                HfstNumberPair from_transition
+                  (get_symbol_number(it->first.first), 
+                   get_symbol_number(it->first.second));
+                HfstNumberPair to_transition
+                  (get_symbol_number(it->second.first), 
+                   get_symbol_number(it->second.second));
+                substitutions_[from_transition] = to_transition;
+              }
 
-	    substitute_(substitutions_);
+            substitute_(substitutions_);
 
-	    return *this;
-	  }
+            return *this;
+          }
 
         /** @brief Substitute all transitions \a sp with a set of transitions
             \a sps. */
@@ -1722,38 +1720,38 @@ namespace hfst {
             the graph with weight \a weight. */
         HfstTransitionGraph &insert_freely
           (const HfstSymbolPairSet &symbol_pairs, 
-	   typename C::WeightType weight) 
+           typename C::WeightType weight) 
           {
-	    for (typename HfstSymbolPairSet::const_iterator symbols_it 
-		   = symbol_pairs.begin();
-		 symbols_it != symbol_pairs.end(); symbols_it++)
-	      {
-		if ( not ( C::is_valid_symbol(symbols_it->first) &&           
-			   C::is_valid_symbol(symbols_it->second) ) ) {
-		  HFST_THROW_MESSAGE
-		    (EmptyStringException, 
-		     "HfstTransitionGraph::insert_freely"
-		     "(const HfstSymbolPairSet&, W)");
-		}
+            for (typename HfstSymbolPairSet::const_iterator symbols_it 
+                   = symbol_pairs.begin();
+                 symbols_it != symbol_pairs.end(); symbols_it++)
+              {
+                if ( not ( C::is_valid_symbol(symbols_it->first) &&           
+                           C::is_valid_symbol(symbols_it->second) ) ) {
+                  HFST_THROW_MESSAGE
+                    (EmptyStringException, 
+                     "HfstTransitionGraph::insert_freely"
+                     "(const HfstSymbolPairSet&, W)");
+                }
 
-		alphabet.insert(symbols_it->first);
-		alphabet.insert(symbols_it->second);
-	      }
+                alphabet.insert(symbols_it->first);
+                alphabet.insert(symbols_it->second);
+              }
 
-	    HfstState source_state=0;
+            HfstState source_state=0;
             for (iterator it = begin(); it != end(); it++) 
-	      {
-		for (typename HfstSymbolPairSet::const_iterator symbols_it 
-		       = symbol_pairs.begin();
-		     symbols_it != symbol_pairs.end(); symbols_it++)
-		  {
-		    HfstTransition <C> tr( source_state, symbols_it->first, 
-					   symbols_it->second, weight );
-		    it->push_back(tr);
-		  }
-		source_state++;
-	      }
-	    
+              {
+                for (typename HfstSymbolPairSet::const_iterator symbols_it 
+                       = symbol_pairs.begin();
+                     symbols_it != symbol_pairs.end(); symbols_it++)
+                  {
+                    HfstTransition <C> tr( source_state, symbols_it->first, 
+                                           symbols_it->second, weight );
+                    it->push_back(tr);
+                  }
+                source_state++;
+              }
+            
             return *this;
           }
         
@@ -1906,30 +1904,30 @@ namespace hfst {
           return *this;
         }
 
-/* 	/\** @brief Determine whether this graph has input-epsilon cycles. */
-/* 	 *\/ */
-/* 	bool has_input_epsilon_cycles(void) */
-/* 	{ */
-/* 	            typedef std::map<HfstState,  */
+/*      /\** @brief Determine whether this graph has input-epsilon cycles. */
+/*       *\/ */
+/*      bool has_input_epsilon_cycles(void) */
+/*      { */
+/*                  typedef std::map<HfstState,  */
 /*           std::set<HfstTransition<C> > > */
 /*           HfstStates; */
 /*         HfstStates state_map; */
 
-/* 	    std::set<HfstState> total_seen; */
-/* 	    for (state_vector::iterator it = state_vector.begin(); */
-/* 		 it != state_vector.end(); ++it) { */
-/* 		if (total_seen.count(*it) != 0) { */
-/* 		    continue; */
-/* 		} */
+/*          std::set<HfstState> total_seen; */
+/*          for (state_vector::iterator it = state_vector.begin(); */
+/*               it != state_vector.end(); ++it) { */
+/*              if (total_seen.count(*it) != 0) { */
+/*                  continue; */
+/*              } */
         
-/* 	    } */
-/* 	} */
+/*          } */
+/*      } */
         
 
     // --- Friends ---
 
         friend class ConversionFunctions;
-	friend class hfst::HarmonizeUnknownAndIdentitySymbols;
+        friend class hfst::HarmonizeUnknownAndIdentitySymbols;
       };
    
     /** @brief An HfstTransitionGraph with transitions of type 
