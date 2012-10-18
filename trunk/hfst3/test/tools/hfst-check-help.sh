@@ -19,7 +19,7 @@ for f in $TOOLDIR/hfst-* ; do
                 echo $f has broken help
                 exit 1
             fi
-            if ! grep -m 1 '^Usage: hfst-' help.out > /dev/null ; then
+            if ! grep -q '^Usage: hfst-' help.out > /dev/null ; then
                 rm help.out
                 echo $f has malformed help
                 exit 1
