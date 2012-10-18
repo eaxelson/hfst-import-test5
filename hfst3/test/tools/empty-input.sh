@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 TOOLDIR=../../tools/src
 for f in $TOOLDIR/hfst-* ; do
     if [ -x "$f" -a ! -d "$f" ] ; then
