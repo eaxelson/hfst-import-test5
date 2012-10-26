@@ -1,5 +1,5 @@
 AM_YFLAGS= -d -o y.tab.c
-AM_CXXFLAGS= -O3 -g -Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors
+AM_CXXFLAGS= -Wcast-qual -Wno-deprecated -Wfatal-errors
 bin_PROGRAMS=htwolcpre1 htwolcpre2 htwolcpre3 hfst-twolc-system
 bin_SCRIPTS=hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT)
 EXTRA_DIST=hfst-twolc.sh common_globals.h
@@ -92,7 +92,7 @@ hfst-twolc$(EXEEXT): hfst-twolc.sh
 	chmod ogu+rx hfst-twolc$(EXEEXT)
 
 hfst-twolc-loc$(EXEEXT): hfst-twolc.sh
-	cat $< | sed -e 's|BINDIR|$(shell pwd)|' > $@
+	cat $< | sed -e 's|BINDIR|$(abs_builddir)|' > $@
 	chmod ogu+rx hfst-twolc-loc$(EXEEXT)
 
 clean-local:
