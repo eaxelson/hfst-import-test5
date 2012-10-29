@@ -222,14 +222,14 @@ int main(int argc, char **argv)
   const ImplementationType types [] = {SFST_TYPE, 
                        TROPICAL_OPENFST_TYPE, 
                        /*LOG_OPENFST_TYPE,*/ 
-				       FOMA_TYPE};
+                                       FOMA_TYPE};
 
   /* For all transducer implementation types, perform the following tests: */
   for (unsigned int i=0; i<TYPES_SIZE; i++)
     {
 
       if (not HfstTransducer::is_implementation_type_available(types[i]))
-	continue;
+        continue;
 
       try {
 
@@ -288,23 +288,23 @@ int main(int argc, char **argv)
 
       /* Function shuffle. */
       {
-	verbose_print("function shuffle", types[i]);
-	
-	hfst::HfstTokenizer tok;
-	HfstTransducer t1("abc", "abc", tok, types[i]);
-	HfstTransducer t1_ = t1;
-	HfstTransducer t2("cde", "cde", tok, types[i]);
-	t1.shuffle(t2);
+        verbose_print("function shuffle", types[i]);
+        
+        hfst::HfstTokenizer tok;
+        HfstTransducer t1("abc", "abc", tok, types[i]);
+        HfstTransducer t1_ = t1;
+        HfstTransducer t2("cde", "cde", tok, types[i]);
+        t1.shuffle(t2);
 
-	HfstTransducer t3("abc", "abC", tok, types[i]);
-	try {
-	  t3.shuffle(t2);
-	  assert(false);
-	}
-	catch (const TransducersAreNotAutomataException & e)
-	  {
-	    assert(true);
-	  }
+        HfstTransducer t3("abc", "abC", tok, types[i]);
+        try {
+          t3.shuffle(t2);
+          assert(false);
+        }
+        catch (const TransducersAreNotAutomataException & e)
+          {
+            assert(true);
+          }
       }
 
 
@@ -318,9 +318,9 @@ int main(int argc, char **argv)
        and get back to the original one.*/
     for (unsigned int j=0; j<=TYPES_SIZE; j++)
       {
-	unsigned int index = (i+j)%TYPES_SIZE;
-	if (HfstTransducer::is_implementation_type_available(types[index]))
-	  t1.convert(types[index]);
+        unsigned int index = (i+j)%TYPES_SIZE;
+        if (HfstTransducer::is_implementation_type_available(types[index]))
+          t1.convert(types[index]);
         assert(compare_alphabets(t1, t2));
       }
     assert(t1.compare(t2));
@@ -629,6 +629,8 @@ int main(int argc, char **argv)
     unk2unk.insert_freely(StringPair("c", "d"));
     HfstTransducer dc("d", "c", types[i]);
 
+    std::cerr << unk2unk << "--\n" << dc << std::endl;
+
     HfstTransducer empty(types[i]);
     assert(not unk2unk.intersect(dc).compare(empty));
 
@@ -654,9 +656,9 @@ int main(int argc, char **argv)
       }
       }
       catch (const HfstException & e)
-	{
-	  std::cerr << e() << std::endl;
-	}
+        {
+          std::cerr << e() << std::endl;
+        }
 
       /* Function push_weights. */
       {

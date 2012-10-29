@@ -1848,10 +1848,13 @@ HfstTransducer &HfstTransducer::insert_freely
 
     /* Add symbols in symbol_pair to the alphabet of this transducer
        and expand unknown and epsilon symbols accordingly. */
-    //HfstTransducer tmp(symbol_pair.first, symbol_pair.second, this->type);
-    //tmp.harmonize(*this);
-    insert_to_alphabet(symbol_pair.first);
-    insert_to_alphabet(symbol_pair.second);
+    HfstTransducer tmp(symbol_pair.first, symbol_pair.second, this->type);
+
+    if (this->type != FOMA_TYPE) {
+      tmp.harmonize(*this);
+      insert_to_alphabet(symbol_pair.first);
+      insert_to_alphabet(symbol_pair.second);
+    }
 
     switch (this->type)    
     {
@@ -1876,16 +1879,25 @@ HfstTransducer &HfstTransducer::insert_freely
       // because foma functions take care of harmonization.
       // However, now we are using HfstBasicTransducer.
       //this->foma_interface.harmonize(this->implementation.foma,
-      //              tmp.implementation.foma);
+      //                                     tmp.implementation.foma);
         hfst::implementations::HfstBasicTransducer * net = 
-        ConversionFunctions::foma_to_hfst_basic_transducer
-        (implementation.foma);
+          ConversionFunctions::foma_to_hfst_basic_transducer
+          (implementation.foma);
+        
+        hfst::implementations::HfstBasicTransducer * tmp_net = 
+          ConversionFunctions::foma_to_hfst_basic_transducer
+          (tmp.implementation.foma);
+
         this->foma_interface.delete_foma(implementation.foma);
+
+        net->harmonize(*tmp_net);
+
         net->insert_freely
-      (StringPair(symbol_pair.first, symbol_pair.second), 0);
+          (StringPair(symbol_pair.first, symbol_pair.second), 0);
         implementation.foma = 
-        ConversionFunctions::hfst_basic_transducer_to_foma(net);
+          ConversionFunctions::hfst_basic_transducer_to_foma(net);
         delete net;
+        delete tmp_net;
         break;
     }
 #endif
