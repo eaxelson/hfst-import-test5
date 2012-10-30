@@ -19,11 +19,11 @@ noinst_LTLIBRARIES=libhfstparsers.la
 
 XRE_SRCS=xre_lex.ll xre_parse.yy xre_utils.cc XreCompiler.cc
 XRE_HDRS=XreCompiler.h xre_utils.h
-XRE_BUILT=xre_parse.h
+XRE_BUILT=xre_parse.h xre_parse.cc xre_lex.cc
 
 PMATCH_SRCS=pmatch_lex.ll pmatch_parse.yy pmatch_utils.cc PmatchCompiler.cc
 PMATCH_HDRS=PmatchCompiler.h pmatch_utils.h
-PMATCH_BUILT=pmatch_parse.h
+PMATCH_BUILT=pmatch_parse.h pmatch_parse.cc pmatch_lex.cc
 
 LEXC_SRCS=lexc-lexer.ll lexc-parser.yy lexc-utils.cc LexcCompiler.cc
 LEXC_HDRS=LexcCompiler.h lexc-utils.h
