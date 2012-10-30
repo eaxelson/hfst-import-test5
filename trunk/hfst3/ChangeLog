@@ -1,3 +1,199 @@
+2012-10-29 13:12  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, swig,
+	  test/libhfst/test_transducer_functions.cc: Fixed a re-introduced
+	  bug in insert_freely(SymbolPair&), now unknown and identity
+	  symbols are expanded during the operation. Also made svn ignore
+	  some generated files in swig directory.
+
+2012-10-26 01:43  mie
+
+	* tools/src/hfst-twolc/src/Makefile.am: Fix unnecessary shell call
+	  that breaks portability
+
+2012-10-19 11:48  mpsilfve
+
+	* libhfst/src/HfstTransducer.cc: Fixed bug in flag diacritic
+	  handling. Transducers were harmonized before insertion of missing
+	  flags, which lead to undesired behavior when identity/unknown
+	  symbols mixed with flag diacritics.
+
+2012-10-18 12:29  eaxelson
+
+	* ., Doxyfile, api_documentation.dox, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h, swig,
+	  tools/src/hfst-tagger/src, tools/src/hfst-twolc/src: Updated
+	  doxygen documentation. Made svn ignore some generated files.
+
+2012-10-18 12:26  eaxelson
+
+	* NSIS/copy_files.sh, NSIS/hfst_installer.nsi: Included Python
+	  scripts needed by tagger tools to Windows installer.
+
+2012-10-18 08:34  eaxelson
+
+	* scripts/hfst-xfst: Removed bashisms from scripts.
+
+2012-10-18 08:13  eaxelson
+
+	* tools/src/hfst-tagger/src/hfst-train-tagger.sh,
+	  tools/src/hfst-twolc/src/Makefile.am,
+	  tools/src/hfst-twolc/src/hfst-twolc.sh,
+	  tools/src/hfst-twolc/test/test: Fixed some GNUisms ans bashisms
+	  in twolc and tagger scripts to make them work also on non-Linux
+	  platforms.
+
+2012-10-18 07:58  eaxelson
+
+	* test/tools/empty-input.sh, test/tools/hfst-check-environment.sh,
+	  test/tools/hfst-check-help.sh, test/tools/hfst-check-version.sh:
+	  Fixed some GNUisms ans bashisms in tests to make them work also
+	  on non-Linux platforms.
+
+2012-10-17 11:49  eaxelson
+
+	* Doxyfile, api_documentation.dox, configure.ac,
+	  test/tools/hfst-check-help.sh,
+	  tools/src/hfst-tagger/src/Makefile.am: Enabled hfst-tagger when
+	  compiling on Windows. Excluded the Windows versions of tagger and
+	  twolc tools from hfst-check-help.sh. Also updated Doxygen
+	  documentation.
+
+2012-10-17 11:46  eaxelson
+
+	* NSIS/README, NSIS/copy_files.sh, NSIS/hfst_installer.nsi: Added
+	  hfst-train-tagger and hfst-twolc to Windows installer. Updated
+	  README file.
+
+2012-10-17 10:40  eaxelson
+
+	* tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-tagger/src/hfst-train-tagger-system.cc,
+	  tools/src/hfst-twolc/src/Makefile.am,
+	  tools/src/hfst-twolc/src/hfst-twolc-system.cc: Added versions of
+	  hfst-twolc and hfst-train-tagger that use system calls instead of
+	  shell commands.
+
+2012-10-16 13:53  eaxelson
+
+	* tools/src/hfst-optimized-lookup.cc: Made small modifications to
+	  hfst-optimized-lookup so that it works on Windows. Now the
+	  transducer file is opened in binary mode and carriage returns are
+	  removed from the input strings.
+
+2012-10-13 03:51  mie
+
+	* libhfst/src/parsers/lexc-utils.cc: Just a test commit, nothing to
+	  see here
+
+2012-10-13 03:13  mie
+
+	* libhfst/src/parsers/lexc-utils.cc,
+	  test/tools/basic.lowercase-lexicon-end.lexc,
+	  test/tools/basic.multichar-flag-with-zero.lexc,
+	  test/tools/lexc-compiler-functionality.sh,
+	  test/tools/lexc-functionality.sh: Parse 0 within @ flags as if it
+	  was known multichar symbol
+
+2012-10-13 03:12  mie
+
+	* libhfst/src/parsers/LexcCompiler.cc: Fix escaped 0 at the end
+
+2012-10-13 02:27  mie
+
+	* libhfst/src/parsers/lexc-lexer.ll,
+	  libhfst/src/parsers/lexc-parser.yy,
+	  test/tools/lexc-compiler-functionality.sh,
+	  test/tools/lexc-functionality.sh: Warn users about wrong case in
+	  keywords
+
+2012-10-11 09:25  eaxelson
+
+	* NSIS/README, NSIS/hfst_installer.nsi: Added a README file.
+
+2012-10-10 14:12  eaxelson
+
+	* NSIS/copy_files.sh, NSIS/hfst_installer.nsi, configure.ac,
+	  tools/src/Makefile.am: Removed hfst-strip-header from tools, use
+	  hfst-fst2fst instead.
+
+2012-10-10 13:51  eaxelson
+
+	* NSIS/copy_files.sh, NSIS/hfst_installer.nsi, configure.ac,
+	  tools/src/Makefile.am: Removed
+	  hfst-preprocess-for-optimized-lookup-format tool.
+
+2012-10-09 11:47  eaxelson
+
+	* NSIS/copy_files.sh, NSIS/hfst_installer.nsi,
+	  swig/hfst_swig_extensions.h, swig/libhfst.i: Updated swig
+	  bindings, edited NSIS scripts.
+
+2012-10-08 17:02  mie
+
+	* tools/src/hfst-info.cc: Parse version vector with serial strtouls
+
+2012-10-08 13:45  moshagen
+
+	* configure.ac: Bring the HFST_LONGVERSION in sync with the other
+	  version strings (?).
+
+2012-10-08 12:10  eaxelson
+
+	* NSIS/hfst_installer.nsi: Added files to HFSt installer.
+
+2012-10-06 19:55  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  test/libhfst/test_constructors.cc, test/libhfst/test_examples.cc,
+	  test/libhfst/test_hfst_basic_transducer.cc,
+	  test/libhfst/test_streams.cc, tools/src/hfst-txt2fst.cc: Changed
+	  HfstTransducer(FILE*, ...) so that epsilon symbol is an
+	  obligatory argument and added a new obligatory argument that
+	  keeps track of the line number in the AT&T file. Did the same to
+	  HfstBasicTransducer::read_in_att_format.
+
+2012-10-05 14:19  eaxelson
+
+	* NSIS/hfst_installer.nsi: Updated installer script.
+
+2012-10-05 11:58  eaxelson
+
+	* NSIS, NSIS/hfst_installer.nsi, swig/hfst_swig_extensions.h,
+	  swig/libhfst.i, swig/test_std_streams.py: Added a directory for
+	  NSIS installer scripts.
+
+2012-10-04 13:07  eaxelson
+
+	* libhfst/src/implementations/FomaTransducer.cc,
+	  swig/hfst_swig_extensions.h, swig/libhfst.i,
+	  swig/test_streams.py: Now FomaTransducer::read_net accepts also
+	  files with CR+LF newlines.
+
+2012-10-03 16:29  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  swig/libhfst.i, swig/test_std_streams.sh, swig/test_streams.py:
+	  Added wrapper class HfstFile for FILE* that can be used in
+	  Python.
+
+2012-10-03 07:50  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: upper- and lowercase versions
+	  of convenience acceptors
+
+2012-10-01 09:09  eaxelson
+
+	* swig/libhfst.i, test/tools/Makefile.am: Added missing files to
+	  test/tools, fixed a typo in libhfst.i.
+
+2012-10-01 08:22  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am: Ready for release 3.3.14.
+
 2012-09-30 07:12  eaxelson
 
 	* swig/test_std_streams.py, swig/test_std_streams.sh: Added new

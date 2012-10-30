@@ -5,6 +5,19 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.3.15
+----------------------------
+
+* Small bugs fixed in function insert_freely, flag diacritic handling 
+  as well as lexc and pmatch tools
+
+* GNU and bash dependencies removed from scripts to make them more portable
+
+* The epsilon symbol argument in HfstTransducer(FILE*, ...) is made obligatory,
+  also a new obligatory argument added that keeps track of the line number 
+  in the AT&T file
+
+
 Noteworthy changes in 3.3.14
 ----------------------------
 
@@ -328,5 +341,4 @@ Noteworthy changes in release 2.1
 ---------------------------------
 
 * hfst-twolc and hfst-compose-intersect understand # like xerox originals
-
 
