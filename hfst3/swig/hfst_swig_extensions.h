@@ -20,6 +20,8 @@ namespace hfst {
   ImplementationType sfst_type() { return SFST_TYPE; }
   ImplementationType tropical_openfst_type() { return TROPICAL_OPENFST_TYPE; }
   ImplementationType foma_type() { return FOMA_TYPE; }
+  ImplementationType hfst_ol_type() { return HFST_OL_TYPE; }
+  ImplementationType hfst_olw_type() { return HFST_OLW_TYPE; }
 
 OneLevelPathVector vectorize(HfstOneLevelPaths * holps)
 {
