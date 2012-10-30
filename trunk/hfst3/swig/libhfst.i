@@ -202,6 +202,8 @@ std::vector<std::pair <std::string, float > > detokenize_paths(hfst::HfstOneLeve
 ImplementationType sfst_type();
 ImplementationType tropical_openfst_type();
 ImplementationType foma_type();
+ImplementationType hfst_ol_type();
+ImplementationType hfst_olw_type();
 
 class HfstInputStream{
 public:
@@ -229,6 +231,7 @@ public:
     HfstTransducer();
     HfstTransducer(HfstInputStream & in) throw (EndOfStreamException);
     HfstTransducer(const HfstTransducer &another);
+    HfstTransducer(const std::string &utf8_str, const HfstTokenizer &multichar_symbol_tokenizer, ImplementationType type);
     HfstTransducer(const std::string &input_utf8_str, const std::string &output_utf8_str, const HfstTokenizer &multichar_symbol_tokenizer, ImplementationType type);
     HfstTransducer(const hfst::implementations::HfstBasicTransducer &t, ImplementationType type);
     HfstTransducer(ImplementationType type);
@@ -299,6 +302,8 @@ public:
     static HfstTransducer * read_lexc(const std::string &filename, ImplementationType type);
     static HfstTransducer universal_pair(ImplementationType type);
 
+    static bool is_implementation_type_available(ImplementationType impl);
+
     %extend {
 
     char *__str__() {
@@ -309,6 +314,34 @@ public:
     };
 
 };
+
+
+  class MultiCharSymbolTrie;
+  typedef std::vector<MultiCharSymbolTrie*> MultiCharSymbolTrieVector;
+  typedef std::vector<bool> SymbolEndVector;
+
+  class MultiCharSymbolTrie
+  {
+  public:
+    MultiCharSymbolTrie(void);
+    ~MultiCharSymbolTrie(void);
+    void add(const char * p);
+    const char * find(const char * p) const;  
+  };
+  
+  class HfstTokenizer
+  {  
+  public:
+
+    HfstTokenizer();
+    void add_skip_symbol(const std::string &symbol);
+    void add_multichar_symbol(const std::string& symbol);
+    StringPairVector tokenize(const std::string &input_string) const;
+    StringVector tokenize_one_level(const std::string &input_string) const;
+    StringPairVector tokenize(const std::string &input_string,
+                              const std::string &output_string) const;
+    static void check_utf8_correctness(const std::string &input_string);
+  };
 
 
 class FdOperation{
@@ -328,3 +361,5 @@ def lookup_clean(transducer, string):
     '''
     return detokenize_paths(purge_flags(transducer.lookup_fd(input)))
 %}
+
+

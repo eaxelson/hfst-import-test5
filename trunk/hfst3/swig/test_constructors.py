@@ -5,110 +5,73 @@
 
 import libhfst
 
-# include "auxiliary_functions.cc"
-
-types = [libhfst.sfst_type(), libhfst.openfst_type(), libhfst.foma_type()]
+types = [libhfst.sfst_type(), libhfst.tropical_openfst_type(), libhfst.foma_type()]
 
 for type in types:
 
-    if not libhfst.is_implementation_type_available(type):
+    if not libhfst.HfstTransducer.is_implementation_type_available(type):
         continue
 
     # The empty transducer
     print("The empty transducer")
-    empty = HfstTransducer(type)
+    empty = libhfst.HfstTransducer(type)
 
     # The epsilon transducer
     print("The epsilon transducer")
-    epsilon = HfstTransducer("@_EPSILON_SYMBOL_@", type);
+    epsilon = libhfst.HfstTransducer("@_EPSILON_SYMBOL_@", type)
     
     # One-transition transducer
-    verbose_print("One-transition transducer", type);
-    HfstTransducer foo("foo", type);
-    HfstTransducer foobar("foo", "bar", type);
+    print("One-transition transducer")
+    foo = libhfst.HfstTransducer("foo", type)
+    foobar = libhfst.HfstTransducer("foo", "bar", type)
     
     # The copy constructor
-    verbose_print("The copy constructor", types[i]);
-    HfstTransducer foobar_copy(foobar);
-    assert(foobar.compare(foobar_copy));
+    print("The copy constructor")
+    foobar_copy = libhfst.HfstTransducer(foobar)
+    assert(foobar.compare(foobar_copy))
     
     # Conversion from HfstBasicTransducer
-    verbose_print("Conversion from HfstBasicTransducer", types[i]);
-    HfstBasicTransducer basic;
-    basic.add_state(1);
-    basic.add_transition(0, HfstBasicTransition(1, "foo", "bar", 0));
-    basic.set_final_weight(1, 0);
-    HfstTransducer foobar_basic(basic, types[i]);
-    assert(foobar.compare(foobar_basic));
+    print("Conversion from HfstBasicTransducer")
+    basic = libhfst.HfstBasicTransducer()
+    basic.add_state(1)
+    basic.add_transition(0, libhfst.HfstBasicTransition(1, "foo", "bar", 0))
+    basic.set_final_weight(1, 0)
+    foobar_basic = libhfst.HfstTransducer(basic, type)
+    assert(foobar.compare(foobar_basic))
     
     # By tokenizing
-    verbose_print("Construction by tokenization", types[i]);
-    HfstTokenizer tok;
-    tok.add_skip_symbol("baz");
-    tok.add_multichar_symbol("foo");
-    tok.add_multichar_symbol("bar");
-    HfstTransducer foo_tok("bazfoobaz", tok, types[i]);
-    HfstTransducer foobar_tok("bazfoo", "barbaz", tok, types[i]);
-    assert(foo.compare(foo_tok));
-    assert(foobar.compare(foobar_tok));
+    print("Construction by tokenization")
+    tok = libhfst.HfstTokenizer()
+    tok.add_skip_symbol("baz")
+    tok.add_multichar_symbol("foo")
+    tok.add_multichar_symbol("bar")
+    foo_tok = libhfst.HfstTransducer("bazfoobaz", tok, type)
+    foobar_tok = libhfst.HfstTransducer("bazfoo", "barbaz", tok, type)
+    assert(foo.compare(foo_tok))
+    assert(foobar.compare(foobar_tok))
+        
+    # Function assign
+    print("Function assign()")
+    foobar2 = libhfst.HfstTransducer("baz", type)
+    foobar.set_name("foobar")
+    assert(foobar.get_name() == "foobar")
+    foobar2.assign(foobar)
+    assert(foobar2.get_name() == "foobar")
+    assert(foobar.compare(foobar2))
+    empty_ol = libhfst.HfstTransducer(libhfst.hfst_ol_type())
+    empty_olw = libhfst.HfstTransducer(libhfst.hfst_olw_type())
+    # reserving props in copy constructor (bug: #3405831)
+    t = libhfst.HfstTransducer("a", libhfst.tropical_openfst_type())
+    t.convert(libhfst.hfst_olw_type())
+    t.set_name("foo")
+    s = libhfst.HfstTransducer(t)
+    assert(s.get_name() == t.get_name())
+    try:
+        empty_ol = foobar2.convert(libhfst.hfst_ol_type())
+        empty_olw = foobar2.convert(libhfst.hfst_olw_type())
+        assert(empty_ol.get_name() == "foobar")
+        assert(empty_olw.get_name() == "foobar")
+    except libhfst.FunctionNotImplementedException:
+        assert(False)
     
-    # From AT&T format
-    verbose_print("Construction from AT&T format", types[i]);
-    FILE * file = fopen((std::string(getenv("srcdir")) + 
-                         std::string("/foobar.att")).c_str(), "rb");
-    assert(file != NULL);
-    unsigned int linecount = 0;
-    HfstTransducer foobar_att(file, types[i], "@0@", linecount);
-    (void)linecount;
-    fclose(file);
-    foobar_att.minimize();
-    
-    assert(foobar.compare(foobar_att));
-    
-    # From HfstInputStream. 
-    Tests also functions get_type, set_name and get_name
-    verbose_print("Construction from HfstInputStream", types[i]);
-    HfstOutputStream out("testfile.hfst", foobar.get_type());
-    foobar.set_name("foobar");
-    out << foobar;
-    out.close();
-    HfstInputStream in("testfile.hfst");
-    HfstTransducer foobar_stream(in);
-    in.close();
-    remove("testfile.hfst");
-    assert(foobar.compare(foobar_stream));
-    assert(foobar_stream.get_name().compare("foobar") == 0);
-    assert(foobar_stream.get_type() == types[i]);
-    
-    # Destructor
-    verbose_print("Destructor", types[i]);
-    HfstTransducer * nu = new HfstTransducer("new", types[i]);
-    delete nu;
-    
-    # Operator=
-    verbose_print("Operator=", types[i]);
-    HfstTransducer foobar2("baz", types[i]);
-    assert(foobar.get_name().compare("foobar") == 0);
-    foobar2 = foobar;
-    assert(foobar2.get_name().compare("foobar") == 0);
-    assert(foobar.compare(foobar2));
-    HfstTransducer empty_ol(HFST_OL_TYPE);
-    HfstTransducer empty_olw(HFST_OLW_TYPE);
-    # reserving props in copy constructor (bug: #3405831) */
-                                            HfstTransducer t("a",TROPICAL_OPENFST_TYPE);
-                                            t.convert(HFST_OLW_TYPE);
-                                            t.set_name("foo");
-                                            HfstTransducer s(t);
-                                            assert(s.get_name() == t.get_name());
-                                            try {
-            empty_ol = foobar2.convert(HFST_OL_TYPE);
-            empty_olw = foobar2.convert(HFST_OLW_TYPE);
-            assert(empty_ol.get_name().compare("foobar") == 0);
-            assert(empty_olw.get_name().compare("foobar") == 0);
-            }
-                                            catch (const FunctionNotImplementedException e)
-                                            {
-            assert(false);
-            }
-
 
