@@ -9,6 +9,9 @@
 %include "file.i"
 %include "exception.i"
 
+%include <typemaps.i>
+%apply unsigned int & INPUT { unsigned int & linecount };
+
 %{
 #define SWIG_FILE_WITH_INIT
 #include "HfstTransducer.h"
@@ -129,7 +132,7 @@ void add_symbols_to_alphabet (const hfst::StringPairSet &symbols);
 void add_transition (HfstState s, const HfstBasicTransition &transition, bool add_symbols_to_alphabet=true);
 HfstBasicTransducer & disjunct(const StringPairVector &spv, float weight);
 const StringSet &get_alphabet () const;
-float get_final_weight (HfstState s) const;
+float get_final_weight (HfstState s) const throw (StateIsNotFinalException);
 HfstState get_max_state () const;
 HfstBasicTransducer &harmonize (HfstBasicTransducer &another);
 HfstBasicTransducer (void);
@@ -156,8 +159,9 @@ void write_in_att_format (std::ostream &os, bool write_weights=true);
 void write_in_att_format (FILE *file, bool write_weights=true);
 void write_in_att_format_number (FILE *file, bool write_weights=true);
 
-static HfstBasicTransducer read_in_att_format (std::istream &is, std::string epsilon_symbol, unsigned int & linecount);
-static HfstBasicTransducer read_in_att_format (FILE *file, std::string epsilon_symbol, unsigned int & linecount);
+static HfstBasicTransducer read_in_att_format (std::istream &is, std::string epsilon_symbol, unsigned int & linecount) throw (NotValidAttFormatException);
+static HfstBasicTransducer read_in_att_format (FILE *file, std::string epsilon_symbol, unsigned int & linecount) throw (NotValidAttFormatException);
+static HfstBasicTransducer read_in_att_format (HfstFile &file, std::string epsilon_symbol, unsigned int & linecount) throw (NotValidAttFormatException);
 
     %extend {
     char *__str__() {
@@ -171,7 +175,7 @@ static HfstBasicTransducer read_in_att_format (FILE *file, std::string epsilon_s
 
 class HfstBasicTransition {
 public:
-	HfstBasicTransition(HfstState s, const std::string &input, const std::string &output, float weight);
+	HfstBasicTransition(HfstState s, const std::string &input, const std::string &output, float weight) throw (EmptyStringException);
 	~HfstBasicTransition();
 	std::string get_input_symbol() const;
 	std::string get_output_symbol() const;

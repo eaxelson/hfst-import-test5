@@ -22,7 +22,7 @@ assert(s2 == 2)
 t.add_transition(s1, libhfst.HfstBasicTransition(s2, "c", "d", 0.8))
 assert(not t.is_final_state(s2))
 t.set_final_weight(s2, 1.0)
-assert(t.is_final_state(s2) && t.get_final_weight(s2) == 1.0)
+assert(t.is_final_state(s2) and t.get_final_weight(s2) == 1.0)
 
 # Take a copy
 tc = libhfst.HfstBasicTransducer(t);
@@ -35,130 +35,101 @@ for s in range(5):
         try:
             w = t.get_final_weight(s)
             assert(False)
-        except libhfst.HfstException:
+        except libhfst.StateIsNotFinalException:
             pass
 
 # Reading a file in non-valid AT&T format
 ofile = open('test.att', 'wb')
 ofile.write('0\n0\t1\ta\tb\n1\t2\tb\n2\n')
 ofile.close()
-ifile = libhfst.HfstFile('test.att')
+ifile = libhfst.hfst_open('test.att', 'rb')
 
 try:
-    linecount = 0
+    linecount = 0;
     foo = libhfst.HfstBasicTransducer.read_in_att_format(ifile, '@0@', linecount);
     ifile.close()
     os.remove('test.att')
     assert(False)
-except libhfst.HfstException:
+except libhfst.NotValidAttFormatException:
     ifile.close()
     os.remove('test.att')
 
   
 print("HfstBasicTransducer: symbol handling")
 
-  t.add_symbol_to_alphabet("foo");
-  t.prune_alphabet();
-  const std::set<std::string> alphabet = t.get_alphabet();
-  assert(alphabet.size() == 7);
-  assert(alphabet.find("a") != alphabet.end());
-  assert(alphabet.find("b") != alphabet.end());
-  assert(alphabet.find("c") != alphabet.end());
-  assert(alphabet.find("d") != alphabet.end());
-  assert(alphabet.find("foo") == alphabet.end());
+t.add_symbol_to_alphabet("foo")
+t.prune_alphabet()
+alphabet = t.get_alphabet()
+assert(len(alphabet) == 7)
+for alpha in ['a', 'b', 'c', 'd']:
+    try:
+        ind = alphabet.index(alpha)
+    except ValueError:
+        assert(False)
+try:
+    alphabet.index('foo')
+    assert(False)
+except ValueError:
+    pass
+
 
   
-  print("HfstBasicTransducer: substitute");
+print('HfstBasicTransducer: substitute')
 
-  HfstBasicTransducer tr;
-  tr.add_state();
-  tr.add_transition(0, HfstBasicTransition(s1, "a", "b", 0));
-  tr.add_transition(0, HfstBasicTransition(s1, "a", "b", 0));
-  tr.set_final_weight(1, 0);
+tr = libhfst.HfstBasicTransducer()
+tr.add_state()
+tr.add_transition(0, libhfst.HfstBasicTransition(s1, "a", "b", 0))
+tr.add_transition(0, libhfst.HfstBasicTransition(s1, "a", "b", 0))
+tr.set_final_weight(1, 0)
 
-  StringPairSet sps;
-  sps.insert(StringPair("A","B"));
-  sps.insert(StringPair("C","D"));
-  tr.substitute(StringPair("a","b"), sps);
+sps = (("A","B"), ("C","D"))
+tr.substitute(("a","b"), sps);
 
-  print("HfstBasicTransducer: EmptyStringException");
+
+print("HfstBasicTransducer: EmptyStringException")
   
-  try {
-    HfstBasicTransducer empty_symbol;
-    empty_symbol.add_transition(0, HfstBasicTransition(0, "", "", 0));
-    assert(false);
-  }
-  catch (EmptyStringException e) {
-    ;
-  }
+try:
+    empty_symbol = libhfst.HfstBasicTransducer()
+    empty_symbol.add_transition(0, libhfst.HfstBasicTransition(0, "", "", 0))
+    assert(False)
+except libhfst.EmptyStringException:
+    pass
 
   
-  print("HfstBasicTransducer: unknown and indentity symbols");
+print("HfstBasicTransducer: unknown and indentity symbols")
 
-  {
-    // In the xerox formalism used here, "?" means the unknown symbol
-    // and "?:?" the identity pair 
-    
-    HfstBasicTransducer tr1;
-    tr1.add_state(1);
-    tr1.set_final_weight(1, 0);
-    tr1.add_transition
-      (0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "foo", 0) );
-    
-    // tr1 is now [ ?:foo ]
-    
-    HfstBasicTransducer tr2;
-    tr2.add_state(1);
-    tr2.add_state(2);
-    tr2.set_final_weight(2, 0);
-    tr2.add_transition
-      (0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", 
-                  "@_IDENTITY_SYMBOL_@", 0) );
-    tr2.add_transition
-      (1, HfstBasicTransition(2, "bar", "bar", 0) );
-    
-    // tr2 is now [ [ ?:? ] [ bar:bar ] ]
-    
-    if (HfstTransducer::is_implementation_type_available(SFST_TYPE))
-      {
-	ImplementationType type = SFST_TYPE;
-	HfstTransducer Tr1(tr1, type);
-	HfstTransducer Tr2(tr2, type);
-	Tr1.disjunct(Tr2);
-    
-	// Tr1 is now [ [ ?:foo | bar:foo ]  |  [[ ?:? | foo:foo ] [ bar:bar ]]]
-      }
-  }
+# In the xerox formalism used here, "?" means the unknown symbol
+# and "?:?" the identity pair 
+   
+tr1 = libhfst.HfstBasicTransducer()
+tr1.add_state(1)
+tr1.set_final_weight(1, 0)
+tr1.add_transition(0, libhfst.HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "foo", 0) )
 
+# tr1 is now [ ?:foo ]
+# print(tr1)
 
-  print("HfstBasicTransducer: iterating through");
+tr2 = libhfst.HfstBasicTransducer()
+tr2.add_state(1)
+tr2.add_state(2)
+tr2.set_final_weight(2, 0)
+tr2.add_transition(0, libhfst.HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) )
+tr2.add_transition(1, libhfst.HfstBasicTransition(2, "bar", "bar", 0) )
 
-  { 
-    unsigned int source_state=0;
+# tr2 is now [ [ ?:? ] [ bar:bar ] ]
+# print(tr2)
 
-    for (HfstBasicTransducer::const_iterator it = t.begin();
-     it != t.end(); it++ )
-      {
-    for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
-           = it->begin(); tr_it != it->end(); tr_it++)
-      {
-        std::cerr << source_state << "\t"
-              << tr_it->get_target_state() << "\t"
-              << tr_it->get_input_symbol() << "\t"
-              << tr_it->get_output_symbol() << "\t"
-              << tr_it->get_weight() << std::endl;
-      }
+if libhfst.HfstTransducer.is_implementation_type_available(libhfst.sfst_type()):
+    Tr1 = libhfst.HfstTransducer(tr1, libhfst.sfst_type())
+    Tr2 = libhfst.HfstTransducer(tr2, libhfst.sfst_type())
+    Tr1.disjunct(Tr2).minimize()
+    # Tr1 is now [ [ ?:foo | bar:foo ]  |  [[ ?:? | foo:foo ] [ bar:bar ]]]
+    # print(Tr1)
 
-    if (t.is_final_state(source_state)) 
-      {
-        std::cerr << source_state << "\t"
-              << t.get_final_weight(source_state) << std::endl;
-      }
-    
-    source_state++;
-      }
-  }
+print("HfstBasicTransducer: iterating through");
 
-  
-}
-
+for state in t.states():
+    for transition in t.transitions(state):
+        print '%i\t%i\t%s\t%s\t%f' % (state, transition.get_target_state(), transition.get_input_symbol(), transition.get_output_symbol(), transition.get_weight())
+    if t.is_final_state(state):
+        print '%i\t%f' % (state, t.get_final_weight(state))
