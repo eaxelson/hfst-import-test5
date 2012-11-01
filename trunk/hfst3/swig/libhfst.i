@@ -9,9 +9,6 @@
 %include "file.i"
 %include "exception.i"
 
-%include <typemaps.i>
-%apply unsigned int & INPUT { unsigned int & linecount };
-
 %{
 #define SWIG_FILE_WITH_INIT
 #include "HfstTransducer.h"
@@ -35,7 +32,11 @@ namespace std {
 %template(StringSet) set<string>;
 %template(HfstTransitions) vector<hfst::implementations::HfstBasicTransition>;
 %template(IntVector) vector<unsigned int>;
+%template(HfstTwoLevelPaths) set<pair<float, vector<pair <string, string> > > >;
 }
+
+%include <typemaps.i>
+%apply unsigned int & INPUT { unsigned int & linecount };
 
 class HfstException {
 public:
@@ -98,7 +99,7 @@ enum ImplementationType;
 enum PushType;
 class HfstInputStream;
 typedef HfstOneLevelPaths std::set<pair<float, vector<string> > >;
-class HfstTwoLevelPaths;
+//class HfstTwoLevelPaths;
 class HfstOutputStream;
 class HfstTransducer;
 class FdOperation;
@@ -112,6 +113,12 @@ typedef std::vector<std::pair<std::string, std::string> > StringPairVector;
 
 typedef std::map<std::string, std::string> HfstSymbolSubstitutions;
 typedef std::map<std::pair<std::string, std::string>, std::pair<std::string, std::string> > HfstSymbolPairSubstitutions;
+
+typedef std::set<std::pair<float, std::vector<std::pair <std::string, std::string> > > > HfstTwoLevelPaths; 
+
+HfstTwoLevelPaths extract_paths(const HfstTransducer &t, int max_num=-1, int cycles=-1);
+HfstTwoLevelPaths extract_paths_fd(const HfstTransducer &t, int max_num=-1, int cycles=-1, bool filter_fd=false);
+
 
 namespace implementations {
 class HfstBasicTransducer;
@@ -291,6 +298,7 @@ public:
     HfstTransducer & reverse (void);
     HfstTransducer & set_final_weights(float weight);
     void set_name(const std::string &name);
+    HfstTransducer & shuffle(const HfstTransducer &another) throw (TransducersAreNotAutomataException);
     HfstTransducer & substitute(bool(*func)(const StringPair &sp, StringPairSet &sps));
     HfstTransducer & substitute(const StringPair &old_symbol_pair, const StringPairSet &new_symbol_pair_set);
     HfstTransducer & substitute(const StringPair &symbol_pair, HfstTransducer &transducer);

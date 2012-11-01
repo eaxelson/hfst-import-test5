@@ -23,6 +23,22 @@ namespace hfst {
   ImplementationType hfst_ol_type() { return HFST_OL_TYPE; }
   ImplementationType hfst_olw_type() { return HFST_OLW_TYPE; }
 
+
+  HfstTwoLevelPaths extract_paths(const HfstTransducer &t, int max_num=-1, int cycles=-1)
+  {
+    HfstTwoLevelPaths result;
+    t.extract_paths(result, max_num, cycles);
+    return result;
+  }
+
+  HfstTwoLevelPaths extract_paths_fd(const HfstTransducer &t, int max_num=-1, int cycles=-1, bool filter_fd=false)
+  {
+    HfstTwoLevelPaths result;
+    t.extract_paths_fd(result, max_num, cycles, filter_fd);
+    return result;
+  }
+
+
 OneLevelPathVector vectorize(HfstOneLevelPaths * holps)
 {
     std::vector<std::pair <float, std::vector<std::string> > > retval;

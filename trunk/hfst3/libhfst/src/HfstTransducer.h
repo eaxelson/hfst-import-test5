@@ -95,19 +95,6 @@ namespace hfst
   //  using hfst::implementations::MyTransducerLibraryTransducer;
   //#endif // #if HAVE_MY_TRANSDUCER_LIBRARY
 
-
-  class HfstFile {
-  private:
-    FILE * file;
-  public:
-    HfstFile();
-    ~HfstFile();
-    void set_file(FILE * f);
-    FILE * get_file();
-    void close();
-    void write(const char * str);
-  };
-
   HfstFile hfst_open(const char * filename, const char * mode);
 
   // *** TESTING AND OPTIMIZATION...
