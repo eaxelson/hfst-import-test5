@@ -42,7 +42,7 @@ for s in range(5):
 ofile = open('test.att', 'wb')
 ofile.write('0\n0\t1\ta\tb\n1\t2\tb\n2\n')
 ofile.close()
-ifile = libhfst.hfst_open('test.att', 'rb')
+ifile = open('test.att', 'rb')
 
 try:
     linecount = 0;

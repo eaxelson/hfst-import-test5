@@ -23,6 +23,19 @@
 
 namespace hfst {
 
+  class HfstFile {
+  private:
+    FILE * file;
+  public:
+    HfstFile();
+    ~HfstFile();
+    void set_file(FILE * f);
+    FILE * get_file();
+    void close();
+    void write(const char * str);
+  };
+
+
   /** @brief A namespace for all code that forms a bridge between
       backend libraries and HFST.
 
@@ -983,6 +996,15 @@ namespace hfst {
             (std::cin /* a dummy variable */,
              file, epsilon_symbol, linecount);
         }       
+
+        static HfstTransitionGraph read_in_att_format
+          (HfstFile &file, 
+           std::string epsilon_symbol,
+           unsigned int & linecount)
+        {
+          return read_in_att_format(std::cin /* a dummy variable */, file.get_file(),
+                                    epsilon_symbol, linecount);
+        }
 
 
     // ----------------------------------------------
