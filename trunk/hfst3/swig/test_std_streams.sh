@@ -1,19 +1,22 @@
 #!/bin/sh
 
 TOOLDIR=../tools/src/
-CALCULATE="$TOOLDIR"hfst-calculate
+STRINGS2FST="$TOOLDIR"hfst-strings2fst
 COMPARE="$TOOLDIR"hfst-compare" -s"
 PYTHON=$1
 
-echo "a:b" | $CALCULATE -f sfst > a2b.sfst
-echo "c:d" | $CALCULATE -f sfst > c2d.sfst
-cat a2b.sfst c2d.sfst > tr.sfst
-echo "a:b" | $CALCULATE -f openfst-tropical > a2b.ofst
-echo "c:d" | $CALCULATE -f openfst-tropical > c2d.ofst
-cat a2b.ofst c2d.ofst > tr.ofst
-echo "a:b" | $CALCULATE -f foma > a2b.foma
-echo "c:d" | $CALCULATE -f foma > c2d.foma
-cat a2b.foma c2d.foma > tr.foma
+STRING1="abcdefghijklmnopqrstuvwxyz"
+STRING2="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+echo $STRING1 | $STRINGS2FST -f sfst > tr1.sfst
+echo $STR1NG2 | $STRINGS2FST -f sfst > tr2.sfst
+cat tr1.sfst tr2.sfst > tr.sfst
+echo $STRING1 | $STRINGS2FST -f openfst-tropical > tr1.ofst
+echo $STRING2 | $STRINGS2FST -f openfst-tropical > tr2.ofst
+cat tr1.ofst tr2.ofst > tr.ofst
+echo $STRING1 | $STRINGS2FST -f foma > tr1.foma
+echo $STRING2 | $STRINGS2FST -f foma > tr2.foma
+cat tr1.foma tr2.foma > tr.foma
 
 if ! (cat tr.sfst | $PYTHON ./test_std_streams.py sfst 2 > tmp.sfst); then
     echo "ERROR: in sfst"
