@@ -262,9 +262,30 @@ namespace hfst
         HfstTransducer replace_epenthesis(    const Rule &rule, bool optional);
         // replace up, left, right, down
         HfstTransducer replace_epenthesis(    const std::vector<Rule> &ruleVector, bool optional);
+
+
         //---------------------------------
         //    RESTRICTION FUNCTIONS
         //---------------------------------
+
+        // create marks for given i
+        static StringPair restrictionMarks( int i);
+
+        /*
+         * define AA1a [  [. 0 .] -> LEFT_MARK || _ center ];
+         * define AA1b [  [. 0 .] -> RIGHT_MARK || center _ ];
+         * retval = AA1 .o. AA2
+         */
+        static HfstTransducer surroundCenterWithBrackets( const HfstTransducer &center,
+                                                   const HfstTransducer &leftMark,
+                                                   const HfstTransducer &rightMark);
+        // Contexts
+        // define NOS1 [ %[ -> 0 || b / B _ ];
+        // define NOF1 [ %] -> 0 || _ c / B ];
+        static HfstTransducer removeBracketsInContext( const HfstTransducerPairVector &context,
+                                                   const HfstTransducer &leftMark,
+                                                   const HfstTransducer &rightMark,
+                                                   int i);
         // Restriction function "=>"
         HfstTransducer restriction( const HfstTransducer &automata, const HfstTransducerPairVector &context);
 

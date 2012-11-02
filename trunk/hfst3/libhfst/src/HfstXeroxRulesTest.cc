@@ -692,6 +692,97 @@ void restriction_test6( ImplementationType type )
     assert(tmp2.compare(input4));
 }
 
+// restriction rule [ x ?* y ] | [ z ?* v ] => b _ c ;
+void restriction_test7( ImplementationType type )
+{
+    HfstTokenizer TOK;
+    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+
+    // Identity (normal)
+    HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+    HfstTransducer identity (identityPair);
+    identity.repeat_star().minimize();
+
+
+    // Mapping
+    HfstTransducer x("x", TOK, type);
+    HfstTransducer y("y", TOK, type);
+
+    HfstTransducer z("z", TOK, type);
+    HfstTransducer v("v", TOK, type);
+    HfstTransducer zSthV(z);
+    zSthV.concatenate(identity).concatenate(v).minimize();
+
+    HfstTransducer center(x);
+    center.concatenate(identity).concatenate(y).minimize();
+    center.disjunct(zSthV).minimize();
+
+    //printf("center \n");
+    //center.write_in_att_format(stdout, 1);
+
+
+    HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+
+    // Context
+    HfstTransducerPair Context1(HfstTransducer("b", TOK, type), HfstTransducer("c", TOK, type));
+  //  HfstTransducerPair Context2(epsilon, HfstTransducer("ab", TOK, type));
+
+    HfstTransducerPairVector ContextVector;
+    ContextVector.push_back(Context1);
+   // ContextVector.push_back(Context2);
+
+    HfstTransducer input1("bxbzycvc", TOK, type);
+    HfstTransducer input2("xy", TOK, type);
+    HfstTransducer input3("zv", TOK, type);
+    HfstTransducer input4("bxyzvc", TOK, type);
+    HfstTransducer result1("bxbzycvc", TOK, type);
+    HfstTransducer empty(type);
+
+
+    HfstTransducer restrictionTr(type);
+    restrictionTr = restriction(center, ContextVector);
+
+    //printf("restrictionTr \n");
+    //restrictionTr.write_in_att_format(stdout, 1);
+/*
+    printf("alphabet: \n");
+    StringSet transducerAlphabet = restrictionTr.get_alphabet();
+    for (StringSet::const_iterator s = transducerAlphabet.begin();
+                   s != transducerAlphabet.end();
+                   ++s)
+        {
+            printf("%s \n", s->c_str());
+            //printf("in alph: %s", alphabet[i] ) ;
+        }
+    printf("------------------ \n");
+*/
+
+    HfstTransducer tmp2(type);
+    tmp2 = input1;
+    tmp2.compose(restrictionTr).minimize();
+    //printf("1\n");
+    //tmp2.write_in_att_format(stdout, 1);
+    assert(tmp2.compare(result1));
+
+    tmp2 = input2;
+    tmp2.compose(restrictionTr).minimize();
+    //printf("2\n");
+    //tmp2.write_in_att_format(stdout, 1);
+    assert(tmp2.compare(empty));
+
+    tmp2 = input3;
+    tmp2.compose(restrictionTr).minimize();
+    //printf("3\n");
+    //tmp2.write_in_att_format(stdout, 1);
+    assert(tmp2.compare(empty));
+
+    tmp2 = input4;
+    tmp2.compose(restrictionTr).minimize();
+    //printf("4\n");
+    //tmp2.write_in_att_format(stdout, 1);
+    assert(tmp2.compare(empty));
+}
+
 // empty language replacements
 // a -> ~[?*]
 void test10a( ImplementationType type )
@@ -2174,9 +2265,8 @@ void test6a( ImplementationType type )
     //printf("Replace leftmost tr2: \n");
     //tmp2.write_in_att_format(stdout, 1);
     assert(tmp2.compare(result2));
-
 }
-
+// a* -> p ;
 void test6b( ImplementationType type )
 {
     HfstTokenizer TOK;
@@ -2221,15 +2311,68 @@ void test6b( ImplementationType type )
 
     // epsilon
     replaceTr = replace_epenthesis(ruleUp, false);
+    //printf("test 6b replaceTr: \n");
+    //replaceTr.write_in_att_format(stdout, 1);
+
+    tmp2 = input1;
+    tmp2.compose(replaceTr).minimize();
+    //printf("test 6b: \n");
+    //tmp2.write_in_att_format(stdout, 1);
+    assert(tmp2.compare(result1));
+}
+// 0 -> b || _ a a
+void test6c( ImplementationType type )
+{
+    HfstTokenizer TOK;
+    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+
+    String LeftMarker("@_LM_@");
+    String RightMarker("@_RM_@");
+    TOK.add_multichar_symbol(LeftMarker);
+    TOK.add_multichar_symbol(RightMarker);
+
+    // Mapping
+
+    HfstTransducer leftMapping("@_EPSILON_SYMBOL_@", TOK, type);
+
+    HfstTransducer rightMapping("b", TOK, type);
+    HfstTransducerPair mappingPair(leftMapping, rightMapping);
+    HfstTransducerPairVector mappingPairVector;
+    mappingPairVector.push_back(mappingPair);
+
+
+    // Context
+    HfstTransducerPair Context(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type), HfstTransducer("aa", TOK, type));
+
+    HfstTransducerPairVector ContextVector;
+    ContextVector.push_back(Context);
+
+    HfstTransducer input1("aa", TOK, type);
+
+    HfstTransducer result1("@_EPSILON_SYMBOL_@aa", "baa",TOK, type);
+
+
+    Rule ruleUp(mappingPairVector, ContextVector, REPL_UP);
+
+    HfstTransducer replaceTr(type);
+    HfstTransducer tmp2(type);
+
+    // epsilon
+    replaceTr = replace_epenthesis(ruleUp, false);
+    //replaceTr = replace(ruleUp, false);
+
+    //printf("test 6c replaceTr: \n");
+    //replaceTr.write_in_att_format(stdout, 1);
 
 
     tmp2 = input1;
     tmp2.compose(replaceTr).minimize();
-    //printf("Replace leftmost tr2: \n");
+    //printf("test 6c composed with aa : \n");
     //tmp2.write_in_att_format(stdout, 1);
     assert(tmp2.compare(result1));
-
 }
+
+
 // a -> b , b -> c
 void test7a( ImplementationType type )
 {
