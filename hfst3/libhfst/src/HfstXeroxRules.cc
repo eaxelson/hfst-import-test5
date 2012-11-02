@@ -19,46 +19,6 @@ namespace hfst
 {
   namespace xeroxRules
   {
-  /*
-        Rule::Rule ( const HfstTransducer &a_mapping )
-      {
-        HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-
-
-        ImplementationType type = a_mapping.get_type();
-
-
-        HfstTransducerPair contextPair(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type),
-                                       HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type));
-        HfstTransducerPairVector epsilonContext;
-        epsilonContext.push_back(contextPair);
-
-
-        mapping = a_mapping;
-        context = epsilonContext;
-        replType = REPL_UP;
-      }
-      Rule::Rule ( const HfstTransducer &a_mapping,
-                     const HfstTransducerPairVector &a_context,
-                     ReplaceType a_replType )
-      {
-
-        for ( unsigned int i = 0; i < a_context.size(); i++ )
-         {
-            if ( a_mapping.get_type() != a_context[i].first.get_type()
-                ||     a_mapping.get_type() != a_context[i].second.get_type()
-                ||     a_context[i].first.get_type() != a_context[i].second.get_type())
-            {
-                HFST_THROW_MESSAGE(TransducerTypeMismatchException, "Rule");
-            }
-         }
-
-        mapping = a_mapping;
-        context = a_context;
-        replType = a_replType;
-      }
-*/
       Rule::Rule ( const HfstTransducerPairVector &mappingPairVector )
       {
         HfstTokenizer TOK;
@@ -71,9 +31,6 @@ namespace hfst
                 HFST_THROW_MESSAGE(TransducerTypeMismatchException, "Rule");
             }
         }
-    //    HfstTransducer tmpMapping(mappingPair.first);
-    //    tmpMapping.cross_product(mappingPair.second).minimize();
-
         ImplementationType type = mappingPairVector[0].first.get_type();
 
         HfstTransducerPair contextPair(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type),
@@ -134,24 +91,6 @@ namespace hfst
 
       ///////
 
-/*
-
-                
-      MarkUpRule::MarkUpRule ( const HfstTransducer &a_mapping,
-                                       StringPair a_marks ):
-              Rule(a_mapping), marks(a_marks)
-      {
-          marks = a_marks;
-      }
-      MarkUpRule::MarkUpRule ( const HfstTransducer &a_mapping,
-                                       const HfstTransducerPairVector &a_contextVector,
-                                       ReplaceType a_replType,
-                                       StringPair a_marks ):
-              Rule(a_mapping, a_contextVector, a_replType), marks(a_marks)
-      {
-          marks = a_marks;
-      }
-      */
       MarkUpRule::MarkUpRule ( const HfstTransducerPairVector &a_mapping,
                                        StringPair a_marks ):
               Rule(a_mapping), marks(a_marks)
@@ -189,16 +128,7 @@ namespace hfst
 
 
 
-
-
-
-
-
       //////////////////////////////////////
-
-
-
-
 
 
 
@@ -288,8 +218,6 @@ namespace hfst
           //return retval;
 
       }
-
-
 
       HfstTransducer expandContextsWithMapping (const HfstTransducerPairVector &ContextVector,
                                       const HfstTransducer &mappingWithBracketsAndTmpBoundary,
@@ -1757,29 +1685,23 @@ namespace hfst
         {
             HfstTokenizer TOK;
             TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-
-
             ImplementationType type = t.get_type();
-
 
             String boundaryMarker(".#.");
             TOK.add_multichar_symbol(boundaryMarker);
-
             HfstTransducer boundary(boundaryMarker, TOK, type);
 
-
             HfstTransducer identityPair = HfstTransducer::identity_pair( type );
-
-
             identityPair.insert_to_alphabet(boundaryMarker);
-
+            // ? - .#.
             HfstTransducer identityMinusBoundary(identityPair);
             identityMinusBoundary.subtract(boundary).minimize();
 
+            // (? - .#.)*
             HfstTransducer identityMinusBoundaryStar(identityMinusBoundary);
             identityMinusBoundaryStar.repeat_star().minimize();
 
-
+            // .#. (? - .#.)* .#.
             HfstTransducer boundaryAnythingBoundary(boundary);
             boundaryAnythingBoundary.concatenate(identityMinusBoundaryStar)
                                     .concatenate(boundary)
@@ -1802,13 +1724,10 @@ namespace hfst
 
 
         //    newTr.insert_to_alphabet(boundaryMarker);
-            newTr.compose(boundaryAnythingBoundary).minimize();
+          //  newTr.compose(boundaryAnythingBoundary).minimize();
 
 
-            //printf("newTr: \n");
-            //newTr.write_in_att_format(stdout, 1);
-
-            // remove boundary paths
+           // remove boundary paths
 
             // [0:.#. | ? - .#.]*
 
@@ -1820,7 +1739,13 @@ namespace hfst
                   .minimize();
 
             // compose with previous
-            retval.compose(newTr).minimize();
+            retval.compose(newTr)
+                  .compose(boundaryAnythingBoundary)
+                  .minimize();
+
+            //printf("retval : \n");
+            //retval.write_in_att_format(stdout, 1);
+
 
             // compose with [.#.:0 | ? - .#.]*
             HfstTransducer boundaryToZero(boundaryMarker, "@_EPSILON_SYMBOL_@", TOK, type);
@@ -2024,6 +1949,18 @@ namespace hfst
             }
             return retval;
         }
+
+
+
+
+
+
+
+
+
+
+
+
 
       //---------------------------------
       //    REPLACE FUNCTIONS - INTERFACE
@@ -2627,10 +2564,6 @@ retval.write_in_att_format(stdout, 1);
 
           retval = removeMarkers( retval );
 
-          // deals with boundary symbol
-          //retval = applyBoundaryMark( retval );
-
-
           //printf("after remove markers: \n");
           //retval.write_in_att_format(stdout, 1);
           return retval;
@@ -2685,9 +2618,134 @@ retval.write_in_att_format(stdout, 1);
 
 
 
+
+
     //---------------------------------
       //    RESTRICTION FUNCTIONS
       //---------------------------------
+    // create marks for given i
+    static StringPair restrictionMarks( int i)
+    {
+        String leftRestrictionMark;
+        String rightRestrictionMark;
+
+        String openingBracket("@_[");
+        String closingBracket("@_]");
+        String atSign("_@");
+
+        // Marks
+        std::stringstream m;
+        m << openingBracket << i << atSign;
+        leftRestrictionMark = m.str();
+
+        m.str(std::string());
+
+        m << closingBracket << i << atSign;
+        rightRestrictionMark = m.str();
+        //cout << "Marks: " << leftRestrictionMark << " " << rightRestrictionMark << "\n";
+
+        StringPair retval(leftRestrictionMark, rightRestrictionMark);
+        return retval;
+    }
+
+
+    /*
+     * define AA1a [  [. 0 .] -> LEFT_MARK || _ center ];
+     * define AA1b [  [. 0 .] -> RIGHT_MARK || center _ ];
+     * retval = AA1 .o. AA2
+     */
+    static HfstTransducer surroundCenterWithBrackets( const HfstTransducer &center,
+                                           const HfstTransducer &leftMark,
+                                           const HfstTransducer &rightMark)
+    {
+        ImplementationType type = center.get_type();
+        HfstTokenizer TOK;
+        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        // Mappings
+        // suround mapping with brackets
+        // define AA1 [ a b -> %[ ... %] ] ;
+        // define AA1a [  [. 0 .] -> %[ || _ center ];
+        // define AA1b [  [. 0 .] -> %] || center _ ];
+
+        HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+        HfstTransducer empty(type);
+
+        HfstTransducerPair mappingPair1(epsilon, leftMark);
+        HfstTransducerPairVector mappingPairVector1;
+        mappingPairVector1.push_back(mappingPair1);
+
+        HfstTransducerPair contextCenter1(epsilon, center);
+        HfstTransducerPairVector contextV1;
+        contextV1.push_back(contextCenter1);
+
+        Rule markCenter1(mappingPairVector1, contextV1,  REPL_UP);
+
+        HfstTransducerPair mappingPair2(epsilon, rightMark);
+        HfstTransducerPairVector mappingPairVector2;
+        mappingPairVector2.push_back(mappingPair2);
+
+        HfstTransducerPair contextCenter2(center, epsilon);
+        HfstTransducerPairVector contextV2;
+        contextV2.push_back(contextCenter2);
+
+        Rule markCenter2(mappingPairVector2, contextV2,  REPL_UP);
+
+        HfstTransducer leftBracketCenter = replace_epenthesis(markCenter1, false);
+        HfstTransducer rightBracketCenter = replace_epenthesis(markCenter2, false);
+
+        HfstTransducer retval (leftBracketCenter);
+        retval.compose(rightBracketCenter);
+        return retval;
+    }
+
+    // Contexts
+    // define NOS1 [ %[ -> 0 || b / B _ ];
+    // define NOF1 [ %] -> 0 || _ c / B ];
+    static HfstTransducer removeBracketsInContext( const HfstTransducerPairVector &context,
+                                               const HfstTransducer &leftMark,
+                                               const HfstTransducer &rightMark,
+                                               int i)
+    {
+        ImplementationType type = context[0].first.get_type();
+        HfstTokenizer TOK;
+        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+
+        HfstTransducerPair leftMappingCtx(leftMark, epsilon);
+        HfstTransducerPairVector leftMappingV;
+        leftMappingV.push_back(leftMappingCtx);
+
+        HfstTransducerPair rightMappingCtx(rightMark, epsilon);
+        HfstTransducerPairVector rightMappingV;
+        rightMappingV.push_back(rightMappingCtx);
+
+        // remove left mark in left context
+        //%] -> 0 || _ rightContxt ;
+        HfstTransducer leftContext(context[i].first);
+        HfstTransducer rightContext(context[i].second);
+
+        HfstTransducerPairVector ContextVector1;
+        HfstTransducerPair Context1(leftContext, epsilon);
+        ContextVector1.push_back(Context1);
+
+        Rule removeLeftMark(leftMappingV, ContextVector1, REPL_UP);
+        HfstTransducer replaceRemoveLeftMark = replace(removeLeftMark, false);
+
+        // remove right mark in right context
+        // %] -> 0 || _ rightContxt ;
+        HfstTransducerPairVector ContextVector2;
+        HfstTransducerPair Context2(epsilon, rightContext);
+        ContextVector2.push_back(Context2);
+
+        Rule removeRightMark(rightMappingV, ContextVector2, REPL_UP);
+        HfstTransducer replaceRemoveRightMark = replace(removeRightMark, false);
+
+        HfstTransducer retval(replaceRemoveLeftMark);
+        retval.compose(replaceRemoveRightMark).minimize();
+        return retval;
+
+    }
+
       /*
        * // restriction rule a => b _ c , j _ k ;
 
@@ -2713,176 +2771,102 @@ retval.write_in_att_format(stdout, 1);
 
         regex X .o. Y .o. NOB ;
        */
-      HfstTransducer restriction( const HfstTransducer &center, const HfstTransducerPairVector &_context)
-      {
-          HfstTransducerPairVector context = _context;
+    HfstTransducer restriction( const HfstTransducer &center, const HfstTransducerPairVector &_context)
+    {
+        HfstTransducerPairVector context = _context;
 
           // TODO: check if the center is automata
-            ImplementationType type = center.get_type();
-            HfstTokenizer TOK;
-            TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-            HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+        ImplementationType type = center.get_type();
+        HfstTokenizer TOK;
+        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
 
-          // Identity (normal)
-          HfstTransducer identityPair = HfstTransducer::identity_pair( type );
-          HfstTransducer identity (identityPair);
-          identity.repeat_star().minimize();
+        // Identity (normal)
+        HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+        HfstTransducer identity (identityPair);
+        identity.repeat_star().minimize();
 
-          // A
-          // define A [ ? - B ]*;
-          HfstTransducer identityWithoutB(identity);
+        // A
+        // define A [ ? - B ]*;
+        HfstTransducer identityWithoutB(identity);
 
-            // define brackets
-            // insert them freely into contexts
+        // create allBrackets and insert them freely into contexts
+        HfstTransducer allBrackets(type);
+        for ( unsigned int i = 0; i < context.size(); i++ )
+        {
+            // Create marks
+            StringPair markPair = restrictionMarks( i );
 
-          HfstTransducer allBrackets(type);
-           for ( unsigned int i = 0; i < context.size(); i++ )
-          {
-                String leftRestrictionMark;
-                  String rightRestrictionMark;
+            String leftRestrictionMark = markPair.first;
+            String rightRestrictionMark = markPair.second;
 
-                  String openingBracket("@_[");
-              String closingBracket("@_]");
-              String atSign("_@");
+            TOK.add_multichar_symbol(leftRestrictionMark);
+            TOK.add_multichar_symbol(rightRestrictionMark);
 
-            // Marks
-            std::stringstream m;
-            m << openingBracket << i << atSign;
-            leftRestrictionMark = m.str();
+            HfstTransducer leftMark(leftRestrictionMark, TOK, type);
+            HfstTransducer rightMark(rightRestrictionMark, TOK, type);
 
-            m.str(std::string());
-
-            m << closingBracket << i << atSign;
-            rightRestrictionMark = m.str();
-            //cout << "Marks: " << leftRestrictionMark << " " << rightRestrictionMark << "\n";
-
-              TOK.add_multichar_symbol(leftRestrictionMark);
-              TOK.add_multichar_symbol(rightRestrictionMark);
-
-
-              HfstTransducer leftMark(leftRestrictionMark, TOK, type);
-              HfstTransducer rightMark(rightRestrictionMark, TOK, type);
-
-              // A
+            // A
             identityWithoutB.insert_to_alphabet(leftRestrictionMark);
             identityWithoutB.insert_to_alphabet(rightRestrictionMark);
 
-              // B
-              // define B [ %[ | %] | %{ | %} ] ;
-              allBrackets.disjunct(leftMark).disjunct(rightMark).minimize();
+            // B
+            // define B [ %[ | %] | %{ | %} ] ;
+            allBrackets.disjunct(leftMark).disjunct(rightMark).minimize();
 
-              // insert freely all brackets to all contexts
-              for ( unsigned int j = 0; j < context.size(); j++ )
-              {
+            // insert freely all brackets to all contexts
+            for ( unsigned int j = 0; j < context.size(); j++ )
+            {
                 context[j].first.insert_freely(leftMark).minimize();
                 context[j].first.insert_freely(rightMark).minimize();
                 context[j].second.insert_freely(leftMark).minimize();
                 context[j].second.insert_freely(rightMark).minimize();
-              }
-          }
-            //printf("allBrackets\n");
-            //allBrackets.write_in_att_format(stdout, 1);
-            HfstTransducer allBracketsStar(allBrackets);
-            allBracketsStar.repeat_star().minimize();
+            }
+        }
 
-            // Create mapping & context transducers and compose them into firstPart
-            // create secondPart for removing extra brackets
-          HfstTransducerVector makredMappingVector;
-          HfstTransducer mappingAndContexts(type);
-            HfstTransducer pAll(type);
-          for ( unsigned int i = 0; i < context.size(); i++ )
+        HfstTransducer allBracketsStar(allBrackets);
+        allBracketsStar.repeat_star().minimize();
+
+        // Create mapping & context transducers and compose them into firstPart
+        // create secondPart for removing extra brackets
+        //  HfstTransducerVector makredMappingVector;
+        HfstTransducer mappingAndContexts(type);
+        HfstTransducer pAll(type);
+        for ( unsigned int i = 0; i < context.size(); i++ )
         {
-            String leftRestrictionMark;
-            String rightRestrictionMark;
+            // Create marks
+            StringPair markPair = restrictionMarks( i );
 
-            String openingBracket("@_[");
-            String closingBracket("@_]");
-            String atSign("_@");
+            String leftRestrictionMark = markPair.first;
+            String rightRestrictionMark = markPair.second;
 
-            // Marks
-            std::stringstream m;
-            m << openingBracket << i << atSign;
-            leftRestrictionMark = m.str();
-
-            m.str(std::string());
-
-            m << closingBracket << i << atSign;
-            rightRestrictionMark = m.str();
-            //cout << "Marks2: " << leftRestrictionMark << " " << rightRestrictionMark << "\n";
+            TOK.add_multichar_symbol(leftRestrictionMark);
+            TOK.add_multichar_symbol(rightRestrictionMark);
 
             HfstTransducer leftMark(leftRestrictionMark, TOK, type);
             HfstTransducer rightMark(rightRestrictionMark, TOK, type);
             HfstTransducerPair marks(leftMark, rightMark);
 
-            // Mappings
-            // suround mapping with brackets
-            // define AA1 [ a b -> %[ ... %] ] ;
-            HfstTransducer leftMapping(center);
-            HfstTransducer empty(type);
-            HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
-
-            HfstTransducerPair mappingPair(leftMapping, empty);
-            HfstTransducerPairVector mappingPairVector;
-            mappingPairVector.push_back(mappingPair);
-            Rule markCenter(mappingPairVector);
-
-            HfstTransducer markedMapping = mark_up_replace(markCenter, marks, false);
-
-            //printf("markedMapping %d\n", i);
-            //markedMapping.write_in_att_format(stdout, 1);
-
-            makredMappingVector.push_back(markedMapping);
+            // Create markedCenter
+            HfstTransducer markedCenter(type);
+            markedCenter = surroundCenterWithBrackets(center, leftMark, rightMark );
 
             if ( i == 0 )
             {
-                mappingAndContexts = markedMapping;
+                mappingAndContexts = markedCenter;
+
             }
             else
             {
-                mappingAndContexts.compose(markedMapping).minimize();
+                mappingAndContexts.compose(markedCenter)
+                                .minimize();
             }
 
             // Contexts
             // define NOS1 [ %[ -> 0 || b / B _ ];
             // define NOF1 [ %] -> 0 || _ c / B ];
-
-            HfstTransducerPair leftMappingCtx(leftMark, epsilon);
-            HfstTransducerPairVector leftMappingV;
-            leftMappingV.push_back(leftMappingCtx);
-
-            HfstTransducerPair rightMappingCtx(rightMark, epsilon);
-            HfstTransducerPairVector rightMappingV;
-            rightMappingV.push_back(rightMappingCtx);
-
-            // remove left mark in left context
-            //%] -> 0 || _ rightContxt ;
-            HfstTransducer leftContext(context[i].first);
-            HfstTransducer rightContext(context[i].second);
-
-            HfstTransducerPairVector ContextVector1;
-            HfstTransducerPair Context1(leftContext, epsilon);
-            ContextVector1.push_back(Context1);
-
-            Rule removeLeftMark(leftMappingV, ContextVector1, REPL_UP);
-            HfstTransducer replaceRemoveLeftMark = replace(removeLeftMark, false);
-
-            //printf("replaceRemoveLeftMark \n");
-            //replaceRemoveLeftMark.write_in_att_format(stdout, 1);
-
-            mappingAndContexts.compose(replaceRemoveLeftMark).minimize();
-
-            // remove right mark in right context
-            // %] -> 0 || _ rightContxt ;
-            HfstTransducerPairVector ContextVector2;
-            HfstTransducerPair Context2(epsilon, rightContext);
-            ContextVector2.push_back(Context2);
-
-            Rule removeRightMark(rightMappingV, ContextVector2, REPL_UP);
-            HfstTransducer replaceRemoveRightMark = replace(removeRightMark, false);
-
-            //printf("replaceRemoveRightMark \n");
-            //replaceRemoveRightMark.write_in_att_format(stdout, 1);
-            mappingAndContexts.compose(replaceRemoveRightMark).minimize();
+            HfstTransducer tmp = removeBracketsInContext(context, leftMark, rightMark, i);
+            mappingAndContexts.compose(tmp).minimize();
 
             // Second part
 
@@ -2916,8 +2900,8 @@ retval.write_in_att_format(stdout, 1);
             }
         }
 
-          HfstTransducer firstPart(identityWithoutB);
-            firstPart.compose(mappingAndContexts).minimize();
+        HfstTransducer firstPart(identityWithoutB);
+        firstPart.compose(mappingAndContexts).minimize();
 
         //define Y [ ~[ ?* [ P1 & P2 ] ?* ] ] ;
 
@@ -2933,17 +2917,27 @@ retval.write_in_att_format(stdout, 1);
         mappingPairVectorB.push_back(mappingPairB);
         Rule ruleB(mappingPairVectorB);
 
-          HfstTransducer BtoEpsilon = replace(ruleB, false);
+        HfstTransducer BtoEpsilon = replace(ruleB, false);
 
-          // X .o. Y .o. NOB ;
-          HfstTransducer retval(firstPart);
-          retval.compose(secondPart).compose(BtoEpsilon).minimize();
+        // X .o. Y .o. NOB ;
+        HfstTransducer retval(firstPart);
+        retval.compose(secondPart).compose(BtoEpsilon).minimize();
 
-          //printf("retval\n");
-          //retval.write_in_att_format(stdout, 1);
+        //printf("retval\n");
+        //retval.write_in_att_format(stdout, 1);
 
+        // remove brackets from alphabet
+
+        //remove marks from the alphabet
+        for ( unsigned int i = 0; i < context.size(); i++ )
+        {
+            // Create marks
+            StringPair markPair = restrictionMarks( i );
+
+            retval.remove_from_alphabet(markPair.first);
+            retval.remove_from_alphabet(markPair.second);
+        }
         return retval;
-
       }
 /*
     //---------------------------------
@@ -3240,6 +3234,8 @@ int main(int argc, char * argv[])
             // epenthesis rules
             test6a( types[i] );
             test6b( types[i] );
+            // [. 0 .] -> b || _ a a ;
+            test6c( types[i] );
 
             //parralel rules
             // a -> b , b -> c
@@ -3292,6 +3288,7 @@ int main(int argc, char * argv[])
             restriction_test5a( types[i] );
 
             restriction_test6( types[i] );
+            restriction_test7( types[i] );
           }
 
           std::cout << "ok" << std::endl;
