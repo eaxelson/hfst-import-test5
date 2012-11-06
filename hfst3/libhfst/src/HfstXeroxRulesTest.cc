@@ -783,6 +783,78 @@ void restriction_test7( ImplementationType type )
     assert(tmp2.compare(empty));
 }
 
+// restriction rule [ x y | x x y y ] => a _ b, x _ y ;
+void restriction_test8( ImplementationType type )
+{
+    //printf("\n -- test 6 ------\n\n");
+
+    HfstTokenizer TOK;
+    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    // Mapping
+    HfstTransducer tmp("xxyy", TOK, type);
+    HfstTransducer center("xy", TOK, type);
+    center.disjunct(tmp).minimize();
+    HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+
+    // Context
+    HfstTransducerPair Context1(HfstTransducer("a", TOK, type), HfstTransducer("b", TOK, type));
+    HfstTransducerPair Context2(HfstTransducer("x", TOK, type), HfstTransducer("y", TOK, type));
+
+    HfstTransducerPairVector ContextVector;
+    ContextVector.push_back(Context1);
+    ContextVector.push_back(Context2);
+
+    HfstTransducer input1("axxyyb", TOK, type);
+    HfstTransducer input2("xxyy", TOK, type);
+    HfstTransducer input3("xy", TOK, type);
+    HfstTransducer input4("xxxyyy", TOK, type);
+    HfstTransducer result1("axxyyb", TOK, type);
+    HfstTransducer empty(type);
+
+
+    HfstTransducer restrictionTr(type);
+    restrictionTr = restriction(center, ContextVector);
+
+//    printf("restrictionTr \n");
+//    restrictionTr.write_in_att_format(stdout, 1);
+/*
+    printf("alphabet: \n");
+    StringSet transducerAlphabet = restrictionTr.get_alphabet();
+    for (StringSet::const_iterator s = transducerAlphabet.begin();
+                   s != transducerAlphabet.end();
+                   ++s)
+        {
+            printf("%s \n", s->c_str());
+            //printf("in alph: %s", alphabet[i] ) ;
+        }
+    printf("------------------ \n");
+*/
+
+    HfstTransducer tmp2(type);
+    tmp2 = input1;
+    tmp2.compose(restrictionTr).minimize();
+    //printf("1\n");
+    //tmp2.write_in_att_format(stdout, 1);
+    assert(tmp2.compare(result1));
+
+    tmp2 = input2;
+    tmp2.compose(restrictionTr).minimize();
+    //printf("2\n");
+    //tmp2.write_in_att_format(stdout, 1);
+    assert(tmp2.compare(empty));
+
+    tmp2 = input3;
+    tmp2.compose(restrictionTr).minimize();
+    //printf("3\n");
+    //tmp2.write_in_att_format(stdout, 1);
+    assert(tmp2.compare(empty));
+
+    tmp2 = input4;
+    tmp2.compose(restrictionTr).minimize();
+    //printf("4\n");
+    //tmp2.write_in_att_format(stdout, 1);
+    assert(tmp2.compare(input4));
+}
 // empty language replacements
 // a -> ~[?*]
 void test10a( ImplementationType type )
