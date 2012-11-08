@@ -20,19 +20,29 @@
 #include "HfstExceptionDefs.h"
 %}
 
+
+class HfstPath {
+public:
+  float weight;
+  std::string input;
+  std::string output;
+  ~HfstPath();
+};
+
 namespace std {
 %template(StringVector) vector<string>;
 %template(StringPairVector) vector<pair<string, string > >;
 %template(OneLevelPath) pair<float, vector<string> >;
 %template(OneLevelPathVector) vector<pair<float, vector<string> > >;
 %template(OneLevelPaths) set<pair<float, vector<string> > >;
-%template(StringFloatVector) vector<pair<string, float> >;
+#%template(StringFloatVector) vector<pair<string, float> >;
 %template(StringPair) pair<string, string>;
 %template(StringPairSet) set<pair<string, string> >;
 %template(StringSet) set<string>;
 %template(HfstTransitions) vector<hfst::implementations::HfstBasicTransition>;
 %template(IntVector) vector<unsigned int>;
 %template(HfstTwoLevelPaths) set<pair<float, vector<pair <string, string> > > >;
+%template(HfstPathVector) vector<HfstPath>;
 }
 
 %include <typemaps.i>
@@ -206,15 +216,21 @@ public:
 }
 
 std::vector<std::pair <float, std::vector<std::string> > > vectorize(hfst::HfstOneLevelPaths * olps);
+std::vector<std::pair <float, std::vector<std::pair<std::string, std::string> > > > vectorize(hfst::HfstTwoLevelPaths tlps);
 std::vector<std::pair <float, std::vector<std::string> > > purge_flags(std::vector<std::pair<float, std::vector<std::string> > > olpv);
-std::vector<std::pair <std::string, float> > detokenize_vector(OneLevelPathVector olpv);
-std::vector<std::pair <std::string, float > > detokenize_paths(hfst::HfstOneLevelPaths * olps);
+std::vector<HfstPath> detokenize_vector(OneLevelPathVector olpv);
+std::vector<HfstPath> detokenize_paths(hfst::HfstOneLevelPaths * olps);
+std::vector<HfstPath> detokenize_vector(TwoLevelPathVector tlpv);
+std::vector<HfstPath> detokenize_paths(hfst::HfstTwoLevelPaths tlps);
 
 ImplementationType sfst_type();
 ImplementationType tropical_openfst_type();
 ImplementationType foma_type();
 ImplementationType hfst_ol_type();
 ImplementationType hfst_olw_type();
+
+PushType to_initial_state();
+PushType to_final_state();
 
 class HfstInputStream{
 public:
@@ -369,7 +385,7 @@ public:
 def lookup_clean(transducer, string):
     '''
     fd-lookup string from transducer, purge flags, return
-    list of (string, float)
+    list of HfstPaths
     '''
     return detokenize_paths(purge_flags(transducer.lookup_fd(input)))
 %}
