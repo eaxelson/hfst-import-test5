@@ -2730,26 +2730,52 @@ retval.write_in_att_format(stdout, 1);
     }
 
 
+    // a < b
+    HfstTransducer before( const HfstTransducer &left, const HfstTransducer &right)
+    {
+        // TODO: check if the center is automata
+       ImplementationType type = left.get_type();
 
+       // Identity
+       HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+       HfstTransducer identity (identityPair);
+       identity.repeat_star().minimize();
 
+       HfstTransducer tmp(identity);
+       tmp.concatenate(right)
+           .concatenate(identity)
+           .concatenate(left)
+           .concatenate(identity)
+           .minimize();
 
+       HfstTransducer retval(identity);
+       retval.subtract(tmp).minimize();
 
+       return retval;
+    }
+    // a > b
+    HfstTransducer after( const HfstTransducer &left, const HfstTransducer &right)
+        {
+            // TODO: check if the center is automata
+           ImplementationType type = left.get_type();
 
+           // Identity
+           HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+           HfstTransducer identity (identityPair);
+           identity.repeat_star().minimize();
 
+           HfstTransducer tmp(identity);
+           tmp.concatenate(left)
+               .concatenate(identity)
+               .concatenate(right)
+               .concatenate(identity)
+               .minimize();
 
+           HfstTransducer retval(identity);
+           retval.subtract(tmp).minimize();
 
-
-
-
-
-
-
-
-
-
-
-
-
+           return retval;
+        }
 
 
 
@@ -2864,6 +2890,8 @@ int main(int argc, char * argv[])
             restriction_test6( types[i] );
             restriction_test7( types[i] );
             restriction_test8( types[i] );
+
+            before_test1( types[i] );
           }
 
           std::cout << "ok" << std::endl;
