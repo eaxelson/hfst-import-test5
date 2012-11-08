@@ -10,6 +10,10 @@ and if you wish to install it,
 
     python setup.py install
 
+To test the SWIG bindings after installation, execute
+
+    ./test.sh
+
 For further information, consult
 
     python setup.py --help
