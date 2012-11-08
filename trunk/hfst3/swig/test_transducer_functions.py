@@ -307,35 +307,77 @@ for type in types:
     # assert(t5.compare(t5_));
 
     # Perform multiple string-to-string substitutions
-    # t6 = libhfst.HfstTransducer(t)
-    # HfstSymbolSubstitutions subs_symbol;
-    # subs_symbol["c"] = "C";
-    # subs_symbol["a"] = "A";
-    # subs_symbol["t"] = "T";
-    # subs_symbol["s"] = "S";
-    # t6.substitute(subs_symbol);
-    # HfstTransducer t6_("CAT", "CATS", tok, types[i]);
-    # assert(t6.compare(t6_));
+    t6 = libhfst.HfstTransducer(t)
+    subs_symbol = { 'c':'C', 'a':'A', 't':'T', 's':'S' }
+    t6.substitute(subs_symbol)
+    t6_ = libhfst.HfstTransducer("CAT", "CATS", tok, type)
+    assert(t6.compare(t6_))
 
     # Perform multiple string pair-to-string pair substitutions
     # t7 = libhfst.HfstTransducer (t)
-    # HfstSymbolPairSubstitutions subs_pair;
-    # subs_pair[("a", "a")] = ("A", "a");
-    # subs_pair[("s", "s")] = ("S", "S");
-    # subs_pair[("t", "t")] = ("t", "T");
-    # t7.substitute(subs_pair);
-    # HfstTransducer t7_("cAt", "caTs", tok, types[i]);
-    # assert(t7.compare(t7_));
+    # subs_pair = { ('a','a'):('A','a'), ('s','s'):('S','S'), ('t','t'):('t','T') }
+    # t7.substitute_string_pairs(subs_pair)
+    # t7_ = libhfst.HfstTransducer("cAt", "caTs", tok, type)
+    # assert(t7.compare(t7_))
 
-    # print("alphabets")
+    print("alphabets")
 
-    # HfstTransducer a2unk("a", "@_UNKNOWN_SYMBOL_@", types[i]);
-    # assert(a2unk.get_alphabet().size() == 4);
-    # a2unk.insert_to_alphabet("FOO");
-    # assert(a2unk.get_alphabet().size() == 5);
-    # a2unk.remove_from_alphabet("FOO");
-    # assert(a2unk.get_alphabet().size() == 4);
-    # StringSet alpha = a2unk.get_alphabet();
-    # assert(alpha.find("FOO") == alpha.end());
+    a2unk = libhfst.HfstTransducer("a", "@_UNKNOWN_SYMBOL_@", type)
+    assert(len(a2unk.get_alphabet()) == 4)
+    a2unk.insert_to_alphabet("FOO")
+    assert(len(a2unk.get_alphabet()) == 5)
+    a2unk.remove_from_alphabet("FOO")
+    assert(len(a2unk.get_alphabet()) == 4)
+    alpha = a2unk.get_alphabet()
+    try:
+        ind = alpha.index("FOO")
+        assert(False)
+    except (ValueError):
+        pass
 
+
+    # Test that binary operations do not change the transducer argument
+
+    print("binary operations")
+
+    id2id = libhfst.HfstTransducer("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", type)
+    a2b = libhfst.HfstTransducer("a", "b", type)
+
+    for function in ('concatenate', 'disjunct', 'intersect', 'subtract', 'compose'):
+
+        a2b_copy = libhfst.HfstTransducer(a2b)
+        id2id_copy = libhfst.HfstTransducer(id2id)
+        id2id_copy2 = libhfst.HfstTransducer(id2id)
+
+        if function == 'concatenate':
+            a2b_copy.concatenate(id2id_copy)
+        elif function == 'disjunct':
+            a2b_copy.disjunct(id2id_copy)
+        elif function == 'intersect':
+            a2b_copy.intersect(id2id_copy)
+        elif function == 'subtract':
+            a2b_copy.subtract(id2id_copy)
+        elif function == 'compose':
+            a2b_copy.compose(id2id_copy)
+
+        assert(id2id_copy.compare(id2id_copy2))
+        assert(compare_alphabets(id2id_copy, id2id_copy2))
+
+    a2b_copy = libhfst.HfstTransducer(a2b)
+    id2id_copy = libhfst.HfstTransducer(id2id)
+    id2id_copy2 = libhfst.HfstTransducer(id2id)
+    a2b_copy.insert_freely(id2id_copy)
+    
+    assert(id2id_copy.compare(id2id_copy2))
+    assert(compare_alphabets(id2id_copy, id2id_copy2))
+
+
+    # Test that binary functions work when the argument and the calling
+    # object are the same
+    foo = libhfst.HfstTransducer("foo", type)
+    foo.concatenate(foo)
+    foofoo = libhfst.HfstTransducer("foo", type)
+    foo2 = libhfst.HfstTransducer("foo", type)
+    foofoo.concatenate(foo2)
+    assert(foo.compare(foofoo))
 

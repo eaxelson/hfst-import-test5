@@ -43,6 +43,8 @@ namespace std {
 %template(IntVector) vector<unsigned int>;
 %template(HfstTwoLevelPaths) set<pair<float, vector<pair <string, string> > > >;
 %template(HfstPathVector) vector<HfstPath>;
+%template(HfstSymbolSubstitutions) map<string, string>;
+%template(HfstSymbolPairSubstitutions) map<pair<string, string>, pair<string, string> >;
 }
 
 %include <typemaps.i>
@@ -320,6 +322,8 @@ public:
     HfstTransducer & substitute(const StringPair &symbol_pair, HfstTransducer &transducer);
     HfstTransducer & substitute(const std::string &old_symbol, const std::string &new_symbol, bool input_side=true, bool output_side=true);
     HfstTransducer & substitute(const StringPair &old_symbol_pair, const StringPair &new_symbol_pair);
+    HfstTransducer & substitute(const HfstSymbolSubstitutions &substitutions);
+    HfstTransducer & substitute(const HfstSymbolPairSubstitutions &substitutions);
     HfstTransducer & subtract(const HfstTransducer &another);
     HfstTransducer & transform_weights(float(*func)(float));
     void write_in_att_format(const std::string &filename, bool write_weights=true) const;
