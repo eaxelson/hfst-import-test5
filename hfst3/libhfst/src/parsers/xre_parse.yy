@@ -61,8 +61,8 @@ extern int yylex();
 %type <mappingWithArrow> MAPPINGPAIR
 
 %type <contextWithMark> CONTEXTS_WITH_MARK
-%type <transducerPairVector> CONTEXTS_VECTOR
-%type <transducerPair> CONTEXT
+%type <transducerPairVector> CONTEXTS_VECTOR, RESTR_CONTEXTS_VECTOR
+%type <transducerPair> CONTEXT, RESTR_CONTEXT
 %type <replType>  CONTEXT_MARK
 %type <label>     HALFARC
 
@@ -432,7 +432,6 @@ REPLACE_ARROW: REPLACE_RIGHT
          ;
 
 ////////////////
-
 REGEXP3: REGEXP4 { }
        | REGEXP3 SHUFFLE REGEXP4 {
             xreerror("No shuffle");
@@ -440,31 +439,32 @@ REGEXP3: REGEXP4 { }
             delete $3;
         }
        | REGEXP3 BEFORE REGEXP4 {
-            xreerror("No before");
-            $$ = $1;
-            delete $3;
+            $$ = new HfstTransducer( before (*$1, *$3) );
+            delete $1, $3;
         }
        | REGEXP3 AFTER REGEXP4 {
-            xreerror("No after");
-            $$ = $1;
-            delete $3;
+            $$ = new HfstTransducer( after (*$1, *$3) );
+            delete $1, $3;
         }
 
        ;
-
+  
 REGEXP4: REGEXP5 { }
+        // restriction rule
+       | REGEXP4 RIGHT_ARROW RESTR_CONTEXTS_VECTOR {
+            //xreerror("No Arrows");
+            $$ = new HfstTransducer( restriction(*$1, *$3) ) ;
+            delete $1;
+            delete $3;
+        }
+       // doesn't exist in xfst
        | REGEXP4 LEFT_ARROW REGEXP5 CENTER_MARKER REGEXP5 {
             xreerror("No Arrows");
             $$ = $1;
             delete $3;
             delete $5;
         }
-       | REGEXP4 RIGHT_ARROW REGEXP5 CENTER_MARKER REGEXP5 {
-            xreerror("No Arrows");
-            $$ = $1;
-            delete $3;
-            delete $5;
-        }
+       // doesn't exist in xfst
        | REGEXP4 LEFT_RIGHT_ARROW REGEXP5 CENTER_MARKER REGEXP5 {
             xreerror("No Arrows");
             $$ = $1;
@@ -472,6 +472,52 @@ REGEXP4: REGEXP5 { }
             delete $5;
         }
        ;
+
+RESTR_CONTEXTS_VECTOR: RESTR_CONTEXT
+         {
+            HfstTransducerPairVector * ContextVector = new HfstTransducerPairVector();
+            ContextVector->push_back(*$1);
+            $$ = ContextVector;
+            delete $1; 
+         }
+
+      | RESTR_CONTEXTS_VECTOR COMMA RESTR_CONTEXT
+         {
+            $1->push_back(*$3);
+            $$ = $1;
+            delete $3; 
+         }
+      
+      ;
+      
+RESTR_CONTEXT: REGEXP4 CENTER_MARKER REGEXP4 
+         {
+            $$ = new HfstTransducerPair(*$1, *$3);
+            delete $1, $3; 
+         }
+      | REGEXP4 CENTER_MARKER
+         {
+           // std::cerr << "Mapping: \n" << *$1  << std::endl;
+            
+            HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+            
+           // std::cerr << "Epsilon: \n" << epsilon  << std::endl;
+            $$ = new HfstTransducerPair(*$1, epsilon);
+            delete $1; 
+         }
+      | CENTER_MARKER REGEXP4
+         {
+            HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+            $$ = new HfstTransducerPair(epsilon, *$2);
+            delete $2; 
+         }
+      | CENTER_MARKER
+         {
+            HfstTransducer empty(hfst::xre::format);
+            $$ = new HfstTransducerPair(empty, empty);
+         }
+      ;
+
 
 REGEXP5: REGEXP6 { }
        | REGEXP5 UNION REGEXP6 {
