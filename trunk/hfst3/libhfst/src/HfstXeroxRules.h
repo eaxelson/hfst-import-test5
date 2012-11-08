@@ -288,6 +288,7 @@ namespace hfst
                                                    int i);
         // Restriction function "=>"
         HfstTransducer restriction( const HfstTransducer &automata, const HfstTransducerPairVector &context);
-
+        HfstTransducer before( const HfstTransducer &left, const HfstTransducer &right);
+        HfstTransducer after( const HfstTransducer &left, const HfstTransducer &right);
     }
 }

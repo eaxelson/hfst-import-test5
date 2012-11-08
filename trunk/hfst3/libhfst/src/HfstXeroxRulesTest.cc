@@ -4,6 +4,90 @@ using namespace implementations;
 using namespace hfst::xeroxRules;
 
 
+// a < b ;
+void before_test1( ImplementationType type )
+{
+    HfstTokenizer TOK;
+    // Mapping
+    HfstTransducer left("a", TOK, type);
+    HfstTransducer right("b", TOK, type);
+
+    HfstTransducer input1("ab", TOK, type);
+    HfstTransducer input2("acb", TOK, type);
+    HfstTransducer input3("ba", TOK, type);
+    HfstTransducer input4("bca", TOK, type);
+    HfstTransducer empty(type);
+
+    HfstTransducer beforeTr(type);
+    beforeTr = before(left, right);
+
+    //printf("restrictionTr \n");
+    //restrictionTr.write_in_att_format(stdout, 1);
+
+    HfstTransducer tmp2(type);
+    tmp2 = input1;
+    tmp2.compose(beforeTr).minimize();
+    //printf("after compose with bac\n");
+    //tmp2.write_in_att_format(stdout, 1);
+    assert(tmp2.compare(input1));
+
+    tmp2 = input2;
+    tmp2.compose(beforeTr).minimize();
+    //printf("after compose with abc\n");
+    //tmp2.write_in_att_format(stdout, 1);
+    assert(tmp2.compare(input2));
+
+    tmp2 = input3;
+    tmp2.compose(beforeTr).minimize();
+    assert(tmp2.compare(empty));
+
+    tmp2 = input4;
+    tmp2.compose(beforeTr).minimize();
+    assert(tmp2.compare(empty));
+}
+// a < b ;
+void after_test1( ImplementationType type )
+{
+    HfstTokenizer TOK;
+    // Mapping
+    HfstTransducer left("a", TOK, type);
+    HfstTransducer right("b", TOK, type);
+
+    HfstTransducer input1("ba", TOK, type);
+    HfstTransducer input2("bca", TOK, type);
+    HfstTransducer input3("ab", TOK, type);
+    HfstTransducer input4("acb", TOK, type);
+    HfstTransducer empty(type);
+
+    HfstTransducer afterTr(type);
+    afterTr = before(left, right);
+
+    //printf("restrictionTr \n");
+    //restrictionTr.write_in_att_format(stdout, 1);
+
+    HfstTransducer tmp2(type);
+    tmp2 = input1;
+    tmp2.compose(afterTr).minimize();
+    //printf("after compose with bac\n");
+    //tmp2.write_in_att_format(stdout, 1);
+    assert(tmp2.compare(input1));
+
+
+    tmp2 = input2;
+    tmp2.compose(afterTr).minimize();
+    //printf("after compose with abc\n");
+    //tmp2.write_in_att_format(stdout, 1);
+    assert(tmp2.compare(input2));
+
+    tmp2 = input3;
+    tmp2.compose(afterTr).minimize();
+    assert(tmp2.compare(empty));
+
+    tmp2 = input4;
+    tmp2.compose(afterTr).minimize();
+    assert(tmp2.compare(empty));
+}
+
 // restriction rule a => b _ c ;
 void restriction_test1( ImplementationType type )
 {
