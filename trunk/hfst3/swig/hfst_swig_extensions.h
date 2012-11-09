@@ -53,6 +53,10 @@ typedef std::vector<HfstPath> HfstPathVector;
 
 namespace hfst {
 
+  HfstTransducer ptrvalue(const HfstTransducer * t) {
+    return *t;
+  }
+
   ImplementationType sfst_type() { return SFST_TYPE; }
   ImplementationType tropical_openfst_type() { return TROPICAL_OPENFST_TYPE; }
   ImplementationType foma_type() { return FOMA_TYPE; }

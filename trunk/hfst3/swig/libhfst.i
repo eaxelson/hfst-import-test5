@@ -379,6 +379,32 @@ public:
     static void check_utf8_correctness(const std::string &input_string);
   };
 
+  HfstTransducer ptrvalue(const HfstTransducer * t);
+
+  namespace lexc {
+
+  class LexcCompiler
+  {
+  public:
+    LexcCompiler();
+    LexcCompiler(hfst::ImplementationType impl);
+    LexcCompiler& parse(FILE* infile);
+    LexcCompiler& parse(const char* filename);
+    LexcCompiler& setVerbosity(bool verbose);
+    LexcCompiler& addAlphabet(const std::string& alphabet);
+    LexcCompiler& setCurrentLexiconName(const std::string& lexicon_name);
+    LexcCompiler& addStringEntry(const std::string& entry, const std::string& continuation, const double weight);
+    LexcCompiler& addStringPairEntry(const std::string& upper, const std::string& lower, const std::string& continuation, const double weight);
+    LexcCompiler& addXreEntry(const std::string& xre, const std::string& continuation, const double weight);
+    LexcCompiler& addXreDefinition(const std::string& name, const std::string& xre);
+    LexcCompiler& setInitialLexiconName(const std::string& lexicon_name);
+    hfst::HfstTransducer* compileLexical();
+    //const std::map<std::string,hfst::HfstTransducer>& getStringTries() const;
+    //const std::map<std::string,hfst::HfstTransducer>& getRegexpUnions() const;
+    const LexcCompiler& printConnectedness() const;
+  };
+  };
+
   namespace rules {
 
     HfstTransducer two_level_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
@@ -426,4 +452,3 @@ def lookup_clean(transducer, string):
     '''
     return detokenize_paths(purge_flags(transducer.lookup_fd(input)))
 %}
-
