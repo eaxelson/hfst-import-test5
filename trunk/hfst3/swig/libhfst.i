@@ -45,6 +45,8 @@ namespace std {
 %template(HfstPathVector) vector<HfstPath>;
 %template(HfstSymbolSubstitutions) map<string, string>;
 %template(HfstSymbolPairSubstitutions) map<pair<string, string>, pair<string, string> >;
+%template(HfstTransducerPair) pair<hfst::HfstTransducer, hfst::HfstTransducer>;
+%template(HfstTransducerPairVector) vector<pair<hfst::HfstTransducer, hfst::HfstTransducer> >;
 }
 
 %include <typemaps.i>
@@ -131,6 +133,8 @@ typedef std::set<std::pair<float, std::vector<std::pair <std::string, std::strin
 HfstTwoLevelPaths extract_paths(const HfstTransducer &t, int max_num=-1, int cycles=-1);
 HfstTwoLevelPaths extract_paths_fd(const HfstTransducer &t, int max_num=-1, int cycles=-1, bool filter_fd=false);
 
+typedef std::pair<HfstTransducer, HfstTransducer> HfstTransducerPair;
+typedef std::vector<std::pair<HfstTransducer, HfstTransducer> > HfstTransducerPairVector;
 
 namespace implementations {
 class HfstBasicTransducer;
@@ -266,8 +270,8 @@ public:
     HfstTransducer(ImplementationType type);
     HfstTransducer(const std::string &symbol, ImplementationType type);
     HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type);
-    HfstTransducer(FILE *ifile, ImplementationType type, const std::string &epsilon_symbol, unsigned int & linecount) throw (EndOfStreamException);
-    HfstTransducer(HfstFile &ifile, ImplementationType type, const std::string &epsilon_symbol) throw (EndOfStreamException);
+    HfstTransducer(FILE *ifile, ImplementationType type, const std::string &epsilon_symbol, unsigned int & linecount) throw (EndOfStreamException, NotValidAttFormatException);
+    HfstTransducer(HfstFile &ifile, ImplementationType type, const std::string &epsilon_symbol) throw (EndOfStreamException, NotValidAttFormatException);
     
     // Then everything else, in the (alphabetic) order in the API manual
     bool compare(const HfstTransducer &another) const;
@@ -375,6 +379,35 @@ public:
     static void check_utf8_correctness(const std::string &input_string);
   };
 
+  namespace rules {
+
+    HfstTransducer two_level_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
+    HfstTransducer two_level_only_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
+    HfstTransducer two_level_if_and_only_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
+    HfstTransducer replace_up(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_down(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_down_karttunen(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_right(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_left(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_up(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_down(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer left_replace_up(HfstTransducer&mapping, bool optional, StringPairSet  &alphabet);
+    HfstTransducer left_replace_up( HfstTransducerPair  &context, HfstTransducer &mapping,bool optional, StringPairSet  &alphabet);
+    HfstTransducer left_replace_down(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet&alphabet);
+    HfstTransducer left_replace_down_karttunen( HfstTransducerPair &context, HfstTransducer&mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer left_replace_left(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet&alphabet);
+    HfstTransducer left_replace_right(HfstTransducerPair&context,HfstTransducer &mapping,bool optional,StringPairSet &alphabet);
+    HfstTransducer restriction(HfstTransducerPairVector &contexts,HfstTransducer &mapping,StringPairSet &alphabet);
+    HfstTransducer coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer restriction_and_coercion(HfstTransducerPairVector &contexts,HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer surface_restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer surface_coercion(HfstTransducerPairVector &contexts,HfstTransducer &mapping,StringPairSet &alphabet);
+    HfstTransducer surface_restriction_and_coercion (HfstTransducerPairVector &contexts,HfstTransducer &mapping,StringPairSet &alphabet);
+    HfstTransducer deep_restriction(HfstTransducerPairVector &contexts,HfstTransducer &mapping,StringPairSet &alphabet);
+    HfstTransducer deep_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer deep_restriction_and_coercion (HfstTransducerPairVector &contexts,HfstTransducer &mapping, StringPairSet &alphabet);
+
+  }; 
 
 class FdOperation{
 public:
@@ -393,5 +426,4 @@ def lookup_clean(transducer, string):
     '''
     return detokenize_paths(purge_flags(transducer.lookup_fd(input)))
 %}
-
 

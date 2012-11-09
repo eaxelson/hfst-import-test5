@@ -3,7 +3,8 @@
 for pytest in \
     test_constructors.py test_flag_diacritics.py \
     test_hfst_basic_transducer.py test_streams.py test_tokenizer.py \
-    test_transducer_functions.py test_extensions.py; \
+    test_transducer_functions.py test_extensions.py \
+    test_examples.py;
     do
     if (! python $pytest); then
 	echo "============================================="
@@ -21,5 +22,5 @@ if ! ./test_std_streams.sh python; then
 fi
 
 echo "==================="
-echo "All 8 tests passed."
+echo "All 9 tests passed."
 echo "==================="
