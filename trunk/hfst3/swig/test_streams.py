@@ -1,7 +1,7 @@
 import libhfst
 import sys
 
-for ttype in (libhfst.sfst_type(), libhfst.tropical_openfst_type(), libhfst.foma_type()):
+for ttype in (libhfst.SFST_TYPE, libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYPE):
 
     tr1 = libhfst.HfstTransducer('a', 'b', ttype)
     tr2 = libhfst.HfstTransducer('c', 'd', ttype)

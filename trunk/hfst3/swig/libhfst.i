@@ -109,8 +109,26 @@ HfstFile hfst_open(const char * filename, const char * args);
  * some overkill in the forward definitions in this file.
  */
 
-enum ImplementationType;
-enum PushType;
+  enum ImplementationType
+  {
+    SFST_TYPE,
+    TROPICAL_OPENFST_TYPE,
+    LOG_OPENFST_TYPE,
+    FOMA_TYPE,
+    HFST_OL_TYPE,
+    HFST_OLW_TYPE,
+    HFST2_TYPE,
+    UNSPECIFIED_TYPE,
+    ERROR_TYPE
+  };
+
+  enum PushType
+  {
+    TO_INITIAL_STATE,
+    TO_FINAL_STATE
+  };
+
+
 class HfstInputStream;
 typedef HfstOneLevelPaths std::set<pair<float, vector<string> > >;
 //class HfstTwoLevelPaths;
@@ -229,14 +247,6 @@ std::vector<HfstPath> detokenize_paths(hfst::HfstOneLevelPaths * olps);
 std::vector<HfstPath> detokenize_vector(TwoLevelPathVector tlpv);
 std::vector<HfstPath> detokenize_paths(hfst::HfstTwoLevelPaths tlps);
 
-ImplementationType sfst_type();
-ImplementationType tropical_openfst_type();
-ImplementationType foma_type();
-ImplementationType hfst_ol_type();
-ImplementationType hfst_olw_type();
-
-PushType to_initial_state();
-PushType to_final_state();
 
 class HfstInputStream{
 public:

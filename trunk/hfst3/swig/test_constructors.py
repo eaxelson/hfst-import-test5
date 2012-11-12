@@ -5,7 +5,7 @@
 
 import libhfst
 
-types = [libhfst.sfst_type(), libhfst.tropical_openfst_type(), libhfst.foma_type()]
+types = [libhfst.SFST_TYPE, libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYPE]
 
 for type in types:
 
@@ -58,17 +58,17 @@ for type in types:
     foobar2.assign(foobar)
     assert(foobar2.get_name() == "foobar")
     assert(foobar.compare(foobar2))
-    empty_ol = libhfst.HfstTransducer(libhfst.hfst_ol_type())
-    empty_olw = libhfst.HfstTransducer(libhfst.hfst_olw_type())
+    empty_ol = libhfst.HfstTransducer(libhfst.HFST_OL_TYPE)
+    empty_olw = libhfst.HfstTransducer(libhfst.HFST_OLW_TYPE)
     # reserving props in copy constructor (bug: #3405831)
-    t = libhfst.HfstTransducer("a", libhfst.tropical_openfst_type())
-    t.convert(libhfst.hfst_olw_type())
+    t = libhfst.HfstTransducer("a", libhfst.TROPICAL_OPENFST_TYPE)
+    t.convert(libhfst.HFST_OLW_TYPE)
     t.set_name("foo")
     s = libhfst.HfstTransducer(t)
     assert(s.get_name() == t.get_name())
     try:
-        empty_ol = foobar2.convert(libhfst.hfst_ol_type())
-        empty_olw = foobar2.convert(libhfst.hfst_olw_type())
+        empty_ol = foobar2.convert(libhfst.HFST_OL_TYPE)
+        empty_olw = foobar2.convert(libhfst.HFST_OLW_TYPE)
         assert(empty_ol.get_name() == "foobar")
         assert(empty_olw.get_name() == "foobar")
     except libhfst.FunctionNotImplementedException:

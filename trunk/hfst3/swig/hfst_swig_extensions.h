@@ -57,15 +57,6 @@ namespace hfst {
     return *t;
   }
 
-  ImplementationType sfst_type() { return SFST_TYPE; }
-  ImplementationType tropical_openfst_type() { return TROPICAL_OPENFST_TYPE; }
-  ImplementationType foma_type() { return FOMA_TYPE; }
-  ImplementationType hfst_ol_type() { return HFST_OL_TYPE; }
-  ImplementationType hfst_olw_type() { return HFST_OLW_TYPE; }
-
-  PushType to_initial_state() { return TO_INITIAL_STATE; }
-  PushType to_final_state() { return TO_FINAL_STATE; }
-
   HfstTwoLevelPaths extract_paths(const HfstTransducer &t, int max_num=-1, int cycles=-1)
   {
     HfstTwoLevelPaths result;

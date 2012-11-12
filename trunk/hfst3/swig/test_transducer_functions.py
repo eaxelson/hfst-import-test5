@@ -6,8 +6,7 @@ def compare_alphabets(t1, t2):
     return alpha1 == alpha2
     
 
-
-types = [libhfst.sfst_type(), libhfst.tropical_openfst_type(), libhfst.foma_type()]
+types = [libhfst.SFST_TYPE, libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYPE]
 
 for type in types:
 
@@ -31,7 +30,7 @@ for type in types:
     assert(t1.compare(t4))
 
     # Weights
-    if type == libhfst.tropical_openfst_type():
+    if type == libhfst.TROPICAL_OPENFST_TYPE:
         t6 = libhfst.HfstTransducer("foo", "bar", type)
         t6.set_final_weights(0.3)
         t7 = libhfst.HfstTransducer("foo", "bar", type)
@@ -120,22 +119,23 @@ for type in types:
 
     # Convert into optimized lookup format
     animals_ol = libhfst.HfstTransducer(animals)
-    if type == libhfst.tropical_openfst_type():
-        animals_ol.convert(libhfst.hfst_olw_type())
+    if type == libhfst.TROPICAL_OPENFST_TYPE:
+        animals_ol.convert(libhfst.HFST_OLW_TYPE)
     else:
-        animals_ol.convert(libhfst.hfst_ol_type())
+        animals_ol.convert(libhfst.HFST_OL_TYPE)
     
     result = libhfst.detokenize_paths(animals_ol.lookup("hippopotamus"))
     #for res in result:
     #    print res[0]
     #    print res[1]
-    
-    if type == libhfst.tropical_openfst_type:
+
+    if type == libhfst.TROPICAL_OPENFST_TYPE:
         best_animals = libhfst.HfstTransducer(animals)
         best_animals.n_best(3)
+        best_animals.convert(libhfst.HFST_OLW_TYPE)
         assert(libhfst.detokenize_paths(best_animals.lookup("mouse"))[0].output == "mice")
         assert(libhfst.detokenize_paths(best_animals.lookup("hippopotamus"))[0].output == "hippopotami")
-        assert(libhfst.detokenize_paths(best_animals.lookup("hippopotamus"))[1].ouput == "hippopotamuses")
+        assert(libhfst.detokenize_paths(best_animals.lookup("hippopotamus"))[1].output == "hippopotamuses")
     
     
     print("Function insert_freely")
@@ -183,7 +183,7 @@ for type in types:
     assert(t1.is_cyclic())
 
 
-    if (type == libhfst.tropical_openfst_type()):
+    if (type == libhfst.TROPICAL_OPENFST_TYPE):
 
         print("function push_weights")
 
@@ -196,10 +196,10 @@ for type in types:
 
         # Convert to tropical OpenFst format and push weights
         # toward final and initial states
-        T_final = libhfst.HfstTransducer(t, libhfst.tropical_openfst_type())
-        T_final.push_weights(libhfst.to_final_state())
-        T_initial = libhfst.HfstTransducer(t, libhfst.tropical_openfst_type())
-        T_initial.push_weights(libhfst.to_initial_state())
+        T_final = libhfst.HfstTransducer(t, libhfst.TROPICAL_OPENFST_TYPE)
+        T_final.push_weights(libhfst.TO_FINAL_STATE)
+        T_initial = libhfst.HfstTransducer(t, libhfst.TROPICAL_OPENFST_TYPE)
+        T_initial.push_weights(libhfst.TO_INITIAL_STATE)
 
         # Convert back to HFST basic transducer
         t_final = libhfst.HfstBasicTransducer(T_final)
@@ -240,7 +240,7 @@ for type in types:
         T = libhfst.HfstTransducer(t, type)
         T.set_final_weights(0.2)
         # T.transform_weights(&modify_weights)
-        T.push_weights(libhfst.to_final_state())
+        T.push_weights(libhfst.TO_FINAL_STATE)
 
         # Convert back to HFST basic transducer and test the weight
         tc = libhfst.HfstBasicTransducer(T)

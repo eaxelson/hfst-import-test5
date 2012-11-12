@@ -1,11 +1,11 @@
 import libhfst  
 
-types = [libhfst.tropical_openfst_type(), libhfst.sfst_type(), libhfst.foma_type()]
+types = [libhfst.TROPICAL_OPENFST_TYPE, libhfst.SFST_TYPE, libhfst.FOMA_TYPE]
 
 # Transducers which the rule transducers are compared with
-rule1 = libhfst.HfstTransducer(libhfst.tropical_openfst_type())
-rule2 = libhfst.HfstTransducer(libhfst.tropical_openfst_type())
-rule3 = libhfst.HfstTransducer(libhfst.tropical_openfst_type())
+rule1 = libhfst.HfstTransducer(libhfst.TROPICAL_OPENFST_TYPE)
+rule2 = libhfst.HfstTransducer(libhfst.TROPICAL_OPENFST_TYPE)
+rule3 = libhfst.HfstTransducer(libhfst.TROPICAL_OPENFST_TYPE)
 
 for type in types:
 
@@ -26,10 +26,10 @@ for type in types:
     rule_transducer3 = libhfst.two_level_if_and_only_if(context, mappings, alphabet)
 
     # Compare rule transducers with tropical rule transducers
-    if type != libhfst.tropical_openfst_type():
-        rule_transducer1.convert(libhfst.tropical_openfst_type())
-        rule_transducer2.convert(libhfst.tropical_openfst_type())
-        rule_transducer3.convert(libhfst.tropical_openfst_type())
+    if type != libhfst.TROPICAL_OPENFST_TYPE:
+        rule_transducer1.convert(libhfst.TROPICAL_OPENFST_TYPE)
+        rule_transducer2.convert(libhfst.TROPICAL_OPENFST_TYPE)
+        rule_transducer3.convert(libhfst.TROPICAL_OPENFST_TYPE)
         assert(rule_transducer1.compare(rule1))
         assert(rule_transducer2.compare(rule2))
         assert(rule_transducer3.compare(rule3))
