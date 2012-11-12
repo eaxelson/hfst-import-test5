@@ -119,9 +119,9 @@ tr2.add_transition(1, libhfst.HfstBasicTransition(2, "bar", "bar", 0) )
 # tr2 is now [ [ ?:? ] [ bar:bar ] ]
 # print(tr2)
 
-if libhfst.HfstTransducer.is_implementation_type_available(libhfst.sfst_type()):
-    Tr1 = libhfst.HfstTransducer(tr1, libhfst.sfst_type())
-    Tr2 = libhfst.HfstTransducer(tr2, libhfst.sfst_type())
+if libhfst.HfstTransducer.is_implementation_type_available(libhfst.SFST_TYPE):
+    Tr1 = libhfst.HfstTransducer(tr1, libhfst.SFST_TYPE)
+    Tr2 = libhfst.HfstTransducer(tr2, libhfst.SFST_TYPE)
     Tr1.disjunct(Tr2).minimize()
     # Tr1 is now [ [ ?:foo | bar:foo ]  |  [[ ?:? | foo:foo ] [ bar:bar ]]]
     # print(Tr1)

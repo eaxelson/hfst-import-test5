@@ -34,7 +34,7 @@ ofile.write("0 1 a b 0.4\n")
 ofile.write("1 c d\n")
 ofile.close()
 
-types = [libhfst.tropical_openfst_type(), libhfst.sfst_type(), libhfst.foma_type()]
+types = [libhfst.TROPICAL_OPENFST_TYPE, libhfst.SFST_TYPE, libhfst.FOMA_TYPE]
 
 for type in types:
   

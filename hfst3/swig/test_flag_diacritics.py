@@ -22,7 +22,7 @@ t.add_transition(s4, libhfst.HfstBasicTransition(s6, fd2, fd2, 0))
 t.add_transition(s5, libhfst.HfstBasicTransition(s6, fd1, fd1, 0))
 
 
-types = [libhfst.sfst_type(), libhfst.tropical_openfst_type(), libhfst.foma_type()]
+types = [libhfst.SFST_TYPE, libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYPE]
 
 for type in types:
 

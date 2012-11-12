@@ -7,11 +7,11 @@ if sys.platform == "win32":
 
 ttype = 0
 if sys.argv[1] == 'sfst':
-    ttype = libhfst.sfst_type()
+    ttype = libhfst.SFST_TYPE
 elif sys.argv[1] == 'openfst':
-    ttype = libhfst.tropical_openfst_type()
+    ttype = libhfst.TROPICAL_OPENFST_TYPE
 elif sys.argv[1] == 'foma':
-    ttype = libhfst.foma_type()
+    ttype = libhfst.FOMA_TYPE
 else:
     print "ERROR: could not parse transducer format argument."
     sys.exit(1)
