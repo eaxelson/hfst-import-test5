@@ -1,8 +1,0 @@
-hfst for Debian
----------------
-
-The linking of both foma and openfst is AIUI not possible under debian-legal
-rules (strict GPLv2 and Apache Licence respectively) so I've selected Openfst
-only.
-
- -- Flammie Pirinen <flammie@iki.fi>  Thu, 17 Mar 2011 02:09:22 +0200

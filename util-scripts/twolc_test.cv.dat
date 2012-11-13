@@ -1,8 +1,0 @@
-# Format:
-# twolc input form, expected output, input to lexc
-
-, музея, музей<n><dat>
-#, училище, училище<n><nom>
-#, училищӗн, училище<n><gen>
-#, сценӑн, сцена<n><gen>
-, Петьӑн, Петя<np><ant><m><gen>
