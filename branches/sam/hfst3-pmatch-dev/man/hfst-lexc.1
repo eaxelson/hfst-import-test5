@@ -1,0 +1,63 @@
+.TH HFST-LEXC "1" "December 2010" "HFST" "User Commands"
+.SH NAME
+hfst-lexc \- manual page for hfst-lexc 0.50 (foma 0.9.13)
+.SH SYNOPSIS
+.B hfst-lexc
+[\fIOPTIONS\fR...] [\fIINFILE\fR]
+.SH DESCRIPTION
+Parse lexc lexicons with foma and convert to hfst format
+.TP
+\fB\-h\fR
+Print help message
+.TP
+\fB\-V\fR
+Print version info
+.TP
+\fB\-v\fR
+Print verbosely while processing
+.TP
+\fB\-q\fR
+Do not print output
+.TP
+\fB\-utf8\fR
+Treat input files as UTF-8 (default)
+.TP
+\fB\-latin1\fR
+Treat input files as latin1 (convert if possible)
+.TP
+\fB\-f\fR\fIFORMAT\fR
+Convert into HFST transducer format FORMAT
+.TP
+\fB\-o\fR\fIOUTFILE\fR
+Store results in OUTFILE
+.PP
+At least ROOT lexicon file is required.
+OUTFILE is mandatory.
+.PP
+Unrecognised commands may be passed to foma verbatim
+.SH EXAMPLES
+.TP
+hfst-lexc -f openfst-tropical -o cat.hfst cat.lexc
+Compile cat lexicon and convert saved result to openfst format
+.SH "REPORTING BUGS"
+Report bugs to <hfst\-bugs@helsinki.fi> or directly to our bug tracker at:
+<https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>
+.SH "SEE ALSO"
+hfst-xfst(1), hfst-foma-wrapper(1),
+.br
+hfst\-foma\-wrapper.sh home page:
+<https://kitwiki.csc.fi/twiki/bin/view/KitWiki//HfstXfst>
+.br
+General help using HFST software:
+<https://kitwiki.csc.fi/twiki/bin/view/KitWiki//HfstHome>
+.SH BUGS
+Options -flush and -stop are not supported. Xfst binartyfile loading is not
+supported. Latin1 support depends on recode and only works with input files,
+not stdin input (working in latin1 environments has been deprecated forever
+already).
+.SH COPYRIGHT
+Copyright \(co 2010 University of Helsinki,
+License GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>
+.br
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
