@@ -16,6 +16,7 @@
 #include "HfstOutputStream.h"
 #include "HfstDataTypes.h"
 #include "HfstFlagDiacritics.h"
+#include "parsers/XreCompiler.h"
 #include "hfst_swig_extensions.h"
 #include "HfstExceptionDefs.h"
 %}
@@ -413,6 +414,19 @@ public:
     //const std::map<std::string,hfst::HfstTransducer>& getRegexpUnions() const;
     const LexcCompiler& printConnectedness() const;
   };
+  };
+
+  namespace xre {
+
+    class XreCompiler
+    {
+    public:
+      XreCompiler();
+      XreCompiler(hfst::ImplementationType impl);
+      void define(const std::string& name, const std::string& xre);
+      HfstTransducer* compile(const std::string& xre);
+    };
+
   };
 
   namespace rules {
