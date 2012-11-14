@@ -340,6 +340,15 @@ namespace hfst {
 
     /** @brief Same as #add_symbol_to_alphabet for each symbol in
         \a symbols. */
+    void add_symbols_to_alphabet(const HfstSymbolSet &symbols)
+    {
+      for (typename HfstSymbolSet::const_iterator it = symbols.begin();
+           it != symbols.end(); it++)
+        {
+          alphabet.insert(*it);
+        }
+    }
+
     void add_symbols_to_alphabet(const HfstSymbolPairSet &symbols)
     {
       for (typename HfstSymbolPairSet::const_iterator it = symbols.begin();

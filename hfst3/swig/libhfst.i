@@ -170,7 +170,7 @@ HfstState add_state (void);
 HfstState add_state (HfstState s);
 std::vector<unsigned int> states() const;
 void add_symbol_to_alphabet (const std::string &symbol);
-void add_symbols_to_alphabet (const hfst::StringPairSet &symbols);
+void add_symbols_to_alphabet (const hfst::StringSet &symbols);
 void add_transition (HfstState s, const HfstBasicTransition &transition, bool add_symbols_to_alphabet=true);
 HfstBasicTransducer & disjunct(const StringPairVector &spv, float weight);
 const StringSet &get_alphabet () const;

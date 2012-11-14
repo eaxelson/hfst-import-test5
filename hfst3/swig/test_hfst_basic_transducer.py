@@ -8,6 +8,14 @@
 import libhfst
 import os
 
+def alphabet_contains(alphabet, symbol):
+    try:
+        ind = alphabet.index(symbol)
+    except ValueError:
+        return False
+    return True
+
+
 print("HfstBasicTransducer construction")
 
 # Create an HfstBasicTransducer [a:b c:d] with weight 3.0
@@ -58,19 +66,13 @@ except libhfst.NotValidAttFormatException:
 print("HfstBasicTransducer: symbol handling")
 
 t.add_symbol_to_alphabet("foo")
+assert(alphabet_contains(t.get_alphabet(), "foo"))
 t.prune_alphabet()
 alphabet = t.get_alphabet()
 assert(len(alphabet) == 7)
 for alpha in ['a', 'b', 'c', 'd']:
-    try:
-        ind = alphabet.index(alpha)
-    except ValueError:
-        assert(False)
-try:
-    alphabet.index('foo')
-    assert(False)
-except ValueError:
-    pass
+    assert(alphabet_contains(alphabet, alpha))
+assert(not alphabet_contains(alphabet, "foo"))
 
 
   

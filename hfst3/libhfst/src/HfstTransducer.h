@@ -1269,8 +1269,6 @@ ccc : ddd
     // ---------- Insertion and substitution ----------
     // ------------------------------------------------
 
-    void foo();
-
     /** \brief Freely insert symbol pair \a symbol_pair into the transducer. 
 
         To each state in this transducer is added a transition that 
