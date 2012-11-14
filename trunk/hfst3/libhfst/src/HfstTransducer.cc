@@ -2044,7 +2044,7 @@ HfstTransducer &HfstTransducer::insert_freely
     return *this;
 }
 
-
+void HfstTransducer::foo() {}
 
 // -----------------------------------------------------------------------
 //
@@ -2149,6 +2149,10 @@ HfstTransducer &HfstTransducer::substitute
 
 }
 
+HfstTransducer &HfstTransducer::substitute_symbols
+(const HfstSymbolSubstitutions &substitutions)
+{ return this->substitute(substitutions); }
+
 HfstTransducer &HfstTransducer::substitute
 (const HfstSymbolSubstitutions &substitutions)
 {
@@ -2166,6 +2170,12 @@ HfstTransducer &HfstTransducer::substitute
   }
   
   return convert_to_hfst_transducer(net);  
+}
+
+HfstTransducer &HfstTransducer::substitute_symbol_pairs
+(const HfstSymbolPairSubstitutions &substitutions)
+{
+  return this->substitute(substitutions);
 }
 
 HfstTransducer &HfstTransducer::substitute
