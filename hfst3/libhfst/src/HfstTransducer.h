@@ -1269,6 +1269,8 @@ ccc : ddd
     // ---------- Insertion and substitution ----------
     // ------------------------------------------------
 
+    void foo();
+
     /** \brief Freely insert symbol pair \a symbol_pair into the transducer. 
 
         To each state in this transducer is added a transition that 
@@ -1400,6 +1402,8 @@ t.substitute(&function);
      */
     HfstTransducer &substitute(const HfstSymbolSubstitutions &substitutions);
 
+    HfstTransducer &substitute_symbols(const HfstSymbolSubstitutions &substitutions);
+
     /** \brief Substitute all transition symbol pairs as defined in \a substitutions.
 
         Each symbol pair old_isymbol:old_osymbol is substituted with symbol pair
@@ -1411,6 +1415,8 @@ t.substitute(&function);
         more efficient than calling substitute separately for each substitution.
      */
     HfstTransducer &substitute(const HfstSymbolPairSubstitutions &substitutions);
+
+    HfstTransducer &substitute_symbol_pairs(const HfstSymbolPairSubstitutions &substitutions);
 
     /** \brief Substitute all transitions equal to \a symbol_pair 
         with a copy of transducer \a transducer. 

@@ -309,16 +309,16 @@ for type in types:
     # Perform multiple string-to-string substitutions
     t6 = libhfst.HfstTransducer(t)
     subs_symbol = { 'c':'C', 'a':'A', 't':'T', 's':'S' }
-    t6.substitute(subs_symbol)
+    t6.substitute_symbols(subs_symbol)
     t6_ = libhfst.HfstTransducer("CAT", "CATS", tok, type)
     assert(t6.compare(t6_))
 
     # Perform multiple string pair-to-string pair substitutions
-    # t7 = libhfst.HfstTransducer (t)
-    # subs_pair = { ('a','a'):('A','a'), ('s','s'):('S','S'), ('t','t'):('t','T') }
-    # t7.substitute_string_pairs(subs_pair)
-    # t7_ = libhfst.HfstTransducer("cAt", "caTs", tok, type)
-    # assert(t7.compare(t7_))
+    t7 = libhfst.HfstTransducer (t)
+    subs_pair = { ('a','a'):('A','a'), ('s','s'):('S','S'), ('t','t'):('t','T') }
+    t7.substitute_symbol_pairs(subs_pair)
+    t7_ = libhfst.HfstTransducer("cAt", "caTs", tok, type)
+    assert(t7.compare(t7_))
 
     print("alphabets")
 

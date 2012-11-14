@@ -13,7 +13,7 @@ transducers = {}
 
 # The regexps that we convert into transducers and store in
 # the lists in the dictionary
-regexps = ['a:b', '0:c', 'foo:bar']
+regexps = ['a:b', '0:c', 'foo:bar', 'a:b c:d', 'baz:"0"*', 'a b+ a:c'] # , 'Var d Var'] TODO
 
 for type in types:
 
@@ -22,6 +22,7 @@ for type in types:
 
     transducers[type] = []
     compiler = libhfst.XreCompiler(type)
+    # compiler.define('Var', 'v a r') TODO
 
     for regexp in regexps:
         # Print only results from tropical openfst implementation
@@ -44,7 +45,4 @@ for type_ind, type_val in enumerate(transducers):
         tr_tropical = libhfst.ptrvalue(transducers[libhfst.TROPICAL_OPENFST_TYPE][tr_ind])
         # Compare
         assert(tr.compare(tr_tropical))
-
-
-#      void define(const std::string& name, const std::string& xre);
 

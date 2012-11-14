@@ -753,8 +753,8 @@ namespace hfst {
         void write_in_att_format(char * ptr, bool write_weights=true) 
         {
       unsigned int source_state=0;
-      int cwt = 0; // characters written in total
-      int cw = 0; // characters written in latest call to sprintf
+      size_t cwt = 0; // characters written in total
+      size_t cw = 0; // characters written in latest call to sprintf
           for (iterator it = begin(); it != end(); it++)
             {
               for (typename HfstTransitions::iterator tr_it
@@ -1402,6 +1402,10 @@ namespace hfst {
           return *this;
         }
 
+        HfstTransitionGraph &substitute_symbols
+          (const HfstSymbolSubstitutions &substitutions)
+          { return this->substitute(substitutions); }
+
         /** @brief Substitute all transitions as defined in \a substitutions */
         HfstTransitionGraph &substitute
           (const HfstSymbolSubstitutions &substitutions)
@@ -1436,6 +1440,10 @@ namespace hfst {
 
             return *this;
           }
+
+        HfstTransitionGraph &substitute_symbol_pairs
+          (const HfstSymbolPairSubstitutions &substitutions)
+          { return this->substitute(substitutions); }
 
         /** @brief Substitute all transitions as defined in \a substitutions.
             

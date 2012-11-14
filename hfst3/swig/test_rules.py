@@ -12,7 +12,9 @@ for type in types:
     if not libhfst.HfstTransducer.is_implementation_type_available(type):
         continue
   
-    print("HfstTransducer two_level_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet, ImplementationType type)")
+    print("HfstTransducer two_level_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet)")
+    print("HfstTransducer two_level_only_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet)")
+    print("HfstTransducer two_level_if_and_only_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet)")
 
     leftc = libhfst.HfstTransducer("c", type)
     rightc = libhfst.HfstTransducer("c", type)
