@@ -2044,8 +2044,6 @@ HfstTransducer &HfstTransducer::insert_freely
     return *this;
 }
 
-void HfstTransducer::foo() {}
-
 // -----------------------------------------------------------------------
 //
 //                        Substitution functions
