@@ -36,10 +36,13 @@ AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
 libhfstparsers_la_SOURCES=$(SFST_SRCS) $(XRE_SRCS) $(PMATCH_SRCS) $(LEXC_SRCS)
 
-AM_CPPFLAGS=-I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/libhfst/src
+AM_CPPFLAGS=-I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/libhfst/src \
+		-I${top_srcdir}/back-ends/foma -I${top_srcdir}/back-ends
 
 if WANT_WINDOWS
-  AM_CPPFLAGS+= -I${top_srcdir}/back-ends/openfstwin/src/include -I${top_srcdir}/back-ends/foma -I${top_srcdir}/back-ends -I${top_srcdir}/back-ends/dlfcn -DWINDOWS
+  AM_CPPFLAGS+= -I${top_srcdir}/back-ends/openfstwin/src/include -I${top_srcdir}/back-ends/dlfcn -DWINDOWS
+else
+  AM_CPPFLAGS+= -I${top_srcdir}/back-ends/openfst/src/include
 endif
 
 # headers of parsers

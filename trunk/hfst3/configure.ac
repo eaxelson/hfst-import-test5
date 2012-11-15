@@ -1,4 +1,4 @@
-## Process this file with autoconf to produce configure script
+elif## Process this file with autoconf to produce configure script
 
 ## Copyright (C) 2010 University of Helsinki
 
@@ -485,23 +485,23 @@ AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
 AC_CHECK_LIB([xml2], [main])
 AC_LANG_PUSH([C++])
 AS_IF([test "x$with_openfst" != "xno" -a "x$enable_windows" == "xno"], 
-      [AC_CHECK_LIB([dl], [main])]
-      [AC_CHECK_LIB([fst], [main], [],
-                 [AC_MSG_FAILURE([openfst test failed (--without-openfst to disable)])])])
+      [AC_CHECK_LIB([dl], [main])])
+#      [AC_CHECK_LIB([fst], [main], [],
+#                 [AC_MSG_FAILURE([openfst test failed (--without-openfst to disable)])])])
 AS_IF([test "x$with_openfst" != "xno"], 
       [AC_CHECK_LIB([pthread], [main])]
       [AC_CHECK_LIB([m], [main])])
-AS_IF([test "x$with_sfst" != "xno" -a "x$enable_windows" == "xno"],
-      [AC_CHECK_LIB([sfst], [main])]
-      [AC_CHECK_LIB([sfst1], [main])])
+#AS_IF([test "x$with_sfst" != "xno" -a "x$enable_windows" == "xno"],
+#      [AC_CHECK_LIB([sfst], [main])]
+#      [AC_CHECK_LIB([sfst1], [main])])
 AS_IF([test "x$ac_cv_lib_sfst_main" == xno -a "x$ac_cv_lib_sfst1_main" == xno],
       [AC_MSG_FAILURE([sfst tests failed (--without-sfst to disable)])])
 AC_LANG_POP
 AC_LANG_PUSH([C])
 AS_IF([test "x$with_foma" != "xno" -a "x$enable_windows" == "xno"],
-      [AC_CHECK_LIB([z], [main])]
-      [AC_CHECK_LIB([foma], [main], [],
-                    [AC_MSG_FAILURE([foma test failed (--without-foma to disable)])])])
+      [AC_CHECK_LIB([z], [main])])
+#      [AC_CHECK_LIB([foma], [main], [],
+#                    [AC_MSG_FAILURE([foma test failed (--without-foma to disable)])])])
 AC_LANG_POP
 
 AS_IF([test "x$with_unicode_handler" = "xglib"],
@@ -524,17 +524,17 @@ AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h]
 AC_CHECK_HEADERS([libxml/tree.h libxml/mem.h])
 AC_LANG_PUSH([C++])
 
-AS_IF([test "x$with_sfst" != "xno" -a "x$enable_windows" == "xno"],
-      [AC_CHECK_HEADERS([sfst/fst.h sfst1/fst.h])])
+#AS_IF([test "x$with_sfst" != "xno" -a "x$enable_windows" == "xno"],
+#      [AC_CHECK_HEADERS([sfst/fst.h sfst1/fst.h])])
 AS_IF([test "x$with_sfst" != "xno"],
       [AC_CHECK_HEADERS([backward/hash_set ext/hash_set hash_set])]
       [AC_CHECK_HEADERS([backward/hash_map ext/hash_map hash_map])])
-AS_IF([test "x$with_openfst" != "xno" -a "x$enable_windows" == "xno"],
-      [AC_CHECK_HEADERS([fst/fstlib.h])])
+#AS_IF([test "x$with_openfst" != "xno" -a "x$enable_windows" == "xno"],
+#      [AC_CHECK_HEADERS([fst/fstlib.h])])
 AC_LANG_POP
 AC_LANG_PUSH([C])
-AS_IF([test "x$with_foma" != "xno" -a "x$enable_windows" == "xno"],
-      [AC_CHECK_HEADERS([fomalib.h])])
+#AS_IF([test "x$with_foma" != "xno" -a "x$enable_windows" == "xno"],
+#      [AC_CHECK_HEADERS([fomalib.h])])
 AC_LANG_POP
 AC_LANG_PUSH([C])
 AS_IF([test "x$with_readline" = "xyes"],
@@ -590,6 +590,9 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 back-ends/openfstwin/Makefile
 		 back-ends/openfstwin/src/Makefile
 		 back-ends/openfstwin/src/lib/Makefile
+		 back-ends/openfst/Makefile
+		 back-ends/openfst/src/Makefile
+		 back-ends/openfst/src/lib/Makefile
 		 back-ends/foma/Makefile
 		 back-ends/sfst/Makefile
 		 man/Makefile 
