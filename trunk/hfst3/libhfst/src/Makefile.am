@@ -35,14 +35,14 @@ libhfst_la_LIBADD = implementations/libhfstimplementations.la \
 			parsers/libhfstparsers.la
 
 if WANT_WINDOWS	
-  AM_CPPFLAGS += -I${top_srcdir}/windows/openfst/src/include \
-			-I${top_srcdir}/windows/foma \
-		 	-I${top_srcdir}/windows \
-			-I${top_srcdir}/windows/dlfcn -DWINDOWS
-  libhfst_la_LIBADD += $(top_srcdir)/windows/dlfcn/libdl.la \
-			$(top_srcdir)/windows/openfst/src/lib/libfst.la \
-			$(top_srcdir)/windows/foma/libfoma.la \
-			$(top_srcdir)/windows/sfst/libsfst.la
+  AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfstwin/src/include \
+			-I${top_srcdir}/back-ends/foma \
+		 	-I${top_srcdir}/back-ends \
+			-I${top_srcdir}/back-ends/dlfcn -DWINDOWS
+  libhfst_la_LIBADD += $(top_srcdir)/back-ends/dlfcn/libdl.la \
+			$(top_srcdir)/back-ends/openfstwin/src/lib/libfst.la \
+			$(top_srcdir)/back-ends/foma/libfoma.la \
+			$(top_srcdir)/back-ends/sfst/libsfst.la
 endif
 
 # we only have one library target but would like a particular includedir
