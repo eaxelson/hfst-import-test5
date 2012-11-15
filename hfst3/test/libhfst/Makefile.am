@@ -2,11 +2,14 @@
 LDADD = ../../libhfst/src/libhfst.la
 AM_CPPFLAGS = -I$(top_srcdir)/libhfst/src/ -I. -g
 
+AM_CPPFLAGS += -I${top_srcdir}/back-ends/foma \
+		-I${top_srcdir}/back-ends
+
 if WANT_WINDOWS
   AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfstwin/src/include \
-		-I${top_srcdir}/back-ends/foma \
-		-I${top_srcdir}/back-ends \
 		-I${top_srcdir}/back-ends/dlfcn -DWINDOWS
+else
+  AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfst/src/include
 endif
 
 AM_CXXFLAGS = -Wno-deprecated

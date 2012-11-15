@@ -30,16 +30,16 @@ IMPLEMENTATION_SRCS=HfstTransitionGraph.cc \
                     compose_intersect/ComposeIntersectRule.cc \
                     compose_intersect/ComposeIntersectFst.cc \
                     compose_intersect/ComposeIntersectUtilities.cc
-#                    HfstConstantTransducer.cc
 
 AM_CXXFLAGS=-Wno-deprecated -g
-AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
+AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/back-ends/foma \
+		-I${top_srcdir}/back-ends
 
 if WANT_WINDOWS
   AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfstwin/src/include \
-	-I${top_srcdir}/back-ends/foma \
-	-I${top_srcdir}/back-ends \
-	-I${top_srcdir}/back-ends/dlfcn -DWINDOWS
+		-I${top_srcdir}/back-ends/dlfcn -DWINDOWS
+else
+  AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfst/src/include
 endif
 
 # the bridges
@@ -90,7 +90,6 @@ implinclude_HEADERS = \
 		compose_intersect/ComposeIntersectRule.h \
 		compose_intersect/ComposeIntersectFst.h \
 		compose_intersect/ComposeIntersectUtilities.h
-#		HfstConstantTransducer.h
 
 compisectinclude_HEADERS=\
 		compose_intersect/ComposeIntersectRulePair.h \

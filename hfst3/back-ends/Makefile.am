@@ -15,5 +15,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS = dlfcn openfstwin foma sfst
+if WANT_WINDOWS
+  SUBDIRS = dlfcn openfstwin foma sfst
+else
+  SUBDIRS = openfst foma sfst
+endif
+
+
 AUTOMAKE_OPTIONS=subdir-objects

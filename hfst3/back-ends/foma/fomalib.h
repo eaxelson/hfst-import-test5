@@ -21,7 +21,7 @@ extern "C" {
 #include <stdio.h>
 #include <inttypes.h>
 #include <string.h>
-  //#include "zlib.h"
+#include "zlib.h"
 
 #define FEXPORT __attribute__((visibility("default")))
 
