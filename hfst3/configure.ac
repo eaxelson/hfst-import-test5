@@ -585,13 +585,13 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 tools/src/hfst-tagger/Makefile
 		 tools/src/hfst-tagger/src/Makefile
 		 tools/src/hfst-tagger/test/Makefile
-		 windows/Makefile
-		 windows/dlfcn/Makefile
-		 windows/openfst/Makefile
-		 windows/openfst/src/Makefile
-		 windows/openfst/src/lib/Makefile
-		 windows/foma/Makefile
-		 windows/sfst/Makefile
+		 back-ends/Makefile
+		 back-ends/dlfcn/Makefile
+		 back-ends/openfstwin/Makefile
+		 back-ends/openfstwin/src/Makefile
+		 back-ends/openfstwin/src/lib/Makefile
+		 back-ends/foma/Makefile
+		 back-ends/sfst/Makefile
 		 man/Makefile 
                  scripts/Makefile scripts/hfst-foma-wrapper.sh],
                  [chmod +x scripts/hfst-foma-wrapper.sh])
