@@ -203,20 +203,22 @@ class HfstBasicTransducer:
     def add_transition(state, transition, add_symbols_to_alphabet=True):
         pass
     
-    ## returns HfstBasicTransducer &
+    ## Add the path \a stringpairpath which has total weight of \a weight to this transducer.
+    # @param stringpairpath A tuple(?) of string pairs 
+    # @return HfstBasicTransducer &
     def disjunct(stringpairpath, weight):
         pass
 
     ## returns const StringSet &, const
-    def get_alphabet()
+    def get_alphabet():
         pass
 
     ## returns float, const, throw (StateIsNotFinalException)
-    def get_final_weight(state)
+    def get_final_weight(state):
         pass
 
     ## returns HfstState, const
-    def get_max_state()
+    def get_max_state():
         pass
 
     ## returns HfstBasicTransducer, HfstBasicTransducer
@@ -251,24 +253,24 @@ class HfstBasicTransducer:
     def is_final_state(state):
         pass
 
-    ## returns HfstBasicTransducer
-    def HfstBasicTransducer & assign (const HfstBasicTransducer &graph):
+    ## returns HfstBasicTransducer&, const HfstBasicTransducer &
+    def assign(graph):
         pass
     
-    ##
-    def const HfstTransitions & transitions (HfstState s) const:
+    ## const HfstTransitions &, HfstState, const
+    def transitions(state):
         pass
     
-    ##
-    def void prune_alphabet ():
+    ## void
+    def prune_alphabet():
         pass
     
-    ##
-    def void remove_symbol_from_alphabet (const std::string &symbol):
+    ## void, const std::string&
+    def remove_symbol_from_alphabet(symbol):
         pass
     
-    ##
-    def void set_final_weight (HfstState s, const float &weight):
+    ## void, HfstState, const float&
+    def set_final_weight(state, weight):
         pass
     
     ## returns HfstBasicTransducer&
@@ -279,47 +281,79 @@ class HfstBasicTransducer:
     def substitute(old_symbol, new_symbol, input_side=True, output_side=True):
         pass
     
-    ## returns HfstBasicTransducer&
-    def substitute_symbols(const HfstSymbolSubstitutions &substitutions):
+    ## returns HfstBasicTransducer&, const HfstSymbolSubstitutions & 
+    def substitute_symbols(substitutions):
         pass
     
-    ## returns HfstBasicTransducer&
-    def substitute_symbol_pairs(const HfstSymbolPairSubstitutions &substitutions):
+    ## returns HfstBasicTransducer&, const HfstSymbolPairSubstitutions 
+    def substitute_symbol_pairs(&substitutions):
         pass
     
-    ## returns HfstBasicTransducer&
-    def substitute(const StringPair &sp, const StringPairSet &sps):
+    ## returns HfstBasicTransducer&, const StringPair&, const StringPairSet&
+    def substitute(sp, sps):
         pass
     
-    ## returns HfstBasicTransducer&
-    def substitute(const StringPair &old_pair, const StringPair &new_pair):
+    ## returns HfstBasicTransducer&, const StringPair &old_pair, const StringPair &new_pair)
+    def substitute(old_pair, new_pair):
+        pass
+        
+    ## returns HfstBasicTransducer&, const StringPair &sp, const HfstBasicTransducer &graph)
+    def substitute(sp, graph):
         pass
     
-    ## returns HfstBasicTransducer&
-    def substitute(bool(*func)(const StringPair &sp, StringPairSet &sps)):
+    ## void, std::ostream &os, bool write_weights=true) ???
+    def write_in_att_format(os, write_weights=True):
         pass
     
-    ## returns HfstBasicTransducer&
-    def substitute(const StringPair &sp, const HfstBasicTransducer &graph):
+    ## void, (FILE *file, bool write_weights=true)
+    def write_in_att_format(file, write_weights=True):
         pass
     
-    ## 
-    def void write_in_att_format(std::ostream &os, bool write_weights=true):
-        pass
-    
-    ##
-    def void write_in_att_format(FILE *file, bool write_weights=true):
-        pass
-    
-    ##
-    def void write_in_att_format_number(FILE *file, bool write_weights=true):
+    ## void, FILE *file, bool write_weights=true)
+    def write_in_att_format_number(file, write_weights=True):
         pass
 
 
-    static HfstBasicTransducer read_in_att_format (std::istream &is, std::string epsilon_symbol, unsigned int & linecount) throw (NotValidAttFormatException);
-    static HfstBasicTransducer read_in_att_format (FILE *file, std::string epsilon_symbol, unsigned int & linecount) throw (NotValidAttFormatException);
-    static HfstBasicTransducer read_in_att_format (HfstFile &file, std::string epsilon_symbol, unsigned int & linecount) throw (NotValidAttFormatException);
+## Returns HfstBasicTransducer, (std::istream &is, std::string epsilon_symbol, unsigned int & linecount) throw (NotValidAttFormatException);
+def read_in_att_format(is, epsilon_symbol, linecount):
+    pass
 
-    %extend {
-    char *__str__() {
+## Returns HfstBasicTransducer, FILE *file, std::string epsilon_symbol, unsigned int & linecount) throw (NotValidAttFormatException);
+def read_in_att_format (file, epsilon_symbol, linecount):
+    pass
 
+## Returns HfstBasicTransducer, HfstFile &file, std::string epsilon_symbol, unsigned int & linecount) throw (NotValidAttFormatException);
+def read_in_att_format (file, epsilon_symbol, linecount):
+    pass
+
+## Print an HfstBasicTransducer
+def print(hfst_basic_transducer):
+    pass
+
+
+class HfstBasicTransition:
+
+    ## HfstState s, const std::string &input, const std::string &output, float weight) throw (EmptyStringException)
+    def __init__(self, state, input, output, weight):
+        pass
+
+    ## string, const
+    def get_input_symbol():
+        pass
+
+    ## string, const
+    def get_output_symbol():
+        pass
+
+    ## HfstState, const
+    def get_target_state():
+        pass
+        
+    ## float, const
+    def get_weight():
+        pass
+
+
+## Print an HfstBasicTransition
+def print(hfst_basic_transition):
+    pass
