@@ -175,14 +175,56 @@ def extract_paths_fd(transducer, max_num=-1, cycles=-1, filter_fd=False):
     pass
 
 
+## A simple transducer class with tropical weights.
+#
+#    An example of creating an HfstBasicTransducer [foo:bar baz:baz] 
+#    with weight 0.4 from scratch:
+#
+# \verbatim
+#  # Create an empty transducer
+#  # The transducer has initially one start state (number zero) 
+#  # that is not final
+#  fsm = libhfst.HfstBasicTransducer()
+#  # Add two states to the transducer
+#  fsm.add_state(1)
+#  fsm.add_state(2)
+#  # Create a transition [foo:bar] leading to state 1 with weight 0.1 ...
+#  tr = libhfst.HfstBasicTransition(1, 'foo', 'bar', 0.1)
+#  # ... and add it to state zero
+#  fsm.add_transition(0, tr)
+#  # Add a transition [baz:baz] with weight 0 from state 1 to state 2 
+#  fsm.add_transition(1, libhfst.HfstBasicTransition(2, 'baz', 'baz', 0.0))
+#  # Set state 2 as final with weight 0.3
+#  fsm.set_final_weight(2, 0.3)
+# \endverbatim
+#
+#    An example of iterating through the states and transitions of the above transducer
+#    when printing them in AT&T format to standard output:
+#
+# \verbatim
+#  # Go through all states
+#  for state in fsm.states(): 
+#        # Go through all transitions
+#        for transition in fsm.transitions(state):
+#              print "%i %i %s %s %f" % (state, transition.get_target_state(), transition.get_input_symbol(), transition.get_output_symbol(), transition,get_weight())
+#
+#  if fsm.is_final_state(source_state): 
+#        print "%i %f" % (state, fsm.get_final_weight(state))
+# \endverbatim
+#
+# @see #HfstBasicTransducer #HfstBasicTransition
 class HfstBasicTransducer:
 
-    ## Returns HfstState
+    ## Add a new state to this graph and return its number.      
+    #  @return The next (smallest) free state number.
     def add_state():
         pass
 
-    ## Returns HfstState
-    # @param state The number of the state that is added
+    ## Add a state \a s to this graph.
+    # If the state already exists, it is not added again.
+    # All states with state number smaller than \a s are also
+    # added to the graph if they did not exist before.
+    # @return \a state
     def add_state(state):
         pass
 
@@ -217,7 +259,8 @@ class HfstBasicTransducer:
     def get_final_weight(state):
         pass
 
-    ## returns HfstState, const
+    ## Get the biggest state number in use. 
+    # @return The biggest state number in use.
     def get_max_state():
         pass
 
@@ -357,3 +400,5 @@ class HfstBasicTransition:
 ## Print an HfstBasicTransition
 def print(hfst_basic_transition):
     pass
+
+

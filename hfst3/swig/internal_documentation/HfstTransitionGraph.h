@@ -1,14 +1,14 @@
-    /** @brief A simple transition graph format that consists of
-        states and transitions between those states.
-    
-    Probably the easiest way to use this template is to choose
-    the implementations #HfstBasicTransducer
-    (HfstTransitionGraph<HfstTropicalTransducerTransitionData>)
-    and #HfstBasicTransition
-    (HfstTransition<HfstTropicalTransducerTransitionData>).
-    The class HfstTropicalTransducerTransitionData contains an input string,
-    an output string and a float weight. HfstBasicTransducer is the 
-    implementation that is used as an example in this documentation.
+    ## A simple transition graph format that consists of
+    #    states and transitions between those states.
+    #
+    # Probably the easiest way to use this template is to choose
+    # the implementations #HfstBasicTransducer
+    # (HfstTransitionGraph<HfstTropicalTransducerTransitionData>)
+    # and #HfstBasicTransition
+    # (HfstTransition<HfstTropicalTransducerTransitionData>).
+    # The class HfstTropicalTransducerTransitionData contains an input string,
+    # an output string and a float weight. HfstBasicTransducer is the 
+    # implementation that is used as an example in this documentation.
 
     An example of creating a HfstBasicTransducer [foo:bar baz:baz] 
     with weight 0.4 from scratch:
@@ -67,35 +67,35 @@
 @see #HfstBasicTransducer HfstBasicTransition */
 class HfstTransitionGraph;
 
-        /** @brief The states of the graph. */
+        ## The states of the graph. */
 std::vector<HfstState> states() const;
 
-        /** @brief Create a graph with one initial state that has state number
+        ## Create a graph with one initial state that has state number
             zero and is not a final state, i.e. create an empty graph. */
 HfstTransitionGraph(void);
 
-    /** @brief The assignment operator. */
+    ## The assignment operator. */
 HfstTransitionGraph &operator=(const HfstTransitionGraph &graph);
 
 HfstTransitionGraph &assign(const HfstTransitionGraph &graph);
 
-    /** @brief Create a deep copy of HfstTransitionGraph \a graph. */
+    ## Create a deep copy of HfstTransitionGraph \a graph. */
 HfstTransitionGraph(const HfstTransitionGraph &graph);
     
-    /** @brief Create an HfstTransitionGraph equivalent to HfstTransducer 
+    ## Create an HfstTransitionGraph equivalent to HfstTransducer 
         \a transducer. FIXME: move to a separate file */
 HfstTransitionGraph(const hfst::HfstTransducer &transducer);
 
 /* Print the alphabet of the graph to standard error stream. */
 void print_alphabet() const; 
 
-        /** @brief Explicitly add \a symbol to the alphabet of the graph.
+        ## Explicitly add \a symbol to the alphabet of the graph.
 
             @note Usually the user does not have to take care of the alphabet
             of a graph. This function can be useful in some special cases. */
 void add_symbol_to_alphabet(const HfstSymbol &symbol);
 
-    /** @brief Remove symbol \a symbol from the alphabet of the graph. 
+    ## Remove symbol \a symbol from the alphabet of the graph. 
 
         @note Use with care, removing symbols that occur in the transitions
         of the graph can have unexpected results. */
@@ -103,20 +103,20 @@ void remove_symbol_from_alphabet(const HfstSymbol &symbol);
 
 void remove_symbols_from_alphabet(const HfstSymbolSet &symbols);
 
-    /** @brief Same as #add_symbol_to_alphabet for each symbol in
+    ## Same as #add_symbol_to_alphabet for each symbol in
         \a symbols. */
 void add_symbols_to_alphabet(const HfstSymbolSet &symbols);
 
 void add_symbols_to_alphabet(const HfstSymbolPairSet &symbols);
 
-        /** @brief Remove all symbols that do not occur in transitions of
+        ## Remove all symbols that do not occur in transitions of
             the graph from its alphabet. 
 
             Epsilon, unknown and identity \link hfst::String symbols\endlink
             are always included in the alphabet. */
 void prune_alphabet();
 
-        /** @brief Get the set of HfstSymbols in the alphabet 
+        ## Get the set of HfstSymbols in the alphabet 
             of the graph. 
         
             The HfstSymbols do not necessarily occur in any transitions
@@ -124,12 +124,12 @@ void prune_alphabet();
             hfst::String symbols\endlink are always included in the alphabet. */
 const HfstTransitionGraphAlphabet &get_alphabet() const;
 
-        /** @brief Add a new state to this graph and return its number.
+        ## Add a new state to this graph and return its number.
         
             @return The next (smallest) free state number. */
 HfstState add_state(void);
 
-        /** @brief Add a state \a s to this graph.
+        ## Add a state \a s to this graph.
  
             If the state already exists, it is not added again.
         All states with state number smaller than \a s are also
@@ -137,42 +137,42 @@ HfstState add_state(void);
             @return \a s*/
 HfstState add_state(HfstState s);
 
-    /** @brief Get the biggest state number in use. */
+    ## Get the biggest state number in use. */
 HfstState get_max_state() const;
 
-        /** @brief Add a transition \a transition to state \a s. 
+        ## Add a transition \a transition to state \a s. 
 
             If state \a s does not exist, it is created. */
     void add_transition(HfstState s, const HfstTransition<C> & transition,
                         bool add_symbols_to_alphabet=true);
 
-        /** @brief Whether state \a s is final. 
+        ## Whether state \a s is final. 
         FIXME: return positive infinity instead if not final. */
 bool is_final_state(HfstState s) const;
 
         /** Get the final weight of state \a s in this graph. */
 typename C::WeightType get_final_weight(HfstState s) const;
 
-        /** @brief Set the final weight of state \a s in this graph 
+        ## Set the final weight of state \a s in this graph 
             to \a weight. 
 
             If the state does not exist, it is created. */
         void set_final_weight(HfstState s, 
                               const typename C::WeightType & weight);
     
-        /** @brief Sort the arcs of this transducer according to input and
+        ## Sort the arcs of this transducer according to input and
             output symbols. */
 HfstTransitionGraph &sort_arcs(void);
 
 
-        /** @brief Get the set of transitions of state \a s in this graph. 
+        ## Get the set of transitions of state \a s in this graph. 
 
             If the state does not exist, a @a StateIndexOutOfBoundsException
             is thrown.
         */
 const HfstTransitions & operator[](HfstState s) const;
         
-        /** @brief Alternative name for operator[].
+        ## Alternative name for operator[].
 
             Python interface uses this function as '[]' is not a legal name.
 
@@ -180,21 +180,21 @@ const HfstTransitions & operator[](HfstState s) const;
          */
 const HfstTransitions & transitions(HfstState s) const;
 
-        /** @brief Write the graph in AT&T format to ostream \a os.
+        ## Write the graph in AT&T format to ostream \a os.
             \a write_weights defines whether weights are printed. */
 void write_in_att_format(std::ostream &os, bool write_weights=true);
 
-        /** @brief Write the graph in AT&T format to FILE \a file.
+        ## Write the graph in AT&T format to FILE \a file.
             \a write_weights defines whether weights are printed. */
 void write_in_att_format(FILE *file, bool write_weights=true);
 
-        /** @brief Write the graph in AT&T format to FILE \a file using numbers
+        ## Write the graph in AT&T format to FILE \a file using numbers
             instead of symbol names.
             \a write_weights defines whether weights are printed. */
 void write_in_att_format_number(FILE *file, bool write_weights=true);
 
 
-        /** @brief Create an HfstTransitionGraph as defined in AT&T 
+        ## Create an HfstTransitionGraph as defined in AT&T 
             transducer format in istream \a is. \a epsilon_symbol 
             defines how epsilon is represented. 
             @pre \a is not at end, otherwise an exception is thrown. 
@@ -205,7 +205,7 @@ void write_in_att_format_number(FILE *file, bool write_weights=true);
            std::string epsilon_symbol,
            unsigned int & linecount);
 
-        /** @brief Create an HfstTransitionGraph as defined 
+        ## Create an HfstTransitionGraph as defined 
             in AT&T transducer format in FILE \a file. 
             \a epsilon_symbol defines how epsilon is represented. 
             @pre \a is not at end, otherwise an exception is thrown. 
@@ -221,7 +221,7 @@ void write_in_att_format_number(FILE *file, bool write_weights=true);
            std::string epsilon_symbol,
            unsigned int & linecount);
 
-        /** @brief Substitute \a old_symbol with \a new_symbol in 
+        ## Substitute \a old_symbol with \a new_symbol in 
             all transitions. \a input_side and \a output_side define
             whether the substitution is made on input and output sides. */
         HfstTransitionGraph &
@@ -230,7 +230,7 @@ void write_in_att_format_number(FILE *file, bool write_weights=true);
                      bool input_side=true, 
                      bool output_side=true);
 
-        /** @brief Substitute all transitions as defined in \a substitutions.
+        ## Substitute all transitions as defined in \a substitutions.
             
             For each transition x:y, \a substitutions is searched and if 
             a mapping x:y -> X:Y is found, the transition x:y is replaced
@@ -239,18 +239,18 @@ void write_in_att_format_number(FILE *file, bool write_weights=true);
         HfstTransitionGraph &substitute
         (const HfstSymbolPairSubstitutions &substitutions);
 
-        /** @brief Substitute all transitions \a sp with a set of transitions
+        ## Substitute all transitions \a sp with a set of transitions
             \a sps. */
         HfstTransitionGraph &substitute
         (const HfstSymbolPair &sp, const HfstSymbolPairSet &sps);
   
-        /** @brief Substitute all transitions \a old_pair with 
+        ## Substitute all transitions \a old_pair with 
             \a new_pair. */
         HfstTransitionGraph &substitute
           (const HfstSymbolPair &old_pair, 
            const HfstSymbolPair &new_pair);
 
-        /** @brief Substitute all transitions \a old_symbol : \a new_symbol
+        ## Substitute all transitions \a old_symbol : \a new_symbol
             with a copy of \a graph.
 
             Copies of \a graph are attached to this graph with
@@ -272,23 +272,23 @@ void write_in_att_format_number(FILE *file, bool write_weights=true);
           substitute(const HfstSymbolPair &sp, 
                      const HfstTransitionGraph &graph);
 
-        /** @brief Insert freely any number of \a symbol_pair in 
+        ## Insert freely any number of \a symbol_pair in 
             the graph with weight \a weight. */
         HfstTransitionGraph &insert_freely
         (const HfstSymbolPair &symbol_pair, typename C::WeightType weight);
 
-        /** @brief Insert freely any number of any symbol in \a symbol_pairs in 
+        ## Insert freely any number of any symbol in \a symbol_pairs in 
             the graph with weight \a weight. */
         HfstTransitionGraph &insert_freely
           (const HfstSymbolPairSet &symbol_pairs, 
            typename C::WeightType weight);
         
-        /** @brief Insert freely any number of \a graph in this
+        ## Insert freely any number of \a graph in this
             graph. */
         HfstTransitionGraph &insert_freely
         (const HfstTransitionGraph &graph);
 
-        /** @brief Harmonize this HfstTransitionGraph and \a another.
+        ## Harmonize this HfstTransitionGraph and \a another.
 
             In harmonization the unknown and identity symbols in 
             transitions of both graphs are expanded according to
@@ -316,7 +316,7 @@ void write_in_att_format_number(FILE *file, bool write_weights=true);
         */
 HfstTransitionGraph &harmonize(HfstTransitionGraph &another);
         
-        /** @brief Disjunct this graph with a one-path graph 
+        ## Disjunct this graph with a one-path graph 
             defined by string pair vector \a spv with weight \a weight. 
             
             @pre This graph must be a trie where all weights are in
@@ -339,13 +339,13 @@ HfstTransitionGraph &harmonize(HfstTransitionGraph &another);
         (const StringPairVector &spv, typename C::WeightType weight);
 
    
-    /** @brief An HfstTransitionGraph with transitions of type 
+    ## An HfstTransitionGraph with transitions of type 
     HfstTropicalTransducerTransitionData and weight type float.
     
     This is probably the most useful kind of HfstTransitionGraph. */
     typedef HfstTransitionGraph <HfstTropicalTransducerTransitionData> 
       HfstBasicTransducer;
     
-    /** @brief A specialization for faster conversion. */
+    ## A specialization for faster conversion. */
     typedef HfstTransitionGraph <HfstFastTransitionData> 
       HfstFastTransducer;
