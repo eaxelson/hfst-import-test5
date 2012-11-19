@@ -215,7 +215,8 @@ def extract_paths_fd(transducer, max_num=-1, cycles=-1, filter_fd=False):
 # @see #HfstBasicTransducer #HfstBasicTransition
 class HfstBasicTransducer:
 
-    ## Add a new state to this graph and return its number.      
+
+    ## Add a new state to this transducer and return its number.      
     #  @return The next (smallest) free state number.
     def add_state():
         pass
@@ -223,39 +224,47 @@ class HfstBasicTransducer:
     ## Add a state \a s to this graph.
     # If the state already exists, it is not added again.
     # All states with state number smaller than \a s are also
-    # added to the graph if they did not exist before.
+    # added to the transducer if they did not exist before.
     # @return \a state
     def add_state(state):
         pass
 
-    ## Returns a tuple of ints, const
+    ## The states of the transducer.
+    # @return A tuple of state numbers.
     def states():
         pass
 
-    ## void
-    # @ param symbol The string to be added
+    ## Explicitly add \a symbol to the alphabet of the graph.
+    # @note Usually the user does not have to take care of the alphabet
+    #       of a graph. This function can be useful in some special cases.
+    # @ param symbol The string to be added.
     def add_symbol_to_alphabet(symbol):
         pass
 
-    ## void, tuple of symbols
+    ## Explicitly add \a symbols to the alphabet of the graph.
+    # @note Usually the user does not have to take care of the alphabet
+    #       of a graph. This function can be useful in some special cases.
+    # @param symbols A tuple of strings to be added.
     def add_symbols_to_alphabet(symbols):
         pass
 
-    ## void state number \a state, HfstBasicTransition \a transition, \a add_symbols_to_alphabet 
+    ## Add a transition \a transition to state \a state, \a add_symbols_to_alphabet defines whether the transition symbols are added to the alphabet. 
+    # If state \a state does not exist, it is created.
     def add_transition(state, transition, add_symbols_to_alphabet=True):
         pass
     
-    ## Add the path \a stringpairpath which has total weight of \a weight to this transducer.
-    # @param stringpairpath A tuple(?) of string pairs 
-    # @return HfstBasicTransducer &
+    ## TODO
     def disjunct(stringpairpath, weight):
         pass
 
-    ## returns const StringSet &, const
+    ## The symbols in the alphabet of the transducer.     
+    # The symbols do not necessarily occur in any transitions of the transducer. 
+    # Epsilon, unknown and identity symbols are always included in the alphabet.
+    # @return A tuple of symbols (strings).
     def get_alphabet():
         pass
 
-    ## returns float, const, throw (StateIsNotFinalException)
+    ## Get the final weight of state \a state in this transducer.
     def get_final_weight(state):
         pass
 
@@ -264,110 +273,145 @@ class HfstBasicTransducer:
     def get_max_state():
         pass
 
-    ## returns HfstBasicTransducer, HfstBasicTransducer
+    ## TODO
     def harmonize(another):
         pass
 
-    ##
+    ## Create a transducer with one initial state that has state number zero and is not a final state, i.e. create an empty transducer.
     def __init__(self):
         pass
 
-    ## const HfstBasicTransducer&
-    def __init__(self, graph):
-        pass
-
-    ## const HfstTransducer&
+    ## Create a deep copy of HfstBasicTransducer \a transducer.
     def __init__(self, transducer):
         pass
 
-    ## Returns &HfstTransducer, StringPair, float
+    ## Create a transducer equivalent to HfstTransducer \a transducer.
+    def __init__(self, transducer):
+        pass
+
+    ## Create a transducer as defined in file \a file in AT&T format.
+    # TODO: An example.
+    # @pre \a file is not at end, otherwise an exception is thrown.
+    # @note Multiple AT&T transducer definitions are separated with the line "--".
+    def __init__(self, file):
+        pass
+
+    ## Insert freely any number of \a symbol_pair in the transducer with weight \a weight.
+    # @param symbol_pair A string pair to be inserted.
+    # @param weight The weight of the inserted symbol pair.
     def insert_freely(symbol_pair, weight):
         pass
 
-    ## Returns &HfstTransducer, StringPairSet, float
+    ## Insert freely any number of any symbol in \a symbol_pairs in the graph with weight \a weight.
+    # @param symbol_pairs A tuple of string pairs to be inserted.
+    # @param weight The weight of the inserted symbol pair.
     def insert_freely(symbol_pairs, weight):
         pass
 
-    ## Returns &HfstTransducer, const HfstBasicTransducer&
-    def insert_freely(graph):
+   ## Insert freely any number of \a transducer in this transducer.
+   # param transducer An HfstBasicTransducer to be inserted.
+    def insert_freely(transducer):
         pass
 
-    ## returns Bool, HfstState, const
+    ## Whether state \a state is final. 
     def is_final_state(state):
         pass
 
-    ## returns HfstBasicTransducer&, const HfstBasicTransducer &
-    def assign(graph):
+    ## The assignment operator.
+    # @return This transducer.
+    def assign(transducer):
         pass
     
-    ## const HfstTransitions &, HfstState, const
+   ## Get the transitions of state \a state in this transducer. 
+   # If the state does not exist, a @a StateIndexOutOfBoundsException is thrown.
+   # @return A tuple of state numbers.
     def transitions(state):
         pass
-    
-    ## void
+
+   ## Remove all symbols that do not occur in transitions of the transudcer from its alphabet. 
+   #  Epsilon, unknown and identity symbols are always included in the alphabet.
     def prune_alphabet():
         pass
     
-    ## void, const std::string&
+    ## Remove symbol \a symbol from the alphabet of the graph. 
+    #  @note Use with care, removing symbols that occur in the transitions of the graph can have unexpected results.
+    # @param symbol The string to be removed.
     def remove_symbol_from_alphabet(symbol):
         pass
     
-    ## void, HfstState, const float&
+    ## Remove symbols \a symbols from the alphabet of the graph. 
+    #  @note Use with care, removing symbols that occur in the transitions of the graph can have unexpected results.
+    # @param symbol A tuple of strings to be removed.
+    def remove_symbols_from_alphabet(symbols):
+        pass
+
+    ## Set the final weight of state \a state in this transducer to \a weight. 
+    # If the state does not exist, it is created.
     def set_final_weight(state, weight):
         pass
     
-    ## returns HfstBasicTransducer&
+    ## Sort the arcs of this transducer according to input and output symbols.
+    # @return This transducer.
     def sort_arcs():
         pass
-    
-    ## returns HfstBasicTransducer&, const std::string&, same, bool, bool
+
+    ## Substitute \a old_symbol with \a new_symbol in all transitions. \a input_side and \a output_side define whether the substitution is made on input and output sides.
+    # @return This transducer.
     def substitute(old_symbol, new_symbol, input_side=True, output_side=True):
         pass
     
-    ## returns HfstBasicTransducer&, const HfstSymbolSubstitutions & 
+    ## Substitute all transition symbols as defined in \a substitutions.
+    # For each transition symbol x, \a substitutions is searched and if a mapping x -> X is found,
+    # the transition symbol x is replaced with X. If no mapping is found, the transition remains the same.
+    # The weights remain the same.
+    # @param substitutions A dictionary that maps symbols (strings) to symbols (strings).
     def substitute_symbols(substitutions):
         pass
     
-    ## returns HfstBasicTransducer&, const HfstSymbolPairSubstitutions 
-    def substitute_symbol_pairs(&substitutions):
+    ## Substitute all transitions as defined in \a substitutions.
+    # For each transition x:y, \a substitutions is searched and if a mapping x:y -> X:Y is found,
+    # the transition x:y is replaced with X:Y. If no mapping is found, the transition remains the same.
+    # The weights remain the same.
+    # @param substitutions A dictionary that maps transitions (string pairs) to transitions (string pairs).
+    def substitute_symbol_pairs(substitutions):
         pass
     
-    ## returns HfstBasicTransducer&, const StringPair&, const StringPairSet&
+    ## Substitute all transitions \a sp with a set of transitions \a sps.
+    # The weights remain the same.
+    # @param sp A transition (string pair) to be substituted.
+    # @param sps A tuple of substituting transitions (string pairs).
     def substitute(sp, sps):
         pass
     
-    ## returns HfstBasicTransducer&, const StringPair &old_pair, const StringPair &new_pair)
+    ## Substitute all transitions \a old_pair with \a new_pair.
+    # @param old_pair The transition (string pair) to be substituted.
+    # @param new_pair The substituting transition (string pair).
     def substitute(old_pair, new_pair):
         pass
         
-    ## returns HfstBasicTransducer&, const StringPair &sp, const HfstBasicTransducer &graph)
-    def substitute(sp, graph):
+    ## Substitute all transitions equal to \a sp with a copy of \a transducer
+    #
+    # Copies of \a transducer are attached to this graph with epsilon transitions.
+    #
+    # The weights of the transitions to be substituted are copied
+    # to epsilon transitions leaving from the source state of
+    # the transitions to be substituted to the initial state
+    # of a copy of \a transducer.
+    #
+    # The final weights in \a transducer are copied to epsilon transitions leading from
+    # the final states (after substitution non-final states)
+    # of \a transducer to target states of transitions equal to \a sp
+    # (that are substituted) in this transducer.
+    #
+    # @param sp The transition (string pair) to be substituted.
+    # @param transducer The substituting transducer.
+    def substitute(sp, transducer):
         pass
     
-    ## void, std::ostream &os, bool write_weights=true) ???
-    def write_in_att_format(os, write_weights=True):
-        pass
-    
-    ## void, (FILE *file, bool write_weights=true)
+    ## Write this transducer in AT&T format to file \a file, \a write_weights defines whether weights are written.
     def write_in_att_format(file, write_weights=True):
         pass
-    
-    ## void, FILE *file, bool write_weights=true)
-    def write_in_att_format_number(file, write_weights=True):
-        pass
 
-
-## Returns HfstBasicTransducer, (std::istream &is, std::string epsilon_symbol, unsigned int & linecount) throw (NotValidAttFormatException);
-def read_in_att_format(is, epsilon_symbol, linecount):
-    pass
-
-## Returns HfstBasicTransducer, FILE *file, std::string epsilon_symbol, unsigned int & linecount) throw (NotValidAttFormatException);
-def read_in_att_format (file, epsilon_symbol, linecount):
-    pass
-
-## Returns HfstBasicTransducer, HfstFile &file, std::string epsilon_symbol, unsigned int & linecount) throw (NotValidAttFormatException);
-def read_in_att_format (file, epsilon_symbol, linecount):
-    pass
 
 ## Print an HfstBasicTransducer
 def print(hfst_basic_transducer):
@@ -400,5 +444,15 @@ class HfstBasicTransition:
 ## Print an HfstBasicTransition
 def print(hfst_basic_transition):
     pass
+
+
+
+
+
+
+
+    
+
+
 
 

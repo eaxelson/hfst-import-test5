@@ -180,6 +180,7 @@ HfstBasicTransducer &harmonize (HfstBasicTransducer &another);
 HfstBasicTransducer (void);
 HfstBasicTransducer (const HfstBasicTransducer &graph);
 HfstBasicTransducer (const hfst::HfstTransducer &transducer);
+HfstBasicTransducer (FILE *file) throw (NotValidAttFormatException);
 HfstBasicTransducer & insert_freely (const StringPair &symbol_pair, float weight);
 HfstBasicTransducer & insert_freely (const StringPairSet &symbol_pairs, float weight);
 HfstBasicTransducer & insert_freely (const HfstBasicTransducer &graph);
@@ -200,10 +201,6 @@ HfstBasicTransducer & substitute (const StringPair &sp, const HfstBasicTransduce
 void write_in_att_format (std::ostream &os, bool write_weights=true);
 void write_in_att_format (FILE *file, bool write_weights=true);
 void write_in_att_format_number (FILE *file, bool write_weights=true);
-
-static HfstBasicTransducer read_in_att_format (std::istream &is, std::string epsilon_symbol, unsigned int & linecount) throw (NotValidAttFormatException);
-static HfstBasicTransducer read_in_att_format (FILE *file, std::string epsilon_symbol, unsigned int & linecount) throw (NotValidAttFormatException);
-static HfstBasicTransducer read_in_att_format (HfstFile &file, std::string epsilon_symbol, unsigned int & linecount) throw (NotValidAttFormatException);
 
     %extend {
     char *__str__() {
