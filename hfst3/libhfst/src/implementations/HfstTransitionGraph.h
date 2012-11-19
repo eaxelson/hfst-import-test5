@@ -193,6 +193,15 @@ namespace hfst {
           state_vector.push_back(tr);
         }
 
+      HfstTransitionGraph(FILE *file) {
+        initialize_alphabet(alphabet);
+        HfstTransitions tr;
+        state_vector.push_back(tr);
+        unsigned int linecount=0;
+        this->assign(read_in_att_format(file, "@0@", linecount));
+      }
+
+
     /** @brief The assignment operator. */
     HfstTransitionGraph &operator=(const HfstTransitionGraph &graph)
       {

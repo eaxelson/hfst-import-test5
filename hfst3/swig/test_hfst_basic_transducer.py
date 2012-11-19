@@ -53,8 +53,7 @@ ofile.close()
 ifile = open('test.att', 'rb')
 
 try:
-    linecount = 0;
-    foo = libhfst.HfstBasicTransducer.read_in_att_format(ifile, '@0@', linecount);
+    foo = libhfst.HfstBasicTransducer.read_in_att_format(ifile)
     ifile.close()
     os.remove('test.att')
     assert(False)
