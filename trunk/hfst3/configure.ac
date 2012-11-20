@@ -39,14 +39,20 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([libhfst/src/HfstTransducer.h])
 AC_CONFIG_HEADERS([config.h libhfst/src/hfst.hpp])
 
-AC_SUBST([LIBHFST_MAJOR], [3])
-AC_SUBST([LIBHFST_MINOR], [3])
+AC_SUBST([LIBHFST_MAJOR],     [3])
+AC_SUBST([LIBHFST_MINOR],     [3])
 AC_SUBST([LIBHFST_EXTENSION], [15])
-AC_SUBST([LIBHFST_VERSION], [3.3.15])
-AC_SUBST([LIBHFST_NAME], [hfst])
+AC_SUBST([LIBHFST_VERSION],   [3.3.15])
+AC_SUBST([LIBHFST_NAME],      [hfst])
 
 # long version = version vector cast in base 10000, for automatic comparisons
 # e.g.: 3.3.2 = 0003 0000 0000 + 0003 0000 + 0002
+
+# Experiment to calculate the HFST_LONGVERSION via the other version strings:
+# HFST_LONGVERSION_STRING=$LIBHFST_MAJOR * 10000 * 10000 + \
+# $LIBHFST_MINOR * 10000 + $LIBHFST_EXTENSION + "L"
+# NB! It turned out to be not portable, and can't be used!
+
 AC_DEFINE([HFST_LONGVERSION], [300030015L],
           [Define to hfst version vector as long in base 10000])
 AC_DEFINE([HFST_REVISION], ["$Revision$"],
