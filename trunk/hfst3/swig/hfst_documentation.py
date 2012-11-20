@@ -117,37 +117,39 @@ class SymbolNotFoundException(HfstException):
 class MetadataException(HfstException):
     pass
 
-## sfst type
+## An SFST transducer, unweighted.
 SFST_TYPE = _libhfst.SFST_TYPE
 
-## type
+## An OpenFst transducer with tropical weights.
 TROPICAL_OPENFST_TYPE = _libhfst.TROPICAL_OPENFST_TYPE
 
-## type
+## An OpenFst transducer with logarithmic weights (limited support). 
 LOG_OPENFST_TYPE = _libhfst.LOG_OPENFST_TYPE
 
-## type
+## A foma transducer, unweighted.
 FOMA_TYPE = _libhfst.FOMA_TYPE
 
-## type
+## An HFST optimized lookup transducer, unweighted.
 HFST_OL_TYPE = _libhfst.HFST_OL_TYPE
 
-## type
+## An HFST optimized lookup transducer with weights.
 HFST_OLW_TYPE = _libhfst.HFST_OLW_TYPE
 
-## type
+## HFST2 header present, conversion required.
 HFST2_TYPE = _libhfst.HFST2_TYPE
 
-## type
+## Format left open by e.g. default constructor.
 UNSPECIFIED_TYPE = _libhfst.UNSPECIFIED_TYPE
 
-## type
+## Type not recognised. This type might be returned by a function if an error occurs.
 ERROR_TYPE = _libhfst.ERROR_TYPE
 
-## type
+## Push weights toward initial state.
+# @see #hfst_documentation.HfstTransducer.push_weights
 TO_INITIAL_STATE = _libhfst.TO_INITIAL_STATE
 
-## type
+## Push weights toward final state(s).
+# @see #hfst_documentation.HfstTransducer.push_weights
 TO_FINAL_STATE = _libhfst.TO_FINAL_STATE
 
 
@@ -212,7 +214,7 @@ def extract_paths_fd(transducer, max_num=-1, cycles=-1, filter_fd=False):
 #        print "%i %f" % (state, fsm.get_final_weight(state))
 # \endverbatim
 #
-# @see #HfstBasicTransducer #HfstBasicTransition
+# @see #hfst_documentation.HfstBasicTransition
 class HfstBasicTransducer:
 
 
@@ -253,7 +255,22 @@ class HfstBasicTransducer:
     def add_transition(state, transition, add_symbols_to_alphabet=True):
         pass
     
-    ## TODO
+    ## Disjunct this transducer with a one-path transducer defined by string pair tuple \a spv that has weight \a weight.
+    #
+    # @pre This graph must be a trie where all weights are in final states,
+    #      i.e. all transitions have a zero weight.
+    #
+    # There is no way to test whether a graph is a trie, so the use
+    # of this function is probably limited to fast construction of a lexicon.
+    # Here is an example:
+    # 
+    # \verbatim
+    # lexicon = libhfst.HfstBasicTransducer()
+    # TOK = libhfst.HfstTokenizer
+    # lexicon.disjunct(TOK.tokenize('dog'), 0.3)
+    # lexicon.disjunct(TOK.tokenize('cat'), 0.5)
+    # lexicon.disjunct(TOK.tokenize('elephant'), 1.6)
+    # \endverbatim
     def disjunct(stringpairpath, weight):
         pass
 
@@ -273,7 +290,26 @@ class HfstBasicTransducer:
     def get_max_state():
         pass
 
-    ## TODO
+    ## Harmonize this transducer and \a another.
+    #
+    # In harmonization the unknown and identity symbols in transitions of both graphs
+    # are expanded according to the symbols that are previously unknown to the graph.
+    #
+    # For example the graphs
+    # \verbatim
+    # [a:b ?:?]
+    # [c:d ? ?:c]\endverbatim
+    # are expanded to
+    # \verbatim
+    # [ a:b [?:? | ?:c | ?:d | c:d | d:c | c:? | d:?] ]
+    # [ c:d [? | a | b] [?:c| a:c | b:?] ]\endverbatim
+    # when harmonized.
+    #
+    # The symbol "?" means \@_UNKNOWN_SYMBOL_\@ in either or both sides of a transition
+    # (transitions of type [?:x], [x:?] and [?:?]). The transition [?] means [\@_IDENTITY_SYMBOL_\@].
+    #
+    # @note This function is always called for all transducer arguments of functions
+    #       that take two or more graphs as their arguments, unless otherwise said.
     def harmonize(another):
         pass
 
@@ -341,7 +377,7 @@ class HfstBasicTransducer:
     
     ## Remove symbols \a symbols from the alphabet of the graph. 
     #  @note Use with care, removing symbols that occur in the transitions of the graph can have unexpected results.
-    # @param symbol A tuple of strings to be removed.
+    # @param symbols A tuple of strings to be removed.
     def remove_symbols_from_alphabet(symbols):
         pass
 
@@ -417,26 +453,32 @@ class HfstBasicTransducer:
 def print(hfst_basic_transducer):
     pass
 
-
+## A transition class that consists of a target state, input and output symbols and a a tropical weight.
+# @see hfst_documentation.HfstBasicTransducer
 class HfstBasicTransition:
 
-    ## HfstState s, const std::string &input, const std::string &output, float weight) throw (EmptyStringException)
+    ## Create an HfstBasicTransition leading to target state \a state with input symbol \a input, output symbol \a output and weight \a weight.
+    # @param state Number of the target state.
+    # @param input The input string.
+    # @param output The output string.
+    # @param weight The weight.
+    # @throws EmptyStringException
     def __init__(self, state, input, output, weight):
         pass
 
-    ## string, const
+    ## Get the input symbol of the transition.
     def get_input_symbol():
         pass
 
-    ## string, const
+    ## Get the output symbol of the transition.
     def get_output_symbol():
         pass
 
-    ## HfstState, const
+    ## Get number of the target state of the transition.
     def get_target_state():
         pass
         
-    ## float, const
+    ## Get the weight of the transition.
     def get_weight():
         pass
 
