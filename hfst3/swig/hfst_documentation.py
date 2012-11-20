@@ -939,3 +939,219 @@ class HfstTransducer:
     def disjunct(another):
         pass
 
+    ## Intersect this transducer with \a another. 
+    def intersect(another):
+        pass
+    
+    ## Subtract transducer \a another from this transducer. 
+    def subtract(another):
+        pass
+
+    ## Convert the transducer into an equivalent transducer in format \a type. 
+    # 
+    # If a weighted transducer is converted into an unweighted one, 
+    # all weights are lost. In the reverse case, all weights are initialized to the 
+    # semiring's one. 
+    # 
+    # A transducer of type #libhfst.SFST_TYPE, #libhfst.TROPICAL_OPENFST_TYPE,
+    # #libhfst.LOG_OPENFST_TYPE or #FOMA_TYPE can be converted into an 
+    # #libhfst.HFST_OL_TYPE or #libhfst.HFST_OLW_TYPE transducer, but an #libhfst.HFST_OL_TYPE
+    # or #libhfst.HFST_OLW_TYPE transducer cannot be converted to any other type.
+    # 
+    # @note For conversion between HfstBasicTransducer and HfstTransducer,
+    # see #HfstTransducer(t, type) and #HfstBasicTransducer(transducer).
+    def convert(type, options=""):
+        pass
+    
+    ## Write the transducer in AT&T format to file \a ofile, \a write_weights defines whether weights are written.
+    # 
+    # The fields in the resulting AT&T format are separated by tabulator characters.
+    # 
+    # NOTE: If the transition symbols contain space characters,the spaces are printed as "@_SPACE_@" because
+    # whitespace characters are used as field separators in AT&T format. Epsilon symbols are printed as "@0@".
+    # 
+    # If several transducers are written in the same file, they must be separated by a line of two consecutive hyphens "--", so that
+    # they will be read correctly by HfstTransducer(file, type, epsilon).
+    # 
+    # An example:
+    # \verbatim
+    # type = libhfst.FOMA_TYPE
+    # foobar = libhfst.HfstTransducer("foo","bar",type)
+    # epsilon = libhfst.HfstTransducer("@_EPSILON_SYMBOL_@",type)
+    # empty = libhfst.HfstTransducer(type)
+    # a_star = libhfst.HfstTransducer("a",type)
+    # a_star.repeat_star()
+    # 
+    # ofile = open("testfile.att", "wb")
+    # foobar.write_in_att_format(ofile)
+    # ofile.write("--\n")
+    # epsilon.write_in_att_format(ofile)
+    # ofile.write("--\n")
+    # empty.write_in_att_format(ofile)
+    # ofile.write("--\n")
+    # a_star.write_in_att_format(ofile)
+    # ofile.close()
+    # \endverbatim
+    # 
+    # This will yield a file "testfile.att" that looks as follows:
+    # \verbatim
+    # 0    1    foo  bar  0.0
+    # 1    0.0
+    # --
+    # 0    0.0
+    # --
+    # --
+    # 0    0.0
+    # 0    0    a    a    0.0
+    # \endverbatim
+    # 
+    # @throws StreamCannotBeWrittenException 
+    # @throws StreamIsClosedException
+    # 
+    # @see redirect(out, t)
+    # @see HfstTransducer(file, type, epsilon) 
+    def write_in_att_format(ofile, write_weights=True):
+        pass
+
+    ## Write the transducer in AT&T format to file named \a filename. \a write_weights defines whether weights are written.
+    # 
+    # If the file exists, it is overwritten. If the file does not exist, it is created. 
+    def write_in_att_format(filename, write_weights=True):
+        pass
+
+    ## Make priority union of this transducer with \a another.
+    #
+    # For the operation t1.priority_union(t2), the result is a union of t1 and t2,
+    # except that whenever t1 and t2 have the same string on left side,
+    # the path in t2 overrides the path in t1.
+    # 
+    # Example
+    # </verbatim>
+    # Transducer 1 (t1):
+    # a : a
+    # b : b
+    # 
+    # Transducer 2 (t2):
+    # b : B
+    # c : C
+    # 
+    # Result ( t1.priority_union(t2) ):
+    # a : a
+    # b : B
+    # c : C
+    # </endverbatim>
+    # For more information, read: www.fsmbook.com
+    #  
+    def priority_union(another):
+        pass
+    
+    ## Make cross product of this transducer with \a another. It pairs every string of this with every string of \a another.
+    # If strings are not the same length, epsilon padding will be added in the end of the shorter string.
+    # @pre Both transducers must be automata, i.e. map strings onto themselves.
+    def cross_product(another):
+        pass
+    
+    ## Shuffle this transducer with transducer \@ another.
+    # 
+    # If transducer A accepts string "foo" and transducer B string "bar",
+    # the transducer that results from shuffling A and B accepts all strings
+    # [(f|b)(o|a)(o|r)].
+    #   
+    # @pre Both transducers must be automata, i.e. map strings onto themselves.
+    def shuffle(another):
+        pass
+        
+    ## Freely insert symbol pair \a symbol_pair into the transducer. 
+    # 
+    # To each state in this transducer is added a transition that 
+    # leads from that state to itself with input and output symbols 
+    # defined by \a symbol_pair.
+    # @param symbol_pair A string pair to be inserted.
+    def insert_freely(symbol_pair):
+        pass
+    
+    ## Freely insert a copy of \a tr into the transducer. 
+    # 
+    # A copy of \a tr is attached with epsilon transitions 
+    # to each state of this transducer. After the operation, for each 
+    # state S in this transducer, there is an epsilon transition 
+    # that leads from state S to the initial state of \a tr, 
+    # and for each final state of \a tr, there is an epsilon transition
+    # that leads from that final state to state S in this transducer.
+    # The weights of the final states in \a tr are copied to the 
+    # epsilon transitions leading to state S.
+    # 
+    # Implemented only for HfstBasicTransducer. 
+    # Conversion is carried out for an HfstTransducer, if this function
+    # is called.
+    # 
+    def insert_freely(tr):
+        pass
+    
+    ## Set the weights of all final states to \a weight. 
+    # If the HfstTransducer is of unweighted type (#libhfst.SFST_TYPE or #libhfst.FOMA_TYPE), nothing is done.
+    def set_final_weights(float weight):
+        pass
+    
+    ## Push weights towards initial or final state(s) 
+    # as defined by \a type.
+    # 
+    # If the HfstTransducer is of unweighted type 
+    # (#SFST_TYPE or #FOMA_TYPE), nothing is done.
+    # @see libhfst.TO_INITIAL_STATE libhfst.TO_FINAL_STATE
+    # 
+    def push_weights(PushType type):
+        pass
+
+    ## Substitute \a old_symbol with \a new_symbol in all transitions. \a input_side and \a output_side define whether the substitution is made on input and output sides.
+    # @return This transducer.
+    def substitute(old_symbol, new_symbol, input_side=True, output_side=True):
+        pass
+    
+    ## Substitute all transition symbols as defined in \a substitutions.
+    # For each transition symbol x, \a substitutions is searched and if a mapping x -> X is found,
+    # the transition symbol x is replaced with X. If no mapping is found, the transition remains the same.
+    # The weights remain the same.
+    # @param substitutions A dictionary that maps symbols (strings) to symbols (strings).
+    def substitute_symbols(substitutions):
+        pass
+    
+    ## Substitute all transitions as defined in \a substitutions.
+    # For each transition x:y, \a substitutions is searched and if a mapping x:y -> X:Y is found,
+    # the transition x:y is replaced with X:Y. If no mapping is found, the transition remains the same.
+    # The weights remain the same.
+    # @param substitutions A dictionary that maps transitions (string pairs) to transitions (string pairs).
+    def substitute_symbol_pairs(substitutions):
+        pass
+    
+    ## Substitute all transitions \a sp with a set of transitions \a sps.
+    # The weights remain the same.
+    # @param sp A transition (string pair) to be substituted.
+    # @param sps A tuple of substituting transitions (string pairs).
+    def substitute(sp, sps):
+        pass
+    
+    ## Substitute all transitions \a old_pair with \a new_pair.
+    # @param old_pair The transition (string pair) to be substituted.
+    # @param new_pair The substituting transition (string pair).
+    def substitute(old_pair, new_pair):
+        pass
+        
+    ## Substitute all transitions equal to \a sp with a copy of \a transducer
+    #
+    # Copies of \a transducer are attached to this graph with epsilon transitions.
+    #
+    # The weights of the transitions to be substituted are copied
+    # to epsilon transitions leaving from the source state of
+    # the transitions to be substituted to the initial state
+    # of a copy of \a transducer.
+    #
+    # The final weights in \a transducer are copied to epsilon transitions leading from
+    # the final states (after substitution non-final states)
+    # of \a transducer to target states of transitions equal to \a sp
+    # (that are substituted) in this transducer.
+    #
+    # @param sp The transition (string pair) to be substituted.
+    # @param transducer The substituting transducer.
+    def substitute(sp, transducer):
+        pass
