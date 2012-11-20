@@ -53,7 +53,7 @@ ofile.close()
 ifile = open('test.att', 'rb')
 
 try:
-    foo = libhfst.HfstBasicTransducer.read_in_att_format(ifile)
+    foo = libhfst.HfstBasicTransducer(ifile)
     ifile.close()
     os.remove('test.att')
     assert(False)
