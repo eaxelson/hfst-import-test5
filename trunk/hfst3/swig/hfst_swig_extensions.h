@@ -166,5 +166,15 @@ namespace hfst {
   {
     return detokenize_vector(vectorize(htlps));
   }
+
+  HfstPathVector detokenize_and_purge_paths(HfstOneLevelPaths * holps)
+  {
+    return detokenize_vector(purge_flags(vectorize(holps)));
+  }
+
+  HfstPathVector detokenize_and_purge_paths(HfstTwoLevelPaths htlps)
+  {
+    return detokenize_vector(purge_flags(vectorize(htlps)));
+  }
   
 }

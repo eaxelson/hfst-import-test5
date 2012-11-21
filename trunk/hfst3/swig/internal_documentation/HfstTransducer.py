@@ -1,3 +1,16 @@
+## Whether lookup of path \a input will have infinite results.
+#
+# Currently, this function will return whether the transducer
+# is infinitely ambiguous on any lookup path found in the transducer,
+# i.e. the argument \a input is ignored.
+#
+# @todo Do not ignore the argument \a input
+# @see #libhfst.lookup(tok_input, limit=-1)
+def is_lookup_infinitely_ambiguous(tok_input):
+    pass
+
+
+
 ## TODO
 def extract_paths(callback, cycles=-1):
     pass
@@ -93,8 +106,7 @@ def extract_paths(max_num=-1, cycles=-1):
 # @see extract_paths(HfstTwoLevelPaths&, int, int) 
 # void extract_paths_fd
 # (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true) const;
-# 
-# public:
+
 ## Extract a maximum of \a max_num paths that are 
 # recognized by the transducer and are not invalidated by flag 
 # diacritic rules following a maximum of \a cycles cycles
@@ -131,30 +143,54 @@ def extract_paths(max_num=-1, cycles=-1):
 # void extract_paths_fd
 # (HfstTwoLevelPaths &results, int max_num=-1, int cycles=-1, 
 # bool filter_fd=true) const;
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Lookup or apply a single tokenized string \a tok_input and return a maximum of \a limit results.
 # 
-# @brief Lookup or apply a single tokenized string \a s and
-# return a maximum of \a limit results.
-# 
-# This is a version of lookup that handles flag diacritics as ordinary
-# symbols and does not validate the sequences prior to outputting.
-# Currently, this function calls lookup_fd.
+# TODO: This is a version of lookup that handles flag diacritics as ordinary
+# symbols and does not validate the sequences prior to outputting. Currently, this function calls lookup_fd.
 #
-# @todo Handle flag diacritics as ordinary symbols instead of calling
-#       lookup_fd.
+# @todo Handle flag diacritics as ordinary symbols instead of calling lookup_fd.
 # @sa lookup_fd
-# HfstOneLevelPaths * lookup(const StringVector& s,
-# ssize_t limit = -1) const;
+# @return HfstOneLevelPaths pointer
+# @param tok_input A tuple of consecutive symbols (strings).
+# @param limit Number of strings to look up. -1 tries to look up all and may get stuck if infinitely ambiguous.
+def lookup(tok_input, limit=-1):
+    pass
+ 
+# @brief Lookup or apply a single string \a input and return a maximum of \a limit results.
 # 
-# @brief Lookup or apply a single string \a s and
-# return a maximum of \a limit results.
-# 
-# This is an overloaded lookup function that leaves tokenizing to the
-# transducer.
-# HfstOneLevelPaths * lookup(const std::string & s,
-# ssize_t limit = -1) const;
-# 
-# @brief Lookup or apply a single string \a s minding flag diacritics
-# properly and store a maximum of \a limit results to \a results.
+# This is an overloaded lookup function that leaves tokenizing to the transducer.
+# @return HfstOneLevelPaths pointer
+# @see #lookup(tok_string, limit=-1)
+def lookup(input, limit=-1):
+    pass
+
+## Lookup or apply a single string \a input and return a maximum of \a limit results. \a tok defined how \a s is tokenized.
+#
+# This is an overloaded lookup function that leaves tokenizing to \a tok.
+# @return HfstOneLevelPaths pointer
+# @see #lookup(tok_string, limit=-1)
+def lookup(tok, input, limit=-1):
+    pass
+
+
+## Lookup or apply a single string \a tok_input minding flag diacritics properly and return a maximum of \a limit results.
 #
 # Traverse all paths on logical first level of the transducer to produce
 # all possible outputs on the second.
@@ -164,67 +200,40 @@ def extract_paths(max_num=-1, cycles=-1):
 # This is a version of lookup that handles flag diacritics as epsilons
 # and validates the sequences prior to outputting.
 # Epsilons on the second level are represented by empty strings
-# in \a results. For an example of flag diacritics, see
-# #hfst::HfstTransducer::extract_paths_fd(hfst::HfstTwoLevelPaths&, int, int, bool) const
-# 
+# in the results.
 #
-# @pre The transducer must be of type #HFST_OL_TYPE or #HFST_OLW_TYPE.
-#      This function is not implemented for other transducer types.
+# @pre The transducer must be of type #libhfst.HFST_OL_TYPE or #libhfst.HFST_OLW_TYPE. This function is not implemented for other transducer types.
 #
-# @param s  String to look up. The weight is ignored.
-# @param limit  (Currently ignored.) Number of strings to look up. 
-#               -1 tries to look up all and may get stuck 
-#               if infinitely ambiguous.
-# \return{A pointer to a HfstOneLevelPaths container allocated by callee}
+# @param tok_input  A tuple of consecutive symbols (strings) to look up.
+# @param limit  (Currently ignored.) Number of strings to look up. -1 tries to look up all and may get stuck if infinitely ambiguous.
 # 
-# @see HfstTokenizer::tokenize_one_level
-# @see is_lookup_infinitely_ambiguous(const StringVector&) const
+# @see #libhfst.is_lookup_infinitely_ambiguous
+# @return HfstOneLevelPaths pointer
 #
 # @todo Do not ignore argument \a limit.
-#
-# HfstOneLevelPaths * lookup_fd(const StringVector& s,
-# ssize_t limit = -1) const;
+def lookup_fd(tok_input, limit = -1):
+    pass
  
-# @brief Lookup or apply a single string \a s minding flag diacritics
-# properly and store a maximum of \a limit results to \a results.
+## Lookup or apply a single string \a s minding flag diacritics properly and return a maximum of \a limit results.
 #
-# This is an overloaded lookup_fd that leaves tokenizing to the
-# transducer.
+# This is an overloaded lookup function that leaves tokenizing to the transducer.
+# @return HfstOneLevelPaths pointer
+# @see #lookup(tok_string, limit=-1)
+def lookup_fd(input, limit = -1):
+    pass
+
+ 
+## Lookup or apply a single string \a input minding flag diacritics properly and return a maximum of \a limit results. \a tok defines how s is tokenized.
 #
-# @param s  String to look up. The weight is ignored.
-# @param limit  (Currently ignored.) Number of strings to look up. 
-#               -1 tries to look up all and may get stuck 
-#               if infinitely ambiguous.
-# \return{A pointer to a HfstOneLevelPaths container allocated by callee}
-#
-#
-#@sa lookup_fd
-# HfstOneLevelPaths * lookup_fd(const std::string& s,
-# ssize_t limit = -1) const;
-# 
-# @brief Lookup or apply a single string \a s and store a maximum of 
-# \a limit results to \a results. \a tok defined how \a s is tokenized.
-#
-#
-# This function is the same as 
-# #lookup(const StringVector&, ssize_t) const
-# but lookup is not done using a string and a tokenizer instead of
-# a StringVector.
-# HfstOneLevelPaths * lookup(const HfstTokenizer& tok,
-# const std::string &s, ssize_t limit = -1) const;
-# 
-# @brief Lookup or apply a single string \a s minding flag diacritics 
-# properly and store a maximum of \a limit results to \a results. 
-# \a tok defines how s is tokenized.
-#
-# The same as 
-# #lookup_fd(const StringVector&, ssize_t) const 
-# but uses a tokenizer and a string instead of a StringVector.
-#
-# HfstOneLevelPaths * lookup_fd(
-# const HfstTokenizer& tok,
-# const std::string &s, ssize_t limit = -1) const;
-# 
+# This is an overloaded lookup function that leaves tokenizing to \a tok.
+# @return HfstOneLevelPaths pointer
+# @see #lookup(tok_string, limit=-1)
+def lookup_fd(tok, input, limit = -1):
+    pass
+
+
+
+ 
 # @brief (Not implemented) Lookdown a single string \a s and return 
 # a maximum of \a limit results.
 #
@@ -253,15 +262,7 @@ def extract_paths(max_num=-1, cycles=-1):
 # HfstOneLevelPaths * lookdown_fd(StringVector& s,
 # ssize_t limit = -1) const;
 # 
-# @brief Whether lookup of path \a s will have infinite results.
-#
-# Currently, this function will return whether the transducer
-# is infinitely ambiguous on any lookup path found in the transducer,
-# i.e. the argument \a s is ignored.
-#
-# @todo Do not ignore the argument s
-# @see lookup(HfstOneLevelPaths&, const StringVector&, ssize_t) const
-# bool is_lookup_infinitely_ambiguous(const StringVector& s) const;
+
 # 
 # @brief (Not implemented) Whether lookdown of path \a s will have
 # infinite results.
@@ -289,11 +290,12 @@ def extract_paths(max_num=-1, cycles=-1):
 # static HfstTransducer identity_pair ( ImplementationType type )
 
 
-## Compile a lexc file in file \a filename into an HfstTransducer
-# of type \a type and return the transducer. 
-# static HfstTransducer * read_lexc(const std::string &filename,
-# ImplementationType type)
-# 
+## Compile a lexc file in file \a filename into an HfstTransducer of type \a type and return the transducer.
+# This function is a static one.
+def read_lexc(filename, type):
+    pass
+
+ 
 # // *** For commandline programs. ***
 # 
 # /* For each flag diacritic fd that is included in the alphabet of
@@ -312,7 +314,7 @@ def extract_paths(max_num=-1, cycles=-1):
 # 
 # void harmonize_flag_diacritics(HfstTransducer &another,
 # bool insert_renamed_flags=true)
-# 
+#
 # /* Whether the alphabet of transducer \a another includes flag diacritics
 # that are not included in the alphabet of this transducer. 
 # bool check_for_missing_flags_in(const HfstTransducer &another) const;
@@ -320,40 +322,12 @@ def extract_paths(max_num=-1, cycles=-1):
 # /* Return true if \a this has flag diacritics in the alphabet. 
 # bool has_flag_diacritics(void) const; 
   
-## A namespace for functions that create two-level, replace, 
-# restriction and coercion rule transducers. 
-# namespace rules
-# {
-# enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT,
-# REPL_DOWN_KARTTUNEN};
-# enum TwolType {twol_right, twol_left, twol_both};
-# 
-# /* helping methods 
-# HfstTransducer universal_fst
-# (const StringPairSet &alphabet, ImplementationType type)
-# HfstTransducer negation_fst
-# (const HfstTransducer &t, const StringPairSet &alphabet)
-# 
-# HfstTransducer replace
-# (HfstTransducer &t, ReplaceType repl_type, bool optional, 
-# StringPairSet &alphabet)
-# HfstTransducer replace_transducer
-# (HfstTransducer &t, std::string lm, std::string rm, 
-# ReplaceType repl_type, StringPairSet &alphabet)
-# HfstTransducer replace_context
-# (HfstTransducer &t, std::string m1, std::string m2, 
-# StringPairSet &alphabet)
-# HfstTransducer replace_in_context
-# (HfstTransducerPair &context, ReplaceType repl_type, 
-# HfstTransducer &t, bool optional, StringPairSet &alphabet)
-# 
-# /* Used by hfst-calculate. 
-# HfstTransducer restriction
-# (HfstTransducerPairVector &contexts, HfstTransducer &mapping, 
-# StringPairSet &alphabet,        TwolType twol_type, int direction ) 
-# 
-# 
-# 
+
+
+
+ 
+ 
+ 
 # // ***** THE PUBLIC INTERFACE *****
 # 
 ## A transducer that obligatorily performs the mappings 

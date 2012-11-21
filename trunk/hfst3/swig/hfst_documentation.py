@@ -167,15 +167,6 @@ class HfstFile:
 def hfst_open(filename, args):
     pass
 
-## Extract a maximum of \a max_num paths in \a transducer following a maximum of \a cycles cycles
-# @return HfstTwoLevelPaths
-def extract_paths(transducer, max_num=-1, cycles=-1):
-    pass
-## Extract a maximum of \a max_num paths that obey flag diacritics in \a transducer following a maximum of \a cycles cycles, \a filter_fd defines whether flags are filtered
-# @return HfstTwoLevelPaths
-def extract_paths_fd(transducer, max_num=-1, cycles=-1, filter_fd=False):
-    pass
-
 
 ## A simple transducer class with tropical weights.
 #
@@ -1155,3 +1146,217 @@ class HfstTransducer:
     # @param transducer The substituting transducer.
     def substitute(sp, transducer):
         pass
+
+    ## Lookup or apply a single tokenized string \a tok_input and return a maximum of \a limit results.
+    # 
+    # TODO: This is a version of lookup that handles flag diacritics as ordinary
+    # symbols and does not validate the sequences prior to outputting. Currently, this function calls lookup_fd.
+    #
+    # @todo Handle flag diacritics as ordinary symbols instead of calling lookup_fd.
+    # @sa lookup_fd
+    # @return HfstOneLevelPaths pointer
+    # @param tok_input A tuple of consecutive symbols (strings).
+    # @param limit Number of strings to look up. -1 tries to look up all and may get stuck if infinitely ambiguous.
+    def lookup(tok_input, limit=-1):
+        pass
+    
+    # @brief Lookup or apply a single string \a input and return a maximum of \a limit results.
+    # 
+    # This is an overloaded lookup function that leaves tokenizing to the transducer.
+    # @return HfstOneLevelPaths pointer
+    # @see #lookup(tok_string, limit=-1)
+    def lookup(input, limit=-1):
+        pass
+    
+    ## Lookup or apply a single string \a input and return a maximum of \a limit results. \a tok defined how \a s is tokenized.
+    #
+    # This is an overloaded lookup function that leaves tokenizing to \a tok.
+    # @return HfstOneLevelPaths pointer
+    # @see #lookup(tok_string, limit=-1)
+    def lookup(tok, input, limit=-1):
+        pass
+    
+    
+    ## Lookup or apply a single string \a tok_input minding flag diacritics properly and return a maximum of \a limit results.
+    #
+    # Traverse all paths on logical first level of the transducer to produce
+    # all possible outputs on the second.
+    # This is in effect a fast composition of single path from left
+    # hand side.
+    #
+    # This is a version of lookup that handles flag diacritics as epsilons
+    # and validates the sequences prior to outputting.
+    # Epsilons on the second level are represented by empty strings
+    # in the results.
+    #
+    # @pre The transducer must be of type #libhfst.HFST_OL_TYPE or #libhfst.HFST_OLW_TYPE. This function is not implemented for other transducer types.
+    #
+    # @param tok_input  A tuple of consecutive symbols (strings) to look up.
+    # @param limit  (Currently ignored.) Number of strings to look up. -1 tries to look up all and may get stuck if infinitely ambiguous.
+    # 
+    # @see #libhfst.is_lookup_infinitely_ambiguous
+    # @return HfstOneLevelPaths pointer
+    #
+    # @todo Do not ignore argument \a limit.
+    def lookup_fd(tok_input, limit = -1):
+        pass
+    
+    ## Lookup or apply a single string \a s minding flag diacritics properly and return a maximum of \a limit results.
+    #
+    # This is an overloaded lookup function that leaves tokenizing to the transducer.
+    # @return HfstOneLevelPaths pointer
+    # @see #lookup(tok_string, limit=-1)
+    def lookup_fd(input, limit = -1):
+        pass
+    
+    
+    ## Lookup or apply a single string \a input minding flag diacritics properly and return a maximum of \a limit results. \a tok defines how s is tokenized.
+    #
+    # This is an overloaded lookup function that leaves tokenizing to \a tok.
+    # @return HfstOneLevelPaths pointer
+    # @see #lookup(tok_string, limit=-1)
+    def lookup_fd(tok, input, limit = -1):
+        pass
+
+    ## Whether lookup of path \a input will have infinite results.
+    #
+    # Currently, this function will return whether the transducer
+    # is infinitely ambiguous on any lookup path found in the transducer,
+    # i.e. the argument \a input is ignored.
+    #
+    # @todo Do not ignore the argument \a input
+    # @see #libhfst.lookup(tok_input, limit=-1)
+    def is_lookup_infinitely_ambiguous(tok_input):
+        pass
+
+
+## Return the HfstTransducer pointed by \a transducer_ptr.
+def ptrvalue(transducer_ptr):
+    pass
+
+## Extract a maximum of \a max_num paths that are recognized by \a transducer following a maximum of \a cycles cycles.
+# 
+# @return An HfstTwoLevelPaths that contains the extracted paths.
+# @param max_num The total number of resulting strings is capped at \a max_num, with 0 or negative indicating unlimited. 
+# @param cycles Indicates how many times a cycle will be followed, with negative numbers indicating unlimited.
+# 
+# This is a version of extract_paths that handles flag diacritics 
+# as ordinary symbols and does not validate the sequences prior to
+# outputting as opposed to #libhfst.extract_paths_fd(transducer, int, int, bool)
+# 
+# If this function is called on a cyclic transducer with unlimited
+# values for both \a max_num and \a cycles, an exception will be thrown.
+# 
+# This example
+# 
+# \verbatim
+# type = libhfst.SFST_TYPE
+# tr1 = libhfst.HfstTransducer("a", "b", type)
+# tr1.repeat_star()
+# tr2 = libhfst.HfstTransducer("c", "d", type)
+# tr2.repeat_star()
+# tr1.concatenate(tr2).minimize()
+# results = libhfst.detokenize_paths(libhfst.extract_paths(tr1, MAX_NUM, CYCLES))
+# 
+# for path in results:
+#     print "%s : &s" % (path.input, path.output)
+# \endverbatim
+# 
+# prints with values MAX_NUM == -1 and CYCLES == 1 all paths
+# that have no consecutive cycles:
+# 
+# \verbatim
+# a : b
+# ac : bd
+# acc : bdd
+# c : d
+# cc : dd
+# \endverbatim
+# 
+# and with values MAX_NUM == 7 and CYCLES == 2 a maximum of 7 paths
+# that follow a cycle a maximum of 2 times (there are 11 such paths,
+# but MAX_NUM limits their number to 7):
+# 
+# \verbatim
+# a : b
+# aa : bb
+# aac : bbd
+# aacc : bbdd
+# c : d
+# cc : dd
+# ccc : ddd
+# \endverbatim
+# 
+# @bug Does not work for HFST_OL_TYPE or HFST_OLW_TYPE?
+# @throws TransducerIsCyclicException
+# @see #n_best 
+# @see libhfst.extract_paths_fd(transducer, max_num=-1, cycles=-1, filter_fd)
+# 
+def extract_paths(transducer, max_num=-1, cycles=-1):
+    pass
+
+## Extract a maximum of \a max_num paths that are recognized by the transducer and are not invalidated by flag diacritic rules following a maximum of \a cycles cycles. \a filter_fd defines whether the flag diacritics themselves are filtered out of the result strings.
+#
+# @return An HfstTwoLevelPaths that contains the extracted paths.
+# @param max_num The total number of resulting strings is capped at \a max_num, with 0 or negative indicating unlimited. 
+# @param cycles Indicates how many times a cycle will be followed, with negative numbers indicating unlimited.
+# @param filter_fd  Whether the flag diacritics are filtered out of the result strings.
+# 
+# If this function is called on a cyclic transducer with unlimited
+# values for both \a max_num and \a cycles, an exception will be thrown.
+# 
+# Flag diacritics are of the form @[PNDRCU][.][A-Z]+([.][A-Z]+)?@. 
+# 
+# For example the transducer 
+# 
+# \verbatim
+# [[@U.FEATURE.FOO@ foo] | [@U.FEATURE.BAR@ bar]]  |  [[foo @U.FEATURE.FOO@] | [bar @U.FEATURE.BAR@]]
+# \endverbatim
+# 
+# will yield the paths <CODE>[foo foo]</CODE> and <CODE>[bar bar]</CODE>.
+# <CODE>[foo bar]</CODE> and <CODE>[bar foo]</CODE> are invalidated
+# by the flag diacritics so thay will not be included in \a results.
+# 
+# 
+# @bug Does not work for HFST_OL_TYPE or HFST_OLW_TYPE?
+# @throws TransducerIsCyclicException
+# @see libhfst.extract_paths(transducer, max_num=-1, cycles=-1) 
+def extract_paths_fd(transducer, max_num=-1, cycles=-1, filter_fd=False):
+    pass
+
+## Detokenize \a tokenized_paths.
+#
+# Concatenate all transition symbols on input and output levels for each path in \a tokenized_paths.
+# 
+# @param tokenized_paths An HfstOneLevelPaths pointer or an HfstTwoLevelPaths.
+# @return A tuple of HfstPaths.
+def detokenize_paths(tokenized_paths):
+    pass
+
+## Detokenize and remove all flag diacritics from \a tokenized_paths.
+#
+# Concatenate all transition symbols except flag diacritics on input and output levels for each path in \a tokenized_paths.
+# 
+# @param tokenized_paths An HfstOneLevelPaths pointer or an HfstTwoLevelPaths.
+# @return A tuple of HfstPaths.
+def detokenize_and_purge_paths(tokenized_paths):
+    pass
+
+
+ 
+# TODO: void extract_random_paths
+# (HfstTwoLevelPaths &results, int max_num) const;
+# 
+# void extract_random_paths_fd
+# (HfstTwoLevelPaths &results, int max_num, bool filter_fd) const;
+# 
+# /* \brief Call \a callback with extracted strings that are not 
+# invalidated by flag diacritic rules.
+# 
+# @see extract_paths(HfstTwoLevelPaths&, int, int) 
+# void extract_paths_fd
+# (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true) const;
+
+
+ 
+
