@@ -9,47 +9,159 @@
 class HfstPath:
     pass
 
-## A superclass for all exceptions
+## Base class for HfstExceptions. Holds its own name and the file and line number where it was thrown.
 class HfstException:
     pass
 
-## documentation (todo)
+## Two or more HfstTransducers are not of the same type.
 class HfstTransducerTypeMismatchException(HfstException):
     pass
 
-## documentation (todo)
+## The library required by the implementation type requested is not linked to HFST. 
+# 
+# An example:
+# \verbatim
+# try:
+#     tr = libhfst.HfstTransducer("foo", "bar", type)
+# except ImplementationTypeNotAvailableException:
+#     print "ERROR: Type requested is not available."
+# \endverbatim
 class ImplementationTypeNotAvailableException(HfstException):
     pass
 
-## documentation (todo)
+## Function has not been implemented (yet).
 class FunctionNotImplementedException(HfstException):
     pass
 
-## documentation (todo)
+## Stream cannot be read. 
+# 
+# Thrown by
+# libhfst.HfstTransducer(in) and
+# libhfst.HfstTransducer(file, type, epsilon)
+# 
+# An example:
+# \verbatim
+# try;
+#     in = libhfst.HfstInputStream("foofile")
+# except StreamNotReadableException:
+#     print "ERROR: file cannot be read."
+# \endverbatim
 class StreamNotReadableException(HfstException):
     pass
 
-## documentation (todo)
+## Stream cannot be written. 
+# 
+# Thrown by #HfstOutputStream.redirect and #hfst_documentation.HfstTransducer.write_in_att_format
+# 
+# An example:
+# \verbatim
+# try:
+#     tr = libhfst.HfstTransducer("foo", libhfst.FOMA_TYPE)
+#     out = HfstOutputStream("testfile")
+#     out.redirect(tr)
+# except StreamCannotBeWrittenException e:
+#     print "ERROR: file cannot be written."
+# \endverbatim
 class StreamCannotBeWrittenException(HfstException):
     pass
 
-## documentation (todo)
+## Stream is closed. 
+# 
+# Thrown by #hfst_documentation.HfstTransducer.write_in_att_format
+# #hfst_documentation.HfstTransducer(file, type, epsilon)
+# #hfst_documentation.HfstTransducer
+# #HfstOutputStream::redirect
+# 
+# An example:
+# 
+# \verbatim
+# try:
+#     tr = libhfst.HfstTransducer("foo", tropical.TROPICAL_OPENFST_TYPE)
+#     out = libhfst.HfstOutputStream("testfile")
+#     out.close()
+#     out,redirect(tr)
+# except StreamIsClosedException:
+#     print "ERROR: stream to file is closed."
+# \endverbatim
 class StreamIsClosedException(HfstException):
     pass
 
-## documentation (todo)
+## The stream is at end.
+# 
+#     Thrown by
+#     #hfst_documentation.HfstTransducer(in)
+#     #hfst_documentation.HfstInputStream.__init__
 class EndOfStreamException(HfstException):
     pass
 
-## documentation (todo)
+## Transducer is cyclic. 
+# 
+#     Thrown by #hfst_documentation.extract_paths and
+#     #hfst_documentation.extract_paths_fd. An example:
+# \verbatim
+# transducer = libhfst.HfstTransducer("a", "b", libhfst.TROPICAL_OPENFST_TYPE)
+# transducer.repeat_star()
+# try:
+#     results = libhfst.detokenize_paths(libhfst.extract_paths())
+#     print "The transducer has %i paths" % len(results)
+# except TransducerIsCyclicException:
+#     print "The transducer is cyclic and has an infinite number of paths."
+# \endverbatim
 class TransducerIsCyclicException(HfstException):
     pass
 
-## documentation (todo)
+## The stream does not contain transducers. 
+# 
+#     Thrown by 
+#     #hfst_documentation.HfstTransducer(istr)
+#     #hfst_documentation.HfstInputStream.__init__
+# 
+#     An example. The file "foofile" contains
+# \verbatim
+# This is a text file.
+# Here is another line.
+# The file ends here.
+# \endverbatim
+# 
+# When we try to read it, an exception will be thrown:
+# 
+# \verbatim
+# try:
+#     in = libhfst.HfstInputStream("foofile")
+# except NotTransducerStreamException:
+#     print "ERROR: file does not contain transducers."
+# \endverbatim
 class NotTransducerStreamException(HfstException):
     pass
 
-## documentation (todo)
+## The stream is not in valid AT&T format. 
+# 
+#     An example. The file "testfile.att" contains
+# 
+# \verbatim
+# 0       1       a      b
+# 1
+# c
+# \verbatim
+# 
+# When we try to read it, an exception is thrown:
+# 
+# \verbatim
+# transducers = []
+# ifile = open("testfile.att", "rb")
+# try:
+#     while not ifile.eof():    
+#         t = libhfst.HfstTransducer(ifile, libhfst.TROPICAL_OPENFST_TYPE, "epsilon")
+#         transducers.append(t)
+#         print "read one transducer"
+# except NotValidAttFormatException:
+#     print "Error reading transducer: not valid AT&T format."
+# ifile.close()
+# print "Read %i transducers in total." % len(transducers)
+# \endverbatim
+#
+#     thrown by 
+#     #hfst_documentation.HfstTransducer(file, type, epsilon)
 class NotValidAttFormatException(HfstException):
     pass
 
@@ -57,63 +169,156 @@ class NotValidAttFormatException(HfstException):
 class NotValidLexcFormatException(HfstException):
     pass
 
-## documentation (todo)
+## State is not final (and cannot have a final weight). 
+# 
+#     An example:
+# 
+# \verbatim
+# tr = libhfst.HfstBasicTransducer()
+# tr.add_state(1)
+# # An exception is thrown as state number 1 is not final
+# w = tr.get_final_weight(1)
+# \endverbatim
+# 
+# You should use function #hfst_documentation.HfstBasicTransducer.is_final_state if you are not sure whether a
+# state is final.
+# 
+# Thrown by #hfst_documentation.HfstBasicTransducer get_final_weight.
 class StateIsNotFinalException(HfstException):
     pass
 
-## documentation (todo)
+## Context transducers are not automata.
+# 
+#     This exception is thrown by
+#     #replace_up(contexts, mapping, optional, alphabet)
+#     when either context transducer does not have equivalent input and
+#     output symbols in all its transitions.
+# 
+#     An example:
+# 
+# \verbatim
+# type = libhfst.SFST_TYPE
+# # The second context transducer is 
+# contexts = (libhfst.HfstTransducer("c", type), libhfst.HfstTransducer("c", "d", type))
+# mapping = libhfst.HfstTransducer("a", "b", type)
+# alphabet = ('a','a'), ('b','b'), ('c','c'), ('d','d')
+# # An exception is thrown
+# rule = libhfst.replace_up(contexts, mapping, True, alphabet)
+# \endverbatim
 class ContextTransducersAreNotAutomataException(HfstException):
     pass
 
-## documentation (todo)
+## Transducers are not automata.
+# 
+#     This exception is thrown by
+#     #cross_product(transducer) 
+#     when either input transducer does not have equivalent input and
+#     output symbols in all its transitions.
 class TransducersAreNotAutomataException(HfstException):
     pass
 
-## documentation (todo)
+## The state number argument is not valid.
+# 
+#     An example:
+# 
+# \verbatim
+# tr = libhfst.HfstBasicTransducer()
+# tr.add_state(1)
+# # An exception is thrown as there is no state number 2
+# w = tr.get_final_weight(2)
+# \endverbatim
 class StateIndexOutOfBoundsException(HfstException):
     pass
 
-## documentation (todo)
+## Transducer has a malformed HFST header. 
+# 
+#     Thrown by hfst::HfstTransducer(HfstInputStream&)
+#     hfst::HfstInputStream()
+#     hfst::HfstInputStream(const std::string&)
 class TransducerHeaderException(HfstException):
     pass
 
-## documentation (todo)
+## An OpenFst transducer does not have an input symbol table. 
+# 
+#     When converting from OpenFst to tropical or log HFST, the OpenFst transducer
+#     must have at least an input symbol table. If the output symbol table
+#     is missing, it is assumed to be equivalent to the input symbol table.
+# 
+#     Thrown by hfst::HfstTransducer(HfstInputStream&)
 class MissingOpenFstInputSymbolTableException(HfstException):
     pass
 
-## documentation (todo)
+## Two or more transducers do not have the same type.
+# 
+#     This can happen if (1) the calling and called transducer in a binary
+#     operation, (2) two transducers in a pair of transducers,
+#     (3) two consecutive transducers coming from an HfstInputStream or
+#     (4) two transducers in a function taking two or more transducers as
+#     arguments do not have the same type.
+# 
+#     Thrown e.g. by
+#     HfstTransducer::disjunct(const HfstTransducer&)
+#     rules::two_level_if
+#     HfstTransducer(HfstInputStream&)
+# 
+# An example:
+# \verbatim
+# foo = libhfst.HfstTransducer("foo", libhfst.SFST_TYPE)
+# bar = libhfst.HfstTransducer("bar", libhfst.FOMA_TYPE)
+# foo.disjunct(bar)   # an exception is thrown 
+# \endverbatim
 class TransducerTypeMismatchException(HfstException):
     pass
 
-## documentation (todo)
+## TODO: The set of transducer pairs is empty. 
+# 
+#     Thrown by rule functions. An example:
+# 
+# \verbatim
+#     contexts = ,  # contexts is empty
+#     restr = libhfst.restriction(contexts, mapping, alphabet, twol_type, direction); 
+# \endverbatim
 class EmptySetOfContextsException(HfstException):
     pass
 
-## documentation (todo)
+## The type of a transducer is not specified.
+# 
+#    This exception is thrown when an implementation type argument
+#    is ERROR_TYPE.
 class SpecifiedTypeRequiredException(HfstException):
     pass
 
-## documentation (todo)
+## An error happened probably due to a bug in the HFST code.
 class HfstFatalException(HfstException):
     pass
 
-## documentation (todo)
+## Transducer has wrong type. 
+# 
+#     This exception suggests that an HfstTransducer has not been properly
+#     initialized, probably due to a bug in the HFST library. Alternatively
+#     the default constructor of HfstTransducer has been called at some point. 
+# 
+#     @see hfst::HfstTransducer()
 class TransducerHasWrongTypeException(HfstException):
     pass
 
-## documentation (todo)
+## String is not valid utf-8. 
+# 
+#     This exception suggests that an input string is not valid utf8.
+# 
 class IncorrectUtf8CodingException(HfstException):
     pass
 
-## documentation (todo)
+## An argument string is an empty string.
+# A transition symbol cannot be an empty string.
 class EmptyStringException(HfstException):
     pass
 
-## documentation (todo)
+## A bug in the HFST code.
 class SymbolNotFoundException(HfstException):
     pass
 
-## documentation (todo)
+## A piece of metadata in an HFST header is not supported.
 class MetadataException(HfstException):
     pass
 
@@ -722,7 +927,7 @@ class HfstTransducer:
     # @throws StreamNotReadableException
     # @throws StreamIsClosedException
     # @throws EndOfStreamException
-    # @see #hfst_documentation.write_in_att_format 
+    # @see #write_in_att_format 
     # 
     # HfstTransducer(HfstFile &ifile, ImplementationType type, const std::string &epsilon_symbol)
     def __init__(self, ifile, type, epsilon_symbol):
@@ -742,9 +947,10 @@ class HfstTransducer:
         pass
  
     ## Create a transducer that recognizes the concatenation of the unions of string pairs in string pair sets in \a spsv. The type of the transducer is defined by \a type. 
-    # @param spvs A tuple of tuples of string input/output pairs.
+    # @param spsv A tuple of tuples of string input/output pairs.
     # @param type The type of the transducer.
-    def __init__(self, spsv, type)
+    def __init__(self, spsv, type):
+        pass
 
     ## Rename the transducer \a name. 
     # @see get_name 
@@ -919,6 +1125,7 @@ class HfstTransducer:
     # 
     # @pre The transducers in \a v are deterministic and epsilon-free.
     # @param v A tuple of transducers.
+    # @param invert Whether the intersection of the transducers in \a v is composed with this transducer.
     def compose_intersect(v, invert=False):
         pass
     
@@ -944,13 +1151,13 @@ class HfstTransducer:
     # all weights are lost. In the reverse case, all weights are initialized to the 
     # semiring's one. 
     # 
-    # A transducer of type #libhfst.SFST_TYPE, #libhfst.TROPICAL_OPENFST_TYPE,
-    # #libhfst.LOG_OPENFST_TYPE or #FOMA_TYPE can be converted into an 
-    # #libhfst.HFST_OL_TYPE or #libhfst.HFST_OLW_TYPE transducer, but an #libhfst.HFST_OL_TYPE
-    # or #libhfst.HFST_OLW_TYPE transducer cannot be converted to any other type.
+    # A transducer of type #hfst_documentation.SFST_TYPE, #hfst_documentation.TROPICAL_OPENFST_TYPE,
+    # #hfst_documentation.LOG_OPENFST_TYPE or #hfst_documentation.FOMA_TYPE can be converted into an 
+    # #hfst_documentation.HFST_OL_TYPE or #hfst_documentation.HFST_OLW_TYPE transducer, but an #hfst_documentation.HFST_OL_TYPE
+    # or #hfst_documentation.HFST_OLW_TYPE transducer cannot be converted to any other type.
     # 
     # @note For conversion between HfstBasicTransducer and HfstTransducer,
-    # see #HfstTransducer(t, type) and #HfstBasicTransducer(transducer).
+    # see #hfst_documentation.HfstTransducer(t, type) and #HfstBasicTransducer(transducer).
     def convert(type, options=""):
         pass
     
@@ -999,7 +1206,7 @@ class HfstTransducer:
     # @throws StreamCannotBeWrittenException 
     # @throws StreamIsClosedException
     # 
-    # @see redirect(out, t)
+    # @see HfstOutputStream.redirect(t)
     # @see HfstTransducer(file, type, epsilon) 
     def write_in_att_format(ofile, write_weights=True):
         pass
@@ -1017,7 +1224,7 @@ class HfstTransducer:
     # the path in t2 overrides the path in t1.
     # 
     # Example
-    # </verbatim>
+    # <\verbatim>
     # Transducer 1 (t1):
     # a : a
     # b : b
@@ -1030,7 +1237,7 @@ class HfstTransducer:
     # a : a
     # b : B
     # c : C
-    # </endverbatim>
+    # <\endverbatim>
     # For more information, read: www.fsmbook.com
     #  
     def priority_union(another):
@@ -1042,7 +1249,7 @@ class HfstTransducer:
     def cross_product(another):
         pass
     
-    ## Shuffle this transducer with transducer \@ another.
+    ## Shuffle this transducer with transducer \a another.
     # 
     # If transducer A accepts string "foo" and transducer B string "bar",
     # the transducer that results from shuffling A and B accepts all strings
@@ -1080,7 +1287,7 @@ class HfstTransducer:
         pass
     
     ## Set the weights of all final states to \a weight. 
-    # If the HfstTransducer is of unweighted type (#libhfst.SFST_TYPE or #libhfst.FOMA_TYPE), nothing is done.
+    # If the HfstTransducer is of unweighted type (#hfst_documentation.SFST_TYPE or #hfst_documentation.FOMA_TYPE), nothing is done.
     def set_final_weights(float weight):
         pass
     
@@ -1189,12 +1396,12 @@ class HfstTransducer:
     # Epsilons on the second level are represented by empty strings
     # in the results.
     #
-    # @pre The transducer must be of type #libhfst.HFST_OL_TYPE or #libhfst.HFST_OLW_TYPE. This function is not implemented for other transducer types.
+    # @pre The transducer must be of type #hfst_documentation.HFST_OL_TYPE or #hfst_documentation.HFST_OLW_TYPE. This function is not implemented for other transducer types.
     #
     # @param tok_input  A tuple of consecutive symbols (strings) to look up.
     # @param limit  (Currently ignored.) Number of strings to look up. -1 tries to look up all and may get stuck if infinitely ambiguous.
     # 
-    # @see #libhfst.is_lookup_infinitely_ambiguous
+    # @see #is_lookup_infinitely_ambiguous
     # @return HfstOneLevelPaths pointer
     #
     # @todo Do not ignore argument \a limit.
@@ -1225,8 +1432,13 @@ class HfstTransducer:
     # i.e. the argument \a input is ignored.
     #
     # @todo Do not ignore the argument \a input
-    # @see #libhfst.lookup(tok_input, limit=-1)
+    # @see #lookup(tok_input, limit=-1)
     def is_lookup_infinitely_ambiguous(tok_input):
+        pass
+
+    ## Compile a lexc file in file \a filename into an HfstTransducer of type \a type and return the transducer.
+    # This function is a static one.  
+    def read_lexc(filename, type):
         pass
 
 
@@ -1289,7 +1501,7 @@ def ptrvalue(transducer_ptr):
 # 
 # @bug Does not work for HFST_OL_TYPE or HFST_OLW_TYPE?
 # @throws TransducerIsCyclicException
-# @see #n_best 
+# @see #hfst_documentation.HfstTransducer.n_best 
 # @see libhfst.extract_paths_fd(transducer, max_num=-1, cycles=-1, filter_fd)
 # 
 def extract_paths(transducer, max_num=-1, cycles=-1):
@@ -1358,5 +1570,317 @@ def detokenize_and_purge_paths(tokenized_paths):
 # (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true) const;
 
 
- 
+##  A stream for reading HFST binary transducers. 
+#
+# An example:
+# \verbatim
+# in = 0
+# try:
+#     in = libhfst.HfstInputStream("testfile") 
+# except StreamNotReadableException: 
+#     print "ERROR: File does not exist."
+#     exit()
+#
+# transducers_read = 0
+#
+# while not in.is_eof(): 
+#     if in.is_bad():
+#         print "ERROR: Stream cannot be read."
+#         exit(1) 
+#     t = libhfst.HfstTransducer(in)
+#     print "One transducer succesfully read."
+#     transducers_read++
+#
+# print "Read %i transducers in total" % transducers_read
+# in.close()
+#\endverbatim
+#
+# For documentation on the HFST binary transducer format, see
+# <a href="HeaderFormatAndConversions.html">here</a>.
+#
+# @see HfstTransducer::HfstTransducer(HfstInputStream &in)
+class HfstInputStream:
+
+    ##  Create a stream to standard input for reading binary transducers. 
+    #
+    # @throws StreamNotReadableException 
+    # @throws NotTransducerStreamException
+    # @throws EndOfStreamException
+    # @throws TransducerHeaderException
+    def __init__(self):
+        pass
+
+    ##  Open a stream to file \a filename for reading binary transducers. 
+    #
+    # @pre The file exists. Otherwise, a StreamNotReadableException is thrown.
+    # @throws StreamNotReadableException 
+    # @throws NotTransducerStreamException
+    # @throws EndOfStreamException
+    # @throws TransducerHeaderException
+    def __init__(self, filename):
+        pass
+
+    ##  Close the stream.
+    #
+    # If the stream points to standard input, nothing is done.
+    def close():
+        pass
+
+    ##  Whether the stream is at end.
+    def is_eof():
+        pass
+
+    ##  Whether badbit is set.
+    def is_bad():
+        pass
+
+    ##  Whether the state of the stream is good for input operations.
+    def is_good():
+        pass
+    
+    ## The type of the first transducer in the stream. 
+    #
+    # By default, all transducers in a stream have the same type, else
+    # a TransducerTypeMismatchException is thrown when reading the first
+    # transducer that has a different type than the previous ones.
+    def get_type():
+        pass
+    
+## A stream for writing binary transducers. 
+#
+#  An example:
+# \verbatim
+# #Write three HFST transducers in binary format to file named "testfile"
+# out = libhfst.HfstOutputStream("testfile", libhfst.FOMA_TYPE)
+# out.redirect(foma_transducer1) 
+# out.redirect(foma_transducer2)
+# out.redirect(foma_transducer3)
+# out.close()
+# \endverbatim
+#
+# For more information on HFST transducer structure, see <a href="HeaderFormatAndConversions.html">this page</a>.
+class HfstOutputStream:
+
+    ## Create a stream to standard output for writing binary transducers of type \a type. \a hfst_format defines whether transducers are written in hfst format or as such in their backend format. 
+    def __init__(type, hfst_format=True):
+        pass
+
+    ## Open a stream to file \a filename for writing binary transducers of type \a type. \a hfst_format defines whether transducers are written in hfst format or as such in their backend format.
+    #
+    # If the file exists, it is overwritten. 
+    def __init__(filename, type, hfst_format=True):
+        pass
+
+    ##  Write the transducer \a transducer in binary format to the stream. 
+    #
+    # All transducers must have the same type as the stream, else a TransducerTypeMismatchException is thrown. 
+    #
+    # @throws TransducerTypeMismatchException
+    def redirect(transducer):
+        pass
+
+    ##  Close the stream. 
+    # If the stream points to standard output, nothing is done.
+    def close():
+        pass
+
+## TODO: documentation
+class MultiCharSymbolTrie:
+    ## TODO: documentation
+    def __init__(self):
+        pass
+    ## TODO: documentation
+    # @param string const char *
+    def add(string):
+        pass
+    ## TODO: documentation
+    # @param string const char *
+    # @return const char *
+    def find(string)  
+
+  
+## A tokenizer for creating transducers from UTF-8 strings.
+#
+# Strings are tokenized from left to right using longest match tokenization.
+# For example, if the tokenizer contains a multicharacter symbol 
+# "foo" and a skip symbol "fo", the string "foo" is tokenized as "foo:foo".
+# If the tokenizer contains a multicharacter symbol "fo" and a skip 
+# symbol "foo", the string "foo" is tokenized as an empty string.
+#
+# An example:
+# \verbatim
+# TOK = libhfst.HfstTokenizer()
+# TOK.add_multichar_symbol("<br />")
+# TOK.add_skip_symbol("<p>")
+# TOK.add_skip_symbol("</p>")
+# spv = TOK.tokenize("<p>A<br />paragraph!</p>")
+# # spv now contains
+# #    ('A','A'), ('<br />','<br />'), ('p','p' ('a','a'), ('r','r'), ('a','a'), 
+# #    ('g','g'), ('r','r'), ('a','a'), ('p','p'), ('h','h'), ('!','!')
+#\endverbatim
+#
+# @note The tokenizer only tokenizes utf-8 strings. 
+# Special symbols are not included in the tokenizer 
+# unless added to it.
+#
+# @see hfst::HfstTransducer::HfstTransducer(const std::string&, const HfstTokenizer&, ImplementationType type) */
+class HfstTokenizer:
+
+    ## Create a tokenizer that recognizes utf-8 symbols. 
+    def __init__(self):
+        pass
+
+    ## Add a symbol to be skipped to this tokenizer. 
+    #
+    # After skipping a symbol, tokenization is always started again.
+    # For example if we have a multicharacter symbol "foo" and a 
+    # skip symbol "bar", the string "fobaro" will be tokenized 
+    # "f" "o" "o", not "foo". 
+    def add_skip_symbol(symbol):
+        pass
+
+    ## Add a multicharacter symbol \a symbol to this tokenizer. 
+    #
+    # If a multicharacter symbol has a skip symbol inside it, it is
+    # not considered a multicharacter symbol. For example if we have 
+    # a multicharacter symbol "foo" and a skip symbol "bar", the string
+    # "fobaro" will be tokenized "f" "o" "o", not "foo". 
+    def add_multichar_symbol(symbol):
+        pass
+
+    ## Tokenize the string \a input_string. 
+    # @return A tuple of string pairs.
+    def tokenize(input_string):
+        pass
+
+    ## Tokenize the string \a input_string.
+    # @return A tuple of strings.
+    def tokenize_one_level(input_string):
+        pass
+
+    ## Tokenize the string pair \a input_string : \a output_string. 
+    #
+    # If one string has more tokens than the other, epsilons will be
+    # inserted to the end of the tokenized string with less tokens
+    # so that both tokenized strings have the same number of tokens.
+    #
+    # @return A tuple of string pairs.
+    def tokenize(input_string, output_string):
+        pass
+
+    ## If \a input_string is not valid utf-8, throw an IncorrectUtf8CodingException.
+    #
+    # A string is non-valid if: 
+    #   - It contains one of the unsigned bytes 192, 193, 245, 246 and 247.
+    #   - If it is not made up of sequences of one initial byte (0xxxxxxx, 
+    #     110xxxxx, 1110xxxx or 11110xxx) followed by an appropriate number 
+    #     of continuation bytes (10xxxxxx).
+    #     -# Initial bytes 0xxxxxxx represent ASCII chars and may not be
+    #        followed by a continuation byte.
+    #     -# Initial bytes 110xxxxx are followed by exactly one 
+    #        continuation byte.
+    #     -# Initial bytes 1110xxxx are followed by exactly two continuation
+    #        bytes.
+    #     -# Initial bytes 11110xxx are followed by exactly three 
+    #        continuation bytes.
+    # (For reference: http://en.wikipedia.org/wiki/UTF-8)
+    #
+    # This function is a static one.
+    check_utf8_correctness(input_string);
+
+
+## A compiler holding information contained in lexc style lexicons.
+# A single LexcCompiler can be extended by adding entries to it, but little
+# else can be done with it. It is sufficient to implement clone of lexc.
+class LexcCompiler:
+
+  ## Create a lexc compiler for unspecified transducer format.
+  def __init__(self):
+      pass
+
+  ## Create a lexc compiler with \a impl as transducer format.
+  def __init__(self, impl):
+      pass
+
+  ## Compile lexc description from \a infile into current compiler.
+  def parse(infile):
+      pass
+
+  ## Compile lexc description from file @a filename into current compiler.
+  def parse(filename):
+      pass
+
+  # @brief Set verbosity options. When \a verbose is true, LexcCompiler will output the messages that Xerox lexc compiler does.
+  def setVerbosity(verbose):
+      pass
+
+  ## Add @a alphabet to multicharacter symbol set.
+  # These symbols may be used for regular expression ? for backends that do
+  # not support open alphabets.
+  def addAlphabet(alphabet):
+      pass
+
+  ## Set current processing lexicon name to @a lexicon_name.
+  def setCurrentLexiconName(lexicon_name):
+      pass
+
+  ## Add entry defined by a @a entry to current lexicon, pointing to @a continuation weighing @a weight to current lexicon.
+  def addStringEntry(entry, continuation, weight):
+      pass
+
+  ## Add entry defined by @a upper:@a lower, pointing to @a continuation weighing @a weight to current lexicon.
+  def addStringPairEntry(upper, lower, continuation, weight):
+      pass
+
+  ## Add entry defined by regular expression @a xre, pointing to @a continuation weighing @a weight to current lexicon.
+  def addXreEntry(xre, continuation, weight):
+      pass
+
+  ## Add macro definition named @a name matching regular expression @a xre to known xerox regular expressions.
+  def addXreDefinition(name, xre):
+      pass
+
+  ## Set start lexicon's name to @a lexicon_name.
+  def setInitialLexiconName(lexicon_name):
+      pass
+
+  ## Create final usable version of current lexicons and entries.
+  # @return HfstTransducer pointer.
+  def compileLexical():
+      pass
+
+  ## Check that current morphotax is connected and print anomalies.
+  # Works like xerox lexc, for compatibility.
+  def printConnectedness():
+      pass
+
+## A compiler holding information needed to compile XREs.
+class XreCompiler
+
+  ## Construct compiler for unknown format transducers.
+  def __init__(self):
+      pass
+
+  ## Create compiler for @a impl format transducers
+  def __init__(self, impl):
+      pass
+
+  ## Add a definition macro. Compilers will replace arcs labeled @a name, with the transducer defined by @a xre in later phases of compilation.
+  def define(name, xre):
+      pass
+
+  ## Compile a transducer defined by @a xre.
+  # May return a pointer to @e empty transducer on non-fatal error.
+  # A None pointer is returned on fatal error, if abort is not called.
+  # @return An HfstTransducer pointer.
+  def compile(xre):
+      pass
+
+class FdOperation:
+    ## TODO: document
+    def __init__(self, fd_operation):
+        pass
+    ## TODO: document
+    def is_diacritic(diacritic_str):
+        pass
 
