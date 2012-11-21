@@ -242,8 +242,10 @@ std::vector<std::pair <float, std::vector<std::pair<std::string, std::string> > 
 std::vector<std::pair <float, std::vector<std::string> > > purge_flags(std::vector<std::pair<float, std::vector<std::string> > > olpv);
 std::vector<HfstPath> detokenize_vector(OneLevelPathVector olpv);
 std::vector<HfstPath> detokenize_paths(hfst::HfstOneLevelPaths * olps);
+std::vector<HfstPath> detokenize_and_purge_paths(hfst::HfstOneLevelPaths * olps);
 std::vector<HfstPath> detokenize_vector(TwoLevelPathVector tlpv);
 std::vector<HfstPath> detokenize_paths(hfst::HfstTwoLevelPaths tlps);
+std::vector<HfstPath> detokenize_and_purge_paths(hfst::HfstTwoLevelPaths tlps);
 
 
 class HfstInputStream{
@@ -343,7 +345,7 @@ public:
     void write_in_att_format(HfstFile &ofile, bool write_weights=true) const;
     void write_in_att_format(char * buffer, bool write_weights=true) const;
     virtual ~HfstTransducer(void);
-    static HfstTransducer * read_lexc(const std::string &filename, ImplementationType type);
+    static HfstTransducer read_lexc(const std::string &filename, ImplementationType type);
     static HfstTransducer universal_pair(ImplementationType type);
 
     static bool is_implementation_type_available(ImplementationType impl);
