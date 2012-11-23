@@ -153,133 +153,87 @@ def left_replace_right(context, mapping, optional, alphabet):
     pass
 
 
+
+## A transducer that allows any (substring) mapping defined by \a mapping only if it occurs in any of the contexts in \a contexts. Symbols outside of the matching substrings are mapped to any symbol allowed by \a alphabet. 
+# 
+# @throws EmptySetOfContextsException
+# 
+# @see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>.
+# @param contexts A tuple of HfstTransducer pairs.
+# @param mapping An HfstTransducer.
+# @param alphabet A tuple of string pairs.
+def restriction(contexts, mapping, alphabet):
+    pass
+
+## A transducer that requires that one of the mappings defined by \a mapping must occur in each context in \a contexts. Symbols outside of the matching substrings are mapped to any symbol allowed by \a alphabet.
+# 
+# @see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>.
+# @param contexts A tuple of HfstTransducer pairs.
+# @param mapping An HfstTransducer.
+# @param alphabet A tuple of string pairs.
+def coercion(contexts, mapping, alphabet):
+    pass
+
+## A transducer that is equivalent to the intersection of restriction and coercion and requires that the mappings defined by \a mapping occur always and only in the given contexts in \a contexts. Symbols outside of the matching substrings are mapped to any symbol allowed by \a alphabet.
+# 
+# @see #restriction #coercion <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>
+# @param contexts A tuple of HfstTransducer pairs.
+# @param mapping An HfstTransducer.
+# @param alphabet A tuple of string pairs.
+def restriction_and_coercion(contexts, mapping, alphabet):
+    pass
+
  
- 
- 
-#     /** \brief A transducer that allows any (substring) mapping defined 
-#         by \a mapping
-#         only if it occurs in any of the contexts in \a contexts. 
-#         Symbols outside of the matching
-#         substrings are mapped to any symbol allowed by \a alphabet. 
+## A transducer that specifies that a string from the input language of the transducer \a mapping may only be mapped to one of its output strings (according to transducer \a mapping) if it appears in any of the contexts in \a contexts. Symbols outside of the matching substrings are mapped to any symbol allowed by \a alphabet.
 # 
-#         @throws EmptySetOfContextsException
+# @see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>.
+# @param contexts A tuple of HfstTransducer pairs.
+# @param mapping An HfstTransducer.
+# @param alphabet A tuple of string pairs.
+def surface_restriction(contexts, mapping, alphabet):
+    pass
+
+## A transducer that specifies that a string from the input language of the transducer \a mapping always has to the mapped to one of its output strings according to transducer \a mapping if it appears in any of the contexts in \a contexts. Symbols outside of the matching substrings are mapped to any symbol allowed by \a alphabet.
 # 
-#         @see
-#      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-#      SFST manual</a>. */
-#     HfstTransducer restriction(HfstTransducerPairVector &contexts, 
-#                                HfstTransducer &mapping, 
-#                                StringPairSet &alphabet);
+# @see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>.
+# @param contexts A tuple of HfstTransducer pairs.
+# @param mapping An HfstTransducer.
+# @param alphabet A tuple of string pairs.
+def surface_coercion(contexts, mapping, alphabet):
+    pass
+
+## A transducer that is equivalent to the intersection of surface_restriction and surface_coercion.
 # 
-#     /** \brief A transducer that requires that one of the mappings 
-#         defined by \a mapping
-#         must occur in each context in \a contexts. Symbols outside of 
-#         the matching
-#         substrings are mapped to any symbol allowed by \a alphabet.
+# @see #surface_restriction #surface_coercion <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>.
+# @param contexts A tuple of HfstTransducer pairs.
+# @param mapping An HfstTransducer.
+# @param alphabet A tuple of string pairs.
+def surface_restriction_and_coercion(contexts, mapping, alphabet):
+    pass
+
+## A transducer that specifies that a string from the output language of the transducer \a mapping may only be mapped to one of its input strings (according to transducer \a mappings) if it appears in any of the contexts in \a contexts.Symbols outside of the matching substrings are mapped to any symbol allowed by \a alphabet.
 # 
-#         @see
-#      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-#      SFST manual</a>. */
-#     HfstTransducer coercion(HfstTransducerPairVector &contexts, 
-#                             HfstTransducer &mapping, 
-#                             StringPairSet &alphabet);
+# @see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>.
+# @param contexts A tuple of HfstTransducer pairs.
+# @param mapping An HfstTransducer.
+# @param alphabet A tuple of string pairs.
+def deep_restriction(contexts, mapping, alphabet):
+    pass
+
+## A transducer that specifies that a string from the output language of the transducer \a mapping always has to be mapped to one of its input strings (according to transducer \a mappings) if it appears in any of the contexts in \a contexts. Symbols outside of the matching substrings are mapped to any symbol allowed by \a alphabet.
 # 
-#     /** \brief A transducer that is equivalent to the intersection 
-#         of restriction and coercion
-#         and requires that the mappings defined by \a mapping occur 
-#         always and only in the
-#         given contexts in \a contexts. Symbols outside of the matching
-#         substrings are mapped to any symbol allowed by \a alphabet.
+# @see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>.
+# @param contexts A tuple of HfstTransducer pairs.
+# @param mapping An HfstTransducer.
+# @param alphabet A tuple of string pairs.
+def deep_coercion(contexts, mapping, alphabet):
+    pass
+
+## A transducer that is equivalent to the intersection of deep_restriction and deep_coercion.
 # 
-#         @see
-#         restriction(HfstTransducerPairVector&, HfstTransducer&, StringPairSet&) 
-#         #coercion 
-#      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-#      SFST manual</a> */
-#     HfstTransducer restriction_and_coercion(HfstTransducerPairVector &contexts,
-#                                             HfstTransducer &mapping, 
-#                                             StringPairSet &alphabet);
-# 
-#     /** \brief A transducer that specifies that a string from 
-#         the input language of the
-#         transducer \a mapping may only be mapped to one of its 
-#         output strings (according
-#         to transducer \a mapping) if it appears in any of the contexts 
-#         in \a contexts.
-#         Symbols outside of the matching substrings are mapped
-#         to any symbol allowed by \a alphabet.
-# 
-#         @see
-#      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-#      SFST manual</a>. */
-#     HfstTransducer surface_restriction(HfstTransducerPairVector &contexts, 
-#                                        HfstTransducer &mapping, 
-#                                        StringPairSet &alphabet);
-# 
-#     /** \brief A transducer that specifies that a string from 
-#         the input language of the transducer
-#         \a mapping always has to the mapped to one of its output 
-#         strings according to
-#         transducer \a mapping if it appears in any of the contexts 
-#         in \a contexts.
-#         Symbols outside of the matching substrings are mapped to 
-#         any symbol allowed by \a alphabet.
-# 
-#         @see
-#      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-#      SFST manual</a>. */
-#     HfstTransducer surface_coercion(HfstTransducerPairVector &contexts, 
-#                                     HfstTransducer &mapping, 
-#                                     StringPairSet &alphabet);
-# 
-#     /** \brief A transducer that is equivalent to the intersection of 
-#         surface_restriction and surface_coercion.
-# 
-#         @see #surface_restriction #surface_coercion 
-#    <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-#    SFST manual</a>. */
-#     HfstTransducer surface_restriction_and_coercion
-#       (HfstTransducerPairVector &contexts, 
-#        HfstTransducer &mapping, 
-#        StringPairSet &alphabet);
-# 
-#     /** \brief A transducer that specifies that a string from 
-#         the output language of the transducer
-#         \a mapping may only be mapped to one of its input strings 
-#         (according to transducer \a mappings)
-#         if it appears in any of the contexts in \a contexts.
-#         Symbols outside of the matching substrings are mapped 
-#         to any symbol allowed by \a alphabet.
-# 
-#         @see
-#   <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-#   SFST manual</a>. */
-#     HfstTransducer deep_restriction(HfstTransducerPairVector &contexts, 
-#                                     HfstTransducer &mapping, 
-#                                     StringPairSet &alphabet);
-# 
-#     /** \brief A transducer that specifies that a string from 
-#         the output language of the transducer
-#         \a mapping always has to be mapped to one of its input strings 
-#         (according to transducer \a mappings)
-#         if it appears in any of the contexts in \a contexts.
-#         Symbols outside of the matching substrings are mapped 
-#         to any symbol allowed by \a alphabet.
-# 
-#         @see
-#    <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-#    SFST manual</a>. */
-#     HfstTransducer deep_coercion(HfstTransducerPairVector &contexts, 
-#                                  HfstTransducer &mapping, 
-#                                  StringPairSet &alphabet);
-# 
-#     /** \brief A transducer that is equivalent to the intersection 
-#         of deep_restriction and deep_coercion.
-# 
-#         @see #deep_restriction #deep_coercion 
-#   <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-#   SFST manual</a>. */
-#     HfstTransducer deep_restriction_and_coercion
-#       (HfstTransducerPairVector &contexts, 
-#        HfstTransducer &mapping, 
-#        StringPairSet &alphabet);
+# @see #deep_restriction #deep_coercion <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>.
+# @param contexts A tuple of HfstTransducer pairs.
+# @param mapping An HfstTransducer.
+# @param alphabet A tuple of string pairs.
+def deep_restriction_and_coercion(contexts, mapping, alphabet):
+    pass
