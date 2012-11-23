@@ -1,5 +1,10 @@
 import libhfst
 import sys
+import os
+
+def remove_generated_files():
+    os.remove('foo.att')
+    os.remove('foo.hfst')
 
 for ttype in (libhfst.SFST_TYPE, libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYPE):
 
@@ -20,10 +25,12 @@ for ttype in (libhfst.SFST_TYPE, libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYP
             if transducers_read == 1:
                 if not tr.compare(tr1):
                     print "ERROR: transducer 1 changed."
+                    remove_generated_files()
                     sys.exit(1)
             if transducers_read == 2:
                 if not tr.compare(tr2):
                     print "ERROR: transducer 2 changed."
+                    remove_generated_files()
                     sys.exit(1)
             tr.write_in_att_format(att_file)
             if transducers_read < 2:
@@ -32,6 +39,7 @@ for ttype in (libhfst.SFST_TYPE, libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYP
             break
     if transducers_read != 2:
         print "ERROR: wrong number of transducers read"
+        remove_generated_files()
         sys.exit(1)
     att_file.close()
 
@@ -44,14 +52,19 @@ for ttype in (libhfst.SFST_TYPE, libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYP
             if transducers_read == 1:
                 if not tr.compare(tr1):
                     print "ERROR: transducer 1 changed in ATT format."
+                    remove_generated_files()
                     sys.exit(1)
             if transducers_read == 2:
                 if not tr.compare(tr2):
                     print "ERROR: transducer 2 changed in ATT format."
+                    remove_generated_files()
                     sys.exit(1)
         except libhfst.EndOfStreamException:
             break
     if transducers_read != 2:
         print "ERROR: wrong number of ATT transducers read"
+        remove_generated_files()
         sys.exit(1)
     att_file.close()
+
+remove_generated_files()
