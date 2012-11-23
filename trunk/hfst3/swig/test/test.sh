@@ -6,7 +6,7 @@ for pytest in \
     test_transducer_functions.py test_extensions.py \
     test_examples.py test_xre_compiler.py ; #test_lexc.py;
     do
-    if (! python $pytest); then
+    if (! PYTHONPATH=$PWD/.. python $pytest); then
 	echo "============================================="
 	echo "FAIL: " $pytest;
 	echo "============================================="
@@ -14,7 +14,7 @@ for pytest in \
     fi;
 done
 
-if ! ./test_std_streams.sh python; then 
+if ! ./test_std_streams.sh; then 
     echo "==========================="
     echo "FAIL: test_std_streams.sh";
     echo "==========================="

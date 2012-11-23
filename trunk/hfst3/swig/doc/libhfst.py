@@ -2431,6 +2431,6 @@ def deep_restriction_and_coercion(contexts, mapping, alphabet):
 #    hfst-sometool transducer.foma
 # \endverbatim
 
-## @page InstallHfst.html Installing the HFST API library
+## @page InstallHfst.html Installing the HFST API library and Swig/Python bindings
 # 
 # TODO
