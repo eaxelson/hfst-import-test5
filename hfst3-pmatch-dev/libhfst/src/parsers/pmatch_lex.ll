@@ -63,6 +63,14 @@ LWSP [\t\r\n ]
     return ALPHA;
 }
 
+"UppercaseAlpha" {
+    return UPPERALPHA;
+}
+
+"LowercaseAlpha" {
+    return LOWERALPHA;
+}
+
 "Num" {
     return NUM;
 }
