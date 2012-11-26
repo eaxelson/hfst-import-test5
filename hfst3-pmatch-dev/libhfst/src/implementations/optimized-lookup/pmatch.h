@@ -8,7 +8,7 @@
 namespace hfst_ol {
 
     class PmatchTransducer;
-    typedef std::map<std::string, PmatchTransducer *> NameRtnMap;
+    typedef std::map<SymbolNumber, PmatchTransducer *> RtnMap;
     enum SpecialSymbol{entry, exit, LC_entry, LC_exit, RC_entry, RC_exit};
 
     class PmatchContainer
@@ -18,18 +18,16 @@ namespace hfst_ol {
         Encoder * encoder;
         SymbolNumber symbol_count;
         PmatchTransducer * toplevel;
-        std::string toplevel_name;
-        std::map<std::string, PmatchTransducer *> rtns;
-        SymbolNumberVector best_result;
+        RtnMap rtns;
         SymbolNumber * input_tape;
         SymbolNumber * orig_input_tape;
         SymbolNumber * output_tape;
         SymbolNumber * orig_output_tape;
-        SymbolNumber * candidate_input_pos;
         SymbolNumberVector output;
 
         std::map<SpecialSymbol, SymbolNumber> special_symbols;
         std::map<SymbolNumber, std::string> end_tag_map;
+        std::map<std::string, SymbolNumber> rtn_names;
 
         void add_special_symbol(const std::string & str, SymbolNumber symbol_number);
 
@@ -41,14 +39,17 @@ namespace hfst_ol {
         bool has_unsatisfied_rtns(void) const;
         std::string get_unsatisfied_rtn_name(void) const;
         std::string match(std::string & input);
-        void add_rtn(PmatchTransducer * rtn, std::string & name);
+        void add_rtn(PmatchTransducer * rtn, SymbolNumber s);
         bool has_queued_input(void);
-        void copy_to_output(SymbolNumberVector & best_result);
+        void copy_to_output(const SymbolNumberVector & best_result);
         std::string stringify_output(void);
 
         static std::string parse_name_from_hfst3_header(std::istream & f);
         static bool is_end_tag(const std::string & symbol);
         bool is_end_tag(const SymbolNumber symbol) const;
+        static bool is_insertion(const std::string & symbol);
+        static std::string name_from_insertion(
+            const std::string & symbol);
         std::string end_tag(const SymbolNumber symbol);
         std::string start_tag(const SymbolNumber symbol);
 
@@ -112,6 +113,7 @@ namespace hfst_ol {
             char tape_step;
             SymbolNumber * context_placeholder;
             ContextChecking context;
+            SymbolNumberVector best_result;
         };
 
         std::stack<Locals> local_stack;
@@ -121,9 +123,8 @@ namespace hfst_ol {
 
         TransducerAlphabet & alphabet;
     
-        std::map<std::string, PmatchTransducer *> & rtns;
+        RtnMap & rtns;
         std::map<SpecialSymbol, SymbolNumber> & markers;
-        SymbolNumberVector & best_result;
 
         // The mutually recursive lookup-handling functions
 
@@ -160,9 +161,8 @@ namespace hfst_ol {
                          TransitionTableIndex index_table_size,
                          TransitionTableIndex transition_table_size,
                          TransducerAlphabet & alphabet,
-                         std::map<std::string, PmatchTransducer *> & rtns,
-                         std::map<SpecialSymbol, SymbolNumber> & markers,
-                         SymbolNumberVector & best_result);
+                         RtnMap & rtns,
+                         std::map<SpecialSymbol, SymbolNumber> & markers);
 
         void display() const;
 
@@ -181,8 +181,15 @@ namespace hfst_ol {
 
         static bool indexes_transition_table(TransitionTableIndex i)
         { return  i >= TRANSITION_TARGET_TABLE_START; }
+
+        const SymbolNumberVector & get_best_result(void) const
+        { return local_stack.top().best_result; }
+        SymbolNumber * get_candidate_input_pos(void) const
+        { return local_stack.top().candidate_input_pos; }
     
         void match(SymbolNumber ** input_tape_entry, SymbolNumber ** output_tape_entry);
+        void rtn_call(SymbolNumber * input_tape_entry, SymbolNumber * output_tape_entry);
+        void rtn_exit(void);
         void note_analysis(SymbolNumber * input_tape, SymbolNumber * output_tape);
 
     };
