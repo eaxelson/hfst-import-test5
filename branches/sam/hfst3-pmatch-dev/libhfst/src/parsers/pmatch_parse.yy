@@ -130,7 +130,7 @@ PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
 
-%nonassoc DEFINE ALPHA NUM PUNCT WHITESPACE INS_LEFT ENDTAG_LEFT LC_LEFT RC_LEFT
+%nonassoc DEFINE ALPHA LOWERALPHA UPPERALPHA NUM PUNCT WHITESPACE INS_LEFT ENDTAG_LEFT LC_LEFT RC_LEFT
 %%
 
 
@@ -707,6 +707,12 @@ REGEXP11: REGEXP12 { }
  }
 | ALPHA {
     $$ = hfst::pmatch::latin1_alpha_acceptor(hfst::pmatch::format);
+ }
+| LOWERALPHA {
+    $$ = hfst::pmatch::latin1_lowercase_acceptor(hfst::pmatch::format);
+ }
+| UPPERALPHA {
+    $$ = hfst::pmatch::latin1_uppercase_acceptor(hfst::pmatch::format);
  }
 | NUM {
     $$ = hfst::pmatch::latin1_numeral_acceptor(hfst::pmatch::format);

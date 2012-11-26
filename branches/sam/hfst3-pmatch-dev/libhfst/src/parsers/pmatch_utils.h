@@ -81,7 +81,7 @@ HfstTransducer* compile(const std::string& pmatch,
 HfstTransducer * latin1_alpha_acceptor(
     ImplementationType type = TROPICAL_OPENFST_TYPE);
 
-HfstTransducer * latin1_lowecase_acceptor(
+HfstTransducer * latin1_lowercase_acceptor(
     ImplementationType type = TROPICAL_OPENFST_TYPE);
 
 HfstTransducer * latin1_uppercase_acceptor(

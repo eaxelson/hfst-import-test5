@@ -449,7 +449,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
       return retval;
   }
 
-  HfstTransducer * latin1_lowecase_acceptor(ImplementationType type)
+  HfstTransducer * latin1_lowercase_acceptor(ImplementationType type)
   {
       HfstTokenizer tok;
       HfstTransducer * retval = new HfstTransducer(type);
