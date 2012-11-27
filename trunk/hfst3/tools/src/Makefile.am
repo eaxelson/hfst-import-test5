@@ -56,8 +56,8 @@ endif
 if WANT_DISJUNCT
 MAYBE_DISJUNCT=hfst-disjunct$(EXEEXT)
 endif
-if WANT_DUPLICATE
-MAYBE_DUPLICATE=hfst-duplicate$(EXEEXT)
+if WANT_MULTIPLY
+MAYBE_MULTIPLY=hfst-multiply$(EXEEXT)
 endif
 if WANT_EXPAND_EQUIVALENCES
 MAYBE_EXPAND_EQUIVALENCES=hfst-expand-equivalences$(EXEEXT)
@@ -204,7 +204,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_AFFIX_GUESSIFY)              \
 			 $(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_CONCATENATE)     \
 			 $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)   \
-			 $(MAYBE_DUPLICATE) $(MAYBE_EDIT_METADATA)                  \
+			 $(MAYBE_MULTIPLY) $(MAYBE_EDIT_METADATA)                  \
 			 $(MAYBE_FORMAT) $(MAYBE_FST2FST) $(MAYBE_FST2STRINGS)      \
 			 $(MAYBE_FST2TXT) $(MAYBE_GREP) $(MAYBE_HEAD)               \
 			 $(MAYBE_INVERT)                                            \
@@ -238,7 +238,7 @@ hfst_concatenate_SOURCES=hfst-concatenate.cc $(HFST_COMMON_SRC)
 hfst_conjunct_SOURCES=hfst-conjunct.cc $(HFST_COMMON_SRC)
 hfst_determinize_SOURCES=hfst-determinize.cc $(HFST_COMMON_SRC)
 hfst_disjunct_SOURCES=hfst-disjunct.cc $(HFST_COMMON_SRC)
-hfst_duplicate_SOURCES=hfst-duplicate.cc $(HFST_COMMON_SRC)
+hfst_multiply_SOURCES=hfst-multiply.cc $(HFST_COMMON_SRC)
 hfst_expand_equivalences_SOURCES=hfst-expand-equivalences.cc $(HFST_COMMON_SRC)
 hfst_edit_metadata_SOURCES=hfst-edit-metadata.cc $(HFST_COMMON_SRC)
 hfst_format_SOURCES=hfst-format.cc $(HFST_COMMON_SRC)
