@@ -95,6 +95,9 @@ For more information on HFST transducer structure, see
     void write(const std::vector<char> &s);
     void write(const char &c);
 
+    // if file is open
+    bool is_open;
+
     // append string s to vector str and a '\0'
     static void append(std::vector<char> &str, const std::string &s);
 
