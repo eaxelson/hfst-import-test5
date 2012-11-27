@@ -149,8 +149,8 @@ typedef std::map<std::pair<std::string, std::string>, std::pair<std::string, std
 
 typedef std::set<std::pair<float, std::vector<std::pair <std::string, std::string> > > > HfstTwoLevelPaths; 
 
-HfstTwoLevelPaths extract_paths(const HfstTransducer &t, int max_num=-1, int cycles=-1);
-HfstTwoLevelPaths extract_paths_fd(const HfstTransducer &t, int max_num=-1, int cycles=-1, bool filter_fd=false);
+HfstTwoLevelPaths extract_paths(const HfstTransducer &t, int max_num=-1, int cycles=-1) throw (TransducerIsCyclicException);
+HfstTwoLevelPaths extract_paths_fd(const HfstTransducer &t, int max_num=-1, int cycles=-1, bool filter_fd=false) throw (TransducerIsCyclicException);
 
 typedef std::pair<HfstTransducer, HfstTransducer> HfstTransducerPair;
 typedef std::vector<std::pair<HfstTransducer, HfstTransducer> > HfstTransducerPairVector;
@@ -250,7 +250,7 @@ std::vector<HfstPath> detokenize_and_purge_paths(hfst::HfstTwoLevelPaths tlps);
 
 class HfstInputStream{
 public:
-    HfstInputStream(const std::string & filename);
+    HfstInputStream(const std::string & filename) throw (NotTransducerStreamException);
     HfstInputStream(void);
     void close(void);
     bool is_bad(void);
@@ -264,7 +264,7 @@ public:
     HfstOutputStream(const std::string & filename, ImplementationType type, bool hfst_format=true);
     HfstOutputStream(ImplementationType type, bool hfst_format=true);
     void close(void);
-    HfstOutputStream & redirect (HfstTransducer & transducer);
+    HfstOutputStream & redirect (HfstTransducer & transducer)  throw (StreamIsClosedException);
     ~HfstOutputStream(void);
 };
 
@@ -280,7 +280,7 @@ public:
     HfstTransducer(ImplementationType type);
     HfstTransducer(const std::string &symbol, ImplementationType type);
     HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type);
-    HfstTransducer(FILE *ifile, ImplementationType type, const std::string &epsilon_symbol, unsigned int & linecount) throw (EndOfStreamException, NotValidAttFormatException);
+    HfstTransducer(FILE *ifile, ImplementationType type, const std::string &epsilon_symbol) throw (EndOfStreamException, NotValidAttFormatException);
     HfstTransducer(HfstFile &ifile, ImplementationType type, const std::string &epsilon_symbol) throw (EndOfStreamException, NotValidAttFormatException);
     
     // Then everything else, in the (alphabetic) order in the API manual
@@ -291,7 +291,7 @@ public:
     HfstTransducer & concatenate(const HfstTransducer &another);
     HfstTransducer & convert(ImplementationType type, std::string options="");
     HfstTransducer & determinize(void);
-    HfstTransducer & disjunct(const HfstTransducer &another);
+    HfstTransducer & disjunct(const HfstTransducer &another) throw (TransducerTypeMismatchException);
     void extract_paths(HfstTwoLevelPaths &results, int max_num=-1, int cycles=-1) const;
     void extract_paths_fd(HfstTwoLevelPaths &results, int max_num=-1, int cycles=-1, bool filter_fd=true) const;
     StringSet get_alphabet(void) const;
@@ -301,7 +301,7 @@ public:
     HfstTransducer & insert_freely(const StringPair &symbol_pair);
     HfstTransducer & insert_freely(const HfstTransducer &tr);
     void insert_to_alphabet(const std::string &symbol);
-    HfstTransducer & intersect(const HfstTransducer &another);
+    HfstTransducer & intersect(const HfstTransducer &another) throw (TransducerTypeMismatchException);
     HfstTransducer & invert(void);
     bool is_cyclic(void) const;
     bool is_lookdown_infinitely_ambiguous(const StringVector &s) const;
@@ -314,10 +314,10 @@ public:
     hfst::HfstOneLevelPaths * lookup_fd(const std::string & s, ssize_t limit = -1) const;
     HfstTransducer & minimize(void);
     HfstTransducer & n_best(unsigned int n);
-    HfstTransducer & assign (const HfstTransducer & another);
+    HfstTransducer & assign (const HfstTransducer & another) throw (TransducerTypeMismatchException);
     HfstTransducer & optionalize(void);
     HfstTransducer & output_project(void);
-    HfstTransducer & priority_union (const HfstTransducer &another);
+    HfstTransducer & priority_union (const HfstTransducer &another)  throw (TransducerTypeMismatchException);
     HfstTransducer & push_weights(PushType type);
     HfstTransducer & remove_epsilons(void);
     void remove_from_alphabet(const std::string &symbol);
@@ -330,7 +330,7 @@ public:
     HfstTransducer & reverse (void);
     HfstTransducer & set_final_weights(float weight);
     void set_name(const std::string &name);
-    HfstTransducer & shuffle(const HfstTransducer &another) throw (TransducersAreNotAutomataException);
+    HfstTransducer & shuffle(const HfstTransducer &another) throw (TransducersAreNotAutomataException, TransducerTypeMismatchException);
     HfstTransducer & substitute(bool(*func)(const StringPair &sp, StringPairSet &sps));
     HfstTransducer & substitute(const StringPair &old_symbol_pair, const StringPairSet &new_symbol_pair_set);
     HfstTransducer & substitute(const StringPair &symbol_pair, HfstTransducer &transducer);
@@ -338,7 +338,7 @@ public:
     HfstTransducer & substitute(const StringPair &old_symbol_pair, const StringPair &new_symbol_pair);
     HfstTransducer & substitute_symbols(const HfstSymbolSubstitutions &substitutions);
     HfstTransducer & substitute_symbol_pairs(const HfstSymbolPairSubstitutions &substitutions);
-    HfstTransducer & subtract(const HfstTransducer &another);
+    HfstTransducer & subtract(const HfstTransducer &another) throw (TransducerTypeMismatchException);
     HfstTransducer & transform_weights(float(*func)(float));
     void write_in_att_format(const std::string &filename, bool write_weights=true) const;
     void write_in_att_format(FILE *ofile, bool write_weights=true) const;

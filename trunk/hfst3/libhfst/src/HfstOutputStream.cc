@@ -22,7 +22,7 @@ using std::string;
 namespace hfst
 {
   HfstOutputStream::HfstOutputStream(ImplementationType type, bool hfst_format):
-    type(type), hfst_format(hfst_format)
+    type(type), hfst_format(hfst_format), is_open(false)
   { 
     if (not HfstTransducer::is_implementation_type_available(type)) {
       HFST_THROW(ImplementationTypeNotAvailableException);
@@ -70,12 +70,13 @@ namespace hfst
         HFST_THROW(SpecifiedTypeRequiredException);
         break;
       }
+    this->is_open=true;
   }
   // FIXME: HfstOutputStream takes a string parameter, 
   //        HfstInputStream a const char*
   HfstOutputStream::HfstOutputStream
   (const std::string &filename,ImplementationType type, bool hfst_format):
-    type(type), hfst_format(hfst_format)
+    type(type), hfst_format(hfst_format), is_open(false)
   { 
     if (not HfstTransducer::is_implementation_type_available(type)) {
       HFST_THROW(ImplementationTypeNotAvailableException);
@@ -129,6 +130,7 @@ namespace hfst
         HFST_THROW(SpecifiedTypeRequiredException);
         break;
       }
+    this->is_open=true;
   }
   
   HfstOutputStream::~HfstOutputStream(void)
@@ -302,6 +304,11 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
 
   HfstOutputStream &HfstOutputStream::operator<< (HfstTransducer &transducer)
   {
+    if (not this->is_open) {
+      HFST_THROW(StreamIsClosedException);
+    }
+      
+
     if (type != transducer.type)
       {
         HFST_THROW_MESSAGE(TransducerTypeMismatchException, 
@@ -346,7 +353,7 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
       std::vector<char> header;
       append_hfst_header_data(header); // attributes "version" and "type"
       for (std::map<string,string>::const_iterator prop =
-	       transducer.props.begin();
+               transducer.props.begin();
            prop != transducer.props.end();
            ++prop)
         {
@@ -455,6 +462,7 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
       default:
         assert(false);
       }
+    this->is_open=false;
   }
 
 }

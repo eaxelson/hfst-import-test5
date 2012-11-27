@@ -7,6 +7,7 @@
 
 import libhfst
 import os
+import sys
 
 def alphabet_contains(alphabet, symbol):
     try:

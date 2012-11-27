@@ -603,6 +603,9 @@ in \a ifile.
     HfstTransducer(FILE * ifile, ImplementationType type, 
                    const std::string &epsilon_symbol, unsigned int & linecount);
 
+    HfstTransducer(FILE * ifile, ImplementationType type, 
+                   const std::string &epsilon_symbol);
+
     HfstTransducer(HfstFile &ifile, ImplementationType type, 
                    const std::string &epsilon_symbol);
 
@@ -1483,8 +1486,11 @@ transducer.transform_weights(&func);
 
     /** \brief Compile a lexc file in file \a filename into an HfstTransducer
     of type \a type and return the transducer. */
-    static HfstTransducer * read_lexc(const std::string &filename,
+    static HfstTransducer * read_lexc_ptr(const std::string &filename,
                       ImplementationType type);
+
+    static HfstTransducer & read_lexc(const std::string &filename,
+                                          ImplementationType type);
 
     // *** For commandline programs. ***
 

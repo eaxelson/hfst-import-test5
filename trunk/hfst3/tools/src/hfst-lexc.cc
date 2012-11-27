@@ -141,14 +141,14 @@ parse_options(int argc, char** argv)
 #include "inc/check-params-common.h"
     if (format == hfst::UNSPECIFIED_TYPE)
       {
-	/*#if HAVE_FOMA
+        /*#if HAVE_FOMA
         if (!silent) {
           warning(0, 0, "Defaulting to foma type "
                   "(since it has native lexc support);\n"
                   "Use command-line option --format to override");
         }
         format = hfst::FOMA_TYPE;
-	#elif HAVE_OPENFST*/
+        #elif HAVE_OPENFST*/
 #if HAVE_OPENFST
         if (!silent) {
           warning(0, 0, "Defaulting to using OpenFst with legacy lexc "
@@ -231,9 +231,9 @@ parse_options(int argc, char** argv)
     if (lexccount > 1)
       {
 #ifdef WINDOWS
-	error(EXIT_FAILURE, 0, "multiple file handling not supported on "
-	      "Windows;\n"
-	      "use a single file");
+        error(EXIT_FAILURE, 0, "multiple file handling not supported on "
+              "Windows;\n"
+              "use a single file");
 #else
         if (!silent) {
           warning(0, 0, "multiple file handling is not supported by all "
@@ -280,7 +280,7 @@ lexc_streams(HfstOutputStream& outstream)
           }
         else
           {
-            trans = HfstTransducer::read_lexc(lexcfilenames[i], format);
+            trans = HfstTransducer::read_lexc_ptr(lexcfilenames[i], format);
             if (0 == trans)
               {
                 error(EXIT_FAILURE, 0, "Could not parse %s correctly.\n"
