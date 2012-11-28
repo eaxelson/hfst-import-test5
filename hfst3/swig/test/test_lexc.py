@@ -31,14 +31,12 @@ for type in types:
     del(parsed)
 
 
-    try:
-        print(" valid file, read_lexc... ")
-        rlexc = libhfst.HfstTransducer.read_lexc("test_lexc.lexc", type)
-        assert(rlexc != 0)
-        assert(animals.compare(rlexc))
-        del(rlexc)
-    except libhfst.FunctionNotImplementedException:
-        assert(False)
+    #try:
+    #    print(" valid file, read_lexc... ")
+    #    rlexc = libhfst.HfstTransducer.read_lexc("test_lexc.lexc", type)
+    #    assert(animals.compare(rlexc))
+    #except libhfst.FunctionNotImplementedException:
+    #    assert(False)
 
 
     # (2) A file that does not follow lexc format

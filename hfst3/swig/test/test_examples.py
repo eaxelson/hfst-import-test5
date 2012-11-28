@@ -8,7 +8,6 @@ for file in 'foofile', 'testfile', 'testfile.att', 'testfile.hfst':
 
 types = [libhfst.SFST_TYPE, libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYPE]
 
-
 # The library required by the implementation type requested is not linked to HFST.
 # --------------------------------------------------------------------------------
 print "ImplementationTypeNotAvailableException"
@@ -107,8 +106,9 @@ for type in types:
         print "read one transducer"
     except libhfst.NotValidAttFormatException:
         print "Error reading transducer: not valid AT&T format."
-        ifile.close()
-        print "Read %i transducers in total." % len(transducers)
+
+ifile.close()
+print "Read %i transducers in total." % len(transducers)
 
 
 # State is not final (and cannot have a final weight). 

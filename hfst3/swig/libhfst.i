@@ -408,7 +408,7 @@ public:
     LexcCompiler& addXreEntry(const std::string& xre, const std::string& continuation, const double weight);
     LexcCompiler& addXreDefinition(const std::string& name, const std::string& xre);
     LexcCompiler& setInitialLexiconName(const std::string& lexicon_name);
-    hfst::HfstTransducer* compileLexical();
+    hfst::HfstTransducer * compileLexical();
     //const std::map<std::string,hfst::HfstTransducer>& getStringTries() const;
     //const std::map<std::string,hfst::HfstTransducer>& getRegexpUnions() const;
     const LexcCompiler& printConnectedness() const;
