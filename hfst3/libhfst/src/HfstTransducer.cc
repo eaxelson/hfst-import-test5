@@ -3876,7 +3876,7 @@ HfstTokenizer HfstTransducer::create_tokenizer()
     return tok;
 }
 
-HfstTransducer & HfstTransducer::read_lexc(const std::string &filename,
+HfstTransducer HfstTransducer::read_lexc(const std::string &filename,
                                          ImplementationType type) {
   HfstTransducer * ptr = read_lexc_ptr(filename, type);
   HfstTransducer retval(*ptr);

@@ -1489,8 +1489,8 @@ transducer.transform_weights(&func);
     static HfstTransducer * read_lexc_ptr(const std::string &filename,
                       ImplementationType type);
 
-    static HfstTransducer & read_lexc(const std::string &filename,
-                                          ImplementationType type);
+    static HfstTransducer read_lexc(const std::string &filename,
+                                    ImplementationType type);
 
     // *** For commandline programs. ***
 
