@@ -601,7 +601,9 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 back-ends/openfst/src/lib/Makefile
 		 back-ends/foma/Makefile
 		 back-ends/sfst/Makefile
-		 man/Makefile 
+		 man/Makefile
+		 swig/Makefile
+		 swig/test/Makefile
                  scripts/Makefile scripts/hfst-foma-wrapper.sh],
                  [chmod +x scripts/hfst-foma-wrapper.sh])
 #		 test/tools/fsmbook-examples/MonishGuesserAnalyzer/Makefile

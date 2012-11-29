@@ -1,5 +1,6 @@
 SUBDIRS=EnglishNumerals NumbersToNumerals FinnishNumerals \
-	EinsteinsPuzzle Esperanto BrazilianPortuguese1 BrazilianPortuguese2 
+	EinsteinsPuzzle Esperanto BrazilianPortuguese1 BrazilianPortuguese2 \
+	MonishAnalysis
 # FinnishOTProsody YaleShooting
 #	Other directories are not included until we have the rule compiler.
 #	DateParser disables until we get hfst-regexp2fst working
