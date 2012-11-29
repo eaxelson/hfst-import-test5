@@ -17,7 +17,7 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = back-ends libhfst tools test doc man scripts
+SUBDIRS = back-ends libhfst tools test doc man scripts swig
 
 # for external projects to use HFST from auto*
 m4dir=$(datadir)/aclocal
