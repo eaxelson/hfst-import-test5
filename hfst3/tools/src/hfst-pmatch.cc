@@ -31,13 +31,13 @@ print_usage()
 // {
 //     hfst_ol::PmatchContainer container(inputstream);
 //     while (inputstream.good()) {
-// 	try {
-// 	    transducer_name = parse_hfst3_header(inputstream);
-// 	} catch (TransducerHeaderException & e) {
-// 	    break;
-// 	}
+//      try {
+//          transducer_name = parse_hfst3_header(inputstream);
+//      } catch (TransducerHeaderException & e) {
+//          break;
+//      }
 //         container.add_rtn(
-// 	    new hfst_ol::PmatchTransducer(inputstream, false), transducer_name);
+//          new hfst_ol::PmatchTransducer(inputstream, false), transducer_name);
 //     }
 //     find_rtns(container);
 //     return container;
@@ -52,8 +52,8 @@ void process_input(hfst_ol::PmatchContainer & container)
 {
     std::string input_line;
     while (std::cin) {
-	getline(std::cin, input_line);
-	print_result(container.match(input_line));
+        getline(std::cin, input_line);
+        print_result(container.match(input_line));
  }
 
     // std::istream user_input = std::cin;
@@ -76,8 +76,8 @@ void process_input(hfst_ol::PmatchContainer & container)
 void find_rtns(hfst_ol::PmatchContainer & cont)
 {
     if (cont.has_unsatisfied_rtns()) {
-	error(EXIT_FAILURE, 0,
-	      "Couldn't find referred transducer"); 
+        error(EXIT_FAILURE, 0,
+              "Couldn't find referred transducer"); 
     }
     // std::map<std::string, std::string> transducer_library =
     //     get_possible_transducers_from_path();
@@ -104,19 +104,19 @@ int parse_options(int argc, char** argv)
     {
         static const struct option long_options[] =
         {
-	    // first the hfst-mandated options
-	  {"help",         no_argument,       0, 'h'},
-	  {"version",      no_argument,       0, 'V'},
-	  {"verbose",      no_argument,       0, 'v'},
-	  {"quiet",        no_argument,       0, 'q'},
-	  {"silent",       no_argument,       0, 's'},
-	  {0,0,0,0}
+            // first the hfst-mandated options
+          {"help",         no_argument,       0, 'h'},
+          {"version",      no_argument,       0, 'V'},
+          {"verbose",      no_argument,       0, 'v'},
+          {"quiet",        no_argument,       0, 'q'},
+          {"silent",       no_argument,       0, 's'},
+          {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         c = getopt_long(argc, argv,
-			"hVvqs",
-			long_options, &option_index);
+                        "hVvqs",
+                        long_options, &option_index);
         if (-1 == c)
         {
             break;
@@ -124,14 +124,18 @@ int parse_options(int argc, char** argv)
 
         switch (c)
         {
-	case 'h':
-	  print_usage();
-	  return EXIT_SUCCESS;
-	  break;
-	default:
-	    std::cerr << "Invalid option\n\n";
-	    return EXIT_FAILURE;
-	    break;
+        case 'h':
+          print_usage();
+          return EXIT_SUCCESS;
+          break;
+        case 'V':
+          print_version();
+          return EXIT_SUCCESS;
+          break;
+        default:
+            std::cerr << "Invalid option\n\n";
+            return EXIT_FAILURE;
+            break;
         }
     }
 
@@ -143,8 +147,8 @@ int parse_options(int argc, char** argv)
     }
   else if ( (optind + 1) == argc)
     {
-	input_file_name = argv[(optind)];
-	return EXIT_CONTINUE;
+        input_file_name = argv[(optind)];
+        return EXIT_CONTINUE;
     }
   else
     {
@@ -165,9 +169,9 @@ int main(int argc, char ** argv)
         return retval;
     }
     std::ifstream instream(input_file_name.c_str(),
-			   std::ifstream::binary);
+                           std::ifstream::binary);
     hfst_ol::PmatchContainer container(instream);
-							
+                                                        
     process_input(container);
     return EXIT_SUCCESS;
 }
