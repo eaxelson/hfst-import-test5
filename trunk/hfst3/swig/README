@@ -12,7 +12,7 @@ and if you wish to install it,
 
 To test the SWIG bindings after installation, execute
 
-    ./test.sh
+    ./test/test.sh
 
 For further information, consult
 
@@ -20,6 +20,10 @@ For further information, consult
     python setup.py --help-commands
 
 and the distutils documentation.
+
+If you are using SWIG bindings locally, or want to run ./test/test.sh before
+installation, add path/to/hfst-top-dir/swig/ to PYTHONPATH and 
+path/to/hfst-top-dir/libhfst/src/.libs/ to LD_LIBRARY_PATH.
 
 Demonstration utilities:
 	      omor_query.py, lookup and basic usage
