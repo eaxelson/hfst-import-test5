@@ -1,3 +1,639 @@
+2012-11-29 12:48  eaxelson
+
+	* Makefile.am, back-ends/foma/Makefile.am,
+	  back-ends/openfst/src/Makefile.am,
+	  back-ends/openfst/src/include/Makefile.am,
+	  back-ends/openfst/src/lib/Makefile.am,
+	  back-ends/sfst/Makefile.am, configure.ac, swig/Makefile.am,
+	  swig/test/Makefile.am, test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/MonishAnalysis/MonishAnalysis.hfst.script:
+	  Fixed a couple of bugs that occurred during installing a dist
+	  package..
+
+2012-11-28 14:23  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/Makefile.am: Fixed a small bug in
+	  HfstTransducer::read_lexc, suppressed some warnings from openfst
+	  headers.
+
+2012-11-28 14:13  eaxelson
+
+	* swig/doc/libhfst.py, swig/libhfst.i, swig/test/test.sh,
+	  swig/test/test_examples.py, swig/test/test_lexc.py: Updated
+	  python tests.
+
+2012-11-28 10:34  eaxelson
+
+	* swig/test/test_examples.py: Added all python examples given in
+	  the doxygen documentation to tests.
+
+2012-11-27 17:51  eaxelson
+
+	* back-ends/foma/fomalib.h, libhfst/src/HfstOutputStream.cc,
+	  libhfst/src/HfstOutputStream.h, libhfst/src/HfstTransducer.cc,
+	  libhfst/src/HfstTransducer.h, swig/libhfst.i, swig/test/test.sh,
+	  swig/test/test_examples.py,
+	  swig/test/test_hfst_basic_transducer.py, tools/src/hfst-lexc.cc:
+	  Added more tests to the Python interface and added throw
+	  statements to functions.
+
+2012-11-27 10:27  eaxelson
+
+	* configure.ac, test/tools/hfst-check-environment.sh,
+	  tools/src/Makefile.am, tools/src/hfst-duplicate.cc,
+	  tools/src/hfst-multiply.cc: Renamed hfst-duplicate as
+	  hfst-multiply.
+
+2012-11-23 15:23  eaxelson
+
+	* swig/test/test_std_streams.sh, swig/test/test_streams.py: Now
+	  tests remove extra files that they generate.
+
+2012-11-23 15:10  eaxelson
+
+	* swig/doc/libhfst.py, swig/test, swig/test.sh, swig/test/test.sh,
+	  swig/test/test_constructors.py, swig/test/test_examples.py,
+	  swig/test/test_extensions.py, swig/test/test_flag_diacritics.py,
+	  swig/test/test_hfst_basic_transducer.py,
+	  swig/test/test_lexc.lexc, swig/test/test_lexc.py,
+	  swig/test/test_lexc_fail.lexc, swig/test/test_rules.py,
+	  swig/test/test_std_streams.py, swig/test/test_std_streams.sh,
+	  swig/test/test_streams.py, swig/test/test_tokenizer.py,
+	  swig/test/test_transducer_functions.py,
+	  swig/test/test_xre_compiler.py, swig/test_constructors.py,
+	  swig/test_examples.py, swig/test_extensions.py,
+	  swig/test_flag_diacritics.py, swig/test_hfst_basic_transducer.py,
+	  swig/test_lexc.py, swig/test_rules.py, swig/test_std_streams.py,
+	  swig/test_std_streams.sh, swig/test_streams.py,
+	  swig/test_tokenizer.py, swig/test_transducer_functions.py,
+	  swig/test_xre_compiler.py: Moved Python tests to a separate
+	  directory.
+
+2012-11-23 14:42  eaxelson
+
+	* swig/Doxyfile, swig/doc, swig/doc/Doxyfile, swig/doc/libhfst.py,
+	  swig/hfst_documentation.py, swig/internal_documentation: Python
+	  documentation is now in a separate directory.
+
+2012-11-23 11:53  eaxelson
+
+	* swig/hfst_documentation.py, swig/internal_documentation/rules.py:
+	  Now all functions in Python interface are documented.
+
+2012-11-21 16:51  eaxelson
+
+	* swig/hfst_documentation.py,
+	  swig/internal_documentation/HfstExceptionDefs.py,
+	  swig/internal_documentation/rules.py: Added documentation on rule
+	  functions of the Python interface.
+
+2012-11-21 11:45  eaxelson
+
+	* swig/internal_documentation/HfstExceptionDefs.py,
+	  swig/internal_documentation/HfstTransducer.py: Added new internal
+	  documentation to the Python interface.
+
+2012-11-21 11:12  eaxelson
+
+	* swig/hfst_documentation.py, swig/hfst_swig_extensions.h,
+	  swig/internal_documentation/HfstTransducer.py, swig/libhfst.i:
+	  More documentation on the Python interface.
+
+2012-11-20 18:32  eaxelson
+
+	* swig/hfst_documentation.py,
+	  swig/internal_documentation/HfstTransducer.py: More swig
+	  documentation...
+
+2012-11-20 17:31  eaxelson
+
+	* swig/hfst_documentation.py,
+	  swig/internal_documentation/HfstTransducer.py: Added more
+	  documentation for class libhfst.HfstTransducer.
+
+2012-11-20 15:13  eaxelson
+
+	* swig/hfst_documentation.py,
+	  swig/internal_documentation/HfstTransducer.py,
+	  swig/internal_documentation/HfstTransitionGraph.h,
+	  swig/test_hfst_basic_transducer.py: Updated swig documentation.
+
+2012-11-20 13:01  moshagen
+
+	* back-ends/openfst, back-ends/openfst/src,
+	  back-ends/openfst/src/lib: Ignore generated files.
+
+2012-11-20 13:00  moshagen
+
+	* configure.ac: Added - as a comment - parts of my attempts at
+	  building all version info from only one definition. No success so
+	  far.
+	  
+	  Whitespace changes.
+
+2012-11-20 12:04  eaxelson
+
+	* back-ends/openfst, back-ends/openfst/AUTHORS,
+	  back-ends/openfst/COPYING, back-ends/openfst/INSTALL,
+	  back-ends/openfst/Makefile.am, back-ends/openfst/NEWS,
+	  back-ends/openfst/README, back-ends/openfst/foo,
+	  back-ends/openfst/src, back-ends/openfst/src/Makefile.am,
+	  back-ends/openfst/src/include,
+	  back-ends/openfst/src/include/Makefile.am,
+	  back-ends/openfst/src/include/fst,
+	  back-ends/openfst/src/include/fst/accumulator.h,
+	  back-ends/openfst/src/include/fst/add-on.h,
+	  back-ends/openfst/src/include/fst/arc-map.h,
+	  back-ends/openfst/src/include/fst/arc.h,
+	  back-ends/openfst/src/include/fst/arcfilter.h,
+	  back-ends/openfst/src/include/fst/arcsort.h,
+	  back-ends/openfst/src/include/fst/bi-table.h,
+	  back-ends/openfst/src/include/fst/cache.h,
+	  back-ends/openfst/src/include/fst/closure.h,
+	  back-ends/openfst/src/include/fst/compact-fst.h,
+	  back-ends/openfst/src/include/fst/compat.h,
+	  back-ends/openfst/src/include/fst/complement.h,
+	  back-ends/openfst/src/include/fst/compose-filter.h,
+	  back-ends/openfst/src/include/fst/compose.h,
+	  back-ends/openfst/src/include/fst/concat.h,
+	  back-ends/openfst/src/include/fst/config.h,
+	  back-ends/openfst/src/include/fst/config.h.in,
+	  back-ends/openfst/src/include/fst/connect.h,
+	  back-ends/openfst/src/include/fst/const-fst.h,
+	  back-ends/openfst/src/include/fst/determinize.h,
+	  back-ends/openfst/src/include/fst/dfs-visit.h,
+	  back-ends/openfst/src/include/fst/difference.h,
+	  back-ends/openfst/src/include/fst/edit-fst.h,
+	  back-ends/openfst/src/include/fst/encode.h,
+	  back-ends/openfst/src/include/fst/epsnormalize.h,
+	  back-ends/openfst/src/include/fst/equal.h,
+	  back-ends/openfst/src/include/fst/equivalent.h,
+	  back-ends/openfst/src/include/fst/expanded-fst.h,
+	  back-ends/openfst/src/include/fst/expectation-weight.h,
+	  back-ends/openfst/src/include/fst/factor-weight.h,
+	  back-ends/openfst/src/include/fst/flags.h,
+	  back-ends/openfst/src/include/fst/float-weight.h,
+	  back-ends/openfst/src/include/fst/fst-decl.h,
+	  back-ends/openfst/src/include/fst/fst.h,
+	  back-ends/openfst/src/include/fst/fstlib.h,
+	  back-ends/openfst/src/include/fst/generic-register.h,
+	  back-ends/openfst/src/include/fst/heap.h,
+	  back-ends/openfst/src/include/fst/icu.h,
+	  back-ends/openfst/src/include/fst/intersect.h,
+	  back-ends/openfst/src/include/fst/interval-set.h,
+	  back-ends/openfst/src/include/fst/invert.h,
+	  back-ends/openfst/src/include/fst/label-reachable.h,
+	  back-ends/openfst/src/include/fst/lexicographic-weight.h,
+	  back-ends/openfst/src/include/fst/lock.h,
+	  back-ends/openfst/src/include/fst/log.h,
+	  back-ends/openfst/src/include/fst/lookahead-filter.h,
+	  back-ends/openfst/src/include/fst/lookahead-matcher.h,
+	  back-ends/openfst/src/include/fst/map.h,
+	  back-ends/openfst/src/include/fst/matcher-fst.h,
+	  back-ends/openfst/src/include/fst/matcher.h,
+	  back-ends/openfst/src/include/fst/minimize.h,
+	  back-ends/openfst/src/include/fst/mutable-fst.h,
+	  back-ends/openfst/src/include/fst/pair-weight.h,
+	  back-ends/openfst/src/include/fst/partition.h,
+	  back-ends/openfst/src/include/fst/power-weight.h,
+	  back-ends/openfst/src/include/fst/product-weight.h,
+	  back-ends/openfst/src/include/fst/project.h,
+	  back-ends/openfst/src/include/fst/properties.h,
+	  back-ends/openfst/src/include/fst/prune.h,
+	  back-ends/openfst/src/include/fst/push.h,
+	  back-ends/openfst/src/include/fst/queue.h,
+	  back-ends/openfst/src/include/fst/randequivalent.h,
+	  back-ends/openfst/src/include/fst/randgen.h,
+	  back-ends/openfst/src/include/fst/random-weight.h,
+	  back-ends/openfst/src/include/fst/rational.h,
+	  back-ends/openfst/src/include/fst/register.h,
+	  back-ends/openfst/src/include/fst/relabel.h,
+	  back-ends/openfst/src/include/fst/replace-util.h,
+	  back-ends/openfst/src/include/fst/replace.h,
+	  back-ends/openfst/src/include/fst/reverse.h,
+	  back-ends/openfst/src/include/fst/reweight.h,
+	  back-ends/openfst/src/include/fst/rmepsilon.h,
+	  back-ends/openfst/src/include/fst/rmfinalepsilon.h,
+	  back-ends/openfst/src/include/fst/shortest-distance.h,
+	  back-ends/openfst/src/include/fst/shortest-path.h,
+	  back-ends/openfst/src/include/fst/signed-log-weight.h,
+	  back-ends/openfst/src/include/fst/slist.h,
+	  back-ends/openfst/src/include/fst/sparse-power-weight.h,
+	  back-ends/openfst/src/include/fst/sparse-tuple-weight.h,
+	  back-ends/openfst/src/include/fst/state-map.h,
+	  back-ends/openfst/src/include/fst/state-reachable.h,
+	  back-ends/openfst/src/include/fst/state-table.h,
+	  back-ends/openfst/src/include/fst/statesort.h,
+	  back-ends/openfst/src/include/fst/string-weight.h,
+	  back-ends/openfst/src/include/fst/string.h,
+	  back-ends/openfst/src/include/fst/symbol-table-ops.h,
+	  back-ends/openfst/src/include/fst/symbol-table.h,
+	  back-ends/openfst/src/include/fst/synchronize.h,
+	  back-ends/openfst/src/include/fst/test-properties.h,
+	  back-ends/openfst/src/include/fst/topsort.h,
+	  back-ends/openfst/src/include/fst/tuple-weight.h,
+	  back-ends/openfst/src/include/fst/types.h,
+	  back-ends/openfst/src/include/fst/union-find.h,
+	  back-ends/openfst/src/include/fst/union.h,
+	  back-ends/openfst/src/include/fst/util.h,
+	  back-ends/openfst/src/include/fst/vector-fst.h,
+	  back-ends/openfst/src/include/fst/verify.h,
+	  back-ends/openfst/src/include/fst/visit.h,
+	  back-ends/openfst/src/include/fst/weight.h,
+	  back-ends/openfst/src/lib, back-ends/openfst/src/lib/Makefile.am,
+	  back-ends/openfst/src/lib/compat.cc,
+	  back-ends/openfst/src/lib/flags.cc,
+	  back-ends/openfst/src/lib/fst.cc,
+	  back-ends/openfst/src/lib/properties.cc,
+	  back-ends/openfst/src/lib/symbol-table-ops.cc,
+	  back-ends/openfst/src/lib/symbol-table.cc,
+	  back-ends/openfst/src/lib/util.cc: Added missing directory
+	  'openfst'.
+
+2012-11-20 08:52  moshagen
+
+	* back-ends/openfstwin/src, back-ends/openfstwin/src/lib: More
+	  generated files to ignore.
+
+2012-11-20 08:51  moshagen
+
+	* back-ends, back-ends/dlfcn, back-ends/foma, back-ends/openfstwin,
+	  back-ends/sfst: Ignore generated files.
+
+2012-11-19 16:10  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  swig/hfst_documentation.py,
+	  swig/internal_documentation/HfstTransitionGraph.h,
+	  swig/libhfst.i, swig/test_hfst_basic_transducer.py: Added a new
+	  constructor to HfstTransitionGraph, also added it to swig
+	  interface.
+
+2012-11-19 14:11  eaxelson
+
+	* swig/hfst_documentation.py,
+	  swig/internal_documentation/HfstTransitionGraph.h: Updated swig
+	  documentation.
+
+2012-11-17 11:20  eaxelson
+
+	* swig/hfst_documentation.py, swig/internal_documentation,
+	  swig/internal_documentation/HfstTransitionGraph.h: Updated python
+	  documentation.
+
+2012-11-16 14:34  eaxelson
+
+	* swig/Doxyfile, swig/hfst_documentation.py: Added more
+	  documentation of the python interface.
+
+2012-11-15 20:34  eaxelson
+
+	* swig/Doxyfile, swig/hfst_documentation.py: Tentatively added
+	  doxygen documentation for Python interface.
+
+2012-11-15 15:57  eaxelson
+
+	* Makefile.am, back-ends/Makefile.am, back-ends/foma/fomalib.h,
+	  configure.ac, libhfst/src/Makefile.am,
+	  libhfst/src/implementations/Makefile.am,
+	  libhfst/src/parsers/Makefile.am, test/libhfst/Makefile.am,
+	  tools/src/Makefile.am, tools/src/hfst-proc/Makefile.am,
+	  tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-twolc/src/Makefile.am: Now all back-ends (SFST,
+	  OpenFst and foma) are moved under HFST and statically linked to
+	  the HFST library.
+
+2012-11-15 12:07  eaxelson
+
+	* back-ends/Makefile.am: Forgot to change the directory name to
+	  opefstwin in Makefile.am.
+
+2012-11-15 12:03  eaxelson
+
+	* Makefile.am, back-ends, back-ends/Makefile.am, back-ends/dlfcn,
+	  back-ends/dlfcn/Makefile.am, back-ends/dlfcn/dlfcn.c,
+	  back-ends/dlfcn/dlfcn.h, back-ends/dlfcn/get-dlfcn.sh,
+	  back-ends/foma, back-ends/foma/CHANGELOG, back-ends/foma/COPYING,
+	  back-ends/foma/Makefile.am, back-ends/foma/README,
+	  back-ends/foma/README.cmatrix, back-ends/foma/README.symbols,
+	  back-ends/foma/apply.c, back-ends/foma/coaccessible.c,
+	  back-ends/foma/constructions.c, back-ends/foma/define.c,
+	  back-ends/foma/determinize.c, back-ends/foma/dynarray.c,
+	  back-ends/foma/extract.c, back-ends/foma/flags.c,
+	  back-ends/foma/foma.h, back-ends/foma/fomalib.h,
+	  back-ends/foma/fomalibconf.h, back-ends/foma/int_stack.c,
+	  back-ends/foma/io.c, back-ends/foma/lex.lexc.c,
+	  back-ends/foma/lex.yy.c, back-ends/foma/lexc.h,
+	  back-ends/foma/lexc.l, back-ends/foma/lexcread.c,
+	  back-ends/foma/mem.c, back-ends/foma/minimize.c,
+	  back-ends/foma/regex.l, back-ends/foma/regex.tab.c,
+	  back-ends/foma/regex.tab.h, back-ends/foma/regex.y,
+	  back-ends/foma/reverse.c, back-ends/foma/rewrite.c,
+	  back-ends/foma/sigma.c, back-ends/foma/spelling.c,
+	  back-ends/foma/stringhash.c, back-ends/foma/structures.c,
+	  back-ends/foma/topsort.c, back-ends/foma/trie.c,
+	  back-ends/foma/utf8.c, back-ends/openfstwin,
+	  back-ends/openfstwin/Makefile.am, back-ends/openfstwin/README,
+	  back-ends/openfstwin/get-openfst.sh, back-ends/openfstwin/src,
+	  back-ends/openfstwin/src/Makefile.am,
+	  back-ends/openfstwin/src/include,
+	  back-ends/openfstwin/src/include/fst,
+	  back-ends/openfstwin/src/include/fst/accumulator.h,
+	  back-ends/openfstwin/src/include/fst/add-on.h,
+	  back-ends/openfstwin/src/include/fst/arc-map.h,
+	  back-ends/openfstwin/src/include/fst/arc.h,
+	  back-ends/openfstwin/src/include/fst/arcfilter.h,
+	  back-ends/openfstwin/src/include/fst/arcsort.h,
+	  back-ends/openfstwin/src/include/fst/bi-table.h,
+	  back-ends/openfstwin/src/include/fst/cache.h,
+	  back-ends/openfstwin/src/include/fst/closure.h,
+	  back-ends/openfstwin/src/include/fst/compact-fst.h,
+	  back-ends/openfstwin/src/include/fst/compat.h,
+	  back-ends/openfstwin/src/include/fst/complement.h,
+	  back-ends/openfstwin/src/include/fst/compose-filter.h,
+	  back-ends/openfstwin/src/include/fst/compose.h,
+	  back-ends/openfstwin/src/include/fst/concat.h,
+	  back-ends/openfstwin/src/include/fst/config.h,
+	  back-ends/openfstwin/src/include/fst/connect.h,
+	  back-ends/openfstwin/src/include/fst/const-fst.h,
+	  back-ends/openfstwin/src/include/fst/determinize.h,
+	  back-ends/openfstwin/src/include/fst/dfs-visit.h,
+	  back-ends/openfstwin/src/include/fst/difference.h,
+	  back-ends/openfstwin/src/include/fst/edit-fst.h,
+	  back-ends/openfstwin/src/include/fst/encode.h,
+	  back-ends/openfstwin/src/include/fst/epsnormalize.h,
+	  back-ends/openfstwin/src/include/fst/equal.h,
+	  back-ends/openfstwin/src/include/fst/equivalent.h,
+	  back-ends/openfstwin/src/include/fst/expanded-fst.h,
+	  back-ends/openfstwin/src/include/fst/expectation-weight.h,
+	  back-ends/openfstwin/src/include/fst/factor-weight.h,
+	  back-ends/openfstwin/src/include/fst/flags.h,
+	  back-ends/openfstwin/src/include/fst/float-weight.h,
+	  back-ends/openfstwin/src/include/fst/fst-decl.h,
+	  back-ends/openfstwin/src/include/fst/fst.h,
+	  back-ends/openfstwin/src/include/fst/fstlib.h,
+	  back-ends/openfstwin/src/include/fst/generic-register.h,
+	  back-ends/openfstwin/src/include/fst/heap.h,
+	  back-ends/openfstwin/src/include/fst/icu.h,
+	  back-ends/openfstwin/src/include/fst/intersect.h,
+	  back-ends/openfstwin/src/include/fst/interval-set.h,
+	  back-ends/openfstwin/src/include/fst/invert.h,
+	  back-ends/openfstwin/src/include/fst/label-reachable.h,
+	  back-ends/openfstwin/src/include/fst/lexicographic-weight.h,
+	  back-ends/openfstwin/src/include/fst/lock.h,
+	  back-ends/openfstwin/src/include/fst/log.h,
+	  back-ends/openfstwin/src/include/fst/lookahead-filter.h,
+	  back-ends/openfstwin/src/include/fst/lookahead-matcher.h,
+	  back-ends/openfstwin/src/include/fst/map.h,
+	  back-ends/openfstwin/src/include/fst/matcher-fst.h,
+	  back-ends/openfstwin/src/include/fst/matcher.h,
+	  back-ends/openfstwin/src/include/fst/minimize.h,
+	  back-ends/openfstwin/src/include/fst/mutable-fst.h,
+	  back-ends/openfstwin/src/include/fst/pair-weight.h,
+	  back-ends/openfstwin/src/include/fst/partition.h,
+	  back-ends/openfstwin/src/include/fst/power-weight.h,
+	  back-ends/openfstwin/src/include/fst/product-weight.h,
+	  back-ends/openfstwin/src/include/fst/project.h,
+	  back-ends/openfstwin/src/include/fst/properties.h,
+	  back-ends/openfstwin/src/include/fst/prune.h,
+	  back-ends/openfstwin/src/include/fst/push.h,
+	  back-ends/openfstwin/src/include/fst/queue.h,
+	  back-ends/openfstwin/src/include/fst/randequivalent.h,
+	  back-ends/openfstwin/src/include/fst/randgen.h,
+	  back-ends/openfstwin/src/include/fst/random-weight.h,
+	  back-ends/openfstwin/src/include/fst/rational.h,
+	  back-ends/openfstwin/src/include/fst/register.h,
+	  back-ends/openfstwin/src/include/fst/relabel.h,
+	  back-ends/openfstwin/src/include/fst/replace-util.h,
+	  back-ends/openfstwin/src/include/fst/replace.h,
+	  back-ends/openfstwin/src/include/fst/reverse.h,
+	  back-ends/openfstwin/src/include/fst/reweight.h,
+	  back-ends/openfstwin/src/include/fst/rmepsilon.h,
+	  back-ends/openfstwin/src/include/fst/rmfinalepsilon.h,
+	  back-ends/openfstwin/src/include/fst/shortest-distance.h,
+	  back-ends/openfstwin/src/include/fst/shortest-path.h,
+	  back-ends/openfstwin/src/include/fst/signed-log-weight.h,
+	  back-ends/openfstwin/src/include/fst/slist.h,
+	  back-ends/openfstwin/src/include/fst/sparse-power-weight.h,
+	  back-ends/openfstwin/src/include/fst/sparse-tuple-weight.h,
+	  back-ends/openfstwin/src/include/fst/state-map.h,
+	  back-ends/openfstwin/src/include/fst/state-reachable.h,
+	  back-ends/openfstwin/src/include/fst/state-table.h,
+	  back-ends/openfstwin/src/include/fst/statesort.h,
+	  back-ends/openfstwin/src/include/fst/string-weight.h,
+	  back-ends/openfstwin/src/include/fst/string.h,
+	  back-ends/openfstwin/src/include/fst/symbol-table-ops.h,
+	  back-ends/openfstwin/src/include/fst/symbol-table.h,
+	  back-ends/openfstwin/src/include/fst/synchronize.h,
+	  back-ends/openfstwin/src/include/fst/test-properties.h,
+	  back-ends/openfstwin/src/include/fst/topsort.h,
+	  back-ends/openfstwin/src/include/fst/tuple-weight.h,
+	  back-ends/openfstwin/src/include/fst/types.h,
+	  back-ends/openfstwin/src/include/fst/union-find.h,
+	  back-ends/openfstwin/src/include/fst/union.h,
+	  back-ends/openfstwin/src/include/fst/unordered_map.h,
+	  back-ends/openfstwin/src/include/fst/unordered_set.h,
+	  back-ends/openfstwin/src/include/fst/util.h,
+	  back-ends/openfstwin/src/include/fst/vector-fst.h,
+	  back-ends/openfstwin/src/include/fst/verify.h,
+	  back-ends/openfstwin/src/include/fst/visit.h,
+	  back-ends/openfstwin/src/include/fst/weight.h,
+	  back-ends/openfstwin/src/lib,
+	  back-ends/openfstwin/src/lib/Makefile.am,
+	  back-ends/openfstwin/src/lib/compat.cc,
+	  back-ends/openfstwin/src/lib/flags.cc,
+	  back-ends/openfstwin/src/lib/fst.cc,
+	  back-ends/openfstwin/src/lib/properties.cc,
+	  back-ends/openfstwin/src/lib/symbol-table-ops.cc,
+	  back-ends/openfstwin/src/lib/symbol-table.cc,
+	  back-ends/openfstwin/src/lib/util.cc, back-ends/sfst,
+	  back-ends/sfst/Makefile.am, back-ends/sfst/README,
+	  back-ends/sfst/alphabet.cc, back-ends/sfst/alphabet.h,
+	  back-ends/sfst/basic.cc, back-ends/sfst/basic.h,
+	  back-ends/sfst/compact.cc, back-ends/sfst/compact.h,
+	  back-ends/sfst/determinise.cc, back-ends/sfst/fst.cc,
+	  back-ends/sfst/fst.h, back-ends/sfst/generate.cc,
+	  back-ends/sfst/hopcroft.cc, back-ends/sfst/interface.h,
+	  back-ends/sfst/mem.h, back-ends/sfst/operators.cc,
+	  back-ends/sfst/sgi.h, back-ends/sfst/utf8.cc,
+	  back-ends/sfst/utf8.h, configure.ac, libhfst/src/Makefile.am,
+	  libhfst/src/implementations/Makefile.am,
+	  libhfst/src/parsers/Makefile.am, test/libhfst/Makefile.am,
+	  tools/src/Makefile.am, tools/src/hfst-proc/Makefile.am,
+	  tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-twolc/src/Makefile.am, windows: Renamed directory
+	  'windows' as 'back-ends'.
+
+2012-11-14 20:08  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  swig/libhfst.i, swig/test_hfst_basic_transducer.py: Added a
+	  variant of HfstBasicTransducer::add_symbols_to_alphabet that
+	  takes a StringSet as an argument.
+
+2012-11-14 18:54  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  swig/libhfst.i, swig/test_rules.py,
+	  swig/test_transducer_functions.py, swig/test_xre_compiler.py:
+	  Added all substitute functions to swig.
+
+2012-11-13 16:07  eaxelson
+
+	* swig/libhfst.i, swig/test.sh, swig/test_xre_compiler.py: Added
+	  XreCompiler functionalities to Swig.
+
+2012-11-12 10:31  eaxelson
+
+	* swig/hfst_swig_extensions.h, swig/libhfst.i, swig/test.sh,
+	  swig/test_constructors.py, swig/test_examples.py,
+	  swig/test_extensions.py, swig/test_flag_diacritics.py,
+	  swig/test_hfst_basic_transducer.py, swig/test_lexc.py,
+	  swig/test_rules.py, swig/test_std_streams.py,
+	  swig/test_streams.py, swig/test_transducer_functions.py: Now
+	  enumerators can be used normally in python, e.g.
+	  libhfst.SFST_TYPE.
+
+2012-11-09 17:14  eaxelson
+
+	* swig/hfst_swig_extensions.h, swig/libhfst.i, swig/test.sh,
+	  swig/test_lexc.py: Added Lexc functions to Swig.
+
+2012-11-09 13:55  eaxelson
+
+	* swig/libhfst.i, swig/test.sh, swig/test_examples.py,
+	  swig/test_rules.py: Added more tests.
+
+2012-11-09 10:05  eaxelson
+
+	* configure.ac: Fixed a typo in configure file.
+
+2012-11-08 17:35  moshagen
+
+	* configure.ac: Bring the HFST_LONGVERSION in sync with the other
+	  version strings (again - is there a way to calculate some version
+	  strings from others? I.e. change once, update everywhere?).
+
+2012-11-08 16:39  moshagen
+
+	* test/tools/fsmbook-examples/MonishAnalysis: Ignore generated
+	  files.
+
+2012-11-08 15:05  eaxelson
+
+	* swig/libhfst.i, swig/test_transducer_functions.py: More updates
+	  to tests.
+
+2012-11-08 13:57  eaxelson
+
+	* swig/README, swig/hfst_swig_extensions.h, swig/libhfst.i,
+	  swig/test.sh, swig/test_extensions.py,
+	  swig/test_flag_diacritics.py, swig/test_transducer_functions.py:
+	  Updated swig tests.
+
+2012-11-08 13:14  sdrobac
+
+	* configure.ac, libhfst/src/parsers/xre_parse.yy,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/MonishAnalysis/Makefile.am,
+	  test/tools/fsmbook-examples/MonishAnalysis/MonishAnalysis.hfst.script,
+	  test/tools/fsmbook-examples/MonishAnalysis/MonishAnalysis.xfst.att,
+	  test/tools/fsmbook-examples/MonishAnalysis/MonishAnalysis.xfst.script,
+	  test/tools/fsmbook-examples/MonishAnalysis/test.script,
+	  test/tools/fsmbook-examples/monish-analysis-test.sh: Fixed
+	  MonishAnalysis fsmbook-examples test
+
+2012-11-08 10:59  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/HfstXeroxRulesTest.cc: Added before and after to
+	  HfstXeroxRules
+
+2012-11-07 13:13  eaxelson
+
+	* swig/test_std_streams.py, swig/test_tokenizer.py: Added new test
+	  for tokenizer.
+
+2012-11-06 13:50  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRulesTest.cc:
+	  Fixed restriction in HfstXeroxRules
+
+2012-11-02 16:29  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/HfstXeroxRulesTest.cc: Updated restriction in
+	  HfstXeroxRules
+
+2012-11-02 13:38  eaxelson
+
+	* swig/hfst_swig_extensions.h, swig/test_std_streams.sh: Small
+	  updates and added documentation to tests and swig bindings.
+
+2012-11-01 15:05  eaxelson
+
+	* NSIS/copy_files.sh, NSIS/hfst_installer.nsi,
+	  libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  swig/hfst_swig_extensions.h, swig/libhfst.i,
+	  swig/test_hfst_basic_transducer.py,
+	  swig/test_transducer_functions.py: Added new test cases and
+	  functions to the Swig interface. Also moved HfstFile to
+	  HfstTransitionGraph.h.
+
+2012-11-01 09:27  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/HfstXeroxRulesTest.cc: Added restriction to
+	  HfstXeroxrules
+
+2012-10-31 13:51  eaxelson
+
+	* swig/test_transducer_functions.py: Added one more test.
+
+2012-10-31 13:20  eaxelson
+
+	* swig/libhfst.i, swig/test_hfst_basic_transducer.py: Updated
+	  tests, added some throw statements to the interface file.
+
+2012-10-31 09:55  eaxelson
+
+	* swig/test_hfst_basic_transducer.py: Tentatively added a new test
+	  for swig bindings.
+
+2012-10-30 16:25  eaxelson
+
+	* swig/hfst_swig_extensions.h, swig/libhfst.i,
+	  swig/test_constructors.py: Added HfstTokenizer to the python
+	  interface.
+
+2012-10-30 15:35  hardwick
+
+	* libhfst/src/parsers/Makefile.am: Added some files to _BUILT that
+	  probably should have been there all along
+	  (is this the cause of those build problems on some platforms?)
+
+2012-10-30 15:20  eaxelson
+
+	* swig/test_constructors.py: Tentatively added python version of
+	  libhfst test.
+
+2012-10-30 10:33  eaxelson
+
+	* test/tools/Makefile.am: Added yet one missing lexc file.
+
+2012-10-30 10:25  eaxelson
+
+	* test/tools/Makefile.am: Added a missing file in lexc tests.
+
+2012-10-30 10:02  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am: Ready for release 3.3.15.
+
 2012-10-29 13:12  eaxelson
 
 	* libhfst/src/HfstTransducer.cc, swig,
