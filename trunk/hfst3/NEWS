@@ -5,6 +5,16 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.4.0
+---------------------------
+
+* Experimental version of the SWIG-generated Python interface is
+  included in the distribution. See swig/README for more info.
+
+* All back-ends (SFST, OpenFst and foma) are bundled with HFST.
+  There is no more need to install them separately.
+
+
 Noteworthy changes in 3.3.15
 ----------------------------
 
@@ -341,4 +351,3 @@ Noteworthy changes in release 2.1
 ---------------------------------
 
 * hfst-twolc and hfst-compose-intersect understand # like xerox originals
-

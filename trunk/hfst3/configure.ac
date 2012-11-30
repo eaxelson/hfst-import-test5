@@ -18,17 +18,17 @@ elif## Process this file with autoconf to produce configure script
 # Information on package
 HFST_NAME=hfst
 HFST_MAJOR=3
-HFST_MINOR=3
-HFST_EXTENSION=15
+HFST_MINOR=4
+HFST_EXTENSION=0
 HFST_VERSION=$HFST_MAJOR.$HFST_MINOR.$HFST_EXTENSION
 # for package-config pc file
 LIBHFST_NAME=hfst
 LIBHFST_MAJOR=3
-LIBHFST_MINOR=3
-LIBHFST_EXTENSION=15
+LIBHFST_MINOR=4
+LIBHFST_EXTENSION=4
 LIBHFST_VERSION=$LIBHFST_MAJOR.$LIBHFST_MINOR.$LIBHFST_EXTENSION
 
-AC_INIT([hfst], [3.3.15], [hfst-bugs@helsinki.fi], [hfst])
+AC_INIT([hfst], [3.4.0], [hfst-bugs@helsinki.fi], [hfst])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall -Werror std-options foreign check-news])
 
@@ -40,9 +40,9 @@ AC_CONFIG_SRCDIR([libhfst/src/HfstTransducer.h])
 AC_CONFIG_HEADERS([config.h libhfst/src/hfst.hpp])
 
 AC_SUBST([LIBHFST_MAJOR],     [3])
-AC_SUBST([LIBHFST_MINOR],     [3])
-AC_SUBST([LIBHFST_EXTENSION], [15])
-AC_SUBST([LIBHFST_VERSION],   [3.3.15])
+AC_SUBST([LIBHFST_MINOR],     [4])
+AC_SUBST([LIBHFST_EXTENSION], [0])
+AC_SUBST([LIBHFST_VERSION],   [3.4.0])
 AC_SUBST([LIBHFST_NAME],      [hfst])
 
 # long version = version vector cast in base 10000, for automatic comparisons
