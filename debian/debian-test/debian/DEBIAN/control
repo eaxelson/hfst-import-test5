@@ -4,7 +4,7 @@ Version: 3.15-1
 Section: devel
 Priority: optional
 Architecture: amd64
-Provides: libhfstospell1, libfst0, libfoma0
+Provides: libhfstospell1
 Depends: libc6 (>= 1.1), libstdc++6 (>= 4.4.3)
 Maintainer: HFST team <hfst-info@sf.net>
 Description: HFST library and commandline tools
