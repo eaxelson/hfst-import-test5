@@ -1,1 +1,20 @@
-Documentation...
+This package contains SWIG-generated Python bindings for the
+HFST library. To use the bindings, you need
+ 
+ - a compatible version of HFST library installed to /usr/lib/ (can be 
+   fetched from http://sourceforge.net/projects/hfst/files/hfst/)
+ - Python version 2.5 =< (the package is tested with version 2.7)
+
+To install the bindings, execute
+
+  ./make-install
+
+in this directory. In case of problems, try doing the same as super-user:
+
+  sudo ./make-install
+
+After installation you should be able to use the bindings by writing
+
+  import libhfst
+
+in the beginning of your Python script.
