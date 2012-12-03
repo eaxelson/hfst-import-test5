@@ -1,27 +1,40 @@
 #!/bin/sh
 
-HFSTLIB=/usr/lib/libhfst.so.22
-PYTHONDIR=/usr/lib/python2.7/dist-packages
-PACKAGEFILE=hfst-22-swig.tar.gz
+HFST_VERSIONNUMBER="3.4.0"
+HFSTLIB=/usr/local/lib/libhfst.so.23
+PACKAGEFILE=hfst_3.4.0_swig_amd64.tar.gz
+
+PYTHONDIR=""
+for py_ver in 2.7 2.6 2.5; do
+    if [ -x /usr/lib/python$py_ver/dist-packages ]; then
+	PYTHONDIR=/usr/lib/python$py_ver/dist-packages
+	break;
+    fi
+done
 
 if ! [ -x $PYTHONDIR ]; then
-    echo "ERROR: could not install Python bindings, directory '"$PYTHONDIR"' not found."
-    echo "Install Python version 2.7 first."
+    echo "ERROR: could not install Python bindings, directory '/usr/lib/pythonX.Y/dist-packages' (X.Y >= 2.5) not found."
     exit 1;
 fi
 
 if ! [ -x $HFSTLIB ]; then
     echo "ERROR: could not install Python bindings, dynamic library '" $HFSTLIB "' not found."
-    echo "Install HFST version 3.4.0 first."
+    echo "Install HFST version "$HFST_VERSIONNUMBER" first."
     exit 1;
 fi
-
-tar -xzvf $PACKAGEFILE
 
 # Install the python files
 for file in libhfst.py _libhfst.so;
 do
-    cp $file $PYTHONDIR/
+    if ! ( cp $file $PYTHONDIR/ ); then
+	echo "ERROR: could not install file "$file"."
+	exit 1;
+    fi
+done
+
+for file in libhfst.py _libhfst.so;
+do
+    rm -fR $file;
 done
 
 echo "Installation complete."
