@@ -6,10 +6,12 @@
 #
 
 HFST_PREFIX="/home/$USER/hfst-installation/"
+PYTHON_PREFIX="/usr/local/lib/python2.7/dist-packages/"
+
 BACKEND_PREFIX="/usr/local/"
-SFST_PREFIX=$BACKEND_PREFIX
-OPENFST_PREFIX=$BACKEND_PREFIX
-FOMA_PREFIX=$BACKEND_PREFIX
+#SFST_PREFIX=$BACKEND_PREFIX
+#OPENFST_PREFIX=$BACKEND_PREFIX
+#FOMA_PREFIX=$BACKEND_PREFIX
 
 HFST_LIBNUMBER=`ls $HFST_PREFIX/lib/ | egrep 'libhfst\.so\.[0-9]+$' \
     | perl -pe 's/libhfst\.so\.([0-9]+)$/\1/'`
@@ -115,19 +117,19 @@ ln -s -T libhfstospell.so.1 libhfstospell.so
 # ---------------------------
 
 # OpenFst
-cp $BACKEND_PREFIX/lib/libfst.so.0.0.0 .
-rm -f libfst.so libfst.so.0
-ln -s -T libfst.so.0.0.0 libfst.so.0
-ln -s -T libfst.so.0 libfst.so
+# cp $BACKEND_PREFIX/lib/libfst.so.0.0.0 .
+# rm -f libfst.so libfst.so.0
+# ln -s -T libfst.so.0.0.0 libfst.so.0
+# ln -s -T libfst.so.0 libfst.so
 
 # SFST
-if (grep "Provides" ../../../debian/DEBIAN/control | \
-    grep "libsfst" > /dev/null); then
-    cp $BACKEND_PREFIX/lib/libsfst.so.0.0.0 .
-    rm -f libsfst.so libsfst.so.0
-    ln -s -T libsfst.so.0.0.0 libsfst.so.0
-    ln -s -T libsfst.so.0 libsfst.so;
-fi
+# if (grep "Provides" ../../../debian/DEBIAN/control | \
+#    grep "libsfst" > /dev/null); then
+#    cp $BACKEND_PREFIX/lib/libsfst.so.0.0.0 .
+#    rm -f libsfst.so libsfst.so.0
+#    ln -s -T libsfst.so.0.0.0 libsfst.so.0
+#    ln -s -T libsfst.so.0 libsfst.so;
+# fi
 
 #if ! (readelf -a libsfst.so.0.0.0 | grep "SONAME" | \
 #      grep "libsfst.so.0" 2>&1 > /dev/null); then
@@ -137,18 +139,18 @@ fi
 #fi
 
 # foma
-if (grep "Provides" ../../../debian/DEBIAN/control \
-    | grep "libfoma" > /dev/null); then
-    cp $BACKEND_PREFIX/lib/libfoma.so.0.9.16 .
-    rm --force libfoma.so.0 libfoma.so
-    ln -s -T libfoma.so.0.9.16 libfoma.so.0
-    ln -s -T libfoma.so.0 libfoma.so;
-fi
+# if (grep "Provides" ../../../debian/DEBIAN/control \
+#    | grep "libfoma" > /dev/null); then
+#    cp $BACKEND_PREFIX/lib/libfoma.so.0.9.16 .
+#    rm --force libfoma.so.0 libfoma.so
+#    ln -s -T libfoma.so.0.9.16 libfoma.so.0
+#    ln -s -T libfoma.so.0 libfoma.so;
+# fi
 
 strip *.so
 chmod 0644 *
 
-cd ../../..
+# cd ../../..
 
 # --------------------------
 # Copy the HFST header files
@@ -185,6 +187,16 @@ do
     fi; 
 done
 cd ../../..
+
+
+# --------------------------------------
+# Copy the SWIG-generated Python modules
+# --------------------------------------
+
+for file in libhfst.py _libhfst.so;
+do
+    cp $PYTHON_PREFIX/$file debian/usr/lib/python2.7/dist-packages/;
+done
 
 
 # -----------------------
