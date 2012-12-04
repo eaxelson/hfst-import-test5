@@ -27,4 +27,4 @@ autoreconf -i && \
 ./configure --with-foma --prefix=$HFST_INSTDIR_FULL_PATH \
 --enable-calculate --enable-edit-metadata --enable-lexc \
 --enable-tagger --enable-proc --enable-shuffle && \
-make && make check && make install
+make && make install
