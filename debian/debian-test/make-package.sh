@@ -5,7 +5,7 @@
 #  -------------------------------------------------
 #
 
-HFST_PREFIX="/home/$USER/hfst-installation/"
+HFST_PREFIX=`pwd`"/hfst-installation/"
 BACKEND_PREFIX="/usr/local/"
 
 
