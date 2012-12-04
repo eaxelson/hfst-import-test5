@@ -107,6 +107,8 @@ ln -s -T libhfstospell.so.1 libhfstospell.so
 strip *.so
 chmod 0644 *
 
+cd ../../..
+
 # --------------------------
 # Copy the HFST header files
 # --------------------------
