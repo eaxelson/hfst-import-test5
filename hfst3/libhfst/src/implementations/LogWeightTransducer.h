@@ -15,7 +15,7 @@
 #include "HfstSymbolDefs.h"
 #include "HfstExceptionDefs.h"
 #include "HfstFlagDiacritics.h"
-#include <fst/fstlib.h>
+#include "fst/fstlib.h"
 #include "HfstExtractStrings.h"
 #include <cstdio>
 #include <string>

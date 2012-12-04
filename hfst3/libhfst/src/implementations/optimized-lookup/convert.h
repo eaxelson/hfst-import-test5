@@ -14,7 +14,7 @@
 #define _HFST_OL_CONVERT_H_
 
 #if HAVE_OPENFST
-#include <fst/fstlib.h>
+#include "fst/fstlib.h"
 #endif // HAVE_OPENFST
 
 #include "transducer.h"
@@ -100,54 +100,54 @@ struct StatePlaceholder {
     }
     
     unsigned int symbol_offset(
-	SymbolNumber const symbol,
-	std::set<SymbolNumber> const & flag_symbols) const {
-	if (symbol == 0) {
-	    return 0;
-	}
-	unsigned int offset = 0;
-	if (flag_symbols.size() == 0) {
-	    for(SymbolTransitionsMap::const_iterator it = inputs.begin();
-		it!= inputs.end(); ++it) {
-		if (symbol == it->first) {
-		    return offset;
-		}
-		offset += it->second.size();
-	    }
-	    
-	} else {
-	    if (inputs.count(0) != 0) { // if there are epsilons
-		offset = inputs.find(0)->second.size();
-	    }
-	    for(std::set<SymbolNumber>::iterator flag_it = flag_symbols.begin();
-		flag_it != flag_symbols.end(); ++flag_it) {
-		if (inputs.count(*flag_it) != 0) { // if this flag is present
-		    if (symbol == *flag_it) {
-			// Flags go to 0 (even if there's no epsilon)
-			return 0;
-		    }
-		    offset += inputs.find(*flag_it)->second.size();
-		}
-	    }
-	    for(SymbolTransitionsMap::const_iterator it = inputs.begin();
-		it!= inputs.end(); ++it) {
-		if (it->first == 0 || flag_symbols.count(it->first) != 0) {
-		    continue;
-		}
-		if (symbol == it->first) {
-		    return offset;
-		}
-		offset += it->second.size();
-	    }
-	    std::string message("error in conversion between optimized lookup "
-				"format and HfstTransducer;\ntried to calculate "
-				"symbol_offset for symbol not present in state");
-	    HFST_THROW_MESSAGE
-		(HfstFatalException,
-		 message);
-	}
-	std::string message("error in function StatePlaceholder::symbol_offset");
-	HFST_THROW_MESSAGE(HfstFatalException, message);
+        SymbolNumber const symbol,
+        std::set<SymbolNumber> const & flag_symbols) const {
+        if (symbol == 0) {
+            return 0;
+        }
+        unsigned int offset = 0;
+        if (flag_symbols.size() == 0) {
+            for(SymbolTransitionsMap::const_iterator it = inputs.begin();
+                it!= inputs.end(); ++it) {
+                if (symbol == it->first) {
+                    return offset;
+                }
+                offset += it->second.size();
+            }
+            
+        } else {
+            if (inputs.count(0) != 0) { // if there are epsilons
+                offset = inputs.find(0)->second.size();
+            }
+            for(std::set<SymbolNumber>::iterator flag_it = flag_symbols.begin();
+                flag_it != flag_symbols.end(); ++flag_it) {
+                if (inputs.count(*flag_it) != 0) { // if this flag is present
+                    if (symbol == *flag_it) {
+                        // Flags go to 0 (even if there's no epsilon)
+                        return 0;
+                    }
+                    offset += inputs.find(*flag_it)->second.size();
+                }
+            }
+            for(SymbolTransitionsMap::const_iterator it = inputs.begin();
+                it!= inputs.end(); ++it) {
+                if (it->first == 0 || flag_symbols.count(it->first) != 0) {
+                    continue;
+                }
+                if (symbol == it->first) {
+                    return offset;
+                }
+                offset += it->second.size();
+            }
+            std::string message("error in conversion between optimized lookup "
+                                "format and HfstTransducer;\ntried to calculate "
+                                "symbol_offset for symbol not present in state");
+            HFST_THROW_MESSAGE
+                (HfstFatalException,
+                 message);
+        }
+        std::string message("error in function StatePlaceholder::symbol_offset");
+        HFST_THROW_MESSAGE(HfstFatalException, message);
     }
 };
 
@@ -161,8 +161,8 @@ class IndexPlaceholders: public std::map<unsigned int,
 {
 public:
     bool fits(StatePlaceholder const & state,
-	      std::set<SymbolNumber> const & flag_symbols,
-	      unsigned int const position) const
+              std::set<SymbolNumber> const & flag_symbols,
+              unsigned int const position) const
     {
     if (count(position) != 0) {
         return false;
@@ -181,15 +181,15 @@ public:
     }
 
     bool unsuitable(unsigned int const index,
-		    SymbolNumber const symbols,
-		    float const packing_aggression) const
+                    SymbolNumber const symbols,
+                    float const packing_aggression) const
     {
     if (count(index) != 0) {
         return true;
     }
     
     // "Perfect packing" (under this strategy)
-/*		for (unsigned int i = 0; i < symbols; ++i) {
+/*              for (unsigned int i = 0; i < symbols; ++i) {
         
         if (count(index + i) == 0) {
         return true;

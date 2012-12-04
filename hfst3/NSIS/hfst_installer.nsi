@@ -76,7 +76,7 @@ section
 	# Install libhfst dll and HFST command line tools
 	# -----------------------------------------------
 
-	File libhfst-22.dll
+	File libhfst-23.dll
 
 	File hfst-affix-guessify.exe
 	File hfst-calculate.exe
@@ -87,9 +87,7 @@ section
 	File hfst-conjunct.exe
 	File hfst-determinize.exe
 	File hfst-disjunct.exe
-	File hfst-duplicate.exe
 	File hfst-edit-metadata.exe
-	#   -- File hfst-expand-equivalences.exe
 	File hfst-format.exe
 	File hfst-fst2fst.exe
 	File hfst-fst2strings.exe
@@ -105,6 +103,7 @@ section
 	File hfst-lookup.exe
 	File hfst-pair-test.exe
 	File hfst-minimize.exe
+	File hfst-multiply.exe
 	File hfst-name.exe
 	File hfst-optimized-lookup.exe
 	File hfst-pmatch.exe
@@ -130,8 +129,6 @@ section
 	File hfst-build-tagger.exe
 	File hfst-train-tagger.exe
 	File hfst-tag.exe
-
-	File hfst-traverse.exe
 
 	File htwolcpre1.exe
 	File htwolcpre2.exe
