@@ -730,24 +730,6 @@ public:
     friend class PmatchContainer;
 };
 
-// A vector that can be written to at any position, so that it
-// adds new elements if the desired element isn't already present.
-class Tape: public SymbolNumberVector
-{
-public:
-    void write(unsigned int i, SymbolNumber s)
-        {
-            if (this->size() > i) {
-                this->operator[](i) = s;
-            } else {
-                while (this->size() <= i) {
-                    this->push_back(NO_SYMBOL_NUMBER);
-                }
-                this->operator[](i) = s;
-            }
-        }
-};
-
 /** \brief A compiled transducer format, suitable for fast lookup operations.
  */
 class Transducer
@@ -765,35 +747,39 @@ protected:
     Weight current_weight;
     HfstOneLevelPaths * lookup_paths;
     Encoder * encoder;
-    Tape input_tape;
-    unsigned int input_tape_pos;
-    Tape output_tape;
-    unsigned int output_tape_pos;
+    SymbolNumber * input_tape;
+    SymbolNumber * output_tape;
     hfst::FdState<SymbolNumber> flag_state;
     // This is to keep track of whether we're going to take a default transition
     bool found_transition;
 
-    void try_epsilon_transitions(unsigned int input_tape_pos,
-                                 unsigned int output_tape_pos,
+    void try_epsilon_transitions(SymbolNumber * input_symbol,
+                                 SymbolNumber * output_symbol,
+                                 SymbolNumber * original_output_tape,
                                  TransitionTableIndex i);
   
-    void try_epsilon_indices(unsigned int input_tape_pos,
-                             unsigned int output_tape_pos,
+    void try_epsilon_indices(SymbolNumber * input_symbol,
+                             SymbolNumber * output_symbol,
+                             SymbolNumber * original_output_tape,
                              TransitionTableIndex i);
 
     void find_transitions(SymbolNumber input,
-                          unsigned int input_tape_pos,
-                          unsigned int output_tape_pos,
+                          SymbolNumber * input_symbol,
+                          SymbolNumber * output_symbol,
+                          SymbolNumber * original_output_tape,
                           TransitionTableIndex i);
 
     void find_index(SymbolNumber input,
-                    unsigned int input_tape_pos,
-                    unsigned int output_tape_pos,
+                    SymbolNumber * input_symbol,
+                    SymbolNumber * output_symbol,
+                    SymbolNumber * original_output_tape,
                     TransitionTableIndex i);
-    
-    void get_analyses(unsigned int input_tape_pos,
-                      unsigned int output_tape_pos,
+
+    void get_analyses(SymbolNumber * input_symbol,
+                      SymbolNumber * output_symbol,
+                      SymbolNumber * original_output_tape,
                       TransitionTableIndex i);
+
     
 
 public:
@@ -866,7 +852,7 @@ public:
     */
     HfstOneLevelPaths * lookup_fd(const std::string & s);
     HfstOneLevelPaths * lookup_fd(const char * s);
-    void note_analysis(void);
+    void note_analysis(SymbolNumber * whole_output_tape);
 
     // Methods for supporting ospell
     SymbolNumber get_unknown_symbol(void) const
@@ -1144,7 +1130,7 @@ public:
         input(InputString()),
         queue(TreeNodeQueue()),
         alphabet_translator(SymbolNumberVector()),
-//  operations(lexicon->get_fd_table()),
+// operations(lexicon->get_fd_table()),
         symbol_table(lexicon->get_symbol_table())
         {
             build_alphabet_translator();
@@ -1169,3 +1155,4 @@ public:
 }
 
 #endif
+
