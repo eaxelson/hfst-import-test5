@@ -20,12 +20,10 @@ namespace hfst_ol {
         PmatchTransducer * toplevel;
         std::string toplevel_name;
         std::map<std::string, PmatchTransducer *> rtns;
-        SymbolNumberVector best_result;
         SymbolNumber * input_tape;
         SymbolNumber * orig_input_tape;
         SymbolNumber * output_tape;
         SymbolNumber * orig_output_tape;
-        SymbolNumber * candidate_input_pos;
         SymbolNumberVector output;
 
         std::map<SpecialSymbol, SymbolNumber> special_symbols;
@@ -98,32 +96,21 @@ namespace hfst_ol {
     class PmatchTransducer
     {
     protected:
-        enum ContextChecking{none, LC, NLC, RC, NRC};
-
-// Transducers have static data, ie. tables for describing the states and
-// transitions, and dynamic data, which is altered during lookup.
-// In pmatch several instances of the same transducer may be operating
-// in a stack, so this dynamic data is put in a class of its own.
-        struct Locals
-        {
-            SymbolNumber * candidate_input_pos;
-            SymbolNumber * output_tape_head;
-            hfst::FdState<SymbolNumber> flag_state;
-            char tape_step;
-            SymbolNumber * context_placeholder;
-            ContextChecking context;
-        };
-
-        std::stack<Locals> local_stack;
-    
         std::vector<SimpleTransition> transition_table;
         std::vector<SimpleIndex> index_table;
 
         TransducerAlphabet & alphabet;
     
+        SymbolNumberVector best_result;
+        SymbolNumber * candidate_input_pos;
+        SymbolNumber * output_tape_head;
+        hfst::FdState<SymbolNumber> flag_state;
         std::map<std::string, PmatchTransducer *> & rtns;
         std::map<SpecialSymbol, SymbolNumber> & markers;
-        SymbolNumberVector & best_result;
+
+        int tape_step;
+        enum ContextChecking{none, LC, NLC, RC, NRC} context;
+        SymbolNumber * context_placeholder;
 
         // The mutually recursive lookup-handling functions
 
@@ -161,8 +148,10 @@ namespace hfst_ol {
                          TransitionTableIndex transition_table_size,
                          TransducerAlphabet & alphabet,
                          std::map<std::string, PmatchTransducer *> & rtns,
-                         std::map<SpecialSymbol, SymbolNumber> & markers,
-                         SymbolNumberVector & best_result);
+                         std::map<SpecialSymbol, SymbolNumber> & markers);
+        
+        SymbolNumberVector & get_best_result(void)
+        { return best_result; }
 
         void display() const;
 
