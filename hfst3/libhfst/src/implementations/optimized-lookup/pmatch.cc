@@ -12,9 +12,9 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
             
     std::string transducer_name;
     try {
-	transducer_name = parse_name_from_hfst3_header(inputstream);
+        transducer_name = parse_name_from_hfst3_header(inputstream);
     } catch(TransducerHeaderException & e) {
-	transducer_name = "TOP";
+        transducer_name = "TOP";
     }
     toplevel_name = transducer_name;
     TransducerHeader header(inputstream);
@@ -45,16 +45,16 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
         rtns,
         special_symbols);
     while (inputstream.good()) {
-	try {
-	    transducer_name = parse_name_from_hfst3_header(inputstream);
-	} catch (TransducerHeaderException & e) {
-	    break;
-	}
+        try {
+            transducer_name = parse_name_from_hfst3_header(inputstream);
+        } catch (TransducerHeaderException & e) {
+            break;
+        }
         header = TransducerHeader(inputstream);
         TransducerAlphabet dummy = TransducerAlphabet(
-	    inputstream, header.symbol_count());
+            inputstream, header.symbol_count());
         add_rtn(
-	    new hfst_ol::PmatchTransducer(inputstream,
+            new hfst_ol::PmatchTransducer(inputstream,
                                           header.index_table_size(),
                                           header.target_table_size(),
                                           alphabet,
@@ -134,50 +134,50 @@ std::string PmatchContainer::parse_name_from_hfst3_header(std::istream & f)
     int c;
     for(header_loc = 0; header_loc < strlen(header1) + 1; header_loc++)
     {
-	c = f.get();
-	if(c != header1[header_loc]) {
-	    break;
-	}
+        c = f.get();
+        if(c != header1[header_loc]) {
+            break;
+        }
     }
     if(header_loc == strlen(header1) + 1)
     {
-	unsigned short remaining_header_len;
-	f.read((char*) &remaining_header_len, sizeof(remaining_header_len));
-	if (f.get() != '\0') {
+        unsigned short remaining_header_len;
+        f.read((char*) &remaining_header_len, sizeof(remaining_header_len));
+        if (f.get() != '\0') {
             HFST_THROW(TransducerHeaderException);
-	}
-	char * headervalue = new char[remaining_header_len];
-	f.read(headervalue, remaining_header_len);
-	if (headervalue[remaining_header_len - 1] != '\0') {
+        }
+        char * headervalue = new char[remaining_header_len];
+        f.read(headervalue, remaining_header_len);
+        if (headervalue[remaining_header_len - 1] != '\0') {
             HFST_THROW(TransducerHeaderException);
-	}
-	char type[remaining_header_len];
-	char name[remaining_header_len];
-	int i = 0;
-	while (i < remaining_header_len) {
-	    if (strstr(headervalue + i, "type")) {
-		strcpy(type, headervalue + i + strlen("type") + 1);
-	    } else if (strstr(headervalue + i, "name")) {
-		strcpy(name, headervalue + i + strlen("name") + 1);
-	    }
-	    while (i < remaining_header_len &&
-		   headervalue[i] != '\0') {
-		++i;
-	    }
-	    ++i;
-	}
-	delete[] headervalue;
-	if (strcmp(type, "HFST_OL") && strcmp(type, "HFST_OLW")) {
+        }
+        char type[remaining_header_len];
+        char name[remaining_header_len];
+        int i = 0;
+        while (i < remaining_header_len) {
+            if (strstr(headervalue + i, "type")) {
+                strcpy(type, headervalue + i + strlen("type") + 1);
+            } else if (strstr(headervalue + i, "name")) {
+                strcpy(name, headervalue + i + strlen("name") + 1);
+            }
+            while (i < remaining_header_len &&
+                   headervalue[i] != '\0') {
+                ++i;
+            }
+            ++i;
+        }
+        delete[] headervalue;
+        if (strcmp(type, "HFST_OL") && strcmp(type, "HFST_OLW")) {
             HFST_THROW(TransducerHeaderException);
-	}
-	return std::string(name);
+        }
+        return std::string(name);
     } else // nope. put back what we've taken
     {
-	f.unget(); // first the non-matching character
-	for(int i = header_loc - 1; i>=0; i--) {
-       // then the characters that did match (if any)
-	    f.unget();
-	}
+        f.unget(); // first the non-matching character
+        for(int i = header_loc - 1; i>=0; i--) {
+            // then the characters that did match (if any)
+            f.unget();
+        }
         HFST_THROW(TransducerHeaderException);
     }
 }
@@ -196,19 +196,19 @@ std::string PmatchContainer::match(std::string & input)
     output.clear();
     while (has_queued_input()) {
         SymbolNumber * input_entry = input_tape;
-	toplevel->match(&input_tape, &output_tape);
-	copy_to_output(toplevel->get_best_result());
-	if (input_entry == input_tape) {
-	    output.push_back(*input_tape++);
-	}
+        toplevel->match(&input_tape, &output_tape);
+        copy_to_output(best_result);
+        if (input_entry == input_tape) {
+            output.push_back(*input_tape++);
+        }
     }
     return stringify_output();
 }
 
 void PmatchContainer::copy_to_output(SymbolNumberVector & best_result)
 {
-    for (SymbolNumberVector::const_iterator it = best_result.begin();
-         it != best_result.end(); ++it) {
+    for (SymbolNumberVector::const_iterator it = locals.back().best_result.begin();
+         it != locals.back().best_result.end(); ++it) {
         output.push_back(*it);
     }
 }
@@ -251,7 +251,7 @@ bool PmatchContainer::has_queued_input(void)
 // void PmatchContainer::tokenize_from_queue(void)
 // {
 //     if (input_queue == NULL || *input_queue == '\0') {
-// 	return;
+//     return;
 //     }
 //     char * orig_input_queue = input_queue;
 //     tokenize(&input_queue);
@@ -267,15 +267,22 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
                                    TransitionTableIndex transition_table_size,
                                    TransducerAlphabet & alpha,
                                    std::map<std::string, PmatchTransducer *> & rtn_map,
-                                   std::map<SpecialSymbol, SymbolNumber> & marker_symbols):
+                                   std::map<SpecialSymbol, SymbolNumber> & marker_symbols,
+                                   SymbolNumberVector & best):
     alphabet(alpha),
     rtns(rtn_map),
     markers(marker_symbols),
-    tape_step(1),
-    context(none),
-    context_placeholder(NULL)
+    best_result(best)
 {
-    flag_state = alphabet.get_fd_table();
+    // initialize the stack for local variables
+    Locals front;
+    front.flag_state = alphabet.get_fd_table();
+    front.tape_step = 1;
+    front.context = none;
+    front.context_placeholder = NULL;
+    local_stack.push_back(front);
+
+    // Allocate and read tables
     char * indextab = (char*) malloc(SimpleIndex::SIZE * index_table_size);
     char * transitiontab = (char*) malloc(SimpleTransition::SIZE * transition_table_size);
     is.read(indextab, SimpleIndex::SIZE * index_table_size);
@@ -283,21 +290,21 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
     char * orig_p = indextab;
     while(index_table_size) {
         index_table.push_back(
-	    SimpleIndex(*(SymbolNumber *) indextab,
-			*(TransitionTableIndex *) (indextab + sizeof(SymbolNumber))));
-            --index_table_size;
-            indextab += SimpleIndex::SIZE;
-        }
+            SimpleIndex(*(SymbolNumber *) indextab,
+                        *(TransitionTableIndex *) (indextab + sizeof(SymbolNumber))));
+        --index_table_size;
+        indextab += SimpleIndex::SIZE;
+    }
     free(orig_p);
     orig_p = transitiontab;
     while(transition_table_size) {
         transition_table.push_back(
-	    SimpleTransition(*(SymbolNumber *) transitiontab,
-			     *(SymbolNumber *) (transitiontab + sizeof(SymbolNumber)),
-			     *(TransitionTableIndex *) (transitiontab + 2*sizeof(SymbolNumber))));
-            --transition_table_size;
-            transitiontab += SimpleTransition::SIZE;
-        }
+            SimpleTransition(*(SymbolNumber *) transitiontab,
+                             *(SymbolNumber *) (transitiontab + sizeof(SymbolNumber)),
+                             *(TransitionTableIndex *) (transitiontab + 2*sizeof(SymbolNumber))));
+        --transition_table_size;
+        transitiontab += SimpleTransition::SIZE;
+    }
     free(orig_p);
 }
 
@@ -311,28 +318,28 @@ void PmatchContainer::initialize_input(const char * input)
     int i = 1;
     while (**input_str_ptr != 0) {
         char * original_input_loc = *input_str_ptr;
-	k = encoder->find_key(input_str_ptr);
-	if (k == NO_SYMBOL_NUMBER) {
+        k = encoder->find_key(input_str_ptr);
+        if (k == NO_SYMBOL_NUMBER) {
             // the encoder moves as far as it can during tokenization,
             // we want to go back to be in position to add one utf-8 char
             *input_str_ptr = original_input_loc;
-	    // Regular tokenization failed
-	    int bytes_to_tokenize = nByte_utf8(**input_str_ptr);
-	    if (bytes_to_tokenize == 0) {
-		// even if it's not utf-8, tokenize a byte at a time
-		bytes_to_tokenize = 1;
-	    }
-	    char new_symbol[bytes_to_tokenize + 1];
-	    memcpy(new_symbol, *input_str_ptr, bytes_to_tokenize);
+            // Regular tokenization failed
+            int bytes_to_tokenize = nByte_utf8(**input_str_ptr);
+            if (bytes_to_tokenize == 0) {
+                // even if it's not utf-8, tokenize a byte at a time
+                bytes_to_tokenize = 1;
+            }
+            char new_symbol[bytes_to_tokenize + 1];
+            memcpy(new_symbol, *input_str_ptr, bytes_to_tokenize);
             new_symbol[bytes_to_tokenize] = '\0';
-	    (*input_str_ptr) += bytes_to_tokenize;
-	    alphabet.add_symbol(new_symbol);
-	    encoder->read_input_symbol(new_symbol, symbol_count);
-	    k = symbol_count;
-	    ++symbol_count;
-	}
-	input_tape[i] = k;
-	++i;
+            (*input_str_ptr) += bytes_to_tokenize;
+            alphabet.add_symbol(new_symbol);
+            encoder->read_input_symbol(new_symbol, symbol_count);
+            k = symbol_count;
+            ++symbol_count;
+        }
+        input_tape[i] = k;
+        ++i;
     }
     input_tape[i] = NO_SYMBOL_NUMBER;
     // Place input_tape beyond the starting NO_SYMBOL
@@ -343,11 +350,14 @@ void PmatchContainer::initialize_input(const char * input)
 void PmatchTransducer::match(SymbolNumber ** input_tape_entry,
                              SymbolNumber ** output_tape_entry)
 {
-    best_result.clear();
-    candidate_input_pos = *input_tape_entry;
-    output_tape_head = *output_tape_entry;
+    locals.back().best_result.clear();
+    locals.back().candidate_input_pos = *input_tape_entry;
+    locals.back().output_tape_head = *output_tape_entry;
+    locals.back().context = none;
+    locals.back().tape_step = 1;
+    locals.back().context_placeholder = NULL;
     get_analyses(*input_tape_entry, *output_tape_entry, 0);
-    *input_tape_entry = candidate_input_pos;
+    *input_tape_entry = locals.back().candidate_input_pos;
 }
 
 // void PmatchTransducer::take_best_path(void)
@@ -363,9 +373,9 @@ void PmatchTransducer::match(SymbolNumber ** input_tape_entry,
 void PmatchTransducer::note_analysis(SymbolNumber * input_tape,
                                      SymbolNumber * output_tape)
 {
-    if (input_tape > candidate_input_pos) {
-        best_result.assign(output_tape_head, output_tape);
-        candidate_input_pos = input_tape;
+    if (input_tape > locals.back().candidate_input_pos) {
+        locals.back().best_result.assign(locals.back().output_tape_head, output_tape);
+        locals.back().candidate_input_pos = input_tape;
     }
 }
 
@@ -381,15 +391,15 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
             SymbolNumber output = transition_table[i].output;
             if (!checking_context()) {
                 if (!try_entering_context(output)) {
-                        *output_tape = output;
-                        get_analyses(input_tape,
-                                     output_tape + 1,
-                                     transition_table[i].target);
-                        ++i;
+                    *output_tape = output;
+                    get_analyses(input_tape,
+                                 output_tape + 1,
+                                 transition_table[i].target);
+                    ++i;
 
                 } else {
                     // We're going to do some context checking
-                    context_placeholder = input_tape;
+                    locals.back().context_placeholder = input_tape;
                     get_analyses(input_tape + tape_step,
                                  output_tape,
                                  transition_table[i].target);
@@ -400,7 +410,7 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
                 // We *are* checking context and may be done
                 if (try_exiting_context(output)) {
                     // We've successfully completed a context check
-                    input_tape = context_placeholder;
+                    input_tape = locals.back().context_placeholder;
                     get_analyses(input_tape,
                                  output_tape,
                                  transition_table[i].target);
@@ -413,11 +423,10 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
                     ++i;
                 }
             }
-            // Then we check for flags, which matter on the input-side.
         } else if (alphabet.is_flag_diacritic(
                        transition_table[i].input)) {
-            std::vector<short> old_values(flag_state.get_values());
-            if (flag_state.apply_operation(
+            std::vector<short> old_values(locals.back().flag_state.get_values());
+            if (locals.back().flag_state.apply_operation(
                     *(alphabet.get_operation(
                           transition_table[i].input)))) {
                 // flag diacritic allowed
@@ -426,7 +435,7 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
                              output_tape + 1,
                              transition_table[i].target);
             }
-            flag_state.assign_values(old_values);
+            locals.back().flag_state.assign_values(old_values);
             ++i;
         } else { // it's not epsilon and it's not a flag, so nothing to do
             return;
@@ -440,10 +449,10 @@ void PmatchTransducer::try_epsilon_indices(SymbolNumber * input_tape,
                                            TransitionTableIndex i)
 {
     if (index_table[i].input == 0) {
-    try_epsilon_transitions(input_tape,
-                            output_tape,
-                            index_table[i].target -
-                            TRANSITION_TARGET_TABLE_START);
+        try_epsilon_transitions(input_tape,
+                                output_tape,
+                                index_table[i].target -
+                                TRANSITION_TARGET_TABLE_START);
     }
 
 }
@@ -480,9 +489,9 @@ void PmatchTransducer::find_index(SymbolNumber input,
 {
     if (index_table[i+input].input == input) {
         find_transitions(input,
-             input_tape,
-             output_tape,
-             index_table[i+input].target - TRANSITION_TARGET_TABLE_START);
+                         input_tape,
+                         output_tape,
+                         index_table[i+input].target - TRANSITION_TARGET_TABLE_START);
     }
 }
 
@@ -508,7 +517,7 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
         }
 
         SymbolNumber input = *input_tape;
-        input_tape += tape_step;
+        input_tape += locals.back().tape_step;
 
         find_transitions(input,
                          input_tape,
@@ -530,7 +539,7 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
 
 
         SymbolNumber input = *input_tape;
-        input_tape += tape_step;
+        input_tape += locals.back().tape_step;
 
         find_index(input,
                    input_tape,
@@ -542,18 +551,18 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
 
 bool PmatchTransducer::checking_context(void) const
 {
-    return context != none;
+    return locals.back().context != none;
 }
 
 bool PmatchTransducer::try_entering_context(SymbolNumber symbol)
 {
     if (symbol == markers[LC_entry]) {
-        context = LC;
-        tape_step = -1;
+        locals.back().context = LC;
+        locals.back().tape_step = -1;
         return true;
     } else if (symbol == markers[RC_entry]) {
-        context = RC;
-        tape_step = 1;
+        locals.back().context = RC;
+        locals.back().tape_step = 1;
         return true;
     } else {
         return false;
@@ -562,7 +571,7 @@ bool PmatchTransducer::try_entering_context(SymbolNumber symbol)
 
 bool PmatchTransducer::try_exiting_context(SymbolNumber symbol)
 {
-    switch (context) {
+    switch (locals.back().context) {
     case LC:
         if (symbol == markers[LC_exit]) {
             exit_context();
@@ -584,8 +593,8 @@ bool PmatchTransducer::try_exiting_context(SymbolNumber symbol)
 
 void PmatchTransducer::exit_context(void)
 {
-    context = none;
-    tape_step = 1;
+    locals.back().context = none;
+    locals.back().tape_step = 1;
 }
 
 }
