@@ -205,7 +205,7 @@ bool Transducer::initialize_input(const char * input)
 {
     char * input_str = const_cast<char *>(input);
     char ** input_str_ptr = &input_str;
-    input_tape.clear();
+    unsigned int i = 0;
     SymbolNumber k = NO_SYMBOL_NUMBER;
     while(**input_str_ptr != 0) {
         char * original_input_loc = *input_str_ptr;
@@ -225,9 +225,10 @@ bool Transducer::initialize_input(const char * input)
             k = alphabet->get_symbol_table().size() - 1;
             encoder->read_input_symbol(new_symbol, k);
         }
-        input_tape.push_back(k);
+        input_tape.write(i, k);
+        ++i;
     }
-    input_tape.push_back(NO_SYMBOL_NUMBER);
+    input_tape.write(i, NO_SYMBOL_NUMBER);
     return true;
 }
 
