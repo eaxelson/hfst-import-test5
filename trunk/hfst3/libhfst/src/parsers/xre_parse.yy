@@ -543,8 +543,7 @@ REGEXP5: REGEXP6 { }
             delete $3;
         }
        | REGEXP5 UPPER_PRIORITY_UNION REGEXP6 {
-            xreerror("No upper priority union");
-            $$ = $1;
+            $$ = & $1->priority_union(*$3);
             delete $3;
         }
        | REGEXP5 LOWER_PRIORITY_UNION REGEXP6 {

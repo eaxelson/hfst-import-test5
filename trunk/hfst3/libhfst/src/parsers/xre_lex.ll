@@ -92,6 +92,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 ">"   { return AFTER; }
 
 ".o." { return COMPOSITION; }
+".O." { return LENIENT_COMPOSITION; }
 ".x." { return CROSS_PRODUCT; }
 ".P." { return UPPER_PRIORITY_UNION; }
 ".p." { return LOWER_PRIORITY_UNION; }
@@ -99,6 +100,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 ".-l." { return LOWER_MINUS; }
 
 "`[" { 
+    // TODO:
   //  xrelval.values = hfst::xre::get_n_to_k(xretext);
     return SUBSTITUTE_LEFT;
     }
