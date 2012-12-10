@@ -8,7 +8,7 @@ hfst-train-tagger-loc$(EXEEXT)
 EXTRA_DIST=hfst-train-tagger.sh
 BUILD_MODEL_SRC=$(srcdir)/build_model_src
 USE_MODEL_SRC=$(srcdir)/use_model_src
-AM_CPPFLAGS=-I${top_srcdir}/libhfst/src -Wno-ignored-qualifiers -Wno-sign-compare -Wno-unused-parameter
+AM_CPPFLAGS=-I${top_srcdir}/libhfst/src -Wno-sign-compare -Wno-unused-parameter
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 
 AM_CPPFLAGS += -I${top_srcdir}/back-ends/foma \
