@@ -42,9 +42,9 @@ EC "%"{U8C}
 /* any ASCII */
 A7 [\x00-\x7e]
 /* special meaning in xre */
-A7RESTRICTED [- |<>%!,:;@0~\\&?$+*/_(){}\]\[-]
+A7RESTRICTED [- |<>%!,^:;@0~\\&?$+*/_(){}\]\[-]
 /* non-restricted ASCII */
-A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%!,:;@0~\\&?$+*/_(){}\]\[-]
+A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%!,^:;@0~\\&?$+*/_(){}\]\[-]
 
 WEIGHT [0-9]+(\.[0-9]+)?
 
@@ -98,7 +98,10 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 ".-u." { return UPPER_MINUS; }
 ".-l." { return LOWER_MINUS; }
 
-"`[[" { return SUBSTITUTE_LEFT; }
+"`[" { 
+  //  xrelval.values = hfst::xre::get_n_to_k(xretext);
+    return SUBSTITUTE_LEFT;
+    }
 
 "\\<=" { return LEFT_RESTRICTION; }
 "<=>" { return LEFT_RIGHT_ARROW; }

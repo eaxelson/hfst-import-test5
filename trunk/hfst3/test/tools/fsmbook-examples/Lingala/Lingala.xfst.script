@@ -28,38 +28,38 @@
 ########################################################################
 
 define Stems [{bet} |        # hit
-              {béb} |        # deteriorate
+              {bï¿½b} |        # deteriorate
               {bomb} |       # hide
-              {bóndel} |     # plead
-              {bóngol} |     # change
-              {bót} |        # be born
-              {búk} |        # break
+              {bï¿½ndel} |     # plead
+              {bï¿½ngol} |     # change
+              {bï¿½t} |        # be born
+              {bï¿½k} |        # break
               {fung} |       # open
               {kabol} |      # divide
               {kang} |       # attach
               {kom} |        # write
               {kund} |       # bury
-              {kóm} |        # arrive
+              {kï¿½m} |        # arrive
               {lakis} |      # teach
-              {lí}  |        # eat
+              {lï¿½}  |        # eat
               {lob} |        # speak
               {luk} |        # search
               {ndim} |       # agree
               {palangan} |   # disperse
               {pangwis} |    # wipe
-              {sál} |        # make
+              {sï¿½l} |        # make
               {sepel} |      # enjoy
-              {sómb} |       # buy
-              {tál} |        # look
-              {támbol} |     # walk
+              {sï¿½mb} |       # buy
+              {tï¿½l} |        # look
+              {tï¿½mbol} |     # walk
               {tambwis} |    # drive
               {tataban} |    # be surprised
-              {tún} |        # ask
-              {yébis}        # yell
+              {tï¿½n} |        # ask
+              {yï¿½bis}        # yell
           ] ;
 
 define L [a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|
-          á|é|í|ó|ú];
+          ï¿½|ï¿½|ï¿½|ï¿½|ï¿½];
 
 define Person1 [Per ":" 1];
 define Person2 [Per ":" 2];
@@ -83,7 +83,7 @@ define Gender3 [Gen ":" [1 "." 2 | 1a "." 2 | 3 "." 4 | 5 "." 6 |
 # That is, the order of the morphemes is: REV, CAUS, PASS, APPL, RECIP
 
 # alobaloba 'he/she speak SP ITER'
-# alíalia   'he eat SP ITER'
+# alï¿½alia   'he eat SP ITER'
 
 define PastTense [Past ":" [Rec|Hist|MoreRem|MostRem]];
 define PresTense [Pres ":" [Cont|Hab1|Hab2]];
@@ -220,6 +220,6 @@ regex VerbLex
         .o.
        Cleanup ;
 
-write att Lingala FOO BAR
+save stack Lingala.foma.gz
 
 

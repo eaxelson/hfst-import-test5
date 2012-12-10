@@ -5,7 +5,7 @@ sed '
 s/arc(net_[a-z0-9]*, //
 s/, / /g
 
-
+s/" "/"@_SPACE_@"/
 s/"?":/"@_UNKNOWN_SYMBOL_@":/
 s/:"?"/:"@_UNKNOWN_SYMBOL_@"/
 s/ "?"/ "@_IDENTITY_SYMBOL_@"/

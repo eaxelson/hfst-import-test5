@@ -271,7 +271,8 @@ regex [FinnWords .o. Gen
            Viol0 .o. Pardon
       ];
 
-write att FinnishOTProsody FOO BAR
+#write att FinnishOTProsody FOO BAR
+save stack FinnishOTProsody.foma.gz
 
 # print lower-words
 

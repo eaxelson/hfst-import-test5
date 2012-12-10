@@ -65,7 +65,8 @@ define YaleShooting   [Alive & ~Loaded]
 
 regex YaleShooting & InertLoaded & InertAlive & LoadFLoaded & ShootFAlive & ShootFLoaded;
 
-write att YaleShooting FOO BAR
+#write prolog > YaleShooting
+save stack YaleShooting.foma.gz
 
 # The resulting network contains an infinite number of valid instantiations of the Yale Shooting scenario. For example, it includes the following frame sequence where the target dies:
 

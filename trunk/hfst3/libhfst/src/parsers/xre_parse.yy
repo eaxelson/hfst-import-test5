@@ -563,8 +563,9 @@ REGEXP6: REGEXP7 { }
 
 REGEXP7: REGEXP8 { }
        | REGEXP7 IGNORING REGEXP8 {
-            xreerror("No ignoring");
-            $$ = $1;
+           // xreerror("No ignoring");
+           // $$ = $1;
+            $$ = & $1->insert_freely(*$3);
             delete $3;
         }
        | REGEXP7 IGNORE_INTERNALLY REGEXP8 {
@@ -672,7 +673,7 @@ REGEXP9: REGEXP10 { }
             $$ = & $1->output_project();
         }
        | REGEXP9 CATENATE_N {
-            $$ = & $1->repeat_n(2);
+            $$ = & $1->repeat_n($2);
         }
        | REGEXP9 CATENATE_N_PLUS {
             $$ = & $1->repeat_n_plus($2);
@@ -688,8 +689,8 @@ REGEXP9: REGEXP10 { }
 
 REGEXP10: REGEXP11 { }
        | TERM_COMPLEMENT REGEXP10 {
-            HfstTransducer* any = new HfstTransducer(hfst::internal_unknown,
-                                        hfst::internal_unknown,
+            HfstTransducer* any = new HfstTransducer(hfst::internal_identity,
+                                        hfst::internal_identity,
                                         hfst::xre::format);
             $$ = & ( any->subtract(*$2));
             delete $2;

@@ -1,7 +1,7 @@
 check:
- # $(top_srcdir)/test/tools/fsmbook-examples/test-example.sh \
- # $(srcdir)/MonishGuesserAnalyzer $(builddir)/MonishGuesserAnalyzer \
- # ../../../../tools/src/  #--test-full
+	$(top_srcdir)/test/tools/fsmbook-examples/test-foma.sh \
+	$(srcdir)/MonishGuesserAnalyzer $(builddir)/MonishGuesserAnalyzer \
+	../../../../tools/src/  #--test-full
 
 EXTRA_DIST=MonishGuesserAnalyzer.hfst.script MonishGuesserAnalyzer.xfst.script \
 	MonishGuesserAnalyzer.xfst.att
