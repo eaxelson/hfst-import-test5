@@ -1,10 +1,10 @@
 check:
-	$(top_srcdir)/test/tools/fsmbook-examples/test-example.sh \
+	$(top_srcdir)/test/tools/fsmbook-examples/test-foma.sh \
 	$(srcdir)/DateParser $(builddir)/DateParser \
 	../../../../tools/src/ # --test-full
 
 EXTRA_DIST=DateParser.hfst.script DateParser.xfst.script \
-	   DateParser.xfst.att
+	   DateParser.xfst.att DateParser2.hfst.script README
 
 clean-local:
 	$(top_srcdir)/test/tools/fsmbook-examples/remove-complement.sh \

@@ -35,4 +35,5 @@ define Rules [ %^U -> u , %^O -> o, %^Ó -> ó , %^A -> a || BackV ?* _ ]
                   [ %^U -> i , %^O -> e , %^Ó -> é , %^A -> ä ] ;
 
 read regex Verbs .o. Rules ;
-write prolog > MonishGuesserAnalyzer ;
+# write prolog > MonishGuesserAnalyzer ;
+save stack MonishGuesserAnalyzer.foma.gz

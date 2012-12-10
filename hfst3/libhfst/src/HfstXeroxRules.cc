@@ -1981,7 +1981,7 @@ namespace hfst
           // for epenthesis rules
           // it can't have more than one epsilon repetition in a row
 
-          //retval = noRepetitionConstraint( retval );
+          retval = noRepetitionConstraint( retval );
 
         //printf("noRepetitionConstraint: \n");
         //retval.write_in_att_format(stdout, 1);
@@ -1995,7 +1995,7 @@ namespace hfst
               //retval.write_in_att_format(stdout, 1);
 
           }
-
+          retval = removeB2Constraint(retval);
 
 
 
@@ -2005,10 +2005,6 @@ namespace hfst
           //printf("after remove markers: \n");
           //retval.write_in_att_format(stdout, 1);
 
-          retval = removeB2Constraint(retval);
-
-          //printf("after remove B2: \n");
-          //retval.write_in_att_format(stdout, 1);
 
           // deals with boundary symbol
           retval = applyBoundaryMark( retval );
@@ -2044,8 +2040,9 @@ namespace hfst
             if ( !optional )
             {
                 retval = mostBracketsPlusConstraint(retval);
-                retval = removeB2Constraint(retval);
+
             }
+            retval = removeB2Constraint(retval);
 
             retval = removeMarkers( retval );
 
@@ -2145,6 +2142,9 @@ namespace hfst
         retval = noRepetitionConstraint( retval );
 
 
+
+          retval = removeB2Constraint(retval);
+
           retval = removeMarkers( retval );
 
           // deals with boundary symbol
@@ -2154,7 +2154,7 @@ namespace hfst
       }
       // left to right
     HfstTransducer replace_leftmost_longest_match( const std::vector<Rule> &ruleVector )
-      {
+    {
 
         HfstTransducer uncondidtionalTr;
         if ( ruleVector.size() == 1 )
@@ -2171,8 +2171,8 @@ namespace hfst
           HfstTransducer retval (leftMostConstraint(uncondidtionalTr));
           //retval = leftMostConstraint(uncondidtionalTr);
 
-        //printf("leftMostConstraint: \n");
-        //retval.write_in_att_format(stdout, 1);
+          //printf("leftMostConstraint: \n");
+          //retval.write_in_att_format(stdout, 1);
 
           retval = longestMatchLeftMostConstraint( retval );
 
@@ -2181,9 +2181,11 @@ namespace hfst
 
 
           // for epenthesis rules
-        // it can't have more than one epsilon repetition in a row
-        retval = noRepetitionConstraint( retval );
+          // it can't have more than one epsilon repetition in a row
+          retval = noRepetitionConstraint( retval );
 
+          // remove LM2, RM2
+          retval = removeB2Constraint(retval);
 
           retval = removeMarkers( retval );
 
@@ -2216,9 +2218,10 @@ namespace hfst
 
 
           // for epenthesis rules
-        // it can't have more than one epsilon repetition in a row
-        retval = noRepetitionConstraint( retval );
-
+          // it can't have more than one epsilon repetition in a row
+          retval = noRepetitionConstraint( retval );
+          // remove LM2, RM2
+          retval = removeB2Constraint(retval);
 
           retval = removeMarkers( retval );
 
@@ -2258,9 +2261,10 @@ namespace hfst
 
 
           // for epenthesis rules
-        // it can't have more than one epsilon repetition in a row
-        retval = noRepetitionConstraint( retval );
-
+          // it can't have more than one epsilon repetition in a row
+          retval = noRepetitionConstraint( retval );
+          // remove LM2, RM2
+          retval = removeB2Constraint(retval);
 
           retval = removeMarkers( retval );
 
@@ -2285,9 +2289,10 @@ namespace hfst
 
 
           // for epenthesis rules
-        // it can't have more than one epsilon repetition in a row
-        retval = noRepetitionConstraint( retval );
-
+          // it can't have more than one epsilon repetition in a row
+          retval = noRepetitionConstraint( retval );
+          // remove LM2, RM2
+          retval = removeB2Constraint(retval);
 
           retval = removeMarkers( retval );
 
@@ -2299,7 +2304,7 @@ namespace hfst
 
 
     HfstTransducer replace_leftmost_shortest_match(const std::vector<Rule> &ruleVector )
-      {
+    {
         HfstTransducer uncondidtionalTr;
         if ( ruleVector.size() == 1 )
         {
@@ -2311,59 +2316,58 @@ namespace hfst
         }
 
 
-          HfstTransducer retval (leftMostConstraint(uncondidtionalTr));
-          //retval = leftMostConstraint(uncondidtionalTr);
-          retval = shortestMatchLeftMostConstraint( retval );
+        HfstTransducer retval (leftMostConstraint(uncondidtionalTr));
+        //retval = leftMostConstraint(uncondidtionalTr);
+        retval = shortestMatchLeftMostConstraint( retval );
 
-          //printf("sh tr: \n");
-          //retval.write_in_att_format(stdout, 1);
+        //printf("sh tr: \n");
+        //retval.write_in_att_format(stdout, 1);
 
 
-          // for epenthesis rules
+        // for epenthesis rules
         // it can't have more than one epsilon repetition in a row
         retval = noRepetitionConstraint( retval );
+        // remove LM2, RM2
+        retval = removeB2Constraint(retval);
 
+        retval = removeMarkers( retval );
 
-          retval = removeMarkers( retval );
+        // deals with boundary symbol
+        retval = applyBoundaryMark( retval );
 
-
-          // deals with boundary symbol
-            retval = applyBoundaryMark( retval );
-
-          return retval;
+        return retval;
       }
 
-      HfstTransducer replace_rightmost_shortest_match( const Rule &rule )
-      {
+    HfstTransducer replace_rightmost_shortest_match( const Rule &rule )
+    {
 
-          HfstTransducer uncondidtionalTr(bracketedReplace( rule, true));
-          //uncondidtionalTr = bracketedReplace( rule, true);
+        HfstTransducer uncondidtionalTr(bracketedReplace( rule, true));
+        //uncondidtionalTr = bracketedReplace( rule, true);
 
-          HfstTransducer retval (rightMostConstraint(uncondidtionalTr));
-          //retval = rightMostConstraint(uncondidtionalTr);
-          retval = shortestMatchRightMostConstraint( retval );
+        HfstTransducer retval (rightMostConstraint(uncondidtionalTr));
+        //retval = rightMostConstraint(uncondidtionalTr);
+        retval = shortestMatchRightMostConstraint( retval );
 
-          //printf("sh tr: \n");
-          //retval.write_in_att_format(stdout, 1);
+        //printf("sh tr: \n");
+        //retval.write_in_att_format(stdout, 1);
 
 
-          // for epenthesis rules
+        // for epenthesis rules
         // it can't have more than one epsilon repetition in a row
         retval = noRepetitionConstraint( retval );
+        // remove LM2, RM2
+        retval = removeB2Constraint(retval);
 
+        retval = removeMarkers( retval );
 
-          retval = removeMarkers( retval );
+        // deals with boundary symbol
+        retval = applyBoundaryMark( retval );
 
-          // deals with boundary symbol
-          retval = applyBoundaryMark( retval );
-
-          return retval;
-      }
+        return retval;
+    }
 
     HfstTransducer replace_rightmost_shortest_match( const std::vector<Rule> &ruleVector )
-      {
-
-
+    {
         HfstTransducer uncondidtionalTr;
         if ( ruleVector.size() == 1 )
         {
@@ -2373,29 +2377,27 @@ namespace hfst
         {
             uncondidtionalTr = parallelBracketedReplace(ruleVector, true);
         }
+        HfstTransducer retval (rightMostConstraint(uncondidtionalTr));
+        //retval = rightMostConstraint(uncondidtionalTr);
+        retval = shortestMatchRightMostConstraint( retval );
+
+        //printf("sh tr: \n");
+        //retval.write_in_att_format(stdout, 1);
 
 
-          HfstTransducer retval (rightMostConstraint(uncondidtionalTr));
-          //retval = rightMostConstraint(uncondidtionalTr);
-          retval = shortestMatchRightMostConstraint( retval );
-
-          //printf("sh tr: \n");
-          //retval.write_in_att_format(stdout, 1);
-
-
-          // for epenthesis rules
+        // for epenthesis rules
         // it can't have more than one epsilon repetition in a row
         retval = noRepetitionConstraint( retval );
+        // remove LM2, RM2
+        retval = removeB2Constraint(retval);
 
+        retval = removeMarkers( retval );
 
+        // deals with boundary symbol
+        retval = applyBoundaryMark( retval );
 
-          retval = removeMarkers( retval );
-
-          // deals with boundary symbol
-          retval = applyBoundaryMark( retval );
-
-          return retval;
-      }
+        return retval;
+    }
 
 
 
@@ -2596,11 +2598,12 @@ retval.write_in_att_format(stdout, 1);
               //printf("after most bracket star: \n");
               //retval.write_in_att_format(stdout, 1);
 
-              retval = removeB2Constraint(retval);
 
-              //printf("after remove B2: \n");
-              //retval.write_in_att_format(stdout, 1);
           }
+
+          retval = removeB2Constraint(retval);
+        //printf("after remove B2: \n");
+        //retval.write_in_att_format(stdout, 1);
 
           retval = removeMarkers( retval );
 
@@ -2726,6 +2729,10 @@ retval.write_in_att_format(stdout, 1);
         retval.subtract(tmp).minimize();
 
         retval.remove_from_alphabet(restrictionMark);
+
+        // deals with boundary symbol
+        retval = applyBoundaryMark( retval );
+
         return retval;
     }
 

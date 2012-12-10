@@ -1,12 +1,11 @@
-
+TOOLDIR=" ../../../../tools/src/./"
 
 # We start our version of the Yale Shooting xfst script with a few simple 
 # definitions
 
 echo 'load | loaded | shoot | alive' | $TOOLDIR/hfst-regexp2fst -f $1 > Proposition 
 echo '[%+ | %- | F] @"Proposition" ' | $TOOLDIR/hfst-regexp2fst -f $1 > Valuation 
-echo '%[ (@"Valuation" [%, @"Valuation"]*) %]' | $TOOLDIR/hfst-regexp2fst -f $1 \
-> Frame 
+echo '%[ (@"Valuation" [%, @"Valuation"]*) %]' | $TOOLDIR/hfst-regexp2fst -f $1 > Frame 
 
 # With these definitions, the expression Frame+ describes an infinite language
 # of frame sequences including the one above for the Yale Shooting scenario.
@@ -35,18 +34,13 @@ echo '@"Frame" & $[F alive]' | $TOOLDIR/hfst-regexp2fst -f $1 > FAlive
 # The Inertia constraints on adjacent frames can be stated as follows. 
 # We start with loaded.
 
-echo '[@"Loaded" & ~@"FLoaded" => _ @"Loaded" | .#.]
-                   &
-      [@"Loaded" => .#. | @"Loaded" | @"FLoaded" _ ]' | \
-$TOOLDIR/hfst-regexp2fst -f $1 > InertLoaded;
+echo '[@"Loaded" & ~@"FLoaded" => _ @"Loaded" | .#.] & [@"Loaded" => .#. | @"Loaded" | @"FLoaded" _ ]' | $TOOLDIR/hfst-regexp2fst -f $1 > InertLoaded;
 
 # The constraint consists of two restrictions. The first restriction says that a frame that contains +loaded and doesn't contain Floaded must be followed by a frame containing +loaded unless it is the last frame of the sequence. The second constraint says that a frame containing +loaded must be preceded by a frame containing +loaded or Floaded (possibly both) unless it is the first frame of the sequence. The first restriction prohibits frame pairs such as [+loaded][-loaded] where loadedness does not persist. The second restriction prohibits frame pairs such as [+alive][+loaded] where +loaded appears in a frame without a either +loaded or Floaded in the preceding frame. Note that the constraints allow both [+loaded,Floaded][-loaded] and [+loaded,Floaded][+loaded]. In the latter case, the F force was applied to loaded but it did not have any effect.
 
 # The inertness constraint on alive has the same form:
 
-echo '[@"Alive" & ~@"FAlive" => _ @"Alive" | .#.]
-                   &
-      [@"Alive" => .#. | @"Alive" | @"FAlive" _ ]' | \
+echo '[@"Alive" & ~@"FAlive" => _ @"Alive" | .#.] & [@"Alive" => .#. | @"Alive" | @"FAlive" _ ]' | \
 $TOOLDIR/hfst-regexp2fst -f $1 > InertAlive
 
 # To express the idea that a +load action in a frame enables +loaded in the next frame, we need a constraint that forces Floaded to be included in every frame that contains +load. Unlike the two inert rules that constrain pairs of adjacent frames, the next three principles constrain single frames.
@@ -68,8 +62,7 @@ echo '[@"Alive" & ~@"Loaded"] @"Load" @"Frame"* @"Shoot" @"Frame"' | \
 
 # The above description is incomplete in that the four or more frames in the sequence to not constrain each other in any way. Only three frames are partially specified. In order to enforce the principles we have set up, we intersect this underspecified frame sequence with our five contstraints:
 
-echo '@"YaleShooting" & @"InertLoaded" & @"InertAlive" & @"LoadFLoaded" & 
-      @"ShootFAlive" & @"ShootFLoaded"' | $TOOLDIR/hfst-regexp2fst -f $1 \
+echo '@"YaleShooting" & @"InertLoaded" & @"InertAlive" & @"LoadFLoaded" & @"ShootFAlive" & @"ShootFLoaded"' | $TOOLDIR/hfst-regexp2fst -f $1 \
 > YaleShooting.hfst.hfst
 
 # The resulting network contains an infinite number of valid instantiations of the Yale Shooting scenario. For example, it includes the following frame sequence where the target dies:

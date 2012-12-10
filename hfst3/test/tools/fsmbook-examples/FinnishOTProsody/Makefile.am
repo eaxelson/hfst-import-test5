@@ -1,5 +1,5 @@
 check:
-	$(top_srcdir)/test/tools/fsmbook-examples/test-example.sh \
+	$(top_srcdir)/test/tools/fsmbook-examples/test-foma.sh \
 	$(srcdir)/FinnishOTProsody $(builddir)/FinnishOTProsody \
 	../../../../tools/src/ # --test-full
 
