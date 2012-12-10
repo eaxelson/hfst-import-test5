@@ -102,6 +102,8 @@ public:
   void write(const char * str);
 };
 HfstFile hfst_open(const char * filename, const char * args);
+HfstFile hfst_stdin();
+HfstFile hfst_stdout();
 
 /*
  * One of the (apparent) peculiarities of swig is that things break in the
@@ -181,6 +183,7 @@ HfstBasicTransducer (void);
 HfstBasicTransducer (const HfstBasicTransducer &graph);
 HfstBasicTransducer (const hfst::HfstTransducer &transducer);
 HfstBasicTransducer (FILE *file) throw (NotValidAttFormatException);
+HfstBasicTransducer (HfstFile &file) throw (NotValidAttFormatException);
 HfstBasicTransducer & insert_freely (const StringPair &symbol_pair, float weight);
 HfstBasicTransducer & insert_freely (const StringPairSet &symbol_pairs, float weight);
 HfstBasicTransducer & insert_freely (const HfstBasicTransducer &graph);

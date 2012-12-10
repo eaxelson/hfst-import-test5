@@ -74,6 +74,19 @@ hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
     return file;
   };
 
+  HfstFile hfst_stdin() { 
+    HfstFile file;
+    file.set_file(stdin);
+    return file;
+  };
+
+  HfstFile hfst_stdout() { 
+    HfstFile file;
+    file.set_file(stdout);
+    return file;
+  };
+
+
 // -----------------------------------------------------------------------
 //
 //                   Testing and optimization functions   

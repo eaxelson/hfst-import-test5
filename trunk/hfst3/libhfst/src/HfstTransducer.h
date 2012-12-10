@@ -96,6 +96,8 @@ namespace hfst
   //#endif // #if HAVE_MY_TRANSDUCER_LIBRARY
 
   HfstFile hfst_open(const char * filename, const char * mode);
+  HfstFile hfst_stdout();
+  HfstFile hfst_stdin();
 
   // *** TESTING AND OPTIMIZATION...
 

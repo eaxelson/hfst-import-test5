@@ -10,6 +10,13 @@ and if you wish to install it,
 
     python setup.py install
 
+If you are using Python >= 3.0, you need to execute
+
+    sed -i 's/class HfstException(_object):/class HfstException(Exception):/' libhfst.py
+
+to be able to use HfstException and its subclasses in Python.
+
+
 To test the SWIG bindings after installation, execute
 
     ./test/test.sh

@@ -10,7 +10,7 @@ types = [libhfst.SFST_TYPE, libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYPE]
 
 # The library required by the implementation type requested is not linked to HFST.
 # --------------------------------------------------------------------------------
-print "ImplementationTypeNotAvailableException"
+print("ImplementationTypeNotAvailableException")
 
 for type in types:
     try:
@@ -44,7 +44,7 @@ for type in types:
 
 # Stream is closed.
 # -----------------
-print "StreamIsClosedException"
+print("StreamIsClosedException")
 
 for type in types:
     try:
@@ -59,61 +59,61 @@ for type in types:
 
 # Transducer is cyclic. 
 # ---------------------
-print "TransducerIsCyclicException" 
+print("TransducerIsCyclicException")
 
 for type in types:
     transducer = libhfst.HfstTransducer("a", "b", type)
     transducer.repeat_star()
     try:
         results = libhfst.detokenize_paths(libhfst.extract_paths(transducer))
-        print "The transducer has %i paths" % len(results)
+        print("The transducer has {0} paths".format(len(results)))
         assert(False)
     except libhfst.TransducerIsCyclicException:
-        print "The transducer is cyclic and has an infinite number of paths."
+        print("The transducer is cyclic and has an infinite number of paths.")
 
 
 # The stream does not contain transducers. 
 # ----------------------------------------
-print "NotTransducerStreamException"
+print("NotTransducerStreamException")
 
 foofile = open('foofile', 'wb')
-foofile.write('This is a text file.\n')
-foofile.write('Here is another line.\n')
-foofile.write('The file ends here.')
+foofile.write('This is a text file.\n'.encode('ascii'))
+foofile.write('Here is another line.\n'.encode('ascii'))
+foofile.write('The file ends here.'.encode('ascii'))
 foofile.close()
 try:
     instr = libhfst.HfstInputStream("foofile")
 except libhfst.NotTransducerStreamException:
-    print "file does not contain transducers."
+    print("file does not contain transducers.")
 
 
 # The stream is not in valid AT&T format. 
 # ---------------------------------------
-print "NotValidAttFormatException"
+print("NotValidAttFormatException")
 
 testfile_att = open("testfile.att", "wb")
-testfile_att.write("0 1 a b\n")
-testfile_att.write("1\n")
-testfile_att.write("c\n")
+testfile_att.write("0 1 a b\n".encode('ascii'))
+testfile_att.write("1\n".encode('ascii'))
+testfile_att.write("c\n".encode('ascii'))
 testfile_att.close()
 
 for type in types:
     transducers = []
-    ifile = open("testfile.att", "rb")
+    ifile = libhfst.hfst_open("testfile.att", "rb")
     try:
         t = libhfst.HfstTransducer(ifile, type, "epsilon")
         transducers.append(t)
-        print "read one transducer"
+        print("read one transducer")
     except libhfst.NotValidAttFormatException:
-        print "Error reading transducer: not valid AT&T format."
+        print("Error reading transducer: not valid AT&T format.")
 
 ifile.close()
-print "Read %i transducers in total." % len(transducers)
+print("Read {0} transducers in total.".format(len(transducers)))
 
 
 # State is not final (and cannot have a final weight). 
 # ----------------------------------------------------
-print "StateIsNotFinalException"
+print("StateIsNotFinalException")
 
 tr = libhfst.HfstBasicTransducer()
 tr.add_state(1)
@@ -127,7 +127,7 @@ except libhfst.StateIsNotFinalException:
 
 # Context transducers are not automata.
 # -------------------------------------
-print "ContextTransducersAreNotAutomataException"
+print("ContextTransducersAreNotAutomataException")
 
 for type in types:
     # The second context transducer is 
@@ -140,7 +140,7 @@ for type in types:
 
 # The state number argument is not valid.
 # ---------------------------------------
-print "NotValidStateNumberException"
+print("NotValidStateNumberException")
 
 # tr = libhfst.HfstBasicTransducer()
 # tr.add_state(1)
@@ -150,7 +150,7 @@ print "NotValidStateNumberException"
 
 # Two or more transducers do not have the same type.
 # --------------------------------------------------
-print "TransducerTypeMismatchException"
+print("TransducerTypeMismatchException")
 
 foo = libhfst.HfstTransducer("foo", libhfst.SFST_TYPE)
 bar = libhfst.HfstTransducer("bar", libhfst.FOMA_TYPE)
@@ -173,7 +173,7 @@ except libhfst.TransducerTypeMismatchException:
 
 # HfstBasicTransducer
 # -------------------
-print "HfstBasicTransducer"
+print("HfstBasicTransducer")
 
 # Create an empty transducer
 # The transducer has initially one start state (number zero) 
@@ -195,14 +195,14 @@ fsm.set_final_weight(2, 0.3)
 for state in fsm.states(): 
     # Go through all transitions
     for transition in fsm.transitions(state):
-        print "%i %i %s %s %f" % (state, transition.get_target_state(), transition.get_input_symbol(), transition.get_output_symbol(), transition.get_weight())
+        print("{0} {1} {2} {3} {4}".format(state, transition.get_target_state(), transition.get_input_symbol(), transition.get_output_symbol(), transition.get_weight()))
 
     if fsm.is_final_state(state): 
-        print "%i %f" % (state, fsm.get_final_weight(state))
+        print("{0} {1}".format(state, fsm.get_final_weight(state)))
     
 # HfstBasicTransducer.disjunct
 # ----------------------------
-print "HfstBasicTransducer.disjunct"
+print("HfstBasicTransducer.disjunct")
 
 lexicon = libhfst.HfstBasicTransducer()
 TOK = libhfst.HfstTokenizer()
@@ -213,7 +213,7 @@ lexicon.disjunct(TOK.tokenize('elephant'), 1.6)
 
 # HfstTransducer
 # --------------
-print "HfstTransducer"
+print("HfstTransducer")
 
 for type in types:
     transducer = libhfst.HfstTransducer('foo','bar', type)
@@ -261,7 +261,7 @@ Tr1.disjunct(Tr2)
 
 
 ## Create a transducer by tokenizing the utf8 string \a utf8_string with tokenizer \a multichar_symbol_tokenizer. The type of the transducer is defined by \a type. 
-print "HfstTransducer.__init__"
+print("HfstTransducer.__init__")
 
 for type in types:
     ustring = 'foobar'
@@ -275,19 +275,19 @@ for type in types:
     ## Create a transducer of type \a type as defined in AT&T format in file \a ifile. \a epsilon_symbol defines how epsilons are represented.
 
 testfile_att = open("testfile.att", "wb")
-testfile_att.write("0      1      foo      bar      0.3\n")
-testfile_att.write("1      0.5\n")
-testfile_att.write("--\n")
-testfile_att.write("0      0.0\n")
-testfile_att.write("--\n")
-testfile_att.write("--\n")
-testfile_att.write("0      0.0\n")
-testfile_att.write("0      0      a        <eps>    0.2")
+testfile_att.write("0      1      foo      bar      0.3\n".encode('ascii'))
+testfile_att.write("1      0.5\n".encode('ascii'))
+testfile_att.write("--\n".encode('ascii'))
+testfile_att.write("0      0.0\n".encode('ascii'))
+testfile_att.write("--\n".encode('ascii'))
+testfile_att.write("--\n".encode('ascii'))
+testfile_att.write("0      0.0\n".encode('ascii'))
+testfile_att.write("0      0      a        <eps>    0.2".encode('ascii'))
 testfile_att.close()
 
 for type in types:
     transducers = []
-    ifile = open("testfile.att", "rb")
+    ifile = libhfst.hfst_open("testfile.att", "rb")
     while (True):
         try:
             t = libhfst.HfstTransducer(ifile, type, "<eps>")
@@ -300,11 +300,11 @@ for type in types:
             break
         except:
             break # End of file
-    assert(len(transducers) == 4)
+    assert len(transducers) == 4
 
 
 ## Write the transducer in AT&T format to file \a ofile, \a write_weights defines whether weights are written.
-print "HfstTransducer.write_in_att_format"
+print("HfstTransducer.write_in_att_format")
 
 for type in types:
 
@@ -314,7 +314,7 @@ for type in types:
     a_star = libhfst.HfstTransducer("a",type)
     a_star.repeat_star()
     
-    ofile = open("testfile.att", "wb")
+    ofile = libhfst.hfst_open("testfile.att", "wb")
     foobar.write_in_att_format(ofile)
     ofile.write("--\n")
     epsilon.write_in_att_format(ofile)
@@ -326,7 +326,7 @@ for type in types:
 
 
 ## Extract a maximum of \a max_num paths that are recognized by \a transducer following a maximum of \a cycles cycles.
-print "extract_paths"
+print("extract_paths")
 
 for type in types:
     tr1 = libhfst.HfstTransducer("a", "b", type)
@@ -337,11 +337,11 @@ for type in types:
     results = libhfst.detokenize_paths(libhfst.extract_paths(tr1, 5, 2))
 
     for path in results:
-        print "%s : %s" % (path.input, path.output)
+        print("{0} : {1}".format(path.input, path.output))
 
 
 ## A stream for writing binary transducers. 
-print "HfstOutputStream"
+print("HfstOutputStream")
 
 for type in types:
     # Write three HFST transducers in binary format to file named "testfile.hfst"
@@ -352,49 +352,49 @@ for type in types:
     out.close()
 
 ##  A stream for reading HFST binary transducers. 
-print "HfstInputStream"
+print("HfstInputStream")
 
 instr = 0
 try:
     instr = libhfst.HfstInputStream("testfile.hfst") 
 except StreamNotReadableException: 
-    print "ERROR: File does not exist."
+    print("ERROR: File does not exist.")
     exit(1)
 
 transducers_read = 0
 
 while not instr.is_eof(): 
     if instr.is_bad():
-        print "ERROR: Stream cannot be read."
+        print("ERROR: Stream cannot be read.")
         exit(1) 
     t = libhfst.HfstTransducer(instr)
-    print "One transducer succesfully read."
+    print("One transducer succesfully read.")
     transducers_read += 1
 
-print "Read %i transducers in total" % transducers_read
+print("Read {0} transducers in total".format(transducers_read))
 instr.close()
 assert(transducers_read == 3)
     
 
 ## A tokenizer for creating transducers from UTF-8 strings.
-print "HfstTokenizer"
+print("HfstTokenizer")
 
 TOK = libhfst.HfstTokenizer()
 TOK.add_multichar_symbol("<br />")
 TOK.add_skip_symbol("<p>")
 TOK.add_skip_symbol("</p>")
 spv = TOK.tokenize("<p>A<br />paragraph!</p>")
-assert(spv == ('A','A'), ('<br />','<br />'), ('p','p'), ('a','a'), ('r','r'), ('a','a'), ('g','g'), ('r','r'), ('a','a'), ('p','p'), ('h','h'), ('!','!'))
+assert spv == (('A','A'), ('<br />','<br />'), ('p','p'), ('a','a'), ('r','r'), ('a','a'), ('g','g'), ('r','r'), ('a','a'), ('p','p'), ('h','h'), ('!','!'))
 
 
 ## Quick Start to HFST
-print "Tutorials"
+print("Tutorials")
 
 for type in types: 
     tr1 = libhfst.HfstTransducer("foo", "bar", type)
     tr2 = libhfst.HfstTransducer("bar", "baz", type)
     tr1.compose(tr2)
-    tr1.write_in_att_format(sys.stdout);
+    tr1.write_in_att_format(libhfst.hfst_stdout());
 
 
 # Create an HFST basic transducer [a:b] with transition weight 0.3 and final weight 0.5.
@@ -416,11 +416,11 @@ try:
         # exit(0)
         pass
     else:
-        print "TEST FAILED"
+        print("TEST FAILED")
         exit(1)
 # If the state does not exist or is not final */
 except libhfst.HfstException:
-    print "TEST FAILED: An exception thrown."
+    print("TEST FAILED: An exception thrown.")
     exit(1)
 
 
@@ -460,12 +460,12 @@ for type in types:
         results = libhfst.detokenize_paths(libhfst.extract_paths(words))
     except libhfst.TransducerIsCyclicException:
         # This should not happen because transducer is not cyclic.
-        print "TEST FAILED"
+        print("TEST FAILED")
         exit(1)
 
     # Go through all paths and print them.
     for path in results:
-        print "%s : %s   %f" % (path.input, path.output, path.weight)
+        print("{0} : {1}   {2}".format(path.input, path.output, path.weight))
 
 
 for file in 'foofile', 'testfile', 'testfile.att', 'testfile.hfst':
