@@ -28,3 +28,8 @@ autoreconf -i && \
 --enable-calculate --enable-edit-metadata --enable-lexc \
 --enable-tagger --enable-proc --enable-shuffle && \
 make && make install
+
+# Make swig bindings
+cd swig
+python setup.py build_ext --inplace
+cd ..
