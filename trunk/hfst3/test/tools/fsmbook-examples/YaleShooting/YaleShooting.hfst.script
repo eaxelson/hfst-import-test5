@@ -65,6 +65,8 @@ echo '[@"Alive" & ~@"Loaded"] @"Load" @"Frame"* @"Shoot" @"Frame"' | \
 echo '@"YaleShooting" & @"InertLoaded" & @"InertAlive" & @"LoadFLoaded" & @"ShootFAlive" & @"ShootFLoaded"' | $TOOLDIR/hfst-regexp2fst -f $1 \
 > YaleShooting.hfst.hfst
 
+rm -f FAlive ShootFLoaded Load ShootFAlive Proposition Loaded InertLoaded Frame Shoot LoadFLoaded FLoaded TMP Alive Valuation InertAlive
+
 # The resulting network contains an infinite number of valid instantiations of the Yale Shooting scenario. For example, it includes the following frame sequence where the target dies:
 
 # [+alive,-loaded]
