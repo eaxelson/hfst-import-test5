@@ -27,7 +27,7 @@ for type in types:
     for regexp in regexps:
         # Print only results from tropical openfst implementation
         if type == libhfst.TROPICAL_OPENFST_TYPE:
-            print "%s" % regexp
+            print("{0}".format(regexp))
         # Compile the regexp and append it to the list
         tr = compiler.compile(regexp)
         transducers[type].append(tr)

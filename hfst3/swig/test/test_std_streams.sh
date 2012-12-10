@@ -3,7 +3,11 @@
 TOOLDIR=../../tools/src/
 STRINGS2FST="$TOOLDIR"hfst-strings2fst
 COMPARE="$TOOLDIR"hfst-compare" -s"
+
 PYTHON=python
+if [ "$1" = "--python" ]; then
+    PYTHON=$2;
+fi
 
 STRING1="abcdefghijklmnopqrstuvwxyz"
 STRING2="ABCDEFGHIJKLMNOPQRSTUVWXYZ"

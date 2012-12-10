@@ -13,7 +13,7 @@ elif sys.argv[1] == 'openfst':
 elif sys.argv[1] == 'foma':
     ttype = libhfst.FOMA_TYPE
 else:
-    print "ERROR: could not parse transducer format argument."
+    print("ERROR: could not parse transducer format argument.")
     sys.exit(1)
     
 transducers_in_stream = int(sys.argv[2])
@@ -32,7 +32,7 @@ while True:
     except libhfst.EndOfStreamException:
         break;
 if transducers_read != transducers_in_stream:
-    print "ERROR: wrong numer of transducers read"
+    print("ERROR: wrong number of transducers read")
     sys.exit(1)
 
 istr.close()

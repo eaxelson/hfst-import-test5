@@ -58,7 +58,7 @@ for type in types:
     results = libhfst.extract_paths_fd(tr)
     
     assert(len(results) == 2)    
-    print results
+    print(results)
 
     #assert(result_strings.find(StringPair("ac","ac")) 
     #       != result_strings.end())

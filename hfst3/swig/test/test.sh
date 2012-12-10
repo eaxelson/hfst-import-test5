@@ -1,5 +1,11 @@
 #!/bin/sh
 
+PYTHON=python
+
+if [ "$1" = "--python" ]; then
+    PYTHON=$2;
+fi
+
 for pytest in \
     test_constructors.py test_flag_diacritics.py \
     test_hfst_basic_transducer.py test_streams.py test_tokenizer.py \
@@ -9,7 +15,7 @@ for pytest in \
     echo $pytest":"
     echo "==================================="
     echo
-    if (! PYTHONPATH=$PWD/.. python $pytest); then
+    if (! PYTHONPATH=$PWD/.. $PYTHON $pytest); then
 	echo "============================================="
 	echo "FAIL: " $pytest;
 	echo "============================================="
@@ -18,7 +24,7 @@ for pytest in \
     echo
 done
 
-if ! ./test_std_streams.sh; then 
+if ! ./test_std_streams.sh --python $PYTHON; then 
     echo "==========================="
     echo "FAIL: test_std_streams.sh";
     echo "==========================="

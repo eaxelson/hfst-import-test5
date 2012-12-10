@@ -49,9 +49,10 @@ for s in range(5):
 
 # Reading a file in non-valid AT&T format
 ofile = open('test.att', 'wb')
-ofile.write('0\n0\t1\ta\tb\n1\t2\tb\n2\n')
+ofile.write("0\n0\t1\ta\tb\n1\t2\tb\n2\n".encode('ascii'))
 ofile.close()
-ifile = open('test.att', 'rb')
+#ifile = open('test.att', 'rb')
+ifile = libhfst.hfst_open('test.att', 'rb')
 
 try:
     foo = libhfst.HfstBasicTransducer(ifile)
@@ -132,6 +133,8 @@ print("HfstBasicTransducer: iterating through");
 
 for state in t.states():
     for transition in t.transitions(state):
-        print '%i\t%i\t%s\t%s\t%f' % (state, transition.get_target_state(), transition.get_input_symbol(), transition.get_output_symbol(), transition.get_weight())
+        # print '%i\t%i\t%s\t%s\t%f' % (state, transition.get_target_state(), transition.get_input_symbol(), transition.get_output_symbol(), transition.get_weight())
+        print("{0}\t{1}\t{2}\t{3}\t{4}".format(state, transition.get_target_state(), transition.get_input_symbol(), transition.get_output_symbol(), transition.get_weight()))
     if t.is_final_state(state):
-        print '%i\t%f' % (state, t.get_final_weight(state))
+        # print '%i\t%f' % (state, t.get_final_weight(state))
+        print("{0}\t{1}".format(state, t.get_final_weight(state)))
