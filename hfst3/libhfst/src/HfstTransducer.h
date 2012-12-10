@@ -1189,8 +1189,8 @@ ccc : ddd
     /** \brief Make priority union of this transducer with \a another.
      *
      * For the operation t1.priority_union(t2), the result is a union of t1 and t2,
-     * except that whenever t1 and t2 have the same string on left side,
-     * the path in t2 overrides the path in t1.
+     * except that whenever t1 and t2 have the same string on the upper side,
+     * the path in t1 overrides the path in t2.
      *
      * Example
      *
@@ -1204,7 +1204,7 @@ ccc : ddd
      *
      * Result ( t1.priority_union(t2) ):
      * a : a
-     * b : B
+     * b : b
      * c : C
      *
      * For more information, read: www.fsmbook.com
@@ -1212,8 +1212,7 @@ ccc : ddd
     HfstTransducer &priority_union(const HfstTransducer &another);
 
 
-    /*
-     *  \brief Make cross product of this transducer with \a.
+    /**  \brief Make cross product of this transducer with \a.
      *  It pairs every string of this with every string of \a.
      *
      *  Both transducers must be automata, i.e. map strings onto themselves.
