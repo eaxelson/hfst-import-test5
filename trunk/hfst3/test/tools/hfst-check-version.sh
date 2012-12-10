@@ -14,6 +14,7 @@ for f in $TOOLDIR/hfst-* ; do
 	 "$f" != "$TOOLDIR/hfst-pmatch""$EXT" -a \
 	 "$f" != "$TOOLDIR/hfst-preprocess-for-optimized-lookup-format""$EXT" -a \
 	 "$f" != "$TOOLDIR/hfst-duplicate""$EXT" -a \
+	 "$f" != "$TOOLDIR/hfst-strip-header""$EXT" -a \
 	 "$f" != "$TOOLDIR/hfst-info""$EXT" ] ; then
         if [ -x "$f" -a ! -d "$f" ] ; then
             if ! "$f" --version > version.out ; then

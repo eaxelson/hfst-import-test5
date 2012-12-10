@@ -14,6 +14,7 @@ for f in $TOOLDIR/hfst-* ; do
 	"$f" != "$TOOLDIR/hfst-twolc-system""$EXT" -a \
 	"$f" != "$TOOLDIR/hfst-duplicate""$EXT" -a \
 	"$f" != "$TOOLDIR/hfst-preprocess-for-optimized-lookup-format""$EXT" -a \
+	"$f" != "$TOOLDIR/hfst-strip-header""$EXT" -a \
 	"$f" != "$TOOLDIR/hfst-train-tagger-system""$EXT" ]; then
         if [ -x "$f" -a ! -d "$f" ] ; then
             if ! "$f" --help > help.out ; then
