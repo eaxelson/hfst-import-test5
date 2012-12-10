@@ -18,8 +18,8 @@
 SUBDIRS=hfst-proc hfst-twolc hfst-tagger
 AUTOMAKE_OPTIONS=std-options subdir-objects
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
-AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/tools/src/parsers 
-AM_CXXFLAGS = -Wno-deprecated
+AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/tools/src/parsers -Wno-sign-compare
+AM_CXXFLAGS = -Wno-deprecated -Wno-sign-compare
 
 AM_CPPFLAGS+= -I${top_srcdir}/back-ends/foma/ \
 		-I${top_srcdir}/back-ends/
@@ -311,7 +311,7 @@ BUILT_SOURCES=hfst-scanner.h hfst-compiler.h $(hfst_lexc2fst_BUILT)
 # make make realise headers automatically follow from flexing
 hfst-scanner.h: hfst-scanner.cc
 
-hfst_calculate_CXXFLAGS= -Wall -Wno-error
+hfst_calculate_CXXFLAGS= -Wall -Wno-error -Wno-sign-compare -Wno-deprecated
 
 ## YACC and FLEX with autotools argh
 AM_YFLAGS=-d

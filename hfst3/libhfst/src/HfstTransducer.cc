@@ -2717,8 +2717,6 @@ HfstTransducer &HfstTransducer::shuffle(const HfstTransducer &another)
 
 HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
 {
-    bool DEBUG = false;
-
     if ( this->type != another.type )
     {
         HFST_THROW_MESSAGE(HfstTransducerTypeMismatchException, 
