@@ -12,6 +12,7 @@ for f in $TOOLDIR/hfst-* ; do
 	"$f" != "$TOOLDIR/hfst-lexc-compiler""$EXT" -a \
 	"$f" != "$TOOLDIR/hfst-info""$EXT" -a \
 	"$f" != "$TOOLDIR/hfst-twolc-system""$EXT" -a \
+	"$f" != "$TOOLDIR/hfst-duplicate""$EXT" -a \
 	"$f" != "$TOOLDIR/hfst-train-tagger-system""$EXT" ]; then
         if [ -x "$f" -a ! -d "$f" ] ; then
             if ! "$f" --help > help.out ; then
