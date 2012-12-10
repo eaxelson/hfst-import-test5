@@ -10,8 +10,14 @@ sudo mkdir $DEBIAN_DIR
 sudo mkdir $DEBIAN_DIR/hfst3/
 sudo mkdir $DEBIAN_DIR/debian/
 sudo mkdir $DEBIAN_DIR/debian/debian-test/
+sudo mkdir $DEBIAN_DIR/debian/debian-swig/
 
 sudo cp ../../hfst3/hfst-*.tar.gz $DEBIAN_DIR/hfst3/
 sudo cp -R * $DEBIAN_DIR/debian/debian-test/
+
+for file in make-install make-package.sh README; 
+do
+    sudo cp ../debian-swig/$file $DEBIAN_DIR/debian/debian-swig/
+done
 
 sudo sed -i 's/amd64/i386/' $DEBIAN_DIR/debian/debian-test/debian/DEBIAN/control
