@@ -1,5 +1,4 @@
-
-AM_CPPFLAGS= -D_MSC_VER -DWINDOWS -Wno-unused-result -Wno-deprecated
+AM_CPPFLAGS= -D_MSC_VER -DWINDOWS -Wno-deprecated
 
 noinst_LTLIBRARIES = libfoma.la
 libfoma_la_SOURCES = int_stack.c define.c determinize.c apply.c \
