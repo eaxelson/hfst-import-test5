@@ -269,16 +269,16 @@ namespace hfst
         //---------------------------------
 
         // create marks for given i
-        static StringPair restrictionMarks( int i);
+        //static StringPair restrictionMarks( int i);
 
         /*
          * define AA1a [  [. 0 .] -> LEFT_MARK || _ center ];
          * define AA1b [  [. 0 .] -> RIGHT_MARK || center _ ];
          * retval = AA1 .o. AA2
          */
-        static HfstTransducer surroundCenterWithBrackets( const HfstTransducer &center,
-                                                   const HfstTransducer &leftMark,
-                                                   const HfstTransducer &rightMark);
+        //static HfstTransducer surroundCenterWithBrackets( const HfstTransducer &center,
+        //                                           const HfstTransducer &leftMark,
+        //                                           const HfstTransducer &rightMark);
         // Contexts
         // define NOS1 [ %[ -> 0 || b / B _ ];
         // define NOF1 [ %] -> 0 || _ c / B ];
