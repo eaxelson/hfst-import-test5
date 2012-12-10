@@ -72,3 +72,9 @@ echo '[@"AllDates.hfst" & @"MaxDays.hfst" & @"LeapDates.hfst"]' | $2/hfst-regexp
 
 
 echo '[@"ValidDates.hfst" @-> "<DATE>" ... "</DATE>"]' | $2/hfst-regexp2fst -f $1 > DateParser.hfst.hfst
+
+rm -f Date.hfst Day.hfst ValidDates.hfst Month.hfst Month30.hfst Month31.hfst AllDates.hfst
+rm -f ZeroToNine.hfst N.hfst Even.hfst OneToNine.hfst Year.hfst Month29.hfst
+rm -f LeapDates.hfst LeapYear.hfst Div4.hfst MaxDays.hfst Odd.hfst MaxDays30.hfst MaxDays31.hfst
+
+

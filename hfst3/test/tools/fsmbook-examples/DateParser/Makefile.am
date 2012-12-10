@@ -4,7 +4,7 @@ check:
 	../../../../tools/src/ # --test-full
 
 EXTRA_DIST=DateParser.hfst.script DateParser.xfst.script \
-	   DateParser.xfst.att DateParser2.hfst.script README
+	   DateParser.xfst.att
 
 clean-local:
 	$(top_srcdir)/test/tools/fsmbook-examples/remove-complement.sh \
