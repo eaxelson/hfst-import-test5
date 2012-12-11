@@ -54,7 +54,7 @@ for i in .sfst .ofst .foma ; do
     fi
 
     if test -f cat$i ; then
-        if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/cat.lexc -o test ; then
+        if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/cat.lexc -o test 2>1 > /dev/null; then
             echo lexc2fst $FFLAG cat.lexc failed with $?
             exit 1
         fi
@@ -64,7 +64,7 @@ for i in .sfst .ofst .foma ; do
         rm test
     fi
     for f in $LEXCTESTS ; do
-        if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/$f -o test ; then
+        if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/$f -o test 2>1 > /dev/null; then
             echo lexc2fst $FFLAG $f failed with $?
             exit 1
         fi
@@ -73,7 +73,7 @@ for i in .sfst .ofst .foma ; do
     if [ $WINDOWS -eq 1 ]; then
 	if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/basic.multi-file-1.lexc \
             $srcdir/basic.multi-file-2.lexc \
-            $srcdir/basic.multi-file-3.lexc -o test ; then
+            $srcdir/basic.multi-file-3.lexc -o test 2>1 > /dev/null; then
             echo lexc2fst $FFLAG basic.multi-file-{1,2,3}.lexc failed with $?
             exit 1
 	fi
