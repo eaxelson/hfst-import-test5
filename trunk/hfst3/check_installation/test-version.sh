@@ -7,15 +7,15 @@ if (uname | egrep "MINGW|mingw" 2>1 > /dev/null); then
 fi
 
 for f in $TOOLSDIR/hfst-* ; do
-    if [ "$f" != "$TOOLDIR/hfst-lexc""$EXT" -a \
-         "$f" != "$TOOLDIR/hfst-lexc2fst""$EXT" -a \
-         "$f" != "$TOOLDIR/hfst-xfst2fst""$EXT" -a \
-	 "$f" != "$TOOLDIR/hfst-lexc-compiler""$EXT" -a \
-	 "$f" != "$TOOLDIR/hfst-pmatch""$EXT" -a \
-	 "$f" != "$TOOLDIR/hfst-preprocess-for-optimized-lookup-format""$EXT" -a \
-	 "$f" != "$TOOLDIR/hfst-duplicate""$EXT" -a \
-	 "$f" != "$TOOLDIR/hfst-strip-header""$EXT" -a \
-	 "$f" != "$TOOLDIR/hfst-info""$EXT" ] ; then
+    if [ "$f" != "hfst-lexc""$EXT" -a \
+         "$f" != "hfst-lexc2fst""$EXT" -a \
+         "$f" != "hfst-xfst2fst""$EXT" -a \
+	 "$f" != "hfst-lexc-compiler""$EXT" -a \
+	 "$f" != "hfst-pmatch""$EXT" -a \
+	 "$f" != "hfst-preprocess-for-optimized-lookup-format""$EXT" -a \
+	 "$f" != "hfst-duplicate""$EXT" -a \
+	 "$f" != "hfst-strip-header""$EXT" -a \
+	 "$f" != "hfst-info""$EXT" ] ; then
         if [ -x "$f" -a ! -d "$f" ] ; then
             if ! "$f" --version > version.out ; then
                 rm version.out
