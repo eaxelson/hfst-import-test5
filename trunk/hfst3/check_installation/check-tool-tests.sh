@@ -1,9 +1,14 @@
 #!/bin/sh
 
+#
+# Perform tests in ./tool_tests. Before executing this script,
+# run copy-tool-tests.sh to create ./tool_tests.
+#
+
 TESTDIR=tool_tests
 
 if [ ! -d "$TESTDIR" ]; then
-    echo "ERROR: directory" $TESTDIR "does not exist."
+    echo "ERROR: directory" $TESTDIR "does not exist, try running ./copy-tool-tests.sh first."
     exit 1;
 fi
 
