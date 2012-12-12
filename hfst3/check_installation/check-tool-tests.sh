@@ -1,14 +1,16 @@
 #!/bin/sh
 
-# Copy hfst3/test/tools/
-cd ../test/tools
-files_to_copy=`svn list`
-cd ../../check_installation
+TESTDIR=tool_tests
 
-for file in $files_to_copy;
-do
-    cp ../test/tools/$file .
-done
+if [ ! -d "$TESTDIR" ]; then
+    echo "ERROR: directory" $TESTDIR "does not exist."
+    exit 1;
+fi
+
+echo ""
+echo "  Moving to directory" `pwd`"/"$TESTDIR"..."
+echo ""
+cd $TESTDIR
 
 # Make the transducers needed by the tests.
 # Overgenerating some files here..
@@ -22,28 +24,6 @@ do
     hfst-txt2fst -e '@0@' -i $file.txt | hfst-fst2fst -w -o $file.hfstol
     hfst-txt2fst -e '@0@' -i $file.txt | hfst-invert | hfst-fst2fst -w -o $file.genhfstol
 done
-
-# Modify the tests so that they use the installed version of tools
-# and refer to right files.
-for file in *.sh;
-do
-    if [ "$file" != "copy-files.sh" ]; then
-	sed -i 's/$TOOLDIR\///' $file
-	sed -i 's/$srcdir\//.\//' $file
-	sed -i 's/hfst-proc\/hfst-apertium-proc/hfst-apertium-proc/' $file
-	sed -i 's/test -x \(.*\);/which \1 2>1 > \/dev\/null;/' $file
-    fi
-done
-
-# TODO: These tests are rewritten in directory check_installation
-rm empty-input.sh
-rm hfst-check-version.sh
-rm hfst-check-help.sh
-
-# These tests are excluded from test/tools/Makefile.am
-rm incompatible-formats.sh
-rm latin-1-strings.sh
-rm lexc-compiler-functionality.sh
 
 # Perform the tests
 for tooltest in *.sh;
@@ -60,3 +40,9 @@ do
 	fi
     fi
 done
+
+echo ""
+echo "  Exiting directory" `pwd`"..."
+echo ""
+
+cd ..
