@@ -1,5 +1,11 @@
 #!/bin/sh
 
+#
+# Copy HFST command line tool tests under ../test/tools to ./tool_tests.
+# The copied tests are modifed so that they use the installed versions
+# of command line tools instead of the ones in ../tools/src.
+#
+
 TESTDIR=./tool_tests/
 
 # Copy hfst3/test/tools/

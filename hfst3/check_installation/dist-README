@@ -1,0 +1,5 @@
+
+To test installed HFST command line tools, run
+
+  ./check-tool-tests.sh
+
