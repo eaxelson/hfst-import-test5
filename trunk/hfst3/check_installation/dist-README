@@ -1,13 +1,8 @@
 
-To test installed HFST command line tools, run
+To test that installed HFST functionalities work as they should, run one 
+or more of the tests below:
 
-  ./check-tool-tests.sh
-
-To test installed HFST morphologies, run
-
-  ./check-morphologies.sh
-
-To test installed HFST swig/Python bindings, run
-
-  ./check-swig-tests.sh
+  ./check-tools.sh             # Command line tools
+  ./check-swig.sh              # SWIG/Python bindings
+  ./check-morphologies.sh      # Morphology scripts
 
