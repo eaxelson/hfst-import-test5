@@ -17,7 +17,7 @@ TESTS=better-cola-machine-test.sh \
 	finnish-numerals-test.sh \
 	numbers-to-numerals-test.sh \
 	monish-analysis-test.sh \
-	yale-shooting-test.sh
+	yale-shooting-test.sh 
 	
 	
  # finnish-ot-prosody-test.sh - missing .O.  and bug somewhere

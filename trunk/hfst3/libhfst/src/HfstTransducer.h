@@ -1214,6 +1214,11 @@ ccc : ddd
     HfstTransducer &priority_union(const HfstTransducer &another);
 
 
+    /**  \brief Make lenient composition of this transducer with \a.
+     *  A .O. B = [ A .o. B ] .P. A
+     */
+    HfstTransducer &lenient_composition(const HfstTransducer &another);
+
     /**  \brief Make cross product of this transducer with \a.
      *  It pairs every string of this with every string of \a.
      *

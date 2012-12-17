@@ -149,8 +149,8 @@ REGEXP2: REPLACE
             delete $3;
         }
        | REGEXP2 LENIENT_COMPOSITION REPLACE {
-            xreerror("No lenient composition");
-            $$ = $1;
+            //xreerror("No lenient composition");
+            $$ = & $1->lenient_composition(*$3);
             delete $3;
         }
        ;
@@ -547,9 +547,15 @@ REGEXP5: REGEXP6 { }
             delete $3;
         }
        | REGEXP5 LOWER_PRIORITY_UNION REGEXP6 {
-            xreerror("No lower priority union");
-            $$ = $1;
-            delete $3;
+            HfstTransducer* left = new HfstTransducer(*$1);
+            HfstTransducer* right =  new HfstTransducer(*$3);
+            right->invert();
+            left->invert();
+
+            $$ = & (left->priority_union(*right).invert());
+         //   xreerror("No lower priority union");
+         //   $$ = $1;
+            delete $1, $3;
         }
        ;
 
