@@ -197,7 +197,7 @@ make_lexcs()
           }
         else
           {
-            trans = HfstTransducer::read_lexc(inputfilenames[i], format);
+            trans = new HfstTransducer(HfstTransducer::read_lexc(inputfilenames[i], format));
             if (0 == trans)
               {
                 hfst_error(EXIT_FAILURE, 0, "Could not parse %s correctly.\n"
