@@ -2494,6 +2494,21 @@ HfstTransducer &HfstTransducer::compose
     return *this;
 }
 
+HfstTransducer &HfstTransducer::lenient_composition( const HfstTransducer &another )
+{
+
+    if ( this->type != another.type )
+    {
+        HFST_THROW_MESSAGE(HfstTransducerTypeMismatchException, "HfstTransducer::lenient_composition");
+    }
+
+    HfstTransducer retval(*this);
+    retval.compose(another).minimize().priority_union(*this).minimize();
+
+    *this = retval;
+    return *this;
+
+}
 
 
 HfstTransducer &HfstTransducer::cross_product( const HfstTransducer &another )
@@ -2507,57 +2522,57 @@ HfstTransducer &HfstTransducer::cross_product( const HfstTransducer &another )
     HfstTransducer automata1(*this);
     HfstTransducer automata2(another);
 
-        // Check if both input transducers are automata
-        HfstTransducer t1_proj(automata1);
-        t1_proj.input_project();
-        HfstTransducer t2_proj(automata2);
-        t2_proj.input_project();
+    // Check if both input transducers are automata
+    HfstTransducer t1_proj(automata1);
+    t1_proj.input_project();
+    HfstTransducer t2_proj(automata2);
+    t2_proj.input_project();
 
-        if ( not t1_proj.compare(automata1) || not t2_proj.compare(automata2) )
-        {
-                HFST_THROW_MESSAGE(TransducersAreNotAutomataException, "HfstTransducer::cross_product");
-        }
+    if ( not t1_proj.compare(automata1) || not t2_proj.compare(automata2) )
+    {
+            HFST_THROW_MESSAGE(TransducersAreNotAutomataException, "HfstTransducer::cross_product");
+    }
 
-        // Put MARK all over lower part of automata1 and upper part of automata2,
-        // and then compose them
-        // Also, there should be created padding after strings, on both sides
+    // Put MARK all over lower part of automata1 and upper part of automata2,
+    // and then compose them
+    // Also, there should be created padding after strings, on both sides
 
-        automata1.insert_to_alphabet("@_MARK_@");
-        automata2.insert_to_alphabet("@_MARK_@");
+    automata1.insert_to_alphabet("@_MARK_@");
+    automata2.insert_to_alphabet("@_MARK_@");
 
-        HfstTokenizer TOK;
-        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-        TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
-        TOK.add_multichar_symbol("@_MARK_@");
+    HfstTokenizer TOK;
+    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
+    TOK.add_multichar_symbol("@_MARK_@");
 
 
-        // EpsilonToMark and MarkToEpsilon are paddings (if strings are not the same size)
-        HfstTransducer UnknownToMark("@_UNKNOWN_SYMBOL_@", "@_MARK_@", TOK, type);
-        HfstTransducer EpsilonToMark("@_EPSILON_SYMBOL_@", "@_MARK_@", TOK, type);
+    // EpsilonToMark and MarkToEpsilon are paddings (if strings are not the same size)
+    HfstTransducer UnknownToMark("@_UNKNOWN_SYMBOL_@", "@_MARK_@", TOK, type);
+    HfstTransducer EpsilonToMark("@_EPSILON_SYMBOL_@", "@_MARK_@", TOK, type);
 
-        HfstTransducer MarkToUnknown(UnknownToMark);
-        MarkToUnknown.invert();
-        HfstTransducer MarkToEpsilon(EpsilonToMark);
-        MarkToEpsilon.invert();
+    HfstTransducer MarkToUnknown(UnknownToMark);
+    MarkToUnknown.invert();
+    HfstTransducer MarkToEpsilon(EpsilonToMark);
+    MarkToEpsilon.invert();
 
-        UnknownToMark.repeat_star().minimize();
-        EpsilonToMark.repeat_star().minimize();
-        MarkToUnknown.repeat_star().minimize();
-        MarkToEpsilon.repeat_star().minimize();
+    UnknownToMark.repeat_star().minimize();
+    EpsilonToMark.repeat_star().minimize();
+    MarkToUnknown.repeat_star().minimize();
+    MarkToEpsilon.repeat_star().minimize();
 
-        HfstTransducer a1(automata1);
-        a1.compose(UnknownToMark).minimize().concatenate(EpsilonToMark).minimize();
+    HfstTransducer a1(automata1);
+    a1.compose(UnknownToMark).minimize().concatenate(EpsilonToMark).minimize();
 
-        HfstTransducer b1(MarkToUnknown);
-        b1.compose(automata2).minimize().concatenate(MarkToEpsilon).minimize();
+    HfstTransducer b1(MarkToUnknown);
+    b1.compose(automata2).minimize().concatenate(MarkToEpsilon).minimize();
 
-        HfstTransducer retval(a1);
-        retval.compose(b1).minimize();
+    HfstTransducer retval(a1);
+    retval.compose(b1).minimize();
 
-        retval.remove_from_alphabet("@_MARK_@");
+    retval.remove_from_alphabet("@_MARK_@");
 
-        *this = retval;
-        return *this;
+    *this = retval;
+    return *this;
 
 }
 
@@ -4348,6 +4363,29 @@ void universal_pair_test ( ImplementationType type )
     assert ( tmp.compose(tr3).compare( empty ) );
 
 }
+void lenient_composition_test ( ImplementationType type )
+{
+    HfstTokenizer TOK;
+
+    HfstTransducer input1("a", "X", TOK, type);
+    HfstTransducer input2("b", "X", TOK, type);
+
+    HfstTransducer input3("b", "N", TOK, type);
+    HfstTransducer input4("c", "X", TOK, type);
+
+
+    HfstTransducer t1(input1);
+    t1.disjunct(input2).minimize();
+
+    HfstTransducer t2(input3);
+    t2.disjunct(input4).minimize();
+
+    HfstTransducer testTr1(t1);
+    assert ( testTr1.lenient_composition( t2 ).compare( t1 ) );
+
+}
+
+
 
 StringVector remove_flags(const StringVector &v)
 {
@@ -4431,6 +4469,10 @@ int main(int argc, char * argv[])
     
         // priority_union unit tests
         priority_union_test( types[i] );
+
+        // lenient_composition unit tests
+       lenient_composition_test( types[i] );
+
 
         // cross_product unit test
         cross_product_subtest1( types[i] );

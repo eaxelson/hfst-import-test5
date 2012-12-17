@@ -2405,7 +2405,9 @@ void test6a( ImplementationType type )
     HfstTransducer tmp2(type);
 
     // epsilon
-    replaceTr = replace_epenthesis(ruleUp, false);
+   // replaceTr = replace_epenthesis(ruleUp, false);
+    // epenthesis rules are covered in basic replace rules
+    replaceTr = replace(ruleUp, false);
 
     tmp2 = input1;
     tmp2.compose(replaceTr).minimize();
@@ -2414,7 +2416,9 @@ void test6a( ImplementationType type )
     assert(tmp2.compare(result1));
 
     // epsilon
-    replaceTr = replace_epenthesis(ruleUp, true);
+   // replaceTr = replace_epenthesis(ruleUp, true);
+    // epenthesis rules are covered in basic replace rules
+    replaceTr = replace(ruleUp, true);
 
     tmp2 = input1;
     tmp2.compose(replaceTr).minimize();
@@ -2466,6 +2470,7 @@ void test6b( ImplementationType type )
     HfstTransducer tmp2(type);
 
     // epsilon
+    // TODO epenthesis rules are covered in basic replace rules
     replaceTr = replace_epenthesis(ruleUp, false);
     //printf("test 6b replaceTr: \n");
     //replaceTr.write_in_att_format(stdout, 1);

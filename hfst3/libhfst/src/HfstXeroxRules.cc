@@ -1726,7 +1726,8 @@ namespace hfst
         //    newTr.insert_to_alphabet(boundaryMarker);
           //  newTr.compose(boundaryAnythingBoundary).minimize();
 
-
+            //printf("newTr 2 : \n");
+            //newTr.write_in_att_format(stdout, 1);
            // remove boundary paths
 
             // [0:.#. | ? - .#.]*
@@ -1742,6 +1743,8 @@ namespace hfst
             retval.compose(newTr)
                   .compose(boundaryAnythingBoundary)
                   .minimize();
+            //printf("retval : \n");
+            //retval.write_in_att_format(stdout, 1);
 
             //printf("retval : \n");
             //retval.write_in_att_format(stdout, 1);
@@ -1757,6 +1760,8 @@ namespace hfst
 
             retval.compose(tmp).minimize();
 
+            //printf("retval 2: \n");
+            //retval.write_in_att_format(stdout, 1);
             // remove boundary from alphabet
             retval.remove_from_alphabet(boundaryMarker);
 
@@ -1988,30 +1993,23 @@ namespace hfst
 
           if ( !optional )
           {
-              retval = mostBracketsPlusConstraint(retval);
+             // retval = mostBracketsPlusConstraint(retval);
+              retval = mostBracketsStarConstraint(retval);
               //retval = removeB2Constraint(retval);
-
-              //printf("After non optional tr: \n");
-              //retval.write_in_att_format(stdout, 1);
+              // printf("After non optional tr: \n");
+              // retval.write_in_att_format(stdout, 1);
 
           }
           retval = removeB2Constraint(retval);
-
-
-
           retval = removeMarkers( retval );
-
 
           //printf("after remove markers: \n");
           //retval.write_in_att_format(stdout, 1);
 
-
           // deals with boundary symbol
           retval = applyBoundaryMark( retval );
-
           //printf("after boundary: \n");
           //retval.write_in_att_format(stdout, 1);
-
           return retval;
       }
 
@@ -2039,8 +2037,8 @@ namespace hfst
 
             if ( !optional )
             {
-                retval = mostBracketsPlusConstraint(retval);
-
+               // retval = mostBracketsPlusConstraint(retval);
+                retval = mostBracketsStarConstraint(retval);
             }
             retval = removeB2Constraint(retval);
 
@@ -2048,11 +2046,10 @@ namespace hfst
 
             // deals with boundary symbol
             retval = applyBoundaryMark( retval );
+
             return retval;
 
       }
-
-    // TODO: replace left!!!!!
       // replace left
       HfstTransducer replace_left( const Rule &rule, bool optional)
       {
@@ -2070,8 +2067,6 @@ namespace hfst
             newMappingPairVector.push_back(HfstTransducerPair(second, first));
 
           }
-
-
 
           Rule newRule ( newMappingPairVector, rule.get_context(), rule.get_replType());
           HfstTransducer retval (replace( newRule, optional));
