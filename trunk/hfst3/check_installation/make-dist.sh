@@ -15,8 +15,10 @@ elif [ "$1" = "--version" ]; then
     VERSION=$2;
 fi
 
-
+echo "  Copying command line tool tests..."
 ./copy-tool-tests.sh
+echo "  Copying tests for swig bindings..."
+./copy-swig-tests.sh
 
 if [ ! "$VERSION" = "" ]; then
     DISTDIR=check-hfst-tools"-"$VERSION;
@@ -33,13 +35,20 @@ if [ ! -d "tool_tests" ]; then
     echo "ERROR: directory 'tool_tests' does not exist."
     exit 1;
 fi
+if [ ! -d "swig_tests" ]; then
+    echo "ERROR: directory 'swig_tests' does not exist."
+    exit 1;
+fi
 
 cp dist-README $DISTDIR/README
 cp ./check-tool-tests.sh $DISTDIR/
 cp --parents ./tool_tests/* $DISTDIR/
+cp ./check-swig-tests.sh $DISTDIR/
+cp --parents ./swig_tests/* $DISTDIR/
 
+echo "  Creating the package..." 
 tar -cvf $DISTDIR.tar $DISTDIR
 gzip $DISTDIR.tar
 
 rm -fr $DISTDIR
-
+echo "  Distribution package "$DISTDIR".tar.gz"" created."
