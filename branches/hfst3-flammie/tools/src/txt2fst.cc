@@ -134,7 +134,7 @@ make_texts()
           }
           HfstTransducer t(inputfile,
                format,
-               std::string(epsilonname));
+               epsilonname);
           hfst_set_name(t, inputfilename, "text");
           hfst_set_formula(t, inputfilename, "T");
           *outstream << t;

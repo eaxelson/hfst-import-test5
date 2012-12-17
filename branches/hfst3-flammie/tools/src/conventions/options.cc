@@ -270,6 +270,10 @@ check_common_options(int argc, char** argv)
         outfile = stdout;
         message_out = stderr;
       }
+    else if (outfile != stdout)
+      {
+        message_out = stdout;
+      }
     if (auto_colors)
       {
         if (message_out == stdout)
@@ -517,6 +521,11 @@ check_common_options(int argc, char** argv)
             format = hfst::OLW_TYPE;
 #   endif
             hfst_verbose("Format was not given, defaulting to %s",
+                         hfst_strformat(format));
+          }
+        else
+          {
+            hfst_verbose("Using %s as output format",
                          hfst_strformat(format));
           }
       }

@@ -102,7 +102,7 @@ hfst_strtoweight(const char *s)
         char* old_numeric = setlocale(LC_NUMERIC, NULL);
         if (old_numeric != NULL)
           {
-            hfst_verbose("%s was not a weight for %s, trying POSIX",
+            hfst_warning("%s was not a weight for %s, trying POSIX",
                           s, old_numeric);
           }
         if (setlocale(LC_NUMERIC, "C") != NULL)
@@ -153,7 +153,7 @@ hfst_strtonumber(const char *s, bool *infinite)
         char* old_numeric = setlocale(LC_NUMERIC, NULL);
         if (old_numeric != NULL)
           {
-            hfst_verbose("%s was not a number for %s, trying POSIX",
+            hfst_warning("%s was not a number for %s, trying POSIX",
                           s, old_numeric);
           }
         if (setlocale(LC_NUMERIC, "C") != NULL)
@@ -531,16 +531,15 @@ hfst_setlocale()
     char* rv = setlocale(LC_ALL, "");
     if (NULL == rv)
       {
-        hfst_error(EXIT_FAILURE, errno, "Unable to set locale for character "
+        hfst_warning("Unable to set locale for character "
               "settings");
       }
 #if HAVE_NL_LANGINFO
     char* charset = nl_langinfo(CODESET);
     if (strcmp(charset, "UTF-8") != 0)
       {
-        hfst_error(EXIT_FAILURE, 0, "Character set %s not supported; exiting to "
-              "avoid data corruption\n"
-              "please set up UTF-8 locale instead (e.g. LC_ALL=en_GB.utf8)",
+        hfst_warning("Character set %s not supported; "
+              "please set up UTF-8 locale(e.g. LC_ALL=en_GB.utf8)",
               charset);
       }
 #endif
@@ -589,6 +588,7 @@ hfst_init_commandline(const char* argv0, const char* version,
                       const char* wikiname, hfst_tool_io him,
                       hfst_input_count hic)
   {
+    message_out = stderr;
     hfst_setlocale();
     hfst_set_program_name(argv0, version, wikiname);
     if (isatty(1) && isatty(2))
