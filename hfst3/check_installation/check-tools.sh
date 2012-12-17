@@ -12,8 +12,12 @@ if [ ! -d "$TESTDIR" ]; then
     exit 1;
 fi
 
+echo "---------------------------------- "
+echo "Testing HFST command line tools... "
+echo "---------------------------------- "
+
 echo ""
-echo "  Moving to directory" `pwd`"/"$TESTDIR"..."
+echo "Moving to directory" `pwd`"/"$TESTDIR"..."
 echo ""
 cd $TESTDIR
 
@@ -37,9 +41,9 @@ do
 	"$tooltest" != "lexc2fst-stress.sh" -a \
 	"$tooltest" != "valgrind.sh" -a \
 	"$tooltest" != "lookup-stress.sh" ]; then
-	echo -n "TEST: "$tooltest"...   "
+	echo -n "Testing: "$tooltest"...   "
 	if ./$tooltest; then
-	    echo "OK"
+	    echo "PASS"
 	else
 	    echo "FAIL"
 	fi
@@ -47,7 +51,7 @@ do
 done
 
 echo ""
-echo "  Exiting directory" `pwd`"..."
+echo "Exiting directory" `pwd`"..."
 echo ""
 
 cd ..

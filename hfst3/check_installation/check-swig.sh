@@ -12,8 +12,12 @@ if [ ! -d "$TESTDIR" ]; then
     exit 1;
 fi
 
+echo "---------------------------------------- "
+echo "Testing SWIG/Python bindings for HFST... "
+echo "---------------------------------------- "
+
 echo ""
-echo "  Moving to directory" `pwd`"/"$TESTDIR"..."
+echo "Moving to directory" `pwd`"/"$TESTDIR"..."
 echo ""
 cd $TESTDIR
 
@@ -27,7 +31,7 @@ cd $TESTDIR
 ./test.sh
 
 echo ""
-echo "  Exiting directory" `pwd`"..."
+echo "Exiting directory" `pwd`"..."
 echo ""
 
 cd ..

@@ -1,5 +1,10 @@
 #!/bin/sh
 
+#
+# Check all installed HFST morphologies. 
+#
+
+
 extension=.sh
 languages="english finnish french german italian swedish turkish"
 directions="analyze generate"
@@ -11,6 +16,10 @@ function fail {
     echo "FAIL"
     exit 1
 }
+
+echo "---------------------------- "
+echo "Testing HFST morphologies... "
+echo "---------------------------- "
 
 for lang in $languages;
 do

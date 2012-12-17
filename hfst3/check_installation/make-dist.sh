@@ -40,9 +40,9 @@ do
 done
 
 cp dist-README $DISTDIR/README
-cp ./check-tool-tests.sh $DISTDIR/
+cp ./check-tools.sh $DISTDIR/
 cp --parents ./tool_tests/* $DISTDIR/
-cp ./check-swig-tests.sh $DISTDIR/
+cp ./check-swig.sh $DISTDIR/
 cp --parents ./swig_tests/* $DISTDIR/
 cp ./check-morphologies.sh $DISTDIR/
 cp --parents ./morphology_tests/* $DISTDIR/
