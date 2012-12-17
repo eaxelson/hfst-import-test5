@@ -89,7 +89,7 @@ parse_options(int argc, char** argv)
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_CREATIONAL_SHORT "SFtlOwQf:b",
+                             HFST_GETOPT_CREATIONAL_SHORT "SFtlOwQb",
                              long_options, &option_index);
         if (-1 == c)
           {
@@ -165,14 +165,33 @@ make_conversions()
 int main(int argc, char **argv)
   {
     hfst_init_commandline(argv[0], "0.1", "HfstFst2Fst",
-                          AUTOM_IN_AUTOM_OUT, READ_ONE);
+                          NO_AUTOMAGIC_IO, READ_ONE);
     parse_options(argc, argv);
     check_common_options(argc, argv);
     parse_options_getenv();
-    hfst_open_streams();
-    if (!hfst_format)
+    // no hfst_open_streams() since special io
+    if (inputfile != stdin)
       {
-        delete outstream;
+        instream = new HfstInputStream(inputfilename);
+      }
+    else
+      {
+        instream = new HfstInputStream();
+      }
+    if (hfst_format)
+      {
+        if (outfile != stdout)
+          {
+            outstream = new HfstOutputStream(outfilename,
+                                             format);
+          }
+        else
+          {
+            outstream = new HfstOutputStream(format);
+          }
+      }
+    else
+      {
         if (outfile != stdout)
           {
             outstream = new HfstOutputStream(outfilename,
