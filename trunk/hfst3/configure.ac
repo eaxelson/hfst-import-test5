@@ -471,9 +471,10 @@ AC_PROG_AWK
 AC_PROG_CPP
 AC_PROG_YACC
 AC_PROG_LEX
-AC_PATH_PROG([FOMACLI], [foma], [false])
+#AC_PATH_PROG([FOMACLI], [foma], [false])
 AC_PATH_PROG([GETOPT], [getopts], [false])
-AM_CONDITIONAL([CAN_FOMAWRAP], [test x$FOMACLI != xfalse])
+#AM_CONDITIONAL([CAN_FOMAWRAP], [test x$FOMACLI != xfalse])
+AM_CONDITIONAL([CAN_FOMAWRAP], [true])
 AM_PATH_PYTHON([2.4],[],[false])
 # if flex 3.X ever comes out, this breaks :)
 LEX_VERSION=`$LEX --version`
@@ -668,7 +669,6 @@ cat <<EOF
     *                 twolc: $enable_twolc
     *                 tagger: $enable_tagger
     *                 txt2fst: $enable_txt2fst
-    * foma used for xfst: -> $FOMACLI
     * unicode parsed in corpus tools with: $with_unicode_handler
 EOF
 dnl stick important warnings to bottom
@@ -680,8 +680,8 @@ dnl hope end users never disable ofst
 AS_IF([test "x$with_openfst" == "xno"],
       [AC_MSG_WARN([Disabling openfst backend will severely cripple libhfst])])
 dnl without foma, foma-based scripts cannot work
-AS_IF([test "x$FOMACLI" = "xfalse"],
-      [AC_MSG_WARN([using hfst-xfst is disabled because foma binary was not found])])
+#AS_IF([test "x$FOMACLI" = "xfalse"],
+#      [AC_MSG_WARN([using hfst-xfst is disabled because foma binary was not found])])
 dnl HFST's case mapping in corpus tools is mainly MES-2 set with other characters
 dnl added as we go
 AS_IF([test "x$with_unicode_handler" = "xhfst"],

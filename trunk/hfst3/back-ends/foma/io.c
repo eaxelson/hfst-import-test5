@@ -88,6 +88,11 @@ struct fsm *fsm_read_binary_file(char *filename) {
   io_error(); return; }
 #else
 
+// HFST addition
+#ifndef WINDOWS
+#define LONG_LONG_SPECIFIER "%lld"
+#endif
+
 void escape_print(FILE *stream, char* string) {
     int i;
     if (strchr(string, '"') != NULL) {
