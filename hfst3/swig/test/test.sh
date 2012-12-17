@@ -1,7 +1,13 @@
 #!/bin/sh
 
-PYTHON=python
+if [ "$1" = "-h" -o "$1" = "--help" ]; then
+    echo ""
+    echo "  Usage:  "$0" [--python PYTHONX.Y]"
+    echo ""
+    exit 0;
+fi
 
+PYTHON=python
 if [ "$1" = "--python" ]; then
     PYTHON=$2;
 fi
