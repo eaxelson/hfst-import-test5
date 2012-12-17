@@ -1,8 +1,8 @@
 #!/bin/sh
 
 #
-# Make a distribution tarball check-hfst-tools[-VERSIONNMUBER].tar.gz that
-# contains tools for testing installed hfst tools.
+# Make a distribution tarball check-hfst[-VERSIONNMUBER].tar.gz that
+# contains tools for testing installed hfst tools and morphologies.
 #
 
 VERSION=
@@ -21,9 +21,9 @@ echo "  Copying tests for swig bindings..."
 ./copy-swig-tests.sh
 
 if [ ! "$VERSION" = "" ]; then
-    DISTDIR=check-hfst-tools"-"$VERSION;
+    DISTDIR=check-hfst"-"$VERSION;
 else
-    DISTDIR=check-hfst-tools
+    DISTDIR=check-hfst
 fi
 
 if [ -d "$DISTDIR" ]; then
@@ -31,20 +31,21 @@ if [ -d "$DISTDIR" ]; then
 fi
 mkdir $DISTDIR
 
-if [ ! -d "tool_tests" ]; then
-    echo "ERROR: directory 'tool_tests' does not exist."
-    exit 1;
-fi
-if [ ! -d "swig_tests" ]; then
-    echo "ERROR: directory 'swig_tests' does not exist."
-    exit 1;
-fi
+for dir in tool_tests swig_tests morphology_tests;
+do
+    if [ ! -d $dir ]; then
+	echo "ERROR: directory 'tool_tests' does not exist."
+	exit 1;
+    fi
+done
 
 cp dist-README $DISTDIR/README
 cp ./check-tool-tests.sh $DISTDIR/
 cp --parents ./tool_tests/* $DISTDIR/
 cp ./check-swig-tests.sh $DISTDIR/
 cp --parents ./swig_tests/* $DISTDIR/
+cp ./check-morphologies.sh $DISTDIR/
+cp --parents ./morphology_tests/* $DISTDIR/
 
 echo "  Creating the package..." 
 tar -cvf $DISTDIR.tar $DISTDIR

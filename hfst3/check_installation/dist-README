@@ -3,3 +3,11 @@ To test installed HFST command line tools, run
 
   ./check-tool-tests.sh
 
+To test installed HFST morphologies, run
+
+  ./check-morphologies.sh
+
+To test installed HFST swig/Python bindings, run
+
+  ./check-swig-tests.sh
+
