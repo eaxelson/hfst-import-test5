@@ -511,11 +511,11 @@ namespace SFST {
     for( ArcsIter it(node->arcs()); it; it++ ) {
       Arc *arc=it;
 
-      NodeHashSet::iterator it=previous.insert(node).first;
+      NodeHashSet::iterator it_=previous.insert(node).first;
       path.push_back(arc->label());
       enumerate_paths_node( arc->target_node(), path, previous, result );
       path.pop_back();
-      previous.erase(it);
+      previous.erase(it_);
     }
   }
 
