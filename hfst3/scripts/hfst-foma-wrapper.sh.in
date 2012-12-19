@@ -1,6 +1,6 @@
 #!/bin/bash
 #foma_exec=@FOMACLI@
-foma_exec=`which hfst_foma`
+foma_exec=@prefix@/bin/hfst_foma
 if [ ! -x $foma_exec ] ; then
     echo "$0 could not find executable foma from $foma_exec"
     exit 1
