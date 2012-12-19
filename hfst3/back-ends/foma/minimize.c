@@ -66,16 +66,16 @@ struct agenda {
   _Bool index;
 };
 
-struct trans_list {
+struct trans_list_ {
     int inout;
     int source;
-} *trans_list;
+} *trans_list_;
 
-struct trans_array {
-    struct trans_list *transitions;
+struct trans_array_ {
+    struct trans_list_ *transitions;
     unsigned int size;
     unsigned int tail;
-} *trans_array;
+} *trans_array_;
 
 
 
@@ -119,8 +119,8 @@ static struct fsm *fsm_minimize_brz(struct fsm *net) {
 static struct fsm *fsm_minimize_hop(struct fsm *net) {
 
     struct e *temp_E;
-    struct trans_array *tptr;
-    struct trans_list *transitions;
+    struct trans_array_ *tptr;
+    struct trans_list_ *transitions;
     int i,j,minsym,next_minsym,current_i, stateno, thissize, source;  
     unsigned int tail;
 
@@ -174,7 +174,7 @@ static struct fsm *fsm_minimize_hop(struct fsm *net) {
             stateno = temp_E - E;
             *(temp_group+thissize) = stateno;
             thissize++;
-            tptr = trans_array+stateno;
+            tptr = trans_array_+stateno;
             /* Clear tails if symloop should start from 0 */
             if (current_i == 0)
                 tptr->tail = 0;
@@ -190,7 +190,7 @@ static struct fsm *fsm_minimize_hop(struct fsm *net) {
 
             /* Add states to temp_move */
             for (i = 0, j = 0; i < thissize; i++) {
-                tptr = trans_array+*(temp_group+i);
+                tptr = trans_array_+*(temp_group+i);
                 tail = tptr->tail;
                 transitions = (tptr->transitions)+tail;
                 while (tail < tptr->size && transitions->inout == minsym) {
@@ -223,8 +223,8 @@ static struct fsm *fsm_minimize_hop(struct fsm *net) {
 
     net = rebuild_machine(net);
 
-    xxfree(trans_array);
-    xxfree(trans_list);
+    xxfree(trans_array_);
+    xxfree(trans_list_);
 
  bail:
     
@@ -554,19 +554,19 @@ static void init_PE() {
 }
 
 static int trans_sort_cmp(const void *a, const void *b) {
-  return (((const struct trans_list *)a)->inout - ((const struct trans_list *)b)->inout);
+  return (((const struct trans_list_ *)a)->inout - ((const struct trans_list_ *)b)->inout);
 }
 
 static void generate_inverse(struct fsm *net) {
     
     struct fsm_state *fsm;
-    struct trans_array *tptr;
-    struct trans_list *listptr;
+    struct trans_array_ *tptr;
+    struct trans_list_ *listptr;
 
     int i, source, target, offsetcount, symbol, size;
     fsm = net->states;
-    trans_array = xxcalloc(net->statecount, sizeof(struct trans_array));
-    trans_list = xxcalloc(net->arccount, sizeof(struct trans_list));
+    trans_array_ = xxcalloc(net->statecount, sizeof(struct trans_array_));
+    trans_list_ = xxcalloc(net->arccount, sizeof(struct trans_list_));
 
     /* Figure out the number of transitions each one has */
     for (i=0; (fsm+i)->state_no != -1; i++) {
@@ -576,12 +576,12 @@ static void generate_inverse(struct fsm *net) {
         target = (fsm+i)->target;
         (E+target)->inv_count++;
         (E+target)->group->inv_count++;
-        (trans_array+target)->size++;
+        (trans_array_+target)->size++;
     }
     offsetcount = 0;
     for (i=0; i < net->statecount; i++) {
-        (trans_array+i)->transitions = trans_list + offsetcount;
-        offsetcount += (trans_array+i)->size;
+        (trans_array_+i)->transitions = trans_list_ + offsetcount;
+        offsetcount += (trans_array_+i)->size;
     }
     for (i=0; (fsm+i)->state_no != -1; i++) {
         if ((fsm+i)->target == -1) {
@@ -590,17 +590,17 @@ static void generate_inverse(struct fsm *net) {
         symbol = symbol_pair_to_single_symbol((fsm+i)->in,(fsm+i)->out);        
         source = (fsm+i)->state_no;
         target = (fsm+i)->target;
-        tptr = trans_array + target;
+        tptr = trans_array_ + target;
         ((tptr->transitions)+(tptr->tail))->inout = symbol;
         ((tptr->transitions)+(tptr->tail))->source = source;
         tptr->tail++;
     }
     /* Sort arcs */
     for (i=0; i < net->statecount; i++) {
-        listptr = (trans_array+i)->transitions;
-        size = (trans_array+i)->size;
+        listptr = (trans_array_+i)->transitions;
+        size = (trans_array_+i)->size;
         if (size > 1)
-            qsort(listptr, size, sizeof(struct trans_list), trans_sort_cmp);
+            qsort(listptr, size, sizeof(struct trans_list_), trans_sort_cmp);
     }
 }
 
