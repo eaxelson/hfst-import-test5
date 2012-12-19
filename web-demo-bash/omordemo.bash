@@ -216,8 +216,11 @@ function print_html_heading_info() {
   <h1>$HEADER</h1>
   <p style="font-size: smaller;">
     These demos are based on the <a href="http://hfst.sf.net/">HFST</a>
-    finite-state versions of language models. All software and language
-    models can be downloaded from HFST download pages.
+    finite-state versions of language models. All software can be downloaded
+    from the <a href="https://sourceforge.net/projects/hfst/files/">HFST
+    download pages</a> and the language models have acquired from free/libre
+    and open source repositories in various places on the internet.  Further
+    details in each language's result pages.
   </p>
 EOHEADING
     # languages may have additional data for headings
