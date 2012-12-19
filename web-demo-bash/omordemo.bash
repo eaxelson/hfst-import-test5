@@ -1,5 +1,7 @@
 #!/bin/bash
 PATH=${PWD}/bin:${PATH}
+# Maximum length for input data
+MAXLENGTH=600
 # Parse parameters and build title
 TITLE="HFST web demo"
 HEADER="HFST"
@@ -317,7 +319,9 @@ function print_forms() {
     <form action='$SCRIPT_NAME' method='GET' accept-charset='UTF-8'>
       <fieldset>
       <legend>Process single word form</legend>
-      <label>Word form to process: <input type="text" name="wf" id="wf" value="$WORDFORM" required placeholder="$PLACEHOLDER"></label>
+      <label>Space separated word forms to process (max. $MAXLENGTH bytes):
+        <textarea maxlength="$MAXLENGTH" name="wf" id="wf" required
+         placeholder="$PLACEHOLDER">${WORDFORM//+/ }</textarea></label>
       <!-- these defaults are left in if javascript fails -->
       <label>Language <select name="language" id="languages" onchange="populate_functions()">
         <option value="">Select to get list of options:</option>
