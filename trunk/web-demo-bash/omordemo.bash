@@ -313,7 +313,7 @@ function print_forms() {
     if test -r hfst/$LL/placeholder.string ; then
         PLACEHOLDER=$(cat hfst/$LL/placeholder.string)
     else
-        PLACEHOLDER="insert wordform"
+        PLACEHOLDER="this example sentence has 8 word-forms to analyse"
     fi
     cat <<FORMS
     <form action='$SCRIPT_NAME' method='GET' accept-charset='UTF-8'>
@@ -321,7 +321,7 @@ function print_forms() {
       <legend>Process single word form</legend>
       <label>Space separated word forms to process (max. $MAXLENGTH bytes):
         <textarea maxlength="$MAXLENGTH" name="wf" id="wf" required
-         placeholder="$PLACEHOLDER">${WORDFORM//+/ }</textarea></label>
+         placeholder="$PLACEHOLDER" rows=5>${WORDFORM//+/ }</textarea></label>
       <!-- these defaults are left in if javascript fails -->
       <label>Language <select name="language" id="languages" onchange="populate_functions()">
         <option value="">Select to get list of options:</option>
