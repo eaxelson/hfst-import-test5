@@ -1,6 +1,7 @@
 SUBDIRS=EnglishNumerals NumbersToNumerals FinnishNumerals \
 	EinsteinsPuzzle Esperanto BrazilianPortuguese1 BrazilianPortuguese2 \
 	MonishAnalysis
+# Palindromes
 # FinnishOTProsody YaleShooting
 #	Other directories are not included until we have the rule compiler.
 #	DateParser disables until we get hfst-regexp2fst working
@@ -35,7 +36,7 @@ TESTS=better-cola-machine-test.sh \
  #			- some other things might be missing, ie. what is Func?
  
 
- # palindromes - there is no xfst.script!, not standard
+ # palindromes - there is no xfst.script!, not standard - works fine, add to make file somehow!!!!!
  # plus-or-minus - missing  =>
  
  
