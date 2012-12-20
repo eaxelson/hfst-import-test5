@@ -1,6 +1,6 @@
-SUBDIRS=EnglishNumerals NumbersToNumerals FinnishNumerals \
-	EinsteinsPuzzle Esperanto BrazilianPortuguese1 BrazilianPortuguese2 \
-	MonishAnalysis
+SUBDIRS=BetterColaMachine BrazilianPortuguese1 BrazilianPortuguese2 \
+	DateParser EinsteinsPuzzle EnglishNumerals Esperanto FinnishNumerals \
+	NumbersToNumerals MonishAnalysis YaleShooting	 
 # Palindromes
 # FinnishOTProsody YaleShooting
 #	Other directories are not included until we have the rule compiler.
