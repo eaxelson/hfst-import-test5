@@ -10,7 +10,7 @@
 ## This program is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
+## GNU Genera7l Public License for more details.
 
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -93,7 +93,7 @@ HFST_HDRS = \
 
 hfstinclude_HEADERS = $(HFST_HDRS)
 
-libhfst_la_LDFLAGS = -no-undefined -version-info 23:0:0
+libhfst_la_LDFLAGS = -no-undefined -version-info 24:0:0
 
 LIBHFST_TSTS=HfstApply HfstInputStream HfstTransducer \
 		HfstOutputStream HfstXeroxRules HfstRules HfstSymbolDefs \

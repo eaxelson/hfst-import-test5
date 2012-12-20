@@ -1,3 +1,372 @@
+2012-12-20 15:20  sdrobac
+
+	* test/tools/fsmbook-examples/FinnishOTProsody/FinnishOTProsody.hfst.script,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/Palindromes/Makefile.am: fsmbook
+	  examples change
+
+2012-12-20 14:03  sdrobac
+
+	* configure.ac, libhfst/src/HfstXeroxRules.cc,
+	  libhfst/src/HfstXeroxRulesTest.cc,
+	  test/tools/fsmbook-examples/FinnishProsody/FinnishProsody.hfst.script,
+	  test/tools/fsmbook-examples/FinnishProsody/test.script,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/Palindromes/Makefile,
+	  test/tools/fsmbook-examples/Palindromes/Makefile.am,
+	  test/tools/fsmbook-examples/Palindromes/Palindromes.hfst.script,
+	  test/tools/fsmbook-examples/Palindromes/test.script,
+	  test/tools/fsmbook-examples/PlusOrMinus/test.script: Epenthesis
+	  rules fixed
+
+2012-12-19 15:07  eaxelson
+
+	* check_installation/morphology_tests/english-analyze.output,
+	  check_installation/morphology_tests/finnish-analyze.output,
+	  check_installation/morphology_tests/french-analyze.output,
+	  check_installation/morphology_tests/german-analyze.output,
+	  check_installation/morphology_tests/italian-analyze.output,
+	  check_installation/morphology_tests/swedish-analyze.output,
+	  check_installation/morphology_tests/turkish-analyze.output:
+	  Updated results of morphology tests.
+
+2012-12-19 14:37  eaxelson
+
+	* scripts/hfst-foma-wrapper.sh.in: Now hfst_foma is called directly
+	  from where it is installed.
+
+2012-12-19 14:37  moshagen
+
+	* configure.ac: Bring the long version string in sync with the
+	  other version numbers.
+
+2012-12-19 13:57  eaxelson
+
+	* scripts/hfst-foma-wrapper.sh.in: hfst-xfst now uses hfst_foma
+	  instead of installed foma.
+
+2012-12-19 11:24  eaxelson
+
+	* check_installation/morphology_tests/english-analyze.input,
+	  check_installation/morphology_tests/finnish-analyze.input,
+	  check_installation/morphology_tests/french-analyze.input,
+	  check_installation/morphology_tests/german-analyze.input,
+	  check_installation/morphology_tests/italian-analyze.input,
+	  check_installation/morphology_tests/swedish-analyze.input,
+	  check_installation/morphology_tests/turkish-analyze.input: Added
+	  test sentences for all morphologies.
+
+2012-12-19 10:53  eaxelson
+
+	* back-ends/foma/Makefile.am, back-ends/foma/minimize.c: Renamed a
+	  duplicate symbol.
+
+2012-12-18 15:37  eaxelson
+
+	* back-ends/sfst/fst.cc: A variable was shadowed by a another
+	  variable with the same name, renamed the previous.
+
+2012-12-18 10:53  moshagen
+
+	* test/tools/fsmbook-examples/FinnishOTProsody: Ignore generated
+	  file.
+
+2012-12-17 15:33  eaxelson
+
+	* check_installation/check-morphologies.sh,
+	  check_installation/check-swig-tests.sh,
+	  check_installation/check-swig.sh,
+	  check_installation/check-tool-tests.sh,
+	  check_installation/check-tools.sh,
+	  check_installation/dist-README, check_installation/make-dist.sh:
+	  Made the names of the tests scripts shorter.
+
+2012-12-17 14:57  eaxelson
+
+	* check_installation/check-morphologies.sh,
+	  check_installation/check-swig-tests.sh,
+	  check_installation/dist-README, check_installation/make-dist.sh,
+	  check_installation/morphology_tests,
+	  check_installation/morphology_tests/english-analyze.input,
+	  check_installation/morphology_tests/english-analyze.output,
+	  check_installation/morphology_tests/english-generate.input,
+	  check_installation/morphology_tests/english-generate.output,
+	  check_installation/morphology_tests/finnish-analyze.input,
+	  check_installation/morphology_tests/finnish-analyze.output,
+	  check_installation/morphology_tests/finnish-generate.input,
+	  check_installation/morphology_tests/finnish-generate.output,
+	  check_installation/morphology_tests/french-analyze.input,
+	  check_installation/morphology_tests/french-analyze.output,
+	  check_installation/morphology_tests/french-generate.input,
+	  check_installation/morphology_tests/french-generate.output,
+	  check_installation/morphology_tests/german-analyze.input,
+	  check_installation/morphology_tests/german-analyze.output,
+	  check_installation/morphology_tests/german-generate.input,
+	  check_installation/morphology_tests/german-generate.output,
+	  check_installation/morphology_tests/italian-analyze.input,
+	  check_installation/morphology_tests/italian-analyze.output,
+	  check_installation/morphology_tests/italian-generate.input,
+	  check_installation/morphology_tests/italian-generate.output,
+	  check_installation/morphology_tests/swedish-analyze.input,
+	  check_installation/morphology_tests/swedish-analyze.output,
+	  check_installation/morphology_tests/swedish-generate.input,
+	  check_installation/morphology_tests/swedish-generate.output,
+	  check_installation/morphology_tests/turkish-analyze.input,
+	  check_installation/morphology_tests/turkish-analyze.output,
+	  check_installation/morphology_tests/turkish-generate.input,
+	  check_installation/morphology_tests/turkish-generate.output:
+	  Tentatively added tests for installed HFST morphologies.
+
+2012-12-17 13:01  sdrobac
+
+	* configure.ac, libhfst/src/HfstTransducer.cc,
+	  libhfst/src/HfstTransducer.h, libhfst/src/HfstXeroxRules.cc,
+	  libhfst/src/HfstXeroxRulesTest.cc,
+	  libhfst/src/parsers/xre_parse.yy,
+	  test/tools/fsmbook-examples/FinnishOTProsody/FinnishOTProsody.hfst.script,
+	  test/tools/fsmbook-examples/Makefile.am: Added lower priority
+	  union to regex parser
+
+2012-12-17 11:18  eaxelson
+
+	* back-ends/foma, back-ends/foma/Makefile.am,
+	  back-ends/foma/foma.c, back-ends/foma/iface.c,
+	  back-ends/foma/io.c, back-ends/foma/lex.cmatrix.c,
+	  back-ends/foma/lex.interface.c, back-ends/foma/stack.c,
+	  configure.ac, scripts/Makefile.am: Added foma script under
+	  back-ends/foma. It is now used by hfst-xfst. Fixes bug #147.
+
+2012-12-17 11:16  eaxelson
+
+	* swig/test/test.sh: Fixed a couple of typos in swig test file.
+
+2012-12-17 11:15  eaxelson
+
+	* check_installation/make-dist.sh: Updated the installation check
+	  script.
+
+2012-12-12 15:29  eaxelson
+
+	* check_installation/check-swig-tests.sh,
+	  check_installation/check-tool-tests.sh,
+	  check_installation/copy-swig-tests.sh,
+	  check_installation/copy-tool-tests.sh,
+	  check_installation/dist-README, check_installation/make-dist.sh:
+	  Tentatively added tests for installed swig bindings.
+
+2012-12-12 14:30  eaxelson
+
+	* check_installation/make-dist.sh,
+	  check_installation/test-empty-input.sh,
+	  check_installation/test-help.sh,
+	  check_installation/test-version.sh: Now installation tests pass
+	  on Hippu.
+
+2012-12-12 12:27  eaxelson
+
+	* check_installation/check-tool-tests.sh,
+	  check_installation/copy-files.sh,
+	  check_installation/copy-tool-tests.sh: Updated tests.
+
+2012-12-11 16:50  eaxelson
+
+	* check_installation/copy-files.sh,
+	  check_installation/test-help.sh,
+	  check_installation/test-version.sh,
+	  test/tools/hfst-check-environment.sh,
+	  test/tools/lexc-functionality.sh,
+	  test/tools/push-weights-functionality.sh: Now installation tests
+	  should pass. Also fixed a cople of minor bugs in test/tools.
+
+2012-12-11 16:09  eaxelson
+
+	* check_installation/copy-files.sh,
+	  check_installation/test-empty-input.sh,
+	  check_installation/test-help.sh,
+	  check_installation/test-version.sh: Added new tests.
+
+2012-12-11 14:31  eaxelson
+
+	* check_installation, check_installation/copy-files.sh: Tentatively
+	  added a test for all installed HFST functionalities.
+
+2012-12-10 23:28  moshagen
+
+	* libhfst/src/Makefile.am, tools/src/hfst-tagger/src/Makefile.am:
+	  Another warning-silencer flag that had to be removed to get hfst
+	  to build on MacOSX.
+
+2012-12-10 23:08  moshagen
+
+	* back-ends/foma/Makefile.am, back-ends/sfst/Makefile.am: Made hfst
+	  build on MacOSX again, by removing the -Wno-unused-result GCC
+	  flag. Sorry about the additional warnings, but I really need it
+	  to build.
+
+2012-12-10 16:49  eaxelson
+
+	* back-ends/foma/Makefile.am, back-ends/sfst/Makefile.am,
+	  libhfst/src/HfstTransducer.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/parsers/Makefile.am, tools/src/Makefile.am,
+	  tools/src/hfst-tagger/src/Makefile.am: Suppressed warnings caused
+	  by back-end libraries.
+
+2012-12-10 15:57  eaxelson
+
+	* swig/doc, test/tools/fsmbook-examples/BetterColaMachine,
+	  test/tools/fsmbook-examples/DateParser,
+	  test/tools/fsmbook-examples/DateParser/DateParser.hfst.script,
+	  test/tools/fsmbook-examples/DateParser/Makefile.am,
+	  test/tools/fsmbook-examples/YaleShooting,
+	  test/tools/fsmbook-examples/YaleShooting/YaleShooting.hfst.script,
+	  tools/src: Ignored generated files.
+
+2012-12-10 15:23  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h, swig/README,
+	  swig/libhfst.i, swig/test/test.sh, swig/test/test_examples.py,
+	  swig/test/test_extensions.py, swig/test/test_flag_diacritics.py,
+	  swig/test/test_hfst_basic_transducer.py,
+	  swig/test/test_std_streams.py, swig/test/test_std_streams.sh,
+	  swig/test/test_streams.py, swig/test/test_xre_compiler.py: SWIG
+	  bindings should now work with both Python version 2 and 3. As
+	  FILE* conversions are no longer supported in Python 3, added more
+	  wrapper functions that use an HfstFile argument instead.
+
+2012-12-10 13:44  sdrobac
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/parsers/xre_lex.ll, libhfst/src/parsers/xre_parse.yy:
+	  Priority union bug fix
+
+2012-12-10 11:29  sdrobac
+
+	* configure.ac, libhfst/src/HfstXeroxRules.cc,
+	  libhfst/src/parsers/xre_lex.ll, libhfst/src/parsers/xre_parse.yy,
+	  test/tools/fsmbook-examples/BetterColaMachine/BetterColaMachine.hfst.script,
+	  test/tools/fsmbook-examples/BetterColaMachine/BetterColaMachine.xfst.script,
+	  test/tools/fsmbook-examples/BetterColaMachine/Makefile.am,
+	  test/tools/fsmbook-examples/BetterColaMachine/test.script,
+	  test/tools/fsmbook-examples/DateParser/DateParser.hfst.script,
+	  test/tools/fsmbook-examples/DateParser/DateParser.xfst.att,
+	  test/tools/fsmbook-examples/DateParser/DateParser.xfst.script,
+	  test/tools/fsmbook-examples/DateParser/Makefile.am,
+	  test/tools/fsmbook-examples/FinnishOTProsody/FinnishOTProsody.hfst.script,
+	  test/tools/fsmbook-examples/FinnishOTProsody/FinnishOTProsody.xfst.script,
+	  test/tools/fsmbook-examples/FinnishOTProsody/Makefile.am,
+	  test/tools/fsmbook-examples/FinnishOTProsody/test.script,
+	  test/tools/fsmbook-examples/FinnishProsody/FinnishProsody.hfst.script,
+	  test/tools/fsmbook-examples/FinnishProsody/test.script,
+	  test/tools/fsmbook-examples/Lingala/Lingala.hfst.script,
+	  test/tools/fsmbook-examples/Lingala/Lingala.xfst.script,
+	  test/tools/fsmbook-examples/Lingala/Makefile.am,
+	  test/tools/fsmbook-examples/Lingala/test.script,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/MonishGuesserAnalyzer/Makefile.am,
+	  test/tools/fsmbook-examples/MonishGuesserAnalyzer/MonishGuesserAnalyzer.hfst.script,
+	  test/tools/fsmbook-examples/MonishGuesserAnalyzer/MonishGuesserAnalyzer.xfst.script,
+	  test/tools/fsmbook-examples/YaleShooting/Makefile.am,
+	  test/tools/fsmbook-examples/YaleShooting/YaleShooting.hfst.script,
+	  test/tools/fsmbook-examples/YaleShooting/YaleShooting.xfst.att,
+	  test/tools/fsmbook-examples/YaleShooting/YaleShooting.xfst.script,
+	  test/tools/fsmbook-examples/better-cola-machine-test.sh,
+	  test/tools/fsmbook-examples/finnish-ot-prosody-test.sh,
+	  test/tools/fsmbook-examples/lingala.sh,
+	  test/tools/fsmbook-examples/test-foma.sh,
+	  test/tools/fsmbook-examples/xfst-prolog-to-hfst-att.sh,
+	  test/tools/fsmbook-examples/yale-shooting-test.sh: Fsmbook tests
+	  updated
+
+2012-12-10 11:22  eaxelson
+
+	* test/tools/hfst-check-help.sh, test/tools/hfst-check-version.sh:
+	  Removed old command line tool hfst-strip-header from tests.
+
+2012-12-10 11:20  eaxelson
+
+	* test/tools/hfst-check-help.sh, test/tools/hfst-check-version.sh:
+	  Removed old command line tool hfst-preprocess-for
+	  optimized-lookup-format from tests.
+
+2012-12-10 11:18  eaxelson
+
+	* test/tools/hfst-check-help.sh, test/tools/hfst-check-version.sh:
+	  Removed old command line tool hfst-duplicate from tests.
+
+2012-12-05 20:10  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h: Revert
+	  previous unintended change to unrelated files
+
+2012-12-05 19:44  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: The
+	  header from r2888 that accidentally didn't get re-committed
+	  with the most recent bugfix in this directory..
+
+2012-12-05 13:45  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc: Fix
+	  typo-bug wrt tape movement
+
+2012-12-05 13:29  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Roll
+	  back previous changes pending bug fixes
+
+2012-12-05 13:11  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc: Avoid
+	  reallocations in the input tape
+
+2012-12-05 13:03  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: New
+	  scheme for input and output tapes to allow them to be arbitrarily
+	  large
+
+2012-12-04 16:47  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc:
+	  Handle the case where we want to take a default transition when
+	  it's the only transition
+
+2012-12-04 16:19  eaxelson
+
+	* NSIS/copy_files.sh, NSIS/hfst_installer.nsi,
+	  libhfst/src/implementations/ConvertTransducerFormat.h,
+	  libhfst/src/implementations/FomaTransducer.h,
+	  libhfst/src/implementations/LogWeightTransducer.h,
+	  libhfst/src/implementations/SfstTransducer.h,
+	  libhfst/src/implementations/TropicalWeightTransducer.h,
+	  libhfst/src/implementations/optimized-lookup/convert.h: Changed
+	  all includes of type <backend-header.h> to "backend-header.h".
+	  Made small modifications to NSIS installer.
+
+2012-12-04 10:30  moshagen
+
+	* swig, swig/test: Ignore generated files.
+
+2012-11-30 15:22  eaxelson
+
+	* swig/README: Added more information to swig/README.
+
+2012-11-30 13:46  eaxelson
+
+	* ChangeLog, NEWS, configure.ac, libhfst/src/Makefile.am: Ready for
+	  release 3.4.0.
+
+2012-11-30 13:10  eaxelson
+
+	* libhfst/src/Makefile.am, tools/src/hfst-pmatch.cc: Fixed some
+	  bugs noticed when making distcheck-
+
 2012-11-29 12:48  eaxelson
 
 	* Makefile.am, back-ends/foma/Makefile.am,
