@@ -20,7 +20,7 @@ echo "BASIC DEFINITIONS ---"
 echo '[u | y | i]' | $2/hfst-regexp2fst -f $1 > HighV                          # High vowel
 echo '[e | o | ö]' | $2/hfst-regexp2fst -f $1 > MidV                          # Mid vowel
 echo '[a | ä]' | $2/hfst-regexp2fst -f $1 > LowV                             # Low vowel
-echo '[HighV | MidV | LowV]' | $2/hfst-regexp2fst -f $1 > USV                  # Unstressed Vowel
+echo '[@"HighV" | @"MidV" | @"LowV"]' | $2/hfst-regexp2fst -f $1 > USV                  # Unstressed Vowel
 
 echo "[b | c | d | f | g | h | j | k | l | m | \
           n | p | q | r | s | t | v | w | x | z]" | $2/hfst-regexp2fst -f $1 > C  # Consonant
@@ -37,7 +37,7 @@ echo '.#. | "."' | $2/hfst-regexp2fst -f $1 > E                                 
 echo '[~$"." "." ~$"."]' | $2/hfst-regexp2fst -f $1 > SB                        # At most one syllable boundary
 
 echo '[@"C"* @"V"]' | $2/hfst-regexp2fst -f $1 > Light                                # Light syllable
-echo '[Light @"P"+]' | $2/hfst-regexp2fst -f $1 > Heavy                            # Heavy syllable
+echo '[@"Light" @"P"+]' | $2/hfst-regexp2fst -f $1 > Heavy                            # Heavy syllable
 
 echo '[@"Heavy" | @"Light"]' | $2/hfst-regexp2fst -f $1 > S                           # Syllable
 echo '[@"S" & $@"SV"]' | $2/hfst-regexp2fst -f $1 > SS                                # Stressed syllable
