@@ -5,6 +5,22 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.4.1
+---------------------------
+
+* Updates to regex parser and optimized lookup transducer
+
+* SWIG bindings now work with both Python version 2 and 3. As FILE* conversions
+  are no longer supported in Python 3, more wrapper functions are added
+  that use an HfstFile argument instead.
+
+* Some of the warnings in back-end libraries fixed or suppressed
+
+* A bug in hfst-xfst linking fixed
+
+* Obsolete command line tools removed
+
+
 Noteworthy changes in 3.4.0
 ---------------------------
 
@@ -351,3 +367,4 @@ Noteworthy changes in release 2.1
 ---------------------------------
 
 * hfst-twolc and hfst-compose-intersect understand # like xerox originals
+

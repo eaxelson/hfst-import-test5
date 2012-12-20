@@ -19,16 +19,16 @@ elif## Process this file with autoconf to produce configure script
 HFST_NAME=hfst
 HFST_MAJOR=3
 HFST_MINOR=4
-HFST_EXTENSION=0
+HFST_EXTENSION=1
 HFST_VERSION=$HFST_MAJOR.$HFST_MINOR.$HFST_EXTENSION
 # for package-config pc file
 LIBHFST_NAME=hfst
 LIBHFST_MAJOR=3
 LIBHFST_MINOR=4
-LIBHFST_EXTENSION=4
+LIBHFST_EXTENSION=1
 LIBHFST_VERSION=$LIBHFST_MAJOR.$LIBHFST_MINOR.$LIBHFST_EXTENSION
 
-AC_INIT([hfst], [3.4.0], [hfst-bugs@helsinki.fi], [hfst])
+AC_INIT([hfst], [3.4.1], [hfst-bugs@helsinki.fi], [hfst])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall -Werror std-options foreign check-news])
 
@@ -41,8 +41,8 @@ AC_CONFIG_HEADERS([config.h libhfst/src/hfst.hpp])
 
 AC_SUBST([LIBHFST_MAJOR],     [3])
 AC_SUBST([LIBHFST_MINOR],     [4])
-AC_SUBST([LIBHFST_EXTENSION], [0])
-AC_SUBST([LIBHFST_VERSION],   [3.4.0])
+AC_SUBST([LIBHFST_EXTENSION], [1])
+AC_SUBST([LIBHFST_VERSION],   [3.4.1])
 AC_SUBST([LIBHFST_NAME],      [hfst])
 
 # long version = version vector cast in base 10000, for automatic comparisons
@@ -581,9 +581,9 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 test/tools/fsmbook-examples/BrazilianPortuguese1/Makefile
 		 test/tools/fsmbook-examples/BrazilianPortuguese2/Makefile
 		 test/tools/fsmbook-examples/MonishAnalysis/Makefile
+		 test/tools/fsmbook-examples/BetterColaMachine/Makefile
 		 test/tools/fsmbook-examples/DateParser/Makefile
 		 test/tools/fsmbook-examples/YaleShooting/Makefile
-		 test/tools/fsmbook-examples/BetterColaMachine/Makefile
                  libhfst/Makefile libhfst/src/Makefile
                  libhfst/src/implementations/Makefile
 		 libhfst/src/parsers/Makefile 
@@ -610,9 +610,8 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 swig/test/Makefile
                  scripts/Makefile scripts/hfst-foma-wrapper.sh],
                  [chmod +x scripts/hfst-foma-wrapper.sh])
-#		 test/tools/fsmbook-examples/MonishGuesserAnalyzer/Makefile
 #		 test/tools/fsmbook-examples/FinnishOTProsody/Makefile
-#        test/tools/fsmbook-examples/Palindromes/Makefile
+#		 test/tools/fsmbook-examples/MonishGuesserAnalyzer/Makefile
 
 
 # output
