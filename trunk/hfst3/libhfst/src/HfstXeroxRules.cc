@@ -1685,6 +1685,7 @@ namespace hfst
         {
             HfstTokenizer TOK;
             TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+            TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
             ImplementationType type = t.get_type();
 
             String boundaryMarker(".#.");
@@ -1708,30 +1709,8 @@ namespace hfst
                                     .minimize();
 
 
-        //    HfstTransducer newTr(boundary);
-        //    newTr.concatenate(t).concatenate(boundary).minimize();
-
-           // apply boundary to the transducer
-
-
-            // compose tr with .#. (? - .#.)* .#.
-            HfstTransducer newTr(t);
-            //printf("newTr 1 : \n");
-            //newTr.write_in_att_format(stdout, 1);
-
-            //printf("boundaryAnythingBoundary: \n");
-            //boundaryAnythingBoundary.write_in_att_format(stdout, 1);
-
-
-        //    newTr.insert_to_alphabet(boundaryMarker);
-          //  newTr.compose(boundaryAnythingBoundary).minimize();
-
-            //printf("newTr 2 : \n");
-            //newTr.write_in_att_format(stdout, 1);
-           // remove boundary paths
 
             // [0:.#. | ? - .#.]*
-
             HfstTransducer zeroToBoundary("@_EPSILON_SYMBOL_@", boundaryMarker, TOK, type);
             HfstTransducer retval(zeroToBoundary);
             retval.disjunct(identityMinusBoundary)
@@ -1739,33 +1718,38 @@ namespace hfst
                   .repeat_star()
                   .minimize();
 
-            // compose with previous
-            retval.compose(newTr)
-                  .compose(boundaryAnythingBoundary)
-                  .minimize();
-            //printf("retval : \n");
-            //retval.write_in_att_format(stdout, 1);
 
-            //printf("retval : \n");
-            //retval.write_in_att_format(stdout, 1);
-
-
-            // compose with [.#.:0 | ? - .#.]*
+            // [.#.:0 | ? - .#.]*
             HfstTransducer boundaryToZero(boundaryMarker, "@_EPSILON_SYMBOL_@", TOK, type);
-            HfstTransducer tmp(boundaryToZero);
-            tmp.disjunct(identityMinusBoundary)
+            HfstTransducer removeBoundary(boundaryToZero);
+            removeBoundary.disjunct(identityMinusBoundary)
                .minimize()
                .repeat_star()
                .minimize();
 
-            retval.compose(tmp).minimize();
+            //printf("tr : \n");
+            //t.write_in_att_format(stdout, 1);
 
-            //printf("retval 2: \n");
+            // apply boundary to the transducer
+            // compose [0:.#. | ? - .#.]* .o. t
+            retval.compose(t)
+                .minimize();
+
+                //printf("after compose 1: \n");
+                //retval.write_in_att_format(stdout, 1);
+
+            // compose with .#. (? - .#.)* .#.
+            retval.compose(boundaryAnythingBoundary)
+                  .minimize();
+
+            // compose with [.#.:0 | ? - .#.]*
+            retval.compose(removeBoundary).minimize();
+
+            //printf("after compose 3: \n");
             //retval.write_in_att_format(stdout, 1);
+
             // remove boundary from alphabet
             retval.remove_from_alphabet(boundaryMarker);
-
-
             return retval;
 
         }
@@ -1972,8 +1956,6 @@ namespace hfst
       //---------------------------------
 
 
-
-
       // replace up, left, right, down
       HfstTransducer replace( const Rule &rule, bool optional)
       {
@@ -1988,26 +1970,20 @@ namespace hfst
 
           retval = noRepetitionConstraint( retval );
 
-        //printf("noRepetitionConstraint: \n");
-        //retval.write_in_att_format(stdout, 1);
+          //printf("noRepetitionConstraint: \n");
+          //retval.write_in_att_format(stdout, 1);
+
+          // deals with boundary symbol, must be before mostBracketsStarConstraint
+          retval = applyBoundaryMark( retval );
 
           if ( !optional )
           {
-             // retval = mostBracketsPlusConstraint(retval);
+              // Epenthesis rules behave differently if used mostBracketsPlusConstraint
+              //retval = mostBracketsPlusConstraint(retval);
               retval = mostBracketsStarConstraint(retval);
-              //retval = removeB2Constraint(retval);
-              // printf("After non optional tr: \n");
-              // retval.write_in_att_format(stdout, 1);
-
           }
           retval = removeB2Constraint(retval);
           retval = removeMarkers( retval );
-
-          //printf("after remove markers: \n");
-          //retval.write_in_att_format(stdout, 1);
-
-          // deals with boundary symbol
-          retval = applyBoundaryMark( retval );
           //printf("after boundary: \n");
           //retval.write_in_att_format(stdout, 1);
           return retval;
@@ -2035,18 +2011,17 @@ namespace hfst
             retval = noRepetitionConstraint( retval );
 
 
+            // deals with boundary symbol
+            retval = applyBoundaryMark( retval );
+
             if ( !optional )
             {
+                // Epenthesis rules behave differently if used mostBracketsPlusConstraint
                // retval = mostBracketsPlusConstraint(retval);
                 retval = mostBracketsStarConstraint(retval);
             }
             retval = removeB2Constraint(retval);
-
             retval = removeMarkers( retval );
-
-            // deals with boundary symbol
-            retval = applyBoundaryMark( retval );
-
             return retval;
 
       }
@@ -2531,86 +2506,13 @@ retval.write_in_att_format(stdout, 1);
       // replace up, left, right, down
       HfstTransducer replace_epenthesis(    const Rule &rule, bool optional)
       {
-          HfstTransducer retval(bracketedReplace(rule, optional));
-
-          //retval = bracketedReplace(rule, optional);
-
-          //printf("bracketedReplace: \n");
-          //retval.write_in_att_format(stdout, 1);
-
-          // it can't have more than one epsilon repetition in a row
-          retval = noRepetitionConstraint( retval );
-
-
-          //printf("after no repet.: \n");
-          //retval.write_in_att_format(stdout, 1);
-
-
-          if ( !optional )
-          {
-              retval = mostBracketsStarConstraint(retval);
-
-              //printf("after most bracket star: \n");
-              //retval.write_in_att_format(stdout, 1);
-
-              retval = removeB2Constraint(retval);
-
-              //printf("after remove B2: \n");
-              //retval.write_in_att_format(stdout, 1);
-          }
-
-          retval = removeMarkers( retval );
-
-          //printf("after remove markers: \n");
-          //retval.write_in_att_format(stdout, 1);
-          return retval;
-
+          return replace(rule, optional);
       }
 
       // replace up, left, right, down
     HfstTransducer replace_epenthesis(    const std::vector<Rule> &ruleVector, bool optional)
       {
-          HfstTransducer retval(parallelBracketedReplace(ruleVector, optional));
-
-
-          //retval = parallelBracketedReplace(ruleVector, optional);
-
-          //printf("bracketedReplace: \n");
-          //retval.write_in_att_format(stdout, 1);
-
-          // it can't have more than one epsilon repetition in a row
-          retval = noRepetitionConstraint( retval );
-
-
-          //printf("after no repet.: \n");
-          //retval.write_in_att_format(stdout, 1);
-
-
-          if ( !optional )
-          {
-              retval = mostBracketsStarConstraint(retval);
-
-              //printf("after most bracket star: \n");
-              //retval.write_in_att_format(stdout, 1);
-
-
-          }
-
-          retval = removeB2Constraint(retval);
-        //printf("after remove B2: \n");
-        //retval.write_in_att_format(stdout, 1);
-
-          retval = removeMarkers( retval );
-
-
-
-          // deals with boundary symbol
-          //retval = applyBoundaryMark( retval );
-
-          //printf("after remove markers: \n");
-          //retval.write_in_att_format(stdout, 1);
-          return retval;
-
+          return replace(ruleVector, optional);
       }
 
 
@@ -2805,6 +2707,8 @@ int main(int argc, char * argv[])
 
           // std::cout << "----- Type --------- " << i << std::endl;
 
+
+
             test1( types[i] );
 
             test1b( types[i]);
@@ -2894,6 +2798,7 @@ int main(int argc, char * argv[])
             restriction_test8( types[i] );
 
             before_test1( types[i] );
+
           }
 
           std::cout << "ok" << std::endl;

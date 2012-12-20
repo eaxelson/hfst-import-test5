@@ -2436,6 +2436,7 @@ void test6b( ImplementationType type )
     String RightMarker("@_RM_@");
     TOK.add_multichar_symbol(LeftMarker);
     TOK.add_multichar_symbol(RightMarker);
+    TOK.add_multichar_symbol(".#.");
 
     // Mapping
     HfstTransducer leftMapping("a", TOK, type);
@@ -2471,7 +2472,7 @@ void test6b( ImplementationType type )
 
     // epsilon
     // TODO epenthesis rules are covered in basic replace rules
-    replaceTr = replace_epenthesis(ruleUp, false);
+    replaceTr = replace(ruleUp, false);
     //printf("test 6b replaceTr: \n");
     //replaceTr.write_in_att_format(stdout, 1);
 
@@ -2519,8 +2520,8 @@ void test6c( ImplementationType type )
     HfstTransducer tmp2(type);
 
     // epsilon
-    replaceTr = replace_epenthesis(ruleUp, false);
-    //replaceTr = replace(ruleUp, false);
+    //replaceTr = replace_epenthesis(ruleUp, false);
+    replaceTr = replace(ruleUp, false);
 
     //printf("test 6c replaceTr: \n");
     //replaceTr.write_in_att_format(stdout, 1);
@@ -2635,7 +2636,8 @@ void test7b( ImplementationType type )
     HfstTransducer tmp2(type);
 
     // epsilon
-    replaceTr = replace_epenthesis( ruleVector, false);
+    //replaceTr = replace_epenthesis( ruleVector, false);
+    replaceTr = replace( ruleVector, false);
 
 
     tmp2 = input1;
@@ -2866,7 +2868,8 @@ void test7d( ImplementationType type )
     HfstTransducer tmp2(type);
 
     // epsilon
-    replaceTr = replace_epenthesis( ruleVector, false);
+    //replaceTr = replace_epenthesis( ruleVector, false);
+    replaceTr = replace( ruleVector, false);
 
 
 
