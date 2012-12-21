@@ -1,8 +1,7 @@
 SUBDIRS=BetterColaMachine BrazilianPortuguese1 BrazilianPortuguese2 \
 	DateParser EinsteinsPuzzle EnglishNumerals Esperanto FinnishNumerals \
 	NumbersToNumerals MonishAnalysis YaleShooting	 
-# Palindromes
-# FinnishOTProsody YaleShooting
+# Palindromes PlusOrMinus
 #	Other directories are not included until we have the rule compiler.
 #	DateParser disables until we get hfst-regexp2fst working
 #	hfst-calculate cannot be used because make distcheck 
@@ -21,13 +20,11 @@ TESTS=better-cola-machine-test.sh \
 	yale-shooting-test.sh 
 	
 	
- # finnish-ot-prosody-test.sh - missing .O.  and bug somewhere
+ # finnish-ot-prosody-test.sh - bug somewhere
  
  # finnish-prosody.sh - not standard
   
- # 	monish-guesser-analyzer-test.sh  ---- weird error with foma type when tested with foma
- # monish-guesser-analyzer-test.sh - weird bug in Root - it looks like there is some issue with alphabet 
- 
+ # 	monish-guesser-analyzer-test.sh  ---- weird error with foma type when tested with foma - bug No 110
 
 
  # lingala - can't make att from xfst: *** ERROR: Sorry. This network is too large to be saved as an AT&T-format transducer file by xfst. You need to license a professional version of this program. ***

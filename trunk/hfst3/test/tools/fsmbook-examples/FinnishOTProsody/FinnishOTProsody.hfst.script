@@ -155,7 +155,7 @@ echo '[@"B" @"MSS" ~$@"MSS"]' | $2/hfst-regexp2fst -f $1 > MainStress
 
 echo "c1"
 # Clash: No stress on adjacent syllables.
-
+# define Clash SS -> ... {*} || SS B _ ;
 echo '@"SS" -> ... {*} || @"SS" @"B" _ ' | $2/hfst-regexp2fst -f $1 > Clash 
 
 echo "c2"
@@ -166,13 +166,13 @@ echo '@"SV" -> ... {*} || .#. ~[?* "(" @"C"*] _ ' | $2/hfst-regexp2fst -f $1 > A
 
 echo "c3"
 # Foot-Bin: Feet are minimally bimoraic and maximally bisyllabic.
-
+# define FootBin ["(" Light ")" | "(" S ["." S]^>1] -> ... {*} ;
 echo '["(" @"Light" ")" | "(" @"S" ["." @"S"]^>1] -> ... {*} ' | $2/hfst-regexp2fst -f $1 > FootBin 
 echo "c4"
 
 # Lapse: Every unstressed syllable must be adjacent to a stressed
 # syllable.
-
+# define Lapse US -> ... {*} || [B US B] _ [B US B];
 echo '@"US" -> ... {*} || [@"B" @"US" @"B"] _ [@"B" @"US" @"B"]' | $2/hfst-regexp2fst -f $1 > Lapse 
 echo "c5"
 

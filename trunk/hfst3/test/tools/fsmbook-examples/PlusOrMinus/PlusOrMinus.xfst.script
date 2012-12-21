@@ -25,7 +25,7 @@ define Z ["0" | N];
 
 define CarryUp [ 1 <- [. .] || .#. _ "0"+ .#.
                             .o.
-                 1 ->   0   || .#. _ "0"+ .#. ];
+                 1 -> 0 || .#. _ "0"+ .#. ];
 
 define AddUp  [1 <- "0", 2 <- 1, 3 <- 2, 4 <- 3,  5  <- 4,
                6 <-  5 , 7 <- 6, 8 <- 7, 9 <- 8, "0" <- 9
@@ -33,55 +33,55 @@ define AddUp  [1 <- "0", 2 <- 1, 3 <- 2, 4 <- 3,  5  <- 4,
 
 define NoLeadingZero [ "0" => .#. N Z* _ , .#. _ .#. ];
 
-# PlusMinusOne maps any natural number N to (N-1), and vice versa.
+# PlusOrMinusOne maps any natural number N to (N-1), and vice versa.
 
-define PlusMinusOne [CarryUp .o. AddUp .o. NoLeadingZero];
+define PlusOrMinusOne [CarryUp .o. AddUp .o. NoLeadingZero];
 
-define PlusMinusTwo   [PlusMinusOne   .o. PlusMinusOne];
-define PlusMinusThree [PlusMinusTwo   .o. PlusMinusOne];
-define PlusMinusFour  [PlusMinusThree .o. PlusMinusOne];
-define PlusMinusFive  [PlusMinusFour  .o. PlusMinusOne];
-define PlusMinusSix   [PlusMinusFive  .o. PlusMinusOne];
-define PlusMinusSeven [PlusMinusSix   .o. PlusMinusOne];
-define PlusMinusEight [PlusMinusSeven .o. PlusMinusOne];
-define PlusMinusNine  [PlusMinusEight .o. PlusMinusOne];
-define PlusMinusTen   [PlusMinusNine  .o. PlusMinusOne];
+define PlusOrMinusTwo   [PlusOrMinusOne   .o. PlusOrMinusOne];
+define PlusOrMinusThree [PlusOrMinusTwo   .o. PlusOrMinusOne];
+define PlusOrMinusFour  [PlusOrMinusThree .o. PlusOrMinusOne];
+define PlusOrMinusFive  [PlusOrMinusFour  .o. PlusOrMinusOne];
+define PlusOrMinusSix   [PlusOrMinusFive  .o. PlusOrMinusOne];
+define PlusOrMinusSeven [PlusOrMinusSix   .o. PlusOrMinusOne];
+define PlusOrMinusEight [PlusOrMinusSeven .o. PlusOrMinusOne];
+define PlusOrMinusNine  [PlusOrMinusEight .o. PlusOrMinusOne];
+define PlusOrMinusTen   [PlusOrMinusNine  .o. PlusOrMinusOne];
 
 # Save the transducers in a file
 
-push PlusMinusOne
-write att PlusMinusOne.att BAR BAZ
+push PlusOrMinusOne
+ save stack PlusOrMinusOne.foma.gz
 
-push PlusMinusTwo
-write att PlusMinusTwo.att BAR BAZ
+push PlusOrMinusTwo
+save stack PlusOrMinusTwo.foma.gz
 
-push PlusMinusThree
-write att PlusMinusThree.att BAR BAZ
+push PlusOrMinusThree
+save stack PlusOrMinusThree.foma.gz
 
-push PlusMinusFour
-write att PlusMinusFour.att BAR BAZ
+push PlusOrMinusFour
+save stack PlusOrMinusFour.foma.gz
 
-push PlusMinusFive
-write att PlusMinusFive.att BAR BAZ
+push PlusOrMinusFive
+save stack PlusOrMinusFive.foma.gz
 
-push PlusMinusSix
-write att PlusMinusSix.att BAR BAZ
+push PlusOrMinusSix
+save stack PlusOrMinusSix.foma.gz
 
-push PlusMinusSeven
-write att PlusMinusSeven.att BAR BAZ
+push PlusOrMinusSeven
+save stack PlusOrMinusSeven.foma.gz
 
-push PlusMinusEight
-write att PlusMinusEight.att BAR BAZ
+push PlusOrMinusEight
+save stack PlusOrMinusEight.foma.gz
 
-push PlusMinusNine
-write att PlusMinusNine.att BAR BAZ
+push PlusOrMinusNine
+save stack PlusOrMinusNine.foma.gz
 
-push PlusMinusTen
-write att PlusMinusTen.att BAR BAZ
+push PlusOrMinusTen
+save stack PlusOrMinusTen.foma.gz
 
 
-#echo Testing PlusMinusSeven...
-#push PlusMinusSeven
+#echo Testing PlusOrMinusSeven...
+#push PlusOrMinusSeven
 
 #echo apply up input: 24
 #apply up 24
