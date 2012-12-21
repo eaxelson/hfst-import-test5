@@ -327,6 +327,21 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
           delete $2, $5;
       }
       
+       | REPLACE REPLACE_ARROW LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED
+      {
+          HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+          HfstTransducerPair mappingPair(*$1, epsilon);
+          
+          $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
+          delete $1;
+      }
+      | REPLACE REPLACE_ARROW LEFT_BRACKET_DOTTED REPLACE RIGHT_BRACKET_DOTTED
+      {
+          HfstTransducerPair mappingPair(*$1, *$4);
+          $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
+          delete $1, $4;
+      }
+      
       ;    
 
 // Contexts: ( ie. || k _ f , ... , f _ s )

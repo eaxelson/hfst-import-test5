@@ -15,10 +15,11 @@ TOOLDIR=../../tools/src
 
 
 # create foma result
-foma -f $1.xfst.script;
-gunzip -f $1.foma.gz
-
-$3/$TOOLDIR/hfst-fst2fst -f openfst-tropical $1.foma -o $1.foma.hfst
+if ! [ -f $1.foma.hfst ]; then
+    foma -f $1.xfst.script;
+    gunzip -f $1.foma.gz
+    $3/$TOOLDIR/hfst-fst2fst -f openfst-tropical $1.foma -o $1.foma.hfst
+fi
 
 # For all HFST implementation types,
   for i in sfst openfst-tropical foma; do

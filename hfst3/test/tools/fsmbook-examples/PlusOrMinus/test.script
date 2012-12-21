@@ -1,24 +1,34 @@
 #!/bin/bash
-TOOLDIR=../../tools/src
-XFST= ../../../../../../xfst/bin/./xfst
+TOOLDIR=../../../../tools/src/./
+XFST=../../../../../../xfst/bin/./
 
 # xfst -f PlusOrMinus.xfst.script
 # rm -f TMP
 # for i in One Two Three Four Five Six Seven Eight Nine; do \
-#   cat "PlusMinus"$i".att" >> TMP;
+#   cat "PlusOrMinus"$i".att" >> TMP;
 #   echo "--" >> TMP;
 # done
-# cat PlusMinusTen.att >> TMP;
+# cat PlusOrMinusTen.att >> TMP;
 # cat TMP | ../xfst-att-to-$TOOLDIR/hfst-att.sh > PlusOrMinus.xfst.att
 
-$TOOLDIR/hfst-txt2fst -f openfst-tropical PlusOrMinus.xfst.att > \
-  PlusOrMinus.xfst.hfst
+
+
+  
+# create foma results
+
+foma -f PlusOrMinus.xfst.script;
+for i in One Two Three Four Five Six Seven Eight Nine Ten; do \
+    gunzip -f "PlusOrMinus"$i.foma.gz
+    $TOOLDIR/hfst-fst2fst -f openfst-tropical "PlusOrMinus"$i.foma -o "PlusOrMinus"$i.foma.hfst
+done
 
 for i in sfst openfst-tropical foma; do
-  sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" PlusOrMinus.hfst.script
   echo "Testing" $i "..."
   sh PlusOrMinus.hfst.script
-  sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" PlusOrMinus.hfst.script
-  $TOOLDIR/hfst-fst2fst -f openfst-tropical PlusOrMinus.hfst.hfst > TMP
-  $TOOLDIR/hfst-compare -q TMP PlusOrMinus.xfst.hfst && echo "TEST PASSED";
+  for j in One Two Three Four Five Six Seven Eight Nine Ten; do \
+      echo"Testing $j"
+      $TOOLDIR/hfst-fst2fst -f openfst-tropical "PlusOrMinus"$j.hfst > TMP
+      rm -f TMP
+      $TOOLDIR/hfst-compare -q TMP "PlusOrMinus"$j.foma.hfst && echo "TEST PASSED";
+  done
 done
