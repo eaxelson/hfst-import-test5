@@ -1,6 +1,6 @@
 SUBDIRS=BetterColaMachine BrazilianPortuguese1 BrazilianPortuguese2 \
-	DateParser EinsteinsPuzzle EnglishNumerals Esperanto FinnishNumerals \
-	NumbersToNumerals MonishAnalysis YaleShooting	 
+	DateParser EinsteinsPuzzle EnglishNumerals Esperanto \
+	NumbersToNumerals FinnishNumerals MonishAnalysis YaleShooting	 
 # Palindromes PlusOrMinus
 #	Other directories are not included until we have the rule compiler.
 #	DateParser disables until we get hfst-regexp2fst working
@@ -14,8 +14,8 @@ TESTS=better-cola-machine-test.sh \
 	einsteins-puzzle-test.sh \
 	english-numerals-test.sh \
 	esperanto-test.sh \
-	finnish-numerals-test.sh \
 	numbers-to-numerals-test.sh \
+	finnish-numerals-test.sh \
 	monish-analysis-test.sh \
 	yale-shooting-test.sh 
 	
@@ -37,5 +37,5 @@ TESTS=better-cola-machine-test.sh \
  # plus-or-minus - missing  =>
  
  
-EXTRA_DIST=xfst-att-to-hfst-att.sh remove-complement.sh test-example.sh \
+EXTRA_DIST=xfst-att-to-hfst-att.sh remove-complement.sh test-example.sh test-foma.sh \
 	foma-att-to-hfst-att.sh $(TESTS)
