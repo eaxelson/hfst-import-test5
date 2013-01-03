@@ -1143,11 +1143,6 @@ void test1( ImplementationType type )
     HfstTokenizer TOK;
     TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-    String LeftMarker("@_LM_@");
-    String RightMarker("@_RM_@");
-    TOK.add_multichar_symbol(LeftMarker);
-    TOK.add_multichar_symbol(RightMarker);
-
     // Mapping
     HfstTransducer leftMapping("ab", TOK, type);
     HfstTransducer rightMapping("x", TOK, type);

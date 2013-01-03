@@ -99,7 +99,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 ".-u." { return UPPER_MINUS; }
 ".-l." { return LOWER_MINUS; }
 
-"`[" { 
+"`" { 
     // TODO:
   //  xrelval.values = hfst::xre::get_n_to_k(xretext);
     return SUBSTITUTE_LEFT;

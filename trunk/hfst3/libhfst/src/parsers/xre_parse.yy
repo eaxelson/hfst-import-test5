@@ -32,6 +32,9 @@ extern int yylex();
     int* values;
     double weight;
     char* label;
+    
+    char *subval1, *subval2;
+    
     hfst::HfstTransducer* transducer;
     hfst::HfstTransducerPair* transducerPair;
     hfst::HfstTransducerPairVector* transducerPairVector;
@@ -54,7 +57,7 @@ extern int yylex();
 
 %type <transducer> XRE REGEXP1 REGEXP2  REGEXP4 REGEXP5 REGEXP6 REGEXP7
                     REGEXP8 REGEXP9 REGEXP10 REGEXP11 REGEXP12 LABEL
-                   REPLACE REGEXP3
+                   REPLACE REGEXP3 SUB1  SUB3 SYMBOL_LIST
 %type <replaceRuleVectorWithArrow> PARALLEL_RULES
 %type <replaceRuleWithArrow>  RULE
 %type <mappingVectorWithArrow> MAPPINGPAIR_VECTOR
@@ -64,7 +67,7 @@ extern int yylex();
 %type <transducerPairVector> CONTEXTS_VECTOR, RESTR_CONTEXTS_VECTOR
 %type <transducerPair> CONTEXT, RESTR_CONTEXT
 %type <replType>  CONTEXT_MARK
-%type <label>     HALFARC
+%type <label>     HALFARC SUB2
 
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
 %nonassoc <label> QUOTED_LITERAL SYMBOL CURLY_BRACKETS
@@ -101,7 +104,7 @@ extern int yylex();
 
 %nonassoc <label> READ_BIN READ_TEXT READ_SPACED READ_PROLOG READ_RE
 %token LEFT_BRACKET RIGHT_BRACKET LEFT_PARENTHESIS RIGHT_PARENTHESIS
-       LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED
+       LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED SUBVAL
        PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
@@ -130,8 +133,9 @@ REGEXP1: REGEXP2 END_OF_EXPRESSION {
     //    std::cerr << "regexp1:regexp2\n"<< *$1 << std::endl; 
         hfst::xre::last_compiled = & $1->minimize();
         $$ = hfst::xre::last_compiled;
-   }
-   ;
+   }          
+;
+
 
 REGEXP2: REPLACE
          { 
@@ -153,7 +157,37 @@ REGEXP2: REPLACE
             $$ = & $1->lenient_composition(*$3);
             delete $3;
         }
-       ;
+        // substitute
+        | SUB1 SUB2 SUB3 {
+            StringPair tmp($2, $2);
+            HfstTransducer * tmpTr = new HfstTransducer(* $1);
+           
+           // build Replace transducer
+            HfstTransducerPair mappingPair(HfstTransducer($2, $2, hfst::xre::format), *$3);
+            HfstTransducerPairVector mappingPairVector;
+            mappingPairVector.push_back(mappingPair);
+            Rule rule(mappingPairVector);
+            HfstTransducer replaceTr(hfst::xre::format);
+            replaceTr = replace(rule, false);
+
+            // `[ a:b, b, x y ]
+            // substitute b with x | y
+            // a:b .o. b -> x | y
+            // [[a:b].i .o. b -> x | y].i - this is for cases when b is on left side
+
+            tmpTr->substitute(tmp, *$3);
+            tmpTr->compose(replaceTr).minimize();
+            tmpTr->invert().compose(replaceTr).invert().minimize();
+            
+            $$ = tmpTr;
+            delete($1, $2, $3);
+         }
+        ;
+
+SUB1: SUBSTITUTE_LEFT LEFT_BRACKET REPLACE COMMA { $$ = $3; } ; // first argument
+SUB2: HALFARC COMMA { $$ = $1; } ;  // symbol that needs to be replaced
+SUB3: SYMBOL_LIST RIGHT_BRACKET      {  $$ = $1;  } ; // symbol list
+
 
 ////////////////////////////
 // Replace operators
@@ -713,12 +747,14 @@ REGEXP10: REGEXP11 { }
                                         hfst::internal_identity,
                                         hfst::xre::format);
             $$ = & ( any->subtract(*$2));
-            delete $2;
+            delete $2, any;
         }
+        /*
        | SUBSTITUTE_LEFT REGEXP10 COMMA REGEXP10 COMMA REGEXP10 RIGHT_BRACKET {
             xreerror("no substitute");
             $$ = $2;
         }
+        */
        ;
 
 REGEXP11: REGEXP12 { }
@@ -730,6 +766,41 @@ REGEXP11: REGEXP12 { }
         }
         ;
 
+// building 3rd argument in the substitute list        
+SYMBOL_LIST: HALFARC {
+            if (strcmp($1, hfst::internal_unknown.c_str()) == 0)
+              {
+                $$ = new HfstTransducer(hfst::internal_identity,
+                                        hfst::internal_identity, hfst::xre::format);
+              }
+            else
+              {
+                $$ = new HfstTransducer($1, $1, hfst::xre::format);
+              }
+            free($1);
+        } 
+        | SYMBOL_LIST HALFARC {
+            HfstTransducer * tmp ;
+            if (strcmp($2, hfst::internal_unknown.c_str()) == 0)
+              {
+                 tmp = new HfstTransducer(hfst::internal_identity,
+                                        hfst::internal_identity, hfst::xre::format);
+              }
+            else
+              {
+                 tmp = new HfstTransducer($2, $2, hfst::xre::format);
+              }
+
+            $1->disjunct(*tmp);
+            $$ = & $1->minimize();
+            delete $2, tmp; 
+            }
+        ;
+
+
+            
+            
+            
 REGEXP12: LABEL { }
         | LABEL WEIGHT { 
             $$ = & $1->set_final_weights($2);
