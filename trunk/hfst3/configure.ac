@@ -442,6 +442,16 @@ AC_ARG_ENABLE([txt2fst],
 			  [enable_txt2fst=$enableval],
 			  [enable_txt2fst=yes])
 AM_CONDITIONAL([WANT_TXT2FST], [test x$enable_txt2fst != xno])
+AC_ARG_ENABLE([xfst],
+			  [AS_HELP_STRING([--enable-xfst],
+							  [build xfst tool @<:@default=yes@:>@])],
+			  [enable_xfst=$enableval],
+			  [enable_xfst=yes])
+AM_CONDITIONAL([WANT_XFST], [test x$enable_xfst != xno])
+
+AM_CONDITIONAL([CAN_FOMAWRAP], [test "x$enable_xfst" != "xno" -a "x$with_foma" != "xno"])
+AM_COND_IF([CAN_FOMAWRAP], [], [AM_CONDITIONAL([WANT_XFST], [false])])
+AM_COND_IF([CAN_FOMAWRAP], [], [enable_xfst=no])
 
 # Disable stress tests by default
 AC_ARG_ENABLE([stress-tests],
@@ -477,7 +487,7 @@ AC_PROG_LEX
 #AC_PATH_PROG([FOMACLI], [foma], [false])
 AC_PATH_PROG([GETOPT], [getopts], [false])
 #AM_CONDITIONAL([CAN_FOMAWRAP], [test x$FOMACLI != xfalse])
-AM_CONDITIONAL([CAN_FOMAWRAP], [true])
+#AM_CONDITIONAL([CAN_FOMAWRAP], [true])
 AM_PATH_PYTHON([2.4],[],[false])
 # if flex 3.X ever comes out, this breaks :)
 LEX_VERSION=`$LEX --version`
@@ -508,8 +518,13 @@ AS_IF([test "x$ac_cv_lib_sfst_main" == xno -a "x$ac_cv_lib_sfst1_main" == xno],
       [AC_MSG_FAILURE([sfst tests failed (--without-sfst to disable)])])
 AC_LANG_POP
 AC_LANG_PUSH([C])
-AS_IF([test "x$with_foma" != "xno" -a "x$enable_windows" == "xno"],
-      [AC_CHECK_LIB([z], [main])])
+
+AM_COND_IF([CAN_FOMAWRAP], [AC_CHECK_LIB([z], [main], [], [AC_MSG_FAILURE([foma test failed because zlib.h was not found (--without-foma to disable)])])])
+
+#AS_IF([test "x$with_foma" != "xno" -a "x$enable_windows" == "xno"],
+#      [AC_CHECK_LIB([z], [main], [], [AC_MSG_FAILURE([foma test failed because zlib.h was not found (--without-foma to disable)])])])
+#AS_IF([test "x$enable_hfst_xfst" != "xno" -a "x$enable_windows" == "xno"],
+#      [AC_CHECK_LIB([z], [main], [], [AC_MSG_FAILURE([foma test failed because zlib.h was not found (--enable-hfst-xfst=no to disable)])])])
 #      [AC_CHECK_LIB([foma], [main], [],
 #                    [AC_MSG_FAILURE([foma test failed (--without-foma to disable)])])])
 AC_LANG_POP
@@ -610,9 +625,9 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 back-ends/sfst/Makefile
 		 man/Makefile
 		 swig/Makefile
-		 swig/test/Makefile
-                 scripts/Makefile scripts/hfst-foma-wrapper.sh],
-                 [chmod +x scripts/hfst-foma-wrapper.sh])
+		 swig/test/Makefile])
+AC_CONFIG_FILES([scripts/Makefile scripts/hfst-foma-wrapper.sh],
+                [chmod +x scripts/hfst-foma-wrapper.sh])
 #		 test/tools/fsmbook-examples/FinnishOTProsody/Makefile
 #		 test/tools/fsmbook-examples/MonishGuesserAnalyzer/Makefile
 
@@ -671,6 +686,7 @@ cat <<EOF
     *                 twolc: $enable_twolc
     *                 tagger: $enable_tagger
     *                 txt2fst: $enable_txt2fst
+    *                 xfst: $enable_xfst
     * unicode parsed in corpus tools with: $with_unicode_handler
 EOF
 dnl stick important warnings to bottom
@@ -697,4 +713,5 @@ AS_IF([test "x$enable_tagger" == "xno" -a "x$enable_windows" == "xno"],
       [AC_MSG_WARN([hfst-train-tagger and hfst-tag are not enabled; you will not be able to train and use taggers; enable using --enable-tagger])])
 AS_IF([test "x$enable_calculate" == "xno"],
       [AC_MSG_WARN([hfst-calculate is not enabled; you will not be able to compile SFST-PL scripts; enable using --enable-calculate])])
-
+AM_COND_IF([CAN_FOMAWRAP], [], 
+      [AC_MSG_WARN([hfst-xfst is not enabled; you will not be able to compile XFST scripts; enable using --with-foma (--enable-xfst)])])

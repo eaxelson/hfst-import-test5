@@ -16,10 +16,21 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 if WANT_WINDOWS
-  SUBDIRS = dlfcn openfstwin foma sfst
+  SUBDIRS = dlfcn openfstwin
 else
-  SUBDIRS = openfst foma sfst
+  SUBDIRS = openfst
 endif
 
+if WANT_SFST
+  SUBDIRS += sfst
+endif
+
+if WANT_FOMA
+  SUBDIRS += foma
+endif
+
+if WANT_XFST
+  SUBDIRS += foma
+endif
 
 AUTOMAKE_OPTIONS=subdir-objects
