@@ -9,7 +9,19 @@ libfoma_la_SOURCES = int_stack.c define.c determinize.c apply.c \
 
 hfst_foma_LDADD = $(top_builddir)/back-ends/foma/libfoma.la
 
-hfst_foma_LDFLAGS=-lreadline -lz -ltermcap
+hfst_foma_LDFLAGS=-lreadline -lz 
+
+if HAVE_TERMCAP
+hfst_foma_LDFLAGS += -ltermcap
+else
+if HAVE_NCURSES
+hfst_foma_LDFLAGS += -lncurses
+else 
+if HAVE_CURSES
+hfst_foma_LDFLAGS += -lcurses
+endif
+endif
+endif
 
 bin_PROGRAMS=hfst_foma
 
