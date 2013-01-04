@@ -521,6 +521,18 @@ AC_LANG_PUSH([C])
 
 AM_COND_IF([CAN_FOMAWRAP], [AC_CHECK_LIB([z], [main], [], [AC_MSG_FAILURE([foma test failed because zlib.h was not found (--without-foma to disable)])])])
 
+AM_CONDITIONAL(HAVE_NCURSES,[false])
+AM_CONDITIONAL(HAVE_CURSES,[false])
+AM_CONDITIONAL(HAVE_TERMCAP,[false])
+
+AC_CHECK_HEADER(ncurses.h,[AC_CHECK_HEADER(term.h,[AC_CHECK_LIB(ncurses,tgetent,[AM_CONDITIONAL(HAVE_NCURSES,[true])])])])
+if test x$ac_cv_lib_ncurses_tgetent != xyes ; then
+   AC_CHECK_HEADER(curses.h,[AC_CHECK_HEADER(term.h,[AC_CHECK_LIB(curses,tgetent,[AM_CONDITIONAL(HAVE_CURSES,[true])])])])
+   if test x$ac_cv_lib_curses_tgetent != xyes ; then
+      AC_CHECK_HEADER(termcap.h,[AC_CHECK_LIB(termcap,tgetent,[AM_CONDITIONAL(HAVE_TERMCAP,[true])])])
+   fi
+fi
+
 #AS_IF([test "x$with_foma" != "xno" -a "x$enable_windows" == "xno"],
 #      [AC_CHECK_LIB([z], [main], [], [AC_MSG_FAILURE([foma test failed because zlib.h was not found (--without-foma to disable)])])])
 #AS_IF([test "x$enable_hfst_xfst" != "xno" -a "x$enable_windows" == "xno"],
