@@ -1,3 +1,50 @@
+2013-01-04 11:12  eaxelson
+
+	* back-ends/foma/Makefile.am, configure.ac: Now -lncurses is used
+	  in foma instead if -ltermcap is not found.
+
+2013-01-03 16:28  eaxelson
+
+	* back-ends/Makefile.am, back-ends/foma/fomalib.h, configure.ac,
+	  test/tools/fsmbook-examples/Makefile.am: Fixed a bug in foma
+	  wrapping-
+
+2013-01-03 14:30  sdrobac
+
+	* libhfst/src/HfstXeroxRulesTest.cc,
+	  libhfst/src/parsers/xre_lex.ll, libhfst/src/parsers/xre_parse.yy:
+	  Added regexp substitution
+
+2012-12-21 14:30  sdrobac
+
+	* libhfst/src/parsers/xre_parse.yy,
+	  test/tools/fsmbook-examples/FinnishOTProsody/FinnishOTProsody.hfst.script,
+	  test/tools/fsmbook-examples/FinnishOTProsody/Makefile.am,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/PlusOrMinus/PlusOrMinus.hfst.script,
+	  test/tools/fsmbook-examples/PlusOrMinus/PlusOrMinus.xfst.script,
+	  test/tools/fsmbook-examples/PlusOrMinus/test.script,
+	  test/tools/fsmbook-examples/test-foma.sh: regex parser - added
+	  left replace epenthesis rule
+
+2012-12-21 07:45  moshagen
+
+	* configure.ac: Added note to remind people to also increment the
+	  HFST_LONGVERSION. This is important to ensure consistent
+	  behaviour between different types of version checks. The
+	  different types of version info returned by hfst-info --version
+	  should be consistent, the long version should just be a
+	  representational variant of the other values.
+
+2012-12-20 17:56  moshagen
+
+	* configure.ac: Longversion.
+
+2012-12-20 16:43  eaxelson
+
+	* ChangeLog, NEWS, configure.ac, libhfst/src/Makefile.am: Ready for
+	  release 3.4.1.
+
 2012-12-20 15:20  sdrobac
 
 	* test/tools/fsmbook-examples/FinnishOTProsody/FinnishOTProsody.hfst.script,
