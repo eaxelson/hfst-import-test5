@@ -5,6 +5,17 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.4.2
+---------------------------
+
+* Added regexp substitution and left replace epenthesis to regexp parser.
+
+* A bug in including zlib in foma fixed.
+
+* Now ncurses library is used instead if termcap is not found when 
+  building hfst-xfst.
+
+
 Noteworthy changes in 3.4.1
 ---------------------------
 
