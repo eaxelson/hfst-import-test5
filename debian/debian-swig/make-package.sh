@@ -1,7 +1,7 @@
 #!/bin/sh
 
-SWIGDIR=../debian-test-copy/hfst-3.4.1/swig
-PACKAGENAME=hfst_3.4.1_python_amd64
+SWIGDIR=../debian-test-copy/hfst-3.4.2/swig
+PACKAGENAME=hfst_3.4.2_python_amd64
 
 mkdir $PACKAGENAME
 
