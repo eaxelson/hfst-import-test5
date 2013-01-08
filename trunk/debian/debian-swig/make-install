@@ -1,11 +1,11 @@
 #!/bin/sh
 
-HFST_VERSIONNUMBER="3.4.0"
-HFSTLIB=/usr/local/lib/libhfst.so.23
-PACKAGEFILE=hfst_3.4.0_swig_amd64.tar.gz
+HFST_VERSIONNUMBER="3.4.2"
+HFSTLIB=/usr/local/lib/libhfst.so.25
+PACKAGEFILE=hfst_3.4.2_swig_amd64.tar.gz
 
 PYTHONDIR=""
-for py_ver in 2.7 2.6 2.5; do
+for py_ver in 2.5 2.6 2.7 3.0 3.1 3.2; do
     if [ -x /usr/lib/python$py_ver/dist-packages ]; then
 	PYTHONDIR=/usr/lib/python$py_ver/dist-packages
 	break;
@@ -13,7 +13,7 @@ for py_ver in 2.7 2.6 2.5; do
 done
 
 if ! [ -x $PYTHONDIR ]; then
-    echo "ERROR: could not install Python bindings, directory '/usr/lib/pythonX.Y/dist-packages' (X.Y >= 2.5) not found."
+    echo "ERROR: could not install Python bindings, directory '/usr/lib/pythonX.Y/dist-packages' (3.2 >= X.Y >= 2.5) not found."
     exit 1;
 fi
 
