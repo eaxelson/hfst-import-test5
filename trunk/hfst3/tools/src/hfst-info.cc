@@ -90,7 +90,7 @@ print_usage()
            "show or test HFST versions and features\n"
             "\n", program_name);
 
-    print_common_program_options(stderr);
+    print_common_program_options(message_out);
     fprintf(message_out, "Test features:\n"
             "  -a, --atleast-version=MVER   require at least MVER version "
             "of HFST\n"
@@ -150,7 +150,12 @@ parse_options(int argc, char** argv)
         case 'f':
           required_features.insert(optarg);
           break;
-
+        case 'h':
+          print_usage();
+          return EXIT_SUCCESS;
+        case 'V':
+          print_version();
+          return EXIT_SUCCESS;
         }
     }
     if ((min_version == -1L) && (max_version == -1L) && (exact_version == -1L)
