@@ -22,8 +22,27 @@ operating system and package manager combinations. For bleeding edge newest
 versions, development and non-supported operating systems and versions you
 will have to perform `installation from the sources`_.
 
+Installation packages for Debian and Ubuntu 
+--------------------------------------------
+
+HFST and related software can be downloaded from `HFST download directory 
+<https://sourceforge.net/projects/hfst/files/hfst/>`_. This folder contains
+sources and debian packages for HFST API library and tool packages.
+The debian packages are experimental; the requirements of debian or ubuntu
+installations are same as main packages. SFST is excluded from the packages
+as it has portability issues with hash_maps and hash_sets. The python packages
+contain binaries for swig-generated Python bindings for HFST. 
+
+Installation packages for Windows
+---------------------------------
+
+`HFST download directory <https://sourceforge.net/projects/hfst/files/hfst/>`_
+contains an experimental installer for Windows, HfstInstaller.exe. It has 
+ready-compiled HFST library, tools and Python bindings. Performing 
+`installation from the sources`_ is also possible on Windows with MinGW.
+
 Installation for MacPorts
--------------------------
+------------------------
 
 The port tree for HFST and related software can be downloaded from `HFST
 download directory <https://sourceforge.net/projects/hfst/files/hfst/>`_.
@@ -238,6 +257,8 @@ It is common practice to keep `generated files out of version control
 For further installation instruction refer to file ``INSTALL``, which contains
 the standard installation instructions for GNU autoconf based software.
 
+If you are compiling HFST from source on Windows with MinGW, use the switch
+``--enable-windows`` when running ``./configure``.
 
 Troubleshooting
 ===============
