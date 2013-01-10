@@ -1,7 +1,6 @@
 SUBDIRS=BetterColaMachine BrazilianPortuguese1 BrazilianPortuguese2 \
 	DateParser EinsteinsPuzzle EnglishNumerals Esperanto FinnishNumerals \
-	NumbersToNumerals MonishAnalysis PlusOrMinus YaleShooting
-# Palindromes 
+	NumbersToNumerals MonishAnalysis PlusOrMinus YaleShooting Palindromes 
 #	Other directories are not included until we have the rule compiler.
 #	hfst-calculate cannot be used because make distcheck 
 #	complains that it is missing
@@ -16,6 +15,7 @@ TESTS=better-cola-machine-test.sh \
 	finnish-numerals-test.sh \
 	numbers-to-numerals-test.sh \
 	monish-analysis-test.sh \
+	palindromes.sh \
 	plus-or-minus.sh \
 	yale-shooting-test.sh 
 	
