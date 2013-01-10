@@ -1,9 +1,7 @@
 #!/bin/bash
 
 for i in sfst openfst-tropical foma; do
-    #  sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" Palindromes.hfst.script
   echo "Testing" $i "..."
   sh Palindromes.hfst.script $i
-    #sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" Palindromes.hfst.script
   diff -q result expected_result && echo "TEST PASSED";
 done
