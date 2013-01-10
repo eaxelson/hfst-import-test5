@@ -27,48 +27,19 @@
 
 ########################################################################
 
-define Stems [{bet} |        # hit
-              {b�b} |        # deteriorate
-              {bomb} |       # hide
-              {b�ndel} |     # plead
-              {b�ngol} |     # change
-              {b�t} |        # be born
-              {b�k} |        # break
-              {fung} |       # open
-              {kabol} |      # divide
-              {kang} |       # attach
-              {kom} |        # write
-              {kund} |       # bury
-              {k�m} |        # arrive
-              {lakis} |      # teach
-              {l�}  |        # eat
-              {lob} |        # speak
-              {luk} |        # search
-              {ndim} |       # agree
-              {palangan} |   # disperse
-              {pangwis} |    # wipe
-              {s�l} |        # make
-              {sepel} |      # enjoy
-              {s�mb} |       # buy
-              {t�l} |        # look
-              {t�mbol} |     # walk
-              {tambwis} |    # drive
-              {tataban} |    # be surprised
-              {t�n} |        # ask
-              {y�bis}        # yell
-          ] ;
+define Stems [ {bet} | {béb} | {bomb} | {bóndel} | {bóngol} | {bót} | {búk} |
+{fung} | {kabol} | {kang} | {kom} | {kund} | {kóm} | {lakis} | {lí}  | {lob} |
+{luk} | {ndim} | {palangan} | {pangwis} | {sál} | {sepel} | {sómb} | {tál} |
+{támbol} | {tambwis} | {tataban} | {tún} | {yébis} ] ;
 
-define L [a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|
-          �|�|�|�|�];
+define L [a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|á|é|í|ó|ú];
 
 define Person1 [Per ":" 1];
 define Person2 [Per ":" 2];
 define Person3 [Per ":" 3];
 define Number [Num ":" [Sg|Pl] ];
 # define Gender [Gen ":" [[1["0"|1]|2|3|4|5|6|7|8|9] "." [1[4|5]|[1|9|10]a]]];
-define Gender3 [Gen ":" [1 "." 2 | 1a "." 2 | 3 "." 4 | 5 "." 6 |
-                         7 "." 8 | 9a "." 10a | 10 | 11 "." 6 |
-                         14 "." 6 | 15]];
+define Gender3 [Gen ":" [1 "." 2 | 1a "." 2 | 3 "." 4 | 5 "." 6 | 7 "." 8 | 9a "." 10a | 10 | 11 "." 6 | 14 "." 6 | 15]];
  
 # define Reflexive [No | Yes];
 

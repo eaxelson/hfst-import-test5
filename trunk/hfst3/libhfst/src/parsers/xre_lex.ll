@@ -57,7 +57,6 @@ LWSP [\t\r\n ]
 
 /* curly brackets */
 BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
-
 %%
 
 
@@ -67,6 +66,8 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
   xrelval.label = hfst::xre::strip_curly(xretext);
   return CURLY_BRACKETS;
 }
+
+
 
 
 

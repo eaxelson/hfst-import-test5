@@ -70,7 +70,7 @@ extern int yylex();
 %type <label>     HALFARC SUB2
 
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
-%nonassoc <label> QUOTED_LITERAL SYMBOL CURLY_BRACKETS
+%nonassoc <label> SYMBOL CURLY_BRACKETS
 
 %left  CROSS_PRODUCT COMPOSITION LENIENT_COMPOSITION INTERSECTION
 %left  CENTER_MARKER MARKUP_MARKER
@@ -113,6 +113,7 @@ extern int yylex();
        PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
+%nonassoc <label> QUOTED_LITERAL
 %%
 
 
@@ -797,10 +798,6 @@ SYMBOL_LIST: HALFARC {
             }
         ;
 
-
-            
-            
-            
 REGEXP12: LABEL { }
         | LABEL WEIGHT { 
             $$ = & $1->set_final_weights($2);
@@ -860,6 +857,13 @@ LABEL: HALFARC {
         $$ = new HfstTransducer($1, TOK, hfst::xre::format);
         free($1);
      }
+     /*
+     | QUOTE {
+        HfstTokenizer TOK;
+        $$ = new HfstTransducer($1, TOK, hfst::xre::format);
+        free($1);
+     }
+     */
      ;
 
 HALFARC: SYMBOL
@@ -869,7 +873,7 @@ HALFARC: SYMBOL
      | ANY_TOKEN {
         $$ = strdup(hfst::internal_unknown.c_str());
      }
-     | QUOTED_LITERAL 
+     | QUOTED_LITERAL  {}
      | BOUNDARY_MARKER {
         $$ = strdup("@#@");
      }

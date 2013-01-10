@@ -614,6 +614,7 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 test/tools/fsmbook-examples/BetterColaMachine/Makefile
 		 test/tools/fsmbook-examples/DateParser/Makefile
 		 test/tools/fsmbook-examples/YaleShooting/Makefile
+		 test/tools/fsmbook-examples/PlusOrMinus/Makefile
                  libhfst/Makefile libhfst/src/Makefile
                  libhfst/src/implementations/Makefile
 		 libhfst/src/parsers/Makefile 
