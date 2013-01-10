@@ -3,8 +3,7 @@ check:
 	$(srcdir)/Lingala $(builddir)/Lingala \
 	../../../../tools/src/./
 
-EXTRA_DIST=Lingala.hfst.script Lingala.xfst.script \
-	   Lingala.xfst.att README
+EXTRA_DIST=Lingala.hfst.script Lingala.xfst.script
 
 clean-local:
 	$(top_srcdir)/test/tools/fsmbook-examples/remove-complement.sh \

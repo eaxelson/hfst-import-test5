@@ -1,34 +1,15 @@
 #!/bin/bash
-TOOLDIR=../../../../tools/src/./
-XFST=../../../../../../xfst/bin/./
+#XFST=../../../../../../xfst/bin/./xfst
+XFST=xfst
 
-# xfst -f PlusOrMinus.xfst.script
-# rm -f TMP
-# for i in One Two Three Four Five Six Seven Eight Nine; do \
-#   cat "PlusOrMinus"$i".att" >> TMP;
-#   echo "--" >> TMP;
-# done
-# cat PlusOrMinusTen.att >> TMP;
-# cat TMP | ../xfst-att-to-$TOOLDIR/hfst-att.sh > PlusOrMinus.xfst.att
+$XFST -f PlusOrMinus.xfst.script
 
-
-
-  
-# create foma results
-
-foma -f PlusOrMinus.xfst.script;
-for i in One Two Three Four Five Six Seven Eight Nine Ten; do \
-    gunzip -f "PlusOrMinus"$i.foma.gz
-    $TOOLDIR/hfst-fst2fst -f openfst-tropical "PlusOrMinus"$i.foma -o "PlusOrMinus"$i.foma.hfst
+rm -f PlusOrMinus.xfst.att
+for i in One Two Three Four Five Six Seven Eight Nine; do \
+  cat "PlusOrMinus"$i".prolog" | ../xfst-prolog-to-hfst-att.sh >> PlusOrMinus.xfst.att;
+  echo "--" >> PlusOrMinus.xfst.att;
 done
+cat PlusOrMinusTen.prolog | ../xfst-prolog-to-hfst-att.sh >> PlusOrMinus.xfst.att;
 
-for i in sfst openfst-tropical foma; do
-  echo "Testing" $i "..."
-  sh PlusOrMinus.hfst.script
-  for j in One Two Three Four Five Six Seven Eight Nine Ten; do \
-      echo"Testing $j"
-      $TOOLDIR/hfst-fst2fst -f openfst-tropical "PlusOrMinus"$j.hfst > TMP
-      rm -f TMP
-      $TOOLDIR/hfst-compare -q TMP "PlusOrMinus"$j.foma.hfst && echo "TEST PASSED";
-  done
-done
+
+#cat PlusOrMinus | ../xfst-prolog-to-hfst-att.sh > PlusOrMinus.xfst.att
