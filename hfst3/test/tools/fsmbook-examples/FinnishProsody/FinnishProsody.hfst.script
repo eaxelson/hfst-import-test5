@@ -37,15 +37,15 @@ echo '[ @"HighV" | @"MidV" | @"LowV" ]' | $2/hfst-regexp2fst -f $1 > USV    # Un
 
 echo "[ b | c | d | f | g | h | j | k | l | m | n | p | q | r | s | t | v | w | x | z ]" | $2/hfst-regexp2fst -f $1 > C     # Consonant
 
-echo '[á | é | í | ó | ú | ý | "ä&#769;" | "ö&#769;"]' | $2/hfst-regexp2fst -f $1 > MSV
-echo '[à | è | ì | ò | ù | "y&#768;" | "ä&#768;" | "ö&#768;"]' | $2/hfst-regexp2fst -f $1 > SSV
+echo '[á | é | í | ó | ú | ý | ä´ | ö´ ]' | $2/hfst-regexp2fst -f $1 > MSV
+echo '[à | è | ì | ò | ù | y` | ä` | ö` ]' | $2/hfst-regexp2fst -f $1 > SSV
 echo '[ @"MSV" | @"SSV" ]' | $2/hfst-regexp2fst -f $1 > SV                  # Stressed vowel
 echo '[ @"USV" | @"SV" ]' | $2/hfst-regexp2fst -f $1 > V                    # Vowel
 
 echo '[ @"V" | @"C" ]' | $2/hfst-regexp2fst -f $1 > P                       # Phone
 
 echo '[[\@"P"+] | .#.]' | $2/hfst-regexp2fst -f $1 > B                      # Boundary
-echo '[.#. | "."]' | $2/hfst-regexp2fst -f $1 > E                           # Edge
+echo '[ .#. | "."]' | $2/hfst-regexp2fst -f $1 > E                           # Edge
 echo '[~$"." "." ~$"."]' | $2/hfst-regexp2fst -f $1 > SB                    # At most one syllable boundary
 
 echo '[ @"C"* @"V" ]'| $2/hfst-regexp2fst -f $1 > Light                     # Light syllable
@@ -58,11 +58,9 @@ echo '[ @"S" & $@"MSV" ]' | $2/hfst-regexp2fst -f $1 > MSS                  # Sy
 
 echo '[ @"S" "." @"S" ]' | $2/hfst-regexp2fst -f $1 > BF                    # Binary foot
 
-
 # Rules for prosody:
 
-echo '[ [. .] -> "." || [ @"HighV" | @"MidV" ]'\
-  '_ @"LowV",'\
+echo '[ [. .] -> "." || [ @"HighV" | @"MidV" ] _ @"LowV",'\
   'i _ [@"MidV" - e],'\
   'u _ [@"MidV" - o],'\
   'y _ [@"MidV" - ö] ]'\
@@ -121,7 +119,8 @@ do
   mv TMP Rules;
 done
 
-cat FinnWords | $2/hfst-compose Rules > FinnProsody
+cat FinnWords.hfst | $2/hfst-compose Rules > FinnProsody
 
 # Print the lexicon with prosody indicated.
-# cat FinnProsody | $2/hfst-project -p output | $2/hfst-fst2strings
+rm -f 
+cat FinnProsody | $2/hfst-project -p output | $2/hfst-fst2strings | sort > result

@@ -1,14 +1,18 @@
 #!/bin/bash
-TOOLDIR=../../../../tools/src/./
+TOOLDIR=../../../../tools/src
 
 for i in sfst openfst-tropical foma; do
-    # sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" FinnishProsody.hfst.script
   echo "Testing" $i "..."
   sh FinnishProsody.hfst.script $i $TOOLDIR
-  # sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" FinnishProsody.hfst.script
-  echo expected_result.strings | $TOOLDIR/hfst-strings2fst -f $i > ExpectedResult;	
-  $TOOLDIR/hfst-project -p output FinnProsody | $TOOLDIR/hfst-compare -q ExpectedResult && \	
-    echo "TEST PASSED";
+
+# Print the lexicon with prosody indicated.
+rm -f result
+cat FinnProsody | $TOOLDIR/hfst-project -p output | $TOOLDIR/hfst-fst2strings | sort > result
+
+
+    rm -f expected_result ;
+    sort expected_result.strings > expected_result
+    diff expected_result result && echo "TEST PASSED";
 done
 
 
