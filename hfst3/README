@@ -39,7 +39,8 @@ Installation packages for Windows
 `HFST download directory <https://sourceforge.net/projects/hfst/files/hfst/>`_
 contains an experimental installer for Windows, HfstInstaller.exe. It has 
 ready-compiled HFST library, tools and Python bindings. Performing 
-`installation from the sources`_ is also possible on Windows with MinGW.
+`installation from the sources`_ is also possible on Windows with MinGW 
+and Cygwin.
 
 Installation for MacPorts
 ------------------------
@@ -257,8 +258,8 @@ It is common practice to keep `generated files out of version control
 For further installation instruction refer to file ``INSTALL``, which contains
 the standard installation instructions for GNU autoconf based software.
 
-If you are compiling HFST from source on Windows with MinGW, use the switch
-``--enable-windows`` when running ``./configure``.
+If you are compiling HFST from source on Windows with MinGW or Cygwin, 
+use the switch ``--enable-windows`` when running ``./configure``.
 
 Troubleshooting
 ===============

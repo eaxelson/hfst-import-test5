@@ -33,6 +33,4 @@ if WANT_XFST
   SUBDIRS += foma
 endif
 
-EXTRA_DIST=dlfcn openfstwin openfst sfst foma
-
 AUTOMAKE_OPTIONS=subdir-objects

@@ -21,3 +21,5 @@ AM_CPPFLAGS = -I $(srcdir)/../include -I $(srcdir)/../../../dlfcn \
 noinst_LTLIBRARIES = libfst.la
 nodist_libfst_la_SOURCES = compat.cc flags.cc fst.cc properties.cc \
                         symbol-table.cc symbol-table-ops.cc util.cc
+EXTRA_DIST = compat.cc flags.cc fst.cc properties.cc \
+                        symbol-table.cc symbol-table-ops.cc util.cc
