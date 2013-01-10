@@ -20,3 +20,4 @@ AUTOMAKE_OPTIONS=subdir-objects
 noinst_LTLIBRARIES = libdl.la
 nodist_libdl_la_SOURCES = dlfcn.c
 
+EXTRA_DIST=dlfcn.h
