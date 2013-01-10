@@ -616,6 +616,7 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 test/tools/fsmbook-examples/YaleShooting/Makefile
 		 test/tools/fsmbook-examples/PlusOrMinus/Makefile
 		 test/tools/fsmbook-examples/Palindromes/Makefile
+		 test/tools/fsmbook-examples/FinnishProsody/Makefile
                  libhfst/Makefile libhfst/src/Makefile
                  libhfst/src/implementations/Makefile
 		 libhfst/src/parsers/Makefile 

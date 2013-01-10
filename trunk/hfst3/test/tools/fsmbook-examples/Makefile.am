@@ -1,6 +1,6 @@
-SUBDIRS=BetterColaMachine BrazilianPortuguese1 BrazilianPortuguese2 \
+SUBDIRS=NumbersToNumerals BetterColaMachine BrazilianPortuguese1 BrazilianPortuguese2 \
 	DateParser EinsteinsPuzzle EnglishNumerals Esperanto FinnishNumerals \
-	NumbersToNumerals MonishAnalysis PlusOrMinus YaleShooting Palindromes 
+	FinnishProsody MonishAnalysis Palindromes PlusOrMinus YaleShooting  
 #	Other directories are not included until we have the rule compiler.
 #	hfst-calculate cannot be used because make distcheck 
 #	complains that it is missing
@@ -13,6 +13,7 @@ TESTS=better-cola-machine-test.sh \
 	english-numerals-test.sh \
 	esperanto-test.sh \
 	finnish-numerals-test.sh \
+	finnish-prosody-test.sh \
 	numbers-to-numerals-test.sh \
 	monish-analysis-test.sh \
 	palindromes.sh \
@@ -28,8 +29,6 @@ TESTS=better-cola-machine-test.sh \
  # lingala - can't make att from xfst: *** ERROR: Sorry. This network is too large to be saved as an AT&T-format transducer file by xfst. You need to license a professional version of this program. ***
  #		problem with alphabet minimization (containment in xfst, replace rules context in foma)
  
-
- # palindromes - there is no xfst.script!, not standard - works fine, add to make file somehow!!!!!
  # finnish-prosody.sh - not standard
  
  
