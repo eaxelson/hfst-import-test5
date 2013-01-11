@@ -29,6 +29,7 @@
 #endif
 
 #include <string>
+#include <cstdio>
 
 //#include "HfstTransducer.h"
 namespace hfst { class HfstTransducer; }
