@@ -659,7 +659,8 @@ cat <<EOF
     *         with openfst: $with_openfst
     *         with foma: $with_foma
     *         with optimized lookup: $with_hfstol
-    * tools including calculate: $enable_calculate (sfstpl2fst)
+    * tools including affix-guessify: $enable_affix_guessify
+    *                 calculate: $enable_calculate (sfstpl2fst)
     *                 compare: $enable_compare
     *                 compose: $enable_compose
     *                 concatenate: $enable_concatenate

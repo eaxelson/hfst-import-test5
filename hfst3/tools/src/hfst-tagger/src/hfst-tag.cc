@@ -104,7 +104,7 @@ int process_input_data(std::string tagger_file_prefix)
   verbose_printf("Read tagger.");
 
   tagger = new SentenceTagger(tagger_file_prefix + ".lex",
-			      tagger_file_prefix + ".seq");
+                              tagger_file_prefix + ".seq");
       
   return EXIT_SUCCESS;
 }
@@ -128,12 +128,12 @@ StringVector get_sentence_vector(void)
       // Skip initial empty lines. The first empty line preceeded by a
       // non emtpy line marks the end of the sentence.
       if (word == "")
-	{
-	  if (read_non_empty_word)
-	    { break; }
-	  else
-	    { continue; }
-	}
+        {
+          if (read_non_empty_word)
+            { break; }
+          else
+            { continue; }
+        }
       
       read_non_empty_word = true;
 
@@ -158,10 +158,10 @@ void print_analysis(const WeightedStringPairVector &res,std::ostream * out)
       // Skip buffer symbols, since the user doesn't want to see
       // those.
       if (std::string(it->first) == "||")
-	{ continue; }
+        { continue; }
 
       (out == NULL ? std::cout : *out) << it->first << "\t" << it->second 
-				       << std::endl;
+                                       << std::endl;
     }
 
   // Print an empty line at the end to signal sentence boundary.
@@ -171,8 +171,14 @@ void print_analysis(const WeightedStringPairVector &res,std::ostream * out)
 int main(int argc, char * argv[])
 {
 
-  parse_options(argc, argv);
-  
+  hfst_set_program_name(argv[0], "0.1", "HfstTag");
+
+  int retval = parse_options(argc, argv);
+  if (retval != EXIT_CONTINUE)
+    {
+      return retval;
+    }
+
   std::string tagger_file_name = inputfilename;
   std::string output_file_name = outfilename;
 

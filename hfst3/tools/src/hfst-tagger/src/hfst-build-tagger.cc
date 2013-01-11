@@ -70,7 +70,39 @@ parse_options(int argc, char** argv)
 
         switch (c)
         {
-#include "inc/getopt-cases-common.h"
+          // instead of including "inc/getopt-cases-common.h", it is copied here
+          // and case 'V' is modified.
+        case 'd':
+          debug = true;
+          break;
+        case 'h':
+          print_usage();
+          return EXIT_SUCCESS;
+          break;
+        case 'V':
+          // do nothing
+          return EXIT_SUCCESS;
+          break;
+        case 'v':
+          verbose = true;
+          silent = false;
+          break;
+        case 'q':
+        case 's':
+          verbose = false;
+          silent = true;
+          break;
+        case 'o':
+          outfilename = hfst_strdup(optarg);
+          outfile = hfst_fopen(outfilename, "w");
+          if (outfile == stdout) 
+            {
+              free(outfilename);
+              outfilename = hfst_strdup("<stdout>");
+              message_out = stderr;
+            }
+          outputNamed = true;
+          break;
 #include "inc/getopt-cases-unary.h"
           // add tool-specific cases here
         break;
@@ -112,3 +144,5 @@ int main( int argc, char **argv )
 
     return retval;
 }
+
+

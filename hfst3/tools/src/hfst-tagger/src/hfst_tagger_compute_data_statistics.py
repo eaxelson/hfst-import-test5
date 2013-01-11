@@ -40,6 +40,16 @@ if re.search("-v[^\w]",arg_string) != None or \
    re.search("--verbose[^\w]",arg_string) != None:
     verbose = True
 
+## --help
+if re.search("-h[^\w]",arg_string) != None or \
+   re.search("--help[^\w]",arg_string) != None:
+    exit(0)
+
+## --version
+if re.search("-V[^\w]",arg_string) != None or \
+   re.search("--version[^\w]",arg_string) != None:
+    exit(0)
+
 tagger_aux.verbose_print("Parsing config file hfst_tagger_config.", verbose)
 
 statistics_patterns = tagger_aux.read_config_file("hfst_tagger_config")
