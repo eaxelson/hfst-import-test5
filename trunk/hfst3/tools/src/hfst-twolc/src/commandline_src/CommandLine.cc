@@ -5,7 +5,7 @@
 void CommandLine::print_version(void)
 {
   // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
-  std::cerr << std::endl << PROGRAM_NAME << " " << 0 << "(" 
+  std::cerr << std::endl << PROGRAM_NAME << " " << 0 << " (" 
         << PACKAGE_STRING << ")" << std::endl
         << "Copyright (C) 2010 University of Helsinki," << std::endl
         << "License GPLv3: GNU GPL version 3 " << std::endl

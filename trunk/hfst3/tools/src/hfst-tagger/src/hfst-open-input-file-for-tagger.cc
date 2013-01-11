@@ -106,7 +106,11 @@ void echo_stream_to_stdout(std::istream &in)
 
 int main( int argc, char **argv ) 
 {
+  // This tool is used in a pipeline of commands, so help and version messages
+  // cannot be written to stdout.
   message_out = stderr;
+
+  hfst_set_program_name("hfst-train-tagger", "0.1", "HfstTrainTagger");
 
   int retval = (parse_options(argc, argv));
 
@@ -119,8 +123,8 @@ int main( int argc, char **argv )
     { output_file_str += ".{lex,seq}"; }
 
   verbose_printf("Reading training data from %s.\n"
-		 "Writing tagger to %s\n", 
-		 input_file_str.c_str(), output_file_str.c_str());
+                 "Writing tagger to %s\n", 
+                 input_file_str.c_str(), output_file_str.c_str());
 
   if (std::string(inputfilename) == "<stdin>")
     { echo_stream_to_stdout(std::cin); }
