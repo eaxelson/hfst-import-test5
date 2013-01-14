@@ -54,6 +54,7 @@ class CommandLine
   bool help;
   bool version;
   bool usage;
+  bool has_debug_file;
 
   CommandLine(int argc,char * argv[]);
   ~CommandLine(void);
