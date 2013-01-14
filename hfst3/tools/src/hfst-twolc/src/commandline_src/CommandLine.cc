@@ -79,7 +79,9 @@ int CommandLine::parse_options(int argc, char** argv)
   char * outfilename = NULL;
   bool outputNamed = false;
   bool inputNamed = false;
+  bool isDebug = false; 
   char * infilename = NULL;
+  char * debug_file_name = NULL;
   ImplementationType form = hfst::TROPICAL_OPENFST_TYPE;
 
   // use of this function requires options are settable on global scope
@@ -96,13 +98,14 @@ int CommandLine::parse_options(int argc, char** argv)
       {"input", required_argument, 0, 'i'}, 
       {"output", required_argument, 0, 'o'},
       {"resolve",no_argument, 0, 'R'},
+      {"debug_file",required_argument, 0, 'D'},
       {"format",required_argument, 0, 'f'},
       {0,0,0,0}
         };
       int option_index = 0;
       // add tool-specific options here 
       char c = getopt_long(argc, argv, 
-               ":hVvqsu" "i:o:" "Ri:f:",
+               ":hVvqsu" "i:o:" "Ri:D:f:",
                long_options, &option_index);
       if (-1 == c)
         {
@@ -135,6 +138,10 @@ int CommandLine::parse_options(int argc, char** argv)
     case 'i':
       inputNamed = true;
       infilename = hfst_strdup(optarg);
+      break;
+    case 'D':
+      isDebug = true;
+      debug_file_name = hfst_strdup(optarg);
       break;
     case 'o':
       outputNamed = true;
@@ -231,6 +238,14 @@ int CommandLine::parse_options(int argc, char** argv)
   this->version = version;
   free(infilename);
   free(outfilename);
+
+  if (isDebug)
+    {
+      this->has_debug_file = true;
+      this->has_input_file = true;
+      this->input_file_name = debug_file_name;
+    }
+
   return EXIT_CONTINUE;
 }
 
@@ -244,7 +259,8 @@ CommandLine::CommandLine(int argc,char * argv[]):
   resolve_conflicts(false),
   help(false),
   version(false),
-  usage(false)
+  usage(false),
+  has_debug_file(false)
 { parse_options(argc,argv); }
 
 CommandLine::~CommandLine(void)

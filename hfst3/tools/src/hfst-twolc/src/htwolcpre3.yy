@@ -542,7 +542,10 @@ int main(int argc, char * argv[])
       CommandLine command_line(argc,argv);
       if (command_line.help or command_line.usage or command_line.version)
 	{ exit(0); }
-      input_reader.set_input(std::cin);
+      if (command_line.has_debug_file)
+	{ input_reader.set_input(command_line.set_input_file()); }
+      else
+	{ input_reader.set_input(std::cin); }
       
       OtherSymbolTransducer::set_transducer_type(command_line.format);
       silent = command_line.be_quiet;
