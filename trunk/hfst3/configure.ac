@@ -455,7 +455,13 @@ AC_ARG_ENABLE([xfst],
 			  [enable_xfst=yes])
 AM_CONDITIONAL([WANT_XFST], [test x$enable_xfst != xno])
 
-AM_CONDITIONAL([CAN_FOMAWRAP], [test "x$enable_xfst" != "xno" -a "x$with_foma" != "xno"])
+
+AC_CHECK_LIB([z], [main], [zlib_exists=yes], [zlib_exists=no])
+AM_CONDITIONAL([CAN_FOMAWRAP], [test "x$enable_xfst" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" != "xno"])
+
+AS_IF([test "x$enable_xfst" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" == "xno"], [warn_about_missing_xfst=yes], [warn_about_missing_xfst=no])
+AS_IF([test "x$enable_xfst" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" != "xno"], [can_fomawrap=yes], [can_fomawrap=no])
+
 AM_COND_IF([CAN_FOMAWRAP], [], [AM_CONDITIONAL([WANT_XFST], [false])])
 AM_COND_IF([CAN_FOMAWRAP], [], [enable_xfst=no])
 
@@ -736,5 +742,7 @@ AS_IF([test "x$enable_tagger" == "xno" -a "x$enable_windows" == "xno"],
       [AC_MSG_WARN([hfst-train-tagger and hfst-tag are not enabled; you will not be able to train and use taggers; enable using --enable-tagger])])
 AS_IF([test "x$enable_calculate" == "xno"],
       [AC_MSG_WARN([hfst-calculate is not enabled; you will not be able to compile SFST-PL scripts; enable using --enable-calculate])])
-AM_COND_IF([CAN_FOMAWRAP], [], 
+AS_IF([test "x$warn_about_missing_xfst" != "xno"],
+      [AC_MSG_WARN([hfst-xfst was disabled because zlib was not found; you will not be able to compile XFST scripts])])
+AS_IF([test "x$can_fomawrap" == "xno" -a "x$warn_about_missing_xfst" == "xno"], 
       [AC_MSG_WARN([hfst-xfst is not enabled; you will not be able to compile XFST scripts; enable using --with-foma (--enable-xfst)])])
