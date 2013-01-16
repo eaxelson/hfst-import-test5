@@ -122,11 +122,11 @@ endif
 if WANT_PMATCH2FST
 MAYBE_PMATCH2FST=hfst-pmatch2fst$(EXEEXT)
 endif
-#if WANT_PREPROCESS_FOR_OPTIMIZED_LOOKUP
-#MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP=hfst-preprocess-for-optimized-lookup-format$(EXEEXT)
-#endif
 if WANT_PROJECT
 MAYBE_PROJECT=hfst-project$(EXEEXT)
+endif
+if WANT_PRUNE_ALPHABET
+MAYBE_PRUNE_ALPHABET=hfst-prune-alphabet$(EXEEXT)
 endif
 if WANT_PUSH_WEIGHTS
 MAYBE_PUSH_WEIGHTS=hfst-push-weights$(EXEEXT)
@@ -211,7 +211,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_LOOKUP) $(MAYBE_MINIMIZE) $(MAYBE_NAME)            \
 			 $(MAYBE_OPTIMIZED_LOOKUP) $(MAYBE_PMATCH)                  \
 			 $(MAYBE_PMATCH2FST)                                        \
-			 $(MAYBE_PROJECT)                                           \
+			 $(MAYBE_PROJECT) $(MAYBE_PRUNE_ALPHABET)                   \
 			 $(MAYBE_PUSH_WEIGHTS) $(MAYBE_REGEXP2FST)                  \
 			 $(MAYBE_REMOVE_EPSILONS) $(MAYBE_REPEAT) $(MAYBE_REVERSE)  \
 			 $(MAYBE_REWEIGHT) $(MAYBE_SHUFFLE)                         \
@@ -272,6 +272,7 @@ hfst_pmatch_SOURCES=hfst-pmatch.cc $(HFST_COMMON_SRC)
 #hfst_preprocess_for_optimized_lookup_format_SOURCES=hfst-preprocess-for-optimized-lookup-format.cc
 #	$(HFST_COMMON_SRC)
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
+hfst_prune_alphabet_SOURCES=hfst-prune-alphabet.cc $(HFST_COMMON_SRC)
 hfst_push_weights_SOURCES=hfst-push-weights.cc $(HFST_COMMON_SRC)
 hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc $(HFST_COMMON_SRC)
 hfst_pmatch2fst_SOURCES=hfst-pmatch2fst.cc $(HFST_COMMON_SRC)

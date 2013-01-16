@@ -36,7 +36,8 @@ TESTS=hfst-check-version.sh hfst-check-help.sh hfst-check-environment.sh \
 	  subtract-functionality.sh \
 	  determinize-functionality.sh minimize-functionality.sh \
 	  remove-epsilons-functionality.sh \
-	  invert-functionality.sh project-functionality.sh repeat-functionality.sh \
+	  invert-functionality.sh project-functionality.sh \
+	  prune-alphabet-functionality.sh repeat-functionality.sh \
 	  reverse-functionality.sh reweight-functionality.sh \
 	  substitute-functionality.sh \
 	  strings2fst-functionality.sh fst2strings-functionality.sh\
@@ -65,7 +66,8 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   a2b_complement.hfst a2b_input_projection_complement.hfst empty.hfst \
 		   walk_or_dog.hfst \
 		   ab.hfst bc.hfst id.hfst aid.hfst idb.hfst \
-		   ab_shuffle_bc.hfst id_shuffle_id.hfst aid_shuffle_idb.hfst
+		   ab_shuffle_bc.hfst id_shuffle_id.hfst aid_shuffle_idb.hfst \
+		   prunable_alphabet.hfst non_prunable_alphabet_1.hfst non_prunable_alphabet_2.hfst
 OL_CHECKS=cat2dog.hfstol cat2dog.genhfstol cat_weight_final.hfstol \
 			proc-caps.hfstol proc-caps.genhfstol \
 			compounds.hfstol
@@ -84,7 +86,8 @@ SFST_CHECKS=0to3cats.sfst 2to4cats.sfst 4cats.sfst\
 			a2b.sfst a2b_complement.sfst a2b_input_projection_complement.sfst \
 			empty.sfst \
 			walk_or_dog.sfst ab.sfst bc.sfst id.sfst aid.sfst idb.sfst \
-			ab_shuffle_bc.sfst id_shuffle_id.sfst aid_shuffle_idb.sfst
+			ab_shuffle_bc.sfst id_shuffle_id.sfst aid_shuffle_idb.sfst \
+			prunable_alphabet.sfst non_prunable_alphabet_1.sfst non_prunable_alphabet_2.sfst
 endif
 if WANT_OPENFST
 OFST_CHECKS=0to3cats.ofst \
@@ -102,7 +105,8 @@ OFST_CHECKS=0to3cats.ofst \
 			cat2dog_0.3.ofst cat2dog_0.5.ofst empty.ofst unk_or_id_star.ofst \
 			a2b.ofst a2b_complement.ofst a2b_input_projection_complement.ofst \
 			walk_or_dog.ofst ab.ofst bc.ofst id.ofst aid.ofst idb.ofst \
-			ab_shuffle_bc.ofst id_shuffle_id.ofst aid_shuffle_idb.ofst
+			ab_shuffle_bc.ofst id_shuffle_id.ofst aid_shuffle_idb.ofst \
+			prunable_alphabet.ofst non_prunable_alphabet_1.ofst non_prunable_alphabet_2.ofst
 endif
 if WANT_FOMA
 FOMA_CHECKS=0to3cats.foma 2to4cats.foma 4cats.foma \
@@ -119,7 +123,8 @@ FOMA_CHECKS=0to3cats.foma 2to4cats.foma 4cats.foma \
 			a2b.foma a2b_complement.foma a2b_input_projection_complement.foma \
 			empty.foma \
 			walk_or_dog.foma ab.foma bc.foma id.foma aid.foma idb.foma \
-			ab_shuffle_bc.foma id_shuffle_id.foma aid_shuffle_idb.foma
+			ab_shuffle_bc.foma id_shuffle_id.foma aid_shuffle_idb.foma \
+			prunable_alphabet.foma non_prunable_alphabet_1.foma non_prunable_alphabet_2.foma
 endif
 
 check_DATA=$(DEFAULT_CHECKS) $(SFST_CHECKS) $(OFST_CHECKS) $(FOMA_CHECKS) $(OL_CHECKS)
@@ -138,7 +143,8 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 a2b.txt a2b_complement.txt a2b_input_projection_complement.txt \
 		 walk_or_dog.txt ab.txt bc.txt id.txt aid.txt idb.txt \
 		 ab_shuffle_bc.txt id_shuffle_id.txt aid_shuffle_idb.txt \
-		 compounds.txt ab_shuffle_bc.txt id_shuffle_id.txt aid_shuffle_idb.txt
+		 compounds.txt ab_shuffle_bc.txt id_shuffle_id.txt aid_shuffle_idb.txt \
+		 prunable_alphabet.txt non_prunable_alphabet_1.txt non_prunable_alphabet_2.txt
 FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-gen.strings \
 			proc-caps-out1.strings proc-caps-out2.strings \
 			proc-caps-out3.strings proc-caps-out4.strings \

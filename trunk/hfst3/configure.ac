@@ -328,6 +328,12 @@ AC_ARG_ENABLE([project],
 			  [enable_project=$enableval],
 			  [enable_project=yes])
 AM_CONDITIONAL([WANT_PROJECT], [test x$enable_project != xno])
+AC_ARG_ENABLE([prune_alphabet],
+			  [AS_HELP_STRING([--enable-prune-alphabet],
+							  [build prune-alphabet tool @<:@default=yes@:>@])],
+			  [enable_prune_alphabet=$enableval],
+			  [enable_prune_alphabet=yes])
+AM_CONDITIONAL([WANT_PRUNE_ALPHABET], [test x$enable_prune_alphabet != xno])
 AC_ARG_ENABLE([proc],
 			  [AS_HELP_STRING([--enable-proc],
 							  [build text processing tool @<:@default=no@:>@])],
@@ -685,6 +691,7 @@ cat <<EOF
     *                 pmatch: $enable_pmatch
     *                 proc: $enable_proc
     *                 project: $enable_project
+    *                 prune-alphabet: $enable_prune_alphabet
     *                 push-weights: $enable_push_weights
     *                 regexp2fst: $enable_regexp2fst
     *                 pmatch2fst: $enable_pmatch2fst
