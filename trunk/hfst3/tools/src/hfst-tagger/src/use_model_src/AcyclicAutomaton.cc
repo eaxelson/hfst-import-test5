@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-float infinity = std::numeric_limits<float>::infinity();
+float infinity_ = std::numeric_limits<float>::infinity();
 
 AcyclicState::AcyclicState(size_t id):
   id(id),
@@ -96,15 +96,15 @@ void AcyclicAutomaton::finalize_position(void)
 
 void AcyclicAutomaton::set_final_weight(State s, Weight weight)
 {
-  if (weight != infinity)
+  if (weight != infinity_)
     {
       size_t source_id = state_to_id_map[s];
       size_t target_id = 0;
 
       data[current_position + 1][target_id].add_transition
-	(source_id,
-	 FINAL_SYMBOL,
-	 data[current_position][source_id].get_weight() + weight);
+        (source_id,
+         FINAL_SYMBOL,
+         data[current_position][source_id].get_weight() + weight);
     }
 }
 
@@ -114,13 +114,13 @@ void AcyclicAutomaton::clear(void)
   for (Data::iterator it = data.begin(); it != data.end(); ++it)
     {
       for (AcyclicStateVector::iterator jt = it->begin();
-	   jt != it->end();
-	   ++jt)
-	{ 
-	  if (not jt->is_initialized())
-	    { break; }
-	  jt->clear(); 
-	}
+           jt != it->end();
+           ++jt)
+        { 
+          if (not jt->is_initialized())
+            { break; }
+          jt->clear(); 
+        }
     }
   
   current_position = 0;
