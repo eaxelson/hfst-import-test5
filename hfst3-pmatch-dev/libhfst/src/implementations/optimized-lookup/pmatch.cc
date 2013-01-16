@@ -432,7 +432,15 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
                 } else {
                     // We're going to do some context checking
                     local_stack.top().context_placeholder = input_tape;
-                    get_analyses(input_tape + local_stack.top().tape_step,
+                    if (local_stack.top().context == LC ||
+                        local_stack.top().context == NLC) {
+                        // When entering a left context,
+                        // we begin checking not at the current symbol
+                        // but the previous one. This should be safe
+                        // because the tape is NO_SYMBOL padded.
+                        input_tape -= 1;
+                    }
+                    get_analyses(input_tape,
                                  output_tape,
                                  transition_table[i].target);
                     exit_context();
