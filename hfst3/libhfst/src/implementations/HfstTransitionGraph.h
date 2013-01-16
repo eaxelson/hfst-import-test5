@@ -414,14 +414,15 @@ namespace hfst {
         /** @brief Remove all symbols that do not occur in transitions of
             the graph from its alphabet. 
 
+            @param force Whether unused symbols are removed even if
+            unknown or identity symbols occur in transitions.
+
             Epsilon, unknown and identity \link hfst::String symbols\endlink
             are always included in the alphabet. */
-        void prune_alphabet() {
+        void prune_alphabet(bool force=true) {
 
           // Which symbols occur in the graph
           HfstTransitionGraphAlphabet symbols_found;
-          initialize_alphabet(symbols_found); /* special symbols are 
-                                                 always known */
 
           for (iterator it = begin(); it != end(); it++)
             {
@@ -436,6 +437,21 @@ namespace hfst {
                 }
             }
           
+          // Whether unknown or identity symbols are used
+          bool unknowns_or_identities_used = 
+            ( (symbols_found.find("@_UNKNOWN_SYMBOL_@") != symbols_found.end()) ||
+              (symbols_found.find("@_IDENTITY_SYMBOL_@") != symbols_found.end()) );
+
+          // We cannot prune the transducer because unknowns or identities
+          // are used in its transitions.
+          if (!force && unknowns_or_identities_used)
+            return;
+
+          // Special symbols are always known
+          symbols_found.insert("@_EPSILON_SYMBOL_@"); 
+          symbols_found.insert("@_UNKNOWN_SYMBOL_@"); 
+          symbols_found.insert("@_IDENTITY_SYMBOL_@"); 
+
           // Which symbols in the graph's alphabet did not occur in 
           // the graph
           HfstTransitionGraphAlphabet symbols_not_found;
