@@ -68,7 +68,7 @@
   unsigned int get_number(const std::string &);
   unsigned int get_second_number(const std::string &s);
   std::string get_name(const std::string &s);
-		       
+               
 %}
 
 
@@ -315,7 +315,8 @@ REGULAR_EXPRESSION: RE_LIST
 {
   $1->apply
     (&HfstTransducer::insert_freely,
-     SymbolPair(TWOLC_FREELY_INSERT,TWOLC_FREELY_INSERT));
+     SymbolPair(TWOLC_FREELY_INSERT,TWOLC_FREELY_INSERT),
+     true);
   $1->apply
     (&HfstTransducer::substitute,
      SymbolPair(TWOLC_FREELY_INSERT,TWOLC_FREELY_INSERT),
@@ -343,7 +344,7 @@ RE: PAIR
 | RE POWER NUMBER_RANGE
 { 
   $$ = &$1->apply(&HfstTransducer::repeat_n_to_k,
-		  get_number($3),get_second_number($3));
+          get_number($3),get_second_number($3));
   free($3);
 }
 | RE STAR
@@ -399,49 +400,49 @@ PAIR: PAIR_SYMBOL COLON PAIR_SYMBOL
       // The absolute word boundary surface realization is treated the same as
       // the surface realizations of other absolute word boundaries.
       OtherSymbolTransducer wb = 
-	alphabet.get_transducer(SymbolPair
-				("__HFST_TWOLC_.#.","__HFST_TWOLC_.#."));
+    alphabet.get_transducer(SymbolPair
+                ("__HFST_TWOLC_.#.","__HFST_TWOLC_.#."));
       OtherSymbolTransducer alt_wb = 
-	alphabet.get_transducer
-	(SymbolPair
-	 ("#",$3 == std::string("__HFST_TWOLC_#") ? "#" : $3));      
+    alphabet.get_transducer
+    (SymbolPair
+     ("#",$3 == std::string("__HFST_TWOLC_#") ? "#" : $3));      
       wb.apply(&HfstTransducer::disjunct,alt_wb);
 
       $$ = new OtherSymbolTransducer(wb);
     }  
   else
     { $$ = new OtherSymbolTransducer
-	(alphabet.get_transducer(SymbolPair($1,$3))); 
+    (alphabet.get_transducer(SymbolPair($1,$3))); 
       if (alphabet.is_empty_pair(SymbolPair($1,$3)))
-	{
-	  std::string error;
-	  if (std::string($1) == std::string($3))
-	    {
-	      std::string symbol = Rule::get_print_name($1);
+    {
+      std::string error;
+      if (std::string($1) == std::string($3))
+        {
+          std::string symbol = Rule::get_print_name($1);
 
-	      error = std::string("The pair set ") + symbol + " is empty.";
-	    }
-	  else
-	    {
-	      std::string symbol1 = Rule::get_print_name($1);
-	      std::string symbol2 = Rule::get_print_name($3);
+          error = std::string("The pair set ") + symbol + " is empty.";
+        }
+      else
+        {
+          std::string symbol1 = Rule::get_print_name($1);
+          std::string symbol2 = Rule::get_print_name($3);
 
-	      error = std::string("The pair set ") + symbol1 + ":" + symbol2 + 
-		" is empty.";
-	    }
-	  error +=  std::string("\n\n") +
+          error = std::string("The pair set ") + symbol1 + ":" + symbol2 + 
+        " is empty.";
+        }
+      error +=  std::string("\n\n") +
 
-	    "Note that a pair set X:Y can be empty, even if the sets X and\n"+
+        "Note that a pair set X:Y can be empty, even if the sets X and\n"+
             "Y are non-empty, since every symbol pair has to be declared in\n"+
-	    "the alphabet or it has to be the center of a rule, or be in\n"  +
-	    "the context of a rule or result from substituting values for\n" +
-	    "variables in a rule with variables.\n\n" +
+        "the alphabet or it has to be the center of a rule, or be in\n"  +
+        "the context of a rule or result from substituting values for\n" +
+        "variables in a rule with variables.\n\n" +
 
-	    "Compilation is terminated because a rule context, definition\n" + 
-	    "or rule center becomes empty.\n\n";
+        "Compilation is terminated because a rule context, definition\n" + 
+        "or rule center becomes empty.\n\n";
 
-	  semantic_error(error.c_str());
-	}
+      semantic_error(error.c_str());
+    }
     }
 
   free($1);
@@ -541,48 +542,48 @@ int main(int argc, char * argv[])
     {
       CommandLine command_line(argc,argv);
       if (command_line.help or command_line.usage or command_line.version)
-	{ exit(0); }
+    { exit(0); }
       if (command_line.has_debug_file)
-	{ input_reader.set_input(command_line.set_input_file()); }
+    { input_reader.set_input(command_line.set_input_file()); }
       else
-	{ input_reader.set_input(std::cin); }
+    { input_reader.set_input(std::cin); }
       
       OtherSymbolTransducer::set_transducer_type(command_line.format);
       silent = command_line.be_quiet;
       verbose = command_line.be_verbose;
       
       TwolCGrammar twolc_grammar(command_line.be_quiet,
-				 command_line.be_verbose,
-				 command_line.resolve_conflicts);
+                 command_line.be_verbose,
+                 command_line.resolve_conflicts);
       grammar = &twolc_grammar;
       int exit_code = yyparse();
       if (exit_code != 0)
-	{ exit(exit_code); }
+    { exit(exit_code); }
       
       message("Compiling and storing rules.");
       if (not command_line.has_output_file)
-	{
-	  HfstOutputStream stdout_(command_line.format);
-	  grammar->compile_and_store(stdout_);
-	}
+    {
+      HfstOutputStream stdout_(command_line.format);
+      grammar->compile_and_store(stdout_);
+    }
       else
-	{
-	  HfstOutputStream out
-	    (command_line.output_file_name,command_line.format);
-	  grammar->compile_and_store(out);
-	}
+    {
+      HfstOutputStream out
+        (command_line.output_file_name,command_line.format);
+      grammar->compile_and_store(out);
+    }
       exit(0);
     }
   catch (const HfstException e)
     {
       std::cerr << "This is an hfst interface bug:" << std::endl
-		<< e() << std::endl;
+        << e() << std::endl;
       exit(1);
     }
   catch (const char * s)
     {
       std::cerr << "This is an a bug probably from sfst:" << std::endl
-		<< s << std::endl;
+        << s << std::endl;
       exit(1);
     }
 }
