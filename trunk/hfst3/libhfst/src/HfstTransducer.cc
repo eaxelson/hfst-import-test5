@@ -1864,7 +1864,9 @@ HfstTransducer &HfstTransducer::insert_freely
     HfstTransducer tmp(symbol_pair.first, symbol_pair.second, this->type);
 
     if (this->type != FOMA_TYPE) {
-      //tmp.harmonize(*this);
+      if (harmonize)
+       { tmp.harmonize(*this); }
+
       insert_to_alphabet(symbol_pair.first);
       insert_to_alphabet(symbol_pair.second);
     }
