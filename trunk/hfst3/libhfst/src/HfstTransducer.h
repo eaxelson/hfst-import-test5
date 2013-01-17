@@ -1283,8 +1283,12 @@ ccc : ddd
         To each state in this transducer is added a transition that 
         leads from that state to itself with input and output symbols 
         defined by \a symbol_pair.
+
+    If harmonize is true, then identity and unknown symbols in the
+    transducer will be exapanded byt the symbols in symbol
+    pair. Otherwise they aren't.
      */
-    HfstTransducer &insert_freely(const StringPair &symbol_pair);
+    HfstTransducer &insert_freely(const StringPair &symbol_pair, bool harmonize=true);
 
     /** \brief Freely insert a copy of \a tr into the transducer. 
 
