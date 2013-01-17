@@ -1733,7 +1733,7 @@ void HfstTransducer::insert_freely_missing_flags_from
         for (StringSet::const_iterator it = missing_flags.begin();
              it != missing_flags.end(); it++)
     {
-            insert_freely(StringPair(*it, *it));
+      insert_freely(StringPair(*it, *it), false);
     }
     }
 }
@@ -1849,7 +1849,7 @@ bool HfstTransducer::check_for_missing_flags_in
 // -----------------------------------------------------------------------
 
 HfstTransducer &HfstTransducer::insert_freely
-(const StringPair &symbol_pair)
+(const StringPair &symbol_pair, bool harmonize)
 {
     HfstTokenizer::check_utf8_correctness(symbol_pair.first);
     HfstTokenizer::check_utf8_correctness(symbol_pair.second);
@@ -1864,7 +1864,7 @@ HfstTransducer &HfstTransducer::insert_freely
     HfstTransducer tmp(symbol_pair.first, symbol_pair.second, this->type);
 
     if (this->type != FOMA_TYPE) {
-      tmp.harmonize(*this);
+      //tmp.harmonize(*this);
       insert_to_alphabet(symbol_pair.first);
       insert_to_alphabet(symbol_pair.second);
     }
