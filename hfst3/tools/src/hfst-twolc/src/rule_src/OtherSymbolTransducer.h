@@ -87,6 +87,9 @@ typedef HfstTransducer &(HfstTransducer::*HfstTransducerTwoNumArgMember)
 typedef HfstTransducer &(HfstTransducer::*HfstTransducerOneSymbolPairArgMember)
   (const SymbolPair &);
 
+typedef HfstTransducer &(HfstTransducer::*HfstTransducerOneSymbolPairBoolArgMember)
+  (const SymbolPair &, bool);
+
 //! @brief Pointer to member function of @A HfstTransducer taking two
 //! strings and two booleans as arguments.
 typedef HfstTransducer &(HfstTransducer::*HfstTransducerSubstMember)
@@ -183,6 +186,10 @@ class OtherSymbolTransducer
   OtherSymbolTransducer 
     &apply
     (const HfstTransducerOneSymbolPairArgMember,const SymbolPair &pair);
+
+  OtherSymbolTransducer 
+    &apply
+    (const HfstTransducerOneSymbolPairBoolArgMember,const SymbolPair &pair, bool b);
 
   //! @brief Apply @a p onto @a this taking @a str1, @a str2, @a b1 and @a b2 
   //! as arguments and minimize @a this.

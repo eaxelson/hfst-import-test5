@@ -42,7 +42,7 @@ Rule::Rule(const std::string &name,
        it != v.end();
        ++it)
     {
-      if (not (*it)->empty())	
+      if (not (*it)->empty())    
     { 
       rule_transducer.apply
         (&HfstTransducer::intersect,(*it)->rule_transducer); 
@@ -93,7 +93,7 @@ void Rule::store(HfstOutputStream &out)
   rule_transducer.apply(&HfstTransducer::substitute,"__HFST_TWOLC_.#.","@#@",
             true,true);
   rule_transducer.apply(&HfstTransducer::substitute,"__HFST_TWOLC_SPACE",
-			" ",
+            " ",
             true,true);
   rule_transducer.apply(&HfstTransducer::substitute,SymbolPair("@#@","@#@"),
             SymbolPair("@#@",HFST_EPSILON));
@@ -188,7 +188,7 @@ void Rule::add_missing_symbols_freely(const SymbolRange &diacritics)
     { 
       rule_transducer.add_symbol_to_alphabet(*it); 
       rule_transducer.apply(&HfstTransducer::insert_freely,
-                SymbolPair(*it,*it)); }
+                SymbolPair(*it,*it), true); }
     }
   
 }

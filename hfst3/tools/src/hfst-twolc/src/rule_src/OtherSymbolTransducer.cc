@@ -204,26 +204,26 @@ OtherSymbolTransducer &OtherSymbolTransducer::harmonize_diacritics
        ++it)
     {
      for (HfstBasicTransducer::HfstTransitions::const_iterator jt 
-	    = it->begin();
-	  jt != it->end();
-	  ++jt)
+        = it->begin();
+      jt != it->end();
+      ++jt)
        {
-	  if (jt->get_input_symbol() == TWOLC_IDENTITY)
-	    {
-	      HfstState target = jt->get_target_state();
-	      
-	      for (HandySet<std::string>::iterator kt = 
-		     missing_diacritics.begin();
-		   kt != missing_diacritics.end();
-		   ++kt)
-		{
-		  basic.add_transition(s,
-				       HfstBasicTransition
-				       (target,*kt,*kt,0.0));
-		}
-	      break;
-	    }
-	}
+      if (jt->get_input_symbol() == TWOLC_IDENTITY)
+        {
+          HfstState target = jt->get_target_state();
+          
+          for (HandySet<std::string>::iterator kt = 
+             missing_diacritics.begin();
+           kt != missing_diacritics.end();
+           ++kt)
+        {
+          basic.add_transition(s,
+                       HfstBasicTransition
+                       (target,*kt,*kt,0.0));
+        }
+          break;
+        }
+    }
      ++s;
     }
   transducer = HfstTransducer(basic,transducer_type);
@@ -404,6 +404,18 @@ OtherSymbolTransducer &OtherSymbolTransducer::apply
   if (is_broken)
     { throw UndefinedSymbolPairsFound(); }
   transducer = CALL_MEMBER_FN(transducer,p)(pair); 
+  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)(); 
+  return *this;
+}
+
+OtherSymbolTransducer &OtherSymbolTransducer::apply
+(const HfstTransducerOneSymbolPairBoolArgMember p,const SymbolPair &pair, bool b)
+{ 
+  if (symbol_pairs.empty())
+    { throw EmptySymbolPairSet(); }
+  if (is_broken)
+    { throw UndefinedSymbolPairsFound(); }
+  transducer = CALL_MEMBER_FN(transducer,p)(pair,b); 
   transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)(); 
   return *this;
 }
