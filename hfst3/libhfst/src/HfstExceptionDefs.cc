@@ -1,5 +1,13 @@
 #include "HfstExceptionDefs.h"
 
+std::string hfst_exception;
+void hfst_set_exception(std::string name) {
+  hfst_exception=name;
+}
+std::string hfst_get_exception() {
+  return hfst_exception;
+}
+
 HfstException::HfstException(void) {}
 
 HfstException::HfstException
