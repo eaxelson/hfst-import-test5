@@ -91,6 +91,8 @@ class EmptyStringException: public HfstException {};
 class SymbolNotFoundException: public HfstException {};
 class MetadataException: public HfstException {};
 
+std::string hfst_get_exception();
+
 namespace hfst
 {
 
@@ -267,7 +269,7 @@ public:
     HfstOutputStream(const std::string & filename, ImplementationType type, bool hfst_format=true);
     HfstOutputStream(ImplementationType type, bool hfst_format=true);
     void close(void);
-    HfstOutputStream & redirect (HfstTransducer & transducer)  throw (StreamIsClosedException);
+    HfstOutputStream & redirect (HfstTransducer & transducer) throw (StreamIsClosedException);
     ~HfstOutputStream(void);
 };
 

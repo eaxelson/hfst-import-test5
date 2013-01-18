@@ -4,6 +4,9 @@
 #include <string>
 #include <sstream>
 
+void hfst_set_exception(std::string name);
+std::string hfst_get_exception();
+
 //! @file HfstExceptionDefs.h
 //! @brief A file for exceptions
 
@@ -22,12 +25,18 @@ struct HfstException
 
 //! @brief Macro to throw an exception of type @a E.
 //! Use @a THROW instead of regular @a throw with subclasses of HfstException.
-#define HFST_THROW(E) throw E(#E,__FILE__,__LINE__)
+#define HFST_THROW(E) do {                              \
+    hfst_set_exception(std::string(#E));                \
+    throw E(#E,__FILE__,__LINE__);                    } \
+  while(false)
 
 //! @brief Macro to throw an exception of type @a E with message @a M.
 //! Use @a THROW instead of regular @a throw with subclasses of HfstException.
-#define HFST_THROW_MESSAGE(E,M) throw E(std::string(#E)+": "+std::string(M)\
-                        ,__FILE__,__LINE__)
+#define HFST_THROW_MESSAGE(E,M) do {            \
+    hfst_set_exception(std::string(#E));        \
+    throw E(std::string(#E)+": "+std::string(M) \
+            ,__FILE__,__LINE__); }              \
+  while(false)
 
 //! @brief Declare a subclass of @a HfstException of type @a CHILD.
 #define HFST_EXCEPTION_CHILD_DECLARATION(CHILD) \
@@ -42,9 +51,9 @@ struct HfstException
       {}
 
 //! @brief Macro to catch exceptions thrown with HFST_THROW
-#define HFST_CATCH(E)							\
-    catch (const E &e)							\
-    {									\
+#define HFST_CATCH(E)                                                   \
+    catch (const E &e)                                                  \
+    {                                                                   \
     std::cerr << e.file << ", line " << e.line << ": " <<       \
         e() << std::endl;                       \
     }
