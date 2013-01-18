@@ -1924,6 +1924,11 @@ HfstTransducer &HfstTransducer::insert_freely
       insert_to_alphabet(symbol_pair.second);
     }
 
+    if (this->type == FOMA_TYPE and not harmonize) {
+      insert_to_alphabet(symbol_pair.first);
+      insert_to_alphabet(symbol_pair.second);
+    }
+
     switch (this->type)    
     {
 #if HAVE_OPENFST
