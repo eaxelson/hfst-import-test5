@@ -266,10 +266,12 @@ HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
       HFST_THROW_MESSAGE
     (HfstFatalException, "harmonize_ with anonymous transducers"); }
 
+    HfstTransducer another_copy(another);
+
     // Prevent flag diacritics from being harmonized by inserting them to
     // the alphabet.
     StringSet this_alphabet    = this->get_alphabet();
-    StringSet another_alphabet = another.get_alphabet();
+    StringSet another_alphabet = another_copy.get_alphabet();
 
     for (StringSet::const_iterator it = another_alphabet.begin();
      it != another_alphabet.end();
@@ -278,6 +280,16 @@ HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
     if (FdOperation::is_diacritic(*it) && this_alphabet.count(*it) == 0)
       {
         this->insert_to_alphabet(*it);
+      }
+      }
+
+    for (StringSet::const_iterator it = this_alphabet.begin();
+     it != this_alphabet.end();
+     ++it)
+      {
+    if (FdOperation::is_diacritic(*it) && another_alphabet.count(*it) == 0)
+      {
+        another_copy.insert_to_alphabet(*it);
       }
       }
 
@@ -294,7 +306,7 @@ HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
     case (TROPICAL_OPENFST_TYPE):
     case (LOG_OPENFST_TYPE):
       {
-    HfstBasicTransducer * another_basic = another.get_basic_transducer();
+    HfstBasicTransducer * another_basic = another_copy.get_basic_transducer();
     HfstBasicTransducer * this_basic = this->convert_to_basic_transducer();
 
     this_basic->harmonize(*another_basic);
@@ -342,6 +354,16 @@ void HfstTransducer::harmonize(HfstTransducer &another)
     if (FdOperation::is_diacritic(*it) && this_alphabet.count(*it) == 0)
       {
         this->insert_to_alphabet(*it);
+      }
+      }
+
+    for (StringSet::const_iterator it = this_alphabet.begin();
+     it != this_alphabet.end();
+     ++it)
+      {
+    if (FdOperation::is_diacritic(*it) && another_alphabet.count(*it) == 0)
+      {
+        another.insert_to_alphabet(*it);
       }
       }
 
