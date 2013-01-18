@@ -266,6 +266,21 @@ HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
       HFST_THROW_MESSAGE
     (HfstFatalException, "harmonize_ with anonymous transducers"); }
 
+    // Prevent flag diacritics from being harmonized by inserting them to
+    // the alphabet.
+    StringSet this_alphabet    = this->get_alphabet();
+    StringSet another_alphabet = another.get_alphabet();
+
+    for (StringSet::const_iterator it = another_alphabet.begin();
+     it != another_alphabet.end();
+     ++it)
+      {
+    if (FdOperation::is_diacritic(*it) && this_alphabet.count(*it) == 0)
+      {
+        this->insert_to_alphabet(*it);
+      }
+      }
+
     switch(this->type)
     {
 #if HAVE_FOMA
@@ -314,6 +329,21 @@ void HfstTransducer::harmonize(HfstTransducer &another)
 
     if (this->anonymous && another.anonymous) {
     return; }
+
+    // Prevent flag diacritics from being harmonized by inserting them to
+    // the alphabet.
+    StringSet this_alphabet    = this->get_alphabet();
+    StringSet another_alphabet = another.get_alphabet();
+
+    for (StringSet::const_iterator it = another_alphabet.begin();
+     it != another_alphabet.end();
+     ++it)
+      {
+    if (FdOperation::is_diacritic(*it) && this_alphabet.count(*it) == 0)
+      {
+        this->insert_to_alphabet(*it);
+      }
+      }
 
     switch(this->type)
     {
@@ -1735,6 +1765,7 @@ void HfstTransducer::insert_freely_missing_flags_from
     {
       insert_freely(StringPair(*it, *it), false);
     }
+
     }
 }
 
