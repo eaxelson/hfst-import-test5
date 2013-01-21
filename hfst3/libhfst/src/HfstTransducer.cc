@@ -1865,6 +1865,94 @@ void rename_flag_diacritics(HfstTransducer &fst,const std::string &suffix)
   fst = HfstTransducer(basic_fst_copy,fst.get_type());
 }
 
+// Return true if the flag in flag_diacritic ends in suffix and false
+// otherwise. E.g. if flag_diacritic = "@D.NeedNoun_1.ON@ and suffix =
+// "_1", return true.
+bool is_flag_suffix
+(const std::string &suffix, const std::string &flag_diacritic)
+{
+  size_t flag_end_pos = flag_diacritic.find_last_of('.');
+
+  if (flag_end_pos == std::string::npos)
+    { return false; }
+
+  if (flag_end_pos < suffix.size())
+    { return false; }
+
+  if (flag_diacritic.substr(flag_end_pos - suffix.size(),suffix.size()) 
+      != suffix)
+    { return false; }
+
+  return true;
+}
+
+// Return a transducer which disallows flag diacritics @OP.X_2.Y@
+// immediately before @OP.Z_1.W@ (i.e. if there are no intervening
+// symbols or epsilon symbols between the flags).
+HfstTransducer get_path_remover(HfstTransducer &fst)
+{
+  StringSet alphabet = fst.get_alphabet();
+
+  StringSet fst1_flag_diacritics;
+  StringSet fst2_flag_diacritics;
+
+  for (StringSet::const_iterator it = alphabet.begin(); 
+       it != alphabet.end(); 
+       ++it)
+    {
+      if (FdOperation::is_diacritic(*it))
+        { 
+          if (is_flag_suffix("_1", *it))
+            { fst1_flag_diacritics.insert(*it); }
+          else
+            { fst2_flag_diacritics.insert(*it); }
+        }
+    }
+
+  HfstBasicTransducer b;
+  b.add_state();
+  b.set_final_weight(0,0.0);
+  b.set_final_weight(1,0.0);
+
+  HfstBasicTransition id_tr(0,internal_identity,internal_identity,0.0);
+  b.add_transition(0, id_tr);
+  b.add_transition(1, id_tr);
+
+  for (StringSet::const_iterator it = fst1_flag_diacritics.begin(); 
+       it != fst1_flag_diacritics.end(); 
+       ++it)
+    {
+      HfstBasicTransition tr(0,*it,*it,0.0);
+      b.add_transition(0, tr);
+    }
+
+  for (StringSet::const_iterator it = fst2_flag_diacritics.begin(); 
+       it != fst2_flag_diacritics.end(); 
+       ++it)
+    {
+      HfstBasicTransition tr(1,*it,*it,0.0);
+      b.add_transition(0, tr);
+      b.add_transition(1, tr);
+    }
+
+  return HfstTransducer(b,fst.get_type());
+}
+
+// Remove all paths that have flag diacritics @OP.X_2.Y@ 
+// immediately before @OP.Z_1.W@ from fst (i.e. if there 
+// are no intervening symbols or epsilon symbols between 
+// the flags).
+void remove_illegal_paths(HfstTransducer &fst)
+{
+  fst.substitute(internal_epsilon, "TMP_FLAG_PATH_REMOVE_EPSILON");
+
+  HfstTransducer illegal_path_remover = get_path_remover(fst);
+  fst.compose(illegal_path_remover).minimize();
+
+  fst.substitute("TMP_FLAG_PATH_REMOVE_EPSILON", internal_epsilon);
+  fst.remove_from_alphabet("TMP_FLAG_PATH_REMOVE_EPSILON");
+}
+
 void HfstTransducer::harmonize_flag_diacritics(HfstTransducer &another,
                                                bool insert_renamed_flags)
 {
@@ -1879,6 +1967,8 @@ void HfstTransducer::harmonize_flag_diacritics(HfstTransducer &another,
         {
           this->insert_freely_missing_flags_from(another);
           another.insert_freely_missing_flags_from(*this);
+          remove_illegal_paths(*this);
+          remove_illegal_paths(another);
         }
     }
   else if (this_has_flag_diacritics and insert_renamed_flags)
@@ -1918,7 +2008,9 @@ HfstTransducer &HfstTransducer::insert_freely
 
     if (this->type != FOMA_TYPE) {
       if (harmonize)
-       { tmp.harmonize(*this); }
+       {
+         tmp.harmonize(*this); 
+       }
 
       insert_to_alphabet(symbol_pair.first);
       insert_to_alphabet(symbol_pair.second);
