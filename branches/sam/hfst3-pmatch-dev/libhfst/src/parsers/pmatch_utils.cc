@@ -372,14 +372,15 @@ HfstTransducer * read_text(char * filename, ImplementationType type)
     if(!infile.good()) {
         std::cerr << "Pmatch: could not open text file " << filename <<
             " for reading\n";
-        return retval;
-    }
-    while(infile.good()) {
-        std::getline(infile, line);
-        if(!line.empty()) {
-            retval->disjunct(HfstTransducer(line, tok, type));
+    } else {
+        while(infile.good()) {
+            std::getline(infile, line);
+            if(!line.empty()) {
+                retval->disjunct(HfstTransducer(line, tok, type));
+            }
         }
     }
+    infile.close();
     return retval;
 }
 
