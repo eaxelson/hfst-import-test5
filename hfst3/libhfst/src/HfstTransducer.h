@@ -674,6 +674,19 @@ in \a ifile.
     of the transducer can have unexpected results. */
     void remove_from_alphabet(const std::string &symbol);
 
+    /** @brief Remove all symbols that do not occur in transitions of
+        the transducer from its alphabet.
+
+        If unknown or identity symbols occur in transitions of the transducer,
+        pruning is not carried out by default.
+
+        @param force Whether unused symbols are removed even if
+        unknown or identity symbols occur in transitions.
+
+        Epsilon, unknown and identity \link hfst::String symbols\endlink
+        are always included in the alphabet. */
+    void prune_alphabet(bool force=true);
+
     /** \brief Whether the transducer is cyclic. */
     bool is_cyclic(void) const;
 

@@ -139,13 +139,10 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                          transducer_n);
         }
 
-        HfstBasicTransducer tr(trans);
-        tr.prune_alphabet(force_pruning);
-        HfstTransducer pruned(tr, trans.get_type());
-
-        hfst_set_name(pruned, pruned, "prune-alphabet");
+        trans.prune_alphabet(force_pruning);
+        hfst_set_name(trans, trans, "prune-alphabet");
         
-        outstream << pruned;
+        outstream << trans;
         free(inputname);
     }
     instream.close();
