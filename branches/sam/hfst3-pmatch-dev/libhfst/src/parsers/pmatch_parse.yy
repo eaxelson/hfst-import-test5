@@ -736,7 +736,8 @@ REGEXP12: LABEL { }
     free($1);
   }
 | READ_TEXT {
-    pmatcherror("no read text");
+  $$ = hfst::pmatch::read_text($1);
+  free($1);
   }
 | READ_SPACED {
     pmatcherror("no read spaced");

@@ -362,6 +362,28 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
       }
 }
 
+HfstTransducer * read_text(char * filename, ImplementationType type)
+{
+    std::ifstream infile;
+    std::string line;
+    infile.open(filename);
+    HfstTokenizer tok;
+    HfstTransducer * retval = new HfstTransducer(type);
+    if(!infile.good()) {
+        std::cerr << "Pmatch: could not open text file " << filename <<
+            " for reading\n";
+        return retval;
+    }
+    while(infile.good()) {
+        std::getline(infile, line);
+        if(!line.empty()) {
+            retval->disjunct(HfstTransducer(line, tok, type));
+        }
+    }
+    return retval;
+}
+
+
   HfstTransducer * latin1_alpha_acceptor(ImplementationType type)
   {
       HfstTokenizer tok;
