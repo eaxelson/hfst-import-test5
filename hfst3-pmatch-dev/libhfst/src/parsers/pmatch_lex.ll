@@ -210,6 +210,11 @@ LWSP [\t\r\n ]
     return READ_RE;
 }
 
+"@lexc\""[^""]+"\"" {
+    pmatchlval.label = hfst::pmatch::get_quoted(pmatchtext);
+    return READ_LEXC;
+}
+
 "[." { return LEFT_BRACKET_DOTTED; }
 ".]" { return RIGHT_BRACKET_DOTTED; }
 "[" { return LEFT_BRACKET; }
