@@ -481,6 +481,15 @@ AC_ARG_ENABLE([windows],
 				[enable_windows=no])
 AM_CONDITIONAL([WANT_WINDOWS], [test x$enable_windows != xno])
 
+# Disable fsmbook tests by default
+AC_ARG_ENABLE([fsmbook-tests],
+		[AS_HELP_STRING([--enable-fsmbook-tests],
+				[perform fsmbook tests when make check is run @<:@default=no@:>@])],
+				[enable_fsmbook_tests=$enableval],
+				[enable_fsmbook_tests=no])
+AM_CONDITIONAL([WANT_FSMBOOK_TESTS], [test x$enable_fsmbook_tests != xno])
+
+
 
 #AS_IF([test "x$enable_windows" != "xno" -a "x$enable_tagger" != "xno"],
 #      [AC_MSG_FAILURE([hfst-train-tagger and hfst-tag cannot be used on Windows; disable --enable-tagger when using --enable-windows])])
