@@ -28,7 +28,8 @@ if [ -x $TOOLDIR/hfst-compare ] ; then
     fi
 fi
 rm -f test_*
-for f in $TOOLDIR/hfst-{conjunct,disjunct,compose,subtract,compose,compose-intersect} ; do
+for operator in conjunct disjunct compose subtract compose compose-intersect ; do
+    f=$TOOLDIR/hfst-$operator
     if [ -x "$f" ] ; then
         # well, not all permutations, but reasonable
         $f -1 cat.hfst -2 dog.hfst > test_named1named2stdout || exit 1
@@ -61,7 +62,8 @@ for f in $TOOLDIR/hfst-{conjunct,disjunct,compose,subtract,compose,compose-inter
     fi
 done
 
-for f in $TOOLDIR/hfst-{determinize,invert,minimize,remove-epsilons,reverse} ; do
+for operator in determinize invert minimize remove-epsilons reverse ; do
+    f=$TOOLDIR/hfst-$operator
     if [ -x $f ] ; then
         $f -i cat.hfst > test_namedinstdout || exit 1
         $f cat.hfst > test_fileinstdout || exit 1
@@ -79,7 +81,8 @@ for f in $TOOLDIR/hfst-{determinize,invert,minimize,remove-epsilons,reverse} ; d
     fi
 done
 
-for f in $TOOLDIR/hfst-{fst2strings,fst2txt} ; do
+for operator in fst2strings fst2txt ; do
+    f=$TOOLDIR/hfst-$operator
     if [ -x $f ] ; then
         $f -i cat.hfst > test_namedinstdout.txt || exit 1
         $f cat.hfst > test_fileinstdout.txt || exit 1
