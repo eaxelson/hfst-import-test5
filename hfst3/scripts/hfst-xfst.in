@@ -66,12 +66,12 @@ if test -t 1 ; then
         echo Running foma without automatic exit at end
         echo Files from interactive session cannot be converted
     fi
-    if ! hfst-foma-wrapper.sh $wrapopts -X"$ffile $efile $lfile $extraopts"; then
+    if ! @prefix@/bin/hfst-foma-wrapper.sh $wrapopts -X"$ffile $efile $lfile $extraopts"; then
         echo "Foma wrapper failed"
         exit 1
     fi
 else
-    if ! hfst-foma-wrapper.sh $wrapopts -X"$ffile $efile $lfile $extraopts" > /dev/null; then
+    if ! @prefix@/bin/hfst-foma-wrapper.sh $wrapopts -X"$ffile $efile $lfile $extraopts" > /dev/null; then
         echo "Foma wrapper failed"
         exit 1
     fi
