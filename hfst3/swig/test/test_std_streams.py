@@ -29,7 +29,8 @@ while True:
         transducers_read += 1
         ostr.redirect(tr)
         transducers_written += 1
-    except libhfst.EndOfStreamException:
+    except: # libhfst.EndOfStreamException:
+        assert(libhfst.hfst_get_exception() == "EndOfStreamException")
         break;
 if transducers_read != transducers_in_stream:
     print("ERROR: wrong number of transducers read")

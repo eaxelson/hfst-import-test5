@@ -71,7 +71,7 @@ for type in types:
         empty_olw = foobar2.convert(libhfst.HFST_OLW_TYPE)
         assert(empty_ol.get_name() == "foobar")
         assert(empty_olw.get_name() == "foobar")
-    except libhfst.FunctionNotImplementedException:
+    except: # libhfst.FunctionNotImplementedException:
         assert(False)
     
 

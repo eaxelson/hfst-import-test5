@@ -35,7 +35,8 @@ for ttype in (libhfst.SFST_TYPE, libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYP
             tr.write_in_att_format(att_file)
             if transducers_read < 2:
                 att_file.write('--\n')
-        except libhfst.EndOfStreamException:
+        except: # libhfst.EndOfStreamException:
+            assert(libhfst.hfst_get_exception() == "EndOfStreamException")
             break
     if transducers_read != 2:
         print("ERROR: wrong number of transducers read")
@@ -59,7 +60,7 @@ for ttype in (libhfst.SFST_TYPE, libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYP
                     print("ERROR: transducer 2 changed in ATT format.")
                     remove_generated_files()
                     sys.exit(1)
-        except libhfst.EndOfStreamException:
+        except: # libhfst.EndOfStreamException:
             break
     if transducers_read != 2:
         print("ERROR: wrong number of ATT transducers read")

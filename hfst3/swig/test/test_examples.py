@@ -15,9 +15,11 @@ print("ImplementationTypeNotAvailableException")
 for type in types:
     try:
         tr = libhfst.HfstTransducer("foo", "bar", type)
-    except libhfst.ImplementationTypeNotAvailableException:
+    except: # libhfst.ImplementationTypeNotAvailableException:
+        assert(libhfst.hfst_get_exception() == "ImplementationTypeNotAvailableException")
         pass
 
+assert(libhfst.hfst_get_exception() == "")
 
 # Stream cannot be read. 
 # ----------------------
@@ -53,7 +55,8 @@ for type in types:
         out.close()
         out.redirect(tr)
         assert(False)
-    except libhfst.StreamIsClosedException:
+    except: # libhfst.StreamIsClosedException:
+        assert(libhfst.hfst_get_exception() == "StreamIsClosedException")
         pass
 
 
@@ -68,7 +71,7 @@ for type in types:
         results = libhfst.detokenize_paths(libhfst.extract_paths(transducer))
         print("The transducer has {0} paths".format(len(results)))
         assert(False)
-    except libhfst.TransducerIsCyclicException:
+    except: # libhfst.TransducerIsCyclicException:
         print("The transducer is cyclic and has an infinite number of paths.")
 
 
@@ -83,7 +86,7 @@ foofile.write('The file ends here.'.encode('ascii'))
 foofile.close()
 try:
     instr = libhfst.HfstInputStream("foofile")
-except libhfst.NotTransducerStreamException:
+except: # libhfst.NotTransducerStreamException:
     print("file does not contain transducers.")
 
 
@@ -104,7 +107,7 @@ for type in types:
         t = libhfst.HfstTransducer(ifile, type, "epsilon")
         transducers.append(t)
         print("read one transducer")
-    except libhfst.NotValidAttFormatException:
+    except: # libhfst.NotValidAttFormatException:
         print("Error reading transducer: not valid AT&T format.")
 
 ifile.close()
@@ -121,7 +124,8 @@ tr.add_state(1)
 try:
     w = tr.get_final_weight(1)
     assert(False)
-except libhfst.StateIsNotFinalException:
+except: # libhfst.StateIsNotFinalException:
+    assert(libhfst.hfst_get_exception() == "StateIsNotFinalException")
     pass
 
 
@@ -157,7 +161,8 @@ bar = libhfst.HfstTransducer("bar", libhfst.FOMA_TYPE)
 try:
     foo.disjunct(bar)
     assert(False)
-except libhfst.TransducerTypeMismatchException:
+except: # libhfst.TransducerTypeMismatchException:
+    assert(libhfst.hfst_get_exception() == "TransducerTypeMismatchException")
     pass
 
 
@@ -229,7 +234,8 @@ sfst_transducer = libhfst.HfstTransducer('foo', 'bar', libhfst.SFST_TYPE)
 try:
     tropical_transducer.disjunct(sfst_transducer)
     assert(False)
-except libhfst.TransducerTypeMismatchException:
+except: # libhfst.TransducerTypeMismatchException:
+    assert(libhfst.hfst_get_exception() == "TransducerTypeMismatchException")
     pass
 
 tropical_transducer = libhfst.HfstTransducer('foo', 'bar', libhfst.TROPICAL_OPENFST_TYPE)
@@ -293,13 +299,14 @@ for type in types:
             t = libhfst.HfstTransducer(ifile, type, "<eps>")
             transducers.append(t)
             # print("read one transducer")
-        except libhfst.NotValidAttFormatException:
-            print("Error reading transducer: not valid AT&T format.")
-            ifile.close()
-            assert(False)
-            break
-        except:
-            break # End of file
+        except: # libhfst.NotValidAttFormatException:
+            if libhfst.hfst_get_exception() == "NotValidAttFormatException":
+                print("Error reading transducer: not valid AT&T format.")
+                ifile.close()
+                assert(False)
+                break
+            else:
+                break # End of file
     assert len(transducers) == 4
 
 
@@ -357,7 +364,7 @@ print("HfstInputStream")
 instr = 0
 try:
     instr = libhfst.HfstInputStream("testfile.hfst") 
-except StreamNotReadableException: 
+except: # StreamNotReadableException: 
     print("ERROR: File does not exist.")
     exit(1)
 
@@ -419,7 +426,7 @@ try:
         print("TEST FAILED")
         exit(1)
 # If the state does not exist or is not final */
-except libhfst.HfstException:
+except: # libhfst.HfstException:
     print("TEST FAILED: An exception thrown.")
     exit(1)
 
@@ -458,7 +465,7 @@ for type in types:
     try:
         # Extract paths and remove tokenization
         results = libhfst.detokenize_paths(libhfst.extract_paths(words))
-    except libhfst.TransducerIsCyclicException:
+    except: # libhfst.TransducerIsCyclicException:
         # This should not happen because transducer is not cyclic.
         print("TEST FAILED")
         exit(1)
