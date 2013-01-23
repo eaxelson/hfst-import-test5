@@ -110,7 +110,7 @@ for f in $files ; do
         fi
         sed -e 's/		/	@_TAB_@/g' -e 's/	 /	@_SPACE_@/g' < "$f".att > "$f".att2
         mv "$f".att2 "$f".att
-        if ! hfst-txt2fst -e '@0@' $verbose $hfstopts $format -i "$f.att" -o "$f" ; then
+        if ! `dirname $(readlink -f $0)`/../tools/src/hfst-txt2fst -e '@0@' $verbose $hfstopts $format -i "$f.att" -o "$f" ; then
             echo "converting $f from text to HFST3 failed"
             exit 1
         fi

@@ -34,6 +34,8 @@ do
 	sed -i 's/$srcdir\//.\//' $file
 	sed -i 's/hfst-proc\/hfst-apertium-proc/hfst-apertium-proc/' $file
 	sed -i 's/test -x \(.*\);/which \1 2>1 > \/dev\/null;/' $file
+	sed -i 's/$SCRIPTDIR\///' $file
+	sed -i 's/-loc / /' $file
     fi
 done
 
