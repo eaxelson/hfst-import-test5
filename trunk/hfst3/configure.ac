@@ -1,4 +1,4 @@
-elif## Process this file with autoconf to produce configure script
+## Process this file with autoconf to produce configure script
 
 ## Copyright (C) 2010 University of Helsinki
 
@@ -662,8 +662,8 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 man/Makefile
 		 swig/Makefile
 		 swig/test/Makefile])
-AC_CONFIG_FILES([scripts/Makefile scripts/hfst-foma-wrapper.sh],
-                [chmod +x scripts/hfst-foma-wrapper.sh])
+AC_CONFIG_FILES([scripts/Makefile scripts/hfst-foma-wrapper.sh scripts/hfst-xfst],
+                [chmod +x scripts/hfst-foma-wrapper.sh scripts/hfst-xfst])
 #		 test/tools/fsmbook-examples/FinnishOTProsody/Makefile
 #		 test/tools/fsmbook-examples/MonishGuesserAnalyzer/Makefile
 
