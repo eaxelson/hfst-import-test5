@@ -54,13 +54,13 @@ utf8_tokenizer = libhfst.HfstTokenizer()
 # Empty string
 try:
     utf8_tokenizer.check_utf8_correctness("")
-except (libhfst.IncorrectUtf8CodingException):
+except: # (libhfst.IncorrectUtf8CodingException):
     assert(False)
 
 # ASCII string "ab"
 try:
     utf8_tokenizer.check_utf8_correctness("ab")
-except (libhfst.IncorrectUtf8CodingException):
+except: # (libhfst.IncorrectUtf8CodingException):
     assert(False)
 
 # The rest of the tests don't work yet
@@ -74,7 +74,7 @@ exit(0)
 
 try:
     utf8_tokenizer.check_utf8_correctness(b"11110000"b"10000000"b"10000000"b"10000000"b"11100000"b"10000000"b"10000000"b"11010000"b"10000000"b"01000000")
-except (libhfst.IncorrectUtf8CodingException):
+except: # (libhfst.IncorrectUtf8CodingException):
     assert(False)
 
 
@@ -84,75 +84,75 @@ except (libhfst.IncorrectUtf8CodingException):
 try:
     utf8_tokenizer.check_utf8_correctness(b"0b11000000"b"0b10000000")
     assert(False)
-except (libhfst.IncorrectUtf8CodingException):
+except: # (libhfst.IncorrectUtf8CodingException):
     pass
 
 # String with byte 193
 try:
     utf8_tokenizer.check_utf8_correctness(b"11000001"b"10000000")
     assert(False)
-except (libhfst.IncorrectUtf8CodingException):
+except: # (libhfst.IncorrectUtf8CodingException):
     pass
 
 # String with byte 245
 try:
     utf8_tokenizer.check_utf8_correctness(b"11110101"b"10000000"b"10000000"b"10000000")
     assert(False)
-except (libhfst.IncorrectUtf8CodingException):
+except: # (libhfst.IncorrectUtf8CodingException):
     pass
 
 # String with byte 246
 try:
     utf8_tokenizer.check_utf8_correctness(b"11110110"b"10000000"b"10000000"b"10000000")
     assert(False)
-except (libhfst.IncorrectUtf8CodingException):
+except: # (libhfst.IncorrectUtf8CodingException):
     pass
 
 # String with byte 247
 try:
     utf8_tokenizer.check_utf8_correctness(b"11110111"b"10000000"b"10000000"b"10000000")
     assert(False)
-except (libhfst.IncorrectUtf8CodingException):
+except: # (libhfst.IncorrectUtf8CodingException):
     pass
 
 # ASCII character followed by a continuation character
 try:
     utf8_tokenizer.check_utf8_correctness(b"01000000"b"10000000")
     assert(False)
-except (libhfst.IncorrectUtf8CodingException):
+except: # (libhfst.IncorrectUtf8CodingException):
     pass
 
 # 11010000 followed by ASCII character
 try:
     utf8_tokenizer.check_utf8_correctness(b"11010000"b"01000000")
     assert(False)
-except (libhfst.IncorrectUtf8CodingException):
+except: # (libhfst.IncorrectUtf8CodingException):
     pass
 
 # 11100000 followed by one continuation character and an ASCII character
 try:
     utf8_tokenizer.check_utf8_correctness(b"11100000"b"10000000"b"01000000")
     assert(False)
-except (libhfst.IncorrectUtf8CodingException):
+except: # (libhfst.IncorrectUtf8CodingException):
     pass
 
 # 11110000 followed by two continuation characters and an ASCII character
 try:
     utf8_tokenizer.check_utf8_correctness(b"11110000"b"10000000"b"10000000"b"01000000")
     assert(False)
-except (libhfst.IncorrectUtf8CodingException):
+except: # (libhfst.IncorrectUtf8CodingException):
     pass
 
 # 11110000 followed by two continuation characters and an ASCII character
 try:
     utf8_tokenizer.check_utf8_correctness(b"11110000"b"10000000"b"10000000"b"01000000")
     assert(False)
-except (libhfst.IncorrectUtf8CodingException):
+except: # (libhfst.IncorrectUtf8CodingException):
     pass
 
 # 11110000 followed by two continuation characters and 1101000010000000
 try:
     utf8_tokenizer.check_utf8_correctness(b"11110000"b"10000000"b"10000000"b"11010000"b"10000000")
     assert(False)
-except (libhfst.IncorrectUtf8CodingException):
+except: # (libhfst.IncorrectUtf8CodingException):
     pass

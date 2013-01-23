@@ -69,7 +69,8 @@ for type in types:
     try:
         t3.shuffle(t2)
         assert(False)
-    except libhfst.TransducersAreNotAutomataException:
+    except: # libhfst.TransducersAreNotAutomataException:
+        assert(libhfst.hfst_get_exception() == "TransducersAreNotAutomataException")
         assert(True)
 
 
@@ -210,7 +211,7 @@ for type in types:
             # Rounding can affect the precision
             assert((0.79 < t_final.get_final_weight(1)) and (t_final.get_final_weight(1) < 0.81))
             # If the state does not exist or is not final
-        except (libhfst.HfstException):
+        except: # (libhfst.HfstException):
             assert(False)
 
         # Test the transition weight
@@ -221,7 +222,7 @@ for type in types:
             # Rounding can affect the precision
             assert((0.79 < weight) and (weight < 0.81))
             # If the state does not exist or is not final */
-        except (libhfst.HfstException):
+        except: # (libhfst.HfstException):
             assert(False)
 
 
@@ -246,7 +247,7 @@ for type in types:
         tc = libhfst.HfstBasicTransducer(T)
         try:
           assert((0.49 < tc.get_final_weight(1)) and (tc.get_final_weight(1) < 0.51))
-        except (libhfst.HfstException):
+        except: # (libhfst.HfstException):
             assert(False)
 
 

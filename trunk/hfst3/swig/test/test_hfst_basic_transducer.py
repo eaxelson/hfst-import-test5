@@ -44,7 +44,8 @@ for s in range(5):
         try:
             w = t.get_final_weight(s)
             assert(False)
-        except libhfst.StateIsNotFinalException:
+        except: # libhfst.StateIsNotFinalException:
+            assert(libhfst.hfst_get_exception() == "StateIsNotFinalException")
             pass
 
 # Reading a file in non-valid AT&T format
@@ -59,7 +60,8 @@ try:
     ifile.close()
     os.remove('test.att')
     assert(False)
-except libhfst.NotValidAttFormatException:
+except: # libhfst.NotValidAttFormatException:
+    assert(libhfst.hfst_get_exception() == "NotValidAttFormatException")
     ifile.close()
     os.remove('test.att')
 
@@ -95,7 +97,8 @@ try:
     empty_symbol = libhfst.HfstBasicTransducer()
     empty_symbol.add_transition(0, libhfst.HfstBasicTransition(0, "", "", 0))
     assert(False)
-except libhfst.EmptyStringException:
+except: # libhfst.EmptyStringException:
+    assert(libhfst.hfst_get_exception() == "EmptyStringException")
     pass
 
   
