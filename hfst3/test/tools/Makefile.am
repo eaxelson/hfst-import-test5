@@ -53,6 +53,7 @@ TESTS=hfst-check-version.sh hfst-check-help.sh hfst-check-environment.sh \
 	  lookup-functionality.sh shuffle-functionality.sh \
 	  lexc-functionality.sh \
 	  lexc-compiler-functionality.sh \
+	  xfst-functionality.sh \
 	  $(STRESSES)
 
 # XFAIL_TESTS=incompatible-formats.sh latin-1-strings.sh

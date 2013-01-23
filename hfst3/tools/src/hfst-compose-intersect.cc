@@ -64,26 +64,26 @@ print_usage()
         "\n", program_name );
         print_common_program_options(message_out);
         print_common_binary_program_options(message_out);
-	fprintf(message_out, "Composition options:\n"
+        fprintf(message_out, "Composition options:\n"
             "  -I, --invert                 Compose the intersection of the\n"
-	    "                               rules with the lexicon instead\n"
+            "                               rules with the lexicon instead\n"
             "                               of composing the lexicon with\n"
-	    "                               the intersection of the rules.\n"
+            "                               the intersection of the rules.\n"
            );
         //print_common_binary_program_parameter_instructions(message_out);
-	fprintf(message_out,
+        fprintf(message_out,
 "\nIf OUTFILE, or either INFILE1 or INFILE2 is missing or -, standard\n" 
 "streams will be used. INFILE1, INFILE2, or both, must be specified\n"
 "The format of INFILE1 and INFILE2 must be the same; the result will\n" 
 "have the same format as these.\n"
 "INFILE1 (the lexicon) must contain exactly one transducer.\n" 
-		"INFILE2 (rule file) may contain several transducers.\n");
+                "INFILE2 (rule file) may contain several transducers.\n");
         fprintf(message_out,
 "\n"
 "Examples:\n"
 "  %s -o analyzer.hfst lexicon.hfst rules.hfst\n"
 "compose rules with lexicon\n"
-		"\n",
+                "\n",
             program_name );
         print_report_bugs();
         fprintf(message_out, "\n");
@@ -101,7 +101,7 @@ parse_options(int argc, char** argv)
         {
           HFST_GETOPT_COMMON_LONG,
           HFST_GETOPT_BINARY_LONG,
-	  {"invert", no_argument, 0, 'I'},
+          {"invert", no_argument, 0, 'I'},
           {0,0,0,0}
         };
         int option_index = 0;
@@ -117,9 +117,9 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-binary.h"
 #include "inc/getopt-cases-error.h"
-	case 'I':
-	  invert = true;
-	  break;
+        case 'I':
+          invert = true;
+          break;
         }
     }
 
@@ -138,7 +138,7 @@ bool is_special_symbol(const std::string &symbol)
 { return symbol.size() > 2 and symbol[0] == '@' and *(symbol.rbegin()) == '@';}
 
 std::string check_all_symbols(const HfstTransducer &lexicon,
-			      const HfstTransducer &rule)
+                              const HfstTransducer &rule)
 {
   HfstBasicTransducer rule_b(rule);
 
@@ -147,13 +147,13 @@ std::string check_all_symbols(const HfstTransducer &lexicon,
   for (HfstState s = 0; s <= rule_b.get_max_state(); ++s)
     {
       for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
-	     rule_b[s].begin();
-	   it != rule_b[s].end();
-	   ++it)
-	{ 
-	  const std::string &input_symbol = it->get_input_symbol();
-	  rule_input_symbols.insert(input_symbol); 
-	}
+             rule_b[s].begin();
+           it != rule_b[s].end();
+           ++it)
+        { 
+          const std::string &input_symbol = it->get_input_symbol();
+          rule_input_symbols.insert(input_symbol); 
+        }
     }
 
   if (rule_input_symbols.count(hfst::internal_identity) != 0)
@@ -164,15 +164,15 @@ std::string check_all_symbols(const HfstTransducer &lexicon,
   for (HfstState s = 0; s <= lexicon_b.get_max_state(); ++s)
     {
       for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
-	     lexicon_b[s].begin();
-	   it != lexicon_b[s].end();
-	   ++it)
-	{ 
-	  const std::string &output_symbol = it->get_output_symbol();
+             lexicon_b[s].begin();
+           it != lexicon_b[s].end();
+           ++it)
+        { 
+          const std::string &output_symbol = it->get_output_symbol();
 
-	  if (rule_input_symbols.count(output_symbol) == 0)
-	    { return output_symbol; }
-	}
+          if (rule_input_symbols.count(output_symbol) == 0)
+            { return output_symbol; }
+        }
     }
   
   return "";
@@ -191,33 +191,33 @@ std::string check_multi_char_symbols
   for (HfstState s = 0; s <= rule_b.get_max_state(); ++s)
     {
       for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
-	     rule_b[s].begin();
-	   it != rule_b[s].end();
-	   ++it)
-	{ 
-	  const std::string &input_symbol = it->get_input_symbol();
-	  rule_input_symbols.insert(input_symbol); 
-	}
+             rule_b[s].begin();
+           it != rule_b[s].end();
+           ++it)
+        { 
+          const std::string &input_symbol = it->get_input_symbol();
+          rule_input_symbols.insert(input_symbol); 
+        }
     }
 
   for (HfstState s = 0; s <= lexicon_b.get_max_state(); ++s)
     {
       for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
-	     lexicon_b[s].begin();
-	   it != lexicon_b[s].end();
-	   ++it)
-	{ 
-	  const std::string &output_symbol = it->get_output_symbol();
+             lexicon_b[s].begin();
+           it != lexicon_b[s].end();
+           ++it)
+        { 
+          const std::string &output_symbol = it->get_output_symbol();
 
-	  if (rule_input_symbols.count(output_symbol) == 0)
-	    {
-	      if (is_special_symbol(output_symbol))
-		{ continue; }
+          if (rule_input_symbols.count(output_symbol) == 0)
+            {
+              if (is_special_symbol(output_symbol))
+                { continue; }
 
-	      if (tokenizer.tokenize_one_level(output_symbol).size() > 1)
-		{ return output_symbol; }
-	    }
-	}
+              if (tokenizer.tokenize_one_level(output_symbol).size() > 1)
+                { return output_symbol; }
+            }
+        }
     }
   
   return "";
@@ -231,16 +231,16 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     (void)bothInputs;
     if (firststream.get_type() != secondstream.get_type())
       {
-        warning(0, 0, "Transducer type mismatch in %1$s and %2$s "
-                  "(types %3$s and %4$s);\n"
-                  "using type %3$s as output",
+        warning(0, 0, "Transducer type mismatch in %s and %s "
+                  "(types %s and %s);\n"
+                  "using type %s as output",
                   firstfilename, secondfilename,
                   hfst_strformat(firststream.get_type()),
                   hfst_strformat(secondstream.get_type()));
       }
 
     HfstTransducerVector rules;
-    size_t rule_n = 1;	
+    size_t rule_n = 1;  
 
     while (secondstream.is_good()) {
       HfstTransducer rule(secondstream);
@@ -262,50 +262,50 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
 
     while (firststream.is_good()) 
       {
-	verbose_printf("Reading lexicon...");
-	HfstTransducer lexicon(firststream);
-	char* lexiconname = hfst_get_name(lexicon, firstfilename);
-	verbose_printf(" %s read\n", lexiconname);
+        verbose_printf("Reading lexicon...");
+        HfstTransducer lexicon(firststream);
+        char* lexiconname = hfst_get_name(lexicon, firstfilename);
+        verbose_printf(" %s read\n", lexiconname);
      
-	verbose_printf("Computing intersecting composition...\n");
-	
-	if (rules.size() > 0)
-	  {
-	    std::string symbol;
-	    if ((symbol = check_all_symbols(lexicon,rules[0])) != "")
-	      {
-		warning(0, 0, 
-			"\nFound output symbols (e.g. \"%1s\") in transducer in\n"
-			"file %2$s which will be filtered out because they are\n"
-			"not found on the output tapes of transducers in file\n"
-			"%3$s.",
-			symbol.c_str(), firstfilename, secondfilename);
-	      }
-	    else if ((symbol = check_multi_char_symbols(lexicon,rules[0])) != "")
-	      { 
-		warning(0, 0, 
-			"\nFound output multi-char symbols (\"%1s\") in \n"
-			"transducer in file %2$s which are not found on the\n"
-			"output tape of transducers in file %3$s.",
-			symbol.c_str(), firstfilename, secondfilename);
-	      }
-	  }
-	
-	lexicon.compose_intersect(rules,invert);
-	char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-							(strlen(lexiconname) +
-							 strlen(secondfilename) +
-							 strlen("compose(%s, interserct(%s))")) 
-							+ 1));
-	if (sprintf(composed_name, "compose(%s, intersect(%s))", 
-		    lexiconname, secondfilename) > 0)
-	  {
-	    lexicon.set_name(composed_name);
-	  }
-	hfst_set_formula(lexicon, lexicon, " ∘ ⋂R");
+        verbose_printf("Computing intersecting composition...\n");
+        
+        if (rules.size() > 0)
+          {
+            std::string symbol;
+            if ((symbol = check_all_symbols(lexicon,rules[0])) != "")
+              {
+                warning(0, 0, 
+                        "\nFound output symbols (e.g. \"%s\") in transducer in\n"
+                        "file %s which will be filtered out because they are\n"
+                        "not found on the output tapes of transducers in file\n"
+                        "%s.",
+                        symbol.c_str(), firstfilename, secondfilename);
+              }
+            else if ((symbol = check_multi_char_symbols(lexicon,rules[0])) != "")
+              { 
+                warning(0, 0, 
+                        "\nFound output multi-char symbols (\"%s\") in \n"
+                        "transducer in file %s which are not found on the\n"
+                        "output tape of transducers in file %s.",
+                        symbol.c_str(), firstfilename, secondfilename);
+              }
+          }
+        
+        lexicon.compose_intersect(rules,invert);
+        char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                                        (strlen(lexiconname) +
+                                                         strlen(secondfilename) +
+                                                         strlen("compose(%s, interserct(%s))")) 
+                                                        + 1));
+        if (sprintf(composed_name, "compose(%s, intersect(%s))", 
+                    lexiconname, secondfilename) > 0)
+          {
+            lexicon.set_name(composed_name);
+          }
+        hfst_set_formula(lexicon, lexicon, " ∘ ⋂R");
 
-	verbose_printf("Storing result in %s...\n", outfilename);
-	outstream << lexicon;
+        verbose_printf("Storing result in %s...\n", outfilename);
+        outstream << lexicon;
       }
 
     firststream.close();
