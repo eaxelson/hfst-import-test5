@@ -195,12 +195,12 @@ void HfstTransducer::remove_from_alphabet(const std::string &symbol)
     convert_to_hfst_transducer(net);
 }
 
-  void HfstTransducer::prune_alphabet(bool force)
+HfstTransducer &HfstTransducer::prune_alphabet(bool force)
 {
   hfst::implementations::HfstBasicTransducer * net 
     = convert_to_basic_transducer();
   net->prune_alphabet(force);
-  (void) convert_to_hfst_transducer(net);
+  return convert_to_hfst_transducer(net);;
 }
 
 StringSet HfstTransducer::get_alphabet() const

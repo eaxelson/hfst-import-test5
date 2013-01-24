@@ -99,24 +99,19 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 ".p." { return LOWER_PRIORITY_UNION; }
 ".-u." { return UPPER_MINUS; }
 ".-l." { return LOWER_MINUS; }
-
-"`" { 
-    // TODO:
-  //  xrelval.values = hfst::xre::get_n_to_k(xretext);
-    return SUBSTITUTE_LEFT;
-    }
+"`" {   return SUBSTITUTE_LEFT; }
 
 "\\<=" { return LEFT_RESTRICTION; }
 "<=>" { return LEFT_RIGHT_ARROW; }
 "<=" { return LEFT_ARROW; }
 "=>" { return RIGHT_ARROW; }
+
 "->" { return REPLACE_RIGHT; }
 "(->)" { return OPTIONAL_REPLACE_RIGHT; }
 "<-" { return REPLACE_LEFT; }
 "(<-)" { return OPTIONAL_REPLACE_LEFT; }
 "<->" { return REPLACE_LEFT_RIGHT; }
 "(<->)" { return OPTIONAL_REPLACE_LEFT_RIGHT; }
-
 "@->" { return LTR_LONGEST_MATCH; }
 "@>" { return LTR_SHORTEST_MATCH; }
 "->@" { return RTL_LONGEST_MATCH; }
