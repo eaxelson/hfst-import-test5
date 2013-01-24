@@ -685,7 +685,7 @@ in \a ifile.
 
         Epsilon, unknown and identity \link hfst::String symbols\endlink
         are always included in the alphabet. */
-    void prune_alphabet(bool force=true);
+    HfstTransducer &prune_alphabet(bool force=true);
 
     /** \brief Whether the transducer is cyclic. */
     bool is_cyclic(void) const;

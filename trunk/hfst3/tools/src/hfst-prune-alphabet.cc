@@ -128,6 +128,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
     {
         transducer_n++;
         HfstTransducer trans(instream);
+
         char* inputname = hfst_get_name(trans, inputfilename);
         if (transducer_n==1)
         {

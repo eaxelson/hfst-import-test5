@@ -149,12 +149,9 @@ REGEXP2: REPLACE
         }
        | REGEXP2 CROSS_PRODUCT REPLACE {
             $$ = & $1->cross_product(*$3);
-            // xreerror("No crossproduct");
-            // $$ = $1;
             delete $3;
         }
        | REGEXP2 LENIENT_COMPOSITION REPLACE {
-            //xreerror("No lenient composition");
             $$ = & $1->lenient_composition(*$3);
             delete $3;
         }
@@ -409,7 +406,11 @@ CONTEXTS_VECTOR: CONTEXT
       ;
 CONTEXT: REPLACE CENTER_MARKER REPLACE 
          {
-            $$ = new HfstTransducerPair(*$1, *$3);
+             HfstTransducer t1(*$1);
+             HfstTransducer t2(*$3);
+             t1.prune_alphabet(false);
+             t2.prune_alphabet(false);
+            $$ = new HfstTransducerPair(t1, t2);
             delete $1, $3; 
          }
       | REPLACE CENTER_MARKER
@@ -502,7 +503,6 @@ REGEXP3: REGEXP4 { }
 REGEXP4: REGEXP5 { }
         // restriction rule
        | REGEXP4 RIGHT_ARROW RESTR_CONTEXTS_VECTOR {
-            //xreerror("No Arrows");
             $$ = new HfstTransducer( restriction(*$1, *$3) ) ;
             delete $1;
             delete $3;
@@ -575,11 +575,12 @@ REGEXP5: REGEXP6 { }
             delete $3;
         }
        | REGEXP5 INTERSECTION REGEXP6 {
-            $$ = & $1->intersect(*$3);
+        // std::cerr << "Intersection: \n"  << std::endl;
+            $$ = & $1->intersect(*$3).prune_alphabet(false);
             delete $3;
         }
        | REGEXP5 MINUS REGEXP6 {
-            $$ = & $1->subtract(*$3);
+            $$ = & $1->subtract(*$3).prune_alphabet(false);
             delete $3;
         }
        | REGEXP5 UPPER_MINUS REGEXP6 {
@@ -601,10 +602,7 @@ REGEXP5: REGEXP6 { }
             HfstTransducer* right =  new HfstTransducer(*$3);
             right->invert();
             left->invert();
-
             $$ = & (left->priority_union(*right).invert());
-         //   xreerror("No lower priority union");
-         //   $$ = $1;
             delete $1, $3;
         }
        ;
@@ -618,8 +616,6 @@ REGEXP6: REGEXP7 { }
 
 REGEXP7: REGEXP8 { }
        | REGEXP7 IGNORING REGEXP8 {
-           // xreerror("No ignoring");
-           // $$ = $1;
             $$ = & $1->insert_freely(*$3);
             delete $3;
         }
@@ -640,12 +636,12 @@ REGEXP8: REGEXP9 { }
        		// TODO: forbid pair complement (ie ~a:b)
        		HfstTransducer complement = HfstTransducer::identity_pair( hfst::xre::format );
        		complement.repeat_star().minimize();
-       		complement.subtract(*$2);
+       		complement.subtract(*$2).prune_alphabet(false);
        		$$ = new HfstTransducer(complement);
    			delete $2;
         }
        | CONTAINMENT REGEXP8 {
-       
+    // std::cerr << "Containment: \n" << std::endl;
             HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
                                     hfst::internal_identity,
                                     hfst::xre::format);
@@ -655,27 +651,12 @@ REGEXP8: REGEXP9 { }
             right->repeat_star();
             left->repeat_star();
 
-            $$ = & ((right->concatenate(*$2).concatenate(*left)));
-            
-       /*
-            HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
-                                    hfst::internal_unknown,
-                                    hfst::xre::format);
-            HfstTransducer* right = new HfstTransducer(hfst::internal_unknown,
-                                    hfst::internal_unknown,
-                                    hfst::xre::format);
-            right->repeat_star();
-            left->repeat_star();
-            HfstTransducer* contain_once = 
-                & ((right->concatenate(*$2).concatenate(*left)));
-            $$ = & (contain_once->repeat_star());
-            
-         */
+            $$ = & right->concatenate(*$2).concatenate(*left).prune_alphabet(false);
             delete $2;
             delete left;
         }
        | CONTAINMENT_ONCE REGEXP8 {
-                                 
+                                  std::cerr << "Contain 1 \n"<< std::endl;
             HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
                                     hfst::internal_unknown,
                                     hfst::xre::format);
@@ -685,13 +666,14 @@ REGEXP8: REGEXP9 { }
             right->repeat_star();
             left->repeat_star();
             HfstTransducer* contain_once = 
-                & ((right->concatenate(*$2).concatenate(*left)));
+                & (right->concatenate(*$2).concatenate(*left).prune_alphabet(false));
             $$ = contain_once;
             delete $2;
             delete left;
 
         }
        | CONTAINMENT_OPT REGEXP8 {
+          
             HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
                                     hfst::internal_unknown,
                                     hfst::xre::format);
@@ -702,7 +684,7 @@ REGEXP8: REGEXP9 { }
             left->repeat_star();
             HfstTransducer* contain_once = 
                 & ((right->concatenate(*$2).concatenate(*left)));
-            $$ = & (contain_once->optionalize());
+            $$ = & (contain_once->optionalize().prune_alphabet(false));
             delete $2;
             delete left;
         }
