@@ -1,6 +1,6 @@
 AM_CPPFLAGS= -Wno-deprecated -std=c99 # -D_MSC_VER -DWINDOWS 
 
-if WANT_WINDOWS
+if WANT_MINGW
 AM_CPPFLAGS += -DWINDOWS
 endif
 

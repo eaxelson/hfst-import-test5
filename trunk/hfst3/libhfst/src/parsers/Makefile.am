@@ -40,7 +40,7 @@ AM_CPPFLAGS=-I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/libhfst/src \
 		-I${top_srcdir}/back-ends/foma -I${top_srcdir}/back-ends \
 		-Wno-deprecated
 
-if WANT_WINDOWS
+if WANT_MINGW
   AM_CPPFLAGS+= -I${top_srcdir}/back-ends/openfstwin/src/include -I${top_srcdir}/back-ends/dlfcn -DWINDOWS
 else
   AM_CPPFLAGS+= -I${top_srcdir}/back-ends/openfst/src/include
