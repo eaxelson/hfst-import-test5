@@ -1,5 +1,9 @@
 AM_CPPFLAGS= -Wno-deprecated -std=c99 # -D_MSC_VER -DWINDOWS 
 
+if WANT_WINDOWS
+AM_CPPFLAGS += -DWINDOWS
+endif
+
 noinst_LTLIBRARIES = libfoma.la
 libfoma_la_SOURCES = int_stack.c define.c determinize.c apply.c \
         rewrite.c lexcread.c topsort.c flags.c minimize.c reverse.c \
@@ -23,8 +27,9 @@ endif
 endif
 endif
 
+if CAN_FOMAWRAP
 bin_PROGRAMS=hfst_foma
-
 hfst_foma_SOURCES=foma.c stack.c iface.c lex.interface.c lex.cmatrix.c
+endif
 
 EXTRA_DIST=foma.h fomalibconf.h fomalib.h lexc.h regex.tab.h 

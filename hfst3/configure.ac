@@ -661,9 +661,10 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 back-ends/sfst/Makefile
 		 man/Makefile
 		 swig/Makefile
-		 swig/test/Makefile])
-AC_CONFIG_FILES([scripts/Makefile scripts/hfst-foma-wrapper.sh scripts/hfst-xfst],
-                [chmod +x scripts/hfst-foma-wrapper.sh scripts/hfst-xfst])
+		 swig/test/Makefile
+		 scripts/Makefile])
+AC_CONFIG_FILES([scripts/hfst-foma-wrapper.sh], [chmod +x scripts/hfst-foma-wrapper.sh])
+AC_CONFIG_FILES([scripts/hfst-xfst], [chmod +x scripts/hfst-xfst])
 #		 test/tools/fsmbook-examples/FinnishOTProsody/Makefile
 #		 test/tools/fsmbook-examples/MonishGuesserAnalyzer/Makefile
 
