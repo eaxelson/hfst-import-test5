@@ -24,7 +24,7 @@ AM_CXXFLAGS = -Wno-deprecated -Wno-sign-compare
 AM_CPPFLAGS+= -I${top_srcdir}/back-ends/foma/ \
 		-I${top_srcdir}/back-ends/
 
-if WANT_WINDOWS
+if WANT_MINGW
   AM_CPPFLAGS+= -I${top_srcdir}/back-ends/openfstwin/src/include \
 		-I${top_srcdir}/back-ends/dlfcn -DWINDOWS
 else

@@ -474,12 +474,12 @@ AC_ARG_ENABLE([stress-tests],
 AM_CONDITIONAL([WANT_STRESSTESTS], [test x$enable_stress_tests != xno])
 
 # Disable compiling on windows by default
-AC_ARG_ENABLE([windows],
-		[AS_HELP_STRING([--enable-windows],
-				[compile on windows @<:@default=no@:>@])],
-				[enable_windows=$enableval],
-				[enable_windows=no])
-AM_CONDITIONAL([WANT_WINDOWS], [test x$enable_windows != xno])
+AC_ARG_ENABLE([mingw],
+		[AS_HELP_STRING([--enable-mingw],
+				[compile on MinGW @<:@default=no@:>@])],
+				mingw_mingw=$enableval],
+				[enable_mingw=no])
+AM_CONDITIONAL([WANT_MINGW], [test x$enable_mingw != xno])
 
 # Disable fsmbook tests by default
 AC_ARG_ENABLE([fsmbook-tests],
@@ -525,7 +525,7 @@ AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
 
 AC_CHECK_LIB([xml2], [main])
 AC_LANG_PUSH([C++])
-AS_IF([test "x$with_openfst" != "xno" -a "x$enable_windows" == "xno"], 
+AS_IF([test "x$with_openfst" != "xno" -a "x$enable_mingw" == "xno"], 
       [AC_CHECK_LIB([dl], [main])])
 #      [AC_CHECK_LIB([fst], [main], [],
 #                 [AC_MSG_FAILURE([openfst test failed (--without-openfst to disable)])])])
@@ -748,7 +748,7 @@ AS_IF([test "x$enable_lexc" == "xno"],
       [AC_MSG_WARN([hfst-lexc is not enabled; hfst-lexc2fst toy will only offer limited support to compile lexc lexicons; enable with --enable-lexc])])
 AS_IF([test "x$enable_twolc" == "xno"],
       [AC_MSG_WARN([hfst-twolc is not enabled; you will not be able to compile xerox twolc grammars; enable using --enable-twolc])])
-AS_IF([test "x$enable_tagger" == "xno" -a "x$enable_windows" == "xno"],
+AS_IF([test "x$enable_tagger" == "xno" -a "x$enable_mingw" == "xno"],
       [AC_MSG_WARN([hfst-train-tagger and hfst-tag are not enabled; you will not be able to train and use taggers; enable using --enable-tagger])])
 AS_IF([test "x$enable_calculate" == "xno"],
       [AC_MSG_WARN([hfst-calculate is not enabled; you will not be able to compile SFST-PL scripts; enable using --enable-calculate])])

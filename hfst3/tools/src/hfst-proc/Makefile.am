@@ -20,7 +20,7 @@ AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/
 AM_CPPFLAGS+= -I${top_srcdir}/back-ends/foma \
 		-I${top_srcdir}/back-ends
 
-if WANT_WINDOWS
+if WANT_MINGW
   AM_CPPFLAGS+= -I${top_srcdir}/back-ends/openfstwin/src/include  -DWINDOWS
 else
   AM_CPPFLAGS+= -I${top_srcdir}/back-ends/openfst/src/include

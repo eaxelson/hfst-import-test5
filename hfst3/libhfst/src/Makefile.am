@@ -44,7 +44,7 @@ if WANT_FOMA
   libhfst_la_LIBADD +=$(top_builddir)/back-ends/foma/libfoma.la
 endif
 
-if WANT_WINDOWS	
+if WANT_MINGW	
   AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfstwin/src/include \
 			-I${top_srcdir}/back-ends/dlfcn -DWINDOWS
   libhfst_la_LIBADD += $(top_builddir)/back-ends/dlfcn/libdl.la \
