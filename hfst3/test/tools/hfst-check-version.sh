@@ -1,9 +1,19 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
 
+TWOLC_TOOL=hfst-twolc/src/hfst-twolc-loc
+TAGGER_TOOLS=$TOOLDIR"/hfst-tagger/src/hfst-tag "$TOOLDIR"/hfst-tagger/src/hfst-train-tagger-loc"
+
+# Extension for executables
 EXT=
+# Check if we are in MinGW environment
 if (uname | egrep "MINGW|mingw" 2>1 > /dev/null); then
+    # Executables have an exe extension
     EXT=".exe";
+    # We use system call version of the shell script
+    TWOLC_TOOL=hfst-twolc/src/hfst-twolc-system
+    # Tagger tool shell script not implemented for windows (MinGW)
+    TAGGER_TOOLS=
 fi
 
 verbose="true"
@@ -20,52 +30,51 @@ fi
 # when testing. They also print their version messages to standard error
 # to avoid giving the message to the next tool in the pipeline.
 #
-for f in $TOOLDIR/hfst-* $TOOLDIR/hfst-proc/hfst-* \
-    $TOOLDIR/hfst-tagger/src/hfst-tag $TOOLDIR/hfst-tagger/src/hfst-train-tagger-loc \
-    $TOOLDIR/hfst-twolc/src/hfst-twolc-loc ; do
+for f in $TOOLDIR/hfst-* $TOOLDIR/hfst-proc/hfst-* $TAGGER_TOOLS \
+    $TOOLDIR/$TWOLC_TOOL ; do
     # Skip deprecated tools that can still lay around somewhere
     if [ "$f" != "$TOOLDIR/hfst-xfst2fst""$EXT" -a \
-	"$f" != "$TOOLDIR/hfst-lexc-compiler""$EXT" -a \
-	"$f" != "$TOOLDIR/hfst-twolc-system""$EXT" -a \
-	"$f" != "$TOOLDIR/hfst-duplicate""$EXT" -a \
-	"$f" != "$TOOLDIR/hfst-preprocess-for-optimized-lookup-format""$EXT" -a \
-	"$f" != "$TOOLDIR/hfst-strip-header""$EXT" -a \
-	"$f" != "$TOOLDIR/hfst-train-tagger-system""$EXT" ]; then
+        "$f" != "$TOOLDIR/hfst-lexc-compiler""$EXT" -a \
+        "$f" != "$TOOLDIR/hfst-twolc-system""$EXT" -a \
+        "$f" != "$TOOLDIR/hfst-duplicate""$EXT" -a \
+        "$f" != "$TOOLDIR/hfst-preprocess-for-optimized-lookup-format""$EXT" -a \
+        "$f" != "$TOOLDIR/hfst-strip-header""$EXT" -a \
+        "$f" != "$TOOLDIR/hfst-train-tagger-system""$EXT" ]; then
         if [ -x "$f" -a ! -d "$f" ] ; then
-	    if [ "$f" != "$TOOLDIR/hfst-tagger/src/hfst-train-tagger-loc" -a \
-		"$f" != "$TOOLDIR/hfst-twolc/src/hfst-twolc-loc" ] ; then
-		if ! "$f" --version > version.out ; then
+            if [ "$f" != "$TOOLDIR/hfst-tagger/src/hfst-train-tagger-loc" -a \
+                "$f" != "$TOOLDIR/""$TWOLC_TOOL" ] ; then
+                if ! "$f" --version > version.out ; then
                     rm version.out
                     echo $f has broken version
                     exit 1
-		fi
-		if ! grep -q 'hfst-[^ ]\+ [0-9.]\+' version.out > /dev/null \
-		    ; then
+                fi
+                if ! grep -q 'hfst-[^ ]\+ [0-9.]\+' version.out > /dev/null \
+                    ; then
                     rm version.out
                     echo $f has malformed version
                     exit 1
-		fi
-	    else
-		if ! "$f" --version 2> version.out ; then
+                fi
+            else
+                if ! "$f" --version 2> version.out ; then
                     rm version.out
                     echo $f has broken version
                     exit 1
-		fi
-		if ! grep -q 'hfst-[^ ]\+ [0-9.]\+' version.out > /dev/null \
-		    ; then
+                fi
+                if ! grep -q 'hfst-[^ ]\+ [0-9.]\+' version.out > /dev/null \
+                    ; then
                     rm version.out
                     echo $f has malformed version
                     exit 1
-		fi
-	    fi
-	    if [ "$verbose" != "false" ]; then
-		echo "PASS: "$f
-	    fi
+                fi
+            fi
+            if [ "$verbose" != "false" ]; then
+                echo "PASS: "$f
+            fi
         fi
     else
-	if [ "$verbose" != "false" ]; then
-	    echo "Skipping "$f"..."
-	fi
+        if [ "$verbose" != "false" ]; then
+            echo "Skipping "$f"..."
+        fi
     fi
 done
 rm version.out

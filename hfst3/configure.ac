@@ -316,12 +316,6 @@ AC_ARG_ENABLE([pmatch],
 			  [enable_pmatch=$enableval],
 			  [enable_pmatch=yes])
 AM_CONDITIONAL([WANT_PMATCH], [test x$enable_pmatch != xno])
-#AC_ARG_ENABLE([preprocess_for_optimized_lookup],
-#			  [AS_HELP_STRING([--enable-remove-epsilons],
-#							  [build remove-epsilons tool @<:@default=no@:>@])],
-#			  [enable_preprocess_for_optimized_lookup=$enableval],
-#			  [enable_preprocess_for_optimized_lookup=no])
-#AM_CONDITIONAL([WANT_PREPROCESS_FOR_OPTIMIZED_LOOKUP], [test x$enable_preprocess_for_optimized_lookup != xno])
 AC_ARG_ENABLE([project],
 			  [AS_HELP_STRING([--enable-project],
 							  [build project tool @<:@default=yes@:>@])],
@@ -491,11 +485,8 @@ AM_CONDITIONAL([WANT_FSMBOOK_TESTS], [test x$enable_fsmbook_tests != xno])
 
 
 
-#AS_IF([test "x$enable_windows" != "xno" -a "x$enable_tagger" != "xno"],
-#      [AC_MSG_FAILURE([hfst-train-tagger and hfst-tag cannot be used on Windows; disable --enable-tagger when using --enable-windows])])
-
-#AS_IF([test x$enable_windows != xno],
-#      [AC_MSG_FAILURE([windows compilation not supported yet (requested with --enable-windows)])])
+AS_IF([test "x$enable_mingw" != "xno" -a "x$enable_tagger" != "xno"],
+      [AC_MSG_FAILURE([hfst-train-tagger and hfst-tag are not supported in MinGW environment; disable tagger tools (with --disable-tagger) when using --enable-mingw])])
 
 # Checks for programs
 AC_PROG_CC
