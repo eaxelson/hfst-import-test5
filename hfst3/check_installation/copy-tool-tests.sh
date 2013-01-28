@@ -52,4 +52,8 @@ rm incompatible-formats.sh
 rm latin-1-strings.sh
 rm lexc-compiler-functionality.sh
 
+# These tests are not included in basic check
+cp ../test-hfst-xfst.sh .
+cp ../test-hfst-twolc.sh .
+
 cd ..
