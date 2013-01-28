@@ -7,22 +7,22 @@ LIBDIR=../libhfst/src/.libs/
 DLLDIR=/mingw/bin/
 SWIGDIR=../SWIG/
 TOOLDIR=../tools/src/.libs/
-TAGGERDIR=../tools/src/hfst-tagger/src/.libs/
-TAGGERPYTHONDIR1=../tools/src/hfst-tagger/src/
-TAGGERPYTHONDIR2=../tools/src/hfst-tagger/src/build_model_src/
+#TAGGERDIR=../tools/src/hfst-tagger/src/.libs/
+#TAGGERPYTHONDIR1=../tools/src/hfst-tagger/src/
+#TAGGERPYTHONDIR2=../tools/src/hfst-tagger/src/build_model_src/
 TWOLCDIR=../tools/src/hfst-twolc/src/.libs/
 
 HFST_LIB=libhfst-23.dll
 DEPENDENCY_DLLS="libgcc_s_dw2-1.dll libstdc++-6.dll"
 SWIG_FILES="_libhfst.pyd libhfst.py"
 
-TAGGER_TOOLS="hfst-open-input-file-for-tagger.exe \
-hfst-build-tagger.exe \
-hfst-train-tagger-system.exe \
-hfst-tag.exe"
+#TAGGER_TOOLS="hfst-open-input-file-for-tagger.exe \
+#hfst-build-tagger.exe \
+#hfst-train-tagger-system.exe \
+#hfst-tag.exe"
 
-TAGGER_PYTHON_FILE1=hfst_tagger_compute_data_statistics.py
-TAGGER_PYTHON_FILE2=tagger_aux.py
+#TAGGER_PYTHON_FILE1=hfst_tagger_compute_data_statistics.py
+#TAGGER_PYTHON_FILE2=tagger_aux.py
 
 TWOLC_TOOLS="htwolcpre1.exe \
 htwolcpre2.exe \
@@ -96,16 +96,16 @@ do
     strip $tool;
 done
 
-for tool in $TAGGER_TOOLS; 
-do
-    cp $TAGGERDIR/$tool .;
-    strip $tool;
-done
+#for tool in $TAGGER_TOOLS; 
+#do
+#    cp $TAGGERDIR/$tool .;
+#    strip $tool;
+#done
 
-cp $TAGGERPYTHONDIR1/$TAGGER_PYTHON_FILE1 .
-cp $TAGGERPYTHONDIR2/$TAGGER_PYTHON_FILE2 .
+#cp $TAGGERPYTHONDIR1/$TAGGER_PYTHON_FILE1 .
+#cp $TAGGERPYTHONDIR2/$TAGGER_PYTHON_FILE2 .
 
-mv hfst-train-tagger-system.exe hfst-train-tagger.exe
+#mv hfst-train-tagger-system.exe hfst-train-tagger.exe
 mv hfst-twolc-system.exe hfst-twolc.exe
 
 for swigfile in $SWIG_FILES;
