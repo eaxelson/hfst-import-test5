@@ -2372,6 +2372,9 @@ HfstTransducer &HfstTransducer::substitute
     (EmptyStringException, 
      "substitute(const StringPair&, HfstTransducer&)");
 
+    HfstTransducer pairTransducer(symbol_pair.first, symbol_pair.second, this->type);
+    this->harmonize(pairTransducer);
+
     bool harm = harmonize_smaller;
     harmonize_smaller=false;
     this->harmonize(transducer);

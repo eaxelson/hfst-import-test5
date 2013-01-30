@@ -159,7 +159,16 @@ REGEXP2: REPLACE
         | SUB1 SUB2 SUB3 {
             StringPair tmp($2, $2);
             HfstTransducer * tmpTr = new HfstTransducer(* $1);
-           
+
+            // to avoid harmonization of SUB1 with SUB3
+            StringSet transducerAlphabet = $3->get_alphabet();
+            for (StringSet::const_iterator s = transducerAlphabet.begin();
+                       s != transducerAlphabet.end();
+                       ++s)
+            {
+                tmpTr->insert_to_alphabet(s->c_str());
+            }
+
            // build Replace transducer
             HfstTransducerPair mappingPair(HfstTransducer($2, $2, hfst::xre::format), *$3);
             HfstTransducerPairVector mappingPairVector;
