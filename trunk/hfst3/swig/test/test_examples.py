@@ -4,7 +4,8 @@ import sys
 
 for file in 'foofile', 'testfile', 'testfile.att', 'testfile.hfst':
     if os.path.exists(file):
-        os.remove(file)
+        pass # doesn't work on MinGW..
+        #os.remove(file)
 
 types = [libhfst.SFST_TYPE, libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYPE]
 
@@ -79,7 +80,7 @@ for type in types:
 # ----------------------------------------
 print("NotTransducerStreamException")
 
-foofile = open('foofile', 'wb')
+foofile = open('foofile', 'w')
 foofile.write('This is a text file.\n'.encode('ascii'))
 foofile.write('Here is another line.\n'.encode('ascii'))
 foofile.write('The file ends here.'.encode('ascii'))
@@ -94,15 +95,15 @@ except: # libhfst.NotTransducerStreamException:
 # ---------------------------------------
 print("NotValidAttFormatException")
 
-testfile_att = open("testfile.att", "wb")
-testfile_att.write("0 1 a b\n".encode('ascii'))
-testfile_att.write("1\n".encode('ascii'))
-testfile_att.write("c\n".encode('ascii'))
+testfile_att = open("testfile.att", "w")
+testfile_att.write('0 1 a b\n'.encode('ascii'))
+testfile_att.write('1\n'.encode('ascii'))
+testfile_att.write('c\n'.encode('ascii'))
 testfile_att.close()
 
 for type in types:
     transducers = []
-    ifile = libhfst.hfst_open("testfile.att", "rb")
+    ifile = libhfst.hfst_open("testfile.att", "r")
     try:
         t = libhfst.HfstTransducer(ifile, type, "epsilon")
         transducers.append(t)
@@ -280,7 +281,7 @@ for type in types:
 
     ## Create a transducer of type \a type as defined in AT&T format in file \a ifile. \a epsilon_symbol defines how epsilons are represented.
 
-testfile_att = open("testfile.att", "wb")
+testfile_att = open("testfile.att", "w")
 testfile_att.write("0      1      foo      bar      0.3\n".encode('ascii'))
 testfile_att.write("1      0.5\n".encode('ascii'))
 testfile_att.write("--\n".encode('ascii'))
@@ -293,7 +294,7 @@ testfile_att.close()
 
 for type in types:
     transducers = []
-    ifile = libhfst.hfst_open("testfile.att", "rb")
+    ifile = libhfst.hfst_open("testfile.att", "r")
     while (True):
         try:
             t = libhfst.HfstTransducer(ifile, type, "<eps>")
@@ -321,7 +322,7 @@ for type in types:
     a_star = libhfst.HfstTransducer("a",type)
     a_star.repeat_star()
     
-    ofile = libhfst.hfst_open("testfile.att", "wb")
+    ofile = libhfst.hfst_open("testfile.att", "w")
     foobar.write_in_att_format(ofile)
     ofile.write("--\n")
     epsilon.write_in_att_format(ofile)
@@ -477,4 +478,4 @@ for type in types:
 
 for file in 'foofile', 'testfile', 'testfile.att', 'testfile.hfst':
     if os.path.exists(file):
-        os.remove(file)
+        pass # os.remove(file) doesn't work on MinGW..
