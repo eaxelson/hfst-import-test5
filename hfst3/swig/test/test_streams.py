@@ -18,18 +18,12 @@ for ttype in (libhfst.SFST_TYPE, libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYP
     ostr.close()
     att_file = libhfst.hfst_open('foo.att', 'w')
 
-    print "#1"
-
     istr = libhfst.HfstInputStream('foo.hfst')
-    
-    print "#2"
 
     transducers_read = 0
     while True:
         try:
-            print "reading.."
             tr = libhfst.HfstTransducer(istr)
-            print "..read"
             transducers_read += 1
             if transducers_read == 1:
                 if not tr.compare(tr1):
@@ -41,9 +35,7 @@ for ttype in (libhfst.SFST_TYPE, libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYP
                     print("ERROR: transducer 2 changed.")
                     remove_generated_files()
                     sys.exit(1)
-            print "writing.."
             tr.write_in_att_format(att_file)
-            print "..wrote"
             if transducers_read < 2:
                 att_file.write('--\n')
         except: # libhfst.EndOfStreamException:
@@ -54,8 +46,6 @@ for ttype in (libhfst.SFST_TYPE, libhfst.TROPICAL_OPENFST_TYPE, libhfst.FOMA_TYP
         remove_generated_files()
         sys.exit(1)
     att_file.close()
-
-    print "HERE"
 
     att_file = libhfst.hfst_open('foo.att', 'r')
     transducers_read = 0
