@@ -80,7 +80,7 @@ for type in types:
 # ----------------------------------------
 print("NotTransducerStreamException")
 
-foofile = open('foofile', 'w')
+foofile = open('foofile', 'wb')
 foofile.write('This is a text file.\n'.encode('ascii'))
 foofile.write('Here is another line.\n'.encode('ascii'))
 foofile.write('The file ends here.'.encode('ascii'))
@@ -95,7 +95,7 @@ except: # libhfst.NotTransducerStreamException:
 # ---------------------------------------
 print("NotValidAttFormatException")
 
-testfile_att = open("testfile.att", "w")
+testfile_att = open("testfile.att", "wb")
 testfile_att.write('0 1 a b\n'.encode('ascii'))
 testfile_att.write('1\n'.encode('ascii'))
 testfile_att.write('c\n'.encode('ascii'))
@@ -281,7 +281,7 @@ for type in types:
 
     ## Create a transducer of type \a type as defined in AT&T format in file \a ifile. \a epsilon_symbol defines how epsilons are represented.
 
-testfile_att = open("testfile.att", "w")
+testfile_att = open("testfile.att", "wb")
 testfile_att.write("0      1      foo      bar      0.3\n".encode('ascii'))
 testfile_att.write("1      0.5\n".encode('ascii'))
 testfile_att.write("--\n".encode('ascii'))
@@ -294,7 +294,7 @@ testfile_att.close()
 
 for type in types:
     transducers = []
-    ifile = libhfst.hfst_open("testfile.att", "r")
+    ifile = libhfst.hfst_open("testfile.att", "rb")
     while (True):
         try:
             t = libhfst.HfstTransducer(ifile, type, "<eps>")

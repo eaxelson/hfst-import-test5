@@ -49,23 +49,20 @@ for s in range(5):
             pass
 
 # Reading a file in non-valid AT&T format
-ofile = open('test.att', 'w')
-ofile.write("0\n".encode('ascii'))
-ofile.write("0\t1\ta\tb\n".encode('ascii'))
-ofile.write("1\t2\tb\n".encode('ascii'))
-ofile.write("2\n".encode('ascii'))
+ofile = open('test.att', 'wb')
+ofile.write("0\n0\t1\ta\tb\n1\t2\tb\n2\n".encode('ascii'))
 ofile.close()
-ifile = open('test.att', 'r') # ERROR On MinGW, using libhfst.hfst_open fails..
+ifile = libhfst.hfst_open('test.att', 'rb') # ERROR On MinGW, using libhfst.hfst_open fails..
 
 try:
     foo = libhfst.HfstBasicTransducer(ifile)
     ifile.close()
-    #os.remove('test.att')
+    os.remove('test.att')
     assert(False)
 except: # libhfst.NotValidAttFormatException:
     assert(libhfst.hfst_get_exception() == "NotValidAttFormatException")
     ifile.close()
-    #os.remove('test.att')
+    os.remove('test.att')
 
   
 print("HfstBasicTransducer: symbol handling")
