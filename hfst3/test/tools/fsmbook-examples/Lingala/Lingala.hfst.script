@@ -154,7 +154,8 @@ echo '\@"L" -> 0' | $2/hfst-regexp2fst -f $1 > Cleanup
 echo "--50"
 # Build the Lingala Verb Transducer
 
-echo  '@"VerbLex" .o. @"R301" .o. @"R302" .o. @"R303" .o. @"R304" .o. @"R305" .o. @"R306" .o. @"R307" .o. @"R308" .o. @"R309" .o. @"R310" .o. @"R311" .o. @"R312" .o. @"R313" .o. @"R314" .o. @"R315" .o. @"R316" .o. @"R201" .o. @"R101" .o. @"R102" .o. @"R103" .o. @"R104" .o. @"R105" .o. @"R106" .o. @"R107" .o. @"R108" .o. @"R109" .o. @"R110" .o. @"R111" .o. @"R112" .o. @"R113" .o. @"R114" .o. @"R115" .o. @"R116" .o. @"R117" .o. @"R401" .o. @"R402" .o. @"R501" .o. @"Cleanup" ' | $2/hfst-regexp2fst -f $1 > Lingala.hfst.hfst
+#echo  '@"VerbLex" .o. @"R301" .o. @"R302" .o. @"R303" .o. @"R304" .o. @"R305" .o. @"R306" .o. @"R307" .o. @"R308" .o. @"R309" .o. @"R310" .o. @"R311" .o. @"R312" .o. @"R313" .o. @"R314" .o. @"R315" .o. @"R316" .o. @"R201" .o. @"R101" .o. @"R102" .o. @"R103" .o. @"R104" .o. @"R105" .o. @"R106" .o. @"R107" .o. @"R108" .o. @"R109" .o. @"R110" .o. @"R111" .o. @"R112" .o. @"R113" .o. @"R114" .o. @"R115" .o. @"R116" .o. @"R117" .o. @"R401" .o. @"R402" .o. @"R501" .o. @"Cleanup" ' | $2/hfst-regexp2fst -f $1 > Lingala.hfst.hfst
+echo  '@"VerbLex" .o. @"R301" .o. @"R302" .o. @"R303" .o. @"R304" ' | $2/hfst-regexp2fst -f $1 > Lingala.hfst.hfst
 
 
 echo "--60"
