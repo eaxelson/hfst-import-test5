@@ -31,7 +31,7 @@ echo '[@"MSV" | @"SSV"]' | $2/hfst-regexp2fst -f $1 > SV                        
 echo '[@"USV" | @"SV"] ' | $2/hfst-regexp2fst -f $1 > V                               # Vowel
 
 echo '[@"V" | @"C"]' | $2/hfst-regexp2fst -f $1 > P                                   # Phone
-echo '[[\@"P"+] | .#.]' | $2/hfst-regexp2fst -f $1 > B                             # Boundary
+echo '[[\@"P"+] | .#. ]' | $2/hfst-regexp2fst -f $1 > B                             # Boundary
 
 echo '.#. | "."' | $2/hfst-regexp2fst -f $1 > E                                 # Edge
 echo '[~$"." "." ~$"."]' | $2/hfst-regexp2fst -f $1 > SB                        # At most one syllable boundary

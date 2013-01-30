@@ -163,20 +163,23 @@ namespace hfst
           HfstTransducer retval(t);
           retval.input_project().minimize();
 
-          //printf("retval: \n");
-          //retval.write_in_att_format(stdout, 1);
+//printf("input projectt: \n");
+//retval.write_in_att_format(stdout, 1);
 
           HfstTransducer tmp(retval);
 
           tmp.compose(Constraint).minimize();
-          //printf("first composition \n");
-          //tmp.write_in_att_format(stdout, 1);
+//printf("first composition \n");
+//tmp.write_in_att_format(stdout, 1);
           tmp.compose(retval).minimize();
-          //printf("tmp: \n");
-          //tmp.write_in_att_format(stdout, 1);
+
 
           tmp.output_project().minimize();
+//printf("tmp: \n");
+//tmp.write_in_att_format(stdout, 1);
           retval.subtract(tmp).minimize();
+//printf("after subtract \n");
+//retval.write_in_att_format(stdout, 1);
 
           retval.compose(t).minimize();
 
@@ -368,73 +371,65 @@ namespace hfst
           //mappingPairVector[0].second.write_in_att_format(stdout, 1);
 
 
-
-        HfstTransducer mapping(type);
-          for ( unsigned int i = 0; i < mappingPairVector.size(); i++ )
-          {
-
-              //mappingPairVector[0].first.substitute(StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@"), StringPair(markupMarker, markupMarker) ).minimize();
-
-              HfstTransducer oneMappingPair(mappingPairVector[i].first);
-
-
-
-              // if it is markup rule, substitute epsilon in left mapping with marker
-              if ( mappingPairVector[i].second.get_property("isMarkup") == "yes" )
-                  oneMappingPair.substitute(StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@"), StringPair(markupMarker, markupMarker) ).minimize();
-
-
-              oneMappingPair.cross_product(mappingPairVector[i].second);
-
-
-            // if it is mark up rule
-            if ( mappingPairVector[i].second.get_property("isMarkup") == "yes" )
+            HfstTransducer mapping(type);
+            for ( unsigned int i = 0; i < mappingPairVector.size(); i++ )
             {
-                HfstTransducer identityPairTmp = HfstTransducer::identity_pair( type );
-                identityPairTmp.insert_to_alphabet(markupMarker);
+                //mappingPairVector[0].first.substitute(StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@"), StringPair(markupMarker, markupMarker) ).minimize();
 
-                // remove relations from the cross product
-                HfstTransducer tmpForIntersect(identityPairTmp);
-                HfstTransducer markupMarkToUnknown(markupMarker, "@_UNKNOWN_SYMBOL_@", TOK, type);
-                tmpForIntersect.disjunct(markupMarkToUnknown);
-                tmpForIntersect.repeat_star().minimize();
-                oneMappingPair.intersect(tmpForIntersect).minimize();
+                HfstTransducer oneMappingPair(mappingPairVector[i].first);
+            //oneMappingPair.insert_to_alphabet("x");
 
-                // replace temporary mark-up marker back to epsilons
-                HfstTransducer tmpForCompose("@_EPSILON_SYMBOL_@", markupMarker, TOK, type);
-                tmpForCompose.disjunct(identityPairTmp).repeat_star().minimize();
-                tmpForCompose.compose(oneMappingPair);
-                oneMappingPair = tmpForCompose;
-                oneMappingPair.remove_from_alphabet(markupMarker);
-            }
-              if ( i == 0 )
-              {
+                // if it is markup rule, substitute epsilon in left mapping with marker
+                if ( mappingPairVector[i].second.get_property("isMarkup") == "yes" )
+                {
+                    oneMappingPair.substitute(StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@"), StringPair(markupMarker, markupMarker) ).minimize();
+                }
+
+                oneMappingPair.cross_product(mappingPairVector[i].second);
+
+                // if it is mark up rule
+                if ( mappingPairVector[i].second.get_property("isMarkup") == "yes" )
+                {
+                    HfstTransducer identityPairTmp = HfstTransducer::identity_pair( type );
+                    identityPairTmp.insert_to_alphabet(markupMarker);
+
+                    // remove relations from the cross product
+                    HfstTransducer tmpForIntersect(identityPairTmp);
+                    HfstTransducer markupMarkToUnknown(markupMarker, "@_UNKNOWN_SYMBOL_@", TOK, type);
+                    tmpForIntersect.disjunct(markupMarkToUnknown);
+                    tmpForIntersect.repeat_star().minimize();
+                    oneMappingPair.intersect(tmpForIntersect).minimize();
+
+                    // replace temporary mark-up marker back to epsilons
+                    HfstTransducer tmpForCompose("@_EPSILON_SYMBOL_@", markupMarker, TOK, type);
+                    tmpForCompose.disjunct(identityPairTmp).repeat_star().minimize();
+                    tmpForCompose.compose(oneMappingPair);
+                    oneMappingPair = tmpForCompose;
+                    oneMappingPair.remove_from_alphabet(markupMarker);
+                }
+                if ( i == 0 )
+                {
                   mapping = oneMappingPair;
-              }
-              else
-              {
+                }
+                else
+                {
                   mapping.disjunct(oneMappingPair).minimize();
-              }
-          }
+                }
+            }
 
 
-          //printf("mapping all after cross product \n");
-          //mapping.write_in_att_format(stdout, 1);
-
-
-          // needed in case of ? -> x replacement
-          mapping.insert_to_alphabet(leftMarker);
-          mapping.insert_to_alphabet(rightMarker);
-          mapping.insert_to_alphabet(tmpMarker);
-
+            //printf("mapping all after cross product \n");
+            //mapping.write_in_att_format(stdout, 1);
+            // needed in case of ? -> x replacement
+            mapping.insert_to_alphabet(leftMarker);
+            mapping.insert_to_alphabet(rightMarker);
+            mapping.insert_to_alphabet(tmpMarker);
 
           HfstTransducer leftBracket(leftMarker, TOK, type);
           HfstTransducer rightBracket(rightMarker, TOK, type);
           HfstTransducer leftBracket2(leftMarker2, TOK, type);
           HfstTransducer rightBracket2(rightMarker2, TOK, type);
           HfstTransducer tmpBracket(tmpMarker, TOK, type);
-
-
 
           // Surround mapping with brackets
           HfstTransducer tmpMapping(leftBracket);
@@ -445,42 +440,47 @@ namespace hfst
           //printf("mappingWithBrackets: \n");
           //mappingWithBrackets.minimize().write_in_att_format(stdout, 1);
 
-          // Identity pair
-          HfstTransducer identityPair = HfstTransducer::identity_pair( type );
-
-
-        HfstTransducer empty(type);
-          // for non-optional replacements
-          if ( optional != true )
-          {
-              // non - optional
-              // mapping = <a:b> u <2a:a>2
-
-              // needed in case of ? -> x replacement
-              //mapping.insert_to_alphabet(leftMarker2);
-              //mapping.insert_to_alphabet(rightMarker2);
-
-              HfstTransducer mappingWithBrackets2(leftBracket2);
-              // TODO replace rules when left part of relation is empty language
-
-              HfstTransducer leftMappingUnion(mappingPairVector[0].first);
-            for ( unsigned int i = 1; i < mappingPairVector.size(); i++ )
+            // Identity pair
+            HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+            // for non-optional replacements
+            if ( optional != true )
             {
-            //    if ( empty.compare(mappingPairVector[i].first) )
-            //        continue;
-                leftMappingUnion.disjunct(mappingPairVector[i].first).minimize();
-            }
+                // non - optional
+                // mapping = <a:b> u <2a:a>2
 
-            mappingWithBrackets2.concatenate(leftMappingUnion).concatenate(rightBracket2).minimize();
+                HfstTransducer mappingWithBrackets2(leftBracket2);
+                HfstTransducer leftMappingUnion(type);
+                leftMappingUnion = mappingPairVector[0].first;
+                for ( unsigned int i = 1; i < mappingPairVector.size(); i++ )
+                {
+                    leftMappingUnion.disjunct(mappingPairVector[i].first).minimize();
+                }
+                // needed in case of ? -> x replacement
+                leftMappingUnion.insert_to_alphabet(leftMarker2);
+                leftMappingUnion.insert_to_alphabet(rightMarker2);
+                leftMappingUnion.insert_to_alphabet(leftMarker);
+                leftMappingUnion.insert_to_alphabet(rightMarker);
+                leftMappingUnion.insert_to_alphabet(tmpMarker);
 
-              // mappingWithBrackets...... expanded
-              mappingWithBrackets.disjunct(mappingWithBrackets2).minimize();
+                //printf("leftMappingUnion: \n");
+                //leftMappingUnion.minimize().write_in_att_format(stdout, 1);
+
+
+                mappingWithBrackets2.concatenate(leftMappingUnion).concatenate(rightBracket2).minimize();
+
+                //printf("mappingWithBrackets2: \n");
+                //mappingWithBrackets2.minimize().write_in_att_format(stdout, 1);
+
+                  // mappingWithBrackets...... expanded
+                mappingWithBrackets.insert_to_alphabet(leftMarker2);
+                mappingWithBrackets.insert_to_alphabet(rightMarker2);
+                //mappingWithBrackets.insert_to_alphabet(leftMarker);
+                //mappingWithBrackets.insert_to_alphabet(rightMarker);
+                mappingWithBrackets.disjunct(mappingWithBrackets2).minimize();
           }
 
           //printf("mappingWithBrackets: \n");
           //mappingWithBrackets.minimize().write_in_att_format(stdout, 1);
-
-
 
 
           // Identity with bracketed mapping and marker symbols and TmpMarker in alphabet
@@ -496,28 +496,20 @@ namespace hfst
               identityExpanded.insert_to_alphabet(leftMarker2);
               identityExpanded.insert_to_alphabet(rightMarker2);
           }
+
           identityExpanded.disjunct(mappingWithBrackets).minimize();
           identityExpanded.repeat_star().minimize();
 
-          //printf("identityExpanded: \n");
-          //identityExpanded.write_in_att_format(stdout, 1);
-
-
-      // when there aren't any contexts, result is identityExpanded
+          // when there aren't any contexts, result is identityExpanded
           if ( ContextVector.size() == 1 )
           {
               HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
               if ( ContextVector[0].first.compare(epsilon) && ContextVector[0].second.compare(epsilon) )
               {
-                  //printf("context 1.1 je 0\n");
                   identityExpanded.remove_from_alphabet(tmpMarker);
                   return identityExpanded;
               }
-
-
           }
-
-
 
 
           // Surround mapping with tmp boudaries
@@ -684,16 +676,24 @@ namespace hfst
                   // needed in case of ? -> x replacement
                 mapping.insert_to_alphabet(leftMarker2);
                 mapping.insert_to_alphabet(rightMarker2);
+                mappingWithBrackets.insert_to_alphabet(leftMarker2);
+                mappingWithBrackets.insert_to_alphabet(rightMarker2);
+
 
                   HfstTransducer mappingProject(mapping);
                   mappingProject.input_project().minimize();
 
                   HfstTransducer mappingWithBracketsNonOptional(leftBracket2);
+                  // needed in case of ? -> x replacement
+              //    mappingWithBracketsNonOptional.insert_to_alphabet(leftMarker2);
+              //    mappingWithBracketsNonOptional.insert_to_alphabet(rightMarker2);
+
                   mappingWithBracketsNonOptional.concatenate(mappingProject).
                                                   concatenate(rightBracket2).
                                                   minimize();
                   // mappingWithBrackets...... expanded
                   mappingWithBrackets.disjunct(mappingWithBracketsNonOptional).minimize();
+
               }
 
               identityExpanded.disjunct(mappingWithBrackets).minimize();
@@ -1524,7 +1524,7 @@ namespace hfst
           repeatingPart.concatenate(identityStar).minimize();
           repeatingPart.repeat_plus().minimize();
           //printf("middlePart: \n");
-          //middlePart.write_in_att_format(stdout, 1);
+          //repeatingPart.write_in_att_format(stdout, 1);
 
 
 
@@ -1660,6 +1660,10 @@ namespace hfst
           // tmp = t.1 .o. Constr .o. t.1
           // (t.1 - tmp.2) .o. t
 
+          //printf("...Constraint: \n");
+          //Constraint.write_in_att_format(stdout, 1);
+
+
           HfstTransducer retval(type);
           retval = constraintComposition(t, Constraint);
 
@@ -1686,6 +1690,7 @@ namespace hfst
             HfstTokenizer TOK;
             TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
             TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
+            TOK.add_multichar_symbol("@_TMP_UNKNOWN_@");
             ImplementationType type = t.get_type();
 
             String boundaryMarker(".#.");
@@ -1718,7 +1723,8 @@ namespace hfst
                   .repeat_star()
                   .minimize();
 
-
+            //printf("retval .o. t: \n");
+            //retval.write_in_att_format(stdout, 1);
             // [.#.:0 | ? - .#.]*
             HfstTransducer boundaryToZero(boundaryMarker, "@_EPSILON_SYMBOL_@", TOK, type);
             HfstTransducer removeBoundary(boundaryToZero);
@@ -1727,16 +1733,19 @@ namespace hfst
                .repeat_star()
                .minimize();
 
-            //printf("tr : \n");
-            //t.write_in_att_format(stdout, 1);
-
             // apply boundary to the transducer
             // compose [0:.#. | ? - .#.]* .o. t
-            retval.compose(t)
-                .minimize();
+            HfstTransducer tr(t);
+            // substitutute unknowns with tmp symbol
+            // this is necessary because of first composition
+            tr.substitute("@_UNKNOWN_SYMBOL_@", "@_TMP_UNKNOWN_@");
 
-                //printf("after compose 1: \n");
-                //retval.write_in_att_format(stdout, 1);
+            retval.compose(tr).minimize();
+            //printf("tr: \n");
+            //tr.write_in_att_format(stdout, 1);
+            //printf("after compose 1: \n");
+            //retval.write_in_att_format(stdout, 1);
+
 
             // compose with .#. (? - .#.)* .#.
             retval.compose(boundaryAnythingBoundary)
@@ -1748,10 +1757,13 @@ namespace hfst
             //printf("after compose 3: \n");
             //retval.write_in_att_format(stdout, 1);
 
+            // bring back unknown symbols
+            retval.substitute("@_TMP_UNKNOWN_@", "@_UNKNOWN_SYMBOL_@");
+            retval.remove_from_alphabet("@_TMP_UNKNOWN_@");
+
             // remove boundary from alphabet
             retval.remove_from_alphabet(boundaryMarker);
             return retval;
-
         }
 
 
@@ -1962,30 +1974,38 @@ namespace hfst
 
           HfstTransducer retval( bracketedReplace(rule, optional) );
 
-          //printf("bracketed replace done: \n");
-          //retval.write_in_att_format(stdout, 1);
+//printf("---bracketed replace done---: \n");
+//retval.minimize().write_in_att_format(stdout, 1);
 
           // for epenthesis rules
           // it can't have more than one epsilon repetition in a row
 
           retval = noRepetitionConstraint( retval );
 
-          //printf("noRepetitionConstraint: \n");
-          //retval.write_in_att_format(stdout, 1);
+//printf("-----noRepetitionConstraint-----: \n");
+//retval.write_in_att_format(stdout, 1);
 
           // deals with boundary symbol, must be before mostBracketsStarConstraint
-          retval = applyBoundaryMark( retval );
+          // TODO: this constraint doesn't work for ? -> x
+              // because first composition composes 0:.#. .o. U:x
+         retval = applyBoundaryMark( retval );
 
+//printf("----after applyBoundaryMark: ----\n");
+//retval.write_in_att_format(stdout, 1);
           if ( !optional )
           {
+
+              //printf(" ----------  mostBracketsStarConstraint --------------\n");
               // Epenthesis rules behave differently if used mostBracketsPlusConstraint
               //retval = mostBracketsPlusConstraint(retval);
               retval = mostBracketsStarConstraint(retval);
+//printf("after non optional: \n");
+//retval.write_in_att_format(stdout, 1);
           }
           retval = removeB2Constraint(retval);
           retval = removeMarkers( retval );
-          //printf("after boundary: \n");
-          //retval.write_in_att_format(stdout, 1);
+//printf("after removeMarkers: \n");
+//retval.write_in_att_format(stdout, 1);
           return retval;
       }
 
@@ -2002,9 +2022,6 @@ namespace hfst
             {
                 retval = parallelBracketedReplace(ruleVector, optional);
             }
-            //printf("replace tr: \n");
-            //retval.write_in_att_format(stdout, 1);
-
 
             // for epenthesis rules
             // it can't have more than one epsilon repetition in a row
@@ -2713,8 +2730,11 @@ int main(int argc, char * argv[])
 
             test1b( types[i]);
 
-            // ? -> a
-            //test1c( types[i]);
+            // ? -> a it doesn't work because of apply boundary thing
+            test1c( types[i]);
+
+            // a -> b || .#. _ ;
+            test1d( types[i]);
 
             // a+ -> x  a_a
             // also @-> and @>
@@ -2758,9 +2778,11 @@ int main(int argc, char * argv[])
             test7c( types[i] );
             // 0 .o. [ [. 0 .] -> a \/ _ b a , a b _ ,, [. 0 .] -> b \/ a _ a ]
             test7d( types[i] );
+            // ? -> x , a -> b
+            test7e( types[i] );
 
             // TODO
-            // markup paraller rules
+            // markup parallel rules
             //test7e( types[i] );
 
             // a -> b, b -> a
