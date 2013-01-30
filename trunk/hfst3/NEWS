@@ -5,6 +5,22 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.4.3
+---------------------------
+
+* Better support for compilation on Cygwin.
+
+* Tool hfst-prune-alphabet added.
+
+* A function 'hfst_get_exception()' added to the swig interface that
+  can be used to handle exceptions on Python 3.
+
+* Bugfixes in hfst-info, hfst-twolc, hfst-regexp2fst and tagger tools.
+
+* Flag diacritic harmonization problem fixed, now identity and
+  unknown symbols are not expanded by flag diacritics.
+
+
 Noteworthy changes in 3.4.2
 ---------------------------
 
@@ -378,4 +394,3 @@ Noteworthy changes in release 2.1
 ---------------------------------
 
 * hfst-twolc and hfst-compose-intersect understand # like xerox originals
-

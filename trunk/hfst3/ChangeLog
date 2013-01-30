@@ -1,3 +1,351 @@
+2013-01-30 12:26  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRulesTest.cc,
+	  libhfst/src/parsers/xre_parse.yy,
+	  test/tools/fsmbook-examples/FinnishOTProsody/FinnishOTProsody.hfst.script,
+	  test/tools/fsmbook-examples/FinnishOTProsody/Makefile.am,
+	  test/tools/fsmbook-examples/Lingala/Lingala.hfst.script: Prune
+	  alphabet added to regexp, also ? -> x rules fixed
+
+2013-01-30 11:34  eaxelson
+
+	* swig/test/test_examples.py,
+	  swig/test/test_hfst_basic_transducer.py,
+	  swig/test/test_streams.py: Added a couple of fixes to swig tests.
+
+2013-01-30 08:29  eaxelson
+
+	* swig/test/test_examples.py,
+	  swig/test/test_hfst_basic_transducer.py,
+	  swig/test/test_streams.py: Now tests pass on MinGW, file handling
+	  still has some problems.
+
+2013-01-28 15:23  eaxelson
+
+	* NSIS/copy_files.sh, NSIS/hfst_installer.nsi: Updated NSIS
+	  installer files.
+
+2013-01-28 14:27  eaxelson
+
+	* configure.ac, test/tools/hfst-check-help.sh,
+	  test/tools/hfst-check-version.sh: Disabled tagger tools if HFST
+	  is compiled on MinGW. They are also skipped in tool tests.
+
+2013-01-28 11:06  eaxelson
+
+	* check_installation/copy-tool-tests.sh,
+	  check_installation/test-hfst-twolc.sh,
+	  check_installation/test-hfst-xfst.sh: Added tests for hfst-xfst
+	  and hfst-twolc in installation tests.
+
+2013-01-28 10:07  eaxelson
+
+	* back-ends/foma/Makefile.am: Added 'AUTOMAKE_OPTIONS=std-options'
+	  to foma Makefile so that foma wrapper gets installed right on
+	  Cygwin.
+
+2013-01-26 10:47  moshagen
+
+	* scripts: Ignore generated files.
+
+2013-01-25 12:56  eaxelson
+
+	* README, back-ends/Makefile.am, back-ends/foma/Makefile.am,
+	  configure.ac, libhfst/src/Makefile.am,
+	  libhfst/src/implementations/Makefile.am,
+	  libhfst/src/parsers/Makefile.am, test/libhfst/Makefile.am,
+	  tools/src/Makefile.am, tools/src/hfst-proc/Makefile.am,
+	  tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-twolc/src/Makefile.am: Renamed option
+	  --enable-windows as --enable-mingw.
+
+2013-01-25 09:05  eaxelson
+
+	* back-ends/foma/Makefile.am, configure.ac: Edited configure.ac so
+	  that setting executable mode on script files should finally work.
+	  Added missing windows conditional to foma Makefile.
+
+2013-01-24 12:49  sdrobac
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/parsers/xre_lex.ll, libhfst/src/parsers/xre_parse.yy,
+	  test/tools/fsmbook-examples/FinnishOTProsody/Makefile.am,
+	  tools/src/hfst-prune-alphabet.cc: Prune alphabet changed for
+	  easier use in parser
+
+2013-01-24 11:35  eaxelson
+
+	* scripts/Makefile.am, scripts/hfst-foma-wrapper-loc.sh,
+	  scripts/hfst-xfst-loc, test/tools/Makefile.am,
+	  test/tools/xfst-functionality.sh: Removed local versions of
+	  hfst-xfst as well as hfst-xfst tests.
+
+2013-01-24 11:09  eaxelson
+
+	* configure.ac, scripts/Makefile.am: Setting executable mode on
+	  scripts.
+
+2013-01-24 10:07  eaxelson
+
+	* test/tools/Makefile.am: Fixed a typo in Makefile.am.
+
+2013-01-23 16:02  eaxelson
+
+	* check_installation/copy-tool-tests.sh,
+	  scripts/hfst-foma-wrapper-loc.sh, test/tools/Makefile.am: Fixed a
+	  bug in foma wrapper. Also added missing test file to EXTRA_DIST.
+
+2013-01-23 14:15  eaxelson
+
+	* configure.ac: Set executable mode on scripts.
+
+2013-01-23 13:35  eaxelson
+
+	* configure.ac, scripts/Makefile.am,
+	  scripts/hfst-foma-wrapper-loc.sh, scripts/hfst-xfst,
+	  scripts/hfst-xfst-loc, scripts/hfst-xfst.in,
+	  test/tools/xfst-functionality.sh: Made a local version of
+	  hfst-xfst that is used in tests.
+
+2013-01-23 12:31  eaxelson
+
+	* tools/src: Ignored *.exe files.
+
+2013-01-23 11:41  eaxelson
+
+	* test/tools/fsmbook-examples/BetterColaMachine,
+	  test/tools/fsmbook-examples/FinnishOTProsody,
+	  test/tools/fsmbook-examples/FinnishProsody,
+	  test/tools/fsmbook-examples/Palindromes,
+	  test/tools/fsmbook-examples/Palindromes/Makefile.am,
+	  test/tools/fsmbook-examples/PlusOrMinus: Ignore generated files.
+
+2013-01-23 11:04  eaxelson
+
+	* test/tools/Makefile.am, test/tools/permutate-file-params.sh,
+	  test/tools/script.xfst, test/tools/xfst-functionality.sh,
+	  tools/src/hfst-compose-intersect.cc: Added a test for hfst-xfst.
+	  Modified permutate-file-params.sh so that it doesn't use curly
+	  braces which are not expanded correctly on all environments. Also
+	  modified hfst-compose-intersect.cc so that it doesn't use dollar
+	  signs when specifying how strings are printed as they don't work
+	  on Cygwin.
+
+2013-01-23 09:12  eaxelson
+
+	* swig/test/test_constructors.py, swig/test/test_examples.py,
+	  swig/test/test_hfst_basic_transducer.py,
+	  swig/test/test_std_streams.py, swig/test/test_streams.py,
+	  swig/test/test_tokenizer.py,
+	  swig/test/test_transducer_functions.py: Now swig tests use
+	  libhfst.hfst_get_exception() instead of catching HFST exception
+	  classes. This should make the tests compatible with python 3
+	  where catching exceptions that do not inherit from BaseException
+	  is not allowed.
+
+2013-01-23 08:38  eaxelson
+
+	* configure.ac, test/tools/Makefile.am: Disabled fsmbook tests from
+	  'make check' by default (enable with --enable-fsmbook-tests)
+	  because they currently depend on foma command line tool.
+
+2013-01-22 15:57  moshagen
+
+	* tools/src: Ignore generated binary.
+
+2013-01-22 10:56  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  tools/src/hfst-prune-alphabet.cc: Added function
+	  HfstTransducer::prune_alphabet which is also used in the tool
+	  hfst-prune-alphabet.
+
+2013-01-21 10:39  mpsilfve
+
+	* libhfst/src/HfstTransducer.cc: Added filtering to
+	  harmonize_flag_diacritics. It will filter out superfluous flag
+	  diacritic paths, which are created during harmonization.
+
+2013-01-18 14:33  mpsilfve
+
+	* libhfst/src/HfstTransducer.cc: Prevented foma from harmonizing
+	  id- and unk-symbols with flag diacritics in insert_freely.
+
+2013-01-18 11:45  eaxelson
+
+	* test/tools/fsmbook-examples/FinnishProsody/Makefile.am: Removed
+	  'words.txt' from EXTRA_DIST as it is not found in svn repository
+	  and make check passes without it.
+
+2013-01-18 11:40  eaxelson
+
+	* libhfst/src/HfstExceptionDefs.cc,
+	  libhfst/src/HfstExceptionDefs.h, swig/libhfst.i: Added a function
+	  'std::string hfst_get_exception()' that can be used to get the
+	  name of the latest exception thrown by HFST library. This is
+	  useful if the version of Python used does not support catching
+	  exceptions that do not inherit from BaseException.
+
+2013-01-18 10:14  mpsilfve
+
+	* libhfst/src/HfstTransducer.cc: Making sure that flag diacritics
+	  are added to the alphabets of both arguments in harmonize and
+	  harmonize_
+
+2013-01-18 09:15  mpsilfve
+
+	* libhfst/src/HfstTransducer.cc: Changed id- and unk-symbols
+	  harmonization so that flag diacritics are no longer harmonized.
+
+2013-01-17 23:29  mpsilfve
+
+	* libhfst/src/HfstTransducer.cc: Fixed a bug in flag diacritic
+	  harmonization yet again. This time actually using the parameter
+	  bool harmonize in freely_insert.
+
+2013-01-17 14:55  mpsilfve
+
+	* tools/src/hfst-twolc/src/htwolcpre3.yy,
+	  tools/src/hfst-twolc/src/rule_src/OtherSymbolTransducer.cc,
+	  tools/src/hfst-twolc/src/rule_src/OtherSymbolTransducer.h,
+	  tools/src/hfst-twolc/src/rule_src/Rule.cc: Fixed problem which
+	  resulted from changing the insert_freely-function in the library.
+
+2013-01-17 14:26  mpsilfve
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h:
+	  Re-fixed flag diacritic harmonization problem, where identity and
+	  unknown symbols were expanded by flag diacritics. To prevent
+	  expansion in this case, I added a bool parameter harmonize to the
+	  insert_freely library function.
+
+2013-01-16 18:21  eaxelson
+
+	* configure.ac: Now configure gives warning on missing hfst-xfst
+	  correctly.
+
+2013-01-16 14:38  eaxelson
+
+	* configure.ac, libhfst/src/implementations/HfstTransitionGraph.h,
+	  test/tools/Makefile.am, test/tools/non_prunable_alphabet_1.txt,
+	  test/tools/non_prunable_alphabet_2.txt,
+	  test/tools/prunable_alphabet.txt,
+	  test/tools/prune-alphabet-functionality.sh,
+	  tools/src/Makefile.am, tools/src/hfst-prune-alphabet.cc: Added a
+	  new tool, hfst-prune-alphabet. Also added a new bool parameter to
+	  HfstTransitionGraph::prune_alphabet.
+
+2013-01-16 10:16  eaxelson
+
+	* tools/src/hfst-tagger/src/use_model_src/AcyclicAutomaton.cc:
+	  Changed variable name 'infinity' to 'infinity_' to avoid
+	  compilation error on Cygwin.
+
+2013-01-14 15:32  mpsilfve
+
+	* tools/src/hfst-twolc/src/commandline_src/CommandLine.cc,
+	  tools/src/hfst-twolc/src/commandline_src/CommandLine.h,
+	  tools/src/hfst-twolc/src/htwolcpre3.yy: Added -D switch to enable
+	  reading from file in htwolcpre2 and htwolcpre3 (for debug
+	  purposes).
+
+2013-01-11 15:57  eaxelson
+
+	* configure.ac, test/tools/hfst-check-help.sh,
+	  test/tools/hfst-check-version.sh,
+	  tools/src/hfst-tagger/src/hfst-build-tagger.cc,
+	  tools/src/hfst-tagger/src/hfst-open-input-file-for-tagger.cc,
+	  tools/src/hfst-tagger/src/hfst-tag.cc,
+	  tools/src/hfst-tagger/src/hfst_tagger_compute_data_statistics.py,
+	  tools/src/hfst-twolc/src/commandline_src/CommandLine.cc: Now
+	  tagger and twolc tools also pass version and help checks.
+
+2013-01-11 10:42  eaxelson
+
+	* libhfst/src/parsers/LexcCompiler.h: Added a missing <cstdio>
+	  header that caused an error on cygwin (FILE was not defined).
+
+2013-01-11 07:27  moshagen
+
+	* test/tools/fsmbook-examples/FinnishProsody: Ignore generated
+	  files.
+
+2013-01-11 07:26  moshagen
+
+	* test/tools/fsmbook-examples/Lingala,
+	  test/tools/fsmbook-examples/Palindromes,
+	  test/tools/fsmbook-examples/PlusOrMinus: Ignore generated files.
+
+2013-01-10 16:02  eaxelson
+
+	* README, back-ends/Makefile.am, back-ends/dlfcn/Makefile.am,
+	  back-ends/openfstwin/src/lib/Makefile.am: Now all back-end files
+	  are included in the distribution package.
+
+2013-01-10 16:00  sdrobac
+
+	* configure.ac,
+	  test/tools/fsmbook-examples/FinnishProsody/FinnishProsody.hfst.script,
+	  test/tools/fsmbook-examples/FinnishProsody/Makefile.am,
+	  test/tools/fsmbook-examples/FinnishProsody/expected_result.strings,
+	  test/tools/fsmbook-examples/FinnishProsody/test.script,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/finnish-prosody-test.sh: Fsm-book
+	  test FinnishProsody
+
+2013-01-10 14:23  sdrobac
+
+	* configure.ac, test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/Palindromes/Makefile.am,
+	  test/tools/fsmbook-examples/Palindromes/test.script,
+	  test/tools/fsmbook-examples/palindromes.sh: Fsm-book test
+	  Palindromes updated
+
+2013-01-10 14:05  eaxelson
+
+	* back-ends/Makefile.am, back-ends/dlfcn/Makefile.am,
+	  back-ends/openfstwin/src/Makefile.am: All back-end directories
+	  are now included in the distribution package.
+
+2013-01-10 13:20  sdrobac
+
+	* configure.ac, libhfst/src/parsers/xre_lex.ll,
+	  libhfst/src/parsers/xre_parse.yy,
+	  test/tools/fsmbook-examples/Lingala/Lingala.hfst.script,
+	  test/tools/fsmbook-examples/Lingala/Lingala.xfst.script,
+	  test/tools/fsmbook-examples/Lingala/Makefile.am,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/PlusOrMinus/Makefile.am,
+	  test/tools/fsmbook-examples/PlusOrMinus/PlusOrMinus.hfst.script,
+	  test/tools/fsmbook-examples/PlusOrMinus/PlusOrMinus.xfst.att,
+	  test/tools/fsmbook-examples/PlusOrMinus/PlusOrMinus.xfst.script,
+	  test/tools/fsmbook-examples/PlusOrMinus/README,
+	  test/tools/fsmbook-examples/PlusOrMinus/test.script,
+	  test/tools/fsmbook-examples/plus-or-minus.sh: Added PlusOrMinus
+	  fsm-book test
+
+2013-01-09 16:01  eaxelson
+
+	* README, test/tools/hfst-check-help.sh,
+	  test/tools/hfst-check-version.sh, tools/src/hfst-info.cc: Updated
+	  README. Fixed hfst-info so that it passes version and help
+	  checks.
+
+2013-01-08 15:22  eaxelson
+
+	* swig/README, swig/libhfst.i: Changed the order of paragraphs in
+	  README. Added a todo comment about XreCompiler.compiler
+	  conflicting with a built-in name 'compile' in python.
+
+2013-01-08 10:39  eaxelson
+
+	* README: Updated README.
+
+2013-01-07 11:36  eaxelson
+
+	* ChangeLog, NEWS, configure.ac, libhfst/src/Makefile.am: Ready for
+	  release 3.4.2.
+
 2013-01-04 11:12  eaxelson
 
 	* back-ends/foma/Makefile.am, configure.ac: Now -lncurses is used
