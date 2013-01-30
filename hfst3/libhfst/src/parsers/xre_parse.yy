@@ -416,17 +416,22 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
       | REPLACE CENTER_MARKER
          {
            // std::cerr << "Mapping: \n" << *$1  << std::endl;
-            
+            HfstTransducer t1(*$1);
+            t1.prune_alphabet(false);
+
             HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
             
            // std::cerr << "Epsilon: \n" << epsilon  << std::endl;
-            $$ = new HfstTransducerPair(*$1, epsilon);
+            $$ = new HfstTransducerPair(t1, epsilon);
             delete $1; 
          }
       | CENTER_MARKER REPLACE
          {
+            HfstTransducer t1(*$2);
+            t1.prune_alphabet(false);
+             
             HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
-            $$ = new HfstTransducerPair(epsilon, *$2);
+            $$ = new HfstTransducerPair(epsilon, t1);
             delete $2; 
          }
       ;
@@ -576,7 +581,7 @@ REGEXP5: REGEXP6 { }
         }
        | REGEXP5 INTERSECTION REGEXP6 {
         // std::cerr << "Intersection: \n"  << std::endl;
-            $$ = & $1->intersect(*$3).prune_alphabet(false);
+            $$ = & $1->intersect(*$3).minimize().prune_alphabet(false);
             delete $3;
         }
        | REGEXP5 MINUS REGEXP6 {
@@ -730,7 +735,7 @@ REGEXP10: REGEXP11 { }
                                         hfst::internal_identity,
                                         hfst::xre::format);
             $$ = & ( any->subtract(*$2));
-            delete $2, any;
+            delete $2;
         }
         /*
        | SUBSTITUTE_LEFT REGEXP10 COMMA REGEXP10 COMMA REGEXP10 RIGHT_BRACKET {

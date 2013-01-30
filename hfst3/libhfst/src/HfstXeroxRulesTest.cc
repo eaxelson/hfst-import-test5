@@ -1335,8 +1335,52 @@ void test1c( ImplementationType type )
 
 }
 
+// a -> b || .#. _ c;
+void test1d( ImplementationType type )
+{
+    HfstTokenizer TOK;
+    TOK.add_multichar_symbol(".#.");
 
+    // Mapping
+    HfstTransducer leftMapping("a", TOK, type);
+    HfstTransducer rightMapping("b", TOK, type);
+    HfstTransducerPair mappingPair(leftMapping, rightMapping);
 
+    HfstTransducerPairVector mappingPairVector;
+    mappingPairVector.push_back(mappingPair);
+
+    HfstTransducer input1(".#.ac", TOK, type);
+    HfstTransducer input2("ac", TOK, type);
+    HfstTransducer result1(".#.ac", ".#.ac", TOK, type);
+    HfstTransducer result2("ac", "bc", TOK, type);
+
+    // Context
+    HfstTransducerPair Context(HfstTransducer(".#.", TOK, type), HfstTransducer("c", TOK, type));
+
+    HfstTransducerPairVector ContextVector;
+    ContextVector.push_back(Context);
+
+    Rule rule(mappingPairVector, ContextVector, REPL_UP);
+
+    HfstTransducer replaceTr(type);
+    replaceTr = replace(rule, false);
+
+    //printf("test1d replaceTr: \n");
+    //replaceTr.write_in_att_format(stdout, 1);
+
+    HfstTransducer tmp2(type);
+    tmp2 = input1;
+    tmp2.compose(replaceTr).minimize();
+    //printf("test1d: \n");
+    //tmp2.write_in_att_format(stdout, 1);
+    assert(tmp2.compare(result1));
+
+    tmp2 = input2;
+    tmp2.compose(replaceTr).minimize();
+    //printf("test1d: \n");
+    //tmp2.write_in_att_format(stdout, 1);
+    assert(tmp2.compare(result2));
+}
 // a+ @-> x || a _ a
 // a+ @-> x // a _ a
 // a+ @-> x \\ a _ a
@@ -2581,9 +2625,6 @@ void test7a( ImplementationType type )
     //printf("Test 7a Replace leftmost tr2: \n");
     //tmp2.write_in_att_format(stdout, 1);
     assert(tmp2.compare(result1));
-
-
-
 }
 
 
@@ -2874,6 +2915,62 @@ void test7d( ImplementationType type )
     //tmp2.write_in_att_format(stdout, 1);
     assert(tmp2.compare(input1));
 }
+// ? -> x , a -> b
+void test7e( ImplementationType type )
+{
+    HfstTokenizer TOK;
+    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol("@_IDENTITY_SYMBOL_@");
+
+    // Mapping
+
+    HfstTransducer leftMapping1("@_IDENTITY_SYMBOL_@", TOK, type);
+    HfstTransducer rightMapping1("x", TOK, type);
+    HfstTransducerPair mappingPair1(leftMapping1, rightMapping1);
+
+    HfstTransducer leftMapping2("a", TOK, type);
+    HfstTransducer rightMapping2("b", TOK, type);
+    HfstTransducerPair mappingPair2(leftMapping2, rightMapping2);
+
+    HfstTransducerPairVector mappingPairVector1;
+    mappingPairVector1.push_back(mappingPair1);
+
+    HfstTransducerPairVector mappingPairVector2;
+    mappingPairVector2.push_back(mappingPair2);
+
+    // without context
+    Rule rule1(mappingPairVector1);
+    Rule rule2(mappingPairVector2);
+
+    vector<Rule> ruleVector;
+
+    ruleVector.push_back(rule1);
+    ruleVector.push_back(rule2);
+
+
+    HfstTransducer input1("ak", TOK, type);
+    HfstTransducer tmp("ak", "xx",TOK, type);
+    HfstTransducer result1("ak", "bx",TOK, type);
+    result1.disjunct(tmp).minimize();
+
+
+    HfstTransducer replaceTr(type);
+    HfstTransducer tmp2(type);
+
+    replaceTr = replace(ruleVector, false);
+
+
+    //printf("Test 7e Replace tr: \n");
+    //replaceTr.write_in_att_format(stdout, 1);
+
+
+    tmp2 = input1;
+    tmp2.compose(replaceTr).minimize();
+    //printf("Test 7e Replace leftmost tr2: \n");
+    //tmp2.write_in_att_format(stdout, 1);
+    assert(tmp2.compare(result1));
+}
+
 
 /* markup vector
 void test7e( ImplementationType type )

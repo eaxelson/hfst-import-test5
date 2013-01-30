@@ -1,7 +1,7 @@
 check:
-	$(top_srcdir)/test/tools/fsmbook-examples/test-example.sh \
+	$(top_srcdir)/test/tools/fsmbook-examples/test-foma.sh \
 	$(srcdir)/FinnishOTProsody $(builddir)/FinnishOTProsody \
-	../../../../tools/src/./ # --test-full
+	../../../../tools/src/./
 
 EXTRA_DIST=FinnishOTProsody.hfst.script FinnishOTProsody.xfst.script \
 	FinnishOTProsody.xfst.att
