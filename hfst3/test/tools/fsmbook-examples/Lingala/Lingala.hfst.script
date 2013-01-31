@@ -5,7 +5,6 @@ echo "[ {bet} | {béb} | {bomb} | {bóndel} | {bóngol} | {bót} | {búk} | \
  {tún} | {yébis} \
 ]" | $2/hfst-regexp2fst -f $1 > Stems
 
-
 echo "[a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|á|é|í|ó|ú]" | $2/hfst-regexp2fst -f $1 > L
 
 echo '[Per ":" 1]' | $2/hfst-regexp2fst -f $1 > Person1
@@ -15,10 +14,6 @@ echo '[Num ":" [Sg|Pl] ]' | $2/hfst-regexp2fst -f $1 > Number
 
 # define Gender [Gen ":" [[1["0"|1]|2|3|4|5|6|7|8|9] "." [1[4|5]|[1|9|10]a]]];
 echo '[Gen ":" [1 "." 2 | 1a "." 2 | 3 "." 4 | 5 "." 6 | 7 "." 8 | 9a "." "10a" | "10" | 11 "." 6 | 14 "." 6 | 15]]' | $2/hfst-regexp2fst -f $1 > Gender3
- 
- 
- 
- 
  
 # define Reflexive [No | Yes];
 
@@ -76,7 +71,6 @@ echo '[[. .] -> {bi}  || "<" _ [$[@"Agr" & $@"Person3" & $Pl & $7]]]' | $2/hfst-
 echo '[[. .] -> i  || "<" _ [$[@"Agr" & $@"Person3" & $Pl & $[9a|"10"]]]]' | $2/hfst-regexp2fst -f $1 > RAgr11
 
 # Rule Block 1
-
 # Singular specific subject markers
 
 echo '[[. .] -> {na} || "<" _ [$[@"SubjAgr" & $@"Person1" & $Sg]]] ' | $2/hfst-regexp2fst -f $1 > R101
@@ -86,13 +80,11 @@ echo '[[. .] -> e  || "<" _ [$[@"SubjAgr" & $@"Person3" & $Sg & $7]]]' | $2/hfst
 echo '[[. .] -> {ei} || "<" _[$[@"SubjAgr" & $@"Person3" & $Sg & $15]]]' | $2/hfst-regexp2fst -f $1 > R105
 
 # Rules of referral for singular subject markers
-echo "--1"
 echo '`[@"RAgr1", Func, Sub]' | $2/hfst-regexp2fst -f $1 > R106
 echo '`[@"RAgr2", Func, Sub]' | $2/hfst-regexp2fst -f $1 > R107
 echo '`[@"RAgr3", Func, Sub]' | $2/hfst-regexp2fst -f $1 > R108
 echo '`[@"RAgr4", Func, Sub]' | $2/hfst-regexp2fst -f $1 > R109
 echo '`[@"RAgr5", Func, Sub]' | $2/hfst-regexp2fst -f $1 > R110
-echo "--5"
 # Plural specific subject markers
 
 echo '[[. .] -> {to} || "<" _ [$[@"SubjAgr" & $@"Person1" & $Pl]]] ' | $2/hfst-regexp2fst -f $1 > R111
@@ -108,7 +100,6 @@ echo '`[@"RAgr11", Func, Sub]' | $2/hfst-regexp2fst -f $1 > R117
 
 echo '[[. .] -> {ko} || "<" _ [$[Fut ":" Immed]]] ' | $2/hfst-regexp2fst -f $1 > R201
 
-echo "--10"
 # Singular specific object markers
 
 echo '[[. .] -> n || "<" _ [$[@"ObjAgr" & $@"Person1" & $Sg]]] ' | $2/hfst-regexp2fst -f $1 > R301
@@ -128,7 +119,6 @@ echo '`[@"RAgr5", Func, Obj]' | $2/hfst-regexp2fst -f $1 > R309
 
 echo '[[. .] -> {lo} || "<" _ [$[@"ObjAgr" & $@"Person1" & $Pl]]] ' | $2/hfst-regexp2fst -f $1 > R310
 
-echo "--20"
 # Rules of referral for plural object markers
 
 echo '`[@"RAgr6", Func, Obj]' | $2/hfst-regexp2fst -f $1 > R311
@@ -138,8 +128,6 @@ echo '`[@"RAgr9", Func, Obj]' | $2/hfst-regexp2fst -f $1 > R314
 echo '`[@"RAgr10", Func, Obj]' | $2/hfst-regexp2fst -f $1 > R315
 echo '`[@"RAgr11", Func, Obj]' | $2/hfst-regexp2fst -f $1 > R316
 
-
-echo "--30"
 # Tense rules
 echo '[[. .] -> {ak} || _ "," [$[Pres ":" [Hab1|Hab2]| Past ":" [Hist|MostRem]]]]' | $2/hfst-regexp2fst -f $1 > R401 
 echo '[[. .] -> a    || _ "," [$[Pres ":" Cont|Fut ":" Immed]]]' | $2/hfst-regexp2fst -f $1 > R402
@@ -147,15 +135,7 @@ echo '[[. .] -> a    || _ "," [$[Pres ":" Cont|Fut ":" Immed]]]' | $2/hfst-regex
 echo '[[. .] -> i || _ "," [$[Fut ":" MostRem|Past ":" [Rec|Hist]]]]' | $2/hfst-regexp2fst -f $1 > R501
 
 # Eliminate Features and auxiliary symbols from the lower side.
-
-echo "--40"
 echo '\@"L" -> 0' | $2/hfst-regexp2fst -f $1 > Cleanup
 
-echo "--50"
 # Build the Lingala Verb Transducer
-
-#echo  '@"VerbLex" .o. @"R301" .o. @"R302" .o. @"R303" .o. @"R304" .o. @"R305" .o. @"R306" .o. @"R307" .o. @"R308" .o. @"R309" .o. @"R310" .o. @"R311" .o. @"R312" .o. @"R313" .o. @"R314" .o. @"R315" .o. @"R316" .o. @"R201" .o. @"R101" .o. @"R102" .o. @"R103" .o. @"R104" .o. @"R105" .o. @"R106" .o. @"R107" .o. @"R108" .o. @"R109" .o. @"R110" .o. @"R111" .o. @"R112" .o. @"R113" .o. @"R114" .o. @"R115" .o. @"R116" .o. @"R117" .o. @"R401" .o. @"R402" .o. @"R501" .o. @"Cleanup" ' | $2/hfst-regexp2fst -f $1 > Lingala.hfst.hfst
-echo  '@"VerbLex" .o. @"R301" .o. @"R302" .o. @"R303" .o. @"R304" ' | $2/hfst-regexp2fst -f $1 > Lingala.hfst.hfst
-
-
-echo "--60"
+echo  '@"VerbLex" .o. @"R301" .o. @"R302" .o. @"R303" .o. @"R304" .o. @"R305" .o. @"R306" .o. @"R307" .o. @"R308" .o. @"R309" .o. @"R310" .o. @"R311" .o. @"R312" .o. @"R313" .o. @"R314" .o. @"R315" .o. @"R316" .o. @"R201" .o. @"R101" .o. @"R102" .o. @"R103" .o. @"R104" .o. @"R105" .o. @"R106" .o. @"R107" .o. @"R108" .o. @"R109" .o. @"R110" .o. @"R111" .o. @"R112" .o. @"R113" .o. @"R114" .o. @"R115" .o. @"R116" .o. @"R117" .o. @"R401" .o. @"R402" .o. @"R501" .o. @"Cleanup" ' | $2/hfst-regexp2fst -f $1 > Lingala.hfst.hfst

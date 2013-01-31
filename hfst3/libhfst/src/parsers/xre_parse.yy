@@ -144,7 +144,7 @@ REGEXP2: REPLACE
          }
        | REGEXP2 COMPOSITION REPLACE {
        
-            $$ = & $1->compose(*$3);
+            $$ = & $1->compose(*$3).minimize();
             delete $3;
         }
        | REGEXP2 CROSS_PRODUCT REPLACE {
@@ -657,10 +657,8 @@ REGEXP8: REGEXP9 { }
        | CONTAINMENT REGEXP8 {
     // std::cerr << "Containment: \n" << std::endl;
             HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
-                                    hfst::internal_identity,
                                     hfst::xre::format);
             HfstTransducer* right = new HfstTransducer(hfst::internal_identity,
-                                    hfst::internal_identity,
                                     hfst::xre::format);
             right->repeat_star();
             left->repeat_star();
@@ -741,7 +739,6 @@ REGEXP9: REGEXP10 { }
 REGEXP10: REGEXP11 { }
        | TERM_COMPLEMENT REGEXP10 {
             HfstTransducer* any = new HfstTransducer(hfst::internal_identity,
-                                        hfst::internal_identity,
                                         hfst::xre::format);
             $$ = & ( any->subtract(*$2));
             delete $2;
@@ -767,8 +764,7 @@ REGEXP11: REGEXP12 { }
 SYMBOL_LIST: HALFARC {
             if (strcmp($1, hfst::internal_unknown.c_str()) == 0)
               {
-                $$ = new HfstTransducer(hfst::internal_identity,
-                                        hfst::internal_identity, hfst::xre::format);
+                $$ = new HfstTransducer(hfst::internal_identity, hfst::xre::format);
               }
             else
               {
@@ -780,8 +776,7 @@ SYMBOL_LIST: HALFARC {
             HfstTransducer * tmp ;
             if (strcmp($2, hfst::internal_unknown.c_str()) == 0)
               {
-                 tmp = new HfstTransducer(hfst::internal_identity,
-                                        hfst::internal_identity, hfst::xre::format);
+                 tmp = new HfstTransducer(hfst::internal_identity, hfst::xre::format);
               }
             else
               {
@@ -821,12 +816,11 @@ REGEXP12: LABEL { }
 LABEL: HALFARC {
         if (strcmp($1, hfst::internal_unknown.c_str()) == 0)
           {
-            $$ = new HfstTransducer(hfst::internal_identity,
-                                    hfst::internal_identity, hfst::xre::format);
+            $$ = new HfstTransducer(hfst::internal_identity, hfst::xre::format);
           }
         else
           {
-            $$ = new HfstTransducer($1, $1, hfst::xre::format);
+            $$ = new HfstTransducer($1, hfst::xre::format);
           }
         free($1);
      }
