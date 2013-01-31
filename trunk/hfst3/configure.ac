@@ -629,6 +629,8 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 test/tools/fsmbook-examples/PlusOrMinus/Makefile
 		 test/tools/fsmbook-examples/Palindromes/Makefile
 		 test/tools/fsmbook-examples/FinnishProsody/Makefile
+		 test/tools/fsmbook-examples/MonishGuesserAnalyzer/Makefile
+		 test/tools/fsmbook-examples/Lingala/Makefile
                  libhfst/Makefile libhfst/src/Makefile
                  libhfst/src/implementations/Makefile
 		 libhfst/src/parsers/Makefile 
@@ -657,7 +659,6 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 AC_CONFIG_FILES([scripts/hfst-foma-wrapper.sh], [chmod +x scripts/hfst-foma-wrapper.sh])
 AC_CONFIG_FILES([scripts/hfst-xfst], [chmod +x scripts/hfst-xfst])
 #		 test/tools/fsmbook-examples/FinnishOTProsody/Makefile
-#		 test/tools/fsmbook-examples/MonishGuesserAnalyzer/Makefile
 
 
 # output

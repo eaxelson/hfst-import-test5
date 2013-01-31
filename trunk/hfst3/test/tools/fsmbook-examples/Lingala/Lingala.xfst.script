@@ -54,7 +54,7 @@ define Gender3 [Gen ":" [1 "." 2 | 1a "." 2 | 3 "." 4 | 5 "." 6 | 7 "." 8 | 9a "
 # That is, the order of the morphemes is: REV, CAUS, PASS, APPL, RECIP
 
 # alobaloba 'he/she speak SP ITER'
-# al�alia   'he eat SP ITER'
+# alalia   'he eat SP ITER'
 
 define PastTense [Past ":" [Rec|Hist|MoreRem|MostRem]];
 define PresTense [Pres ":" [Cont|Hab1|Hab2]];
