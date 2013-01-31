@@ -30,14 +30,16 @@ cd $TESTDIR
 for file in *.sh;
 do
     if [ "$file" != "copy-files.sh" ]; then
-	sed -i 's/$TOOLDIR\///' $file
-	sed -i 's/$srcdir\//.\//' $file
+	sed -i 's/$\TOOLDIR\///' $file
+	sed -i 's/\$srcdir\//.\//' $file
 	sed -i 's/hfst-proc\/hfst-apertium-proc/hfst-apertium-proc/' $file
 	sed -i 's/test -x \(.*\);/which \1 2>1 > \/dev\/null;/' $file
-	sed -i 's/$SCRIPTDIR\///' $file
+	sed -i 's/\$SCRIPTDIR\///' $file
 	sed -i 's/-loc / /' $file
     fi
 done
+
+sed -i 's/$\TOOLDIR\///' prune-alphabet-functionality.sh
 
 # These tests are rewritten in directory check_installation
 rm empty-input.sh
