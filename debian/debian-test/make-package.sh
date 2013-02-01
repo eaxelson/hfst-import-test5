@@ -78,8 +78,8 @@ do
     sed -i 's/usr\/local\/bin\//usr\/bin\//' $tool;
 done
 
-# hfst-xfst depends on foma tools
-rm -f hfst-foma-wrapper.sh hfst-xfst 1> /dev/null 2> /dev/null
+# hfst-xfst depends on zlib..
+rm -f hfst_foma hfst-foma-wrapper.sh hfst-xfst 1> /dev/null 2> /dev/null
 
 for tool in hfst-* htwolcpre*;
 do
@@ -100,9 +100,9 @@ cp $HFST_PREFIX/lib/libhfst.so."$HFST_LIBNUMBER".0.0 .
 ln -s -T libhfst.so."$HFST_LIBNUMBER".0.0 libhfst.so."$HFST_LIBNUMBER"
 ln -s -T libhfst.so."$HFST_LIBNUMBER" libhfst.so
 
-cp -P $BACKEND_PREFIX/lib/libhfstospell.so.1.0.0 .
-ln -s -T libhfstospell.so.1.0.0 libhfstospell.so.1
-ln -s -T libhfstospell.so.1 libhfstospell.so
+#cp -P $BACKEND_PREFIX/lib/libhfstospell.so.1.0.0 .
+#ln -s -T libhfstospell.so.1.0.0 libhfstospell.so.1
+#ln -s -T libhfstospell.so.1 libhfstospell.so
 
 strip *.so
 chmod 0644 *
