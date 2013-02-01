@@ -6,20 +6,20 @@ Python extension eg. like so:
 
     python setup.py build_ext --inplace
 
-If you are using Python >= 3.0, you need to execute
+If you are using Python3 ( =< 3.2), you can execute
 
     sed -i 's/class HfstException(_object):/class HfstException(Exception):/' libhfst.py
 
-after build to be able to use HfstException and its subclasses in Python.
+after build to be able to use HfstException and its subclasses in Python. 
 
 If you wish to install the extension, run
 
     python setup.py install
 
 
-To test the SWIG bindings after installation, execute
+To test the SWIG bindings after installation, run
 
-    ./test/test.sh
+    ./test/test.sh (--python PYTHON)
 
 For further information, consult
 

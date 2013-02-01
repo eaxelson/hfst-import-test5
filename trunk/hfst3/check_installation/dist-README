@@ -6,3 +6,11 @@ or more of the tests below:
   ./check-swig.sh              # SWIG/Python bindings
   ./check-morphologies.sh      # Morphology scripts
 
+The tool check-tools.sh accepts the option '--prefix PREFIX' which tells
+where the HFST tools to be tested are found. 
+
+The tool check-swig.sh accepts the option '--python PYTHON' which defines
+the python program to be used (e.g. python2, python3).
+
+By default, the python program and HFST command line tools are searched
+in the locations defined the environment variable PATH.
