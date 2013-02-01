@@ -29,7 +29,7 @@ if [ -x $TOOLDIR/hfst-compare ] ; then
 fi
 rm -f test_*
 for operator in conjunct disjunct compose subtract compose compose-intersect ; do
-    f=$TOOLDIR/hfst-$operator
+    f=$TOOLDIR/"hfst-"$operator" -q"
     if [ -x "$f" ] ; then
         # well, not all permutations, but reasonable
         $f -1 cat.hfst -2 dog.hfst > test_named1named2stdout || exit 1
