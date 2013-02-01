@@ -9,7 +9,7 @@
 # Check that these tools are found
 for tool in hfst-strings2fst hfst-compare;
 do
-    if ! (which $tool 2>1 1 > /dev/null); then
+    if (which $tool | grep "not found" ); then
 	echo "ERROR: the tool "$tool" was not found, install it before running this test (test_std_streams.sh)"
 	exit 1;
     fi

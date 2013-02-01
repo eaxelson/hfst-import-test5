@@ -5,7 +5,7 @@
 # run copy-tool-tests.sh to create ./tool_tests.
 #
 
-PREFIX=/usr/local/bin/
+PREFIX=
 
 if [ "$1" = "-h" -o "$1" = "--help" ]; then
     echo ""

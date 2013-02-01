@@ -14,3 +14,4 @@ the python program to be used (e.g. python2, python3).
 
 By default, the python program and HFST command line tools are searched
 in the locations defined the environment variable PATH.
+
