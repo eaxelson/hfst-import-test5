@@ -21,7 +21,7 @@ for pytest in \
     echo $pytest":"
     echo "==================================="
     echo
-    if (! PYTHONPATH=$PWD/.. $PYTHON $pytest); then
+    if (! $PYTHON $pytest); then
 	echo "============================================="
 	echo "FAIL: " $pytest;
 	echo "============================================="
@@ -30,6 +30,9 @@ for pytest in \
     echo
 done
 
+echo "test_std_streams.sh:"
+echo "==================================="
+echo
 if ! ./test_std_streams.sh --python $PYTHON; then 
     echo "==========================="
     echo "FAIL: test_std_streams.sh";
