@@ -1,5 +1,5 @@
 #!/bin/sh
-TOOLSDIR=`which hfst-repeat | sed 's/hfst-repeat//'`
+TOOLSDIR=$1
 for f in $TOOLSDIR/hfst-* ; do
     if ! (echo "$f" | grep "hfst-twolc-loc" > /dev/null); then 
 	if ! (echo "$f" | grep "tagger" > /dev/null); then
