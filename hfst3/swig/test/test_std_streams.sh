@@ -1,6 +1,6 @@
 #!/bin/sh
 
-TOOLDIR=../../tools/src/
+TOOLDIR=
 STRINGS2FST="$TOOLDIR"hfst-strings2fst
 COMPARE="$TOOLDIR"hfst-compare" -s"
 
@@ -27,7 +27,7 @@ echo $STRING2 | $STRINGS2FST -f foma > tr2.foma
 cat tr1.foma tr2.foma > tr.foma
 rm tr1.foma tr2.foma
 
-if ! (cat tr.sfst | PYTHONPATH=$PWD/.. $PYTHON ./test_std_streams.py sfst 2 > tmp.sfst); then
+if ! (cat tr.sfst | $PYTHON ./test_std_streams.py sfst 2 > tmp.sfst); then
     echo "ERROR: in sfst"
     rm tr.sfst
     exit 1
@@ -40,7 +40,7 @@ if ! ($COMPARE tr.sfst tmp.sfst); then
 fi
 rm tr.sfst tmp.sfst
 
-if ! (cat tr.ofst | PYTHONPATH=$PWD/.. $PYTHON ./test_std_streams.py openfst 2 > tmp.ofst); then
+if ! (cat tr.ofst | $PYTHON ./test_std_streams.py openfst 2 > tmp.ofst); then
     echo "ERROR: in openfst"
     rm tr.ofst
     exit 1
@@ -53,7 +53,7 @@ if ! ($COMPARE tr.ofst tmp.ofst); then
 fi
 rm tr.ofst tmp.ofst
 
-if ! (cat tr.foma | PYTHONPATH=$PWD/.. $PYTHON ./test_std_streams.py foma 2 > tmp.foma); then
+if ! (cat tr.foma | $PYTHON ./test_std_streams.py foma 2 > tmp.foma); then
     rm tr.foma
     echo "ERROR: in foma"
     exit 1
