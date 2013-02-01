@@ -1,5 +1,5 @@
 #!/bin/sh
-TOOLSDIR=`which hfst-repeat | sed 's/hfst-repeat//'`
+TOOLSDIR=$1
 
 EXT=
 if (uname | egrep "MINGW|mingw" 2>1 > /dev/null); then

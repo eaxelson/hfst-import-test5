@@ -5,6 +5,18 @@
 # run copy-tool-tests.sh to create ./tool_tests.
 #
 
+PREFIX=/usr/local/bin
+
+PREFIX=
+if [ "$1" = "-h" -o "$1" = "--help" ]; then
+    echo ""
+    echo "  Usage:  "$0" [--prefix PREFIX]"
+    echo ""
+    exit 0;
+elif [ "$1" = "--prefix" ]; then
+    PREFIX=$2;
+fi
+
 TESTDIR=tool_tests
 
 if [ ! -d "$TESTDIR" ]; then
@@ -42,7 +54,7 @@ do
 	"$tooltest" != "valgrind.sh" -a \
 	"$tooltest" != "lookup-stress.sh" ]; then
 	echo -n "Testing: "$tooltest"...   "
-	if ./$tooltest; then
+	if ./$tooltest $PREFIX ; then
 	    echo "PASS"
 	else
 	    echo "FAIL"
