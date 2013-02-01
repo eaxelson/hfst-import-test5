@@ -21,14 +21,7 @@ echo "Moving to directory" `pwd`"/"$TESTDIR"..."
 echo ""
 cd $TESTDIR
 
-# Perform the tests
-#if (which python2.7 > /dev/null); then
-#    ./test.sh --python python2.7
-#fi
-#if (which python3.2 > /dev/null); then
-#    ./test.sh --python python3.2
-#fi
-./test.sh
+./test.sh --python python3
 
 echo ""
 echo "Exiting directory" `pwd`"..."
