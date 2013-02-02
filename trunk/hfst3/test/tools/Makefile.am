@@ -72,7 +72,7 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   prunable_alphabet.hfst non_prunable_alphabet_1.hfst non_prunable_alphabet_2.hfst
 OL_CHECKS=cat2dog.hfstol cat2dog.genhfstol cat_weight_final.hfstol \
 			proc-caps.hfstol proc-caps.genhfstol \
-			compounds.hfstol
+			compounds.hfstol compounds2.hfstol
 if WANT_SFST
 SFST_CHECKS=0to3cats.sfst 2to4cats.sfst 4cats.sfst\
 			4toINFcats.sfst cat2cat_or_CAT_uppercased.sfst \
@@ -145,7 +145,8 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 a2b.txt a2b_complement.txt a2b_input_projection_complement.txt \
 		 walk_or_dog.txt ab.txt bc.txt id.txt aid.txt idb.txt \
 		 ab_shuffle_bc.txt id_shuffle_id.txt aid_shuffle_idb.txt \
-		 compounds.txt ab_shuffle_bc.txt id_shuffle_id.txt aid_shuffle_idb.txt \
+		 compounds.txt ab_compounds2.txt \
+		 shuffle_bc.txt id_shuffle_id.txt aid_shuffle_idb.txt \
 		 prunable_alphabet.txt non_prunable_alphabet_1.txt non_prunable_alphabet_2.txt
 FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-gen.strings \
 			proc-caps-out1.strings proc-caps-out2.strings \
@@ -153,6 +154,7 @@ FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-gen.strings \
 			proc-caps-out5.strings \
 			proc-cat-out.strings proc-cat-weighted-out.strings \
 			proc-compounds-out.strings proc-compounds.strings \
+			proc-compounds2-out.strings proc-compounds2.strings \
 			utf-8.strings latin-1.strings \
 			cat2dog.strings heavycat.strings
 FST_PAIRS=cat2dog.pairs
