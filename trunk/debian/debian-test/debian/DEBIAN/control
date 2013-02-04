@@ -4,6 +4,7 @@ Version: 4.3-1
 Section: devel
 Priority: optional
 Architecture: amd64
+Installed-size: 12 000
 Depends: libc6 (>= 1.1), libstdc++6 (>= 4.4.3)
 Maintainer: HFST team <hfst-info@sf.net>
 Description: HFST library and commandline tools

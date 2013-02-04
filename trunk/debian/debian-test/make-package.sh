@@ -67,9 +67,12 @@ do
     cp -P $HFST_PREFIX/bin/$tool . ;
 done
 
-# remove local version of hfst-twolc
+# remove local version of hfst-twolc and hfst-train-tagger-loc
 if test -e $HFST_PREFIX/bin/hfst-twolc-loc; then
     rm -f $HFST_PREFIX/bin/hfst-twolc-loc;
+fi
+if test -e $HFST_PREFIX/bin/hfst-train-tagger-loc; then
+    rm -f $HFST_PREFIX/bin/hfst-train-tagger-loc;
 fi
 
 # replace prefix /usr/local/bin/ with /usr/bin/
@@ -77,6 +80,9 @@ for tool in hfst-twolc;
 do
     sed -i 's/usr\/local\/bin\//usr\/bin\//' $tool;
 done
+
+# replace local paths with /usr/
+sed -i 's/\/home\/eaxelson\/hfst-code\/debian\/debian-test-copy\/hfst-installation\//\/usr\//' hfst-twolc
 
 # hfst-xfst depends on zlib..
 rm -f hfst_foma hfst-foma-wrapper.sh hfst-xfst 1> /dev/null 2> /dev/null
@@ -139,9 +145,11 @@ done
 cd debian/usr/bin
 for program in *; 
 do  
-    if ! [ -L "$program" ]; then 
-	chrpath -d $program ; 
-    fi; 
+    if [ "$program" != "hfst-twolc" ]; then
+	if ! [ -L "$program" ]; then 
+	    chrpath -d $program ; 
+	fi; 
+    fi
 done
 cd ../../..
 
