@@ -12,7 +12,7 @@ TOOLDIR=../tools/src/.libs/
 #TAGGERPYTHONDIR2=../tools/src/hfst-tagger/src/build_model_src/
 TWOLCDIR=../tools/src/hfst-twolc/src/.libs/
 
-HFST_LIB=libhfst-23.dll
+HFST_LIB=libhfst-26.dll
 DEPENDENCY_DLLS="libgcc_s_dw2-1.dll libstdc++-6.dll"
 SWIG_FILES="_libhfst.pyd libhfst.py"
 

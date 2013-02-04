@@ -60,13 +60,14 @@ section
 	# Install Swig/Python bindings
 	# ----------------------------
 
-	${If} ${FileExists} "C:\Python27\Lib\site-packages"
-	      messageBox MB_OK "Found Python directory, installing Swig/Python bindings there (to C:\Python27\Lib\site-packages)."
-	      setOutPath "C:\Python27\Lib\site-packages\"
-	${Else}
-	      messageBox MB_OK "Did not find Python, so installing Swig/Python bindings only locally (to $0)."	
-	${EndIf}
+	#${If} ${FileExists} "C:\Python27\Lib\site-packages"
+	#      messageBox MB_OK "Found Python directory, installing Swig/Python bindings there (to C:\Python27\Lib\site-packages)."
+	#      setOutPath "C:\Python27\Lib\site-packages\"
+	#${Else}
+	#      messageBox MB_OK "Did not find Python, so installing Swig/Python bindings only locally (to $0)."	
+	#${EndIf}
 
+	messageBox MB_OK "Installing Swig/Python bindings locally (to $0). See README after installation for how to install them to Python directory."	
 	File _libhfst.pyd
 	File libhfst.py
 
@@ -76,7 +77,7 @@ section
 	# Install libhfst dll and HFST command line tools
 	# -----------------------------------------------
 
-	File libhfst-23.dll
+	File libhfst-26.dll
 
 	File hfst-affix-guessify.exe
 	File hfst-calculate.exe
