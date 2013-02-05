@@ -244,7 +244,6 @@ LWSP [\t\r\n ]
 "," { return COMMA; }
 
 "\"\"" { return EPSILON_TOKEN; }
-"0" { return EPSILON_TOKEN; }
 "[]" { return EPSILON_TOKEN; }
 "?" { return ANY_TOKEN; }
 
