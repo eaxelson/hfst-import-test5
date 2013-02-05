@@ -38,9 +38,17 @@ for att_file in *.txt;
 do
     file=`echo $att_file | sed 's/\.txt//'`
     hfst-txt2fst -e '@0@' $file.txt > $file.hfst
-    hfst-txt2fst -f sfst -e '@0@' $file.txt > $file.sfst
+    if (hfst-format --format | grep 'sfst' > /dev/null); then
+	hfst-txt2fst -f sfst -e '@0@' $file.txt > $file.sfst
+    else
+	echo "warning: sfst back-end not available, assumed skipped off and continuing"
+    fi
     hfst-txt2fst -f openfst-tropical -e '@0@' $file.txt > $file.ofst
-    hfst-txt2fst -f foma -e '@0@' $file.txt > $file.foma
+    if (hfst-format --format | grep 'foma' > /dev/null); then
+	hfst-txt2fst -f foma -e '@0@' $file.txt > $file.foma
+    else
+	echo "warning: foma back-end not available, assumed skipped off and continuing"
+    fi
     hfst-txt2fst -e '@0@' -i $file.txt | hfst-fst2fst -w -o $file.hfstol
     hfst-txt2fst -e '@0@' -i $file.txt | hfst-invert | hfst-fst2fst -w -o $file.genhfstol
 done
