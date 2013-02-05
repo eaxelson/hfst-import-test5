@@ -189,11 +189,11 @@ REGEXP2: REPLACE
     $$ = $1;
     delete $3;
  }
-| REPLACE RIGHT_CONTEXT {
+| REGEXP2 RIGHT_CONTEXT {
     $$ = & $1->concatenate(*$2);
     delete $2;
  }
-| REPLACE LEFT_CONTEXT {
+| REGEXP2 LEFT_CONTEXT {
     $$ = & $2->concatenate(*$1);
     delete $1;
  }
