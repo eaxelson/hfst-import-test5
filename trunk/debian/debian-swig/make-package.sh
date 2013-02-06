@@ -1,7 +1,7 @@
 #!/bin/sh
 
-SWIGDIR=../debian-test-copy/hfst-3.4.2/swig
-PACKAGENAME=hfst_3.4.2_python_amd64
+SWIGDIR=../debian-test-copy/hfst-3.4.3/swig
+PACKAGENAME=hfst_3.4.3_python_amd64
 
 mkdir $PACKAGENAME
 
@@ -15,7 +15,7 @@ do
     cp $SWIGDIR/$file $PACKAGENAME/;
 done
 
-cp make-install $PACKAGENAME/
+#cp make-install $PACKAGENAME/
 cp README $PACKAGENAME/
 
 tar -cvf $PACKAGENAME.tar $PACKAGENAME/

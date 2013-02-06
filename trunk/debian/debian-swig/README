@@ -3,15 +3,20 @@ HFST library. To use the bindings, you need
  
  - a compatible version of HFST library installed to /usr/lib/ (can be 
    fetched from http://sourceforge.net/projects/hfst/files/hfst/)
- - Python version 2.5 =< (the package is tested with version 2.7)
+ - Python compiler/interpreter
 
-To install the bindings, execute
+To install the bindings, you need to copy files _libhfst.so and libhfst.py
+so that the Python interpreter will find them. For Python2, you must copy
+them to
 
-  ./make-install
+  /usr/lib/python2.X/dist-packages/
 
-in this directory. In case of problems, try doing the same as super-user:
+where 2.X is the version of Python you wish to use (e.g. 2.7). For any 
+version of Python3 it is enough to copy the files to
 
-  sudo ./make-install
+  /usr/lib/python3/dist-packages/
+
+as all Python3 interpreters share the same directory.
 
 After installation you should be able to use the bindings by writing
 
