@@ -21,7 +21,7 @@ libhfst_module = Extension('_libhfst',
                            )
 
 setup(name = 'libhfst_swig',
-      version = '3.2.0_beta',
+      version = '3.4.3_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.sourceforge.net',
