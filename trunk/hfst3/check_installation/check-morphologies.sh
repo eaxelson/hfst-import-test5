@@ -6,7 +6,7 @@
 
 
 extension=.sh
-languages="english finnish french german italian swedish turkish"
+languages="english finnish french german italian omorfi swedish turkish"
 directions="analyze generate"
 format=xerox
 morph_folder=morphology_tests
