@@ -9,7 +9,13 @@ namespace hfst_ol {
 
     class PmatchTransducer;
     typedef std::map<SymbolNumber, PmatchTransducer *> RtnMap;
-    enum SpecialSymbol{entry, exit, LC_entry, LC_exit, RC_entry, RC_exit};
+    enum SpecialSymbol{entry,
+                       exit,
+                       LC_entry,
+                       LC_exit,
+                       RC_entry,
+                       RC_exit,
+                       boundary};
 
     class PmatchContainer
     {

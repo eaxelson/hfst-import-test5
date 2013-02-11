@@ -43,7 +43,7 @@ A7 [\x00-\x7e]
 /* special meaning in pmatch */
 A7RESTRICTED [- |<>%:;@0~\\&?$+*/_(){}\]\[-]
 /* non-restricted ASCII */
-A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%:;@0~\\&?$+*/_(){}\]\[-]
+A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%:;@~\\&?$+*/_(){}\]\[-]
 
 WEIGHT [0-9]+(\.[0-9]+)?
 
@@ -245,7 +245,9 @@ LWSP [\t\r\n ]
 
 "\"\"" { return EPSILON_TOKEN; }
 "[]" { return EPSILON_TOKEN; }
+"0" { return EPSILON_TOKEN; }
 "?" { return ANY_TOKEN; }
+"#" { return BOUNDARY_MARKER; }
 
 {NAME_CH}+ {
     pmatchlval.label = hfst::pmatch::strip_percents(pmatchtext);
@@ -263,7 +265,7 @@ LWSP [\t\r\n ]
 
 {LWSP}* { /* ignorable whitespace */ }
 
-("!"|"#")[^\n]*$ { /* ignore comments */ }
+("!")[^\n]*$ { /* ignore comments */ }
 
 . { 
     return LEXER_ERROR;
