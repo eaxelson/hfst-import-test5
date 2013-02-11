@@ -27,6 +27,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
     special_symbols[LC_exit] = NO_SYMBOL_NUMBER;
     special_symbols[RC_entry] = NO_SYMBOL_NUMBER;
     special_symbols[RC_exit] = NO_SYMBOL_NUMBER;
+    special_symbols[boundary] = NO_SYMBOL_NUMBER;
 
     const SymbolTable & symbol_table = alphabet.get_symbol_table();
     for (SymbolNumber i = 1; i < symbol_table.size(); ++i) {
@@ -80,6 +81,8 @@ void PmatchContainer::add_special_symbol(const std::string & str,
         special_symbols[LC_exit] = symbol_number;
     } else if (str == "@_PMATCH_RC_EXIT_@") {
         special_symbols[RC_exit] = symbol_number;
+    } else if (str == "@_BOUNDARY_@") {
+        special_symbols[boundary] = symbol_number;
     } else if (is_end_tag(str)) {
         end_tag_map[symbol_number] = str.substr(16, str.size() - 18);
     } else if (is_insertion(str)) {
@@ -239,6 +242,8 @@ std::string PmatchContainer::stringify_output(void)
         } else if (is_end_tag(*it)) {
             retval.insert(start_tag_pos.top(), start_tag(*it));
             retval.append(end_tag(*it));
+        } else if (*it == special_symbols[boundary]) {
+            continue;
         } else {
             retval.append(alphabet.string_from_symbol(*it));
         }
@@ -324,11 +329,12 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
 void PmatchContainer::initialize_input(const char * input)
 {
     input_tape = orig_input_tape;
-    SymbolNumber k = NO_SYMBOL_NUMBER;
     char * input_str = const_cast<char *>(input);
     char ** input_str_ptr = &input_str;
+    SymbolNumber k = NO_SYMBOL_NUMBER;
     input_tape[0] = NO_SYMBOL_NUMBER;
-    int i = 1;
+    input_tape[1] = special_symbols[boundary];
+    int i = 2;
     while (**input_str_ptr != 0) {
         char * original_input_loc = *input_str_ptr;
         k = encoder->find_key(input_str_ptr);
@@ -354,9 +360,10 @@ void PmatchContainer::initialize_input(const char * input)
         input_tape[i] = k;
         ++i;
     }
-    input_tape[i] = NO_SYMBOL_NUMBER;
-    // Place input_tape beyond the starting NO_SYMBOL
-    ++input_tape;
+    input_tape[i] = special_symbols[boundary];
+    input_tape[i+1] = NO_SYMBOL_NUMBER;
+    // Place input_tape beyond the opening boundary
+    input_tape += 2;
     return;
 }
 
@@ -582,7 +589,6 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
         }
         
         if (*input_tape == NO_SYMBOL_NUMBER) {
-            return;
         }
 
 

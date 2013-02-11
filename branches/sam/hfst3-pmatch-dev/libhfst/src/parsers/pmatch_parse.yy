@@ -841,7 +841,7 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
     free($1);
   }
 | BOUNDARY_MARKER {
-    $$ = new HfstTransducer("@#@", "@#@", hfst::pmatch::format);
+    $$ = new HfstTransducer("@_BOUNDARY_@", "@_BOUNDARY_@", hfst::pmatch::format);
   }
 ;
 
