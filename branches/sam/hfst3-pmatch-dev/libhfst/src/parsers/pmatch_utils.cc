@@ -203,16 +203,16 @@ get_quoted(const char *s)
 {
     const char *qstart = strchr((char*) s, '"') + 1;
     const char *qend = strrchr((char*) s, '"');
-    char* qpart = strdup(qstart);
-    *(qpart+ (size_t) (qend - qstart)) = '\0';
-    return qpart;
+    return strndup(qstart, (size_t) (qend - qstart));
 }
 
 char*
 parse_quoted(const char *s)
 {
     char* quoted = get_quoted(s);
-    char* rv = static_cast<char*>(malloc(sizeof(char)*strlen(quoted)));
+    // Mysteriously, when the quoted string is 24 + n * 16 bytes in length, an
+    // extra byte is needed for rv.
+    char* rv = static_cast<char*>(malloc(sizeof(char)*(strlen(quoted) + 1)));
     char* p = quoted;
     char* r = rv;
     while (*p != '\0')
@@ -220,8 +220,8 @@ parse_quoted(const char *s)
         if (*p != '\\')
           {
             *r = *p;
-            r++;
-            p++;
+            ++r;
+            ++p;
           }
         else if (*p == '\\')
           {
