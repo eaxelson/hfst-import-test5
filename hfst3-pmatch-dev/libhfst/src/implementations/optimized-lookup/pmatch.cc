@@ -589,6 +589,7 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
         }
         
         if (*input_tape == NO_SYMBOL_NUMBER) {
+            return;
         }
 
 
