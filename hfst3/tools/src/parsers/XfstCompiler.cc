@@ -557,7 +557,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             new HfstInputStream(infile):
             new HfstInputStream();
         }
-      catch (hfst::exceptions::NotTransducerStreamException ntse)
+      catch (NotTransducerStreamException ntse)
         {
           fprintf(stderr, "Unable to read transducers from %s\n", 
                   infile);
@@ -1269,10 +1269,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       prompt();
       return *this;
     }
+
   XfstCompiler& 
   XfstCompiler::read_regex(const char* indata)
     {
       HfstTransducer* compiled = xre_.compile(indata);
+      //compiled.substitute(definitions_); // added
       stack_.push(compiled);
       print_transducer_info();
       prompt();
@@ -1829,6 +1831,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 XfstCompiler* xfst_ = 0;
 
 }}
+
+int main(int argc, char** argv)
+{
+  hfst::xfst::XfstCompiler comp(hfst::TROPICAL_OPENFST_TYPE);
+  comp.setVerbosity(true);
+  comp.parse("foo.xfst");
+  return EXIT_SUCCESS;
+}
 
 #else
 #include <cstdlib>
