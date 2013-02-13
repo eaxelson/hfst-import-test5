@@ -346,6 +346,12 @@ AC_ARG_ENABLE([regexp2fst],
 			  [enable_regexp2fst=$enableval],
 			  [enable_regexp2fst=yes])
 AM_CONDITIONAL([WANT_REGEXP2FST], [test x$enable_regexp2fst != xno])
+AC_ARG_ENABLE([xfst2fst],
+			  [AS_HELP_STRING([--enable-xfst2fst],
+							  [build xfst2fst tool @<:@default=no@:>@])],
+			  [enable_xfst2fst=$enableval],
+			  [enable_xfst2fst=no])
+AM_CONDITIONAL([WANT_XFST2FST], [test x$enable_xfst2fst != xno])
 AC_ARG_ENABLE([pmatch2fst],
 			  [AS_HELP_STRING([--enable-pmatch2fst],
 							  [build pmatch2fst tool @<:@default=yes@:>@])],
@@ -448,6 +454,12 @@ AC_ARG_ENABLE([xfst],
 			  [enable_xfst=$enableval],
 			  [enable_xfst=yes])
 AM_CONDITIONAL([WANT_XFST], [test x$enable_xfst != xno])
+AC_ARG_ENABLE([xfst2fst],
+			  [AS_HELP_STRING([--enable-xfst2fst],
+							  [build xfst2fst tool @<:@default=no@:>@])],
+			  [enable_xfst2fst=$enableval],
+			  [enable_xfst2fst=yes])
+AM_CONDITIONAL([WANT_XFST2FST], [test x$enable_xfst2fst != xno])
 
 
 AC_CHECK_LIB([z], [main], [zlib_exists=yes], [zlib_exists=no])
@@ -636,6 +648,7 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 libhfst/src/parsers/Makefile 
                  libhfst/hfst.pc 
 		 tools/Makefile tools/src/Makefile tools/src/hfst-proc/Makefile
+		 tools/src/parsers/Makefile
 		 tools/src/hfst-twolc/Makefile
 		 tools/src/hfst-twolc/src/Makefile
 		 tools/src/hfst-twolc/test/Makefile
