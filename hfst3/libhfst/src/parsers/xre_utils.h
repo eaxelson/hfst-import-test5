@@ -20,7 +20,6 @@ extern std::map<std::string,hfst::HfstTransducer*> definitions;
 extern HfstTransducer* last_compiled;
 extern ImplementationType format;
 
-
 /**
  * @brief input handling function for flex that parses strings.
  */

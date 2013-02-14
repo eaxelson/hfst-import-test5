@@ -26,6 +26,13 @@ XreCompiler::define(const std::string& name, const std::string& xre)
   definitions_[name] = compiled;
 }
 
+extern bool expand_definitions;
+
+void set_expand_definitions(bool expand)
+{
+  expand_definitions=expand;
+}
+
 HfstTransducer*
 XreCompiler::compile(const std::string& xre)
 {
