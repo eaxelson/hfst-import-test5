@@ -56,6 +56,8 @@ class XreCompiler
   //!        A null pointer is returned on fatal error, if abort is not called.
   HfstTransducer* compile(const std::string& xre);
 
+  void set_expand_definitions(bool expand);
+
   private:
   std::map<std::string,hfst::HfstTransducer*> definitions_;
   hfst::ImplementationType format_;

@@ -1836,6 +1836,7 @@ int main(int argc, char** argv)
 {
   hfst::xfst::XfstCompiler comp(hfst::TROPICAL_OPENFST_TYPE);
   comp.setVerbosity(true);
+  comp.set_expand_definitions(true);
   comp.parse("foo.xfst");
   return EXIT_SUCCESS;
 }

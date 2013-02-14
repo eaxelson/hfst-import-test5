@@ -49,6 +49,7 @@ hfst::HfstTransducer* last_compiled;
 hfst::ImplementationType format;
 size_t len;
 
+  bool expand_definitions=false;
 
 int*
 get_n_to_k(const char* s)
@@ -346,13 +347,16 @@ compile(const string& xre, map<string,HfstTransducer*>& defs,
 HfstTransducer*
 expand_definition(HfstTransducer* tr, const char* symbol)
 {
-  for (std::map<std::string,hfst::HfstTransducer*>::const_iterator it
-         = definitions.begin(); it != definitions.end(); it++) 
+  if (expand_definitions)
     {
-      if (strcmp(it->first.c_str(), symbol) == 0)
+      for (std::map<std::string,hfst::HfstTransducer*>::const_iterator it
+             = definitions.begin(); it != definitions.end(); it++) 
         {
-          tr->substitute(hfst::StringPair(symbol,symbol), *(it->second));
-          break;
+          if (strcmp(it->first.c_str(), symbol) == 0)
+            {
+              tr->substitute(hfst::StringPair(symbol,symbol), *(it->second));
+              break;
+            }
         }
     }
   return tr;
