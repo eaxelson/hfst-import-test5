@@ -51,6 +51,10 @@ class XreCompiler
   //!        defined by @a xre in later phases of compilation.
   void define(const std::string& name, const std::string& xre);
 
+  //! @brief Remove a definition macro.
+  void undefine(const std::string& name);
+
+
   //! @brief Compile a transducer defined by @a xre.
   //!        May return a pointer to @e empty transducer on non-fatal error.
   //!        A null pointer is returned on fatal error, if abort is not called.
