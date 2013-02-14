@@ -95,23 +95,23 @@ strip_curly(const char *s)
     int i = 0;
     while (*c != '\0')
     {
-    	// If first char is { or last one }, then skip it
-    	if ( ( *c == '{' && i == 0 ) || ( *c == '}' && *(c + 1) == '\0' ) )
-		{
-    		if (*(c + 1) == '\0')
-			{
-				break;
-			}
-			else
-			{
-				stripped[i] = *(c + 1);
-				i++;
-				c += 2;
-			}
-		}
+        // If first char is { or last one }, then skip it
+        if ( ( *c == '{' && i == 0 ) || ( *c == '}' && *(c + 1) == '\0' ) )
+                {
+                if (*(c + 1) == '\0')
+                        {
+                                break;
+                        }
+                        else
+                        {
+                                stripped[i] = *(c + 1);
+                                i++;
+                                c += 2;
+                        }
+                }
         else
         {
-        	stripped[i] = *c;
+                stripped[i] = *c;
             i++;
             c++;
         }
@@ -341,6 +341,21 @@ compile(const string& xre, map<string,HfstTransducer*>& defs,
       {
         return new HfstTransducer(impl);
       }
+}
+
+HfstTransducer*
+expand_definition(HfstTransducer* tr, const char* symbol)
+{
+  for (std::map<std::string,hfst::HfstTransducer*>::const_iterator it
+         = definitions.begin(); it != definitions.end(); it++) 
+    {
+      if (strcmp(it->first.c_str(), symbol) == 0)
+        {
+          tr->substitute(hfst::StringPair(symbol,symbol), *(it->second));
+          break;
+        }
+    }
+  return tr;
 }
 
 } }

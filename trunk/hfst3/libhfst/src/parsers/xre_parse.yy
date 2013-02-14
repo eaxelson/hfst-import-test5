@@ -820,7 +820,8 @@ LABEL: HALFARC {
           }
         else
           {
-            $$ = new HfstTransducer($1, hfst::xre::format);
+            HfstTransducer * tmp = new HfstTransducer($1, hfst::xre::format);
+	    $$ = hfst::xre::expand_definition(tmp, $1);
           }
         free($1);
      }
