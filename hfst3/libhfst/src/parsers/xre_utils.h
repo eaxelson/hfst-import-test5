@@ -59,6 +59,12 @@ HfstTransducer* compile(const std::string& xre,
                         std::map<std::string,hfst::HfstTransducer*>& defs,
                         hfst::ImplementationType type);
 
+/** 
+ * @brief For a single-transition transducer, if the transition symbol is a name for
+ * transducer definition, expand the transition into the corresponding transducer.
+ */
+HfstTransducer* expand_definition(HfstTransducer* tr, const char* symbol);
+
 } } // namespaces
 #endif
 // vim: set ft=cpp.doxygen:
