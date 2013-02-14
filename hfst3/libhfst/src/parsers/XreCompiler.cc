@@ -26,6 +26,15 @@ XreCompiler::define(const std::string& name, const std::string& xre)
   definitions_[name] = compiled;
 }
 
+void
+XreCompiler::undefine(const std::string& name) 
+{
+if (definitions_.find(name) != definitions_.end())
+  {
+    definitions_.erase(name);
+  }
+}
+
 extern bool expand_definitions;
 
 void set_expand_definitions(bool expand)
