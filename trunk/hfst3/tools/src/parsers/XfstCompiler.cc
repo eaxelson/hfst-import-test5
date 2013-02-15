@@ -52,6 +52,7 @@ namespace xfst {
         format_(hfst::TROPICAL_OPENFST_TYPE),
         verbose_(false)
       {
+        xre_.set_expand_definitions(true);
         variables_["assert"] = "OFF";
         variables_["char-encoding"] = "UTF-8";
         variables_["copyright-owner"] = "Copyleft (c) University of Helsinki";
@@ -80,6 +81,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         format_(impl),
         verbose_(false)
       {
+        xre_.set_expand_definitions(true);
         variables_["assert"] = "OFF";
         variables_["char-encoding"] = "UTF-8";
         variables_["copyright-owner"] = "Copyleft (c) University of Helsinki";
@@ -975,6 +977,25 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       prompt();
       return *this;
     }
+
+  static void print_paths(const hfst::HfstTwoLevelPaths &paths, FILE* outfile)
+  {
+    for (hfst::HfstTwoLevelPaths::const_iterator it = paths.begin();
+         it != paths.end(); it++)
+      {
+        hfst::StringPairVector path = it->second;
+        for (hfst::StringPairVector::const_iterator p = path.begin();
+             p != path.end(); p++)
+          {
+            if (p->first == p->second) {
+              fprintf(outfile, "%s", p->first.c_str()); }
+            else {
+              fprintf(outfile, "%s:%s", p->first.c_str(), p->second.c_str()); }
+          }
+        fprintf(outfile, "\n");
+      }
+  }
+
   XfstCompiler& 
   XfstCompiler::print_lower_words(const char* /* name */,
                                   unsigned int number,
@@ -988,8 +1009,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::print_random_lower(unsigned int number, FILE* outfile)
     {
-      fprintf(outfile, "missing %u random lower %s:%d\n", number,
-              __FILE__, __LINE__);
+      hfst::HfstTwoLevelPaths paths;
+      HfstTransducer tmp = hfst::HfstTransducer(*(stack_.top()));
+      tmp.output_project();
+      tmp.extract_random_paths(paths, number);
+      print_paths(paths, outfile);
+      prompt();
       return *this;
     }
   XfstCompiler& 
@@ -1004,8 +1029,11 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler&
   XfstCompiler::print_random_upper(unsigned int number, FILE* outfile)
     {
-      fprintf(outfile, "missing %u random upper %s:%d\n", number,
-              __FILE__, __LINE__);
+      hfst::HfstTwoLevelPaths paths;
+      HfstTransducer tmp = hfst::HfstTransducer(*(stack_.top()));
+      tmp.input_project();
+      tmp.extract_random_paths(paths, number);
+      print_paths(paths, outfile);
       prompt();
       return *this;
     }
@@ -1018,11 +1046,13 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       prompt();
       return *this;
     }
+
   XfstCompiler& 
   XfstCompiler::print_random_words(unsigned int number, FILE* outfile)
     {
-      fprintf(outfile, "missing %u random words %s:%d\n", number,
-              __FILE__, __LINE__);
+      hfst::HfstTwoLevelPaths paths;
+      stack_.top()->extract_random_paths(paths, number);
+      print_paths(paths, outfile);
       prompt();
       return *this;
     }
@@ -1036,7 +1066,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::print_net(FILE* outfile)
     {
-      fprintf(outfile, "missing print net %s:%d\n", __FILE__, __LINE__);
+      stack_.top()->write_in_att_format(outfile);
       prompt();
       return *this;
     }
@@ -1047,10 +1077,41 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       prompt();
       return *this;
     }
+
+  static bool is_special_symbol(const std::string &s)
+  {
+    if (s == hfst::internal_epsilon || s == hfst::internal_unknown || 
+        s == hfst::internal_identity ) {
+      return true;
+    }
+    return false;
+  }
+
+  static void print_alphabet(const StringSet & alpha, FILE* outfile)
+  {
+    unsigned int sigma_count=0;
+    fprintf(outfile, "Sigma: ");
+    for (StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
+      {
+        if (! is_special_symbol(*it)) 
+          {
+            fprintf(outfile, "%s", it->c_str()); 
+            sigma_count++;
+            if (++it != alpha.end()) {
+              fprintf(outfile, ", ");
+            }
+            --it;
+          }
+      }
+    fprintf(outfile, "\n");
+    fprintf(outfile, "Size: %d\n", sigma_count);
+  }
+
   XfstCompiler& 
   XfstCompiler::print_sigma(FILE* outfile)
     {
-      fprintf(outfile, "missing print sigma %s:%d\n", __FILE__, __LINE__);
+      hfst::StringSet alpha = stack_.top()->get_alphabet();
+      print_alphabet(alpha, outfile);
       prompt();
       return *this;
     }
@@ -1836,7 +1897,6 @@ int main(int argc, char** argv)
 {
   hfst::xfst::XfstCompiler comp(hfst::TROPICAL_OPENFST_TYPE);
   comp.setVerbosity(true);
-  comp.set_expand_definitions(true);
   comp.parse("foo.xfst");
   return EXIT_SUCCESS;
 }

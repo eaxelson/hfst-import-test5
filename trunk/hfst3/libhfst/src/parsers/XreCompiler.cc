@@ -37,7 +37,7 @@ if (definitions_.find(name) != definitions_.end())
 
 extern bool expand_definitions;
 
-void set_expand_definitions(bool expand)
+void XreCompiler::set_expand_definitions(bool expand)
 {
   expand_definitions=expand;
 }
