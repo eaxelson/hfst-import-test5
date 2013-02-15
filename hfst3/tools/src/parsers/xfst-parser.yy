@@ -245,7 +245,7 @@ COMMAND: ADD_PROPS REDIRECT_IN NEWLINE {
        | COLLECT_EPSILON_LOOPS NEWLINE {
             hfst::xfst::xfst_->collect_epsilon_loops();
        }
-       | COMPACT_SIGMA NEWLINE {
+       | COMPACT_SIGMA END_COMMAND {
             hfst::xfst::xfst_->compact_sigma();
        }
        // flags
@@ -776,6 +776,8 @@ COMMAND: ADD_PROPS REDIRECT_IN NEWLINE {
        }
        | NEWLINE
        ;
+
+       END_COMMAND: NEWLINE | SEMICOLON | SEMICOLON NEWLINE ;
 
 COMMAND_SEQUENCE: COMMAND_SEQUENCE NAMETOKEN {
                     $$ = static_cast<char*>(malloc(sizeof(char)*strlen($1)+strlen($2)+2));

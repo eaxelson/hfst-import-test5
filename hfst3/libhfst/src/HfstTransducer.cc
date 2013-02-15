@@ -457,18 +457,23 @@ HfstOneLevelPaths * HfstTransducer::lookup_fd(const StringVector& s,
 {
     switch(this->type) {
 
-        /* TODO: Convert into HFST_OL(W)_TYPE, if needed? */
-
     case (HFST_OL_TYPE):
     case (HFST_OLW_TYPE):
-    return this->implementation.hfst_ol->lookup_fd(s);
+      return this->implementation.hfst_ol->lookup_fd(s);
 
     case (ERROR_TYPE):
-    HFST_THROW(TransducerHasWrongTypeException);
+      HFST_THROW(TransducerHasWrongTypeException);
     default:
-    (void)s;
-    (void)limit;
-    HFST_THROW(FunctionNotImplementedException);
+      hfst::implementations::HfstBasicTransducer net(*this);    
+      HfstTransducer * tmp;
+      if (this->type == TROPICAL_OPENFST_TYPE) {
+        tmp = new HfstTransducer(net, HFST_OLW_TYPE); }
+      else {
+        tmp = new HfstTransducer(net, HFST_OL_TYPE); }
+      HfstOneLevelPaths * retval = tmp->lookup_fd(s, limit);
+      delete tmp;
+      return retval;
+
     }
 }
 
@@ -481,14 +486,21 @@ HfstOneLevelPaths * HfstTransducer::lookup_fd(const std::string & s,
 
     case (HFST_OL_TYPE):
     case (HFST_OLW_TYPE):
-    return this->implementation.hfst_ol->lookup_fd(s);
+      return this->implementation.hfst_ol->lookup_fd(s);
 
     case (ERROR_TYPE):
-    HFST_THROW(TransducerHasWrongTypeException);
+      HFST_THROW(TransducerHasWrongTypeException);
     default:
-    (void)s;
-    (void)limit;
-    HFST_THROW(FunctionNotImplementedException);
+      hfst::implementations::HfstBasicTransducer net(*this);    
+      HfstTransducer * tmp;
+      if (this->type == TROPICAL_OPENFST_TYPE) {
+        tmp = new HfstTransducer(net, HFST_OLW_TYPE); }
+      else {
+        tmp = new HfstTransducer(net, HFST_OL_TYPE); }
+      HfstOneLevelPaths * retval = tmp->lookup_fd(s, limit);
+      delete tmp;
+      return retval;
+
     }
 }
 
@@ -513,6 +525,21 @@ HfstOneLevelPaths * HfstTransducer::lookdown_fd(StringVector& s,
     (void)limit;
     HFST_THROW(FunctionNotImplementedException);
 }
+
+  HfstOneLevelPaths * HfstTransducer::lookdown(const std::string& s,
+                         ssize_t limit) const {
+    (void)s;
+    (void)limit;
+    HFST_THROW(FunctionNotImplementedException);
+}
+
+  HfstOneLevelPaths * HfstTransducer::lookdown_fd(const std::string& s,
+                        ssize_t limit) const {
+    (void)s;
+    (void)limit;
+    HFST_THROW(FunctionNotImplementedException);
+}
+
 
 bool HfstTransducer::is_lookup_infinitely_ambiguous(const StringVector& s)
     const {

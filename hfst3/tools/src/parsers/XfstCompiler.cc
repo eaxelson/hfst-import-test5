@@ -134,35 +134,42 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         return *this;
       }
 
-    XfstCompiler&
-    XfstCompiler::apply_up_line(char* /*line*/)
+  static void print_paths(const hfst::HfstOneLevelPaths &paths, FILE* outfile=stdout)
+  {
+    for (hfst::HfstOneLevelPaths::const_iterator it = paths.begin();
+         it != paths.end(); it++)
       {
-        fprintf(stderr, "Missing apply up %s:%d\n", __FILE__, __LINE__);
-#if 0
-        char* token = strstrip(line);
-        HfstTransducer top = stack_.top();
-        top.lookdown(token);
-        for (each result)
+        hfst::StringVector path = it->second;
+        for (hfst::StringVector::const_iterator p = path.begin();
+             p != path.end(); p++)
           {
-            print result;
+            fprintf(outfile, "%s", p->c_str());
           }
-#endif
+        fprintf(outfile, "\n");
+      }
+  }
+
+    XfstCompiler&
+    XfstCompiler::apply_up_line(char* line)
+      {
+        char* token = strstrip(line);
+        HfstTransducer* top = stack_.top();
+        HfstOneLevelPaths * paths = top->lookup_fd(std::string(token));
+        print_paths(*paths);
+        delete paths;
         return *this;
       }
 
     XfstCompiler&
-    XfstCompiler::apply_down_line(char* /*line*/)
+    XfstCompiler::apply_down_line(char* line)
       {
-        fprintf(stderr, "Missing apply down %s:%d\n", __FILE__, __LINE__);
-#if 0
         char* token = strstrip(line);
-        HfstTransducer top = stack_.top();
-        top.lookup(token);
-        for (each result)
-          {
-            print result;
-          }
-#endif
+        HfstTransducer tmp(*(stack_.top()));
+        // lookdown not yet implemented in HFST
+        tmp.invert().minimize();
+        HfstOneLevelPaths * paths = tmp.lookup_fd(std::string(token));
+        print_paths(*paths);
+        delete paths;
         return *this;
       }
 
@@ -586,8 +593,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::compact_sigma()
     {
-      fprintf(stderr, "cannot compact sigma %s:%d\n", __FILE__,
-              __LINE__);
+      stack_.top()->prune_alphabet();
       prompt();
       return *this;
     }

@@ -1056,6 +1056,9 @@ ccc : ddd
     HfstOneLevelPaths * lookdown(const StringVector& s,
                  ssize_t limit = -1) const;
 
+    HfstOneLevelPaths * lookdown(const std::string& s,
+                 ssize_t limit = -1) const;
+
     //! @brief (Not implemented) Lookdown a single string minding 
     //! flag diacritics properly.
     //! 
@@ -1065,6 +1068,9 @@ ccc : ddd
     //! @sa lookdown
     //! @todo todo
     HfstOneLevelPaths * lookdown_fd(StringVector& s,
+                    ssize_t limit = -1) const;
+
+    HfstOneLevelPaths * lookdown_fd(const std::string& s,
                     ssize_t limit = -1) const;
 
     //! @brief Whether lookup of path \a s will have infinite results.
