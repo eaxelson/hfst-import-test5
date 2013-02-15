@@ -417,7 +417,6 @@ class XfstCompiler
   XfstCompiler& apply_med_line(char* line);
   XfstCompiler& read_prop_line(char* line);
 
-  // TODO: handle transducer variables..
   hfst::xre::XreCompiler xre_;
   hfst::lexc::LexcCompiler lexc_;
 #if HAVE_TWOLC
