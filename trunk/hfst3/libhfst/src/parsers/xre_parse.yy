@@ -140,6 +140,7 @@ REGEXP1: REGEXP2 END_OF_EXPRESSION {
 
 REGEXP2: REPLACE
          { 
+            $$ = & $1->minimize();
           //  std::cerr << "regexp2:replace \n"<< std::endl; 
          }
        | REGEXP2 COMPOSITION REPLACE {
@@ -152,7 +153,7 @@ REGEXP2: REPLACE
             delete $3;
         }
        | REGEXP2 LENIENT_COMPOSITION REPLACE {
-            $$ = & $1->lenient_composition(*$3);
+            $$ = & $1->lenient_composition(*$3).minimize();
             delete $3;
         }
         // substitute
@@ -417,8 +418,8 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
          {
              HfstTransducer t1(*$1);
              HfstTransducer t2(*$3);
-             t1.prune_alphabet(false);
-             t2.prune_alphabet(false);
+             t1.minimize().prune_alphabet(false);
+             t2.minimize().prune_alphabet(false);
             $$ = new HfstTransducerPair(t1, t2);
             delete $1, $3; 
          }
@@ -426,7 +427,7 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
          {
            // std::cerr << "Mapping: \n" << *$1  << std::endl;
             HfstTransducer t1(*$1);
-            t1.prune_alphabet(false);
+            t1.minimize().prune_alphabet(false);
 
             HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
             
@@ -437,7 +438,7 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
       | CENTER_MARKER REPLACE
          {
             HfstTransducer t1(*$2);
-            t1.prune_alphabet(false);
+            t1.minimize().prune_alphabet(false);
              
             HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
             $$ = new HfstTransducerPair(epsilon, t1);

@@ -229,12 +229,22 @@ namespace hfst
                                       bool optional)
       {
 
-        ImplementationType type = identityExpanded.get_type();
+          ImplementationType type = identityExpanded.get_type();
 
           HfstTransducer unionContextReplace(type);
 
+          HfstTokenizer TOK;
+          TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+          HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+
           for ( unsigned int i = 0; i < ContextVector.size(); i++ )
           {
+             //printf("firstContext \n");
+             //ContextVector[i].first.write_in_att_format(stdout, 1);
+
+             //printf("secondContext \n");
+             //ContextVector[i].second.write_in_att_format(stdout, 1);
+
             // Expand context with mapping
             // Cr' = (Rc .*) << Markers (<,>,|) .o. [I:I | <a:b>]*
             // Cr = Cr|Cr'
@@ -308,7 +318,64 @@ namespace hfst
             secondContext.disjunct(rightContextExpanded).minimize();
 
 
-              // put mapping between (expanded) contexts
+            // add boundary symbol before/after contexts
+            String boundaryMarker(".#.");
+            TOK.add_multichar_symbol(boundaryMarker);
+            HfstTransducer boundary(boundaryMarker, TOK, type);
+
+            HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+            //identityPair.insert_to_alphabet(boundaryMarker);
+            HfstTransducer identityStar(identityPair);
+            identityStar.repeat_star();
+            identityStar.insert_to_alphabet(boundaryMarker);
+
+            // to firstContext
+            StringSet firstContextAlphabet = firstContext.get_alphabet();
+            bool hasBoundary = false;
+            for (StringSet::const_iterator s = firstContextAlphabet.begin();
+                      s != firstContextAlphabet.end();
+                      ++s)
+            {
+                if( boundaryMarker.compare(s->c_str()) == 0 )
+                    hasBoundary = true;
+            }
+
+           if ( hasBoundary == false )
+           {
+                //printf("\n - Left context boundary false! - \n");
+                firstContext.insert_to_alphabet(boundaryMarker);
+                HfstTransducer tmp(boundary);
+                tmp.concatenate(identityStar).minimize();
+                //printf("tmp \n");
+                //tmp.write_in_att_format(stdout, 1);
+                tmp.concatenate(firstContext);
+
+                //printf("tmp2 \n");
+                //tmp.write_in_att_format(stdout, 1);
+                firstContext = tmp;
+
+           }
+
+            // to secondContext
+            StringSet secondContextAlphabet = secondContext.get_alphabet();
+            hasBoundary = false;
+            for (StringSet::const_iterator s = secondContextAlphabet.begin();
+                      s != secondContextAlphabet.end();
+                      ++s)
+            {
+                if( boundaryMarker.compare(s->c_str()) == 0 )
+                    hasBoundary = true;
+            }
+
+           if ( hasBoundary == false )
+           {
+              // printf("\n - Right context boundary false! - \n");
+                secondContext.insert_to_alphabet(boundaryMarker);
+                secondContext.concatenate(identityStar).concatenate(boundary).minimize();
+           }
+
+
+             // put mapping between (expanded) contexts
               HfstTransducer oneContextReplace(firstContext);
               oneContextReplace.concatenate(mappingWithBracketsAndTmpBoundary).
                           concatenate(secondContext);
@@ -479,8 +546,8 @@ namespace hfst
                 mappingWithBrackets.disjunct(mappingWithBrackets2).minimize();
           }
 
-          //printf("mappingWithBrackets: \n");
-          //mappingWithBrackets.minimize().write_in_att_format(stdout, 1);
+            //printf("mappingWithBrackets: \n");
+            //mappingWithBrackets.minimize().write_in_att_format(stdout, 1);
 
 
           // Identity with bracketed mapping and marker symbols and TmpMarker in alphabet
@@ -529,7 +596,8 @@ namespace hfst
           //printf("bracketedReplace: \n");
           //bracketedReplace.write_in_att_format(stdout, 1);
 
-
+          //printf("identityExpanded: \n");
+          //identityExpanded.write_in_att_format(stdout, 1);
 
           // Expand all contexts with mapping taking in consideration replace type
           // result is their union
@@ -574,9 +642,6 @@ namespace hfst
       // bracketed replace for parallel rules
     HfstTransducer parallelBracketedReplace( const std::vector<Rule> &ruleVector, bool optional)
       {
-
-
-
           HfstTokenizer TOK;
           TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
           String leftMarker("@_LM_@");
@@ -698,9 +763,7 @@ namespace hfst
 
               identityExpanded.disjunct(mappingWithBrackets).minimize();
               mappingWithBracketsVector.push_back(mappingWithBrackets);
-
           }
-
               identityExpanded.repeat_star().minimize();
 
               // if none of the rules have contexts, return identityExpanded
@@ -710,13 +773,10 @@ namespace hfst
                   return identityExpanded;
               }
 
-
-
               // if they have contexts, process them
 
               HfstTransducer bracketedReplace(type);
               HfstTransducer unionContextReplace(type);
-
 
               if ( ruleVector.size() != mappingWithBracketsVector.size() )
               {
@@ -755,11 +815,6 @@ namespace hfst
 
               }
           /////////////////////}
-
-
-
-
-
 
           // subtract all mappings in contexts from replace without contexts
               HfstTransducer replaceWithoutContexts(bracketedReplace);
@@ -1736,16 +1791,18 @@ namespace hfst
             // apply boundary to the transducer
             // compose [0:.#. | ? - .#.]* .o. t
             HfstTransducer tr(t);
+
+            //tr.insert_to_alphabet(boundaryMarker);
             // substitutute unknowns with tmp symbol
             // this is necessary because of first composition
             tr.substitute("@_UNKNOWN_SYMBOL_@", "@_TMP_UNKNOWN_@");
 
             retval.compose(tr).minimize();
+        //    retval = tr;
+
+
             //printf("tr: \n");
             //tr.write_in_att_format(stdout, 1);
-            //printf("after compose 1: \n");
-            //retval.write_in_att_format(stdout, 1);
-
 
             // compose with .#. (? - .#.)* .#.
             retval.compose(boundaryAnythingBoundary)
@@ -1754,12 +1811,15 @@ namespace hfst
             // compose with [.#.:0 | ? - .#.]*
             retval.compose(removeBoundary).minimize();
 
-            //printf("after compose 3: \n");
-            //retval.write_in_att_format(stdout, 1);
+        //printf("after compose 3: \n");
+        //retval.write_in_att_format(stdout, 1);
 
             // bring back unknown symbols
             retval.substitute("@_TMP_UNKNOWN_@", "@_UNKNOWN_SYMBOL_@");
             retval.remove_from_alphabet("@_TMP_UNKNOWN_@");
+
+          //  printf("retval: \n");
+          //  retval.write_in_att_format(stdout, 1);
 
             // remove boundary from alphabet
             retval.remove_from_alphabet(boundaryMarker);
@@ -1986,8 +2046,6 @@ namespace hfst
 //retval.write_in_att_format(stdout, 1);
 
           // deals with boundary symbol, must be before mostBracketsStarConstraint
-          // TODO: this constraint doesn't work for ? -> x
-              // because first composition composes 0:.#. .o. U:x
          retval = applyBoundaryMark( retval );
 
 //printf("----after applyBoundaryMark: ----\n");
@@ -2023,13 +2081,22 @@ namespace hfst
                 retval = parallelBracketedReplace(ruleVector, optional);
             }
 
+            //printf("- bracketed replace -\n");
+            //retval.write_in_att_format(stdout, 1);
+
             // for epenthesis rules
             // it can't have more than one epsilon repetition in a row
             retval = noRepetitionConstraint( retval );
 
+//printf("----after noRepetitionConstraint: ----\n");
+//retval.write_in_att_format(stdout, 1);
+
 
             // deals with boundary symbol
             retval = applyBoundaryMark( retval );
+
+//printf("----after applyBoundaryMark: ----\n");
+//retval.write_in_att_format(stdout, 1);
 
             if ( !optional )
             {
@@ -2037,8 +2104,17 @@ namespace hfst
                // retval = mostBracketsPlusConstraint(retval);
                 retval = mostBracketsStarConstraint(retval);
             }
+
+//printf("----after mostBracketsStarConstraint: ----\n");
+//retval.write_in_att_format(stdout, 1);
             retval = removeB2Constraint(retval);
+
+//printf("----after removeB2Constraint: ----\n");
+//retval.write_in_att_format(stdout, 1);
             retval = removeMarkers( retval );
+
+            //printf("----after removeMarkers: ----\n");
+            //retval.write_in_att_format(stdout, 1);
             return retval;
 
       }
