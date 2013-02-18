@@ -43,6 +43,17 @@ using std::stack;
 extern FILE* hxfstin;
 extern int hxfstparse(void);
 
+class yy_buffer_state;
+typedef yy_buffer_state *YY_BUFFER_STATE;
+extern YY_BUFFER_STATE hxfst_scan_buffer(char*, size_t);
+
+// todo: see if readline is supported 
+//#include <stdio.h>
+//#include <stdlib.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+
+
 namespace hfst { 
 namespace xfst {
 
@@ -74,6 +85,7 @@ namespace xfst {
         variables_["sort-arcs"] = "MAYBE";
         variables_["use-timer"] = "OFF";
         variables_["verbose"] = "OFF";
+        prompt();
       }
         
 XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
@@ -1861,6 +1873,16 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       fclose(hxfstin);
       return rv;
     }
+  int
+  XfstCompiler::parse_line(char line[])
+  {
+    hxfstin = NULL;
+    xfst_ = this;
+    hxfst_scan_buffer(line, sizeof(line));
+    //int rv = hxfstparse();
+    //return rv;
+    return 0;
+  }
 
   XfstCompiler&
   XfstCompiler::print_properties(FILE* outfile)
@@ -1903,7 +1925,47 @@ int main(int argc, char** argv)
 {
   hfst::xfst::XfstCompiler comp(hfst::TROPICAL_OPENFST_TYPE);
   comp.setVerbosity(true);
-  comp.parse("foo.xfst");
+  //comp.prompt();
+
+  if (false) {
+      comp.parse(stdin); // no support for backspace or Up/Down keys
+  }
+  
+  // support for backspace
+  if (false) {
+    char line[256];
+    //comp.parse(stdin); // this is needed so that first command is parsed correctly..
+    while (cin.getline(line, 256))
+      {
+        comp.parse_line(line);
+      }
+  }
+
+  // support for backspace and Up/Down keys, needs readline, doesn't work.. 
+  if (true)
+  {
+    char *buf;
+    rl_bind_key('\t',rl_abort); // disable auto-complet
+
+    //comp.parse_line(strdup("")); // this is needed so that first command is parsed correctly..
+    comp.prompt();
+    while((buf = readline("")) != NULL)
+      {
+        if (buf[0] != 0) {
+          add_history(buf); }
+
+        //fprintf(stderr, "parsing '%s'...\n", buf);
+        //comp.parse_line(buf);
+        FILE *tempfile = fopen("temp", "wb");
+        fprintf(tempfile, "%s", buf);
+        fclose(tempfile);
+        comp.parse("temp");
+        //fprintf(stderr, "parsed\n");
+        //comp.prompt();
+      }
+    free(buf);
+    }
+
   return EXIT_SUCCESS;
 }
 

@@ -30,7 +30,7 @@ noinst_HEADERS = XfstCompiler.h xfst-utils.h xfst-parser.h
 
 bin_PROGRAMS=$(MAYBE_XFST)
 hfst_xfst2fst_SOURCES = xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc
-hfst_xfst2fst_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS)
+hfst_xfst2fst_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS) -lreadline
 
 #xfst-parser.h: xfst-parser.cc
 

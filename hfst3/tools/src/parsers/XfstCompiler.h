@@ -405,11 +405,14 @@ class XfstCompiler
   int parse(FILE* infile);
   //! @brief Parse @a filename
   int parse(const char* filename);
+  //! @brief Parse @a line
+  int parse_line(char line[]);
   //! @brief Print prompts and XFST outputs
   XfstCompiler& setVerbosity(bool verbosity);
+  //! @brief Explicitly print the prompt
+  const XfstCompiler& prompt() const;
   private:
   const XfstCompiler& error(const char* message) const;
-  const XfstCompiler& prompt() const;
   const XfstCompiler& print_transducer_info() const;
   XfstCompiler& add_prop_line(char* line);
   XfstCompiler& apply_up_line(char* line);
