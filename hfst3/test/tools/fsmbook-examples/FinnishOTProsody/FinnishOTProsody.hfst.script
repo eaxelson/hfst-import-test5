@@ -194,7 +194,18 @@ echo "c7"
 # All-Ft-Left: Every foot starts at the beginning of a
 #              prosodic word.
 
-echo '[ "(" -> ...   {*} || .#. @"SB" _ .o. "(" -> ... {*}^2 || .#. @"SB"^2 _ .o. "(" -> ... {*}^3 || .#. @"SB"^3 _ .o. "(" -> ... {*}^4 || .#. @"SB"^4 _ .o. "(" -> ... {*}^5 || .#. @"SB"^5 _ .o. "(" -> ... {*}^6 || .#. @"SB"^6 _ .o. "(" -> ... {*}^7 || .#. @"SB"^7 _ .o. "(" -> ... {*}^8 || .#. @"SB"^8 _ ]' | $2/hfst-regexp2fst -f $1 > AllFeetFirst
+echo '[ "(" -> ... {*} || .#. @"SB" _ .o. "(" -> ... {*}^2 || .#. @"SB"^2 _ .o. "(" -> ... {*}^3 || .#. @"SB"^3 _ .o. "(" -> ... {*}^4 || .#. @"SB"^4 _ .o. "(" -> ... {*}^5 || .#. @"SB"^5 _ .o. "(" -> ... {*}^6 || .#. @"SB"^6 _ .o. "(" -> ... {*}^7 || .#. @"SB"^7 _ .o. "(" -> ... {*}^8 || .#. @"SB"^8 _ ]' | $2/hfst-regexp2fst -f $1 > AllFeetFirst
+#echo '"(" -> ... {*} || .#. @"SB" _ ' | $2/hfst-regexp2fst -f $1 > a0
+#echo '"(" -> ... {*}^2 || .#. @"SB"^2 _ '  | $2/hfst-regexp2fst -f $1 > a1
+#echo '"(" -> ... {*}^3 || .#. @"SB"^3 _ '  | $2/hfst-regexp2fst -f $1 > a2
+#echo '"(" -> ... {*}^4 || .#. @"SB"^4 _ '  | $2/hfst-regexp2fst -f $1 > a3
+#echo '"(" -> ... {*}^5 || .#. @"SB"^5 _ '  | $2/hfst-regexp2fst -f $1 > a4
+#echo '"(" -> ... {*}^6 || .#. @"SB"^6 _ '  | $2/hfst-regexp2fst -f $1 > a5
+#echo '"(" -> ... {*}^7 || .#. @"SB"^7 _ '  | $2/hfst-regexp2fst -f $1 > a6
+#echo '"(" -> ... {*}^8 || .#. @"SB"^8 _ ' | $2/hfst-regexp2fst -f $1 > a7
+
+#echo '--a comp'
+#echo '@"a0" .o. @"a1" .o. @"a2" .o. @"a3" .o. @"a4" .o. @"a5" .o. @"a6" .o. @"a7"' | $2/hfst-regexp2fst -f $1 > AllFeetFirst
 
 # Evaluation
 echo "c8"
