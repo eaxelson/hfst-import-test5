@@ -460,27 +460,27 @@ COMMAND: ADD_PROPS REDIRECT_IN NEWLINE {
        | PRINT_SHORTEST_STRING_SIZE NEWLINE {
             hfst::xfst::xfst_->print_shortest_string_size(stdout);
        }
-       | PRINT_LOWER_WORDS NAMETOKEN NUMBER NEWLINE {
+       | PRINT_LOWER_WORDS NAMETOKEN NUMBER END_COMMAND {
             hfst::xfst::xfst_->print_lower_words($2, $3, stdout);
             free($2);
        }
-       | PRINT_LOWER_WORDS NAMETOKEN NEWLINE {
+       | PRINT_LOWER_WORDS NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->print_lower_words($2, 0, stdout);
             free($2);
        }
-       | PRINT_LOWER_WORDS NUMBER NEWLINE {
+       | PRINT_LOWER_WORDS NUMBER END_COMMAND {
             hfst::xfst::xfst_->print_lower_words(0, $2, stdout);
        }
-       | PRINT_LOWER_WORDS REDIRECT_OUT NEWLINE {
+       | PRINT_LOWER_WORDS REDIRECT_OUT END_COMMAND {
             hfst::xfst::xfst_->print_lower_words(0, 0, hfst::xfst::xfst_fopen($2, "w"));
        }
-       | PRINT_RANDOM_LOWER NUMBER NEWLINE {
+       | PRINT_RANDOM_LOWER NUMBER END_COMMAND {
             hfst::xfst::xfst_->print_random_lower($2, stdout);
        }
-       | PRINT_RANDOM_LOWER NEWLINE {
+       | PRINT_RANDOM_LOWER END_COMMAND {
             hfst::xfst::xfst_->print_random_lower(15, stdout);
        }
-       | PRINT_RANDOM_LOWER REDIRECT_OUT NEWLINE {
+       | PRINT_RANDOM_LOWER REDIRECT_OUT END_COMMAND {
             hfst::xfst::xfst_->print_random_lower(15, hfst::xfst::xfst_fopen($2, "w"));
        }
        | PRINT_UPPER_WORDS NAMETOKEN NUMBER NEWLINE {
@@ -496,30 +496,30 @@ COMMAND: ADD_PROPS REDIRECT_IN NEWLINE {
        | PRINT_UPPER_WORDS REDIRECT_OUT NEWLINE {
             hfst::xfst::xfst_->print_upper_words(0, 0, hfst::xfst::xfst_fopen($2, "w"));
        }
-       | PRINT_RANDOM_UPPER NUMBER NEWLINE {
+       | PRINT_RANDOM_UPPER NUMBER END_COMMAND {
             hfst::xfst::xfst_->print_random_upper($2, stdout);
        }
-       | PRINT_RANDOM_UPPER NEWLINE {
+       | PRINT_RANDOM_UPPER END_COMMAND {
             hfst::xfst::xfst_->print_random_upper(15, stdout);
        }
-       | PRINT_WORDS NAMETOKEN NUMBER NEWLINE {
+       | PRINT_WORDS NAMETOKEN NUMBER END_COMMAND {
             hfst::xfst::xfst_->print_words($2, $3, stdout);
             free($2);
        }
-       | PRINT_WORDS NAMETOKEN NEWLINE {
+       | PRINT_WORDS NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->print_words($2, 0, stdout);
             free($2);
        }
-       | PRINT_WORDS NUMBER NEWLINE {
+       | PRINT_WORDS NUMBER END_COMMAND {
             hfst::xfst::xfst_->print_words(0, $2, stdout);
        }
-       | PRINT_WORDS NEWLINE {
+       | PRINT_WORDS END_COMMAND {
             hfst::xfst::xfst_->print_words(0, 0, stdout);
        }
-       | PRINT_RANDOM_WORDS NUMBER NEWLINE {
+       | PRINT_RANDOM_WORDS NUMBER END_COMMAND {
             hfst::xfst::xfst_->print_random_words($2, stdout);
        }
-       | PRINT_RANDOM_WORDS NEWLINE {
+       | PRINT_RANDOM_WORDS END_COMMAND {
             hfst::xfst::xfst_->print_random_words(15, stdout);
        }
        | PRINT NAMETOKEN NEWLINE {
