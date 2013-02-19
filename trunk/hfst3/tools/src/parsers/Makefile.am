@@ -20,7 +20,7 @@ BUILT_SOURCES=xfst-parser.h xfst-parser.cc xfst-lexer.cc
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
-AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/libhfst/src/parsers $(GLIB_CPPFLAGS) -Wno-deprecated
+AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/tools/src $(GLIB_CPPFLAGS) -Wno-deprecated
 
 if WANT_XFST2FST
 MAYBE_XFST=hfst-xfst2fst
@@ -28,8 +28,10 @@ endif
 
 noinst_HEADERS = XfstCompiler.h xfst-utils.h xfst-parser.h
 
+HFST_COMMON_SRC=../hfst-program-options.cc ../hfst-commandline.cc ../hfst-tool-metadata.cc
+
 bin_PROGRAMS=$(MAYBE_XFST)
-hfst_xfst2fst_SOURCES = xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc
+hfst_xfst2fst_SOURCES = xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc $(HFST_COMMON_SRC)
 hfst_xfst2fst_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS) -lreadline
 
 #xfst-parser.h: xfst-parser.cc

@@ -409,8 +409,12 @@ class XfstCompiler
   int parse_line(char line[]);
   //! @brief Print prompts and XFST outputs
   XfstCompiler& setVerbosity(bool verbosity);
+  //! @brief Print prompts
+  XfstCompiler& setPromptVerbosity(bool verbosity);
   //! @brief Explicitly print the prompt
   const XfstCompiler& prompt() const;
+  //! @brief Get the prompt
+  char* get_prompt() const;
   private:
   const XfstCompiler& error(const char* message) const;
   const XfstCompiler& print_transducer_info() const;
@@ -436,6 +440,7 @@ class XfstCompiler
   hfst::HfstTransducer* last_defined_;
   hfst::ImplementationType format_;
   bool verbose_;
+  bool verbose_prompt_;
 }
 ;
 

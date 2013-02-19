@@ -61,7 +61,8 @@ namespace xfst {
     XfstCompiler::XfstCompiler() :
         xre_(hfst::TROPICAL_OPENFST_TYPE),
         format_(hfst::TROPICAL_OPENFST_TYPE),
-        verbose_(false)
+        verbose_(false),
+        verbose_prompt_(false)
       {
         xre_.set_expand_definitions(true);
         variables_["assert"] = "OFF";
@@ -91,7 +92,8 @@ namespace xfst {
 XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         xre_(impl),
         format_(impl),
-        verbose_(false)
+        verbose_(false),
+        verbose_prompt_(false)
       {
         xre_.set_expand_definitions(true);
         variables_["assert"] = "OFF";
@@ -638,14 +640,16 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::quit(const char* message)
     {
-      if (strcmp(message, "dodongo") == 0)
+      if (verbose_ && (strcmp(message, "dodongo") == 0))
         {
           fprintf(stdout, "dislikes smoke.\n");
         }
-      else
+      else if (verbose_)
         {
           fprintf(stdout, "%s.\n", message);
         }
+      else
+        ;
       exit(EXIT_SUCCESS);
       return *this;
     }
@@ -1896,16 +1900,30 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       verbose_ = verbosity;
       return *this;
     }
+  XfstCompiler&
+  XfstCompiler::setPromptVerbosity(bool verbosity)
+  {
+    verbose_prompt_ = verbosity;
+    return *this;
+  }
 
   const XfstCompiler&
   XfstCompiler::prompt() const
     {
-      if (verbose_)
+      if (verbose_prompt_ && verbose_)
         {
           fprintf(stdout, "hfst[" SIZE_T_SPECIFIER "]: ", stack_.size());
         }
       return *this;
     }
+
+  char*
+  XfstCompiler::get_prompt() const
+  {
+    char p[256];
+    sprintf(p, "hfst[" SIZE_T_SPECIFIER "]: ", stack_.size());
+    return strdup(p);
+  }
 
   const XfstCompiler&
   XfstCompiler::print_transducer_info() const
@@ -1921,11 +1939,158 @@ XfstCompiler* xfst_ = 0;
 
 }}
 
+#include <getopt.h>
+#include "hfst-commandline.h"
+#include "hfst-program-options.h"
+#include "hfst-tool-metadata.h"
+#include "inc/globals-common.h"
+
+static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
+
+void
+print_usage()
+{
+  // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp                                                                                                                                                               
+  // Usage line                                                                                                                                                                                                                            
+  fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
+          "XFST parser\n"
+          "\n", program_name);
+  
+  print_common_program_options(message_out);
+  fprintf(message_out, "\n");
+  fprintf(message_out, "Xfst-specific options:\n");
+  fprintf(message_out, 
+          "  -f, --format=FMT       Write result using FMT as backend format\n"
+          "  -F. --...              ...\n"
+          "\n"
+          "If FMT is not given, OpenFst's tropical format will be used.\n"
+          "The possible values for FMT are { foma, openfst-tropical, openfst-log,\n"
+          "sfst, optimized-lookup-weighted, optimized-lookup-unweighted }\n");
+  fprintf(message_out, "\n");
+  print_report_bugs();
+  fprintf(message_out, "\n");
+  print_more_info();
+}
+
+int
+parse_options(int argc, char** argv)
+{
+  extend_options_getenv(&argc, &argv);
+  // use of this function requires options are settable on global scope                                                                                                                                                                    
+  while (true)
+    {
+        static const struct option long_options[] =
+          {
+            HFST_GETOPT_COMMON_LONG,
+            // add tool-specific options here
+            {"format", required_argument, 0, 'f'},
+            {"scriptfile", required_argument, 0, 'F'},
+            {0,0,0,0}
+          };
+        int option_index = 0;
+        // add tool-specific options here
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "f:F:",
+                             long_options, &option_index);
+        if (-1 == c)
+          {
+            break;
+          }
+
+        switch (c)
+          {
+            //copied from "inc/getopt-cases-common.h"
+          case 'd':
+            debug = true;
+            break;
+          case 'h':
+            print_usage();
+            return EXIT_SUCCESS;
+            break;
+          case 'V':
+            print_version();
+            return EXIT_SUCCESS;
+            break;
+          case 'v':
+            verbose = true;
+            silent = false;
+            break;
+          case 'q':
+          case 's':
+            verbose = false;
+            silent = true;
+            break;
+            /*case 'o':
+            outfilename = hfst_strdup(optarg);
+            outfile = hfst_fopen(outfilename, "w");
+            if (outfile == stdout)
+              {
+                free(outfilename);
+                outfilename = hfst_strdup("<stdout>");
+                message_out = stderr;
+              }
+            outputNamed = true;
+            break;*/
+          case 'f':
+            output_format = hfst_parse_format_name(optarg);
+            break;
+#include "inc/getopt-cases-error.h"
+          }
+    }
+
+  //#include "inc/check-params-common.h"
+  if (output_format == hfst::UNSPECIFIED_TYPE)
+    {
+      output_format = hfst::TROPICAL_OPENFST_TYPE;
+      verbose_printf("Using default output format OpenFst "
+                     "with tropical weight class\n");
+    }
+
+  return EXIT_CONTINUE;
+}
+
+
+
 int main(int argc, char** argv)
 {
-  hfst::xfst::XfstCompiler comp(hfst::TROPICAL_OPENFST_TYPE);
-  comp.setVerbosity(true);
-  //comp.prompt();
+
+  hfst_set_program_name(argv[0], "0.1", "HfstXfst2Fst");
+  int retval = parse_options(argc, argv);
+  if (retval != EXIT_CONTINUE)
+    {
+      return retval;
+    }
+
+  //verbose_printf("Reading from %s, writing to %s\n",
+  //             inputfilename, outfilename);
+  switch (output_format)
+    {
+    case hfst::SFST_TYPE:
+      verbose_printf("Using SFST as output handler\n");
+      break;
+    case hfst::TROPICAL_OPENFST_TYPE:
+      verbose_printf("Using OpenFst's tropical weights as output\n");
+      break;
+    case hfst::LOG_OPENFST_TYPE:
+      verbose_printf("Using OpenFst's log weight output\n");
+      break;
+    case hfst::FOMA_TYPE:
+      verbose_printf("Using foma as output handler\n");
+      break;
+    case hfst::HFST_OL_TYPE:
+      verbose_printf("Using optimized lookup output\n");
+      break;
+    case hfst::HFST_OLW_TYPE:
+      verbose_printf("Using optimized lookup weighted output\n");
+      break;
+    default:
+      error(EXIT_FAILURE, 0, "Unknown format cannot be used as output\n");
+      return EXIT_FAILURE;
+    }
+
+
+  hfst::xfst::XfstCompiler comp(output_format);
+  comp.setVerbosity(!silent);
+  comp.setPromptVerbosity(false); // prompts handled manually
 
   if (false) {
       comp.parse(stdin); // no support for backspace or Up/Down keys
@@ -1934,36 +2099,35 @@ int main(int argc, char** argv)
   // support for backspace
   if (false) {
     char line[256];
-    //comp.parse(stdin); // this is needed so that first command is parsed correctly..
     while (cin.getline(line, 256))
       {
         comp.parse_line(line);
       }
   }
 
-  // support for backspace and Up/Down keys, needs readline, doesn't work.. 
+  // support for backspace and Up/Down keys, needs readline library
   if (true)
   {
-    char *buf;
+    char *buf = NULL;           // result from readline
     rl_bind_key('\t',rl_abort); // disable auto-complet
 
-    //comp.parse_line(strdup("")); // this is needed so that first command is parsed correctly..
-    comp.prompt();
-    while((buf = readline("")) != NULL)
+    char* promptline = (!silent) ? comp.get_prompt() : strdup("");
+    while((buf = readline(promptline)) != NULL)
       {
         if (buf[0] != 0) {
           add_history(buf); }
 
-        //fprintf(stderr, "parsing '%s'...\n", buf);
-        //comp.parse_line(buf);
+        // use temporary file for parsing, stdout is already controlled by readline 
         FILE *tempfile = fopen("temp", "wb");
         fprintf(tempfile, "%s", buf);
         fclose(tempfile);
         comp.parse("temp");
-        //fprintf(stderr, "parsed\n");
-        //comp.prompt();
+
+        free(promptline);
+        promptline = (!silent) ? comp.get_prompt() : strdup("");
       }
     free(buf);
+    free(promptline);
     }
 
   return EXIT_SUCCESS;
