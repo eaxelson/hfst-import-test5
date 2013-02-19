@@ -43,16 +43,11 @@ using std::stack;
 extern FILE* hxfstin;
 extern int hxfstparse(void);
 
+extern int hxfstlex(void);
 class yy_buffer_state;
 typedef yy_buffer_state *YY_BUFFER_STATE;
-extern YY_BUFFER_STATE hxfst_scan_buffer(char*, size_t);
-
-// todo: see if readline is supported 
-//#include <stdio.h>
-//#include <stdlib.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-
+extern YY_BUFFER_STATE hxfst_scan_string(const char*);
+extern void hxfst_delete_buffer(YY_BUFFER_STATE);
 
 namespace hfst { 
 namespace xfst {
@@ -1861,7 +1856,10 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       hxfstin = infile;
       xfst_ = this;
-      return hxfstparse();
+      //YY_BUFFER_STATE bs = hxfst_create_buffer(hxfstin, 32000);
+      int rv = hxfstparse();
+      //hxfst_delete_buffer(bs);
+      return rv;
     }
   int
   XfstCompiler::parse(const char* filename)
@@ -1873,7 +1871,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           return -1;
         }
       xfst_ = this;
+      //YY_BUFFER_STATE bs = hxfst_create_buffer(hxfstin, 32000);
       int rv = hxfstparse();
+      //hxfst_delete_buffer(bs);
       fclose(hxfstin);
       return rv;
     }
@@ -1882,9 +1882,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   {
     hxfstin = NULL;
     xfst_ = this;
-    hxfst_scan_buffer(line, sizeof(line));
-    //int rv = hxfstparse();
-    //return rv;
+    YY_BUFFER_STATE bs = hxfst_scan_string(line);
+    hxfstparse();
+    hxfst_delete_buffer(bs);
     return 0;
   }
 
@@ -1938,239 +1938,6 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 XfstCompiler* xfst_ = 0;
 
 }}
-
-#include <getopt.h>
-#include "hfst-commandline.h"
-#include "hfst-program-options.h"
-#include "hfst-tool-metadata.h"
-#include "inc/globals-common.h"
-
-static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
-static char* scriptfilename = NULL;
-static char* startupfilename = NULL;
-static char* execute_commands = NULL;
-static bool pipemode = false;
-static bool use_readline = true;
-
-void
-print_usage()
-{
-  // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp                                                                                                                                                               
-  // Usage line                                                                                                                                                                                                                            
-  fprintf(message_out, "Usage: %s [OPTIONS...]\n"
-          "XFST parser\n"
-          "\n", program_name);
-  
-  print_common_program_options(message_out);
-  fprintf(message_out, "\n");
-  fprintf(message_out, "Xfst-specific options:\n");
-  fprintf(message_out, 
-          "  -e, --execute=CMD        Execute command CMD on startup\n" 
-          "  -f, --format=FMT         Write result using FMT as backend format\n"
-          "  -F. --scriptfile=FILE    Read commands from FILE, and quit\n"
-          "  -l, --startupfile=FILE   Read commands from FILE on startup\n"
-          "  -p, --pipe-mode          Pipe mode (non-interactive), reads from standard input\n"
-          "  -r, --no-readline        Do not use readline library for input\n"
-          "\n"
-          "Option --execute can be invoked only once, but CMD can contain several commands\n"
-          "separated by semicolons.\n"
-          "If FMT is not given, OpenFst's tropical format will be used.\n"
-          "The possible values for FMT are { foma, openfst-tropical, openfst-log,\n"
-          "sfst, optimized-lookup-weighted, optimized-lookup-unweighted }\n");
-  fprintf(message_out, "\n");
-  print_report_bugs();
-  fprintf(message_out, "\n");
-  print_more_info();
-}
-
-int
-parse_options(int argc, char** argv)
-{
-  extend_options_getenv(&argc, &argv);
-  // use of this function requires options are settable on global scope                                                                                                                                                                    
-  while (true)
-    {
-        static const struct option long_options[] =
-          {
-            HFST_GETOPT_COMMON_LONG,
-            // add tool-specific options here
-            {"format", required_argument, 0, 'f'},
-            {"scriptfile", required_argument, 0, 'F'},
-            {"execute", required_argument, 0, 'e'},
-            {"startupfile", required_argument, 0, 'l'},
-            {"pipe-mode", no_argument, 0, 'p'},
-            {"no-readline", no_argument, 0, 'r'},
-            {0,0,0,0}
-          };
-        int option_index = 0;
-        // add tool-specific options here
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "f:F:e:l:pr",
-                             long_options, &option_index);
-        if (-1 == c)
-          {
-            break;
-          }
-
-        switch (c)
-          {
-            //copied from "inc/getopt-cases-common.h"
-          case 'd':
-            debug = true;
-            break;
-          case 'h':
-            print_usage();
-            return EXIT_SUCCESS;
-            break;
-          case 'V':
-            print_version();
-            return EXIT_SUCCESS;
-            break;
-          case 'v':
-            verbose = true;
-            silent = false;
-            break;
-          case 'q':
-          case 's':
-            verbose = false;
-            silent = true;
-            break;
-          case 'f':
-            output_format = hfst_parse_format_name(optarg);
-            break;
-          case 'F':
-            scriptfilename = hfst_strdup(optarg);
-            break;
-          case 'e':
-            execute_commands = hfst_strdup(optarg);
-            break;
-          case 'l':
-            startupfilename = hfst_strdup(optarg);
-            break;
-          case 'p':
-            pipemode = true;
-            break;
-          case 'r':
-            use_readline = false;
-            break;
-#include "inc/getopt-cases-error.h"
-          }
-    }
-
-  //#include "inc/check-params-common.h"
-  if (output_format == hfst::UNSPECIFIED_TYPE)
-    {
-      output_format = hfst::TROPICAL_OPENFST_TYPE;
-      verbose_printf("Using default output format OpenFst "
-                     "with tropical weight class\n");
-    }
-
-  return EXIT_CONTINUE;
-}
-
-
-
-int main(int argc, char** argv)
-{
-
-  hfst_set_program_name(argv[0], "0.1", "HfstXfst2Fst");
-  int retval = parse_options(argc, argv);
-  if (retval != EXIT_CONTINUE)
-    {
-      return retval;
-    }
-
-  switch (output_format)
-    {
-    case hfst::SFST_TYPE:
-      verbose_printf("Using SFST as output handler\n");
-      break;
-    case hfst::TROPICAL_OPENFST_TYPE:
-      verbose_printf("Using OpenFst's tropical weights as output\n");
-      break;
-    case hfst::LOG_OPENFST_TYPE:
-      verbose_printf("Using OpenFst's log weight output\n");
-      break;
-    case hfst::FOMA_TYPE:
-      verbose_printf("Using foma as output handler\n");
-      break;
-    case hfst::HFST_OL_TYPE:
-      verbose_printf("Using optimized lookup output\n");
-      break;
-    case hfst::HFST_OLW_TYPE:
-      verbose_printf("Using optimized lookup weighted output\n");
-      break;
-    default:
-      error(EXIT_FAILURE, 0, "Unknown format cannot be used as output\n");
-      return EXIT_FAILURE;
-    }
-  
-  if (pipemode && (scriptfilename != NULL))
-    {
-      error(EXIT_FAILURE, 0 , "--pipe-mode and --scriptfile cannot be used simultaneously\n");
-      return EXIT_FAILURE;
-    }
-
-  // Create XfstCompiler
-  hfst::xfst::XfstCompiler comp(output_format);
-  comp.setVerbosity(!silent);
-
-  // If needed, execute script given in command line
-  if (execute_commands != NULL)
-    {
-      comp.parse_line(execute_commands);
-    }
-  // If needed, execute script in startup file
-  if (startupfilename != NULL)
-    {
-      comp.parse(startupfilename);
-    }
-  
-  if (pipemode) 
-    {
-      comp.parse(stdin);
-    }
-  else if (scriptfilename != NULL)
-    {
-      comp.parse(scriptfilename);
-    }
-  else if (! use_readline)
-    {
-      // support for backspace
-      char line[256];
-      while (cin.getline(line, 256))
-        {
-          comp.parse_line(line);
-        }
-    }
-  else
-    {
-      // support for backspace and Up/Down keys, needs readline library
-
-      comp.setPromptVerbosity(false); // prompts handled manually
-      char *buf = NULL;               // result from readline
-      rl_bind_key('\t',rl_abort);     // disable auto-complet
-
-      char* promptline = (!silent) ? comp.get_prompt() : strdup("");
-      while((buf = readline(promptline)) != NULL)
-        {
-          if (buf[0] != 0) {
-            add_history(buf); }
-          
-          // use temporary file for parsing, stdout is already controlled by readline 
-          FILE *tempfile = fopen("temp", "wb");
-          fprintf(tempfile, "%s", buf);
-          fclose(tempfile);
-          comp.parse("temp");
-          
-          free(promptline);
-          promptline = (!silent) ? comp.get_prompt() : strdup("");
-        }
-      free(buf);
-      free(promptline);
-    }
-
-  return EXIT_SUCCESS;
-}
 
 #else
 #include <cstdlib>
