@@ -9,21 +9,18 @@ REMOVE="rm -f"
 
 for format in sfst openfst-tropical foma;
 do
-
-    if ! (${FORMATS} --list-formats | grep $format 2>1 > /dev/null); then
+    if ! (${FORMATS} --list-formats | grep $format > /dev/null); then
 	continue;
     fi
-    
     echo "define Foo foo;" > startup
-    if ! (echo "regex Foo Bar; save stack tmp;" | ${XFST_TOOL} -l startup -e "define Bar bar;"); then
+    if ! (echo "regex Foo Bar; save stack tmp;" | ${XFST_TOOL} -f $format -l startup -e "define Bar bar;"); then
 	${REMOVE} ${EXTRA_FILES}
 	exit 1
     fi
-    if ! (echo "foo bar" | ${STRINGS2FST} -S | ${COMPARE} tmp); then
+    if ! (echo "foo bar" | ${STRINGS2FST} -f $format -S | ${COMPARE} tmp); then
 	${REMOVE} ${EXTRA_FILES}
 	exit 1
     fi
-    
 done
 
 ${REMOVE} ${EXTRA_FILES}
