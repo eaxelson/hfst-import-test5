@@ -407,6 +407,7 @@ class XfstCompiler
   int parse(const char* filename);
   //! @brief Parse @a line
   int parse_line(char line[]);
+  int parse_line(std::string line);
   //! @brief Print prompts and XFST outputs
   XfstCompiler& setVerbosity(bool verbosity);
   //! @brief Print prompts
