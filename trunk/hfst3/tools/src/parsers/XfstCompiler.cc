@@ -1887,6 +1887,18 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     hxfst_delete_buffer(bs);
     return 0;
   }
+  int
+  XfstCompiler::parse_line(std::string line)
+  {
+    hxfstin = NULL;
+    xfst_ = this;
+    char * line_ = strdup(line.c_str());
+    YY_BUFFER_STATE bs = hxfst_scan_string(line_);
+    hxfstparse();
+    hxfst_delete_buffer(bs);
+    free(line_);
+    return 0;
+  }
 
   XfstCompiler&
   XfstCompiler::print_properties(FILE* outfile)

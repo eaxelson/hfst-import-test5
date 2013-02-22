@@ -37,6 +37,8 @@ static std::vector<char*> execute_commands;
 static bool pipemode = false;
 static bool use_readline = true;
 
+static const size_t LINE_SIZE=1024;
+
 void
 print_usage()
 {
@@ -150,69 +152,48 @@ parse_options(int argc, char** argv)
   return EXIT_CONTINUE;
 }
 
-bool is_whitespace(char c)
+// todo: handle literal "define" or "regex"
+bool contains_regex(const std::string &str)
 {
-  if (c == '\r' || c == '\n' || c == ' ' || c == '\t') {
-    return true; }
+  if (std::string::npos != str.find("define"))
+    return true;
+  if (std::string::npos != str.find("regex"))
+    return true;
   return false;
 }
 
-bool contains_keyword(const char* keyword, const std::string &str)
+// todo: handle literal ";"
+bool ends_regex(const std::string &str)
 {
-  unsigned found = str.find(keyword); 
-  if (found != std::string::npos)
-    {
-      for (unsigned i=0; i<found; i++)
-        {
-          if (! is_whitespace(str[i])) 
-            return false;
-        }
-      return true;
-    }
-  else 
-    {
-      return false;
-    }
-}
-
-bool contains_regex(char* l)
-{
-  bool retval=false;
-  std::string line(l);
-  return (contains_keyword("define", line) || contains_keyword("regex", line))
-}
-
-bool ends_regex(char* l)
-{
-  
-}
-
-char* get_lines_until_end_of_regex(char *line, size_t size, FILE *file)
-{
+  if (std::string::npos != str.find(";"))
+    return true;
+  return false;
 }
 
 // 0 == read line
 // 1 == end of file
 // 2 == error in parsing
-int xfst_get_line(std::string &str, FILE* file)
+int xfst_get_line(int &retval, std::string &str, FILE* file)
 {
   str=std::string("");
   char line [LINE_SIZE];
   if (NULL == fgets(line, LINE_SIZE, file))
     {
-      return 1;
+      retval=1;
+      return retval;
     }
   else
     {
       str = std::string(line);
-      if (contains_regex(linestr))
+      if (contains_regex(str) && ! ends_regex(str))
         {
           while(true)
             {
               if (NULL == fgets(line, LINE_SIZE, file)) 
                 {
                   error(EXIT_FAILURE, 0, "parsing of regex failed: no end of expression (;) found before end of file\n");
-                  return 2;
+                  retval=2;
+                  return retval;
                 }
               else 
                 {
@@ -220,11 +201,14 @@ int xfst_get_line(std::string &str, FILE* file)
                   str.append(next_line);
                   if (ends_regex(next_line))
                     {
-                      return 0;
+                      retval=0;
+                      return retval;
                     }
                 }
             }
         }
+      retval=0;
+      return 0;
     }
 }
 
@@ -301,33 +285,38 @@ int main(int argc, char** argv)
         }
       std::string line;
       int retval;
-      while(0 == xfst_get_line(line, startupfile))
+      while(0 == xfst_get_line(retval, line, startupfile))
         {
-          if (0 != comp.parse_line(line.c_str()))
+          if (0 != comp.parse_line(line))
             {
               fclose(startupfile);
               error(EXIT_FAILURE, 0, "error in startupfile\n");
               return EXIT_FAILURE;
             }
         }
+      if (2 == retval)
+        return EXIT_FAILURE;
       fclose(startupfile);
     }
   
   if (pipemode) 
     {
       std::string line;
-      while (xfst_get_line(line, stdout))
+      int retval;
+      while (0 == xfst_get_line(retval, line, stdout))
         {
-          if (0 != comp.parse_line(line.c_str()))
+          if (0 != comp.parse_line(line))
             {
               error(EXIT_FAILURE, 0, "error in input\n");
               return EXIT_FAILURE;
             }
         }
+      if (2 == retval)
+        return EXIT_FAILURE;
     }
   else if (scriptfilename != NULL)
     {
-      if (execute_commands == NULL) // parse_line has not been used
+      if (execute_commands.size() == 0) // parse_line has not been used
         {
           if (0 != comp.parse(scriptfilename))
             {
@@ -344,15 +333,18 @@ int main(int argc, char** argv)
               return EXIT_FAILURE;
             }
           std::string line;
-          while (xfst_get_line(line, scriptfile))
+          int retval;
+          while (0 == xfst_get_line(retval, line, scriptfile))
             { 
-              if (0 != comp.parse_line(line.c_str()))
+              if (0 != comp.parse_line(line))
                 {
                   fclose(scriptfile);
                   error(EXIT_FAILURE, 0, "error in scriptfile\n");
                   return EXIT_FAILURE;
                 } 
             }
+          if (2 == retval)
+            return EXIT_FAILURE;
           fclose(scriptfile);
         }
     }

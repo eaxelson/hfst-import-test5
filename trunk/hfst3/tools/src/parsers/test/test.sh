@@ -12,8 +12,9 @@ do
     if ! (${FORMATS} --list-formats | grep $format > /dev/null); then
 	continue;
     fi
-    echo "define Foo foo;" > startup
-    if ! (echo "regex Foo Bar; save stack tmp;" | ${XFST_TOOL} -f $format -l startup -e "define Bar bar;"); then
+    echo "define Foo foo" > startup
+    echo ";" >> startup
+    if ! ((echo "regex Foo Bar;" && echo "save stack tmp") | ${XFST_TOOL} -f $format -l startup -e "define Bar bar;"); then
 	${REMOVE} ${EXTRA_FILES}
 	exit 1
     fi
