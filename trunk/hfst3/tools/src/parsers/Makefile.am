@@ -15,6 +15,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SUBDIRS=test
+
 BUILT_SOURCES=xfst-parser.h xfst-parser.cc xfst-lexer.cc
 
 AM_YFLAGS=-d

@@ -625,7 +625,7 @@ COMMAND: ADD_PROPS REDIRECT_IN NEWLINE {
        | SAVE_DEFINITIONS NEWLINE {
             hfst::xfst::xfst_->write_definitions(0);
        }
-       | SAVE_STACK NAMETOKEN NEWLINE {
+       | SAVE_STACK NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->write_stack($2);
             free($2);
        }
