@@ -33,7 +33,7 @@
 static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
 static char* scriptfilename = NULL;
 static char* startupfilename = NULL;
-static char* execute_commands = NULL;
+static std::vector<char*> execute_commands;
 static bool pipemode = false;
 static bool use_readline = true;
 
@@ -57,8 +57,7 @@ print_usage()
           "  -p, --pipe-mode          Pipe mode (non-interactive), reads from standard input\n"
           "  -r, --no-readline        Do not use readline library for input\n"
           "\n"
-          "Option --execute can be invoked only once, but CMD can contain several commands\n"
-          "separated by semicolons.\n"
+          "Option --execute can be invoked many times.\n"
           "If FMT is not given, OpenFst's tropical format will be used.\n"
           "The possible values for FMT are { foma, openfst-tropical, openfst-log,\n"
           "sfst, optimized-lookup-weighted, optimized-lookup-unweighted }\n");
@@ -126,7 +125,7 @@ parse_options(int argc, char** argv)
             scriptfilename = hfst_strdup(optarg);
             break;
           case 'e':
-            execute_commands = hfst_strdup(optarg);
+            execute_commands.push_back(hfst_strdup(optarg));
             break;
           case 'l':
             startupfilename = hfst_strdup(optarg);
@@ -141,7 +140,6 @@ parse_options(int argc, char** argv)
           }
     }
 
-  //#include "inc/check-params-common.h"
   if (output_format == hfst::UNSPECIFIED_TYPE)
     {
       output_format = hfst::TROPICAL_OPENFST_TYPE;
@@ -152,7 +150,83 @@ parse_options(int argc, char** argv)
   return EXIT_CONTINUE;
 }
 
+bool is_whitespace(char c)
+{
+  if (c == '\r' || c == '\n' || c == ' ' || c == '\t') {
+    return true; }
+  return false;
+}
 
+bool contains_keyword(const char* keyword, const std::string &str)
+{
+  unsigned found = str.find(keyword); 
+  if (found != std::string::npos)
+    {
+      for (unsigned i=0; i<found; i++)
+        {
+          if (! is_whitespace(str[i])) 
+            return false;
+        }
+      return true;
+    }
+  else 
+    {
+      return false;
+    }
+}
+
+bool contains_regex(char* l)
+{
+  bool retval=false;
+  std::string line(l);
+  return (contains_keyword("define", line) || contains_keyword("regex", line))
+}
+
+bool ends_regex(char* l)
+{
+  
+}
+
+char* get_lines_until_end_of_regex(char *line, size_t size, FILE *file)
+{
+}
+
+// 0 == read line
+// 1 == end of file
+// 2 == error in parsing
+int xfst_get_line(std::string &str, FILE* file)
+{
+  str=std::string("");
+  char line [LINE_SIZE];
+  if (NULL == fgets(line, LINE_SIZE, file))
+    {
+      return 1;
+    }
+  else
+    {
+      str = std::string(line);
+      if (contains_regex(linestr))
+        {
+          while(true)
+            {
+              if (NULL == fgets(line, LINE_SIZE, file)) 
+                {
+                  error(EXIT_FAILURE, 0, "parsing of regex failed: no end of expression (;) found before end of file\n");
+                  return 2;
+                }
+              else 
+                {
+                  std::string next_line(line);
+                  str.append(next_line);
+                  if (ends_regex(next_line))
+                    {
+                      return 0;
+                    }
+                }
+            }
+        }
+    }
+}
 
 int main(int argc, char** argv)
 {
@@ -197,7 +271,7 @@ int main(int argc, char** argv)
 
   if ((startupfilename != NULL) && (scriptfilename != NULL))
     {
-      error(EXIT_FAILURE, 0 , "--startupfile and --scriptfile cannot be used simultaneously\n");
+      error(EXIT_FAILURE, 0, "--startupfile and --scriptfile cannot be used simultaneously\n");
       return EXIT_FAILURE;
     }
 
@@ -206,11 +280,13 @@ int main(int argc, char** argv)
   hfst::xfst::XfstCompiler comp(output_format);
   comp.setVerbosity(!silent);
 
-  // If needed, execute script given in command line
-  if (execute_commands != NULL)
+  // If needed, execute scripts given in command line
+  for (std::vector<char*>::const_iterator cmd = execute_commands.begin();
+       cmd != execute_commands.end(); cmd++)
     {
-      if (0 != comp.parse_line(execute_commands))
+      if (0 != comp.parse_line(*cmd))
         {
+          error(EXIT_FAILURE, 0, "parameter of option --execute could not be parsed\n");
           return EXIT_FAILURE;
         }
     }
@@ -223,12 +299,14 @@ int main(int argc, char** argv)
           error(EXIT_FAILURE, 0, "could not open startupfile\n");
           return EXIT_FAILURE;
         }
-      char line[512];
-      while (NULL != fgets(line, 512, startupfile))
+      std::string line;
+      int retval;
+      while(0 == xfst_get_line(line, startupfile))
         {
-          if (0 != comp.parse_line(line))
+          if (0 != comp.parse_line(line.c_str()))
             {
               fclose(startupfile);
+              error(EXIT_FAILURE, 0, "error in startupfile\n");
               return EXIT_FAILURE;
             }
         }
@@ -237,11 +315,12 @@ int main(int argc, char** argv)
   
   if (pipemode) 
     {
-      char line[256];
-      while (cin.getline(line, 256))
+      std::string line;
+      while (xfst_get_line(line, stdout))
         {
-          if (0 != comp.parse_line(line))
+          if (0 != comp.parse_line(line.c_str()))
             {
+              error(EXIT_FAILURE, 0, "error in input\n");
               return EXIT_FAILURE;
             }
         }
@@ -252,6 +331,7 @@ int main(int argc, char** argv)
         {
           if (0 != comp.parse(scriptfilename))
             {
+              error(EXIT_FAILURE, 0, "error in scriptfile\n");
               return EXIT_FAILURE;
             }
         }
@@ -263,12 +343,13 @@ int main(int argc, char** argv)
               error(EXIT_FAILURE, 0, "could not open scriptfile\n");
               return EXIT_FAILURE;
             }
-          char line[512];
-          while (NULL != fgets(line, 512, scriptfile))
+          std::string line;
+          while (xfst_get_line(line, scriptfile))
             { 
-              if (0 != comp.parse_line(line))
+              if (0 != comp.parse_line(line.c_str()))
                 {
                   fclose(scriptfile);
+                  error(EXIT_FAILURE, 0, "error in scriptfile\n");
                   return EXIT_FAILURE;
                 } 
             }
@@ -301,7 +382,6 @@ int main(int argc, char** argv)
           if (buf[0] != 0) {
             add_history(buf); }
           
-          // use temporary file for parsing, stdout is already controlled by readline 
           comp.parse_line(buf);
           
           free(promptline);

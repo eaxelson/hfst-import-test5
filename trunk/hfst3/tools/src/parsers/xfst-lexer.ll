@@ -641,7 +641,7 @@ LWSP [\t ]*
     return CTRLD;
 }
 
-[\n\r] { return NEWLINE; }
+[\n\r] { /* skip newline */ }
 
 [\t ]* { /* skip whitespace */ }
 
