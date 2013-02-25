@@ -152,65 +152,35 @@ parse_options(int argc, char** argv)
   return EXIT_CONTINUE;
 }
 
-// todo: handle literal "define" or "regex"
-bool contains_regex(const std::string &str)
-{
-  if (std::string::npos != str.find("define"))
-    return true;
-  if (std::string::npos != str.find("regex"))
-    return true;
-  return false;
+// Based on a function in foma written by Mans Hulden.
+char *file_to_mem(char *name) {
+
+  FILE    *infile;
+  size_t    numbytes;
+  char *buffer;
+  infile = fopen(name, "r");
+  if(infile == NULL) {
+    printf("Error opening file '%s'\n",name);
+    return NULL;
+  }
+  fseek(infile, 0L, SEEK_END);
+  numbytes = ftell(infile);
+  fseek(infile, 0L, SEEK_SET);
+  // FIX: use malloc instead
+  buffer = (char*)xxmalloc((numbytes+1) * sizeof(char));
+  if(buffer == NULL) {
+    printf("Error reading file '%s'\n",name);
+    return NULL;
+  }
+  if (fread(buffer, sizeof(char), numbytes, infile) != numbytes) {
+    printf("Error reading file '%s'\n",name);
+    return NULL;
+  }
+  fclose(infile);
+  *(buffer+numbytes)='\0';
+  return(buffer);
 }
 
-// todo: handle literal ";"
-bool ends_regex(const std::string &str)
-{
-  if (std::string::npos != str.find(";"))
-    return true;
-  return false;
-}
-
-// 0 == read line
-// 1 == end of file
-// 2 == error in parsing
-int xfst_get_line(int &retval, std::string &str, FILE* file)
-{
-  str=std::string("");
-  char line [LINE_SIZE];
-  if (NULL == fgets(line, LINE_SIZE, file))
-    {
-      retval=1;
-      return retval;
-    }
-  else
-    {
-      str = std::string(line);
-      if (contains_regex(str) && ! ends_regex(str))
-        {
-          while(true)
-            {
-              if (NULL == fgets(line, LINE_SIZE, file)) 
-                {
-                  error(EXIT_FAILURE, 0, "parsing of regex failed: no end of expression (;) found before end of file\n");
-                  retval=2;
-                  return retval;
-                }
-              else 
-                {
-                  std::string next_line(line);
-                  str.append(next_line);
-                  if (ends_regex(next_line))
-                    {
-                      retval=0;
-                      return retval;
-                    }
-                }
-            }
-        }
-      retval=0;
-      return 0;
-    }
-}
 
 int main(int argc, char** argv)
 {
@@ -277,46 +247,28 @@ int main(int argc, char** argv)
   // If needed, execute script in startup file
   if (startupfilename != NULL)
     {
-      FILE *startupfile = fopen(startupfilename, "r");
-      if (startupfile == NULL)
+      char* line = file_to_mem(startupfilename);
+      if (0 != comp.parse_line(line))
         {
-          error(EXIT_FAILURE, 0, "could not open startupfile\n");
+          error(EXIT_FAILURE, 0, "error in startupfile\n");
           return EXIT_FAILURE;
         }
-      std::string line;
-      int retval;
-      while(0 == xfst_get_line(retval, line, startupfile))
-        {
-          if (0 != comp.parse_line(line))
-            {
-              fclose(startupfile);
-              error(EXIT_FAILURE, 0, "error in startupfile\n");
-              return EXIT_FAILURE;
-            }
-        }
-      if (2 == retval)
-        return EXIT_FAILURE;
-      fclose(startupfile);
+      free(line);
     }
   
   if (pipemode) 
     {
-      std::string line;
-      int retval;
-      while (0 == xfst_get_line(retval, line, stdout))
+      char* line = file_to_mem(startupfilename);
+      if (0 != comp.parse_line(line))
         {
-          if (0 != comp.parse_line(line))
-            {
-              error(EXIT_FAILURE, 0, "error in input\n");
-              return EXIT_FAILURE;
-            }
+          error(EXIT_FAILURE, 0, "error in input\n");
+          return EXIT_FAILURE;
         }
-      if (2 == retval)
-        return EXIT_FAILURE;
+      free(line);
     }
   else if (scriptfilename != NULL)
     {
-      if (execute_commands.size() == 0) // parse_line has not been used
+      /*if (execute_commands.size() == 0) // parse_line has not been used
         {
           if (0 != comp.parse(scriptfilename))
             {
@@ -325,28 +277,15 @@ int main(int argc, char** argv)
             }
         }
       else // we have to use parse_line consistently
+      {*/
+      char* line = file_to_mem(scriptfilename);
+      if (0 != comp.parse_line(line))
         {
-          FILE *scriptfile = fopen(scriptfilename, "r");
-          if (scriptfile == NULL)
-            {
-              error(EXIT_FAILURE, 0, "could not open scriptfile\n");
-              return EXIT_FAILURE;
-            }
-          std::string line;
-          int retval;
-          while (0 == xfst_get_line(retval, line, scriptfile))
-            { 
-              if (0 != comp.parse_line(line))
-                {
-                  fclose(scriptfile);
-                  error(EXIT_FAILURE, 0, "error in scriptfile\n");
-                  return EXIT_FAILURE;
-                } 
-            }
-          if (2 == retval)
-            return EXIT_FAILURE;
-          fclose(scriptfile);
+          error(EXIT_FAILURE, 0, "error in scriptfile\n");
+          return EXIT_FAILURE;
         }
+      free(line);
+          //}
     }
   else if (! use_readline)
     {
