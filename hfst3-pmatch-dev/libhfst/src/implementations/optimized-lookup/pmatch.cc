@@ -291,14 +291,18 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
     markers(marker_symbols)
 {
     // initialize the stack for local variables
-    Locals front;
-    front.candidate_input_pos = NULL;
-    front.output_tape_head = NULL;
-    front.flag_state = alphabet.get_fd_table();
-    front.tape_step = 1;
-    front.context = none;
-    front.context_placeholder = NULL;
-    local_stack.push(front);
+    LocalVariables locals_front;
+    locals_front.flag_state = alphabet.get_fd_table();
+    locals_front.tape_step = 1;
+    locals_front.context = none;
+    locals_front.context_placeholder = NULL;
+    local_stack.push(locals_front);
+    RtnVariables rtn_front;
+    rtn_front.candidate_input_pos = NULL;
+    rtn_front.output_tape_head = NULL;
+    rtn_front.locals = locals_front;
+    rtn_stack.push(rtn_front);
+
 
     // Allocate and read tables
     char * indextab = (char*) malloc(SimpleIndex::SIZE * index_table_size);
@@ -370,27 +374,28 @@ void PmatchContainer::initialize_input(const char * input)
 void PmatchTransducer::match(SymbolNumber ** input_tape_entry,
                              SymbolNumber ** output_tape_entry)
 {
-    local_stack.top().best_result.clear();
-    local_stack.top().candidate_input_pos = *input_tape_entry;
-    local_stack.top().output_tape_head = *output_tape_entry;
+    rtn_stack.top().best_result.clear();
+    rtn_stack.top().candidate_input_pos = *input_tape_entry;
+    rtn_stack.top().output_tape_head = *output_tape_entry;
     local_stack.top().context = none;
     local_stack.top().tape_step = 1;
     local_stack.top().context_placeholder = NULL;
     get_analyses(*input_tape_entry, *output_tape_entry, 0);
-    *input_tape_entry = local_stack.top().candidate_input_pos;
+    *input_tape_entry = rtn_stack.top().candidate_input_pos;
 }
 
 void PmatchTransducer::rtn_call(SymbolNumber * input_tape_entry,
                                 SymbolNumber * output_tape_entry)
 {
-    Locals locals;
-    locals.candidate_input_pos = input_tape_entry;
-    locals.output_tape_head = output_tape_entry;
-    locals.flag_state = alphabet.get_fd_table();
-    locals.tape_step = 1;
-    locals.context = none;
-    locals.context_placeholder = NULL;
-    local_stack.push(locals);
+    // rtn_stack.push(rtn_stack.top());
+    // rtn_stack.top().locals = local_stack.top();
+    // rtn_stack.top().candidate_input_pos = input_tape_entry;
+    // locals.output_tape_head = output_tape_entry;
+    // locals.flag_state = alphabet.get_fd_table();
+    // locals.tape_step = 1;
+    // locals.context = none;
+    // locals.context_placeholder = NULL;
+    // local_stack.push(locals);
     get_analyses(input_tape_entry, output_tape_entry, 0);
 }
 
@@ -412,9 +417,9 @@ void PmatchTransducer::rtn_exit(void)
 void PmatchTransducer::note_analysis(SymbolNumber * input_tape,
                                      SymbolNumber * output_tape)
 {
-    if (input_tape > local_stack.top().candidate_input_pos) {
-        local_stack.top().best_result.assign(local_stack.top().output_tape_head, output_tape);
-        local_stack.top().candidate_input_pos = input_tape;
+    if (input_tape > rtn_stack.top().candidate_input_pos) {
+        rtn_stack.top().best_result.assign(rtn_stack.top().output_tape_head, output_tape);
+        rtn_stack.top().candidate_input_pos = input_tape;
     }
 }
 
@@ -438,6 +443,7 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
 
                 } else {
                     // We're going to do some context checking
+//                    std::cerrs << "Entered context, stack is " << local_stack.size() << std::endl;
                     local_stack.top().context_placeholder = input_tape;
                     if (local_stack.top().context == LC ||
                         local_stack.top().context == NLC) {
@@ -450,17 +456,20 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
                     get_analyses(input_tape,
                                  output_tape,
                                  transition_table[i].target);
-                    exit_context();
+                    local_stack.pop();
                     ++i;
                 }
             } else {
                 // We *are* checking context and may be done
                 if (try_exiting_context(output)) {
+//                    std::cerr << "Exited context, stack is " << local_stack.size() << std::endl;
                     // We've successfully completed a context check
                     input_tape = local_stack.top().context_placeholder;
+//                    std::cerr << "input tape restored to " << *input_tape << std::endl;
                     get_analyses(input_tape,
                                  output_tape,
                                  transition_table[i].target);
+                    local_stack.pop();
                     ++i;
                 } else {
                     // Don't touch output when checking context
@@ -612,10 +621,12 @@ bool PmatchTransducer::checking_context(void) const
 bool PmatchTransducer::try_entering_context(SymbolNumber symbol)
 {
     if (symbol == markers[LC_entry]) {
+        local_stack.push(local_stack.top());
         local_stack.top().context = LC;
         local_stack.top().tape_step = -1;
         return true;
     } else if (symbol == markers[RC_entry]) {
+        local_stack.push(local_stack.top());
         local_stack.top().context = RC;
         local_stack.top().tape_step = 1;
         return true;
@@ -648,6 +659,7 @@ bool PmatchTransducer::try_exiting_context(SymbolNumber symbol)
 
 void PmatchTransducer::exit_context(void)
 {
+    local_stack.push(local_stack.top());
     local_stack.top().context = none;
     local_stack.top().tape_step = 1;
 }

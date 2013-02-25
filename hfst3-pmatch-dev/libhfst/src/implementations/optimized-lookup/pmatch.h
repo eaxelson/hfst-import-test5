@@ -111,18 +111,24 @@ namespace hfst_ol {
 // transitions, and dynamic data, which is altered during lookup.
 // In pmatch several instances of the same transducer may be operating
 // in a stack, so this dynamic data is put in a class of its own.
-        struct Locals
+        struct LocalVariables
         {
-            SymbolNumber * candidate_input_pos;
-            SymbolNumber * output_tape_head;
             hfst::FdState<SymbolNumber> flag_state;
             char tape_step;
             SymbolNumber * context_placeholder;
             ContextChecking context;
-            SymbolNumberVector best_result;
         };
 
-        std::stack<Locals> local_stack;
+        struct RtnVariables
+        {
+            SymbolNumber * candidate_input_pos;
+            SymbolNumber * output_tape_head;
+            SymbolNumberVector best_result;
+            LocalVariables locals;
+        };
+
+        std::stack<LocalVariables> local_stack;
+        std::stack<RtnVariables> rtn_stack;
     
         std::vector<SimpleTransition> transition_table;
         std::vector<SimpleIndex> index_table;
@@ -189,9 +195,9 @@ namespace hfst_ol {
         { return  i >= TRANSITION_TARGET_TABLE_START; }
 
         const SymbolNumberVector & get_best_result(void) const
-        { return local_stack.top().best_result; }
+        { return rtn_stack.top().best_result; }
         SymbolNumber * get_candidate_input_pos(void) const
-        { return local_stack.top().candidate_input_pos; }
+        { return rtn_stack.top().candidate_input_pos; }
     
         void match(SymbolNumber ** input_tape_entry, SymbolNumber ** output_tape_entry);
         void rtn_call(SymbolNumber * input_tape_entry, SymbolNumber * output_tape_entry);
