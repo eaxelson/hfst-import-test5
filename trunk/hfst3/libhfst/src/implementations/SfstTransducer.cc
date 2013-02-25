@@ -216,10 +216,22 @@ namespace hfst { namespace implementations {
       return true;
     }
     
-    unsigned int SfstTransducer::number_of_states(Transducer* )
+    unsigned int SfstTransducer::number_of_states(Transducer* t)
     {
-      return -1;
+      std::vector<SFST::Node*> indexing;
+      std::pair<size_t, size_t> number_of_nodes_and_transitions = 
+        t->nodeindexing(&indexing);
+      return number_of_nodes_and_transitions.first;
     }
+
+    unsigned int SfstTransducer::number_of_arcs(Transducer* t)
+    {
+      std::vector<SFST::Node*> indexing;
+      std::pair<size_t, size_t> number_of_nodes_and_transitions = 
+        t->nodeindexing(&indexing);
+      return number_of_nodes_and_transitions.second;
+    }
+
 
     Transducer * SfstInputStream::read_transducer()
   {
@@ -303,7 +315,7 @@ namespace hfst { namespace implementations {
     transducer->store(ofile); 
     if (fflush(ofile) != 0) {
       HFST_THROW_MESSAGE(HfstFatalException, 
-			 "An error happened when writing an SfstTransducer.");
+                         "An error happened when writing an SfstTransducer.");
     }
   }
 
@@ -317,9 +329,9 @@ namespace hfst { namespace implementations {
       unsigned int biggest_number=0;
       SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
       for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); 
-	   it != cm.end(); it++) {
-	if (it->first > biggest_number)
-	  biggest_number = it->first;
+           it != cm.end(); it++) {
+        if (it->first > biggest_number)
+          biggest_number = it->first;
       }
       return biggest_number;
     }
@@ -334,10 +346,10 @@ namespace hfst { namespace implementations {
       
       StringSet alphabet = get_alphabet(t);
       for (StringSet::const_iterator it = alphabet.begin(); it != alphabet.end(); it++)
-	{
-	  unsigned int symbol_number = get_symbol_number(t, it->c_str());
-	  symbol_vector.at(symbol_number) = *it;
-	}
+        {
+          unsigned int symbol_number = get_symbol_number(t, it->c_str());
+          symbol_vector.at(symbol_number) = *it;
+        }
       return symbol_vector;
     }
     
@@ -347,9 +359,9 @@ namespace hfst { namespace implementations {
       StringSet alphabet = get_alphabet(t);
       std::map<std::string, unsigned int> symbol_map;
       for (StringSet::const_iterator it = alphabet.begin(); it != alphabet.end(); it++)
-	{
-	  symbol_map[*it] = get_symbol_number(t, it->c_str());
-	}
+        {
+          symbol_map[*it] = get_symbol_number(t, it->c_str());
+        }
       return symbol_map;
     }
 

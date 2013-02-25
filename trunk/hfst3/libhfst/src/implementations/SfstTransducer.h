@@ -195,6 +195,7 @@ namespace implementations
 
       float get_profile_seconds();
       static unsigned int number_of_states(Transducer *t);
+      static unsigned int number_of_arcs(Transducer *t);
 
       static StringSet get_alphabet(Transducer *t);
       static void insert_to_alphabet(Transducer *t, const std::string &symbol);

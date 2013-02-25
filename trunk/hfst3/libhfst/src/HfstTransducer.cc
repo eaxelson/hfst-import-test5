@@ -1251,6 +1251,31 @@ unsigned int HfstTransducer::number_of_states() const
     return this->sfst_interface.number_of_states
         (this->implementation.sfst);
 #endif
+#if HAVE_FOMA
+    if (type == FOMA_TYPE)
+    return this->foma_interface.number_of_states
+      (this->implementation.foma);
+#endif
+    return 0;
+}
+
+unsigned int HfstTransducer::number_of_arcs() const
+{
+#if HAVE_OPENFST
+    if (type == TROPICAL_OPENFST_TYPE)
+    return this->tropical_ofst_interface.number_of_arcs
+        (this->implementation.tropical_ofst);
+#endif
+#if HAVE_SFST
+    if (type == SFST_TYPE)
+    return this->sfst_interface.number_of_arcs
+        (this->implementation.sfst);
+#endif
+#if HAVE_FOMA
+    if (type == FOMA_TYPE)
+    return this->foma_interface.number_of_arcs
+      (this->implementation.foma);
+#endif
     return 0;
 }
 
