@@ -461,6 +461,30 @@ namespace hfst { namespace implementations {
     return !(t->is_loop_free);
   }
   
+    unsigned int FomaTransducer::number_of_states(fsm * t)
+    {
+      unsigned int retval=0;
+      int laststate = -1;
+      for(int i=0; ((t->states)+i)->state_no != -1; i++)
+        {
+          if (((t->states)+1)->state_no != laststate)
+            retval++;
+          laststate = ((t->states)+i)->state_no;
+        }
+      return retval;
+    }
+
+    unsigned int FomaTransducer::number_of_arcs(fsm * t)
+    {
+      unsigned int retval=0;
+      for(int i=0; ((t->states)+i)->state_no != -1; i++)
+        {
+          if (((t->states)+i)->final_state != 1)
+            retval++;
+        }
+      return retval;
+    }
+
   
   static bool extract_paths
   (fsm * t, int state,
@@ -609,11 +633,11 @@ namespace hfst { namespace implementations {
     bool res = true;
     for (int i=0; ((t->states)+i)->state_no != -1 && res == true; i++) {
       if (((t->states)+i)->start_state == 1 && 
-	  (initial_states.find(((t->states)+i)->state_no)
-	   == initial_states.end()) ) {
+          (initial_states.find(((t->states)+i)->state_no)
+           == initial_states.end()) ) {
 
-	initial_states.insert(((t->states)+i)->state_no);
-		
+        initial_states.insert(((t->states)+i)->state_no);
+                
         res = hfst::implementations::extract_paths
           (t, ((t->states)+i)->state_no, all_visitations, path_visitations,
            callback, cycles, fd_state_stack, 
@@ -684,16 +708,16 @@ namespace hfst { namespace implementations {
     {
       unsigned int biggest_number=0;
       for(struct sigma* p = t->sigma; p!=NULL; p=p->next)
-	{
-	  if (p->symbol == NULL)
-	    break;
-	  if (biggest_number < (unsigned int)p->number)
-	    biggest_number = (unsigned int)p->number;
-	}
+        {
+          if (p->symbol == NULL)
+            break;
+          if (biggest_number < (unsigned int)p->number)
+            biggest_number = (unsigned int)p->number;
+        }
       // epsilon, unknown and identity are always included and
       // get_symbol_number always returns a value for them
       if (biggest_number < 2)
-	return 2; 
+        return 2; 
       return biggest_number;
     }
 
@@ -885,7 +909,7 @@ namespace hfst { namespace implementations {
             last_final = lineint[3];
             break;
         case 5:
-	  (fsm+i)->state_no = lineint[0]; // error
+          (fsm+i)->state_no = lineint[0]; // error
             (fsm+i)->in = lineint[1];
             (fsm+i)->out = lineint[2];
             (fsm+i)->target = lineint[3];

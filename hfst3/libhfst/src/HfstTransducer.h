@@ -275,11 +275,6 @@ An example:
     //  my_transducer_library_interface;
     //#endif
 
-
-    /* The number of states in the transducer. 
-       Used by the harmonization function. */
-    unsigned int number_of_states() const;
-
     /* Harmonize transducers this and another. In harmonization, 
        the symbol-to-number correspondencies of this transducer are recoded
        so that they are equivalent to the ones used in transducer another.
@@ -322,6 +317,9 @@ An example:
     /* whether HFST is linked to the transducer library 
        needed by implementation type \a type. */
     static bool is_implementation_type_available(ImplementationType type);
+
+    unsigned int number_of_states() const;
+    unsigned int number_of_arcs() const;
 
   protected:
     /* For internal use: Create a tokenizer that recognizes all symbols 

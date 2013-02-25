@@ -160,6 +160,8 @@ namespace hfst {
 
       static fsm * read_lexc(const std::string &filename);
 
+      static unsigned int number_of_states(fsm * net);
+      static unsigned int number_of_arcs(fsm * net);
     };
 
 } }

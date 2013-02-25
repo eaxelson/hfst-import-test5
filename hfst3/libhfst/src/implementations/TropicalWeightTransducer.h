@@ -282,6 +282,7 @@ namespace implementations
       float get_profile_seconds();
 
       static unsigned int number_of_states(const StdVectorFst * t);
+      static unsigned int number_of_arcs(const StdVectorFst * t);
 
       // for HFST version 2 transducer handling
       static void set_symbol_table

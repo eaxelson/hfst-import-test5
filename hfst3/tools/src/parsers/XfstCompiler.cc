@@ -1942,7 +1942,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       if (verbose_ && !stack_.empty())
         {
-          fprintf(stdout, "? bytes. ? states, ? arcs, ? paths\n");
+          HfstTransducer* top = stack_.top();
+          fprintf(stdout, "? bytes. %i states, %i arcs, ? paths\n",
+                  top->number_of_states(), top->number_of_arcs());
         }
       return *this;
     }

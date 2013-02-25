@@ -37,8 +37,6 @@ static std::vector<char*> execute_commands;
 static bool pipemode = false;
 static bool use_readline = true;
 
-static const size_t LINE_SIZE=1024;
-
 void
 print_usage()
 {
@@ -153,34 +151,60 @@ parse_options(int argc, char** argv)
 }
 
 // Based on a function in foma written by Mans Hulden.
-char *file_to_mem(char *name) {
+// Read the file 'filename' to memory and return a pointer to it.
+// Filename "<stdout>" uses stdout for reading.
+// Returns NULL if file cannot be opened or read or memory cannot be allocated.
+char *file_to_mem(char *filename) {
 
   FILE    *infile;
   size_t    numbytes;
   char *buffer;
-  infile = fopen(name, "r");
-  if(infile == NULL) {
-    printf("Error opening file '%s'\n",name);
-    return NULL;
-  }
+  infile = (strcmp(filename, "<stdout>") == 0)? stdout : fopen(filename, "r");
+  if(infile == NULL) 
+    {
+      error(EXIT_FAILURE, 0, "Error opening file '%s'\n", filename);
+      return NULL;
+    }
   fseek(infile, 0L, SEEK_END);
   numbytes = ftell(infile);
   fseek(infile, 0L, SEEK_SET);
   // FIX: use malloc instead
   buffer = (char*)xxmalloc((numbytes+1) * sizeof(char));
-  if(buffer == NULL) {
-    printf("Error reading file '%s'\n",name);
-    return NULL;
-  }
-  if (fread(buffer, sizeof(char), numbytes, infile) != numbytes) {
-    printf("Error reading file '%s'\n",name);
-    return NULL;
-  }
-  fclose(infile);
+  if(buffer == NULL) 
+    {
+      error(EXIT_FAILURE, 0, "Error allocating memory to read file '%s'\n", filename);
+      return NULL;
+    }
+  if (fread(buffer, sizeof(char), numbytes, infile) != numbytes) 
+    {
+      error(EXIT_FAILURE, 0, "Error reading file '%s' to memory\n", filename);
+      return NULL;
+    }
+  if (strcmp(filename, "<stdout>") != 0)
+    {
+      fclose(infile);
+    }
   *(buffer+numbytes)='\0';
   return(buffer);
 }
 
+// Parse file 'filename' using compiler 'comp'.
+// Filename "<stdout>" uses stdout for reading.
+int parse_file(const char* filename, hfst::xfst::XfstCompiler &comp)
+{
+  char* line = file_to_mem(startupfilename);
+  if (NULL == line)
+    {
+      return EXIT_FAILURE;
+    }
+  if (0 != comp.parse_line(line))
+    {
+      error(EXIT_FAILURE, 0, "error when parsing startupfile\n");
+      return EXIT_FAILURE;
+    }
+  free(line);
+  return 0;
+}
 
 int main(int argc, char** argv)
 {
@@ -238,63 +262,50 @@ int main(int argc, char** argv)
   for (std::vector<char*>::const_iterator cmd = execute_commands.begin();
        cmd != execute_commands.end(); cmd++)
     {
+      verbose_printf("Executing xfst command '%s' given on command line...\n", *cmd);
       if (0 != comp.parse_line(*cmd))
         {
-          error(EXIT_FAILURE, 0, "parameter of option --execute could not be parsed\n");
+          error(EXIT_FAILURE, 0, "command '%s' could not be parsed\n", *cmd);
           return EXIT_FAILURE;
         }
     }
   // If needed, execute script in startup file
   if (startupfilename != NULL)
     {
-      char* line = file_to_mem(startupfilename);
-      if (0 != comp.parse_line(line))
+      verbose_printf("Executing startup file '%s'...\n", startupfilename);
+      if (parse_file(startupfilename, comp) == EXIT_FAILURE)
         {
-          error(EXIT_FAILURE, 0, "error in startupfile\n");
           return EXIT_FAILURE;
         }
-      free(line);
     }
-  
+
   if (pipemode) 
     {
-      char* line = file_to_mem(startupfilename);
-      if (0 != comp.parse_line(line))
+      verbose_printf("Reading from standard input...\n");
+      if (parse_file("<stdout>", comp) == EXIT_FAILURE)
         {
-          error(EXIT_FAILURE, 0, "error in input\n");
           return EXIT_FAILURE;
         }
-      free(line);
     }
   else if (scriptfilename != NULL)
     {
-      /*if (execute_commands.size() == 0) // parse_line has not been used
+      verbose_printf("Reading from script file '%s'\n", scriptfilename);
+      if (parse_file(scriptfilename, comp) == EXIT_FAILURE)
         {
-          if (0 != comp.parse(scriptfilename))
-            {
-              error(EXIT_FAILURE, 0, "error in scriptfile\n");
-              return EXIT_FAILURE;
-            }
-        }
-      else // we have to use parse_line consistently
-      {*/
-      char* line = file_to_mem(scriptfilename);
-      if (0 != comp.parse_line(line))
-        {
-          error(EXIT_FAILURE, 0, "error in scriptfile\n");
           return EXIT_FAILURE;
         }
-      free(line);
-          //}
     }
+  // Use interactive mode
   else if (! use_readline)
     {
+      verbose_printf("Starting interactive mode...\n");
       // support for backspace
       char line[256];
       while (cin.getline(line, 256))
         {
           if (0 != comp.parse_line(line))
             {
+              error(EXIT_FAILURE, 0, "line '%s' could not be parsed\n", line);
               return EXIT_FAILURE;
             }
         }
@@ -303,6 +314,7 @@ int main(int argc, char** argv)
     {
       // support for backspace and Up/Down keys, needs readline library
 
+      verbose_printf("Starting interactive mode...\n");
       comp.setPromptVerbosity(false); // prompts handled manually
       char *buf = NULL;               // result from readline
       rl_bind_key('\t',rl_abort);     // disable auto-complet
@@ -313,7 +325,11 @@ int main(int argc, char** argv)
           if (buf[0] != 0) {
             add_history(buf); }
           
-          comp.parse_line(buf);
+          if (0 != comp.parse_line(buf))
+            {
+              error(EXIT_FAILURE, 0, "line '%s' could not be parsed\n", buf);
+              return EXIT_FAILURE;
+            }
           
           free(promptline);
           promptline = (!silent) ? comp.get_prompt() : strdup("");

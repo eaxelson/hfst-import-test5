@@ -114,7 +114,7 @@ namespace hfst { namespace implementations
             = fst::SymbolTableIterator(*(t->InputSymbols()));
           not it.Done(); it.Next() ) {
       if (it.Value() > biggest_number) 
-	biggest_number = it.Value();
+        biggest_number = it.Value();
     }      
     return biggest_number;
   }
@@ -130,8 +130,8 @@ namespace hfst { namespace implementations
     StringSet alphabet = get_alphabet(t);
     for (StringSet::const_iterator it = alphabet.begin(); it != alphabet.end(); it++)
       {
-	unsigned int symbol_number = get_symbol_number(t, *it);
-	symbol_vector.at(symbol_number) = *it;
+        unsigned int symbol_number = get_symbol_number(t, *it);
+        symbol_vector.at(symbol_number) = *it;
       }
     return symbol_vector;
   }
@@ -812,6 +812,19 @@ namespace hfst { namespace implementations
     for (fst::StateIterator<StdVectorFst> siter(*t); 
          not siter.Done(); siter.Next())
       retval++;
+    return retval;
+  }
+
+  unsigned int TropicalWeightTransducer::number_of_arcs(const StdVectorFst *t)
+  {
+    unsigned int retval=0;
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+         not siter.Done(); siter.Next())
+      {
+        for (fst::ArcIterator<StdVectorFst> aiter(*t,siter.Value()); 
+             !aiter.Done(); aiter.Next())
+          retval++;
+      }
     return retval;
   }
 
@@ -1562,7 +1575,7 @@ namespace hfst { namespace implementations
     for (unsigned int i = 0; i < n; ++i)
       {
         StdVectorFst * optional_t = optionalize(t);
-	optional_t->SetInputSymbols(t->InputSymbols());
+        optional_t->SetInputSymbols(t->InputSymbols());
         Concat(repetition,*optional_t);
         delete optional_t;
       }
@@ -2457,7 +2470,7 @@ namespace hfst { namespace implementations
     /* If the target state is final, */
     if ( t->Final(t_target) != TropicalWeight::Zero() ) {
       if ( (rand() % 4) == 0 ) {  // randomly return the path so far,
-	path.first = path.first + t->Final(t_target).Value();
+        path.first = path.first + t->Final(t_target).Value();
         return path;
       } // or continue.
       last_index = (int)path.second.size();  
