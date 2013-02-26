@@ -84,8 +84,8 @@ namespace hfst
       HfstTransducer * make_transducer(Range *r1, Range *r2, ImplementationType type);
       static void warn(const char *msg);
       HfstTransducer *new_transducer( Range*, Range*, ImplementationType );
-      HfstTransducer *read_words( char *filename, ImplementationType type);
-      HfstTransducer *read_transducer( char *filename, ImplementationType type );
+      HfstTransducer *read_words( const char *folder, char *filename, ImplementationType type);
+      HfstTransducer *read_transducer( const char *folder, char *filename, ImplementationType type );
       HfstTransducer *var_value( char *name );
       HfstTransducer *rvar_value( char *name, ImplementationType );
       Range *svar_value( char *name );
@@ -95,7 +95,7 @@ namespace hfst
       Character symbol_code( char *s );
       //static unsigned int utf8toint( char *s );
       
-      void write_to_file(HfstTransducer *t, char *filename);
+      void write_to_file(HfstTransducer *t, const char *folder, char *filename);
       
       static Range *add_value( Character, Range*);
       static Range *add_var_values( char *name, Range*);

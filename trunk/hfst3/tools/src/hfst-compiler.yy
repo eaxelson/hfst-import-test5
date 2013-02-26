@@ -26,6 +26,8 @@
 extern char* FileName;
 extern bool Verbose;
 
+char * folder = NULL;
+
 using std::cerr;
 using namespace hfst;
 
@@ -102,7 +104,7 @@ ASSIGNMENT: VAR '=' RE              { if (DEBUG) { printf("defining transducer v
           | RVAR '=' RE             { if (DEBUG) { printf("defining agreement transducer variable \"%s\"..\n", $1); }; if (compiler->def_rvar($1,$3)) warn2("assignment of empty transducer to",$1); }
           | SVAR '=' VALUES         { if (DEBUG) { printf("defining range variable \"%s\"..\n", $1); }; if (compiler->def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
           | RSVAR '=' VALUES        { if (DEBUG) { printf("defining agreement range variable \"%s\"..\n", $1); }; if (compiler->def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
-          | RE PRINT STRING         { compiler->write_to_file($1, $3); }
+          | RE PRINT STRING         { compiler->write_to_file($1, folder, $3); }
           | ALPHA RE                { if (DEBUG) { printf("defining alphabet..\n"); }; compiler->def_alphabet($2); delete $2; }
           ;
 
@@ -142,8 +144,8 @@ RE:         RE ARROW CONTEXTS2      { $$ = compiler->restriction($1,$2,$3,0); }
           | RE '-' RE        { $1->subtract(*$3); delete $3; $$ = $1; }
           | RE '|' RE        { $1->disjunct(*$3); delete $3; $$ = $1; }
           | '(' RE ')'       { $$ = $2; }
-          | STRING           { $$ = compiler->read_words($1, output_format); }
-          | STRING2          { try { $$ = compiler->read_transducer($1, output_format); } catch (HfstException e) { printf("\nAn error happened when reading file \"%s\"\n", $1); exit(1); } }
+          | STRING           { $$ = compiler->read_words(folder, $1, output_format); }
+          | STRING2          { try { $$ = compiler->read_transducer(folder, $1, output_format); } catch (HfstException e) { printf("\nAn error happened when reading file \"%s\"\n", $1); exit(1); } }
           ;
 
 RANGES:     RANGE RANGES     { $$ = compiler->add_range($1,$2); }
@@ -360,6 +362,14 @@ parse_options(int argc, char** argv)
       }
     FileName = strdup(inputfilename);        
 
+    if (NULL != inputfilename && strcmp(inputfilename, "<stdin>") != 0)
+    {
+	std::string str(inputfilename);
+	size_t found = str.find_last_of("/\\");
+	if (found != std::string::npos)
+  	  folder = strdup(str.substr(0,found).c_str());
+    }
+
     return EXIT_CONTINUE;
 }
 
@@ -455,9 +465,9 @@ int main( int argc, char *argv[] )
     fclose(inputfile);
       try {
         if (strcmp(outfilename,"<stdout>") == 0)
-          compiler->write_to_file(Result, "");
+          compiler->write_to_file(Result, NULL, "");
 	else
-          compiler->write_to_file(Result, strdup(outfilename));
+          compiler->write_to_file(Result, NULL, strdup(outfilename));
       } catch (HfstException e) {
           printf("\nAn error happened when writing to file \"%s\"\n", outfilename); }
     //printf("type is: %i\n", Result->get_type());
@@ -469,5 +479,8 @@ int main( int argc, char *argv[] )
       cerr << "\n" << p << "\n\n";
       exit(1);
   }
+  if (NULL != folder)
+    free(folder);
+
   exit(0);
 }
