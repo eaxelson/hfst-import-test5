@@ -577,15 +577,22 @@ namespace hfst
 
   }
 
-  HfstTransducer * HfstCompiler::read_words(char *filename, 
+  HfstTransducer * HfstCompiler::read_words(const char *folder, char *filename, 
                         ImplementationType type) {
 
+    std::string filestr("");
+    if (NULL != folder) {
+      filestr.append(folder);
+      filestr.append("/"); // FIX: WINDOWS
+    }
+    filestr.append(filename);
+    
     if (Verbose)
-      fprintf(stderr,"\nreading words from %s...", filename);
-    std::ifstream is(filename);
+      fprintf(stderr,"\nreading words from %s...", filestr.c_str());
+    std::ifstream is(filestr.c_str());
     if (!is.is_open()) {
       static char message[1000];
-      sprintf(message,"Error: Cannot open file \"%s\"!", filename);
+      sprintf(message,"Error: Cannot open file \"%s\"!", filestr.c_str());
       throw message;
     }
     free( filename );
@@ -651,10 +658,18 @@ namespace hfst
     }
   }
 
-  HfstTransducer * HfstCompiler::read_transducer(char *filename, ImplementationType type) {
+  HfstTransducer * HfstCompiler::read_transducer(const char *folder, char *filename, ImplementationType type) {
+
+    std::string filestr("");
+    if (NULL != folder) {
+      filestr.append(folder);
+      filestr.append("/"); // FIX: WINDOWS
+    }
+    filestr.append(filename);
+
     if (Verbose)
-      fprintf(stderr,"\nreading transducer from %s...", filename);
-    HfstInputStream is(filename);
+      fprintf(stderr,"\nreading transducer from %s...", filestr.c_str());
+    HfstInputStream is(filestr.c_str());
     //is.open();
     HfstTransducer *t = new HfstTransducer(is);
     is.close();
@@ -665,8 +680,16 @@ namespace hfst
     return t;
   }
 
-  void HfstCompiler::write_to_file(HfstTransducer *t, char* filename) {
-    HfstOutputStream os(std::string(filename), t->get_type());
+  void HfstCompiler::write_to_file(HfstTransducer *t, const char* folder, char* filename) {
+
+    std::string filestr("");
+    if (NULL != folder) {
+      filestr.append(folder);
+      filestr.append("/"); // FIX: WINDOWS
+    }
+    filestr.append(filename);
+
+    HfstOutputStream os(filestr, t->get_type());
     //os.open();
     os << *t;
     os.close();
