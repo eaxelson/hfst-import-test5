@@ -353,8 +353,16 @@ process_stream(HfstInputStream& instream, FILE* outf)
     while(instream.is_good())
     {
         transducer_n++;
-        HfstTransducer t(instream);
-        char* inputname = strdup(t.get_name().c_str());
+        HfstTransducer* t=NULL;
+        try 
+          {
+            t = new HfstTransducer(instream);
+          }
+        catch (const TransducerTypeMismatchException &e)
+          {
+            error(EXIT_FAILURE, 0, "input transducers do not have the same type");
+          }
+        char* inputname = strdup(t->get_name().c_str());
         if (strlen(inputname) <= 0)
           {
             inputname = strdup(inputfilename);
@@ -374,7 +382,7 @@ process_stream(HfstInputStream& instream, FILE* outf)
             fprintf(outf, "--\n");
 
         bool printw; // whether weights are printed
-        hfst::ImplementationType type = t.get_type();
+        hfst::ImplementationType type = t->get_type();
         if (print_weights)
           printw=true;
         else if (do_not_print_weights)
@@ -389,19 +397,20 @@ process_stream(HfstInputStream& instream, FILE* outf)
       {
       case ATT_TEXT:
         if (use_numbers)
-          t.write_in_att_format_number(outf,printw);
+          t->write_in_att_format_number(outf,printw);
         else
-          t.write_in_att_format(outf,printw);
+          t->write_in_att_format(outf,printw);
         break;
       case DOT_TEXT:
-        print_dot(outf, t);
+        print_dot(outf, *t);
         break;
       case PCKIMMO_TEXT:
-        print_pckimmo(outf, t);
+        print_pckimmo(outf, *t);
         break;
       default:
         error(EXIT_FAILURE, 0, "Unknown print format");
       }
+    delete t;
     }
     instream.close();
     if (outf != stdout)

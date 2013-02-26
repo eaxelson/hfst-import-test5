@@ -306,8 +306,9 @@ namespace hfst
     else {
       if (stream_eof())
         HFST_THROW(EndOfStreamException);
-      ImplementationType stype = stream_fst_type();
-      if (stype != type) {
+      ImplementationType current_type  = this->get_type();
+      ImplementationType stype = this->stream_fst_type();
+      if (stype != current_type) {
         HFST_THROW_MESSAGE(TransducerTypeMismatchException,
                            "HfstInputStream contains HfstTransducers "
                            "whose type is not the same");
