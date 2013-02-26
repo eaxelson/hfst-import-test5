@@ -213,6 +213,10 @@ namespace hfst { namespace implementations {
   fsm * FomaTransducer::define_transducer
     (const std::string &isymbol, const std::string &osymbol)
   { 
+    // identity-to-identity gives wrong result if cross product is used
+    if (isymbol == osymbol) {
+      return define_transducer(isymbol);
+    }
     return fsm_cross_product( fsm_symbol(const_cast<char*>(isymbol.c_str())), 
                               fsm_symbol(const_cast<char*>(osymbol.c_str())) );
     // should either argument be deleted?
