@@ -14,6 +14,8 @@
 #include "HfstSymbolDefs.h"
 #include <time.h>
 
+using namespace SFST;
+
 #ifndef MAIN_TEST
 namespace hfst { namespace implementations {
 
