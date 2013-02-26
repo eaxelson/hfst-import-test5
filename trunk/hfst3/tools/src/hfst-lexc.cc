@@ -164,9 +164,9 @@ parse_options(int argc, char** argv)
       }
     if (outfile == stdout)
       {
-        error(EXIT_FAILURE, 0, "Cannot write result to <stdout> since backend "
+        /*error(EXIT_FAILURE, 0, "Cannot write result to <stdout> since backend "
               "libraries will pollute it;\n"
-              "Use command-line option --output meanwhile");
+              "Use command-line option --output meanwhile");*/
       }
     if (start_readline && (argc - optind > 0))
       {

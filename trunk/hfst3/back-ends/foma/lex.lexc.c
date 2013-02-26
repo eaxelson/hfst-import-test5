@@ -1349,7 +1349,7 @@ struct fsm *fsm_lexc_parse_string(char *string) {
    lexc_init();
    if (lexclex() != 1) {
      if (lexentries != -1) {
-         printf("%i\n",lexentries);
+       fprintf(stderr, "%i\n",lexentries);
      }       
    } 
    lexc_delete_buffer(my_string_buffer);
@@ -1745,10 +1745,10 @@ YY_RULE_SETUP
 {
   lexc_trim(lexctext+8);
   if (lexentries != -1) {
-    printf("%i, ",lexentries);
+    fprintf(stderr, "%i, ",lexentries);
   }
-  printf("%s...",lexctext+8); 
-  fflush(stdout);
+  fprintf(stderr, "%s...",lexctext+8); 
+  fflush(stderr);
   lexentries = 0;
   lexc_set_current_lexicon(lexctext+8, SOURCE_LEXICON);
   BEGIN(LEXENTRIES);
@@ -1774,8 +1774,8 @@ YY_RULE_SETUP
     lexc_clear_current_word();
     lexentries++;
     if (lexentries %10000 == 0) {
-      printf("%i...",lexentries);
-      fflush(stdout);
+      fprintf(stderr, "%i...",lexentries);
+      fflush(stderr);
     }
     BEGIN(EATUPINFO);
 }
@@ -1801,8 +1801,8 @@ YY_RULE_SETUP
     lexc_clear_current_word();
     lexentries++;
     if (lexentries %10000 == 0) {
-      printf("%i...",lexentries);
-      fflush(stdout);
+      fprintf(stderr, "%i...",lexentries);
+      fflush(stderr);
     }
 }
         YY_BREAK
@@ -1961,7 +1961,7 @@ YY_RULE_SETUP
 case 30:
 YY_RULE_SETUP
 #line 247 "lexc.l"
-{ printf("\n***Syntax error on line %i column %i at '%s'\n",lexclineno,lexccolumn,lexctext); return 1;}
+  { fprintf(stderr, "\n***Syntax error on line %i column %i at '%s'\n",lexclineno,lexccolumn,lexctext); return 1;}
         YY_BREAK
 case 31:
 YY_RULE_SETUP

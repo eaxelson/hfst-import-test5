@@ -22,7 +22,7 @@ if [ "$srcdir" = "" ]; then
 fi
 
 WINDOWS=1
-if (uname | egrep "MINGW|mingw" 2>1 > /dev/null); then
+if (uname | egrep "MINGW|mingw" > /dev/null); then
     WINDOWS=0;
 fi
 
@@ -54,7 +54,7 @@ for i in .sfst .ofst .foma ; do
     fi
 
     if test -f cat$i ; then
-        if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/cat.lexc -o test 2>1 > /dev/null; then
+        if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/cat.lexc > test 2> /dev/null; then
             echo lexc2fst $FFLAG cat.lexc failed with $?
             exit 1
         fi
@@ -64,7 +64,7 @@ for i in .sfst .ofst .foma ; do
         rm test
     fi
     for f in $LEXCTESTS ; do
-        if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/$f -o test 2>1 > /dev/null; then
+        if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/$f > test 2> /dev/null; then
             echo lexc2fst $FFLAG $f failed with $?
             exit 1
         fi
@@ -73,8 +73,8 @@ for i in .sfst .ofst .foma ; do
     if [ $WINDOWS -eq 1 ]; then
 	if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/basic.multi-file-1.lexc \
             $srcdir/basic.multi-file-2.lexc \
-            $srcdir/basic.multi-file-3.lexc -o test 2>1 > /dev/null; then
-            echo lexc2fst $FFLAG basic.multi-file-{1,2,3}.lexc failed with $?
+            $srcdir/basic.multi-file-3.lexc > test 2> /dev/null; then
+            echo lexc $FFLAG basic.multi-file-{1,2,3}.lexc failed with $?
             exit 1
 	fi
 	if ! $TOOLDIR/hfst-compare -s walk_or_dog$i test ; then

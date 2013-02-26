@@ -696,7 +696,7 @@ void lexc_number_states() {
         for (s = statelist; s != NULL; s = s->next) {        
             if (s->next == NULL) {
                 s->state->number = 0;
-                printf("*Warning: no Root lexicon, using '%s' as Root.\n",s->state->lexstate->name);
+                fprintf(stderr, "*Warning: no Root lexicon, using '%s' as Root.\n",s->state->lexstate->name); // HFST changed from stdout to stderr
                 s->start = 1;
                 n++;
             }
@@ -723,12 +723,12 @@ void lexc_number_states() {
     lexc_statecount = n+1;
     for (l = lexstates; l != NULL ; l = l->next) {
         if (l->targeted == 0 && l->state->number != 0) {
-            printf("*Warning: lexicon '%s' defined but not used\n",l->name);
-            fflush(stdout);
+	  fprintf(stderr, "*Warning: lexicon '%s' defined but not used\n",l->name);  // HFST changed from stdout to stderr
+            fflush(stderr);
         }
         if (l->has_outgoing == 0 && strcmp(l->name, "#") != 0) {
-            printf("***Warning: lexicon '%s' used but never defined\n",l->name);
-            fflush(stdout);
+	  fprintf(stderr, "***Warning: lexicon '%s' used but never defined\n",l->name);  // HFST changed from stdout to stderr
+            fflush(stderr);
         }
     }
 }
@@ -888,15 +888,15 @@ struct fsm *lexc_to_fsm() {
     struct trans *t;
     int i, j,  linecount;
 
-    printf("Building lexicon...\n");
-    fflush(stdout);
+    fprintf(stderr, "Building lexicon...\n");  // HFST changed from stdout to stderr
+    fflush(stderr);
     lexc_merge_states();
     net = fsm_create("");
     xxfree(net->sigma);
     net->sigma = lexsigma;
     lexc_number_states();
     if (hasfinal == 0) {
-        printf("Warning: # is never reached!!!\n");
+      fprintf(stderr, "Warning: # is never reached!!!\n");  // HFST changed from stdout to stderr
         return(fsm_empty_set());
     }
     sa = xxmalloc(sizeof(struct statelist)*lexc_statecount);
@@ -934,13 +934,13 @@ struct fsm *lexc_to_fsm() {
     sigma_cleanup(net,0);
     sigma_sort(net);
     
-    printf("Determinizing...\n");
-    fflush(stdout);
+    fprintf(stderr, "Determinizing...\n"); // HFST changed from stdout to stderr
+    fflush(stderr);
     net = fsm_determinize(net);
-    printf("Minimizing...\n");
-    fflush(stdout);
+    fprintf(stderr, "Minimizing...\n"); // HFST changed from stdout to stderr
+    fflush(stderr);
     net = fsm_topsort(fsm_minimize(net));
-    printf("Done!\n");
+    fprintf(stderr, "Done!\n"); // HFST changed from stdout to stderr
     return(net);
 }
 

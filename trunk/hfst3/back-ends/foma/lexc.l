@@ -48,7 +48,7 @@ struct fsm *fsm_lexc_parse_string(char *string) {
    lexc_init();
    if (lexclex() != 1) {
      if (lexentries != -1) {
-         printf("%i\n",lexentries);
+         fprintf(stderr, "%i\n",lexentries);
      }       
    } 
    lexc_delete_buffer(my_string_buffer);
