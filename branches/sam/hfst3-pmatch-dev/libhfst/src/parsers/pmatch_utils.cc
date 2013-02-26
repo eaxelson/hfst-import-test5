@@ -388,87 +388,8 @@ HfstTransducer * read_text(char * filename, ImplementationType type)
   HfstTransducer * latin1_alpha_acceptor(ImplementationType type)
   {
       HfstTokenizer tok;
-      HfstTransducer * retval = new HfstTransducer(type);
-      const std::string asciialpha =
-          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-      for (std::string::const_iterator it = asciialpha.begin();
-           it != asciialpha.end(); ++it) {
-          retval->disjunct(HfstTransducer(std::string(1, *it), type));
-      }
-      retval->disjunct(HfstTransducer("à", tok, type));
-      retval->disjunct(HfstTransducer("á", tok, type));
-      retval->disjunct(HfstTransducer("â", tok, type));
-      retval->disjunct(HfstTransducer("ã", tok, type));
-      retval->disjunct(HfstTransducer("ä", tok, type));
-      retval->disjunct(HfstTransducer("å", tok, type));
-      retval->disjunct(HfstTransducer("æ", tok, type));
-      retval->disjunct(HfstTransducer("ç", tok, type));
-      retval->disjunct(HfstTransducer("è", tok, type));
-      retval->disjunct(HfstTransducer("é", tok, type));
-      retval->disjunct(HfstTransducer("ê", tok, type));
-      retval->disjunct(HfstTransducer("ë", tok, type));
-      retval->disjunct(HfstTransducer("ì", tok, type));
-      retval->disjunct(HfstTransducer("í", tok, type));
-      retval->disjunct(HfstTransducer("î", tok, type));
-      retval->disjunct(HfstTransducer("ï", tok, type));
-      retval->disjunct(HfstTransducer("ð", tok, type));
-      retval->disjunct(HfstTransducer("ñ", tok, type));
-      retval->disjunct(HfstTransducer("ò", tok, type));
-      retval->disjunct(HfstTransducer("ó", tok, type));
-      retval->disjunct(HfstTransducer("ô", tok, type));
-      retval->disjunct(HfstTransducer("õ", tok, type));
-      retval->disjunct(HfstTransducer("ö", tok, type));
-      retval->disjunct(HfstTransducer("ø", tok, type));
-      retval->disjunct(HfstTransducer("ù", tok, type));
-      retval->disjunct(HfstTransducer("ú", tok, type));
-      retval->disjunct(HfstTransducer("û", tok, type));
-      retval->disjunct(HfstTransducer("ü", tok, type));
-      retval->disjunct(HfstTransducer("ý", tok, type));
-      retval->disjunct(HfstTransducer("þ", tok, type));
-      retval->disjunct(HfstTransducer("ÿ", tok, type));
-      retval->disjunct(HfstTransducer("À", tok, type));
-      retval->disjunct(HfstTransducer("Á", tok, type));
-      retval->disjunct(HfstTransducer("Â", tok, type));
-      retval->disjunct(HfstTransducer("Ã", tok, type));
-      retval->disjunct(HfstTransducer("Ä", tok, type));
-      retval->disjunct(HfstTransducer("Å", tok, type));
-      retval->disjunct(HfstTransducer("Æ", tok, type));
-      retval->disjunct(HfstTransducer("Ç", tok, type));
-      retval->disjunct(HfstTransducer("È", tok, type));
-      retval->disjunct(HfstTransducer("É", tok, type));
-      retval->disjunct(HfstTransducer("Ê", tok, type));
-      retval->disjunct(HfstTransducer("Ë", tok, type));
-      retval->disjunct(HfstTransducer("Ì", tok, type));
-      retval->disjunct(HfstTransducer("Í", tok, type));
-      retval->disjunct(HfstTransducer("Î", tok, type));
-      retval->disjunct(HfstTransducer("Ï", tok, type));
-      retval->disjunct(HfstTransducer("Ð", tok, type));
-      retval->disjunct(HfstTransducer("Ñ", tok, type));
-      retval->disjunct(HfstTransducer("Ò", tok, type));
-      retval->disjunct(HfstTransducer("Ó", tok, type));
-      retval->disjunct(HfstTransducer("Ô", tok, type));
-      retval->disjunct(HfstTransducer("Õ", tok, type));
-      retval->disjunct(HfstTransducer("Ö", tok, type));
-      retval->disjunct(HfstTransducer("Ø", tok, type));
-      retval->disjunct(HfstTransducer("Ù", tok, type));
-      retval->disjunct(HfstTransducer("Ú", tok, type));
-      retval->disjunct(HfstTransducer("Û", tok, type));
-      retval->disjunct(HfstTransducer("Ü", tok, type));
-      retval->disjunct(HfstTransducer("Ý", tok, type));
-      retval->disjunct(HfstTransducer("Þ", tok, type));
-      retval->disjunct(HfstTransducer("ß", tok, type));
-// Combining accents: grave, acute, circumflex, tilde, overline,
-      // diaresis, cedilla
-      retval->disjunct(HfstTransducer("\u0300", tok, type));
-      retval->disjunct(HfstTransducer("\u0301", tok, type));
-      retval->disjunct(HfstTransducer("\u0302", tok, type));
-      retval->disjunct(HfstTransducer("\u0303", tok, type));
-      retval->disjunct(HfstTransducer("\u0305", tok, type));
-      retval->disjunct(HfstTransducer("\u0308", tok, type));
-      retval->disjunct(HfstTransducer("\u0327", tok, type));
-      // Small solidus and large combining solidus
-      retval->disjunct(HfstTransducer("\u0337", tok, type));
-      retval->disjunct(HfstTransducer("\u0338", tok, type));
+      HfstTransducer * retval = latin1_lowercase_acceptor();
+      retval->disjunct(*latin1_uppercase_acceptor());
       return retval;
   }
 
@@ -476,55 +397,10 @@ HfstTransducer * read_text(char * filename, ImplementationType type)
   {
       HfstTokenizer tok;
       HfstTransducer * retval = new HfstTransducer(type);
-      const std::string asciialpha =
-          "abcdefghijklmnopqrstuvwxyz";
-      for (std::string::const_iterator it = asciialpha.begin();
-           it != asciialpha.end(); ++it) {
-          retval->disjunct(HfstTransducer(std::string(1, *it), type));
+      for (size_t i = 0; i < array_size(latin1_lower); ++i) {
+          retval->disjunct(HfstTransducer(latin1_lower[i], tok, type));
       }
-      retval->disjunct(HfstTransducer("à", tok, type));
-      retval->disjunct(HfstTransducer("á", tok, type));
-      retval->disjunct(HfstTransducer("â", tok, type));
-      retval->disjunct(HfstTransducer("ã", tok, type));
-      retval->disjunct(HfstTransducer("ä", tok, type));
-      retval->disjunct(HfstTransducer("å", tok, type));
-      retval->disjunct(HfstTransducer("æ", tok, type));
-      retval->disjunct(HfstTransducer("ç", tok, type));
-      retval->disjunct(HfstTransducer("è", tok, type));
-      retval->disjunct(HfstTransducer("é", tok, type));
-      retval->disjunct(HfstTransducer("ê", tok, type));
-      retval->disjunct(HfstTransducer("ë", tok, type));
-      retval->disjunct(HfstTransducer("ì", tok, type));
-      retval->disjunct(HfstTransducer("í", tok, type));
-      retval->disjunct(HfstTransducer("î", tok, type));
-      retval->disjunct(HfstTransducer("ï", tok, type));
-      retval->disjunct(HfstTransducer("ð", tok, type));
-      retval->disjunct(HfstTransducer("ñ", tok, type));
-      retval->disjunct(HfstTransducer("ò", tok, type));
-      retval->disjunct(HfstTransducer("ó", tok, type));
-      retval->disjunct(HfstTransducer("ô", tok, type));
-      retval->disjunct(HfstTransducer("õ", tok, type));
-      retval->disjunct(HfstTransducer("ö", tok, type));
-      retval->disjunct(HfstTransducer("ø", tok, type));
-      retval->disjunct(HfstTransducer("ù", tok, type));
-      retval->disjunct(HfstTransducer("ú", tok, type));
-      retval->disjunct(HfstTransducer("û", tok, type));
-      retval->disjunct(HfstTransducer("ü", tok, type));
-      retval->disjunct(HfstTransducer("ý", tok, type));
-      retval->disjunct(HfstTransducer("þ", tok, type));
-      retval->disjunct(HfstTransducer("ÿ", tok, type));
-// Combining accents: grave, acute, circumflex, tilde, overline,
-      // diaresis, cedilla
-      retval->disjunct(HfstTransducer("\u0300", tok, type));
-      retval->disjunct(HfstTransducer("\u0301", tok, type));
-      retval->disjunct(HfstTransducer("\u0302", tok, type));
-      retval->disjunct(HfstTransducer("\u0303", tok, type));
-      retval->disjunct(HfstTransducer("\u0305", tok, type));
-      retval->disjunct(HfstTransducer("\u0308", tok, type));
-      retval->disjunct(HfstTransducer("\u0327", tok, type));
-      // Small solidus and large combining solidus
-      retval->disjunct(HfstTransducer("\u0337", tok, type));
-      retval->disjunct(HfstTransducer("\u0338", tok, type));
+      retval->disjunct(*combining_accent_acceptor());
       return retval;
   }
 
@@ -532,55 +408,20 @@ HfstTransducer * read_text(char * filename, ImplementationType type)
   {
       HfstTokenizer tok;
       HfstTransducer * retval = new HfstTransducer(type);
-      const std::string asciialpha =
-          "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      for (std::string::const_iterator it = asciialpha.begin();
-           it != asciialpha.end(); ++it) {
-          retval->disjunct(HfstTransducer(std::string(1, *it), type));
+      for (size_t i = 0; i < array_size(latin1_upper); ++i) {
+          retval->disjunct(HfstTransducer(latin1_upper[i], tok, type));
       }
-      retval->disjunct(HfstTransducer("À", tok, type));
-      retval->disjunct(HfstTransducer("Á", tok, type));
-      retval->disjunct(HfstTransducer("Â", tok, type));
-      retval->disjunct(HfstTransducer("Ã", tok, type));
-      retval->disjunct(HfstTransducer("Ä", tok, type));
-      retval->disjunct(HfstTransducer("Å", tok, type));
-      retval->disjunct(HfstTransducer("Æ", tok, type));
-      retval->disjunct(HfstTransducer("Ç", tok, type));
-      retval->disjunct(HfstTransducer("È", tok, type));
-      retval->disjunct(HfstTransducer("É", tok, type));
-      retval->disjunct(HfstTransducer("Ê", tok, type));
-      retval->disjunct(HfstTransducer("Ë", tok, type));
-      retval->disjunct(HfstTransducer("Ì", tok, type));
-      retval->disjunct(HfstTransducer("Í", tok, type));
-      retval->disjunct(HfstTransducer("Î", tok, type));
-      retval->disjunct(HfstTransducer("Ï", tok, type));
-      retval->disjunct(HfstTransducer("Ð", tok, type));
-      retval->disjunct(HfstTransducer("Ñ", tok, type));
-      retval->disjunct(HfstTransducer("Ò", tok, type));
-      retval->disjunct(HfstTransducer("Ó", tok, type));
-      retval->disjunct(HfstTransducer("Ô", tok, type));
-      retval->disjunct(HfstTransducer("Õ", tok, type));
-      retval->disjunct(HfstTransducer("Ö", tok, type));
-      retval->disjunct(HfstTransducer("Ø", tok, type));
-      retval->disjunct(HfstTransducer("Ù", tok, type));
-      retval->disjunct(HfstTransducer("Ú", tok, type));
-      retval->disjunct(HfstTransducer("Û", tok, type));
-      retval->disjunct(HfstTransducer("Ü", tok, type));
-      retval->disjunct(HfstTransducer("Ý", tok, type));
-      retval->disjunct(HfstTransducer("Þ", tok, type));
-      retval->disjunct(HfstTransducer("ß", tok, type));
-// Combining accents: grave, acute, circumflex, tilde, overline,
-      // diaresis, cedilla
-      retval->disjunct(HfstTransducer("\u0300", tok, type));
-      retval->disjunct(HfstTransducer("\u0301", tok, type));
-      retval->disjunct(HfstTransducer("\u0302", tok, type));
-      retval->disjunct(HfstTransducer("\u0303", tok, type));
-      retval->disjunct(HfstTransducer("\u0305", tok, type));
-      retval->disjunct(HfstTransducer("\u0308", tok, type));
-      retval->disjunct(HfstTransducer("\u0327", tok, type));
-      // Small solidus and large combining solidus
-      retval->disjunct(HfstTransducer("\u0337", tok, type));
-      retval->disjunct(HfstTransducer("\u0338", tok, type));
+      retval->disjunct(*combining_accent_acceptor());
+      return retval;
+  }
+
+  HfstTransducer * combining_accent_acceptor(ImplementationType type)
+  {
+      HfstTokenizer tok;
+      HfstTransducer * retval = new HfstTransducer(type);
+      for (size_t i = 0; i < array_size(combining_accents); ++i) {
+          retval->disjunct(HfstTransducer(combining_accents[i], tok, type));
+      }
       return retval;
   }
 
@@ -600,18 +441,9 @@ HfstTransducer * read_text(char * filename, ImplementationType type)
   {
       HfstTokenizer tok;
       HfstTransducer * retval = new HfstTransducer(type);
-      const std::string punct =
-          "!\"#$%&'()*+,-./:;<=>?@[\\]^_{|}~";
-      for (std::string::const_iterator it = punct.begin(); it != punct.end();
-           ++it) {
-          retval->disjunct(HfstTransducer(std::string(1, *it), type));
+      for (size_t i = 0; i < array_size(latin1_punct); ++i) {
+          retval->disjunct(HfstTransducer(latin1_punct[i], tok, type));
       }
-      retval->disjunct(HfstTransducer("`", tok, type));
-      retval->disjunct(HfstTransducer("´", tok, type));
-      retval->disjunct(HfstTransducer("¡", tok, type));
-      retval->disjunct(HfstTransducer("«", tok, type));
-      retval->disjunct(HfstTransducer("»", tok, type));
-      retval->disjunct(HfstTransducer("¿", tok, type));
       return retval;
   }
 
@@ -619,19 +451,10 @@ HfstTransducer * latin1_whitespace_acceptor(ImplementationType type)
 {
     HfstTokenizer tok;
     HfstTransducer * retval = new HfstTransducer(type);
-    retval->disjunct(HfstTransducer(" ", tok, type));
-      retval->disjunct(HfstTransducer("\n", tok, type));
-      retval->disjunct(HfstTransducer("\t", tok, type));
-      // Non-breaking space, CR
-      retval->disjunct(HfstTransducer("\u00A0", tok, type));
-      retval->disjunct(HfstTransducer("\r", tok, type));
-      // punctuation space, thin space, line separator, par separator
-      retval->disjunct(HfstTransducer("\u2008", tok, type));
-      retval->disjunct(HfstTransducer("\u2009", tok, type));
-      retval->disjunct(HfstTransducer("\u2028", tok, type));
-      retval->disjunct(HfstTransducer("\u2029", tok, type));
-      return retval;
+    for (size_t i = 0; i < array_size(latin1_whitespace); ++i) {
+        retval->disjunct(HfstTransducer(latin1_whitespace[i], tok, type));
+    }
+    return retval;
 }
-
 
 } }
