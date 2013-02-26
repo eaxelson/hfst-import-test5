@@ -1,0 +1,98 @@
+\documentclass{llncs}
+\usepackage{llncsdoc}
+\usepackage[utf8x]{inputenc}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage{url}
+%
+\begin{document}
+%
+\title{HFST---a System for Creating NLP Tools}
+%
+\author{Krister Lind\'{e}n \and Erik Axelson \and Senka Drobac \and Sam Hardwick \and\\
+Tommi A Pirinen \and Miikka Silfverberg \and ...}
+
+\institute{University of Helsinki\\
+Department of Modern Languages\\
+Unioninkatu 40 A\\
+FI-00014 Helsingin yliopisto, Finland\\
+\email{\{krister.linden, erik.axelson, senka.drobac, sam.hardwick,\\
+tommi.pirinen, miikka silfverberg, ...\}@helsinki.fi}}
+
+\maketitle
+
+% Removed the manual bibstyle in favor of splncs03.bst,
+% if it's required fetch it from svn history
+
+\begin{abstract}
+%Krister
+\keywords{keywords here}
+\end{abstract}
+
+
+\section*{Introduction}
+% Krister
+
+\section{Applications and Tests}\label{hfst:structural-layout}
+
+\subsection{Language identification}
+% Miikka
+
+\subsection{Morphologies and Guessers}
+% Juha, Miikka
+
+\subsection{Spell-checking}
+% Tommi
+
+
+\subsection{Named Entity Recognition}
+% Jyrki, Juha (Sam?)
+
+\subsection{Language Generation for Unknown words}
+% Miikka
+
+\section{Examples for User Environments}
+
+\subsection{An Interface in Python}
+% Erik
+
+\subsubsection{A Chatroom Morphology tool}
+% Sam
+
+\subsection{HFST on Unix, Mac and Windows}
+% Erik, Tommi
+
+\subsection{Other user-oriented items}
+% Erik
+
+\section{Under the Hood}
+
+\subsection{An independent XFST module}
+% Erik (Erik)
+
+\subsection{XFST regexp compilation}
+% Senka, Miikka
+
+\subsection{Pmatch with applications for NER}
+% Sam
+
+\subsection{Other HFST development tools}
+% Erik
+
+\section{Discussion}\label{hfst:discussion}
+
+\subsection{HMM vs. CRF for English and Finnish taggers}
+% Miikka
+
+\subsection{Adding rules to statistical systems (taggers and parser)}
+% Miikka
+
+\section{Conclusion}\label{hfst:conclusion}
+
+\subsubsection*{Acknowledgments}
+
+\bibliographystyle{splncs03}
+\bibliography{sfcm-2013}
+
+\end{document}
+% vim: set spell
