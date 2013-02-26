@@ -82,6 +82,59 @@ HfstTransducer* compile(const std::string& pmatch,
 HfstTransducer * read_text(char * filename,
                            ImplementationType type = TROPICAL_OPENFST_TYPE);
 
+/**
+ * @brief Return the size a static array with a template trick.
+ */
+
+template<typename T, size_t N>
+    size_t array_size(T (&t)[N]) {
+    return N;
+}
+
+static const char * latin1_upper[] =
+    {
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
+        "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "À", "Á",
+        "Â", "Ã", "Ä", "Å", "Æ", "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï",
+        "Ð", "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "Þ",
+        "ß"
+    };
+
+static const char * latin1_lower[] =
+    {
+        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
+        "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "à", "á",
+        "â", "ã", "ä", "å", "æ", "ç", "è", "é", "ê", "ë", "ì", "í", "î", "ï",
+        "ð", "ñ", "ò", "ó", "ô", "õ", "ö", "ø", "ù", "ú", "û", "ü", "ý", "þ",
+        "ß"
+    };
+
+static const char * combining_accents[] =
+    {
+        // Combining accents: grave, acute, circumflex, tilde, overline,
+        // diaresis, cedilla
+        "\u0300", "\u0301", "\u0302", "\u0303", "\u0305", "\u0308", "\u0327",
+        // Small solidus and large combining solidus
+        "\u0337", "\u0338"
+    };
+
+static const char * latin1_punct[] =
+    {
+        "!", "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".",
+        "/", ":", ";", "<", "=", ">", "?", "@", "[", "\\", "]", "^", "_",
+        "{", "|", "}", "~", "`", "´", "¡", "«", "»", "¿"
+    };
+
+static const char * latin1_whitespace[] =
+    {
+        " ", "\n", "\t",
+        // Non-breaking space, CR
+        "\u00A0",
+        "\r",
+        // punctuation space, thin space, line separator, par separator
+        "\u2008", "\u2009", "\u2028", "\u2029"
+    };
+
 /** @brief Return a transducer that accepts one utf-8 symbol that is also a
  *  latin-1 alphabetical character. 
  */
@@ -92,6 +145,9 @@ HfstTransducer * latin1_lowercase_acceptor(
     ImplementationType type = TROPICAL_OPENFST_TYPE);
 
 HfstTransducer * latin1_uppercase_acceptor(
+    ImplementationType type = TROPICAL_OPENFST_TYPE);
+
+HfstTransducer * combining_accent_acceptor(
     ImplementationType type = TROPICAL_OPENFST_TYPE);
 
 /** @brief Return a transducer that accepts one arabic numeral character. 
