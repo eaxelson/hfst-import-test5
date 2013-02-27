@@ -231,10 +231,15 @@ void PmatchContainer::copy_to_output(const SymbolNumberVector & best_result)
 
 std::string PmatchContainer::stringify_output(void)
 {
+    return stringify(output);
+}
+
+std::string PmatchContainer::stringify(SymbolNumberVector & str)
+{
     std::string retval;
     std::stack<unsigned int> start_tag_pos;
-    for (SymbolNumberVector::const_iterator it = output.begin();
-         it != output.end(); ++it) {
+    for (SymbolNumberVector::const_iterator it = str.begin();
+         it != str.end(); ++it) {
         if (*it == special_symbols[entry]) {
             start_tag_pos.push(retval.size());
         } else if (*it == special_symbols[exit]) {
@@ -421,6 +426,10 @@ void PmatchTransducer::note_analysis(SymbolNumber * input_tape,
         rtn_stack.top().best_result.assign(rtn_stack.top().output_tape_head, output_tape);
         rtn_stack.top().candidate_input_pos = input_tape;
     }
+//     if (warn && input_tape == rtn_stack.top().candidate_input_pos) {
+//         std::cerr << "\n\tWarning: conflicting matches found, discarding:\n"
+//                   << s
+//     }
 }
 
 void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
