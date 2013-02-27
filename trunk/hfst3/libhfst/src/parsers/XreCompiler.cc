@@ -36,10 +36,16 @@ if (definitions_.find(name) != definitions_.end())
 }
 
 extern bool expand_definitions;
+extern bool harmonize_;
 
 void XreCompiler::set_expand_definitions(bool expand)
 {
   expand_definitions=expand;
+}
+
+void XreCompiler::set_harmonization(bool harmonize)
+{
+  harmonize_=harmonize;
 }
 
 HfstTransducer*

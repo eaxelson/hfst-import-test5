@@ -61,6 +61,7 @@ class XreCompiler
   HfstTransducer* compile(const std::string& xre);
 
   void set_expand_definitions(bool expand);
+  void set_harmonization(bool harmonize);
 
   private:
   std::map<std::string,hfst::HfstTransducer*> definitions_;

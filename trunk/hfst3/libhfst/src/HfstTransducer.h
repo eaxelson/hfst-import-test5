@@ -1,5 +1,5 @@
 //       This program is free software: you can redistribute it and/or modify
-//       it under the terms of the GNU General Public License as published by
+//       it under the terms of the GNU General Publirmoc License as published by
 //       the Free Software Foundation, version 3 of the License.
 //
 //       This program is distributed in the hope that it will be useful,
@@ -287,6 +287,8 @@ An example:
        returns a harmonized version of that. If this and \a another 
        have type FOMA_TYPE, NULL is returned. */
     HfstTransducer * harmonize_(const HfstTransducer &another);
+
+    HfstTransducer * harmonize_symbol_encodings(const HfstTransducer &another);
 
     /* Check if transducer \a another has in its alphabet flag diacritics
        that are not found in the alphabet of this transducer and insert
@@ -698,7 +700,7 @@ in \a ifile.
         string pairs with the same weights
         and the same alignments. 
     */
-    bool compare(const HfstTransducer &another) const;
+    bool compare(const HfstTransducer &another, bool harmonize=true) const;
 
     /** \brief Convert the transducer into an equivalent transducer 
         in format \a type. 

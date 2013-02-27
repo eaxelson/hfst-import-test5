@@ -38,12 +38,14 @@ using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::ImplementationType;
-//
+
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 #include "inc/globals-common.h"
 #include "inc/globals-binary.h"
+
+static bool harmonize=true;
 
 void
 print_usage()
@@ -54,6 +56,10 @@ print_usage()
         "\n", program_name );
         print_common_program_options(message_out);
         print_common_binary_program_options(message_out);
+        fprintf(message_out,
+                "Harmonization:\n"
+                "  -H, --do-not-harmonize Do not harmonize symbols.\n");
+        //                "  -F, --harmonize-flags  Harmonize flag diacritics.\n");
         fprintf(message_out, "\n");
         print_common_binary_program_parameter_instructions(message_out);
         fprintf(message_out, "\n");
@@ -82,11 +88,12 @@ parse_options(int argc, char** argv)
         {
           HFST_GETOPT_COMMON_LONG,
           HFST_GETOPT_BINARY_LONG,
+          {"do-not-harmonize", no_argument, 0, 'H'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_BINARY_SHORT,
+                             HFST_GETOPT_BINARY_SHORT "H",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -96,6 +103,10 @@ parse_options(int argc, char** argv)
         {
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-binary.h"
+        case 'H':
+          harmonize=false;
+          break;
+
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -119,10 +130,10 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
     while (continueReading) {
         first = new HfstTransducer(firststream);
         transducer_n_first++;
-	if (secondstream.is_good()) {
-	  second = new HfstTransducer(secondstream);
-	  transducer_n_second++;
-	}
+        if (secondstream.is_good()) {
+          second = new HfstTransducer(secondstream);
+          transducer_n_second++;
+        }
         char* firstname = strdup(first->get_name().c_str());
         char* secondname = strdup(second->get_name().c_str());
         if (strlen(firstname) == 0)
@@ -145,7 +156,7 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
         }
         try
           {
-            if (first->compare(*second))
+            if (first->compare(*second, harmonize))
               {
                 if (transducer_n_first == 1)
                   {
@@ -188,29 +199,29 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
           }
 
         continueReading = firststream.is_good() && 
-	  (secondstream.is_good() || transducer_n_second == 1);
+          (secondstream.is_good() || transducer_n_second == 1);
 
-	delete first;
-	first=0;
-	// delete the transducer of second stream, unless we continue reading
-	// the first stream and there is only one transducer in the second stream
-	if ((continueReading && secondstream.is_good()) || not continueReading)
-	  {
-	    delete second;
-	    second=0;
-	  }
+        delete first;
+        first=0;
+        // delete the transducer of second stream, unless we continue reading
+        // the first stream and there is only one transducer in the second stream
+        if ((continueReading && secondstream.is_good()) || not continueReading)
+          {
+            delete second;
+            second=0;
+          }
     }
     
     if (firststream.is_good())
     {
-	error(EXIT_FAILURE, 0, "second input '%s' contains fewer transducers than first input '%s'; "
-	      "this is only possible if the second input contains exactly one transducer", 
-	      secondfilename, firstfilename);
+        error(EXIT_FAILURE, 0, "second input '%s' contains fewer transducers than first input '%s'; "
+              "this is only possible if the second input contains exactly one transducer", 
+              secondfilename, firstfilename);
     }
     else if (secondstream.is_good())
     {
       error(EXIT_FAILURE, 0, "first input '%s' contains fewer transducers than second input '%s'",
-	    firstfilename, secondfilename);
+            firstfilename, secondfilename);
     }
     firststream.close();
     secondstream.close();

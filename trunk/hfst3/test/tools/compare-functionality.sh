@@ -15,5 +15,15 @@ for f in $comparables; do
             fi
         fi
     done
+    # [a|?] and [?] are equal if harmonized
+    if ! $TOOLDIR/hfst-compare -s a_or_id.hfst id.hfst ; then
+	echo "compare -s mismatches" "a_or_id.hfst" "id.hfst"
+	exit 1
+    fi
+    # [a|?] and [?] are not equal if not harmonized
+    if $TOOLDIR/hfst-compare -H -s a_or_id.hfst id.hfst ; then
+	echo "compare -H -s matches" "a_or_id.hfst" "id.hfst"
+	exit 1
+    fi
 done
 

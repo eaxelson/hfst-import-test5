@@ -280,6 +280,23 @@ unsigned int HfstTransducer::get_symbol_number(const std::string &symbol)
     }    
 }
 
+/*
+  Only harmonize number-to-symbol-encodings.
+  \a another is not modifed, but a modifed copy of it is returned.
+*/
+HfstTransducer * HfstTransducer::harmonize_symbol_encodings(const HfstTransducer &another)
+{
+  HfstBasicTransducer * another_basic = another.get_basic_transducer();
+  HfstBasicTransducer * this_basic = this->convert_to_basic_transducer();
+  
+  this->convert_to_hfst_transducer(this_basic);
+  HfstTransducer * another_harmonized
+    = new HfstTransducer(*another_basic, this->type);
+  delete another_basic;
+  
+  return another_harmonized;  
+}
+
 /* 
    Harmonize this transducer with a copy of another.
    another is not modifed, but a modified copy of it is returned. 
@@ -1194,7 +1211,7 @@ HfstTransducer::get_properties() const
 //
 // -----------------------------------------------------------------------
 
-bool HfstTransducer::compare(const HfstTransducer &another) const
+bool HfstTransducer::compare(const HfstTransducer &another, bool harmonize) const
 {
     if (this->type != another.type)
     HFST_THROW_MESSAGE(TransducerTypeMismatchException, 
@@ -1202,7 +1219,10 @@ bool HfstTransducer::compare(const HfstTransducer &another) const
 
     HfstTransducer one_copy(*this);
     HfstTransducer another_copy(another);
-    one_copy.harmonize(another_copy);
+
+    if (harmonize)
+      { one_copy.harmonize(another_copy); }
+
     one_copy.minimize();
 
     switch (one_copy.type)
@@ -1215,6 +1235,14 @@ bool HfstTransducer::compare(const HfstTransducer &another) const
 #endif
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
+    /* if no harmonization was carried out, symbol encodnings must be harmonized 
+       as OpenFst does not do it */
+    if (! harmonize)
+      {
+        HfstTransducer * tmp = one_copy.harmonize_symbol_encodings(another_copy);
+        another_copy = *tmp;
+        delete tmp;
+      }
         return one_copy.tropical_ofst_interface.are_equivalent(
         one_copy.implementation.tropical_ofst, 
         another_copy.implementation.tropical_ofst);
@@ -2713,6 +2741,14 @@ HfstTransducer &HfstTransducer::compose
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
     {
+    /* if no harmonization was carried out, symbol encodnings must be harmonized 
+       as OpenFst does not do it */
+    if (! harmonize)
+      {
+        HfstTransducer * tmp = this->harmonize_symbol_encodings(*another_harmonized);
+        delete another_harmonized;
+        another_harmonized = tmp;
+      }
     fst::StdVectorFst * tropical_ofst_temp =
             this->tropical_ofst_interface.compose
         (this->implementation.tropical_ofst,
@@ -2773,7 +2809,7 @@ HfstTransducer &HfstTransducer::compose
     return *this;
 }
 
-HfstTransducer &HfstTransducer::lenient_composition( const HfstTransducer &another, bool )
+HfstTransducer &HfstTransducer::lenient_composition( const HfstTransducer &another, bool /*harmonize*/)
 {
 
     if ( this->type != another.type )
@@ -2790,7 +2826,7 @@ HfstTransducer &HfstTransducer::lenient_composition( const HfstTransducer &anoth
 }
 
 
-HfstTransducer &HfstTransducer::cross_product( const HfstTransducer &another, bool )
+HfstTransducer &HfstTransducer::cross_product( const HfstTransducer &another, bool /*harmonize*/)
 {
 
     if ( this->type != another.type )
@@ -3209,7 +3245,7 @@ HfstTransducer &HfstTransducer::compose_intersect
 }
 
 HfstTransducer &HfstTransducer::concatenate
-(const HfstTransducer &another, bool)
+(const HfstTransducer &another, bool harmonize)
 { is_trie = false; // This could be done so that is_trie is preserved
     return apply
     (
@@ -3227,7 +3263,7 @@ HfstTransducer &HfstTransducer::concatenate
         //#if HAVE_MY_TRANSDUCER_LIBRARY
         //&hfst::implementations::MyTransducerLibraryTransducer::concatenate,
         //#endif
-        const_cast<HfstTransducer&>(another));
+        const_cast<HfstTransducer&>(another), harmonize);
 }
 
 
@@ -3290,7 +3326,7 @@ HfstTransducer &HfstTransducer::disjunct_as_tries(HfstTransducer &another,
 }
 
 HfstTransducer &HfstTransducer::disjunct
-(const HfstTransducer &another, bool)
+(const HfstTransducer &another, bool harmonize)
 {
     is_trie = false;
     return apply(
@@ -3305,10 +3341,10 @@ HfstTransducer &HfstTransducer::disjunct
     &hfst::implementations::FomaTransducer::disjunct,
 #endif
     /* Add here your implementation. */
-    const_cast<HfstTransducer&>(another)); }
+    const_cast<HfstTransducer&>(another), harmonize); }
 
 HfstTransducer &HfstTransducer::intersect
-(const HfstTransducer &another, bool)
+(const HfstTransducer &another, bool harmonize)
 { is_trie = false; // This could be done so that is_trie is preserved
     return apply(
 #if HAVE_SFST
@@ -3322,10 +3358,10 @@ HfstTransducer &HfstTransducer::intersect
     &hfst::implementations::FomaTransducer::intersect,
 #endif
     /* Add here your implementation. */
-    const_cast<HfstTransducer&>(another)); }
+    const_cast<HfstTransducer&>(another), harmonize); }
 
 HfstTransducer &HfstTransducer::subtract
-(const HfstTransducer &another, bool)
+(const HfstTransducer &another, bool harmonize)
 { is_trie = false; // This could be done so that is_trie is preserved
     return apply(
 #if HAVE_SFST
@@ -3339,7 +3375,7 @@ HfstTransducer &HfstTransducer::subtract
     &hfst::implementations::FomaTransducer::subtract,
 #endif
     /* Add here your implementation. */
-    const_cast<HfstTransducer&>(another)); }
+    const_cast<HfstTransducer&>(another), harmonize); }
 
 
 // -----------------------------------------------------------------------
