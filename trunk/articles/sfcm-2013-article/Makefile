@@ -6,6 +6,10 @@ SCP			= scp
 SCPFLAGS	= 
 REMOTE_DIR	= tapirine@ruuvi.helsinki.fi:public_html/paperit/
 
+.PHONY: all
+
+all: hfst-sfcm2013.pdf
+
 # using pdflatex, xelatex etc.
 %.pdf: %.tex
 	$(PDFLATEX) $(PDFLATEXFLAGS) $<

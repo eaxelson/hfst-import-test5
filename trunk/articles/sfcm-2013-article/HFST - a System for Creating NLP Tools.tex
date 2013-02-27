@@ -1,9 +1,15 @@
 \documentclass{llncs}
+
 \usepackage{llncsdoc}
-\usepackage[utf8x]{inputenc}
 \usepackage{multirow}
 \usepackage{caption}
 \usepackage{url}
+
+\usepackage{fontspec}
+\usepackage{xunicode}
+\usepackage{xltxtra}
+\usepackage{expex}
+
 %
 \begin{document}
 %
@@ -44,6 +50,50 @@ tommi.pirinen, miikka silfverberg, ...\}@helsinki.fi}}
 \subsection{Spell-checking}
 % Tommi
 
+Weighted finite-state methods in performing spell-checking and correction is a
+relatively recent branch of study in research of spell-checking. The concept is
+simple: finite-state morphological analysers and such can be trivially ported
+into spell-checking dictionaries providing a language model for the correctly
+spelled words in the spell-checking system. A baseline finite-state model for
+correcting spelling errors can be inferred from the language model by creating
+a Levenshtein-Damerau automaton based on the alphabetic characters present in
+the language. The language model can be simply trained to prefer more common
+words when the Levenshtein-Damerau distance between to suggestions is the same.
+This is done by basic unigram language model training that simply maximises
+the frequency of the suggested word. To our experience even relatively moderate
+training material will gain improvement in quality as the statistical training
+improves the discriminative power of the model, and the likelihood of random
+typing error is more likely in frequent words.
+
+The practical process of creating a finite-state spell-checker and corrector
+is really simple: given an analysator capable of recognising correctly spelled
+word-forms of a language, take a projection to the surface forms to create a
+single-tape automaton. The automaton is trained with corpus word-form list, 
+where end-weight of each word-form is e.g. $-\log\frac{c(wf)}{CS}$, where 
+$c(wf)$ is the count of word-forms, and $CS$ is the corpus size. Words not
+found in the corpus are given some weight $w_{max} > -\log\frac{1}{CS}$ to
+push them in the bottom of the suggestion list; this weighting can be done
+in finite-state algebra by composition of weighted $\Sigma^{\star}$ language,
+or by manually fixing the data structure.
+
+The error model can be improved from the baseline Levenshtein-Damerau distance
+metric as well. For this purpose we need an error corpus, that is, set of
+errors with their frequencies. This can be semi-automatically extracted from
+weakly annotated sources, such as Wikipedia. From wikipedia we get, among tons
+of other things, word-to-word corrections. It is possible to use the specific
+word-to-word corrections to create simple extension of common confusables to
+error model. Another way is to re-align the corrections using the
+Damerau-Levenshtein algorithm, and train the original distance measure with
+frequencies of the corrections in same manner as we did for word-forms above.
+
+As an example of simplicity of this process, we have obtained an open source
+German morphological analyser
+morphisto~\footnote{\url{http://code.google.com/p/morphisto/}} to generate a
+spelling checker, trained it with word-forms extracted from German
+Wikipedia~\footnote{\url{http://de.wikipedia.org}} and applied it to Wikipedia
+data to find spelling errors and correct them with n~\% of precision. The whole
+script to do this is in our version control~\footnote{\url{}}, and it took us
+no more than one work day by one researcher to implement this application.
 
 \subsection{Named Entity Recognition}
 % Jyrki, Juha (Sam?)
@@ -61,6 +111,33 @@ tommi.pirinen, miikka silfverberg, ...\}@helsinki.fi}}
 
 \subsection{HFST on Unix, Mac and Windows}
 % Erik, Tommi
+
+Portability has been one of the design goals of HFST system. The current 
+versions are available or compilable on all POSIX-supporting systems, including
+Linuxes, Mac OS X and Cygwin under Windows system. Another layer of portability
+is attained by HFST's programming language bindings via SWIG, it is possible to
+use full HFST library through it's SWIG interfaces in all supported systems,
+currently the bindings are offered for for python programming language version
+3.
+
+The python bindings in particular make it smooth to use language models
+developed for HFST in rapid prototyping of advanced tools. For an example, in
+my current project I developed a chunker for Finnish language by simply
+bracketing adjacent agreeing cases and few other similar expressions with
+basically few lines of code on top of existing morphological analysers. E.g.
+given Finnish sentence ``miljoona kärpästä voi olla väärässä paikassa'' we get
+bracketing all three phrases bracketed by really simple python based bracketing
+that are illustrated in following figure gloss:
+
+\ex
+\begingl
+\gla Miljoona$_1$ kärpästä$_1$ voi$_2$ olla$_2$ väärässä$_3$ paikassa$_3$//
+\glb Million-{\sc Num} fly-{\sc Par} can-{\sc AuxV} be-{\sc Inf} wrong-{\sc Ine} place-{\sc Ine}//
+\glft `Million flies can be in a wrong place' //
+\endgl
+\xe
+
+
 
 \subsection{Other user-oriented items}
 % Erik
@@ -95,4 +172,4 @@ tommi.pirinen, miikka silfverberg, ...\}@helsinki.fi}}
 \bibliography{sfcm-2013}
 
 \end{document}
-% vim: set spell
+% vim: set spell:
