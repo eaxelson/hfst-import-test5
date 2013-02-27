@@ -384,45 +384,43 @@ HfstTransducer * read_text(char * filename, ImplementationType type)
     return retval;
 }
 
+  HfstTransducer * latin1_acceptor(ImplementationType type)
+  {
+      HfstTransducer * retval = latin1_alpha_acceptor();
+      HfstTransducer * tmp = latin1_numeral_acceptor();
+      retval->disjunct(*tmp); delete tmp;
+      tmp = latin1_punct_acceptor(); retval->disjunct(*tmp); delete tmp;
+      tmp = latin1_whitespace_acceptor(); retval->disjunct(*tmp); delete tmp;
+      return retval;
+  }
 
   HfstTransducer * latin1_alpha_acceptor(ImplementationType type)
   {
-      HfstTokenizer tok;
       HfstTransducer * retval = latin1_lowercase_acceptor();
-      retval->disjunct(*latin1_uppercase_acceptor());
+      HfstTransducer * tmp = latin1_uppercase_acceptor();
+      retval->disjunct(*tmp); delete tmp;
       return retval;
   }
 
   HfstTransducer * latin1_lowercase_acceptor(ImplementationType type)
   {
-      HfstTokenizer tok;
-      HfstTransducer * retval = new HfstTransducer(type);
-      for (size_t i = 0; i < array_size(latin1_lower); ++i) {
-          retval->disjunct(HfstTransducer(latin1_lower[i], tok, type));
-      }
-      retval->disjunct(*combining_accent_acceptor());
+      HfstTransducer * retval = acceptor_from_cstr(latin1_lower, type);
+      HfstTransducer * tmp = combining_accent_acceptor();
+      retval->disjunct(*tmp); delete tmp;
       return retval;
   }
 
   HfstTransducer * latin1_uppercase_acceptor(ImplementationType type)
   {
-      HfstTokenizer tok;
-      HfstTransducer * retval = new HfstTransducer(type);
-      for (size_t i = 0; i < array_size(latin1_upper); ++i) {
-          retval->disjunct(HfstTransducer(latin1_upper[i], tok, type));
-      }
-      retval->disjunct(*combining_accent_acceptor());
+      HfstTransducer * retval = acceptor_from_cstr(latin1_upper, type);
+      HfstTransducer * tmp = combining_accent_acceptor();
+      retval->disjunct(*tmp); delete tmp;
       return retval;
   }
 
   HfstTransducer * combining_accent_acceptor(ImplementationType type)
   {
-      HfstTokenizer tok;
-      HfstTransducer * retval = new HfstTransducer(type);
-      for (size_t i = 0; i < array_size(combining_accents); ++i) {
-          retval->disjunct(HfstTransducer(combining_accents[i], tok, type));
-      }
-      return retval;
+      return acceptor_from_cstr(combining_accents, type);
   }
 
   HfstTransducer * latin1_numeral_acceptor(ImplementationType type)
@@ -439,22 +437,12 @@ HfstTransducer * read_text(char * filename, ImplementationType type)
 
   HfstTransducer * latin1_punct_acceptor(ImplementationType type)
   {
-      HfstTokenizer tok;
-      HfstTransducer * retval = new HfstTransducer(type);
-      for (size_t i = 0; i < array_size(latin1_punct); ++i) {
-          retval->disjunct(HfstTransducer(latin1_punct[i], tok, type));
-      }
-      return retval;
+      return acceptor_from_cstr(latin1_punct, type);
   }
 
 HfstTransducer * latin1_whitespace_acceptor(ImplementationType type)
 {
-    HfstTokenizer tok;
-    HfstTransducer * retval = new HfstTransducer(type);
-    for (size_t i = 0; i < array_size(latin1_whitespace); ++i) {
-        retval->disjunct(HfstTransducer(latin1_whitespace[i], tok, type));
-    }
-    return retval;
+    return acceptor_from_cstr(latin1_whitespace, type);
 }
 
 } }
