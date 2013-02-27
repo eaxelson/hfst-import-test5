@@ -82,15 +82,6 @@ HfstTransducer* compile(const std::string& pmatch,
 HfstTransducer * read_text(char * filename,
                            ImplementationType type = TROPICAL_OPENFST_TYPE);
 
-/**
- * @brief Return the size a static array with a template trick.
- */
-
-template<typename T, size_t N>
-    size_t array_size(T (&t)[N]) {
-    return N;
-}
-
 static const char * latin1_upper[] =
     {
         "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
@@ -135,9 +126,29 @@ static const char * latin1_whitespace[] =
         "\u2008", "\u2009", "\u2028", "\u2029"
     };
 
-/** @brief Return a transducer that accepts one utf-8 symbol that is also a
- *  latin-1 alphabetical character. 
+/** @brief Return a transducer that accepts a single string from an array of
+ *  char *. 
  */
+
+template<typename T, size_t N>
+    HfstTransducer * acceptor_from_cstr(
+        T (&strings)[N],
+        ImplementationType type) {
+    HfstTokenizer tok;
+    HfstTransducer * retval = new HfstTransducer(type);
+    for (size_t i = 0; i < N; ++i) {
+        retval->disjunct(HfstTransducer(strings[i], tok, type));
+    }
+    return retval;
+}
+
+/**
+ * Character class acceptors
+ */
+
+HfstTransducer * latin1_acceptor(
+    ImplementationType type = TROPICAL_OPENFST_TYPE);
+
 HfstTransducer * latin1_alpha_acceptor(
     ImplementationType type = TROPICAL_OPENFST_TYPE);
 
@@ -156,13 +167,13 @@ HfstTransducer * latin1_numeral_acceptor(
     ImplementationType type = TROPICAL_OPENFST_TYPE);
 
 /** @brief Return a transducer that accepts one utf-8 symbol that is also a
-    latin-1 punctuation character.
+ *  latin-1 punctuation character.
 */
 HfstTransducer * latin1_punct_acceptor(
     ImplementationType type = TROPICAL_OPENFST_TYPE);
 
 /** @brief Return a transducer that accepts one utf-8 symbol that is also a
-    latin-1 whitespace character.
+ *  latin-1 whitespace character.
 */
 HfstTransducer * latin1_whitespace_acceptor(
     ImplementationType type = TROPICAL_OPENFST_TYPE);
