@@ -663,6 +663,7 @@ in \a ifile.
     @note Usually this function is not needed since new symbols are
     added to the alphabet by default. */
     void insert_to_alphabet(const std::string &symbol); 
+    void insert_to_alphabet(const std::set<std::string> &symbols); 
 
     /** \brief Remove \a symbol from the alphabet of the transducer.
     CURRENTLY NOT IMPLEMENTED.
@@ -1184,7 +1185,7 @@ ccc : ddd
     HfstTransducer &output_project();
 
     /** \brief Compose this transducer with \a another. */
-    HfstTransducer &compose(const HfstTransducer &another);
+    HfstTransducer &compose(const HfstTransducer &another, bool harmonize=true);
 
     /** \brief Compose this transducer with the intersection of
         transducers in \a v. If \a invert is true, then compose the
@@ -1197,13 +1198,13 @@ ccc : ddd
         @pre The transducers in \a v are deterministic and epsilon-free.
     */
     HfstTransducer &compose_intersect(const HfstTransducerVector &v,
-                                      bool invert=false);
+                                      bool invert=false, bool harmonize=true);
 
     /** \brief Concatenate this transducer with \a another. */
-    HfstTransducer &concatenate(const HfstTransducer &another);
+    HfstTransducer &concatenate(const HfstTransducer &another, bool harmonize=true);
 
     /** \brief Disjunct this transducer with \a another. */
-    HfstTransducer &disjunct(const HfstTransducer &another);
+    HfstTransducer &disjunct(const HfstTransducer &another, bool harmonize=true);
 
     /** \brief Make priority union of this transducer with \a another.
      *
@@ -1228,13 +1229,13 @@ ccc : ddd
      *
      * For more information, read: www.fsmbook.com
      *  */
-    HfstTransducer &priority_union(const HfstTransducer &another);
+    HfstTransducer &priority_union(const HfstTransducer &another, bool harmonize=true);
 
 
     /**  \brief Make lenient composition of this transducer with \a.
      *  A .O. B = [ A .o. B ] .P. A
      */
-    HfstTransducer &lenient_composition(const HfstTransducer &another);
+    HfstTransducer &lenient_composition(const HfstTransducer &another, bool harmonize=true);
 
     /**  \brief Make cross product of this transducer with \a.
      *  It pairs every string of this with every string of \a.
@@ -1244,7 +1245,7 @@ ccc : ddd
      *  If strings are not the same length, epsilon padding will be added in the end of the shorter string.
      *
      */
-    HfstTransducer &cross_product(const HfstTransducer &another);
+    HfstTransducer &cross_product(const HfstTransducer &another, bool harmonize=true);
 
 
     /*
@@ -1257,7 +1258,7 @@ ccc : ddd
      *  @pre Both transducers must be automata, i.e. map strings onto themselves.
      *
      */
-    HfstTransducer &shuffle(const HfstTransducer &another);
+    HfstTransducer &shuffle(const HfstTransducer &another, bool harmonize=true);
 
     /** \brief Create universal pair transducer of \a type.
      *
@@ -1285,10 +1286,10 @@ ccc : ddd
     HfstTransducer &disjunct(const StringPairVector &spv);
 
     /** \brief Intersect this transducer with \a another. */
-    HfstTransducer &intersect(const HfstTransducer &another);
+    HfstTransducer &intersect(const HfstTransducer &another, bool harmonize=true);
 
     /** \brief Subtract transducer \a another from this transducer. */
-    HfstTransducer &subtract(const HfstTransducer &another);
+    HfstTransducer &subtract(const HfstTransducer &another, bool harmonize=true);
 
 
     // ------------------------------------------------
@@ -1322,7 +1323,7 @@ ccc : ddd
         Conversion is carried out for an HfstTransducer, if this function
         is called.
      */
-    HfstTransducer &insert_freely(const HfstTransducer &tr);
+    HfstTransducer &insert_freely(const HfstTransducer &tr, bool harmonize=true);
 
     /** \brief Substitute all transition \a sp with transitions \a sps 
         as defined by function \a func. 
@@ -1537,7 +1538,9 @@ transducer.transform_weights(&func);
      */
     void harmonize_flag_diacritics(HfstTransducer &another,
                                    bool insert_renamed_flags=true);
-
+    
+    void insert_missing_symbols_to_alphabet_from(const HfstTransducer &another);
+    
     /* Whether the alphabet of transducer \a another includes flag diacritics
        that are not included in the alphabet of this transducer. */
     bool check_for_missing_flags_in(const HfstTransducer &another) const;

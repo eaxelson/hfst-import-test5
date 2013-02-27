@@ -180,6 +180,23 @@ void HfstTransducer::insert_to_alphabet(const std::string &symbol)
     convert_to_hfst_transducer(net);
 }
 
+void HfstTransducer::insert_to_alphabet(const std::set<std::string> &symbols) 
+{
+    for (std::set<std::string>::const_iterator it = symbols.begin(); 
+         it != symbols.end(); it++)
+      {
+        HfstTokenizer::check_utf8_correctness(*it);
+        if (*it == "")
+          { HFST_THROW_MESSAGE(EmptyStringException, "insert_to_alphabet"); }
+      }
+
+    hfst::implementations::HfstBasicTransducer * net 
+      = convert_to_basic_transducer();
+    net->add_symbols_to_alphabet(symbols);
+    convert_to_hfst_transducer(net);
+}
+
+
 
 void HfstTransducer::remove_from_alphabet(const std::string &symbol) 
 {
@@ -263,6 +280,15 @@ unsigned int HfstTransducer::get_symbol_number(const std::string &symbol)
     }    
 }
 
+/* 
+   Harmonize this transducer with a copy of another.
+   another is not modifed, but a modified copy of it is returned. 
+   Flag diacritics from the alphabet of this transducer are inserted
+   to the alphabet of the copy of another, so that they are excluded
+   from harmonization.
+   If foma is used as implementation type, no harmonization is carried out,
+   as foma's functions take care of harmonization. Then NULL is returned.
+*/
 HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
 {
   using namespace implementations;
@@ -1803,6 +1829,23 @@ HfstTransducer &HfstTransducer::n_best(unsigned int n)
 
 
 
+void HfstTransducer::insert_missing_symbols_to_alphabet_from(const HfstTransducer &another)
+{
+  StringSet this_alphabet = this->get_alphabet();
+  StringSet another_alphabet = another.get_alphabet();
+  StringSet missing_symbols;
+
+  for (StringSet::const_iterator it = another_alphabet.begin();
+       it != another_alphabet.end(); it++)
+    {
+      if (this_alphabet.find(*it) == this_alphabet.end())
+        { 
+          missing_symbols.insert(*it);
+        }
+    }
+  this->insert_to_alphabet(missing_symbols);
+  return;
+}
 
 // -----------------------------------------------------------------------
 //
@@ -1810,6 +1853,13 @@ HfstTransducer &HfstTransducer::n_best(unsigned int n)
 //
 // -----------------------------------------------------------------------
 
+/* 
+   Check for missing flag diacritics (FG), i.e. FGs that are present in the 
+   alphabet of \a another but not in the alphabet of this transducer and insert 
+   them to \a missing_flags. \a return_on_first_miss defines whether function 
+   returns after first missing FG is found and inserted to \a missing_flags.
+   @ retval Whether any missing FGs where found.
+*/
 bool HfstTransducer::check_for_missing_flags_in
 (const HfstTransducer &another,
  StringSet &missing_flags,
@@ -1821,16 +1871,16 @@ bool HfstTransducer::check_for_missing_flags_in
 
     for (StringSet::const_iterator it = another_alphabet.begin();
          it != another_alphabet.end(); it++)
-    {
+      {
         if ( FdOperation::is_diacritic(*it) && 
              (this_alphabet.find(*it) == this_alphabet.end()) )
-    {
+          {
             missing_flags.insert(*it);
             retval = true;
             if (return_on_first_miss)
-        return retval;
-    }
-    }
+              { return retval; }
+          }
+      }
     return retval;
 }
 
@@ -1843,10 +1893,9 @@ void HfstTransducer::insert_freely_missing_flags_from
     {
         for (StringSet::const_iterator it = missing_flags.begin();
              it != missing_flags.end(); it++)
-    {
-      insert_freely(StringPair(*it, *it), false);
-    }
-
+          {
+            insert_freely(StringPair(*it, *it), false);
+          }     
     }
 }
 
@@ -2147,7 +2196,7 @@ HfstTransducer &HfstTransducer::insert_freely
 }
 
 HfstTransducer &HfstTransducer::insert_freely
-(const HfstTransducer &tr)
+(const HfstTransducer &tr, bool)
 {
     if (this->type != tr.type)
     HFST_THROW_MESSAGE(TransducerTypeMismatchException,
@@ -2616,18 +2665,28 @@ bool substitute_unknown_identity_pairs
 
 
 HfstTransducer &HfstTransducer::compose
-(const HfstTransducer &another)
+(const HfstTransducer &another, bool harmonize)
 { is_trie = false;
 
     if (this->type != another.type)
     HFST_THROW_MESSAGE(HfstTransducerTypeMismatchException,
                "HfstTransducer::compose");
 
-    HfstTransducer * another_harmonized =
-      this->harmonize_(const_cast<HfstTransducer&>(another));
-    if (another_harmonized == NULL) { // foma
-      another_harmonized = new HfstTransducer(another);
-    }
+    HfstTransducer * another_harmonized;
+
+    if (harmonize)
+      {
+        another_harmonized =
+          this->harmonize_(const_cast<HfstTransducer&>(another));
+        
+        if (another_harmonized == NULL) { // foma
+          another_harmonized = new HfstTransducer(another);
+        }
+      }
+    else
+      {
+        another_harmonized = new HfstTransducer(another);
+      }
 
     // Handle special symbols here.
     if ( (this->type != FOMA_TYPE) && unknown_symbols_in_use) 
@@ -2676,6 +2735,12 @@ HfstTransducer &HfstTransducer::compose
 #if HAVE_FOMA
     case FOMA_TYPE:
     {
+      /* prevent foma from harmonizing, if needed */
+      if (! harmonize)
+        {
+          this->insert_missing_symbols_to_alphabet_from(*another_harmonized);
+          another_harmonized->insert_missing_symbols_to_alphabet_from(*this);
+        }
     fsm * foma_temp =
             this->foma_interface.compose
             (implementation.foma,another_harmonized->implementation.foma);
@@ -2708,7 +2773,7 @@ HfstTransducer &HfstTransducer::compose
     return *this;
 }
 
-HfstTransducer &HfstTransducer::lenient_composition( const HfstTransducer &another )
+HfstTransducer &HfstTransducer::lenient_composition( const HfstTransducer &another, bool )
 {
 
     if ( this->type != another.type )
@@ -2725,7 +2790,7 @@ HfstTransducer &HfstTransducer::lenient_composition( const HfstTransducer &anoth
 }
 
 
-HfstTransducer &HfstTransducer::cross_product( const HfstTransducer &another )
+HfstTransducer &HfstTransducer::cross_product( const HfstTransducer &another, bool )
 {
 
     if ( this->type != another.type )
@@ -2856,7 +2921,7 @@ bool code_symbols_for_shuffle(const StringPair &sp, StringPairSet &sps)
   return true;
 }
 
-HfstTransducer &HfstTransducer::shuffle(const HfstTransducer &another)
+HfstTransducer &HfstTransducer::shuffle(const HfstTransducer &another, bool)
 {
   if (this->type != another.type)
     HFST_THROW_MESSAGE(TransducerTypeMismatchException,
@@ -2944,7 +3009,7 @@ HfstTransducer &HfstTransducer::shuffle(const HfstTransducer &another)
 
 
 
-HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
+HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another, bool)
 {
     if ( this->type != another.type )
     {
@@ -2975,7 +3040,7 @@ HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
 }
 
 HfstTransducer &HfstTransducer::compose_intersect
-(const HfstTransducerVector &v, bool invert)
+(const HfstTransducerVector &v, bool invert, bool)
 {
   // Foma transducers don't harmonize porperly. If the input is foma
   // transducers, convert to openfst type.
@@ -3144,7 +3209,7 @@ HfstTransducer &HfstTransducer::compose_intersect
 }
 
 HfstTransducer &HfstTransducer::concatenate
-(const HfstTransducer &another)
+(const HfstTransducer &another, bool)
 { is_trie = false; // This could be done so that is_trie is preserved
     return apply
     (
@@ -3225,7 +3290,7 @@ HfstTransducer &HfstTransducer::disjunct_as_tries(HfstTransducer &another,
 }
 
 HfstTransducer &HfstTransducer::disjunct
-(const HfstTransducer &another)
+(const HfstTransducer &another, bool)
 {
     is_trie = false;
     return apply(
@@ -3243,7 +3308,7 @@ HfstTransducer &HfstTransducer::disjunct
     const_cast<HfstTransducer&>(another)); }
 
 HfstTransducer &HfstTransducer::intersect
-(const HfstTransducer &another)
+(const HfstTransducer &another, bool)
 { is_trie = false; // This could be done so that is_trie is preserved
     return apply(
 #if HAVE_SFST
@@ -3260,7 +3325,7 @@ HfstTransducer &HfstTransducer::intersect
     const_cast<HfstTransducer&>(another)); }
 
 HfstTransducer &HfstTransducer::subtract
-(const HfstTransducer &another)
+(const HfstTransducer &another, bool)
 { is_trie = false; // This could be done so that is_trie is preserved
     return apply(
 #if HAVE_SFST
