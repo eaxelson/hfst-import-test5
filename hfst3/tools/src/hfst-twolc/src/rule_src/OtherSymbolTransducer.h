@@ -68,6 +68,11 @@ typedef HfstTransducer &(HfstTransducer::*HfstTransducerOneArgMember)
   (const HfstTransducer &);
 
 //! @brief Pointer to a member function of @a HfstTransducer taking one
+//! argument.
+typedef HfstTransducer &(HfstTransducer::*HfstTransducerBoolArgMember)
+  (const HfstTransducer &, bool);
+
+//! @brief Pointer to a member function of @a HfstTransducer taking one
 //! argument and returning a boolean.
 typedef bool (HfstTransducer::*HfstTransducerOneArgMemberBool)
   (const HfstTransducer &) const;
@@ -162,6 +167,10 @@ class OtherSymbolTransducer
   //! @a another.
   OtherSymbolTransducer 
     &apply(const HfstTransducerOneArgMember,
+       const OtherSymbolTransducer &another);
+
+  OtherSymbolTransducer 
+    &apply(const HfstTransducerBoolArgMember,
        const OtherSymbolTransducer &another);
 
   //! @brief Call @a p of @a this taking @a another as argument.

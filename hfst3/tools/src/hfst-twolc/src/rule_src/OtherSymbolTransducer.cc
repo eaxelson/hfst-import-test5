@@ -357,6 +357,26 @@ OtherSymbolTransducer &OtherSymbolTransducer::apply
   return *this;
 }
 
+OtherSymbolTransducer &OtherSymbolTransducer::apply
+(const HfstTransducerBoolArgMember p,const OtherSymbolTransducer &another)
+{ 
+  if (symbol_pairs.empty())
+    { throw EmptySymbolPairSet(); }
+  if (is_broken)
+    { throw UndefinedSymbolPairsFound(); }
+  if (another.is_broken)
+    { throw UndefinedSymbolPairsFound(); }
+  OtherSymbolTransducer another_copy(another);
+  if (not diacritics.empty())
+    {
+      harmonize_diacritics(another_copy);
+      another_copy.harmonize_diacritics(*this);
+    }
+  transducer = CALL_MEMBER_FN(transducer,p)(another_copy.transducer, true); 
+  transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)(); 
+  return *this;
+}
+
 bool OtherSymbolTransducer::apply
 (const HfstTransducerOneArgMemberBool p,const OtherSymbolTransducer &another)
 const
