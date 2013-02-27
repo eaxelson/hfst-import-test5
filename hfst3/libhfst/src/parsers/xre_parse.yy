@@ -16,6 +16,12 @@ using namespace hfst::implementations;
 
 #include "xre_utils.h"
 
+namespace hfst { namespace xre {
+extern bool harmonize_;
+}}
+
+using hfst::xre::harmonize_;
+
 extern void xreerror(const char * text);
 extern int xrelex();
 extern int yylex();
@@ -145,7 +151,7 @@ REGEXP2: REPLACE
          }
        | REGEXP2 COMPOSITION REPLACE {
        
-            $$ = & $1->compose(*$3).minimize();
+            $$ = & $1->compose(*$3, harmonize_).minimize();
             delete $3;
         }
        | REGEXP2 CROSS_PRODUCT REPLACE {
@@ -586,16 +592,16 @@ RESTR_CONTEXT: REGEXP4 CENTER_MARKER REGEXP4
 
 REGEXP5: REGEXP6 { }
        | REGEXP5 UNION REGEXP6 {
-            $$ = & $1->disjunct(*$3);
+            $$ = & $1->disjunct(*$3, harmonize_);
             delete $3;
         }
        | REGEXP5 INTERSECTION REGEXP6 {
         // std::cerr << "Intersection: \n"  << std::endl;
-            $$ = & $1->intersect(*$3).minimize().prune_alphabet(false);
+            $$ = & $1->intersect(*$3, harmonize_).minimize().prune_alphabet(false);
             delete $3;
         }
        | REGEXP5 MINUS REGEXP6 {
-            $$ = & $1->subtract(*$3).prune_alphabet(false);
+            $$ = & $1->subtract(*$3, harmonize_).prune_alphabet(false);
             delete $3;
         }
        | REGEXP5 UPPER_MINUS REGEXP6 {
@@ -624,7 +630,7 @@ REGEXP5: REGEXP6 { }
 
 REGEXP6: REGEXP7 { }
        | REGEXP6 REGEXP7 { 
-        $$ = & $1->concatenate(*$2);
+        $$ = & $1->concatenate(*$2, harmonize_);
         delete $2;
         }
        ;
@@ -784,7 +790,7 @@ SYMBOL_LIST: HALFARC {
                  tmp = new HfstTransducer($2, $2, hfst::xre::format);
               }
 
-            $1->disjunct(*tmp);
+            $1->disjunct(*tmp, harmonize_);
             $$ = & $1->minimize();
             delete $2, tmp; 
             }

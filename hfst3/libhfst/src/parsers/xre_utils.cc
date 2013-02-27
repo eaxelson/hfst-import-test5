@@ -50,6 +50,7 @@ hfst::ImplementationType format;
 size_t len;
 
   bool expand_definitions=false;
+  bool harmonize_=true;
 
 int*
 get_n_to_k(const char* s)

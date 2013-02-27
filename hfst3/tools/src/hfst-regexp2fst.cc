@@ -69,6 +69,8 @@ static bool logarithmic_weights=false;
 
 static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
 
+static bool harmonize=true;
+
 void
 print_usage()
 {
@@ -88,7 +90,8 @@ print_usage()
 "      --log (todo)          Take negative logarithm of each weight\n"
 "  -l, --line                Input is line separated (default)\n"
 "  -S, --semicolon           Input is semicolon separated\n"
-"  -e, --epsilon=EPS         Map EPS as zero.\n");
+"  -e, --epsilon=EPS         Map EPS as zero.\n"
+"  -H, --do-not-harmonize    Do not expand '?' symbols.\n");
         fprintf(message_out, "\n");
 
         fprintf(message_out, 
@@ -96,8 +99,8 @@ print_usage()
             "FMT must be one of the following: "
             "{foma, sfst, openfst-tropical, openfst-log}.\n"
             "If EPS is not defined, the default representation of 0 is used\n"
-	    "Weights are currently not implemented.\n"
-	    "\n"
+            "Weights are currently not implemented.\n"
+            "\n"
             );
 
         fprintf(message_out, "Examples:\n"
@@ -129,11 +132,12 @@ parse_options(int argc, char** argv)
           {"line", no_argument, 0, 'l'},
           {"semicolon", no_argument, 0, 'S'},
           {"format", required_argument, 0, 'f'},
+          {"do-not-harmonize", no_argument, 0, 'H'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "je:123lSf:",
+                             HFST_GETOPT_UNARY_SHORT "je:123lSf:H",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -168,6 +172,9 @@ parse_options(int argc, char** argv)
         case 'f':
             output_format = hfst_parse_format_name(optarg);
             break;
+        case 'H':
+            harmonize=false;
+            break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -191,6 +198,7 @@ process_stream(HfstOutputStream& outstream)
   size_t len = 0;
   unsigned int line_count = 0;
   XreCompiler comp(output_format);
+  comp.set_harmonization(harmonize);
   HfstTransducer disjunction(output_format);
   //outstream.open();
   int delim = '\n';
@@ -240,7 +248,7 @@ process_stream(HfstOutputStream& outstream)
         }
       if (disjunct_expressions)
         {
-          disjunction.disjunct(*compiled);
+          disjunction.disjunct(*compiled, harmonize);
         }
       else
         {

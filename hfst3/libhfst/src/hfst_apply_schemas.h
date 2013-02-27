@@ -95,4 +95,4 @@ HfstTransducer &apply(
  //my_namespace::MyFst * (*my_transducer_library_funct)
  //  (my_namespace::MyFst *, my_namespace::MyFst *),
  //#endif
- HfstTransducer &another );
+ HfstTransducer &another, bool harmonize );
