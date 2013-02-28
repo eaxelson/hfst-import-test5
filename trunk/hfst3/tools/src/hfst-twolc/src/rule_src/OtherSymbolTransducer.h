@@ -108,7 +108,7 @@ typedef HfstTransducer &(HfstTransducer::*HfstTransducerSubstPairMember)
 //! @brief Pointer to member function of @A HfstTransducer taking a
 //! @a SymbolPair and an @a HfstTransducer as arguments.
 typedef HfstTransducer &(HfstTransducer::*HfstTransducerSubstPairFstMember)
-  (const SymbolPair &,HfstTransducer &);
+  (const SymbolPair &,HfstTransducer &,bool);
 
 //! @brief For calling a pointer to a member function passed as argument. 
 #define CALL_MEMBER_FN(object,ptr_to_member) ((object).*(ptr_to_member))
@@ -216,7 +216,7 @@ class OtherSymbolTransducer
   //! minimize @a this.
   OtherSymbolTransducer 
     &apply(const HfstTransducerSubstPairFstMember p,const SymbolPair &p1,
-       const OtherSymbolTransducer &t);
+           const OtherSymbolTransducer &t, bool b);
 
 
   //! @brief Add one transition from the start state of @a this to a new state

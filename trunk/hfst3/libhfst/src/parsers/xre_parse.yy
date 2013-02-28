@@ -189,7 +189,7 @@ REGEXP2: REPLACE
             // a:b .o. b -> x | y
             // [[a:b].i .o. b -> x | y].i - this is for cases when b is on left side
 
-            tmpTr->substitute(tmp, *$3);
+            tmpTr->substitute(tmp, *$3, false);
             tmpTr->compose(replaceTr).minimize();
             tmpTr->invert().compose(replaceTr).invert().minimize();
             

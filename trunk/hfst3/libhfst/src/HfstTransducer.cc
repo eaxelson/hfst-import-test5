@@ -2450,7 +2450,7 @@ HfstTransducer &HfstTransducer::substitute
 
 HfstTransducer &HfstTransducer::substitute
 (const StringPair &symbol_pair,
- HfstTransducer &transducer)
+ HfstTransducer &transducer, bool harmonize)
 { 
 
     if (this->type != transducer.type) {
@@ -2463,7 +2463,23 @@ HfstTransducer &HfstTransducer::substitute
      "substitute(const StringPair&, HfstTransducer&)");
 
     HfstTransducer pairTransducer(symbol_pair.first, symbol_pair.second, this->type);
+    if (! harmonize)
+      {
+        this->insert_missing_symbols_to_alphabet_from(pairTransducer);
+        pairTransducer.insert_missing_symbols_to_alphabet_from(*this);
+      }
+    this->insert_missing_symbols_to_alphabet_from(pairTransducer, true);
+    pairTransducer.insert_missing_symbols_to_alphabet_from(*this, true);
+
     this->harmonize(pairTransducer);
+
+    if (! harmonize)
+      {
+        this->insert_missing_symbols_to_alphabet_from(transducer);
+        transducer.insert_missing_symbols_to_alphabet_from(*this);
+      }
+    this->insert_missing_symbols_to_alphabet_from(transducer, true);
+    transducer.insert_missing_symbols_to_alphabet_from(*this, true);
 
     bool harm = harmonize_smaller;
     harmonize_smaller=false;

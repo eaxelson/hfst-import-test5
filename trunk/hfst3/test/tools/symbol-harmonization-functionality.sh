@@ -168,15 +168,15 @@ for ext in .sfst .ofst .foma; do
     echo "\`[[a:b ?] , c , d ]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp1;
     echo "[a:b ?]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp2;
     if ! ($TOOLDIR/hfst-compare -H tmp1 tmp2 > /dev/null); then
-	echo "  (skipping substitution test #1, does not work yet)" ${FFLAG}
-	#exit 1;
+	echo "substitution test #1" ${FFLAG}
+	exit 1;
     fi
 
     echo "\`[[a:b ?] , b , B C D ]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp1;
-    echo "[a:B a:C a:D ?]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp2;
+    echo "[[a:B | a:C | a:D] ?]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp2;
     if ! ($TOOLDIR/hfst-compare -H tmp1 tmp2 > /dev/null); then
-	echo "  (skipping substitution test #2, does not work yet)" ${FFLAG}
-	#exit 1;
+	echo "substitution test #2" ${FFLAG}
+	exit 1;
     fi
     
 

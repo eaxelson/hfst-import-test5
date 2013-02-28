@@ -468,7 +468,7 @@ OtherSymbolTransducer &OtherSymbolTransducer::apply
 
 OtherSymbolTransducer &OtherSymbolTransducer::apply
 (const HfstTransducerSubstPairFstMember p,const SymbolPair &p1, 
- const OtherSymbolTransducer &t)
+ const OtherSymbolTransducer &t, bool b)
 {
   if (symbol_pairs.empty())
     { throw EmptySymbolPairSet(); }
@@ -476,7 +476,7 @@ OtherSymbolTransducer &OtherSymbolTransducer::apply
     { throw UndefinedSymbolPairsFound(); }
 
   OtherSymbolTransducer t_copy(t);
-  transducer = CALL_MEMBER_FN(transducer,p)(p1,t_copy.transducer);
+  transducer = CALL_MEMBER_FN(transducer,p)(p1,t_copy.transducer,b);
   transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)(); 
   return *this;
 }
