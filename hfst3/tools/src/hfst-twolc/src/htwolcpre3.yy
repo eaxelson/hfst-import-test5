@@ -320,7 +320,8 @@ REGULAR_EXPRESSION: RE_LIST
   $1->apply
     (&HfstTransducer::substitute,
      SymbolPair(TWOLC_FREELY_INSERT,TWOLC_FREELY_INSERT),
-     *$3);
+     *$3,
+     true);
   $$ = $1;
 
   delete $3;

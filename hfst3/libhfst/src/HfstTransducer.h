@@ -1466,7 +1466,7 @@ t.substitute(&function);
         @see String
      */
     HfstTransducer &substitute(const StringPair &symbol_pair,
-                               HfstTransducer &transducer);
+                               HfstTransducer &transducer, bool harmonize=true);
 
 
     // -----------------------------------------------
