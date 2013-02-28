@@ -637,7 +637,7 @@ REGEXP6: REGEXP7 { }
 
 REGEXP7: REGEXP8 { }
        | REGEXP7 IGNORING REGEXP8 {
-            $$ = & $1->insert_freely(*$3);
+            $$ = & $1->insert_freely(*$3, harmonize_);
             delete $3;
         }
        | REGEXP7 IGNORE_INTERNALLY REGEXP8 {
