@@ -134,8 +134,8 @@ namespace hfst
 
       HfstTransducer removeMarkers( const HfstTransducer &tr )
       {
-        String leftMarker("@_LM_@");
-        String rightMarker("@_RM_@");
+        String leftMarker("@LM@");
+        String rightMarker("@RM@");
 
         HfstTransducer retval(tr);
 
@@ -190,10 +190,10 @@ namespace hfst
       {
           HfstTokenizer TOK;
           TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-          String leftMarker("@_LM_@");
-          String rightMarker("@_RM_@");
-          String leftMarker2("@_LM2_@");
-          String rightMarker2("@_RM2_@");
+          String leftMarker("@LM@");
+          String rightMarker("@RM@");
+          String leftMarker2("@LM2@");
+          String rightMarker2("@RM2@");
 
 
           TOK.add_multichar_symbol(leftMarker);
@@ -408,12 +408,12 @@ namespace hfst
           HfstTokenizer TOK;
           TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
           TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
-          String leftMarker("@_LM_@");
-          String rightMarker("@_RM_@");
-          String tmpMarker("@_TMPM_@");
-          String leftMarker2("@_LM2_@");
-          String rightMarker2("@_RM2_@");
-          String markupMarker("@_MMM_@");
+          String leftMarker("@LM@");
+          String rightMarker("@RM@");
+          String tmpMarker("@TMPM@");
+          String leftMarker2("@LM2@");
+          String rightMarker2("@RM2@");
+          String markupMarker("@MMM@");
 
 
           TOK.add_multichar_symbol(leftMarker);
@@ -644,13 +644,13 @@ namespace hfst
       {
           HfstTokenizer TOK;
           TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-          String leftMarker("@_LM_@");
-          String rightMarker("@_RM_@");
+          String leftMarker("@LM@");
+          String rightMarker("@RM@");
 
-          String leftMarker2("@_LM2_@");
-          String rightMarker2("@_RM2_@");
+          String leftMarker2("@LM2@");
+          String rightMarker2("@RM2@");
 
-          String tmpMarker("@_TMPM_@");
+          String tmpMarker("@TMPM@");
           TOK.add_multichar_symbol(leftMarker);
           TOK.add_multichar_symbol(rightMarker);
           TOK.add_multichar_symbol(leftMarker2);
@@ -859,8 +859,8 @@ namespace hfst
           HfstTokenizer TOK;
           TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-          String leftMarker("@_LM_@");
-          String rightMarker("@_RM_@");
+          String leftMarker("@LM@");
+          String rightMarker("@RM@");
           TOK.add_multichar_symbol(leftMarker);
           TOK.add_multichar_symbol(rightMarker);
 
@@ -903,8 +903,8 @@ namespace hfst
           TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
           TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
 
-          String leftMarker("@_LM_@");
-          String rightMarker("@_RM_@");
+          String leftMarker("@LM@");
+          String rightMarker("@RM@");
           TOK.add_multichar_symbol(leftMarker);
           TOK.add_multichar_symbol(rightMarker);
 
@@ -977,8 +977,8 @@ namespace hfst
           TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
           TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
 
-          String leftMarker("@_LM_@");
-          String rightMarker("@_RM_@");
+          String leftMarker("@LM@");
+          String rightMarker("@RM@");
           TOK.add_multichar_symbol(leftMarker);
           TOK.add_multichar_symbol(rightMarker);
 
@@ -1057,8 +1057,8 @@ namespace hfst
           HfstTokenizer TOK;
           TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-          String leftMarker("@_LM_@");
-          String rightMarker("@_RM_@");
+          String leftMarker("@LM@");
+          String rightMarker("@RM@");
           TOK.add_multichar_symbol(leftMarker);
           TOK.add_multichar_symbol(rightMarker);
 
@@ -1147,8 +1147,8 @@ namespace hfst
           HfstTokenizer TOK;
           TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-          String leftMarker("@_LM_@");
-          String rightMarker("@_RM_@");
+          String leftMarker("@LM@");
+          String rightMarker("@RM@");
           TOK.add_multichar_symbol(leftMarker);
           TOK.add_multichar_symbol(rightMarker);
 
@@ -1235,8 +1235,8 @@ namespace hfst
           HfstTokenizer TOK;
           TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-          String leftMarker("@_LM_@");
-          String rightMarker("@_RM_@");
+          String leftMarker("@LM@");
+          String rightMarker("@RM@");
           TOK.add_multichar_symbol(leftMarker);
           TOK.add_multichar_symbol(rightMarker);
 
@@ -1322,8 +1322,8 @@ namespace hfst
           HfstTokenizer TOK;
           TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-          String leftMarker("@_LM_@");
-          String rightMarker("@_RM_@");
+          String leftMarker("@LM@");
+          String rightMarker("@RM@");
           TOK.add_multichar_symbol(leftMarker);
           TOK.add_multichar_symbol(rightMarker);
 
@@ -1406,10 +1406,10 @@ namespace hfst
           HfstTokenizer TOK;
           TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-          String leftMarker("@_LM_@");
-          String rightMarker("@_RM_@");
-          String leftMarker2("@_LM2_@");
-          String rightMarker2("@_RM2_@");
+          String leftMarker("@LM@");
+          String rightMarker("@RM@");
+          String leftMarker2("@LM2@");
+          String rightMarker2("@RM2@");
 
           TOK.add_multichar_symbol(leftMarker);
           TOK.add_multichar_symbol(rightMarker);
@@ -1508,10 +1508,10 @@ namespace hfst
           HfstTokenizer TOK;
           TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-          String leftMarker("@_LM_@");
-          String rightMarker("@_RM_@");
-          String leftMarker2("@_LM2_@");
-          String rightMarker2("@_RM2_@");
+          String leftMarker("@LM@");
+          String rightMarker("@RM@");
+          String leftMarker2("@LM2@");
+          String rightMarker2("@RM2@");
           TOK.add_multichar_symbol(leftMarker);
           TOK.add_multichar_symbol(rightMarker);
           TOK.add_multichar_symbol(leftMarker2);
@@ -1612,8 +1612,8 @@ namespace hfst
           TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
 
-          String leftMarker2("@_LM2_@");
-          String rightMarker2("@_RM2_@");
+          String leftMarker2("@LM2@");
+          String rightMarker2("@RM2@");
 
           TOK.add_multichar_symbol(leftMarker2);
           TOK.add_multichar_symbol(rightMarker2);
@@ -1664,13 +1664,13 @@ namespace hfst
           HfstTokenizer TOK;
           TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-          String leftMarker("@_LM_@");
-          String rightMarker("@_RM_@");
+          String leftMarker("@LM@");
+          String rightMarker("@RM@");
           TOK.add_multichar_symbol(leftMarker);
           TOK.add_multichar_symbol(rightMarker);
 
-          String leftMarker2("@_LM2_@");
-          String rightMarker2("@_RM2_@");
+          String leftMarker2("@LM2@");
+          String rightMarker2("@RM2@");
 
           TOK.add_multichar_symbol(leftMarker2);
           TOK.add_multichar_symbol(rightMarker2);
@@ -1745,7 +1745,7 @@ namespace hfst
             HfstTokenizer TOK;
             TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
             TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
-            TOK.add_multichar_symbol("@_TMP_UNKNOWN_@");
+            TOK.add_multichar_symbol("@TMP_UNKNOWN@");
             ImplementationType type = t.get_type();
 
             String boundaryMarker(".#.");
@@ -1795,7 +1795,7 @@ namespace hfst
             //tr.insert_to_alphabet(boundaryMarker);
             // substitutute unknowns with tmp symbol
             // this is necessary because of first composition
-            tr.substitute("@_UNKNOWN_SYMBOL_@", "@_TMP_UNKNOWN_@");
+            tr.substitute("@_UNKNOWN_SYMBOL_@", "@TMP_UNKNOWN@");
 
             retval.compose(tr).minimize();
         //    retval = tr;
@@ -1815,8 +1815,8 @@ namespace hfst
         //retval.write_in_att_format(stdout, 1);
 
             // bring back unknown symbols
-            retval.substitute("@_TMP_UNKNOWN_@", "@_UNKNOWN_SYMBOL_@");
-            retval.remove_from_alphabet("@_TMP_UNKNOWN_@");
+            retval.substitute("@TMP_UNKNOWN@", "@_UNKNOWN_SYMBOL_@");
+            retval.remove_from_alphabet("@TMP_UNKNOWN@");
 
           //  printf("retval: \n");
           //  retval.write_in_att_format(stdout, 1);
