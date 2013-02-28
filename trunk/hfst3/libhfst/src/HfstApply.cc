@@ -321,22 +321,17 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
     if (this->type != another.type)
       HFST_THROW(TransducerTypeMismatchException);
 
-    HfstTransducer * another_;
+    /* prevent harmonization, if needed */
+    if (! harmonize)
+      {
+        this->insert_missing_symbols_to_alphabet_from(another);
+        another.insert_missing_symbols_to_alphabet_from(*this);
+      }
 
-    if (harmonize)
-      {
-        another_ =
-          this->harmonize_(const_cast<HfstTransducer&>(another));
-        
-        if (another_ == NULL) // foma
-          { 
-            another_ = new HfstTransducer(another);
-          }
-      }
-    else
-      {
-        another_ = new HfstTransducer(another);
-      }
+    HfstTransducer * another_ =
+      this->harmonize_(const_cast<HfstTransducer&>(another));        
+    if (another_ == NULL) // foma
+      { another_ = new HfstTransducer(another); }
 
     switch (this->type)
       {
@@ -354,14 +349,6 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         {
-          /* if no harmonization was carried out, symbol encodnings must be harmonized                                                                                                                                                                       as OpenFst does not do it */
-          if (! harmonize)
-            {
-              HfstTransducer * tmp = this->harmonize_symbol_encodings(*another_);
-              delete another_;
-              another_ = tmp;
-            }
-
           fst::StdVectorFst * tropical_ofst_temp =
             tropical_ofst_funct(this->implementation.tropical_ofst,
                                 another_->implementation.tropical_ofst);
@@ -382,12 +369,6 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 #if HAVE_FOMA
       case FOMA_TYPE:
         {
-          /* prevent foma from harmonizing, if needed */
-          if (! harmonize)
-            {
-              this->insert_missing_symbols_to_alphabet_from(*another_);
-              another_->insert_missing_symbols_to_alphabet_from(*this);
-            }
           fsm * foma_temp = 
             foma_funct(implementation.foma,another_->implementation.foma);
           delete implementation.foma;

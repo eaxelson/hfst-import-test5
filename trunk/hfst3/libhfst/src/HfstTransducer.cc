@@ -286,15 +286,27 @@ unsigned int HfstTransducer::get_symbol_number(const std::string &symbol)
 */
 HfstTransducer * HfstTransducer::harmonize_symbol_encodings(const HfstTransducer &another)
 {
+  /*
+  std::cerr << "== 1 ==" << std::endl;
   HfstBasicTransducer * another_basic = another.get_basic_transducer();
-  HfstBasicTransducer * this_basic = this->convert_to_basic_transducer();
+  std::cerr << "== 2 ==" << std::endl;
+  HfstBasicTransducer * this_basic = this->convert_to_basic_transducer(); // OpenFst fails
   
+  std::cerr << "== 3 ==" << std::endl;
   this->convert_to_hfst_transducer(this_basic);
+  std::cerr << "== 4 ==" << std::endl;
   HfstTransducer * another_harmonized
     = new HfstTransducer(*another_basic, this->type);
+  std::cerr << "== 5 ==" << std::endl;
   delete another_basic;
+  std::cerr << "== 6 ==" << std::endl;
   
-  return another_harmonized;  
+  return another_harmonized;  */
+
+  HfstBasicTransducer another_basic(another);
+  HfstBasicTransducer this_basic(*this);
+  *this = HfstTransducer(this_basic, this->get_type());
+  return new HfstTransducer(another_basic, another.get_type());
 }
 
 /* 
@@ -319,7 +331,7 @@ HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
     HfstTransducer another_copy(another);
 
     // Prevent flag diacritics from being harmonized by inserting them to
-    // the alphabet.
+    // the alphabet. FIX?: remove them at the end?
     StringSet this_alphabet    = this->get_alphabet();
     StringSet another_alphabet = another_copy.get_alphabet();
 
@@ -1220,8 +1232,19 @@ bool HfstTransducer::compare(const HfstTransducer &another, bool harmonize) cons
     HfstTransducer one_copy(*this);
     HfstTransducer another_copy(another);
 
-    if (harmonize)
-      { one_copy.harmonize(another_copy); }
+    /* prevent harmonization, if needed */
+    if (! harmonize)
+      { 
+        one_copy.insert_missing_symbols_to_alphabet_from(another_copy);
+        another_copy.insert_missing_symbols_to_alphabet_from(one_copy);
+      }
+
+    if (this->type != FOMA_TYPE)
+      {
+        HfstTransducer *tmp = one_copy.harmonize_(another_copy);
+        another_copy = *tmp;
+        delete tmp;
+      }
 
     one_copy.minimize();
 
@@ -1235,14 +1258,6 @@ bool HfstTransducer::compare(const HfstTransducer &another, bool harmonize) cons
 #endif
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
-    /* if no harmonization was carried out, symbol encodnings must be harmonized 
-       as OpenFst does not do it */
-    if (! harmonize)
-      {
-        HfstTransducer * tmp = one_copy.harmonize_symbol_encodings(another_copy);
-        another_copy = *tmp;
-        delete tmp;
-      }
         return one_copy.tropical_ofst_interface.are_equivalent(
         one_copy.implementation.tropical_ofst, 
         another_copy.implementation.tropical_ofst);
@@ -2700,20 +2715,21 @@ HfstTransducer &HfstTransducer::compose
     HFST_THROW_MESSAGE(HfstTransducerTypeMismatchException,
                "HfstTransducer::compose");
 
-    HfstTransducer * another_harmonized;
+    HfstTransducer * another_copy = new HfstTransducer(another);
 
-    if (harmonize)
+    /* prevent harmonization, if needed */
+    if (! harmonize)
       {
-        another_harmonized =
-          this->harmonize_(const_cast<HfstTransducer&>(another));
-        
-        if (another_harmonized == NULL) { // foma
-          another_harmonized = new HfstTransducer(another);
-        }
+        this->insert_missing_symbols_to_alphabet_from(*another_copy);
+        another_copy->insert_missing_symbols_to_alphabet_from(*this);
       }
-    else
+
+    if (this->type != FOMA_TYPE)
       {
-        another_harmonized = new HfstTransducer(another);
+        HfstTransducer * tmp =
+          this->harmonize_(const_cast<HfstTransducer&>(*another_copy));
+        delete another_copy;
+        another_copy = tmp;
       }
 
     // Handle special symbols here.
@@ -2721,7 +2737,7 @@ HfstTransducer &HfstTransducer::compose
     {
       // comment...
       this->substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",false,true);
-      const_cast<HfstTransducer*>(another_harmonized)->substitute
+      const_cast<HfstTransducer*>(another_copy)->substitute
     ("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",true,false);
     }
     
@@ -2732,7 +2748,7 @@ HfstTransducer &HfstTransducer::compose
     {
     SFST::Transducer * sfst_temp =
       this->sfst_interface.compose
-      (implementation.sfst,another_harmonized->implementation.sfst);
+      (implementation.sfst,another_copy->implementation.sfst);
     delete implementation.sfst;
     implementation.sfst = sfst_temp;
     break;
@@ -2741,18 +2757,10 @@ HfstTransducer &HfstTransducer::compose
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
     {
-    /* if no harmonization was carried out, symbol encodnings must be harmonized 
-       as OpenFst does not do it */
-    if (! harmonize)
-      {
-        HfstTransducer * tmp = this->harmonize_symbol_encodings(*another_harmonized);
-        delete another_harmonized;
-        another_harmonized = tmp;
-      }
     fst::StdVectorFst * tropical_ofst_temp =
             this->tropical_ofst_interface.compose
         (this->implementation.tropical_ofst,
-         another_harmonized->implementation.tropical_ofst);
+         another_copy->implementation.tropical_ofst);
     delete implementation.tropical_ofst;
     implementation.tropical_ofst = tropical_ofst_temp;
     break;
@@ -2762,7 +2770,7 @@ HfstTransducer &HfstTransducer::compose
     hfst::implementations::LogFst * log_ofst_temp =
             this->log_ofst_interface.compose
       (implementation.log_ofst,
-       another_harmonized->implementation.log_ofst);
+       another_copy->implementation.log_ofst);
     delete implementation.log_ofst;
     implementation.log_ofst = log_ofst_temp;
     break;
@@ -2771,15 +2779,9 @@ HfstTransducer &HfstTransducer::compose
 #if HAVE_FOMA
     case FOMA_TYPE:
     {
-      /* prevent foma from harmonizing, if needed */
-      if (! harmonize)
-        {
-          this->insert_missing_symbols_to_alphabet_from(*another_harmonized);
-          another_harmonized->insert_missing_symbols_to_alphabet_from(*this);
-        }
     fsm * foma_temp =
             this->foma_interface.compose
-            (implementation.foma,another_harmonized->implementation.foma);
+            (implementation.foma,another_copy->implementation.foma);
     this->foma_interface.delete_foma(implementation.foma);
     implementation.foma = foma_temp;
     break;
@@ -2801,10 +2803,10 @@ HfstTransducer &HfstTransducer::compose
     {
         // comment...
         this->substitute(&substitute_single_identity_with_the_other_symbol);
-        (const_cast<HfstTransducer*>(another_harmonized))->
+        (const_cast<HfstTransducer*>(another_copy))->
        substitute(&substitute_unknown_identity_pairs);
     }
-    delete another_harmonized;
+    delete another_copy;
 
     return *this;
 }

@@ -72,16 +72,13 @@ for ext in .sfst .ofst .foma; do
 	exit 1;
     fi
 
-
-    continue;
-
     # concatenation
     echo "[?]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp1;
     echo "[a:b]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp2;
 
     # harmonization
     $TOOLDIR/hfst-concatenate tmp1 tmp2 | $TOOLDIR/hfst-minimize > concatenation;
-    echo "[[?|a|b] a:b]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} | $TOOLDIR/hfst-minimize > result;
+    echo "[[?|a|b] a:b]" | $TOOLDIR/hfst-regexp2fst -H ${FFLAG} | $TOOLDIR/hfst-minimize > result;  # error
     # do not harmonize when comparing, the transducers must be exactly the same
     if ! ($TOOLDIR/hfst-compare -H -s concatenation result); then
 	echo "#9" ${FFLAG}
@@ -90,10 +87,10 @@ for ext in .sfst .ofst .foma; do
 
     # no harmonization
     $TOOLDIR/hfst-concatenate -H tmp1 tmp2 | $TOOLDIR/hfst-minimize > concatenation;
-    echo "[?|a:b]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} | $TOOLDIR/hfst-minimize > result;
+    echo "[? a:b]" | $TOOLDIR/hfst-regexp2fst -H ${FFLAG} | $TOOLDIR/hfst-minimize > result;
     # do not harmonize when comparing, the transducers must be exactly the same
     if ! ($TOOLDIR/hfst-compare -H -s concatenation result); then
-	echo "#9" ${FFLAG}
+	echo "#10" ${FFLAG}
 	exit 1;
     fi
 
@@ -101,11 +98,13 @@ for ext in .sfst .ofst .foma; do
     # disjunction
     echo "[?]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp1;
     echo "[a:b]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp2;
+
+    # harmonization
     $TOOLDIR/hfst-disjunct tmp1 tmp2 | $TOOLDIR/hfst-minimize > disjunction;
-    echo "[[?|a|b] a:b]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} | $TOOLDIR/hfst-minimize > result;
+    echo "[?|a|b|a:b]" | $TOOLDIR/hfst-regexp2fst -H ${FFLAG} | $TOOLDIR/hfst-minimize > result;
     # do not harmonize when comparing, the transducers must be exactly the same
     if ! ($TOOLDIR/hfst-compare -H -s disjunction result); then
-	echo "#10" ${FFLAG}
+	echo "#11" ${FFLAG}
 	exit 1;
     fi
 
