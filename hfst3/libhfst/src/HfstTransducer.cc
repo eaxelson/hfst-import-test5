@@ -1238,6 +1238,9 @@ bool HfstTransducer::compare(const HfstTransducer &another, bool harmonize) cons
         one_copy.insert_missing_symbols_to_alphabet_from(another_copy);
         another_copy.insert_missing_symbols_to_alphabet_from(one_copy);
       }
+    /* always prevent harmonizing special symbols */
+    one_copy.insert_missing_symbols_to_alphabet_from(another_copy, true);
+    another_copy.insert_missing_symbols_to_alphabet_from(one_copy, true);
 
     if (this->type != FOMA_TYPE)
       {
@@ -1871,8 +1874,17 @@ HfstTransducer &HfstTransducer::n_best(unsigned int n)
 }
 
 
+static bool is_special_symbol(const std::string &symbol)
+{
+  if (symbol.size() < 4)
+    return false;
+  if (symbol[0] == '@' && symbol[symbol.size()-1] == '@' && 
+      symbol[1] == '_' && symbol[symbol.size()-2] == '_')
+    return true;
+  return false;
+}
 
-void HfstTransducer::insert_missing_symbols_to_alphabet_from(const HfstTransducer &another)
+void HfstTransducer::insert_missing_symbols_to_alphabet_from(const HfstTransducer &another, bool only_special_symbols)
 {
   StringSet this_alphabet = this->get_alphabet();
   StringSet another_alphabet = another.get_alphabet();
@@ -1883,7 +1895,15 @@ void HfstTransducer::insert_missing_symbols_to_alphabet_from(const HfstTransduce
     {
       if (this_alphabet.find(*it) == this_alphabet.end())
         { 
-          missing_symbols.insert(*it);
+          if (! only_special_symbols)
+            {
+              missing_symbols.insert(*it);
+            }
+          else
+            {
+              if (is_special_symbol(*it))
+                missing_symbols.insert(*it);
+            }
         }
     }
   this->insert_to_alphabet(missing_symbols);
@@ -2649,6 +2669,10 @@ HfstTransducer &HfstTransducer::compose
         this->insert_missing_symbols_to_alphabet_from(*another_copy);
         another_copy->insert_missing_symbols_to_alphabet_from(*this);
       }
+
+    /* special symbols are never harmonized */
+    this->insert_missing_symbols_to_alphabet_from(*another_copy, true);
+    another_copy->insert_missing_symbols_to_alphabet_from(*this, true);
 
     if (this->type != FOMA_TYPE)
       {

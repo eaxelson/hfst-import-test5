@@ -164,6 +164,38 @@ for ext in .sfst .ofst .foma; do
     fi
 
 
+    ## substitution
+    echo "\`[[a:b ?] , c , d ]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp1;
+    echo "[a:b ?]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp2;
+    if ! ($TOOLDIR/hfst-compare -H tmp1 tmp2 > /dev/null); then
+	echo "  (skipping substitution test #1, does not work yet)" ${FFLAG}
+	#exit 1;
+    fi
+
+    echo "\`[[a:b ?] , b , B C D ]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp1;
+    echo "[a:B a:C a:D ?]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp2;
+    if ! ($TOOLDIR/hfst-compare -H tmp1 tmp2 > /dev/null); then
+	echo "  (skipping substitution test #2, does not work yet)" ${FFLAG}
+	#exit 1;
+    fi
+    
+
+    ## special symbols @_.*_@
+    echo "@_foo_@" | $TOOLDIR/hfst-strings2fst -S ${FFLAG} > tmp1;
+    echo "[?:?]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp2;
+    for tool in hfst-compose hfst-concatenate hfst-conjunct hfst-disjunct hfst-subtract;
+    do
+	$TOOLDIR/$tool tmp1 tmp2 | $TOOLDIR/hfst-fst2txt | tr '\t' ' ' > result
+	if (grep "@_foo_@ @_UNKNOWN_SYMBOL_@" result > /dev/null); then
+	    echo "special symbols" $tool ${FFLAG}
+	    exit 1;
+	fi
+	if (grep "@_UNKNOWN_SYMBOL_@ @_foo_@" result > /dev/null); then
+	    echo "special symbols" $tool ${FFLAG}
+	    exit 1;
+	fi
+    done
+
 done
 
 exit 0;

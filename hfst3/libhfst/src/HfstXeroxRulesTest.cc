@@ -1181,7 +1181,7 @@ void test1( ImplementationType type )
     tmp2.compose(replaceTr).minimize();
     //printf("test 1 optional: \n");
     //tmp2.write_in_att_format(stdout, 1);
-    assert(tmp2.compare(result1));
+    assert(tmp2.compare(result1)); // FAIL
 
 
     //replace up non optional

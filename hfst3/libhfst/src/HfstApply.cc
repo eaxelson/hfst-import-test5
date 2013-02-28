@@ -328,8 +328,12 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
         another.insert_missing_symbols_to_alphabet_from(*this);
       }
 
+    /* special symbols are never harmonized */
+    this->insert_missing_symbols_to_alphabet_from(another, true);
+    another.insert_missing_symbols_to_alphabet_from(*this, true);
+
     HfstTransducer * another_ =
-      this->harmonize_(const_cast<HfstTransducer&>(another));        
+      this->harmonize_(another);        
     if (another_ == NULL) // foma
       { another_ = new HfstTransducer(another); }
 
