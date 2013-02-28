@@ -42,10 +42,48 @@ tommi.pirinen, miikka silfverberg, ...\}@helsinki.fi}}
 \section{Applications and Tests}\label{hfst:structural-layout}
 
 \subsection{Language identification}
+\begin{itemize}
+\item Language identification is the task of recognizing the language
+  of a text excerpt.
+\item Lots of application e.g. processing documents written in several
+  different languages.
+\item Several standard methods including character n-grams \cite{cavnar/1994}.
+\item One n-gram model per language. The model giving the highest
+  probability wins.
+\item Character n-gram models can be implemented as weighted
+  finite-state automata.
+\item Degree of uncertainty of the guess? 
+\item We use hfst-tools for doing this. The underlying mechnism
+  utilizes the tagger tools in hfst.
+\item Experiment with Finnish, Swedish and English. Add Estonian,
+  Spanish, French?
+\end{itemize}
 % Miikka
 
 \subsection{Morphologies and Guessers}
+\label{sec: morph-guessers}
 % Juha, Miikka
+\begin{itemize}
+\item Morphological guessers are needed to compensate for insufficient
+  coverage of morphological analyzers.
+\item Suffix based guessing has proved sufficient in practice for
+  agglutinating languages like Finnish~\cite{linden/2009/nodalida}.
+\item Using hfst tools it is possible to transform an existing morphological analyzer into a guesser. 
+\item If the analyzer marks declensions of words, the guesser will
+  guess the declension in addition to the inflectional information.
+\item In addition the guesser constructs a stem for the word.
+\item If the morphological analyzer is weighted, the weights are used
+  to arrange guesses in order of likelihood. The guesser also prefers
+  longer matches with words recognized by the analyzer to shorter
+  ones.
+\item Using information about declension classes also helps in
+  guessing. Some declensions might only contain a couple of words,
+  implying that an unknown word is unlikely to belong to that
+  declension. In addition it might be known that new words are likely
+  to be added to a small set of declension classes.
+\item The guesser is a convenient tool when extending the lexicon.
+\item Some results for Finnish.
+\end{itemize}
 
 \subsection{Spell-checking}
 % Tommi
@@ -99,7 +137,29 @@ no more than one work day by one researcher to implement this application.
 % Jyrki, Juha (Sam?)
 
 \subsection{Language Generation for Unknown words}
-% Miikka
+\begin{itemize}
+\item In language generation the goal is to generate automatic
+  messages about a computer system in natural language.
+\item The system includes some concepts like weather phenomena or
+  airline connections and it generates messages about the state of the
+  concepts for a user.
+\item For agglutinating languages this presents n challenge because
+  the base forms of the concepts to be inflected depending on syntactic
+  context.
+\item A generation system can utilize a morphological analyzer, but
+  all of the concepts might not be recognized by the analyzer.
+\item Therefore another mechanism is needed for generating word forms
+  from the lemma of the base form of the concept.
+\item Morphological guessers presented in~\ref{sec: morph-guessers}
+  can be used for generation of word forms in addition to analysis.
+\item When the word class and base form of the word are known, a
+  paradigm of word forms can be generated.
+\item This can also be used when expanding a morphological
+  analyzer. It can be used to generate a list of suggestion forms,
+  which can be examined quickly to determine whether a word could
+  belong to a given declension class.
+\item Example from Finnish.
+\end{itemize}
 
 \section{Examples for User Environments}
 
