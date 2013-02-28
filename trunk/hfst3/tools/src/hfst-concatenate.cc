@@ -89,6 +89,7 @@ parse_options(int argc, char** argv)
           HFST_GETOPT_COMMON_LONG,
           HFST_GETOPT_BINARY_LONG,
           {"harmonize-flags", no_argument, 0, 'F'},
+          {"do-not-harmonize", no_argument, 0, 'H'},
           {0,0,0,0}
         };
         int option_index = 0;
