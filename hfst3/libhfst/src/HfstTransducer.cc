@@ -2153,93 +2153,12 @@ HfstTransducer &HfstTransducer::insert_freely
     (EmptyStringException, 
      "insert_freely(const StringPair&)");
 
-    /* Add symbols in symbol_pair to the alphabet of this transducer
-       and expand unknown and epsilon symbols accordingly. */
-    HfstTransducer tmp(symbol_pair.first, symbol_pair.second, this->type);
-
-    if (this->type != FOMA_TYPE) {
-      if (harmonize)
-       {
-         tmp.harmonize(*this); 
-       }
-
-      insert_to_alphabet(symbol_pair.first);
-      insert_to_alphabet(symbol_pair.second);
-    }
-
-    if (this->type == FOMA_TYPE and not harmonize) {
-      insert_to_alphabet(symbol_pair.first);
-      insert_to_alphabet(symbol_pair.second);
-    }
-
-    switch (this->type)    
-    {
-#if HAVE_OPENFST
-    case TROPICAL_OPENFST_TYPE:
-    {
-    hfst::implementations::TropicalWeightTransducer::insert_freely
-            (implementation.tropical_ofst,symbol_pair);
-    break;
-    }
-    case LOG_OPENFST_TYPE:
-    {
-    hfst::implementations::LogWeightTransducer::insert_freely
-            (implementation.log_ofst,symbol_pair);
-    break;
-    }
-#endif
-#if HAVE_FOMA
-    case FOMA_TYPE:
-    {
-      // HfstTransducer::harmonize does nothing to foma transducers, 
-      // because foma functions take care of harmonization.
-      // However, now we are using HfstBasicTransducer.
-      //this->foma_interface.harmonize(this->implementation.foma,
-      //                                     tmp.implementation.foma);
-        hfst::implementations::HfstBasicTransducer * net = 
-          ConversionFunctions::foma_to_hfst_basic_transducer
-          (implementation.foma);
-        
-        hfst::implementations::HfstBasicTransducer * tmp_net = 
-          ConversionFunctions::foma_to_hfst_basic_transducer
-          (tmp.implementation.foma);
-
-        this->foma_interface.delete_foma(implementation.foma);
-
-        net->harmonize(*tmp_net);
-
-        net->insert_freely
-          (StringPair(symbol_pair.first, symbol_pair.second), 0);
-        implementation.foma = 
-          ConversionFunctions::hfst_basic_transducer_to_foma(net);
-        delete net;
-        delete tmp_net;
-        break;
-    }
-#endif
-#if HAVE_SFST
-    case SFST_TYPE:
-    {
-    hfst::implementations::Transducer * temp =
-            hfst::implementations::SfstTransducer::insert_freely
-            (implementation.sfst,symbol_pair);
-    delete implementation.sfst;
-    implementation.sfst = temp;
-    break;
-    }
-#endif
-    /* Add here your implementation. */
-    case ERROR_TYPE:
-        HFST_THROW(TransducerHasWrongTypeException);
-    default:
-        HFST_THROW(FunctionNotImplementedException);
-    }
-
-    return *this;
+    HfstTransducer tr(symbol_pair.first, symbol_pair.second, this->get_type());
+    return this->insert_freely(tr, harmonize);
 }
 
 HfstTransducer &HfstTransducer::insert_freely
-(const HfstTransducer &tr, bool)
+(const HfstTransducer &tr, bool harmonize)
 {
     if (this->type != tr.type)
     HFST_THROW_MESSAGE(TransducerTypeMismatchException,
@@ -2247,12 +2166,16 @@ HfstTransducer &HfstTransducer::insert_freely
 
     /* In this function, this transducer must always be harmonized
        according to tr, not the other way round. */
-    bool harm = harmonize_smaller;
-    harmonize_smaller=false;
-    HfstTransducer * tr_harmonized = this->harmonize_(tr);
-    harmonize_smaller=harm;
+    HfstTransducer * tr_harmonized = NULL;
+    if (harmonize)
+      {
+        bool harm = harmonize_smaller;
+        harmonize_smaller=false;
+        tr_harmonized = this->harmonize_(tr);
+        harmonize_smaller=harm;
+      }
 
-    if (tr_harmonized == NULL) { // foma
+    if (tr_harmonized == NULL) { // foma or no harmonization
       tr_harmonized = new HfstTransducer(tr);
     }
 
@@ -2306,8 +2229,11 @@ HfstTransducer &HfstTransducer::insert_freely
     // HfstTransducer::harmonize does nothing to a foma transducer,
     // because foma's own functions take care of harmonizing.
     // Now we need to harmonize because we are using internal transducers.
-    this->foma_interface.harmonize
+      if (harmonize) 
+        {
+          this->foma_interface.harmonize
             (implementation.foma,tr_harmonized->implementation.foma);
+        }
 
     hfst::implementations::HfstBasicTransducer * net = 
             ConversionFunctions::foma_to_hfst_basic_transducer
