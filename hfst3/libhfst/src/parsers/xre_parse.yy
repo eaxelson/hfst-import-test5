@@ -167,7 +167,7 @@ REGEXP2: REPLACE
             StringPair tmp($2, $2);
             HfstTransducer * tmpTr = new HfstTransducer(* $1);
 
-            // to avoid harmonization of SUB1 with SUB3
+            // FIX?: not needed?: to avoid harmonization of SUB1 with SUB3
             StringSet transducerAlphabet = $3->get_alphabet();
             for (StringSet::const_iterator s = transducerAlphabet.begin();
                        s != transducerAlphabet.end();
@@ -189,7 +189,7 @@ REGEXP2: REPLACE
             // a:b .o. b -> x | y
             // [[a:b].i .o. b -> x | y].i - this is for cases when b is on left side
 
-            tmpTr->substitute(tmp, *$3, false);
+            tmpTr->substitute(tmp, *$3, false); // no harmonization
             tmpTr->compose(replaceTr).minimize();
             tmpTr->invert().compose(replaceTr).invert().minimize();
             
@@ -790,7 +790,7 @@ SYMBOL_LIST: HALFARC {
                  tmp = new HfstTransducer($2, $2, hfst::xre::format);
               }
 
-            $1->disjunct(*tmp, harmonize_);
+            $1->disjunct(*tmp, false); // do not harmonize
             $$ = & $1->minimize();
             delete $2, tmp; 
             }
