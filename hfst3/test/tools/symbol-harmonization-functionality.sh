@@ -178,7 +178,30 @@ for ext in .sfst .ofst .foma; do
 	echo "substitution test #2" ${FFLAG}
 	exit 1;
     fi
-    
+
+
+    ## freely insert aka ignore
+    echo "[?] / a" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp1;
+    echo "[a* ? a*]" | $TOOLDIR/hfst-regexp2fst -H ${FFLAG} > tmp2;
+    if ! ($TOOLDIR/hfst-compare -H tmp1 tmp2 > /dev/null); then
+	echo "freely insert (aka ignore) test #1" ${FFLAG}
+	exit 1;
+    fi
+
+    echo "[?|a] / a:0" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp1;
+    echo "[[a:0]* [?|a] [a:0]*]" | $TOOLDIR/hfst-regexp2fst -H ${FFLAG} > tmp2;
+    if ! ($TOOLDIR/hfst-compare -H tmp1 tmp2 > /dev/null); then
+	echo "freely insert (aka ignore) test #2" ${FFLAG}
+	exit 1;
+    fi
+
+    echo "[?|a] / [a b]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp1;
+    echo "[[a b]* [?|a] [a b]*]" | $TOOLDIR/hfst-regexp2fst -H ${FFLAG} > tmp2;
+    if ! ($TOOLDIR/hfst-compare -H tmp1 tmp2 > /dev/null); then
+	echo "freely insert (aka ignore) test #3" ${FFLAG}
+	exit 1;
+    fi
+
 
     ## special symbols @_.*_@
     echo "@_foo_@" | $TOOLDIR/hfst-strings2fst -S ${FFLAG} > tmp1;
