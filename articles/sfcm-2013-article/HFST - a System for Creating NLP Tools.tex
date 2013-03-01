@@ -164,21 +164,16 @@ no more than one work day by one researcher to implement this application.
 \section{Examples for User Environments}
 
 \subsection{An Interface in Python}
-% Erik
-
-\subsubsection{A Chatroom Morphology tool}
-% Sam
-
-\subsection{HFST on Unix, Mac and Windows}
 % Erik, Tommi
 
-Portability has been one of the design goals of HFST system. The current 
-versions are available or compilable on all POSIX-supporting systems, including
-Linuxes, Mac OS X and Cygwin under Windows system. Another layer of portability
-is attained by HFST's programming language bindings via SWIG, it is possible to
-use full HFST library through it's SWIG interfaces in all supported systems,
-currently the bindings are offered for for python programming language version
-3.
+In addition to API library and command line tools, HFST library can also be used
+through SWIG-generated python bindings. Currently the bindings are offered for
+python programming language versions 2 and 3. All HFST functionalities are available
+via both versions, but the python interpreters themselves have some differences.
+Python 2 allows HFST exceptions to be caught directly, but python 3 requires the use
+of a special wrapper function written as a part of the bindings. On the other hand, 
+python 3 has better support for unicode characters, so it is probably a better choice
+for linguistic applications.
 
 The python bindings in particular make it smooth to use language models
 developed for HFST in rapid prototyping of advanced tools. For an example, in
@@ -198,6 +193,20 @@ that are illustrated in following figure gloss:
 \xe
 
 
+\subsubsection{A Chatroom Morphology tool}
+% Sam
+
+\subsection{HFST on Unix, Mac and Windows}
+% Erik, Tommi
+
+Portability has been one of the design goals of HFST system. The current 
+versions are available or compilable on all POSIX-supporting systems, including
+Linuxes, Mac OS X and Cygwin under Windows system. Compilation is also possible 
+on MinGW under Windows. Another layer of portability
+is attained by HFST's programming language bindings via SWIG, it is possible to
+use full HFST library through it's SWIG interfaces in all supported systems with
+python versions 2 and 3.
+
 
 \subsection{Other user-oriented items}
 % Erik
@@ -206,6 +215,12 @@ that are illustrated in following figure gloss:
 
 \subsection{An independent XFST module}
 % Erik (Erik)
+
+HFST command line tools include an XFST parser tool that can be used in interactive
+mode or to compile scriptfiles. The tool implements the same functionalities as the
+original XFST (Xerox Finite-State Tool) which is a general-purpose utility for computing
+with finite-state networks.
+
 
 \subsection{XFST regexp compilation}
 % Senka, Miikka
