@@ -167,7 +167,7 @@ REGEXP2: REPLACE
             StringPair tmp($2, $2);
             HfstTransducer * tmpTr = new HfstTransducer(* $1);
 
-            // FIX?: not needed?: to avoid harmonization of SUB1 with SUB3
+            // to avoid harmonization of SUB1 with SUB3
             StringSet transducerAlphabet = $3->get_alphabet();
             for (StringSet::const_iterator s = transducerAlphabet.begin();
                        s != transducerAlphabet.end();
@@ -176,23 +176,43 @@ REGEXP2: REPLACE
                 tmpTr->insert_to_alphabet(s->c_str());
             }
 
-           // build Replace transducer
-            HfstTransducerPair mappingPair(HfstTransducer($2, $2, hfst::xre::format), *$3);
-            HfstTransducerPairVector mappingPairVector;
-            mappingPairVector.push_back(mappingPair);
-            Rule rule(mappingPairVector);
-            HfstTransducer replaceTr(hfst::xre::format);
-            replaceTr = replace(rule, false);
+	    bool empty_replace_transducer=false;
+	    HfstTransducer empty(hfst::xre::format);
+	    if (empty.compare(*$3))
+	    {
+		empty_replace_transducer=true;
+	    }	
+
+	    if (empty_replace_transducer)
+	    {
+	        // substitute all transitions {b:a, a:b, b:b} with b:b
+		// as they will be removed anyway
+		hfst::xre::set_substitution_function_symbol($2);
+		tmpTr->substitute(&hfst::xre::substitution_function);
+	    }	
 
             // `[ a:b, b, x y ]
             // substitute b with x | y
-            // a:b .o. b -> x | y
-            // [[a:b].i .o. b -> x | y].i - this is for cases when b is on left side
-
             tmpTr->substitute(tmp, *$3, false); // no harmonization
-            tmpTr->compose(replaceTr).minimize();
-            tmpTr->invert().compose(replaceTr).invert().minimize();
+
+	    if (!empty_replace_transducer) 
+            {
+               // a:b .o. b -> x | y
+               // [[a:b].i .o. b -> x | y].i - this is for cases when b is on left side
+
+	       // build Replace transducer
+               HfstTransducerPair mappingPair(HfstTransducer($2, $2, hfst::xre::format), *$3);
+               HfstTransducerPairVector mappingPairVector;
+               mappingPairVector.push_back(mappingPair);
+               Rule rule(mappingPairVector);
+               HfstTransducer replaceTr(hfst::xre::format);
+               replaceTr = replace(rule, false);
+
+               tmpTr->compose(replaceTr).minimize();
+               tmpTr->invert().compose(replaceTr).invert();
+	    }
             
+	    tmpTr->minimize();
             $$ = tmpTr;
             delete($1, $2, $3);
          }
@@ -200,8 +220,10 @@ REGEXP2: REPLACE
 
 SUB1: SUBSTITUTE_LEFT LEFT_BRACKET REPLACE COMMA { $$ = $3; } ; // first argument
 SUB2: HALFARC COMMA { $$ = $1; } ;  // symbol that needs to be replaced
-SUB3: SYMBOL_LIST RIGHT_BRACKET      {  $$ = $1;  } ; // symbol list
-
+SUB3: SYMBOL_LIST RIGHT_BRACKET {  $$ = $1;  }  // symbol list
+      |     
+      RIGHT_BRACKET { $$ = new HfstTransducer(hfst::xre::format); } // an empty symbol list
+      ;
 
 ////////////////////////////
 // Replace operators

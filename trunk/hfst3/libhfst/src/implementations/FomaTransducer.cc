@@ -205,6 +205,9 @@ namespace hfst { namespace implementations {
 
     fsm * FomaTransducer::define_transducer(const std::string &symbol)
   {     
+    /*if (symbol == hfst::internal_unknown) {
+      return define_transducer(symbol, symbol);
+      }*/
     fsm * retval = fsm_symbol(const_cast<char*>(symbol.c_str()));
     fsm_count(retval);
     return retval;
@@ -214,9 +217,9 @@ namespace hfst { namespace implementations {
     (const std::string &isymbol, const std::string &osymbol)
   { 
     // identity-to-identity gives wrong result if cross product is used
-    if (isymbol == osymbol) {
+    /*if (isymbol == osymbol && isymbol == hfst::internal_identity) {
       return define_transducer(isymbol);
-    }
+      }*/
     return fsm_cross_product( fsm_symbol(const_cast<char*>(isymbol.c_str())), 
                               fsm_symbol(const_cast<char*>(osymbol.c_str())) );
     // should either argument be deleted?
@@ -456,7 +459,7 @@ namespace hfst { namespace implementations {
   (fsm * t1, fsm * t2)
   {
     return fsm_isempty(fsm_union(fsm_minus(fsm_copy(t1),fsm_copy(t2)),
-                                 fsm_minus(fsm_copy(t1),fsm_copy(t2))));    
+                                 fsm_minus(fsm_copy(t2),fsm_copy(t1))));    
   }
 
   bool FomaTransducer::is_cyclic(fsm * t)

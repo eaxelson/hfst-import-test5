@@ -20,6 +20,10 @@ extern std::map<std::string,hfst::HfstTransducer*> definitions;
 extern HfstTransducer* last_compiled;
 extern ImplementationType format;
 
+void set_substitution_function_symbol(const std::string &symbol);
+
+bool substitution_function(const hfst::StringPair &p, hfst::StringPairSet &sps);
+
 /**
  * @brief input handling function for flex that parses strings.
  */
