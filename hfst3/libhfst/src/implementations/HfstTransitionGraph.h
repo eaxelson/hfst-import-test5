@@ -1623,7 +1623,7 @@ namespace hfst {
           unsigned int offset = s;
 
           // Copy \a graph
-      HfstState source_state=0;
+          HfstState source_state=0;
           for (const_iterator it = graph.begin(); 
                it != graph.end(); it++)
             {

@@ -52,6 +52,26 @@ size_t len;
   bool expand_definitions=false;
   bool harmonize_=true;
 
+  std::string substitution_function_symbol;
+
+void set_substitution_function_symbol(const std::string &symbol)
+{
+  substitution_function_symbol=symbol;
+}
+
+bool substitution_function(const hfst::StringPair &p, hfst::StringPairSet &sps)
+{
+  if (p.first == substitution_function_symbol ||
+      p.second == substitution_function_symbol)
+    {
+      sps.insert(hfst::StringPair(substitution_function_symbol, 
+                                  substitution_function_symbol));
+      return true;
+    }
+  return false;
+}
+
+
 int*
 get_n_to_k(const char* s)
 {
