@@ -239,6 +239,7 @@ for ext in .sfst .ofst .foma; do
 	exit 1;
     fi
 
+
     ## special symbols @_.*_@
     echo "@_foo_@" | $TOOLDIR/hfst-strings2fst -S ${FFLAG} > tmp1;
     echo "[?:?]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp2;
