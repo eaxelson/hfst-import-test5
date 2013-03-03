@@ -383,4 +383,39 @@ expand_definition(HfstTransducer* tr, const char* symbol)
   return tr;
 }
 
+HfstTransducer*
+xfst_label_to_transducer(const char* input, const char* output)
+{
+  HfstTransducer * retval = NULL;
+
+  if  (strcmp(input, hfst::internal_unknown.c_str()) == 0 && 
+       strcmp(output, hfst::internal_unknown.c_str()) == 0)
+    {
+      HfstTransducer id(hfst::internal_identity, hfst::internal_identity, hfst::xre::format);
+      retval = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown, hfst::xre::format);
+      retval->disjunct(id).minimize();
+    }
+  else if (strcmp(input, hfst::internal_unknown.c_str()) == 0)
+    {
+      HfstTransducer output_tr(output, output, hfst::xre::format);
+      retval = new HfstTransducer(hfst::internal_unknown, output, hfst::xre::format);
+      retval->disjunct(output_tr).minimize();
+    }
+  else if (strcmp(output, hfst::internal_unknown.c_str()) == 0)
+    {
+      HfstTransducer input_tr(input, input, hfst::xre::format);
+      retval = new HfstTransducer(input, hfst::internal_unknown, hfst::xre::format);
+      retval->disjunct(input_tr).minimize();
+    }
+  else
+    {
+      retval = new HfstTransducer(input, output, hfst::xre::format);
+    }
+
+  return retval;
+}
+
+
 } }
+
+

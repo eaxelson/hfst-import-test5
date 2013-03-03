@@ -856,7 +856,8 @@ LABEL: HALFARC {
      }
      |
      HALFARC PAIR_SEPARATOR HALFARC { // FIXED: add identities, if needed
-     	if (strcmp($1, hfst::internal_unknown.c_str()) == 0 && 
+     	     $$ = hfst::xre::xfst_label_to_transducer($1,$3);
+     /*	if (strcmp($1, hfst::internal_unknown.c_str()) == 0 && 
 	    strcmp($3, hfst::internal_unknown.c_str()) == 0 )
 	    {
 	    HfstTransducer id(hfst::internal_identity, hfst::internal_identity, hfst::xre::format);
@@ -868,24 +869,27 @@ LABEL: HALFARC {
 	else
 	{
 		$$ = new HfstTransducer($1, $3, hfst::xre::format);
-        }
+        }*/
         free($1);
         free($3);
      }
      | HALFARC PAIR_SEPARATOR_WO_RIGHT {
-        $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::xre::format);
+        $$ = hfst::xre::xfst_label_to_transducer($1,hfst::internal_unknown.c_str());
+        /*$$ = new HfstTransducer($1, hfst::internal_unknown, hfst::xre::format);*/
         free($1);
      }
      | PAIR_SEPARATOR_WO_LEFT HALFARC {
-        $$ = new HfstTransducer(hfst::internal_unknown, $2, hfst::xre::format);
+        $$ = hfst::xre::xfst_label_to_transducer(hfst::internal_unknown.c_str(),$2);
+        /*$$ = new HfstTransducer(hfst::internal_unknown, $2, hfst::xre::format);*/
         free($2);
      }
      | PAIR_SEPARATOR_SOLE { // FIXED: add identities
-        HfstTransducer id(hfst::internal_identity, hfst::internal_identity, hfst::xre::format);
+        /*HfstTransducer id(hfst::internal_identity, hfst::internal_identity, hfst::xre::format);
         HfstTransducer * retval = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
                                   hfst::xre::format);
 	retval->disjunct(id).minimize();
-	$$ = retval;
+	$$ = retval;*/
+	$$ = hfst::xre::xfst_label_to_transducer(hfst::internal_unknown.c_str(), hfst::internal_unknown.c_str());	
      }
      | CURLY_BRACKETS {
         HfstTokenizer TOK;
