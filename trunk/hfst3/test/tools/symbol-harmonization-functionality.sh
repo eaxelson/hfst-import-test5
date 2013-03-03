@@ -226,26 +226,41 @@ for ext in .sfst .ofst .foma; do
 
     ## some cases
     echo "a:?" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp1;
-    echo "a:?|a" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp2;
-    if ! ($TOOLDIR/hfst-compare -H tmp1 tmp2 > /dev/null); then
+    echo "a:?|a" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp3;
+    if ! ($TOOLDIR/hfst-compare -H tmp1 tmp3 > /dev/null); then
 	echo "[a:?] == [a:?|a] test" ${FFLAG}
 	exit 1;
     fi
 
     echo "?:b" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp1;
-    echo "?:b|b" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp2;
-    if ! ($TOOLDIR/hfst-compare -H tmp1 tmp2 > /dev/null); then
+    echo "?:b|b" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp3;
+    if ! ($TOOLDIR/hfst-compare -H tmp1 tmp3 > /dev/null); then
 	echo "[?:b] == [?:b|b] test" ${FFLAG}
 	exit 1;
     fi
 
 
-    ## special symbols @_.*_@
+    ## test that special symbols @_.*_@ are never harmonized
     echo "@_foo_@" | $TOOLDIR/hfst-strings2fst -S ${FFLAG} > tmp1;
     echo "[?:?]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp2;
+    # using command line binary tools
     for tool in hfst-compose hfst-concatenate hfst-conjunct hfst-disjunct hfst-subtract
     do
 	$TOOLDIR/$tool tmp1 tmp2 | $TOOLDIR/hfst-fst2txt | tr '\t' ' ' > result
+	if (grep "@_foo_@ @_UNKNOWN_SYMBOL_@" result > /dev/null); then
+	    echo "special symbols" $tool ${FFLAG}
+	    exit 1;
+	fi
+	if (grep "@_UNKNOWN_SYMBOL_@ @_foo_@" result > /dev/null); then
+	    echo "special symbols" $tool ${FFLAG}
+	    exit 1;
+	fi
+    done
+    # and using regex parser operators
+    for operator in ".o." " " "&" "|" "-"
+    do
+	echo '?:?' $operator '"@_foo_@"' | $TOOLDIR/hfst-regexp2fst ${FFLAG} | \
+	    $TOOLDIR/hfst-fst2txt | tr '\t' ' ' > result
 	if (grep "@_foo_@ @_UNKNOWN_SYMBOL_@" result > /dev/null); then
 	    echo "special symbols" $tool ${FFLAG}
 	    exit 1;
