@@ -224,6 +224,21 @@ for ext in .sfst .ofst .foma; do
     fi
 
 
+    ## some cases
+    echo "a:?" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp1;
+    echo "a:?|a" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp2;
+    if ! ($TOOLDIR/hfst-compare -H tmp1 tmp2 > /dev/null); then
+	echo "[a:?] == [a:?|a] test" ${FFLAG}
+	exit 1;
+    fi
+
+    echo "?:b" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp1;
+    echo "?:b|b" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp2;
+    if ! ($TOOLDIR/hfst-compare -H tmp1 tmp2 > /dev/null); then
+	echo "[?:b] == [?:b|b] test" ${FFLAG}
+	exit 1;
+    fi
+
     ## special symbols @_.*_@
     echo "@_foo_@" | $TOOLDIR/hfst-strings2fst -S ${FFLAG} > tmp1;
     echo "[?:?]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp2;
