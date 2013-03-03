@@ -40,6 +40,7 @@ tommi.pirinen, miikka silfverberg, ...\}@helsinki.fi}}
 % Krister
 
 \section{Applications and Tests}\label{hfst:structural-layout}
+% Miikka
 
 \subsection{Language identification}
 \begin{itemize}
@@ -55,10 +56,42 @@ tommi.pirinen, miikka silfverberg, ...\}@helsinki.fi}}
 \item Degree of uncertainty of the guess? 
 \item We use hfst-tools for doing this. The underlying mechnism
   utilizes the tagger tools in hfst.
-\item Experiment with Finnish, Swedish and English. Add Estonian,
-  Spanish, French?
+\item Dutch corpus: Alpino treebank~\cite{bouma/2000}.
+\item English corpus: Penn Treebank~\cite{marcus/1993}.
+\item Estonian corpus: Estonian National Corpus~\footnote{http://www.cl.ut.ee/korpused/segakorpus/}.
+\item Finnish corpus: Helsingin Sanomat year 1995~\footnote{http://www.csc.fi/kielipankki/}
+\item German corpus: TIGER Corpus~\cite{brants/2002}.
+\item Swedish corpus: Talbanken~\cite{einarsson/1976}.
+
 \end{itemize}
-% Miikka
+
+\begin{table}
+\begin{tabular}{l|rr}
+Language & train data~~~~~~~~~                 & test data~~~~~~~~~\\
+\hline
+Dutch    & 2000 sent (245,000 chars)  & 200 sent (24,000 chars)\\
+English  & 2000 sent (265,000 chars)  & 200 sent (26,000 chars)\\
+Estonian & 2000 sent (238,000 chars)  & 200 sent (23,000 chars)\\
+Finnish  & 2000 sent (155,000 chars)  & 200 sent (14,000 chars)\\
+German   & 2000 sent (280,000 chars)  & 200 sent (28,000 chars)\\
+Swedish  & 2000 sent (164,000 chars)  & 200 sent (16,000 chars)\\
+\end{tabular}
+\end{table}
+
+\begin{table}
+\begin{tabular}{l|l}
+Language & Accuracy\\
+\hline
+Dutch    & ~~~99.0\%\\
+English  & ~~~99.5\%\\
+Estonian & ~~~99.5\%\\
+Finnish  & ~~~99.5\%\\
+German   & ~~100.0\%\\
+Swedish  & ~~~99.5\%\\
+\hline
+ALL      & ~~~99.5\%
+\end{tabular}
+\end{table}
 
 \subsection{Morphologies and Guessers}
 \label{sec: morph-guessers}
