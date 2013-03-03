@@ -855,8 +855,20 @@ LABEL: HALFARC {
         free($1);
      }
      |
-     HALFARC PAIR_SEPARATOR HALFARC {
-        $$ = new HfstTransducer($1, $3, hfst::xre::format);
+     HALFARC PAIR_SEPARATOR HALFARC { // FIXED: add identities, if needed
+     	if (strcmp($1, hfst::internal_unknown.c_str()) == 0 && 
+	    strcmp($3, hfst::internal_unknown.c_str()) == 0 )
+	    {
+	    HfstTransducer id(hfst::internal_identity, hfst::internal_identity, hfst::xre::format);
+            HfstTransducer * retval = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
+                                       hfst::xre::format);
+	    retval->disjunct(id).minimize();
+	    $$ = retval;
+	    }	
+	else
+	{
+		$$ = new HfstTransducer($1, $3, hfst::xre::format);
+        }
         free($1);
         free($3);
      }
@@ -868,9 +880,12 @@ LABEL: HALFARC {
         $$ = new HfstTransducer(hfst::internal_unknown, $2, hfst::xre::format);
         free($2);
      }
-     | PAIR_SEPARATOR_SOLE {
-        $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
-                                hfst::xre::format);
+     | PAIR_SEPARATOR_SOLE { // FIXED: add identities
+        HfstTransducer id(hfst::internal_identity, hfst::internal_identity, hfst::xre::format);
+        HfstTransducer * retval = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
+                                  hfst::xre::format);
+	retval->disjunct(id).minimize();
+	$$ = retval;
      }
      | CURLY_BRACKETS {
         HfstTokenizer TOK;

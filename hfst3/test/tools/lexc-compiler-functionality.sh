@@ -17,6 +17,11 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
           xre.star-plus-optional.lexc"
 LEXCXFAIL="xfail.bogus.lexc xfail.ISO-8859-1.lexc xfail.lexicon-semicolon.lexc"
 
+if test "$srcdir" = ""; then
+    srcdir="./"
+fi
+
+
 if ! test -x $TOOLDIR/hfst-lexc2fst ; then
     echo missing hfst-lexc2fst, assuming configured off, skipping
     exit 73
@@ -50,6 +55,7 @@ for i in .sfst .ofst .foma ; do
             exit 1
         fi
         if ! $TOOLDIR/hfst-compare -s cat$i test ; then
+	    echo "results differ: " "cat"$i" test"
             exit 1
         fi
         rm test
