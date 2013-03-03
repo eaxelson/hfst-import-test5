@@ -146,13 +146,13 @@ for ext in .sfst .ofst .foma; do
     echo "[a:b]" | $TOOLDIR/hfst-regexp2fst ${FFLAG} > tmp2;
 
     # harmonization FOMA FAILS
-    #$TOOLDIR/hfst-subtract tmp1 tmp2 | $TOOLDIR/hfst-minimize > subtraction;
-    #echo "[?:?|a:?|?:a|b:?|?:b|b:a]" | $TOOLDIR/hfst-regexp2fst -H ${FFLAG} | $TOOLDIR/hfst-minimize > result;
+    $TOOLDIR/hfst-subtract tmp1 tmp2 | $TOOLDIR/hfst-minimize > subtraction;
+    echo "[?:?|a:?|?:a|b:?|?:b|b:a|a|b]" | $TOOLDIR/hfst-regexp2fst -H ${FFLAG} | $TOOLDIR/hfst-minimize > result;
     # do not harmonize when comparing, the transducers must be exactly the same
-    #if ! ($TOOLDIR/hfst-compare -H -s subtraction result); then
-#	echo "subtract #1" ${FFLAG}
-#	exit 1;
-#    fi
+    if ! ($TOOLDIR/hfst-compare -H -s subtraction result); then
+	echo "subtract #1" ${FFLAG}
+	exit 1;
+    fi
 
     # no harmonization
     $TOOLDIR/hfst-subtract -H tmp1 tmp2 | $TOOLDIR/hfst-minimize > subtraction;
@@ -241,7 +241,5 @@ for ext in .sfst .ofst .foma; do
     done
 
 done
-
-echo "  skipping case [?:?|a:?] | hfst-regexp2fst for foma type"
 
 exit 0;
