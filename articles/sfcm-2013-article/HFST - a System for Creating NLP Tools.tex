@@ -91,15 +91,15 @@ used Talbanken~\cite{einarsson/1976}.
 
 \begin{table}
 \begin{center}
-\begin{tabular}{l|rr}
-Language & train data~~~~~~~~~ & test data~~~~~~~~~\\
+\begin{tabular}{l|cc}
+Language & Train data (utf-8 chars) & Test data (utf-8 chars)\\
 \hline
-Dutch    & 245,000 chars  & 24,000 chars\\
-English  & 265,000 chars  & 26,000 chars\\
-Estonian & 238,000 chars  & 23,000 chars\\
-Finnish  & 155,000 chars  & 14,000 chars\\
-German   & 280,000 chars  & 28,000 chars\\
-Swedish  & 164,000 chars  & 16,000 chars\\
+Dutch    & 245,000  & 24,000\\
+English  & 265,000  & 26,000\\
+Estonian & 238,000  & 23,000\\
+Finnish  & 155,000  & 14,000\\
+German   & 280,000  & 28,000\\
+Swedish  & 164,000  & 16,000\\
 \end{tabular}
 \caption{For each language, we used 2000 sentences for training and
   200 sentence for testing. We give the sizes of the data sets in
@@ -164,26 +164,72 @@ using Hfst language identifiers thus remains future work.
 \subsection{Morphologies and Guessers}
 \label{sec: morph-guessers}
 % Juha, Miikka
+
+Language technological applications for agglutinating languages like
+Finnish and Hungarian benefit greatly from high coverage morphological
+analyzer, which supply word forms with their morphological
+analyses. This makes applications dependent on the coverage of the
+morphological analyzer. Building a high coverage morphological
+analyzer (with recall over 95\%) is a substantial task and even with a
+high coverage analyzer domain specific vocabulary presents a
+challenge. Therefore accurate methods for dealing with out of
+vocabulary words are needed.
+
+Using Hfst tools it is possible to use an existing morphological
+analyzer to construct a morphological guesser based on word
+suffixes. Suffix based guessing is sufficient for many agglutinating
+languages such as Finnish~\cite{linden/2009/nodalida}, where most
+inflection and derivation is marked using suffixes. Even if a word is
+not recognized by the morphological analyzer, the analyzer is likely
+to recognize some words which inflect similarly as the unknown
+word. These can be used for guessing the inflection of the unknown
+word.
+
+Guessing of an unknown word like ``twiitin'' (the genitive form of
+``twiitti'' tweet in Finnish) is based on finding the recognized word
+forms like ``sviitin'' (genitive form of ``sviitti'' hotel suite in
+Finnish), that have long suffixes such as ``-iitin'', which match the
+suffixes of the unrecognized word. The longer the common suffix, the
+likelier it is that the unrecognized word has the same inflection as
+the known word. The guesser will output morphological analyses for
+``twiitin'' in order of likelihood.
+
+Besides the length of the matching suffix, guesses can also be ordered
+based on the probability that a suffix matches a given analysis. This
+can be estimated using a labeled training corpus. In addition, any
+existing weighting scheme in the original morphological analyzer can
+be utilized.
+
+If the morphological analyzer marks declension class, the guesser can
+also be used for guessing the declension class. If the declension
+class is marked, the guesser can be used for generation of word forms
+as well as analysis. This is described in
+Section~\ref{sec:morph-generation}.
+
+Constructing a morphological guesser from
+OMorFii~\footnote{http://code.google.com/p/omorfi/} The open-source
+Finnish morphology, the three top guesses for ``twiitin'' are (the
+markup is slightly simplified): \small
+\begin{verbatim}
+  twiit  [POS=NOUN] [GUESS_CATEGORY=5]  [NUM=SG][CASE=GEN]
+  twiiti [POS=NOUN] [GUESS_CATEGORY=33] [NUM=SG][CASE=NOM]
+  twiit  [POS=VERB] [GUESS_CATEGORY=53] [VOICE=ACT][MOOD=INDV] ...
+\end{verbatim}
+\normalsize
+The first field corresponds to the stem of the word, the second field
+to its main part of speech and the third to its declension class. The
+fourth field shows the inflectional and derivational information of
+the guess. In this case, the first guess is correct. It is modeled
+after declension class number 5, which is a class of nouns containing
+among others the noun ``sviitti''.
+
+
+More stuff to write about:
 \begin{itemize}
-\item Morphological guessers are needed to compensate for insufficient
-  coverage of morphological analyzers.
-\item Suffix based guessing has proved sufficient in practice for
-  agglutinating languages like Finnish~\cite{linden/2009/nodalida}.
-\item Using hfst tools it is possible to transform an existing morphological analyzer into a guesser. 
-\item If the analyzer marks declensions of words, the guesser will
-  guess the declension in addition to the inflectional information.
-\item In addition the guesser constructs a stem for the word.
-\item If the morphological analyzer is weighted, the weights are used
-  to arrange guesses in order of likelihood. The guesser also prefers
-  longer matches with words recognized by the analyzer to shorter
-  ones.
-\item Using information about declension classes also helps in
-  guessing. Some declensions might only contain a couple of words,
-  implying that an unknown word is unlikely to belong to that
-  declension. In addition it might be known that new words are likely
-  to be added to a small set of declension classes.
-\item The guesser is a convenient tool when extending the lexicon.
-\item Some results for Finnish.
+\item Experiment for Finnish. How often is the first guess correct?
+  How often is the correct answer among the three best guesses?
+\item Using the guesser for extending the lexicon.
+\item More?
 \end{itemize}
 
 \subsection{Spell-checking}
@@ -238,6 +284,9 @@ no more than one work day by one researcher to implement this application.
 % Jyrki, Juha (Sam?)
 
 \subsection{Language Generation for Unknown words}
+\label{sec:morph-generation}
+
+
 \begin{itemize}
 \item In language generation the goal is to generate automatic
   messages about a computer system in natural language.
