@@ -43,42 +43,81 @@ tommi.pirinen, miikka silfverberg, ...\}@helsinki.fi}}
 % Miikka
 
 \subsection{Language identification}
-\begin{itemize}
-\item Language identification is the task of recognizing the language
-  of a text excerpt.
-\item Lots of application e.g. processing documents written in several
-  different languages.
-\item Several standard methods including character n-grams \cite{cavnar/1994}.
-\item One n-gram model per language. The model giving the highest
-  probability wins.
-\item Character n-gram models can be implemented as weighted
-  finite-state automata.
-\item Degree of uncertainty of the guess? 
-\item We use hfst-tools for doing this. The underlying mechnism
-  utilizes the tagger tools in hfst.
-\item Dutch corpus: Alpino treebank~\cite{bouma/2000}.
-\item English corpus: Penn Treebank~\cite{marcus/1993}.
-\item Estonian corpus: Estonian National Corpus~\footnote{http://www.cl.ut.ee/korpused/segakorpus/}.
-\item Finnish corpus: Helsingin Sanomat year 1995~\footnote{http://www.csc.fi/kielipankki/}
-\item German corpus: TIGER Corpus~\cite{brants/2002}.
-\item Swedish corpus: Talbanken~\cite{einarsson/1976}.
+Language identification is the task of recognizing the language of a
+text or text fragment. It is highly useful in applications, that need
+to process documents written in various languages where the language
+might not be overtly marked in the document. For example a translation
+application might need to identify the language of a document in order
+apply the correct translation model. Another example is a speller for
+Finnish might need to identify paragraphs, that are written in
+English, in order to not perform spell checking on the paragraphs.
 
-\end{itemize}
+In this section we outline how to use Hfst tagger tools and language
+identification tools for creating language identifiers. We also
+present an experiment on language identification for documents written
+in Dutch, English, Estonian, Finnish, German or Swedish. The
+experiment shows that Hfst language identifiers are highly accurate
+(99.5\% of the input sentences were correctly classified).
+
+There are several methods for performing languages
+identification. Highly accurate language identification can be
+accomplished by treating documents as letter sequences and training
+Markov chain from training documents whose language is
+known~\cite{cavnar/1994}. One Markov chain is trained for each
+language that the system recognizes. Language identification consists
+of applying each Markov chain on input and choosing the language whose
+model gives the highest likelihood for the text. 
+
+Hfst language identifiers adopt a Markov chain framework, which can be
+implemented using weighted finite-state technology. Using Hfst tagger
+tools~\cite{silfverberg/2011}, we train Markov models for all
+languages. A separate program, {\tt hfst-guess-language}, reads the
+models and input text and labels each sentence with the language,
+whose model gave the highest likelihood for the sentence.
+
+We present an experiment on applying Hfst language identifiers for
+guessing the language of sentences written in six languages. For all
+languages except Swedish, we used training data from corpora
+containing newspaper text. For Swedish, we used more general text.
+
+For Dutch we used the Alpino treebank~\cite{bouma/2000}, for English
+we used the Penn Treebank~\cite{marcus/1993}, for Estonian we used the
+Estonian National
+Corpus~\footnote{http://www.cl.ut.ee/korpused/segakorpus/}, for
+Finnish we used text from the largest Finnish newspaper Helsingin
+Sanomat year 1995~\footnote{http://www.csc.fi/kielipankki/}, for
+German we used the TIGER Corpus~\cite{brants/2002} and for Swedish we
+used Talbanken~\cite{einarsson/1976}.
 
 \begin{table}
+\begin{center}
 \begin{tabular}{l|rr}
-Language & train data~~~~~~~~~                 & test data~~~~~~~~~\\
+Language & train data~~~~~~~~~ & test data~~~~~~~~~\\
 \hline
-Dutch    & 2000 sent (245,000 chars)  & 200 sent (24,000 chars)\\
-English  & 2000 sent (265,000 chars)  & 200 sent (26,000 chars)\\
-Estonian & 2000 sent (238,000 chars)  & 200 sent (23,000 chars)\\
-Finnish  & 2000 sent (155,000 chars)  & 200 sent (14,000 chars)\\
-German   & 2000 sent (280,000 chars)  & 200 sent (28,000 chars)\\
-Swedish  & 2000 sent (164,000 chars)  & 200 sent (16,000 chars)\\
+Dutch    & 245,000 chars  & 24,000 chars\\
+English  & 265,000 chars  & 26,000 chars\\
+Estonian & 238,000 chars  & 23,000 chars\\
+Finnish  & 155,000 chars  & 14,000 chars\\
+German   & 280,000 chars  & 28,000 chars\\
+Swedish  & 164,000 chars  & 16,000 chars\\
 \end{tabular}
+\caption{For each language, we used 2000 sentences for training and
+  200 sentence for testing. We give the sizes of the data sets in
+  utf-8 characters.}\label{tab:lang-id-data}
+\end{center}
 \end{table}
 
+For each language, we chose 2200 sentences for training and
+testing. Of the sentences, every eleventh sentence was used for
+testing and the rest for training. This totals 2000 sentences for
+training and 200 sentences for testing for each language. The sizes of
+the data sets in utf-8 characters are described in
+Table~\ref{tab:lang-id-data}. The average length of a sentence in
+characters was shorter for Finnish and Swedish than for the other
+languages.
+
 \begin{table}
+\begin{center}
 \begin{tabular}{l|l}
 Language & Accuracy\\
 \hline
@@ -91,7 +130,36 @@ Swedish  & ~~~99.5\%\\
 \hline
 ALL      & ~~~99.5\%
 \end{tabular}
+\caption{We give accuracy of the language guesser per language and for
+  all languages.}\label{tab:lang-id-acc}
+\end{center}
 \end{table}
+
+We ran the language identifier for test sentences from all six
+languages (totally 1200 sentences) and computed the accuracy of the
+language identification system as the $corr / all$, where $corr$ is
+the number of sentences whose language was correctly guessed and $all$
+is the number of all sentences. In Table~\ref{tab:lang-id-acc}, we
+show results for each individual language and all languages
+combined. 
+
+Of all sentences, 99.5\% were correctly classified, which demonstrates
+that the language identifiers are highly accurate. This is encouraging
+because Finnish and Estonian have similar orthographies. This applies
+to German, Swedish and Dutch as well.
+
+Currently identification is limited to identifying the closest
+language corresponding to a sentence. There is no option to label a
+sentence as belonging to an unknown language. It could be possible to
+apply some threshold likelihood $l(n)$ which would state that a model
+has to give a sentence of $n$ characters at least likelihood $l(n)$,
+in order for the sentence to be labeled as belonging to the language
+of the model. 
+
+In practice it has been very difficult to establish $l(n)$ in a
+reliable way. It is likely to be dependent on the genre of the
+document, which makes it less useful. Identifying unknown language
+using Hfst language identifiers thus remains future work.
 
 \subsection{Morphologies and Guessers}
 \label{sec: morph-guessers}
