@@ -1538,7 +1538,15 @@ namespace hfst { namespace implementations
   TropicalWeightTransducer::n_best(StdVectorFst * t, unsigned int n)
   { 
     StdVectorFst * n_best_fst = new StdVectorFst(); 
-    fst::ShortestPath(*t,n_best_fst,(size_t)n);
+    try 
+      {
+        fst::ShortestPath(*t,n_best_fst,(size_t)n);
+      }
+    catch (const std::bad_alloc & e)
+      {
+        //std::cerr << "ERROR: std::bad_alloc caught in TropicalWeightTransducer::n_best" << std::endl;
+        HFST_THROW_MESSAGE(HfstFatalException, "TropicalWeightTransducer::nbest runs out of memory");
+      }
     return n_best_fst;
   }
 

@@ -148,8 +148,8 @@ parse_options(int argc, char** argv)
             {"max-out-length", required_argument, 0, 'L'},
             {"max-strings", required_argument, 0, 'n'},
             {"nbest", required_argument, 0, 'N'},
-	    {"random", required_argument, 0, 'r'},
-	    {"print-separator", no_argument, 0, 'S'},
+            {"random", required_argument, 0, 'r'},
+            {"print-separator", no_argument, 0, 'S'},
             {"out-exclude", required_argument, 0, 'U'},
             {"out-prefix", required_argument, 0, 'P'},
             {"print-weights", no_argument, 0, 'w'},
@@ -230,9 +230,9 @@ parse_options(int argc, char** argv)
         case 'U':
           output_exclude = optarg;
           break;
-	case 'S':
-	  print_separator_after_each_transducer = true;
-	  break;
+        case 'S':
+          print_separator_after_each_transducer = true;
+          break;
         case 'e':
           epsilon_format = hfst_strdup(optarg);
           break;
@@ -470,7 +470,15 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     {
       verbose_printf("Pruning transducer to %i best path(s)...\n", 
              nbest_strings);
-      t.n_best(nbest_strings);
+      try 
+        {
+          t.n_best(nbest_strings);
+        }
+      catch(const HfstFatalException & e)
+        {
+          error(EXIT_FAILURE, 0, "n_best runs out of memory");
+          return EXIT_FAILURE;
+        }
     }
     else
     {
