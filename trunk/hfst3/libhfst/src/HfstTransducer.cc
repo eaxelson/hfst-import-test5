@@ -1874,7 +1874,7 @@ HfstTransducer &HfstTransducer::n_best(unsigned int n)
 }
 
 
-static bool is_special_symbol(const std::string &symbol)
+bool HfstTransducer::is_special_symbol(const std::string &symbol)
 {
   if (symbol.size() < 4)
     return false;

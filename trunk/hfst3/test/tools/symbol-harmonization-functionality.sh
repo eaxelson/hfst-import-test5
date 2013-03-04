@@ -271,6 +271,10 @@ for ext in .sfst .ofst .foma; do
 	fi
     done
 
+
+    ## test special symbols in replace rules
+    
+
 done
 
 exit 0;

@@ -1542,6 +1542,8 @@ transducer.transform_weights(&func);
                                    bool insert_renamed_flags=true);
     
     void insert_missing_symbols_to_alphabet_from(const HfstTransducer &another, bool only_special_symbols=false);
+
+    static bool is_special_symbol(const std::string & symbol);
     
     /* Whether the alphabet of transducer \a another includes flag diacritics
        that are not included in the alphabet of this transducer. */

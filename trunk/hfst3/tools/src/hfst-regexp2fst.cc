@@ -198,6 +198,7 @@ process_stream(HfstOutputStream& outstream)
   size_t len = 0;
   unsigned int line_count = 0;
   XreCompiler comp(output_format);
+  comp.set_verbosity(true, stderr);
   comp.set_harmonization(harmonize);
   HfstTransducer disjunction(output_format);
   //outstream.open();
