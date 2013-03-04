@@ -207,9 +207,9 @@ as well as analysis. This is described in
 Section~\ref{sec:morph-generation}.
 
 Constructing a morphological guesser from
-OMorFii~\footnote{http://code.google.com/p/omorfi/} The open-source
-Finnish morphology, the three top guesses for ``twiitin'' are (the
-markup is slightly simplified): \small
+OMorFi~\footnote{http://code.google.com/p/omorfi/} The open-source
+Finnish morphology~\cite{pirinen/2008}, the three top guesses for
+``twiitin'' are (the markup is slightly simplified): \small
 \begin{verbatim}
   twiit  [POS=NOUN] [GUESS_CATEGORY=5]  [NUM=SG][CASE=GEN]
   twiiti [POS=NOUN] [GUESS_CATEGORY=33] [NUM=SG][CASE=NOM]
@@ -285,31 +285,46 @@ no more than one work day by one researcher to implement this application.
 
 \subsection{Language Generation for Unknown words}
 \label{sec:morph-generation}
+Natural language user interfaces like dialogue systems, need a
+language generation component for generating messages for the
+user. The aim is to supply the user with information about the
+internal state of some data base such as airline connections or
+weather phenomena.
 
+Language generation systems for agglutinating languages will benefit
+from morphological analyzers, because generating syntactically correct
+sentences requires inflecting words according to syntactic
+context. Depending on the domain and coverage of the morphological
+analyzer, it might also be necessary to inflect words that are not
+recognized by the morphological analyzer. 
 
-\begin{itemize}
-\item In language generation the goal is to generate automatic
-  messages about a computer system in natural language.
-\item The system includes some concepts like weather phenomena or
-  airline connections and it generates messages about the state of the
-  concepts for a user.
-\item For agglutinating languages this presents n challenge because
-  the base forms of the concepts to be inflected depending on syntactic
-  context.
-\item A generation system can utilize a morphological analyzer, but
-  all of the concepts might not be recognized by the analyzer.
-\item Therefore another mechanism is needed for generating word forms
-  from the lemma of the base form of the concept.
-\item Morphological guessers presented in~\ref{sec: morph-guessers}
-  can be used for generation of word forms in addition to analysis.
-\item When the word class and base form of the word are known, a
-  paradigm of word forms can be generated.
-\item This can also be used when expanding a morphological
-  analyzer. It can be used to generate a list of suggestion forms,
-  which can be examined quickly to determine whether a word could
-  belong to a given declension class.
-\item Example from Finnish.
-\end{itemize}
+Hfst morphological guessers presented in Section~\ref{sec:
+  morph-guessers} can be used for generation as well as morphological
+analysis. For example using the OMorFi morphology for Finnish, the
+best morphological guess for the unknown word ``twiitin'' is
+\begin{verbatim}
+  twiit  [POS=NOUN] [GUESS_CATEGORY=5]  [NUM=SG][CASE=GEN]
+\end{verbatim}
+Replacing the inflectional information {\tt [NUM=SG][CASE=GEN]}
+(singular geneitive case) by {\tt [NUM=PL][CASE=PAR]} (plural
+partitive case) gives the analysis
+\begin{verbatim}
+  twiit  [POS=NOUN] [GUESS_CATEGORY=5]  [NUM=PL][CASE=PAR]
+\end{verbatim}
+which can be fed back to the guesser to generate the surface forms
+``twiitteja'' and ``twiittejä''. The latter one is correct, though the
+first one would also be possible in theory, since the variation
+between ``-ja'' and ``-jä'' is governed by Finnish vowel harmony and
+the stem ``twiit'' is neutral with respect to vowel harmony.
+
+Besides language generation, morphological form generation is useful
+when adding new entries to a morphological analyzer. For a human
+expert it is easy to identify whether the word forms in a generated
+list are the correct ones. It would also be possible to search a
+corpus for the generated word forms, which can give a clue of whether
+the generated forms constitute actual words and therefor also give a
+clue about whether the guessed morphological analysis is the correct
+one.
 
 \section{Examples for User Environments}
 
