@@ -51,6 +51,8 @@ size_t len;
 
   bool expand_definitions=false;
   bool harmonize_=true;
+  bool verbose_=false;
+  FILE * warning_stream=NULL;
 
   std::string substitution_function_symbol;
 
@@ -415,6 +417,25 @@ xfst_label_to_transducer(const char* input, const char* output)
   return retval;
 }
 
+void warn_about_special_symbols_in_replace(HfstTransducer * t)
+{
+  if (!verbose_)
+    return;
+
+  StringSet alphabet = t->get_alphabet();
+  for (StringSet::const_iterator it = alphabet.begin(); 
+       it != alphabet.end(); it++)
+    {
+      if (HfstTransducer::is_special_symbol(*it) && 
+          *it != hfst::internal_epsilon &&
+          *it != hfst::internal_unknown &&
+          *it != hfst::internal_identity)
+        {         
+          fprintf(warning_stream, "warning: using special symbol '%s' in replace rule, "
+                  "use substitute instead\n", it->c_str());
+        }
+    }
+}
 
 } }
 

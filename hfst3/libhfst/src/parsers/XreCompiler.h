@@ -60,8 +60,17 @@ class XreCompiler
   //!        A null pointer is returned on fatal error, if abort is not called.
   HfstTransducer* compile(const std::string& xre);
 
+  //! @brief Whether transducer names defined with function 'define' are expanded.
+  //!        Default is false.
   void set_expand_definitions(bool expand);
+
+  //! @brief Whether binary operators harmonize their argument transducers.
+  //!        Default is true,
   void set_harmonization(bool harmonize);
+
+  //! @brief Whether warning messages are printed to \a file.
+  //!        Default is false, If verbose==false, \a file is ignored.
+  void set_verbosity(bool verbose, FILE * file);
 
   private:
   std::map<std::string,hfst::HfstTransducer*> definitions_;

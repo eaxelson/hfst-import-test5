@@ -150,7 +150,7 @@ REGEXP2: REPLACE
           //  std::cerr << "regexp2:replace \n"<< std::endl; 
          }
        | REGEXP2 COMPOSITION REPLACE {
-       
+       	    
             $$ = & $1->compose(*$3, harmonize_).minimize();
             delete $3;
         }
@@ -229,7 +229,7 @@ SUB3: SYMBOL_LIST RIGHT_BRACKET {  $$ = $1;  }  // symbol list
 // Replace operators
 ///////////////////////////
 
-REPLACE : REGEXP3 {}
+REPLACE : REGEXP3 { }
        |  PARALLEL_RULES
          {
           // std::cerr << "replace:parallel_rules"<< std::endl;        
@@ -340,8 +340,9 @@ MAPPINGPAIR_VECTOR: MAPPINGPAIR_VECTOR COMMA MAPPINGPAIR
     
 MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
       {
-        // std::cerr << "mapping : r2 arrow r2"<< std::endl;      
-  
+        // std::cerr << "mapping : r2 arrow r2"<< std::endl;
+	hfst::xre::warn_about_special_symbols_in_replace($1);  
+	hfst::xre::warn_about_special_symbols_in_replace($3);  
           HfstTransducerPair mappingPair(*$1, *$3);
           $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
 

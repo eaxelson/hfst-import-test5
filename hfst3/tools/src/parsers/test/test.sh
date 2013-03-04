@@ -14,9 +14,9 @@ do
 	continue;
     fi
 
-    # Create a transducer [Foo Bar Baz] where Foo is [foo], Bar [bar] and Baz [baz].
-    # Definition of Foo is given in startup file, and definitions of Bar and Baz
-    # on command line.
+    ## Create a transducer [Foo Bar Baz] where Foo is [foo], Bar [bar] and Baz [baz].
+    ## Definition of Foo is given in startup file, and definitions of Bar and Baz
+    ## on command line.
     echo "define Foo" > startup # continue regex on
     echo "foo;" >> startup      # another line
     if ! ((echo "regex Foo Bar Baz;" && echo "save stack tmp") | \
@@ -44,6 +44,15 @@ do
     then
 	${REMOVE} ${EXTRA_FILES}
 	exit 1
+    fi
+
+    ## Test that using special symbols in replace rules yields an error message
+    if ! (echo 'regex a -> "@_foo_@";' | ../hfst-xfst2fst -f $format 2> tmp && grep "warning:" tmp); then
+	exit 1;
+    fi
+    # silent mode
+    if (echo 'regex a -> "@_foo_@";' | ../hfst-xfst2fst -s -f $format 2> tmp && grep "warning:" tmp); then
+	exit 1;
     fi
     
 done

@@ -60,6 +60,7 @@ namespace xfst {
         verbose_prompt_(false)
       {
         xre_.set_expand_definitions(true);
+        xre_.set_verbosity(true, stderr);
         variables_["assert"] = "OFF";
         variables_["char-encoding"] = "UTF-8";
         variables_["copyright-owner"] = "Copyleft (c) University of Helsinki";
@@ -91,6 +92,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         verbose_prompt_(false)
       {
         xre_.set_expand_definitions(true);
+        xre_.set_verbosity(true, stderr);
         variables_["assert"] = "OFF";
         variables_["char-encoding"] = "UTF-8";
         variables_["copyright-owner"] = "Copyleft (c) University of Helsinki";
@@ -1910,6 +1912,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::setVerbosity(bool verbosity)
     {
       verbose_ = verbosity;
+      xre_.set_verbosity(verbosity, stderr);
       return *this;
     }
   XfstCompiler&
