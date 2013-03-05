@@ -48,9 +48,9 @@ text or text fragment. It is highly useful in applications, that need
 to process documents written in various languages where the language
 might not be overtly marked in the document. For example a translation
 application might need to identify the language of a document in order
-apply the correct translation model. Another example is a speller for
-Finnish might need to identify paragraphs, that are written in
-English, in order to not perform spell checking on the paragraphs.
+to apply the correct translation model. Another example is a speller for
+Finnish that might need to identify paragraphs that are written in
+English, in order not to perform spell checking on the paragraphs.
 
 In this section we outline how to use Hfst tagger tools and language
 identification tools for creating language identifiers. We also
@@ -59,7 +59,7 @@ in Dutch, English, Estonian, Finnish, German or Swedish. The
 experiment shows that Hfst language identifiers are highly accurate
 (99.5\% of the input sentences were correctly classified).
 
-There are several methods for performing languages
+There are several methods for performing language
 identification. Highly accurate language identification can be
 accomplished by treating documents as letter sequences and training
 Markov chain from training documents whose language is
@@ -167,7 +167,7 @@ using Hfst language identifiers thus remains future work.
 
 Language technological applications for agglutinating languages like
 Finnish and Hungarian benefit greatly from high coverage morphological
-analyzer, which supply word forms with their morphological
+analyzers, which supply word forms with their morphological
 analyses. This makes applications dependent on the coverage of the
 morphological analyzer. Building a high coverage morphological
 analyzer (with recall over 95\%) is a substantial task and even with a
@@ -235,9 +235,9 @@ More stuff to write about:
 \subsection{Spell-checking}
 % Tommi
 
-Weighted finite-state methods in performing spell-checking and correction is a
-relatively recent branch of study in research of spell-checking. The concept is
-simple: finite-state morphological analysers and such can be trivially ported
+Using weighted finite-state methods in performing spell-checking and correction 
+is a relatively recent branch of study in spell-checking research. The concept
+is simple: finite-state morphological analysers and such can be trivially ported
 into spell-checking dictionaries providing a language model for the correctly
 spelled words in the spell-checking system. A baseline finite-state model for
 correcting spelling errors can be inferred from the language model by creating
@@ -245,7 +245,7 @@ a Levenshtein-Damerau automaton based on the alphabetic characters present in
 the language. The language model can be simply trained to prefer more common
 words when the Levenshtein-Damerau distance between to suggestions is the same.
 This is done by basic unigram language model training that simply maximises
-the frequency of the suggested word. To our experience even relatively moderate
+the frequency of the suggested word. To our experience, even relatively moderate
 training material will gain improvement in quality as the statistical training
 improves the discriminative power of the model, and the likelihood of random
 typing error is more likely in frequent words.
@@ -262,9 +262,9 @@ in finite-state algebra by composition of weighted $\Sigma^{\star}$ language,
 or by manually fixing the data structure.
 
 The error model can be improved from the baseline Levenshtein-Damerau distance
-metric as well. For this purpose we need an error corpus, that is, set of
+metric as well. For this purpose we need an error corpus, that is, a set of
 errors with their frequencies. This can be semi-automatically extracted from
-weakly annotated sources, such as Wikipedia. From wikipedia we get, among tons
+weakly annotated sources, such as Wikipedia. From Wikipedia we get, among tons
 of other things, word-to-word corrections. It is possible to use the specific
 word-to-word corrections to create simple extension of common confusables to
 error model. Another way is to re-align the corrections using the
@@ -306,7 +306,7 @@ best morphological guess for the unknown word ``twiitin'' is
   twiit  [POS=NOUN] [GUESS_CATEGORY=5]  [NUM=SG][CASE=GEN]
 \end{verbatim}
 Replacing the inflectional information {\tt [NUM=SG][CASE=GEN]}
-(singular geneitive case) by {\tt [NUM=PL][CASE=PAR]} (plural
+(singular genitive case) by {\tt [NUM=PL][CASE=PAR]} (plural
 partitive case) gives the analysis
 \begin{verbatim}
   twiit  [POS=NOUN] [GUESS_CATEGORY=5]  [NUM=PL][CASE=PAR]
@@ -342,7 +342,7 @@ for linguistic applications.
 
 The python bindings in particular make it smooth to use language models
 developed for HFST in rapid prototyping of advanced tools. For an example, in
-my current project (name of the project?) I developed a chunker for Finnish language by simply
+a current project a chunker for Finnish language was developed by simply
 bracketing adjacent agreeing cases and few other similar expressions with
 basically few lines of code on top of existing morphological analysers. E.g.
 given Finnish sentence ``miljoona kärpästä voi olla väärässä paikassa'' we get
@@ -417,6 +417,8 @@ hfst[1]:
 
 \subsection{Other HFST development tools}
 % Erik
+
+Is this what we want?:
 
 - better regexp parser
 - hfst-fst2txt.cc also writes to dot/graphviz format
