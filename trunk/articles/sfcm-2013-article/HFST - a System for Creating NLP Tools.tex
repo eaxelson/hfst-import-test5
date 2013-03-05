@@ -721,6 +721,53 @@ hfst[1]:
 \subsection{XFST regexp compilation}
 % Senka, Miikka
 
+Restriction rules have been added to the resgex parser.
+
+Building restriction rules:
+
+\begin{verbatim}
+  define U [ ? - %<D%> ] ;
+
+  define CENTER [ x y | x x y y ];
+
+  Contexts:
+  define L1 [ a ] ;
+  define R1 [ b ] ;
+
+  define L2 [ x ] ;
+  define R2 [ y ] ;
+  
+Surround center with marks:
+  define CEN1 [ U* %<D%> CENTER %<D%> U* ] ;
+
+Put mark in context:
+  define RES1 [ U* L1 %<D%> U* %<D%> R1 U* ] ;
+  define RES2 [ U* L2 %<D%> U* %<D%> R2 U* ] ;
+  
+  
+  define NODU [ U | 0:%<D%> ]* ;
+  define NODL [ U | %<D%>:0 ]* ;
+
+ 
+  regex U* - [ NODU .o. [ CEN1 - [ RES1 | RES2 ] ] .o. NODL ] ;
+   \end{verbatim}     
+        
+Before and after:
+
+a and b are languages (automata)
+
+Before ( a < b ):
+
+\begin{verbatim}
+~[?* b ?* a ?*]
+\end{verbatim}
+
+After ( a > b ):
+
+\begin{verbatim}
+~[?* a ?* b ?*]
+\end{verbatim}
+
 \subsection{Pmatch with applications for NER}
 % Sam
 
