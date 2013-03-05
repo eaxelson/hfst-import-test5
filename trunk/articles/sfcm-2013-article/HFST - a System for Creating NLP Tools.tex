@@ -342,7 +342,7 @@ for linguistic applications.
 
 The python bindings in particular make it smooth to use language models
 developed for HFST in rapid prototyping of advanced tools. For an example, in
-my current project I developed a chunker for Finnish language by simply
+my current project (name of the project?) I developed a chunker for Finnish language by simply
 bracketing adjacent agreeing cases and few other similar expressions with
 basically few lines of code on top of existing morphological analysers. E.g.
 given Finnish sentence ``miljoona kärpästä voi olla väärässä paikassa'' we get
@@ -367,8 +367,15 @@ that are illustrated in following figure gloss:
 Portability has been one of the design goals of HFST system. The current 
 versions are available or compilable on all POSIX-supporting systems, including
 Linuxes, Mac OS X and Cygwin under Windows system. Compilation is also possible 
-on MinGW under Windows. Another layer of portability
-is attained by HFST's programming language bindings via SWIG, it is possible to
+on MinGW under Windows. 
+
+Fresh version of HFST source code can be fetched from our svn repository at Sourceforge.
+We also offer, usually twice a month, new release packages that include source tarball
+(compilable on all aforementioned platforms), Debian binaries (Linux), MacPort 
+distribution (MacOS X) and NSIS installer (Windows).
+
+Another layer of portability
+is attained by HFST's programming language bindings via SWIG. It is possible to
 use full HFST library through it's SWIG interfaces in all supported systems with
 python versions 2 and 3.
 
@@ -384,8 +391,23 @@ python versions 2 and 3.
 HFST command line tools include an XFST parser tool that can be used in interactive
 mode or to compile scriptfiles. The tool implements the same functionalities as the
 original XFST (Xerox Finite-State Tool) which is a general-purpose utility for computing
-with finite-state networks.
+with finite-state networks. Below is an example of using hfst-xfst in interactive mode
+where we define two transducer variables, use them in a regular expression and print
+random words recognized by the expression.
 
+\begin{verbatim}
+$ hfst-xfst2fst 
+hfst[0]: define Foo foo;
+hfst[0]: define Bar bar;
+hfst[0]: regex [[Foo|0] baz [Bar|0]];
+? bytes. 4 states, 4 arcs, ? paths
+hfst[1]: print random-words
+baz
+bazbar
+foobaz
+foobazbar
+hfst[1]: 
+\end{verbatim}
 
 \subsection{XFST regexp compilation}
 % Senka, Miikka
@@ -395,6 +417,10 @@ with finite-state networks.
 
 \subsection{Other HFST development tools}
 % Erik
+
+- better regexp parser
+- hfst-fst2txt.cc also writes to dot/graphviz format
+- tool hfst-prune-alphabet
 
 \section{Discussion}\label{hfst:discussion}
 
