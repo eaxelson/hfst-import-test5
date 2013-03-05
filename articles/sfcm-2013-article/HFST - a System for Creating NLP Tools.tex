@@ -283,6 +283,315 @@ no more than one work day by one researcher to implement this application.
 \subsection{Named Entity Recognition}
 % Jyrki, Juha (Sam?)
 
+An important application of the Pmatch tool is named-entity
+recognition (NER). Toy examples of named-entity recognition with
+Pmatch were presented by Karttunen \cite{karttunen/2011}. We have
+converted a full-scale named-entity recognizer for Swedish to use the
+HFST implementation of Pmatch, and we are writing one for Finnish.
+
+A named-entity recognizer marks names in a text, typically with
+information on the type (category) of the name. \textsf{[Ref?]} Major
+types of names include persons, locations, organizations, events and
+works of art. NER tools may also recognize temporal and numeric
+expressions. Names and their types can be recognized based on internal
+evidence, i.e. the structure of the name itself (e.g., \textit{ACME
+  Inc.} probably denotes a company), or based on external evidence,
+i.e. the context of the name (e.g., \textit{she works for ACME};
+\textit{ACME hired a new CEO}). \textsf{[Ref: McDonald 1996?]} In
+addition, NER tools typically use gazetteers, lists of known names, to
+ensure that common names are recognized with the correct type.
+\textsf{[Is this general description of NER needed?]}
+
+A key feature of Pmatch making it well-suited for NER is the ability
+to add XML-style tags around substrings matching a regular expression,
+as in \cite{karttunen/2011}. Such tagging regular expressions are
+specified by suffixing the expression with
+\texttt{EndTag(\textit{TagName})}. For example, the following regular
+expression \texttt{CorpSuffix} (with auxiliary definitions) marks
+company names ending in a company designator:
+
+\begin{verbatim}
+Define NSTag [? - [Whitespace|"<"|">"]] ;
+Define Aa ["A"|"a"] ;
+...
+Define Zz ["Z"|"z"] ;
+Define CorpSuffix
+    [UppercaseAlpha NSTag+ " "]+
+    ["HB" | Aa Bb | Aa "." Bb "." | Cc Oo | Ii "nc" | Ll Tt Dd
+     | "AG" | "A.S." | "A/S" | "AS" | "ADR" | "Corp" | "Gmb" Hh
+     | "Hld" | "Limited" | "N.V." | "Oy" | "S.A." | "SA" | "BV"]
+    EndTag(EnamexOrgCrp) ;
+\end{verbatim}
+
+\begin{sloppypar}
+The built-in set \texttt{Whitespace} denotes any whitespace character
+and \texttt{UppercaseAlpha} any uppercase letter. String literals are
+enclosed in double quotes where Karttunen's FST uses curly braces
+\cite{karttunen/2011}.
+\end{sloppypar}
+
+For matching, Pmatch considers the regular expression with the special
+name \texttt{TOP}. Thus, to be able to tag the company names with the
+expression \texttt{CorpSuffix} above, \texttt{TOP} must refer to it:
+
+\begin{verbatim}
+Define TOP ... | CorpSuffix | ... ;
+\end{verbatim}
+
+The expression can now tag the company names in the following input
+text:
+
+\begin{verbatim}
+Computer Systems Corp announced a merger with Home Computers Inc .
+\end{verbatim}
+
+\noindent
+The result is:
+
+\begin{verbatim}
+<EnamexOrgCrp>Computer Systems Corp</EnamexOrgCrp> announced a
+merger with <EnamexOrgCrp>Home Computers Inc</EnamexOrgCrp> .
+\end{verbatim}
+
+Pmatch outputs as such the parts of input that do not match the
+regular expression or that match a part of the expression without an
+\texttt{EndTag}.
+
+In general, a Pmatch expression set (file) contains a list of named
+regular expression definitions of the form \texttt{Define
+  \textit{name} \textit{regex} ;}. The regular expression
+\texttt{\textit{regex}} may contain references to other named regular
+expressions.
+
+Pmatch considers leftmost longest matches of \texttt{TOP} in the input
+and adds the tags specified in \texttt{TOP} or the expressions to
+which it refers. If several subexpressions match the same leftmost
+longest match, it is unspecified (but deterministic) which one Pmatch
+chooses. To disambiguate between matches, context expressions can be
+added to the matching regular expressions. This case may arise when
+one expression is an exception to a more general rule. In such a case,
+the exception expression can be subtracted from the general one.
+\textsf{[Example?]}
+
+\textsf{[Is this correct? Should this rather be in the technical
+  description of Pmatch?]}
+
+An \texttt{EndTag} expression may be accompanied with a context
+expression specifying that the tags should only be added if the
+context of the match matches the context expression. For example, the
+following expression tags the capitalized words following
+\textit{rörelseresultatet för} (`operating profit of') with
+\texttt{EnamexOrgCrp}:
+
+\begin{verbatim}
+Define CapWord2 UppercaseAlpha NSTag+ ;
+Define OrgCrpOpProfit
+    CapWord2 [" " CapWord2]*
+    EndTag(EnamexOrgCrp)
+    LC(Rr "örelse" ["resultatet" | "förlust"] " för ") ;
+Define TOP ... | OrgCrpOpProfit | ... ;
+\end{verbatim}
+
+\noindent
+For example
+
+\begin{verbatim}
+Rörelseresultatet för <EnamexOrgCrp>Computer Systems</EnamexOrgCrp>
+var ...
+\end{verbatim}
+
+As in \cite{karttunen/2011}, the regular expression in \texttt{LC()}
+specifies a left context that must precede the actual match for the
+match to be considered and the tags added. Similarly, \texttt{RC()}
+specifies a right context that must follow the match. \texttt{NLC()}
+and \texttt{NRC()} are negative left and right context, respectively:
+the match is considered only if not preceded (or followed) by the
+negative context.
+
+Context expressions may be combined with conjunction and disjunction.
+For example, the following expressions mark a capitalized word ending
+in an \textit{s} as a sports organization (\texttt{EnamesxOrgAth}) if
+it is preceded by \textit{in} and followed by \textit{segermål}
+(`winning goal'):
+
+\begin{verbatim}
+Define OrgAthWingoal
+    CapWord2 "s" EndTag(EnamexOrgAth) LC(" in ") RC(" segermål") ;
+Define TOP ... | OrgAthWingoal | ... ;
+\end{verbatim}
+
+\textsf{[Example of disjunctive contexts?]}
+
+Conjunctive contexts can also be specified at several stages in the
+expressions. For example, a name is marked as a sports event by the
+following expressions only if it is followed by a space and
+\textit{spelades} (`was played') (right context expression from
+\texttt{EvnAtlIntl}) and preceded by a space or sentence boundary
+(\texttt{\#}) (left context expression from \texttt{TOP}).
+
+\begin{verbatim}
+Define EvnAtlIntl
+    [CapWord2 " "]+ "International "
+    EndTag(EnamexEvnAtl)
+    RC(" spelades") ;
+Define TOP [ ... | EvnAtlIntl | ... ] LC(Whitespace | #) ;
+\end{verbatim}
+
+\noindent
+In this case, the left context condition in \texttt{TOP} is considered
+for all the \texttt{EndTag} expressions contained or included in
+\texttt{TOP}.
+
+HFST Pmatch regular expressions may contain transductions that can add
+extra output or discard specified parts of the input. Even though they
+are not in general used in tagging regular expressions, they can be
+used in correction expressions that modify previously added tags. For
+example, the following expressions move the start tag by removing the
+existing tags and adding new ones using \texttt{EndTag}:
+
+\begin{verbatim}
+Define LowerWord LowercaseAlpha+ ;
+Define NoTags [? - ["<"|">"]]+ ;
+Define StartTagPrsHum "<EnamexPrsHum>" ;
+Define RemoveStartTagPrsHum
+    StartTagPrsHum> .o. [StartTagPrsHum -> ""] ;
+Define EndTagEnamex "</Enamex" [? - ">"]+ ">" ;
+Define RemoveEndTag [EndTagEnamex .o. [EndTagEnamex -> ""]] ;
+Define TOP
+    RemoveStartTagPrs LowerWord " " CapWord2 "s "
+    [Vv Dd " " NoTags RemoveEndTag EndTag(EnamexPrsHum)] ;
+\end{verbatim}
+
+For example, this corrects
+
+\begin{verbatim}
+... <EnamexPrsHum>säger Computers vd Svensson<EnamexPrsHum>
+\end{verbatim}
+
+\noindent
+(`says Computer's CEO Svensson') to
+
+\begin{verbatim}
+... säger Computers vd <EnamexPrsHum>Svensson<EnamexPrsHum>
+\end{verbatim}
+
+The Swedish named-entity recognizer works on tokenized running text
+input: punctuation marks are separated from words by spaces but the
+words are not annotated in any way. In contrast, the forthcoming
+Finnish NER tool will work on annotated text, which makes it easier to
+write more general rules, in particular for a morphologically rich
+language such as Finnish.
+
+The original implementation of the Swedish named-entity recognizer
+\cite{kokkinakis/2003} contained 24 different recognizers running in a
+pipeline and a correction filter run after each stage. 21 of the
+recognizers and the correction filter had been written using
+Flex\footnote{http://flex.sourceforge.net/} rules; the remaining three
+were Perl scripts recognizing names in gazetteers. The Flex rules
+recognize regular expression matches in text, corresponding to names
+and their possible context, and the actions of the rules mark the name
+part of the match with XML elements. The correction filter modifies
+the tags of the elements to remove incorrectly marked names, to
+include words in the context in names, to exclude incorrectly included
+parts of names, to split names into two, to mark new names based on
+marked names in the context, and to change the type of a name.
+\textsf{[How much (or little) should we describe the original
+  implementation?]}
+
+Incentives for reimplementing the Swedish recognizer in Pmatch
+included the slow compilation of some of the Flex rule sets (several
+hours in the worst case), which makes it time-consuming to test
+changes to the rules, and the wish to be able to use a single tool or
+formalism for all components of the recognizer.
+
+Since both Flex and Pmatch are based on regular expressions and
+recognizing the leftmost longest match, we were able to automate a
+large part of the conversion from Flex rules to Pmatch rules. The
+conversion script also analysed the Flex actions to find out which
+part (words) of the recognized match was to be marked as a name and
+which was context. The correction filter was converted by hand, since
+its actions were more varied and would have required more elaborate
+processing than those in the recognizers.
+
+However, differences in the semantics of Flex NER rules and Pmatch
+meant that the Pmatch expressions generated by the automatic
+conversion had to be edited by hand to work correctly. Firstly, the
+Flex rules were written so that the matched regular expressions cover
+the contexts in addition to the name to be recognized, whereas Pmatch
+excludes contexts from the leftmost longest match. Consequently, the
+leftmost longest match at a certain point in text may be found by
+different patterns in Flex and Pmatch. \textsf{[Add an example of the
+  consequences]}
+
+Secondly, Flex rules are ordered whereas Pmatch expressions are not.
+This means that the Flex patterns can be ordered from the most
+specific to the most general, so that the most specific pattern is
+chosen even if also a more general pattern would match. In contrast,
+Pmatch cannot guarantee any specific order: if more than one
+expression have the same leftmost longest match, an arbitrary
+expression is chosen, though always the same for the same set of
+expressions. The ordering has to be replaced with more detailed
+contexts or regular language difference or both. For example, to
+prevent capitalized ``järnväg'' (`railway') from matching a more
+general expression marking street names, it is subtracted from the
+more general pattern:
+
+\begin{verbatim}
+Define LocStrSweExcept "Järnväg" ("en") | "Omväg" ("en") | ... ;
+Define LocStrSwe
+    [Capword2 ["väg" ("en") | "gata" ("n")]] - LocStrSweExcept
+    EndTag(EnamexLocStr) ;
+\end{verbatim}
+
+The gazetteer lookup of the original implementation of the Swedish NER
+marks words found in the gazetteer not only as such but also, for
+example, names with an inflectional suffix, names with another name
+prefixed with a dash or slash, and lowercased names of at least five
+letters. The gazetteers of the original implementation contain pairs
+of names and their types, but to make the Pmatch implementation more
+efficient, the names have been divided into files by name type. The
+Pmatch rules read these files as disjunctions of strings with the
+\texttt{@txt"\textit{filename}"} construct. The basic Pmatch rules for
+the gazetteer lookup are as follows:
+
+\begin{verbatim}
+Define NSTag [Alpha|Num] | [? - [Whitespace|"<"|">"]] ;
+! Names as such
+Define LocStrBasic @txt"gaz-LocStr.txt" EndTag(EnamexLocStr) ;
+Define PrsHumBasic @txt"gaz-PrsHum.txt" EndTag(EnamexPrsHum) ;
+...
+! Names with an inflectional suffix
+Define Suffix ["s" | ":" LowercaseAlpha+] ;
+Define LocStrSuffix
+    @txt"gaz-LocStr.txt" Suffix EndTag(EnamexLocStr) ;
+...
+! Words with a prefixed word
+Define PrefixWord UppercaseAlpha NSTag+ ["/"|"-"] ;
+Define LocStrPrefixWord 
+    PrefixWord @txt"gaz-LocStr.txt" EndTag(EnamexLocStr) ;
+...
+Define Boundary [" " | #] ;
+Define TOP
+    [  LocStrBasic | PrsHumBasic | ... | LocStrSuffix | ... 
+     | LocStrPrefixWord | ... ]
+    LC(Boundary) RC(Boundary);
+\end{verbatim}
+
+The context conditions in \texttt{TOP} allows names to be recognized
+only at word boundaries.
+
+Compiling the Pmatch version of the Swedish NER was about ten times
+faster than that of the Flex version, so the goal of speeding up the
+compilation was largely achieved. However, it seems to take about
+three times as much time to process text with Pmatch NER than with
+Flex NER. This speed also required the use of a left context condition
+of a whitespace or sentence boundary; without the context, the running
+times were many times longer. The total size of the current Pmatch
+FSTs is over three gigabytes, about eight times as large as the
+executables compiled from the Flex files, but we will investigate ways
+to reduce their size. \textsf{[Should we have more precise figures,
+  even though the current results are still rather preliminary?]}
+
 \subsection{Language Generation for Unknown words}
 \label{sec:morph-generation}
 Natural language user interfaces like dialogue systems, need a
