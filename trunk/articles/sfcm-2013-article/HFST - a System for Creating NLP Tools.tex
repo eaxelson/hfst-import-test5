@@ -692,6 +692,33 @@ python versions 2 and 3.
 \subsection{Other user-oriented items}
 % Erik
 
+- new command line tools: hfst-prune-alphabet, hfst-xfst, hfst-tagger
+- flag diacritic harmonization: now identity and unknown symbols are
+  not expanded by flag diacritics
+- harmonization parameter in binary operators
+- support for default symbol
+
+- dependencies: zlib, ncurses used if termcap is not found (hfst-xfst)
+- GNU and bash dependencies removed from scripts to make them more portable
+- some of the warnings in back-end libraries fixed or suppressed
+- all back-ends (SFST, OpenFst and foma) are bundled with HFST, there is
+  no more need to install them separately.
+- SFST and foma libraries are disabled from default build
+
+- hfst-fst2txt.cc also writes to dot/graphviz format
+- PCKIMMO output mode for hfst-fst2txt
+- changes to hfst-proc text formatting
+- added the option print-separator in hfst-fst2strings to achieve better
+  control of pipelined command line tools
+
+- function shuffle added under HfstTransducer and hfst-shuffle
+
+- conversions between transducer formats are more efficient
+
+- all binary command line tools handle the case where the first input
+  contains several transducers and the second input exactly one transducer
+
+
 \section{Under the Hood}
 
 \subsection{An independent XFST module}
@@ -717,6 +744,11 @@ foobaz
 foobazbar
 hfst[1]: 
 \end{verbatim}
+
+- examples from Finite-State Morphology Homepage by Beesley and Karttunen
+- via XFST scripts and using HFST command line tools (mainly hfst-regexp2fst)
+- how many commands are implemented in hfst-xfst
+- other test cases?
 
 \subsection{XFST regexp compilation}
 % Senka, Miikka
@@ -750,7 +782,7 @@ Put mark in context:
 
  
   regex U* - [ NODU .o. [ CEN1 - [ RES1 | RES2 ] ] .o. NODL ] ;
-   \end{verbatim}     
+\end{verbatim}     
         
 Before and after:
 
@@ -773,12 +805,6 @@ After ( a > b ):
 
 \subsection{Other HFST development tools}
 % Erik
-
-Is this what we want?:
-
-- better regexp parser
-- hfst-fst2txt.cc also writes to dot/graphviz format
-- tool hfst-prune-alphabet
 
 \section{Discussion}\label{hfst:discussion}
 
