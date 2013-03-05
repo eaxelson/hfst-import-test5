@@ -308,7 +308,7 @@ An example:
 
     /* Whether the conversion requested can be done without losing 
        any information */
-    bool static is_safe_conversion(ImplementationType original,
+    static bool is_safe_conversion(ImplementationType original,
                                    ImplementationType conversion);
 
     /* For internal use */
