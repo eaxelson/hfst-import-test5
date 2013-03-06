@@ -496,7 +496,7 @@ include words in the context in names, to exclude incorrectly included
 parts of names, to split names into two, to mark new names based on
 marked names in the context, and to change the type of a name.
 \textsf{[How much (or little) should we describe the original
-  implementation?]}
+    implementation?]}
 
 Incentives for reimplementing the Swedish recognizer in Pmatch
 included the slow compilation of some of the Flex rule sets (several
@@ -640,23 +640,25 @@ one.
 \subsection{An Interface in Python}
 % Erik, Tommi
 
-In addition to API library and command line tools, HFST library can also be used
-through SWIG-generated python bindings. Currently the bindings are offered for
-python programming language versions 2 and 3. All HFST functionalities are available
-via both versions, but the python interpreters themselves have some differences.
-Python 2 allows HFST exceptions to be caught directly, but python 3 requires the use
-of a special wrapper function written as a part of the bindings. On the other hand, 
-python 3 has better support for unicode characters, so it is probably a better choice
-for linguistic applications.
+In addition to API library and command line tools, HFST library can
+also be used through SWIG-generated python bindings. Currently the
+bindings are offered for python programming language versions 2 and
+3. All HFST functionalities are available via both versions, but the
+python interpreters themselves have some differences.  Python 2 allows
+HFST exceptions to be caught directly, but python 3 requires the use
+of a special wrapper function written as a part of the bindings. On
+the other hand, python 3 has better support for unicode characters, so
+it is probably a better choice for linguistic applications.
 
-The python bindings in particular make it smooth to use language models
-developed for HFST in rapid prototyping of advanced tools. For an example, in
-a current project a chunker for Finnish language was developed by simply
-bracketing adjacent agreeing cases and few other similar expressions with
-basically few lines of code on top of existing morphological analysers. E.g.
-given Finnish sentence ``miljoona kärpästä voi olla väärässä paikassa'' we get
-bracketing all three phrases bracketed by really simple python based bracketing
-that are illustrated in following figure gloss:
+The python bindings in particular make it smooth to use language
+models developed for HFST in rapid prototyping of advanced tools. For
+an example, in a current project a chunker for Finnish language was
+developed by simply bracketing adjacent agreeing cases and few other
+similar expressions with basically few lines of code on top of
+existing morphological analysers. E.g.  given Finnish sentence
+``miljoona kärpästä voi olla väärässä paikassa'' we get bracketing all
+three phrases bracketed by really simple python based bracketing that
+are illustrated in following figure gloss:
 
 \ex
 \begingl
@@ -673,63 +675,67 @@ that are illustrated in following figure gloss:
 \subsection{HFST on Unix, Mac and Windows}
 % Erik, Tommi
 
-Portability has been one of the design goals of HFST system. The current 
-versions are available or compilable on all POSIX-supporting systems, including
-Linuxes, Mac OS X and Cygwin under Windows system. Compilation is also possible 
-on MinGW under Windows. 
+Portability has been one of the design goals of HFST system. The
+current versions are available or compilable on all POSIX-supporting
+systems, including Linuxes, Mac OS X and Cygwin under Windows
+system. Compilation is also possible on MinGW under Windows.
 
-Fresh version of HFST source code can be fetched from our svn repository at Sourceforge.
-We also offer, usually twice a month, new release packages that include source tarball
-(compilable on all aforementioned platforms), Debian binaries (Linux), MacPort 
+Fresh version of HFST source code can be fetched from our svn
+repository at Sourceforge. We also offer, usually twice a month, new
+release packages that include source tarball (compilable on all
+aforementioned platforms), Debian binaries (Linux), MacPort
 distribution (MacOS X) and NSIS installer (Windows).
 
-Another layer of portability
-is attained by HFST's programming language bindings via SWIG. It is possible to
-use full HFST library through it's SWIG interfaces in all supported systems with
-python versions 2 and 3.
+Another layer of portability is attained by HFST's programming
+language bindings via SWIG. It is possible to use full HFST library
+through it's SWIG interfaces in all supported systems with python
+versions 2 and 3.
 
 
 \subsection{Other user-oriented items}
 % Erik
 
-- new command line tools: hfst-prune-alphabet, hfst-xfst, hfst-tagger
-- flag diacritic harmonization: now identity and unknown symbols are
-  not expanded by flag diacritics
-- harmonization parameter in binary operators
-- support for default symbol
+We have new command line tools: an XFST parser hfst-xfst and a tagging
+tool hfst-tagger. Also some functions hidden un the API are now
+availeble as command line tools: hfst-shuffle and hfst-prune-alphabet.
+Better cooperation between flag diacritics and identity/unknown
+symbols. We have a parameter in binary operators that controls whether
+unknown/identity transitions are expanded, the default being true. We
+support the default symbol, that matches always if no other transition
+in a given state matches.
 
-- dependencies: zlib, ncurses used if termcap is not found (hfst-xfst)
-- GNU and bash dependencies removed from scripts to make them more portable
-- some of the warnings in back-end libraries fixed or suppressed
-- all back-ends (SFST, OpenFst and foma) are bundled with HFST, there is
-  no more need to install them separately.
-- SFST and foma libraries are disabled from default build
+Keep the number of dependencies as low as possible and offer a
+possibility to use another library. zlib was removed, the library
+ncurses used if termcap is not found. GNU and bash dependencies were
+also removed from scripts to make them more portable. Another way to
+reduce the number of dependencies is that all back-ends (SFST, OpenFst
+and foma) are bundled with HFST. There is no more need to install them
+separately or worry about having the right version. SFST and foma
+libraries are disabled from default build to make it faster and still
+be able to handle weighted transducers. We can also make modifications
+to the back-end libraries, for instance some of the warnings in
+back-end libraries that are given during compilation are now fixed or
+suppressed.
 
-- hfst-fst2txt.cc also writes to dot/graphviz format
-- PCKIMMO output mode for hfst-fst2txt
-- changes to hfst-proc text formatting
-- added the option print-separator in hfst-fst2strings to achieve better
-  control of pipelined command line tools
-
-- function shuffle added under HfstTransducer and hfst-shuffle
-
-- conversions between transducer formats are more efficient
-
-- all binary command line tools handle the case where the first input
-  contains several transducers and the second input exactly one transducer
-
+Interoperability via added formats: hfst-fst2txt.cc also writes to
+dot/graphviz format, PCKIMMO output mode is supported for
+hfst-fst2txt. The option print-separator is added to hfst-fst2strings
+to achieve better control of pipelined command line tools.
 
 \section{Under the Hood}
 
 \subsection{An independent XFST module}
 % Erik (Erik)
 
-HFST command line tools include an XFST parser tool that can be used in interactive
-mode or to compile scriptfiles. The tool implements the same functionalities as the
-original XFST (Xerox Finite-State Tool) which is a general-purpose utility for computing
-with finite-state networks. Below is an example of using hfst-xfst in interactive mode
-where we define two transducer variables, use them in a regular expression and print
-random words recognized by the expression.
+HFST command line tools include an XFST parser tool that can be used
+in interactive mode or to compile scriptfiles. The tool implements the
+same functionalities as the original XFST (Xerox Finite-State Tool)
+which is a general-purpose utility for computing with finite-state
+networks. There are over 100 commands in hfst-xfst, the same as in the
+original Xerox tool. Below is an example of using hfst-xfst in
+interactive mode where we define two transducer variables, use them in
+a regular expression and print random words recognized by the
+expression.
 
 \begin{verbatim}
 $ hfst-xfst2fst 
@@ -745,10 +751,13 @@ foobazbar
 hfst[1]: 
 \end{verbatim}
 
-- examples from Finite-State Morphology Homepage by Beesley and Karttunen
-- via XFST scripts and using HFST command line tools (mainly hfst-regexp2fst)
-- how many commands are implemented in hfst-xfst
-- other test cases?
+To test hfst-xfst, we have compiled some examples from Finite-State
+Morphology Homepage by Beesley and Karttunen.  There are 17 examples
+and they are compiled in three ways to make sure that they work as
+they should: (1) with the original XFST tool, (2) with the HFST tool
+hfst-xfst and (3) using HFST command line tools, mainly
+hfst-regexp2fst. The last case is also useful for testing the
+functionality of HFST command line tools.
 
 \subsection{XFST regexp compilation}
 % Senka, Miikka
