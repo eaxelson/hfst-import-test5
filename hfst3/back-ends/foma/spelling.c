@@ -43,7 +43,7 @@ int node_insert(struct apply_med_handle *medh, int wordpos, int fsmstate, int g,
 char *print_sym(int sym, struct sigma *sigma) {
     while (sigma != NULL) {
         if (sigma->number == sym) {
-            return(sigma->symbol);
+	    return(sigma->symbol);
         }
         sigma = sigma->next;
     }
@@ -64,8 +64,8 @@ void print_match(struct apply_med_handle *medh, struct astarnode *node, struct s
     }
     printptr = 0;
     if (medh->outstring_length < 2*wordlen) {
-        medh->outstring_length *= 2;
-        medh->outstring = xxrealloc(medh->outstring, medh->outstring_length*sizeof(char));
+	medh->outstring_length *= 2;
+	medh->outstring = xxrealloc(medh->outstring, medh->outstring_length*sizeof(char));
     }
     while (!(int_stack_isempty())) {
         sym = int_stack_pop();
@@ -73,9 +73,9 @@ void print_match(struct apply_med_handle *medh, struct astarnode *node, struct s
             printptr += sprintf(medh->outstring+printptr,"%s", print_sym(sym, sigma));
         }
         if (sym == 0) {
-            if (medh->align_symbol) {
-                printptr += sprintf(medh->outstring+printptr,"%s",medh->align_symbol);
-            }
+	    if (medh->align_symbol) {
+		printptr += sprintf(medh->outstring+printptr,"%s",medh->align_symbol);
+	    }
         }
         if (sym == 2) {
             printptr += sprintf(medh->outstring+printptr,"@");
@@ -91,26 +91,26 @@ void print_match(struct apply_med_handle *medh, struct astarnode *node, struct s
     }
     printptr = 0;
     if (medh->instring_length < 2*wordlen) {
-        medh->instring_length *= 2;
-        medh->instring = xxrealloc(medh->instring, medh->instring_length*sizeof(char));
+	medh->instring_length *= 2;
+	medh->instring = xxrealloc(medh->instring, medh->instring_length*sizeof(char));
     }
     for (i = 0; !(int_stack_isempty()); ) {
-        sym = int_stack_pop();  
+        sym = int_stack_pop();	
         if (sym > 2) {
             printptr += sprintf(medh->instring+printptr,"%s", print_sym(sym, sigma));
             i += utf8skip(word+i)+1;
         }
         if (sym == 0) {
-            if (medh->align_symbol) {
-                printptr += sprintf(medh->instring+printptr,"%s",medh->align_symbol);
-            }
+	    if (medh->align_symbol) {
+		printptr += sprintf(medh->instring+printptr,"%s",medh->align_symbol);
+	    }
         }
         if (sym == 2) {
             if (i > wordlen) {
-                printptr += sprintf(medh->instring+printptr,"*");
+		printptr += sprintf(medh->instring+printptr,"*");
             } else {
-                //printf("%.*s", utf8skip(word+i)+1, word+i);
-                printptr += sprintf(medh->instring+printptr,"%.*s", utf8skip(word+i)+1, word+i);
+		//printf("%.*s", utf8skip(word+i)+1, word+i);
+		printptr += sprintf(medh->instring+printptr,"%.*s", utf8skip(word+i)+1, word+i);
                 i+= utf8skip(word+i)+1;
             }
         }
@@ -121,27 +121,27 @@ void print_match(struct apply_med_handle *medh, struct astarnode *node, struct s
 
 void apply_med_clear(struct apply_med_handle *medh) {
     if (medh == NULL)
-        return;
+	return;
     if (medh->agenda != NULL)
-        xxfree(medh->agenda);
+	xxfree(medh->agenda);
     if (medh->instring != NULL)
-        xxfree(medh->instring);
+	xxfree(medh->instring);
     if (medh->outstring != NULL)
-        xxfree(medh->outstring);
+	xxfree(medh->outstring);
     if (medh->heap != NULL)
-        xxfree(medh->heap);
+	xxfree(medh->heap);
     if (medh->state_array != NULL)
-        xxfree(medh->state_array);
+	xxfree(medh->state_array);
     if (medh->align_symbol != NULL)
-        xxfree(medh->align_symbol);
+	xxfree(medh->align_symbol);
     if (medh->letterbits != NULL)
-        xxfree(medh->letterbits);
+	xxfree(medh->letterbits);
     if (medh->nletterbits != NULL)
-        xxfree(medh->nletterbits);
+	xxfree(medh->nletterbits);
     if (medh->intword != NULL)
-        xxfree(medh->intword);
+	xxfree(medh->intword);
     if (medh->sigmahash != NULL)
-        sh_done(medh->sigmahash);
+	sh_done(medh->sigmahash);
     xxfree(medh);
 }
 
@@ -162,15 +162,15 @@ struct apply_med_handle *apply_med_init(struct fsm *net) {
     medh->heapcount = 0;
     medh->state_array = map_firstlines(net);
     if (net->medlookup != NULL && net->medlookup->confusion_matrix != NULL) {
-        medh->hascm = 1;
-        medh->cm = net->medlookup->confusion_matrix;
+	medh->hascm = 1;
+	medh->cm = net->medlookup->confusion_matrix;
     }
     medh->maxsigma = sigma_max(net->sigma)+1;
     medh->sigmahash = sh_init();
     for (sigma = net->sigma; sigma != NULL && sigma->number != -1 ; sigma=sigma->next ) {
-        if (sigma->number > IDENTITY) {
-            sh_add_string(medh->sigmahash, sigma->symbol, sigma->number);
-        }
+	if (sigma->number > IDENTITY) {
+	    sh_add_string(medh->sigmahash, sigma->symbol, sigma->number);
+	}
     }
 
 
@@ -189,25 +189,25 @@ struct apply_med_handle *apply_med_init(struct fsm *net) {
 
 void apply_med_set_heap_max(struct apply_med_handle *medh, int max) {
     if (medh != NULL) {
-        medh->med_max_heap_size = max;
+	medh->med_max_heap_size = max;
     }
 }
 
 void apply_med_set_align_symbol(struct apply_med_handle *medh, char *align) {
     if (medh != NULL) {
-        medh->align_symbol = xxstrdup(align);
+	medh->align_symbol = xxstrdup(align);
     }
 }
 
 void apply_med_set_med_limit(struct apply_med_handle *medh, int max) {
     if (medh != NULL) {
-        medh->med_limit = max;
+	medh->med_limit = max;
     }
 }
 
 void apply_med_set_med_cutoff(struct apply_med_handle *medh, int max) {
     if (medh != NULL) {
-        medh->med_cutoff = max;
+	medh->med_cutoff = max;
     }
 }
 
@@ -239,7 +239,7 @@ char *apply_med(struct apply_med_handle *medh, char *word) {
 
 
     if (word == NULL) {
-        goto resume;
+	goto resume;
     }
 
     medh->word = word;
@@ -251,18 +251,18 @@ char *apply_med(struct apply_med_handle *medh, char *word) {
     medh->wordlen = strlen(word);
     medh->utf8len = utf8strlen(word);
     if (medh->intword != NULL) {
-        xxfree(medh->intword);
+	xxfree(medh->intword);
     }
     medh->intword = xxmalloc(sizeof(int)*(medh->utf8len+1));
 
    /* intword -> sigma numbers of word */
     for (i=0, j=0; i < medh->wordlen; i += thisskip, j++) {
-        thisskip = utf8skip(word+i)+1;
-        strncpy(temputf, word+i, thisskip);
-        temputf[thisskip] = '\0';
-        if (sh_find_string(medh->sigmahash, temputf) != NULL) {     
-            *(medh->intword+j) = sh_get_value(medh->sigmahash);
-        } else {
+	thisskip = utf8skip(word+i)+1;
+	strncpy(temputf, word+i, thisskip);
+	temputf[thisskip] = '\0';
+	if (sh_find_string(medh->sigmahash, temputf) != NULL) {	    
+	    *(medh->intword+j) = sh_get_value(medh->sigmahash);
+	} else {
             *(medh->intword+j) = IDENTITY;
         }
     }
@@ -286,14 +286,14 @@ char *apply_med(struct apply_med_handle *medh, char *word) {
         /* Need to save this in case we realloc and print_match() */
         medh->curr_agenda_offset = curr_node-medh->agenda;
         if (curr_node == NULL) {
-            //printf("Reached cutoff of %i.\n", medh->med_cutoff);
+	    //printf("Reached cutoff of %i.\n", medh->med_cutoff);
             goto out;
         }
-        medh->curr_state = curr_node->fsmstate;
-        medh->curr_ptr = (medh->state_array+medh->curr_state)->transitions;
-        if (!medh->curr_ptr->final_state || !(curr_node->wordpos == medh->utf8len)) {
-            //continue;
-        }
+	medh->curr_state = curr_node->fsmstate;
+	medh->curr_ptr = (medh->state_array+medh->curr_state)->transitions;
+	if (!medh->curr_ptr->final_state || !(curr_node->wordpos == medh->utf8len)) {
+	    //continue;
+	}
 
         medh->nodes_expanded++;
 
@@ -321,16 +321,16 @@ char *apply_med(struct apply_med_handle *medh, char *word) {
                     medh->curr_node_has_match = 1;
                     print_match(medh, medh->agenda+medh->curr_agenda_offset, medh->net->sigma, medh->word);
                     medh->nummatches++;
-                    return(medh->outstring);
+		    return(medh->outstring);
                 }
             }
 
-        resume:
+	resume:
 
-            if (medh->nummatches == medh->med_limit) {
-                goto out;
-            }
-            
+	    if (medh->nummatches == medh->med_limit) {
+		goto out;
+	    }
+	    
             if (medh->curr_ptr->target == -1 && medh->curr_pos == medh->utf8len)
                 break;
             if (medh->curr_ptr->target == -1 && medh->lines == 1)
@@ -348,14 +348,14 @@ char *apply_med(struct apply_med_handle *medh, char *word) {
             h = calculate_h(medh, medh->intword, medh->curr_pos, medh->curr_ptr->target);
 
             if ((medh->curr_pos == medh->utf8len) && (medh->curr_ptr->final_state == 0) && (h == 0)) {
-                h = 1;
+		// h = 1;
             }
 
             if (g+h <= medh->med_cutoff) {
                 if (!node_insert(medh, medh->curr_pos, target, g, h, in, out, medh->curr_agenda_offset)) {
-                    goto out;
-                }            
-            }
+		    goto out;
+		}            
+	    }
             if (medh->curr_pos == medh->utf8len)
                 goto skip;
 
@@ -371,8 +371,8 @@ char *apply_med(struct apply_med_handle *medh, char *word) {
             h = calculate_h(medh, medh->intword, medh->curr_pos+1, medh->curr_ptr->target);
             if ((g+h) <= medh->med_cutoff) {
                 if (!node_insert(medh,medh->curr_pos+1, target, g, h, in, out, medh->curr_agenda_offset)) {
-                    goto out;
-                }
+		    goto out;
+		}
             }
         insert:
             /* Insert a symbol into input */
@@ -388,8 +388,8 @@ char *apply_med(struct apply_med_handle *medh, char *word) {
                 
                 if (g+h <= medh->med_cutoff)
                     if (!node_insert(medh,medh->curr_pos+1, medh->curr_state, g, h, in, out, medh->curr_agenda_offset)) {
-                        goto out;
-                    }
+			goto out;
+		    }
             }
             if (medh->curr_ptr->target == -1)
                 break;
@@ -478,10 +478,10 @@ int node_insert(struct apply_med_handle *medh, int wordpos, int fsmstate, int g,
     /* We add the node in the array */
     i = medh->astarcount;
     if (i >= (medh->agenda_size-1)) {
-        if (medh->agenda_size*2 >= medh->med_max_heap_size) {
-            //printf("heap limit reached by %i\n", medh->med_max_heap_size);
-            return 0;
-        }
+	if (medh->agenda_size*2 >= medh->med_max_heap_size) {
+	    //printf("heap limit reached by %i\n", medh->med_max_heap_size);
+	    return 0;
+	}
         medh->agenda_size *= 2;
         medh->agenda = xxrealloc(medh->agenda, sizeof(struct astarnode)*medh->agenda_size);
     }

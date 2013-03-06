@@ -1,5 +1,5 @@
 /*     Foma: a finite-state toolkit and library.                             */
-/*     Copyright © 2008-2011 Mans Hulden                                     */
+/*     Copyright © 2008-2012 Mans Hulden                                     */
 
 /*     This file is part of foma.                                            */
 
@@ -83,67 +83,67 @@ struct fsm *fsm_letter_machine(struct fsm *net) {
 
     while (fsm_get_next_arc(inh)) {
         in = fsm_get_arc_in(inh);
-        out = fsm_get_arc_out(inh);
-        innum = fsm_get_arc_num_in(inh);
-        outnum = fsm_get_arc_num_out(inh);
-        source = fsm_get_arc_source(inh);
-        target = fsm_get_arc_target(inh);
-        
-        if (((innum > IDENTITY) && utf8strlen(in) > 1) || ((outnum > IDENTITY) && utf8strlen(out) > 1)) {
-            inlen = innum <= IDENTITY ? 1 : utf8strlen(in);
-            outlen = outnum <= IDENTITY ? 1 : utf8strlen(out);
-            steps = inlen > outlen ? inlen : outlen;
+	out = fsm_get_arc_out(inh);
+	innum = fsm_get_arc_num_in(inh);
+	outnum = fsm_get_arc_num_out(inh);
+	source = fsm_get_arc_source(inh);
+	target = fsm_get_arc_target(inh);
+	
+	if (((innum > IDENTITY) && utf8strlen(in) > 1) || ((outnum > IDENTITY) && utf8strlen(out) > 1)) {
+	    inlen = innum <= IDENTITY ? 1 : utf8strlen(in);
+	    outlen = outnum <= IDENTITY ? 1 : utf8strlen(out);
+	    steps = inlen > outlen ? inlen : outlen;
 
-            target = addstate;
-            for (i = 0; i < steps; i++) {
-                if (innum <= IDENTITY || inlen < 1) {
-                    if (inlen < 1)
-                        currin = "@_EPSILON_SYMBOL_@";
-                    else 
-                        currin = in;
-                } else {
-                    strncpy(tmpin, in, utf8skip(in)+1);
-                    *(tmpin+utf8skip(in)+1) = '\0';
-                    currin = tmpin;
-                    inlen--;
-                    in = in+utf8skip(in)+1;
-                }
-                if (outnum <= IDENTITY || outlen < 1) {
-                    if (outlen < 1)
-                        currout = "@_EPSILON_SYMBOL_@";
-                    else
-                        currout = out;
-                } else {
-                    strncpy(tmpout, out, utf8skip(in)+1);
-                    *(tmpout+utf8skip(out)+1) = '\0';
-                    currout = tmpout;
-                    out = out+utf8skip(out)+1;
-                    outlen--;
-                }
-                if (i == 0 && steps > 1) {                  
-                    target = addstate;
-                    addstate++;
-                }
-                if (i > 0 && (steps-i == 1)) {
-                    source = addstate - 1;
-                    target = fsm_get_arc_target(inh);
-                }
-                if (i > 0 && (steps-i != 1)) {
-                    source = addstate-1;
-                    target = addstate;
-                    addstate++;
-                }
-                fsm_construct_add_arc(outh,source,target,currin,currout);
-            }
-        } else {
-            fsm_construct_add_arc(outh,source,target,in,out);
-        }
+	    target = addstate;
+	    for (i = 0; i < steps; i++) {
+		if (innum <= IDENTITY || inlen < 1) {
+		    if (inlen < 1)
+			currin = "@_EPSILON_SYMBOL_@";
+		    else 
+			currin = in;
+		} else {
+		    strncpy(tmpin, in, utf8skip(in)+1);
+		    *(tmpin+utf8skip(in)+1) = '\0';
+		    currin = tmpin;
+		    inlen--;
+		    in = in+utf8skip(in)+1;
+		}
+		if (outnum <= IDENTITY || outlen < 1) {
+		    if (outlen < 1)
+			currout = "@_EPSILON_SYMBOL_@";
+		    else
+			currout = out;
+		} else {
+		    strncpy(tmpout, out, utf8skip(in)+1);
+		    *(tmpout+utf8skip(out)+1) = '\0';
+		    currout = tmpout;
+		    out = out+utf8skip(out)+1;
+		    outlen--;
+		}
+		if (i == 0 && steps > 1) {		    
+		    target = addstate;
+		    addstate++;
+		}
+		if (i > 0 && (steps-i == 1)) {
+		    source = addstate - 1;
+		    target = fsm_get_arc_target(inh);
+		}
+		if (i > 0 && (steps-i != 1)) {
+		    source = addstate-1;
+		    target = addstate;
+		    addstate++;
+		}
+		fsm_construct_add_arc(outh,source,target,currin,currout);
+	    }
+	} else {
+	    fsm_construct_add_arc(outh,source,target,in,out);
+	}
     }
     while ((i = fsm_get_next_final(inh)) != -1) {
-        fsm_construct_set_final(outh, i);
+	fsm_construct_set_final(outh, i);
     }
     while ((i = fsm_get_next_initial(inh)) != -1) {
-        fsm_construct_set_initial(outh, i);
+	fsm_construct_set_initial(outh, i);
     }
     fsm_read_done(inh);
     outnet = fsm_construct_done(outh);
@@ -161,10 +161,10 @@ struct fsm *fsm_explode(char *symbol) {
     
     length = strlen(symbol)-2;
     for (i=1, j=1; i <= length; i += skip, j++) {
-        skip = utf8skip(symbol+i)+1;
-        tempstring = xxstrndup(((symbol+i)),skip);
-        fsm_construct_add_arc(h,j-1,j,tempstring,tempstring);
-        xxfree(tempstring);
+	skip = utf8skip(symbol+i)+1;
+	tempstring = xxstrndup(((symbol+i)),skip);
+	fsm_construct_add_arc(h,j-1,j,tempstring,tempstring);
+	xxfree(tempstring);
     }
     fsm_construct_set_final(h, j-1);
     net = fsm_construct_done(h);
@@ -525,9 +525,9 @@ struct fsm *fsm_intersect(struct fsm *net1, struct fsm *net2) {
     net2 = fsm_minimize(net2);
 
     if (fsm_isempty(net1) || fsm_isempty(net2)) {
-        fsm_destroy(net1);
-        fsm_destroy(net2);
-        return(fsm_empty_set());
+	fsm_destroy(net1);
+	fsm_destroy(net2);
+	return(fsm_empty_set());
     }
 
     fsm_merge_sigma(net1, net2);
@@ -669,9 +669,9 @@ struct fsm *fsm_compose(struct fsm *net1, struct fsm *net2) {
     net2 = fsm_minimize(net2);
 
     if (fsm_isempty(net1) || fsm_isempty(net2)) {
-        fsm_destroy(net1);
-        fsm_destroy(net2);
-        return(fsm_empty_set());
+	fsm_destroy(net1);
+	fsm_destroy(net2);
+	return(fsm_empty_set());
     }
     
     /* If flag-is-epsilon is on, we need to add the flag symbols    */
@@ -982,20 +982,20 @@ struct sigma *copy_mergesigma(struct mergesigma *mergesigma) {
     
     sigma = new_sigma = NULL;
     while(mergesigma != NULL) {
-        if (sigma == NULL) {
-            sigma = xxmalloc(sizeof(struct sigma));
-            new_sigma = sigma;
-        } else {
-            sigma->next = xxmalloc(sizeof(struct sigma));
-            sigma = sigma->next;
-        }
-        sigma->next = NULL;
-        sigma->number = mergesigma->number;
-        
-        sigma->symbol = NULL;
-        if (mergesigma->symbol != NULL)
-            sigma->symbol = xxstrdup(mergesigma->symbol);
-        mergesigma = mergesigma->next;
+	if (sigma == NULL) {
+	    sigma = xxmalloc(sizeof(struct sigma));
+	    new_sigma = sigma;
+	} else {
+	    sigma->next = xxmalloc(sizeof(struct sigma));
+	    sigma = sigma->next;
+	}
+	sigma->next = NULL;
+	sigma->number = mergesigma->number;
+	
+	sigma->symbol = NULL;
+	if (mergesigma->symbol != NULL)
+	    sigma->symbol = xxstrdup(mergesigma->symbol);
+	mergesigma = mergesigma->next;
     }
     return(new_sigma);
 }
@@ -1006,6 +1006,19 @@ void fsm_merge_sigma(struct fsm *net1, struct fsm *net2) {
   struct mergesigma *mergesigma, *mergesigma2, *start_mergesigma;
   struct fsm_state *fsm_state, *new_1_state, *new_2_state;
   int i, j, end_1 = 0, end_2 = 0, sigmasizes, *mapping_1, *mapping_2, equal = 1, unknown_1 = 0, unknown_2 = 0, net_unk = 0, net_adds = 0, net_lines;
+
+#ifdef foo
+  i = sigma_find(".#.", net1->sigma);
+  j = sigma_find(".#.", net2->sigma);
+  if (i != -1 && j == -1) {
+      sigma_add(".#.", net2->sigma);
+      sigma_sort(net2);
+  }
+  if (j != -1 && i == -1) {
+      sigma_add(".#.", net1->sigma);
+      sigma_sort(net1);
+  }
+#endif
 
   sigma_1 = net1->sigma;
   sigma_2 = net2->sigma;
@@ -1055,51 +1068,51 @@ void fsm_merge_sigma(struct fsm *net1, struct fsm *net2) {
       /* 1 or 2 contains special characters */
       if ((sigma_1->number <= IDENTITY) || (sigma_2->number <= IDENTITY)) {
 
-        /* Treating zeros or unknowns */
-        
-        if ((sigma_1->number == UNKNOWN) || (sigma_1->number == IDENTITY))
-          unknown_1 = 1;
-        if ((sigma_2->number == UNKNOWN) || (sigma_2->number == IDENTITY))
-          unknown_2 = 1;
+	/* Treating zeros or unknowns */
+	
+	if ((sigma_1->number == UNKNOWN) || (sigma_1->number == IDENTITY))
+	  unknown_1 = 1;
+	if ((sigma_2->number == UNKNOWN) || (sigma_2->number == IDENTITY))
+	  unknown_2 = 1;
 
-        if (sigma_1->number == sigma_2->number) {
-          mergesigma = add_to_mergesigma(mergesigma, sigma_1, 3);
-          sigma_1 = sigma_1->next;
-          sigma_2 = sigma_2->next;
-        }
-        else if (sigma_1->number < sigma_2->number) {
-          mergesigma = add_to_mergesigma(mergesigma, sigma_1, 1);
-          sigma_1 = sigma_1->next;
-          equal = 0;
-        }
-        else {
-          mergesigma = add_to_mergesigma(mergesigma, sigma_2, 2);
-          sigma_2 = sigma_2->next;
-          equal = 0;
-        }
-        continue;
+	if (sigma_1->number == sigma_2->number) {
+	  mergesigma = add_to_mergesigma(mergesigma, sigma_1, 3);
+	  sigma_1 = sigma_1->next;
+	  sigma_2 = sigma_2->next;
+	}
+	else if (sigma_1->number < sigma_2->number) {
+	  mergesigma = add_to_mergesigma(mergesigma, sigma_1, 1);
+	  sigma_1 = sigma_1->next;
+	  equal = 0;
+	}
+	else {
+	  mergesigma = add_to_mergesigma(mergesigma, sigma_2, 2);
+	  sigma_2 = sigma_2->next;
+	  equal = 0;
+	}
+	continue;
       }
       /* Both contain non-special chars */
       if (strcmp(sigma_1->symbol, sigma_2->symbol) == 0) {
         mergesigma = add_to_mergesigma(mergesigma, sigma_1, 3);
-        /* Add symbol numbers to mapping */
-        *(mapping_1+(sigma_1->number)) = mergesigma->number;
-        *(mapping_2+(sigma_2->number)) = mergesigma->number;
+	/* Add symbol numbers to mapping */
+	*(mapping_1+(sigma_1->number)) = mergesigma->number;
+	*(mapping_2+(sigma_2->number)) = mergesigma->number;
 
-        sigma_1 = sigma_1->next;
-        sigma_2 = sigma_2->next;
+	sigma_1 = sigma_1->next;
+	sigma_2 = sigma_2->next;
       }
       else if (strcmp(sigma_1->symbol, sigma_2->symbol) < 0) {
-        mergesigma = add_to_mergesigma(mergesigma, sigma_1, 1);
-        *(mapping_1+(sigma_1->number)) = mergesigma->number;
-        sigma_1 = sigma_1->next;
-        equal = 0;
+	mergesigma = add_to_mergesigma(mergesigma, sigma_1, 1);
+	*(mapping_1+(sigma_1->number)) = mergesigma->number;
+	sigma_1 = sigma_1->next;
+	equal = 0;
       }
       else {
-        mergesigma = add_to_mergesigma(mergesigma, sigma_2, 2);
-        *(mapping_2+(sigma_2->number)) = mergesigma->number;
-        sigma_2 = sigma_2->next;
-        equal = 0;
+	mergesigma = add_to_mergesigma(mergesigma, sigma_2, 2);
+	*(mapping_2+(sigma_2->number)) = mergesigma->number;
+	sigma_2 = sigma_2->next;
+	equal = 0;
       }
       continue;
     }    
@@ -1141,79 +1154,79 @@ void fsm_merge_sigma(struct fsm *net1, struct fsm *net2) {
     net_lines = find_arccount(net1->states);
     for(mergesigma = start_mergesigma; mergesigma != NULL; mergesigma=mergesigma->next) {
       if(mergesigma->presence == 2) {
-        net_unk++;
+	net_unk++;
       }
     }
     for(net_adds = 0, i=0; (fsm_state+i)->state_no != -1; i++) {
       if ((fsm_state+i)->in == IDENTITY)
-        net_adds += net_unk;
+	net_adds += net_unk;
       if (((fsm_state+i)->in == UNKNOWN) && ((fsm_state+i)->out != UNKNOWN))
-        net_adds += net_unk;
+	net_adds += net_unk;
       if (((fsm_state+i)->out == UNKNOWN) && ((fsm_state+i)->in != UNKNOWN))
-        net_adds += net_unk;
+	net_adds += net_unk;
       if (((fsm_state+i)->in == UNKNOWN) && ((fsm_state+i)->out == UNKNOWN))
-        net_adds += net_unk*net_unk - net_unk + 2*net_unk;
+	net_adds += net_unk*net_unk - net_unk + 2*net_unk;
     }
 
     new_1_state = xxmalloc(sizeof(struct fsm_state)*(net_adds+net_lines+1));
     for(i=0,j=0; (fsm_state+i)->state_no != -1; i++) {    
       
       if ((fsm_state+i)->in == IDENTITY) {
-        add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-        j++;
-        for (mergesigma=start_mergesigma; mergesigma != NULL; mergesigma=mergesigma->next) {
-          if ((mergesigma->presence == 2) && (mergesigma->number > IDENTITY)) {
-            add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, mergesigma->number, mergesigma->number, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-            j++;
-          }
-        }
+	add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	j++;
+	for (mergesigma=start_mergesigma; mergesigma != NULL; mergesigma=mergesigma->next) {
+	  if ((mergesigma->presence == 2) && (mergesigma->number > IDENTITY)) {
+	    add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, mergesigma->number, mergesigma->number, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	    j++;
+	  }
+	}
       }
 
       if ((fsm_state+i)->in == UNKNOWN && (fsm_state+i)->out != UNKNOWN) {
-        add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-        j++;
-        for (mergesigma=start_mergesigma; mergesigma!=NULL; mergesigma=mergesigma->next) {
-          if ((mergesigma->presence == 2) && (mergesigma->number > IDENTITY)) {
-            add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, mergesigma->number, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-            j++;
-          }
-        }
+	add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	j++;
+	for (mergesigma=start_mergesigma; mergesigma!=NULL; mergesigma=mergesigma->next) {
+	  if ((mergesigma->presence == 2) && (mergesigma->number > IDENTITY)) {
+	    add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, mergesigma->number, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	    j++;
+	  }
+	}
       }
 
       if (((fsm_state+i)->in != UNKNOWN) && ((fsm_state+i)->out == UNKNOWN)) {
-        add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-        j++;
-        for (mergesigma=start_mergesigma; mergesigma != NULL; mergesigma = mergesigma->next) {
-          if ((mergesigma->presence == 2) && (mergesigma->number > IDENTITY)) {
-            add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, mergesigma->number, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-            j++;
-          }
-        }
+	add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	j++;
+	for (mergesigma=start_mergesigma; mergesigma != NULL; mergesigma = mergesigma->next) {
+	  if ((mergesigma->presence == 2) && (mergesigma->number > IDENTITY)) {
+	    add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, mergesigma->number, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	    j++;
+	  }
+	}
       }
 
       /* Replace ?:? with ?:[all unknowns] [all unknowns]:? and [all unknowns]:[all unknowns] where a != b */
       if ((fsm_state+i)->in == UNKNOWN && (fsm_state+i)->out == UNKNOWN) {
-        add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-        j++;
-        for (mergesigma2=start_mergesigma; mergesigma2 != NULL ; mergesigma2 = mergesigma2->next) {
-          for (mergesigma=start_mergesigma; mergesigma!=NULL; mergesigma=mergesigma->next) {
-            if (((mergesigma->presence == 2 && mergesigma2->presence == 2 && mergesigma->number > IDENTITY && mergesigma2->number > IDENTITY) || (mergesigma->number == UNKNOWN && mergesigma2->number > IDENTITY && mergesigma2->presence == 2) || (mergesigma2->number == UNKNOWN && mergesigma->number > IDENTITY && mergesigma->presence == 2)) && mergesigma->number != mergesigma2->number) {
-              add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, mergesigma->number, mergesigma2->number, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-              j++;
-            }
-          }
-        }
+	add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	j++;
+	for (mergesigma2=start_mergesigma; mergesigma2 != NULL ; mergesigma2 = mergesigma2->next) {
+	  for (mergesigma=start_mergesigma; mergesigma!=NULL; mergesigma=mergesigma->next) {
+	    if (((mergesigma->presence == 2 && mergesigma2->presence == 2 && mergesigma->number > IDENTITY && mergesigma2->number > IDENTITY) || (mergesigma->number == UNKNOWN && mergesigma2->number > IDENTITY && mergesigma2->presence == 2) || (mergesigma2->number == UNKNOWN && mergesigma->number > IDENTITY && mergesigma->presence == 2)) && mergesigma->number != mergesigma2->number) {
+	      add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, mergesigma->number, mergesigma2->number, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	      j++;
+	    }
+	  }
+	}
       }
 
       /* Simply copy arcs that are not IDENTITY or UNKNOWN */
       if (((fsm_state+i)->in > IDENTITY || (fsm_state+i)->in == EPSILON) && ((fsm_state+i)->out > IDENTITY || (fsm_state+i)->out == EPSILON)) {
-        add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-        j++;
+	add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	j++;
       }
       
       if ((fsm_state+i)->in == -1) {
-        add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-        j++;
+	add_fsm_arc(new_1_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	j++;
       }
     }
 
@@ -1228,19 +1241,19 @@ void fsm_merge_sigma(struct fsm *net1, struct fsm *net2) {
     net_lines = find_arccount(net2->states);
     for(net_unk = 0, mergesigma = start_mergesigma; mergesigma != NULL; mergesigma=mergesigma->next) {
       if(mergesigma->presence == 1) {
-        net_unk++;
+	net_unk++;
       }
     }
 
     for(net_adds = 0, i=0; (fsm_state+i)->state_no != -1; i++) {
       if ((fsm_state+i)->in == IDENTITY)
-        net_adds += net_unk;
+	net_adds += net_unk;
       if (((fsm_state+i)->in == UNKNOWN) && ((fsm_state+i)->out != UNKNOWN))
-        net_adds += net_unk;
+	net_adds += net_unk;
       if (((fsm_state+i)->out == UNKNOWN) && ((fsm_state+i)->in != UNKNOWN))
-        net_adds += net_unk;
+	net_adds += net_unk;
       if (((fsm_state+i)->in == UNKNOWN) && ((fsm_state+i)->out == UNKNOWN))
-        net_adds += net_unk*net_unk - net_unk + 2*net_unk;
+	net_adds += net_unk*net_unk - net_unk + 2*net_unk;
     }
 
     /* We need net_add new lines in fsm_state */
@@ -1248,61 +1261,61 @@ void fsm_merge_sigma(struct fsm *net1, struct fsm *net2) {
     for(i=0,j=0; (fsm_state+i)->state_no != -1; i++) {    
 
       if ((fsm_state+i)->in == IDENTITY) {
-        add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-        j++;
-        for (mergesigma=start_mergesigma; mergesigma!=NULL; mergesigma=mergesigma->next) {
-          if ((mergesigma->presence == 1) && (mergesigma->number > IDENTITY)) {
-            add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, mergesigma->number, mergesigma->number, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-            j++;
-          }
-        }
+	add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	j++;
+	for (mergesigma=start_mergesigma; mergesigma!=NULL; mergesigma=mergesigma->next) {
+	  if ((mergesigma->presence == 1) && (mergesigma->number > IDENTITY)) {
+	    add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, mergesigma->number, mergesigma->number, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	    j++;
+	  }
+	}
       }
 
       if ((fsm_state+i)->in == UNKNOWN && (fsm_state+i)->out != UNKNOWN) {
-        add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-        j++;
-        for (mergesigma=start_mergesigma; mergesigma!=NULL; mergesigma=mergesigma->next) {
-          if (mergesigma->presence == 1 && mergesigma->number > IDENTITY) {
-            add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, mergesigma->number, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-            j++;
-          }
-        }
+	add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	j++;
+	for (mergesigma=start_mergesigma; mergesigma!=NULL; mergesigma=mergesigma->next) {
+	  if (mergesigma->presence == 1 && mergesigma->number > IDENTITY) {
+	    add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, mergesigma->number, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	    j++;
+	  }
+	}
       }
 
       if ((fsm_state+i)->in != UNKNOWN && (fsm_state+i)->out == UNKNOWN) {
-        add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-        j++;
-        for (mergesigma=start_mergesigma; mergesigma!=NULL; mergesigma=mergesigma->next) {
-          if ((mergesigma->presence == 1) && (mergesigma->number > IDENTITY)) {
-            add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, mergesigma->number, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-            j++;
-          }
-        }
+	add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	j++;
+	for (mergesigma=start_mergesigma; mergesigma!=NULL; mergesigma=mergesigma->next) {
+	  if ((mergesigma->presence == 1) && (mergesigma->number > IDENTITY)) {
+	    add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, mergesigma->number, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	    j++;
+	  }
+	}
       }
 
       if ((fsm_state+i)->in == UNKNOWN && (fsm_state+i)->out == UNKNOWN) {
-        add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-        j++;
-        for (mergesigma2=start_mergesigma; mergesigma2 != NULL ; mergesigma2 = mergesigma2->next) {
-          for (mergesigma=start_mergesigma; mergesigma!=NULL; mergesigma=mergesigma->next) {
-            if (((mergesigma->presence == 1 && mergesigma2->presence == 1 && mergesigma->number > IDENTITY && mergesigma2->number > IDENTITY) || (mergesigma->number == UNKNOWN && mergesigma2->number > IDENTITY && mergesigma2->presence == 1) || (mergesigma2->number == UNKNOWN && mergesigma->number > IDENTITY && mergesigma->presence == 1)) && mergesigma->number != mergesigma2->number) {
-              add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, mergesigma->number, mergesigma2->number, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-              j++;
-            }
-          }
-        }
+	add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	j++;
+	for (mergesigma2=start_mergesigma; mergesigma2 != NULL ; mergesigma2 = mergesigma2->next) {
+	  for (mergesigma=start_mergesigma; mergesigma!=NULL; mergesigma=mergesigma->next) {
+	    if (((mergesigma->presence == 1 && mergesigma2->presence == 1 && mergesigma->number > IDENTITY && mergesigma2->number > IDENTITY) || (mergesigma->number == UNKNOWN && mergesigma2->number > IDENTITY && mergesigma2->presence == 1) || (mergesigma2->number == UNKNOWN && mergesigma->number > IDENTITY && mergesigma->presence == 1)) && mergesigma->number != mergesigma2->number) {
+	      add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, mergesigma->number, mergesigma2->number, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	      j++;
+	    }
+	  }
+	}
       }
 
       /* Simply copy arcs that are not IDENTITY or UNKNOWN */
       if (((fsm_state+i)->in > IDENTITY || (fsm_state+i)->in == EPSILON) && ((fsm_state+i)->out > IDENTITY || (fsm_state+i)->out == EPSILON)) {
-        
-        add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-        j++;
+	
+	add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	j++;
       }
 
       if ((fsm_state+i)->in == -1) {
-        add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
-        j++;
+	add_fsm_arc(new_2_state, j, (fsm_state+i)->state_no, (fsm_state+i)->in, (fsm_state+i)->out, (fsm_state+i)->target, (fsm_state+i)->final_state, (fsm_state+i)->start_state);
+	j++;
       }
     }
 
@@ -1545,10 +1558,10 @@ struct fsm *fsm_completes(struct fsm *net, int operation) {
   for (i=0; (fsm+i)->state_no != -1; i++) {
     if (operation == COMPLEMENT) {
       if ((fsm+i)->final_state == 1) {
-        (fsm+i)->final_state = 0;
+	(fsm+i)->final_state = 0;
       } else if ((fsm+i)->final_state == 0) {
-        (fsm+i)->final_state = 1;
-      }         
+	(fsm+i)->final_state = 1;
+      }		
     }
     if ((fsm+i)->target != -1)
       arccount++;
@@ -1570,11 +1583,11 @@ struct fsm *fsm_completes(struct fsm *net, int operation) {
 
 /*     if (operation == COMPLEMENT) { */
 /*       for (i=0; (fsm+i)->state_no != -1; i++) { */
-/*      if ((fsm+i)->final_state) { */
-/*        (fsm+i)->final_state = 0; */
-/*      } else { */
-/*        (fsm+i)->final_state = 1; */
-/*      } */
+/* 	if ((fsm+i)->final_state) { */
+/* 	  (fsm+i)->final_state = 0; */
+/* 	} else { */
+/* 	  (fsm+i)->final_state = 1; */
+/* 	} */
 /*       } */
 /*     } */
     xxfree(starts);
@@ -1635,7 +1648,7 @@ struct fsm *fsm_completes(struct fsm *net, int operation) {
   for (i=0; i<statecount; i++) {
     for (j=2; j<=last_sigma; j++) {
       if (*(state_table+(i*sigsize+j)) == -1)
-        *(state_table+(i*sigsize+j)) = sink_state;
+	*(state_table+(i*sigsize+j)) = sink_state;
     }
   }
   
@@ -1742,67 +1755,67 @@ struct fsm *fsm_substitute_label(struct fsm *net, char *original, struct fsm *su
     subh = fsm_read_init(substitute);
     repsym = fsm_get_symbol_number(inh, original);
     if (repsym == -1) {
-        fsm_read_done(inh);
-        return(NULL);
+	fsm_read_done(inh);
+	return(NULL);
     }
     outh = fsm_construct_init(net->name);
     fsm_construct_copy_sigma(outh, net->sigma);
     while (fsm_get_next_arc(inh)) {
-        source = fsm_get_arc_source(inh);
-        target = fsm_get_arc_target(inh);
-        in = fsm_get_arc_num_in(inh);
-        out = fsm_get_arc_num_out(inh);
+	source = fsm_get_arc_source(inh);
+	target = fsm_get_arc_target(inh);
+	in = fsm_get_arc_num_in(inh);
+	out = fsm_get_arc_num_out(inh);
 
-        /* Double-sided arc, splice in substitute network */
-        if (in == repsym && out == repsym) {
-            fsm_read_reset(subh);
-            fsm_construct_add_arc_nums(outh, source, addstate1, EPSILON, EPSILON);
-            while (fsm_get_next_arc(subh)) {
-                source = fsm_get_arc_source(subh);
-                target = fsm_get_arc_target(subh);
-                subin = fsm_get_arc_in(subh);
-                subout = fsm_get_arc_out(subh);
-                fsm_construct_add_arc(outh, source+addstate1, target+addstate1, subin, subout);
-            }
-            while ((i = fsm_get_next_final(subh)) != -1) {
-                target = fsm_get_arc_target(inh);
-                fsm_construct_add_arc_nums(outh, addstate1+i, target, EPSILON, EPSILON);
-            }
-            addstate1 = addstate1 + addstate2;
-            /* One-sided replace, splice in repsym .x. sub or sub .x. repsym */
-        } else if (in == repsym || out == repsym) {
-            if (in == repsym) {
-                subnet2 = fsm_minimize(fsm_cross_product(fsm_copy(substitute), fsm_symbol(fsm_get_arc_out(inh))));
-            } else {
-                subnet2 = fsm_minimize(fsm_cross_product(fsm_symbol(fsm_get_arc_in(inh)),fsm_copy(substitute)));
-            }
-            fsm_construct_add_arc_nums(outh, source, addstate1, EPSILON, EPSILON);              
-            subh2 = fsm_read_init(subnet2);
-            while (fsm_get_next_arc(subh2)) {
-                source = fsm_get_arc_source(subh2);
-                target = fsm_get_arc_target(subh2);
-                subin = fsm_get_arc_in(subh2);
-                subout = fsm_get_arc_out(subh2);
-                fsm_construct_add_arc(outh, source+addstate1, target+addstate1, subin, subout);
-            }
-            while ((i = fsm_get_next_final(subh2)) != -1) {
-                target = fsm_get_arc_target(inh);
-                fsm_construct_add_arc_nums(outh, addstate1+i, target, EPSILON, EPSILON);
-            }
-            fsm_read_done(subh2);
-            addstate1 = addstate1 + subnet2->statecount;
-            fsm_destroy(subnet2);
-        } else {
-            /* Default, just copy arc */
-            fsm_construct_add_arc_nums(outh, source, target, in, out);
-        }
+	/* Double-sided arc, splice in substitute network */
+	if (in == repsym && out == repsym) {
+	    fsm_read_reset(subh);
+	    fsm_construct_add_arc_nums(outh, source, addstate1, EPSILON, EPSILON);
+	    while (fsm_get_next_arc(subh)) {
+		source = fsm_get_arc_source(subh);
+		target = fsm_get_arc_target(subh);
+		subin = fsm_get_arc_in(subh);
+		subout = fsm_get_arc_out(subh);
+		fsm_construct_add_arc(outh, source+addstate1, target+addstate1, subin, subout);
+	    }
+	    while ((i = fsm_get_next_final(subh)) != -1) {
+		target = fsm_get_arc_target(inh);
+		fsm_construct_add_arc_nums(outh, addstate1+i, target, EPSILON, EPSILON);
+	    }
+	    addstate1 = addstate1 + addstate2;
+	    /* One-sided replace, splice in repsym .x. sub or sub .x. repsym */
+	} else if (in == repsym || out == repsym) {
+	    if (in == repsym) {
+		subnet2 = fsm_minimize(fsm_cross_product(fsm_copy(substitute), fsm_symbol(fsm_get_arc_out(inh))));
+	    } else {
+		subnet2 = fsm_minimize(fsm_cross_product(fsm_symbol(fsm_get_arc_in(inh)),fsm_copy(substitute)));
+	    }
+	    fsm_construct_add_arc_nums(outh, source, addstate1, EPSILON, EPSILON);		
+	    subh2 = fsm_read_init(subnet2);
+	    while (fsm_get_next_arc(subh2)) {
+		source = fsm_get_arc_source(subh2);
+		target = fsm_get_arc_target(subh2);
+		subin = fsm_get_arc_in(subh2);
+		subout = fsm_get_arc_out(subh2);
+		fsm_construct_add_arc(outh, source+addstate1, target+addstate1, subin, subout);
+	    }
+	    while ((i = fsm_get_next_final(subh2)) != -1) {
+		target = fsm_get_arc_target(inh);
+		fsm_construct_add_arc_nums(outh, addstate1+i, target, EPSILON, EPSILON);
+	    }
+	    fsm_read_done(subh2);
+	    addstate1 = addstate1 + subnet2->statecount;
+	    fsm_destroy(subnet2);
+	} else {
+	    /* Default, just copy arc */
+	    fsm_construct_add_arc_nums(outh, source, target, in, out);
+	}
     }
 
     while ((i = fsm_get_next_final(inh)) != -1) {
-        fsm_construct_set_final(outh, i);
+	fsm_construct_set_final(outh, i);
     }
     while ((i = fsm_get_next_initial(inh)) != -1) {
-        fsm_construct_set_initial(outh, i);
+	fsm_construct_set_initial(outh, i);
     }
     fsm_read_done(inh);
     fsm_read_done(subh);
@@ -1816,8 +1829,8 @@ struct fsm *fsm_substitute_symbol(struct fsm *net, char *original, char *substit
     if (strcmp(original,substitute) == 0)
         return(net);
     if ((o = sigma_find(original, net->sigma)) == -1) {
-        printf("\nSymbol '%s' not found in network!\n",original);
-        return(net);
+	printf("\nSymbol '%s' not found in network!\n",original);
+	return(net);
     }
     if (strcmp(substitute,"0") == 0)
         s = EPSILON;
@@ -1825,11 +1838,11 @@ struct fsm *fsm_substitute_symbol(struct fsm *net, char *original, char *substit
         s = sigma_add(substitute, net->sigma);
     }
     for (i=0, fsm = net->states; (fsm+i)->state_no != -1; i++) {
-        if ((fsm+i)->in == o) {
-            (fsm+i)->in = s;
+	if ((fsm+i)->in == o) {
+	    (fsm+i)->in = s;
         }
-        if ((fsm+i)->out == o) {
-            (fsm+i)->out = s;
+	if ((fsm+i)->out == o) {
+	    (fsm+i)->out = s;
         }
     }
     net->sigma = sigma_remove(original, net->sigma);
@@ -1902,60 +1915,60 @@ struct fsm *fsm_cross_product(struct fsm *net1, struct fsm *net2) {
 
     fsm_state_set_current_state(current_state, current_final, current_start);
 
-    for (machine_a = (point_a+a)->transitions ; (machine_a->state_no == a)  ; machine_a++) {
-      for (machine_b = (point_b+b)->transitions; (machine_b->state_no == b) ; machine_b++) {
-        
-        if ((machine_a->target == -1) && (machine_b->target == -1)) {
-          continue;
-        }
-        if ((machine_a->target == -1) && (machine_a->final_state == 0)) {
-          continue;
-        }
-        if ((machine_b->target == -1) && (machine_b->final_state == 0)) {
-          continue;
-        }
-        /* Main check */
-        if (!((machine_a->target == -1) || (machine_b->target == -1))) {
-          if ((target_number = bi_avl_find(machine_a->target, machine_b->target)) == -1) {
+    for (machine_a = (point_a+a)->transitions ; machine_a->state_no == a  ; machine_a++) {
+      for (machine_b = (point_b+b)->transitions; machine_b->state_no == b ; machine_b++) {
+	
+	if ((machine_a->target == -1) && (machine_b->target == -1)) {
+	  continue;
+	}
+	if ((machine_a->target == -1) && (machine_a->final_state == 0)) {
+	  continue;
+	}
+	if ((machine_b->target == -1) && (machine_b->final_state == 0)) {
+	  continue;
+	}
+	/* Main check */
+	if (!((machine_a->target == -1) || (machine_b->target == -1))) {
+	  if ((target_number = bi_avl_find(machine_a->target, machine_b->target)) == -1) {
               STACK_2_PUSH(machine_b->target, machine_a->target);
               target_number = bi_avl_insert(machine_a->target, machine_b->target);
-          }
-          symbol1 = machine_a->in;
-          symbol2 = machine_b->in;
-          if (symbol1 == IDENTITY && symbol2 != IDENTITY)
-            symbol1 = UNKNOWN;
-          if (symbol2 == IDENTITY && symbol1 != IDENTITY)
-            symbol2 = UNKNOWN;
-          
+	  }
+	  symbol1 = machine_a->in;
+	  symbol2 = machine_b->in;
+	  if (symbol1 == IDENTITY && symbol2 != IDENTITY)
+	    symbol1 = UNKNOWN;
+	  if (symbol2 == IDENTITY && symbol1 != IDENTITY)
+	    symbol2 = UNKNOWN;
+	  
           fsm_state_add_arc(current_state, symbol1, symbol2, target_number, current_final, current_start);
-          /* @:@ -> @:@ and also ?:? */
-          if ((machine_a->in == IDENTITY) && (machine_b->in == IDENTITY)) {
+	  /* @:@ -> @:@ and also ?:? */
+	  if ((machine_a->in == IDENTITY) && (machine_b->in == IDENTITY)) {
               fsm_state_add_arc(current_state, UNKNOWN, UNKNOWN, target_number, current_final, current_start);
-          }
-        }
-        if (machine_a->final_state == 1 && machine_b->target != -1) {
+	  }
+	}
+	if (machine_a->final_state == 1 && machine_b->target != -1) {
             
-          /* Add 0:b i.e. stay in state A */
-          if ((target_number = bi_avl_find(machine_a->state_no, machine_b->target)) == -1) {
+	  /* Add 0:b i.e. stay in state A */
+	  if ((target_number = bi_avl_find(machine_a->state_no, machine_b->target)) == -1) {
               STACK_2_PUSH(machine_b->target, machine_a->state_no);
               target_number = bi_avl_insert(machine_a->state_no, machine_b->target);
-          }
-          /* @:0 becomes ?:0 */
-          symbol2 = machine_b->in == IDENTITY ? UNKNOWN : machine_b->in;
+	  }
+	  /* @:0 becomes ?:0 */
+	  symbol2 = machine_b->in == IDENTITY ? UNKNOWN : machine_b->in;
           fsm_state_add_arc(current_state, EPSILON, symbol2, target_number, current_final, current_start);
-        }
+	}
 
-        if (machine_b->final_state == 1 && machine_a->target != -1) {
-          
-          /* Add a:0 i.e. stay in state B */
-          if ((target_number = bi_avl_find(machine_a->target, machine_b->state_no)) == -1) {
+	if (machine_b->final_state == 1 && machine_a->target != -1) {
+	  
+	  /* Add a:0 i.e. stay in state B */
+	  if ((target_number = bi_avl_find(machine_a->target, machine_b->state_no)) == -1) {
               STACK_2_PUSH(machine_b->state_no, machine_a->target);
               target_number = bi_avl_insert(machine_a->target, machine_b->state_no);
-          }
-          /* @:0 becomes ?:0 */
-          symbol1 = machine_a->in == IDENTITY ? UNKNOWN : machine_a->in;
+	  }
+	  /* @:0 becomes ?:0 */
+	  symbol1 = machine_a->in == IDENTITY ? UNKNOWN : machine_a->in;
           fsm_state_add_arc(current_state, symbol1, EPSILON, target_number, current_final, current_start);
-        }
+	}
       }
     }
     /* Check arctrack */
@@ -2042,29 +2055,29 @@ struct fsm *fsm_shuffle(struct fsm *net1, struct fsm *net2) {
     fsm_state_set_current_state(current_state, current_final, current_start);
 
     /* Follow A, B stays */
-    for (machine_a = (point_a+a)->transitions ; (machine_a->state_no == a)  ; machine_a++) {
-        if (machine_a->target == -1) {
-          continue;
-        }
-        if ((target_number = bi_avl_find(machine_a->target, b)) == -1) {
+    for (machine_a = (point_a+a)->transitions ; machine_a->state_no == a  ; machine_a++) {
+	if (machine_a->target == -1) {
+	  continue;
+	}
+	if ((target_number = bi_avl_find(machine_a->target, b)) == -1) {
           STACK_2_PUSH(b, machine_a->target);
-          target_number = bi_avl_insert(machine_a->target, b);
-        }
+	  target_number = bi_avl_insert(machine_a->target, b);
+	}
 
         fsm_state_add_arc(current_state, machine_a->in, machine_a->out, target_number, current_final, current_start);
     }
 
     /* Follow B, A stays */
-      for (machine_b = (point_b+b)->transitions; (machine_b->state_no == b) ; machine_b++) {
-        
-        if (machine_b->target == -1) {
-          continue;
-        }
+      for (machine_b = (point_b+b)->transitions; machine_b->state_no == b ; machine_b++) {
+	
+	if (machine_b->target == -1) {
+	  continue;
+	}
 
-          if ((target_number = bi_avl_find(a, machine_b->target)) == -1) {
+	  if ((target_number = bi_avl_find(a, machine_b->target)) == -1) {
               STACK_2_PUSH(machine_b->target, a);
               target_number = bi_avl_insert(a, machine_b->target);
-          }
+	  }
           fsm_state_add_arc(current_state, machine_b->in, machine_b->out, target_number, current_final, current_start);
       }
 
@@ -2077,7 +2090,7 @@ struct fsm *fsm_shuffle(struct fsm *net1, struct fsm *net2) {
   xxfree(point_a);
   xxfree(point_b);
   fsm_destroy(net2);
-  bi_avl_free(bi_avl);
+  bi_avl_free();
   return(net1);
 }
 
@@ -2146,7 +2159,7 @@ struct fsm *fsm_minus(struct fsm *net1, struct fsm *net2) {
           } else {
               /* b is alive */
               b_has_trans = 0;
-              for (machine_b = (point_b+b)->transitions ; (machine_b->state_no == b) ; machine_b++) {
+              for (machine_b = (point_b+b)->transitions ; machine_b->state_no == b ; machine_b++) {
                   if (machine_a->in == machine_b->in && machine_a->out == machine_b->out) {
                       b_has_trans = 1;
                       btarget = machine_b->target;
@@ -2176,7 +2189,7 @@ struct fsm *fsm_minus(struct fsm *net1, struct fsm *net2) {
   xxfree(point_a);
   xxfree(point_b);
   fsm_destroy(net2);
-  bi_avl_free(bi_avl);
+  bi_avl_free();
   return(fsm_minimize(net1));
 }
 
@@ -2345,8 +2358,8 @@ struct fsm *fsm_ignore(struct fsm *net1, struct fsm *net2, int operation) {
       j++;
       splices++;
       if ((fsm1+i)->in != -1) {
-        add_fsm_arc(new_fsm, j, (fsm1+i)->state_no, (fsm1+i)->in, (fsm1+i)->out, (fsm1+i)->target, (fsm1+i)->final_state, (fsm1+i)->start_state);
-        j++;
+	add_fsm_arc(new_fsm, j, (fsm1+i)->state_no, (fsm1+i)->in, (fsm1+i)->out, (fsm1+i)->target, (fsm1+i)->final_state, (fsm1+i)->start_state);
+	j++;
       }
     } else {
       add_fsm_arc(new_fsm, j, (fsm1+i)->state_no, (fsm1+i)->in, (fsm1+i)->out, (fsm1+i)->target, (fsm1+i)->final_state, (fsm1+i)->start_state);
@@ -2362,20 +2375,20 @@ struct fsm *fsm_ignore(struct fsm *net1, struct fsm *net2, int operation) {
     /* Zero handled return arc states */
 
     for (k=0; k<states2; k++)
-         *(handled_states2+k) = 0;
+	 *(handled_states2+k) = 0;
     
     for (i=0; (fsm2+i)->state_no != -1; i++) {
       if ((fsm2+i)->final_state == 1 && *(handled_states2+(fsm2+i)->state_no) == 0) {
-        add_fsm_arc(new_fsm, j, (fsm2+i)->state_no + state_add_counter, EPSILON, EPSILON, *(return_state+returns), 0, 0);
-        j++;
-        *(handled_states2+(fsm2+i)->state_no) = 1;
-        if ((fsm2+i)->target != -1) {
-          add_fsm_arc(new_fsm, j, (fsm2+i)->state_no + state_add_counter, (fsm2+i)->in, (fsm2+i)->out , (fsm2+i)->target + state_add_counter, 0, 0);
-          j++;
-        }
+	add_fsm_arc(new_fsm, j, (fsm2+i)->state_no + state_add_counter, EPSILON, EPSILON, *(return_state+returns), 0, 0);
+	j++;
+	*(handled_states2+(fsm2+i)->state_no) = 1;
+	if ((fsm2+i)->target != -1) {
+	  add_fsm_arc(new_fsm, j, (fsm2+i)->state_no + state_add_counter, (fsm2+i)->in, (fsm2+i)->out , (fsm2+i)->target + state_add_counter, 0, 0);
+	  j++;
+	}
       } else {
-        add_fsm_arc(new_fsm, j, (fsm2+i)->state_no + state_add_counter, (fsm2+i)->in, (fsm2+i)->out, (fsm2+i)->target + state_add_counter, 0, 0);
-        j++;
+	add_fsm_arc(new_fsm, j, (fsm2+i)->state_no + state_add_counter, (fsm2+i)->in, (fsm2+i)->out, (fsm2+i)->target + state_add_counter, 0, 0);
+	j++;
       }
     }
     state_add_counter = state_add_counter + states2;
@@ -2421,9 +2434,9 @@ void fsm_compact(struct fsm *net) {
     /* since @ and ? only match utf8 symbols of length 1           */
 
     for (sig = net->sigma; sig != NULL && sig->number != -1; sig = sig->next) {
-        if (utf8strlen(sig->symbol) > 1) {
-            *(potential+sig->number) = 0;
-        }
+	if (utf8strlen(sig->symbol) > 1) {
+	    *(potential+sig->number) = 0;
+	}
     }
 
     prevstate = 0;
@@ -2737,45 +2750,45 @@ struct fsm *fsm_left_rewr(struct fsm *net, struct fsm *rewr) {
     maxsigma++;
     sigmatable = xxmalloc(maxsigma * sizeof(int));
     for (i = 0; i < maxsigma; i++) {
-        *(sigmatable+i) = -1;
+	*(sigmatable+i) = -1;
     }
     addedsink = 0;
     while ((currstate = fsm_get_next_state(inh)) != -1) {
-        seensource = 0;
-        fsm_construct_set_final(outh, currstate);
+	seensource = 0;
+	fsm_construct_set_final(outh, currstate);
 
-        while (fsm_get_next_state_arc(inh)) {
-            innum = fsm_get_arc_num_in(inh);
-            outnum = fsm_get_arc_num_out(inh);
-            *(sigmatable+innum) = currstate;
-            if (innum == relabelin) {
-                    seensource = 1;
-                    if (fsm_read_is_final(inh, currstate)) {
-                        outnum = relabelout;                
-                    }
-            }
-            fsm_construct_add_arc_nums(outh, fsm_get_arc_source(inh), fsm_get_arc_target(inh), innum, outnum);
-        }
-        for (i = 2; i < maxsigma; i++) {
-            if (*(sigmatable+i) != currstate && i != relabelin) {
-                fsm_construct_add_arc_nums(outh, currstate, sinkstate, i, i);
-                addedsink = 1;
-            }
-        }
-        if (seensource == 0) {
-            addedsink = 1;
-            if (fsm_read_is_final(inh, currstate)) {
-                fsm_construct_add_arc_nums(outh, currstate, sinkstate, relabelin, relabelout);
-            } else {
-                fsm_construct_add_arc_nums(outh, currstate, sinkstate, relabelin, relabelin);
-            }
-        }
+	while (fsm_get_next_state_arc(inh)) {
+	    innum = fsm_get_arc_num_in(inh);
+	    outnum = fsm_get_arc_num_out(inh);
+	    *(sigmatable+innum) = currstate;
+	    if (innum == relabelin) {
+		    seensource = 1;
+		    if (fsm_read_is_final(inh, currstate)) {
+			outnum = relabelout;		    
+		    }
+	    }
+	    fsm_construct_add_arc_nums(outh, fsm_get_arc_source(inh), fsm_get_arc_target(inh), innum, outnum);
+	}
+	for (i = 2; i < maxsigma; i++) {
+	    if (*(sigmatable+i) != currstate && i != relabelin) {
+		fsm_construct_add_arc_nums(outh, currstate, sinkstate, i, i);
+		addedsink = 1;
+	    }
+	}
+	if (seensource == 0) {
+	    addedsink = 1;
+	    if (fsm_read_is_final(inh, currstate)) {
+		fsm_construct_add_arc_nums(outh, currstate, sinkstate, relabelin, relabelout);
+	    } else {
+		fsm_construct_add_arc_nums(outh, currstate, sinkstate, relabelin, relabelin);
+	    }
+	}
     }
     if (addedsink) {
-        for (i = 2; i < maxsigma; i++) {
-            fsm_construct_add_arc_nums(outh, sinkstate, sinkstate, i, i);
-        }
-        fsm_construct_set_final(outh, sinkstate);
+	for (i = 2; i < maxsigma; i++) {
+	    fsm_construct_add_arc_nums(outh, sinkstate, sinkstate, i, i);
+	}
+	fsm_construct_set_final(outh, sinkstate);
     }
     fsm_construct_set_initial(outh, 0);
     fsm_read_done(inh);
@@ -2800,28 +2813,28 @@ struct fsm *fsm_add_sink(struct fsm *net, int final) {
     maxsigma++;
     sigmatable = xxmalloc(maxsigma * sizeof(int));
     for (i = 0; i < maxsigma; i++) {
-        *(sigmatable+i) = -1;
+	*(sigmatable+i) = -1;
     }
     while ((currstate = fsm_get_next_state(inh)) != -1) {
-        while (fsm_get_next_state_arc(inh)) {
-            fsm_construct_add_arc_nums(outh, fsm_get_arc_source(inh), fsm_get_arc_target(inh), fsm_get_arc_num_in(inh), fsm_get_arc_num_out(inh));
-            *(sigmatable+fsm_get_arc_num_in(inh)) = currstate;
-        }
-        for (i = 2; i < maxsigma; i++) {
-            if (*(sigmatable+i) != currstate) {
-                fsm_construct_add_arc_nums(outh, currstate, sinkstate, i, i);
-            }
-        }
+	while (fsm_get_next_state_arc(inh)) {
+	    fsm_construct_add_arc_nums(outh, fsm_get_arc_source(inh), fsm_get_arc_target(inh), fsm_get_arc_num_in(inh), fsm_get_arc_num_out(inh));
+	    *(sigmatable+fsm_get_arc_num_in(inh)) = currstate;
+	}
+	for (i = 2; i < maxsigma; i++) {
+	    if (*(sigmatable+i) != currstate) {
+		fsm_construct_add_arc_nums(outh, currstate, sinkstate, i, i);
+	    }
+	}
     }
     for (i = 2; i < maxsigma; i++) {
-        fsm_construct_add_arc_nums(outh, sinkstate, sinkstate, i, i);
+	fsm_construct_add_arc_nums(outh, sinkstate, sinkstate, i, i);
     }
 
     while ((i = fsm_get_next_final(inh)) != -1) {
-        fsm_construct_set_final(outh, i);
+	fsm_construct_set_final(outh, i);
     }
     if (final == 1) {
-        fsm_construct_set_final(outh, sinkstate);
+	fsm_construct_set_final(outh, sinkstate);
     }
     fsm_construct_set_initial(outh, 0);
     fsm_read_done(inh);
@@ -2849,29 +2862,29 @@ struct fsm *fsm_add_loop(struct fsm *net, struct fsm *marker, int finals) {
     fsm_construct_copy_sigma(outh, net->sigma);
     
     while (fsm_get_next_arc(inh)) {
-        fsm_construct_add_arc_nums(outh, fsm_get_arc_source(inh), fsm_get_arc_target(inh), fsm_get_arc_num_in(inh), fsm_get_arc_num_out(inh));
+	fsm_construct_add_arc_nums(outh, fsm_get_arc_source(inh), fsm_get_arc_target(inh), fsm_get_arc_num_in(inh), fsm_get_arc_num_out(inh));
     }
     /* Where to put the loops */
     if (finals == 1) {
-        while ((i = fsm_get_next_final(inh)) != -1) {
-            fsm_construct_set_final(outh, i);
-            fsm_read_reset(minh);
-            while (fsm_get_next_arc(minh)) {
-                fsm_construct_add_arc(outh, i, i, fsm_get_arc_in(minh), fsm_get_arc_out(minh));
-            }
-        }
+	while ((i = fsm_get_next_final(inh)) != -1) {
+	    fsm_construct_set_final(outh, i);
+	    fsm_read_reset(minh);
+	    while (fsm_get_next_arc(minh)) {
+		fsm_construct_add_arc(outh, i, i, fsm_get_arc_in(minh), fsm_get_arc_out(minh));
+	    }
+	}
     } else if (finals == 0 || finals == 2) {
-        for (i=0; i < net->statecount; i++) {
-            if (finals == 2 || !fsm_read_is_final(inh, i)) {
-                fsm_read_reset(minh);
-                while (fsm_get_next_arc(minh)) {
-                    fsm_construct_add_arc(outh, i, i, fsm_get_arc_in(minh), fsm_get_arc_out(minh));
-                }
-            }
-        }
+	for (i=0; i < net->statecount; i++) {
+	    if (finals == 2 || !fsm_read_is_final(inh, i)) {
+		fsm_read_reset(minh);
+		while (fsm_get_next_arc(minh)) {
+		    fsm_construct_add_arc(outh, i, i, fsm_get_arc_in(minh), fsm_get_arc_out(minh));
+		}
+	    }
+	}
     }
     while ((i = fsm_get_next_final(inh)) != -1) {
-        fsm_construct_set_final(outh, i);
+	fsm_construct_set_final(outh, i);
     }
     fsm_construct_set_initial(outh, 0);
     fsm_read_done(inh);
@@ -2900,26 +2913,26 @@ struct fsm *fsm_mark_fsm_tail(struct fsm *net, struct fsm *marker) {
     maxstate = net->statecount;
     
     while (fsm_get_next_arc(inh)) {
-        target = fsm_get_arc_target(inh);
-        if (fsm_read_is_final(inh, target)) {
-            if (!*(mappings+target)) {
-                newtarget = maxstate;
-                *(mappings+target) = newtarget;
-                fsm_read_reset(minh);
-                while (fsm_get_next_arc(minh)) {
-                    fsm_construct_add_arc(outh, newtarget, target, fsm_get_arc_in(minh), fsm_get_arc_out(minh));
-                }
-                maxstate++;
-            } else {
-                newtarget = *(mappings+target);
-            }
-            fsm_construct_add_arc_nums(outh, fsm_get_arc_source(inh), newtarget, fsm_get_arc_num_in(inh), fsm_get_arc_num_out(inh));
-        } else {
-            fsm_construct_add_arc_nums(outh, fsm_get_arc_source(inh), target, fsm_get_arc_num_in(inh), fsm_get_arc_num_out(inh));
-        }
+	target = fsm_get_arc_target(inh);
+	if (fsm_read_is_final(inh, target)) {
+	    if (!*(mappings+target)) {
+		newtarget = maxstate;
+		*(mappings+target) = newtarget;
+		fsm_read_reset(minh);
+		while (fsm_get_next_arc(minh)) {
+		    fsm_construct_add_arc(outh, newtarget, target, fsm_get_arc_in(minh), fsm_get_arc_out(minh));
+		}
+		maxstate++;
+	    } else {
+		newtarget = *(mappings+target);
+	    }
+	    fsm_construct_add_arc_nums(outh, fsm_get_arc_source(inh), newtarget, fsm_get_arc_num_in(inh), fsm_get_arc_num_out(inh));
+	} else {
+	    fsm_construct_add_arc_nums(outh, fsm_get_arc_source(inh), target, fsm_get_arc_num_in(inh), fsm_get_arc_num_out(inh));
+	}
     }
     for (i=0; i < net->statecount; i++) {
-        fsm_construct_set_final(outh,i);
+	fsm_construct_set_final(outh,i);
     }
 
     fsm_construct_set_initial(outh, 0);
@@ -2941,9 +2954,9 @@ struct fsm *fsm_flatten(struct fsm *net, struct fsm *epsilon) {
     inh = fsm_read_init(net);
     eps = fsm_read_init(epsilon);
     if (fsm_get_next_arc(eps) == -1) {
-        fsm_destroy(net);
-        fsm_destroy(epsilon);
-        return NULL;
+	fsm_destroy(net);
+	fsm_destroy(epsilon);
+	return NULL;
     }
     epssym = strdup(fsm_get_arc_in(eps));
     fsm_read_done(eps);
@@ -2954,28 +2967,28 @@ struct fsm *fsm_flatten(struct fsm *net, struct fsm *epsilon) {
     fsm_construct_copy_sigma(outh, net->sigma);
 
     while (fsm_get_next_arc(inh)) {
-        target = fsm_get_arc_target(inh);       
-        in = fsm_get_arc_num_in(inh);
-        out = fsm_get_arc_num_out(inh);
-        if (in == EPSILON || out == EPSILON)  { 
-            instring = fsm_get_arc_in(inh);
-            outstring = fsm_get_arc_out(inh);
-            if (in == EPSILON)  { instring = epssym; }
-            if (out == EPSILON) { outstring = epssym; }     
+	target = fsm_get_arc_target(inh);	
+	in = fsm_get_arc_num_in(inh);
+	out = fsm_get_arc_num_out(inh);
+	if (in == EPSILON || out == EPSILON)  { 
+	    instring = fsm_get_arc_in(inh);
+	    outstring = fsm_get_arc_out(inh);
+	    if (in == EPSILON)  { instring = epssym; }
+	    if (out == EPSILON) { outstring = epssym; }	    
 
-            fsm_construct_add_arc(outh, fsm_get_arc_source(inh), maxstate, instring, instring);
-            fsm_construct_add_arc(outh, maxstate, target, outstring, outstring);
-        } else {
-            fsm_construct_add_arc_nums(outh, fsm_get_arc_source(inh), maxstate, in, in);
-            fsm_construct_add_arc_nums(outh, maxstate, target, out, out);
-        }
-        maxstate++;
+	    fsm_construct_add_arc(outh, fsm_get_arc_source(inh), maxstate, instring, instring);
+	    fsm_construct_add_arc(outh, maxstate, target, outstring, outstring);
+	} else {
+	    fsm_construct_add_arc_nums(outh, fsm_get_arc_source(inh), maxstate, in, in);
+	    fsm_construct_add_arc_nums(outh, maxstate, target, out, out);
+	}
+	maxstate++;
     }
     while ((i = fsm_get_next_final(inh)) != -1) {
-        fsm_construct_set_final(outh, i);
+	fsm_construct_set_final(outh, i);
     }
     while ((i = fsm_get_next_initial(inh)) != -1) {
-        fsm_construct_set_initial(outh, i);
+	fsm_construct_set_initial(outh, i);
     }
 
     fsm_read_done(inh);

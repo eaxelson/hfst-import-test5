@@ -1,5 +1,5 @@
 /*     Foma: a finite-state toolkit and library.                             */
-/*     Copyright © 2008-2011 Mans Hulden                                     */
+/*     Copyright © 2008-2012 Mans Hulden                                     */
 
 /*     This file is part of foma.                                            */
 
@@ -26,13 +26,13 @@ struct sigma *sigma_remove(char *symbol, struct sigma *sigma) {
   for ( ; sigma != NULL && sigma->number != -1; sigma_prev = sigma, sigma=sigma->next) {
     if (strcmp(sigma->symbol,symbol) == 0) {
       if (sigma_prev == NULL) {
-        sigma_start = sigma->next;
-        xxfree(sigma->symbol);
-        xxfree(sigma);
+	sigma_start = sigma->next;
+	xxfree(sigma->symbol);
+	xxfree(sigma);
       } else {
-        (sigma_prev)->next = sigma->next;
-        xxfree(sigma->symbol);
-        xxfree(sigma);
+	(sigma_prev)->next = sigma->next;
+	xxfree(sigma->symbol);
+	xxfree(sigma);
       }
       break;
     }
@@ -47,13 +47,13 @@ struct sigma *sigma_remove_num(int num, struct sigma *sigma) {
   for ( ; sigma != NULL && sigma->number != -1; sigma_prev = sigma, sigma=sigma->next) {
     if (sigma->number == num) {
       if (sigma_prev == NULL) {
-        sigma_start = sigma->next;
-        xxfree(sigma->symbol);
-        xxfree(sigma);
+	sigma_start = sigma->next;
+	xxfree(sigma->symbol);
+	xxfree(sigma);
       } else {
-        (sigma_prev)->next = sigma->next;
-        xxfree(sigma->symbol);
-        xxfree(sigma);
+	(sigma_prev)->next = sigma->next;
+	xxfree(sigma->symbol);
+	xxfree(sigma);
       }
       break;
     }
@@ -79,19 +79,19 @@ int sigma_add_special (int symbol, struct sigma *sigma) {
       }
       sigma_splice = xxmalloc(sizeof(struct sigma));
       if (sigma_previous != NULL) {
-        (sigma_previous)->next = sigma_splice;
-        sigma_splice->number = symbol;
-        sigma_splice->symbol = str;
-        (sigma_splice)->next = sigma; 
-        return(symbol);
+	(sigma_previous)->next = sigma_splice;
+	sigma_splice->number = symbol;
+	sigma_splice->symbol = str;
+	(sigma_splice)->next = sigma; 
+	return(symbol);
       } else {
-        sigma_splice->symbol = sigma->symbol;
-        sigma_splice->number = sigma->number;
-        sigma_splice->next = sigma->next;
-        sigma->number = symbol;
-        sigma->symbol = str;
-        sigma->next = sigma_splice;
-        return(symbol);
+	sigma_splice->symbol = sigma->symbol;
+	sigma_splice->number = sigma->number;
+	sigma_splice->next = sigma->next;
+	sigma->number = symbol;
+	sigma->symbol = str;
+	sigma->next = sigma_splice;
+	return(symbol);
       }
     }
     sigma->next = NULL;
@@ -118,15 +118,15 @@ int sigma_add (char *symbol, struct sigma *sigma) {
   /* Insert non-special in any order */
   if (assert == -1) {
     if (sigma->number == -1) {
-        sigma->number = 3;
+ 	sigma->number = 3;
     } else {
       for (; sigma->next != NULL; sigma = sigma->next) {
       }
       sigma->next = xxmalloc(sizeof(struct sigma));
       if ((sigma->number)+1 < 3) {
-        (sigma->next)->number = 3;
+	(sigma->next)->number = 3;
       } else {
-        (sigma->next)->number = (sigma->number)+1;
+	(sigma->next)->number = (sigma->number)+1;
       }
       sigma = sigma->next;
     }
@@ -142,21 +142,21 @@ int sigma_add (char *symbol, struct sigma *sigma) {
       }
       sigma_splice = xxmalloc(sizeof(struct sigma));
       if (sigma_previous != NULL) {
-        (sigma_previous)->next = sigma_splice;
-        sigma_splice->number = assert;
-        sigma_splice->symbol = xxmalloc(sizeof(char)*(strlen(symbol)+1));
-        strcpy(sigma_splice->symbol, symbol);
-        (sigma_splice)->next = sigma; 
-        return(assert);
+	(sigma_previous)->next = sigma_splice;
+	sigma_splice->number = assert;
+	sigma_splice->symbol = xxmalloc(sizeof(char)*(strlen(symbol)+1));
+	strcpy(sigma_splice->symbol, symbol);
+	(sigma_splice)->next = sigma; 
+	return(assert);
       } else {
-        sigma_splice->symbol = sigma->symbol;
-        sigma_splice->number = sigma->number;
-        sigma_splice->next = sigma->next;
-        sigma->number = assert;
-        sigma->symbol = xxmalloc(sizeof(char)*(strlen(symbol)+1));
-        strcpy(sigma->symbol, symbol);
-        sigma->next = sigma_splice;
-        return(assert);
+	sigma_splice->symbol = sigma->symbol;
+	sigma_splice->number = sigma->number;
+	sigma_splice->next = sigma->next;
+	sigma->number = assert;
+	sigma->symbol = xxmalloc(sizeof(char)*(strlen(symbol)+1));
+	strcpy(sigma->symbol, symbol);
+	sigma->next = sigma_splice;
+	return(assert);
       }
     }
     sigma->next = NULL;
@@ -209,10 +209,10 @@ void sigma_cleanup (struct fsm *net, int force) {
     sig_prev = NULL;
     for (sig = net->sigma; sig != NULL && sig->number != -1; sig = sign) {
         first = 1;
-        sign = sig->next;
+	sign = sig->next;
         if (!*(attested+(sig->number))) {
-            xxfree(sig->symbol);
-            xxfree(sig);
+	    xxfree(sig->symbol);
+	    xxfree(sig);
             if (sig_prev != NULL) {
                 sig_prev->next = sign;
                 first = 0;
@@ -302,6 +302,22 @@ char *sigma_string(int number, struct sigma *sigma) {
     return NULL;
 }
 
+/* Substitutes string symbol for sub in sigma */
+/* no check for duplicates                    */
+int sigma_substitute(char *symbol, char *sub, struct sigma *sigma) {
+    if (sigma->number == -1) {
+        return -1;
+    }
+    for (; sigma != NULL && sigma->number != -1 ; sigma = sigma->next) {
+        if (strcmp(sigma->symbol, symbol) == 0) {
+	    xxfree(sigma->symbol);
+	    sigma->symbol = strdup(sub);
+            return(sigma->number);
+        }
+    }
+    return -1;
+}
+
 int sigma_find(char *symbol, struct sigma *sigma) {
     
     if (sigma->number == -1) {
@@ -332,17 +348,17 @@ struct sigma *sigma_copy(struct sigma *sigma) {
     copy_sigma_s = xxmalloc(sizeof(struct sigma));
 
     for (copy_sigma = copy_sigma_s; sigma != NULL; sigma=sigma->next) {
-        if (f == 1) {
-            copy_sigma->next = xxmalloc(sizeof(struct sigma));
-            copy_sigma = copy_sigma->next;
-        }
-        copy_sigma->number = sigma->number;
-        if (sigma->symbol != NULL)
-            copy_sigma->symbol = xxstrdup(sigma->symbol);
-        else
-            copy_sigma->symbol = NULL;
-        copy_sigma->next = NULL;
-        f = 1;
+	if (f == 1) {
+	    copy_sigma->next = xxmalloc(sizeof(struct sigma));
+	    copy_sigma = copy_sigma->next;
+	}
+	copy_sigma->number = sigma->number;
+	if (sigma->symbol != NULL)
+	    copy_sigma->symbol = xxstrdup(sigma->symbol);
+	else
+	    copy_sigma->symbol = NULL;
+	copy_sigma->next = NULL;
+	f = 1;
     }
     return(copy_sigma_s);
 }

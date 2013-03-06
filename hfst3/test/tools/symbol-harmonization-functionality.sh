@@ -273,7 +273,24 @@ for ext in .sfst .ofst .foma; do
 
 
     ## test special symbols in replace rules
-    
+
+
+    ## test ".#." which is a special symbol in foma
+    if ! (echo '[".#." ".#."]' | $TOOLDIR/hfst-regexp2fst ${FFLAG} | $TOOLDIR/hfst-fst2txt > /dev/null); then
+	echo "special symbol '.#.'" ${FFLAG}
+	exit 1
+    fi
+
+    if ! (echo '["@#@" "@#@"]' | $TOOLDIR/hfst-regexp2fst ${FFLAG} | $TOOLDIR/hfst-fst2txt > /dev/null); then
+	echo "special symbol '@#@'" ${FFLAG}
+	exit 1
+    fi
+
+    if ! (echo '["@#@" ".#."]' | $TOOLDIR/hfst-regexp2fst ${FFLAG} | $TOOLDIR/hfst-fst2txt > /dev/null); then
+	echo "special symbols '.#.' and '#@£'" ${FFLAG}
+	exit 1
+    fi
+
 
 done
 
