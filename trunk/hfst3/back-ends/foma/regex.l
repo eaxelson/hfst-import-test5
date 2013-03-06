@@ -257,7 +257,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 
  /* Stuff that goes inside " ", including UTF8 \uHHHH sequences */
 <QTD>([\300-\337].|[\340-\357]..|[\360-\367]...|[\001-\041]|[\043-\177])+/[\042] {
-  decode_quoted(yytext);                                                                                  
+  decode_quoted(yytext);										  
   yylval_param->net = fsm_symbol(yytext);
   BEGIN(QTDEND);
   return NET;
@@ -282,8 +282,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
   yylval_param->net = fsm_identity();  
   return NET;
 }
- /* TODO: This S(x,y) conflicts with function definitions. */
- /*  Need to resolve this somehow. */
+
 (_S\() { return SUCCESSOR_OF; }
 
 (_isunambiguous\()   { return ISUNAMBIGUOUS;   }
@@ -333,7 +332,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
       escaped++;
     }
     for(skip = utf8skip(yytext+i)+1; skip > 0; skip--) {
-        *(yytext+j) = *(yytext+i);
+	*(yytext+j) = *(yytext+i);
         i++; j++;
     }
   }

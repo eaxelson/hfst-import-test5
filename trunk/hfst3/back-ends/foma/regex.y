@@ -104,26 +104,26 @@ void clear_rewrite_ruleset(struct rewrite_set *rewrite_rules) {
     struct fsmrules *r, *rp;
     for (rule = rewrite_rules; rule != NULL; rule = rulep) {
 
-        for (r = rule->rewrite_rules ; r != NULL; r = rp) {
-            fsm_destroy(r->left);
-            fsm_destroy(r->right);
-            fsm_destroy(r->right2);
-            rp = r->next;
-            xxfree(r);
-        }
-        
-        for (contexts = rule->rewrite_contexts; contexts != NULL ; contexts = contextsp) {
+	for (r = rule->rewrite_rules ; r != NULL; r = rp) {
+	    fsm_destroy(r->left);
+	    fsm_destroy(r->right);
+	    fsm_destroy(r->right2);
+	    rp = r->next;
+	    xxfree(r);
+	}
+	
+	for (contexts = rule->rewrite_contexts; contexts != NULL ; contexts = contextsp) {
 
-            contextsp = contexts->next;
-            fsm_destroy(contexts->left);
-            fsm_destroy(contexts->right);
-            fsm_destroy(contexts->cpleft);
-            fsm_destroy(contexts->cpright);
-            xxfree(contexts);
-        }
-        rulep = rule->next;
-        //fsm_destroy(rules->cpunion);
-        xxfree(rule);
+	    contextsp = contexts->next;
+	    fsm_destroy(contexts->left);
+	    fsm_destroy(contexts->right);
+	    fsm_destroy(contexts->cpleft);
+	    fsm_destroy(contexts->cpright);
+	    xxfree(contexts);
+	}
+       	rulep = rule->next;
+	//fsm_destroy(rules->cpunion);
+	xxfree(rule);
     }
 }
 
@@ -177,8 +177,8 @@ void add_rule(struct fsm *L, struct fsm *R, struct fsm *R2, int type) {
             newrule->arrow_type = type;
             rules = newrule;
         } else {
-            //fsm_destroy(test);
-        }
+	    //fsm_destroy(test);
+	}
     }
 }
 
@@ -366,7 +366,7 @@ network11: NET { $$ = $1;}
 sub1: SUBSTITUTE LBRACKET network COMMA { $$ = $3; substituting = 1;                      }
 sub2: SUBVAL COMMA SUBVAL RBRACKET      { subval1 = $2; subval2 = $4; }
 
-network12: fend    { $$ = $1 } |
+network12: fend    { $$ = $1; } |
          ISIDENTITY   network RPAREN    { $$ = fsm_boolean(fsm_isidentity($2));   } |
          ISFUNCTIONAL network RPAREN    { $$ = fsm_boolean(fsm_isfunctional($2)); } |
          ISUNAMBIGUOUS network RPAREN   { $$ = fsm_boolean(fsm_isunambiguous($2)); } |

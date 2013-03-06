@@ -1,5 +1,5 @@
 /*     Foma: a finite-state toolkit and library.                             */
-/*     Copyright © 2008-2011 Mans Hulden                                     */
+/*     Copyright © 2008-2013 Mans Hulden                                     */
 
 /*     This file is part of foma.                                            */
 
@@ -31,7 +31,7 @@ extern "C" {
 /* Library version */
 #define MAJOR_VERSION 0
 #define MINOR_VERSION 9
-#define BUILD_VERSION 16
+#define BUILD_VERSION 17
 #define STATUS_VERSION "alpha"
 
 /* Special symbols on arcs */
