@@ -4701,7 +4701,7 @@ int main(int argc, char * argv[])
         HfstTransducer a("a", types[i]);
         a.repeat_n(2);
 
-            // Test alphabet after substitute
+        // Test alphabet after substitute
 
         HfstTransducer t("a", "b", types[i]);
         t.substitute("a", "c");
@@ -4730,6 +4730,17 @@ int main(int argc, char * argv[])
         assert(ab_.get_alphabet() == ab.get_alphabet());
         assert(ac_.get_alphabet() == ac.get_alphabet());
 
+
+        // Test removing symbols
+        {
+          HfstTransducer TR("a", "b", types[i]);
+          HfstTransducer TR_COPY(TR);
+          TR.remove_from_alphabet("c");
+          TR.remove_from_alphabet("d");
+          assert(TR.compare(TR_COPY));
+          TR.remove_from_alphabet("c");
+          TR.remove_from_alphabet("d");
+        }
 
         HfstTransducer &compose(const HfstTransducer &another);
 
