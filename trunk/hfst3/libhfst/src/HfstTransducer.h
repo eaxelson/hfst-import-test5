@@ -1095,6 +1095,9 @@ ccc : ddd
     // --------- Optimization operations ---------
     // -------------------------------------------
 
+    HfstTransducer &eliminate_flags();
+    HfstTransducer &eliminate_flag(const std::string &flag);
+
     /** \brief Remove all <i>epsilon:epsilon</i> transitions 
         from the transducer so that the transducer remains equivalent. */
     HfstTransducer &remove_epsilons();

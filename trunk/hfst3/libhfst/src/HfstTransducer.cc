@@ -1358,6 +1358,32 @@ unsigned int HfstTransducer::number_of_arcs() const
 //
 // -----------------------------------------------------------------------
 
+HfstTransducer &HfstTransducer::eliminate_flags()
+{
+#if HAVE_FOMA
+  ImplementationType original_type = this->get_type();
+  this->convert(FOMA_TYPE);
+  this->foma_interface.eliminate_flags(this->implementation.foma);
+  this->convert(original_type);
+#else
+  HFST_THROW(FunctionNotImplementedException, "HfstTransducer::eliminate_flags");
+#endif
+  return *this;
+}
+
+HfstTransducer &HfstTransducer::eliminate_flag(const std::string & flag)
+{
+#if HAVE_FOMA
+  ImplementationType original_type = this->get_type();
+  this->convert(FOMA_TYPE);
+  this->foma_interface.eliminate_flag(this->implementation.foma, flag);
+  this->convert(original_type);
+#else
+  HFST_THROW(FunctionNotImplementedException, "HfstTransducer::eliminate_flag");
+#endif
+  return *this;
+}
+
 HfstTransducer &HfstTransducer::remove_epsilons()
 { is_trie = false;
     return apply(

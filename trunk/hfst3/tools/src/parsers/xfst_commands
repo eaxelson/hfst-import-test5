@@ -1,7 +1,7 @@
 add properties
 alias
-apply down
-apply up
+# apply down
+# apply up
 apropos
 cleanup net
 clear stack
@@ -10,17 +10,17 @@ compact sigma
 compile-replace lower
 compile-replace upper
 complete net
-compose net
-concatenate net
+# compose net
+# concatenate net
 crossproduct net
-define
-determinize net
+# define
+# determinize net
 echo
 edit properties
 eliminate flag
 epsilon-remove net
 help
-ignore net
+# ignore net
 inspect net
 intersect net
 invert net
@@ -50,10 +50,10 @@ print longest-string
 print longest-string-size
 print lower-words
 print name
-print net
-print random-lower
-print random-upper
-print random-words
+# print net
+# print random-lower
+# print random-upper
+# print random-words
 print shortest-string
 print shortest-string-size
 print sigma

@@ -1524,7 +1524,19 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::ignore_net()
     {
-      fprintf(stderr, "missing ignore %s:%d\n", __FILE__, __LINE__);
+      if (stack_.size() < 2)
+        {
+          fprintf(stderr, "Not enough networks on stack. Operation requires at least 2.\n");
+          return *this;
+        }
+      HfstTransducer * result = stack_.top();
+      stack_.pop();
+      HfstTransducer * ignored = stack_.top();
+      stack_.pop();
+      result->insert_freely(*ignored);
+      result->minimize();
+      delete ignored;
+      stack_.push(result);
       print_transducer_info();
       prompt();
       return *this;
