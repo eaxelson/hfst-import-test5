@@ -1,0 +1,5 @@
+regex b:c;
+regex a:b;
+compose net
+print net > result
+quit

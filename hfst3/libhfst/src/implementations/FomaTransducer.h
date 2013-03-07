@@ -162,6 +162,9 @@ namespace hfst {
 
       static unsigned int number_of_states(fsm * net);
       static unsigned int number_of_arcs(fsm * net);
+
+      static fsm * eliminate_flags(fsm * t);
+      static fsm * eliminate_flag(fsm * t, const std::string & flag);
     };
 
 } }

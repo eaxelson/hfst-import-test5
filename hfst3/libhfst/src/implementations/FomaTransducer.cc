@@ -795,6 +795,19 @@ namespace hfst { namespace implementations {
     return retval;
   }
 
+  struct fsm * FomaTransducer::eliminate_flags(struct fsm * t)
+  {
+    return flag_eliminate(t, NULL);
+  }
+
+  struct fsm * FomaTransducer::eliminate_flag(struct fsm * t, const std::string & flag)
+  {
+    char * flag_ = strdup(flag.c_str());
+    struct fsm * retval = flag_eliminate(t, flag_);
+    free(flag_);
+    return retval;
+  }
+
   void FomaTransducer::print_test(fsm * t)
   {
     net_print_att(t, stdout);
