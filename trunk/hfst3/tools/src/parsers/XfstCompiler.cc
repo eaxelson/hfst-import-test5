@@ -312,27 +312,6 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     XfstCompiler::apply_up(FILE* infile)
       {
         return this->apply(infile, APPLY_UP_DIRECTION);
-        /*        char* line = 0;
-        size_t len = 0;
-        ssize_t read;
-        if (infile == stdin)
-          {
-            fprintf(stdout, "apply up> ");
-          }
-        while ((read = getline(&line, &len, infile)) != -1)
-          {
-            apply_up_line(line);
-            if (infile == stdin)
-              {
-                fprintf(stdout, "apply up> ");
-              }
-          }
-        if (infile == stdin)
-          {
-            fprintf(stdout, "\n");
-          }
-        prompt();
-        return *this;*/
       }
 
     XfstCompiler&
@@ -354,15 +333,6 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     XfstCompiler::apply_down(FILE* infile)
       {
         return this->apply(infile, APPLY_DOWN_DIRECTION);
-        /*char* line = 0;
-        size_t len = 0;
-        ssize_t read;
-        while ((read = getline(&line, &len, infile)) != -1)
-          {
-            apply_down_line(line);
-          }
-        prompt();
-        return *this;*/
       }
 
     XfstCompiler&
@@ -871,14 +841,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return this->test_null(true);
     }
   XfstCompiler& 
-  XfstCompiler::test_null(bool invert)
+  XfstCompiler::test_null(bool invert_test_result)
     {
       HfstTransducer * tmp = this->top();
       if (NULL == tmp)
         return *this;
       HfstTransducer empty(tmp->get_type());
       bool value = empty.compare(*tmp, false);
-      if (invert)
+      if (invert_test_result)
         value = !value;
       this->print_bool(value);
       prompt();

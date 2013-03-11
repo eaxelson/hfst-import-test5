@@ -41,15 +41,18 @@ namespace hfst {
 //! @brief hfst::xfst namespace contains all functions needed to parse XFST scritpts
 namespace xfst {
 
+  // Used internally in function 'apply_unary_operator'.
   enum UnaryOperation
   { DETERMINIZE_NET, EPSILON_REMOVE_NET, INVERT_NET,
     LOWER_SIDE_NET, UPPER_SIDE_NET, OPTIONAL_NET, ONE_PLUS_NET,
     ZERO_PLUS_NET, REVERSE_NET, MINIMIZE_NET };
 
+  // Used internally in function 'apply_binaryoperator(_iteratively)'.
   enum BinaryOperation
   { IGNORE_NET, INTERSECT_NET, COMPOSE_NET, CONCATENATE_NET, MINUS_NET,
     UNION_NET, SHUFFLE_NET };
 
+  // Used internally in function 'apply'.
   enum ApplyDirection { APPLY_UP_DIRECTION, APPLY_DOWN_DIRECTION };
 
 
@@ -125,9 +128,6 @@ class XfstCompiler
   //! @todo helps have not been written or copied
   XfstCompiler& describe(const char* text);
 
-  HfstTransducer * top();
-  XfstCompiler& print_bool(bool value);
-
   //! @brief Clear stack
   XfstCompiler& clear();
   //! @brief Pop stack
@@ -175,40 +175,42 @@ class XfstCompiler
 
   XfstCompiler& test_uni(int level);
 
-  //! @brief Test stack for equivalence
+  //! @brief Test top transducer in stack for equivalence
   //! @todo tests are not implemented
   XfstCompiler& test_eq();
-  //! @brief Test stack for functionality
+  //! @brief Test top transducer in stack for functionality
   //! @todo tests are not implemented
   XfstCompiler& test_funct();
-  //! @brief Test stack for identity
+  //! @brief Test top transducer in stack for identity
   //! @todo tests are not implemented
   XfstCompiler& test_id();
-  //! @brief Test stack for upper language boundedness
+  //! @brief Test top transducer in stack for upper language boundedness
   //! @todo tests are not implemented
   XfstCompiler& test_upper_bounded();
-  //! @brief Test stack for upper language universality
+  //! @brief Test top transducer in stack for upper language universality
   //! @todo tests are not implemented
   XfstCompiler& test_upper_uni();
-  //! @brief Test stack for lower language boundedness
+  //! @brief Test top transducer in stack for lower language boundedness
   //! @todo tests are not implemented
   XfstCompiler& test_lower_bounded();
-  //! @brief Test stack for lower language universality
+  //! @brief Test top transducer in stack for lower language universality
   //! @todo tests are not implemented
   XfstCompiler& test_lower_uni();
-  //! @brief Test stack for not emptiness
+  //! @brief Test top transducer in stack for not emptiness
   //! @todo tests are not implemented
   XfstCompiler& test_nonnull();
-  //! @brief Test stack for emptiness
+  //! @brief Test top transducer in stack for emptiness
+  //! \a invert_test_result defines whether the result is inverted
+  //! (so that 'test_nonnull' can be implemented with the same function).
   //! @todo tests are not implemented
-  XfstCompiler& test_null(bool invert=false);
-  //! @brief Test stack for overlapping
+  XfstCompiler& test_null(bool invert_test_result=false);
+  //! @brief Test top transducer in stack for overlapping
   //! @todo tests are not implemented
   XfstCompiler& test_overlap();
-  //! @brief Test stack for sublanguage
+  //! @brief Test top transducer in stack for sublanguage
   //! @todo tests are not implemented
   XfstCompiler& test_sublanguage();
-  //! @brief Test stack for unambiguity
+  //! @brief Test top transducer in stack for unambiguity
   //! @todo tests are not implemented
   XfstCompiler& test_unambiguous();
 
@@ -436,6 +438,10 @@ class XfstCompiler
   char* get_prompt() const;
 
  protected:
+  //! @brief Perform lookup on the top transducer using strings in \a infile.
+  //! \a direction specifies whether apply is done on input (up) or output (down) 
+  //! side. If infile is stdin, interactive mode with prompts is used.
+  //! The results are printed to standard output.
   XfstCompiler& apply(FILE* infile, ApplyDirection direction);
 
   //! @brief Apply \a operation on top transducer in the stack.
@@ -456,8 +462,12 @@ class XfstCompiler
   //! If the stack is empty, print a warning.
   XfstCompiler& apply_binary_operation_iteratively(BinaryOperation operation);
 
+  //! @brief The topmost transducer in the stack.
+  //! If empty, print a warning message and return NULL.
+  HfstTransducer * top();
 
   private:
+  /* */
   const XfstCompiler& error(const char* message) const;
   const XfstCompiler& print_transducer_info() const;
   XfstCompiler& add_prop_line(char* line);
@@ -465,6 +475,7 @@ class XfstCompiler
   XfstCompiler& apply_up_line(char* line);
   XfstCompiler& apply_down_line(char* line);
   XfstCompiler& apply_med_line(char* line);
+  XfstCompiler& print_bool(bool value);
   XfstCompiler& read_prop_line(char* line);
 
   hfst::xre::XreCompiler xre_;
