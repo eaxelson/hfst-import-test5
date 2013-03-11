@@ -1,0 +1,5 @@
+regex a:b;
+regex c:d;
+ignore net
+print net > result
+quit

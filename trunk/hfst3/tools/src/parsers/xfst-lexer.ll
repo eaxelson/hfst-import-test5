@@ -177,7 +177,7 @@ LWSP [\t ]*
     return DETERMINIZE;
 }
 
-"echo"{WSP}+.*$ {
+"echo"{WSP}+.* {
     hxfstlval.text = hfst::xfst::strstrip(hxfsttext + strlen("echo "));
     return ECHO;
 }

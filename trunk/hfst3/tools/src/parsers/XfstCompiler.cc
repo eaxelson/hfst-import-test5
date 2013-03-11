@@ -52,7 +52,16 @@ extern void hxfst_delete_buffer(YY_BUFFER_STATE);
 namespace hfst { 
 namespace xfst {
 
+  int UPPER_LEVEL=0;
+  int LOWER_LEVEL=1;
 
+  enum UnaryOperation 
+    { DETERMINIZE_NET, EPSILON_REMOVE_NET, INVERT_NET,
+      LOWER_SIDE_NET, UPPER_SIDE_NET };
+
+  enum BinaryOperation
+    { IGNORE_NET, INTERSECT_NET };
+  
     XfstCompiler::XfstCompiler() :
         xre_(hfst::TROPICAL_OPENFST_TYPE),
         format_(hfst::TROPICAL_OPENFST_TYPE),
@@ -723,6 +732,25 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       prompt();
       return *this;
     }
+
+  XfstCompiler&
+  XfstCompiler::print_bool(const int & value)
+  {
+    fprintf(stdout, "%i, (1 = TRUE, 0 = FALSE)\n", value);
+    prompt();
+    return *this;
+  }
+  HfstTransducer *
+  XfstCompiler::top()
+  {
+    if (stack_.size() < 1)
+      {
+        fprintf(stderr, "Empty stack.\n");
+        return NULL;
+      }
+    return stack_.top();
+  }  
+
   XfstCompiler& 
   XfstCompiler::test_funct()
     {
@@ -733,9 +761,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler&
   XfstCompiler::test_id()
     {
-      fprintf(stderr, "test id missing %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      HfstTransducer * tmp = this->top();
+      if (NULL == tmp)
+        return *this;
+      HfstTransducer id(hfst::internal_identity, tmp->get_type());
+      int value = (id.compare(*tmp, false))? 1 : 0;
+      return this->print_bool(value);
     }
   XfstCompiler& 
   XfstCompiler::test_upper_bounded()
@@ -745,11 +776,25 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return *this;
     }
   XfstCompiler& 
+  XfstCompiler::test_uni(int level)
+    {
+      HfstTransducer * temp = this->top();
+      if (NULL == temp)
+        return *this;
+      HfstTransducer tmp(*temp);
+      tmp.input_project();
+      HfstTransducer id(hfst::internal_identity, tmp.get_type());
+      int value = 0;
+      if (level == UPPER_LEVEL)
+        value = (id.compare(tmp, false))? 1 : 0;
+      if (level == LOWER_LEVEL)
+        value = (id.compare(tmp, false))? 0 : 1;
+      return this->print_bool(value);
+    }
+  XfstCompiler& 
   XfstCompiler::test_upper_uni()
     {
-      fprintf(stderr, "test uu missing %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      return this->test_uni(UPPER_LEVEL);
     }
   XfstCompiler& 
   XfstCompiler::test_lower_bounded()
@@ -761,23 +806,26 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::test_lower_uni()
     {
-      fprintf(stderr, "test lu missing %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      return this->test_uni(LOWER_LEVEL);
     }
   XfstCompiler& 
   XfstCompiler::test_nonnull()
     {
-      fprintf(stderr, "test nonnull missing %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      return this->test_null(true);
     }
   XfstCompiler& 
-  XfstCompiler::test_null()
+  XfstCompiler::test_null(bool invert)
     {
-      fprintf(stderr, "test null missing %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      HfstTransducer * tmp = this->top();
+      if (NULL == tmp)
+        return *this;
+      HfstTransducer empty(tmp->get_type());
+      int value=0;
+      if (invert)
+        value = (empty.compare(*tmp, false))? 1 : 0;
+      else
+        value = (empty.compare(*tmp, false))? 0 : 1;
+      return this->print_bool(value);
     }
   XfstCompiler& 
   XfstCompiler::test_overlap()
@@ -1085,7 +1133,10 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::print_net(FILE* outfile)
     {
-      stack_.top()->write_in_att_format(outfile);
+      HfstTransducer * tmp = this->top();
+      if (tmp == NULL)
+        return *this;
+      tmp->write_in_att_format(outfile);
       prompt();
       return *this;
     }
@@ -1489,41 +1540,46 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       prompt();
       return *this;
     }
-  XfstCompiler& 
-  XfstCompiler::determinize_net()
-    {
-      if (stack_.size() < 1)
-        {
-          fprintf(stderr, "Empty stack.\n");
-          return *this;
-        }
-      HfstTransducer* result = stack_.top();
-      stack_.pop();
-      result->determinize();
-      stack_.push(result);
-      print_transducer_info();
-      prompt();
+
+  XfstCompiler&
+  XfstCompiler::apply_unary_operation(int operation)
+  {
+    HfstTransducer* result = this->top();
+    if (result == NULL)
       return *this;
-    }
-  XfstCompiler& 
-  XfstCompiler::epsilon_remove_net()
-    {
-      if (stack_.size() < 1)
-        {
-          fprintf(stderr, "Empty stack.\n");
-          return *this;
-        }
-      HfstTransducer* result = stack_.top();
-      stack_.pop();
-      result->remove_epsilons();
-      stack_.push(result);
-      print_transducer_info();
-      prompt();
-      return *this;
-    }
-  XfstCompiler& 
-  XfstCompiler::ignore_net()
-    {
+    this->pop();
+
+    switch (operation)
+      {
+      case DETERMINIZE_NET:
+        result->determinize();
+        break;
+      case EPSILON_REMOVE_NET:
+        result->remove_epsilons();
+        break;
+      case INVERT_NET:
+        result->invert();
+        break;
+      case LOWER_SIDE_NET:
+        result->output_project();
+        break;
+      case UPPER_SIDE_NET:
+        result->input_project();
+        break;
+      default:
+        fprintf(stderr, "ERROR: unknown unary operation\n");
+        break;
+      }
+
+    stack_.push(result);
+    print_transducer_info();
+    prompt();
+    return *this;
+  }
+
+  XfstCompiler&
+  XfstCompiler::apply_binary_operation(int operation)
+  {
       if (stack_.size() < 2)
         {
           fprintf(stderr, "Not enough networks on stack. Operation requires at least 2.\n");
@@ -1531,53 +1587,82 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         }
       HfstTransducer * result = stack_.top();
       stack_.pop();
-      HfstTransducer * ignored = stack_.top();
+      HfstTransducer * another = stack_.top();
       stack_.pop();
-      result->insert_freely(*ignored);
+
+      switch (operation)
+        {
+        case IGNORE_NET:
+          result->insert_freely(*another);
+          break;
+        default:
+          fprintf(stderr, "ERROR: unknown binary operation\n");
+          break;
+        }
+
       result->minimize();
-      delete ignored;
+      delete another;
       stack_.push(result);
       print_transducer_info();
       prompt();
       return *this;
+  }
+
+  XfstCompiler&
+  XfstCompiler::apply_binary_operation_iteratively(int operation)
+  {
+    if (stack_.size() < 1)
+      {
+        fprintf(stderr, "Empty stack.\n");
+        return *this;
+      }
+    HfstTransducer* result = stack_.top();
+    stack_.pop();
+    while (!stack_.empty())
+      {
+        HfstTransducer* t = stack_.top();
+        switch (operation)
+          {
+          case INTERSECT_NET:
+            result->intersect(*t);
+            break;
+          default:
+            fprintf(stderr, "ERROR: unknown binary operation\n");
+            break;
+          }
+        stack_.pop();
+        delete t;
+      }
+    stack_.push(result);
+    print_transducer_info();
+    prompt();
+    return *this;
+  }
+
+  XfstCompiler& 
+  XfstCompiler::determinize_net()
+    {
+      return this->apply_unary_operation(DETERMINIZE_NET);
+    }
+  XfstCompiler& 
+  XfstCompiler::epsilon_remove_net()
+    {
+      return this->apply_unary_operation(EPSILON_REMOVE_NET);
+    }
+  XfstCompiler& 
+  XfstCompiler::ignore_net()
+    {
+      return this->apply_binary_operation(IGNORE_NET);
     }
   XfstCompiler& 
   XfstCompiler::intersect_net()
     {
-      if (stack_.size() < 1)
-        {
-          fprintf(stderr, "Empty stack.\n");
-          return *this;
-        }
-      HfstTransducer* result = stack_.top();
-      stack_.pop();
-      while (!stack_.empty())
-        {
-          HfstTransducer* t = stack_.top();
-          result->intersect(*t);
-          stack_.pop();
-          delete t;
-        }
-      stack_.push(result);
-      print_transducer_info();
-      prompt();
-      return *this;
+      return this->apply_binary_operation_iteratively(INTERSECT_NET);
     }
   XfstCompiler& 
   XfstCompiler::invert_net()
     {
-      if (stack_.size() < 1)
-        {
-          fprintf(stderr, "Empty stack.\n");
-          return *this;
-        }
-      HfstTransducer* result = stack_.top();
-      stack_.pop();
-      result->invert();
-      stack_.push(result);
-      print_transducer_info();
-      prompt();
-      return *this;
+      return this->apply_unary_operation(INVERT_NET);
     }
   XfstCompiler& 
   XfstCompiler::label_net()
@@ -1590,34 +1675,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::lower_side_net()
     {
-      if (stack_.size() < 1)
-        {
-          fprintf(stderr, "Empty stack.\n");
-          return *this;
-        }
-      HfstTransducer* result = stack_.top();
-      stack_.pop();
-      result->output_project();
-      stack_.push(result);
-      print_transducer_info();
-      prompt();
-      return *this;
+      return this->apply_unary_operation(LOWER_SIDE_NET);
     }
   XfstCompiler& 
   XfstCompiler::upper_side_net()
     {
-      if (stack_.size() < 1)
-        {
-          fprintf(stderr, "Empty stack.\n");
-          return *this;
-        }
-      HfstTransducer* result = stack_.top();
-      stack_.pop();
-      result->input_project();
-      stack_.push(result);
-      print_transducer_info();
-      prompt();
-      return *this;
+      return this->apply_unary_operation(UPPER_SIDE_NET);
     }
   XfstCompiler& 
   XfstCompiler::minimize_net()

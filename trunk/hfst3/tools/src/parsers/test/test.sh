@@ -56,7 +56,7 @@ do
 	exit 1;
     fi
 
-    for testfile in compose_net;
+    for testfile in compose_net concatenate_net union_net ignore_net invert_net;
     do
 	if ! (cat $testfile.xfst | ../hfst-xfst2fst -q -f $format > /dev/null); then
 	    echo "ERROR: in compiling "$testfile".xfst"

@@ -704,6 +704,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | CONCATENATE END_COMMAND {
             hfst::xfst::xfst_->concatenate_net();
        }
+       | MINUS END_COMMAND {
+            hfst::xfst::xfst_->concatenate_net();
+       }
        | CROSSPRODUCT END_COMMAND {
             hfst::xfst::xfst_->crossproduct_net();
        }

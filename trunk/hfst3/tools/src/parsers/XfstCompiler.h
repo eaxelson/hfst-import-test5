@@ -40,6 +40,7 @@
 namespace hfst { 
 //! @brief hfst::xfst namespace contains all functions needed to parse XFST scritpts
 namespace xfst {
+
 //! @brief Xfst compiler contains all the methods and variables a session of
 //! XFST script parser needs.
 class XfstCompiler
@@ -112,6 +113,9 @@ class XfstCompiler
   //! @todo helps have not been written or copied
   XfstCompiler& describe(const char* text);
 
+  HfstTransducer * top();
+  XfstCompiler& print_bool(const int & value);
+
   //! @brief Clear stack
   XfstCompiler& clear();
   //! @brief Pop stack
@@ -157,6 +161,8 @@ class XfstCompiler
   //! @brief Show all variables
   XfstCompiler& show();
 
+  XfstCompiler& test_uni(int level);
+
   //! @brief Test stack for equivalence
   //! @todo tests are not implemented
   XfstCompiler& test_eq();
@@ -183,7 +189,7 @@ class XfstCompiler
   XfstCompiler& test_nonnull();
   //! @brief Test stack for emptiness
   //! @todo tests are not implemented
-  XfstCompiler& test_null();
+  XfstCompiler& test_null(bool invert=false);
   //! @brief Test stack for overlapping
   //! @todo tests are not implemented
   XfstCompiler& test_overlap();
@@ -322,6 +328,24 @@ class XfstCompiler
   XfstCompiler& read_lexc(FILE* infile);
   //! @brief Read lexicons from @a indata
   XfstCompiler& read_lexc(const char* indata);
+
+  //! @brief Apply \a operation on top transducer in the stack.
+  //! If the stack is empty, print a warning.
+  XfstCompiler& apply_unary_operation(int operation);
+  //! @brief Apply \a operation on two top transducers in the stack.
+  //! The top transducers are popped, the operation is applied 
+  //! (the topmost transducer is the first transducer in the operation), 
+  //! and the result is pushed to the top of the stack.
+  //! If the stack has less than two transducers, print a warning.
+  XfstCompiler& apply_binary_operation(int operation);
+
+  //! @brief Apply \a operation on all transducers in the stack.
+  //! The top transducer (n1) is popped, the operation is applied iteratively
+  //! for all next transducers (n2, n3, n4 ...) in the stack:
+  //! [[[n1 OPERATION n2] OPERATION n3] OPERATION n4] ...
+  //! popping each of them and the result is pushed to the stack.
+  //! If the stack is empty, print a warning.
+  XfstCompiler& apply_binary_operation_iteratively(int operation);
 
   //! @brief do some label pushing
   //! @todo HFST automata cannot push labels
