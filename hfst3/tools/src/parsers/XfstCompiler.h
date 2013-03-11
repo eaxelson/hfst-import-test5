@@ -41,6 +41,18 @@ namespace hfst {
 //! @brief hfst::xfst namespace contains all functions needed to parse XFST scritpts
 namespace xfst {
 
+  enum UnaryOperation
+  { DETERMINIZE_NET, EPSILON_REMOVE_NET, INVERT_NET,
+    LOWER_SIDE_NET, UPPER_SIDE_NET, OPTIONAL_NET, ONE_PLUS_NET,
+    ZERO_PLUS_NET, REVERSE_NET, MINIMIZE_NET };
+
+  enum BinaryOperation
+  { IGNORE_NET, INTERSECT_NET, COMPOSE_NET, CONCATENATE_NET, MINUS_NET,
+    UNION_NET, SHUFFLE_NET };
+
+  enum ApplyDirection { APPLY_UP_DIRECTION, APPLY_DOWN_DIRECTION };
+
+
 //! @brief Xfst compiler contains all the methods and variables a session of
 //! XFST script parser needs.
 class XfstCompiler
@@ -57,7 +69,7 @@ class XfstCompiler
   //! @brief Add properties from text, one property per line
   //! @todo properties cannot be stored in HFST automata
   XfstCompiler& add_props(const char* indata);
-  
+
   //! @brief Perform lookdowns on top of the stack, one per line
   //! @todo lookdown is missing from HFST
   XfstCompiler& apply_up(FILE* infile);
@@ -114,7 +126,7 @@ class XfstCompiler
   XfstCompiler& describe(const char* text);
 
   HfstTransducer * top();
-  XfstCompiler& print_bool(const int & value);
+  XfstCompiler& print_bool(bool value);
 
   //! @brief Clear stack
   XfstCompiler& clear();
@@ -329,24 +341,6 @@ class XfstCompiler
   //! @brief Read lexicons from @a indata
   XfstCompiler& read_lexc(const char* indata);
 
-  //! @brief Apply \a operation on top transducer in the stack.
-  //! If the stack is empty, print a warning.
-  XfstCompiler& apply_unary_operation(int operation);
-  //! @brief Apply \a operation on two top transducers in the stack.
-  //! The top transducers are popped, the operation is applied 
-  //! (the topmost transducer is the first transducer in the operation), 
-  //! and the result is pushed to the top of the stack.
-  //! If the stack has less than two transducers, print a warning.
-  XfstCompiler& apply_binary_operation(int operation);
-
-  //! @brief Apply \a operation on all transducers in the stack.
-  //! The top transducer (n1) is popped, the operation is applied iteratively
-  //! for all next transducers (n2, n3, n4 ...) in the stack:
-  //! [[[n1 OPERATION n2] OPERATION n3] OPERATION n4] ...
-  //! popping each of them and the result is pushed to the stack.
-  //! If the stack is empty, print a warning.
-  XfstCompiler& apply_binary_operation_iteratively(int operation);
-
   //! @brief do some label pushing
   //! @todo HFST automata cannot push labels
   XfstCompiler& cleanup_net();
@@ -440,10 +434,34 @@ class XfstCompiler
   const XfstCompiler& prompt() const;
   //! @brief Get the prompt
   char* get_prompt() const;
+
+ protected:
+  XfstCompiler& apply(FILE* infile, ApplyDirection direction);
+
+  //! @brief Apply \a operation on top transducer in the stack.
+  //! If the stack is empty, print a warning.
+  XfstCompiler& apply_unary_operation(UnaryOperation operation);
+  //! @brief Apply \a operation on two top transducers in the stack.
+  //! The top transducers are popped, the operation is applied 
+  //! (the topmost transducer is the first transducer in the operation), 
+  //! and the result is pushed to the top of the stack.
+  //! If the stack has less than two transducers, print a warning.
+  XfstCompiler& apply_binary_operation(BinaryOperation operation);
+
+  //! @brief Apply \a operation on all transducers in the stack.
+  //! The top transducer (n1) is popped, the operation is applied iteratively
+  //! for all next transducers (n2, n3, n4 ...) in the stack:
+  //! [[[n1 OPERATION n2] OPERATION n3] OPERATION n4] ...
+  //! popping each of them and the result is pushed to the stack.
+  //! If the stack is empty, print a warning.
+  XfstCompiler& apply_binary_operation_iteratively(BinaryOperation operation);
+
+
   private:
   const XfstCompiler& error(const char* message) const;
   const XfstCompiler& print_transducer_info() const;
   XfstCompiler& add_prop_line(char* line);
+  XfstCompiler& apply_line(char* line, ApplyDirection direction);
   XfstCompiler& apply_up_line(char* line);
   XfstCompiler& apply_down_line(char* line);
   XfstCompiler& apply_med_line(char* line);
