@@ -113,6 +113,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             return EXIT_FAILURE;
        }
        // apply
+       | APPLY_UP END_COMMAND {
+       	    hfst::xfst::xfst_->apply_up(stdin);
+       }
        | APPLY_UP NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->apply_up($2);
             free($2);
@@ -123,6 +126,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | APPLY_UP END_COMMAND NAMETOKEN_LIST END_SUB {
             hfst::xfst::xfst_->apply_up($3);
             free($3);
+       }
+       | APPLY_DOWN END_COMMAND {
+            hfst::xfst::xfst_->apply_down(stdin);
        }
        | APPLY_DOWN NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->apply_down($2);
@@ -705,7 +711,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->concatenate_net();
        }
        | MINUS END_COMMAND {
-            hfst::xfst::xfst_->concatenate_net();
+            hfst::xfst::xfst_->minus_net();
        }
        | CROSSPRODUCT END_COMMAND {
             hfst::xfst::xfst_->crossproduct_net();

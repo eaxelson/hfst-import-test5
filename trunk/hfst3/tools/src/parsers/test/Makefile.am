@@ -5,5 +5,7 @@ EXTRA_DIST=test.sh \
 	concatenate_net.xfst concatenate_net.att \
 	union_net.xsft unioni_net.att \
 	ignore_net.xfst ignore_net.att \
-	invert_net.xfst invert_net.att
+	invert_net.xfst invert_net.att \
+	minus_net.xfst minus_net.att \
+	intersect_net.xfst intersect_net.att
 check_DATA=test.sh
