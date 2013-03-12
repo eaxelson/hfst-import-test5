@@ -1843,6 +1843,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return *this;
     }
 
+  // For 'inspect_net': print to stdout all arcs in \a transitions. Return the number of arcs.
   static unsigned int print_arcs(const HfstBasicTransducer::HfstTransitions & transitions)
   {
     bool first_loop = true;
@@ -1876,6 +1877,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     return arc_number - 1;
   }
 
+  // For 'inspect_net': print current level.
   static void print_level(const std::vector<unsigned int> & whole_path,
                           const std::vector<unsigned int> & shortest_path)
   {
@@ -1886,6 +1888,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       }
   }
 
+  // For 'inspect_net': append state \a state to paths.
   static void append_state_to_paths(std::vector<unsigned int> & whole_path,
                                     std::vector<unsigned int> & shortest_path,
                                     unsigned int state)
@@ -1903,6 +1906,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     shortest_path.push_back(state);
   }
 
+  // For 'inspect_net': return to level \a level. Return whether the operation succeeded.
   static bool return_to_level(std::vector<unsigned int> & whole_path,
                               std::vector<unsigned int> & shortest_path,
                               unsigned int level)
@@ -1925,12 +1929,6 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     return true;
   }
 
-  static bool return_to_previous_level(std::vector<unsigned int> & whole_path,
-                                       std::vector<unsigned int> & shortest_path)
-  {
-    return return_to_level(whole_path, shortest_path, whole_path.size() -1);
-  }
-
   XfstCompiler&
   XfstCompiler::inspect_net()
     {
@@ -1948,7 +1946,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
       fprintf(stdout, "%s", help_msg);
 
-      // path of states gone through, can contain loops
+      // path of states visited, can contain loops
       std::vector<unsigned int> whole_path;
       // shortest path of states to current state, no loops
       std::vector<unsigned int> shortest_path;
@@ -1961,112 +1959,102 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         }
       fprintf(stdout, "\n");
 
+      // transitions of current state
       HfstBasicTransducer::HfstTransitions transitions = net[0];
+      // number of arcs in current state
       unsigned int number_of_arcs = print_arcs(transitions);
 
+      // for getline
       char* line = 0;
       size_t len = 0;
       ssize_t read;
 
+      // the while loop begins, keep on reading from user
       while ((read = getline(&line, &len, stdin)) != -1)
         {
-          // back to previous state
+          // case (1): back to previous state
           if (strcmp(line, "<\n") == 0)
             {
+              // exit if already in the start state
               if (whole_path.size() < 2)
                 {
                   return *this;
                 }
-              if (! return_to_level(whole_path, shortest_path, whole_path.size() - 1))
+              else if (! return_to_level(whole_path, shortest_path, whole_path.size() - 1))
                 {
-                  fprintf(stdout, "ERROR: could not return to level '%i'\n", (int)(whole_path.size() - 1));
+                  fprintf(stdout, "FATAL ERROR: could not return to level '%i'\n", (int)(whole_path.size() - 1));
                   return *this;
                 }
-              transitions = net[whole_path.back()];
-              print_level(whole_path, shortest_path);
-              if (net.is_final_state(whole_path.back()))
-                {
-                  fprintf(stdout, " (final)");
-                }
-              fprintf(stdout, "\n");
-              number_of_arcs = print_arcs(transitions);
-              continue;
             }
-          // back to state number N
-          if (line[0] == '-')
+          // case (2): back to state number N
+          else if (line[0] == '-')
             {
-              int back_to_level = atoi(line+1);
-              if (back_to_level == EOF)
-                {
-                  fprintf(stdout, "could not read level number\n");
-                  continue;
-                }
-              else if (back_to_level == 0)
+              int back_to_level = atoi(line+1); // skip '-'
+              if (back_to_level == EOF || back_to_level == 0)
                 {
                   fprintf(stdout, "could not read level number (type '0' if you wish to exit program)\n");
                   continue;
                 }
               else if (back_to_level < 0 || back_to_level > whole_path.size())
                 {
-                  fprintf(stdout, "no such level: '%i'\n", back_to_level);
+                  fprintf(stdout, "no such level: '%i' (current level is %i)\n", back_to_level, (int)whole_path.size() );
                   continue;
                 }
-              else 
+              else if (! return_to_level(whole_path, shortest_path, back_to_level))
                 {
-                  if (! return_to_level(whole_path, shortest_path, back_to_level))
-                    {
-                      fprintf(stdout, "ERROR: could not return to level '%i'\n", back_to_level);
-                      return *this;
-                    }
-                  transitions = net[whole_path.back()];
-                  print_level(whole_path, shortest_path);
-                  if (net.is_final_state(whole_path.back()))
-                    {
-                      fprintf(stdout, " (final)");
-                    }
-                  fprintf(stdout, "\n");
-                  number_of_arcs = print_arcs(transitions);
-                  continue;
+                  fprintf(stdout, "FATAL ERROR: could not return to level '%i'\n", back_to_level);
+                  return *this;
                 }
             }
-          if (strcmp(line, "0\n") == 0)
+          // case (3): exit program
+          else if (strcmp(line, "0\n") == 0)
             {
               return *this;
               continue;
             }
-
-          int number = atoi(line); // FIX 
-          if (number == EOF || number == 0)
-            {
-              fprintf(stdout, "could not read arc number\n");
-            }
-          else if (number < 1 || number > number_of_arcs)
-            {
-              if (number_of_arcs < 1) 
-                {
-                  fprintf(stdout, "state has no arcs\n");
-                }
-              else 
-                {
-                  fprintf(stdout, "arc number must be between %i and %i\n", 1, number_of_arcs);
-                }
-            }
+          // case (4): follow arc
           else
             {
-              HfstBasicTransition tr = transitions[number - 1];
-              fprintf(stdout, "  %s:%s --> ", tr.get_input_symbol().c_str(), 
-                      tr.get_output_symbol().c_str());
-              append_state_to_paths(whole_path, shortest_path, tr.get_target_state());
-              transitions = net[whole_path.back()];
-              print_level(whole_path, shortest_path);
-              if (net.is_final_state(whole_path.back()))
+              int number = atoi(line); // FIX: atoi is not portable
+              // first handle special cases..
+              if (number == EOF || number == 0)
                 {
-                  fprintf(stdout, " (final)");
+                  fprintf(stdout, "could not read arc number\n");
+                  continue;
                 }
-              fprintf(stdout, "\n");
-              number_of_arcs = print_arcs(transitions);
+              else if (number < 1 || number > number_of_arcs)
+                {
+                  if (number_of_arcs < 1) 
+                    {
+                      fprintf(stdout, "state has no arcs\n");
+                    }
+                  else 
+                    {
+                      fprintf(stdout, "arc number must be between %i and %i\n", 1, number_of_arcs);
+                    }
+                  continue;
+                }
+              // then the normal case:
+              else
+                {
+                  HfstBasicTransition tr = transitions[number - 1];
+                  fprintf(stdout, "  %s:%s --> ", tr.get_input_symbol().c_str(), 
+                          tr.get_output_symbol().c_str());
+                  append_state_to_paths(whole_path, shortest_path, tr.get_target_state());
+                }
             }
-        }
+
+          // update transitions and number of arcs and print information about current level 
+          transitions = net[whole_path.back()];
+          print_level(whole_path, shortest_path);
+          if (net.is_final_state(whole_path.back()))
+            {
+              fprintf(stdout, " (final)");
+            }
+          fprintf(stdout, "\n");
+          number_of_arcs = print_arcs(transitions);
+
+        } // end of while loop
 
       prompt();
       return *this;
