@@ -926,13 +926,13 @@ In order to compare the XFST's and Foma's result with the result from the
 \verb+hfst-regexp2fst+ tool, we wrote out the XFST's result as prolog script,
 transformed it to HFST type transducer and then used \verb+hfst-compare+ tool
 for comparison. Unfortunately, for some tests, the stack was too big to be saved
-as a text file. For those tests we used foma compiler to get the result
+as a text file. For those tests we used only foma compiler to get the result
 transducer we can compare our results to.
 
 Although we aimed to get complete backward compability with XFST and Foma, we
 noticed that in some border line cases the results might differ.
 
-Some differences might occur when using replace rules in regular expressions.
+Differences might occur when using replace rules in regular expressions.
 One example where we found that XFST and \verb+hfst-regexp2fst+ in certain cases
 give different results is the longest match.
 
@@ -959,14 +959,24 @@ In \verb+hfst-regexp2fst+ tool, replace rules are compiled using preference
 operator~\cite{drobac/2012}, which in this case successfully finds that output string
 \verb+aaxx+ is less preferable in comparison to the output string \verb+xxx+ and therefore is excluded from the final result.
 
-
-Furthermore, we have noticed that XFST prunes alphabet after some operations.
-
+Furthermore, we have noticed that there are some differences in pruning alphabet
+after performing certain operations.
+These two examples will give different results if compiled with XFST:  
 \begin{verbatim}
 regex [a | b | c ] & $[a | b] ;
+resulting alphabet: a, b
 \end{verbatim}
-if compiled in XFST, the result transducer won't contain symbol \verb+c+
-in the alphabet.
+\begin{verbatim}
+regex [a | b | c ] & [a | b] ;
+resulting alphabet: a, b, c
+\end{verbatim}
+
+Hfst regex parser prunes alphabet always after following operations:
+\textbf{replace rules} (contexts are also pruned before being compiled with the
+rule), \textbf{complement}, \textbf{containments}, \textbf{intersection},
+\textbf{minus}.
+Therefore, if upper comannds were run in \verb+hfst-regexp2fst+ tool, the
+resulting albphabet would always be \verb+a, b+.
 
 \subsection{Pmatch with applications for NER}
 % Sam
