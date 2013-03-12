@@ -251,7 +251,7 @@ improves the discriminative power of the model, and the likelihood of random
 typing error is more likely in frequent words.
 
 The practical process of creating a finite-state spell-checker and corrector
-is really simple: given an analysator capable of recognising correctly spelled
+is really simple: given an analyser capable of recognising correctly spelled
 word-forms of a language, take a projection to the surface forms to create a
 single-tape automaton. The automaton is trained with corpus word-form list, 
 where end-weight of each word-form is e.g. $-\log\frac{c(wf)}{CS}$, where 
@@ -271,17 +271,28 @@ error model. Another way is to re-align the corrections using the
 Damerau-Levenshtein algorithm, and train the original distance measure with
 frequencies of the corrections in same manner as we did for word-forms above.
 
+The application of the language and error model for spell-checking is
+standard finite-state traversal or composition. The checking of correct spelling
+is a composition $w \circ L$, where $w$ is a single path automaton containing
+the word-form and $L$ is a single-tape automaton recognising the correct
+word-forms of a language. The spelling correction is $(w \circ E \circ L)_1$,
+where $E$ is an two-tape automaton containing the error model, and $_1$ is
+projection to result language.
+
 As an example of simplicity of this process, we have obtained an open source
 German morphological analyser
 morphisto~\footnote{\url{http://code.google.com/p/morphisto/}} to generate a
 spelling checker, trained it with word-forms extracted from German
 Wikipedia~\footnote{\url{http://de.wikipedia.org}} and applied it to Wikipedia
-data to find spelling errors and correct them. The whole
-script to do this is in our version control~\footnote{\url{}}, and it took us
-no more than one work day by one researcher to implement this application.
-The resulting system does spell-checking and correction with baseline
-finite-state edit distance algorithm~\cite{pirinen/2010finitestate} applying
-up to 2 errors per word-form at speed of 100,000~word-forms per second.
+data to find spelling errors and correct them. The whole script to do this is
+in our version
+control~\footnote{\url{svn://svn.code.sf.net/p/hfst/code/trunk/articles/sfcm-2013-article}},
+and it took us no more than one work day by one researcher to implement this
+application.  The resulting system does spell-checking and correction with
+baseline finite-state edit distance algorithm~\cite{pirinen2010finitestate}
+applying up to 2 errors per word-form at speed of 77,500~word-forms per second.
+For further evaluations on other language and error models, refer
+to~\cite{pirinen2012improving}.
 
 \subsection{Named Entity Recognition}
 % Jyrki, Juha (Sam?)
