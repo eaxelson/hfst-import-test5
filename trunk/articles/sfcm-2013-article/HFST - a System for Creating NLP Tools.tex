@@ -795,52 +795,74 @@ solution that uses hfst command line tools (other than hfst-xfst).
 \subsection{XFST regexp compilation}
 % Senka, Miikka
 
-Restriction rules have been added to the regex parser.
+Regex parser tool \verb+hfst-regexp2fst+ was developed. General backward
+compability with XFST regular expression parser was demonstrated through the
+fsm-book test set, where original tests were altered in a way that they could be
+run through the parser tool. Since the parser tool alone doesn't have stack
+operations as XFST and Foma do, the biggest change in the test cases was
+operating with defined variables.
 
-Building restriction rules:
-
+For example, in the Monish Guesser Analyser test, front vowels are defined:
 \begin{verbatim}
-  define U [ ? - %<D%> ] ;
-
-  define CENTER [ x y | x x y y ];
-
-  Contexts:
-  define L1 [ a ] ;
-  define R1 [ b ] ;
-
-  define L2 [ x ] ;
-  define R2 [ y ] ;
-  
-Surround center with marks:
-  define CEN1 [ U* %<D%> CENTER %<D%> U* ] ;
-
-Put mark in context:
-  define RES1 [ U* L1 %<D%> U* %<D%> R1 U* ] ;
-  define RES2 [ U* L2 %<D%> U* %<D%> R2 U* ] ;
-  
-  
-  define NODU [ U | 0:%<D%> ]* ;
-  define NODL [ U | %<D%>:0 ]* ;
-
- 
-  regex U* - [ NODU .o. [ CEN1 - [ RES1 | RES2 ] ] .o. NODL ] ;
-\end{verbatim}     
-        
-Before and after:
-
-a and b are languages (automata)
-
-Before ( a < b ):
-
+define FrontV [ i | e | é | ä ];
+\end{verbatim}  
+Instead of using XFST's \verb+define+ function, we save intermediate results
+to files:
 \begin{verbatim}
-~[?* b ?* a ?*]
+echo '[ i | e | é | ä ]' | hfst-regexp2fst > FrontV
+\end{verbatim}  
+Transducer saved in the FrontV file is later simply used as \verb+@"FrontV"+:
+\begin{verbatim}
+$ echo '[ [ ? - [ @"BackV" | @"MorphoV" ] ]+ & $[ @"FrontV" ] ] | \
+[ [ ? - [ @"FrontV" | @"MorphoV" ] ]+ & $[ @"BackV" ] ]'
+|  hfst-regexp2fst > Root
 \end{verbatim}
 
-After ( a > b ):
+In order to compare the XFST's and Foma's result with the result from the
+\verb+hfst-regexp2fst+ tool, we wrote out the XFST's result as prolog script,
+transformed it to HFST type transducer and then used \verb+hfst-compare+ tool
+for comparison. Unfortunately, for some tests, the stack was too big to be saved
+as a text file. For those tests we used foma compiler to get the result
+transducer we can compare our results to.
+
+Although we aimed to get complete backward compability with XFST and Foma, we
+noticed that in some border line cases the results might differ.
+
+Some differences might occur when using replace rules in regular expressions.
+One example where we found that XFST and \verb+hfst-regexp2fst+ in certain cases
+give different results is the longest match.
+
+Both regular expressions: 
+\begin{verbatim}
+regex a+ b+ | b+ a+ @-> x \\ _ x ;
+regex a+ b+ | b+ a+ @-> x \/ _ x ;
+\end{verbatim}
+result in transducer which for input \verb+aabbaax+ gives two outputs:
+\verb+aaxx+ and \verb+xxx+.
+
+However, the same regular expression compiled with \verb+hfst-regexp2fst+ tool
+will for the same input give only one output \verb+xxx+:
+\begin{verbatim}
+$ echo 'a a b b a a x .o. a+ b+ | b+ a+ @-> x \\ _ x;' \
+    | hfst-regexp2fst | hfst-fst2strings
+aabbaax:xxx
+$ echo 'a a b b a a x .o. a+ b+ | b+ a+ @-> x \// _ x;' \
+    | hfst-regexp2fst | hfst-fst2strings
+aabbaax:xxx
+\end{verbatim} 
+It is likely that in this case difference is caused by different compilation approaches.
+In \verb+hfst-regexp2fst+ tool, replace rules are compiled using preference
+operator~\cite{drobac/2012}, which in this case successfully finds that output string
+\verb+aaxx+ is less preferable in comparison to the output string \verb+xxx+ and therefore is excluded from the final result.
+
+
+Furthermore, we have noticed that XFST prunes alphabet after some operations.
 
 \begin{verbatim}
-~[?* a ?* b ?*]
+regex [a | b | c ] & $[a | b] ;
 \end{verbatim}
+if compiled in XFST, the result transducer won't contain symbol \verb+c+
+in the alphabet.
 
 \subsection{Pmatch with applications for NER}
 % Sam
@@ -859,6 +881,9 @@ After ( a > b ):
 \section{Conclusion}\label{hfst:conclusion}
 
 \subsubsection*{Acknowledgments}
+The research leading to some of these results has received funding from the
+European Commission's 7th Framework Program under grant agreement n° 238405 (CLARA).
+
 
 \bibliographystyle{splncs03}
 \bibliography{sfcm-2013}
