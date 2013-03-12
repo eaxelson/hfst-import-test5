@@ -49,11 +49,14 @@ typedef yy_buffer_state *YY_BUFFER_STATE;
 extern YY_BUFFER_STATE hxfst_scan_string(const char*);
 extern void hxfst_delete_buffer(YY_BUFFER_STATE);
 
+#include "implementations/HfstTransitionGraph.h"
+
+using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstBasicTransition;
+
 namespace hfst { 
 namespace xfst {
 
-  int UPPER_LEVEL=0;
-  int LOWER_LEVEL=1;
   
     XfstCompiler::XfstCompiler() :
         xre_(hfst::TROPICAL_OPENFST_TYPE),
@@ -798,7 +801,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return *this;
     }
   XfstCompiler& 
-  XfstCompiler::test_uni(int level)
+  XfstCompiler::test_uni(Level level)
     {
       HfstTransducer * temp = this->top();
       if (NULL == temp)
@@ -1839,10 +1842,134 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       prompt();
       return *this;
     }
+
+  static unsigned int print_arcs(const HfstBasicTransducer::HfstTransitions & transitions)
+  {
+    bool first_loop = true;
+    unsigned int arc_number = 1;
+    for (HfstBasicTransducer::HfstTransitions::const_iterator it = transitions.begin();
+         it != transitions.end(); it++)
+      {
+        if (first_loop) 
+          {
+            fprintf(stdout, "Arcs:");
+            first_loop = false;
+          }
+        else
+          {
+            fprintf(stdout, ", ");
+          }
+        std::string isymbol = it->get_input_symbol();
+        std::string osymbol = it->get_output_symbol();
+
+        if (isymbol == osymbol)
+          {
+            fprintf(stdout, " %i. %s", arc_number, isymbol.c_str());
+          }
+        else
+          {
+            fprintf(stdout, " %i. %s:%s", arc_number, isymbol.c_str(), osymbol.c_str());
+          }
+        arc_number++;
+      }
+    fprintf(stdout, "\n");
+    return arc_number - 1;
+  }
+
+  static void print_level(const std::vector<unsigned int> & whole_path,
+                          const std::vector<unsigned int> & shortest_path)
+  {
+    fprintf(stdout, "Level %i", (int)whole_path.size());
+    if (shortest_path.size() < whole_path.size())
+      {
+        fprintf(stdout, " (= %i)", (int)shortest_path.size());
+      }
+  }
+
+  static void add_to_paths(std::vector<unsigned int> & whole_path,
+                           std::vector<unsigned int> & shortest_path,
+                           unsigned int state)
+  {
+    whole_path.push_back(state);
+    for (std::vector<unsigned int>::iterator it = shortest_path.begin();
+         it != shortest_path.end(); it++)
+      {
+        if (*it == state)
+          {
+            shortest_path.erase(it, shortest_path.end());
+          }
+      }
+    shortest_path.push_back(state);
+  }
+
   XfstCompiler&
   XfstCompiler::inspect_net()
     {
-      fprintf(stderr, "missing inspect net %s:%d\n", __FILE__, __LINE__);
+      HfstTransducer * t = this->top();
+      if (t == NULL)
+        return *this;
+
+      HfstBasicTransducer net(*t);
+
+      const char * help_msg = 
+        "'N' transits arc N, '-N' returns to level N, '<' "
+        "to previous level, '0' quits.\n";
+
+      fprintf(stdout, "%s", help_msg);
+
+      // path of states gone through, can contain loops
+      std::vector<unsigned int> whole_path;
+      // shortest path of states to current state, no loops
+      std::vector<unsigned int> shortest_path;
+
+      add_to_paths(whole_path, shortest_path, 0);
+      print_level(whole_path, shortest_path);
+      fprintf(stdout, "\n");
+
+      HfstBasicTransducer::HfstTransitions transitions = net[0];
+      unsigned int number_of_arcs = print_arcs(transitions);
+
+      char* line = 0;
+      size_t len = 0;
+      ssize_t read;
+
+      while ((read = getline(&line, &len, stdin)) != -1)
+        {
+          if (strcmp(line, "0") == 0) {
+            return *this;
+          }
+          if (strcmp(line, "<") == 0) {
+            
+          }
+          int number = atoi(line); // FIX 
+          if (number == EOF)
+            fprintf(stdout, "could not read arc number\n");
+          else if (number < 1 || number > number_of_arcs)
+            {
+              if (number_of_arcs < 1) {
+                fprintf(stdout, "state has no arcs\n");
+              }
+              else {
+                fprintf(stdout, "arc number must be between %i and %i\n", 1, number_of_arcs);
+              }
+            }
+          else
+            {
+              HfstBasicTransition tr = transitions[number - 1];
+              fprintf(stdout, "  %s:%s --> ", tr.get_input_symbol().c_str(), 
+                      tr.get_output_symbol().c_str());
+              transitions = net[tr.get_target_state()];
+              add_to_paths(whole_path, shortest_path, tr.get_target_state());
+              print_level(whole_path, shortest_path);
+              if (net.is_final_state(tr.get_target_state()))
+                {
+                  fprintf(stdout, " (final)");
+                }
+              fprintf(stdout, "\n");
+              number_of_arcs = print_arcs(transitions);
+            }
+        }
+
       prompt();
       return *this;
     }
