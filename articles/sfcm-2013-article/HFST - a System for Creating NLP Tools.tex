@@ -640,15 +640,43 @@ one.
 \subsection{An Interface in Python}
 % Erik, Tommi
 
-In addition to API library and command line tools, HFST library can
-also be used through SWIG-generated python bindings. Currently the
-bindings are offered for python programming language versions 2 and
-3. All HFST functionalities are available via both versions, but the
-python interpreters themselves have some differences.  Python 2 allows
-HFST exceptions to be caught directly, but python 3 requires the use
-of a special wrapper function written as a part of the bindings. On
-the other hand, python 3 has better support for unicode characters, so
-it is probably a better choice for linguistic applications.
+In addition to an API library and command line tools, HFST library can
+also be used through SWIG-generated python bindings. The bindings are
+offered for python programming language versions 2 and 3. All HFST
+functionalities are available via both versions, but the python
+interpreters themselves have some differences. For example, Python 2
+allows HFST exceptions to be caught directly, but python 3 requires
+the use of a special wrapper function written as a part of the
+bindings. On the other hand, python 3 has better support for unicode
+characters, so it is probably a better choice for most linguistic
+applications.
+
+Below is an example of iterating through the states and transitions of
+an HFST transducer using python bindings:
+
+\begin{verbatim}
+# Go through all states in fsm       
+for state in fsm.states():
+    # Go through all transitions                                               
+    for transition in fsm.transitions(state):
+        # do something
+\end{verbatim}
+
+And the same using HFST API directly:
+
+\begin{verbatim}
+// Go through all states in fsm
+for (HfstBasicTransducer::const_iterator it = fsm.begin();
+       it != fsm.end(); it++ )      
+    {      
+     // Go through all transitions    
+    for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it  
+           = it->begin(); tr_it != it->end(); tr_it++) 
+        {
+        // do something
+        }
+    }
+\end{verbatim}
 
 The python bindings in particular make it smooth to use language
 models developed for HFST in rapid prototyping of advanced tools. For
@@ -683,8 +711,8 @@ system. Compilation is also possible on MinGW under Windows.
 Fresh version of HFST source code can be fetched from our svn
 repository at Sourceforge. We also offer, usually twice a month, new
 release packages that include source tarball (compilable on all
-aforementioned platforms), Debian binaries (Linux), MacPort
-distribution (MacOS X) and NSIS installer (Windows).
+aforementioned platforms), Debian binaries (for Linux), MacPort
+distribution (for MacOS X) and NSIS installer (for Windows).
 
 Another layer of portability is attained by HFST's programming
 language bindings via SWIG. It is possible to use full HFST library
@@ -695,32 +723,29 @@ versions 2 and 3.
 \subsection{Other user-oriented items}
 % Erik
 
-We have new command line tools: an XFST parser hfst-xfst and a tagging
-tool hfst-tagger. Also some functions hidden un the API are now
-availeble as command line tools: hfst-shuffle and hfst-prune-alphabet.
-Better cooperation between flag diacritics and identity/unknown
-symbols. We have a parameter in binary operators that controls whether
-unknown/identity transitions are expanded, the default being true. We
-support the default symbol, that matches always if no other transition
-in a given state matches.
+We have four new command line tools. The most important are the XFST
+parser hfst-xfst and the tagging tool hfst-tagger. Also two functions
+that were earlier available only through the API can now be used via
+command line tools: hfst-shuffle and hfst-prune-alphabet. The existing
+tools also have new features: hfst-fst2txt can write to dot/graphviz
+and PCKIMMO format and hfst-fst2strings has a new parameter that
+controls its output to achieve better interoperability with other
+command line tools.
 
-Keep the number of dependencies as low as possible and offer a
-possibility to use another library. zlib was removed, the library
-ncurses used if termcap is not found. GNU and bash dependencies were
-also removed from scripts to make them more portable. Another way to
-reduce the number of dependencies is that all back-ends (SFST, OpenFst
-and foma) are bundled with HFST. There is no more need to install them
-separately or worry about having the right version. SFST and foma
-libraries are disabled from default build to make it faster and still
-be able to handle weighted transducers. We can also make modifications
-to the back-end libraries, for instance some of the warnings in
-back-end libraries that are given during compilation are now fixed or
-suppressed.
+Special symbols can be controlled better as we have added a parameter
+to binary operators that controls whether unknown/identity transitions
+are expanded, the default being true. We also have a new special
+symbol, the default symbol that matches any symbol if no other
+transition in a given state matches.
 
-Interoperability via added formats: hfst-fst2txt.cc also writes to
-dot/graphviz format, PCKIMMO output mode is supported for
-hfst-fst2txt. The option print-separator is added to hfst-fst2strings
-to achieve better control of pipelined command line tools.
+We have kept the number of dependencies in HFST as low as possible.
+All back-ends (SFST, OpenFst and foma) are now bundled with
+HFST. There is no more need to install them separately or worry about
+having the right version. We can also make modifications to the
+back-end libraries, for instance some of the warnings in back-end
+libraries that are given during compilation are now fixed or
+suppressed. GNU- and bash-specific commands were also removed from
+scripts to make them more portable.
 
 \section{Under the Hood}
 
@@ -732,10 +757,9 @@ in interactive mode or to compile scriptfiles. The tool implements the
 same functionalities as the original XFST (Xerox Finite-State Tool)
 which is a general-purpose utility for computing with finite-state
 networks. There are over 100 commands in hfst-xfst, the same as in the
-original Xerox tool. Below is an example of using hfst-xfst in
-interactive mode where we define two transducer variables, use them in
-a regular expression and print random words recognized by the
-expression.
+Xerox tool. Below is an example of using hfst-xfst in interactive mode
+where we define two transducer variables, use them in a regular
+expression and print random words recognized by the expression.
 
 \begin{verbatim}
 $ hfst-xfst2fst 
@@ -751,86 +775,63 @@ foobazbar
 hfst[1]: 
 \end{verbatim}
 
-To test hfst-xfst, we have compiled some examples from Finite-State
-Morphology Homepage by Beesley and Karttunen.  There are 17 examples
-and they are compiled in three ways to make sure that they work as
-they should: (1) with the original XFST tool, (2) with the HFST tool
-hfst-xfst and (3) using HFST command line tools, mainly
-hfst-regexp2fst. The last case is also useful for testing the
-functionality of HFST command line tools.
+To test hfst-xfst, we have compiled 17 out of the 22 XFST exercises
+that are found in the homepage of Beesley and Karttunen's book Finite
+State Morphology. We have omitted the exercises that do not include an
+answer and are not trivial to solve. We have compiled the exercises
+using both Xerox's XFST and HFST's hfst-xfst and compared the results
+for equivalence. For some exercises, we also have an additional
+solution that uses hfst command line tools (other than hfst-xfst).
 
 \subsection{XFST regexp compilation}
 % Senka, Miikka
 
-Regex parser tool \verb+hfst-regexp2fst+ was developed. General backward
-compability with XFST regular expression parser was demonstrated through the
-fsm-book test set, where original tests were altered in a way that they could be
-run through the parser tool. Since the parser tool alone doesn't have stack
-operations as XFST and Foma do, the biggest change in the test cases was
-operating with defined variables.
+Restriction rules have been added to the regex parser.
 
-For example, in the test Monish Guesser Analyser, front vowels are defined:
+Building restriction rules:
+
 \begin{verbatim}
-define FrontV [ i | e | é | ä ];
-\end{verbatim}  
-Instead of using XFST's \verb+define+ function, we save intermediate results
-to files:
+  define U [ ? - %<D%> ] ;
+
+  define CENTER [ x y | x x y y ];
+
+  Contexts:
+  define L1 [ a ] ;
+  define R1 [ b ] ;
+
+  define L2 [ x ] ;
+  define R2 [ y ] ;
+  
+Surround center with marks:
+  define CEN1 [ U* %<D%> CENTER %<D%> U* ] ;
+
+Put mark in context:
+  define RES1 [ U* L1 %<D%> U* %<D%> R1 U* ] ;
+  define RES2 [ U* L2 %<D%> U* %<D%> R2 U* ] ;
+  
+  
+  define NODU [ U | 0:%<D%> ]* ;
+  define NODL [ U | %<D%>:0 ]* ;
+
+ 
+  regex U* - [ NODU .o. [ CEN1 - [ RES1 | RES2 ] ] .o. NODL ] ;
+\end{verbatim}     
+        
+Before and after:
+
+a and b are languages (automata)
+
+Before ( a < b ):
+
 \begin{verbatim}
-echo '[ i | e | é | ä ]' | hfst-regexp2fst > FrontV
-\end{verbatim}  
-Transducer saved in the FrontV file is later simply used as: \verb+@"FrontV"+:
-\begin{verbatim}
-$ echo '[ [ ? - [ @"BackV" | @"MorphoV" ] ]+ & $[ @"FrontV" ] ] | \
-[ [ ? - [ @"FrontV" | @"MorphoV" ] ]+ & $[ @"BackV" ] ]'
-|  hfst-regexp2fst > Root
+~[?* b ?* a ?*]
 \end{verbatim}
 
-In order to compare the XFST's and Foma's result with the result from the
-\verb+hfst-regexp2fst+ tool, we wrote out the XFST's result as prolog script,
-transformed it to HFST type transducer and then used \verb+hfst-compare+ tool
-for comparison. Unfortunately, for some tests, the stack was too big to be saved
-as a text file, so we used only foma compiler to get the desired result.
+After ( a > b ):
 
-Although we aimed to get complete backward compability with XFST and Foma, we
-noticed that in some border line cases the results might differ.
-
-Some differences might ocur when using replace rules in regular expressions. One
-example where we found that XFST and \verb+hfst-regexp2fst+ in certain cases
-give different results is the longest match.
-
-Both regular expressions: 
 \begin{verbatim}
-regex a+ b+ | b+ a+ @-> x \\ _ x ;
-regex a+ b+ | b+ a+ @-> x \/ _ x ;
+~[?* a ?* b ?*]
 \end{verbatim}
-result in transducer which for input \verb+aabbaax+ gives two outputs:
-\begin{verbatim}
-aaxx
-xxx
-\end{verbatim}
-
-However, the same regular expression compiled with \verb+hfst-regexp2fst+ tool
-will for the same input give only one output \verb+xxx+:
-\begin{verbatim}
-$ echo 'a a b b a a x .o. a+ b+ | b+ a+ @-> x \\ _ x;' \
-    | hfst-regexp2fst | hfst-fst2strings
-aabbaax:xxx
-$ echo 'a a b b a a x .o. a+ b+ | b+ a+ @-> x \// _ x;' \
-    | hfst-regexp2fst | hfst-fst2strings
-aabbaax:xxx
-\end{verbatim} 
-It is likely that in this case difference is caused by different compilation approaches.
-In \verb+hfst-regexp2fst+ tool, replace rules are compiled using preference
-operator~\cite{drobac/2012}, which in this case successfully finds that output string \verb+aaxx+ is less preferable in comparison to the output string \verb+xxx+ and therefore is excluded from the final result.
-
-
-Furthermore, we have noticed that XFST prunes alphabet after some operations.
-
-\begin{verbatim}
-regex [a | b | c ] & $[a | b] ;
-\end{verbatim}
-if compiled in XFST, the result transducer won't contain symbol \verb+c+
-in the alphabet.
 
 \subsection{Pmatch with applications for NER}
 % Sam
@@ -849,8 +850,6 @@ in the alphabet.
 \section{Conclusion}\label{hfst:conclusion}
 
 \subsubsection*{Acknowledgments}
-The research leading to some of these results has received funding from the
-European Commission's 7th Framework Program under grant agreement n° 238405 (CLARA).
 
 \bibliographystyle{splncs03}
 \bibliography{sfcm-2013}
