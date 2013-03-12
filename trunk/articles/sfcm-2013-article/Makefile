@@ -183,9 +183,9 @@ hfst/de/morphisto.a:
 	$(WGET) http://morphisto.googlecode.com/files/morphisto-02022011.a -O $@
 
 $(DICT_DE): hfst/de/morphisto.a
-	$(HFST_PROJECT) -p output -v $< |\
+	$(HFST_INVERT) -v $< |\
 		$(HFST_MINIMIZE) -v |\
-		$(HFST_FST2FST) -v -f olw $< -o $@
+		$(HFST_FST2FST) -v -f olw -o $@
 # }}}
 #
 # {{{ German error model building
