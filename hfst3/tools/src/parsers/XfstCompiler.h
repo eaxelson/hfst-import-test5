@@ -55,6 +55,8 @@ namespace xfst {
   // Used internally in function 'apply'.
   enum ApplyDirection { APPLY_UP_DIRECTION, APPLY_DOWN_DIRECTION };
 
+  // Used internally in function 'test_uni'.
+  enum Level { LOWER_LEVEL, UPPER_LEVEL };
 
 //! @brief Xfst compiler contains all the methods and variables a session of
 //! XFST script parser needs.
@@ -173,7 +175,7 @@ class XfstCompiler
   //! @brief Show all variables
   XfstCompiler& show();
 
-  XfstCompiler& test_uni(int level);
+  XfstCompiler& test_uni(Level level);
 
   //! @brief Test top transducer in stack for equivalence
   //! @todo tests are not implemented
