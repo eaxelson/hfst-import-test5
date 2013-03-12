@@ -276,9 +276,12 @@ German morphological analyser
 morphisto~\footnote{\url{http://code.google.com/p/morphisto/}} to generate a
 spelling checker, trained it with word-forms extracted from German
 Wikipedia~\footnote{\url{http://de.wikipedia.org}} and applied it to Wikipedia
-data to find spelling errors and correct them with n~\% of precision. The whole
+data to find spelling errors and correct them. The whole
 script to do this is in our version control~\footnote{\url{}}, and it took us
 no more than one work day by one researcher to implement this application.
+The resulting system does spell-checking and correction with baseline
+finite-state edit distance algorithm~\cite{pirinen/2010finitestate} applying
+up to 2 errors per word-form at speed of 100,000~word-forms per second.
 
 \subsection{Named Entity Recognition}
 % Jyrki, Juha (Sam?)
@@ -678,15 +681,14 @@ for (HfstBasicTransducer::const_iterator it = fsm.begin();
     }
 \end{verbatim}
 
-The python bindings in particular make it smooth to use language
-models developed for HFST in rapid prototyping of advanced tools. For
-an example, in a current project a chunker for Finnish language was
-developed by simply bracketing adjacent agreeing cases and few other
-similar expressions with basically few lines of code on top of
-existing morphological analysers. E.g.  given Finnish sentence
-``miljoona kärpästä voi olla väärässä paikassa'' we get bracketing all
-three phrases bracketed by really simple python based bracketing that
-are illustrated in following figure gloss:
+The python bindings in particular make it smooth to use language models
+developed for HFST in rapid prototyping of advanced tools. For an example, a
+chunker for Finnish language was developed by simply bracketing adjacent
+agreeing cases and few other similar expressions with basically few lines of
+code on top of existing morphological analysers. E.g.  given Finnish sentence
+``miljoona kärpästä voi olla väärässä paikassa'' we get bracketing all three
+phrases bracketed by really simple python based bracketing that are illustrated
+in following figure gloss:
 
 \ex
 \begingl
@@ -696,6 +698,13 @@ are illustrated in following figure gloss:
 \endgl
 \xe
 
+The rules governing chunking are all about pairs of words here: measurement
+phrase is a numeral followed by a partitive nominal, verbal phrase is an
+auxiliary followed by a lexical verb and noun phrase is an adjective and a noun
+in any agreeing case.  The three pairs of words can be identified as common
+chunks of Finnish language and having specific rules for these specific pairs
+will give reasonable baseline surface syntax for applications where more
+elaborate syntax structure is not required.
 
 \subsubsection{A Chatroom Morphology tool}
 % Sam
