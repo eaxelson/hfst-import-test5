@@ -39,6 +39,11 @@ using std::stack;
 #include "xfst-utils.h"
 #include "xfst-parser.h"
 
+// todo: see if readline is supported
+#include <readline/readline.h>
+#include <readline/history.h>
+
+
 #ifndef DEBUG_MAIN
 extern FILE* hxfstin;
 extern int hxfstparse(void);
@@ -1929,6 +1934,47 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     return true;
   }
 
+  static char * inspect_getline(FILE * file)
+  {
+    /*
+    char* line_ = 0;
+    size_t len = 0;
+    ssize_t read;
+
+    read = getline(&line_, &len, file);
+    if (read == -1)
+      {
+        return NULL;
+      }
+      return line_;*/
+    char *buf = NULL;               // result from readline                                                                                                                                                                                
+    rl_bind_key('\t',rl_abort);     // disable auto-complet                                                                                                                                                                                
+
+    if((buf = readline("")) != NULL)
+      {
+        if (buf[0] != '\0') 
+          {
+            add_history(buf);
+          }
+      }
+    return buf;
+  }
+
+  static int length_of_history=0;
+
+  static void begin_inspect_history()
+  {
+    length_of_history=history_length;
+  }
+
+  static void ignore_inspect_history()
+  {
+    for (unsigned int index=(history_length - 1); index > (length_of_history - 1); index--)
+      {
+        remove_history(index);
+      }
+  }
+
   XfstCompiler&
   XfstCompiler::inspect_net()
     {
@@ -1964,51 +2010,53 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       // number of arcs in current state
       unsigned int number_of_arcs = print_arcs(transitions);
 
-      // for getline
-      char* line = 0;
-      size_t len = 0;
-      ssize_t read;
+      char * line;
+      begin_inspect_history();
 
       // the while loop begins, keep on reading from user
-      while ((read = getline(&line, &len, stdin)) != -1)
+      while ((line = inspect_getline(stdin)) != NULL)
         {
           // case (1): back to previous state
-          if (strcmp(line, "<\n") == 0)
+          if (strcmp(line, "<\n") == 0 || strcmp(line, "<") == 0)
             {
               // exit if already in the start state
               if (whole_path.size() < 2)
                 {
+                  ignore_inspect_history();
                   return *this;
                 }
               else if (! return_to_level(whole_path, shortest_path, whole_path.size() - 1))
                 {
                   fprintf(stdout, "FATAL ERROR: could not return to level '%i'\n", (int)(whole_path.size() - 1));
+                  ignore_inspect_history();
                   return *this;
                 }
             }
           // case (2): back to state number N
           else if (line[0] == '-')
             {
-              int back_to_level = atoi(line+1); // skip '-'
-              if (back_to_level == EOF || back_to_level == 0)
+              int level = atoi(line+1); // skip '-'
+              if (level == EOF || level == 0)
                 {
                   fprintf(stdout, "could not read level number (type '0' if you wish to exit program)\n");
+                  continue;;
+                }
+              else if (level < 0 || level > whole_path.size())
+                {
+                  fprintf(stdout, "no such level: '%i' (current level is %i)\n", level, (int)whole_path.size() );
                   continue;
                 }
-              else if (back_to_level < 0 || back_to_level > whole_path.size())
+              else if (! return_to_level(whole_path, shortest_path, level))
                 {
-                  fprintf(stdout, "no such level: '%i' (current level is %i)\n", back_to_level, (int)whole_path.size() );
-                  continue;
-                }
-              else if (! return_to_level(whole_path, shortest_path, back_to_level))
-                {
-                  fprintf(stdout, "FATAL ERROR: could not return to level '%i'\n", back_to_level);
+                  fprintf(stdout, "FATAL ERROR: could not return to level '%i'\n", level);
+                  ignore_inspect_history();
                   return *this;
                 }
             }
           // case (3): exit program
-          else if (strcmp(line, "0\n") == 0)
+          else if (strcmp(line, "0\n") == 0 || strcmp(line, "0") == 0)
             {
+              ignore_inspect_history();
               return *this;
               continue;
             }
@@ -2056,6 +2104,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
         } // end of while loop
 
+      ignore_inspect_history();
       prompt();
       return *this;
     }
