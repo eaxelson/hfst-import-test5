@@ -468,6 +468,15 @@ class XfstCompiler
   //! If empty, print a warning message and return NULL.
   HfstTransducer * top();
 
+  //! @brief Get next line from \a file. Return NULL if end of file is reached.
+  char * xfst_getline(FILE * file);
+
+  //! @brief Get current readline history index.
+  int current_history_index();
+
+  //! @brief Remove all readline history after \a index. 
+  void ignore_history_after_index(int index);
+
   private:
   /* */
   const XfstCompiler& error(const char* message) const;
