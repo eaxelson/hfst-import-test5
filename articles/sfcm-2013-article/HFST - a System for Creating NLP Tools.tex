@@ -4,6 +4,7 @@
 \usepackage{multirow}
 \usepackage{caption}
 \usepackage{url}
+\usepackage{tabularx}
 
 \usepackage{fontspec}
 \usepackage{xunicode}
@@ -16,14 +17,14 @@
 \title{HFST---a System for Creating NLP Tools}
 %
 \author{Krister Lind\'{e}n \and Erik Axelson \and Senka Drobac \and Sam Hardwick \and\\
-Jyrki Niemi \and Tommi A Pirinen \and Miikka Silfverberg \and ...}
+Juha Kuokkala \and Jyrki Niemi \and Tommi A Pirinen \and Miikka Silfverberg}
 
 \institute{University of Helsinki\\
 Department of Modern Languages\\
 Unioninkatu 40 A\\
 FI-00014 Helsingin yliopisto, Finland\\
 \email{\{krister.linden, erik.axelson, senka.drobac, sam.hardwick,\\
-jyrki.niemi, tommi.pirinen, miikka silfverberg, ...\}@helsinki.fi}}
+juha.kuokkala, jyrki.niemi, tommi.pirinen, miikka.silfverberg\}@helsinki.fi}}
 
 \maketitle
 
@@ -223,14 +224,175 @@ the guess. In this case, the first guess is correct. It is modeled
 after declension class number 5, which is a class of nouns containing
 among others the noun ``sviitti''.
 
+\subsubsection{Extending lexicon with the guesser.}
+
+The morphological guesser has proven to be a useful tool when adding 
+large bulks of new vocabulary into Omorfi's lexicon. According to our
+experiences of handling ca. 260.000 proper nouns, the guesser had
+roughly 90\% accuracy in assigning the correct inflection class to new
+lexicon entries, so the manual work needed was reduced to only
+checking the guesser's results and correcting ca. 10\% of the
+entries. Also, as the new lexical entries were added to the system at
+several batches and the guesser was rebuilt after each batch, the
+accuracy of the guesser was constantly improving during the process.
+
+We did a preliminary test to assess the guesser's accuracy when only
+some basic proper nouns were included in Omorfi's lexicon. A sample of
+100 words from each proper noun list to be added (place names,
+companies, organisations, given names, family names) showed that the
+guesser's first guess of inflection class was correct in the majority
+of cases in all the groups. The success percentage of finding correct
+class within five guesses ranged from 68 (companies) to 93 (place
+names). the differences between the groups are readily explained by
+the facts that the place names most often have endings correcponding
+to regular nouns, whereas the organisational and company names often
+contain foreign and acronym components not recognised by the guesser.
+
+\begin{table}
+\begin{center}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\begin{tabularx}{0.6\textwidth}{l|CCCCCC}
+         &  \multicolumn{5}{c}{Correct analysis at n'th guess:}     & \\
+         &    1  &   2  &   3  &   4  &   5  &  failed\\
+\hline
+place names   &   87  &   4  &   4  &   0  &   2  &     3\\
+family names  &   82  &   4  &   2  &   3  &   2  &     7\\
+given names   &   75  &   4  &   5  &   1  &   0  &    15\\
+organisations &   69  &   7  &   5  &   0  &   0  &    19\\
+companies     &   53  &   7  &   5  &   3  &   0  &    32\\
+\end{tabularx}
+\caption{Preliminary tests with 100-word samples.}\label{tab:lang-id-acc}
+\end{center}
+\end{table}
+
+Many of the incorrect guesses seemed to be either non-finite verb
+forms or noun forms containing clitics. To pick the most probably
+correct candidate from the generated guesses for manual checking, we
+used the following algorithm:
+
+ 1. Generate n guesses for the lexicon form (we used n = 20).
+
+ 2. Take the first guess which has [CASE=NOM] (nominative case)
+ analysis and a generated paradigm containing nominative singular form
+ identical to the given lexicon form.
+
+ 2b. If the guess analysis has [NUM=PL] (plural number), then the
+ lexicon form must match the nominative plural of the paradigm,
+ instead of singular.
+
+ 3. If none of the guesses fulfills the previous conditions, take the
+ first guess which has [CASE=NOM] analysis and a nominal inflection
+ class.
+
+We began the actual classifying work with lists of family names
+(ca. 12,000) and given names (ca. 4,000). Using the initial guesser
+and the above algorithm, we generated a reverse-sorted list with
+guessed inflection classes and corresponding sample paradigms for easy
+manual checking.
+
+\small
+\begin{verbatim}
+   Aura   9    Aura : Auran : Auraa : Auraan : Aurat : Aurain, Aurojen : Auroja : Auroihin
+   Oura   10   Oura : Ouran : Ouraa : Ouraan : Ourat : Ourain, Ourien : Ouria : Ouriin
+   Pura   10   Pura : Puran : Puraa : Puraan : Purat : Purain, Purien : Puria : Puriin
+  Saura   9    Saura : Sauran : Sauraa : Sauraan : Saurat : Saurain, Saurojen : Sauroja : Sauroihin
+  Peura   9    Peura : Peuran : Peuraa : Peuraan : Peurat : Peurain, Peurojen : Peuroja : Peuroihin
+  Tiura   10   Tiura : Tiuran : Tiuraa : Tiuraan : Tiurat : Tiurain, Tiurien : Tiuria : Tiuriin
+Heikura   13   Heikura : Heikuran : Heikuraa : Heikuraan : Heikurat : Heikurojen, Heikuroiden, Heikuroitten : Heikuroja, Heikuroita : Heikuroihin
+\end{verbatim}
+\normalsize
+
+The checking revealed that 74\% of the guessed inflection classes were
+correct as such (66\% of given names, 77\% of family
+names). Additionally, some 4\% were correct, but needed additional
+information, such as alternative inflection class or lack of consonant
+gradation, to be added manually.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{l|rr|rr}
+               & \multicolumn{2}{c|}{Given names}  & \multicolumn{2}{c}{Family names}\\
+               & \multicolumn{2}{c|}{(N = 4220)}   & \multicolumn{2}{c}{(N = 12187)}\\
+\hline
+Correct        & ~2787  &  66.0\%  &    ~9314  &  76.7\%\\
+Correct w/add. & ~~279  &   6.7\%  &    ~~295  &   2.4\%\\
+Not correct    & ~1154  &  27.3\%  &    ~2578  &  21.1\%\\
+\end{tabular}
+\caption{Inflection class guessing results for personal names.}\label{tab:lang-id-acc}
+\end{center}
+\end{table}
+
+After the lists of personal names had been checked, they were included
+into Omorfi's lexicon in order to improve the guesser's performance
+when handling further proper noun data. Especially the Finnish
+geographical names, which constituted a major part of our data, have
+plenty of resemblances to Finnish family names, and their classification 
+was thus supposed to gain substantially from this addition.
+
+The guesser did indeed perform well with the Finnish geographical
+names (ca. 230,000): 91\% of the inflection class codes generated were
+correct without any editing. A smaller collection of foreign
+geographical names -- states, provinces and cities (ca. 12,000) --
+also yielded quite good results, considering the tiny amount of
+foreign lexical data previously known by Omorfi: 73\% of the guesses
+were correct as such, and 6\% with some additions.
+
+The last batch of our proper names consisted of ca. 6,600
+organisational names. These included mostly Finnish but to some extent
+also international companies, societies and other
+organisations. Before handling the organisations, the geographical
+names were incorporated into Omorfi and the guesser rebuilt. With this
+guesser, we got 86\% of the organisational names correctly assigned
+and 3\% correctly but needing additions.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{l|rr|rr|rr|rr}
+     & \multicolumn{2}{c|}{Finnish geogr.}  & \multicolumn{2}{c|}{States and prov.}  & \multicolumn{2}{c|}{Foreign cities}  & \multicolumn{2}{c}{Organisations}\\
+     & \multicolumn{2}{c|}{(N = 227413)}  & \multicolumn{2}{c|}{(N = 733)}  & \multicolumn{2}{c|}{(N = 11738)}  & \multicolumn{2}{c}{(N = 6627)}\\
+\hline
+Correct        & 207085 & 91.1\%  & ~~~616  &  84.0\% & ~~8437 &   71.9\% & ~~5702 &   86.0\%\\
+Correct w/add. & ~~2001 &  0.9\%  & ~~~~29  &   4.0\% & ~~~685 &    5.8\% & ~~~185 &    2.8\%\\
+Not correct    & ~18327 &  8.1\%  & ~~~~88  &  12.0\% & ~~2616 &   22.3\% & ~~~740 &   11.2\%\\
+\end{tabular}
+\caption{Inflection class guessing results for geographical and organisational names.
+[[States \& prov. and Foreign cities to be put together??]]
+}\label{tab:lang-id-acc}
+\end{center}
+\end{table}
+
+All the numbers drawn together, we can conclude that 89\% of the
+inflection class codes assigned by the guesser were usable as such,
+and ca. 1\% were correct with additions. The percentage would probably
+be a bit lower, had we not taken advantage of adding freshly coded
+batches of vocabulary into Omorfi during the process. It should also
+be noted that organisational names consisting of acronyms not
+inflectable as normal nouns were filtered out of this data. Also
+multi-word names containing a possibly inflecting adjective attribute
+were left out, since they should rather not be handled as single
+lexemes.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{l|rr}
+        & \multicolumn{2}{c}{All together}\\
+        & \multicolumn{2}{c}{(N = 262918)}\\
+\hline
+Correct        & 233941 & 89.0\%\\
+Correct w/add. &   3474 &  1.3\%\\
+Not correct    &  25503 &  9.7\%\\
+\end{tabular}
+\caption{Combined guessing results.}\label{tab:lang-id-acc}
+\end{center}
+\end{table}
 
 More stuff to write about:
 \begin{itemize}
 \item Experiment for Finnish. How often is the first guess correct?
   How often is the correct answer among the three best guesses?
-\item Using the guesser for extending the lexicon.
 \item More?
 \end{itemize}
+
 
 \subsection{Spell-checking}
 % Tommi
