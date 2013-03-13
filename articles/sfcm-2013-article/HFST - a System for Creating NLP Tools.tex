@@ -1086,13 +1086,11 @@ define FrontV [ i | e | é | ä ];
 Instead of using XFST's \verb+define+ function, we save intermediate results
 to files:
 \begin{verbatim}
-echo '[ i | e | é | ä ]' | hfst-regexp2fst > FrontV
+$ echo '[ i | e | é | ä ]' | hfst-regexp2fst > FrontV
 \end{verbatim}  
 Transducer saved in the FrontV file is later simply used as \verb+@"FrontV"+:
 \begin{verbatim}
-$ echo '[ [ ? - [ @"BackV" | @"MorphoV" ] ]+ & $[ @"FrontV" ] ] | \
-[ [ ? - [ @"FrontV" | @"MorphoV" ] ]+ & $[ @"BackV" ] ]'
-|  hfst-regexp2fst > Root
+$ echo '[ ? -  $[ @"FrontV" ] | hfst-regexp2fst > Example
 \end{verbatim}
 
 In order to compare the XFST's and Foma's result with the result from the
@@ -1109,15 +1107,13 @@ Differences might occur when using replace rules in regular expressions.
 One example where we found that XFST and \verb+hfst-regexp2fst+ in certain cases
 give different results is the longest match.
 
-Both regular expressions: 
+Left-to-right longest match is supposed to give exactly one output string for each input string. However, when compiled using XFST, both of the following left-to-right longest match rules result in transducers which for input \verb+aabbaax+ give two outputs: \verb+aaxx+ and \verb+xxx+.
 \begin{verbatim}
 regex a+ b+ | b+ a+ @-> x \\ _ x ;
 regex a+ b+ | b+ a+ @-> x \/ _ x ;
 \end{verbatim}
-result in transducer which for input \verb+aabbaax+ gives two outputs:
-\verb+aaxx+ and \verb+xxx+.
 
-However, the same regular expression compiled with \verb+hfst-regexp2fst+ tool
+The same regular expression compiled with \verb+hfst-regexp2fst+ tool
 will for the same input give only one output \verb+xxx+:
 \begin{verbatim}
 $ echo 'a a b b a a x .o. a+ b+ | b+ a+ @-> x \\ _ x;' \
@@ -1127,7 +1123,8 @@ $ echo 'a a b b a a x .o. a+ b+ | b+ a+ @-> x \// _ x;' \
     | hfst-regexp2fst | hfst-fst2strings
 aabbaax:xxx
 \end{verbatim} 
-It is likely that in this case difference is caused by different compilation approaches.
+
+It is likely that, in this case, difference is caused by different compilation approaches.
 In \verb+hfst-regexp2fst+ tool, replace rules are compiled using preference
 operator~\cite{drobac/2012}, which in this case successfully finds that output string
 \verb+aaxx+ is less preferable in comparison to the output string \verb+xxx+ and therefore is excluded from the final result.
@@ -1148,8 +1145,8 @@ Hfst regex parser prunes alphabet always after following operations:
 \textbf{replace rules} (contexts are also pruned before being compiled with the
 rule), \textbf{complement}, \textbf{containments}, \textbf{intersection},
 \textbf{minus}.
-Therefore, if upper comannds were run in \verb+hfst-regexp2fst+ tool, the
-resulting albphabet would always be \verb+a, b+.
+Therefore, if upper commands were run in \verb+hfst-regexp2fst+ tool, the
+resulting alphabet would always be \verb+a, b+.
 
 \subsection{Pmatch with applications for NER}
 % Sam
