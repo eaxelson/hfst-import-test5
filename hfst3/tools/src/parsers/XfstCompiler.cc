@@ -282,9 +282,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     XfstCompiler&
     XfstCompiler::apply(FILE* infile, ApplyDirection direction)
       {
-        char* line = 0;
-        size_t len = 0;
-        ssize_t read;
+        //char* line = 0;
+        //size_t len = 0;
+        //ssize_t read;
+
+        char * line = NULL;
+
         if (infile == stdin)
           {
             if (direction == APPLY_UP_DIRECTION)
@@ -292,7 +295,10 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             if (direction == APPLY_DOWN_DIRECTION)
               fprintf(stdout, "apply down> ");
           }
-        while ((read = getline(&line, &len, infile)) != -1)
+
+        int ind = current_history_index();
+        //while ((read = getline(&line, &len, infile)) != -1)
+        while ((line = xfst_getline(infile)) != NULL)
           {
             if (direction == APPLY_UP_DIRECTION)
               apply_up_line(line);
@@ -311,6 +317,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           {
             fprintf(stdout, "\n");
           }
+
+        ignore_history_after_index(ind);
         prompt();
         return *this;
       }
@@ -1934,7 +1942,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     return true;
   }
 
-  static char * inspect_getline(FILE * file)
+  // todo: see if readline is supported
+  char * XfstCompiler::xfst_getline(FILE * file)
   {
     /*
     char* line_ = 0;
@@ -1960,20 +1969,61 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     return buf;
   }
 
-  static int length_of_history=0;
-
-  static void begin_inspect_history()
+  int XfstCompiler::current_history_index()
   {
-    length_of_history=history_length;
+    return history_length;
   }
 
-  static void ignore_inspect_history()
+  void XfstCompiler::ignore_history_after_index(int index)
   {
-    for (unsigned int index=(history_length - 1); index > (length_of_history - 1); index--)
+    for (unsigned int i=(history_length - 1); 
+         i > (index - 1); i--)
       {
-        remove_history(index);
+        remove_history(i);
       }
   }
+
+  // whether arc \a number can be followed in a state that has \a number_of_arcs arcs.
+  static bool can_arc_be_followed(int number, unsigned int number_of_arcs)
+  {
+    if (number == EOF || number == 0)
+      {
+        fprintf(stdout, "could not read arc number\n");
+        return false;
+      }
+    else if (number < 1 || number > number_of_arcs)
+      {
+        if (number_of_arcs < 1) 
+          {
+            fprintf(stdout, "state has no arcs\n");
+          }
+        else 
+          {
+            fprintf(stdout, "arc number must be between %i and %i\n", 1, number_of_arcs);
+          }
+        return false;
+      }
+    return true;
+  }
+
+  static bool can_level_be_reached(int level, size_t whole_path_length)
+  {
+    if (level == EOF || level == 0)
+      {
+        fprintf(stdout, "could not read level number (type '0' if you wish to exit program)\n");
+        return false;
+      }
+    else if (level < 0 || level > whole_path_length)
+      {
+        fprintf(stdout, "no such level: '%i' (current level is %i)\n", level, (int)whole_path_length );
+        return false;
+      }
+    return true;
+  }
+
+  static const char * inspect_net_help_msg = 
+    "'N' transits arc N, '-N' returns to level N, '<' "
+    "to previous level, '0' quits.\n";
 
   XfstCompiler&
   XfstCompiler::inspect_net()
@@ -1983,14 +2033,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {
           return *this;
         }
-
       HfstBasicTransducer net(*t);
 
-      const char * help_msg = 
-        "'N' transits arc N, '-N' returns to level N, '<' "
-        "to previous level, '0' quits.\n";
-
-      fprintf(stdout, "%s", help_msg);
+      fprintf(stdout, "%s", inspect_net_help_msg);
 
       // path of states visited, can contain loops
       std::vector<unsigned int> whole_path;
@@ -2010,25 +2055,25 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       // number of arcs in current state
       unsigned int number_of_arcs = print_arcs(transitions);
 
-      char * line;
-      begin_inspect_history();
+      char * line;       // line from xfst_getline
+      // index after which the history added during inspect_net is ignored
+      int ind = current_history_index();
 
       // the while loop begins, keep on reading from user
-      while ((line = inspect_getline(stdin)) != NULL)
+      while ((line = xfst_getline(stdin)) != NULL)
         {
           // case (1): back to previous state
           if (strcmp(line, "<\n") == 0 || strcmp(line, "<") == 0)
             {
-              // exit if already in the start state
-              if (whole_path.size() < 2)
+              if (whole_path.size() < 2)  // exit if already in the start state
                 {
-                  ignore_inspect_history();
+                  ignore_history_after_index(ind);
                   return *this;
                 }
               else if (! return_to_level(whole_path, shortest_path, whole_path.size() - 1))
                 {
                   fprintf(stdout, "FATAL ERROR: could not return to level '%i'\n", (int)(whole_path.size() - 1));
-                  ignore_inspect_history();
+                  ignore_history_after_index(ind);
                   return *this;
                 }
             }
@@ -2036,53 +2081,31 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           else if (line[0] == '-')
             {
               int level = atoi(line+1); // skip '-'
-              if (level == EOF || level == 0)
+              if (! can_level_be_reached(level, whole_path.size()))
                 {
-                  fprintf(stdout, "could not read level number (type '0' if you wish to exit program)\n");
-                  continue;;
-                }
-              else if (level < 0 || level > whole_path.size())
-                {
-                  fprintf(stdout, "no such level: '%i' (current level is %i)\n", level, (int)whole_path.size() );
                   continue;
                 }
               else if (! return_to_level(whole_path, shortest_path, level))
                 {
                   fprintf(stdout, "FATAL ERROR: could not return to level '%i'\n", level);
-                  ignore_inspect_history();
+                  ignore_history_after_index(ind);
                   return *this;
                 }
             }
           // case (3): exit program
           else if (strcmp(line, "0\n") == 0 || strcmp(line, "0") == 0)
             {
-              ignore_inspect_history();
+              ignore_history_after_index(ind);
               return *this;
-              continue;
             }
           // case (4): follow arc
           else
             {
               int number = atoi(line); // FIX: atoi is not portable
-              // first handle special cases..
-              if (number == EOF || number == 0)
+              if (! can_arc_be_followed(number, number_of_arcs))
                 {
-                  fprintf(stdout, "could not read arc number\n");
                   continue;
                 }
-              else if (number < 1 || number > number_of_arcs)
-                {
-                  if (number_of_arcs < 1) 
-                    {
-                      fprintf(stdout, "state has no arcs\n");
-                    }
-                  else 
-                    {
-                      fprintf(stdout, "arc number must be between %i and %i\n", 1, number_of_arcs);
-                    }
-                  continue;
-                }
-              // then the normal case:
               else
                 {
                   HfstBasicTransition tr = transitions[number - 1];
@@ -2104,7 +2127,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
         } // end of while loop
 
-      ignore_inspect_history();
+      ignore_history_after_index(ind);
       prompt();
       return *this;
     }
