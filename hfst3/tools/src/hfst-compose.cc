@@ -176,7 +176,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
 
         hfst_set_name(*first, *first, *second, "compose");
         hfst_set_formula(*first, *first, *second, "∘");
-        first->compose(*second, harmonize_flags, harmonize);
+        first->compose(*second, harmonize);
         outstream << *first;
 
         }
