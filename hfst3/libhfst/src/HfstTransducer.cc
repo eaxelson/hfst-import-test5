@@ -2083,73 +2083,6 @@ bool is_flag_suffix
   return true;
 }
 
-// Return a transducer which disallows flag diacritics @OP.X_2.Y@
-// immediately before @OP.Z_1.W@ (i.e. if there are no intervening
-// symbols or epsilon symbols between the flags).
-HfstTransducer get_path_remover(HfstTransducer &fst)
-{
-  StringSet alphabet = fst.get_alphabet();
-
-  StringSet fst1_flag_diacritics;
-  StringSet fst2_flag_diacritics;
-
-  for (StringSet::const_iterator it = alphabet.begin(); 
-       it != alphabet.end(); 
-       ++it)
-    {
-      if (FdOperation::is_diacritic(*it))
-        { 
-          if (is_flag_suffix("_1", *it))
-            { fst1_flag_diacritics.insert(*it); }
-          else
-            { fst2_flag_diacritics.insert(*it); }
-        }
-    }
-
-  HfstBasicTransducer b;
-  b.add_state();
-  b.set_final_weight(0,0.0);
-  b.set_final_weight(1,0.0);
-
-  HfstBasicTransition id_tr(0,internal_identity,internal_identity,0.0);
-  b.add_transition(0, id_tr);
-  b.add_transition(1, id_tr);
-
-  for (StringSet::const_iterator it = fst1_flag_diacritics.begin(); 
-       it != fst1_flag_diacritics.end(); 
-       ++it)
-    {
-      HfstBasicTransition tr(0,*it,*it,0.0);
-      b.add_transition(0, tr);
-    }
-
-  for (StringSet::const_iterator it = fst2_flag_diacritics.begin(); 
-       it != fst2_flag_diacritics.end(); 
-       ++it)
-    {
-      HfstBasicTransition tr(1,*it,*it,0.0);
-      b.add_transition(0, tr);
-      b.add_transition(1, tr);
-    }
-
-  return HfstTransducer(b,fst.get_type());
-}
-
-// Remove all paths that have flag diacritics @OP.X_2.Y@ 
-// immediately before @OP.Z_1.W@ from fst (i.e. if there 
-// are no intervening symbols or epsilon symbols between 
-// the flags).
-void remove_illegal_paths(HfstTransducer &fst)
-{
-  fst.substitute(internal_epsilon, "TMP_FLAG_PATH_REMOVE_EPSILON");
-
-  HfstTransducer illegal_path_remover = get_path_remover(fst);
-  fst.compose(illegal_path_remover).minimize();
-
-  fst.substitute("TMP_FLAG_PATH_REMOVE_EPSILON", internal_epsilon);
-  fst.remove_from_alphabet("TMP_FLAG_PATH_REMOVE_EPSILON");
-}
-
 void HfstTransducer::harmonize_flag_diacritics(HfstTransducer &another,
                                                bool insert_renamed_flags)
 {
@@ -2164,8 +2097,6 @@ void HfstTransducer::harmonize_flag_diacritics(HfstTransducer &another,
         {
           this->insert_freely_missing_flags_from(another);
           another.insert_freely_missing_flags_from(*this);
-          remove_illegal_paths(*this);
-          remove_illegal_paths(another);
         }
     }
   else if (this_has_flag_diacritics and insert_renamed_flags)
@@ -2696,7 +2627,9 @@ bool substitute_unknown_identity_pairs
 
 
 HfstTransducer &HfstTransducer::compose
-(const HfstTransducer &another, bool harmonize)
+(const HfstTransducer &another, 
+ bool remove_illegal_flag_paths, 
+ bool harmonize)
 { is_trie = false;
 
     if (this->type != another.type)
@@ -2800,7 +2733,166 @@ HfstTransducer &HfstTransducer::compose
     }
     delete another_copy;
 
+    if (remove_illegal_flag_paths)
+      { this->remove_illegal_flag_paths(); }
+
     return *this;
+}
+
+// Composition with this transducer restricts _1_flags ($X.Y_1.Z$) so
+// they can't succeed _2_flags ($X.Y_2.Z$) immediately. Used for
+// filtering illegal combinations of flag diacritics after binary
+// operations.
+HfstTransducer get_flag_path_restriction(const StringSet &_1_flags,
+                                         const StringSet &_2_flags,
+                                         ImplementationType type)
+{
+  // Two state fst with borh states final.
+  HfstBasicTransducer basic_restriction;
+  basic_restriction.add_state();
+  implementations::HfstState start_state = 0;
+  implementations::HfstState seen_2_state = 1;
+
+  basic_restriction.set_final_weight(start_state, 0.0);
+  basic_restriction.set_final_weight(seen_2_state, 0.0);
+
+  basic_restriction.add_transition
+    (start_state,
+     HfstBasicTransition(start_state,
+                         internal_identity,
+                         internal_identity,
+                         0.0));
+
+  basic_restriction.add_transition
+    (seen_2_state,
+     HfstBasicTransition(start_state,
+                         internal_identity,
+                         internal_identity,
+                         0.0));
+
+  // All _1_flags are allowed as long as no _2_flags with no
+  // intervening symbols were observed.
+  for (StringSet::const_iterator it = _1_flags.begin();
+       it != _1_flags.end();
+       ++it)
+    {
+      std::string dollar_flag = *it;
+      dollar_flag.at(0) = '$';
+      dollar_flag.at(dollar_flag.size() - 1) = '$';
+
+      basic_restriction.add_transition
+        (start_state,
+         HfstBasicTransition(start_state,
+                             dollar_flag,
+                             dollar_flag,
+                             0.0));
+    }
+
+  // If _2_flags are observed, _1_flags are illegal before an
+  // intervening regular symbol is seen.
+  for (StringSet::const_iterator it = _2_flags.begin();
+       it != _2_flags.end();
+       ++it)
+    {
+      std::string dollar_flag = *it;
+      dollar_flag.at(0) = '$';
+      dollar_flag.at(dollar_flag.size() - 1) = '$';
+
+      basic_restriction.add_transition
+        (start_state,
+         HfstBasicTransition(seen_2_state,
+                             dollar_flag,
+                             dollar_flag,
+                             0.0));
+
+      basic_restriction.add_transition
+        (seen_2_state,
+         HfstBasicTransition(seen_2_state,
+                             dollar_flag,
+                             dollar_flag,
+                             0.0));
+    }
+
+  HfstTransducer restriction(basic_restriction,
+                             type);
+
+  return restriction;
+}
+
+HfstTransducer &HfstTransducer::remove_illegal_flag_paths(void)
+{ 
+  StringSet alphabet = this->get_alphabet();
+  StringSet _1_flags;
+  StringSet _2_flags;
+
+  // Gather _1 and _2 flag diacritics.
+  for (StringSet::const_iterator it = alphabet.begin();
+       it != alphabet.end();
+       ++it)
+    {
+      if (not FdOperation::is_diacritic(*it))
+        { continue; }
+
+      if (it->find("_1.") != std::string::npos)
+        { 
+          _1_flags.insert(*it);
+        }
+
+      if (it->find("_2.") != std::string::npos)
+        { 
+          _2_flags.insert(*it);
+        }
+    }
+
+  // if there aren't both _1 and _2 flag diaciritcs, there can be no
+  // illegal paths.
+  if (_1_flags.empty() or _2_flags.empty())
+    { return *this; }
+
+  // Rename @...@ flags to $...$ flags and compile restriction.
+  HfstSymbolSubstitutions subst;
+  HfstSymbolSubstitutions back_subst;
+  
+  for (StringSet::const_iterator it = _1_flags.begin();
+       it != _1_flags.end();
+       ++it)
+    {
+      std::string at_flag = *it;
+      std::string dollar_flag = *it;
+      dollar_flag.at(0) = '$';
+      dollar_flag.at(dollar_flag.size() - 1) = '$';
+
+      subst[at_flag] = dollar_flag;
+      back_subst[dollar_flag] = at_flag;
+    }
+
+  for (StringSet::const_iterator it = _2_flags.begin();
+       it != _2_flags.end();
+       ++it)
+    {
+      std::string at_flag = *it;
+      std::string dollar_flag = *it;
+      dollar_flag.at(0) = '$';
+      dollar_flag.at(dollar_flag.size() - 1) = '$';
+
+      subst[at_flag] = dollar_flag;
+      back_subst[dollar_flag] = at_flag;
+    }
+
+  this->substitute(subst);
+
+  HfstTransducer restriction = get_flag_path_restriction(_1_flags,
+                                                         _2_flags,
+                                                         this->type);
+
+
+  // Apply restrictions.
+  this->compose(restriction, false);
+
+  // Rename $...$ flags back to @...@ flags.
+  this->substitute(back_subst);
+
+  return *this;
 }
 
 HfstTransducer &HfstTransducer::lenient_composition( const HfstTransducer &another, bool /*harmonize*/)
