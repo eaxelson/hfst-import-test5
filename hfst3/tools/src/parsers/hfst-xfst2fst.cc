@@ -20,9 +20,10 @@
 
 #include "XfstCompiler.h"
 
-// todo: see if readline is supported 
-#include <readline/readline.h>
-#include <readline/history.h>
+#ifdef HAVE_READLINE
+  #include <readline/readline.h>
+  #include <readline/history.h>
+#endif
 
 #include <getopt.h>
 #include "hfst-commandline.h"
@@ -35,7 +36,11 @@ static char* scriptfilename = NULL;
 static char* startupfilename = NULL;
 static std::vector<char*> execute_commands;
 static bool pipemode = false;
-static bool use_readline = true;
+#ifdef HAVE_READLINE
+  static bool use_readline = true;
+#else
+  static bool use_readline = false;
+#endif
 
 void
 print_usage()
@@ -299,6 +304,9 @@ int main(int argc, char** argv)
   else if (! use_readline)
     {
       verbose_printf("Starting interactive mode...\n");
+      comp.setPromptVerbosity(!silent);
+      if (!silent)
+        comp.prompt();
       // support for backspace
       char line[256];
       while (cin.getline(line, 256))
@@ -312,6 +320,7 @@ int main(int argc, char** argv)
     }
   else
     {
+#ifdef HAVE_READLINE
       // support for backspace and Up/Down keys, needs readline library
 
       verbose_printf("Starting interactive mode...\n");
@@ -336,6 +345,10 @@ int main(int argc, char** argv)
         }
       free(buf);
       free(promptline);
+#else
+      fprintf(stderr, "ERROR: missing readline library\n");
+      return EXIT_FAILURE;
+#endif
     }
 
   return EXIT_SUCCESS;

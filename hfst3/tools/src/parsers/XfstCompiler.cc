@@ -39,10 +39,10 @@ using std::stack;
 #include "xfst-utils.h"
 #include "xfst-parser.h"
 
-// todo: see if readline is supported
-#include <readline/readline.h>
-#include <readline/history.h>
-
+#ifdef HAVE_READLINE
+  #include <readline/readline.h>
+  #include <readline/history.h>
+#endif
 
 #ifndef DEBUG_MAIN
 extern FILE* hxfstin;
@@ -1954,21 +1954,10 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     return true;
   }
 
-  // todo: see if readline is supported
+
   char * XfstCompiler::xfst_getline(FILE * file)
   {
-    /*
-    char* line_ = 0;
-    size_t len = 0;
-    ssize_t read;
-
-    read = getline(&line_, &len, file);
-    if (read == -1)
-      {
-        return NULL;
-      }
-      return line_;*/
-
+#ifdef HAVE_READLINE
     char *buf = NULL;               // result from readline
     rl_bind_key('\t',rl_abort);     // disable auto-complet
 
@@ -1978,20 +1967,38 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           add_history(buf);
       }
     return buf;
+#else
+    char* line_ = 0;
+    size_t len = 0;
+    ssize_t read;
+
+    read = getline(&line_, &len, file);
+    if (read == -1)
+      {
+        return NULL;
+      }
+      return line_;
+#endif
   }
 
   int XfstCompiler::current_history_index()
   {
+#ifdef HAVE_READLINE
     return history_length;
+#else
+    return -1;
+#endif
   }
 
   void XfstCompiler::ignore_history_after_index(int index)
   {
+#ifdef HAVE_READLINE
     for (unsigned int i=(history_length - 1); 
          i > (index - 1); i--)
       {
         remove_history(i);
       }
+#endif
   }
 
   // whether arc \a number can be followed in a state 
@@ -2080,6 +2087,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
               if (whole_path.size() < 2)  // exit if already in the start state
                 {
                   ignore_history_after_index(ind);
+                  prompt();
                   return *this;
                 }
               else if (! return_to_level(whole_path, shortest_path, 
@@ -2088,6 +2096,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
                   fprintf(stdout, "FATAL ERROR: could not return to level '%i'\n", 
                           (int)(whole_path.size() - 1));
                   ignore_history_after_index(ind);
+                  prompt();
                   return *this;
                 }
             }
@@ -2103,6 +2112,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
                 {
                   fprintf(stdout, "FATAL ERROR: could not return to level '%i'\n", level);
                   ignore_history_after_index(ind);
+                  prompt();
                   return *this;
                 }
             }
@@ -2110,6 +2120,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           else if (strcmp(line, "0\n") == 0 || strcmp(line, "0") == 0)
             {
               ignore_history_after_index(ind);
+              prompt();
               return *this;
             }
           // case (4): follow arc
