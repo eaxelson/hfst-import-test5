@@ -15,12 +15,12 @@ do
 	continue;
     fi
 
-    ## Create a transducer [Foo Bar Baz] where Foo is [foo], Bar [bar] and Baz [baz].
+    ## Create a transducer [Foo Bar Baz] where Foo is [foo], Bar [bar] and Baz [Baz].
     ## Definition of Foo is given in startup file, and definitions of Bar and Baz
-    ## on command line.
+    ## on command line. Baz is later undefined in input.
     echo "define Foo" > startup # continue regex on
     echo "foo;" >> startup      # another line
-    if ! ((echo "regex Foo Bar Baz;" && echo "save stack tmp") | \
+    if ! ((echo "undefine Baz" && echo "regex Foo Bar Baz;" && echo "save stack tmp") | \
 	${XFST_TOOL} -f $format -l startup \
 	-e "define Bar bar;" -e "define Baz baz;");
     then
@@ -28,24 +28,27 @@ do
 	exit 1
     fi
     # Test that the result is as intended.
-    if ! (echo "foo bar baz" | ${STRINGS2FST} -f $format | ${COMPARE} tmp);
+    if ! (echo "foo bar Baz" | ${STRINGS2FST} -f $format | ${COMPARE} tmp);
     then
 	${REMOVE} ${EXTRA_FILES}
 	exit 1
     fi
 
-    # Create a transducer with literal words "define".
-    if ! ((echo "regex define;" && echo "save stack tmp") | ${XFST_TOOL} -f $format;);
-    then
-	${REMOVE} ${EXTRA_FILES}
-	exit 1
-    fi
-    # Test that the result is as intended.
-    if ! (echo "define" | ${STRINGS2FST} -f $format | ${COMPARE} tmp);
-    then
-	${REMOVE} ${EXTRA_FILES}
-	exit 1
-    fi
+    # Create a transducer with literal words "define" and "regex".
+    for word in define regex
+    do
+	if ! ((echo "regex "$word";" && echo "save stack tmp") | ${XFST_TOOL} -f $format;);
+	then
+	    ${REMOVE} ${EXTRA_FILES}
+	    exit 1
+	fi
+        # Test that the result is as intended.
+	if ! (echo $word | ${STRINGS2FST} -f $format | ${COMPARE} tmp);
+	then
+	    ${REMOVE} ${EXTRA_FILES}
+	    exit 1
+	fi
+    done
 
     ## Test that using special symbols in replace rules yields an error message
     if ! (echo 'regex a -> "@_foo_@";' | ../hfst-xfst2fst -f $format > /dev/null 2> tmp && grep "warning:" tmp); then
@@ -56,8 +59,16 @@ do
 	exit 1;
     fi
 
-    for testfile in compose_net concatenate_net union_net ignore_net invert_net minus_net intersect_net;
+    ## Test that the result of testfile.xfst (written in att format in file 'result')
+    ## is the same as testfile.att.
+    for testfile in compose_net concatenate_net union_net ignore_net invert_net minus_net intersect_net \
+	determinize_net epsilon_remove_net invert_net minimize_net negate_net \
+	one_plus_net prune_net reverse_net sort_net upper_side_net zero_plus_net lower_side_net
     do
+	if ! (ls $testfile.xfst 2> /dev/null); then
+	    echo "skipping missing test for "$testfile
+	    continue
+	fi
 	if ! (cat $testfile.xfst | ../hfst-xfst2fst -q -f $format > /dev/null); then
 	    echo "ERROR: in compiling "$testfile".xfst"
 	    exit 1;
@@ -72,8 +83,6 @@ do
 	fi
     done
 
-    # for testfile in test_equivalence
-
 ## add properties
 # alias
 # apply down
@@ -86,32 +95,18 @@ do
 # compile-replace lower
 # compile-replace upper
 # complete net
-# compose net
-
-
-# concatenate net
 # crossproduct net
-# define
-# determinize net
 # echo
 # edit properties
 # eliminate flag
-# epsilon-remove net
 # help
 # ignore net
 # inspect net
-# intersect net
-# invert net
 # label net
 # list
 # load defined
 # load stack
-# lower-side net
-# minimize net
-# minus net
 # name net
-# negate net
-# one-plus net
 # pop stack
 # print aliases
 # print arc-tally
@@ -141,7 +136,6 @@ do
 # print stack
 # print upper-words
 # print words
-# prune net
 # push defined
 # quit
 # read att
@@ -151,7 +145,6 @@ do
 # read regex
 # read spaced-text
 # read text
-# reverse net
 # rotate stack
 # save defined
 # save stack
@@ -159,7 +152,6 @@ do
 # show
 # shuffle net
 # sigma net
-# sort net
 # source
 # substitute defined
 # substitute label
@@ -178,9 +170,7 @@ do
 # turn stack
 # twosided flag-diacritics
 # undefine
-# union net
 # unlist
-# upper-side net
 # write att
 # write definition
 # write definitions
@@ -189,7 +179,7 @@ do
 # write properties
 # write spaced-text
 # write text
-# zero-plus net
+
 
 
 done
