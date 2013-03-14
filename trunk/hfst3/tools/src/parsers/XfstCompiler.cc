@@ -279,44 +279,36 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         return *this;
       }
 
+  static void print_apply_prompt(ApplyDirection direction)
+  {
+    if (direction == APPLY_UP_DIRECTION)
+      fprintf(stdout, "apply up> ");
+    else if (direction == APPLY_DOWN_DIRECTION)
+      fprintf(stdout, "apply down> ");
+  }
+
     XfstCompiler&
     XfstCompiler::apply(FILE* infile, ApplyDirection direction)
       {
-        //char* line = 0;
-        //size_t len = 0;
-        //ssize_t read;
-
         char * line = NULL;
 
         if (infile == stdin)
-          {
-            if (direction == APPLY_UP_DIRECTION)
-              fprintf(stdout, "apply up> ");
-            if (direction == APPLY_DOWN_DIRECTION)
-              fprintf(stdout, "apply down> ");
-          }
+          print_apply_prompt(direction);
 
         int ind = current_history_index();
-        //while ((read = getline(&line, &len, infile)) != -1)
+
         while ((line = xfst_getline(infile)) != NULL)
           {
             if (direction == APPLY_UP_DIRECTION)
               apply_up_line(line);
-            if (direction == APPLY_DOWN_DIRECTION)
+            else if (direction == APPLY_DOWN_DIRECTION)
               apply_down_line(line);
             
             if (infile == stdin)
-              {
-                if (direction == APPLY_UP_DIRECTION)
-                  fprintf(stdout, "apply up> ");
-                if (direction == APPLY_DOWN_DIRECTION)
-                  fprintf(stdout, "apply down> ");
-              }
+              print_apply_prompt(direction);
           }
         if (infile == stdin)
-          {
-            fprintf(stdout, "\n");
-          }
+          fprintf(stdout, "\n");
 
         ignore_history_after_index(ind);
         prompt();
@@ -453,7 +445,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
                        const char* xre)
     {
       HfstTransducer* compiled = xre_.compile(xre);
-      char* signature = static_cast<char*>(malloc(sizeof(char)*strlen(name)+strlen(prototype)+1));
+      char* signature = static_cast<char*>
+        (malloc(sizeof(char)*strlen(name)+strlen(prototype)+1));
       const char* s = name;
       char* p = signature;
       while (*s != '\0')
@@ -757,7 +750,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       if (stack_.size() < 2)
         {
-          fprintf(stderr, "Not enough networks on stack. Operation requires at least 2.\n");
+          fprintf(stderr, "Not enough networks on stack. "
+                  "Operation requires at least 2.\n");
           return *this;
         }
       HfstTransducer* first = stack_.top();
@@ -819,17 +813,20 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       HfstTransducer * temp = this->top();
       if (NULL == temp)
         return *this;
+
       HfstTransducer tmp(*temp);
       tmp.input_project();
       HfstTransducer id(hfst::internal_identity, tmp.get_type());
       bool value = false;
+
       if (level == UPPER_LEVEL)
         value = id.compare(tmp, false);
       else if (level == LOWER_LEVEL)
         value = ! id.compare(tmp, false);
       else
-        fprintf(stderr, "ERROR: argumnent given to function 'test_uni'\n"
+        fprintf(stderr, "ERROR: argument given to function 'test_uni'\n"
                 "not recognized\n");
+
       this->print_bool(value);
       prompt();
       return *this;
@@ -862,11 +859,13 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       HfstTransducer * tmp = this->top();
       if (NULL == tmp)
         return *this;
+
       HfstTransducer empty(tmp->get_type());
       bool value = empty.compare(*tmp, false);
       if (invert_test_result)
         value = !value;
       this->print_bool(value);
+
       prompt();
       return *this;
     }
@@ -898,9 +897,11 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       HfstTransducer* top = this->top();
       if (top == NULL)
         return *this;
+
       stack_.pop();
       top->substitute(src, target);
       stack_.push(top);
+
       print_transducer_info();
       prompt();
       return *this;
@@ -958,8 +959,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::print_defined(FILE* outfile)
     {
-      for (map<string,HfstTransducer*>::const_iterator def = definitions_.begin();
-           def != definitions_.end();
+      for (map<string,HfstTransducer*>::const_iterator def 
+             = definitions_.begin(); def != definitions_.end();
            ++def)
         {
           fprintf(outfile, "%10s ? bytes. ? states, ? arcs, ? paths\n",
@@ -1432,7 +1433,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
 #define MAX_FILE_SIZE 10000000
       size_t read = 0;
-      char* file_data = static_cast<char*>(malloc(sizeof(char)*MAX_FILE_SIZE+1));
+      char* file_data = static_cast<char*>
+        (malloc(sizeof(char)*MAX_FILE_SIZE+1));
       read = fread(file_data, sizeof(char), MAX_FILE_SIZE, infile);
       if ((read > 0) && (read < MAX_FILE_SIZE) && (feof(infile)))
         {
@@ -1609,7 +1611,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   {
       if (stack_.size() < 2)
         {
-          fprintf(stderr, "Not enough networks on stack. Operation requires at least 2.\n");
+          fprintf(stderr, "Not enough networks on stack. "
+                  "Operation requires at least 2.\n");
           return *this;
         }
       HfstTransducer * result = stack_.top();
@@ -1760,8 +1763,10 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           return *this;
         }
 
-      HfstTransducer * result = new HfstTransducer(hfst::internal_identity, hfst::internal_identity, format_);
-      HfstTransducer unk2unk(hfst::internal_unknown, hfst::internal_unknown, format_);
+      HfstTransducer * result = new HfstTransducer
+        (hfst::internal_identity, hfst::internal_identity, format_);
+      HfstTransducer unk2unk
+        (hfst::internal_unknown, hfst::internal_unknown, format_);
       result->disjunct(unk2unk);
       result->repeat_star();
       result->minimize();
@@ -1856,13 +1861,15 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return *this;
     }
 
-  // For 'inspect_net': print to stdout all arcs in \a transitions. Return the number of arcs.
-  static unsigned int print_arcs(const HfstBasicTransducer::HfstTransitions & transitions)
+  // For 'inspect_net': print to stdout all arcs in 
+  // \a transitions. Return the number of arcs.
+  static unsigned int print_arcs
+  (const HfstBasicTransducer::HfstTransitions & transitions)
   {
     bool first_loop = true;
     unsigned int arc_number = 1;
-    for (HfstBasicTransducer::HfstTransitions::const_iterator it = transitions.begin();
-         it != transitions.end(); it++)
+    for (HfstBasicTransducer::HfstTransitions::const_iterator it 
+           = transitions.begin(); it != transitions.end(); it++)
       {
         if (first_loop) 
           {
@@ -1882,7 +1889,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           }
         else
           {
-            fprintf(stdout, " %i. %s:%s", arc_number, isymbol.c_str(), osymbol.c_str());
+            fprintf(stdout, " %i. %s:%s", arc_number, 
+                    isymbol.c_str(), osymbol.c_str());
           }
         arc_number++;
       }
@@ -1891,8 +1899,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   }
 
   // For 'inspect_net': print current level.
-  static void print_level(const std::vector<unsigned int> & whole_path,
-                          const std::vector<unsigned int> & shortest_path)
+  static void print_level
+  (const std::vector<unsigned int> & whole_path,
+   const std::vector<unsigned int> & shortest_path)
   {
     fprintf(stdout, "Level %i", (int)whole_path.size());
     if (shortest_path.size() < whole_path.size())
@@ -1902,9 +1911,10 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   }
 
   // For 'inspect_net': append state \a state to paths.
-  static void append_state_to_paths(std::vector<unsigned int> & whole_path,
-                                    std::vector<unsigned int> & shortest_path,
-                                    unsigned int state)
+  static void append_state_to_paths
+  (std::vector<unsigned int> & whole_path,
+   std::vector<unsigned int> & shortest_path,
+   unsigned int state)
   {
     whole_path.push_back(state);
     for (std::vector<unsigned int>::iterator it = shortest_path.begin();
@@ -1919,10 +1929,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     shortest_path.push_back(state);
   }
 
-  // For 'inspect_net': return to level \a level. Return whether the operation succeeded.
-  static bool return_to_level(std::vector<unsigned int> & whole_path,
-                              std::vector<unsigned int> & shortest_path,
-                              unsigned int level)
+  // For 'inspect_net': return to level \a level. 
+  // Return whether the operation succeeded.
+  static bool return_to_level
+  (std::vector<unsigned int> & whole_path,
+   std::vector<unsigned int> & shortest_path,
+   unsigned int level)
   {
     if (whole_path.size() < level || level == 0)
       return false;
@@ -1956,15 +1968,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         return NULL;
       }
       return line_;*/
-    char *buf = NULL;               // result from readline                                                                                                                                                                                
-    rl_bind_key('\t',rl_abort);     // disable auto-complet                                                                                                                                                                                
+
+    char *buf = NULL;               // result from readline
+    rl_bind_key('\t',rl_abort);     // disable auto-complet
 
     if((buf = readline("")) != NULL)
       {
-        if (buf[0] != '\0') 
-          {
-            add_history(buf);
-          }
+        if (buf[0] != '\0')
+          add_history(buf);
       }
     return buf;
   }
@@ -1983,8 +1994,10 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       }
   }
 
-  // whether arc \a number can be followed in a state that has \a number_of_arcs arcs.
-  static bool can_arc_be_followed(int number, unsigned int number_of_arcs)
+  // whether arc \a number can be followed in a state 
+  // that has \a number_of_arcs arcs.
+  static bool can_arc_be_followed
+  (int number, unsigned int number_of_arcs)
   {
     if (number == EOF || number == 0)
       {
@@ -1994,28 +2007,28 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     else if (number < 1 || number > number_of_arcs)
       {
         if (number_of_arcs < 1) 
-          {
-            fprintf(stdout, "state has no arcs\n");
-          }
+          fprintf(stdout, "state has no arcs\n");
         else 
-          {
-            fprintf(stdout, "arc number must be between %i and %i\n", 1, number_of_arcs);
-          }
+          fprintf(stdout, "arc number must be between %i and %i\n",
+                  1, number_of_arcs);
         return false;
       }
     return true;
   }
 
-  static bool can_level_be_reached(int level, size_t whole_path_length)
+  static bool can_level_be_reached
+  (int level, size_t whole_path_length)
   {
     if (level == EOF || level == 0)
       {
-        fprintf(stdout, "could not read level number (type '0' if you wish to exit program)\n");
+        fprintf(stdout, "could not read level number "
+                "(type '0' if you wish to exit program)\n");
         return false;
       }
     else if (level < 0 || level > whole_path_length)
       {
-        fprintf(stdout, "no such level: '%i' (current level is %i)\n", level, (int)whole_path_length );
+        fprintf(stdout, "no such level: '%i' (current level is %i)\n",
+                level, (int)whole_path_length );
         return false;
       }
     return true;
@@ -2030,9 +2043,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       HfstTransducer * t = this->top();
       if (t == NULL)
-        {
-          return *this;
-        }
+        return *this;
+
       HfstBasicTransducer net(*t);
 
       fprintf(stdout, "%s", inspect_net_help_msg);
@@ -2044,10 +2056,10 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
       append_state_to_paths(whole_path, shortest_path, 0);
       print_level(whole_path, shortest_path);
+
       if (net.is_final_state(0))
-        {
-          fprintf(stdout, " (final)");
-        }
+        fprintf(stdout, " (final)");
+      
       fprintf(stdout, "\n");
 
       // transitions of current state
@@ -2070,9 +2082,11 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
                   ignore_history_after_index(ind);
                   return *this;
                 }
-              else if (! return_to_level(whole_path, shortest_path, whole_path.size() - 1))
+              else if (! return_to_level(whole_path, shortest_path, 
+                                         whole_path.size() - 1))
                 {
-                  fprintf(stdout, "FATAL ERROR: could not return to level '%i'\n", (int)(whole_path.size() - 1));
+                  fprintf(stdout, "FATAL ERROR: could not return to level '%i'\n", 
+                          (int)(whole_path.size() - 1));
                   ignore_history_after_index(ind);
                   return *this;
                 }

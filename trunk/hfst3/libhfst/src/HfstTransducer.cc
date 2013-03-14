@@ -1366,7 +1366,7 @@ HfstTransducer &HfstTransducer::eliminate_flags()
   this->foma_interface.eliminate_flags(this->implementation.foma);
   this->convert(original_type);
 #else
-  HFST_THROW(FunctionNotImplementedException, "HfstTransducer::eliminate_flags");
+  HFST_THROW_MESSAGE(FunctionNotImplementedException, "HfstTransducer::eliminate_flags");
 #endif
   return *this;
 }
@@ -1379,7 +1379,7 @@ HfstTransducer &HfstTransducer::eliminate_flag(const std::string & flag)
   this->foma_interface.eliminate_flag(this->implementation.foma, flag);
   this->convert(original_type);
 #else
-  HFST_THROW(FunctionNotImplementedException, "HfstTransducer::eliminate_flag");
+  HFST_THROW_MESSAGE(FunctionNotImplementedException, "HfstTransducer::eliminate_flag");
 #endif
   return *this;
 }
