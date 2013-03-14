@@ -22,7 +22,7 @@ do
     echo "foo;" >> startup      # another line
     if ! ((echo "undefine Baz" && echo "regex Foo Bar Baz;" && echo "save stack tmp") | \
 	${XFST_TOOL} -f $format -l startup \
-	-e "define Bar bar;" -e "define Baz baz;");
+	-e "define Bar bar;" -e "define Baz baz;" > /dev/null 2> /dev/null);
     then
 	${REMOVE} ${EXTRA_FILES}
 	exit 1
@@ -37,7 +37,7 @@ do
     # Create a transducer with literal words "define" and "regex".
     for word in define regex
     do
-	if ! ((echo "regex "$word";" && echo "save stack tmp") | ${XFST_TOOL} -f $format;);
+	if ! ((echo "regex "$word";" && echo "save stack tmp") | ${XFST_TOOL} -f $format > /dev/null 2> /dev/null;);
 	then
 	    ${REMOVE} ${EXTRA_FILES}
 	    exit 1
@@ -51,11 +51,11 @@ do
     done
 
     ## Test that using special symbols in replace rules yields an error message
-    if ! (echo 'regex a -> "@_foo_@";' | ../hfst-xfst2fst -f $format > /dev/null 2> tmp && grep "warning:" tmp); then
+    if ! (echo 'regex a -> "@_foo_@";' | ../hfst-xfst2fst -f $format > /dev/null 2> tmp && grep "warning:" tmp > /dev/null); then
 	exit 1;
     fi
     # silent mode
-    if (echo 'regex a -> "@_foo_@";' | ../hfst-xfst2fst -s -f $format > /dev/null 2> tmp && grep "warning:" tmp); then
+    if (echo 'regex a -> "@_foo_@";' | ../hfst-xfst2fst -s -f $format > /dev/null 2> tmp && grep "warning:" tmp > /dev/null); then
 	exit 1;
     fi
 
@@ -66,7 +66,7 @@ do
 	one_plus_net prune_net reverse_net sort_net upper_side_net zero_plus_net lower_side_net
     do
 	if ! (ls $testfile.xfst 2> /dev/null); then
-	    echo "skipping missing test for "$testfile
+	    echo "skipping missing test for "$testfile"..."
 	    continue
 	fi
 	if ! (cat $testfile.xfst | ../hfst-xfst2fst -q -f $format > /dev/null); then
@@ -83,10 +83,29 @@ do
 	fi
     done
 
+    ## Test that the result of testfile.xfst (written to standard output)
+    ## contains the lines listed in testfile.grep.
+    for testfile in apply_up apply_down print_stack
+    do
+	if ! (ls $testfile.xfst 2> /dev/null); then
+	    echo "skipping missing test for "$testfile"..."
+	    continue
+	fi
+	if ! (cat $testfile.xfst | ../hfst-xfst2fst -f $format > tmp); then
+	    echo "ERROR: in compiling "$testfile.xfst
+	    exit 1;
+	fi
+	for expression in `cat $testfile.grep`
+	do
+	    if ! (grep $expression tmp > /dev/null); then
+		echo "ERROR: "$testfile" test failed: cannot find '"$expression"' in output"
+		exit 1;
+	    fi
+	done
+    done
+
 ## add properties
 # alias
-# apply down
-# apply up
 # apropos
 # cleanup net
 # clear stack
@@ -133,7 +152,6 @@ do
 # print sigma-tally
 # print sigma-word-tally
 # print size
-# print stack
 # print upper-words
 # print words
 # push defined

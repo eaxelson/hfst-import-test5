@@ -1,0 +1,5 @@
+regex [ foo:bar | foo:baz ];
+apply up
+foo
+bar
+baz
