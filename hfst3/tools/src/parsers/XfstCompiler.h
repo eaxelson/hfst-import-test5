@@ -109,7 +109,6 @@ class XfstCompiler
   //! @todo Regex parser does not support macro functions
   XfstCompiler& define(const char* name, const char* prototype, const char* xre);
   //! @brief Remove definition
-  //! @todo Regex parser doesn't support undefine
   XfstCompiler& undefine(const char* name_list);
   //! @brief Remove list
   //! @todo HFST does not support lists

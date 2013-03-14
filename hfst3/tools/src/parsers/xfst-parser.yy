@@ -716,6 +716,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | CROSSPRODUCT END_COMMAND {
             hfst::xfst::xfst_->crossproduct_net();
        }
+       | MINIMIZE END_COMMAND {
+            hfst::xfst::xfst_->minimize_net();
+       }
        | DETERMINIZE END_COMMAND {
             hfst::xfst::xfst_->determinize_net();
        }

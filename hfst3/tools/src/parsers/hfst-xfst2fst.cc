@@ -65,7 +65,8 @@ print_usage()
           "Option --execute can be invoked many times.\n"
           "If FMT is not given, OpenFst's tropical format will be used.\n"
           "The possible values for FMT are { foma, openfst-tropical, openfst-log,\n"
-          "sfst, optimized-lookup-weighted, optimized-lookup-unweighted }\n");
+          "sfst, optimized-lookup-weighted, optimized-lookup-unweighted }\n"
+          "Readline library, if enabled when configuring, is used for input be default.\n");
   fprintf(message_out, "\n");
   print_report_bugs();
   fprintf(message_out, "\n");

@@ -478,6 +478,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           if (definitions_.find(name) != definitions_.end())
             {
               definitions_.erase(definitions_.find(name));
+              xre_.undefine(name);
             }
           name = strtok(NULL, " ");
         }
