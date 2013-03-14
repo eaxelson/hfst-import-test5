@@ -306,10 +306,17 @@ An example:
     HfstTransducer &disjunct_as_tries(HfstTransducer &another,
                                       ImplementationType type);  
 
+
+    /* Remove paths where @..._2@ transitions immediately preceede 
+       @..._1@ transitions, i.e. transitions resulting from incorrect
+       ordering of flag diacritics. */
+    HfstTransducer &remove_illegal_flag_paths(void);
+
     /* Whether the conversion requested can be done without losing 
        any information */
     static bool is_safe_conversion(ImplementationType original,
                                    ImplementationType conversion);
+
 
     /* For internal use */
     static HfstTransducer &read_in_att_format
@@ -1190,7 +1197,9 @@ ccc : ddd
     HfstTransducer &output_project();
 
     /** \brief Compose this transducer with \a another. */
-    HfstTransducer &compose(const HfstTransducer &another, bool harmonize=true);
+    HfstTransducer &compose(const HfstTransducer &another, 
+                            bool remove_illegal_flag_paths = false, 
+                            bool harmonize=true);
 
     /** \brief Compose this transducer with the intersection of
         transducers in \a v. If \a invert is true, then compose the
