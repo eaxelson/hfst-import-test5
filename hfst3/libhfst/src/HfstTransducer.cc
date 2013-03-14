@@ -1980,11 +1980,19 @@ void HfstTransducer::insert_freely_missing_flags_from
     if (check_for_missing_flags_in(another, missing_flags,
                                    false /* do not return on first miss */ ))
     {
-        for (StringSet::const_iterator it = missing_flags.begin();
-             it != missing_flags.end(); it++)
-          {
-            insert_freely(StringPair(*it, *it), false);
-          }     
+      HfstBasicTransducer basic(*this);
+
+      for (size_t s = 0; s <= basic.get_max_state(); ++s)
+        {
+          for (StringSet::const_iterator it = missing_flags.begin();
+               it != missing_flags.end(); it++)
+            {
+              basic.add_transition
+                (s, HfstBasicTransition(s,*it,*it,0.0));
+            }
+        }
+
+      *this = HfstTransducer(basic, this->type);
     }
 }
 
