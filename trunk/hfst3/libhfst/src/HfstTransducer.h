@@ -1198,7 +1198,6 @@ ccc : ddd
 
     /** \brief Compose this transducer with \a another. */
     HfstTransducer &compose(const HfstTransducer &another, 
-                            bool remove_illegal_flag_paths = false, 
                             bool harmonize=true);
 
     /** \brief Compose this transducer with the intersection of

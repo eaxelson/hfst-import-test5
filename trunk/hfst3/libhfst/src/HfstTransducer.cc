@@ -2101,10 +2101,12 @@ void HfstTransducer::harmonize_flag_diacritics(HfstTransducer &another,
     {
       rename_flag_diacritics(*this,"_1");
       rename_flag_diacritics(another,"_2");
+
       if (insert_renamed_flags)
         {
           this->insert_freely_missing_flags_from(another);
           another.insert_freely_missing_flags_from(*this);
+          this->remove_illegal_flag_paths();
         }
     }
   else if (this_has_flag_diacritics and insert_renamed_flags)
@@ -2636,7 +2638,6 @@ bool substitute_unknown_identity_pairs
 
 HfstTransducer &HfstTransducer::compose
 (const HfstTransducer &another, 
- bool remove_illegal_flag_paths, 
  bool harmonize)
 { is_trie = false;
 
@@ -2740,9 +2741,6 @@ HfstTransducer &HfstTransducer::compose
        substitute(&substitute_unknown_identity_pairs);
     }
     delete another_copy;
-
-    if (remove_illegal_flag_paths)
-      { this->remove_illegal_flag_paths(); }
 
     return *this;
 }
@@ -2895,7 +2893,7 @@ HfstTransducer &HfstTransducer::remove_illegal_flag_paths(void)
 
 
   // Apply restrictions.
-  this->compose(restriction, false);
+  this->compose(restriction);
 
   // Rename $...$ flags back to @...@ flags.
   this->substitute(back_subst);
