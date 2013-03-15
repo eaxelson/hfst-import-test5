@@ -1079,8 +1079,13 @@ in interactive mode or to compile scriptfiles. The tool implements the
 same functionalities as the original XFST (Xerox Finite-State Tool)
 which is a general-purpose utility for computing with finite-state
 networks. There are over 100 commands in hfst-xfst, the same as in the
-Xerox tool. Below is an example of using hfst-xfst in interactive mode
-where we define two transducer variables, use them in a regular
+Xerox tool. Additionally, there is an option to independently use
+regular expression parser the module was built upon, through the
+\verb+hfst-regexp2fst+ tool. It is likely that it is easier to parse
+regular expressions in bash scripts that way.
+
+Below is an example of using hfst-xfst in interactive
+mode where we define two transducer variables, use them in a regular
 expression and print random words recognized by the expression.
 
 \begin{verbatim}
@@ -1097,77 +1102,65 @@ foobazbar
 hfst[1]: 
 \end{verbatim}
 
-To test hfst-xfst, we have compiled 17 out of the 22 XFST exercises
+To test \verb+hfst-xfst2fst+, we have compiled 17 out of the 22 XFST exercises
 that are found in the homepage of Beesley and Karttunen's book Finite
 State Morphology. We have omitted the exercises that do not include an
 answer and are not trivial to solve. We have compiled the exercises
 using both Xerox's XFST and HFST's hfst-xfst and compared the results
-for equivalence. For some exercises, we also have an additional
-solution that uses hfst command line tools (other than hfst-xfst).
+for equivalence. We have also tested the funcionality of the
+\verb+hfst-regexp2fst+ tool by rewriting the original tests in a way that they
+use hfst command line tools (other than hfst-xfst).
 
-\subsection{XFST regexp compilation}
 % Senka, Miikka
-
-Regex parser tool \verb+hfst-regexp2fst+ was developed. General backward
-compability with XFST regular expression parser was demonstrated through the
-fsm-book test set, where original tests were altered in a way that they could be
-run through the parser tool. Since the parser tool alone doesn't have stack
-operations as XFST and Foma do, the biggest change in the test cases was
-operating with defined variables.
-
-For example, in the Monish Guesser Analyser test, front vowels are defined:
-\begin{verbatim}
-define FrontV [ i | e | é | ä ];
-\end{verbatim}  
-Instead of using XFST's \verb+define+ function, we save intermediate results
-to files:
-\begin{verbatim}
-$ echo '[ i | e | é | ä ]' | hfst-regexp2fst > FrontV
-\end{verbatim}  
-Transducer saved in the FrontV file is later simply used as \verb+@"FrontV"+:
-\begin{verbatim}
-$ echo '[ ? -  $[ @"FrontV" ] | hfst-regexp2fst > Example
-\end{verbatim}
-
-In order to compare the XFST's and Foma's result with the result from the
-\verb+hfst-regexp2fst+ tool, we wrote out the XFST's result as prolog script,
-transformed it to HFST type transducer and then used \verb+hfst-compare+ tool
-for comparison. Unfortunately, for some tests, the stack was too big to be saved
-as a text file. For those tests we used only foma compiler to get the result
-transducer we can compare our results to.
-
-Although we aimed to get complete backward compability with XFST and Foma, we
-noticed that in some border line cases the results might differ.
-
-Differences might occur when using replace rules in regular expressions.
-One example where we found that XFST and \verb+hfst-regexp2fst+ in certain cases
+Although we are aiming to get complete backward compability with XFST, we
+noticed that in some border line cases the results might differ. Differences
+might occur when using replace rules in regular expressions.
+One example where we found that XFST and \verb+hfst-xfst2fst+ in certain cases
 give different results is the longest match.
 
-Left-to-right longest match is supposed to give exactly one output string for each input string. However, when compiled using XFST, both of the following left-to-right longest match rules result in transducers which for input \verb+aabbaax+ give two outputs: \verb+aaxx+ and \verb+xxx+.
+
+By it's definition, in left-to-right longest match: 
 \begin{verbatim}
-regex a+ b+ | b+ a+ @-> x \\ _ x ;
-regex a+ b+ | b+ a+ @-> x \/ _ x ;
+A @-> B || L _ R
+\end{verbatim}
+where \verb+A+, \verb+B+, \verb+L+ and \verb+R+ denote languages, the
+expression \verb+A+ matches input left-to-right and replaces only the longest
+match at each step.
+
+Therefore, left-to-right longest match is supposed to give exactly one output
+string for each input string. However, when compiled using XFST, both of the following left-to-right
+longest match rules result in transducers which for input \verb+aabbaax+ give two outputs: \verb+aaxx+ and \verb+xxx+.
+\begin{verbatim}
+xfst[0]: regex a+ b+ | b+ a+ @-> x \\ _ x ;
+3.1 Kb. 8 states, 31 arcs, Circular.
+xfst[1]: down aabbaax
+aaxx
+xxx
+xfst[1]: regex a+ b+ | b+ a+ @-> x \/ _ x ;
+3.1 Kb. 8 states, 31 arcs, Circular.
+xfst[2]: down aabbaax
+aaxx
+xxx
 \end{verbatim}
 
-The same regular expression compiled with \verb+hfst-regexp2fst+ tool
-will for the same input give only one output \verb+xxx+:
-\begin{verbatim}
-$ echo 'a a b b a a x .o. a+ b+ | b+ a+ @-> x \\ _ x;' \
-    | hfst-regexp2fst | hfst-fst2strings
-aabbaax:xxx
-$ echo 'a a b b a a x .o. a+ b+ | b+ a+ @-> x \// _ x;' \
-    | hfst-regexp2fst | hfst-fst2strings
-aabbaax:xxx
-\end{verbatim} 
+In the examples, \verb+\\+ sign denotes that the left context \verb+L+ is to be
+matched on the input side of the relation and the right context \verb+R+ is to
+be matched on the output side of the relation. The \verb+\/+ sign denotes
+that both contexts are to be matched on the output side of the relation.
+
+The same regular expressions compiled with \verb+hfst-xfst2fst+ will for the same
+input give only one output \verb+xxx+, which we consider to be the only correct
+result.
 
 It is likely that, in this case, difference is caused by different compilation approaches.
-In \verb+hfst-regexp2fst+ tool, replace rules are compiled using preference
+In \verb+hfst-xfst2fst+, replace rules are compiled using preference
 operator~\cite{drobac/2012}, which in this case successfully finds that output string
 \verb+aaxx+ is less preferable in comparison to the output string \verb+xxx+ and therefore is excluded from the final result.
 
 Furthermore, we have noticed that there are some differences in pruning alphabet
 after performing certain operations.
-These two examples will give different results if compiled with XFST:  
+These two examples will give the same transition graphs, but different alphabet
+sets if compiled with XFST:
 \begin{verbatim}
 regex [a | b | c ] & $[a | b] ;
 resulting alphabet: a, b
@@ -1177,12 +1170,19 @@ regex [a | b | c ] & [a | b] ;
 resulting alphabet: a, b, c
 \end{verbatim}
 
-Hfst regex parser prunes alphabet always after following operations:
+Hfst's \verb+hfst-xfst2fst+ prunes alphabet always after following operations:
 \textbf{replace rules} (contexts are also pruned before being compiled with the
 rule), \textbf{complement}, \textbf{containments}, \textbf{intersection},
-\textbf{minus}.
-Therefore, if upper commands were run in \verb+hfst-regexp2fst+ tool, the
-resulting alphabet would always be \verb+a, b+.
+\textbf{minus}. However, it seems that XFST prunes the alphabet only if at
+least one of the operands contains unknown symbols and if the result doesn't
+contain any. Therefore, if upper commands were run in \verb+hfst-xfst2fst+
+environment, the resulting alphabet would be differen't from XFST's, it
+would in both cases be \verb+a+, \verb+b+.
+
+We haven't managed to find an example in which this difference might influence
+the correctnes of the result, but pruning alphabet does result with
+having a slightly smaller result transducer.
+
 
 \subsection{Pmatch with applications for NER}
 % Sam
