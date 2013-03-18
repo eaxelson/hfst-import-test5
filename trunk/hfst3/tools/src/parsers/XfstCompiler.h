@@ -58,6 +58,8 @@ namespace xfst {
   // Used internally in function 'test_uni'.
   enum Level { LOWER_LEVEL, UPPER_LEVEL };
 
+  enum TestOperation { TEST_SUBLANGUAGE_, TEST_OVERLAP_ };
+
 //! @brief Xfst compiler contains all the methods and variables a session of
 //! XFST script parser needs.
 class XfstCompiler
@@ -234,6 +236,9 @@ class XfstCompiler
   XfstCompiler& print_file_info(FILE* outfile);
   //! @brief Print flag diacritics
   XfstCompiler& print_flags(FILE* outfile);
+
+  XfstCompiler& print_labels(FILE* outfile, HfstTransducer* tr);
+
   //! @brief Print labels in network @a name
   XfstCompiler& print_labels(const char* name, FILE* outfile);
   //! @brief Print labels
@@ -462,6 +467,9 @@ class XfstCompiler
   //! popping each of them and the result is pushed to the stack.
   //! If the stack is empty, print a warning.
   XfstCompiler& apply_binary_operation_iteratively(BinaryOperation operation);
+
+  //! @brief Print the result of \a operation when applied to the whole stack.
+  XfstCompiler& test_operation(TestOperation operation);
 
   //! @brief The topmost transducer in the stack.
   //! If empty, print a warning message and return NULL.

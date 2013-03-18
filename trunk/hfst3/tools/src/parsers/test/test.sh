@@ -85,17 +85,17 @@ do
 
     ## Test that the result of testfile.xfst (written to standard output)
     ## contains the lines listed in testfile.grep.
-    for testfile in apply_up apply_down print_stack
+    for testfile in apply_up apply_down print_stack print_labels
     do
 	if ! (ls $testfile.xfst 2> /dev/null); then
 	    echo "skipping missing test for "$testfile"..."
 	    continue
 	fi
-	if ! (cat $testfile.xfst | ../hfst-xfst2fst -f $format > tmp); then
+	if ! (cat $testfile.xfst | ../hfst-xfst2fst -f $format | tr ' ' '#' > tmp); then
 	    echo "ERROR: in compiling "$testfile.xfst
 	    exit 1;
 	fi
-	for expression in `cat $testfile.grep`
+	for expression in `cat $testfile.grep | tr ' ' '#'`
 	do
 	    if ! (grep $expression tmp > /dev/null); then
 		echo "ERROR: "$testfile" test failed: cannot find '"$expression"' in output"
@@ -103,6 +103,31 @@ do
 	    fi
 	done
     done
+
+    ## Test that the results of testfile_true.xfst and testfile_false.xfst (written to file tmp)
+    ## contain the lines listed in files test_true.grep and test_false.grep, respectively.
+    for testcase in _true _false # whether we test the positive or negative case
+    do
+	for testfile in test_overlap test_sublanguage # the function to be tested
+	do
+	    if ! (ls $testfile$testcase.xfst 2> /dev/null); then
+		echo "skipping missing test for "$testfile$testcase"..."
+		continue
+	    fi
+	    if ! (cat $testfile$testcase.xfst | ../hfst-xfst2fst -f $format | tr ' ' '#' > tmp); then
+		echo "ERROR: in compiling "$testfile$testcase.xfst
+		exit 1;
+	    fi
+	    for expression in `cat "test"$testcase.grep | tr ' ' '#'`
+	    do
+		if ! (grep $expression tmp > /dev/null); then
+		    echo "ERROR: "$testfile$testcase" test failed: cannot find '"$expression"' in output"
+		    exit 1;
+		fi
+	    done
+	done
+    done
+    
 
 ## add properties
 # alias

@@ -804,7 +804,15 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::test_upper_bounded()
     {
-      fprintf(stderr, "test ub missing %s:%d\n", __FILE__, __LINE__);
+      HfstTransducer * temp = this->top();
+      if (NULL == temp)
+        return *this;
+      
+      HfstTransducer tmp(*temp);
+      tmp.output_project();
+      tmp.minimize();
+      
+      this->print_bool(! tmp.is_cyclic());
       prompt();
       return *this;
     }
@@ -840,7 +848,15 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::test_lower_bounded()
     {
-      fprintf(stderr, "test lb missing %s:%d\n", __FILE__, __LINE__);
+      HfstTransducer * temp = this->top();
+      if (NULL == temp)
+        return *this;
+      
+      HfstTransducer tmp(*temp);
+      tmp.input_project();
+      tmp.minimize();
+      
+      this->print_bool(! tmp.is_cyclic());
       prompt();
       return *this;
     }
@@ -870,19 +886,72 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       prompt();
       return *this;
     }
+
+  XfstCompiler&
+  XfstCompiler::test_operation(TestOperation operation)
+  {
+    if (stack_.size() < 2)
+      {
+        fprintf(stderr, "Not enough networks on stack. "
+                "Operation requires at least 2.\n");
+        prompt();
+        return *this;
+      }
+      std::stack<HfstTransducer*> copied_stack(stack_); 
+
+      HfstTransducer topmost_transducer(*(copied_stack.top()));
+      copied_stack.pop();
+
+      HfstTransducer empty(topmost_transducer.get_type());
+
+      while (!copied_stack.empty())
+      {
+        HfstTransducer next_transducer(*(copied_stack.top()));
+        copied_stack.pop();
+
+        switch(operation)
+          {
+          case TEST_OVERLAP_:
+            topmost_transducer.intersect(next_transducer);
+            if(topmost_transducer.compare(empty))
+              {
+                this->print_bool(false);
+                prompt();
+                return *this;
+              }
+            break;
+          case TEST_SUBLANGUAGE_:
+            {
+              HfstTransducer intersection(topmost_transducer);
+              intersection.intersect(next_transducer);
+              if(! intersection.compare(topmost_transducer))
+                {
+                  this->print_bool(false);
+                  prompt();
+                  return *this;
+                }
+              topmost_transducer = next_transducer;
+              break;
+            }
+          default:
+            fprintf(stderr, "ERROR: unknown test operation\n");
+            break;
+          }
+      }
+      this->print_bool(true);
+      prompt();
+      return *this;
+  }
+
   XfstCompiler& 
   XfstCompiler::test_overlap()
     {
-      fprintf(stderr, "test overlap missing %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      return this->test_operation(TEST_OVERLAP_);
     }
   XfstCompiler& 
   XfstCompiler::test_sublanguage()
     {
-      fprintf(stderr, "test sublang missing %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      return this->test_operation(TEST_SUBLANGUAGE_);
     }
   XfstCompiler& 
   XfstCompiler::test_unambiguous()
@@ -1000,18 +1069,62 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return *this;
     }
   
+  XfstCompiler&
+  XfstCompiler::print_labels(FILE* outfile)
+  {
+    HfstTransducer* topmost = this->top();
+    if (topmost == NULL)
+      return *this;
+    return this->print_labels(outfile, topmost);
+  }
+
   XfstCompiler& 
   XfstCompiler::print_labels(const char* name, FILE* outfile)
-    {
-      fprintf(outfile, "missing print %s labels %s:%d\n", name,
-              __FILE__, __LINE__);
+    { 
+      std::map<std::string, HfstTransducer*>::const_iterator it 
+        = definitions_.find(name);
+      if (it == definitions_.end())
+        {
+          fprintf(outfile, "no such definition '%s'\n", name);
+        }
+      else
+        {
+          return this->print_labels(outfile, it->second);
+        }
       prompt();
       return *this;
     }
   XfstCompiler& 
-  XfstCompiler::print_labels(FILE* outfile)
+  XfstCompiler::print_labels(FILE* outfile, HfstTransducer* tr)
     {
-      fprintf(outfile, "missing print labels %s:%d\n", __FILE__, __LINE__);
+      std::set<std::pair<std::string, std::string> > label_set;
+      HfstBasicTransducer fsm(*tr);
+      
+      for (HfstBasicTransducer::const_iterator it = fsm.begin();       
+           it != fsm.end(); it++ ) 
+        {      
+          for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it  
+                 = it->begin(); tr_it != it->end(); tr_it++)       
+            {
+              std::pair<std::string, std::string> label_pair
+                (tr_it->get_input_symbol(), tr_it->get_output_symbol());
+              label_set.insert(label_pair);
+            }
+        }
+        
+      fprintf(outfile, "Labels: ");
+      for(std::set<std::pair<std::string, std::string> >::const_iterator it
+            = label_set.begin(); it != label_set.end(); it++)
+        {
+          if (it != label_set.begin())
+            fprintf(outfile, ", ");
+          fprintf(outfile, "%s", it->first.c_str());
+          if (it->first != it->second)
+            fprintf(outfile, ":%s", it->second.c_str());
+        }
+      fprintf(outfile, "\n");
+      fprintf(outfile, "Size: %i\n", (int)label_set.size());
+
       prompt();
       return *this;
     }

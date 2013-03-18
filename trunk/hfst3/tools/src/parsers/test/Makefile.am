@@ -19,5 +19,9 @@ EXTRA_DIST=test.sh \
 	lower_side_net.xfst lower_side_net.att \
 	apply_up.xfst apply_up.grep \
 	apply_down.xfst apply_down.grep \
-	print_stack.xfst print_stack.grep
+	print_stack.xfst print_stack.grep \
+	print_labels.xfst print_labels.grep \
+	test_sublanguage_true.xfst test_sublanguage_false.xfst \
+	test_overlap_true.xfst test_overlap_false.xfst \
+	test_true.grep test_false.grep
 check_DATA=test.sh

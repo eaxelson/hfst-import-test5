@@ -312,7 +312,7 @@ LWSP [\t ]*
 "print flags"|"flags" {
     return PRINT_FLAGS;
 }
-"print labels"|"labels"$ {
+"print labels"|"labels" {
     return PRINT_LABELS;
 }
 "print label-maps"|"label-maps" {
