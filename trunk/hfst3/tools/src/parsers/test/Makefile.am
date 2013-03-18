@@ -21,6 +21,7 @@ EXTRA_DIST=test.sh \
 	apply_down.xfst apply_down.grep \
 	print_stack.xfst print_stack.grep \
 	print_labels.xfst print_labels.grep \
+	print_label_tally.xfst print_label_tally.grep \
 	test_sublanguage_true.xfst test_sublanguage_false.xfst \
 	test_overlap_true.xfst test_overlap_false.xfst \
 	test_true.grep test_false.grep

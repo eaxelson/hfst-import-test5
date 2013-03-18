@@ -251,6 +251,11 @@ class XfstCompiler
   XfstCompiler& print_list(const char* name, FILE* outfile);
   //! @brief Print all lists
   XfstCompiler& print_list(FILE* outfile);
+
+  bool shortest_string(const hfst::HfstTransducer * transducer,
+                       hfst::HfstTwoLevelPaths & paths,
+                       unsigned int & size);
+
   //! @brief Print shortest string of network
   XfstCompiler& print_shortest_string(FILE* outfile);
   //! @brief Print length of shortest string
