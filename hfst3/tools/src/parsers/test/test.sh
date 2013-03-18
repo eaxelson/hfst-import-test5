@@ -85,7 +85,7 @@ do
 
     ## Test that the result of testfile.xfst (written to standard output)
     ## contains the lines listed in testfile.grep.
-    for testfile in apply_up apply_down print_stack print_labels
+    for testfile in apply_up apply_down print_stack print_labels print_label_tally
     do
 	if ! (ls $testfile.xfst 2> /dev/null); then
 	    echo "skipping missing test for "$testfile"..."

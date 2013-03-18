@@ -170,6 +170,23 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       }
   }
 
+  static void print_paths(const hfst::HfstTwoLevelPaths &paths, FILE* outfile=stdout)
+  {
+    for (hfst::HfstTwoLevelPaths::const_iterator it = paths.begin();
+         it != paths.end(); it++)
+      {
+        hfst::StringPairVector path = it->second;
+        for (hfst::StringPairVector::const_iterator p = path.begin();
+             p != path.end(); p++)
+          {
+            fprintf(outfile, "%s", p->first.c_str());
+            if (p->first != p->second)
+              fprintf(outfile, ":%s", p->second.c_str());
+          }
+        fprintf(outfile, "\n");
+      }
+  }
+
     XfstCompiler&
     XfstCompiler::apply_line(char* line, ApplyDirection direction)
       {
@@ -1139,9 +1156,42 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::print_label_count(FILE* outfile)
     {
-      fprintf(outfile, "missing label count %s:%d\n", __FILE__, __LINE__);
+    HfstTransducer* topmost = this->top();
+    if (topmost == NULL)
       return *this;
+
+    std::map<std::pair<std::string, std::string>, unsigned int > label_map;
+    HfstBasicTransducer fsm(*topmost);
+      
+      for (HfstBasicTransducer::const_iterator it = fsm.begin();       
+           it != fsm.end(); it++ ) 
+        {      
+          for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it  
+                 = it->begin(); tr_it != it->end(); tr_it++)       
+            {
+              std::pair<std::string, std::string> label_pair
+                (tr_it->get_input_symbol(), tr_it->get_output_symbol());
+              (label_map[label_pair])++;
+            }
+        }
+
+      unsigned int index=1;
+      for(std::map<std::pair<std::string, std::string>, unsigned int >::const_iterator 
+            it= label_map.begin(); it != label_map.end(); it++)
+        {
+          if (it != label_map.begin())
+            fprintf(outfile, "   ");
+          fprintf(outfile, "%i. ", index);
+          fprintf(outfile, "%s", it->first.first.c_str());
+          if (it->first.first != it->first.second)
+            fprintf(outfile, ":%s", it->first.second.c_str());
+          fprintf(outfile, " %i", it->second);
+          index++;
+        }
+      fprintf(outfile, "\n");
+
       prompt();
+      return *this;
     }
 
   XfstCompiler&
@@ -1178,17 +1228,74 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return *this;
     }
 
+  bool
+  XfstCompiler::shortest_string
+  (const hfst::HfstTransducer * transducer, 
+   hfst::HfstTwoLevelPaths & paths, 
+   unsigned int & size)
+  { 
+    HfstTransducer empty(transducer->get_type());
+
+    if (empty.compare(*transducer))
+      return false;
+
+    std::string match_xre("");
+    HfstTransducer * n_length = xre_.compile(("[" + match_xre + "]").c_str());
+    n_length->compose(*transducer);
+    
+    while(empty.compare(*n_length))
+      {
+        match_xre.append(std::string("? "));
+        delete n_length;
+        n_length = xre_.compile(("[" + match_xre + "]").c_str());
+        n_length->compose(*transducer);
+        size++;
+      }
+    
+    n_length->extract_paths(paths);
+    delete n_length;
+    return true;
+  }
+
   XfstCompiler& 
   XfstCompiler::print_shortest_string(FILE* outfile)
     {
-      fprintf(outfile, "missing shortest string %s:%d\n", __FILE__, __LINE__);
+      HfstTransducer* topmost = this->top();
+      if (topmost == NULL)
+        return *this;
+
+      HfstTwoLevelPaths paths;
+      unsigned int size=0;
+
+      if (! this->shortest_string(topmost, paths, size))
+        {
+          fprintf(stdout, "transducer is empty\n");
+        }
+      else
+        {
+          print_paths(paths, outfile);
+        }
       prompt();
       return *this;
     }
   XfstCompiler& 
   XfstCompiler::print_shortest_string_size(FILE* outfile)
     {
-      fprintf(outfile, "missing shortest string size %s:%d\n", __FILE__, __LINE__);
+      HfstTransducer* topmost = this->top();
+      if (topmost == NULL)
+        return *this;
+
+      HfstTwoLevelPaths paths;
+      unsigned int size=0;
+
+      if (! this->shortest_string(topmost, paths, size))
+        {
+          fprintf(stdout, "transducer is empty\n");
+        }
+      else
+        {
+          fprintf(outfile, "%i\n", size);
+        }
       prompt();
       return *this;
     }
@@ -1206,24 +1313,6 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       prompt();
       return *this;
     }
-
-  static void print_paths(const hfst::HfstTwoLevelPaths &paths, FILE* outfile)
-  {
-    for (hfst::HfstTwoLevelPaths::const_iterator it = paths.begin();
-         it != paths.end(); it++)
-      {
-        hfst::StringPairVector path = it->second;
-        for (hfst::StringPairVector::const_iterator p = path.begin();
-             p != path.end(); p++)
-          {
-            if (p->first == p->second) {
-              fprintf(outfile, "%s", p->first.c_str()); }
-            else {
-              fprintf(outfile, "%s:%s", p->first.c_str(), p->second.c_str()); }
-          }
-        fprintf(outfile, "\n");
-      }
-  }
 
   XfstCompiler& 
   XfstCompiler::print_lower_words(const char* /* name */,
