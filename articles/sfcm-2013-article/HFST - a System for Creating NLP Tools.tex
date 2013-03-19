@@ -1195,8 +1195,28 @@ having a slightly smaller result transducer.
 \subsection{HMM vs. CRF for English and Finnish taggers}
 % Miikka
 
+
 \subsection{Adding rules to statistical systems (taggers and parser)}
 % Miikka
+While existing statistical models like HMMs and PCFGs can incorporate
+a lot of useful information for tasks like part-of-speech tagging and
+syntactic parsing, there are phenomena like congruence, which are
+simply too complex for these models. Probably because of this, there
+has been a growing interest in combining rule based and statistical
+methods in core NLP tasks like part-of-speech tagging and syntactic
+parsing~\cite{manning/2011}. Such a combination presents challenges
+both for statistical estimation and inference methods and for the
+representation of linguistic information in a way which is compatible
+with a statistical system.
+
+Finite-state transducers and automata can be used to express
+linguistically relevant phenomena for tagging and parsing as regular
+string sets. The validity of this approach is demonstrated by the
+success of parsing systems like Constraint
+Grammar~\cite{karlsson/1990}, which utilizes finite-state
+constraints. Weighted machines offer the added benefit of expressing
+phenomena as fuzzy sets in a compact way. This makes them an excellent
+candidate for adding linguistic knowledge to statistical models.
 
 \section{Conclusion}\label{hfst:conclusion}
 
