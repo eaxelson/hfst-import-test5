@@ -45,12 +45,12 @@ juha.kuokkala, jyrki.niemi, tommi.pirinen, miikka.silfverberg\}@helsinki.fi}}
 
 \subsection{Language identification}
 Language identification is the task of recognizing the language of a
-text or text fragment. It is highly useful in applications, that need
-to process documents written in various languages where the language
+text or text fragment. It is useful in applications, that need to
+process documents written in various languages where the language
 might not be overtly marked in the document. For example a translation
 application might need to identify the language of a document in order
-to apply the correct translation model. Another example is a speller for
-Finnish that might need to identify paragraphs that are written in
+to apply the correct translation model. Another example is a speller
+for Finnish, which might need to identify paragraphs that are written in
 English, in order not to perform spell checking on the paragraphs.
 
 In this section we outline how to use Hfst tagger tools and language
@@ -62,8 +62,8 @@ experiment shows that Hfst language identifiers are highly accurate
 
 There are several methods for performing language
 identification. Highly accurate language identification can be
-accomplished by treating documents as letter sequences and training
-Markov chain from training documents whose language is
+accomplished by treating data as a letter sequence and training
+a Markov chain from training documents whose language is
 known~\cite{cavnar/1994}. One Markov chain is trained for each
 language that the system recognizes. Language identification consists
 of applying each Markov chain on input and choosing the language whose
@@ -145,9 +145,9 @@ show results for each individual language and all languages
 combined. 
 
 Of all sentences, 99.5\% were correctly classified, which demonstrates
-that the language identifiers are highly accurate. This is encouraging
-because Finnish and Estonian have similar orthographies. This applies
-to German, Swedish and Dutch as well.
+that the language identification system is accurate. This is
+encouraging because Finnish and Estonian have similar
+orthographies. This applies to German, Swedish and Dutch as well.
 
 Currently identification is limited to identifying the closest
 language corresponding to a sentence. There is no option to label a
@@ -176,7 +176,7 @@ high coverage analyzer domain specific vocabulary presents a
 challenge. Therefore accurate methods for dealing with out of
 vocabulary words are needed.
 
-Using Hfst tools it is possible to use an existing morphological
+With Hfst tools it is possible to use an existing morphological
 analyzer to construct a morphological guesser based on word
 suffixes. Suffix based guessing is sufficient for many agglutinating
 languages such as Finnish~\cite{linden/2009/nodalida}, where most
@@ -187,7 +187,7 @@ word. These can be used for guessing the inflection of the unknown
 word.
 
 Guessing of an unknown word like ``twiitin'' (the genitive form of
-``twiitti'' tweet in Finnish) is based on finding the recognized word
+``twiitti'' tweet in Finnish) is based on finding recognized word
 forms like ``sviitin'' (genitive form of ``sviitti'' hotel suite in
 Finnish), that have long suffixes such as ``-iitin'', which match the
 suffixes of the unrecognized word. The longer the common suffix, the
@@ -913,8 +913,8 @@ expense of run time.
 Natural language user interfaces like dialogue systems, need a
 language generation component for generating messages for the
 user. The aim is to supply the user with information about the
-internal state of some data base such as airline connections or
-weather phenomena.
+internal state of some database containing information like airline
+connections or weather phenomena.
 
 Language generation systems for agglutinating languages will benefit
 from morphological analyzers, because generating syntactically correct
