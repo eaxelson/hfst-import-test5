@@ -1022,6 +1022,39 @@ elaborate syntax structure is not required.
 
 \subsubsection{A Chatroom Morphology tool}
 % Sam
+One example of rapid development and leverage of language resources is
+an IRC bot performing morphological analysis and synthesis on command.
+Originally written as a source of entertainment for linguistics students,
+it's usable as a learning resource and discussion facilitator for
+language learners. It also proved useful as a testing environment;
+requested analyses that weren't found in the transducers can be written to a
+log file.
+
+The pertinent code for performing lookup on an appropriate transducer
+is as simple as:
+
+\begin{verbatim}
+transducer = libhfst.HfstTransducer(libhfst.HfstInputStream("transducer.hfst"))
+results = transducer.lookup(message)
+for result in libhfst.vectorize(results):
+    irc_message(result)
+\end{verbatim}
+
+For more than just providing analyses of words, either the underlying transducer
+or the bot can be customized to allow
+specific queries:
+
+\begin{verbatim}
+<user> hfstbot: kintereellä
+<hfstbot> user: kinner<N><Sg><Ade>
+<user> hfstbot: gen kinner<N><Pl><Nom>
+<hfstbot> user: kintereet
+\end{verbatim}
+
+In this case, the user wants to see the analysis for ``kintereellä'',
+which translates to ``on the hock''. Being informed that it is
+a singular noun in the adessive case, the base or nominative form of which
+is ``kinner'', the user asks for the plural nominative, which is ``kintereet''.
 
 \subsection{HFST on Unix, Mac and Windows}
 % Erik, Tommi
