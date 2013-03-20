@@ -82,6 +82,25 @@ addPercents(string& s)
 }
 
 string&
+flagJoinerEncode(string& s, bool left)
+{
+    if (left)
+      {
+        string& lxs = s;
+        lxs = lxs.insert(0, LEXC_FLAG_LEFT_START);
+        lxs = lxs.append(LEXC_FLAG_END);
+        return lxs;
+      }
+    else
+      {
+        string& lxs = s;
+        lxs = lxs.insert(0, LEXC_FLAG_RIGHT_START);
+        lxs = lxs.append(LEXC_FLAG_END);
+        return lxs;
+      }
+}
+
+string&
 joinerEncode(string& s)
 {
     string& lxs = s;
@@ -257,7 +276,7 @@ strip_percents(const char* s, bool do_zeros)
       {
         if (in_at)
           {
-            if (*p = '@')
+            if (*p == '@')
               {
                 in_at = false;
               }
