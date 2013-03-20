@@ -483,6 +483,7 @@ addition, NER tools typically use gazetteers, lists of known names, to
 ensure that high-frequency names are recognized with the correct type.
 
 \subsubsection{Named Entity Recognition with Pmatch.}
+\label{pmatch_for_ner}
 
 A key feature of Pmatch that makes it well-suited for NER is the ability
 to add XML-style tags around substrings matching a regular expression,
@@ -1191,6 +1192,41 @@ having a slightly smaller result transducer.
 
 \subsection{Pmatch with applications for NER}
 % Sam
+
+At the 2011 SFCM conference, it was remarked that the Pmatch system presented
+in~\cite{karttunen/2011}, while
+of obvious practical interest, lacked a free implementation and certain
+useful features, such as flag diacritics. The idea of implementing
+something similar for an existing FST library became apparent, and
+ultimately the HFST team became motivated to design a rule-based named entity
+recogniser (NER) by first implementing a subset of Pmatch deemed
+necessary for that purpose.
+
+An overview of the relevant features is presented in \ref{pmatch_for_ner}.
+Building on an existing Xerox-oriented regex parser API (in \verb+libhfst+) and a
+runtime-oriented transducer format with support for flag diacritics
+(\verb+hfst-optimized-lookup+, see \cite{silfverberg/2009} and
+\cite{hfst/2011}), remaining requisites were
+
+\begin{enumerate}
+\item A mechanism for naming and retrieving transducers during compilation.
+\item A scheme of control symbols to direct the runtime operation of the matching.
+\item Logic for compiling new features.
+\item A runtime tool that particularily needs to deal with the non-FST or
+state-preserving aspects of pmatch.
+\end{enumerate}
+
+We will first overview the details of some features.
+
+\subsubsection{EndTag()}
+
+\subsubsection{Contexts}
+
+\subsubsection{Utilities}
+
+\subsubsection{State during matching}
+
+\subsubsection{Departures from pmatch}
 
 \subsection{Other HFST development tools}
 % Erik
