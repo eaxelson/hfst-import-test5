@@ -151,7 +151,7 @@ LexcCompiler::addStringEntry(const string& data,
     totalEntries_++;
     continuations_.insert(continuation);
     string encodedCont = string(continuation);
-    encodedCont = joinerEncode(encodedCont);
+    encodedCont = flagJoinerEncode(encodedCont, false);
     tokenizer_.add_multichar_symbol(encodedCont);
     HfstTransducer newPath(data + encodedCont, tokenizer_, format_);
     if (weight != 0)
@@ -182,7 +182,7 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
     totalEntries_++;
     continuations_.insert(continuation);
     string encodedCont = string(continuation);
-    encodedCont = joinerEncode(encodedCont);
+    encodedCont = flagJoinerEncode(encodedCont, false);
     tokenizer_.add_multichar_symbol(encodedCont);
     HfstTransducer newPath(upper + encodedCont, lower + encodedCont,
                            tokenizer_, format_);
@@ -215,7 +215,7 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
     totalEntries_++;
     continuations_.insert(continuation);
     string encodedCont = string(continuation);
-    encodedCont = joinerEncode(encodedCont);
+    encodedCont = flagJoinerEncode(encodedCont, false);
     tokenizer_.add_multichar_symbol(encodedCont);
     char* xre_encoded = hfst::xre::add_percents(encodedCont.c_str());
     HfstTransducer* newPaths = xre_.compile(regexp + " "  + string(xre_encoded));
@@ -262,7 +262,7 @@ LexcCompiler::setCurrentLexiconName(const string& lexiconName)
     currentLexiconName_ = lexiconName;
     lexiconNames_.insert(lexiconName);
     string encodedName(lexiconName);
-    joinerEncode(encodedName);
+    flagJoinerEncode(encodedName, false);
     tokenizer_.add_multichar_symbol(encodedName);
     if (!quiet_)
       {
@@ -328,7 +328,7 @@ LexcCompiler::compileLexical()
             fprintf(stderr, "%s", s->c_str());
           }
         string joinerEnc = *s;
-        joinerEncode(joinerEnc);
+        flagJoinerEncode(joinerEnc, true);
         HfstTransducer leftJoiner(joinerEnc, joinerEnc, format_);
         HfstTransducer lexicon(format_);
         if (stringTries_.find(*s) != stringTries_.end())
@@ -352,6 +352,7 @@ LexcCompiler::compileLexical()
       {
         fprintf(stderr, "\n" "calculating correct lexicon combinations...");
       }
+#if WANT_OLD_JOINERS
     for (set<string>::const_iterator s = lexiconNames_.begin();
          s != lexiconNames_.end();
          ++s)
@@ -373,7 +374,7 @@ LexcCompiler::compileLexical()
                     s->c_str());
           }
         string startEnc = initialLexiconName_;
-        joinerEncode(startEnc);
+        flagJoinerEncode(startEnc);
         HfstTransducer start(startEnc, startEnc, format_);
         string joinerEnc = *s;
         joinerEncode(joinerEnc);
@@ -415,6 +416,7 @@ LexcCompiler::compileLexical()
     string endEnc = "#";
     joinerEncode(endEnc);
     lexicons.substitute(endEnc, "@_EPSILON_SYMBOL_@");
+#endif
     lexicons.substitute("@ZERO@", "0");
     HfstTransducer* rv = new HfstTransducer(lexicons);
     rv->minimize();
