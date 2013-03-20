@@ -1358,29 +1358,111 @@ unsigned int HfstTransducer::number_of_arcs() const
 //
 // -----------------------------------------------------------------------
 
+// if (required): ~[(?* FAIL_FLAGS) ~$SUCCEED_FLAGS SELF ?*]
+// if (! required): ~[?* FAIL_FLAGS ~$SUCCEED_FLAGS SELF ?*] 
+static HfstTransducer * new_filter
+  (const HfstTransducer & fail_flags, const HfstTransducer & succeed_flags, 
+   const HfstTransducer & self, bool required)
+{
+  return NULL;
+}
+
+
+/* @brief Get flag filter for transducer \a transducer. 
+   @param transducer The transducer that is going to be filtered. 
+   @param flags The set of all flags in \a transducer. 
+   @param flag The flag that is filtered, if empty string, all flags are filtered. */
+static HfstTransducer * get_flag_filter
+(const HfstTransducer * transducer, const StringSet & flags, const String & flag)
+{
+#if ! HAVE_FOMA
+  throw "get_flag_filter: no foma";
+#else
+
+  ImplementationType type = transducer->get_type();
+  bool flag_found = false;
+  HfstTransducer * filter = NULL;
+
+  for (StringSet::const_iterator f = flags.begin();
+       f != flags.end(); f++)
+    {
+      HfstTransducer self(*f, type);
+      HfstTransducer succeed_flags(type);
+      HfstTransducer fail_flags(type);
+      
+      char op = FdOperation::get_operator(*f)[0];
+      if ((flag == "" || FdOperation::get_feature(*f) == flag) 
+          && (op == 'U' || op == 'R' || op == 'D'))        // Equal flag?   
+        {
+          for (StringSet::const_iterator ff = flags.begin();
+               ff != flags.end(); ff++)
+            {
+              int fstatus = FomaTransducer::is_valid_flag_combination(*f, *ff);
+              if (fstatus == 1) {
+                fail_flags.disjunct(HfstTransducer(*ff, type));
+                flag_found = true;
+              } if (fstatus == 2) {
+                succeed_flags.disjunct(HfstTransducer(*ff, type));
+                flag_found = true;
+              }
+            }
+        }
+      
+      if (flag_found) {
+        HfstTransducer * newfilter = new_filter
+          (fail_flags, succeed_flags, self, (FdOperation::get_feature(*f)[0] == 'R'));
+
+        // intersect filter with newfilter
+        if (filter == NULL)
+          filter = newfilter;
+        else {
+          filter->intersect(*newfilter);
+          delete newfilter;
+        }
+      }
+      flag_found = false;
+
+    }
+  return filter;
+#endif
+}
+
+
 HfstTransducer &HfstTransducer::eliminate_flags()
 {
 #if HAVE_FOMA
-  ImplementationType original_type = this->get_type();
-  this->convert(FOMA_TYPE);
-  this->foma_interface.eliminate_flags(this->implementation.foma);
-  this->convert(original_type);
-#else
-  HFST_THROW_MESSAGE(FunctionNotImplementedException, "HfstTransducer::eliminate_flags");
+  if (type == FOMA_TYPE)
+    {
+      struct fsm * result = this->foma_interface.eliminate_flags(this->implementation.foma);
+      this->foma_interface.delete_foma(this->implementation.foma);
+      this->implementation.foma = result;
+      return *this;
+    }
 #endif
+
+  HfstBasicTransducer basic(*this);
+  StringSet flags = basic.get_flags();
+  HfstTransducer * filter = get_flag_filter(this, flags, "");
+  
   return *this;
 }
 
 HfstTransducer &HfstTransducer::eliminate_flag(const std::string & flag)
 {
 #if HAVE_FOMA
-  ImplementationType original_type = this->get_type();
-  this->convert(FOMA_TYPE);
-  this->foma_interface.eliminate_flag(this->implementation.foma, flag);
-  this->convert(original_type);
-#else
-  HFST_THROW_MESSAGE(FunctionNotImplementedException, "HfstTransducer::eliminate_flag");
+  if (type == FOMA_TYPE)
+    {
+      struct fsm * result = this->foma_interface.eliminate_flag(this->implementation.foma, flag);
+      this->foma_interface.delete_foma(this->implementation.foma);
+      this->implementation.foma = result;
+      return *this;
+    }
 #endif
+
+  HfstBasicTransducer basic(*this);
+  StringSet flags = basic.get_flags();
+  HfstTransducer * filter = get_flag_filter(this, flags, flag);
+
   return *this;
 }
 

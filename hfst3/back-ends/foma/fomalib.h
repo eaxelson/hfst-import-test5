@@ -245,6 +245,9 @@ FEXPORT struct fsm *fsm_flatten(struct fsm *net, struct fsm *epsilon);
 /* Remove those symbols from sigma that have the same distribution as IDENTITY */
 FEXPORT void fsm_compact(struct fsm *net);
 
+/* HFST addition: function made visible. */
+FEXPORT int flag_build(int ftype, char *fname, char *fvalue, int fftype, char *ffname, char *ffvalue);
+
 /* Eliminate flag diacritics and return equivalent FSM          */
 /* with name = NULL the function eliminates all flag diacritics */
 FEXPORT struct fsm *flag_eliminate(struct fsm *net, char *name);

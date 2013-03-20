@@ -795,6 +795,42 @@ namespace hfst { namespace implementations {
     return retval;
   }
 
+  static int hfst_operator_to_foma(const std::string & op)
+  {
+    if (op[1] == 'U')
+      return FLAG_UNIFY;
+    if (op[1] == 'C')
+      return FLAG_CLEAR;
+    if (op[1] == 'D')
+      return FLAG_DISALLOW;
+    if (op[1] == 'N')
+      return FLAG_NEGATIVE;
+    if (op[1] == 'P')
+      return FLAG_POSITIVE;
+    if (op[1] == 'R')
+      return FLAG_REQUIRE;
+    throw;
+  }
+
+  int FomaTransducer::is_valid_flag_combination
+    (const std::string & flag1, const std::string & flag2)
+  {
+    int operator1 = hfst_operator_to_foma(FdOperation::get_operator(flag1));
+    char * feature1 = strdup(FdOperation::get_feature(flag1).c_str());
+    char * value1 = strdup(FdOperation::get_value(flag1).c_str());
+
+    int operator2 = hfst_operator_to_foma(FdOperation::get_operator(flag2));
+    char * feature2 = strdup(FdOperation::get_feature(flag2).c_str());
+    char * value2 = strdup(FdOperation::get_value(flag2).c_str());
+
+    int result = flag_build(operator1, feature1, value1,
+                            operator2, feature2, value2);
+
+    free(feature1); free(value1); free(feature2); free(value2);
+
+    return result;
+  }
+
   struct fsm * FomaTransducer::eliminate_flags(struct fsm * t)
   {
     return flag_eliminate(t, NULL);

@@ -681,7 +681,11 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::eliminate_flags()
     {
-      fprintf(stderr, "cannot eliminate flags %s:%d\n", __FILE__, __LINE__);
+      HfstTransducer * tmp = this->top();
+      if (NULL == tmp)
+        return *this;
+
+      tmp->eliminate_flags();
       prompt();
       return *this;
     }
@@ -1111,6 +1115,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       prompt();
       return *this;
     }
+
   XfstCompiler& 
   XfstCompiler::print_labels(FILE* outfile, HfstTransducer* tr)
     {
@@ -1228,12 +1233,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return *this;
     }
 
+  // TODO: more efficient implementation
   bool
   XfstCompiler::shortest_string
   (const hfst::HfstTransducer * transducer, 
    hfst::HfstTwoLevelPaths & paths, 
    unsigned int & size)
   { 
+    /*
     HfstTransducer empty(transducer->get_type());
 
     if (empty.compare(*transducer))
@@ -1254,7 +1261,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     
     n_length->extract_paths(paths);
     delete n_length;
-    return true;
+    return true;*/
   }
 
   XfstCompiler& 
@@ -1727,12 +1734,17 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::complete_net()
     {
-      fprintf(stderr, "missing complete net %s:%d\n", __FILE__, __LINE__);
-      if (stack_.size() < 1)
-        {
-          fprintf(stderr, "Empty stack.\n");
-          return *this;
-        }
+      HfstTransducer* topmost = this->top();
+      if (topmost == NULL)
+        return *this;
+
+      HfstBasicTransducer fsm(*topmost);
+      fsm.complete();
+      HfstTransducer * result = new HfstTransducer(fsm, topmost->get_type());
+      stack_.pop();
+      delete topmost;
+      stack_.push(result);
+
       print_transducer_info();
       prompt();
       return *this;
@@ -1918,11 +1930,44 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::label_net()
     {
-      fprintf(stderr, "missing label net %s:%d\n", __FILE__, __LINE__);
+      HfstTransducer* topmost = this->top();
+      if (topmost == NULL)
+        return *this;
+
+      HfstTransducer * result = new HfstTransducer(topmost->get_type());
+      
+      std::set<std::pair<std::string, std::string> > label_set;
+      HfstBasicTransducer fsm(*topmost);
+      
+      for (HfstBasicTransducer::const_iterator it = fsm.begin();       
+           it != fsm.end(); it++ ) 
+        {      
+          for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it  
+                 = it->begin(); tr_it != it->end(); tr_it++)       
+            {
+              std::pair<std::string, std::string> label_pair
+                (tr_it->get_input_symbol(), tr_it->get_output_symbol());
+              label_set.insert(label_pair);
+            }
+        }
+
+      for (std::set<std::pair<std::string, std::string> >::const_iterator
+             it = label_set.begin(); it != label_set.end(); it++)
+        {
+          HfstTransducer label_tr(it->first, it->second, result->get_type());
+          result->disjunct(label_tr);
+        }
+
+      result->minimize();
+      stack_.pop();
+      delete topmost;
+      stack_.push(result);
+
       print_transducer_info();
       prompt();
       return *this;
     }
+
   XfstCompiler& 
   XfstCompiler::lower_side_net()
     {
