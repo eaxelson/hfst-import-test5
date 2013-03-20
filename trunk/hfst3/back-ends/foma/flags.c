@@ -27,7 +27,7 @@
 
 static struct flags *flag_extract (struct fsm *net);
 static char *flag_type_to_char (int type);
-static int flag_build(int ftype, char *fname, char *fvalue, int fftype, char *ffname, char *ffvalue);
+// HFST change: this is visible in fomalib.h: static int flag_build(int ftype, char *fname, char *fvalue, int fftype, char *ffname, char *ffvalue);
 static void flag_purge (struct fsm *net, char *name);
 static struct fsm *flag_create_symbol(int type, char *name, char *value);
 

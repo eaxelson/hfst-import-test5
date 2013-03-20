@@ -1563,6 +1563,8 @@ transducer.transform_weights(&func);
     /* Return true if \a this has flag diacritics in the alphabet. */
     bool has_flag_diacritics(void) const;
 
+    
+
     // *** Friends **** //
 
     friend std::ostream& operator<<(std::ostream &out, const HfstTransducer &t);
