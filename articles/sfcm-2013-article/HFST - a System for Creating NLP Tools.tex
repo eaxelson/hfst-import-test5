@@ -1157,6 +1157,8 @@ In \verb+hfst-xfst2fst+, replace rules are compiled using preference
 operator~\cite{drobac/2012}, which in this case successfully finds that output string
 \verb+aaxx+ is less preferable in comparison to the output string \verb+xxx+ and therefore is excluded from the final result.
 
+
+
 Furthermore, we have noticed that there are some differences in pruning alphabet
 after performing certain operations.
 These two examples will give the same transition graphs, but different alphabet
@@ -1170,17 +1172,20 @@ regex [a | b | c ] & [a | b] ;
 resulting alphabet: a, b, c
 \end{verbatim}
 
+
+
 Hfst's \verb+hfst-xfst2fst+ prunes alphabet always after following operations:
 \textbf{replace rules} (contexts are also pruned before being compiled with the
 rule), \textbf{complement}, \textbf{containments}, \textbf{intersection},
 \textbf{minus}. However, it seems that XFST prunes the alphabet only if at
 least one of the operands contains unknown symbols and if the result doesn't
 contain any. Therefore, if upper commands were run in \verb+hfst-xfst2fst+
-environment, the resulting alphabet would be differen't from XFST's, it
+environment, the resulting alphabet would be different from XFST's, it
 would in both cases be \verb+a+, \verb+b+.
 
-We haven't managed to find an example in which this difference might influence
-the correctnes of the result, but pruning alphabet does result with
+In HFST, alphabet pruning only removes symbols from the alphabet if pruning will not have any effect on the function of the transducer.
+Therefore, we haven't managed to find an example in which this difference might influence
+the correctness of the result, but pruning alphabet does result with
 having a slightly smaller result transducer.
 
 
