@@ -38,7 +38,7 @@
   int yyparse();
   void reduce_queue(bool variable_symbol=false);
   void set_variable_values(void);
-  void reduce_symbol_pair(void);
+  void reduce_symbol_pair(bool no_definitions = false);
   void increase_line_counter(void);
   std::string &get_symbol_queue_front(void);
   void pop_symbol_queue(void);
@@ -398,7 +398,7 @@ PAIR: GRAMMAR_SYMBOL COLON_SPACE
   // For pairs "X:" and "X:?".
   // Reduce the first three symbols "X", "__HFST_TWOLC_:" and "__HFST_TWOLC_?"
   // from symbol_queue.
-  reduce_symbol_pair(); 
+  reduce_symbol_pair(true); 
 }
 | COLON GRAMMAR_SYMBOL_SPACE
 {
@@ -407,14 +407,14 @@ PAIR: GRAMMAR_SYMBOL COLON_SPACE
   // Reduce the three first symbols "__HFST_TWOLC_?", "__HFST_TWOLC_:" and "X"
   // from symbol_queue.
   symbol_queue.push_front("__HFST_TWOLC_?");
-  reduce_symbol_pair(); 
+  reduce_symbol_pair(true); 
 }
 | GRAMMAR_SYMBOL COLON GRAMMAR_SYMBOL_SPACE
 { 
   // For pairs "X:Y".
   // Reduce the first three symbols "X", "__HFST_TWOLC_:" and "Y" from
   // symbol_queue.
-  reduce_symbol_pair(); 
+  reduce_symbol_pair(true); 
 }
 | COLON_SPACE
 {
@@ -507,10 +507,37 @@ void set_variable_values(void)
 
 // Pop the queue three times: once for the input symbol, once for the pair
 // separator and once for the output symbol.
-void reduce_symbol_pair(void)
+void reduce_symbol_pair(bool no_definitions)
 {
+  if (no_definitions)
+    {
+      if (definitions.has_element(get_symbol_queue_front()))
+	{
+	  std::string def = get_symbol_queue_front();
+	  std::string error = 
+	    "Definition name " + def + " can't be used in pair expressions " + 
+	    def + ":, :" + def + " and " + def + ":" + def + ".";
+	  
+	  yyerror(error.c_str());
+	}
+    }
+
   reduce_queue();
   reduce_queue();
+
+  if (no_definitions)
+    {
+      if (definitions.has_element(get_symbol_queue_front()))
+	{
+	  std::string def = get_symbol_queue_front();
+	  std::string error = 
+	    "Definition name " + def + " can't be used in pair expressions " + 
+	    def + ":, :" + def + " and " + def + ":" + def + ".";
+	  
+	  yyerror(error.c_str());
+	}
+    }
+
   reduce_queue();
 }
 
