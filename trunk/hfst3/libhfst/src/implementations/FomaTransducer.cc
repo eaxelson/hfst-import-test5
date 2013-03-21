@@ -797,17 +797,17 @@ namespace hfst { namespace implementations {
 
   static int hfst_operator_to_foma(const std::string & op)
   {
-    if (op[1] == 'U')
+    if (op[0] == 'U')
       return FLAG_UNIFY;
-    if (op[1] == 'C')
+    if (op[0] == 'C')
       return FLAG_CLEAR;
-    if (op[1] == 'D')
+    if (op[0] == 'D')
       return FLAG_DISALLOW;
-    if (op[1] == 'N')
+    if (op[0] == 'N')
       return FLAG_NEGATIVE;
-    if (op[1] == 'P')
+    if (op[0] == 'P')
       return FLAG_POSITIVE;
-    if (op[1] == 'R')
+    if (op[0] == 'R')
       return FLAG_REQUIRE;
     throw;
   }

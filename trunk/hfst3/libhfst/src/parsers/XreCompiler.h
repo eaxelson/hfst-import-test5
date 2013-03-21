@@ -51,6 +51,11 @@ class XreCompiler
   //!        defined by @a xre in later phases of compilation.
   void define(const std::string& name, const std::string& xre);
 
+  //! @brief Add a definition macro.
+  //!        Compilers will replace arcs labeled @a name, with the transducer
+  //!        \a transducer in later phases of compilation.
+  void define(const std::string& name, const HfstTransducer & transducer);
+
   //! @brief Remove a definition macro.
   void undefine(const std::string& name);
 

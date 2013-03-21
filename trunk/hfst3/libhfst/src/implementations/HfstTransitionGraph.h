@@ -2035,6 +2035,56 @@ namespace hfst {
             return flags;
           }
 
+        // Whether symbol \a symbol must be purged from transitions and alphabet
+        // of a transducer after \a flag has been eliminated from the transducer.
+        // If \a flag is the empty string, all flags have been eliminated.
+        bool purge_symbol(const std::string & symbol, const std::string & flag)
+        {         
+          if (! FdOperation::is_diacritic(symbol))
+            return false;
+          if (flag == "")
+            return true;
+          else if (FdOperation::get_feature(symbol) == flag)
+            return true;
+          return false;
+        }
+
+        // Replace arcs in \a transducer that use flag \a flag with epsilon arcs
+        // and remove \a flag from alphabet of \a transducer. If \a flag is the empty                                                  
+        // string, replace/remove all flags.
+        void flag_purge(const std::string & flag)
+        {
+          // (1) Go through all states and transitions
+          for (iterator it = begin(); it != end(); it++)
+            {
+              for (unsigned int i=0; i < it->size(); i++)
+                {
+                  HfstTransition<C> &tr_it = it->operator[](i);
+                  
+                  if ( purge_symbol(tr_it.get_input_symbol(), flag) ||
+                       purge_symbol(tr_it.get_output_symbol(), flag) )
+                    {
+                      // change the current transition
+                      HfstTransition<C> tr
+                        (tr_it.get_target_state(), "@_EPSILON_SYMBOL_@",
+                         "@_EPSILON_SYMBOL_@", tr_it.get_weight());
+                      it->operator[](i) = tr;
+                    }
+                }
+            }
+          // (2) Go through the alphabet
+          StringSet extra_symbols;
+          for (StringSet::const_iterator it = alphabet.begin();
+               it != alphabet.end(); it++) 
+            {
+              if (purge_symbol(*it, flag))
+                extra_symbols.insert(*it);
+            }
+          // remove symbols
+          remove_symbols_from_alphabet(extra_symbols);
+        }
+        
+
 /*      /\** @brief Determine whether this graph has input-epsilon cycles. */
 /*       *\/ */
 /*      bool has_input_epsilon_cycles(void) */
