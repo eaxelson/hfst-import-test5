@@ -19,15 +19,20 @@
 std::string TwolCGrammar::get_original_name(const std::string &name)
 { return name.substr(0,name.find("SUBCASE:")); }
 
-TwolCGrammar::TwolCGrammar(bool be_quiet,bool be_verbose,bool resolve_conflicts):
+TwolCGrammar::TwolCGrammar(bool be_quiet,
+                           bool be_verbose,
+                           bool resolve_left_conflicts,
+                           bool resolve_right_conflicts):
   be_quiet(be_quiet),
   be_verbose(be_verbose)
 {
   left_arrow_rule_container.set_report_left_arrow_conflicts(not be_quiet);
   left_arrow_rule_container.set_resolve_left_arrow_conflicts
-    (resolve_conflicts);
+    (resolve_left_conflicts);
   right_arrow_rule_container.set_report_right_arrow_conflicts
     (be_verbose);
+  right_arrow_rule_container.set_resolve_right_arrow_conflicts
+    (resolve_right_conflicts);
 }
 
 void TwolCGrammar::define_diacritics(const SymbolRange &diacritics)
@@ -37,9 +42,9 @@ void TwolCGrammar::define_diacritics(const SymbolRange &diacritics)
 }
 
 void TwolCGrammar::add_rule(const std::string &name,
-                const SymbolPair &center,
-                op::OPERATOR oper,
-                const OtherSymbolTransducerVector contexts)
+                            const SymbolPair &center,
+                            op::OPERATOR oper,
+                            const OtherSymbolTransducerVector contexts)
 {
   Rule * rule;
   switch (oper)
@@ -205,7 +210,7 @@ ImplementationType transducer_type
 
  OtherSymbolTransducer::set_transducer_type(transducer_type);
 
-  TwolCGrammar g(true,false,true);
+ TwolCGrammar g(true,false,true,true);
 
   /*HandySet<SymbolPair> symbols;
   symbols.insert(SymbolPair("a","b"));

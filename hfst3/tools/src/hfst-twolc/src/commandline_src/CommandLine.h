@@ -50,7 +50,8 @@ class CommandLine
   std::string output_file_name;
   std::ostream * output_file;
   ImplementationType format;
-  bool resolve_conflicts;
+  bool resolve_left_conflicts;
+  bool resolve_right_conflicts;
   bool help;
   bool version;
   bool usage;

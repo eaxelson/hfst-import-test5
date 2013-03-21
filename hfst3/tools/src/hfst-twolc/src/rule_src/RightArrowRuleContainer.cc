@@ -17,9 +17,13 @@
 #include "RightArrowRuleContainer.h"
 
 bool RightArrowRuleContainer::report_right_arrow_conflicts = true;
+bool RightArrowRuleContainer::resolve_right_arrow_conflicts = true;
 
 void RightArrowRuleContainer::set_report_right_arrow_conflicts(bool option)
 { report_right_arrow_conflicts = option; }
+
+void RightArrowRuleContainer::set_resolve_right_arrow_conflicts(bool option)
+{ resolve_right_arrow_conflicts = option; }
 
 void RightArrowRuleContainer::add_rule_and_display_and_resolve_conflicts
 (ConflictResolvingRightArrowRule * rule,std::ostream &out)
@@ -36,8 +40,14 @@ void RightArrowRuleContainer::add_rule_and_display_and_resolve_conflicts
           << "Resolving the conflict by joining contexts." 
           << std::endl << std::endl;
     }
-      center_to_rule_map[rule->center_pair]->resolve_conflict(*rule); 
-      rule->is_empty = true;
+
+      if (resolve_right_arrow_conflicts)
+        { 
+          center_to_rule_map[rule->center_pair]->resolve_conflict(*rule); 
+          rule->is_empty = true;
+        }
+      else
+        { rule_vector.push_back(rule); }
     }
   else
     { 
