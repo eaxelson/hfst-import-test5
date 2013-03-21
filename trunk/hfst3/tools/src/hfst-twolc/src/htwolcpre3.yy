@@ -554,8 +554,9 @@ int main(int argc, char * argv[])
       verbose = command_line.be_verbose;
       
       TwolCGrammar twolc_grammar(command_line.be_quiet,
-                 command_line.be_verbose,
-                 command_line.resolve_conflicts);
+				 command_line.be_verbose,
+				 command_line.resolve_left_conflicts,
+				 command_line.resolve_right_conflicts);
       grammar = &twolc_grammar;
       int exit_code = yyparse();
       if (exit_code != 0)

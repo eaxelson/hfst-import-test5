@@ -47,33 +47,41 @@ void CommandLine::print_help(void)
         << "written to STDOUT." << std::endl << std::endl;
 
   std::cerr << "Common options:\n"
-        << "  -h, --help             Print help message" << std::endl  
-        << "  -V, --version          Print version info" << std::endl 
-        << "  -u, --usage            Print usage"  << std::endl
-        << "  -v, --verbose          Print verbosely while processing"
+        << "  -h, --help               Print help message" << std::endl  
+        << "  -V, --version            Print version info" << std::endl 
+        << "  -u, --usage              Print usage"  << std::endl
+        << "  -v, --verbose            Print verbosely while processing"
         << std::endl
-        << "  -q, --quiet            Do not print output" << std::endl
-        << "  -s, --silent           Alias of --quiet"    << std::endl;
+        << "  -q, --quiet              Do not print output" << std::endl
+        << "  -s, --silent             Alias of --quiet"    << std::endl;
 
   std::cerr << "Input/Output options:" << std::endl
-        << "  -i, --input=INFILE     Read input transducer from INFILE"
+        << "  -i, --input=INFILE       Read input transducer from INFILE"
         << std::endl
-        << "  -o, --output=OUTFILE   Write output transducer to OUTFILE"
+        << "  -o, --output=OUTFILE     Write output transducer to OUTFILE"
         << std::endl;
 
   std::cerr << "TwolC grammar options:" << std::endl
-        << "  -R, --resolve          Resolve left-arrow conflicts." 
+        << "  -R, --resolve            Resolve left-arrow conflicts." 
         << std::endl
-        << "  -f, --format=FORMAT    Store result in format FORMAT." 
+        << "  -D, --dont-resolve-right Don't resolve right-arrow conflicts." 
+        << std::endl
+        << "  -f, --format=FORMAT      Store result in format FORMAT." 
         << std::endl << std::endl;
   
   std::cerr << "Format may be one of openfst-log, openfst-tropical, foma or sfst."
         << std::endl << std::endl;
+
+  std::cerr << "By default format is openfst-tropical. By default right arrow "
+            << std::endl 
+            << "conflicts are resolved and left arrow conflicts are not resolved."
+            << std::endl << std::endl;
 }
 
 int CommandLine::parse_options(int argc, char** argv)
 {
-  bool resolve = false;
+  bool resolve_left = false;
+  bool resolve_right = true;
   bool verbose = false;
   bool silent = false;
   char * outfilename = NULL;
@@ -97,15 +105,16 @@ int CommandLine::parse_options(int argc, char** argv)
       {"usage", no_argument, 0, 'u'},
       {"input", required_argument, 0, 'i'}, 
       {"output", required_argument, 0, 'o'},
-      {"resolve",no_argument, 0, 'R'},
-      {"debug_file",required_argument, 0, 'D'},
+      {"resolve-left",no_argument, 0, 'R'},
+      {"dont-resolve-right",no_argument, 0, 'D'},
+      {"debug_file",required_argument, 0, 'd'},
       {"format",required_argument, 0, 'f'},
       {0,0,0,0}
         };
       int option_index = 0;
       // add tool-specific options here 
       char c = getopt_long(argc, argv, 
-               ":hVvqsu" "i:o:" "Ri:D:f:",
+               ":hVvqsu" "i:o:" "RDi:d:f:",
                long_options, &option_index);
       if (-1 == c)
         {
@@ -133,13 +142,16 @@ int CommandLine::parse_options(int argc, char** argv)
       silent = true;
       break;
     case 'R':
-      resolve = true;
+      resolve_left = true;
+      break;
+    case 'D':
+      resolve_right = false;
       break;
     case 'i':
       inputNamed = true;
       infilename = hfst_strdup(optarg);
       break;
-    case 'D':
+    case 'd':
       isDebug = true;
       debug_file_name = hfst_strdup(optarg);
       break;
@@ -227,7 +239,8 @@ int CommandLine::parse_options(int argc, char** argv)
   this->be_quiet = silent;
   this->has_input_file = inputNamed;
   this->has_output_file = outputNamed;
-  this->resolve_conflicts = resolve;
+  this->resolve_left_conflicts = resolve_left;
+  this->resolve_right_conflicts = resolve_right;
   if (this->has_input_file)
     { this->input_file_name = infilename; }
   if (this->has_output_file)
@@ -256,7 +269,8 @@ CommandLine::CommandLine(int argc,char * argv[]):
   input_file(NULL),
   has_output_file(false),
   output_file(NULL),
-  resolve_conflicts(false),
+  resolve_left_conflicts(false),
+  resolve_right_conflicts(true),
   help(false),
   version(false),
   usage(false),

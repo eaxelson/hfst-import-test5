@@ -65,7 +65,10 @@ class TwolCGrammar
   SymbolRange diacritics;
 
  public:
-  TwolCGrammar(bool be_quiet,bool be_verbose,bool resolve_conflicts);
+  TwolCGrammar(bool be_quiet,
+               bool be_verbose,
+               bool resolve_left_conflicts,
+               bool resolve_right_conflicts);
   void define_diacritics(const SymbolRange &diacritics);
   void add_rule(const std::string &name,
         const SymbolPair &center,
