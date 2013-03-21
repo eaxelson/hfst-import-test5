@@ -1255,8 +1255,7 @@ state-preserving aspects of pmatch.
 
 We will first overview the details of some features.
 
-\subsubsection{EndTag()}
-
+\subsubsection{Tagging.}
 A straightforward way to accomplish tagging at the beginning and end of matches
 of first, last and complete names might look like this:
 
@@ -1327,7 +1326,7 @@ With just the entry and end tags, the network simplifies to:
 
 \end{tikzpicture}
 
-\subsubsection{Contexts}
+\subsubsection{Contexts and state during matching.}
 
 Context markers trigger special runtime behaviour and restrict
 progress during matching, very similarly to flag diacritics.
@@ -1340,9 +1339,20 @@ There are two special considerations:
 matching in a stateful stack.
 \end{enumerate}
 
-\subsubsection{State during matching}
+Additionally, a stack for preserving input tape position
+and output tape content during each RTN (recursive transition
+network) invocation must be kept separately from the runtime
+context-checking stack. Otherwise, transition data is unduplicated
+and these stacks are the only arbitrary amounts memory reserved
+for accomplishing non-finite state extensions.
 
-\subsubsection{Departures from pmatch}
+\subsubsection{Transduction.}
+
+Each matching rule is by default compiled as an identity transduction.
+In many applications, however, it is useful to eg. operate on input
+tagged with morphological information, but give output
+with the tags removed. Matching is therefore not
+performed with automata, but arbitrary transducers.
 
 \subsection{Other HFST development tools}
 % Erik
