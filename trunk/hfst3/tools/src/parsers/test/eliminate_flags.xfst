@@ -1,0 +1,3 @@
+regex [["@P.FOO.foo@" foo] | ["@P.FOO.bar@" bar]] baz [["@U.FOO.foo@" foo] | ["@U.FOO.bar@" bar]];
+eliminate flags
+print net > result

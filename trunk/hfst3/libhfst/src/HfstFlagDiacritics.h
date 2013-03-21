@@ -34,7 +34,7 @@ public:
     FdFeature Feature(void) const { return feature; }
     FdValue Value(void) const { return value; }
     std::string Name(void) const { return name; }
-
+    
     static FdOperator char_to_operator(char c)
         {
             switch (c) {
