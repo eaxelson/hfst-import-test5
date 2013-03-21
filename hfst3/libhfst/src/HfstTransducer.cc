@@ -1481,7 +1481,6 @@ HfstTransducer &HfstTransducer::eliminate_flags()
   if (type == FOMA_TYPE)
     {
       struct fsm * result = this->foma_interface.eliminate_flags(this->implementation.foma);
-      this->foma_interface.delete_foma(this->implementation.foma);
       this->implementation.foma = result;
       return *this;
     }
@@ -1515,9 +1514,8 @@ HfstTransducer &HfstTransducer::eliminate_flag(const std::string & flag)
   if (type == FOMA_TYPE)
     {
       struct fsm * result = this->foma_interface.eliminate_flag(this->implementation.foma, flag);
-      this->foma_interface.delete_foma(this->implementation.foma);
       this->implementation.foma = result;
-      return this->minimize();
+      return *this;
     }
 #endif
 
