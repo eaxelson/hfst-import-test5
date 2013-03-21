@@ -5,6 +5,8 @@
 \usepackage{caption}
 \usepackage{url}
 \usepackage{tabularx}
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning}
 
 \usepackage{fontspec}
 \usepackage{xunicode}
@@ -1252,6 +1254,76 @@ state-preserving aspects of pmatch.
 We will first overview the details of some features.
 
 \subsubsection{EndTag()}
+
+A straightforward way to accomplish tagging at the beginning and end of matches
+of first, last and complete names might look like this:
+
+\begin{tikzpicture}[shorten >=1pt,node distance=2.8cm,auto,on grid] 
+   \node[state,initial] (q_0)   {$q_0$}; 
+   \node[state] (q_1) [above right=of q_0] {$q_1$}; 
+   \node[state] (q_2) [right=of q_0] {$q_2$}; 
+   \node[state] (q_3) [below right=of q_0] {$q_3$};
+   \node[state] (q_4) [right=of q_1] {$q_4$};
+   \node[state] (q_5) [right=of q_2] {$q_5$};
+   \node[state] (q_6) [right=of q_3] {$q_6$};
+   \node[state] (q_7) [right=of q_6] {$q_7$};
+   \node[state,accepting] (q_8) [above right=of q_7] {$q_8$};
+    \path[->] 
+    (q_0) edge  node {$\varepsilon$:<FName>} (q_1)
+          edge  node {$\varepsilon$:<LName>} (q_2)
+          edge  node {$\varepsilon$:<Name>} (q_3)
+    (q_1) edge  node {John} (q_4)
+    (q_2) edge  node {Bardin} (q_5)
+    (q_3) edge  node {John} (q_6)
+    (q_6) edge  node {Bardin} (q_7)
+    (q_4) edge  node {$\varepsilon$:</FName>} (q_8)
+    (q_5) edge  node {$\varepsilon$:</LName>} (q_8)
+    (q_7) edge  node {$\varepsilon$:</Name>} (q_8);
+
+\end{tikzpicture}
+
+In this scenario, every new name is repeated in two places in the network. With
+large lists and multiple sources of this type of ambiguity, size inefficiencies
+can become serious.
+
+One idea of Pmatch was to recognise the shared prefix in the first name ``John''
+and the entire name ``John Bardin'' and defer tag-writing until the entity
+has become unambiguous. In HFST, this is accomplished by detecting the tag directive
+during compilation and prefixing the subnetwork in question with an entry marker.
+After matching is complete, the entry marker is resolved in linear time with
+a simple position stack (in pseudocode):
+
+\begin{verbatim}
+for each symbol in result:
+    if symbol == entry marker:
+         push position into stack
+    if symbol is end tag:
+         insert corresponding start tag into postion at stack top
+         pop stack
+         append end tag
+    else:
+         append symbol
+\end{verbatim}
+
+With just the entry and end tags, the network simplifies to:
+
+\begin{tikzpicture}[shorten >=1pt,node distance=3cm,auto,on grid] 
+   \node[state,initial] (q_0)   {$q_0$}; 
+   \node[state] (q_1) [right=of q_0] {$q_1$}; 
+   \node[state] (q_2) [above right=of q_1] {$q_2$}; 
+   \node[state] (q_3) [below right=of q_1] {$q_3$};
+   \node[state] (q_4) [right=of q_2] {$q_4$};
+   \node[state,accepting] (q_5) [right=of q_3] {$q_5$};
+    \path[->] 
+    (q_0) edge  node {$\varepsilon$:@ENTRY@} (q_1)
+    (q_1) edge  node {John} (q_2)
+    (q_1) edge  node {Bardin} (q_3)
+    (q_2) edge  node {Bardin} (q_4)
+    (q_3) edge [swap] node {$\varepsilon$:</LName>} (q_5)
+    (q_2) edge [bend right]  node {$\varepsilon$:</FName>} (q_5)
+    (q_4) edge [bend left] node {$\varepsilon$:</Name>} (q_5);
+
+\end{tikzpicture}
 
 \subsubsection{Contexts}
 
