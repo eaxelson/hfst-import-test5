@@ -672,8 +672,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::eliminate_flag(const char* name)
     {
-      fprintf(stderr, "cannot eliminate flag %s %s:%d\n", name,
-              __FILE__, __LINE__);
+      HfstTransducer * tmp = this->top();
+      if (NULL == tmp)
+        return *this;
+
+      std::string name_(name);
+      tmp->eliminate_flag(name);
       prompt();
       return *this;
     }

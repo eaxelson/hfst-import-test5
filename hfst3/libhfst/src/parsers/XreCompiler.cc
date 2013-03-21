@@ -27,6 +27,12 @@ XreCompiler::define(const std::string& name, const std::string& xre)
 }
 
 void
+XreCompiler::define(const std::string& name, const HfstTransducer & transducer)
+{
+  definitions_[name] = new HfstTransducer(transducer);
+}
+
+void
 XreCompiler::undefine(const std::string& name) 
 {
 if (definitions_.find(name) != definitions_.end())

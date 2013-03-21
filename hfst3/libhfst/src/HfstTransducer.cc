@@ -1364,14 +1364,32 @@ static HfstTransducer * new_filter
   (const HfstTransducer & fail_flags, const HfstTransducer & succeed_flags, 
    const HfstTransducer & self, bool required)
 {
-  return NULL;
+  ImplementationType type = fail_flags.get_type();
+  hfst::xre::XreCompiler comp(type);
+  comp.set_expand_definitions(true);
+  comp.define("Fail", fail_flags);
+  comp.define("Succeed", succeed_flags);
+  comp.define("Self", self);
+  HfstTransducer * result = NULL;
+  if (required)
+    result = comp.compile("~[(?* Fail) ~$Succeed Self ?*]");
+  else
+    result = comp.compile("~[?* Fail ~$Succeed Self ?*]");
+
+  // Should the xre compiler do this?
+  result->remove_from_alphabet("Fail");
+  result->remove_from_alphabet("Succeed");
+  result->remove_from_alphabet("Self");
+
+  return result;
 }
 
 
 /* @brief Get flag filter for transducer \a transducer. 
    @param transducer The transducer that is going to be filtered. 
    @param flags The set of all flags in \a transducer. 
-   @param flag The flag that is filtered, if empty string, all flags are filtered. */
+   @param flag The flag that is filtered, if empty string, all flags are filtered. 
+   @return The flag filter, if there is nothing to filter, return NULL. */
 static HfstTransducer * get_flag_filter
 (const HfstTransducer * transducer, const StringSet & flags, const String & flag)
 {
@@ -1386,7 +1404,7 @@ static HfstTransducer * get_flag_filter
   for (StringSet::const_iterator f = flags.begin();
        f != flags.end(); f++)
     {
-      HfstTransducer self(*f, type);
+      HfstTransducer self("_" + *f, type);
       HfstTransducer succeed_flags(type);
       HfstTransducer fail_flags(type);
       
@@ -1398,11 +1416,12 @@ static HfstTransducer * get_flag_filter
                ff != flags.end(); ff++)
             {
               int fstatus = FomaTransducer::is_valid_flag_combination(*f, *ff);
+
               if (fstatus == 1) {
-                fail_flags.disjunct(HfstTransducer(*ff, type));
+                fail_flags.disjunct(HfstTransducer("_" + *ff, type));
                 flag_found = true;
               } if (fstatus == 2) {
-                succeed_flags.disjunct(HfstTransducer(*ff, type));
+                succeed_flags.disjunct(HfstTransducer("_" + *ff, type));
                 flag_found = true;
               }
             }
@@ -1410,7 +1429,7 @@ static HfstTransducer * get_flag_filter
       
       if (flag_found) {
         HfstTransducer * newfilter = new_filter
-          (fail_flags, succeed_flags, self, (FdOperation::get_feature(*f)[0] == 'R'));
+          (fail_flags, succeed_flags, self, (FdOperation::get_operator(*f)[0] == 'R'));
 
         // intersect filter with newfilter
         if (filter == NULL)
@@ -1423,10 +1442,38 @@ static HfstTransducer * get_flag_filter
       flag_found = false;
 
     }
+
+  StringSet alpha = filter->get_alphabet();
+  for (StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
+    {
+      if (it->size() > 1)
+        {
+          if (it->at(0) == '_' && it->at(1) == '@')
+            {
+              string str(*it);
+              str.erase(0,1);
+              filter->substitute(*it, str);
+            }
+        }
+    }
+
+  filter->minimize();
+
   return filter;
 #endif
 }
 
+// Replace arcs in \a transducer that use flag \a flag with epsilon arcs
+// and remove \a flag from alphabet of \a transducer. If \a flag is the empty
+// string, replace/remove all flags.
+static void flag_purge(HfstTransducer & transducer, const std::string & flag)
+{
+  ImplementationType type = transducer.get_type();
+  HfstBasicTransducer net(transducer);
+  net.flag_purge(flag);
+  transducer = HfstTransducer(net, type);
+  return;
+}
 
 HfstTransducer &HfstTransducer::eliminate_flags()
 {
@@ -1444,7 +1491,22 @@ HfstTransducer &HfstTransducer::eliminate_flags()
   StringSet flags = basic.get_flags();
   HfstTransducer * filter = get_flag_filter(this, flags, "");
   
-  return *this;
+  if (filter != NULL) {
+    // change to 0: extern int g_flag_is_epsilon; ?
+    HfstTransducer filter_copy(*filter);
+    filter_copy.compose(*this).compose(*filter);
+    delete filter;
+    // change back to original value: extern int g_flag_is_epsilon; ?
+    flag_purge(filter_copy, "");
+    *this = filter_copy;
+  }
+
+  /*flag_purge(newnet, name);
+  newnet = fsm_minimize(newnet);
+  sigma_cleanup(newnet,0);
+  return(fsm_topsort(newnet));*/
+
+  return this->minimize();
 }
 
 HfstTransducer &HfstTransducer::eliminate_flag(const std::string & flag)
@@ -1455,7 +1517,7 @@ HfstTransducer &HfstTransducer::eliminate_flag(const std::string & flag)
       struct fsm * result = this->foma_interface.eliminate_flag(this->implementation.foma, flag);
       this->foma_interface.delete_foma(this->implementation.foma);
       this->implementation.foma = result;
-      return *this;
+      return this->minimize();
     }
 #endif
 
@@ -1463,7 +1525,22 @@ HfstTransducer &HfstTransducer::eliminate_flag(const std::string & flag)
   StringSet flags = basic.get_flags();
   HfstTransducer * filter = get_flag_filter(this, flags, flag);
 
-  return *this;
+  if (filter != NULL) {
+    // change to 0: extern int g_flag_is_epsilon; ?
+    HfstTransducer filter_copy(*filter);
+    filter_copy.compose(*this).compose(*filter);
+    delete filter;
+    // change back to original value: extern int g_flag_is_epsilon; ?
+    flag_purge(filter_copy, flag);
+    *this = filter_copy;
+  }
+
+  /*flag_purge(newnet, name);
+  newnet = fsm_minimize(newnet);
+  sigma_cleanup(newnet,0);
+  return(fsm_topsort(newnet));*/
+
+  return this->minimize();
 }
 
 HfstTransducer &HfstTransducer::remove_epsilons()
