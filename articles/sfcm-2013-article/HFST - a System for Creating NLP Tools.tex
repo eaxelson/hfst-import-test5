@@ -1235,7 +1235,9 @@ useful features, such as flag diacritics. The idea of implementing
 something similar for an existing FST library became apparent, and
 ultimately the HFST team became motivated to design a rule-based named entity
 recogniser (NER) by first implementing a subset of Pmatch deemed
-necessary for that purpose.
+necessary for that purpose. Beyond the tagging concept,
+runtime contexts, named subnetworks and various utilities were most crucial and
+were implemented as need arose.
 
 An overview of the relevant features is presented in \ref{pmatch_for_ner}.
 Building on an existing Xerox-oriented regex parser API (in \verb+libhfst+) and a
@@ -1327,7 +1329,16 @@ With just the entry and end tags, the network simplifies to:
 
 \subsubsection{Contexts}
 
-\subsubsection{Utilities}
+Context markers trigger special runtime behaviour and restrict
+progress during matching, very similarly to flag diacritics.
+There are two special considerations:
+
+\begin{enumerate}
+\item Left contexts are compiled to the left side of the network, in reverse
+(so that the first symbol to the left is at the end of the context).
+\item Processing direction and position must be preserved during
+matching in a stateful stack.
+\end{enumerate}
 
 \subsubsection{State during matching}
 
