@@ -19,7 +19,8 @@ EXTRA_DIST=test test1 test1.txt_fst test10 test10.txt_fst test11 \
 		   test48.txt_fst test49 test49.txt_fst\
 		   test51 test51.txt_fst test52 test52.txt_fst test53 test53.txt_fst\
 		   test54 test54.txt_fst test55 test55.txt_fst test56 test56.txt_fst\
-                   test57.txt_fst test58.txt_fst test59.txt_fst
+                   test57.txt_fst test58.txt_fst test59.txt_fst test60.txt_fst\
+                   test61.txt_fst test60 test61
 check_DATA=test test1 test1.txt_fst test10 test10.txt_fst test11 \
 		   test11.txt_fst test12 test12.txt_fst test13 test13.txt_fst \
 		   test14 test14.txt_fst test15 test15.txt_fst test16 test16.txt_fst\
@@ -39,5 +40,5 @@ check_DATA=test test1 test1.txt_fst test10 test10.txt_fst test11 \
 		   test48.txt_fst test49 test49.txt_fst
 		   test51 test51.txt_fst test52 test52.txt_fst test53 test53.txt_fst\
 		   test54 test54.txt_fst test55 test55.txt_fst test56 test56.txt_fst\
-                   test57 test58 test59
+                   test57 test58 test59 test60.txt_fst test61.txt_fst test60 test61
 
