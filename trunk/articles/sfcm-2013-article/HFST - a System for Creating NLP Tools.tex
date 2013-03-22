@@ -1045,7 +1045,8 @@ The pertinent code for performing lookup on an appropriate transducer
 is as simple as:
 
 \begin{verbatim}
-transducer = libhfst.HfstTransducer(libhfst.HfstInputStream("transducer.hfst"))
+transducer = libhfst.HfstTransducer(
+    libhfst.HfstInputStream("transducer.hfst"))
 results = transducer.lookup(message)
 for result in libhfst.vectorize(results):
     irc_message(result)
