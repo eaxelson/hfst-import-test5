@@ -59,13 +59,14 @@ do
 	exit 1;
     fi
 
-    ## Test that the result of testfile.xfst (written in att format in file 'result')
+    ## Test that the result of testfile.xfst (written in att format in file 'result' or in files 'result1' and 'result2')
     ## is the same as testfile.att.
     for testfile in compose_net concatenate_net union_net ignore_net invert_net minus_net intersect_net \
 	determinize_net epsilon_remove_net invert_net minimize_net negate_net \
 	one_plus_net prune_net reverse_net sort_net upper_side_net zero_plus_net lower_side_net \
 	eliminate_flag eliminate_flags
     do
+	rm -f result result1 result2
 	if ! (ls $testfile.xfst 2> /dev/null); then
 	    echo "skipping missing test for "$testfile"..."
 	    continue
@@ -73,6 +74,14 @@ do
 	if ! (cat $testfile.xfst | ../hfst-xfst2fst -q -f $format > /dev/null); then
 	    echo "ERROR: in compiling "$testfile".xfst"
 	    exit 1;
+	fi
+	# if there are several result files, concatenate them into one
+	if [ -e result1 ]; then
+	    cat result1 > result
+	fi
+	if [ -e result2 ]; then
+	    echo "--" >> result
+	    cat result2 >> result
 	fi
 	if ! (cat result | ${TXT2FST} > tmp1; cat $testfile.att | ${TXT2FST} > tmp2; ); then
 	    echo "ERROR: in compiling "$testfile".att"

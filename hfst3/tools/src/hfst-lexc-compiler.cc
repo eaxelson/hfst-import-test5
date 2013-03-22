@@ -164,6 +164,7 @@ lexc_streams(LexcCompiler& lexc, HfstOutputStream& outstream)
       }
     verbose_printf("Compiling... ");
     HfstTransducer* res = lexc.compileLexical();
+
     if (0 == res)
       {
         if (lexccount == 1)
