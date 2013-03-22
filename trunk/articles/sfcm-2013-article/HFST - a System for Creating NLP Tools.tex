@@ -47,19 +47,19 @@ juha.kuokkala, jyrki.niemi, tommi.pirinen, miikka.silfverberg\}@helsinki.fi}}
 
 \subsection{Language identification}
 Language identification is the task of recognizing the language of a
-text or text fragment. It is useful in applications, that need to
+text or text fragment. It is useful in applications that need to
 process documents written in various languages where the language
-might not be overtly marked in the document. For example a translation
+might not be explicitly marked in the document. For example a translation
 application might need to identify the language of a document in order
 to apply the correct translation model. Another example is a speller
 for Finnish, which might need to identify paragraphs that are written in
-English, in order not to perform spell checking on the paragraphs.
+English, in order not to perform spell checking on those paragraphs.
 
-In this section we outline how to use Hfst tagger tools and language
+In this section we outline how to use HFST tagger tools and language
 identification tools for creating language identifiers. We also
 present an experiment on language identification for documents written
 in Dutch, English, Estonian, Finnish, German or Swedish. The
-experiment shows that Hfst language identifiers are highly accurate
+experiment shows that HFST language identifiers are highly accurate
 (99.5\% of the input sentences were correctly classified).
 
 There are several methods for performing language
@@ -71,14 +71,14 @@ language that the system recognizes. Language identification consists
 of applying each Markov chain on input and choosing the language whose
 model gives the highest likelihood for the text. 
 
-Hfst language identifiers adopt a Markov chain framework, which can be
-implemented using weighted finite-state technology. Using Hfst tagger
+HFST language identifiers adopt a Markov chain framework, which can be
+implemented using weighted finite-state technology. Using HFST tagger
 tools~\cite{silfverberg/2011}, we train Markov models for all
 languages. A separate program, {\tt hfst-guess-language}, reads the
 models and input text and labels each sentence with the language,
 whose model gave the highest likelihood for the sentence.
 
-We present an experiment on applying Hfst language identifiers for
+We present an experiment on applying HFST language identifiers for
 guessing the language of sentences written in six languages. For all
 languages except Swedish, we used training data from corpora
 containing newspaper text. For Swedish, we used more general text.
@@ -162,7 +162,7 @@ of the model.
 In practice it has been very difficult to establish $l(n)$ in a
 reliable way. It is likely to be dependent on the genre of the
 document, which makes it less useful. Identifying unknown language
-using Hfst language identifiers thus remains future work.
+using HFST language identifiers thus remains future work.
 
 \subsection{Morphologies and Guessers}
 \label{sec: morph-guessers}
@@ -178,7 +178,7 @@ high coverage analyzer domain specific vocabulary presents a
 challenge. Therefore accurate methods for dealing with out of
 vocabulary words are needed.
 
-With Hfst tools it is possible to use an existing morphological
+With HFST tools it is possible to use an existing morphological
 analyzer to construct a morphological guesser based on word
 suffixes. Suffix based guessing is sufficient for many agglutinating
 languages such as Finnish~\cite{linden/2009/nodalida}, where most
@@ -928,7 +928,7 @@ context. Depending on the domain and coverage of the morphological
 analyzer, it might also be necessary to inflect words that are not
 recognized by the morphological analyzer. 
 
-Hfst morphological guessers presented in Section~\ref{sec:
+HFST morphological guessers presented in Section~\ref{sec:
   morph-guessers} can be used for generation as well as morphological
 analysis. For example using the OMorFi morphology for Finnish, the
 best morphological guess for the unknown word ``twiitin'' is
@@ -1147,7 +1147,7 @@ answer and are not trivial to solve. We have compiled the exercises
 using both Xerox's XFST and HFST's hfst-xfst and compared the results
 for equivalence. We have also tested the funcionality of the
 \verb+hfst-regexp2fst+ tool by rewriting the original tests in a way that they
-use hfst command line tools (other than hfst-xfst).
+use HFST command line tools (other than hfst-xfst).
 
 % Senka, Miikka
 Although we are aiming to get complete backward compability with XFST, we
@@ -1212,7 +1212,7 @@ resulting alphabet: a, b, c
 
 
 
-Hfst's \verb+hfst-xfst2fst+ prunes alphabet always after following operations:
+HFST \verb+hfst-xfst2fst+ prunes alphabet always after following operations:
 \textbf{replace rules} (contexts are also pruned before being compiled with the
 rule), \textbf{complement}, \textbf{containments}, \textbf{intersection},
 \textbf{minus}. However, it seems that XFST prunes the alphabet only if at
