@@ -367,6 +367,14 @@ compile(const string& xre, map<string,HfstTransducer*>& defs,
       }
 }
 
+bool is_definition(const char* symbol)
+{
+  std::string symbol_(symbol);
+  if (definitions.find(symbol_) == definitions.end())
+    return false;
+  return true;
+}
+
 HfstTransducer*
 expand_definition(HfstTransducer* tr, const char* symbol)
 {
@@ -378,6 +386,7 @@ expand_definition(HfstTransducer* tr, const char* symbol)
           if (strcmp(it->first.c_str(), symbol) == 0)
             {
               tr->substitute(hfst::StringPair(symbol,symbol), *(it->second));
+              tr->remove_from_alphabet(symbol);
               break;
             }
         }
@@ -385,11 +394,31 @@ expand_definition(HfstTransducer* tr, const char* symbol)
   return tr;
 }
 
+static const char * get_print_format(const char * symbol)
+{
+  if (strcmp(hfst::internal_identity.c_str(), symbol) == 0)
+    return "?";
+  if (strcmp(hfst::internal_unknown.c_str(), symbol) == 0)
+    return "?";
+  if (strcmp(hfst::internal_epsilon.c_str(), symbol) == 0)
+    return "0";
+  return symbol;
+}
+
 HfstTransducer*
 xfst_label_to_transducer(const char* input, const char* output)
 {
   HfstTransducer * retval = NULL;
 
+  // non-matching definitions
+  if ( (is_definition(input) || is_definition(output)) && 
+       strcmp(input, output) != 0 )
+    {
+      char msg[256];
+      sprintf(msg, "invalid use of definitions in label %s:%s", 
+              get_print_format(input), get_print_format(output));
+      xreerror(msg);
+    }
   if  (strcmp(input, hfst::internal_unknown.c_str()) == 0 && 
        strcmp(output, hfst::internal_unknown.c_str()) == 0)
     {
@@ -413,6 +442,9 @@ xfst_label_to_transducer(const char* input, const char* output)
     {
       retval = new HfstTransducer(input, output, hfst::xre::format);
     }
+
+  if (is_definition(input))
+    retval = expand_definition(retval, input);
 
   return retval;
 }

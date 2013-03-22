@@ -2474,9 +2474,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     hxfstin = NULL;
     xfst_ = this;
     YY_BUFFER_STATE bs = hxfst_scan_string(line);
-    hxfstparse();
+    int rv = hxfstparse();
     hxfst_delete_buffer(bs);
-    return 0;
+    return rv;
   }
   int
   XfstCompiler::parse_line(std::string line)
@@ -2485,10 +2485,10 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     xfst_ = this;
     char * line_ = strdup(line.c_str());
     YY_BUFFER_STATE bs = hxfst_scan_string(line_);
-    hxfstparse();
+    int rv = hxfstparse();
     hxfst_delete_buffer(bs);
     free(line_);
-    return 0;
+    return rv;
   }
 
   XfstCompiler&
