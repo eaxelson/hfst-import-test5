@@ -272,19 +272,21 @@ forms or noun forms containing clitics. To pick the most probably
 correct candidate from the generated guesses for manual checking, we
 used the following algorithm:
 
- 1. Generate n guesses for the lexicon form (we used n = 20).
+\begin{description}
+\item[1.] Generate n guesses for the lexicon form (we used n = 20).
 
- 2. Take the first guess which has [CASE=NOM] (nominative case)
+\item[2.] Take the first guess which has [CASE=NOM] (nominative case)
  analysis and a generated paradigm containing nominative singular form
  identical to the given lexicon form.
 
- 2b. If the guess analysis has [NUM=PL] (plural number), then the
+\item[2b.] If the guess analysis has [NUM=PL] (plural number), then the
  lexicon form must match the nominative plural of the paradigm,
  instead of singular.
 
- 3. If none of the guesses fulfills the previous conditions, take the
+\item[3.] If none of the guesses fulfills the previous conditions, take the
  first guess which has [CASE=NOM] analysis and a nominal inflection
  class.
+\end{description}
 
 We began the actual classifying work with lists of family names
 (ca. 12,000) and given names (ca. 4,000). Using the initial guesser
