@@ -1358,8 +1358,8 @@ unsigned int HfstTransducer::number_of_arcs() const
 //
 // -----------------------------------------------------------------------
 
-// if (required): ~[(?* FAIL_FLAGS) ~$SUCCEED_FLAGS SELF ?*]
-// if (! required): ~[?* FAIL_FLAGS ~$SUCCEED_FLAGS SELF ?*] 
+// if (required): return ~[(?* FAIL_FLAGS) ~$SUCCEED_FLAGS SELF ?*]
+// if (! required): return ~[?* FAIL_FLAGS ~$SUCCEED_FLAGS SELF ?*] 
 static HfstTransducer * new_filter
   (const HfstTransducer & fail_flags, const HfstTransducer & succeed_flags, 
    const HfstTransducer & self, bool required)
@@ -1384,6 +1384,24 @@ static HfstTransducer * new_filter
   return result;
 }
 
+// Substitute each symbol '_@FLAG@' with '@FLAG@'
+static void substitute_escaped_flags(HfstTransducer * filter)
+{
+  StringSet alpha = filter->get_alphabet();
+  for (StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
+    {
+      if (it->size() > 1)
+        {
+          if (it->at(0) == '_' && it->at(1) == '@')
+            {
+              string str(*it);
+              str.erase(0,1);
+              filter->substitute(*it, str);
+            }
+        }
+    }
+  return;
+}
 
 /* @brief Get flag filter for transducer \a transducer. 
    @param transducer The transducer that is going to be filtered. 
@@ -1404,7 +1422,7 @@ static HfstTransducer * get_flag_filter
   for (StringSet::const_iterator f = flags.begin();
        f != flags.end(); f++)
     {
-      HfstTransducer self("_" + *f, type);
+      HfstTransducer self("_" + *f, type); // escape flags
       HfstTransducer succeed_flags(type);
       HfstTransducer fail_flags(type);
       
@@ -1440,25 +1458,10 @@ static HfstTransducer * get_flag_filter
         }
       }
       flag_found = false;
-
     }
 
-  StringSet alpha = filter->get_alphabet();
-  for (StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
-    {
-      if (it->size() > 1)
-        {
-          if (it->at(0) == '_' && it->at(1) == '@')
-            {
-              string str(*it);
-              str.erase(0,1);
-              filter->substitute(*it, str);
-            }
-        }
-    }
-
+  substitute_escaped_flags(filter);  // unescape the flags
   filter->minimize();
-
   return filter;
 #endif
 }
@@ -1490,20 +1493,14 @@ HfstTransducer &HfstTransducer::eliminate_flags()
   StringSet flags = basic.get_flags();
   HfstTransducer * filter = get_flag_filter(this, flags, "");
   
-  if (filter != NULL) {
-    // change to 0: extern int g_flag_is_epsilon; ?
-    HfstTransducer filter_copy(*filter);
-    filter_copy.compose(*this).compose(*filter);
-    delete filter;
-    // change back to original value: extern int g_flag_is_epsilon; ?
-    flag_purge(filter_copy, "");
-    *this = filter_copy;
-  }
-
-  /*flag_purge(newnet, name);
-  newnet = fsm_minimize(newnet);
-  sigma_cleanup(newnet,0);
-  return(fsm_topsort(newnet));*/
+  if (filter != NULL) 
+    {
+      HfstTransducer filter_copy(*filter);
+      filter_copy.compose(*this).compose(*filter);
+      delete filter;
+      flag_purge(filter_copy, "");
+      *this = filter_copy;
+    }
 
   return this->minimize();
 }
@@ -1523,20 +1520,14 @@ HfstTransducer &HfstTransducer::eliminate_flag(const std::string & flag)
   StringSet flags = basic.get_flags();
   HfstTransducer * filter = get_flag_filter(this, flags, flag);
 
-  if (filter != NULL) {
-    // change to 0: extern int g_flag_is_epsilon; ?
-    HfstTransducer filter_copy(*filter);
-    filter_copy.compose(*this).compose(*filter);
-    delete filter;
-    // change back to original value: extern int g_flag_is_epsilon; ?
-    flag_purge(filter_copy, flag);
-    *this = filter_copy;
-  }
-
-  /*flag_purge(newnet, name);
-  newnet = fsm_minimize(newnet);
-  sigma_cleanup(newnet,0);
-  return(fsm_topsort(newnet));*/
+  if (filter != NULL) 
+    {
+      HfstTransducer filter_copy(*filter);
+      filter_copy.compose(*this).compose(*filter);
+      delete filter;
+      flag_purge(filter_copy, flag);
+      *this = filter_copy;
+    }
 
   return this->minimize();
 }

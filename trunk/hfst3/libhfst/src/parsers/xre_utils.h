@@ -68,6 +68,8 @@ HfstTransducer* compile(const std::string& xre,
  */
 HfstTransducer* expand_definition(HfstTransducer* tr, const char* symbol);
 
+bool is_definition(const char* symbol);
+
 /** @brief Parse "input:output", ":output", "input:" or ":". */
  HfstTransducer* xfst_label_to_transducer(const char* input, const char* output);
 
