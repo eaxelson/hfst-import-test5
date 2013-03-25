@@ -28,8 +28,8 @@ namespace hfst { namespace lexc {
 
 const char LEXC_JOINER_START[] = "@_LEXC_JOINER.";
 const char LEXC_JOINER_END[] = "_@";
-const char LEXC_FLAG_LEFT_START[] = "@P.LEXNAME.";
-const char LEXC_FLAG_RIGHT_START[] = "@R.LEXNAME.";
+const char LEXC_FLAG_LEFT_START[] = "@R.LEXNAME.";
+const char LEXC_FLAG_RIGHT_START[] = "@P.LEXNAME.";
 const char LEXC_FLAG_END[] = "@";
 const char LEXC_DFN_START[] = "@_LEXC_DEFINITION.";
 const char LEXC_DFN_END[] = "_@";
