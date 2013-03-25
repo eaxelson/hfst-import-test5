@@ -449,6 +449,8 @@ class XfstCompiler
   char* get_prompt() const;
 
  protected:
+  XfstCompiler& print_apply_prompt(ApplyDirection direction);
+
   //! @brief Perform lookup on the top transducer using strings in \a infile.
   //! \a direction specifies whether apply is done on input (up) or output (down) 
   //! side. If infile is stdin, interactive mode with prompts is used.

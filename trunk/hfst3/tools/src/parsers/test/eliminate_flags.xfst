@@ -1,6 +1,7 @@
 regex [["@P.FOOBAR.foo@" foo] | ["@P.FOOBAR.bar@" bar]] baz [["@U.FOOBAR.foo@" foo] | ["@U.FOOBAR.bar@" bar]];
 eliminate flags
-print net > result1
+print net
 regex [["@P.BAZ.ON@" baz] | ["@P.BAZ.OFF@"]]  [["@P.FOOBAR.foo@" foo] | ["@P.FOOBAR.bar@" bar]] baz [["@U.FOOBAR.foo@" foo] | ["@U.FOOBAR.bar@" bar]]  [["@U.BAZ.ON@" baz] | ["@U.BAZ.OFF@"]];
 eliminate flags
-print net > result2
+echo --
+print net
