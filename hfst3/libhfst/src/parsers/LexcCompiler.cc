@@ -264,6 +264,8 @@ LexcCompiler::setCurrentLexiconName(const string& lexiconName)
     string encodedName(lexiconName);
     flagJoinerEncode(encodedName, false);
     tokenizer_.add_multichar_symbol(encodedName);
+    flagJoinerEncode(encodedName, true);
+    tokenizer_.add_multichar_symbol(encodedName);
     if (!quiet_)
       {
         if ((firstLexicon) && (lexiconName == "Root"))
@@ -348,11 +350,11 @@ LexcCompiler::compileLexical()
       }
     // repeat star to overgenerate
     lexicons.repeat_star().minimize();
+#if WANT_OLD_JOINERS
     if (verbose_)
       {
         fprintf(stderr, "\n" "calculating correct lexicon combinations...");
       }
-#if WANT_OLD_JOINERS
     for (set<string>::const_iterator s = lexiconNames_.begin();
          s != lexiconNames_.end();
          ++s)
@@ -416,9 +418,25 @@ LexcCompiler::compileLexical()
     string endEnc = "#";
     joinerEncode(endEnc);
     lexicons.substitute(endEnc, "@_EPSILON_SYMBOL_@");
+#else
+    string startEnc = initialLexiconName_;
+    flagJoinerEncode(startEnc, false);
+    HfstTransducer start(startEnc, startEnc, format_);
+    string endEnc = "#";
+    flagJoinerEncode(endEnc, true);
+    HfstTransducer end(endEnc, endEnc, format_);
+    lexicons = start.concatenate(lexicons).concatenate(end);
 #endif
     lexicons.substitute("@ZERO@", "0");
+    if (verbose_)
+      {
+        fprintf(stderr, "Converting...\n");
+      }
     HfstTransducer* rv = new HfstTransducer(lexicons);
+    if (verbose_)
+      {
+        fprintf(stderr, "Minimizing...\n");
+      }
     rv->minimize();
     return rv;
 }
