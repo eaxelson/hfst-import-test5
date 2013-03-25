@@ -65,7 +65,7 @@ do
     for testfile in compose_net concatenate_net union_net ignore_net invert_net minus_net intersect_net \
 	determinize_net epsilon_remove_net invert_net minimize_net negate_net \
 	one_plus_net prune_net reverse_net sort_net upper_side_net zero_plus_net lower_side_net \
-	eliminate_flag eliminate_flags
+	eliminate_flag eliminate_flags define
     do
 	rm -f result result1 result2
 	if ! (ls $testfile.xfst 2> /dev/null); then
@@ -82,6 +82,23 @@ do
 	fi
 	if ! (${COMPARE} tmp1 tmp2); then
 	    echo "ERROR: "$testfile" test failed"
+	    exit 1;
+	fi
+    done
+
+    ## Test that testfile_fail fails.
+    for testfile in define_fail
+    do
+	if ! (ls $testfile.xfst 2> /dev/null); then
+	    echo "skipping missing test for "$testfile"..."
+	    continue
+	fi
+	if ! (cat $testfile.xfst | ../hfst-xfst2fst -s -f $format 2> tmp > /dev/null); then
+	    echo "ERROR: in compiling "$testfile".xfst"
+	    exit 1;
+	fi
+	if ! (grep "xre parsing failed" tmp > /dev/null); then
+	    echo "ERROR: in "$testfile".xfst"
 	    exit 1;
 	fi
     done

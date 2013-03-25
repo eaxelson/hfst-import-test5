@@ -1031,6 +1031,11 @@ namespace hfst { namespace implementations {
     return t->is_cyclic();
   }
 
+  bool SfstTransducer::is_automaton(Transducer * t)
+  {
+    return t->is_automaton();
+  } 
+
 
   FdTable<SFST::Character>* SfstTransducer::get_flag_diacritics(Transducer * t)
   {

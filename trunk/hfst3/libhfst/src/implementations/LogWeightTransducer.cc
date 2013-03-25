@@ -1112,6 +1112,26 @@ namespace hfst { namespace implementations
     return Equivalent(A, B);
   }
   
+  bool LogWeightTransducer::is_automaton(LogFst * t)
+  {
+    for (fst::StateIterator<LogFst> siter(*t);
+         not siter.Done(); siter.Next())
+      {
+        StateId s = siter.Value();
+        for (fst::ArcIterator<LogFst> aiter(*t,s);
+             !aiter.Done(); aiter.Next())
+          {
+            const LogArc &arc = aiter.Value();
+            if (arc.ilabel != arc.olabel)
+              return false;
+            if (arc.ilabel == 1) // ?:?                                                            
+              return false;
+          }
+      }
+    return true;
+  }
+
+
   bool LogWeightTransducer::is_cyclic(LogFst * t)
   {
     return t->Properties(kCyclic, true) & kCyclic;

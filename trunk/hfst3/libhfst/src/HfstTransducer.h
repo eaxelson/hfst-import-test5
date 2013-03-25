@@ -698,6 +698,9 @@ in \a ifile.
     /** \brief Whether the transducer is cyclic. */
     bool is_cyclic(void) const;
 
+    /** \brief Whether the transducer is an automaton. */
+    bool is_automaton(void) const;
+
     /** \brief The implementation type of the transducer. */
     ImplementationType get_type(void) const;
 
@@ -915,6 +918,9 @@ ccc : ddd
        @see extract_paths(HfstTwoLevelPaths&, int, int) */
     void extract_paths_fd
       (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true) const;
+
+    void extract_shortest_paths
+      (HfstTwoLevelPaths &results) const;
     
   public:
     /** \brief Extract a maximum of \a max_num paths that are 
