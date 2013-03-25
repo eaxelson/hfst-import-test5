@@ -101,17 +101,14 @@ do
 	    echo "skipping missing test for "$testfile"..."
 	    continue
 	fi
-	if ! (cat $testfile.xfst | ../hfst-xfst2fst -f $format | tr ' ' '#' > tmp); then
+	if ! (cat $testfile.xfst | ../hfst-xfst2fst -f $format -s > tmp); then
 	    echo "ERROR: in compiling "$testfile.xfst
 	    exit 1;
 	fi
-	for expression in `cat $testfile.grep | tr ' ' '#'`
-	do
-	    if ! (grep $expression tmp > /dev/null); then
-		echo "ERROR: "$testfile" test failed: cannot find '"$expression"' in output"
-		exit 1;
-	    fi
-	done
+	if ! (diff --ignore-blank-lines tmp $testfile.output); then
+	    echo "ERROR: in result from "$testfile.xfst
+	    exit 1;
+	fi
     done
 
     ## Test that the results of testfile_true.xfst and testfile_false.xfst (written to file tmp)
@@ -124,17 +121,14 @@ do
 		echo "skipping missing test for "$testfile$testcase"..."
 		continue
 	    fi
-	    if ! (cat $testfile$testcase.xfst | ../hfst-xfst2fst -f $format | tr ' ' '#' > tmp); then
+	    if ! (cat $testfile$testcase.xfst | ../hfst-xfst2fst -s -f $format > tmp); then
 		echo "ERROR: in compiling "$testfile$testcase.xfst
 		exit 1;
 	    fi
-	    for expression in `cat "test"$testcase.grep | tr ' ' '#'`
-	    do
-		if ! (grep $expression tmp > /dev/null); then
-		    echo "ERROR: "$testfile$testcase" test failed: cannot find '"$expression"' in output"
-		    exit 1;
-		fi
-	    done
+	    if ! (diff --ignore-blank-lines tmp "test"$testcase.output); then
+		echo "ERROR: in testing "$testfile$testcase.xfst
+		exit 1;
+	    fi
 	done
     done
     
