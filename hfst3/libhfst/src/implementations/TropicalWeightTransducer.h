@@ -224,7 +224,8 @@ namespace implementations
       
       static bool are_equivalent(StdVectorFst *one, StdVectorFst *another);
       static bool is_cyclic(StdVectorFst * t);
-      
+      static bool is_automaton(StdVectorFst * t);
+
       static FdTable<int64>* get_flag_diacritics(StdVectorFst * t);
 
       static void print_alphabet(const StdVectorFst *t);

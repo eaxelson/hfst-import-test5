@@ -214,7 +214,8 @@ namespace implementations
       
       static bool are_equivalent(LogFst *one, LogFst *another);
       static bool is_cyclic(LogFst * t);
-      
+      static bool is_automaton(LogFst * t);      
+
       static FdTable<int64>* get_flag_diacritics(LogFst * t);
 
       // string versions

@@ -178,6 +178,7 @@ namespace implementations
 
       static bool are_equivalent(SFST::Transducer * t1, SFST::Transducer * t2);
       static bool is_cyclic(SFST::Transducer * t);
+      static bool is_automaton(SFST::Transducer * t);
       
       static FdTable<SFST::Character>* get_flag_diacritics(SFST::Transducer * t);
 

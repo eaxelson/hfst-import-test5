@@ -1248,6 +1248,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
    hfst::HfstTwoLevelPaths & paths, 
    unsigned int & size)
   { 
+    transducer->extract_shortest_paths(paths);
+    return true;
     /*
     HfstTransducer empty(transducer->get_type());
 

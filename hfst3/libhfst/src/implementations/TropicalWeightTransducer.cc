@@ -1223,6 +1223,25 @@ namespace hfst { namespace implementations
     return Equivalent(A, B);
   }
   
+  bool TropicalWeightTransducer::is_automaton(StdVectorFst * t)
+  {
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+         not siter.Done(); siter.Next()) 
+      {
+        StateId s = siter.Value();
+        for (fst::ArcIterator<StdVectorFst> aiter(*t,s); 
+             !aiter.Done(); aiter.Next())
+          {
+            const StdArc &arc = aiter.Value();
+            if (arc.ilabel != arc.olabel)
+              return false;
+            if (arc.ilabel == 1) // ?:?
+              return false;
+          }
+      }
+    return true;
+  }
+
   bool TropicalWeightTransducer::is_cyclic(StdVectorFst * t)
   {
     return t->Properties(kCyclic, true) & kCyclic;
@@ -2286,7 +2305,6 @@ namespace hfst { namespace implementations
   }
 
   // ----- TRIE FUNCTIONS END -----
-
 
   static bool extract_paths
   (StdVectorFst * t, StdArc::StateId s,

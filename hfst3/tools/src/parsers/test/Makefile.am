@@ -19,6 +19,8 @@ EXTRA_DIST=test.sh \
 	lower_side_net.xfst lower_side_net.att \
 	eliminate_flag.xfst eliminate_flag.att \
 	eliminate_flags.xfst eliminate_flags.att \
+	define.xfst define.att \
+	define_fail.xfst \
 	apply_up.xfst apply_up.output \
 	apply_down.xfst apply_down.output \
 	print_stack.xfst print_stack.output \

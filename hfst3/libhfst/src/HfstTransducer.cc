@@ -1283,6 +1283,35 @@ bool HfstTransducer::compare(const HfstTransducer &another, bool harmonize) cons
 
 }
   
+bool HfstTransducer::is_automaton(void) const
+{
+    switch(type)
+    {
+#if HAVE_SFST
+    case SFST_TYPE:
+        return sfst_interface.is_automaton(implementation.sfst);
+#endif
+#if HAVE_OPENFST
+    case TROPICAL_OPENFST_TYPE:
+        return tropical_ofst_interface.is_automaton(implementation.tropical_ofst);
+    case LOG_OPENFST_TYPE:
+        return log_ofst_interface.is_automaton(implementation.log_ofst);
+#endif
+#if HAVE_FOMA && HAVE_OPENFST
+    case FOMA_TYPE:
+      {
+        HfstTransducer t(*this);
+        t.convert(TROPICAL_OPENFST_TYPE);
+        return t.is_automaton();
+      }
+#endif
+    case ERROR_TYPE:
+        HFST_THROW(TransducerHasWrongTypeException);
+    default:
+        HFST_THROW(FunctionNotImplementedException);
+    }
+}
+
 bool HfstTransducer::is_cyclic(void) const
 {
     switch(type)
@@ -1917,6 +1946,18 @@ public:
         return RetVal((max_num < 1) || (int)paths.size() < max_num, true);
     }
 };
+
+void HfstTransducer::extract_shortest_paths(HfstTwoLevelPaths &results) const
+{
+#if HAVE_OPENFST
+  HfstTransducer t(*this);
+  t.convert(TROPICAL_OPENFST_TYPE);
+  t.n_best(1);
+  t.extract_paths(results);
+  return;
+#endif
+  HFST_THROW(FunctionNotImplementedException);
+}
   
 void HfstTransducer::extract_paths(HfstTwoLevelPaths &results,
                    int max_num, int cycles) const
