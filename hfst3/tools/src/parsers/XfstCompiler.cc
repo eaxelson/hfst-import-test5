@@ -296,12 +296,16 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         return *this;
       }
 
-  static void print_apply_prompt(ApplyDirection direction)
+  XfstCompiler&
+  XfstCompiler::print_apply_prompt(ApplyDirection direction)
   {
+    if (! verbose_)
+      return *this;
     if (direction == APPLY_UP_DIRECTION)
       fprintf(stdout, "apply up> ");
     else if (direction == APPLY_DOWN_DIRECTION)
       fprintf(stdout, "apply down> ");
+    return *this;
   }
 
     XfstCompiler&

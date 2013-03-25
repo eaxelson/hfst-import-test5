@@ -3,5 +3,5 @@ regex c:d;
 regex b:c;
 regex [a:b c:d];
 upper-side net
-print net > result
+print net
 quit

@@ -1,5 +1,5 @@
 regex a:b;
 regex c:d;
 ignore net
-print net > result
+print net
 quit

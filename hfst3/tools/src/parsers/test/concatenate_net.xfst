@@ -3,5 +3,5 @@ regex c:d;
 regex b:c;
 regex a:b;
 concatenate net
-print net > result
+print net
 quit
