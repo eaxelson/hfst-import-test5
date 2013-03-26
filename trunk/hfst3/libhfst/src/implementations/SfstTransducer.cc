@@ -776,6 +776,14 @@ namespace hfst { namespace implementations {
       (t, t->root_node(), all_visitations, path_visitations,
        callback, cycles, fd_state_stack, filter_fd, 
        spv);
+
+    // add epsilon path, if needed
+    if (t->root_node() && t->root_node()->is_final()) {
+      StringPairVector empty_spv;
+      HfstTwoLevelPath epsilon_path(0, empty_spv);
+      callback(epsilon_path, true /* final*/);
+    }
+
   }
 
   /* Get a random path from transducer \a t. */

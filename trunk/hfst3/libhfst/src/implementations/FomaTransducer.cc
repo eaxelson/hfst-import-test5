@@ -651,6 +651,27 @@ namespace hfst { namespace implementations {
            filter_fd, spv);
       }
     }
+    // add epsilon path, if needed
+    for (std::set<int>::const_iterator it = initial_states.begin(); 
+         it != initial_states.end(); it++)
+      {
+        bool final_initial = false;
+        for(int i=0; ((t->states)+i)->state_no != -1; i++)
+          {
+            fsm_state* s = (t->states)+i;
+            if(s->state_no == *it && s->final_state == 1)
+              {
+                final_initial = true;
+                break;
+              }
+          }
+        if (final_initial) {
+          StringPairVector empty_spv;
+          HfstTwoLevelPath epsilon_path(0, empty_spv);
+          callback(epsilon_path, true /* final*/);
+        }
+      }
+
   }
 
     void FomaTransducer::extract_random_paths

@@ -2422,6 +2422,13 @@ namespace hfst { namespace implementations
       (t,t->Start(),all_visitations,path_visitations,
        0.0f,callback,cycles,fd_state_stack,filter_fd, 
        spv);
+
+    // add epsilon path, if needed
+    if (t->Start() != -1 && t->Final(t->Start()) != TropicalWeight::Zero()) {
+      StringPairVector empty_spv;
+      HfstTwoLevelPath epsilon_path(t->Final(t->Start()).Value(), empty_spv);
+      callback(epsilon_path, true /* final*/);
+    }
   }
 
   /* Get a random path from transducer \a t. */
