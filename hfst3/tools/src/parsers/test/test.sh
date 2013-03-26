@@ -105,7 +105,7 @@ do
 
     ## Test that the result of testfile.xfst (written to standard output)
     ## is the same as testfile.output
-    for testfile in apply_up apply_down print_stack print_labels print_label_tally
+    for testfile in apply_up apply_down print_stack print_labels print_label_tally shortest_string
     do
 	if ! (ls $testfile.xfst 2> /dev/null); then
 	    echo "skipping missing test for "$testfile"..."

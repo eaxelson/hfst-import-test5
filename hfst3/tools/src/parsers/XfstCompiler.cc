@@ -1242,14 +1242,13 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     }
 
   // TODO: more efficient implementation
-  bool
+  XfstCompiler&
   XfstCompiler::shortest_string
   (const hfst::HfstTransducer * transducer, 
-   hfst::HfstTwoLevelPaths & paths, 
-   unsigned int & size)
+   hfst::HfstTwoLevelPaths & paths)
   { 
     transducer->extract_shortest_paths(paths);
-    return true;
+    return *this;
     /*
     HfstTransducer empty(transducer->get_type());
 
@@ -1282,9 +1281,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         return *this;
 
       HfstTwoLevelPaths paths;
-      unsigned int size=0;
+      this->shortest_string(topmost, paths);
 
-      if (! this->shortest_string(topmost, paths, size))
+      if (paths.size() == 0)
         {
           fprintf(stdout, "transducer is empty\n");
         }
@@ -1303,15 +1302,15 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         return *this;
 
       HfstTwoLevelPaths paths;
-      unsigned int size=0;
+      this->shortest_string(topmost, paths);
 
-      if (! this->shortest_string(topmost, paths, size))
+      if (paths.size() == 0)
         {
           fprintf(stdout, "transducer is empty\n");
         }
       else
         {
-          fprintf(outfile, "%i\n", size);
+          fprintf(outfile, "%i\n", (int)(paths.begin()->second.size()));
         }
       prompt();
       return *this;
