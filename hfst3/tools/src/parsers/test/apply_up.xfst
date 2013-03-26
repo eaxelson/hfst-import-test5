@@ -1,5 +1,13 @@
-regex [ foo:bar | foo:baz ];
+regex [ {foo}:{bar} | {foo}:{baz} ];
 apply up
 foo
 bar
 baz
+<ctrl-d>
+set print-space ON
+apply up
+foo
+bar
+baz
+<ctrl-d>
+exit

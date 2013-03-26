@@ -21,6 +21,7 @@ EXTRA_DIST=test.sh \
 	eliminate_flags.xfst eliminate_flags.att \
 	define.xfst define.att \
 	define_fail.xfst \
+	set_variable.xfst set_variable.output \
 	apply_up.xfst apply_up.output \
 	apply_down.xfst apply_down.output \
 	print_stack.xfst print_stack.output \

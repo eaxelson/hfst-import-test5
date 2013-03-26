@@ -449,6 +449,9 @@ class XfstCompiler
 
  protected:
   XfstCompiler& print_apply_prompt(ApplyDirection direction);
+  XfstCompiler& print_symbol(const char* symbol, FILE* outfile=stdout);
+  XfstCompiler& print_paths(const hfst::HfstTwoLevelPaths &paths, FILE* outfile=stdout);
+  XfstCompiler& print_paths(const hfst::HfstOneLevelPaths &paths, FILE* outfile=stdout);
 
   //! @brief Perform lookup on the top transducer using strings in \a infile.
   //! \a direction specifies whether apply is done on input (up) or output (down) 

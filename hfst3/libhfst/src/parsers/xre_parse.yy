@@ -898,6 +898,12 @@ LABEL: HALFARC {
         $$ = new HfstTransducer($1, TOK, hfst::xre::format);
         free($1);
      }
+     | CURLY_BRACKETS PAIR_SEPARATOR CURLY_BRACKETS {
+        HfstTokenizer TOK;
+        $$ = new HfstTransducer($1, $3, TOK, hfst::xre::format);
+        free($1);
+	free($3);
+     }
      /*
      | QUOTE {
         HfstTokenizer TOK;
