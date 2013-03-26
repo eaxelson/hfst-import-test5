@@ -155,7 +155,17 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         return *this;
       }
 
-  static void print_paths(const hfst::HfstOneLevelPaths &paths, FILE* outfile=stdout)
+  XfstCompiler&
+  XfstCompiler::print_symbol(const char* symbol, FILE* outfile /* =stdout*/)
+  {
+    if (variables_["show-flags"] == "OFF" && FdOperation::is_diacritic(symbol))
+      return *this;
+    fprintf(outfile, "%s", symbol);
+    return *this;
+  }
+
+  XfstCompiler&
+  XfstCompiler::print_paths(const hfst::HfstOneLevelPaths &paths, FILE* outfile /* =stdout */)
   {
     for (hfst::HfstOneLevelPaths::const_iterator it = paths.begin();
          it != paths.end(); it++)
@@ -164,13 +174,16 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         for (hfst::StringVector::const_iterator p = path.begin();
              p != path.end(); p++)
           {
-            fprintf(outfile, "%s", p->c_str());
+            print_symbol(p->c_str(), outfile);
+            if (variables_["print-space"] == "ON")
+              fprintf(outfile, " ");
           }
         fprintf(outfile, "\n");
       }
   }
 
-  static void print_paths(const hfst::HfstTwoLevelPaths &paths, FILE* outfile=stdout)
+  XfstCompiler&
+  XfstCompiler::print_paths(const hfst::HfstTwoLevelPaths &paths, FILE* outfile /* =stdout */)
   {
     for (hfst::HfstTwoLevelPaths::const_iterator it = paths.begin();
          it != paths.end(); it++)
@@ -179,9 +192,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         for (hfst::StringPairVector::const_iterator p = path.begin();
              p != path.end(); p++)
           {
-            fprintf(outfile, "%s", p->first.c_str());
+            print_symbol(p->first.c_str(), outfile);
             if (p->first != p->second)
-              fprintf(outfile, ":%s", p->second.c_str());
+              {
+                fprintf(outfile, ":");
+                print_symbol(p->second.c_str(), outfile);
+              }
+            if (variables_["print-space"] == "ON")
+              fprintf(outfile, " ");
           }
         fprintf(outfile, "\n");
       }
@@ -199,7 +217,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             tmp->invert().minimize();
           }
         HfstOneLevelPaths * paths = tmp->lookup_fd(std::string(token));
-        print_paths(*paths);
+        this->print_paths(*paths);
         if (paths->empty())
           fprintf(stdout, "???\n");
         delete paths;
@@ -318,8 +336,15 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
         int ind = current_history_index();
 
+        bool ctrl_d_end = false;
+
         while ((line = xfst_getline(infile)) != NULL)
           {
+            if (strcmp(line, "<ctrl-d>") == 0 || strcmp(line, "<ctrl-d>\n") == 0)
+              {
+                ctrl_d_end = true;
+                break;
+              }
             if (direction == APPLY_UP_DIRECTION)
               apply_up_line(line);
             else if (direction == APPLY_DOWN_DIRECTION)
@@ -328,7 +353,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             if (infile == stdin)
               print_apply_prompt(direction);
           }
-        if (infile == stdin)
+        if (infile == stdin && ! ctrl_d_end)
           fprintf(stdout, "\n");
 
         ignore_history_after_index(ind);
