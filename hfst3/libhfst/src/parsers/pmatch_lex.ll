@@ -41,9 +41,9 @@ EC "%"{U8C}
 /* any ASCII */
 A7 [\x00-\x7e]
 /* special meaning in pmatch */
-A7RESTRICTED [- |<>%!:;@0~\\&?$+*/_(){}\]\[-]
+A7RESTRICTED [- |<>%:;@0~\\&?$+*/_(){}\]\[-]
 /* non-restricted ASCII */
-A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%!:;@0~\\&?$+*/_(){}\]\[-]
+A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%:;@~\\&?$+*/_(){}\]\[-]
 
 WEIGHT [0-9]+(\.[0-9]+)?
 
@@ -63,6 +63,14 @@ LWSP [\t\r\n ]
     return ALPHA;
 }
 
+"UppercaseAlpha" {
+    return UPPERALPHA;
+}
+
+"LowercaseAlpha" {
+    return LOWERALPHA;
+}
+
 "Num" {
     return NUM;
 }
@@ -73,6 +81,10 @@ LWSP [\t\r\n ]
 
 "Whitespace" {
     return WHITESPACE;
+}
+
+"OptCap(" {
+    return OPTCAP_LEFT;
 }
 
 "Ins(" {
@@ -202,6 +214,11 @@ LWSP [\t\r\n ]
     return READ_RE;
 }
 
+"@lexc\""[^""]+"\"" {
+    pmatchlval.label = hfst::pmatch::get_quoted(pmatchtext);
+    return READ_LEXC;
+}
+
 "[." { return LEFT_BRACKET_DOTTED; }
 ".]" { return RIGHT_BRACKET_DOTTED; }
 "[" { return LEFT_BRACKET; }
@@ -231,9 +248,10 @@ LWSP [\t\r\n ]
 "," { return COMMA; }
 
 "\"\"" { return EPSILON_TOKEN; }
-"0" { return EPSILON_TOKEN; }
 "[]" { return EPSILON_TOKEN; }
+"0" { return EPSILON_TOKEN; }
 "?" { return ANY_TOKEN; }
+"#" { return BOUNDARY_MARKER; }
 
 {NAME_CH}+ {
     pmatchlval.label = hfst::pmatch::strip_percents(pmatchtext);
@@ -251,7 +269,7 @@ LWSP [\t\r\n ]
 
 {LWSP}* { /* ignorable whitespace */ }
 
-("!"|"#")[^\n]*$ { /* ignore comments */ }
+("!")[^\n]*$ { /* ignore comments */ }
 
 . { 
     return LEXER_ERROR;

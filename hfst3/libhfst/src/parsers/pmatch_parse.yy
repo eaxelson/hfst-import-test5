@@ -78,7 +78,7 @@ REPLACE REGEXP3
 %type <transducerPair> CONTEXT
 %type <replType>  CONTEXT_MARK
 
-%type <transducer> INSERT RIGHT_CONTEXT LEFT_CONTEXT
+%type <transducer> OPTCAP INSERT RIGHT_CONTEXT LEFT_CONTEXT
 
 
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
@@ -118,7 +118,7 @@ LOWER_PRIORITY_UNION
 %nonassoc <values> CATENATE_N_TO_K
 %nonassoc <value> CATENATE_N CATENATE_N_PLUS CATENATE_N_MINUS
 
-%nonassoc <label> READ_BIN READ_TEXT READ_SPACED READ_PROLOG READ_RE
+%nonassoc <label> READ_BIN READ_TEXT READ_SPACED READ_PROLOG READ_RE READ_LEXC
 %token LEFT_BRACKET RIGHT_BRACKET LEFT_PARENTHESIS RIGHT_PARENTHESIS
 LEFT_CURLY RIGHT_CURLY LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED
 PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
@@ -130,7 +130,7 @@ PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
 
-%nonassoc DEFINE ALPHA NUM PUNCT WHITESPACE INS_LEFT ENDTAG_LEFT LC_LEFT RC_LEFT
+%nonassoc DEFINE ALPHA LOWERALPHA UPPERALPHA NUM PUNCT WHITESPACE OPTCAP_LEFT INS_LEFT ENDTAG_LEFT LC_LEFT RC_LEFT
 %%
 
 
@@ -141,12 +141,12 @@ PMATCH: REGEXP1 { }
 
 REGEXP1: REGEXP2 END_OF_EXPRESSION {
 //       std::cerr << "regexp1:regexp2 end of expr \n"<< std::endl; 
-    hfst::pmatch::last_compiled = hfst::pmatch::add_pmatch_delimiters($1);
+    hfst::pmatch::last_compiled = $1;
     $$ = hfst::pmatch::last_compiled;
  }
 | REGEXP2 END_OF_WEIGHTED_EXPRESSION {
-    //std::cerr << "regexp1:regexp2 end of wighted expr \n"<< std::endl; 
-    hfst::pmatch::last_compiled = hfst::pmatch::add_pmatch_delimiters($1);
+    //std::cerr << "regexp1:regexp2 end of weighted expr \n"<< std::endl; 
+    hfst::pmatch::last_compiled = $1;
     hfst::pmatch::last_compiled->set_final_weights($2);
     $$ = hfst::pmatch::last_compiled;
  }
@@ -171,7 +171,7 @@ REGEXP2: REPLACE
 }
 | REGEXP2 ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
     hfst::pmatch::add_end_tag($1, $3);
-    $$ = $1;
+    $$ = hfst::pmatch::add_pmatch_delimiters($1);
  }
 | REGEXP2 COMPOSITION REPLACE {
        
@@ -189,11 +189,11 @@ REGEXP2: REPLACE
     $$ = $1;
     delete $3;
  }
-| REPLACE RIGHT_CONTEXT {
+| REGEXP2 RIGHT_CONTEXT {
     $$ = & $1->concatenate(*$2);
     delete $2;
  }
-| REPLACE LEFT_CONTEXT {
+| REGEXP2 LEFT_CONTEXT {
     $$ = & $2->concatenate(*$1);
     delete $1;
  }
@@ -677,7 +677,7 @@ REGEXP9: REGEXP10 { }
     free($2);
  }
 | INSERT { }
-
+| OPTCAP { }
 ;
 
 REGEXP10: REGEXP11 { }
@@ -708,6 +708,12 @@ REGEXP11: REGEXP12 { }
 | ALPHA {
     $$ = hfst::pmatch::latin1_alpha_acceptor(hfst::pmatch::format);
  }
+| LOWERALPHA {
+    $$ = hfst::pmatch::latin1_lowercase_acceptor(hfst::pmatch::format);
+ }
+| UPPERALPHA {
+    $$ = hfst::pmatch::latin1_uppercase_acceptor(hfst::pmatch::format);
+ }
 | NUM {
     $$ = hfst::pmatch::latin1_numeral_acceptor(hfst::pmatch::format);
  }
@@ -717,6 +723,11 @@ REGEXP11: REGEXP12 { }
 | WHITESPACE {
     $$ = hfst::pmatch::latin1_whitespace_acceptor(hfst::pmatch::format);
  }
+;
+
+OPTCAP: OPTCAP_LEFT REGEXP11 RIGHT_PARENTHESIS {
+    $$ = hfst::pmatch::optcap(* $2);
+}
 ;
 
 REGEXP12: LABEL { }
@@ -730,7 +741,8 @@ REGEXP12: LABEL { }
     free($1);
   }
 | READ_TEXT {
-    pmatcherror("no read text");
+  $$ = hfst::pmatch::read_text($1);
+  free($1);
   }
 | READ_SPACED {
     pmatcherror("no read spaced");
@@ -740,6 +752,10 @@ REGEXP12: LABEL { }
   }
 | READ_RE {
     pmatcherror("Definitely no read regex");
+  }
+| READ_LEXC {
+    $$ = hfst::HfstTransducer::read_lexc_ptr($1, hfst::TROPICAL_OPENFST_TYPE);
+    free($1);
   }
 ;
 
@@ -830,7 +846,7 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
     free($1);
   }
 | BOUNDARY_MARKER {
-    $$ = new HfstTransducer("@#@", "@#@", hfst::pmatch::format);
+    $$ = new HfstTransducer("@_BOUNDARY_@", "@_BOUNDARY_@", hfst::pmatch::format);
   }
 ;
 
@@ -875,6 +891,9 @@ LEFT_CONTEXT: LC_LEFT REPLACE RIGHT_PARENTHESIS {
         hfst::internal_epsilon, hfst::pmatch::LC_EXIT_SYMBOL, hfst::pmatch::format);
     lc_entry->concatenate($2->reverse());
     lc_entry->concatenate(*lc_exit);
+    lc_entry->substitute("@_PMATCH_ENTRY_@", "@_PMATCH_TMP_@");
+    lc_entry->substitute("@_PMATCH_EXIT_@", "@_PMATCH_ENTRY_@");
+    lc_entry->substitute("@_PMATCH_TMP_@", "@_PMATCH_EXIT_@");
     $$ = lc_entry;
     delete $2;
     delete lc_exit;
