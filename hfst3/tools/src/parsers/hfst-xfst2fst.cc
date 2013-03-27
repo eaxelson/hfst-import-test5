@@ -312,6 +312,8 @@ int main(int argc, char** argv)
       char line[256];
       while (cin.getline(line, 256))
         {
+          if (line[0] == '!') // skip comment line
+            continue;
           if (0 != comp.parse_line(line))
             {
               error(EXIT_FAILURE, 0, "line '%s' could not be parsed\n", line);
@@ -332,6 +334,9 @@ int main(int argc, char** argv)
       char* promptline = (!silent) ? comp.get_prompt() : strdup("");
       while((buf = readline(promptline)) != NULL)
         {
+          if (buf[0] == '!') // skip comment line
+            continue;
+
           if (buf[0] != 0) {
             add_history(buf); }
           

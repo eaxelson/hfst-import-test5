@@ -945,7 +945,7 @@ ccc : ddd
         For example the transducer 
 
 \verbatim
-[[@U.FEATURE.FOO@ foo] | [@U.FEATURE.BAR@ bar]]  |  [[foo @U.FEATURE.FOO@] | [bar @U.FEATURE.BAR@]]
+[[@P.FEATURE.FOO@ foo] | [@P.FEATURE.BAR@ bar]]  |  [[foo @U.FEATURE.FOO@] | [bar @U.FEATURE.BAR@]]
 \endverbatim
 
         will yield the paths <CODE>[foo foo]</CODE> and <CODE>[bar bar]</CODE>.
