@@ -449,7 +449,7 @@ class XfstCompiler
 
  protected:
   XfstCompiler& print_apply_prompt(ApplyDirection direction);
-  XfstCompiler& print_symbol(const char* symbol, FILE* outfile=stdout);
+  const char* get_print_symbol(const char* symbol);
   XfstCompiler& print_paths(const hfst::HfstTwoLevelPaths &paths, FILE* outfile=stdout);
   XfstCompiler& print_paths(const hfst::HfstOneLevelPaths &paths, FILE* outfile=stdout);
 

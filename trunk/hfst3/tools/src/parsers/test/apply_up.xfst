@@ -10,4 +10,19 @@ foo
 bar
 baz
 <ctrl-d>
+regex "@P.N.N@" foo "@U.N.N@";
+apply up
+foo
+bar
+<ctrl-d>
+set show-flags ON
+apply up
+foo
+bar
+<ctrl-d>
+! test longest matching in tokenization
+regex {foo}:{bar} | foo:bar;
+apply up
+foo
+<ctrl-d>
 exit

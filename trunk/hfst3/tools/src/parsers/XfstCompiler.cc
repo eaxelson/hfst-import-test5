@@ -155,54 +155,99 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         return *this;
       }
 
-  XfstCompiler&
-  XfstCompiler::print_symbol(const char* symbol, FILE* outfile /* =stdout*/)
+  const char *
+  XfstCompiler::get_print_symbol(const char* symbol)
   {
-    if (variables_["show-flags"] == "OFF" && FdOperation::is_diacritic(symbol))
-      return *this;
-    fprintf(outfile, "%s", symbol);
-    return *this;
+    if (variables_["show-flags"] == "OFF" &&  // show no flags
+        FdOperation::is_diacritic(symbol))    // symbol is flag
+      {
+        return "";  // print nothing
+      }
+    return symbol;
   }
 
   XfstCompiler&
   XfstCompiler::print_paths(const hfst::HfstOneLevelPaths &paths, FILE* outfile /* =stdout */)
   {
+    // go through all paths
     for (hfst::HfstOneLevelPaths::const_iterator it = paths.begin();
          it != paths.end(); it++)
       {
         hfst::StringVector path = it->second;
+        bool something_printed = false;  // to control printing spaces
+
+        // go through the path
         for (hfst::StringVector::const_iterator p = path.begin();
              p != path.end(); p++)
           {
-            print_symbol(p->c_str(), outfile);
-            if (variables_["print-space"] == "ON")
-              fprintf(outfile, " ");
-          }
+            const char * print_symbol = get_print_symbol(p->c_str());
+
+            // see if symbol separator (space) is needed
+            if (variables_["print-space"] == "ON" &&  // print space required
+                something_printed &&                  // not first symbol shown 
+                strcmp(print_symbol, "") != 0)        // something to show
+              {
+                fprintf(outfile, " ");
+              }
+
+            fprintf(outfile, "%s", print_symbol);
+
+            if (strcmp(print_symbol, "") != 0) {
+              something_printed = true;
+            }
+
+          } // path went through
+
         fprintf(outfile, "\n");
-      }
+
+      } // all paths went through
+
   }
 
   XfstCompiler&
   XfstCompiler::print_paths(const hfst::HfstTwoLevelPaths &paths, FILE* outfile /* =stdout */)
   {
+    // go through all paths
     for (hfst::HfstTwoLevelPaths::const_iterator it = paths.begin();
          it != paths.end(); it++)
       {
         hfst::StringPairVector path = it->second;
+        bool something_printed = false;  // to control printing spaces
+
+        // go through the path
         for (hfst::StringPairVector::const_iterator p = path.begin();
              p != path.end(); p++)
           {
-            print_symbol(p->first.c_str(), outfile);
-            if (p->first != p->second)
+            const char * print_symbol = get_print_symbol(p->first.c_str());
+
+            // see if symbol separator (space) is needed
+            if (variables_["print-space"] == "ON" &&  // print space required
+                something_printed &&                  // not first symbol shown
+                strcmp(print_symbol, "") != 0)        // something to show
               {
-                fprintf(outfile, ":");
-                print_symbol(p->second.c_str(), outfile);
+                fprintf(outfile, " ");
               }
-            if (variables_["print-space"] == "ON")
-              fprintf(outfile, " ");
-          }
+
+            fprintf(outfile, "%s", print_symbol);
+
+            if (strcmp(print_symbol, "") != 0)
+              something_printed = true;
+
+            print_symbol = get_print_symbol(p->second.c_str());
+            
+            // see if output symbol is needed
+            if (strcmp(print_symbol, "") != 0 &&   // something to show
+                p->first != p->second)             // input and output symbols differ
+              {
+                fprintf(outfile, ":%s", print_symbol);
+              }
+
+          } // path went through
+
         fprintf(outfile, "\n");
-      }
+
+      } // all paths went through
+
   }
 
     XfstCompiler&
@@ -216,13 +261,23 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             tmp = new HfstTransducer(*(stack_.top()));
             tmp->invert().minimize();
           }
-        HfstOneLevelPaths * paths = tmp->lookup_fd(std::string(token));
+        HfstOneLevelPaths * paths = NULL;
+
+        if (variables_["obey-flags"] == "ON") {
+          paths = tmp->lookup_fd(std::string(token));
+        }
+        else {
+          paths = tmp->lookup(std::string(token));
+        }
+
         this->print_paths(*paths);
-        if (paths->empty())
+        if (paths->empty()) {
           fprintf(stdout, "???\n");
+        }
         delete paths;
         if (direction == APPLY_DOWN_DIRECTION)
           {
+            // free memory reserved for temporary transducer
             delete tmp;
           }
         return *this;
@@ -317,12 +372,15 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler&
   XfstCompiler::print_apply_prompt(ApplyDirection direction)
   {
-    if (! verbose_)
+    if (! verbose_) {
       return *this;
-    if (direction == APPLY_UP_DIRECTION)
+    }
+    if (direction == APPLY_UP_DIRECTION) {
       fprintf(stdout, "apply up> ");
-    else if (direction == APPLY_DOWN_DIRECTION)
+    }
+    else if (direction == APPLY_DOWN_DIRECTION) {
       fprintf(stdout, "apply down> ");
+    }
     return *this;
   }
 
