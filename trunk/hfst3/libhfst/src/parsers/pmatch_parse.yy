@@ -136,23 +136,21 @@ PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 
 
 
-PMATCH: REGEXP1 { }
+PMATCH: REGEXP1 {
+    $1->minimize();
+    hfst::pmatch::last_compiled = $1;
+    $$ = hfst::pmatch::last_compiled;
+ }
 ;
 
-REGEXP1: REGEXP2 END_OF_EXPRESSION {
-//       std::cerr << "regexp1:regexp2 end of expr \n"<< std::endl; 
-    hfst::pmatch::last_compiled = $1;
-    $$ = hfst::pmatch::last_compiled;
- }
+REGEXP1: REGEXP2 END_OF_EXPRESSION { }
 | REGEXP2 END_OF_WEIGHTED_EXPRESSION {
-    //std::cerr << "regexp1:regexp2 end of weighted expr \n"<< std::endl; 
-    hfst::pmatch::last_compiled = $1;
-    hfst::pmatch::last_compiled->set_final_weights($2);
-    $$ = hfst::pmatch::last_compiled;
+    $1->set_final_weights($2);
+    $$ = $1;
  }
 | DEFINE SYMBOL REGEXP1 {
-    //            std::cerr << "matched Define " << $2 << std::endl;
     $3->set_name($2);
+    $3->minimize();
     hfst::pmatch::named_transducers.insert(
         std::pair<std::string,hfst::HfstTransducer>($2, HfstTransducer(*($3))));
     $$ = $3;
