@@ -445,4 +445,21 @@ HfstTransducer * latin1_whitespace_acceptor(ImplementationType type)
     return acceptor_from_cstr(latin1_whitespace, type);
 }
 
+HfstTransducer * optcap(HfstTransducer & t)
+{
+    HfstTokenizer tok;
+    HfstTransducer capify(t.get_type());
+    for (size_t i = 0; i < array_len(latin1_lower); ++i) {
+        capify.disjunct(HfstTransducer(latin1_lower[i], latin1_upper[i],
+                                       tok, t.get_type()));
+    }
+    capify.concatenate(HfstTransducer::identity_pair(
+                           t.get_type()).repeat_star());
+    HfstTransducer * retval = new HfstTransducer(t);
+    retval->compose(capify);
+    retval->output_project();
+    retval->disjunct(t);
+    return retval;
+}
+
 } }
