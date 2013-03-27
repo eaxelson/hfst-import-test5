@@ -142,6 +142,11 @@ template<typename T, size_t N>
     return retval;
 }
 
+template<typename T, size_t N>
+    size_t array_len(T(&strings)[N]) {
+    return N;
+}
+
 /**
  * Character class acceptors
  */
@@ -177,6 +182,8 @@ HfstTransducer * latin1_punct_acceptor(
 */
 HfstTransducer * latin1_whitespace_acceptor(
     ImplementationType type = TROPICAL_OPENFST_TYPE);
+
+HfstTransducer * optcap(HfstTransducer & t);
 
 } } // namespaces
 #endif

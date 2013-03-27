@@ -83,6 +83,10 @@ LWSP [\t\r\n ]
     return WHITESPACE;
 }
 
+"OptCap(" {
+    return OPTCAP_LEFT;
+}
+
 "Ins(" {
     return INS_LEFT;
 }
