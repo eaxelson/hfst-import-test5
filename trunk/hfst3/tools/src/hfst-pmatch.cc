@@ -7,14 +7,14 @@ print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] TRANSDUCER\n"
-           "perform matching/lookup on text streams\n"
-        "\n", program_name);
+            "perform matching/lookup on text streams\n"
+            "\n", program_name);
 
     print_common_program_options(message_out);
     fprintf(message_out, 
-        "Input/Output options:\n"
-        "  -i, --input=INFILE     Read input transducer from INFILE\n"
-        "  -o, --output=OUTFILE   Write output to OUTFILE\n");
+            "Input/Output options:\n"
+            "  -i, --input=INFILE     Read input transducer from INFILE\n"
+            "  -o, --output=OUTFILE   Write output to OUTFILE\n");
 
     fprintf(message_out, "Pmatch options:\n");
 //            "  -e, --epsilon-format=EPS         Print epsilon as EPS\n"
@@ -31,13 +31,13 @@ print_usage()
 // {
 //     hfst_ol::PmatchContainer container(inputstream);
 //     while (inputstream.good()) {
-//      try {
-//          transducer_name = parse_hfst3_header(inputstream);
-//      } catch (TransducerHeaderException & e) {
-//          break;
-//      }
+// try {
+//     transducer_name = parse_hfst3_header(inputstream);
+// } catch (TransducerHeaderException & e) {
+//     break;
+// }
 //         container.add_rtn(
-//          new hfst_ol::PmatchTransducer(inputstream, false), transducer_name);
+//     new hfst_ol::PmatchTransducer(inputstream, false), transducer_name);
 //     }
 //     find_rtns(container);
 //     return container;
@@ -54,7 +54,7 @@ void process_input(hfst_ol::PmatchContainer & container)
     while (std::cin) {
         getline(std::cin, input_line);
         print_result(container.match(input_line));
- }
+    }
 
     // std::istream user_input = std::cin;
     // while(!getline(user_input, input_line).failbit) {
@@ -103,15 +103,15 @@ int parse_options(int argc, char** argv)
     while (true)
     {
         static const struct option long_options[] =
-        {
-            // first the hfst-mandated options
-          {"help",         no_argument,       0, 'h'},
-          {"version",      no_argument,       0, 'V'},
-          {"verbose",      no_argument,       0, 'v'},
-          {"quiet",        no_argument,       0, 'q'},
-          {"silent",       no_argument,       0, 's'},
-          {0,0,0,0}
-        };
+            {
+                // first the hfst-mandated options
+                {"help",         no_argument,       0, 'h'},
+                {"version",      no_argument,       0, 'V'},
+                {"verbose",      no_argument,       0, 'v'},
+                {"quiet",        no_argument,       0, 'q'},
+                {"silent",       no_argument,       0, 's'},
+                {0,0,0,0}
+            };
         int option_index = 0;
         // add tool-specific options here 
         c = getopt_long(argc, argv,
@@ -125,13 +125,9 @@ int parse_options(int argc, char** argv)
         switch (c)
         {
         case 'h':
-          print_usage();
-          return EXIT_SUCCESS;
-          break;
-        case 'V':
-          print_version();
-          return EXIT_SUCCESS;
-          break;
+            print_usage();
+            return EXIT_SUCCESS;
+            break;
         default:
             std::cerr << "Invalid option\n\n";
             return EXIT_FAILURE;
@@ -140,20 +136,20 @@ int parse_options(int argc, char** argv)
     }
 
     // no more options, we should now be at the input filename
-  if ( (optind + 1) < argc)
+    if ( (optind + 1) < argc)
     {
-      std::cerr << "More than one input file given\n";
-      return EXIT_FAILURE;
+        std::cerr << "More than one input file given\n";
+        return EXIT_FAILURE;
     }
-  else if ( (optind + 1) == argc)
+    else if ( (optind + 1) == argc)
     {
         input_file_name = argv[(optind)];
         return EXIT_CONTINUE;
     }
-  else
+    else
     {
-      std::cerr << "No input file given\n";
-      return EXIT_FAILURE;
+        std::cerr << "No input file given\n";
+        return EXIT_FAILURE;
     }
 
     return EXIT_CONTINUE;
@@ -171,7 +167,7 @@ int main(int argc, char ** argv)
     std::ifstream instream(input_file_name.c_str(),
                            std::ifstream::binary);
     hfst_ol::PmatchContainer container(instream);
-                                                        
+
     process_input(container);
     return EXIT_SUCCESS;
 }
