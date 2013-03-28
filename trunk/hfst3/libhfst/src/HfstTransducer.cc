@@ -1947,6 +1947,11 @@ public:
     }
 };
 
+void HfstTransducer::extract_longest_paths(HfstTwoLevelPaths &results) const
+{
+  HFST_THROW(FunctionNotImplementedException);
+}
+
 void HfstTransducer::extract_shortest_paths(HfstTwoLevelPaths &results) const
 {
 #if HAVE_OPENFST

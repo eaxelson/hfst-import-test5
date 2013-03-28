@@ -403,13 +403,17 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
                 ctrl_d_end = true;
                 break;
               }
-            if (direction == APPLY_UP_DIRECTION)
+
+            if (direction == APPLY_UP_DIRECTION) {
               apply_up_line(line);
-            else if (direction == APPLY_DOWN_DIRECTION)
+            }
+            else if (direction == APPLY_DOWN_DIRECTION) {
               apply_down_line(line);
+            }
             
-            if (infile == stdin)
+            if (infile == stdin) {
               print_apply_prompt(direction);
+            }
           }
         if (infile == stdin && ! ctrl_d_end)
           fprintf(stdout, "\n");
