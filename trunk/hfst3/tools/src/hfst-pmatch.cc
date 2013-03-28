@@ -128,6 +128,10 @@ int parse_options(int argc, char** argv)
             print_usage();
             return EXIT_SUCCESS;
             break;
+        case 'V':
+          print_version();
+          return EXIT_SUCCESS;
+          break;
         default:
             std::cerr << "Invalid option\n\n";
             return EXIT_FAILURE;
