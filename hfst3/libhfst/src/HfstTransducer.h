@@ -919,9 +919,17 @@ ccc : ddd
     void extract_paths_fd
       (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true) const;
 
+    // todo: handle flag diacritics
+    // todo: throw TransducerIsCyclicException, if cyclic
     void extract_shortest_paths
       (HfstTwoLevelPaths &results) const;
     
+    // todo: implement
+    // todo: handle flag diacritics
+    // todo: throw TransducerIsCyclicException, if cyclic
+    void extract_longest_paths
+      (HfstTwoLevelPaths &results) const;
+
   public:
     /** \brief Extract a maximum of \a max_num paths that are 
         recognized by the transducer and are not invalidated by flag 
