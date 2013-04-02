@@ -1949,6 +1949,27 @@ public:
 
 void HfstTransducer::extract_longest_paths(HfstTwoLevelPaths &results) const
 {
+  std::cerr << "extract_longest_paths..." << std::endl;
+  using hfst::implementations::HfstState;
+
+  HfstBasicTransducer net(*this);
+  std::vector<std::set<HfstState> > states_sorted = net.topsort();
+
+  std::cerr << "printing sets of states..." << std::endl;
+  unsigned int distance = 0;
+  for (std::vector<std::set<HfstState> >::const_iterator dist_it = states_sorted.begin();
+       dist_it != states_sorted.end(); dist_it++)
+    {
+      fprintf(stderr, "states at distance %i: ", distance);
+      for (std::set<HfstState>::const_iterator state_it = dist_it->begin();
+           state_it != dist_it->end(); state_it++)
+        {
+          fprintf(stderr, "%i ", *state_it);
+        }
+      fprintf(stderr, "\n");
+      distance++;
+    }
+  std::cerr << "...extract_longest_paths" << std::endl;
   HFST_THROW(FunctionNotImplementedException);
 }
 

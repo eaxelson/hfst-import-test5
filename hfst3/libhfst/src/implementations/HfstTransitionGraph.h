@@ -2084,55 +2084,136 @@ namespace hfst {
           remove_symbols_from_alphabet(extra_symbols);
         }
 
+
+        struct TopologicalSort
+        {
+          std::vector<int> distance_of_state;
+          std::vector<std::set<HfstState> > states_at_distance;
+          
+          void set_biggest_state_number(unsigned int biggest_state_number)
+          {
+            distance_of_state = std::vector<int>(biggest_state_number+1, -1);
+          }
+
+          void set_state_at_distance(HfstState state, unsigned int distance)
+          {
+            std::cerr << "set_state_at_distance(" << state << ", " << distance << ")...";
+            // see that 'state' does not exceed the maximum state number given in initialization
+            if (state > (distance_of_state.size() - 1))
+              {
+                std::cerr << "ERROR in TopologicalSort::set_state_at_distance: first argument ("
+                          << state << ") is out of range (should be < " << distance_of_state.size() 
+                          << ")" << std::endl;
+              }
+            // if there is nothing on index 'state',
+            // push back empty sets of states up to index 'state', including
+            while (distance + 1 > (unsigned int)states_at_distance.size()) 
+              {
+                std::cerr << "pushing back empty set..";
+                std::set<HfstState> empty_set;
+                states_at_distance.push_back(empty_set);
+                std::cerr << " done" << std::endl;
+              }
+            // if there was previous distance defined for 'state', erase it
+            int previous_distance = distance_of_state.at(state);
+            if (previous_distance != -1 && previous_distance != distance)
+              {
+                states_at_distance.at(previous_distance).erase(state);
+              }
+            // set state and distance
+            states_at_distance.at(distance).insert(state);
+            distance_of_state.at(state) = distance;
+            std::cerr << " done" << std::endl;
+          }
+
+          const std::set<HfstState> & get_states_at_distance(unsigned int distance)
+          {
+            // if there is nothing on index 'state',
+            // push back empty sets of states up to index 'state', including
+            while (distance > (states_at_distance.size() - 1)) 
+              {
+                std::set<HfstState> empty_set;
+                states_at_distance.push_back(empty_set);
+              }
+            return states_at_distance.at(distance);
+          }
+        };
+
         /* 
-           Topologically sort the graph.
+           Get a topological maximum distance sort of this graph.
            @return A vector of sets of states. At each vector index ind, the result contains
            the set of all states whose maximum distance from the start state is ind.
         */
         std::vector<std::set<HfstState> > topsort() const
           {
-            // initialize variables:
-            //  - distance_of_state (size: number of states in this graph, value of each element: -1, except [0] == 0)
-            //  - states_at_distance (size: 100, value of each element: the empty set, except [0] == {0})
             unsigned int current_distance = 0;
-            std::vector<int> distance_of_state(this->state_vector.size(), -1);
-            distance_of_state[0] = 0;
-            std::vector<std::set<HfstState> > states_at_distance;
-            std::set<HfstState> state_set;
-            state_set.insert(0);
-            states_at_distance[0] = state_set; 
+            TopologicalSort TopSort;
+            TopSort.set_biggest_state_number(state_vector.size()-1);
+            TopSort.set_state_at_distance(0,current_distance);
             bool new_states_found = false; // end condition for do-while loop
 
             do
               {
+                std::cerr << "Distance: " << current_distance << std::endl;
                 new_states_found = false;
                 std::set<HfstState> new_states;
                 // go through all states at current distance
-                const std::set<HfstState> & states = states_at_distance[current_distance];
+                const std::set<HfstState> & states = TopSort.get_states_at_distance(current_distance);
                 for (std::set<HfstState>::const_iterator state_it = states.begin();
                      state_it != states.end(); state_it++)
                   {
                     // go through all transitions of each state
-                    const HfstTransitions & transitions = this->state_vector[*state_it];
+                    const HfstTransitions & transitions = this->state_vector.at(*state_it);
                     for (typename HfstTransitions::const_iterator transition_it 
                            = transitions.begin();
                          transition_it != transitions.end(); transition_it++)
                       {
+                        std::cerr << "state: " << *state_it << "  target state: " << transition_it->get_target_state() << std::endl;
                         new_states_found = true;
                         HfstState target_state = transition_it->get_target_state();
-                        distance_of_state[target_state] = current_distance + 1; 
                         new_states.insert(target_state);
                       } 
                     // all transitions gone through
                   }
                 // all states gone through
+                
+                for (std::set<HfstState>::const_iterator it = new_states.begin();
+                     it != new_states.end(); it++)
+                  {
+                    std::cerr << "setting state " << *it << " at distance " << (current_distance + 1) << std::endl;
+                    TopSort.set_state_at_distance(*it, current_distance + 1); 
+                  }
                 current_distance++;
-                states_at_distance.push_back(new_states);
               }
             while (new_states_found);
 
-            return states_at_distance;
+            return TopSort.states_at_distance;
           }
+
+        /** The length of longest string accepted by this graph. 
+           If no string is accepted, return -1. */
+        int longest_string_size()
+        {
+          // get topological maximum distance sort
+          std::vector<std::set<HfstState> > states_sorted = this->topsort();
+          // go through all sets of states in descending order
+          for (unsigned int i = states_sorted.size() - 1; i >= 0; i--)
+            {
+              const std::set<HfstState> & states = states_sorted.at(i);
+              // go through all states in a set that have the same order
+              for (std::set<HfstState>::const_iterator it = states.begin();
+                   it != states.end(); it++)
+                {
+                  // if a final state is encountered, return the order of that state
+                  if (is_final_state(*it))
+                    {
+                      return (int)i;
+                    }
+                }
+            }
+          // if no final states were encountered, return a negative value
+          return -1;
+        }
 
 /*      /\** @brief Determine whether this graph has input-epsilon cycles. */
 /*       *\/ */
