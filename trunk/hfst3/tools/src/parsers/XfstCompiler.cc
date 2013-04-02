@@ -1405,7 +1405,15 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::print_longest_string(FILE* outfile)
     {
-      fprintf(outfile, "missing longest string %s:%d\n", __FILE__, __LINE__);
+      //fprintf(outfile, "missing longest string %s:%d\n", __FILE__, __LINE__);
+      
+      HfstTransducer* topmost = this->top();
+      if (topmost == NULL)
+        return *this;
+
+      HfstTwoLevelPaths paths;
+      topmost->extract_longest_paths(paths);
+
       prompt();
       return *this;
     }
