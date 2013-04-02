@@ -1947,30 +1947,34 @@ public:
     }
 };
 
-void HfstTransducer::extract_longest_paths(HfstTwoLevelPaths &results) const
+int HfstTransducer::longest_path_size() const
 {
-  std::cerr << "extract_longest_paths..." << std::endl;
-  using hfst::implementations::HfstState;
-
   HfstBasicTransducer net(*this);
-  std::vector<std::set<HfstState> > states_sorted = net.topsort();
+  return net.longest_path_size();
+}
 
-  std::cerr << "printing sets of states..." << std::endl;
-  unsigned int distance = 0;
-  for (std::vector<std::set<HfstState> >::const_iterator dist_it = states_sorted.begin();
-       dist_it != states_sorted.end(); dist_it++)
+bool HfstTransducer::extract_longest_paths(HfstTwoLevelPaths &results) const
+{
+  HfstBasicTransducer net(*this);
+  int length = net.longest_path_size();
+  if (length < 0)
+    return false;
+
+  std::string match_xre("[ ");
+  for (unsigned int i=0; i < (unsigned int)length; i++)
     {
-      fprintf(stderr, "states at distance %i: ", distance);
-      for (std::set<HfstState>::const_iterator state_it = dist_it->begin();
-           state_it != dist_it->end(); state_it++)
-        {
-          fprintf(stderr, "%i ", *state_it);
-        }
-      fprintf(stderr, "\n");
-      distance++;
+      match_xre.append("? ");
     }
-  std::cerr << "...extract_longest_paths" << std::endl;
-  HFST_THROW(FunctionNotImplementedException);
+  match_xre.append("]");
+  hfst::xre::XreCompiler xre(this->get_type());
+  HfstTransducer * length_tr = xre.compile(match_xre.c_str());
+
+  length_tr->compose(*this);
+  length_tr->minimize();
+  length_tr->extract_paths(results);
+  delete length_tr;
+
+  return true;
 }
 
 void HfstTransducer::extract_shortest_paths(HfstTwoLevelPaths &results) const
