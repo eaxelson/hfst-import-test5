@@ -924,11 +924,12 @@ ccc : ddd
     void extract_shortest_paths
       (HfstTwoLevelPaths &results) const;
     
-    // todo: implement
     // todo: handle flag diacritics
     // todo: throw TransducerIsCyclicException, if cyclic
-    void extract_longest_paths
+    bool extract_longest_paths
       (HfstTwoLevelPaths &results) const;
+
+    int longest_path_size() const;
 
   public:
     /** \brief Extract a maximum of \a max_num paths that are 

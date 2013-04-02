@@ -2097,7 +2097,7 @@ namespace hfst {
 
           void set_state_at_distance(HfstState state, unsigned int distance)
           {
-            std::cerr << "set_state_at_distance(" << state << ", " << distance << ")...";
+            //std::cerr << "set_state_at_distance(" << state << ", " << distance << ")...";
             // see that 'state' does not exceed the maximum state number given in initialization
             if (state > (distance_of_state.size() - 1))
               {
@@ -2109,10 +2109,10 @@ namespace hfst {
             // push back empty sets of states up to index 'state', including
             while (distance + 1 > (unsigned int)states_at_distance.size()) 
               {
-                std::cerr << "pushing back empty set..";
+                //std::cerr << "pushing back empty set..";
                 std::set<HfstState> empty_set;
                 states_at_distance.push_back(empty_set);
-                std::cerr << " done" << std::endl;
+                //std::cerr << " done" << std::endl;
               }
             // if there was previous distance defined for 'state', erase it
             int previous_distance = distance_of_state.at(state);
@@ -2123,7 +2123,7 @@ namespace hfst {
             // set state and distance
             states_at_distance.at(distance).insert(state);
             distance_of_state.at(state) = distance;
-            std::cerr << " done" << std::endl;
+            //std::cerr << " done" << std::endl;
           }
 
           const std::set<HfstState> & get_states_at_distance(unsigned int distance)
@@ -2154,7 +2154,7 @@ namespace hfst {
 
             do
               {
-                std::cerr << "Distance: " << current_distance << std::endl;
+                //std::cerr << "Distance: " << current_distance << std::endl;
                 new_states_found = false;
                 std::set<HfstState> new_states;
                 // go through all states at current distance
@@ -2168,7 +2168,7 @@ namespace hfst {
                            = transitions.begin();
                          transition_it != transitions.end(); transition_it++)
                       {
-                        std::cerr << "state: " << *state_it << "  target state: " << transition_it->get_target_state() << std::endl;
+                        //std::cerr << "state: " << *state_it << "  target state: " << transition_it->get_target_state() << std::endl;
                         new_states_found = true;
                         HfstState target_state = transition_it->get_target_state();
                         new_states.insert(target_state);
@@ -2180,7 +2180,7 @@ namespace hfst {
                 for (std::set<HfstState>::const_iterator it = new_states.begin();
                      it != new_states.end(); it++)
                   {
-                    std::cerr << "setting state " << *it << " at distance " << (current_distance + 1) << std::endl;
+                    //std::cerr << "setting state " << *it << " at distance " << (current_distance + 1) << std::endl;
                     TopSort.set_state_at_distance(*it, current_distance + 1); 
                   }
                 current_distance++;
@@ -2192,14 +2192,14 @@ namespace hfst {
 
         /** The length of longest string accepted by this graph. 
            If no string is accepted, return -1. */
-        int longest_string_size()
+        int longest_path_size()
         {
           // get topological maximum distance sort
           std::vector<std::set<HfstState> > states_sorted = this->topsort();
           // go through all sets of states in descending order
-          for (unsigned int i = states_sorted.size() - 1; i >= 0; i--)
+          for (int i = states_sorted.size() - 1; i >= 0; i--)
             {
-              const std::set<HfstState> & states = states_sorted.at(i);
+              const std::set<HfstState> & states = states_sorted.at((unsigned int)i);
               // go through all states in a set that have the same order
               for (std::set<HfstState>::const_iterator it = states.begin();
                    it != states.end(); it++)
@@ -2207,7 +2207,7 @@ namespace hfst {
                   // if a final state is encountered, return the order of that state
                   if (is_final_state(*it))
                     {
-                      return (int)i;
+                      return i;
                     }
                 }
             }

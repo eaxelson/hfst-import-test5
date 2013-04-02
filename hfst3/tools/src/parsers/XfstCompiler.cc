@@ -1336,28 +1336,6 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   { 
     transducer->extract_shortest_paths(paths);
     return *this;
-    /*
-    HfstTransducer empty(transducer->get_type());
-
-    if (empty.compare(*transducer))
-      return false;
-
-    std::string match_xre("");
-    HfstTransducer * n_length = xre_.compile(("[" + match_xre + "]").c_str());
-    n_length->compose(*transducer);
-    
-    while(empty.compare(*n_length))
-      {
-        match_xre.append(std::string("? "));
-        delete n_length;
-        n_length = xre_.compile(("[" + match_xre + "]").c_str());
-        n_length->compose(*transducer);
-        size++;
-      }
-    
-    n_length->extract_paths(paths);
-    delete n_length;
-    return true;*/
   }
 
   XfstCompiler& 
@@ -1405,22 +1383,38 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::print_longest_string(FILE* outfile)
     {
-      //fprintf(outfile, "missing longest string %s:%d\n", __FILE__, __LINE__);
-      
       HfstTransducer* topmost = this->top();
       if (topmost == NULL)
         return *this;
 
       HfstTwoLevelPaths paths;
-      topmost->extract_longest_paths(paths);
-
+      if (! topmost->extract_longest_paths(paths))
+        {
+          fprintf(stdout, "transducer is empty\n");
+        }
+      else
+        {
+          print_paths(paths, outfile);
+        }
       prompt();
       return *this;
     }
   XfstCompiler& 
   XfstCompiler::print_longest_string_size(FILE* outfile)
     {
-      fprintf(outfile, "missing longes string size %s:%d\n", __FILE__, __LINE__);
+      HfstTransducer* topmost = this->top();
+      if (topmost == NULL)
+        return *this;
+
+      int length = topmost->longest_path_size();
+      if (length < 0)
+        {
+          fprintf(stdout, "transducer is empty\n");
+        }
+      else
+        {
+          fprintf(outfile, "%i\n", length);
+        }
       prompt();
       return *this;
     }
