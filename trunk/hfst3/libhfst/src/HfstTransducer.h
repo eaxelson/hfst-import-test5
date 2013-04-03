@@ -99,6 +99,13 @@ namespace hfst
   HfstFile hfst_stdout();
   HfstFile hfst_stdin();
 
+  int longest_path_length(const HfstTwoLevelPaths & paths, bool equally_long=false);
+  HfstTwoLevelPaths get_longest_paths(const HfstTwoLevelPaths & paths);
+  HfstTwoLevelPaths remove_flags(const HfstTwoLevelPaths & paths);
+  StringPairVector remove_flags(const StringPairVector &v);
+  StringVector remove_flags(const StringVector &v);
+
+
   // *** TESTING AND OPTIMIZATION...
 
   enum MinimizationAlgorithm { HOPCROFT, BRZOZOWSKI };
@@ -924,12 +931,10 @@ ccc : ddd
     void extract_shortest_paths
       (HfstTwoLevelPaths &results) const;
     
-    // todo: handle flag diacritics
-    // todo: throw TransducerIsCyclicException, if cyclic
     bool extract_longest_paths
-      (HfstTwoLevelPaths &results) const;
+      (HfstTwoLevelPaths &results, bool obey_flags=true /*,bool show_flags=false*/) const;
 
-    int longest_path_size() const;
+    int longest_path_size(bool obey_flags=true) const;
 
   public:
     /** \brief Extract a maximum of \a max_num paths that are 

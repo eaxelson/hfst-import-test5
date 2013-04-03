@@ -86,6 +86,93 @@ hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
     return file;
   };
 
+int longest_path_length(const HfstTwoLevelPaths & paths, bool equally_long)
+{
+  if (paths.size() == 0)
+    {
+      return -1;
+    }
+  if (equally_long)
+    {
+      return (int)(paths.begin()->second.size());
+    }
+
+  unsigned int max_path_length = 0;
+
+  for (HfstTwoLevelPaths::const_iterator it = paths.begin();
+       it != paths.end(); it++)
+    {
+      unsigned int length = it->second.size();
+      max_path_length = (length > max_path_length)? length : max_path_length;
+    }
+  return (int)max_path_length;
+}
+
+HfstTwoLevelPaths get_longest_paths(const HfstTwoLevelPaths & paths)
+{
+  HfstTwoLevelPaths result;
+  unsigned int max_path_length = 0;
+
+  for (HfstTwoLevelPaths::const_iterator it = paths.begin();
+       it != paths.end(); it++)
+    {
+      unsigned int length = it->second.size();
+      max_path_length = (length > max_path_length)? length : max_path_length;
+    }
+
+  for (HfstTwoLevelPaths::const_iterator it = paths.begin();
+       it != paths.end(); it++)
+    {
+      unsigned int length = it->second.size();
+      if (length == max_path_length)
+        {
+          result.insert(*it);
+        }
+    }
+
+  return result;
+}
+
+HfstTwoLevelPaths remove_flags(const HfstTwoLevelPaths & paths)
+{
+  HfstTwoLevelPaths result;
+
+  for (HfstTwoLevelPaths::const_iterator it = paths.begin();
+       it != paths.end(); it++)
+    {
+      result.insert(HfstTwoLevelPath(it->first,
+                                     remove_flags(it->second)));
+    }
+  return result;
+}
+
+StringVector remove_flags(const StringVector &v)
+{
+  StringVector v_wo_flags;
+  for (StringVector::const_iterator it = v.begin();
+       it != v.end();
+       ++it)
+    {
+      if (not FdOperation::is_diacritic(*it))
+        { v_wo_flags.push_back(*it); }
+    }
+  return v_wo_flags;
+}
+
+StringPairVector remove_flags(const StringPairVector &v)
+{
+  StringPairVector v_wo_flags;
+  for (StringPairVector::const_iterator it = v.begin();
+       it != v.end();
+       ++it)
+    {
+      if (not FdOperation::is_diacritic(it->first) &&
+          not FdOperation::is_diacritic(it->second))
+        { v_wo_flags.push_back(*it); }
+    }
+  return v_wo_flags;
+}
+
 
 // -----------------------------------------------------------------------
 //
@@ -1947,35 +2034,119 @@ public:
     }
 };
 
-int HfstTransducer::longest_path_size() const
+int HfstTransducer::longest_path_size(bool obey_flags) const
 {
-  HfstBasicTransducer net(*this);
-  return net.longest_path_size();
+  if (! obey_flags)
+    {
+      HfstBasicTransducer net(*this);
+      return net.longest_path_size();
+    }
+
+  HfstTwoLevelPaths results;
+  bool paths_found = this->extract_longest_paths(results, true /* obey flags */);
+  if (! paths_found)
+    {
+      return -1;
+    }
+  // else, there is at least one path
+  return results.begin()->second.size();
 }
 
-bool HfstTransducer::extract_longest_paths(HfstTwoLevelPaths &results) const
+static std::string match_any_n_times(unsigned int n, const StringSet & flags)
+{
+  std::string match_any(" [ ? ");
+  for (StringSet::const_iterator it = flags.begin(); 
+       it != flags.end(); it++)
+    {
+      match_any = match_any + "| \"" + *it + "\" ";
+    }
+  match_any += " ] ";
+
+  std::string match_length("[");
+  for (unsigned int i=0; i < n; i++)
+    {
+      match_length += match_any;
+    }
+  match_length += "]";
+
+  return match_length;
+}
+
+bool HfstTransducer::extract_longest_paths
+(HfstTwoLevelPaths &results, bool obey_flags /*,bool show_flags*/) const
 {
   HfstBasicTransducer net(*this);
-  int length = net.longest_path_size();
-  if (length < 0)
+  std::vector<unsigned int> path_lengths = net.path_sizes();
+  if (path_lengths.size() == 0)
     return false;
 
-  std::string match_xre("[ ");
-  for (unsigned int i=0; i < (unsigned int)length; i++)
+  StringSet flags = net.get_flags();
+
+  // go through each length of accepted paths in descending order
+  for (std::vector<unsigned int>::const_iterator length = path_lengths.begin();
+       length != path_lengths.end(); length++)
     {
-      match_xre.append("? ");
-    }
-  match_xre.append("]");
-  hfst::xre::XreCompiler xre(this->get_type());
-  HfstTransducer * length_tr = xre.compile(match_xre.c_str());
+      // create a transducer [ any any ... any any ] where the number of transitions
+      // that accept any symbol (including flags) is equal to current length
+      // of accepted paths
+      std::string match_length = match_any_n_times(*length, flags);
 
-  length_tr->compose(*this);
-  length_tr->minimize();
-  length_tr->extract_paths(results);
-  delete length_tr;
+      hfst::xre::XreCompiler xre(this->get_type());
+      HfstTransducer * length_tr = xre.compile(match_length.c_str());
 
-  return true;
+      // filter out the paths of current length and extract them
+      length_tr->compose(*this);
+      length_tr->minimize();
+      if (obey_flags)
+        {
+          length_tr->extract_paths_fd(results);
+        }
+      else
+        {
+          length_tr->extract_paths(results);
+        }
+      delete length_tr;
+
+      // if paths were found
+      if (results.size() > 0)
+        {
+          //if (show_flags)
+          return true;
+          /*
+          // it is possible that there are longer paths after flags have been removed
+          else
+            {
+              results = remove_flags(results);
+              results = get_longest_paths(results);
+              int max_length = longest_path_length(results);
+              if (max_length < 0 || max_length > *length) // this should not happen
+                {
+                  HFST_THROW(HfstFatalException);
+                }
+              if (max_length == *length)
+                {
+                  return true;
+                }
+              // see if there could be longer paths
+              length++;
+              if (*length == path_lengths.end())
+                {
+                  return true;
+                }
+              if (*length < max_length)
+                {
+                  return true;
+                }
+              else this gets a bit complicated...       
+                }*/
+        }
+
+    } // lengths of accepted paths gone through
+
+  // no paths found
+  return false;
 }
+
 
 void HfstTransducer::extract_shortest_paths(HfstTwoLevelPaths &results) const
 {
@@ -5009,21 +5180,6 @@ void lenient_composition_test ( ImplementationType type )
     HfstTransducer testTr1(t1);
     assert ( testTr1.lenient_composition( t2 ).compare( t1 ) );
 
-}
-
-
-
-StringVector remove_flags(const StringVector &v)
-{
-  StringVector v_wo_flags;
-  for (StringVector::const_iterator it = v.begin();
-       it != v.end();
-       ++it)
-    {
-      if (not FdOperation::is_diacritic(*it))
-        { v_wo_flags.push_back(*it); }
-    }
-  return v_wo_flags;
 }
 
 int main(int argc, char * argv[])
