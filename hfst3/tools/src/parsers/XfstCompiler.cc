@@ -1388,12 +1388,21 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         return *this;
 
       HfstTwoLevelPaths paths;
-      if (! topmost->extract_longest_paths(paths))
+
+      bool paths_found = 
+        topmost->extract_longest_paths(paths, variables_["obey-flags"] == "ON");
+
+      if (! paths_found)
         {
           fprintf(stdout, "transducer is empty\n");
         }
       else
         {
+          if (variables_["show-flags"] == "OFF" && topmost->has_flag_diacritics())
+            {
+              fprintf(stdout, "warning: longest string may have flag diacritics that are not shown\n");
+              fprintf(stdout, "         but are used in calculating its length (use 'eliminate flags')\n");
+            }
           print_paths(paths, outfile);
         }
       prompt();
@@ -1406,13 +1415,19 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       if (topmost == NULL)
         return *this;
 
-      int length = topmost->longest_path_size();
+      int length = 
+        topmost->longest_path_size(variables_["obey-flags"] == "ON");
       if (length < 0)
         {
           fprintf(stdout, "transducer is empty\n");
         }
       else
         {
+          if (variables_["show-flags"] == "OFF" && topmost->has_flag_diacritics())
+            {
+              fprintf(stdout, "warning: longest string may have flag diacritics that are not shown\n");
+              fprintf(stdout, "         but are used in calculating its length (use 'eliminate flags')\n");
+            }
           fprintf(outfile, "%i\n", length);
         }
       prompt();
