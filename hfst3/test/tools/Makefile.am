@@ -153,8 +153,8 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 a2b.txt a2b_complement.txt a2b_input_projection_complement.txt \
 		 walk_or_dog.txt ab.txt bc.txt id.txt aid.txt idb.txt \
 		 ab_shuffle_bc.txt id_shuffle_id.txt aid_shuffle_idb.txt \
-		 compounds.txt ab_compounds2.txt \
-		 shuffle_bc.txt id_shuffle_id.txt aid_shuffle_idb.txt \
+		 compounds.txt compounds2.txt \
+		 id_shuffle_id.txt aid_shuffle_idb.txt \
 		 prunable_alphabet.txt non_prunable_alphabet_1.txt non_prunable_alphabet_2.txt id.txt unk2unk_or_id.txt \
 		 a2a_or_a2b_or_a2unk.txt a2b_or_b2b_or_unk2b.txt a_or_id.txt
 FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-gen.strings \
