@@ -43,7 +43,60 @@ for i in "" .sfst .ofst .foma; do
 
     fi
 
+    if test -f infinitely_ambiguous$i ; then
+	
+	if ! echo "ad" | $TOOLDIR/hfst-lookup infinitely_ambiguous$i \
+	    2> warnings > test.lookups;
+	then
+	    exit 1
+	fi
+	
+	if ! grep -q "infinite" warnings; then
+	    echo "FAIL: infinitely ambiguous string 'ad' should give a warning"
+	    exit 1;
+	fi
+
+	if ! echo "b" | $TOOLDIR/hfst-lookup infinitely_ambiguous$i \
+	    2> warnings > test.lookups;
+	then
+	    exit 1
+	fi
+	
+	if grep -q "infinite" warnings; then
+	    echo "FAIL: unambiguous string 'b' should not give a warning"
+	    exit 1;
+	fi
+
+    fi
+
+    if test -f infinitely_ambiguous_with_flags$i ; then
+
+	if ! echo "a" | $TOOLDIR/hfst-lookup infinitely_ambiguous_with_flags$i \
+	    2> warnings > test.lookups;
+	then
+	    exit 1
+	fi
+	
+	if ! grep -q "infinite" warnings; then
+	    echo "FAIL: infinitely ambiguous string 'a' should give a warning"
+	    exit 1;
+	fi
+
+	if ! echo "b" | $TOOLDIR/hfst-lookup infinitely_ambiguous_with_flags$i \
+	    2> warnings > test.lookups;
+	then
+	    exit 1
+	fi
+	
+	if grep -q "infinite" warnings; then
+	    echo "FAIL: unambiguous string 'b' should not give a warning"
+	    exit 1;
+	fi
+
+    fi
+
 done
 
 rm TMP
 rm test.lookups
+rm warnings
