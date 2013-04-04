@@ -35,6 +35,7 @@
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 #include "HfstLookupFlagDiacritics.h"
+#include "HfstFlagDiacritics.h"
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
@@ -63,6 +64,7 @@ using hfst::HfstOneLevelPath;
 using hfst::HfstOneLevelPaths;
 using hfst::HfstTwoLevelPath;
 using hfst::HfstTwoLevelPaths;
+using hfst::FdOperation;
 
 using hfst::StringPair;
 using hfst::StringPairVector;
@@ -880,7 +882,7 @@ string_to_utf8(char* p)
           }
         char* nextu8 = hfst_strndup(p, u8len);
         path->push_back(nextu8);
-	free(nextu8);
+        free(nextu8);
         p += u8len;
       }
     return path;
@@ -1051,7 +1053,9 @@ bool is_lookup_infinitely_ambiguous
   // Whether the end of the lookup path s has been reached
   bool only_epsilons=false;
   if ((unsigned int)s.second.size() == index)
-    only_epsilons=true;
+    {
+      only_epsilons=true;
+    }
 
   // Go through all transitions in this state
   const HfstBasicTransducer::HfstTransitions &transitions = t[state];
@@ -1061,15 +1065,23 @@ bool is_lookup_infinitely_ambiguous
     {
       // CASE 1: Input epsilons do not consume a symbol in the lookup path s,
       //         so they can be added freely.
-      if (is_epsilon(it->get_input_symbol()))
+      // (Diacritics are also treated as epsilons, although it might cause false
+      //  positive results, because loops with diacritics can be invalidated by
+      //  other diacritics.)
+      if ( is_epsilon(it->get_input_symbol()) || 
+           FdOperation::is_diacritic(it->get_input_symbol()) )
     {
       epsilon_path_states.insert(state);
       if (epsilon_path_states.find(it->get_target_state()) 
           != epsilon_path_states.end())
-        return true;
+        {
+          return true;
+        }
       if (is_lookup_infinitely_ambiguous
           (t, s, index, it->get_target_state(), epsilon_path_states))
-        return true;
+        {
+          return true;
+        }
       epsilon_path_states.erase(state);
     }
 
@@ -1078,13 +1090,15 @@ bool is_lookup_infinitely_ambiguous
          been reached. */
       else if (not only_epsilons)
     {
-      if (it->get_input_symbol().compare(s.second.at(index)) == 0)
+      if ( it->get_input_symbol().compare(s.second.at(index)) == 0 )
         {
           index++; // consume an input symbol in the lookup path s
           std::set<HfstState> empty_set;
           if (is_lookup_infinitely_ambiguous
-              (t, s, index, it->get_target_state(), empty_set)) {
-            return true; }
+              (t, s, index, it->get_target_state(), empty_set)) 
+            {
+              return true; 
+            }
           index--; // add the input symbol back to the lookup path s.
         }
     }
@@ -1762,14 +1776,14 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
             if (!internal_transducers)
               {
                 char* format_string = hfst_strformat(cascade[0].get_type());
-		if (!silent) {
-		  warning(0, 0, 
-			  "It is not possible to perform fast lookups with %s "
-			  "format automata.\n"
-			  "Converting to HFST basic transducer format "
-			  "and performing slow lookups",
-			  format_string);
-		}
+                if (!silent) {
+                  warning(0, 0, 
+                          "It is not possible to perform fast lookups with %s "
+                          "format automata.\n"
+                          "Converting to HFST basic transducer format "
+                          "and performing slow lookups",
+                          format_string);
+                }
                 free(format_string);
                 for (unsigned int i=0; i<cascade.size(); i++) 
                   {
