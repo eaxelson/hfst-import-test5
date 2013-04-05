@@ -85,6 +85,9 @@ namespace hfst
 
       @see HfstTransducer::substitute(const HfstSymbolPairSubstitutions&) */
   typedef std::map<StringPair, StringPair> HfstSymbolPairSubstitutions;
+
+  typedef std::pair<float, StringPairVector> HfstTwoLevelPath;
+  typedef std::set<HfstTwoLevelPath> HfstTwoLevelPaths;
   
 /* The internal representations */
   const std::string internal_epsilon = "@_EPSILON_SYMBOL_@";
@@ -112,6 +115,14 @@ namespace hfst
   namespace symbols {
     void collect_unknown_sets(StringSet &s1, StringSet &unknown1,
                   StringSet &s2, StringSet &unknown2);
+    int longest_path_length(const hfst::HfstTwoLevelPaths & paths, bool equally_long=false);
+    hfst::HfstTwoLevelPaths get_longest_paths(const hfst::HfstTwoLevelPaths & paths);
+    StringVector to_string_vector(const hfst::HfstTwoLevelPath & path);
+    std::string to_string(const StringVector & sv);
+    hfst::HfstTwoLevelPaths remove_flags(const hfst::HfstTwoLevelPaths & paths);
+    hfst::HfstTwoLevelPath remove_flags(const hfst::HfstTwoLevelPath & path);
+    StringPairVector remove_flags(const StringPairVector &v);
+    StringVector remove_flags(const StringVector &v);
   }
 }
 #endif

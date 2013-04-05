@@ -99,13 +99,6 @@ namespace hfst
   HfstFile hfst_stdout();
   HfstFile hfst_stdin();
 
-  int longest_path_length(const HfstTwoLevelPaths & paths, bool equally_long=false);
-  HfstTwoLevelPaths get_longest_paths(const HfstTwoLevelPaths & paths);
-  HfstTwoLevelPaths remove_flags(const HfstTwoLevelPaths & paths);
-  StringPairVector remove_flags(const StringPairVector &v);
-  StringVector remove_flags(const StringVector &v);
-
-
   // *** TESTING AND OPTIMIZATION...
 
   enum MinimizationAlgorithm { HOPCROFT, BRZOZOWSKI };

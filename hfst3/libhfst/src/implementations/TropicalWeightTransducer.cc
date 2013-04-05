@@ -2530,6 +2530,39 @@ namespace hfst { namespace implementations
     return path;
   };
       
+  void TropicalWeightTransducer::extract_random_paths_fd
+  (StdVectorFst *t, HfstTwoLevelPaths &results, int max_num, bool filter_fd)
+  {
+    srand((unsigned int)(time(0)));
+    FdTable<int64> * ft = get_flag_diacritics(t); // FIXME: use HfstLookupFlags
+
+    while (max_num > 0) {
+      HfstTwoLevelPath path = random_path(t);
+      StringVector sv = hfst::symbols::to_string_vector(path);
+      std::string s = hfst::symbols::to_string(sv);
+      if (! ft->is_valid_string(s))
+        {
+          continue;
+        }
+      if (filter_fd)
+        {
+          path = hfst::symbols::remove_flags(path);
+        }
+
+      /* If we extract the same path again, try at most 5 times
+         to extract another one. */
+      unsigned int i = 0;
+      while ( (results.find(path) != results.end()) and (i < 5) ) {
+        path = random_path(t);
+        ++i;
+      }
+      results.insert(path);
+
+      --max_num;    
+    }
+    delete ft;
+  }
+
   void TropicalWeightTransducer::extract_random_paths
   (StdVectorFst *t, HfstTwoLevelPaths &results, int max_num)
   {
@@ -2560,7 +2593,10 @@ namespace hfst { namespace implementations
         !it.Done(); it.Next())
     {
       if(FdOperation::is_diacritic(it.Symbol()))
-        table->define_diacritic(it.Value(), it.Symbol());
+        {
+          std::cerr << "defining diacritic " << it.Value() << " " << it.Symbol() << std::endl; 
+          table->define_diacritic(it.Value(), it.Symbol());
+        }
     }
     return table;
   }
