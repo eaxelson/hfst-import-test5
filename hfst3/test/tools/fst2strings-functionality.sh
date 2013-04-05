@@ -12,6 +12,19 @@ for i in "" .sfst .ofst .foma; do
         fi
         rm test.strings;
     fi
+    if test -f unification_flags$i ; then
+        for foo in 0 1 2 3 4 5 6 7 8 9
+        do
+            if ! $TOOLDIR/hfst-fst2strings --random 5 -X obey-flags \
+                unification_flags$i > test.strings ; then
+                echo extracting random flags from unification_flags$i failed
+                exit 1
+            fi
+            if (egrep "A|B|C" test.strings | egrep "a|b|c" > /dev/null); then
+                echo "error in processing flags in "unification_flags$i
+            fi
+        done
+    fi
 done
 
 for i in "" .sfst .ofst; do

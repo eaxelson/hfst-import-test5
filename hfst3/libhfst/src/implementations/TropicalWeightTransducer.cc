@@ -12,6 +12,7 @@
 
 #include "TropicalWeightTransducer.h"
 #include "HfstSymbolDefs.h"
+#include "HfstLookupFlagDiacritics.h"
 
 #ifndef MAIN_TEST
 namespace hfst { namespace implementations
@@ -2534,33 +2535,41 @@ namespace hfst { namespace implementations
   (StdVectorFst *t, HfstTwoLevelPaths &results, int max_num, bool filter_fd)
   {
     srand((unsigned int)(time(0)));
-    FdTable<int64> * ft = get_flag_diacritics(t); // FIXME: use HfstLookupFlags
 
-    while (max_num > 0) {
-      HfstTwoLevelPath path = random_path(t);
-      StringVector sv = hfst::symbols::to_string_vector(path);
-      std::string s = hfst::symbols::to_string(sv);
-      if (! ft->is_valid_string(s))
-        {
-          continue;
-        }
-      if (filter_fd)
-        {
-          path = hfst::symbols::remove_flags(path);
-        }
-
-      /* If we extract the same path again, try at most 5 times
-         to extract another one. */
-      unsigned int i = 0;
-      while ( (results.find(path) != results.end()) and (i < 5) ) {
-        path = random_path(t);
-        ++i;
+    FlagDiacriticTable fdt;
+    StringSet alphabet = get_alphabet(t);
+    for (StringSet::const_iterator it = alphabet.begin(); 
+         it != alphabet.end(); it++)
+      {
+        fdt.insert_symbol(*it);
       }
-      results.insert(path);
 
-      --max_num;    
-    }
-    delete ft;
+    while (max_num > 0) 
+      {
+        HfstTwoLevelPath path = random_path(t);
+        StringVector sv = hfst::symbols::to_string_vector(path);
+        if (fdt.is_valid_string(sv))
+          {
+            if (filter_fd)
+              {
+                path = hfst::symbols::remove_flags(path);
+              }
+            
+            /* If we extract the same path again, try at most 5 times
+               to extract another one. */
+            unsigned int i = 0;
+            while ( (results.find(path) != results.end()) and (i < 5) ) 
+              {
+                path = random_path(t);
+                ++i;
+              }
+            results.insert(path);
+            
+            --max_num;    
+          }
+      }
+
+    return;
   }
 
   void TropicalWeightTransducer::extract_random_paths
