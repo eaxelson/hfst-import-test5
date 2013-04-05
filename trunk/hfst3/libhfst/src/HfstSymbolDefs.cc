@@ -11,6 +11,7 @@
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "HfstSymbolDefs.h"
+#include "HfstFlagDiacritics.h"
 
 #ifndef MAIN_TEST
 
@@ -57,6 +58,7 @@ bool is_default(const char * str)
 }
 
   namespace symbols {
+
     void collect_unknown_sets(StringSet &s1, StringSet &unknown1,
                   StringSet &s2, StringSet &unknown2)
     {
@@ -71,6 +73,124 @@ bool is_default(const char * str)
       unknown1.insert(sym2);
       }
     }
+
+    std::string to_string(const StringVector & sv)
+    {
+      std::string result;
+      for (StringVector::const_iterator it = sv.begin(); it != sv.end(); it++)
+        {
+          result.append(*it);
+        }
+      return result;
+    }
+
+    StringVector to_string_vector(const HfstTwoLevelPath & path)
+    {
+      StringVector result;
+      StringPairVector spv = path.second;
+      for (StringPairVector::const_iterator it = spv.begin(); it != spv.end(); it++)
+        {
+          result.push_back(it->first);
+        }
+      return result;
+    }
+
+    int longest_path_length(const HfstTwoLevelPaths & paths, bool equally_long)
+    {
+      if (paths.size() == 0)
+        {
+          return -1;
+        }
+      if (equally_long)
+        {
+          return (int)(paths.begin()->second.size());
+        }
+
+      unsigned int max_path_length = 0;
+
+      for (HfstTwoLevelPaths::const_iterator it = paths.begin();
+           it != paths.end(); it++)
+        {
+          unsigned int length = it->second.size();
+          max_path_length = (length > max_path_length)? length : max_path_length;
+        }
+      return (int)max_path_length;
+    }
+
+    HfstTwoLevelPaths get_longest_paths(const HfstTwoLevelPaths & paths)
+    {
+      HfstTwoLevelPaths result;
+      unsigned int max_path_length = 0;
+
+      for (HfstTwoLevelPaths::const_iterator it = paths.begin();
+           it != paths.end(); it++)
+        {
+          unsigned int length = it->second.size();
+          max_path_length = (length > max_path_length)? length : max_path_length;
+        }
+
+      for (HfstTwoLevelPaths::const_iterator it = paths.begin();
+           it != paths.end(); it++)
+        {
+          unsigned int length = it->second.size();
+          if (length == max_path_length)
+            {
+              result.insert(*it);
+            }
+        }
+
+      return result;
+    }
+
+    HfstTwoLevelPaths remove_flags(const HfstTwoLevelPaths & paths)
+    {
+      HfstTwoLevelPaths result;
+
+      for (HfstTwoLevelPaths::const_iterator it = paths.begin();
+           it != paths.end(); it++)
+        {
+          result.insert(HfstTwoLevelPath(it->first,
+                                         remove_flags(it->second)));
+        }
+      return result;
+    }
+
+    HfstTwoLevelPath remove_flags(const HfstTwoLevelPath & path)
+    {
+      StringPairVector spv = path.second;
+      spv = remove_flags(spv);
+      HfstTwoLevelPath result(path.first, spv);
+      return result;
+    }
+
+
+    StringVector remove_flags(const StringVector &v)
+    {
+      StringVector v_wo_flags;
+      for (StringVector::const_iterator it = v.begin();
+           it != v.end();
+           ++it)
+        {
+          if (not FdOperation::is_diacritic(*it))
+            { v_wo_flags.push_back(*it); }
+        }
+      return v_wo_flags;
+    }
+
+    StringPairVector remove_flags(const StringPairVector &v)
+    {
+      StringPairVector v_wo_flags;
+      for (StringPairVector::const_iterator it = v.begin();
+           it != v.end();
+           ++it)
+        {
+          if (not FdOperation::is_diacritic(it->first) &&
+              not FdOperation::is_diacritic(it->second))
+            { v_wo_flags.push_back(*it); }
+        }
+      return v_wo_flags;
+    }
+
   }
 
 

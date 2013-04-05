@@ -185,6 +185,9 @@ namespace implementations
       static void extract_random_paths
     (StdVectorFst *t, HfstTwoLevelPaths &results, int max_num);
 
+      static void extract_random_paths_fd
+        (StdVectorFst *t, HfstTwoLevelPaths &results, int max_num, bool filter_fd);
+
       static StdVectorFst * compose(StdVectorFst * t1,
                                    StdVectorFst * t2);
       static StdVectorFst * concatenate(StdVectorFst * t1,

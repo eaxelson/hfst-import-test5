@@ -86,93 +86,6 @@ hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
     return file;
   };
 
-int longest_path_length(const HfstTwoLevelPaths & paths, bool equally_long)
-{
-  if (paths.size() == 0)
-    {
-      return -1;
-    }
-  if (equally_long)
-    {
-      return (int)(paths.begin()->second.size());
-    }
-
-  unsigned int max_path_length = 0;
-
-  for (HfstTwoLevelPaths::const_iterator it = paths.begin();
-       it != paths.end(); it++)
-    {
-      unsigned int length = it->second.size();
-      max_path_length = (length > max_path_length)? length : max_path_length;
-    }
-  return (int)max_path_length;
-}
-
-HfstTwoLevelPaths get_longest_paths(const HfstTwoLevelPaths & paths)
-{
-  HfstTwoLevelPaths result;
-  unsigned int max_path_length = 0;
-
-  for (HfstTwoLevelPaths::const_iterator it = paths.begin();
-       it != paths.end(); it++)
-    {
-      unsigned int length = it->second.size();
-      max_path_length = (length > max_path_length)? length : max_path_length;
-    }
-
-  for (HfstTwoLevelPaths::const_iterator it = paths.begin();
-       it != paths.end(); it++)
-    {
-      unsigned int length = it->second.size();
-      if (length == max_path_length)
-        {
-          result.insert(*it);
-        }
-    }
-
-  return result;
-}
-
-HfstTwoLevelPaths remove_flags(const HfstTwoLevelPaths & paths)
-{
-  HfstTwoLevelPaths result;
-
-  for (HfstTwoLevelPaths::const_iterator it = paths.begin();
-       it != paths.end(); it++)
-    {
-      result.insert(HfstTwoLevelPath(it->first,
-                                     remove_flags(it->second)));
-    }
-  return result;
-}
-
-StringVector remove_flags(const StringVector &v)
-{
-  StringVector v_wo_flags;
-  for (StringVector::const_iterator it = v.begin();
-       it != v.end();
-       ++it)
-    {
-      if (not FdOperation::is_diacritic(*it))
-        { v_wo_flags.push_back(*it); }
-    }
-  return v_wo_flags;
-}
-
-StringPairVector remove_flags(const StringPairVector &v)
-{
-  StringPairVector v_wo_flags;
-  for (StringPairVector::const_iterator it = v.begin();
-       it != v.end();
-       ++it)
-    {
-      if (not FdOperation::is_diacritic(it->first) &&
-          not FdOperation::is_diacritic(it->second))
-        { v_wo_flags.push_back(*it); }
-    }
-  return v_wo_flags;
-}
-
 
 // -----------------------------------------------------------------------
 //
@@ -2231,9 +2144,13 @@ void HfstTransducer::extract_random_paths
 void HfstTransducer::extract_random_paths_fd
 (HfstTwoLevelPaths &results, int max_num, bool filter_fd) const
 {
-  (void)results;
-  (void)max_num;
-  (void)filter_fd;
+#if HAVE_OPENFST
+  HfstTransducer copy(*this);
+  copy.convert(TROPICAL_OPENFST_TYPE);
+  copy.tropical_ofst_interface.extract_random_paths_fd
+    (copy.implementation.tropical_ofst, results, max_num, filter_fd);
+  return;
+#endif
   HFST_THROW(FunctionNotImplementedException);
 }
 
@@ -5308,14 +5225,14 @@ int main(int argc, char * argv[])
         HfstOneLevelPaths * results = 
           a_paths_copy.lookup_fd(flag_tokenizer.tokenize_one_level("ABCBA"));
         assert(results->size() == 1);
-        assert(remove_flags(results->begin()->second) ==
+        assert(hfst::symbols::remove_flags(results->begin()->second) ==
                flag_tokenizer.tokenize_one_level("ABCBA"));
         delete results;
 
         results = 
           a_paths_copy.lookup_fd(flag_tokenizer.tokenize_one_level("ABCAA"));
         assert(results->size() == 1);
-        assert(remove_flags(results->begin()->second) ==
+        assert(hfst::symbols::remove_flags(results->begin()->second) ==
                flag_tokenizer.tokenize_one_level("ABCAA"));
         delete results;
 
@@ -5338,14 +5255,14 @@ int main(int argc, char * argv[])
         results = 
           b_paths_copy.lookup_fd(flag_tokenizer.tokenize_one_level("ABCBA"));
         assert(results->size() == 1);
-        assert(remove_flags(results->begin()->second) ==
+        assert(hfst::symbols::remove_flags(results->begin()->second) ==
                flag_tokenizer.tokenize_one_level("ABCBA"));
         delete results;
 
         results = 
           b_paths_copy.lookup_fd(flag_tokenizer.tokenize_one_level("ABCBB"));
         assert(results->size() == 1);
-        assert(remove_flags(results->begin()->second) ==
+        assert(hfst::symbols::remove_flags(results->begin()->second) ==
                flag_tokenizer.tokenize_one_level("ABCBB"));
         delete results;
 
@@ -5358,7 +5275,7 @@ int main(int argc, char * argv[])
         HfstOneLevelPaths * one_result = 
           a_paths.lookup_fd(flag_tokenizer.tokenize_one_level("ABCBA"));
         assert(one_result->size() == 1);
-               assert(remove_flags(one_result->begin()->second) ==
+        assert(hfst::symbols::remove_flags(one_result->begin()->second) ==
                flag_tokenizer.tokenize_one_level("ABCBA"));
         delete one_result;
 
