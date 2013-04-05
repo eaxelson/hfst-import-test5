@@ -74,11 +74,15 @@ bool is_default(const char * str)
       }
     }
 
-    std::string to_string(const StringVector & sv)
+    std::string to_string(const StringVector & sv, bool spaces)
     {
       std::string result;
       for (StringVector::const_iterator it = sv.begin(); it != sv.end(); it++)
         {
+          if (spaces && it != sv.begin())
+            {
+              result.append(" ");
+            }
           result.append(*it);
         }
       return result;
