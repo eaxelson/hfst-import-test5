@@ -1045,7 +1045,7 @@ namespace hfst { namespace implementations {
   } 
 
 
-  FdTable<SFST::Character>* SfstTransducer::get_flag_diacritics(Transducer * t)
+    FdTable<SFST::Character>* SfstTransducer::get_flag_diacritics(Transducer * t)
   {
     FdTable<SFST::Character>* table = new FdTable<SFST::Character>();
     SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();

@@ -27,7 +27,8 @@ HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
 		  HfstRules.cc HfstXeroxRules.cc \
 		  HfstSymbolDefs.cc HfstTokenizer.cc \
 		  HfstFlagDiacritics.cc HfstExceptionDefs.cc \
-		  HarmonizeUnknownAndIdentitySymbols.cc
+		  HarmonizeUnknownAndIdentitySymbols.cc \
+		  HfstLookupFlagDiacritics.cc
 
 # libtool takes over
 libhfst_la_SOURCES = $(HFST_SRCS)
@@ -87,6 +88,7 @@ HFST_HDRS = \
 	HfstInputStream.h \
 	HfstOutputStream.h \
 	HfstXeroxRules.h \
+	HfstLookupFlagDiacritics.h \
 	parsers/LexcCompiler.h parsers/XreCompiler.h parsers/PmatchCompiler.h
 ### Add your library here ###
 #	implementations/MyTransducerLibraryTransducer.h

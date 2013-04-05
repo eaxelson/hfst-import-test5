@@ -188,7 +188,7 @@ noinst_HEADERS= \
 	inc/getopt-cases-common.h inc/getopt-cases-error.h  \
 	inc/getopt-cases-unary.h  inc/globals-binary.h      \
 	inc/globals-common.h      inc/globals-unary.h \
-	HfstStrings2FstTokenizer.h HfstLookupFlagDiacritics.h \
+	HfstStrings2FstTokenizer.h \
 	hfst-tool-metadata.h hfst-optimized-lookup.h hfst-pmatch.h \
 	guessify_fst.h generate_model_forms.h
 # parsers/XreCompiler.h parsers/xre_utils.h
@@ -247,9 +247,9 @@ hfst_fst2strings_SOURCES=hfst-fst2strings.cc $(HFST_COMMON_SRC)
 hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
 hfst_grep_SOURCES=hfst-grep.cc $(HFST_COMMON_SRC)
 hfst_guess_SOURCES=hfst-guess.cc generate_model_forms.cc guessify_fst.cc \
-HfstLookupFlagDiacritics.cc $(HFST_COMMON_SRC)
+$(HFST_COMMON_SRC)
 hfst_guessify_SOURCES=hfst-guessify.cc guessify_fst.cc \
-HfstLookupFlagDiacritics.cc $(HFST_COMMON_SRC)
+$(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_info_SOURCES=hfst-info.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
@@ -262,7 +262,7 @@ hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
 #					  parsers/LexcCompiler.h parsers/lexc-utils.h
 #hfst_lexc2fst_BUILT=parsers/lexc-parser.h parsers/xre_parse.h
 hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC) \
-HfstStrings2FstTokenizer.cc HfstLookupFlagDiacritics.cc
+HfstStrings2FstTokenizer.cc
 hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC) \
 HfstStrings2FstTokenizer.cc 
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
