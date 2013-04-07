@@ -232,11 +232,12 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     if (firststream.get_type() != secondstream.get_type())
       {
         warning(0, 0, "Transducer type mismatch in %s and %s "
-                  "(types %s and %s);\n"
-                  "using type %s as output",
-                  firstfilename, secondfilename,
-                  hfst_strformat(firststream.get_type()),
-                  hfst_strformat(secondstream.get_type()));
+                "(types %s and %s);\n"
+                "using type %s as output",
+                firstfilename, secondfilename,
+                hfst_strformat(firststream.get_type()),
+                hfst_strformat(secondstream.get_type()),
+                hfst_strformat(secondstream.get_type()));
       }
 
     HfstTransducerVector rules;
