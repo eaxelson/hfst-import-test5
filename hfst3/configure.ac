@@ -66,9 +66,9 @@ AC_DEFINE_UNQUOTED([HFST_STRING], ["$PACKAGE_STRING"],
 # allow backends to be removed
 AC_ARG_WITH([sfst],
             [AS_HELP_STRING([--with-sfst],
-                            [process unweighted fsts with SFST @<:@default=no@:>@])],
+                            [process unweighted fsts with SFST @<:@default=yes@:>@])],
             [],
-            [with_sfst=no])
+            [with_sfst=yes])
 AS_IF([test "x$with_sfst" != xno], [AC_DEFINE([HAVE_SFST], [1],
                                               [Define to compile SFST support in HFST])])
 AM_CONDITIONAL([WANT_SFST], [test x$with_sfst != xno])
@@ -82,9 +82,9 @@ AS_IF([test "x$with_openfst" != xno], [AC_DEFINE([HAVE_OPENFST], [1],
 AM_CONDITIONAL([WANT_OPENFST], [test x$with_openfst != xno])
 AC_ARG_WITH([foma],
             [AS_HELP_STRING([--with-foma],
-                            [process unweighted fsts with foma @<:@default=no@:>@])],
+                            [process unweighted fsts with foma @<:@default=yes@:>@])],
             [],
-            [with_foma=no])
+            [with_foma=yes])
 AS_IF([test "x$with_foma" != xno], [AC_DEFINE([HAVE_FOMA], [1],
                                               [Define to compile foma support in HFST])])
 AM_CONDITIONAL([WANT_FOMA], [test x$with_foma != xno])
