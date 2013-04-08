@@ -79,7 +79,7 @@ fi
 
 # compounding / space handling checks
 if ! $TOOLDIR/hfst-proc/hfst-apertium-proc compounds.hfstol < $srcdir/proc-compounds.strings | tr -d '\r' > test.strings ; then
-    echo compound fail:
+    echo compound fail 1:
     cat test.strings
     exit 1
 fi
@@ -88,7 +88,7 @@ if ! diff test.strings $srcdir/proc-compounds-out.strings ; then
 fi
 rm test.strings
 if ! $TOOLDIR/hfst-proc/hfst-apertium-proc compounds2.hfstol < $srcdir/proc-compounds2.strings | tr -d '\r' > test.strings ; then
-    echo compound fail:
+    echo compound fail 2:
     cat test.strings
     exit 1
 fi

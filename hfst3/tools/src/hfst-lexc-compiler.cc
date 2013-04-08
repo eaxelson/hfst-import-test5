@@ -57,7 +57,7 @@ print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1...]]\n"
-             "Compile lexc files into transducer\n"
+             "Compile lexc files into transducer (experimental)\n"
         "\n", program_name );
         print_common_program_options(message_out);
         fprintf(message_out, "Input/Output options:\n"
@@ -119,7 +119,10 @@ parse_options(int argc, char** argv)
 #include "inc/check-params-common.h"
     if (format == hfst::UNSPECIFIED_TYPE)
       {
-        warning(0, 0, "Defaulting to OpenFst tropical type");
+        if (!silent)
+          {
+            warning(0, 0, "Defaulting to OpenFst tropical type");
+          }
         format = hfst::TROPICAL_OPENFST_TYPE;
       }
     if (argc - optind > 0)
@@ -201,6 +204,7 @@ int main( int argc, char **argv ) {
     {
         return retval;
     }
+    warning(0, 0, "hfst-lexc2fst is experimental, use hfst-lexc instead");
     // close buffers, we use streams
     for (unsigned int i = 0; i < lexccount; i++)
       {

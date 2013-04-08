@@ -139,29 +139,26 @@ parse_options(int argc, char** argv)
     }
 
 #include "inc/check-params-common.h"
+
+#if HAVE_FOMA
     if (format == hfst::UNSPECIFIED_TYPE)
       {
-        /*#if HAVE_FOMA
-        if (!silent) {
-          warning(0, 0, "Defaulting to foma type "
-                  "(since it has native lexc support);\n"
-                  "Use command-line option --format to override");
-        }
+        if (!silent) 
+          {
+            warning(0, 0, "Defaulting to foma type "
+                    "(since it has native lexc support)\n");
+          }
         format = hfst::FOMA_TYPE;
-        #elif HAVE_OPENFST*/
-#if HAVE_OPENFST
-        if (!silent) {
-          warning(0, 0, "Defaulting to using OpenFst with legacy lexc "
-                  "compilation scheme\n"
-                  "Use command-line option --format to override");
-        }
-        format = hfst::TROPICAL_OPENFST_TYPE;
-#else
-        error(EXIT_FAILURE, 0, "Format not given and cannot deduce sensible "
-              "defaults with current setup;\n"
-              "Use command-line option --format to define format");
-#endif
       }
+    else
+      {
+        warning(0, 0, "Using foma type (since it has native lexc support)\n");
+        format = hfst::FOMA_TYPE;
+      }
+#else
+    error(EXIT_FAILURE, 0, "Foma not available.\n");
+#endif
+
     if (outfile == stdout)
       {
         /*error(EXIT_FAILURE, 0, "Cannot write result to <stdout> since backend "
