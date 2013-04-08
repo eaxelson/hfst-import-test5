@@ -50,8 +50,9 @@ TESTS=hfst-check-version.sh hfst-check-help.sh hfst-check-environment.sh \
 	  calculate-functionality.sh format-functionality.sh \
 	  lookup-functionality.sh shuffle-functionality.sh \
 	  lexc-functionality.sh \
-	  lexc-compiler-functionality.sh symbol-harmonization-functionality.sh \
+	  symbol-harmonization-functionality.sh \
 	  $(STRESSES)
+# lexc-compiler-functionality.sh is experimental
 
 # XFAIL_TESTS=incompatible-formats.sh latin-1-strings.sh
 

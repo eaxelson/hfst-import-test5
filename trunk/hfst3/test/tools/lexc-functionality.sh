@@ -17,6 +17,11 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
           xre.star-plus-optional.lexc"
 LEXCXFAIL="xfail.bogus.lexc xfail.ISO-8859-1.lexc xfail.lexicon-semicolon.lexc"
 
+if ! ($TOOLDIR/hfst-format --test-format foma ) ; then
+    echo "skipping lexc tests as foma back-end is not available"
+    exit 0;
+fi
+
 if [ "$srcdir" = "" ]; then
     srcdir="./";
 fi
@@ -58,7 +63,7 @@ for i in .sfst .ofst .foma ; do
             echo lexc2fst $FFLAG cat.lexc failed with $?
             exit 1
         fi
-        if ! $TOOLDIR/hfst-compare -s cat$i test ; then
+        if ! $TOOLDIR/hfst-compare -s cat.foma test ; then
             exit 1
         fi
         rm test
@@ -77,7 +82,7 @@ for i in .sfst .ofst .foma ; do
             echo lexc $FFLAG basic.multi-file-{1,2,3}.lexc failed with $?
             exit 1
 	fi
-	if ! $TOOLDIR/hfst-compare -s walk_or_dog$i test ; then
+	if ! $TOOLDIR/hfst-compare -s walk_or_dog.foma test ; then
             exit 1
 	fi
     fi
