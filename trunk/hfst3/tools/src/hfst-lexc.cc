@@ -156,7 +156,7 @@ parse_options(int argc, char** argv)
         format = hfst::FOMA_TYPE;
       }
 #else
-    error(EXIT_FAILURE, 0, "Foma not available.\n");
+    error(EXIT_FAILURE, 0, "Foma back-end is not enabled\n");
 #endif
 
     if (outfile == stdout)
