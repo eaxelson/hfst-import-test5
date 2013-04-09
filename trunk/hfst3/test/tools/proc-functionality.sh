@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # skipping
-return 77
+exit 77
 
 TOOLDIR=../../tools/src
 

@@ -1,4 +1,8 @@
 #!/bin/sh
+
+# skip test
+exit 77
+
 TOOLDIR=../../tools/src
 LEXCTESTS="stress.random-lexicons-100.lexc"
 for i in "" .sfst .ofst .foma ; do
