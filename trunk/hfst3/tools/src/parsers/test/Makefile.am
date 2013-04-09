@@ -1,5 +1,9 @@
 ## Process this file with automake to produce Makefile.in
+
+if WANT_XFST2FST
 TESTS=test.sh
+endif
+
 EXTRA_DIST=test.sh \
 	compose_net.xfst compose_net.att \
 	concatenate_net.xfst concatenate_net.att \
