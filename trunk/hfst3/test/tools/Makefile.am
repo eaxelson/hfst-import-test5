@@ -47,11 +47,23 @@ TESTS=hfst-check-version.sh hfst-check-help.sh hfst-check-environment.sh \
 	  summarize-functionality.sh proc-functionality.sh \
 	  regexp2fst-functionality.sh \
 	  split-functionality.sh head-functionality.sh tail-functionality.sh \
-	  calculate-functionality.sh format-functionality.sh \
-	  lookup-functionality.sh shuffle-functionality.sh \
-	  lexc-functionality.sh lexc-compiler-functionality.sh \
+	  format-functionality.sh \
+	  lookup-functionality.sh \
 	  symbol-harmonization-functionality.sh \
 	  $(STRESSES)
+
+if WANT_LEXC
+TESTS += lexc-functionality.sh
+endif
+if WANT_LEXC2FST
+TESTS += lexc-compiler-functionality.sh
+endif
+if WANT_CALCULATE
+TESTS += calculate-functionality.sh
+endif
+if WANT_SHUFFLE
+TESTS += shuffle-functionality.sh
+endif
 
 # XFAIL_TESTS=incompatible-formats.sh latin-1-strings.sh
 
