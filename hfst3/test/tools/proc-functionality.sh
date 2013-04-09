@@ -1,4 +1,8 @@
 #!/bin/sh
+
+# skipping
+return 77
+
 TOOLDIR=../../tools/src
 
 if [ "$srcdir" = "" ]; then
