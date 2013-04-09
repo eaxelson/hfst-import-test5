@@ -38,13 +38,13 @@ for att_file in *.txt;
 do
     file=`echo $att_file | sed 's/\.txt//'`
     hfst-txt2fst -e '@0@' $file.txt > $file.hfst
-    if (hfst-format --format | grep 'sfst' > /dev/null); then
+    if (hfst-format --list-formats | grep 'sfst' > /dev/null); then
 	hfst-txt2fst -f sfst -e '@0@' $file.txt > $file.sfst
     else
 	echo "warning: sfst back-end not available, assumed skipped off and continuing"
     fi
     hfst-txt2fst -f openfst-tropical -e '@0@' $file.txt > $file.ofst
-    if (hfst-format --format | grep 'foma' > /dev/null); then
+    if (hfst-format --list-formats | grep 'foma' > /dev/null); then
 	hfst-txt2fst -f foma -e '@0@' $file.txt > $file.foma
     else
 	echo "warning: foma back-end not available, assumed skipped off and continuing"
@@ -63,7 +63,9 @@ do
 	echo -n "Testing: "$tooltest"...   "
 	if (./$tooltest $PREFIX) ; then
 	    echo "PASS"
-	else
+	elif [ "$?" -eq "77" ] ; then
+            echo "SKIP"
+        else
 	    echo "FAIL"
 	fi
     fi

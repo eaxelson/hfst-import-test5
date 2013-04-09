@@ -27,19 +27,17 @@ cd $TESTDIR
 
 # Modify the tests so that they use the installed version of tools
 # and refer to right files.
-for file in *.sh;
+for file in *.sh symbol-harmonization-functionality.sh;
 do
     if [ "$file" != "copy-files.sh" ]; then
-	sed -i 's/$\TOOLDIR\//$1/' $file
-	sed -i 's/\$srcdir\//.\//' $file
-	sed -i 's/hfst-proc\/hfst-apertium-proc/hfst-apertium-proc/' $file
-	sed -i 's/test -x \(.*\);/which \1 2>1 > \/dev\/null;/' $file
-	sed -i 's/\$SCRIPTDIR\//$1/' $file
-	sed -i 's/-loc / /' $file
+	sed -i 's/$\TOOLDIR\//$1/g' $file
+	sed -i 's/\$srcdir\//.\//g' $file
+	sed -i 's/hfst-proc\/hfst-apertium-proc/hfst-apertium-proc/g' $file
+	sed -i 's/test -x \(.*\);/which \1 2>1 > \/dev\/null;/g' $file
+	sed -i 's/\$SCRIPTDIR\//$1/g' $file
+	sed -i 's/-loc / /g' $file
     fi
 done
-
-sed -i 's/$\TOOLDIR\//$1/' prune-alphabet-functionality.sh
 
 # These tests are rewritten in directory check_installation
 rm empty-input.sh
