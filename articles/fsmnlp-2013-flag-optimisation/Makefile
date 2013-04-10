@@ -3,17 +3,23 @@
 # # `blah' in Proceedings of FSMLNP 2013
 
 XELATEX=xelatex
+BIBTEX=bibtex
+
+.PHONY: articles clean
 
 # article
-articles: fsmnlp-2012-speedspelling.pdf fsmnlp-2012-spelling-tutorial.pdf
+articles: fsmnlp-2013-flag-optimisation.pdf
 
 %.pdf: %.dot
 	dot -Tpdf -o$@ $<
 
 fsmnlp-2013-flag-optimisation.pdf: fsmnlp-2013-flag-optimisation.tex fsmnlp2013flags.bib
-	$(XELATEX) fsmnlp-2012-flag-optimisation.tex
-	$(BIBTEX)  fsmnlp-2012-flag-optimisation
-	$(XELATEX) fsmnlp-2012-flag-optimisation.tex
-	$(XELATEX) fsmnlp-2012-flag-optimisation.tex
-	$(XELATEX) fsmnlp-2012-flag-optimisation.tex
+	$(XELATEX) fsmnlp-2013-flag-optimisation.tex
+	$(BIBTEX)  fsmnlp-2013-flag-optimisation
+	$(XELATEX) fsmnlp-2013-flag-optimisation.tex
+	$(XELATEX) fsmnlp-2013-flag-optimisation.tex
+	$(XELATEX) fsmnlp-2013-flag-optimisation.tex
 
+clean:
+	-rm -f fsmnlp-2013-flag-optimisation.aux fsmnlp-2013-flag-optimisation.bbl \
+		fsmnlp-2013-flag-optimisation.log fsmnlp-2013-flag-optimisation.blg
