@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# skipping
-exit 77
-
 TOOLDIR=../../tools/src
 
 if [ "$srcdir" = "" ]; then
@@ -91,12 +88,16 @@ if ! diff test.strings $srcdir/proc-compounds-out.strings ; then
     exit 1
 fi
 rm test.strings
-if ! $TOOLDIR/hfst-proc/hfst-apertium-proc compounds2.hfstol < $srcdir/proc-compounds2.strings | tr -d '\r' > test.strings ; then
-    echo compound fail
-    cat test.strings
-    exit 1
-fi
-if ! diff test.strings $srcdir/proc-compounds2-out.strings ; then
-    exit 1
-fi
-rm test.strings
+
+## skip new test introduced in version 3014...
+exit 77
+
+#if ! $TOOLDIR/hfst-proc/hfst-apertium-proc compounds2.hfstol < $srcdir/proc-compounds2.strings | tr -d '\r' > test.strings ; then
+#    echo compound fail
+#    cat test.strings
+#    exit 1
+#fi
+#if ! diff test.strings $srcdir/proc-compounds2-out.strings ; then
+#    exit 1
+#fi
+#rm test.strings
