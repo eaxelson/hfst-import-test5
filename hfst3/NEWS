@@ -5,6 +5,24 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.4.4
+---------------------------
+
+* foma and sfst backends are enabled by default in configure
+
+* Updated to foma version 0.9.17
+
+* New functions added to HfstTransitionGraph, e.g. longest_string_size and
+  top_sort
+
+* pmatch tools updated
+
+* Bugs fixed in xre parser and hfst-twolc
+
+* A boolean argument added to binary transducer functions that controls
+  whether symbol harmonization is carried out
+
+
 Noteworthy changes in 3.4.3
 ---------------------------
 
