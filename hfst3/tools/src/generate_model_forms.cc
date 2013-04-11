@@ -94,9 +94,9 @@ bool contains_analysis_symbols(const StringVector &word_form)
 }
 
 StringVector generate_word_forms(const StringVector &analysis,
-				 HfstTransducer &form_generator,
-				 size_t max_generated_forms,
-				 float generate_threshold)
+                                 HfstTransducer &form_generator,
+                                 size_t max_generated_forms,
+                                 float generate_threshold)
 {
   HfstOneLevelPaths * word_forms = form_generator.lookup(analysis);
 
@@ -111,23 +111,23 @@ StringVector generate_word_forms(const StringVector &analysis,
        ++it)
     {
       if (num > max_generated_forms)
-	{ break; }
+        { break; }
 
       if (best_weight == -1)
-	{ best_weight = it->first; }
+        { best_weight = it->first; }
 
       if (it->first - best_weight >= generate_threshold)
-	{ break; }
+        { break; }
 
       const StringVector &word_form = it->second;
       
       if (contains_analysis_symbols(word_form))
-	{ continue; }
+        { continue; }
       
       // The word form is reversed, so we start from the end and
       // iterate to the beginning.
       result_set.insert(StringVector(word_form.rbegin(), 
-				     word_form.rend()));
+                                     word_form.rend()));
       
       ++num;
     }
@@ -143,7 +143,7 @@ StringVector generate_word_forms(const StringVector &analysis,
        ++it)
     {
       if (not first_form)
-	{ results.push_back(", "); }
+        { results.push_back(", "); }
 
       results.insert(results.end(), it->begin(), it->end());
 
@@ -157,10 +157,10 @@ StringVector generate_word_forms(const StringVector &analysis,
 }
 
 StringVectorVector get_model_forms(const StringVector &reversed_analysis,
-				   const StringVectorVector &model_forms,
-				   HfstTransducer &form_generator,
-				   size_t max_generated_forms,
-				   float generate_threshold)
+                                   const StringVectorVector &model_forms,
+                                   HfstTransducer &form_generator,
+                                   size_t max_generated_forms,
+                                   float generate_threshold)
 {
   StringVector reversed_analysis_prefix = 
     get_analysis_prefix(reversed_analysis);
@@ -174,9 +174,9 @@ StringVectorVector get_model_forms(const StringVector &reversed_analysis,
       StringVector model_analysis = join(*it, reversed_analysis_prefix);
 
       results.push_back(generate_word_forms(model_analysis,
-					    form_generator,
-					    max_generated_forms,
-					    generate_threshold));
+                                            form_generator,
+                                            max_generated_forms,
+                                            generate_threshold));
     }
 
   return results;
@@ -249,15 +249,17 @@ StringVectorVector get_guesses(const std::string &word_form,
       ++num;
     }
 
+  delete paths;
+
   return results;
 }
 
 StringVectorVector get_paradigms(const std::string &word_form,
-				 const StringVectorVector &guesses,
-				 HfstTransducer &generator,
-				 const StringVectorVector &model_forms,
-				 size_t number_of_generated_forms,
-				 float generate_threshold)
+                                 const StringVectorVector &guesses,
+                                 HfstTransducer &generator,
+                                 const StringVectorVector &model_forms,
+                                 size_t number_of_generated_forms,
+                                 float generate_threshold)
 {
   StringVectorVector paradigm_guesses;
 
@@ -268,10 +270,10 @@ StringVectorVector get_paradigms(const std::string &word_form,
       StringVector analysis_guess = *it;
 
       StringVectorVector results = get_model_forms(analysis_guess,
-						   model_forms,
-						   generator,
-						   number_of_generated_forms,
-						   generate_threshold);
+                                                   model_forms,
+                                                   generator,
+                                                   number_of_generated_forms,
+                                                   generate_threshold);
       
       StringVector paradigm;
       paradigm.push_back(word_form);
