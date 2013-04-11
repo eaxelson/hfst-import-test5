@@ -1,0 +1,48 @@
+kpv
+4.9 Mb. 55328 states, 128131 arcs, Circular.
+Wo FLAG: CONJ-CONNEG, tr size is: 4.9 Mb., 100.00% size of the original tr
+Wo FLAG: CONJ-INF, tr size is: 3.8 Mb., 77.55% size of the original tr
+Wo FLAG: CONJ-MX, tr size is: 4.9 Mb., 100.00% size of the original tr
+Wo FLAG: CONJ-NX, tr size is: 4.9 Mb., 100.00% size of the original tr
+Wo FLAG: CONJ-POSS, tr size is: 4.8 Mb., 97.95% size of the original tr
+Wo FLAG: CONJ-PX, tr size is: 4.9 Mb., 100.00% size of the original tr
+Wo FLAG: CONJ-TX, tr size is: 4.9 Mb., 100.00% size of the original tr
+--
+myv
+5.8 Mb. 63681 states, 158226 arcs, Circular.
+Wo FLAG: CONJ, tr size is: 5.5 Mb., 94.82% size of the original tr
+Wo FLAG: CONJ-CONNEG, tr size is: 5.8 Mb., 100.00% size of the original tr
+Wo FLAG: CONJ-INF, tr size is: 5.8 Mb., 100.00% size of the original tr
+Wo FLAG: CONJ-MX, tr size is: 5.7 Mb., 98.27% size of the original tr
+Wo FLAG: CONJ-PX, tr size is: 5.8 Mb., 100.00% size of the original tr
+Wo FLAG: CONJ-TX, tr size is: 5.8 Mb., 100.00% size of the original tr
+Wo FLAG: CX, tr size is: 5.8 Mb., 100.00% size of the original tr
+Wo FLAG: DECL-CX, tr size is: 5.8 Mb., 100.00% size of the original tr
+Wo FLAG: DECL-DX, tr size is: 5.8 Mb., 100.00% size of the original tr
+Wo FLAG: DECL-NX, tr size is: 4.9 Mb., 84.48% size of the original tr
+Wo FLAG: DNUM, tr size is: 5.8 Mb., 100.00% size of the original tr
+Wo FLAG: HYPH-COMBO, tr size is: 5.8 Mb., 100.00% size of the original tr
+Wo FLAG: INDEF, tr size is: 5.8 Mb., 100.00% size of the original tr
+Wo FLAG: LV, tr size is: 5.8 Mb., 100.00% size of the original tr
+Wo FLAG: NUM, tr size is: 5.8 Mb., 100.00% size of the original tr
+Wo FLAG: POS, tr size is: 5.8 Mb., 100.00% size of the original tr
+Wo FLAG: PossPx, tr size is: 5.8 Mb., 100.00% size of the original tr
+Wo FLAG: TLOSS, tr size is: 5.8 Mb., 100.00% size of the original tr
+Wo FLAG: TNUM, tr size is: 5.8 Mb., 100.00% size of the original tr
+Wo FLAG: TPERS, tr size is: 5.8 Mb., 100.00% size of the original tr
+--
+sma
+6.6 Mb. 83846 states, 161799 arcs, Circular.
+Wo FLAG: NeedNoun, tr size is: 5.5 Mb., 83.33% size of the original tr
+--
+sme
+16.7 Mb. 210292 states, 413665 arcs, Circular.
+Wo FLAG: Cap, tr size is: 16.7 Mb., 100.00% size of the original tr
+Wo FLAG: NeedNoun, tr size is: 13.9 Mb., 83.23% size of the original tr
+Wo FLAG: NeedsVowRed, tr size is: 16.5 Mb., 98.80% size of the original tr
+--
+smj
+8.0 Mb. 101958 states, 196818 arcs, Circular.
+Wo FLAG: Cap, tr size is: 8.0 Mb., 100.00% size of the original tr
+Wo FLAG: NeedNoun, tr size is: 7.0 Mb., 87.50% size of the original tr
+--

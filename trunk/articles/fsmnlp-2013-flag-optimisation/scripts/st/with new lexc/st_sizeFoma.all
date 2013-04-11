@@ -1,0 +1,18 @@
+deu
+82.0 kB. 2446 states, 4655 arcs, unknown number of paths.
+Orig Disk: 61864
+Wo FLAG: LEXNAME, tr size is: 14573, 23.55% size of the original tr
+Wo FLAG: PTC, tr size is: 121976, 197.16% size of the original tr
+--
+grn
+17.2 kB. 354 states, 664 arcs, unknown number of paths.
+Orig Disk: 10196
+Wo FLAG: LEXNAME, tr size is: 6009, 58.93% size of the original tr
+Wo FLAG: NEG, tr size is: 17612, 172.73% size of the original tr
+--
+kmr
+14.9 kB. 413 states, 644 arcs, unknown number of paths.
+Orig Disk: 9905
+Wo FLAG: LEXNAME, tr size is: 7425, 74.96% size of the original tr
+Wo FLAG: PREF, tr size is: 40256, 406.42% size of the original tr
+--
