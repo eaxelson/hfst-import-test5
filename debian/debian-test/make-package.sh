@@ -83,6 +83,7 @@ done
 
 # replace local paths with /usr/
 sed -i 's/\/home\/eaxelson\/hfst-code\/debian\/debian-test-copy\/hfst-installation\//\/usr\//' hfst-twolc
+sed -i 's/\/home\/eaxelson\/debian-release\/debian\/debian-test-copy\/hfst-installation\//\/usr\//' hfst-twolc
 
 # hfst-xfst depends on zlib..
 rm -f hfst_foma hfst-foma-wrapper.sh hfst-xfst 1> /dev/null 2> /dev/null
