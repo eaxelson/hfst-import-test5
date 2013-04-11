@@ -48,8 +48,10 @@ using hfst::HfstOutputStream;
 // Marker for removed symbols.
 #define REMOVED_SYMBOL "<removed_symbol>"
 
+std::string my_default = "$_DEFAULT_SYMBOL_$";
+
 void remove_flag_diacritics(HfstTransducer &morphological_analyzer, 
-			    const StringSet &alphabet)
+                            const StringSet &alphabet)
 {
   HfstSymbolSubstitutions flag_diacritic_epsilon_pairs;
 
@@ -58,7 +60,7 @@ void remove_flag_diacritics(HfstTransducer &morphological_analyzer,
        ++it)
     {
       if (FlagDiacriticTable::is_diacritic(*it))
-	{ flag_diacritic_epsilon_pairs[*it] = internal_epsilon; }
+        { flag_diacritic_epsilon_pairs[*it] = internal_epsilon; }
     }
 
   morphological_analyzer.substitute(flag_diacritic_epsilon_pairs);
@@ -76,7 +78,7 @@ StringSet get_cathegory_symbols(const StringSet &alphabet)
        ++it)
     {
       if (is_cathegory_symbol(*it))
-	{ cathegory_symbols.insert(*it); }
+        { cathegory_symbols.insert(*it); }
     }
 
   return cathegory_symbols;
@@ -89,7 +91,7 @@ HfstTransducer get_prefix_remover(const StringSet &alphabet)
   HfstTransducer cathegory_symbols_fst(TROPICAL_OPENFST_TYPE);
 
   HfstTransducer identity_except_cathegory(internal_identity,
-					   TROPICAL_OPENFST_TYPE);
+                                           TROPICAL_OPENFST_TYPE);
   HfstBasicTransducer basic_identity(identity_except_cathegory);
 
   // Add cathegory symbols as paths in cathegory_symbols_fst and add
@@ -110,12 +112,12 @@ HfstTransducer get_prefix_remover(const StringSet &alphabet)
   HfstTransducer identity(internal_identity,TROPICAL_OPENFST_TYPE);
   cathegory_symbols_fst.concatenate(identity).minimize();
   identity_except_cathegory = HfstTransducer(basic_identity,
-					     TROPICAL_OPENFST_TYPE);
+                                             TROPICAL_OPENFST_TYPE);
   identity_except_cathegory.repeat_star().minimize();
 
   HfstTransducer remove_symbol(internal_unknown,
-			       REMOVED_SYMBOL,
-			       TROPICAL_OPENFST_TYPE);
+                               REMOVED_SYMBOL,
+                               TROPICAL_OPENFST_TYPE);
   remove_symbol.repeat_star().minimize();
 
   HfstTransducer remove_suffix(cathegory_symbols_fst);
@@ -160,7 +162,7 @@ HfstTransducer get_invalid_form_filterer(const StringSet &alphabet)
 }
 
 void rewrite_removed_symbols(HfstTransducer &morphological_analyzer,
-			     const StringSet &alphabet)
+                             const StringSet &alphabet)
 {
   HfstSymbolPairSubstitutions substitution_pairs;
 
@@ -172,10 +174,10 @@ void rewrite_removed_symbols(HfstTransducer &morphological_analyzer,
        ++it)
     {
       if (*it != internal_epsilon)
-	{
-	  substitution_pairs[ StringPair(*it,REMOVED_SYMBOL) ] =
-	    StringPair(*it, *it);
-	}
+        {
+          substitution_pairs[ StringPair(*it,REMOVED_SYMBOL) ] =
+            StringPair(*it, *it);
+        }
     }
   
   morphological_analyzer.substitute(substitution_pairs);
@@ -183,7 +185,7 @@ void rewrite_removed_symbols(HfstTransducer &morphological_analyzer,
 }
 
 HfstTransducer guessify_analyzer(HfstTransducer morphological_analyzer,
-				 float penalty)
+                                 float penalty)
 {
   // Convert to tropical openfst type so that all operations can be
   // performed.
@@ -231,10 +233,10 @@ HfstTransducer guessify_analyzer(HfstTransducer morphological_analyzer,
   for (HfstState s = 0; s <= basic_guesser.get_max_state(); ++s)
     { 
       basic_guesser.add_transition
-	(s,HfstBasicTransition(sink_state,
-			       internal_default,
-			       internal_default,
-			       penalty));
+        (s,HfstBasicTransition(sink_state,
+                               my_default,
+                               my_default,
+                               penalty));
     }
 
   // Add an a-transition to the sink state to all states where there
@@ -244,11 +246,11 @@ HfstTransducer guessify_analyzer(HfstTransducer morphological_analyzer,
   for (HfstState s = 0; s <= basic_guesser.get_max_state(); ++s)
     {
       if (basic_guesser[s].size() == 1 and
-	  basic_guesser[s][0].get_input_symbol() == internal_default)
-	{
-	  basic_guesser.add_transition
-	    (s, HfstBasicTransition(sink_state, "a",  "a", penalty));
-	}
+          basic_guesser[s][0].get_input_symbol() == my_default)
+        {
+          basic_guesser.add_transition
+            (s, HfstBasicTransition(sink_state, "a",  "a", penalty));
+        }
     }
   
   HfstTransducer guesser(basic_guesser,TROPICAL_OPENFST_TYPE);
@@ -258,8 +260,8 @@ HfstTransducer guessify_analyzer(HfstTransducer morphological_analyzer,
   guesser.compose(invalid_form_filterer).minimize();
   
   guesser.set_name(std::string("guessified(") + 
-		   morphological_analyzer_name +
-		   ")");
+                   morphological_analyzer_name +
+                   ")");
 
   guesser.set_property("reverse input","true");
 
@@ -267,13 +269,14 @@ HfstTransducer guessify_analyzer(HfstTransducer morphological_analyzer,
 }
 
 void store_guesser(HfstTransducer &guesser,
-		   HfstOutputStream &out,
-		   bool compile_generator)
+                   HfstOutputStream &out,
+                   bool compile_generator)
 {
   HfstTransducer generator(TROPICAL_OPENFST_TYPE);
   if (compile_generator)
     { generator = guesser; }
-
+  
+  guesser.substitute(my_default, internal_default);
   guesser.convert(HFST_OLW_TYPE);
   out << guesser;
 
@@ -281,6 +284,7 @@ void store_guesser(HfstTransducer &guesser,
     {
       generator.invert();
       generator.set_name(std::string("inverted(") + guesser.get_name() + ")");
+      generator.substitute(my_default, internal_default);
       generator.convert(HFST_OLW_TYPE);
       out << generator;
     }
@@ -301,14 +305,14 @@ int main(void)
   float default_penalty = DEFAULT_PENALTY;
 
   HfstTransducer guesser = guessify_analyzer(analyzer,
-					     default_penalty);
+                                             default_penalty);
 
   bool compile_generator = false;
 
   HfstOutputStream out;
   store_guesser(guesser,
-		out,
-		compile_generator);
+                out,
+                compile_generator);
 }
 
 #endif // MAIN_TEST
