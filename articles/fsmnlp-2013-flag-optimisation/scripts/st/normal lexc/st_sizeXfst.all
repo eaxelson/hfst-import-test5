@@ -1,0 +1,12 @@
+deu
+53.2 Kb. 726 states, 1118 arcs, 2203 paths.
+Wo FLAG: PTC, tr size is: 52.7 Kb., 99.06% size of the original tr
+--
+grn
+21.1 Kb. 234 states, 459 arcs, Circular.
+Wo FLAG: NEG, tr size is: 20.4 Kb., 96.68% size of the original tr
+--
+kmr
+26.5 Kb. 328 states, 535 arcs, 11966 paths.
+Wo FLAG: PREF, tr size is: 21.8 Kb., 82.26% size of the original tr
+--
