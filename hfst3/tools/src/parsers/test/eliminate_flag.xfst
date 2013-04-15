@@ -1,3 +1,17 @@
-regex [["@P.FOOBAR.foo@" foo] | ["@P.FOOBAR.bar@" bar]] baz [["@U.FOOBAR.foo@" foo] | ["@U.FOOBAR.bar@" bar]];
-eliminate flag FOOBAR
-print net
+regex [ [x|X] a [x|X] ]  |  [ [y|Y|z|Z] a [y|Y|z|Z] ];
+regex [ ["@U.X.ON@" [x|X]] | ["@U.X.OFF@" [y|Y|z|Z]] ] a [ ["@U.X.ON@" [x|X]] | ["@U.X.OFF@" [y|Y|z|Z]] ];
+eliminate flag X
+equivalent
+regex [ ["@P.X.ON@" [x|X]] | ["@P.X.OFF@" [y|Y|z|Z]] ] a [ ["@U.X.ON@" [x|X]] | ["@U.X.OFF@" [y|Y|z|Z]] ];
+eliminate flag X
+equivalent
+regex [ ["@N.X.OFF@" [x|X]] | ["@N.X.ON@" [y|Y|z|Z]] ] a [ ["@U.X.ON@" [x|X]] | ["@U.X.OFF@" [y|Y|z|Z]] ];
+eliminate flag X
+equivalent
+regex [ ["@N.X.OFF@" [x|X]] | ["@N.X.ON@" [y|Y|z|Z]] ] a [ ["@U.X.ON@" [x|X]] | ["@U.X.OFF@" [y|Y|z|Z]] ];
+eliminate flag X
+equivalent
+regex [ ["@N.X.OFF@" [x|X]] | ["@N.X.ON@" [y|Y|z|Z]] ] a [ ["@P.X.ON@" [x|X]] | ["@P.X.OFF@" [y|Y|z|Z]] ];
+# segfault...
+# eliminate flag X
+# equivalent
