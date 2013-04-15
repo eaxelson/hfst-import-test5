@@ -738,8 +738,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {
           HfstTransducer* t = new HfstTransducer(*instream);
           stack_.push(t);
+          print_transducer_info();
         }
-      print_transducer_info();
       prompt();
       return *this;
     }
