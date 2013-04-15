@@ -65,7 +65,7 @@ do
     for testfile in compose_net concatenate_net union_net ignore_net invert_net minus_net intersect_net \
 	determinize_net epsilon_remove_net invert_net minimize_net negate_net \
 	one_plus_net prune_net reverse_net sort_net upper_side_net zero_plus_net lower_side_net \
-	eliminate_flag eliminate_flags define
+	define
     do
 	rm -f result result1 result2
 	if ! (ls $testfile.xfst 2> /dev/null); then
@@ -106,7 +106,7 @@ do
     ## Test that the result of testfile.xfst (written to standard output)
     ## is the same as testfile.output
     for testfile in apply_up apply_down print_stack print_labels print_label_tally \
-	shortest_string set_variable
+	shortest_string set_variable eliminate_flag
     do
 	if ! (ls $testfile.xfst 2> /dev/null); then
 	    echo "skipping missing test for "$testfile"..."

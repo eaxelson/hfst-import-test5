@@ -21,10 +21,9 @@ EXTRA_DIST=test.sh \
 	reverse_net.xfst reverse_net.att \
 	upper_side_net.xfst upper_side_net.att \
 	lower_side_net.xfst lower_side_net.att \
-	eliminate_flag.xfst eliminate_flag.att \
-	eliminate_flags.xfst eliminate_flags.att \
 	define.xfst define.att \
 	define_fail.xfst \
+	eliminate_flag.xfst eliminate_flag.output \
 	set_variable.xfst set_variable.output \
 	apply_up.xfst apply_up.output \
 	apply_down.xfst apply_down.output \
