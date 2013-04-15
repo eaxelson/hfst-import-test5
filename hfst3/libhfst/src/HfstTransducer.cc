@@ -1425,7 +1425,9 @@ static void substitute_escaped_flags(HfstTransducer * filter)
             {
               string str(*it);
               str.erase(0,1);
+              //std::cerr << "substituting '" << *it << "' with '" << str << "'...";
               filter->substitute(*it, str);
+              //std::cerr << " done" << std::endl;
             }
         }
     }
@@ -1489,8 +1491,12 @@ static HfstTransducer * get_flag_filter
       flag_found = false;
     }
 
-  substitute_escaped_flags(filter);  // unescape the flags
-  filter->minimize();
+  if (filter != NULL)
+    {
+      substitute_escaped_flags(filter);  // unescape the flags
+      filter->minimize();
+    }
+
   return filter;
 #endif
 }
@@ -1530,6 +1536,10 @@ HfstTransducer &HfstTransducer::eliminate_flags()
       flag_purge(filter_copy, "");
       *this = filter_copy;
     }
+  else
+    {
+      flag_purge(*this, "");
+    }
 
   return this->minimize();
 }
@@ -1556,6 +1566,10 @@ HfstTransducer &HfstTransducer::eliminate_flag(const std::string & flag)
       delete filter;
       flag_purge(filter_copy, flag);
       *this = filter_copy;
+    }
+  else
+    {
+      flag_purge(*this, "");
     }
 
   return this->minimize();

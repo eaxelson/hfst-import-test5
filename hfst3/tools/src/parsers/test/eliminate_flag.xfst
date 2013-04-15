@@ -13,5 +13,5 @@ eliminate flag X
 equivalent
 regex [ ["@N.X.OFF@" [x|X]] | ["@N.X.ON@" [y|Y|z|Z]] ] a [ ["@P.X.ON@" [x|X]] | ["@P.X.OFF@" [y|Y|z|Z]] ];
 # segfault...
-# eliminate flag X
-# equivalent
+eliminate flag X
+equivalent
