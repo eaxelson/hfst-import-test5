@@ -1425,9 +1425,7 @@ static void substitute_escaped_flags(HfstTransducer * filter)
             {
               string str(*it);
               str.erase(0,1);
-              //std::cerr << "substituting '" << *it << "' with '" << str << "'...";
               filter->substitute(*it, str);
-              //std::cerr << " done" << std::endl;
             }
         }
     }
@@ -1469,10 +1467,13 @@ static HfstTransducer * get_flag_filter
               if (fstatus == 1) {
                 fail_flags.disjunct(HfstTransducer("_" + *ff, type));
                 flag_found = true;
-              } if (fstatus == 2) {
+              } else if (fstatus == 2) {
                 succeed_flags.disjunct(HfstTransducer("_" + *ff, type));
                 flag_found = true;
+              } else {
+                succeed_flags.disjunct(HfstTransducer("_" + *ff, type));
               }
+
             }
         }
       

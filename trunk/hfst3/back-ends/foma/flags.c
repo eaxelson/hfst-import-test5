@@ -78,8 +78,8 @@ struct fsm *flag_eliminate(struct fsm *net, char *name) {
                 found = 1;
         }
         if (found == 0) {
-            printf("Flag attribute '%s' does not occur in the network.\n",name);
-            return(net);
+          //printf("Flag attribute '%s' does not occur in the network.\n",name);
+          return(net);
         }
     }
 
