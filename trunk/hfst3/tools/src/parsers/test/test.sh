@@ -60,6 +60,19 @@ do
 	exit 1;
     fi
 
+    ## Test that the transducer info is correct
+    if ! (echo 'regex [a|b|c|d|e] ([d|e|f|g]);' | ../hfst-xfst2fst -f $format > tmp 2> /dev/null); then
+        exit 1;
+    fi
+    if (! grep "3 states" tmp > /dev/null); then
+        echo "here 1"
+        exit 1;
+    fi
+    if (! grep "9 arcs" tmp > /dev/null); then
+        echo "here 2"
+        exit 1;
+    fi
+
     ## Test that the result of testfile.xfst (written in att format to standard output)
     ## is the same as testfile.att using att-to-fst conversion.
     for testfile in compose_net concatenate_net union_net ignore_net invert_net minus_net intersect_net \
@@ -106,7 +119,7 @@ do
     ## Test that the result of testfile.xfst (written to standard output)
     ## is the same as testfile.output
     for testfile in apply_up apply_down print_stack print_labels print_label_tally \
-	shortest_string set_variable eliminate_flag
+	shortest_string set_variable eliminate_flag info
     do
 	if ! (ls $testfile.xfst 2> /dev/null); then
 	    echo "skipping missing test for "$testfile"..."
@@ -123,7 +136,7 @@ do
     done
 
     ## Test that the results of testfile_true.xfst and testfile_false.xfst (written to file tmp)
-    ## contain the lines listed in files test_true.grep and test_false.grep, respectively.
+    ## contain the lines listed in files test_true.input and test_false.output, respectively.
     for testcase in _true _false # whether we test the positive or negative case
     do
 	for testfile in test_overlap test_sublanguage # the function to be tested

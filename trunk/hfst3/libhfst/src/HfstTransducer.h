@@ -72,6 +72,9 @@ namespace hfst
   }
   class HfstCompiler;
   class HfstTransducer;
+  namespace xfst {
+    class XfstCompiler;
+  }
 
   using hfst::implementations::HfstOlTransducer;
 
@@ -1588,6 +1591,7 @@ transducer.transform_weights(&func);
     friend class HfstCompiler;
     friend class hfst::implementations::ConversionFunctions;
     friend class HfstGrammar;
+    friend class xfst::XfstCompiler;
   };
 
   /** \brief Write transducer \a t in AT&T format to ostream \a out.
