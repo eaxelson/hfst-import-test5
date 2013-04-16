@@ -24,7 +24,7 @@ AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 
 # HFST bridge specific stuff
 HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
-		  HfstRules.cc HfstXeroxRules.cc \
+		  HfstRules.cc HfstXeroxRules.cc HfstDataTypes.cc \
 		  HfstSymbolDefs.cc HfstTokenizer.cc \
 		  HfstFlagDiacritics.cc HfstExceptionDefs.cc \
 		  HarmonizeUnknownAndIdentitySymbols.cc \

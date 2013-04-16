@@ -474,7 +474,7 @@ namespace hfst { namespace implementations {
       int laststate = -1;
       for(int i=0; ((t->states)+i)->state_no != -1; i++)
         {
-          if (((t->states)+1)->state_no != laststate)
+          if (((t->states)+i)->state_no != laststate)
             retval++;
           laststate = ((t->states)+i)->state_no;
         }
@@ -486,7 +486,7 @@ namespace hfst { namespace implementations {
       unsigned int retval=0;
       for(int i=0; ((t->states)+i)->state_no != -1; i++)
         {
-          if (((t->states)+i)->final_state != 1)
+          if (((t->states)+i)->in != -1)
             retval++;
         }
       return retval;

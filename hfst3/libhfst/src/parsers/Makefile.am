@@ -52,16 +52,16 @@ extincludedir = $(hfstincludedir)/parsers
 
 extinclude_HEADERS = $(XRE_HDRS) $(PMATCH_HDRS) $(LEXC_HDRS)
 
-LIBHFST_PARSER_TSTS=XreCompiler PmatchCompiler
+LIBHFST_PARSER_TSTS=XreCompiler # PmatchCompiler
 
 check_PROGRAMS=$(LIBHFST_PARSER_TSTS)
 
 XreCompiler_SOURCES=XreCompiler.cc xre_utils.cc xre_parse.yy xre_lex.ll
 XreCompiler_CXXFLAGS=-DUNIT_TEST
 XreCompiler_LDADD=../libhfst.la
-PmatchCompiler_SOURCES=PmatchCompiler.cc pmatch_utils.cc pmatch_parse.yy pmatch_lex.ll
-PmatchCompiler_CXXFLAGS=-DUNIT_TEST
-PmatchCompiler_LDADD=../libhfst.la
+#PmatchCompiler_SOURCES=PmatchCompiler.cc pmatch_utils.cc pmatch_parse.yy pmatch_lex.ll
+#PmatchCompiler_CXXFLAGS=-DUNIT_TEST
+#PmatchCompiler_LDADD=../libhfst.la
 #LexcCompiler_SOURCES=LexcCompiler.cc lexc-utils.cc lexc-parser.yy lexc-lexer.ll
 #LexcCompiler_CXXFLAGS=-DUNIT_TEST
 #LexcCompiler_LDADD=../libhfst.la

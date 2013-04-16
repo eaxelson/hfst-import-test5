@@ -57,6 +57,9 @@ namespace hfst
                   if an error occurs. */ 
   };
 
+  const char * implementation_type_to_string(ImplementationType type);
+  const char * implementation_type_to_format(ImplementationType type);
+
   /** \brief The type of a push operation.
       @see HfstTransducer::push_weights */
   enum PushType

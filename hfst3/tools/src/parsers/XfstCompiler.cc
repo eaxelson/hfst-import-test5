@@ -718,6 +718,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return *this;
     }
 
+  static const char * to_filename(const char * file)
+  {
+    if (file == 0)
+      return "<stdin>";
+    else
+      return file;
+  }
+
   XfstCompiler& 
   XfstCompiler::load_stack(const char* infile)
     {
@@ -731,12 +739,31 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       catch (NotTransducerStreamException ntse)
         {
           fprintf(stderr, "Unable to read transducers from %s\n", 
-                  infile);
+                  to_filename(infile));
           return *this;
         }
       while (instream->is_good())
         {
           HfstTransducer* t = new HfstTransducer(*instream);
+
+          if (t->get_type() != format_)
+            {
+              if (verbose_)
+                {
+                  fprintf(stderr, "warning: converting transducer type from %s to %s "
+                          "when reading from file '%s'",
+                          hfst::implementation_type_to_format(t->get_type()),
+                          hfst::implementation_type_to_format(format_),
+                          to_filename(infile));
+                  if (! hfst::HfstTransducer::is_safe_conversion(t->get_type(), format_))
+                    {
+                      fprintf(stderr, " (loss of information is possible)");
+                    }
+                  fprintf(stderr, "\n");
+                }
+              t->convert(format_);
+            }
+
           stack_.push(t);
           print_transducer_info();
         }
