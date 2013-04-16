@@ -21,6 +21,8 @@ extern HfstTransducer* last_compiled;
 extern ImplementationType format;
 
 extern std::map<std::string, hfst::HfstTransducer> named_transducers;
+struct PmatchUtilityTransducers;
+extern PmatchUtilityTransducers utils;
 const std::string RC_ENTRY_SYMBOL = "@_PMATCH_RC_ENTRY_@";
 const std::string RC_EXIT_SYMBOL = "@_PMATCH_RC_EXIT_@";
 const std::string LC_ENTRY_SYMBOL = "@_PMATCH_LC_ENTRY_@";
@@ -82,50 +84,6 @@ HfstTransducer* compile(const std::string& pmatch,
 HfstTransducer * read_text(char * filename,
                            ImplementationType type = TROPICAL_OPENFST_TYPE);
 
-static const char * latin1_upper[] =
-    {
-        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
-        "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "À", "Á",
-        "Â", "Ã", "Ä", "Å", "Æ", "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï",
-        "Ð", "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "Þ",
-        "ß"
-    };
-
-static const char * latin1_lower[] =
-    {
-        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
-        "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "à", "á",
-        "â", "ã", "ä", "å", "æ", "ç", "è", "é", "ê", "ë", "ì", "í", "î", "ï",
-        "ð", "ñ", "ò", "ó", "ô", "õ", "ö", "ø", "ù", "ú", "û", "ü", "ý", "þ",
-        "ß"
-    };
-
-static const char * combining_accents[] =
-    {
-        // Combining accents: grave, acute, circumflex, tilde, overline,
-        // diaresis, cedilla
-        "\u0300", "\u0301", "\u0302", "\u0303", "\u0305", "\u0308", "\u0327",
-        // Small solidus and large combining solidus
-        "\u0337", "\u0338"
-    };
-
-static const char * latin1_punct[] =
-    {
-        "!", "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".",
-        "/", ":", ";", "<", "=", ">", "?", "@", "[", "\\", "]", "^", "_",
-        "{", "|", "}", "~", "`", "´", "¡", "«", "»", "¿"
-    };
-
-static const char * latin1_whitespace[] =
-    {
-        " ", "\n", "\t",
-        // Non-breaking space, CR
-        "\u00A0",
-        "\r",
-        // punctuation space, thin space, line separator, par separator
-        "\u2008", "\u2009", "\u2028", "\u2029"
-    };
-
 /** @brief Return a transducer that accepts a single string from an array of
  *  char *. 
  */
@@ -147,43 +105,114 @@ template<typename T, size_t N>
     return N;
 }
 
-/**
- * Character class acceptors
- */
+    static const char * latin1_upper[] =
+    {
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
+        "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "À", "Á",
+        "Â", "Ã", "Ä", "Å", "Æ", "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï",
+        "Ð", "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "Þ",
+        "ß"
+    };
+    
+    static const char * latin1_lower[] =
+    {
+        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
+        "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "à", "á",
+        "â", "ã", "ä", "å", "æ", "ç", "è", "é", "ê", "ë", "ì", "í", "î", "ï",
+        "ð", "ñ", "ò", "ó", "ô", "õ", "ö", "ø", "ù", "ú", "û", "ü", "ý", "þ",
+        "ß"
+    };
 
-HfstTransducer * latin1_acceptor(
-    ImplementationType type = TROPICAL_OPENFST_TYPE);
+    static const char * combining_accents[] =
+    {
+        // Combining accents: grave, acute, circumflex, tilde, overline,
+        // diaresis, cedilla
+        "\u0300", "\u0301", "\u0302", "\u0303", "\u0305", "\u0308", "\u0327",
+        // Small solidus and large combining solidus
+        "\u0337", "\u0338"
+    };
+    
+    static const char * latin1_punct[] =
+    {
+        "!", "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".",
+        "/", ":", ";", "<", "=", ">", "?", "@", "[", "\\", "]", "^", "_",
+        "{", "|", "}", "~", "`", "´", "¡", "«", "»", "¿"
+    };
+    
+    static const char * latin1_whitespace[] =
+    {
+        " ", "\n", "\t",
+        // Non-breaking space, CR
+        "\u00A0",
+        "\r",
+        // punctuation space, thin space, line separator, par separator
+        "\u2008", "\u2009", "\u2028", "\u2029"
+    };
 
-HfstTransducer * latin1_alpha_acceptor(
-    ImplementationType type = TROPICAL_OPENFST_TYPE);
 
-HfstTransducer * latin1_lowercase_acceptor(
-    ImplementationType type = TROPICAL_OPENFST_TYPE);
+struct PmatchUtilityTransducers
+{
+    PmatchUtilityTransducers();
+    ~PmatchUtilityTransducers();
+    /**
+     * Character class acceptors
+     */
 
-HfstTransducer * latin1_uppercase_acceptor(
-    ImplementationType type = TROPICAL_OPENFST_TYPE);
-
-HfstTransducer * combining_accent_acceptor(
-    ImplementationType type = TROPICAL_OPENFST_TYPE);
-
+    const HfstTransducer * latin1_acceptor;
+    const HfstTransducer * latin1_alpha_acceptor;
+    const HfstTransducer * latin1_lowercase_acceptor;
+    const HfstTransducer * latin1_uppercase_acceptor;
+    const HfstTransducer * combining_accent_acceptor;
+    const HfstTransducer * latin1_numeral_acceptor;
+    const HfstTransducer * latin1_punct_acceptor;
+    const HfstTransducer * latin1_whitespace_acceptor;
+    const HfstTransducer * capify;
+    const HfstTransducer * lowerfy;
+    
+    HfstTransducer * make_latin1_acceptor(
+        ImplementationType type = TROPICAL_OPENFST_TYPE);
+    
+    HfstTransducer * make_latin1_alpha_acceptor(
+        ImplementationType type = TROPICAL_OPENFST_TYPE);
+    
+    HfstTransducer * make_latin1_lowercase_acceptor(
+        ImplementationType type = TROPICAL_OPENFST_TYPE);
+    
+    HfstTransducer * make_latin1_uppercase_acceptor(
+        ImplementationType type = TROPICAL_OPENFST_TYPE);
+    
+    HfstTransducer * make_combining_accent_acceptor(
+        ImplementationType type = TROPICAL_OPENFST_TYPE);
+    
 /** @brief Return a transducer that accepts one arabic numeral character. 
  */
-HfstTransducer * latin1_numeral_acceptor(
-    ImplementationType type = TROPICAL_OPENFST_TYPE);
-
+    HfstTransducer * make_latin1_numeral_acceptor(
+        ImplementationType type = TROPICAL_OPENFST_TYPE);
+    
 /** @brief Return a transducer that accepts one utf-8 symbol that is also a
  *  latin-1 punctuation character.
-*/
-HfstTransducer * latin1_punct_acceptor(
-    ImplementationType type = TROPICAL_OPENFST_TYPE);
-
+ */
+    HfstTransducer * make_latin1_punct_acceptor(
+        ImplementationType type = TROPICAL_OPENFST_TYPE);
+    
 /** @brief Return a transducer that accepts one utf-8 symbol that is also a
  *  latin-1 whitespace character.
-*/
-HfstTransducer * latin1_whitespace_acceptor(
-    ImplementationType type = TROPICAL_OPENFST_TYPE);
+ */
 
-HfstTransducer * optcap(HfstTransducer & t);
+    HfstTransducer * make_latin1_whitespace_acceptor(
+        ImplementationType type = TROPICAL_OPENFST_TYPE);
+    
+    HfstTransducer * make_lowerfy(
+        ImplementationType type = TROPICAL_OPENFST_TYPE);
+    
+    HfstTransducer * make_capify(
+        ImplementationType type = TROPICAL_OPENFST_TYPE);
+    
+    HfstTransducer * optcap(HfstTransducer & t);
+    HfstTransducer * tolower(HfstTransducer & t);
+    HfstTransducer * toupper(HfstTransducer & t);
+};
+
 
 } } // namespaces
 #endif
