@@ -9,7 +9,7 @@
 #ifndef UNIT_TEST
 
 namespace hfst { namespace pmatch {
-PmatchCompiler::PmatchCompiler() : 
+PmatchCompiler::PmatchCompiler() :
     definitions_(),
     format_(hfst::TROPICAL_OPENFST_TYPE)
 {}
