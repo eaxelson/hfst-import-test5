@@ -153,7 +153,7 @@ LexcCompiler::addStringEntry(const string& data,
     string encodedCont = string(continuation);
     encodedCont = flagJoinerEncode(encodedCont, false);
     tokenizer_.add_multichar_symbol(encodedCont);
-    HfstTransducer newPath(data + encodedCont, tokenizer_, format_);
+    HfstTransducer newPath(data, tokenizer_, format_);
     if (weight != 0)
       {
         newPath.set_final_weights(weight);
@@ -163,7 +163,13 @@ LexcCompiler::addStringEntry(const string& data,
         stringTries_.insert(pair<string,HfstTransducer>(currentLexiconName_,
                                                         HfstTransducer(format_)));
       }
+    HfstTransducer joiner(encodedCont, tokenizer_, format_);
+    newPath.concatenate(joiner).minimize();
     stringTries_[currentLexiconName_].disjunct(newPath);
+    if ((currentEntries_ % 50) == 0)
+      {
+        stringTries_[currentLexiconName_].minimize();
+      }
     if (!quiet_)
       {
         if ((currentEntries_ % 10000) == 0)
@@ -184,7 +190,7 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
     string encodedCont = string(continuation);
     encodedCont = flagJoinerEncode(encodedCont, false);
     tokenizer_.add_multichar_symbol(encodedCont);
-    HfstTransducer newPath(upper + encodedCont, lower + encodedCont,
+    HfstTransducer newPath(upper, lower,
                            tokenizer_, format_);
     if (weight != 0)
       {
@@ -195,7 +201,13 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
         stringTries_.insert(pair<string,HfstTransducer>(currentLexiconName_,
                                                         HfstTransducer(format_)));
       }
+    HfstTransducer joiner(encodedCont, tokenizer_, format_);
+    newPath.concatenate(joiner).minimize();
     stringTries_[currentLexiconName_].disjunct(newPath);
+    if ((currentEntries_ % 50) == 0)
+      {
+        stringTries_[currentLexiconName_].minimize();
+      }
     if (!quiet_)
       {
         if ((currentEntries_ % 10000) == 0)
