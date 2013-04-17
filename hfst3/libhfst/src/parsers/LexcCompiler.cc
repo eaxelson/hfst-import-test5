@@ -153,7 +153,8 @@ LexcCompiler::addStringEntry(const string& data,
     string encodedCont = string(continuation);
     encodedCont = flagJoinerEncode(encodedCont, false);
     tokenizer_.add_multichar_symbol(encodedCont);
-    HfstTransducer newPath(data, tokenizer_, format_);
+    HfstTransducer newPath(data + string("@_EPSILON_SYMBOL_@"),
+                           tokenizer_, format_);
     if (weight != 0)
       {
         newPath.set_final_weights(weight);
@@ -190,7 +191,8 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
     string encodedCont = string(continuation);
     encodedCont = flagJoinerEncode(encodedCont, false);
     tokenizer_.add_multichar_symbol(encodedCont);
-    HfstTransducer newPath(upper, lower,
+    HfstTransducer newPath(upper + "@_EPSILON_SYMBOL_@",
+                           lower + "@_EPSILON_SYMBOL_@",
                            tokenizer_, format_);
     if (weight != 0)
       {
