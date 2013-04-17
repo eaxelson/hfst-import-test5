@@ -2132,19 +2132,31 @@ void HfstTransducer::extract_random_paths
 #endif
 #if HAVE_SFST
     case SFST_TYPE:
-    {
-      this->sfst_interface.extract_random_paths
-    (this->implementation.sfst, results, max_num);
-    }
-    break;
+      {
+#if HAVE_OPENFST
+        HfstTransducer copy(*this);
+        copy.convert(TROPICAL_OPENFST_TYPE);
+        copy.tropical_ofst_interface.extract_random_paths
+          (copy.implementation.tropical_ofst, results, max_num);
+        break;
+#endif
+        HFST_THROW(FunctionNotImplementedException);
+        break;
+      }
 #endif
 #if HAVE_FOMA
     case FOMA_TYPE:
-    {
-      this->foma_interface.extract_random_paths
-    (this->implementation.foma, results, max_num);
-    }
-    break;
+      {
+#if HAVE_OPENFST
+        HfstTransducer copy(*this);
+        copy.convert(TROPICAL_OPENFST_TYPE);
+        copy.tropical_ofst_interface.extract_random_paths
+          (copy.implementation.tropical_ofst, results, max_num);
+        break;
+#endif
+        HFST_THROW(FunctionNotImplementedException);
+        break;
+      }
 #endif
     /* Add here your implementation. */
     case ERROR_TYPE:

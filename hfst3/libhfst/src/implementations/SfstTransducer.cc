@@ -885,9 +885,26 @@ namespace hfst { namespace implementations {
     return path;
   };
     
+    static bool is_minimal_and_empty(Transducer *t)
+    {
+      for( ArcsIter p(t->root_node()->arcs()); p; p++ ) {
+        return false;
+      }
+      return true;
+    }
+
+    // FIX: keeps returning epsilon paths...
   void SfstTransducer::extract_random_paths
   (Transducer *t, HfstTwoLevelPaths &results, int max_num)
   {
+    // empty transducer
+    if (is_minimal_and_empty(t))
+      {
+        return;
+      }
+    bool is_epsilon_path_accepted =
+      t->root_node()->is_final();
+
     srand((unsigned int)(time(0)));
 
     while (max_num > 0) {
@@ -897,9 +914,14 @@ namespace hfst { namespace implementations {
      to extract another one. */
       unsigned int i = 0;
       while ( (results.find(path) != results.end()) and (i < 5) ) {
-    path = random_path(t);
-    ++i;
+        path = random_path(t);
+        ++i;
       }
+      if (!is_epsilon_path_accepted && path.second.size() == 0)
+        {
+          fprintf(stderr, "wrong epsilon path returned, retrying...\n");
+          continue;
+        }
       results.insert(path);
 
       --max_num;    

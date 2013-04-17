@@ -2432,17 +2432,34 @@ namespace hfst { namespace implementations
     }
   }
 
-  /* Get a random path from transducer \a t. */
-  static HfstTwoLevelPath random_path(StdVectorFst *t) {
+  static bool is_minimal_and_empty(StdVectorFst *t)
+  {
+    int start_state = t->Start();
+    if (start_state < 0)
+      return true;
     
-    HfstTwoLevelPath path;    
+    for (fst::ArcIterator<StdVectorFst> aiter(*t,start_state); 
+         !aiter.Done(); aiter.Next())
+      {
+        return false;
+      }
+    return true;
+  }
+
+  /* Get a random path from transducer \a t. */
+  static HfstTwoLevelPath random_path_(StdVectorFst *t) {
+
+    /* If the transducer is empty, return. */
+    if (is_minimal_and_empty(t)) {
+      throw "transducer is empty";
+    }
+    
+    HfstTwoLevelPath path;
     path.first=0; // zero weight
     StateId current_state = t->Start();
 
-    /* If the transducer is empty, return. */
-    if (current_state < 0) {
-      return path;
-    }
+    bool is_epsilon_path_accepted =
+      (t->Final(t->Start()) != TropicalWeight::Zero());
 
     /* If we cannot proceed, all elements in \a path whose index is smaller
        that \a last_index constitute the longest path that is recognized by
@@ -2480,10 +2497,12 @@ namespace hfst { namespace implementations
       
       /* If we cannot proceed, return the longest path so far. */
       if (t_transitions.empty() || broken[current_state]) {
-    for (int i=(int)path.second.size()-1; i>=last_index; i--) {
-      path.second.pop_back(); 
-    }
-    return path;
+        for (int i=(int)path.second.size()-1; i>=last_index; i--) {
+          path.second.pop_back(); 
+        }
+        if (!is_epsilon_path_accepted && path.second.size() == 0)
+          throw "cannot extract random path";
+        return path;
       }
 
       /* Go through all transitions in a random order.
@@ -2505,6 +2524,8 @@ namespace hfst { namespace implementations
     if ( t->Final(t_target) != TropicalWeight::Zero() ) {
       if ( (rand() % 4) == 0 ) {  // randomly return the path so far,
         path.first = path.first + t->Final(t_target).Value();
+        if (!is_epsilon_path_accepted && path.second.size() == 0)
+          throw "cannot extract random path";
         return path;
       } // or continue.
       last_index = (int)path.second.size();  
@@ -2527,70 +2548,122 @@ namespace hfst { namespace implementations
     break;
       }     
     }
-
+    if (!is_epsilon_path_accepted && path.second.size() == 0)
+      throw "cannot extract random path";
     return path;
   };
-      
+
+  /* Try to extract a random path from \a t at most \a max_times times. */
+  static HfstTwoLevelPath random_path(StdVectorFst *t, unsigned int max_times=5)
+  {
+    HfstTwoLevelPath path;
+
+    while (max_times > 0)
+      {
+        try 
+          {
+            --max_times;
+            path = random_path_(t);
+            return path;
+          }
+        catch (const char * msg)
+          {
+            if (strcmp("transducer is empty", msg) == 0)
+              {
+                throw msg;
+              }
+            else if (strcmp("cannot extract random path", msg) == 0)
+              {
+                continue;
+              }
+            else
+              {
+                throw "cannot extract random path";
+              }
+          }
+      }
+    throw "cannot extract random path";
+  }
+
   void TropicalWeightTransducer::extract_random_paths_fd
   (StdVectorFst *t, HfstTwoLevelPaths &results, int max_num, bool filter_fd)
   {
-    srand((unsigned int)(time(0)));
-
     FlagDiacriticTable fdt;
-    StringSet alphabet = get_alphabet(t);
-    for (StringSet::const_iterator it = alphabet.begin(); 
-         it != alphabet.end(); it++)
+    StringSet alpha = get_alphabet(t);
+    for (StringSet::const_iterator it = alpha.begin(); 
+         it != alpha.end(); it++)
       {
         fdt.insert_symbol(*it);
       }
 
-    while (max_num > 0) 
+    HfstTwoLevelPaths fd_results;
+    // We filter flags efter extracting paths, so we request five times
+    // more paths than wanted.
+    extract_random_paths(t, fd_results, (5 * max_num));
+
+    for (HfstTwoLevelPaths::const_iterator it = fd_results.begin();
+         (it != fd_results.end() && max_num > 0); it++)
       {
-        HfstTwoLevelPath path = random_path(t);
+        HfstTwoLevelPath path = *it;
         StringVector sv = hfst::symbols::to_string_vector(path);
+        
         if (fdt.is_valid_string(sv))
           {
             if (filter_fd)
               {
                 path = hfst::symbols::remove_flags(path);
               }
-            
-            /* If we extract the same path again, try at most 5 times
-               to extract another one. */
-            unsigned int i = 0;
-            while ( (results.find(path) != results.end()) and (i < 5) ) 
-              {
-                path = random_path(t);
-                ++i;
-              }
             results.insert(path);
-            
-            --max_num;    
+            --max_num;
           }
       }
 
     return;
   }
 
+
   void TropicalWeightTransducer::extract_random_paths
   (StdVectorFst *t, HfstTwoLevelPaths &results, int max_num)
   {
     srand((unsigned int)(time(0)));
 
-    while (max_num > 0) {
-      HfstTwoLevelPath path = random_path(t);
+    while (max_num > 0) 
+      {
+        /* Try to extract one path at most 5 times. */
+        HfstTwoLevelPath path;
+        try  
+          {
+            --max_num;
+            path = random_path(t, 5);
+          }
+        catch (const char * msg) 
+          {
+            if(strcmp("cannot extract random path", msg) == 0)
+              {
+                continue; // one trial used, keep on trying
+              }
+            return; // not even possible to extract paths
+          }
+        
+        /* If we extract the same path again, try at most 5 times
+           to extract another one. */
+        unsigned int i = max_num;
+        while ( (results.find(path) != results.end()) &&
+                i > 0)
+          {
+            try
+              {
+                --i;
+                path = random_path(t, 5);
+              }
+            catch (const char * msg) {} // keep on trying
+          }
 
-      /* If we extract the same path again, try at most 5 times
-     to extract another one. */
-      unsigned int i = 0;
-      while ( (results.find(path) != results.end()) and (i < 5) ) {
-    path = random_path(t);
-    ++i;
+        /* Insert the path (another or the same). */
+        results.insert(path);
       }
-      results.insert(path);
-
-      --max_num;    
-    }
+    
+    return;
   }
 
   FdTable<int64>* TropicalWeightTransducer::get_flag_diacritics

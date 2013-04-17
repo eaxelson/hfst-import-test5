@@ -119,6 +119,7 @@ namespace hfst
     hfst::HfstTwoLevelPaths get_longest_paths(const hfst::HfstTwoLevelPaths & paths);
     StringVector to_string_vector(const hfst::HfstTwoLevelPath & path);
     std::string to_string(const StringVector & sv, bool spaces=false);
+    std::string to_string(const StringPairVector & sv, bool spaces=false);
     hfst::HfstTwoLevelPaths remove_flags(const hfst::HfstTwoLevelPaths & paths);
     hfst::HfstTwoLevelPath remove_flags(const hfst::HfstTwoLevelPath & path);
     StringPairVector remove_flags(const StringPairVector &v);

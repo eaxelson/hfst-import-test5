@@ -83,7 +83,7 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   ab_shuffle_bc.hfst id_shuffle_id.hfst aid_shuffle_idb.hfst \
 		   prunable_alphabet.hfst non_prunable_alphabet_1.hfst non_prunable_alphabet_2.hfst id.hfst \
 		   a2a_or_a2b_or_a2unk.hfst a2b_or_b2b_or_unk2b.hfst unk2unk_or_id.hfst \
-		   a_or_id.hfst
+		   a_or_id.hfst id_star_a_b_c.hfst
 OL_CHECKS=cat2dog.hfstol cat2dog.genhfstol cat_weight_final.hfstol \
 			proc-caps.hfstol proc-caps.genhfstol \
 			compounds.hfstol compounds2.hfstol
@@ -105,7 +105,7 @@ SFST_CHECKS=0to3cats.sfst 2to4cats.sfst 4cats.sfst\
 			ab_shuffle_bc.sfst id_shuffle_id.sfst aid_shuffle_idb.sfst \
 			prunable_alphabet.sfst non_prunable_alphabet_1.sfst non_prunable_alphabet_2.sfst id.sfst \
 			a2a_or_a2b_or_a2unk.sfst a2b_or_b2b_or_unk2b.sfst unk2unk_or_id.sfst \
-			a_or_id.sfst
+			a_or_id.sfst id_star_a_b_c.sfst
 endif
 if WANT_OPENFST
 OFST_CHECKS=0to3cats.ofst \
@@ -126,7 +126,7 @@ OFST_CHECKS=0to3cats.ofst \
 			ab_shuffle_bc.ofst id_shuffle_id.ofst aid_shuffle_idb.ofst \
 			prunable_alphabet.ofst non_prunable_alphabet_1.ofst non_prunable_alphabet_2.ofst id.ofst \
 			a2a_or_a2b_or_a2unk.ofst a2b_or_b2b_or_unk2b.ofst unk2unk_or_id.ofst \
-			a_or_id.ofst
+			a_or_id.ofst id_star_a_b_c.ofst
 endif
 if WANT_FOMA
 FOMA_CHECKS=0to3cats.foma 2to4cats.foma 4cats.foma \
@@ -146,7 +146,7 @@ FOMA_CHECKS=0to3cats.foma 2to4cats.foma 4cats.foma \
 			ab_shuffle_bc.foma id_shuffle_id.foma aid_shuffle_idb.foma \
 			prunable_alphabet.foma non_prunable_alphabet_1.foma non_prunable_alphabet_2.foma id.foma \
 			a2a_or_a2b_or_a2unk.foma a2b_or_b2b_or_unk2b.foma unk2unk_or_id.foma \
-			a_or_id.foma
+			a_or_id.foma id_star_a_b_c.foma
 endif
 
 check_DATA=$(DEFAULT_CHECKS) $(SFST_CHECKS) $(OFST_CHECKS) $(FOMA_CHECKS) $(OL_CHECKS)
@@ -168,7 +168,7 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 compounds.txt compounds2.txt \
 		 id_shuffle_id.txt aid_shuffle_idb.txt \
 		 prunable_alphabet.txt non_prunable_alphabet_1.txt non_prunable_alphabet_2.txt id.txt unk2unk_or_id.txt \
-		 a2a_or_a2b_or_a2unk.txt a2b_or_b2b_or_unk2b.txt a_or_id.txt
+		 a2a_or_a2b_or_a2unk.txt a2b_or_b2b_or_unk2b.txt a_or_id.txt id_star_a_b_c.txt
 FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-gen.strings \
 			proc-caps-out1.strings proc-caps-out2.strings \
 			proc-caps-out3.strings proc-caps-out4.strings \
