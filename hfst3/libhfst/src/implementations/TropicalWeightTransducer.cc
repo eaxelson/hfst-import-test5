@@ -2676,7 +2676,6 @@ namespace hfst { namespace implementations
     {
       if(FdOperation::is_diacritic(it.Symbol()))
         {
-          std::cerr << "defining diacritic " << it.Value() << " " << it.Symbol() << std::endl; 
           table->define_diacritic(it.Value(), it.Symbol());
         }
     }

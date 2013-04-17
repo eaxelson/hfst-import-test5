@@ -33,10 +33,29 @@ for i in "" .sfst .ofst .foma; do
             done
         done
     fi
+
+    # extract 5 times 100 random strings and check that the flags are obeyed, i.e. no string is accepted
+    if test -f unification_flags_fail$i ; then
+        for foo in 0 1 2 3 4
+        do
+            if ! $TOOLDIR/hfst-fst2strings --random 100 -X obey-flags \
+                unification_flags_fail$i > test.strings ; then
+                echo extracting random flags from unification_flags_fail$i failed
+                exit 1
+            fi
+            if ! (wc -l test.strings | grep '^0 ' > /dev/null); then
+                echo "error in processing flags in "unification_flags$i": the following paths are not valid:"
+                cat test.strings
+                exit 1
+            fi
+        done
+    fi
+
 done
 
 for i in "" .sfst .ofst .foma; do
 
+    # Test the empty transducer
     if test -f empty$i ; then
 	if ! $TOOLDIR/hfst-fst2strings -r 20 empty$i > /dev/null ; then
 	    echo "searching for random paths in an empty transducer failed"
@@ -44,6 +63,7 @@ for i in "" .sfst .ofst .foma; do
 	fi
     fi
 
+    # Test that epsilon paths are not accepted
     if test -f id_star_a_b_c$i ; then
 
         if ! ($TOOLDIR/hfst-fst2strings -r 10 id_star_a_b_c$i > tmp); then
