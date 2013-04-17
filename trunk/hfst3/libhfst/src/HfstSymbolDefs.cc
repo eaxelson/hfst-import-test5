@@ -88,6 +88,26 @@ bool is_default(const char * str)
       return result;
     }
 
+    std::string to_string(const StringPairVector & spv, bool spaces)
+    {
+      std::string result;
+      for (StringPairVector::const_iterator it = spv.begin(); it != spv.end(); it++)
+        {
+          if (spaces && it != spv.begin())
+            {
+              result.append(" ");
+            }
+          result.append(it->first);
+          if (it->first != it->second)
+            {
+              result.append(":");
+              result.append(it->second);
+            }
+        }
+      return result;
+    }
+
+
     StringVector to_string_vector(const HfstTwoLevelPath & path)
     {
       StringVector result;
