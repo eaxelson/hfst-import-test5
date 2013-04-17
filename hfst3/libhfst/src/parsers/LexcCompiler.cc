@@ -82,6 +82,7 @@ LexcCompiler::LexcCompiler(ImplementationType impl) :
 {
     tokenizer_.add_multichar_symbol("@0@");
     tokenizer_.add_multichar_symbol("@ZERO@");
+    tokenizer_.add_multichar_symbol("@@ANOTHER_EPSILON@@");
     string hash("#");
     lexiconNames_.insert(hash);
     tokenizer_.add_multichar_symbol(joinerEncode(hash));
@@ -153,7 +154,7 @@ LexcCompiler::addStringEntry(const string& data,
     string encodedCont = string(continuation);
     encodedCont = flagJoinerEncode(encodedCont, false);
     tokenizer_.add_multichar_symbol(encodedCont);
-    HfstTransducer newPath(data + string("@_EPSILON_SYMBOL_@"),
+    HfstTransducer newPath(data + string("@@ANOTHER_EPSILON@@"),
                            tokenizer_, format_);
     if (weight != 0)
       {
@@ -191,8 +192,8 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
     string encodedCont = string(continuation);
     encodedCont = flagJoinerEncode(encodedCont, false);
     tokenizer_.add_multichar_symbol(encodedCont);
-    HfstTransducer newPath(upper + "@_EPSILON_SYMBOL_@",
-                           lower + "@_EPSILON_SYMBOL_@",
+    HfstTransducer newPath(upper + "@@ANOTHER_EPSILON@@",
+                           lower + "@@ANOTHER_EPSILON@@",
                            tokenizer_, format_);
     if (weight != 0)
       {
@@ -442,6 +443,7 @@ LexcCompiler::compileLexical()
     lexicons = start.concatenate(lexicons).concatenate(end);
 #endif
     lexicons.substitute("@ZERO@", "0");
+    lexicons.substitute("@@ANOTHER_EPSILON@@", "@_EPSILON_SYMBOL_@");
     if (verbose_)
       {
         fprintf(stderr, "Converting...\n");
