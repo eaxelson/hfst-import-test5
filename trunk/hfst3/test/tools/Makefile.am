@@ -72,7 +72,7 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   cat+dog.hfst catdog.hfst cat_or_dog.hfst cat.hfst \
 		   CAT_uppercased2cat.hfst CAT_uppercased.hfst cat_weight_final.hfst \
 		   cat_weight_initial.hfst cat_weight_middle.hfst dog2cat.hfst \
-		   dog.hfst infinitely_ambiguous.hfst infinitely_ambiguous_with_flags.hfst unification_flags.hfst non_minimal.hfst rule1.hfst \
+		   dog.hfst infinitely_ambiguous.hfst infinitely_ambiguous_with_flags.hfst unification_flags.hfst unification_flags_fail.hfst non_minimal.hfst rule1.hfst \
 		   rule2.hfst summarize_test1.hfst summarize_test2.hfst tac.hfst \
 		   epsilon.hfst epsilon2cat.hfst cat2epsilon.hfst \
 		   unknown-star.hfst identity-star.hfst unknown2a.hfst identity.hfst \
@@ -95,7 +95,7 @@ SFST_CHECKS=0to3cats.sfst 2to4cats.sfst 4cats.sfst\
 			cat.sfst CAT_uppercased2cat.sfst CAT_uppercased.sfst\
 			cat_weight_final.sfst cat_weight_initial.sfst \
 			cat_weight_middle.sfst dog2cat.sfst dog.sfst \
-			infinitely_ambiguous.sfst infinitely_ambiguous_with_flags.sfst unification_flags.sfst non_minimal.sfst \
+			infinitely_ambiguous.sfst infinitely_ambiguous_with_flags.sfst unification_flags.sfst unification_flags_fail.sfst non_minimal.sfst \
 			rule1.sfst rule2.sfst summarize_test1.sfst \
 			summarize_test2.sfst tac.sfst unknown2a.sfst\
 			identity.sfst abid.sfst unk2unk.sfst unk_or_id_star.sfst \
@@ -115,7 +115,7 @@ OFST_CHECKS=0to3cats.ofst \
 			cat_or_dog.ofst cat.ofst CAT_uppercased2cat.ofst \
 			CAT_uppercased.ofst cat_weight_final.ofst \
 			cat_weight_initial.ofst cat_weight_middle.ofst \
-			dog2cat.ofst dog.ofst infinitely_ambiguous.ofst infinitely_ambiguous_with_flags.ofst unification_flags.ofst \
+			dog2cat.ofst dog.ofst infinitely_ambiguous.ofst infinitely_ambiguous_with_flags.ofst unification_flags.ofst unification_flags_fail.ofst \
 			non_minimal.ofst rule1.ofst rule2.ofst \
 			summarize_test1.ofst summarize_test2.ofst tac.ofst\
 			unknown2a.ofst identity.ofst \
@@ -136,7 +136,7 @@ FOMA_CHECKS=0to3cats.foma 2to4cats.foma 4cats.foma \
 			cat.foma CAT_uppercased2cat.foma \
 			CAT_uppercased.foma cat_weight_final.foma \
 			cat_weight_initial.foma cat_weight_middle.foma \
-			dog2cat.foma dog.foma infinitely_ambiguous.foma infinitely_ambiguous_with_flags.foma unification_flags.foma \
+			dog2cat.foma dog.foma infinitely_ambiguous.foma infinitely_ambiguous_with_flags.foma unification_flags.foma unification_flags_fail.foma \
 			non_minimal.foma rule1.foma rule2.foma \
 			summarize_test1.foma summarize_test2.foma tac.foma\
 			unknown2a.foma identity.foma abid.foma unk2unk.foma unk_or_id_star.foma \
@@ -157,7 +157,7 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 cat+dog.txt catdog.txt cat_or_dog.txt cat.txt CAT_uppercased2cat.txt \
 		 CAT_uppercased.txt cat_weight_final.txt cat_weight_initial.txt \
 		 cat_weight_middle.txt dog2cat.txt dog.txt\
-		 epsilon.txt epsilon2cat.txt infinitely_ambiguous.txt infinitely_ambiguous_with_flags.txt unification_flags.txt \
+		 epsilon.txt epsilon2cat.txt infinitely_ambiguous.txt infinitely_ambiguous_with_flags.txt unification_flags.txt unification_flags_fail.txt \
 		 non_minimal.txt rule1.txt rule2.txt summarize_test1.txt \
 		 summarize_test2.txt tac.txt proc-caps.txt \
 		 unknown-star.txt identity-star.txt unknown2a.txt identity.txt\
