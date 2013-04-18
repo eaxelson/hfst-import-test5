@@ -870,12 +870,12 @@ namespace hfst { namespace implementations
     for ( StringSet::const_iterator it = unknown_t2.begin();
           it != unknown_t2.end(); it++ ) {
       if(st2->AddSymbol(*it) < 3) {
-    std::cerr << "ERROR: string " << *it << " got strange number" << std::endl;
-    assert(false);
+        std::cerr << "ERROR: string " << *it << " got strange number" << std::endl;
+        assert(false);
       }
     }
     t2->SetInputSymbols(st2);
-
+    
     // ...calculate the number mappings needed in harmonization...
     NumberNumberMap km = create_mapping(t1, t2);
 
@@ -1564,7 +1564,6 @@ namespace hfst { namespace implementations
       }
     catch (const std::bad_alloc & e)
       {
-        //std::cerr << "ERROR: std::bad_alloc caught in TropicalWeightTransducer::n_best" << std::endl;
         HFST_THROW_MESSAGE(HfstFatalException, "TropicalWeightTransducer::nbest runs out of memory");
       }
     return n_best_fst;
@@ -1995,21 +1994,6 @@ namespace hfst { namespace implementations
     StdVectorFst * t2_ = expand_arcs(t2, foo, false);
     t1->SetOutputSymbols(t1->InputSymbols());
     t2_->SetInputSymbols(t1->OutputSymbols());
-
-#ifdef FOO
-    std::cerr << "t1 output symbols" << std::endl;
-    for ( fst::SymbolTableIterator it 
-            = fst::SymbolTableIterator(*(t1->OutputSymbols()));
-          not it.Done(); it.Next() ) {
-      std::cerr << it.Value() << it.Symbol() << std::endl;
-    }
-    std::cerr << "t2_ input symbols" << std::endl;
-    for ( fst::SymbolTableIterator it 
-            = fst::SymbolTableIterator(*(t2_->InputSymbols()));
-          not it.Done(); it.Next() ) {
-      std::cerr << it.Value() << it.Symbol() << std::endl;
-    }
-#endif
 
     ArcSort(t1, StdOLabelCompare());
     ArcSort(t2_, StdILabelCompare());
