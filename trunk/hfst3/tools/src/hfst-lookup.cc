@@ -34,6 +34,7 @@
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+#include "HfstEpsilonHandler.h"
 #include "HfstLookupFlagDiacritics.h"
 #include "HfstFlagDiacritics.h"
 #include "HfstTransducer.h"
@@ -65,6 +66,7 @@ using hfst::HfstOneLevelPaths;
 using hfst::HfstTwoLevelPath;
 using hfst::HfstTwoLevelPaths;
 using hfst::FdOperation;
+using hfst::HfstEpsilonHandler;
 
 using hfst::StringPair;
 using hfst::StringPairVector;
@@ -1072,75 +1074,6 @@ lookup_simple(const HfstOneLevelPath& s, HfstTransducer& t, bool* infinity)
   return results;
 }
 
-
-/* A class for handling input epsilon cycles in function lookup_fd. */
-class EpsilonHandler
-{
-protected:
-  typedef std::vector<HfstState> HfstStateVector;
-  // the path of consecutive input epsilon transitions
-  HfstStateVector epsilon_path; 
-  size_t max_cycles; // maximum number of consecutive epsilon cycles allowed
-  size_t cycles;     // number of cycles detected so far
-public:
-  EpsilonHandler(size_t cutoff);
-  void push_back(HfstState s);
-  void pop_back();
-  bool can_continue(HfstState s);
-};
-
-/* Create an epsilon handler which allows a maximum of \a cutoff
-   consecutive input epsilon cycles. The cycles do not need to be
-   the same. */
-EpsilonHandler::EpsilonHandler(size_t cutoff): 
-  epsilon_path(), max_cycles(cutoff), cycles(0) {};
-
-/* Called before calling lookup_fd recursively. 
-   Appends state \a s to the epsilon path if not found at the end already. */
-void EpsilonHandler::push_back(HfstState s)
-{
-  if (not epsilon_path.empty()) {
-    if  (epsilon_path.back() != s ) {
-      epsilon_path.push_back(s);
-    }
-  }
-  else {
-    epsilon_path.push_back(s);
-  }
-};
-
-/* Removes a state from the end of the epsilon path, 
-   unless the path it is empty. */
-void EpsilonHandler::pop_back()
-{
-  if (not epsilon_path.empty())
-    epsilon_path.pop_back();
-};
-
-/* This function is called at the beginning of lookup_fd. 
-   It tells whether we can proceed in the current state (i.e. state \a s)
-   and updates the cycle counter and epsilon path of the EpsilonHandler. */
-bool EpsilonHandler::can_continue(HfstState s)
-{
-  for(HfstStateVector::iterator it = epsilon_path.begin();
-      it != epsilon_path.end(); it++)
-    {
-      if (*it == s) // a cycle detected
-        {
-          it++;
-          // erase the cycle from the epsilon path 
-          // and check whether the number of cycles is exceeded
-          epsilon_path.erase(it, epsilon_path.end());
-          cycles++;
-          if (cycles > max_cycles) {
-            return false;
-          }
-          return true;
-        }
-    }
-  return true;  // no cycle detected
-};
-
 static void push_back_to_two_level_path
 (HfstTwoLevelPath &path,
  const StringPair &sp,
@@ -1216,7 +1149,7 @@ static void lookup_fd
  unsigned int lookup_index, // an iterator instead?
  HfstTwoLevelPath &path_so_far,
  StringSet &alphabet,
- EpsilonHandler Eh)
+ HfstEpsilonHandler Eh)
 {
   // Check whether the number of input epsilon cycles is exceeded
   if (not Eh.can_continue(state)) {
@@ -1262,10 +1195,10 @@ static void lookup_fd
            it->get_weight());
       }
 
-          EpsilonHandler * Ehp = NULL;
+          HfstEpsilonHandler * Ehp = NULL;
           if (input_symbol_consumed) {
             lookup_index++;
-            Ehp = new EpsilonHandler(infinite_cutoff);
+            Ehp = new HfstEpsilonHandler(infinite_cutoff);
           }
           else {
             Eh.push_back(state);
@@ -1301,7 +1234,7 @@ static void lookup_fd
   unsigned int lookup_index = 0;
   HfstTwoLevelPath path_so_far;
   StringSet alphabet = t.get_alphabet();
-  EpsilonHandler Eh(infinite_cutoff);
+  HfstEpsilonHandler Eh(infinite_cutoff);
   lookup_fd(t, lookup_path, results, state, lookup_index, path_so_far, 
         alphabet, Eh);
 }
