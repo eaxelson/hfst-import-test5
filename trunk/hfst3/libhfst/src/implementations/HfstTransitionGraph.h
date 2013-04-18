@@ -2251,6 +2251,82 @@
              return result;
            }
 
+         bool is_lookup_infinitely_ambiguous
+           (const HfstOneLevelPath& s,
+            unsigned int& index, HfstState state,
+            std::set<HfstState> &epsilon_path_states)
+         {
+           // Whether the end of the lookup path s has been reached                    
+           bool only_epsilons=false;
+           if ((unsigned int)s.second.size() == index)
+             {
+               only_epsilons=true;
+             }
+           
+           // Go through all transitions in this state                                 
+           const HfstBasicTransducer::HfstTransitions &transitions 
+             = this->operator[](state);
+           for (HfstBasicTransducer::HfstTransitions::const_iterator it
+                  = transitions.begin();
+                it != transitions.end(); it++)
+             {
+               // CASE 1: Input epsilons do not consume a symbol in the lookup path s,               
+               //         so they can be added freely.                                 
+               // (Diacritics are also treated as epsilons, although it might cause false                                                   
+               //  positive results, because loops with diacritics can be invalidated by                                                    
+               //  other diacritics.)                                                  
+               if ( is_epsilon(it->get_input_symbol()) ||
+                    FdOperation::is_diacritic(it->get_input_symbol()) )
+                 {
+                   epsilon_path_states.insert(state);
+                   if (epsilon_path_states.find(it->get_target_state())
+                       != epsilon_path_states.end())
+                     {
+                       return true;
+                     }
+                   if (is_lookup_infinitely_ambiguous
+                       (s, index, it->get_target_state(), epsilon_path_states))
+                     {
+                       return true;
+                     }
+                   epsilon_path_states.erase(state);
+                 }
+               
+               /* CASE 2: Other input symbols consume a symbol in the lookup path s,   
+                  so they can be added only if the end of the lookup path s has not    
+                  been reached. */
+               else if (not only_epsilons)
+                 {
+                   if ( it->get_input_symbol().compare(s.second.at(index)) == 0 )
+                     {
+                       index++; // consume an input symbol in the lookup path s            
+                       std::set<HfstState> empty_set;
+                       if (is_lookup_infinitely_ambiguous
+                           (s, index, it->get_target_state(), empty_set))
+                         {
+                           return true;
+                         }
+                       index--; // add the input symbol back to the lookup path s.         
+                     }
+                 }
+             }
+           return false;
+         }
+
+
+
+         bool is_lookup_infinitely_ambiguous(const HfstOneLevelPath & s)
+         {
+           std::set<HfstState> epsilon_path_states;
+           epsilon_path_states.insert(0);
+           unsigned int index=0;
+           HfstState initial_state=0;
+
+           return is_lookup_infinitely_ambiguous(s, index, initial_state,
+                                                 epsilon_path_states);
+         }
+
+
 /*      /\** @brief Determine whether this graph has input-epsilon cycles. */
 /*       *\/ */
 /*      bool has_input_epsilon_cycles(void) */
