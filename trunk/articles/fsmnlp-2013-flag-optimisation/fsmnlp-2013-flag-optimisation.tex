@@ -177,14 +177,22 @@ In table~\ref{table:sizes} there are sizes.
     \centering
     \begin{tabular}{|l|r|r|r|}
         \hline
-        \bf Language & \bf Original & \bf Elim. flags & \bf Ours \\
+        \bf Language & \bf With flags & \bf Original & \bf \% \\
         \hline
-        \bf English & 100 & 1,000 & 1  \\
+        \bf Greenlandic & 8400635 & 261074412 & 3,4\%  \\
+        \bf Erzya & 2801339 & 3333669 & 84\%  \\
+        \bf South Saami & 3147213 & 3600902 & 87\%  \\
+        \bf North Saami & 6789658 & 9152930 & 74\%  \\
+        \bf Komi Zyryen & 2315384 & 2719971 & 85\%  \\
+        \bf German & 32678 & 25836 & 126\%  \\
         \hline
     \end{tabular}
-    \caption{Sizes of automata with and with-out flags (in bytes)
+    \caption{Sizes of transducers with and with-out automatic flags (in bytes); Percentage shows size of the flagged transducer in comparison to the original
     \label{table:sizes}}
 \end{table}
+
+
+
 
 In table~\ref{table:speed} there are speeds.
 
