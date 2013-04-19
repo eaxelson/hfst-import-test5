@@ -151,6 +151,11 @@ Eliminating flags is done by
 
 Measuring automata sizes with foma
 
+\begin{figure*}
+    \includegraphics[width=\textwidth]{transducer.png}
+     \caption{Simplified part of Finnish lexc grammar description with automatic flags
+     \label{fig:lexc-fin-flag}}
+\end{figure*}
 
 \section{Data}
 \label{sec:data}
@@ -192,17 +197,17 @@ In table~\ref{table:sizes} there are sizes.
 \end{table}
 
 
-
-
 In table~\ref{table:speed} there are speeds.
 
 \begin{table}
     \centering
     \begin{tabular}{|l|r|r|r|}
         \hline
-        \bf Language & \bf Original & \bf Elim. flags & \bf Ours \\
+        \bf Language & \bf Original & \bf With flags & \bf Words \\
         \hline
-        \bf English & 100 & 1,000 & 1  \\
+        \bf kal & 1 s & 5 s  & 21262  \\
+        \bf smj & 1 s & 5 s  & 21262  \\
+        
         \hline
     \end{tabular}
     \caption{Sizes of automata with and with-out flags (in words per second)
@@ -255,6 +260,8 @@ We thank our colleagues and we got funding.
 
 \bibliographystyle{acl}
 \bibliography{fsmnlp2013flags}
+
+
 
 
 \end{document}
