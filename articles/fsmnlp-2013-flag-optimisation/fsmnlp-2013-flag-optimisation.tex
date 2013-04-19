@@ -142,14 +142,17 @@ of what such compression can achieve.
 \section{Methods}
 \label{sec:methods}
 
-Flag diacritics are
+Flag diacritics are special multi-character symbols which are interpreted during runtime. They have special syntax: \verb+@operator.feature.value@+, where operator is one of the available operators (P, U, R, D, N, C), feature is name of a feature provisionally set by user and value can be any value held in feature, also provisionally defined ~\cite{beesley2003finite}.
+
+In this paper, we will use only two types of flag diacritics: positive setting (\verb+@P.feature value@+) and require test (\verb+@R.feature value@+). While positive setting flag only sets the feature to its value, require test flag invokes testing if the feature is set to the designated value.
+For example, \verb+@P.LEXNAME.Root@+ will set feature \verb+LEXNAME+ to value \verb+Root+. If later in the path occurs request test flag \verb+@R.LEXNAME.Root@+, the invoked test will succeed and that path will be considered as valid. 
 
 Our algorithm is based on the finding that adjacent morph combinatorics can
 be expressed with finite-state flags like this:
 
 Eliminating flags is done by
 
-Measuring automata sizes with foma
+Measuring automata sizes with
 
 \begin{figure*}
     \includegraphics[width=\textwidth]{transducer.png}
