@@ -145,14 +145,14 @@ of what such compression can achieve.
 Flag diacritics are special multi-character symbols which are interpreted during runtime. They have special syntax: \verb+@operator.feature.value@+, where operator is one of the available operators (P, U, R, D, N, C), feature is name of a feature provisionally set by user and value can be any value held in feature, also provisionally defined ~\cite{beesley2003finite}.
 
 In this paper, we will use only two types of flag diacritics: positive setting (\verb+@P.feature value@+) and require test (\verb+@R.feature value@+). While positive setting flag only sets the feature to its value, require test flag invokes testing if the feature is set to the designated value.
-For example, \verb+@P.LEXNAME.Root@+ will set feature \verb+LEXNAME+ to value \verb+Root+. If later in the path occurs request test flag \verb+@R.LEXNAME.Root@+, the invoked test will succeed and that path will be considered as valid. 
+For example, \verb+@P.LEXNAME.Root@+ will set feature \texttt{LEXNAME} to value \texttt{Root}. If later in the path occurs request test flag \verb+@R.LEXNAME.Root@+, the invoked test will succeed and that path will be considered as valid. 
 
-Our algorithm is based on the finding that adjacent morph combinatorics can
-be expressed with finite-state flags like this:
+Our algorithm is based on the finding that adjacent morph combinatorics can be expressed with finite-state flags like this:
 
-Eliminating flags is done by
+Every rightward continuation is replaced with positive setting flag with feature called \texttt{LEXNAME} and value corresponding to the continuation lexicon. For example, lexicon in figure~\ref{fig:lexc-fin} has two rightward continuations: \texttt{NOUNCASES} and \texttt{\#}, which are presented with flags \verb+@P.LEXNAME.NOUNCASES@+ and \verb+@P.LEXNAME.#@+. 
+The same way, every leftward continuation is replaced with request test flag, also with feature \texttt{LEXNAME} and corresponding value. Therefore, lexicon shown in figure~\ref{fig:lexc-fin} will have also two leftward continuations: \texttt{NOUNCASES} and \texttt{\#}, which are this time presented with flags \verb+@R.LEXNAME.NOUNCASES@+ and \verb+@R.LEXNAME.#@+. Additionally, every lexicon starts with \texttt{Root}, which is represented with pair of flags \verb+@R.LEXNAME.Root@@R.LEXNAME.#@+.
 
-Measuring automata sizes with
+The transducer built from lexicon in figure~\ref{fig:lexc-fin} is shown in figure~\ref{fig:lexc-fin-flags}. 
 
 \begin{figure*}
     \includegraphics[width=\textwidth]{transducer.png}
@@ -171,7 +171,7 @@ repository~\cite{moshagen2013building}. The languages selected are:
 \section{Evaluation}
 \label{sec:evaluation}
 
-To evaluate the algorithm, we measure the propoportional size gains that are
+To evaluate the algorithm, we measure the proportional size gains that are
 achieved by the flags we introduce as compared to the equivalent automaton
 without the induced flags, and we contrast these results to the ones that have
 been attained by having linguists manually determine the flag positions and
@@ -179,7 +179,7 @@ their logic. Since introduction of flags always causes an overhead in the
 application time of the automata, we also measure the average running speed
 of the automata with our flags to get the trade-off ratios.
 
-In table~\ref{table:sizes} there are sizes.
+In table~\ref{table:sizes} there are shown sizes of transducers compiled with new method that uses flag diacritics, original transducer compiled with regular lexc compiler and finally there is shown ratio of newly build transducers and original ones.
 
 \begin{table}
     \centering
@@ -201,7 +201,7 @@ In table~\ref{table:sizes} there are sizes.
 \end{table}
 
 
-In table~\ref{table:speed} there are speeds.
+In table~\ref{table:speed} there are speed measures of optimized lookup on corpus words. Before measurements, transducers were transformed to the HFST optimized lookup format. First column shows languages on which tests were done, second one shows how much time was needed for the optimized lookup to finish whe performed with the original transducer. Third column shows time to do optimized lookup with new transducer with flags and finally there is number of processed words.
 
 \begin{table}
     \centering
