@@ -1,3 +1,6 @@
+#ifndef _HFST_EPSILON_HANDLER_H_
+#define _HFST_EPSILON_HANDLER_H_
+
 #include "HfstDataTypes.h"
 
 namespace hfst {
@@ -19,3 +22,5 @@ namespace hfst {
   };
 
 }
+
+#endif // _HFST_EPSILON_HANDLER_H_
