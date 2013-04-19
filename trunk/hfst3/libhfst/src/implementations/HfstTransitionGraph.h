@@ -15,11 +15,12 @@
  #include "../HfstExceptionDefs.h"
  #include "../HfstDataTypes.h"
  #include "../HarmonizeUnknownAndIdentitySymbols.h"
+ #include "../HfstFlagDiacritics.h"
+ #include "../HfstEpsilonHandler.h"
  #include "ConvertTransducerFormat.h"
  #include "HfstTransition.h"
  #include "HfstTropicalTransducerTransitionData.h"
  #include "HfstFastTransitionData.h"
-
 
  namespace hfst {
 
@@ -2324,6 +2325,181 @@
 
            return is_lookup_infinitely_ambiguous(s, index, initial_state,
                                                  epsilon_path_states);
+         }
+
+
+
+
+
+         static void push_back_to_two_level_path
+           (HfstTwoLevelPath &path,
+            const StringPair &sp,
+            const float &weight)
+         {
+           path.second.push_back(sp);
+           path.first = path.first + weight;
+         }
+         
+         static void pop_back_from_two_level_path
+           (HfstTwoLevelPath &path,
+            const float &weight)
+         {
+           path.second.pop_back();
+           path.first = path.first - weight;
+         }
+         
+         static void add_to_results
+           (HfstTwoLevelPaths &results,
+            HfstTwoLevelPath &path_so_far,
+            const float &final_weight)
+         {
+           path_so_far.first = path_so_far.first + final_weight;
+           results.insert(path_so_far);
+           path_so_far.first = path_so_far.first - final_weight;
+         }
+
+         static bool is_possible_transition
+           (const HfstBasicTransition &transition,
+            const StringVector &lookup_path,
+            const unsigned int &lookup_index,
+            const StringSet &alphabet,
+            bool &input_symbol_consumed)
+         {
+           std::string isymbol = transition.get_input_symbol();
+           
+           // If we are not at the end of lookup_path,
+           if (not (lookup_index == (unsigned int)lookup_path.size()))
+             {
+               // we can go further if the current symbol in lookup_path
+               // matches to the input symbol of the transition, i.e
+               // either the input symbol is the same as the current symbol
+               if ( isymbol.compare(lookup_path.at(lookup_index)) == 0 ||
+                    // or the input symbol is the identity symbol and
+                    // the current symbol is not found in the alphabet
+                    // of the transducer.
+                    ( is_identity(isymbol) &&
+                      (alphabet.find(lookup_path.at(lookup_index)) 
+                       == alphabet.end()) ) 
+                    )
+                 {
+                   input_symbol_consumed=true;
+                   return true;
+                 }
+             }
+           // Whether there are more symbols in lookup_path or not,
+           // we can always go further if the input symbol of the transition
+           // is an epsilon or a flag diacritic.
+           if ( is_epsilon(isymbol) || 
+                FdOperation::is_diacritic(isymbol) )
+             {
+               input_symbol_consumed=false;
+               return true;
+             }
+           
+           // No matches.
+           return false;
+         }
+         
+         void lookup_fd
+           (const StringVector &lookup_path,
+            HfstTwoLevelPaths &results,
+            HfstState state,
+            unsigned int lookup_index, // an iterator instead?
+            HfstTwoLevelPath &path_so_far,
+            StringSet &alphabet,
+            HfstEpsilonHandler Eh,
+            size_t infinite_cutoff)
+         {
+           // Check whether the number of input epsilon cycles is exceeded
+           if (not Eh.can_continue(state)) {
+             return;
+           }
+           
+           // If we are at the end of lookup_path,
+           if (lookup_index == lookup_path.size())
+             {
+               // and if the current state is final, 
+               if (this->is_final_state(state)) 
+                 {
+                   // path_so_far is a valid result.
+                   add_to_results
+                     (results, path_so_far, this->get_final_weight(state) );
+                 }
+             }
+           
+           // Whether there are more symbols in lookup_path or not,
+           // go through all transitions in the current state.
+           const HfstBasicTransducer::HfstTransitions &transitions 
+             = this->operator[](state);
+           for (HfstBasicTransducer::HfstTransitions::const_iterator it 
+                  = transitions.begin();
+                it != transitions.end(); it++)
+             {
+               bool input_symbol_consumed=false;
+               if ( is_possible_transition
+                    (*it, lookup_path, lookup_index, alphabet, 
+                     input_symbol_consumed) )
+                 {
+                   // update path_so_far and lookup_index
+                   
+                   if (not (is_identity(it->get_input_symbol()))) {
+                     push_back_to_two_level_path
+                       (path_so_far, 
+                        StringPair(it->get_input_symbol(), 
+                                   it->get_output_symbol()),
+                        it->get_weight());
+                   }
+                   else { // identity symbol is replaced with the lookup symbol
+                     push_back_to_two_level_path
+                       (path_so_far, 
+                        StringPair(lookup_path.at(lookup_index), 
+                                   lookup_path.at(lookup_index)),
+                        it->get_weight());
+                   }
+                   
+                   HfstEpsilonHandler * Ehp = NULL;
+                   if (input_symbol_consumed) {
+                     lookup_index++;
+                     Ehp = new HfstEpsilonHandler(infinite_cutoff);
+                   }
+                   else {
+                     Eh.push_back(state);
+                     Ehp = &Eh;
+                   }
+                   
+                   // call lookup for the target state of the transition
+                   lookup_fd(lookup_path, results, it->get_target_state(),
+                             lookup_index, path_so_far, alphabet, *Ehp, infinite_cutoff);
+                   
+                   // return to the original values of path_so_far 
+                   // and lookup_index
+                   if (input_symbol_consumed) {
+                     lookup_index--;
+                     delete Ehp;
+                   }
+                   else {
+                     // Eh.pop_back();  not needed because the destructor
+                     // of Eh is automatically called next
+                   }
+                   
+                   pop_back_from_two_level_path(path_so_far, it->get_weight());
+                 }
+             }
+           
+         }
+         
+         void lookup_fd
+           (const StringVector &lookup_path,
+            HfstTwoLevelPaths &results,
+            size_t infinite_cutoff)
+         {
+           HfstState state = 0;
+           unsigned int lookup_index = 0;
+           HfstTwoLevelPath path_so_far;
+           StringSet alphabet = this->get_alphabet();
+           HfstEpsilonHandler Eh(infinite_cutoff);
+           lookup_fd(lookup_path, results, state, lookup_index, path_so_far, 
+                     alphabet, Eh, infinite_cutoff);
          }
 
 

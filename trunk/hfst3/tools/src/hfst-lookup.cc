@@ -34,7 +34,6 @@
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
-#include "HfstEpsilonHandler.h"
 #include "HfstLookupFlagDiacritics.h"
 #include "HfstFlagDiacritics.h"
 #include "HfstTransducer.h"
@@ -441,49 +440,6 @@ parse_options(int argc, char** argv)
 
 static std::string get_print_format(const std::string &s) ;
 
-// local flag handling
-bool
-is_flag_diacritic(const std::string& label)
-  {
-    const char* p = label.c_str();
-    if (*p == '\0') 
-      {
-        return false;
-      }
-    if (*p != '@')
-      {
-        return false;
-      }
-    p++;
-    if (*p == '\0') 
-      {
-        return false;
-      }
-    if ((*p != 'P') && (*p != 'D') && (*p != 'C') && (*p != 'R') &&
-        (*p != 'U') && (*p != 'N'))
-      {
-        return false;
-      }
-    p++;
-    if (*p == '\0') 
-      {
-        return false;
-      }
-    if (*p != '.')
-      {
-        return false;
-      }
-    while (*p != '\0')
-      {
-        p++;
-      }
-    if (*(p-1) != '@')
-      {
-       return false;
-      }
-    return true;
-  } 
-
 bool
 is_valid_flag_diacritic_path(StringVector arcs)
   {
@@ -530,7 +486,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
               {
                 lookup_len += strlen(epsilon_format);
               }
-            else if (is_flag_diacritic(*s))
+            else if (FdOperation::is_diacritic(*s))
               {
                 if (show_flags)
                   {
@@ -559,7 +515,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
               {
                 input_len += strlen(epsilon_format);
               }
-            else if (is_flag_diacritic(*s))
+            else if (FdOperation::is_diacritic(*s))
               {
                 if (show_flags)
                   {
@@ -622,7 +578,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
                 p = strcpy(p, epsilon_format);
                 p += strlen(epsilon_format);
               }
-            else if (is_flag_diacritic(*s))
+            else if (FdOperation::is_diacritic(*s))
               {
                 if (show_flags)
                   {
@@ -665,7 +621,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
                 p = strcpy(p, epsilon_format);
                 p += strlen(epsilon_format);
               }
-            else if (is_flag_diacritic(*s))
+            else if (FdOperation::is_diacritic(*s))
               {
                 if (show_flags)
                   {
@@ -1074,171 +1030,6 @@ lookup_simple(const HfstOneLevelPath& s, HfstTransducer& t, bool* infinity)
   return results;
 }
 
-static void push_back_to_two_level_path
-(HfstTwoLevelPath &path,
- const StringPair &sp,
- const float &weight)
-{
-  path.second.push_back(sp);
-  path.first = path.first + weight;
-}
-
-static void pop_back_from_two_level_path
-(HfstTwoLevelPath &path,
- const float &weight)
-{
-  path.second.pop_back();
-  path.first = path.first - weight;
-}
-
-static void add_to_results
-(HfstTwoLevelPaths &results,
- HfstTwoLevelPath &path_so_far,
- const float &final_weight)
-{
-  path_so_far.first = path_so_far.first + final_weight;
-  results.insert(path_so_far);
-  path_so_far.first = path_so_far.first - final_weight;
-}
-
-static bool is_possible_transition
-(const HfstBasicTransition &transition,
- const StringVector &lookup_path,
- const unsigned int &lookup_index,
- const StringSet &alphabet,
- bool &input_symbol_consumed)
-{
-  std::string isymbol = transition.get_input_symbol();
-
-  // If we are not at the end of lookup_path,
-  if (not (lookup_index == (unsigned int)lookup_path.size()))
-    {
-      // we can go further if the current symbol in lookup_path
-      // matches to the input symbol of the transition, i.e
-      // either the input symbol is the same as the current symbol
-      if ( isymbol.compare(lookup_path.at(lookup_index)) == 0 ||
-       // or the input symbol is the identity symbol and the current
-       // symbol is not found in the alphabet of the transducer.
-       ( is_identity(isymbol) &&
-         (alphabet.find(lookup_path.at(lookup_index)) == alphabet.end()) ) 
-       )
-        {
-          input_symbol_consumed=true;
-          return true;
-        }
-    }
-  // Whether there are more symbols in lookup_path or not,
-  // we can always go further if the input symbol of the transition
-  // is an epsilon or a flag diacritic.
-  if ( is_epsilon(isymbol) || 
-       is_flag_diacritic(isymbol) )
-    {
-      input_symbol_consumed=false;
-      return true;
-    }
-
-  // No matches.
-  return false;
-}
-
-static void lookup_fd
-(HfstBasicTransducer &t,
- const StringVector &lookup_path,
- HfstTwoLevelPaths &results,
- HfstState state,
- unsigned int lookup_index, // an iterator instead?
- HfstTwoLevelPath &path_so_far,
- StringSet &alphabet,
- HfstEpsilonHandler Eh)
-{
-  // Check whether the number of input epsilon cycles is exceeded
-  if (not Eh.can_continue(state)) {
-    return;
-  }
-
-  // If we are at the end of lookup_path,
-  if (lookup_index == lookup_path.size())
-    {
-      // and if the current state is final, 
-      if (t.is_final_state(state)) 
-        {
-          // path_so_far is a valid result.
-          add_to_results
-            (results, path_so_far, t.get_final_weight(state) );
-        }
-    }
-
-  // Whether there are more symbols in lookup_path or not,
-  // go through all transitions in the current state.
-  const HfstBasicTransducer::HfstTransitions &transitions = t[state];
-  for (HfstBasicTransducer::HfstTransitions::const_iterator it 
-         = transitions.begin();
-       it != transitions.end(); it++)
-    {
-      bool input_symbol_consumed=false;
-      if ( is_possible_transition
-           (*it, lookup_path, lookup_index, alphabet, input_symbol_consumed) )
-        {
-          // update path_so_far and lookup_index
-
-      if (not (is_identity(it->get_input_symbol()))) {
-        push_back_to_two_level_path
-          (path_so_far, 
-           StringPair(it->get_input_symbol(), it->get_output_symbol()),
-           it->get_weight());
-      }
-      else { // identity symbol is replaced with the lookup symbol
-        push_back_to_two_level_path
-          (path_so_far, 
-           StringPair(lookup_path.at(lookup_index), 
-              lookup_path.at(lookup_index)),
-           it->get_weight());
-      }
-
-          HfstEpsilonHandler * Ehp = NULL;
-          if (input_symbol_consumed) {
-            lookup_index++;
-            Ehp = new HfstEpsilonHandler(infinite_cutoff);
-          }
-          else {
-            Eh.push_back(state);
-            Ehp = &Eh;
-      }
-
-          // call lookup for the target state of the transition
-          lookup_fd(t, lookup_path, results, it->get_target_state(),
-                    lookup_index, path_so_far, alphabet, *Ehp);
-
-          // return to the original values of path_so_far and lookup_index
-          if (input_symbol_consumed) {
-            lookup_index--;
-            delete Ehp;
-          }
-          else {
-            // Eh.pop_back();  not needed because the destructor of Eh is 
-            //                 automatically called next
-          }
-
-          pop_back_from_two_level_path(path_so_far, it->get_weight());
-        }
-    }
-  
-}
-
-static void lookup_fd
-(HfstBasicTransducer &t,
- const StringVector &lookup_path,
- HfstTwoLevelPaths &results)
-{
-  HfstState state = 0;
-  unsigned int lookup_index = 0;
-  HfstTwoLevelPath path_so_far;
-  StringSet alphabet = t.get_alphabet();
-  HfstEpsilonHandler Eh(infinite_cutoff);
-  lookup_fd(t, lookup_path, results, state, lookup_index, path_so_far, 
-        alphabet, Eh);
-}
-
 
 
 /* Replace all strings \a str1 in \a symbol with \a str2. */
@@ -1284,16 +1075,16 @@ static void print_lookup_string(const StringVector &s) {
   }
 }
 
-void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results, 
-               const HfstOneLevelPath& s, ssize_t limit = -1)
+void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results, 
+                         const HfstOneLevelPath& s, ssize_t limit = -1)
 {
-  (void)limit;
+  (void)limit; // FIX ???
 
   /* If we want a StringPairVector representation */
   HfstTwoLevelPaths results_spv;
   StringPairVector path_spv;
 
-  lookup_fd(t, s.second, results_spv);
+  t.lookup_fd(s.second, results_spv, infinite_cutoff);
 
   if (print_pairs) {
     
@@ -1356,7 +1147,7 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
                arc != res->second.end();
                arc++)
             {
-              if (show_flags || !is_flag_diacritic(*arc))
+              if (show_flags || ! FdOperation::is_diacritic(*arc))
                 {
                   unflagged.push_back(*arc);
                 }
@@ -1378,12 +1169,12 @@ lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity)
     warning(0, 0, "Got infinite results, number of cycles limited to " SIZE_T_SPECIFIER "",
         infinite_cutoff);
       }
-      lookup_fd(t, *results, s, infinite_cutoff);
+      lookup_fd_and_print(t, *results, s, infinite_cutoff);
       *infinity = true;
     }
   else
     {
-      lookup_fd(t, *results, s);
+      lookup_fd_and_print(t, *results, s);
     }
 
   if (results->size() == 0)
