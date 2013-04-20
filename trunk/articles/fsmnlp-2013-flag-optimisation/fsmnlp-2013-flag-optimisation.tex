@@ -202,36 +202,24 @@ In table~\ref{table:sizes} there are shown sizes of the original transducers com
     \label{table:sizes}}
 \end{table}
 
-In table~\ref{table:speed} there are speed measures of optimized lookup on corpus words. Before measurements, transducers were transformed to the HFST optimized lookup format. First column shows languages on which tests were done, second one shows how much time was needed for the optimized lookup to process with the original transducer. Third column shows time to do optimized lookup when new transducer with flags is used and finally there is number of processed words.
+In table~\ref{table:speed} there are speed measures of optimized lookup performed on Wikipedia texts. Before measurements, transducers were transformed to the HFST optimized lookup format and the test was done with hfst-lookup tool. In the first column there are results when lookup was done with original transducer and the second colum shows results with automaticaly flaged transducer. 
 
 \begin{table}
     \centering
-    \begin{tabular}{|l|r|r|r|}
+    \begin{tabular}{|l|r|r|}
         \hline
-        \bf Language & \bf Original & \bf With flags & \bf Words \\
+        \bf Language & \bf Original & \bf With flags \\
         \hline
-        \bf Greenlandic & 13 s & 164 s  & 764823  \\
-        \bf Lule Saami & 1 s & 5 s  & 21262  \\
+        \bf Greenlandic & 58832 & 4663\\
+        \bf North Saami & 228347  & 1141 \\
+        \bf Erzya & 111394  & 3010\\
+        \bf Lule Saami & 1 21262 & 4352 \\
         \hline
     \end{tabular}
     \caption{Sizes of automata with and with-out flags (in words per second)
     \label{table:speed}}
 \end{table}
 
-In table~\ref{table:tradeoff} we have summarised the actual tradeoffs.
-
-\begin{table}
-    \centering
-    \begin{tabular}{|l|r|r|r|}
-        \hline
-        \bf Language & \bf Original & \bf Elim. flags & \bf Ours \\
-        \hline
-        \bf English & 100 & 1,000 & 1  \\
-        \hline
-    \end{tabular}
-    \caption{Trade-off proportions size-to-speed
-    \label{table:tradeoff}}
-\end{table}
 
 \begin{figure*}
     \includegraphics[width=\textwidth]{gr.png}
@@ -262,7 +250,7 @@ morphophonology would be cool. Also, graph-structure. And other things.
 \label{sec:conclusion}
 
 In this article we showed that by using morphologically motivated flags we can
-improve the size of the automata by factor of 1000. This way we can prevent
+improve the size of the large transducers while still keeping the processing speeds in reasonable range. This way we can prevent
 linguist from doing optimisation work in vain and as an added bonus the
 linguistic descriptions stay closer to linguistics, and remain more readable.
 
