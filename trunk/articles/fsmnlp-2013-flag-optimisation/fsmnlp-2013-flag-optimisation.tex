@@ -25,7 +25,12 @@ PO Box 24 \\
 Departmet of Speech Sciences\\
 PO Box 9\\
 00014 University of Helsinki\\
-  {\tt tommi.pirinen@helsinki.fi} \\}
+  {\tt tommi.pirinen@helsinki.fi} \\}\\\And
+  Miikka Silfverberg \\
+  Department of Modern Languages \\
+	PO Box 24 \\
+	00014 University of Helsinki \\
+	{\tt miikka.silfverberg@helsinki.fi} \\}
 \fi
 
 \date{\today}
@@ -175,7 +180,7 @@ North Saami (sme), Erzya (myv), Komi Zyryen (kpv), South Sami (sma), Lule Sami (
 Speed performances of North Saami and Erzya were tested by performing lookup on Wikipedia texts, while Greenlandic and Lule Saami had texts available
  in the Tromsa's language repository.
  
- All the operations with transducers have been done using Helsinki Finite State Technologies~\cite{linden2009,linden2011}.
+ All the operations with transducers have been done using Helsinki Finite State Technologies~\cite{linden2011}.
 
 
 
@@ -243,28 +248,28 @@ Working with real-world languages, we have noticed that in practice language des
 
 While R flag diacritics will always occur only once for every left continuation lexicon, the results have shown that, for certain right continuations, P flag diacritics occur hundreds of times. This will happen every time when in the same set of morphemes there are words which have the same beginning. For example, in figure~\ref{fig:lexc-gr-flag} there is shown how two morphemes \texttt{maagar} and \texttt{maagarnar} have same continuation flag \verb+@P.LEXNAME.IV@+, but they can't collapse into the same path. It should be checked if skipping inserting flags for those paths would further reduce size of transition graphs.
 
+
+
 %Surprisingly, no differences were found in ......
 %There are several possible explanations for this result.
 
-\subsection{Future Directions}
-\label{subsec:future-directions}
+%\subsection{Future Directions}
+%\label{subsec:future-directions}
 
-This is an optimistic thing so we thought that automatic induction of flags
-shoulda work nicely for other neat things too. Hyperminimisation based on
-morphophonology would be cool. Also, graph-structure. And other things.
+%This is an optimistic thing so we thought that automatic induction of flags
+%shoulda work nicely for other neat things too. Hyperminimisation based on
+%morphophonology would be cool. Also, graph-structure. And other things.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
 In this article we showed that by using morphologically motivated flags we can
-improve the size of the large transducers while still keeping the processing speeds in reasonable range. This way we can prevent
-linguist from doing optimisation work in vain and as an added bonus the
-linguistic descriptions stay closer to linguistics, and remain more readable.
-
+improve the size of the large transducers while still keeping the processing speeds in reasonable range. 
+Automatically inserted flag diacritics would make manual optimization preformed by linguists unnecessary, which would result in  
+more readable and easier to maintain linguistic descriptions.
 \iffalse
 \section*{Acknowledgments}
-
-We thank our colleagues and we got funding.
+The research leading to these results has received funding from the European Commission’s 7th Framework Program under grant agreement n°238405 (CLARA).
 \fi
 
 \bibliographystyle{acl}
