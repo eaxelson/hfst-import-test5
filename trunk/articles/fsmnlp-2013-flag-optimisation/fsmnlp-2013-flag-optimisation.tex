@@ -39,8 +39,8 @@ PO Box 9\\
     hand alongside morphological descriptions. In this paper we present a novel
     method of discovering ideal flag positions automatically based on the
     morpheme strucuture implicit in the language description. With this
-    approach we have gained 200~\% decrease in size of finite-state networks
-    with no speed penalties on the application phase.
+    approach we have gained significant decrease in size of finite-state networks
+    without drastic speed penalties on the application phase.
 \end{abstract}
 
 \section{Introduction}
@@ -73,10 +73,9 @@ look very linguistically motivated or maintainable as computational description.
 The paper is organised as follows: In the section~\ref{sec:background} we
 introduce the flag diacritics and optimisation problems of finite-state 
 automata. In the section~\ref{sec:methods} we show the algorithm for automatic
-flag induction we use and describe flag elimination and size measurements we
-use. In section~\ref{sec:data} we briefly go through the existing language
-descriptions we use to show the differences between hand-written flag
-diacritics by expert dictionary writers and our algorithm. In 
+flag induction we use and describe how was achieved flag harmonization in compose function. 
+In section~\ref{sec:data} we briefly go through the existing language
+descriptions we use for testing. In 
 section~\ref{sec:evaluation} we show the effects of applying our algorithm
 to the size and efficiency of the finite-state automata. In~\ref{sec:discussion}
 we evaluate the pros and cons of our approach and lay out future improvements,
@@ -170,7 +169,15 @@ Lexicons that contain flag diacritics can be composed to other transducers witho
 We measure the success of our algorithm using real-world, large scale language
 descriptions. For this purpose we have acquired freely available, open source
 language descriptions from University of Tromsa's language 
-repository~\cite{moshagen2013building}. The languages selected are:
+repository~\cite{moshagen2013building}. The languages selected are Greenlandic (kal), 
+North Saami (sme), Erzya (myv), Komi Zyryen (kpv), South Sami (sma), Lule Sami (smj) and German (deu).
+
+Speed performances of North Saami and Erzya were tested by performing lookup on Wikipedia texts, while Greenlandic and Lule Saami had texts available
+ in the Tromsa's language repository.
+ 
+ All the operations with transducers have been done using Helsinki Finite State Technologies~\cite{linden2009, linden2011}.
+
+
 
 \section{Evaluation}
 \label{sec:evaluation}
@@ -202,7 +209,7 @@ In table~\ref{table:sizes} there are shown sizes of the original transducers com
     \label{table:sizes}}
 \end{table}
 
-In table~\ref{table:speed} there are speed measures of optimized lookup performed on Wikipedia texts. Before measurements, transducers were transformed to the HFST optimized lookup format and the test was done with hfst-lookup tool. In the first column there are results when lookup was done with original transducer and the second colum shows results with automaticaly flaged transducer. 
+In table~\ref{table:speed} there are speed measures of optimized lookup performed on Wikipedia texts. Before measurements, transducers were transformed to the HFST's optimized lookup format and the test was done with hfst-lookup tool. In the first column there are results when lookup was done with original transducer and the second colum shows results with automatically flagged one. 
 
 \begin{table}
     \centering
@@ -232,12 +239,12 @@ In table~\ref{table:speed} there are speed measures of optimized lookup performe
 
 The results of this study show that large scale language descriptions compile into smaller transducers when flags were inserted automatically. This is especially true for language descriptions which repeat morphemes in many different places, like in Greenlandic. Since flag diacritics themselves take space in the transducer graph, this method showed not to be appropriate for smaller languages.
 
-Working with real-world languages, we have noticed that in practice language descriptions often contain empty, or nearly empty, continuation lexicons. Inserting flags in those cases only increases size of the transducer, without being able to gain any benefits. Therefore, those continuation lexicons should be recognized during compilation time and skipped when inserting corresponding flag diacritics.
+Working with real-world languages, we have noticed that in practice language descriptions often contain empty, or nearly empty, continuation lexicons. Inserting flags in those cases only increases size of the transducer, without gaining any benefits. Therefore, those continuation lexicons should be recognized during compilation time and skipped when inserting corresponding flag diacritics.
 
-While R flag diacritics will always occur only once for every left continuation lexicon, the results have shown that, for certain right continuations, P flag diacritics occur hundreds of times. This will happen every time when in the same set of morphemes there are words which have the same beginning. For example, in figure~\ref{fig:lexc-gr-flag} there is shown how two morphemes \texttt{maagar} and \texttt{maagarnar} have same continuation flag +@P.LEXNAME.IV@+, but they can't collapse into the same path. It should be checked if skipping inserting flags for those paths would further reduce size of transition graphs.
+While R flag diacritics will always occur only once for every left continuation lexicon, the results have shown that, for certain right continuations, P flag diacritics occur hundreds of times. This will happen every time when in the same set of morphemes there are words which have the same beginning. For example, in figure~\ref{fig:lexc-gr-flag} there is shown how two morphemes \texttt{maagar} and \texttt{maagarnar} have same continuation flag \verb+@P.LEXNAME.IV@+, but they can't collapse into the same path. It should be checked if skipping inserting flags for those paths would further reduce size of transition graphs.
 
-Surprisingly, no differences were found in ......
-There are several possible explanations for this result.
+%Surprisingly, no differences were found in ......
+%There are several possible explanations for this result.
 
 \subsection{Future Directions}
 \label{subsec:future-directions}
