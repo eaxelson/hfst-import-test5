@@ -152,7 +152,11 @@ Our algorithm is based on the finding that adjacent morph combinatorics can be e
 Every rightward continuation is replaced with positive setting flag with feature called \texttt{LEXNAME} and value corresponding to the continuation lexicon. For example, lexicon in figure~\ref{fig:lexc-fin} has two rightward continuations: \texttt{NOUNCASES} and \texttt{\#}, which are presented with flags \verb+@P.LEXNAME.NOUNCASES@+ and \verb+@P.LEXNAME.#@+. 
 The same way, every leftward continuation is replaced with request test flag, also with feature \texttt{LEXNAME} and corresponding value. Therefore, lexicon shown in figure~\ref{fig:lexc-fin} will have also two leftward continuations: \texttt{NOUNCASES} and \texttt{\#}, which are this time presented with flags \verb+@R.LEXNAME.NOUNCASES@+ and \verb+@R.LEXNAME.#@+. Additionally, every lexicon starts with \texttt{Root}, which is represented with pair of flags \verb+@R.LEXNAME.Root@@R.LEXNAME.#@+.
 
-The transducer built from lexicon in figure~\ref{fig:lexc-fin} is shown in figure~\ref{fig:lexc-fin-flags}. 
+The transducer built from lexicon in figure~\ref{fig:lexc-fin} is shown in figure~\ref{fig:lexc-fin-flag}. 
+
+
+Lexicons that contain flag diacritics can be composed to other transducers without worrying about flag collision or flags being part of the contexts (in i.e. replace rules). This is achieved ...
+
 
 \begin{figure*}
     \includegraphics[width=\textwidth]{transducer.png}
@@ -173,35 +177,32 @@ repository~\cite{moshagen2013building}. The languages selected are:
 
 To evaluate the algorithm, we measure the proportional size gains that are
 achieved by the flags we introduce as compared to the equivalent automaton
-without the induced flags, and we contrast these results to the ones that have
-been attained by having linguists manually determine the flag positions and
-their logic. Since introduction of flags always causes an overhead in the
+without the induced flags. Since introduction of flags always causes an overhead in the
 application time of the automata, we also measure the average running speed
 of the automata with our flags to get the trade-off ratios.
 
-In table~\ref{table:sizes} there are shown sizes of transducers compiled with new method that uses flag diacritics, original transducer compiled with regular lexc compiler and finally there is shown ratio of newly build transducers and original ones.
+In table~\ref{table:sizes} there are shown sizes of the original transducers compiled with regular lexc compiler, transducers compiled with new method that inserts flag diacritics and finally their ratio.
 
 \begin{table}
     \centering
     \begin{tabular}{|l|r|r|r|}
         \hline
-        \bf Language & \bf With flags & \bf Original & \bf \% \\
+        \bf Language & \bf Original & \bf With flags & \bf \% \\
         \hline
-        \bf Greenlandic & 8400635 & 261074412 & 3,4\%  \\
-        \bf North Saami & 6789658 & 9152930 & 74\%  \\
-        \bf Erzya & 2801339 & 3333669 & 84\%  \\
-        \bf Komi Zyryen & 2315384 & 2719971 & 85\%  \\
-        \bf South Saami & 3147213 & 3600902 & 87\%  \\
-        \bf Lule Saami & 3639278 & 4381573 & 87\%  \\
-        \bf German & 32678 & 25836 & 126\%  \\
+        \bf Greenlandic &	261074412 	& 8400635 & 3,4\%  \\
+        \bf North Saami &	9152930 	& 6789658 & 74\%  \\
+        \bf Erzya		&	3333669 	& 2801339 & 84\%  \\
+        \bf Komi Zyryen &	2719971 	& 2315384 & 85\%  \\
+        \bf South Saami &	3600902 	& 3147213 & 87\%  \\
+        \bf Lule Saami 	&	4381573 	& 3639278 & 87\%  \\
+        \bf German 		&	25836 		& 32678   & 126\%  \\
         \hline
     \end{tabular}
-    \caption{Sizes of transducers with and with-out automatic flags (in bytes); Percentage shows size of the flagged transducer in comparison to the original
+    \caption{Sizes of transducers without and with automatic flags (in bytes); Percentage shows size of the flagged transducer in comparison to the original
     \label{table:sizes}}
 \end{table}
 
-
-In table~\ref{table:speed} there are speed measures of optimized lookup on corpus words. Before measurements, transducers were transformed to the HFST optimized lookup format. First column shows languages on which tests were done, second one shows how much time was needed for the optimized lookup to finish whe performed with the original transducer. Third column shows time to do optimized lookup with new transducer with flags and finally there is number of processed words.
+In table~\ref{table:speed} there are speed measures of optimized lookup on corpus words. Before measurements, transducers were transformed to the HFST optimized lookup format. First column shows languages on which tests were done, second one shows how much time was needed for the optimized lookup to process with the original transducer. Third column shows time to do optimized lookup when new transducer with flags is used and finally there is number of processed words.
 
 \begin{table}
     \centering
@@ -232,11 +233,21 @@ In table~\ref{table:tradeoff} we have summarised the actual tradeoffs.
     \label{table:tradeoff}}
 \end{table}
 
+\begin{figure*}
+    \includegraphics[width=\textwidth]{gr.png}
+     \caption{Simplified part of Greenlandic lexc grammar description with automatic flags
+     \label{fig:lexc-gr-flag}}
+\end{figure*}
 
 \section{Discussion}
 \label{sec:discussion}
 
-The results of this study show/indicate that .......
+The results of this study show that large scale language descriptions compile into smaller transducers when flags were inserted automatically. This is especially true for language descriptions which repeat morphemes in many different places, like in Greenlandic. Since flag diacritics themselves take space in the transducer graph, this method showed not to be appropriate for smaller languages.
+
+Working with real-world languages, we have noticed that in practice language descriptions often contain empty, or nearly empty, continuation lexicons. Inserting flags in those cases only increases size of the transducer, without being able to gain any benefits. Therefore, those continuation lexicons should be recognized during compilation time and skipped when inserting corresponding flag diacritics.
+
+While R flag diacritics will always occur only once for every left continuation lexicon, the results have shown that, for certain right continuations, P flag diacritics occur hundreds of times. This will happen every time when in the same set of morphemes there are words which have the same beginning. For example, in figure~\ref{fig:lexc-gr-flag} there is shown how two morphemes \texttt{maagar} and \texttt{maagarnar} have same continuation flag +@P.LEXNAME.IV@+, but they can't collapse into the same path. It should be checked if skipping inserting flags for those paths would further reduce size of transition graphs.
+
 Surprisingly, no differences were found in ......
 There are several possible explanations for this result.
 
