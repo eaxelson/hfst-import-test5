@@ -12,7 +12,7 @@
 %\setlength\titlebox{6.5cm}    % You can expand the title box if you
 % really have to
 
-\title{Optimising Morphological Analyser Automata Using Morphological Structure
+\title{Optimising Morphological Analyser Transducers Using Morphological Structure
 and Automatically Induced Flag Diacritics}
 
 \iffalse
@@ -200,7 +200,7 @@ The transducer built from the morphological description in
 figure~\ref{fig:lexc-fin} is shown in figure~\ref{fig:lexc-fin-flag}.
 
 
-Lexicons that containing flag diacritics can be composed with other
+Lexicons that contain flag diacritics can be composed with other
 transducers which also contain flag diacritics without worrying about
 flag collisions. This is achieved by renaming flag diacritics in both
 argument transducers in such a way that collisions become impossible
@@ -280,8 +280,9 @@ In Table~\ref{table:speed} there are speed measures of optimized
 lookup tool. Before measurements, transducers were transformed to
 HFST's optimized lookup format and the test was done using the
 hfst-lookup tool. In the first column there are results when lookup
-was done with original transducer and the second colum shows results
-with automatically flagged one.
+was done with original transducer and the second colum shows results 
+with automatically flagged one. Although our results show that lookup 
+is much slower for transducers that contain automatic flags, lookup speed of 1000 words per second is sufficient for various applications with transducers.
 
 \begin{table}
     \centering
