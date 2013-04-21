@@ -38,62 +38,77 @@ PO Box 9\\
 \begin{document}
 \maketitle
 \begin{abstract}
-    Flag diacritics are a historical method of optimising finite-state networks
-    by combining identical sub graphs of the transition graph of a transducer. Traditionally, the
-    feature has required linguists to write the optimisation of the graph by
-    hand alongside morphological descriptions. In this paper, we present a novel
-    method of discovering ideal flag positions automatically based on the
-    morpheme structure implicit in the language description. With this
-    approach, we have gained significant decrease in size of finite-state networks
-    without drastic speed penalties on the application phase.
+
+    Flag diacritics enable optimising a finite-state networks by
+    combining identical sub-graphs of its transition
+    graph. Traditionally, the feature has required linguists to devise
+    the optimisations to the graph by hand alongside the morphological
+    description. In this paper, we present a novel method of
+    discovering flag positions in morphological lexicons automatically
+    based on the morpheme structure implicit in the language
+    description. With this approach, we have gained significant
+    decrease in the size of finite-state networks without drastic
+    speed penalties on lookup of word-forms.
+
 \end{abstract}
 
 \section{Introduction}
 
-The finite-state transducers are optimal way of encoding morphological analysers
-of natural languages. Transducers made for large-scale language materials can
-often grow to be too large for some use cases. These transducers can be optimised
-by recognising equivalent sub-graphs in the automaton and combining them using
-special symbols, called flag diacritics, to determine the correct entrance and
-exit paths. Typical way of applying flag diacritics now requires a linguist to
-provide the compiler with their positions. However, there are two
-major problems with this kind of approach: Firstly, linguists are not very good
-in knowing the structure of finite-state networks that will become from
-lexicographical-morphological descriptions; Secondly, the addition of flag
-diacritics to these descriptions makes them unreadable and unmanageable since
-the amount of non-linguistic data in the linguistic description increases. This
-article seeks to address the problem using an algorithm for inducing the ideal
-flag positions from the linguistic morpheme structure of the analyser that is
-implicitly present in the description. 
+Finite-state transducers are an established way of encoding
+morphological analysers for natural languages. Nevertheless,
+full-scale morphological analyzers can often grow to be too large for
+use cases like spell checkers, which should have moderate memory
+footprint. Large transducers can be optimised by recognising
+equivalent sub-graphs and combining them using special symbols called
+flag diacritics, to couple entrance points of the sub-graphs with the
+correct exit points.
 
-One of the reasons why flag diacritics have been so cumbersome in the past,
-is their two-fold nature. On one hand, they are there to optimise the
-finite-state automaton structure, e.g. in~\cite{karttunen2006numbers}. On the
-other hand, they are the primary method of describing non-contiguous 
-morphological constraints~\cite{beesley1998constraining}. If they are applied
-on the constriction of separated morphotactic dependencies, the effect on
-optimisation is at best haphazard, and the resulting description does not
-look very linguistically motivated or maintainable as computational description.
+Up to date, applying flag diacritics has required a linguist to provide
+the lexicon compiler with their positions. However, there are two
+major problems with this kind of approach: Firstly, linguists often do
+not have a very good understanding of the structure of the
+finite-state networks which result from lexicographical-morphological
+descriptions; Secondly, the addition of flag diacritics to these
+descriptions makes them unreadable and unmanageable since the amount
+of non-linguistic data in the linguistic description increases. 
 
-The paper is organised as follows: In the section~\ref{sec:background}, we
-introduce the flag diacritics and optimisation problems of finite-state 
-automata. In the section~\ref{sec:methods}, we show the algorithm for automatic
-flag induction we use and describe how flag harmonization in compose function was achieved. 
-In section~\ref{sec:data}, we briefly go through the existing language
-descriptions we use for testing. In 
-section~\ref{sec:evaluation} we show the effects of applying our algorithm
-to the size and efficiency of the finite-state automata. Finally, in section~\ref{sec:discussion}
-we evaluate the pros and cons of our approach and lay out future improvements.
+One of the reasons why flag diacritics have been so cumbersome from
+the linguists point of view, is their two-fold nature. On one hand,
+they are there to optimise the finite-state automaton structure,
+e.g. in~\cite{karttunen2006numbers}. On the other hand, they are the
+primary method of describing non-contiguous morphological
+constraints~\cite{beesley1998constraining}. If they are applied on the
+constriction of separated morphotactic dependencies, the effect on
+optimisation is at best haphazard, and the resulting description is
+neither linguistically motivated nor maintainable from a computational
+view-point.
+
+This article seeks to address problems associated with flag diacritics
+by using an algorithm for inducing flag positions from the linguistic
+morpheme structure which is implicitly present in lexical
+descriptions.
+
+The paper is organised as follows: In section~\ref{sec:background}, we
+introduce the flag diacritics and optimisation problems of
+finite-state automata. In section~\ref{sec:methods}, we describe our
+algorithm for automatic flag induction and modifications to standard
+algebraical operations, which allow operating on transducers
+containing flag diacritics.  In section~\ref{sec:data}, we briefly go
+through the existing language descriptions we use for testing. In
+section~\ref{sec:evaluation}, we show the effects of applying our
+algorithm to the size and lookup speed of the finite-state
+automata. Finally, in section~\ref{sec:discussion}, we evaluate the
+pros and cons of our approach and lay out future improvements.
 
 \section{Background}
 \label{sec:background}
 
 Finite state morphology~\cite{beesley2003finite} is the state-of-the-art in
 writing morphological analysers for natural languages of the whole range of
-typologically varying morphological features. The practical finite-state
-approach in this frame is build around two practical concepts: writing
+typologically varying morphological features. The finite-state
+approach in is build around two practical concepts: constructing
 lexicographical descriptions of the language using a syntax called lexc and
-writing morphophonological variations in regular expression rules. In this
+expressing morphophonological variations as regular expression rules. In this
 paper we study the use of lexicographical structure as framed by lexc. Lexc
 itself is a simple right-linear phrase structure grammar formalism. In
 linguistic terms this means approximately the following: we have concept of
