@@ -43,7 +43,7 @@ PO Box 9\\
     feature has required linguists to write the optimisation of the graph by
     hand alongside morphological descriptions. In this paper, we present a novel
     method of discovering ideal flag positions automatically based on the
-    morpheme strucuture implicit in the language description. With this
+    morpheme structure implicit in the language description. With this
     approach, we have gained significant decrease in size of finite-state networks
     without drastic speed penalties on the application phase.
 \end{abstract}
@@ -98,13 +98,12 @@ paper we study the use of lexicographical structure as framed by lexc. Lexc
 itself is a simple right-linear phrase structure grammar formalism. In
 linguistic terms this means approximately the following: we have concept of
 lexicon, which refers to set of morphemes. Each of these morphemes defines a
-continuation, which determines a set of morphemes that can come after it. And
-these are the only two things there are. 
+continuation, which determines a set of morphemes that can come after it.
 
 If think of Finnish morphology for example, nominal inflection is built neatly
 from left to right with morphemes. In figure~\ref{fig:lexc-fin} there is a 
-lexc representation of Finnish words \emph{talo} `house' and \emph{asu}
-`clothing' and \emph{kärry}, and nominal suffixes \emph{n} (singular genitive),
+lexc representation of Finnish words \emph{talo} `house', \emph{asu}
+`clothing' and \emph{kärry} `cart', and nominal suffixes \emph{n} (singular genitive),
 \emph{lle} (singular allative) and \emph{ksi} (singular translative). The
 structure of the grammar starts from the \texttt{Root}, each of the nouns in
 root set of morphemes continues rightwards to \texttt{NOUNCASES} set of 
@@ -133,9 +132,9 @@ optimisation~\shortcite{karttunen2006numbers}. In this paper, he showed that
 the optimisation quality of wisely selected flag diacritics is significant;
 from 20,498 state automaton to 1,946 state one. The article describes Finnish
 numerals, which have the feature of requiring agreeing inflection in free
-compounding, and this can be achieved by allowing all compounds and restricting
-the combinations by flags instead of lexicon structure. Article does not
-unfortunately show examples or re-producable description of the lexicographical
+compounding. This can be achieved by allowing all compounds and restricting
+the combinations by flags, instead by lexicon structure. Article, unfortunately, does not
+show examples or re-producible description of the lexicographical
 data, but to our experience there are no available morphologies that show
 similar compression quality, so it can be considered towards the upper bounds
 of what such compression can achieve.
@@ -144,17 +143,18 @@ of what such compression can achieve.
 \section{Methods}
 \label{sec:methods}
 
-Flag diacritics are special multi-character symbols which are interpreted during runtime. They have special syntax: \verb+@operator.feature.value@+, where operator is one of the available operators (P, U, R, D, N, C), feature is name of a feature provisionally set by user and value can be any value held in feature, also provisionally defined ~\cite{beesley2003finite}.
+Flag diacritics are special multi-character symbols which are interpreted during runtime. They have special syntax: \verb+@operator.feature.value@+, where
+\texttt{operator} is one of the available operators (P, U, R, D, N, C), \texttt{feature} is name of a feature provisionally set by user and \texttt{value} can be any value held in feature, also provisionally defined ~\cite{beesley2003finite}.
 
 In this paper, we will use only two types of flag diacritics: positive setting (\verb+@P.feature value@+) and require test (\verb+@R.feature value@+). While positive setting flag only sets the feature to its value, require test flag invokes testing if the feature is set to the designated value.
-For example, \verb+@P.LEXNAME.Root@+ will set feature \texttt{LEXNAME} to value \texttt{Root}. If later in the path occurs request test flag \verb+@R.LEXNAME.Root@+, the invoked test will succeed and that path will be considered as valid. 
+For example, \verb+@P.LEXNAME.Root@+ will set feature \texttt{LEXNAME} to value \texttt{Root}. If later in the path occurs flag R that requires test \verb+@R.LEXNAME.Root@+, the invoked test will succeed and that path will be considered valid. 
 
 Our algorithm is based on the finding that adjacent morph combinatorics can be expressed with finite-state flags like this:
 
 Every rightward continuation is replaced with positive setting flag with feature called \texttt{LEXNAME} and value corresponding to the continuation lexicon. For example, lexicon in figure~\ref{fig:lexc-fin} has two rightward continuations: \texttt{NOUNCASES} and \texttt{\#}, which are presented with flags \verb+@P.LEXNAME.NOUNCASES@+ and \verb+@P.LEXNAME.#@+. 
-The same way, every leftward continuation is replaced with request test flag, also with feature \texttt{LEXNAME} and corresponding value. Therefore, lexicon shown in figure~\ref{fig:lexc-fin} will have also two leftward continuations: \texttt{NOUNCASES} and \texttt{\#}, which are this time presented with flags \verb+@R.LEXNAME.NOUNCASES@+ and \verb+@R.LEXNAME.#@+. Additionally, every lexicon starts with \texttt{Root}, which is represented with pair of flags \verb+@R.LEXNAME.Root@@R.LEXNAME.#@+.
+The same way, every leftward continuation is replaced with request test flag, also with feature \texttt{LEXNAME} and corresponding value. Therefore, lexicon shown in figure~\ref{fig:lexc-fin} will have also two leftward continuations: \texttt{NOUNCASES} and \texttt{\#}, which are this time presented with flags \verb+@R.LEXNAME.NOUNCASES@+ and \verb+@R.LEXNAME.#@+. Additionally, every morphological description starts with \texttt{Root}, which is represented with pair of flags \verb+@P.LEXNAME.Root@@R.LEXNAME.Root@+.
 
-The transducer built from lexicon in figure~\ref{fig:lexc-fin} is shown in figure~\ref{fig:lexc-fin-flag}. 
+The transducer built from morphological description in figure~\ref{fig:lexc-fin} is shown in figure~\ref{fig:lexc-fin-flag}. 
 
 
 Lexicons that contain flag diacritics can be composed to other
@@ -182,12 +182,6 @@ the transducers that are obtained by compiling out flag diacritics
 from the original lexicon $L$ and the original rule $R$.
 
 
-\begin{figure*}
-    \includegraphics[width=\textwidth]{transducer.png}
-     \caption{Simplified part of Finnish lexc grammar description with automatic flags
-     \label{fig:lexc-fin-flag}}
-\end{figure*}
-
 \section{Data}
 \label{sec:data}
 
@@ -208,10 +202,10 @@ Speed performances of North Saami and Erzya were tested by performing lookup on 
 \label{sec:evaluation}
 
 To evaluate the algorithm, we measure the proportional size gains that are
-achieved by the flags we introduce as compared to the equivalent automaton
+achieved by the flags we introduce as compared to the equivalent transducer
 without the induced flags. Since introduction of flags always causes an overhead in the
-application time of the automata, we also measure the average running speed
-of the automata with our flags to get the trade-off ratios.
+application time of the transducer, we also measure the average running speed
+of the transducer with our flags to get the trade-off ratios.
 
 In table~\ref{table:sizes} there are shown sizes of the original transducers compiled with regular lexc compiler, transducers compiled with new method that inserts flag diacritics and finally their ratio.
 
@@ -234,7 +228,7 @@ In table~\ref{table:sizes} there are shown sizes of the original transducers com
     \label{table:sizes}}
 \end{table}
 
-In table~\ref{table:speed} there are speed measures of optimized lookup performed on Wikipedia texts. Before measurements, transducers were transformed to the HFST's optimized lookup format and the test was done with hfst-lookup tool. In the first column there are results when lookup was done with original transducer and the second colum shows results with automatically flagged one. 
+In table~\ref{table:speed} there are speed measures of optimized lookup tool. Before measurements, transducers were transformed to the HFST's optimized lookup format and the test was done with hfst-lookup tool. In the first column there are results when lookup was done with original transducer and the second colum shows results with automatically flagged one. 
 
 \begin{table}
     \centering
@@ -248,10 +242,15 @@ In table~\ref{table:speed} there are speed measures of optimized lookup performe
         \bf Lule Saami & 1 21262 & 4352 \\
         \hline
     \end{tabular}
-    \caption{Sizes of automata with and with-out flags (in words per second)
+    \caption{Sizes of transducers without and with automatic flags (in words per second)
     \label{table:speed}}
 \end{table}
 
+\begin{figure*}
+    \includegraphics[width=\textwidth]{transducer.png}
+     \caption{Simplified part of Finnish lexc grammar description with automatic flags
+     \label{fig:lexc-fin-flag}}
+\end{figure*}
 
 \begin{figure*}
     \includegraphics[width=\textwidth]{gr.png}
@@ -264,7 +263,7 @@ In table~\ref{table:speed} there are speed measures of optimized lookup performe
 
 The results of this study show that large scale language descriptions compile into smaller transducers when flags were inserted automatically. This is especially true for language descriptions which repeat morphemes in many different places, like in Greenlandic. Since flag diacritics themselves take space in the transducer graph, this method showed not to be appropriate for smaller languages.
 
-Working with real-world languages, we have noticed that in practice language descriptions often contain empty, or nearly empty, continuation lexicons. Inserting flags in those cases only increases size of the transducer, without gaining any benefits. Therefore, those continuation lexicons should be recognized during compilation time and skipped when inserting corresponding flag diacritics.
+Working with real-world languages, we have noticed that in practice language descriptions often contain empty, or nearly empty, continuation lexicons. Inserting flags in those cases only increase size of the transducer, without gaining any benefits. Therefore, those continuation lexicons should be recognized during compilation time and skipped when inserting corresponding flag diacritics.
 
 While R flag diacritics will always occur only once for every left continuation lexicon, the results have shown that, for certain right continuations, P flag diacritics occur hundreds of times. This will happen every time when in the same set of morphemes there are words which have the same beginning. For example, in figure~\ref{fig:lexc-gr-flag} there is shown how two morphemes \texttt{maagar} and \texttt{maagarnar} have same continuation flag \verb+@P.LEXNAME.IV@+, but they can't collapse into the same path. It should be checked if skipping inserting flags for those paths would further reduce size of transition graphs.
 
