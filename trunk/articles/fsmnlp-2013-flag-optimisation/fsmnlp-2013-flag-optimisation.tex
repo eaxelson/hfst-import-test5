@@ -210,10 +210,10 @@ other.
 Consider for example composition of a lexicon $L$ with a rule $R$. If
 both transducers contain flag diacritics for feature {\tt FEATURE},
 then all features $F$ are renamed {\tt F1} in $L$ and {\tt F2} in
-$R$.~\footnote{It is not sufficient to rename only the flag diacritics
+$R$.~\footnote{It is not sufficient to rename only flag diacritics
   with common features, because that might clash with existing feature
   names.} All flag diacritics (like {\tt @P.F.True@}) are renamed
-correspondingly (to {\tt P.F1.True@} in $L$ and {\tt P.F2.True@} in
+correspondingly (to {\tt @P.F1.True@} in $L$ and {\tt @P.F2.True@} in
 $R$) and a new lexicon $L'$ and rule $R'$ are created by inserting
 freely all flag diacritics from $R$ to $L$ and from $L$ to $R$.
 
@@ -228,29 +228,34 @@ from the original lexicon $L$ and the original rule $R$.
 \section{Data}
 \label{sec:data}
 
-We measure the success of our algorithm using real-world, large scale language
-descriptions. For this purpose we have acquired freely available, open source
-language descriptions from University of Tromsa's language 
-repository~\cite{moshagen2013building}. The languages selected are Greenlandic (kal), 
-North Saami (sme), Erzya (myv), Komi Zyryen (kpv), South Sami (sma), Lule Sami (smj) and German (deu).
+We measure the success of our algorithm using real-world, large scale
+language descriptions. For this purpose we have acquired freely
+available, open source language descriptions from University of
+Tromsa's language repository~\cite{moshagen2013building}. The
+languages selected are Greenlandic (kal), North Saami (sme), Erzya
+(myv), Komi Zyryen (kpv), South Sami (sma), Lule Sami (smj) and German
+(deu).
 
-Speed performances of North Saami and Erzya were tested by performing lookup on Wikipedia texts, while Greenlandic and Lule Saami had texts available
- in the Tromsa's language repository.
+Speed performances of North Saami and Erzya were tested by performing
+lookup on Wikipedia texts, while Greenlandic and Lule Saami had texts
+available in the Tromsa's language repository.
  
- All the operations with transducers have been done using Helsinki Finite State Technologies~\cite{linden2011}.
-
-
+All operations with transducers were performed using Helsinki Finite
+State Technology tools~\cite{linden2011}.
 
 \section{Evaluation}
 \label{sec:evaluation}
 
-To evaluate the algorithm, we measure the proportional size gains that are
-achieved by the flags we introduce as compared to the equivalent transducer
-without the induced flags. Since introduction of flags always causes an overhead in the
-application time of the transducer, we also measure the average running speed
-of the transducer with our flags to get the trade-off ratios.
+To evaluate the algorithm, we measure the proportional size gains that
+are achieved by the flags we introduce as compared to the equivalent
+transducer without the induced flags. Since introduction of flags
+always causes an overhead in the application time of the transducer,
+we also measure the average running speed of the transducer with our
+flags to get the trade-off ratios.
 
-In table~\ref{table:sizes} there are shown sizes of the original transducers compiled with regular lexc compiler, transducers compiled with new method that inserts flag diacritics and finally their ratio.
+In table~\ref{table:sizes} there are shown sizes of the original
+transducers compiled with regular lexc compiler, transducers compiled
+with new method that inserts flag diacritics and finally their ratio.
 
 \begin{table}
     \centering
@@ -271,7 +276,12 @@ In table~\ref{table:sizes} there are shown sizes of the original transducers com
     \label{table:sizes}}
 \end{table}
 
-In table~\ref{table:speed} there are speed measures of optimized lookup tool. Before measurements, transducers were transformed to the HFST's optimized lookup format and the test was done with hfst-lookup tool. In the first column there are results when lookup was done with original transducer and the second colum shows results with automatically flagged one. 
+In Table~\ref{table:speed} there are speed measures of optimized
+lookup tool. Before measurements, transducers were transformed to
+HFST's optimized lookup format and the test was done using the
+hfst-lookup tool. In the first column there are results when lookup
+was done with original transducer and the second colum shows results
+with automatically flagged one.
 
 \begin{table}
     \centering
@@ -285,7 +295,7 @@ In table~\ref{table:speed} there are speed measures of optimized lookup tool. Be
         \bf Lule Saami & 1 21262 & 4352 \\
         \hline
     \end{tabular}
-    \caption{Sizes of transducers without and with automatic flags (in words per second)
+    \caption{Lookup times for transducers without and with automatic flags (in words per second)
     \label{table:speed}}
 \end{table}
 
@@ -304,11 +314,32 @@ In table~\ref{table:speed} there are speed measures of optimized lookup tool. Be
 \section{Discussion}
 \label{sec:discussion}
 
-The results of this study show that large scale language descriptions compile into smaller transducers when flags were inserted automatically. This is especially true for language descriptions which repeat morphemes in many different places, like in Greenlandic. Since flag diacritics themselves take space in the transducer graph, this method showed not to be appropriate for smaller languages.
+The results of this study show that large scale language descriptions
+can be compiled into smaller transducers using automatically inserted
+flags. The effect is especially pronounced for language descriptions
+which repeat morphemes in many different places, like the
+morphological analyzer for Greenlandic. Since flag diacritics
+themselves take space in the transducer graph, this method did not
+offer great improvements for descriptions where the original
+transducer was small.
 
-Working with real-world languages, we have noticed that in practice language descriptions often contain empty, or nearly empty, continuation lexicons. Inserting flags in those cases only increase size of the transducer, without gaining any benefits. Therefore, those continuation lexicons should be recognized during compilation time and skipped when inserting corresponding flag diacritics.
+Real-world morphological descriptions often contain empty, or nearly
+empty, continuation lexicons. Inserting flags in those cases only
+increase size of the transducer, without gaining any
+benefits. Therefore, those continuation lexicons should be recognized
+during compilation time and skipped when inserting corresponding flag
+diacritics.
 
-While R flag diacritics will always occur only once for every left continuation lexicon, the results have shown that, for certain right continuations, P flag diacritics occur hundreds of times. This will happen every time when in the same set of morphemes there are words which have the same beginning. For example, in figure~\ref{fig:lexc-gr-flag} there is shown how two morphemes \texttt{maagar} and \texttt{maagarnar} have same continuation flag \verb+@P.LEXNAME.IV@+, but they can't collapse into the same path. It should be checked if skipping inserting flags for those paths would further reduce size of transition graphs.
+While requiring {\tt R} flag diacritics will always occur only once
+for every left continuation lexicon, the results have shown that, for
+certain right continuations, P flag diacritics occur hundreds of
+times. This will happen every time when in the same set of morphemes
+there are words which have the same beginning. For example, in
+figure~\ref{fig:lexc-gr-flag} shows how two morphemes \texttt{maagar}
+and \texttt{maagarnar} have same continuation flag
+\verb+@P.LEXNAME.IV@+, but they can't collapse into the same path. It
+should be checked if skipping inserting flags for those paths would
+further reduce size of transition graphs.
 
 
 
@@ -325,14 +356,16 @@ While R flag diacritics will always occur only once for every left continuation 
 \section{Conclusion}
 \label{sec:conclusion}
 
-In this article we showed that by using morphologically motivated flags we can
-improve the size of the large transducers while still keeping the processing speeds in reasonable range. 
-Automatically inserted flag diacritics would make manual optimization preformed by linguists unnecessary, which would result in  
-more readable and easier to maintain linguistic descriptions.
-\iffalse
+In this article we showed that by using morphologically motivated
+flags we can improve the size of the large transducers while still
+keeping the processing speeds in reasonable range.  Automatically
+inserted flag diacritics would make manual optimization preformed by
+linguists unnecessary, which would result in more readable and easier
+to maintain linguistic descriptions.  \iffalse
 \section*{Acknowledgments}
-The research leading to these results has received funding from the European Commission’s 7th Framework Program under grant agreement n°238405 (CLARA).
-\fi
+The research leading to these results has received funding from the
+European Commission’s 7th Framework Program under grant agreement
+n°238405 (CLARA).  \fi
 
 \bibliographystyle{acl}
 \bibliography{fsmnlp2013flags}
