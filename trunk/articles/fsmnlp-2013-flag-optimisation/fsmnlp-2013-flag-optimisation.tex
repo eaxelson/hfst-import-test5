@@ -160,21 +160,21 @@ The transducer built from lexicon in figure~\ref{fig:lexc-fin} is shown in figur
 
 
 Lexicons that contain flag diacritics can be composed to other
-transducers without worrying about flag collision or flag diacritics
-being part of the contexts (in i.e. replace rules). This is achieved
-by renaming flag diacritics in both argument transducers in such a way
-that collisions become impossible and then inserting flag diacritics
-freely from each argument to the other.
+transducers that also contain flag diacritics without worrying about
+flag collisions. This is achieved by renaming flag diacritics in both
+argument transducers in such a way that collisions become impossible
+and then inserting flag diacritics freely from each argument to the
+other.
 
 Consider for example composition of a lexicon $L$ with a rule $R$. If
 both transducers contain flag diacritics for feature {\tt FEATURE},
-the feature is renamed {\tt FEATURE1} in $L$ and {\tt FEATURE2} in
-$R$. All flag diacritics (like {\tt @P.FEATURE.True@}) are renamed
-correspondingly (to {\tt P.FEATURE1.True@} in $L$ and {\tt
-  P.FEATURE2.True@} in $R$) and a new lexicon $L'$ and rule $R'$ are created
-by inserting freely all flag diacritics with feature {\tt FEATURE1}
-into $R$ and flag diacritics with feature {\tt FEATURE2} into the
-lexicon $L$.
+then all features $F$ are renamed {\tt F1} in $L$ and {\tt F2} in
+$R$.~\footnote{It is not sufficient to rename only the flag diacritics
+  with common features, because that might clash with existing feature
+  names.} All flag diacritics (like {\tt @P.F.True@}) are renamed
+correspondingly (to {\tt P.F1.True@} in $L$ and {\tt P.F2.True@} in
+$R$) and a new lexicon $L'$ and rule $R'$ are created by inserting
+freely all flag diacritics from $R$ to $L$ and from $L$ to $R$.
 
 The transducers $L'$ and $R'$ can be composed and it is easy to
 see that the result satisfies the property that, if flag diacritics
