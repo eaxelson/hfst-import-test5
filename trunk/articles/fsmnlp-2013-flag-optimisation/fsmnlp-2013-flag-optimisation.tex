@@ -39,27 +39,27 @@ PO Box 9\\
 \maketitle
 \begin{abstract}
     Flag diacritics are a historical method of optimising finite-state networks
-    by combining identical structures with differing parts. Traditionally the
+    by combining identical sub graphs of the transition graph of a transducer. Traditionally, the
     feature has required linguists to write the optimisation of the graph by
-    hand alongside morphological descriptions. In this paper we present a novel
+    hand alongside morphological descriptions. In this paper, we present a novel
     method of discovering ideal flag positions automatically based on the
     morpheme strucuture implicit in the language description. With this
-    approach we have gained significant decrease in size of finite-state networks
+    approach, we have gained significant decrease in size of finite-state networks
     without drastic speed penalties on the application phase.
 \end{abstract}
 
 \section{Introduction}
 
-The finite-state automata are optimal way of encoding morphological analysers
-of natural languages. The automata made for large-scale language materials can
-often grow to be too large for some use cases. These automata can be optimised
-by recognising equivalent sub-graphs in the automaton, and combining them using
-special symbols called flag diacritics to determine the correct entrance and
+The finite-state transducers are optimal way of encoding morphological analysers
+of natural languages. Transducers made for large-scale language materials can
+often grow to be too large for some use cases. These transducers can be optimised
+by recognising equivalent sub-graphs in the automaton and combining them using
+special symbols, called flag diacritics, to determine the correct entrance and
 exit paths. Typical way of applying flag diacritics now requires a linguist to
-provide the compiler with the positions for these flags. However, there are two
-major problems with this kind of approach: firstly linguists are not very good
+provide the compiler with their positions. However, there are two
+major problems with this kind of approach: Firstly, linguists are not very good
 in knowing the structure of finite-state networks that will become from
-lexicographical-morphological descriptions, secondly the addition of flag
+lexicographical-morphological descriptions; Secondly, the addition of flag
 diacritics to these descriptions makes them unreadable and unmanageable since
 the amount of non-linguistic data in the linguistic description increases. This
 article seeks to address the problem using an algorithm for inducing the ideal
@@ -67,25 +67,23 @@ flag positions from the linguistic morpheme structure of the analyser that is
 implicitly present in the description. 
 
 One of the reasons why flag diacritics have been so cumbersome in the past,
-is their two-fold nature. On the other hand they are there to optimise the
-finite-state automaton structure, e.g. in~\cite{karttunen2006numbers}, on the
-other hand they are the primary method of describing non-contiguous 
+is their two-fold nature. On one hand, they are there to optimise the
+finite-state automaton structure, e.g. in~\cite{karttunen2006numbers}. On the
+other hand, they are the primary method of describing non-contiguous 
 morphological constraints~\cite{beesley1998constraining}. If they are applied
 on the constriction of separated morphotactic dependencies, the effect on
 optimisation is at best haphazard, and the resulting description does not
 look very linguistically motivated or maintainable as computational description.
 
-The paper is organised as follows: In the section~\ref{sec:background} we
+The paper is organised as follows: In the section~\ref{sec:background}, we
 introduce the flag diacritics and optimisation problems of finite-state 
-automata. In the section~\ref{sec:methods} we show the algorithm for automatic
-flag induction we use and describe how was achieved flag harmonization in compose function. 
-In section~\ref{sec:data} we briefly go through the existing language
+automata. In the section~\ref{sec:methods}, we show the algorithm for automatic
+flag induction we use and describe how flag harmonization in compose function was achieved. 
+In section~\ref{sec:data}, we briefly go through the existing language
 descriptions we use for testing. In 
 section~\ref{sec:evaluation} we show the effects of applying our algorithm
-to the size and efficiency of the finite-state automata. In~\ref{sec:discussion}
-we evaluate the pros and cons of our approach and lay out future improvements,
-and finally in section~\ref{sec:conclusion} we tie the article together by
-verifying what we set out to study.
+to the size and efficiency of the finite-state automata. Finally, in section~\ref{sec:discussion}
+we evaluate the pros and cons of our approach and lay out future improvements.
 
 \section{Background}
 \label{sec:background}
