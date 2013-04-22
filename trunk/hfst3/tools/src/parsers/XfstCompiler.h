@@ -55,8 +55,8 @@ namespace xfst {
   // Used internally in function 'apply'.
   enum ApplyDirection { APPLY_UP_DIRECTION, APPLY_DOWN_DIRECTION };
 
-  // Used internally in function 'test_uni'.
-  enum Level { LOWER_LEVEL, UPPER_LEVEL };
+  // Used internally
+  enum Level { LOWER_LEVEL, UPPER_LEVEL, BOTH_LEVELS };
 
   enum TestOperation { TEST_SUBLANGUAGE_, TEST_OVERLAP_ };
 
@@ -450,9 +450,13 @@ class XfstCompiler
  protected:
   XfstCompiler& print_apply_prompt(ApplyDirection direction);
   const char* get_print_symbol(const char* symbol);
-  XfstCompiler& print_paths(const hfst::HfstTwoLevelPaths &paths, FILE* outfile=stdout, int n=-1);
-  XfstCompiler& print_paths(const hfst::HfstOneLevelPaths &paths, FILE* outfile=stdout, int n=-1);
+  XfstCompiler& print_paths(const hfst::HfstTwoLevelPaths &paths, 
+                            FILE* outfile=stdout, int n=-1);
+  XfstCompiler& print_paths(const hfst::HfstOneLevelPaths &paths, 
+                            FILE* outfile=stdout, int n=-1);
   XfstCompiler& print_longest_string_or_its_size(FILE* outfile, bool print_size);
+  XfstCompiler& print_words(const char* name, unsigned int number,
+                            FILE* outfile, Level level);
 
   //! @brief Perform lookup on the top transducer using strings in \a infile.
   //! \a direction specifies whether apply is done on input (up) or output (down) 

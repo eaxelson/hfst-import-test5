@@ -212,7 +212,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
   XfstCompiler&
   XfstCompiler::print_paths(const hfst::HfstTwoLevelPaths &paths, FILE* outfile /* =stdout */, int n /* = -1*/)
-  {
+  { 
     // go through n paths
     for (hfst::HfstTwoLevelPaths::const_iterator it = paths.begin();
          n != 0 && it != paths.end(); it++)
@@ -1363,7 +1363,6 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return *this;
     }
 
-  // TODO: more efficient implementation
   XfstCompiler&
   XfstCompiler::shortest_string
   (const hfst::HfstTransducer * transducer, 
@@ -1531,10 +1530,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
                                   unsigned int number,
                                   FILE* outfile)
     {
-      fprintf(outfile, "missing %u lower words %s:%d\n", number,
-              __FILE__, __LINE__);
-      prompt();
-      return *this;
+      return print_words("", number, outfile, LOWER_LEVEL);
     }
   XfstCompiler& 
   XfstCompiler::print_random_lower(unsigned int number, FILE* outfile)
@@ -1551,10 +1547,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::print_upper_words(const char* /* name */, unsigned int number,
                                   FILE* outfile)
     {
-      fprintf(outfile, "missing %u upper words %s:%d\n", number,
-              __FILE__, __LINE__);
-      prompt();
-      return *this;
+      return print_words("", number, outfile, UPPER_LEVEL);
     }
   XfstCompiler&
   XfstCompiler::print_random_upper(unsigned int number, FILE* outfile)
@@ -1567,12 +1560,55 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       prompt();
       return *this;
     }
+
   XfstCompiler& 
   XfstCompiler::print_words(const char* /* name */, unsigned int number,
                             FILE* outfile)
+  {
+    return print_words("", number, outfile, BOTH_LEVELS);
+  }
+
+  XfstCompiler& 
+  XfstCompiler::print_words(const char* /* name */, unsigned int number,
+                            FILE* outfile, Level level)
     {
-      fprintf(outfile, "missing %u words %s:%d\n", number,
-              __FILE__, __LINE__);
+      HfstTransducer * tmp = this->top();
+      if (tmp == NULL)
+        return *this;
+
+      HfstTransducer temp(*tmp);
+
+      switch (level)
+        {
+        case UPPER_LEVEL:
+          temp.input_project();
+          break;
+        case LOWER_LEVEL:
+          temp.output_project();
+          break;
+        case BOTH_LEVELS:
+          break;
+        default:
+          fprintf(stderr, "ERROR: argument given to function 'print_words'\n"
+                  "not recognized\n");
+          prompt();
+          return *this;
+        }
+
+      HfstTwoLevelPaths results;
+
+      try
+        {
+          temp.extract_paths(results, number, -1);
+        }
+      catch (const TransducerIsCyclicException & e)
+        {
+          fprintf(stderr, "warning: transducer is cyclic, limiting the number of cycles to 5\n");
+          temp.extract_paths(results, number, 5);
+        }
+
+      print_paths(results, outfile);
+
       prompt();
       return *this;
     }
@@ -1580,8 +1616,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::print_random_words(unsigned int number, FILE* outfile)
     {
+      HfstTransducer * tmp = this->top();
+      if (tmp == NULL)
+        return *this;
+
       hfst::HfstTwoLevelPaths paths;
-      stack_.top()->extract_random_paths(paths, number);
+      tmp->extract_random_paths(paths, number);
       print_paths(paths, outfile);
       prompt();
       return *this;
