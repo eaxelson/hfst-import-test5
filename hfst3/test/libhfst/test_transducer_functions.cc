@@ -163,7 +163,7 @@ bool do_results_contain(const HfstTwoLevelPaths &paths,
   return false;
 }
 
-void print_weighted_paths(const WeightedPaths<float>::Set &paths)
+/*void print_weighted_paths(const WeightedPaths<float>::Set &paths)
 {
   for (WeightedPaths<float>::Set::const_iterator it = paths.begin();
        it != paths.end(); it++)
@@ -171,7 +171,7 @@ void print_weighted_paths(const WeightedPaths<float>::Set &paths)
       fprintf(stderr, "%s:%s\t%f\n", 
           it->istring.c_str(), it->ostring.c_str(), it->weight);
     }
-}
+    }*/
 
 void print_string_vector(const StringVector &sv)
 {
@@ -335,7 +335,7 @@ int main(int argc, char **argv)
     using hfst::StringPair;
     using hfst::StringPairSet;
     using hfst::HfstTokenizer;
-    using hfst::WeightedPaths;
+    //using hfst::WeightedPaths;
 
     /* Create a transducer that contains animals. */
     HfstTokenizer tok;

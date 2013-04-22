@@ -450,8 +450,9 @@ class XfstCompiler
  protected:
   XfstCompiler& print_apply_prompt(ApplyDirection direction);
   const char* get_print_symbol(const char* symbol);
-  XfstCompiler& print_paths(const hfst::HfstTwoLevelPaths &paths, FILE* outfile=stdout);
-  XfstCompiler& print_paths(const hfst::HfstOneLevelPaths &paths, FILE* outfile=stdout);
+  XfstCompiler& print_paths(const hfst::HfstTwoLevelPaths &paths, FILE* outfile=stdout, int n=-1);
+  XfstCompiler& print_paths(const hfst::HfstOneLevelPaths &paths, FILE* outfile=stdout, int n=-1);
+  XfstCompiler& print_longest_string_or_its_size(FILE* outfile, bool print_size);
 
   //! @brief Perform lookup on the top transducer using strings in \a infile.
   //! \a direction specifies whether apply is done on input (up) or output (down) 
