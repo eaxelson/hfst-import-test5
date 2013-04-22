@@ -38,6 +38,7 @@ namespace hfst {
       @see HfstOneLevelPath
       @see HfstTransducer::extract_paths
   */
+#ifdef FOO
   template<class W> class WeightedPath
     {
     public:
@@ -129,6 +130,7 @@ namespace hfst {
           this->weight = another.weight; }
     };
 
+
   /* \brief A class for storing weighted string pairs that represent 
       paths in a transducer. 
 
@@ -169,6 +171,7 @@ namespace hfst {
           { it->reverse(); }
       }
     };
+#endif
     
     class ExtractStringsCb
     {

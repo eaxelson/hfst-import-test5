@@ -163,15 +163,19 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       {
         return "";  // print nothing
       }
+    if (strcmp(hfst::internal_epsilon.c_str(), symbol) == 0)
+      {
+        return "@0@";
+      }
     return symbol;
   }
 
   XfstCompiler&
-  XfstCompiler::print_paths(const hfst::HfstOneLevelPaths &paths, FILE* outfile /* =stdout */)
+  XfstCompiler::print_paths(const hfst::HfstOneLevelPaths &paths, FILE* outfile /* =stdout */, int n /* = -1*/)
   {
-    // go through all paths
+    // go through n paths
     for (hfst::HfstOneLevelPaths::const_iterator it = paths.begin();
-         it != paths.end(); it++)
+         n != 0 && it != paths.end(); it++)
       {
         hfst::StringVector path = it->second;
         bool something_printed = false;  // to control printing spaces
@@ -199,17 +203,19 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           } // path went through
 
         fprintf(outfile, "\n");
+        --n;
 
-      } // all paths went through
+      } // n paths went through
 
+    return *this;
   }
 
   XfstCompiler&
-  XfstCompiler::print_paths(const hfst::HfstTwoLevelPaths &paths, FILE* outfile /* =stdout */)
+  XfstCompiler::print_paths(const hfst::HfstTwoLevelPaths &paths, FILE* outfile /* =stdout */, int n /* = -1*/)
   {
-    // go through all paths
+    // go through n paths
     for (hfst::HfstTwoLevelPaths::const_iterator it = paths.begin();
-         it != paths.end(); it++)
+         n != 0 && it != paths.end(); it++)
       {
         hfst::StringPairVector path = it->second;
         bool something_printed = false;  // to control printing spaces
@@ -245,9 +251,11 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           } // path went through
 
         fprintf(outfile, "\n");
+        --n;
 
-      } // all paths went through
+      } // n paths went through
 
+    return *this;
   }
 
     XfstCompiler&
@@ -1407,58 +1415,115 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       prompt();
       return *this;
     }
+
+  XfstCompiler&
+  XfstCompiler::print_longest_string_or_its_size(FILE* outfile, bool print_size)
+  {
+      HfstTransducer* topmost = this->top();
+      if (topmost == NULL)
+        return *this;
+
+      HfstTransducer tmp_lower(*topmost);
+      HfstTransducer tmp_upper(*topmost);
+      tmp_lower.output_project().minimize();
+      tmp_upper.input_project().minimize();
+
+      HfstTwoLevelPaths paths_upper;
+      HfstTwoLevelPaths paths_lower;
+
+      bool upper_is_cyclic = false;
+      bool lower_is_cyclic = false;
+      bool transducer_is_empty = false;
+
+      try
+        {
+          transducer_is_empty = 
+            ! tmp_upper.extract_longest_paths(paths_upper, 
+                                              variables_["obey-flags"] == "ON");
+        }
+      catch (const TransducerIsCyclicException & e)
+        {
+          upper_is_cyclic = true;
+        }
+
+      try
+        {
+          transducer_is_empty = 
+            ! tmp_lower.extract_longest_paths(paths_lower, 
+                                              variables_["obey-flags"] == "ON");
+        }
+      catch (const TransducerIsCyclicException & e)
+        {
+          lower_is_cyclic = true;
+        }
+
+      if (upper_is_cyclic && lower_is_cyclic)
+        {
+          fprintf(stdout, "transducer is cyclic\n");
+        }
+      else if (transducer_is_empty)
+        {
+          fprintf(stdout, "transducer is empty\n");
+        }
+      else
+        {
+          if (variables_["show-flags"] == "OFF" && 
+              (tmp_upper.has_flag_diacritics() || 
+               tmp_lower.has_flag_diacritics()) )
+            {
+              fprintf(stdout, "warning: longest string may have flag diacritics that are not shown\n");
+              fprintf(stdout, "         but are used in calculating its length (use 'eliminate flags')\n");
+            }
+
+          if (upper_is_cyclic)
+            {
+              fprintf(outfile, "Upper level is cyclic.\n");
+            }
+          else
+            {
+              fprintf(outfile, "Upper: ");
+              if (print_size)
+                {
+                  fprintf(outfile, "%i\n", (int)paths_upper.begin()->second.size());
+                }
+              else
+                {
+                  print_paths(paths_upper, outfile, 1);
+                }
+            }
+
+          if (lower_is_cyclic)
+            {
+              fprintf(outfile, "Lower level is cyclic.\n");
+            }
+          else
+            {
+              fprintf(outfile, "Lower: ");
+              if (print_size)
+                {
+                  fprintf(outfile, "%i\n", (int)paths_lower.begin()->second.size());
+                }
+              else
+                {
+                  print_paths(paths_lower, outfile, 1);
+                }
+            }
+        }
+
+      prompt();
+      return *this;
+  }
+
   XfstCompiler& 
   XfstCompiler::print_longest_string(FILE* outfile)
     {
-      HfstTransducer* topmost = this->top();
-      if (topmost == NULL)
-        return *this;
-
-      HfstTwoLevelPaths paths;
-
-      bool paths_found = 
-        topmost->extract_longest_paths(paths, variables_["obey-flags"] == "ON");
-
-      if (! paths_found)
-        {
-          fprintf(stdout, "transducer is empty\n");
-        }
-      else
-        {
-          if (variables_["show-flags"] == "OFF" && topmost->has_flag_diacritics())
-            {
-              fprintf(stdout, "warning: longest string may have flag diacritics that are not shown\n");
-              fprintf(stdout, "         but are used in calculating its length (use 'eliminate flags')\n");
-            }
-          print_paths(paths, outfile);
-        }
-      prompt();
-      return *this;
+      return print_longest_string_or_its_size(outfile, false);
     }
+
   XfstCompiler& 
   XfstCompiler::print_longest_string_size(FILE* outfile)
     {
-      HfstTransducer* topmost = this->top();
-      if (topmost == NULL)
-        return *this;
-
-      int length = 
-        topmost->longest_path_size(variables_["obey-flags"] == "ON");
-      if (length < 0)
-        {
-          fprintf(stdout, "transducer is empty\n");
-        }
-      else
-        {
-          if (variables_["show-flags"] == "OFF" && topmost->has_flag_diacritics())
-            {
-              fprintf(stdout, "warning: longest string may have flag diacritics that are not shown\n");
-              fprintf(stdout, "         but are used in calculating its length (use 'eliminate flags')\n");
-            }
-          fprintf(outfile, "%i\n", length);
-        }
-      prompt();
-      return *this;
+      return print_longest_string_or_its_size(outfile, true);
     }
 
   XfstCompiler& 
@@ -1524,7 +1589,22 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::print_name(FILE* outfile)
     {
-      fprintf(outfile, "cannot tell name %s:%d\n", __FILE__, __LINE__);
+      HfstTransducer * tmp = this->top();
+      if (tmp == NULL)
+        return *this;
+
+      for (std::map<std::string, HfstTransducer*>::const_iterator it 
+             = names_.begin(); it != names_.end(); it++)
+        {
+          if (tmp == it->second)
+            {
+              fprintf(outfile, "Name: %s\n", it->first.c_str());
+              prompt();
+              return *this;
+            }
+        }
+
+      fprintf(outfile, "No name.\n");
       prompt();
       return *this;
     }

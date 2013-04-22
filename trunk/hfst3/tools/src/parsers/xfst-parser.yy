@@ -453,6 +453,12 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | PRINT_LONGEST_STRING_SIZE END_COMMAND {
             hfst::xfst::xfst_->print_longest_string_size(stdout);
        }
+       | PRINT_NAME REDIRECT_OUT END_COMMAND {
+            hfst::xfst::xfst_->print_name(hfst::xfst::xfst_fopen($2, "w"));
+       }
+       | PRINT_NAME END_COMMAND {
+            hfst::xfst::xfst_->print_name(stdout);
+       }
        | PRINT_SHORTEST_STRING REDIRECT_OUT END_COMMAND {
             hfst::xfst::xfst_->print_shortest_string(hfst::xfst::xfst_fopen($2, "w"));
        }
@@ -488,6 +494,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | PRINT_RANDOM_LOWER REDIRECT_OUT END_COMMAND {
             hfst::xfst::xfst_->print_random_lower(15, hfst::xfst::xfst_fopen($2, "w"));
        }
+       | PRINT_RANDOM_LOWER NUMBER REDIRECT_OUT END_COMMAND {
+            hfst::xfst::xfst_->print_random_lower($2, hfst::xfst::xfst_fopen($3, "w"));
+       }
        | PRINT_UPPER_WORDS NAMETOKEN NUMBER END_COMMAND {
             hfst::xfst::xfst_->print_upper_words($2, $3, stdout);
        }
@@ -507,6 +516,12 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | PRINT_RANDOM_UPPER END_COMMAND {
             hfst::xfst::xfst_->print_random_upper(15, stdout);
        }
+       | PRINT_RANDOM_UPPER NUMBER REDIRECT_OUT END_COMMAND {
+            hfst::xfst::xfst_->print_random_upper($2, hfst::xfst::xfst_fopen($3, "w"));
+       }
+       | PRINT_RANDOM_UPPER REDIRECT_OUT END_COMMAND {
+            hfst::xfst::xfst_->print_random_upper(15, hfst::xfst::xfst_fopen($2, "w"));
+       }
        | PRINT_WORDS NAMETOKEN NUMBER END_COMMAND {
             hfst::xfst::xfst_->print_words($2, $3, stdout);
             free($2);
@@ -521,11 +536,23 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | PRINT_WORDS END_COMMAND {
             hfst::xfst::xfst_->print_words(0, 0, stdout);
        }
+       | PRINT_WORDS NUMBER REDIRECT_OUT END_COMMAND {
+            hfst::xfst::xfst_->print_words(0, $2, hfst::xfst::xfst_fopen($3, "w"));
+       }
+       | PRINT_WORDS REDIRECT_OUT END_COMMAND {
+            hfst::xfst::xfst_->print_words(0, 0, hfst::xfst::xfst_fopen($2, "w"));
+       }
        | PRINT_RANDOM_WORDS NUMBER END_COMMAND {
             hfst::xfst::xfst_->print_random_words($2, stdout);
        }
        | PRINT_RANDOM_WORDS END_COMMAND {
             hfst::xfst::xfst_->print_random_words(15, stdout);
+       }
+       | PRINT_RANDOM_WORDS NUMBER REDIRECT_OUT END_COMMAND {
+            hfst::xfst::xfst_->print_random_words($2, hfst::xfst::xfst_fopen($3, "w"));
+       }
+       | PRINT_RANDOM_WORDS REDIRECT_OUT END_COMMAND {
+            hfst::xfst::xfst_->print_random_words(15, hfst::xfst::xfst_fopen($2, "w"));
        }
        | PRINT NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->print_net($2, stdout);

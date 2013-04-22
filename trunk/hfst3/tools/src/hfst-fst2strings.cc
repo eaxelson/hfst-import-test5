@@ -41,8 +41,8 @@ using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::FdOperation;
 
-using hfst::WeightedPaths;
-using hfst::WeightedPath;
+//using hfst::WeightedPaths;
+//using hfst::WeightedPath;
 using hfst::StringPairVector;
 using hfst::HfstTwoLevelPath;
 using hfst::HfstTwoLevelPaths;

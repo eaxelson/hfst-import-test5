@@ -1956,7 +1956,7 @@ public:
     RetVal operator()(HfstTwoLevelPath& path, bool final)
     {
         if(final)
-        paths.insert(path);
+          paths.insert(path);
         
         return RetVal((max_num < 1) || (int)paths.size() < max_num, true);
     }
@@ -1964,6 +1964,11 @@ public:
 
 int HfstTransducer::longest_path_size(bool obey_flags) const
 {
+  if (this->is_cyclic())
+    {
+      HFST_THROW(TransducerIsCyclicException);
+    }
+
   if (! obey_flags)
     {
       HfstBasicTransducer net(*this);
@@ -2003,6 +2008,11 @@ static std::string match_any_n_times(unsigned int n, const StringSet & flags)
 bool HfstTransducer::extract_longest_paths
 (HfstTwoLevelPaths &results, bool obey_flags /*,bool show_flags*/) const
 {
+  if (this->is_cyclic())
+    {
+      HFST_THROW(TransducerIsCyclicException);
+    }
+
   HfstBasicTransducer net(*this);
   std::vector<unsigned int> path_lengths = net.path_sizes();
   if (path_lengths.size() == 0)
