@@ -2142,19 +2142,21 @@
            }
          };
 
+         enum SortDistance { MaximumDistance, MinimumDistance };
+
          /* 
             Get a topological (maximum distance) sort of this graph.
             @return A vector of sets of states. At each vector index ind, the
             result contains the set of all states whose (maximum) distance from
             the start state is ind.
          */
-         std::vector<std::set<HfstState> > topsort(bool use_maximum_distance=true) const
+         std::vector<std::set<HfstState> > topsort(SortDistance dist) const
            {
              typedef std::set<HfstState>::const_iterator StateIt;
              unsigned int current_distance = 0; // topological distance
              TopologicalSort TopSort;
              TopSort.set_biggest_state_number(state_vector.size()-1);
-             TopSort.set_state_at_distance(0,current_distance,use_maximum_distance);
+             TopSort.set_state_at_distance(0,current_distance,(dist == MaximumDistance));
              bool new_states_found = false; // end condition for do-while loop
 
             do
@@ -2188,7 +2190,7 @@
                 for (StateIt it = new_states.begin(); 
                      it != new_states.end(); it++)
                   {
-                    TopSort.set_state_at_distance(*it, current_distance + 1, use_maximum_distance); 
+                    TopSort.set_state_at_distance(*it, current_distance + 1, (dist == MaximumDistance)); 
                   }
                 current_distance++;
               }
@@ -2202,7 +2204,7 @@
          int longest_path_size()
         {
           // get topological maximum distance sort
-          std::vector<std::set<HfstState> > states_sorted = this->topsort(true);
+          std::vector<std::set<HfstState> > states_sorted = this->topsort(MaximumDistance);
           // go through all sets of states in descending order
           for (int distance = states_sorted.size() - 1; distance >= 0; distance--)
             {
@@ -2230,7 +2232,7 @@
            {
              std::vector<unsigned int> result;
              // get topological maximum distance sort
-             std::vector<std::set<HfstState> > states_sorted = this->topsort(false);
+             std::vector<std::set<HfstState> > states_sorted = this->topsort(MinimumDistance);
              // go through all sets of states in descending order
              for (int distance = states_sorted.size() - 1; distance >= 0; distance--)
                {
