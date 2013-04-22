@@ -28,9 +28,9 @@ PO Box 9\\
   {\tt tommi.pirinen@helsinki.fi} \\\And
   Miikka Silfverberg \\
   Department of Modern Languages \\
-	PO Box 24 \\
-	00014 University of Helsinki \\
-	{\tt miikka.silfverberg@helsinki.fi} \\}
+    PO Box 24 \\
+    00014 University of Helsinki \\
+    {\tt miikka.silfverberg@helsinki.fi} \\}
 \fi
 
 \date{\today}
@@ -47,7 +47,7 @@ PO Box 9\\
     discovering flag positions in morphological lexicons automatically
     based on the morpheme structure implicit in the language
     description. With this approach, we have gained significant
-    decrease in the size of finite-state networks without drastic
+    decrease in the size of finite-state networks (up to 96\%) without drastic
     speed penalties on lookup of word-forms.
 
 \end{abstract}
@@ -67,7 +67,7 @@ Up to date, applying flag diacritics has required a linguist to provide
 the lexicon compiler with their positions. However, there are two
 major problems with this kind of approach: Firstly, linguists often do
 not have a very good understanding of the structure of the
-finite-state networks which result from lexicographical-morphological
+finite-state networks built from lexicographical-morphological
 descriptions; Secondly, the addition of flag diacritics to these
 descriptions makes them unreadable and unmanageable since the amount
 of non-linguistic data in the linguistic description increases. 
@@ -85,7 +85,7 @@ view-point.
 
 This article seeks to address problems associated with flag diacritics
 by using an algorithm for inducing flag positions from the linguistic
-morpheme structure which is implicitly present in lexical
+morpheme structure, implicitly present in lexical
 descriptions.
 
 The paper is organised as follows: In section~\ref{sec:background}, we
@@ -148,7 +148,7 @@ signifying the end of a word-form.
 \end{figure}
 
 Finnish was used as an example in Karttunen's paper on flag diacritics
-in optimisation~\shortcite{karttunen2006numbers}. In this paper, he
+in optimisation~\shortcite{karttunen2006numbers}. In that paper, he
 showed that the optimisation quality of wisely selected flag
 diacritics can be substantial; from a 20,498 state automaton to an
 1,946 state one. The article describes Finnish numerals, which have
@@ -174,7 +174,7 @@ setting (\verb+@P.feature value@+) and require test
 feature to its value, require test flag invokes testing whether the
 feature is set to the designated value.  For example,
 \verb+@P.LEXNAME.Root@+ will set feature \texttt{LEXNAME} to value
-\texttt{Root}. If later in the path occurs flag R that requires test
+\texttt{Root}. If later in the path there is an R flag that requires test
 \verb+@R.LEXNAME.Root@+, the invoked test will succeed and that path
 will be considered valid.
 
@@ -209,7 +209,7 @@ other.
 
 Consider for example composition of a lexicon $L$ with a rule $R$. If
 both transducers contain flag diacritics for feature {\tt FEATURE},
-then all features $F$ are renamed {\tt F1} in $L$ and {\tt F2} in
+then $all features F$ are renamed {\tt F1} in $L$ and {\tt F2} in
 $R$.~\footnote{It is not sufficient to rename only flag diacritics
   with common features, because that might clash with existing feature
   names.} All flag diacritics (like {\tt @P.F.True@}) are renamed
@@ -263,13 +263,13 @@ with new method that inserts flag diacritics and finally their ratio.
         \hline
         \bf Language & \bf Original & \bf With flags & \bf \% \\
         \hline
-        \bf Greenlandic &	261074412 	& 8400635 & 3,4\%  \\
-        \bf North Saami &	9152930 	& 6789658 & 74\%  \\
-        \bf Erzya		&	3333669 	& 2801339 & 84\%  \\
-        \bf Komi Zyryen &	2719971 	& 2315384 & 85\%  \\
-        \bf South Saami &	3600902 	& 3147213 & 87\%  \\
-        \bf Lule Saami 	&	4381573 	& 3639278 & 87\%  \\
-        \bf German 		&	25836 		& 32678   & 126\%  \\
+        \bf Greenlandic &   261074412   & 8400635 & 3,4\%  \\
+        \bf North Saami &   9152930     & 6789658 & 74\%  \\
+        \bf Erzya       &   3333669     & 2801339 & 84\%  \\
+        \bf Komi Zyryen &   2719971     & 2315384 & 85\%  \\
+        \bf South Saami &   3600902     & 3147213 & 87\%  \\
+        \bf Lule Saami  &   4381573     & 3639278 & 87\%  \\
+        \bf German      &   25836       & 32678   & 126\%  \\
         \hline
     \end{tabular}
     \caption{Sizes of transducers without and with automatic flags (in bytes); Percentage shows size of the flagged transducer in comparison to the original
@@ -282,7 +282,9 @@ HFST's optimized lookup format and the test was done using the
 hfst-lookup tool. In the first column there are results when lookup
 was done with original transducer and the second colum shows results 
 with automatically flagged one. Although our results show that lookup 
-is much slower for transducers that contain automatic flags, lookup speed of 1000 words per second is sufficient for various applications with transducers.
+is much slower for transducers that contain automatic flags, even lookup speed
+of 1000 words per second is sufficient for various applications with transducers
+(like spelling correction).
 
 \begin{table}
     \centering
@@ -338,8 +340,8 @@ times. This will happen every time when in the same set of morphemes
 there are words which have the same beginning. For example, in
 figure~\ref{fig:lexc-gr-flag} shows how two morphemes \texttt{maagar}
 and \texttt{maagarnar} have same continuation flag
-\verb+@P.LEXNAME.IV@+, but they can't collapse into the same path. It
-should be checked if skipping inserting flags for those paths would
+\verb+@P.LEXNAME.IV@+, but they can't collapse into the same path. In future
+work, it should be checked if skipping inserting flags for those paths would
 further reduce size of transition graphs.
 
 
