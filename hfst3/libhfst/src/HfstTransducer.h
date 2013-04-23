@@ -1125,6 +1125,9 @@ ccc : ddd
         from the transducer so that the transducer remains equivalent. */
     HfstTransducer &remove_epsilons();
 
+    /** \brief Make transducer coaccessible. */
+    HfstTransducer &prune();
+
     /** \brief Determinize the transducer.
 
         Determinizing a transducer yields an equivalent transducer that has

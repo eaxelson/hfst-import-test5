@@ -39,6 +39,8 @@ using std::stack;
 #include "xfst-utils.h"
 #include "xfst-parser.h"
 
+#include "../HfstStrings2FstTokenizer.h"
+
 #ifdef HAVE_READLINE
   #include <readline/readline.h>
   #include <readline/history.h>
@@ -623,12 +625,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     }
 
   XfstCompiler& 
-  XfstCompiler::load_definitions(FILE* /* infile */)
+  XfstCompiler::load_definitions(const char * infilename)
     {
-      fprintf(stderr, "Cannot load definitions %s:%d\n", __FILE__,
-              __LINE__);
-      prompt();
-      return *this;
+      return this->load_stack_or_definitions(infilename, true); // definitions
     }
 
   XfstCompiler& 
@@ -671,6 +670,13 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::push(const char* name)
     {
+      if (definitions_.find(name) == definitions_.end())
+        {
+          fprintf(stderr, "no such defined network: '%s'\n", name);
+          prompt();
+          return *this;
+        }
+
       stack_.push(definitions_[name]);
       print_transducer_info();
       prompt();
@@ -680,7 +686,13 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::push()
     {
-      stack_.push(last_defined_);
+      for (map<string,HfstTransducer*>::const_iterator def 
+             = definitions_.begin(); def != definitions_.end();
+           ++def)
+        {
+          stack_.push(new HfstTransducer(*(def->second)));
+        }
+
       print_transducer_info();
       prompt();
       return *this;
@@ -707,20 +719,20 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler&
   XfstCompiler::rotate()
     {
-      HfstTransducer* top = stack_.top();
-      stack_.pop();
+      if (stack_.empty())
+        {
+          prompt();
+          return *this;
+        }
+        
       stack<HfstTransducer*> tmp;
       while (!stack_.empty())
         {
           tmp.push(stack_.top());
           stack_.pop();
         }
-      tmp.push(top);
-      while (!tmp.empty())
-        {
-          stack_.push(tmp.top());
-          tmp.pop();
-        }
+      stack_ = tmp;
+
       print_transducer_info();
       prompt();
       return *this;
@@ -734,20 +746,41 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return file;
   }
 
-  XfstCompiler& 
-  XfstCompiler::load_stack(const char* infile)
-    {
-      HfstInputStream* instream = 0;
+  XfstCompiler&
+  XfstCompiler::add_loaded_definition(HfstTransducer * t)
+  {
+    std::string def_name = t->get_name();
+    if (def_name == "")
+      {
+        fprintf(stderr, "warning: loaded transducer definition has no name, skipping it\n");
+        return *this;
+      }
+    std::map<std::string, HfstTransducer*>::const_iterator it 
+      = definitions_.find(def_name);
+    if (it != definitions_.end())
+      {
+        fprintf(stderr, "warning: a definition named '%s' already exists, overwriting it\n", def_name.c_str());
+        definitions_.erase(def_name);
+      }
+    definitions_[def_name] = t;
+    return *this;
+  }
+
+  XfstCompiler&
+  XfstCompiler::load_stack_or_definitions(const char* infilename, bool load_definitions)
+  {
+    HfstInputStream* instream = 0;
       try 
         {
-          instream = (infile != 0) ?
-            new HfstInputStream(infile):
+          instream = (infilename != 0) ?
+            new HfstInputStream(infilename):
             new HfstInputStream();
         }
       catch (NotTransducerStreamException ntse)
         {
           fprintf(stderr, "Unable to read transducers from %s\n", 
-                  to_filename(infile));
+                  to_filename(infilename));
+          prompt();
           return *this;
         }
       while (instream->is_good())
@@ -762,7 +795,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
                           "when reading from file '%s'",
                           hfst::implementation_type_to_format(t->get_type()),
                           hfst::implementation_type_to_format(format_),
-                          to_filename(infile));
+                          to_filename(infilename));
                   if (! hfst::HfstTransducer::is_safe_conversion(t->get_type(), format_))
                     {
                       fprintf(stderr, " (loss of information is possible)");
@@ -772,11 +805,24 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
               t->convert(format_);
             }
 
-          stack_.push(t);
-          print_transducer_info();
+          if (load_definitions)
+            {
+              add_loaded_definition(t);
+            }
+          else
+            {
+              stack_.push(t);
+              print_transducer_info();
+            }
         }
       prompt();
       return *this;
+  }
+
+  XfstCompiler& 
+  XfstCompiler::load_stack(const char* infilename)
+    {
+      return this->load_stack_or_definitions(infilename, false); // stack
     }
 
   XfstCompiler& 
@@ -1816,12 +1862,19 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::write_definition(const char* name, const char* outfile)
     {
-      fprintf(stderr, "Warning: cannot to save name of definition with "
-              "transducer: %s:%d\n", __FILE__, __LINE__);
+      if (definitions_.find(name) == definitions_.end())
+        {
+          fprintf(stderr, "no such defined network: '%s'\n", name);
+          prompt();
+          return *this;
+        }
+
       HfstOutputStream* outstream = (outfile != 0) ?
         new HfstOutputStream(outfile, format_):
         new HfstOutputStream(format_);
-      *outstream << *(definitions_[name]);
+      HfstTransducer tmp(*(definitions_[name]));
+      tmp.set_name(std::string(name));
+      *outstream << tmp;
       outstream->close();
       delete outstream;
       prompt();
@@ -1830,8 +1883,13 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::write_definitions(const char* outfile)
     {
-      fprintf(stderr, "Warning: cannot save names of definitions with "
-              "transducers: %s:%d", __FILE__, __LINE__);
+      if (definitions_.empty())
+        {
+          fprintf(stderr, "no defined networks\n");
+          prompt();
+          return *this;
+        }
+
       HfstOutputStream* outstream = (outfile != 0) ?
         new HfstOutputStream(outfile, format_):
         new HfstOutputStream(format_);
@@ -1839,7 +1897,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
            def != definitions_.end();
            ++def)
         {
-          *outstream << *(def->second);
+          HfstTransducer tmp(*(def->second));
+          tmp.set_name(def->first);
+          *outstream << tmp;
         }
       outstream->close();
       delete outstream;
@@ -1946,12 +2006,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return *this;
     }
   XfstCompiler& 
-  XfstCompiler::read_spaced(FILE* /* infile */)
+  XfstCompiler::read_spaced(FILE* infile)
     {
-      fprintf(stderr, "missing read spaced %s:%d\n", __FILE__, __LINE__);
-      print_transducer_info();
-      prompt();
-      return *this;
+      return this->read_text_or_spaced(infile, true); // spaces are used
     }
   XfstCompiler& 
   XfstCompiler::read_spaced(const char* /* indata */)
@@ -1962,12 +2019,32 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return *this;
     }
   XfstCompiler& 
-  XfstCompiler::read_text(FILE* /* infile */)
+  XfstCompiler::read_text_or_spaced(FILE* infile, bool spaces)
+  {
+    HfstTransducer * tmp = new HfstTransducer(format_);
+    StringVector mcs; // no multichar symbols
+    HfstStrings2FstTokenizer tok(mcs, hfst::internal_epsilon);
+    char * line;
+    
+    while( (line = xfst_getline(infile)) != NULL )
+      {
+        line = remove_newline(line);
+        StringPairVector spv = tok.tokenize_pair_string(std::string(line), spaces);
+        HfstTransducer line_tr(spv, format_);
+        tmp->disjunct(line_tr);
+      }
+    
+    tmp->minimize();
+    stack_.push(tmp);
+    
+    print_transducer_info();
+    prompt();
+    return *this;
+  }
+  XfstCompiler& 
+  XfstCompiler::read_text(FILE* infile)
     {
-      fprintf(stderr, "missing read text %s:%d\n", __FILE__, __LINE__);
-      print_transducer_info();
-      prompt();
-      return *this;
+      return this->read_text_or_spaced(infile, false); // spaces are not used
     }
   XfstCompiler& 
   XfstCompiler::read_text(const char* /* indata */)
@@ -2024,10 +2101,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::crossproduct_net()
     {
-      fprintf(stderr, "cannot crossproduct %s:%d\n", __FILE__, __LINE__);
-      print_transducer_info();
-      prompt();
-      return *this;
+      return this->apply_binary_operation(CROSSPRODUCT_NET);
     }
 
   XfstCompiler&
@@ -2038,45 +2112,57 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return *this;
     this->pop();
 
-    switch (operation)
+    try 
       {
-      case DETERMINIZE_NET:
-        result->determinize();
-        break;
-      case EPSILON_REMOVE_NET:
-        result->remove_epsilons();
-        break;
-      case INVERT_NET:
-        result->invert();
-        break;
-      case LOWER_SIDE_NET:
-        result->output_project();
-        break;
-      case UPPER_SIDE_NET:
-        result->input_project();
-        break;
-      case ZERO_PLUS_NET:
-        result->repeat_star();
-        break;
-      case ONE_PLUS_NET:
-        result->repeat_plus();
-        break;
-      case OPTIONAL_NET:
-        result->optionalize();
-        break;
-      case REVERSE_NET:
-        result->reverse();
-        break;
-      case MINIMIZE_NET:
-        result->minimize();
-        break;
-      default:
-        fprintf(stderr, "ERROR: unknown unary operation\n");
-        break;
+        switch (operation)
+          {
+          case DETERMINIZE_NET:
+            result->determinize();
+            break;
+          case EPSILON_REMOVE_NET:
+            result->remove_epsilons();
+            break;
+          case INVERT_NET:
+            result->invert();
+            break;
+          case LOWER_SIDE_NET:
+            result->output_project();
+            break;
+          case UPPER_SIDE_NET:
+            result->input_project();
+            break;
+          case ZERO_PLUS_NET:
+            result->repeat_star();
+            break;
+          case ONE_PLUS_NET:
+            result->repeat_plus();
+            break;
+          case OPTIONAL_NET:
+            result->optionalize();
+            break;
+          case REVERSE_NET:
+            result->reverse();
+            break;
+          case MINIMIZE_NET:
+            result->minimize();
+            break;
+          case PRUNE_NET_:
+            result->prune();
+            break;
+          default:
+            fprintf(stderr, "ERROR: unknown unary operation\n");
+            break;
+          }
+
+        stack_.push(result);
+        print_transducer_info();
+      }
+    catch (const FunctionNotImplementedException & e)
+      {
+        fprintf(stderr, "function not available.\n");
+        stack_.push(result);
       }
 
-    stack_.push(result);
-    print_transducer_info();
     prompt();
     return *this;
   }
@@ -2103,6 +2189,21 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         case MINUS_NET:
           result->subtract(*another);
           break;
+        case (CROSSPRODUCT_NET):
+          try 
+            {
+              result->cross_product(*another);
+              break;
+            }
+          catch (const TransducersAreNotAutomataException & e)
+            {
+              fprintf(stderr, "transducers are not automata\n");
+              stack_.push(another);
+              stack_.push(result);
+              prompt();
+              return *this;
+              break;
+            }
         default:
           fprintf(stderr, "ERROR: unknown binary operation\n");
           break;
@@ -2307,10 +2408,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::prune_net()
     {
-      fprintf(stderr, "missing prune net %s:%d\n", __FILE__, __LINE__);
-      print_transducer_info();
-      prompt();
-      return *this;
+      return this->apply_unary_operation(PRUNE_NET_);
     }
   XfstCompiler& 
   XfstCompiler::reverse_net()
@@ -2325,7 +2423,15 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::sigma_net()
     {
-      fprintf(stderr, "missing sigma net %s:%d\n", __FILE__, __LINE__);
+      HfstTransducer * tmp = this->top();
+      if (tmp == NULL)
+        return *this;
+
+      StringSet alpha = tmp->get_alphabet();
+      StringPairSet alpha_ = hfst::symbols::to_string_pair_set(alpha);
+      HfstTransducer * sigma = new HfstTransducer(alpha_, format_);
+      
+      stack_.push(sigma);
       print_transducer_info();
       prompt();
       return *this;
@@ -2462,6 +2568,19 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     return true;
   }
 
+  char * XfstCompiler::remove_newline(char * line)
+  {
+    unsigned int i=0;
+    while (line[i] != '\0')
+      {
+        if (line[i] == '\n' || line[i] == '\r')
+          {
+            line[i] = '\0';
+          }
+        ++i;
+      }
+    return line;
+  }
 
   char * XfstCompiler::xfst_getline(FILE * file)
   {
@@ -2690,6 +2809,32 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::read_lexc(FILE* infile)
     {
       lexc_.parse(infile);
+      prompt();
+      return *this;
+    }
+  XfstCompiler&
+  XfstCompiler::read_att(FILE* infile)
+    {
+      try
+        {
+          HfstTransducer * tmp = new HfstTransducer(infile, format_);
+          stack_.push(tmp);
+          print_transducer_info();
+        }
+      catch (const HfstException & e)
+        {
+          fprintf(stderr, "error reading file in att format\n");
+        }
+      prompt();
+      return *this;
+    }
+  XfstCompiler& 
+  XfstCompiler::write_att(FILE* infile)
+    {
+      HfstTransducer * tmp = this->top();
+      if (tmp == NULL)
+        return *this;
+      tmp->write_in_att_format(infile);
       prompt();
       return *this;
     }

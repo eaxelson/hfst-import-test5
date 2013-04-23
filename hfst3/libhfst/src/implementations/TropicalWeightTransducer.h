@@ -168,6 +168,7 @@ namespace implementations
       static StdVectorFst * minimize(StdVectorFst * t);
       static StdVectorFst * remove_epsilons(StdVectorFst * t);
       static StdVectorFst * n_best(StdVectorFst * t, unsigned int n);
+      static StdVectorFst * prune(StdVectorFst * t);
       static StdVectorFst * repeat_star(StdVectorFst * t);
       static StdVectorFst * repeat_plus(StdVectorFst * t);
       static StdVectorFst * repeat_n(StdVectorFst * t, unsigned int n);

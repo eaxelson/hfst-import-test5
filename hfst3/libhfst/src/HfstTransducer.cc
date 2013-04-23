@@ -1595,6 +1595,19 @@ HfstTransducer &HfstTransducer::remove_epsilons()
     //#endif
     false ); }
 
+HfstTransducer &HfstTransducer::prune()
+{
+#if HAVE_OPENFST
+  this->convert(TROPICAL_OPENFST_TYPE);
+  fst::StdVectorFst * temp = hfst::implementations::TropicalWeightTransducer::prune
+    (this->implementation.tropical_ofst);
+  delete this->implementation.tropical_ofst;
+  this->implementation.tropical_ofst = temp;
+  return *this;
+#endif
+  HFST_THROW(FunctionNotImplementedException);
+}
+
 HfstTransducer &HfstTransducer::determinize()
 { is_trie = false;
     return apply(

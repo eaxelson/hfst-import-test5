@@ -305,6 +305,9 @@ LWSP [\t ]*
 "write dot"|"wdot"|"dot" {
     return SAVE_DOT;
 }
+"write att"|"att" {
+    return WRITE_ATT;
+}
 
 "print file-info"|"file-info" {
     return PRINT_FILE_INFO;
@@ -383,7 +386,7 @@ LWSP [\t ]*
     return PRINT_WORDS;
 }
 "prune net"|"prune" {
-    return PRUNE;
+    return PRUNE_NET;
 }
 
 
@@ -398,6 +401,10 @@ LWSP [\t ]*
 
 "lexc"|"read lexc" {
     return READ_LEXC;
+}
+
+"att"|"read att" {
+    return READ_ATT;
 }
 
 "read properties"|"rprops" {

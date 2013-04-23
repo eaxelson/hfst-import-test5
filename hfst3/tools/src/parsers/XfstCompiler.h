@@ -45,12 +45,12 @@ namespace xfst {
   enum UnaryOperation
   { DETERMINIZE_NET, EPSILON_REMOVE_NET, INVERT_NET,
     LOWER_SIDE_NET, UPPER_SIDE_NET, OPTIONAL_NET, ONE_PLUS_NET,
-    ZERO_PLUS_NET, REVERSE_NET, MINIMIZE_NET };
+    ZERO_PLUS_NET, REVERSE_NET, MINIMIZE_NET, PRUNE_NET_ };
 
   // Used internally in function 'apply_binaryoperator(_iteratively)'.
   enum BinaryOperation
   { IGNORE_NET, INTERSECT_NET, COMPOSE_NET, CONCATENATE_NET, MINUS_NET,
-    UNION_NET, SHUFFLE_NET };
+    UNION_NET, SHUFFLE_NET, CROSSPRODUCT_NET };
 
   // Used internally in function 'apply'.
   enum ApplyDirection { APPLY_UP_DIRECTION, APPLY_DOWN_DIRECTION };
@@ -122,7 +122,7 @@ class XfstCompiler
 
   //! @brief Load regex macros from file
   //! @todo Definition names cannot be stored in HFST automata binaries
-  XfstCompiler& load_definitions(FILE* infile);
+  XfstCompiler& load_definitions(const char* infilename);
 
   //! @brief Search help directory
   //! @todo helps have not been written or copied
@@ -352,6 +352,10 @@ class XfstCompiler
   XfstCompiler& read_lexc(FILE* infile);
   //! @brief Read lexicons from @a indata
   XfstCompiler& read_lexc(const char* indata);
+  //! @brief Read a transducer in att format from @a infile
+  XfstCompiler& read_att(FILE* infile);
+  //! @brief Write top transducer in att format to @a outfile
+  XfstCompiler& write_att(FILE* outfile);
 
   //! @brief do some label pushing
   //! @todo HFST automata cannot push labels
@@ -457,6 +461,9 @@ class XfstCompiler
   XfstCompiler& print_longest_string_or_its_size(FILE* outfile, bool print_size);
   XfstCompiler& print_words(const char* name, unsigned int number,
                             FILE* outfile, Level level);
+  XfstCompiler& read_text_or_spaced(FILE *infile, bool spaces);
+  XfstCompiler& load_stack_or_definitions(const char *infilename, bool definitions);
+  XfstCompiler& add_loaded_definition(HfstTransducer * t);
 
   //! @brief Perform lookup on the top transducer using strings in \a infile.
   //! \a direction specifies whether apply is done on input (up) or output (down) 
@@ -491,6 +498,8 @@ class XfstCompiler
 
   //! @brief Get next line from \a file. Return NULL if end of file is reached.
   char * xfst_getline(FILE * file);
+  
+  char * remove_newline(char *);
 
   //! @brief Get current readline history index.
   int current_history_index();
