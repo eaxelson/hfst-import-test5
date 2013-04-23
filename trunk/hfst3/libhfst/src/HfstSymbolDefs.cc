@@ -107,6 +107,16 @@ bool is_default(const char * str)
       return result;
     }
 
+    StringPairSet to_string_pair_set(const StringSet & ss)
+    {
+      StringPairSet result;
+      for (StringSet::const_iterator it = ss.begin();
+           it != ss.end(); it++)
+        {
+          result.insert(StringPair(*it,*it));
+        }
+      return result;
+    }
 
     StringVector to_string_vector(const HfstTwoLevelPath & path)
     {

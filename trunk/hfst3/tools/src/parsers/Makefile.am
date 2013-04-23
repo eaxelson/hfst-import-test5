@@ -30,7 +30,7 @@ endif
 
 noinst_HEADERS = XfstCompiler.h xfst-utils.h xfst-parser.h
 
-HFST_COMMON_SRC=../hfst-program-options.cc ../hfst-commandline.cc ../hfst-tool-metadata.cc
+HFST_COMMON_SRC=../hfst-program-options.cc ../hfst-commandline.cc ../hfst-tool-metadata.cc ../HfstStrings2FstTokenizer.cc
 
 bin_PROGRAMS=$(MAYBE_XFST)
 hfst_xfst2fst_SOURCES = xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc hfst-xfst2fst.cc $(HFST_COMMON_SRC)

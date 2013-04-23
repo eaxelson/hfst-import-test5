@@ -84,8 +84,8 @@ int hxfstlex(void);
        DEFINE_LIST TEST_ID PRINT_LISTS TEST_SUBLANGUAGE TEST_LOWER_UNI
        COMPILE_REPLACE_UPPER CLEANUP ADD_PROPS PRINT_SIGMA_WORD_COUNT SHUFFLE
        COLON SAVE_TEXT DETERMINIZE SIGMA COMPILE_REPLACE_LOWER UNION
-       PRINT_DIR LIST LOWER_SIDE MINIMIZE MINUS PRINT_NAME PRUNE
-       PUSH_DEFINED READ_LEXC TWOSIDED_FLAGS
+       PRINT_DIR LIST LOWER_SIDE MINIMIZE MINUS PRINT_NAME PRUNE_NET
+       PUSH_DEFINED READ_LEXC READ_ATT TWOSIDED_FLAGS WRITE_ATT
        ERROR
        NEWLINE
     
@@ -211,7 +211,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
        }
        | LOADD NAMETOKEN END_COMMAND {
-            hfst::xfst::xfst_->load_definitions(hfst::xfst::xfst_fopen($2, "r"));
+            hfst::xfst::xfst_->load_definitions($2);
             free($2);
        }
        // help
@@ -229,11 +229,11 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | POP END_COMMAND {
             hfst::xfst::xfst_->pop();
        }
-       | PUSH NAMETOKEN END_COMMAND {
+       | PUSH_DEFINED NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->push($2);
             free($2);
        }
-       | PUSH END_COMMAND {
+       | PUSH_DEFINED END_COMMAND {
             hfst::xfst::xfst_->push();
        }
        | TURN END_COMMAND {
@@ -724,6 +724,21 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | READ_LEXC NAMETOKEN_LIST CTRLD {
             hfst::xfst::xfst_->read_lexc(stdin);
        }
+       | READ_ATT NAMETOKEN END_COMMAND {
+            hfst::xfst::xfst_->read_att(hfst::xfst::xfst_fopen($2, "r"));
+            free($2);
+       }
+       | WRITE_ATT END_COMMAND {
+            hfst::xfst::xfst_->write_att(stdout);       
+       }
+       | WRITE_ATT REDIRECT_OUT END_COMMAND {
+            hfst::xfst::xfst_->write_att(hfst::xfst::xfst_fopen($2, "wb"));
+            free($2);
+       }
+       | WRITE_ATT NAMETOKEN END_COMMAND {
+            hfst::xfst::xfst_->write_att(hfst::xfst::xfst_fopen($2, "wb"));
+            free($2);
+       }
        // net ops
        | CLEANUP END_COMMAND {
             hfst::xfst::xfst_->cleanup_net();
@@ -751,6 +766,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        }
        | EPSILON_REMOVE END_COMMAND {
             hfst::xfst::xfst_->epsilon_remove_net();
+       }
+       | PRUNE_NET END_COMMAND {
+            hfst::xfst::xfst_->prune_net();
        }
        | IGNORE END_COMMAND {
             hfst::xfst::xfst_->ignore_net();

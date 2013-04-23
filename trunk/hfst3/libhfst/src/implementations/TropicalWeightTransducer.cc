@@ -1555,6 +1555,13 @@ namespace hfst { namespace implementations
   { return new StdVectorFst(RmEpsilonFst<StdArc>(*t)); }
 
   StdVectorFst * 
+  TropicalWeightTransducer::prune(StdVectorFst * t)
+  { StdVectorFst * retval = new StdVectorFst(); 
+    fst::Prune(*t, retval, TropicalWeight::One());
+    return retval;
+  }
+
+  StdVectorFst * 
   TropicalWeightTransducer::n_best(StdVectorFst * t, unsigned int n)
   { 
     StdVectorFst * n_best_fst = new StdVectorFst(); 
