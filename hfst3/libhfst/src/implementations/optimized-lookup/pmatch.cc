@@ -465,6 +465,10 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
                     get_analyses(input_tape,
                                  output_tape,
                                  transition_table[i].target);
+                    if (local_stack.top().context == LC ||
+                        local_stack.top().context == NLC) {
+                        input_tape += 1; // Undo what we did - this is very inelegant
+                    }
                     local_stack.pop();
                     ++i;
                 }
