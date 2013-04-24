@@ -204,7 +204,9 @@ get_quoted(const char *s)
 {
     const char *qstart = strchr((char*) s, '"') + 1;
     const char *qend = strrchr((char*) s, '"');
-    return strndup(qstart, (size_t) (qend - qstart));
+    char* qpart = strdup(qstart);
+    *(qpart+ (size_t) (qend - qstart)) = '\0';
+    return qpart;
 }
 
 char*
