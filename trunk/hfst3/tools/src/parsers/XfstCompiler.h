@@ -220,7 +220,7 @@ class XfstCompiler
   //! @brief Substitute labels @a src by @a target.
   XfstCompiler& substitute(const char* src, const char* target);
   //! @brief Substitute all labels in @a list by @a target.
-  XfstCompiler& substitute(const char** list, const char* target);
+  XfstCompiler& substitute_list(const char* list, const char* target);
 
   //! @brief Print aliases
   XfstCompiler& print_aliases(FILE* outfile);

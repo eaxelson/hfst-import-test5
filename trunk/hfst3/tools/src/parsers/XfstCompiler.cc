@@ -1166,7 +1166,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         return *this;
 
       stack_.pop();
-      top->substitute(src, target);
+      top->substitute(target, src);
       stack_.push(top);
 
       print_transducer_info();
@@ -1174,21 +1174,24 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return *this;
     }
   XfstCompiler& 
-  XfstCompiler::substitute(const char** list, const char* target)
+  XfstCompiler::substitute_list(const char* list, const char* target)
     {
       HfstTransducer* top = this->top();
       if (top == NULL)
         return *this;
       stack_.pop();
-      for (const char* src = *list; src != 0; src++)
-        {
-          if (strchr(src, ':') != 0)
-            {
-              fprintf(stderr, "missing substitute %s:%d\n", __FILE__, __LINE__);
-            }
-          top->substitute(src, target);
-        }
-      stack_.push(top);
+
+      // `[ [TR] , s , L ]
+      xre_.define("TempXfstTransducerName", *top);
+      std::string subst_regex("`[ [TempXfstTransducerName] , ");
+      subst_regex = subst_regex + std::string(target) + " , ";
+      subst_regex = subst_regex +  std::string(list);
+      subst_regex = subst_regex + " ]";
+
+      HfstTransducer * substituted = xre_.compile(subst_regex);
+      xre_.undefine("TempXfstTransducerName");
+
+      stack_.push(substituted);
       print_transducer_info();
       prompt();
       return *this;

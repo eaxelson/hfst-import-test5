@@ -352,8 +352,8 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
             free($4);
        }
-       | SUBSTITUTE_SYMBOL NAMETOKEN_LIST FOR LABEL END_COMMAND {
-            hfst::xfst::xfst_->substitute($2, $4);
+       | SUBSTITUTE_SYMBOL NAMETOKEN_LIST FOR NAMETOKEN END_COMMAND {
+            hfst::xfst::xfst_->substitute_list($2, $4);
             free($2);
             free($4);
        }
@@ -909,7 +909,6 @@ NAMETOKEN_LIST: NAMETOKEN_LIST NAMETOKEN {
                     s++;
                 }
                 *r = '\0';
-                $$ = $1;
              }
              | NAMETOKEN {
                 $$ = $1;
