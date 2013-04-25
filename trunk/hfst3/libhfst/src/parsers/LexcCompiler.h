@@ -122,6 +122,7 @@ class LexcCompiler
   std::map<std::string,hfst::HfstTransducer> stringTries_;
   std::map<std::string,hfst::HfstTransducer> regexps_;
   std::set<std::string> lexiconNames_;
+  std::set<std::string> noFlags_;
   std::set<std::string> continuations_;
   std::string currentLexiconName_;
   size_t totalEntries_;
