@@ -138,6 +138,12 @@ LexcCompiler::setVerbosity(bool verbose)
 }
 
 LexcCompiler&
+LexcCompiler::addNoFlag(const string& lexname)
+{
+    noFlags_.insert(lexname);
+    return *this;
+}
+LexcCompiler&
 LexcCompiler::addAlphabet(const string& alpha)
 {
     tokenizer_.add_multichar_symbol(alpha);
