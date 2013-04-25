@@ -30,6 +30,8 @@
 
 extern void hxfsterror(const char *text);
 
+int source_stack_size = 0;
+
 %}
 
 /* c.f. Unicode Standard 5.1 D92 Table 3-7 */
@@ -84,6 +86,7 @@ WSP [\t ]
 LWSP [\t ]*
 
 %x REGEX_STATE
+%x SOURCE_STATE
 %%
 
 "add properties"|"add" {
@@ -465,7 +468,7 @@ LWSP [\t ]*
 }
 
 "source" {
-    return SOURCE;
+    BEGIN(SOURCE_STATE);
 }
 
 "substitute defined" {
@@ -584,6 +587,18 @@ LWSP [\t ]*
     return ERROR;
 }
 
+<SOURCE_STATE>[a-z0-9]+ {  
+  FILE * tmp = NULL;
+  if ((tmp = fopen(hfst::xfst::strstrip(hxfsttext), "r" )) != NULL) {
+    printf("Opening file '%s'.\n", hfst::xfst::strstrip(hxfsttext));       
+    hxfstpush_buffer_state(hxfst_create_buffer(tmp, 32000));
+    ++source_stack_size;
+  } else {
+    printf("Error opening file '%s'\n",hfst::xfst::strstrip(hxfsttext));
+  } 
+  BEGIN(INITIAL); 
+}
+
 ">"{WSP}*{NAMETOKEN} {
     hxfstlval.file = hfst::xfst::strstrip(hxfsttext+1);
     return REDIRECT_OUT;
@@ -653,6 +668,16 @@ LWSP [\t ]*
 [\t ]* { /* skip whitespace */ }
 
 "!".*$ { /* skip comments */ }
+
+<<EOF>> {
+    --source_stack_size;
+    if (source_stack_size < 0) {
+      yyterminate();
+    }
+    else {
+      hxfstpop_buffer_state();
+    }
+}
 
 [\x80-\xff] {
     hxfsterror("Illegal 8-bit sequence (cannot form valid UTF-8)");
