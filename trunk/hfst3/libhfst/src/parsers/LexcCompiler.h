@@ -69,6 +69,10 @@ class LexcCompiler
   //! not support open alphabets.
   LexcCompiler& addAlphabet(const std::string& alphabet);
 
+  //! @brief add @a lexname to noflaggable lexicon set.
+  //! @deprecated experimental, transitional
+  LexcCompiler& addNoFlag(const std::string& lexname);
+
   //! @brief set current processing lexicon name to @a lexicon_name.
   LexcCompiler& setCurrentLexiconName(const std::string& lexicon_name);
 

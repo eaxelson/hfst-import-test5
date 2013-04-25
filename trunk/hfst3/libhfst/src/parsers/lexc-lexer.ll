@@ -85,90 +85,108 @@ LEXICONNAME {LEXICONCHAR}+
 WSP [\t ]
 LWSP [\r\n\t ]
 
-%x MULTICHARS DEFINITIONS LEXICONS ENDED
+%x MULTICHARS DEFINITIONS NOFLAGS LEXICONS ENDED
 %%
 
 
 <INITIAL>^{WSP}*("Multichar"|"multichar"|"MULTICHAR")("_"|" ")("symbols"|"Symbols"|"SYMBOLS"){LWSP}+ {
-	BEGIN MULTICHARS;
-	hfst::lexc::token_update_positions(hlexctext);
-	return MULTICHARS_START;
+    BEGIN MULTICHARS;
+    hfst::lexc::token_update_positions(hlexctext);
+    return MULTICHARS_START;
 }
 
-<INITIAL,MULTICHARS>^{WSP}*("Definitions"|"Declarations"|"definitions"|"declarations"|"DEFINITIONS"|"DECLARATIONS"){LWSP}+ {
-	BEGIN DEFINITIONS;
-	hfst::lexc::token_update_positions(hlexctext);
-	return DEFINITIONS_START;
+<INITIAL,MULTICHARS>^{WSP}*("NOFLAGS"|"NoFlags"|"Noflags"|"noflags"){LWSP}+ {
+    BEGIN NOFLAGS;
+    hfst::lexc::token_update_positions(hlexctext);
+    return NOFLAGS_START;
 }
 
-<INITIAL,MULTICHARS,DEFINITIONS>^{WSP}*("LEXICON"){WSP}+{LEXICONNAME} {
-	BEGIN LEXICONS;
-	hfst::lexc::token_update_positions(hlexctext);
-	char* lexicon_start;
-	lexicon_start = hfst::lexc::strstrip(hlexctext);
-	hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "LEXICON",
-										  NULL, true);
-	free(lexicon_start);
-	return LEXICON_START;
+<INITIAL,MULTICHARS,NOFLAGS>^{WSP}*("Definitions"|"Declarations"|"definitions"|"declarations"|"DEFINITIONS"|"DECLARATIONS"){LWSP}+ {
+    BEGIN DEFINITIONS;
+    hfst::lexc::token_update_positions(hlexctext);
+    return DEFINITIONS_START;
 }
 
-<INITIAL,MULTICHARS,DEFINITIONS>^{WSP}*("lexicon"){WSP}+{LEXICONNAME} {
-	BEGIN LEXICONS;
-	hfst::lexc::token_update_positions(hlexctext);
-	char* lexicon_start;
-	lexicon_start = hfst::lexc::strstrip(hlexctext);
-	hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "lexicon",
-										  NULL, true);
-	free(lexicon_start);
+<INITIAL,MULTICHARS,NOFLAGS,DEFINITIONS>^{WSP}*("LEXICON"){WSP}+{LEXICONNAME} {
+    BEGIN LEXICONS;
+    hfst::lexc::token_update_positions(hlexctext);
+    char* lexicon_start;
+    lexicon_start = hfst::lexc::strstrip(hlexctext);
+    hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "LEXICON",
+                                          NULL, true);
+    free(lexicon_start);
+    return LEXICON_START;
+}
+
+<INITIAL,MULTICHARS,NOFLAGS,DEFINITIONS>^{WSP}*("lexicon"){WSP}+{LEXICONNAME} {
+    BEGIN LEXICONS;
+    hfst::lexc::token_update_positions(hlexctext);
+    char* lexicon_start;
+    lexicon_start = hfst::lexc::strstrip(hlexctext);
+    hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "lexicon",
+                                          NULL, true);
+    free(lexicon_start);
     hlexcerror("Lowercase lexicon parsed as LEXICON");
-	return LEXICON_START_WRONG_CASE;
+    return LEXICON_START_WRONG_CASE;
 }
 
-<INITIAL,MULTICHARS,DEFINITIONS>^{WSP}*("Lexicon"){WSP}+{LEXICONNAME} {
-	BEGIN LEXICONS;
-	hfst::lexc::token_update_positions(hlexctext);
-	char* lexicon_start;
-	lexicon_start = hfst::lexc::strstrip(hlexctext);
-	hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "Lexicon",
-										  NULL, true);
-	free(lexicon_start);
+<INITIAL,MULTICHARS,NOFLAGS,DEFINITIONS>^{WSP}*("Lexicon"){WSP}+{LEXICONNAME} {
+    BEGIN LEXICONS;
+    hfst::lexc::token_update_positions(hlexctext);
+    char* lexicon_start;
+    lexicon_start = hfst::lexc::strstrip(hlexctext);
+    hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "Lexicon",
+                                          NULL, true);
+    free(lexicon_start);
     hlexcerror("Titlecase Lexicon parsed as LEXICON");
-	return LEXICON_START_WRONG_CASE;
+    return LEXICON_START_WRONG_CASE;
 }
 
-<INITIAL,MULTICHARS,DEFINITIONS>^{WSP}*("END"|"End"|"end"){LWSP}+ {
-	hfst::lexc::token_update_positions(hlexctext);
-	return END_START;
+<INITIAL,MULTICHARS,NOFLAGS,DEFINITIONS>^{WSP}*("END"|"End"|"end"){LWSP}+ {
+    hfst::lexc::token_update_positions(hlexctext);
+    return END_START;
 }
 
 <INITIAL>!.* {
-	hfst::lexc::token_update_positions(hlexctext);
+    hfst::lexc::token_update_positions(hlexctext);
 }
 
 <INITIAL>{LWSP} {
-	hfst::lexc::token_update_positions(hlexctext);
+    hfst::lexc::token_update_positions(hlexctext);
 }
 
 <MULTICHARS>{STRINGTOKEN} {
-	hfst::lexc::token_update_positions(hlexctext);
-	hlexclval.name = hfst::lexc::strip_percents(hlexctext, false);
-	return MULTICHAR_SYMBOL;
+    hfst::lexc::token_update_positions(hlexctext);
+    hlexclval.name = hfst::lexc::strip_percents(hlexctext, false);
+    return MULTICHAR_SYMBOL;
 }
 
 <MULTICHARS>!.* { hfst::lexc::token_update_positions(hlexctext); }
 
 <MULTICHARS>{LWSP} { hfst::lexc::token_update_positions(hlexctext); }
 
+<NOFLAGS>{LEXICONNAME} {
+    hfst::lexc::token_update_positions(hlexctext);
+    hlexclval.name = strdup(hlexctext);
+    return LEXICON_NAME;
+}
+
+<NOFLAGS>!.* { hfst::lexc::token_update_positions(hlexctext); }
+
+<NOFLAGS>{LWSP} { hfst::lexc::token_update_positions(hlexctext); }
+
+<NOFLAGS>";" { BEGIN INITIAL; }
+
 <DEFINITIONS>{STRINGTOKEN}{WSP}*/"=" {
-	hfst::lexc::token_update_positions(hlexctext);
-	hlexclval.name = hfst::lexc::strstrip(hlexctext);
-	return DEFINITION_NAME;
+    hfst::lexc::token_update_positions(hlexctext);
+    hlexclval.name = hfst::lexc::strstrip(hlexctext);
+    return DEFINITION_NAME;
 }
 
 <DEFINITIONS>"="{XRETOKEN}";" {
-	hfst::lexc::token_update_positions(hlexctext);
-	hlexclval.name = hfst::lexc::strdup_nonconst_part(hlexctext, "=", ";", false);
-	return DEFINITION_EXPRESSION;
+    hfst::lexc::token_update_positions(hlexctext);
+    hlexclval.name = hfst::lexc::strdup_nonconst_part(hlexctext, "=", ";", false);
+    return DEFINITION_EXPRESSION;
 }
 
 <DEFINITIONS>!.* { hfst::lexc::token_update_positions(hlexctext); }
@@ -176,101 +194,101 @@ LWSP [\r\n\t ]
 <DEFINITIONS>{LWSP} { hfst::lexc::token_update_positions(hlexctext); }
 
 <LEXICONS>^{WSP}*"LEXICON"{WSP}+{LEXICONNAME} {
-	hfst::lexc::token_update_positions(hlexctext);
-	char* lexicon_start;
-	lexicon_start = hfst::lexc::strstrip(hlexctext);
-	hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "LEXICON", 0, true);
-	free(lexicon_start);
-	return LEXICON_START;
+    hfst::lexc::token_update_positions(hlexctext);
+    char* lexicon_start;
+    lexicon_start = hfst::lexc::strstrip(hlexctext);
+    hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "LEXICON", 0, true);
+    free(lexicon_start);
+    return LEXICON_START;
 }
 
 <LEXICONS>^{WSP}*"Lexicon"{WSP}+{LEXICONNAME} {
-	hfst::lexc::token_update_positions(hlexctext);
-	char* lexicon_start;
-	lexicon_start = hfst::lexc::strstrip(hlexctext);
-	hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "Lexicon", 0, true);
-	free(lexicon_start);
+    hfst::lexc::token_update_positions(hlexctext);
+    char* lexicon_start;
+    lexicon_start = hfst::lexc::strstrip(hlexctext);
+    hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "Lexicon", 0, true);
+    free(lexicon_start);
     hlexcerror("Titlecase Lexicon parsed as LEXICON");
-	return LEXICON_START_WRONG_CASE;
+    return LEXICON_START_WRONG_CASE;
 }
 
 <LEXICONS>^{WSP}*"lexicon"{WSP}+{LEXICONNAME} {
-	hfst::lexc::token_update_positions(hlexctext);
-	char* lexicon_start;
-	lexicon_start = hfst::lexc::strstrip(hlexctext);
-	hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "lexicon", 0, true);
-	free(lexicon_start);
+    hfst::lexc::token_update_positions(hlexctext);
+    char* lexicon_start;
+    lexicon_start = hfst::lexc::strstrip(hlexctext);
+    hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "lexicon", 0, true);
+    free(lexicon_start);
     hlexcerror("Lowercase lexicon parsed as LEXICON");
-	return LEXICON_START_WRONG_CASE;
+    return LEXICON_START_WRONG_CASE;
 }
 
 <LEXICONS>{STRINGTOKEN} {
-	hfst::lexc::token_update_positions(hlexctext);
-	hlexclval.name = hfst::lexc::strip_percents(hlexctext, false);
-	return ULSTRING;
+    hfst::lexc::token_update_positions(hlexctext);
+    hlexclval.name = hfst::lexc::strip_percents(hlexctext, false);
+    return ULSTRING;
 }
 
 <LEXICONS>"<"{WSP}*{XRETOKEN}{WSP}*">" {
-	hfst::lexc::token_update_positions(hlexctext);
-	hlexclval.name = hfst::lexc::strdup_nonconst_part(hlexctext, "<", ">", false);
-	return XEROX_REGEXP;
+    hfst::lexc::token_update_positions(hlexctext);
+    hlexclval.name = hfst::lexc::strdup_nonconst_part(hlexctext, "<", ">", false);
+    return XEROX_REGEXP;
 }
 
 <LEXICONS>{LEXICONNAME}/{WSP}*("\""|";") {
-	hfst::lexc::token_update_positions(hlexctext);
-	hlexclval.name = strdup(hlexctext);
-	return LEXICON_NAME;
+    hfst::lexc::token_update_positions(hlexctext);
+    hlexclval.name = strdup(hlexctext);
+    return LEXICON_NAME;
 }
 
 <LEXICONS>"\""[^\n\t""]*"\"" {
-	hfst::lexc::token_update_positions(hlexctext);
-	hlexclval.name = strdup(hlexctext);
-	return ENTRY_GLOSS;
+    hfst::lexc::token_update_positions(hlexctext);
+    hlexclval.name = strdup(hlexctext);
+    return ENTRY_GLOSS;
 }
 
 <LEXICONS>^{WSP}*"END"{LWSP}+ {
-	BEGIN ENDED;
-	hfst::lexc::token_update_positions(hlexctext);
-	return END_START;
+    BEGIN ENDED;
+    hfst::lexc::token_update_positions(hlexctext);
+    return END_START;
 }
 
 <LEXICONS>";" {
-	hfst::lexc::token_update_positions(hlexctext);
-	return hlexctext[0];
+    hfst::lexc::token_update_positions(hlexctext);
+    return hlexctext[0];
 }
 
 <LEXICONS>":" {
-	hfst::lexc::token_update_positions(hlexctext);
-	return hlexctext[0];
+    hfst::lexc::token_update_positions(hlexctext);
+    return hlexctext[0];
 }
 
 <LEXICONS>!.* {
-	hfst::lexc::token_update_positions(hlexctext);
+    hfst::lexc::token_update_positions(hlexctext);
 
 }
 <LEXICONS>{LWSP} {
-	hfst::lexc::token_update_positions(hlexctext);
+    hfst::lexc::token_update_positions(hlexctext);
 
 }
 
 <ENDED>. { 
-	hfst::lexc::token_update_positions(hlexctext);
+    hfst::lexc::token_update_positions(hlexctext);
 
 }
 <ENDED>{LWSP} {
-	hfst::lexc::token_update_positions(hlexctext);
+    hfst::lexc::token_update_positions(hlexctext);
 }
 
 <*>[\x80-\xff] {
-	hfst::lexc::token_update_positions(hlexctext);
-	hlexcerror("Illegal 8-bit sequence (cannot form valid UTF-8)");
-	return ERROR;
+    hfst::lexc::token_update_positions(hlexctext);
+    hlexcerror("Illegal 8-bit sequence (cannot form valid UTF-8)");
+    return ERROR;
 }
 
 <*>. {
-	hfst::lexc::token_update_positions(hlexctext);
-	hlexcerror("Syntax error in lexer (no valid token found at the point)");
-	return ERROR;
+    hfst::lexc::token_update_positions(hlexctext);
+    hlexcerror("Syntax error in lexer (no valid token found at the point)");
+    return ERROR;
 }
 
 %%
