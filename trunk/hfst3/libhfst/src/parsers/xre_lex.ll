@@ -218,6 +218,10 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     return SYMBOL;
 }  
 
+{NAME_CH}+"(" { 
+    xrelval.label = strdup(xretext);
+    return FUNCTION_NAME; }
+
 ";\t"{WEIGHT} {
     xrelval.weight = hfst::xre::get_weight(xretext + 2);
     return END_OF_WEIGHTED_EXPRESSION;

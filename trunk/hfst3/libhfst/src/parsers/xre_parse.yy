@@ -44,7 +44,8 @@ extern int yylex();
     hfst::HfstTransducer* transducer;
     hfst::HfstTransducerPair* transducerPair;
     hfst::HfstTransducerPairVector* transducerPairVector;
-    
+    hfst::HfstTransducerVector* transducerVector;   // function call 
+
    std::pair<hfst::xeroxRules::ReplaceArrow, std::vector<hfst::xeroxRules::Rule> >* replaceRuleVectorWithArrow;
    std::pair< hfst::xeroxRules::ReplaceArrow, hfst::xeroxRules::Rule>* replaceRuleWithArrow;   
    std::pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducerPairVector>* mappingVectorWithArrow;
@@ -74,6 +75,9 @@ extern int yylex();
 %type <transducerPair> CONTEXT, RESTR_CONTEXT
 %type <replType>  CONTEXT_MARK
 %type <label>     HALFARC SUB2
+
+%type <transducerVector> REGEXP_LIST   // function call
+%type <label> FUNCTION                 // function call
 
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
 %nonassoc <label> SYMBOL CURLY_BRACKETS
@@ -109,6 +113,7 @@ extern int yylex();
 %nonassoc <value> CATENATE_N CATENATE_N_PLUS CATENATE_N_MINUS
 
 %nonassoc <label> READ_BIN READ_TEXT READ_SPACED READ_PROLOG READ_RE
+%nonassoc <label> FUNCTION_NAME   // function call
 %token LEFT_BRACKET RIGHT_BRACKET LEFT_PARENTHESIS RIGHT_PARENTHESIS
        LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED SUBVAL
        PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
@@ -140,7 +145,7 @@ REGEXP1: REGEXP2 END_OF_EXPRESSION {
     //    std::cerr << "regexp1:regexp2\n"<< *$1 << std::endl; 
         hfst::xre::last_compiled = & $1->minimize();
         $$ = hfst::xre::last_compiled;
-   }          
+   }
 ;
 
 
@@ -162,8 +167,14 @@ REGEXP2: REPLACE
             $$ = & $1->lenient_composition(*$3).minimize();
             delete $3;
         }
+        // function call
+       | FUNCTION REGEXP_LIST RIGHT_PARENTHESIS {
+            fprintf(stderr, "function %s@%i) called: function definitions not yet implemented, returning an empty transducer\n", $1, (int)$2->size());
+            $$ = new hfst::HfstTransducer(hfst::xre::format);
+            // $$ = hfst::xre::evaluate_function($1, $2);
+        }
         // substitute
-        | SUB1 SUB2 SUB3 {
+       | SUB1 SUB2 SUB3 {
             StringPair tmp($2, $2);
             HfstTransducer * tmpTr = new HfstTransducer(* $1);
 
@@ -925,6 +936,19 @@ HALFARC: SYMBOL
         $$ = strdup("@#@");
      }
      ;
+
+REGEXP_LIST: REGEXP_LIST COMMA REGEXP2 { 
+       $$->push_back(*($3)); 
+     } 
+     | REGEXP2 { 
+       $$ = new hfst::HfstTransducerVector();
+       $$->push_back(*($1)); 
+     }
+     ;
+
+FUNCTION: FUNCTION_NAME {
+        $$ = strdup($1);
+    };
 
 %%
 
