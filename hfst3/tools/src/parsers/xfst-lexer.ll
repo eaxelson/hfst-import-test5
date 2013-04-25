@@ -587,7 +587,7 @@ LWSP [\t ]*
     return ERROR;
 }
 
-<SOURCE_STATE>[a-z0-9]+ {  
+<SOURCE_STATE>[A-Za-z]{NAMECHAR}* {  
   FILE * tmp = NULL;
   if ((tmp = fopen(hfst::xfst::strstrip(hxfsttext), "r" )) != NULL) {
     printf("Opening file '%s'.\n", hfst::xfst::strstrip(hxfsttext));       
