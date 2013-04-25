@@ -31,6 +31,9 @@ for i in sfst openfst-tropical foma; do
     if ! $TOOLDIR/hfst-regexp2fst -S -f $i $srcdir/parallel-left-arrow-multicom-emptyline.xre > test.fst ; then
         exit 1
     fi
+    if ! $TOOLDIR/hfst-regexp2fst -S -f $i $srcdir/left-arrow-with-semicolon-comment.xre > test.fst ; then
+        exit 1
+    fi
 done
 
 rm -f test.fst
