@@ -47,6 +47,7 @@ static
 void
 handle_noflag(const string& lexname)
 {
+    fprintf(stderr, "DEBUG: Adding %s to noflags\n", lexname.c_str());
     hfst::lexc::lexc_->addNoFlag(lexname);
 }
 static
@@ -169,7 +170,7 @@ handle_end()
 
 %%
 
-LEXC_FILE: MULTICHAR_PART NOFLAGS_PART DEFINITIONS_PART LEXICON_PART END_PART {
+LEXC_FILE: NOFLAGS_PART MULTICHAR_PART DEFINITIONS_PART LEXICON_PART END_PART {
                 handle_eof();
             }
              ;
