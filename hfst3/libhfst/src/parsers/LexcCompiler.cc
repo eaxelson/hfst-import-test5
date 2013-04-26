@@ -430,7 +430,8 @@ LexcCompiler::compileLexical()
           }
         if (verbose_)
           {
-            fprintf(stderr, "%s -> %s -> #, ", initialLexiconName_.c_str(),
+            fprintf(stderr, "Morphotaxing... "
+                    " %s -> %s -> #, ", initialLexiconName_.c_str(),
                     s->c_str());
           }
         string startEnc = initialLexiconName_;
@@ -449,6 +450,8 @@ LexcCompiler::compileLexical()
         HfstTransducer joinerPair = joiner.repeat_n(2);
         HfstTransducer morphotax = sigmaStar.disjunct(joinerPair);
         morphotax.repeat_star();
+        fprintf(stderr, "DBG: morphotax like\n");
+        std::cerr << morphotax;
         morphotax = start.concatenate(morphotax).concatenate(end).minimize();
         lexicons = lexicons.compose(morphotax);
         lexicons.substitute(joinerEnc, "@_EPSILON_SYMBOL_@").minimize();
@@ -463,6 +466,11 @@ LexcCompiler::compileLexical()
         string endEnc = "#";
         joinerEncode(endEnc);
         HfstTransducer end(endEnc, endEnc, format_);
+        if (verbose_)
+          {
+            fprintf(stderr, "Morphotaxing... "
+                    " %s .* #, ", initialLexiconName_.c_str());
+          }
         HfstTransducer sigmaStar("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@",
                                  format_);
         sigmaStar = sigmaStar.subtract(start).subtract(end).subtract(joiner);
@@ -483,6 +491,11 @@ LexcCompiler::compileLexical()
         string endEnc = "#";
         flagJoinerEncode(endEnc, true);
         HfstTransducer end(endEnc, endEnc, format_);
+        if (verbose_)
+          {
+            fprintf(stderr, "Using flags for... "
+                    " %s .* #, ", initialLexiconName_.c_str());
+          }
         lexicons = start.concatenate(lexicons).concatenate(end);
       }
     lexicons.substitute("@ZERO@", "0");
