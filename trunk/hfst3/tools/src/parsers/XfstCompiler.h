@@ -109,7 +109,7 @@ class XfstCompiler
   XfstCompiler& define(const char* name, const char* xre);
   //! @brief Define regex macro function
   //! @todo Regex parser does not support macro functions
-  XfstCompiler& define(const char* name, const char* prototype, const char* xre);
+  XfstCompiler& define_function(const char* prototype, const char* xre);
   //! @brief Remove definition
   XfstCompiler& undefine(const char* name_list);
   //! @brief Remove list

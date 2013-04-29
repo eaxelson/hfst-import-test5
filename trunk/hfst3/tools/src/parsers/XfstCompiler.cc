@@ -558,10 +558,98 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return *this;
     }
 
+  
+  static int extract_function_name
+  (const char* prototype, std::string& name)
+  {
+    for (unsigned int i=0; prototype[i] != 0; i++)
+      {
+        name = name + prototype[i];
+        if (prototype[i] == '(')
+          {
+            return ++i;
+          }
+      }
+    return -1;
+  }
+
+  static bool extract_function_arguments
+  (const char * arg_list, std::vector<std::string>& args)
+  {
+    // skip the function name
+    unsigned int i=0;
+    while(arg_list[i] != '(')
+      {
+        if (arg_list[i] == '\0')
+          {
+            return false;
+          }
+        ++i;
+      }
+    ++i;
+
+    std::string arg = "";
+    for ( ; arg_list[i] != ')'; i++)
+      {
+        if (arg_list[i] == '\0')
+          {
+            return false;
+          }
+        else if (arg_list[i] == ' ')
+          {
+            ;
+          }
+        else if (arg_list[i] == ',')
+          {
+            args.push_back(arg);
+            arg = "";
+          }
+        else
+          {
+            arg = arg + arg_list[i];
+          }
+      }
+    return true;
+  }
+
   XfstCompiler&
-  XfstCompiler::define(const char* name, const char* prototype,
-                       const char* xre)
+  XfstCompiler::define_function(const char* prototype,
+                                const char* xre)
     {
+      fprintf(stderr, "define_function: %s, %s\n", prototype, xre);
+
+      std::string name = "";
+      std::vector<std::string> arguments;
+
+      if (! extract_function_name(prototype, name))
+        {
+          fprintf(stderr, "Error extrating function name from prototype '%s'\n",
+                  prototype);
+          exit(1);
+        }
+
+      if (! extract_function_arguments(prototype, arguments))
+        {
+          fprintf(stderr, "Error extrating function arguments from prototype '%s'\n",
+                  prototype);
+          exit(1);
+        }
+
+      fprintf(stderr, "Extracted name '%s' and arguments (", name.c_str());
+      for (std::vector<std::string>::const_iterator it = arguments.begin();
+           it != arguments.end(); it++)
+        {
+          if (it != arguments.begin())
+            {
+              fprintf(stderr, ", ");
+            }
+          fprintf(stderr, "%s", it->c_str());
+        }
+      fprintf(stderr, ")\n");
+
+      exit(1);
+
+      /*
       HfstTransducer* compiled = xre_.compile(xre);
       char* signature = static_cast<char*>
         (malloc(sizeof(char)*strlen(name)+strlen(prototype)+1));
@@ -583,7 +671,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       *p = '\0';
       functions_[signature] = compiled;
       prompt();
-      return *this;
+      return *this;*/
     }
 
   XfstCompiler&
