@@ -17,6 +17,8 @@ extern char* data;
 extern char* startptr;
 extern size_t len;
 extern std::map<std::string,hfst::HfstTransducer*> definitions;
+extern std::map<std::string,std::string> function_definitions;
+extern std::map<std::string,std::vector<std::string> > function_arguments;
 extern HfstTransducer* last_compiled;
 extern ImplementationType format;
 
@@ -60,6 +62,8 @@ double get_weight(const char* s);
  */
 HfstTransducer* compile(const std::string& xre,
                         std::map<std::string,hfst::HfstTransducer*>& defs,
+                        std::map<std::string,std::string>& func_defs,
+                        std::map<std::string,std::vector<std::string> > func_args,
                         hfst::ImplementationType type);
 
 /** 
@@ -69,6 +73,8 @@ HfstTransducer* compile(const std::string& xre,
 HfstTransducer* expand_definition(HfstTransducer* tr, const char* symbol);
 
 bool is_definition(const char* symbol);
+
+bool is_valid_function_call(const char * name, std::vector<HfstTransducer> * args);
 
 /** @brief Parse "input:output", ":output", "input:" or ":". */
  HfstTransducer* xfst_label_to_transducer(const char* input, const char* output);

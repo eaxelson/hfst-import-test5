@@ -559,7 +559,10 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     }
 
   
-  static int extract_function_name
+  // Store function name in \a prototype to \a name.
+  // Return whether extraction succeeded.
+  // \a prototype must be of format "functionname(arg1, arg2, ... argN)"
+  static bool extract_function_name
   (const char* prototype, std::string& name)
   {
     for (unsigned int i=0; prototype[i] != 0; i++)
@@ -567,46 +570,50 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         name = name + prototype[i];
         if (prototype[i] == '(')
           {
-            return ++i;
+            return true;
           }
       }
-    return -1;
+    return false; // no starting parenthesis found
   }
 
+  // Store names of function arguments in \a prototype to \a args.
+  // Return whether extraction succeeded.
+  // \a prototype must be of format "functionname(arg1, arg2, ... argN)"
   static bool extract_function_arguments
-  (const char * arg_list, std::vector<std::string>& args)
+  (const char * prototype, std::vector<std::string>& args)
   {
     // skip the function name
     unsigned int i=0;
-    while(arg_list[i] != '(')
+    while(prototype[i] != '(')
       {
-        if (arg_list[i] == '\0')
+        if (prototype[i] == '\0')
           {
-            return false;
+            return false; // function name ended too early
           }
         ++i;
       }
-    ++i;
+    ++i; // skip the "(" in function name
 
+    // start scanning the argument list "arg1, arg2, ... argN )"
     std::string arg = "";
-    for ( ; arg_list[i] != ')'; i++)
+    for ( ; prototype[i] != ')'; i++)
       {
-        if (arg_list[i] == '\0')
+        if (prototype[i] == '\0') // no closing parenthesis found
           {
             return false;
           }
-        else if (arg_list[i] == ' ')
+        else if (prototype[i] == ' ') // skip whitespace
           {
             ;
           }
-        else if (arg_list[i] == ',')
+        else if (prototype[i] == ',') // end of argument
           {
             args.push_back(arg);
             arg = "";
           }
         else
           {
-            arg = arg + arg_list[i];
+            arg = arg + prototype[i];
           }
       }
     return true;
@@ -616,7 +623,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::define_function(const char* prototype,
                                 const char* xre)
     {
-      fprintf(stderr, "define_function: %s, %s\n", prototype, xre);
+      //fprintf(stderr, "define_function: %s, %s\n", prototype, xre);
 
       std::string name = "";
       std::vector<std::string> arguments;
@@ -635,6 +642,16 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           exit(1);
         }
 
+      if (! xre_.define_function(name, arguments, std::string(xre)))
+        {
+          fprintf(stderr, "Error when defining function\n");
+          exit(1);
+        }
+        
+      prompt();
+      return *this;
+
+      /*
       fprintf(stderr, "Extracted name '%s' and arguments (", name.c_str());
       for (std::vector<std::string>::const_iterator it = arguments.begin();
            it != arguments.end(); it++)
@@ -646,8 +663,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           fprintf(stderr, "%s", it->c_str());
         }
       fprintf(stderr, ")\n");
-
-      exit(1);
+      */
 
       /*
       HfstTransducer* compiled = xre_.compile(xre);

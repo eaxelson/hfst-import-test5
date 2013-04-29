@@ -11,11 +11,15 @@
 namespace hfst { namespace xre {
 XreCompiler::XreCompiler() : 
     definitions_(),
+    function_definitions_(),
+    function_arguments_(),
     format_(hfst::TROPICAL_OPENFST_TYPE)
 {}
 
 XreCompiler::XreCompiler(hfst::ImplementationType impl) :
     definitions_(),
+    function_definitions_(),
+    function_arguments_(),
     format_(impl)
 {}
 
@@ -32,13 +36,27 @@ XreCompiler::define(const std::string& name, const HfstTransducer & transducer)
   definitions_[name] = new HfstTransducer(transducer);
 }
 
-void
+bool
 XreCompiler::define_function(const std::string& name, 
                              const std::vector<std::string>& arguments,
                              const std::string& xre)
 {
-  return;
+  for (std::vector<std::string>::const_iterator it = arguments.begin();
+       it != arguments.end(); it++)
+    {
+      if (definitions_.find(*it) != definitions_.end())
+        {
+          fprintf(stderr, "Error: function argument %s is already a defined variable\n",
+                  it->c_str());
+          return false;
+        }
+    }
+  
+  function_arguments_[name] = arguments;
+  function_definitions_[name] = xre;
+  return true;
 }
+
 
 void
 XreCompiler::undefine(const std::string& name) 
@@ -76,7 +94,7 @@ void XreCompiler::set_verbosity(bool verbose, FILE * file)
 HfstTransducer*
 XreCompiler::compile(const std::string& xre)
 {
-  return hfst::xre::compile(xre, definitions_, format_);
+  return hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, format_);
 }
 
 }}

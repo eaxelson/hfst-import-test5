@@ -65,7 +65,7 @@ class XreCompiler
   //! where args is ("foo", "bar", "baz"), defines a function named Foo( that
   //! accepts the disjunction of its first and second arguments concatenated with
   //! one or more its third argument.
-  void define_function(const std::string& name, 
+  bool define_function(const std::string& name, 
                        const std::vector<std::string>& arguments, 
                        const std::string& xre);
 
@@ -97,6 +97,8 @@ class XreCompiler
 
   private:
   std::map<std::string,hfst::HfstTransducer*> definitions_;
+  std::map<std::string, std::string> function_definitions_;
+  std::map<std::string, std::vector<std::string> > function_arguments_;
   hfst::ImplementationType format_;
 
 }
