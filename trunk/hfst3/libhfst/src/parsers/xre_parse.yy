@@ -169,9 +169,13 @@ REGEXP2: REPLACE
         }
         // function call
        | FUNCTION REGEXP_LIST RIGHT_PARENTHESIS {
-            fprintf(stderr, "function %s@%i) called: function definitions not yet implemented, returning an empty transducer\n", $1, (int)$2->size());
-            $$ = new hfst::HfstTransducer(hfst::xre::format);
-            // $$ = hfst::xre::evaluate_function($1, $2);
+            if (! hfst::xre::is_valid_function_call($1, $2)) {
+              return EXIT_FAILURE;
+            }
+            else {
+              fprintf(stderr, "function %s@%i) called: function definitions not yet implemented, returning an empty transducer\n", $1, (int)$2->size());
+              $$ = new hfst::HfstTransducer(hfst::xre::format);
+            }
         }
         // substitute
        | SUB1 SUB2 SUB3 {
@@ -938,11 +942,13 @@ HALFARC: SYMBOL
      ;
 
 REGEXP_LIST: REGEXP_LIST COMMA REGEXP2 { 
-       $$->push_back(*($3)); 
+       $$->push_back(*($3));
+       delete $3; 
      } 
      | REGEXP2 { 
        $$ = new hfst::HfstTransducerVector();
        $$->push_back(*($1)); 
+       delete $1;
      }
      ;
 

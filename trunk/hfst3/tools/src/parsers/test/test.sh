@@ -28,6 +28,7 @@ do
 	${REMOVE} ${EXTRA_FILES}
 	exit 1
     fi
+
     # Test that the result is as intended.
     if ! (echo "foo bar Baz" | ${STRINGS2FST} -f $format | ${COMPARE} tmp);
     then

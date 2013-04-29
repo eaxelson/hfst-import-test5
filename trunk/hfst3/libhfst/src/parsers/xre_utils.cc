@@ -44,6 +44,8 @@ namespace xre
 
 char* data;
 std::map<std::string,hfst::HfstTransducer*> definitions;
+  std::map<std::string,std::string>  function_definitions;
+  std::map<std::string,std::vector<std::string> > function_arguments;
 char* startptr;
 hfst::HfstTransducer* last_compiled;
 hfst::ImplementationType format;
@@ -343,6 +345,8 @@ get_weight(const char *s)
 
 HfstTransducer*
 compile(const string& xre, map<string,HfstTransducer*>& defs,
+        map<string, string>& func_defs,
+        map<string, std::vector<string> > func_args,
         ImplementationType impl)
 {
     // lock here?
@@ -350,6 +354,8 @@ compile(const string& xre, map<string,HfstTransducer*>& defs,
     startptr = data;
     len = strlen(data);
     definitions = defs;
+    function_definitions = func_defs;
+    function_arguments = func_args;
     format = impl;
     xreparse();
     free(startptr);
@@ -365,6 +371,44 @@ compile(const string& xre, map<string,HfstTransducer*>& defs,
       {
         return new HfstTransducer(impl);
       }
+}
+
+bool is_valid_function_call
+(const char * name, std::vector<HfstTransducer> * args)
+{
+  std::map<std::string, std::string>::const_iterator name2xre
+    = function_definitions.find(name);
+  std::map<std::string, std::vector<std::string> >::const_iterator name2args
+    = function_arguments.find(name);
+
+  if (name2xre == function_definitions.end() || 
+      name2args == function_arguments.end())
+    {
+      fprintf(stderr, "No such function defined: '%s'\n", name);
+      return false;
+    }
+
+  StringVector arg_names = name2args->second;
+
+  if ( arg_names.size() != args->size())
+    {
+      fprintf(stderr, "Wrong number of arguments: function '%s' expects %i, %i given\n", 
+              name, (int)arg_names.size(), (int)args->size());
+      return false;
+    }
+
+  for (StringVector::const_iterator it = arg_names.begin();
+      it != arg_names.end(); it++)
+    {
+      if (is_definition(it->c_str()))
+        {
+          fprintf(stderr, "Function '%s' has argument named '%s' which is already a defined variable\n", 
+                  name, it->c_str());
+          return false;
+        }
+    }
+
+  return true;
 }
 
 bool is_definition(const char* symbol)
