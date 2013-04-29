@@ -65,7 +65,15 @@ static bool sum_weights=false;
 static bool normalize_weights=false;
 static bool logarithmic_weights=false;
 
-static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
+#if HAVE_OPENFST
+static hfst::ImplementationType compilation_format = hfst::TROPICAL_OPENFST_TYPE;
+#elif HAVE_FOMA
+static hfst::ImplementationType compilation_format = hfst::FOMA_TYPE;
+#elif HAVE_SFST
+static hfst::ImplementationType compilation_format = hfst::SFST_TYPE;
+#else
+static hfst::ImplementationType compilation_format = hfst::ERROR_TYPE;
+#endif
 
 void
 print_usage()
@@ -77,30 +85,19 @@ print_usage()
     print_common_program_options(message_out);
     print_common_unary_program_options(message_out); 
     fprintf(message_out, "String and format options:\n"
-            "  -f, --format=FMT          Write result in FMT format\n"
-            "  -j, --disjunct            Disjunct all regexps instead of transforming\n"
-            "                            each regexp into a separate transducer\n"
-            "      --sum (todo)          Sum weights of duplicate strings instead of \n"
-            "                            taking minimum\n"
-            "      --norm (todo)         Divide each weight by sum of all weights\n"
-            "      --log (todo)          Take negative logarithm of each weight\n"
-            "  -l, --line                Input is line separated\n"
-            "  -S, --semicolon           Input is semicolon separated (default)\n"
             "  -e, --epsilon=EPS         Map EPS as zero.\n");
     fprintf(message_out, "\n");
 
     fprintf(message_out, 
             "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
-            "FMT must be one of the following: "
-            "{foma, sfst, openfst-tropical, openfst-log}.\n"
             "If EPS is not defined, the default representation of 0 is used\n"
             "Weights are currently not implemented.\n"
             "\n"
         );
 
     fprintf(message_out, "Examples:\n"
-            "  echo \" c:d a:o t:g \" | %s \n"
-            "  echo \" cat ; dog \" | %s -S   create transducers \"cat\" and \"dog\"\n"
+            "  echo \"Define TOP  UppercaseAlpha Alpha* LC(\\\"professor\\\") EndTag(ProfName);\" | %s \n"
+            "  create matcher that tags \"professor Chomsky\" as \"professor <ProfName>Chomsky</ProfName>\"\n"
             "\n", program_name, program_name);
     print_report_bugs();
     fprintf(message_out, "\n");
@@ -119,19 +116,12 @@ parse_options(int argc, char** argv)
             {
                 HFST_GETOPT_COMMON_LONG,
                 HFST_GETOPT_UNARY_LONG,
-                {"disjunct", no_argument, 0, 'j'},
                 {"epsilon", required_argument, 0, 'e'},
-                {"sum", no_argument, 0, '1'},
-                {"norm", no_argument, 0, '2'},
-                {"log", no_argument, 0, '3'},
-                {"line", no_argument, 0, 'l'},
-                {"semicolon", no_argument, 0, 'S'},
-                {"format", required_argument, 0, 'f'},
                 {0,0,0,0}
             };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "je:123lSf:",
+                             HFST_GETOPT_UNARY_SHORT "e::",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -145,134 +135,37 @@ parse_options(int argc, char** argv)
         case 'e':
             epsilonname = hfst_strdup(optarg);
             break;
-        case '1':
-            sum_weights = true;
-            break;
-        case '2':
-            normalize_weights = true;
-            break;
-        case '3':
-            logarithmic_weights = true;
-            break;
-        case 'j':
-            disjunct_expressions = true;
-            break;
-        case 'S':
-            line_separated = false;
-            break;
-        case 'l':
-            line_separated = true;
-            break;
-        case 'f':
-            output_format = hfst_parse_format_name(optarg);
-            break;
 #include "inc/getopt-cases-error.h"
         }
     }
 
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
-    if (output_format == hfst::UNSPECIFIED_TYPE)
-    {
-        verbose_printf("Output format not specified, "
-                       "defaulting to openfst tropical\n");
-        output_format = hfst::TROPICAL_OPENFST_TYPE;
-    }
     return EXIT_CONTINUE;
 }
 
 int
 process_stream(HfstOutputStream& outstream)
 {
-    size_t transducer_n = 0;
-    char* line = 0;
-    size_t len = 0;
-    unsigned int line_count = 0;
-    PmatchCompiler comp(output_format);
-    HfstTransducer disjunction(output_format);
-    std::map<std::string, HfstTransducer *> named_transducers;
-    //outstream.open();
-    int delim = '\n';
-    if (line_separated)
-    {
-        delim = '\n';
+    PmatchCompiler comp(compilation_format);
+    std::string file_contents;
+    std::map<std::string, HfstTransducer*> definitions;
+    int c;
+    while ((c = fgetc(inputfile)) != EOF) {
+        file_contents.push_back(c);
     }
-    else
-    {
-        delim = ';';
-    }
-    char* first_line = 0;
-    while (hfst_getdelim(&line, &len, delim, inputfile) != -1)
-    {
-        if (first_line == 0)
-        {
-            first_line = strdup(line);
-        }
-        char* exp = line;
-        while ((*exp == '\n') || (*exp == '\r') || (*exp == ' ')) {
-            exp++;
-        }
-        if (*exp == '\0')
-        {
-            verbose_printf("Skipping whitespace expression #%u", line_count);
-            continue;
-        }
-        line_count++;
-        transducer_n++;
-        HfstTransducer* compiled;
-        verbose_printf("Compiling expression %u\n", line_count);
-        compiled = comp.compile(line);
-        if (disjunct_expressions)
-        {
-            disjunction.disjunct(*compiled);
-        }
-        else
-        {
-            if (delim == '\n')
-            {
-                // hfst_set_formula(*compiled,
-                //                  string(line).substr(0 ,strlen(line) - 1),
-                //                  "X");
-            }
-            else
-            {
-//              hfst_set_formula(*compiled, line, "X");
-            }
-            if (compiled->get_name() != "") {
-                named_transducers[compiled->get_name()] = compiled;
-            } else {
-                delete compiled;
-            }
-        }
-    }
-
+    definitions = comp.compile(file_contents);
+    
     // When done compiling everything, look for TOP and output it first
-    if (named_transducers.count("TOP") == 1) {
-        outstream << (*named_transducers["TOP"]).convert(hfst::HFST_OL_TYPE);
-        delete named_transducers["TOP"];
-        named_transducers.erase("TOP");
+    if (definitions.count("TOP") == 1) {
+        outstream << (*definitions["TOP"]).convert(hfst::HFST_OL_TYPE);
+        delete definitions["TOP"];
+        definitions.erase("TOP");
     }
-    for (std::map<std::string, HfstTransducer *>::iterator it = named_transducers.begin();
-         it != named_transducers.end(); ++it) {
-//        outstream << (*(it->second)).convert(hfst::HFST_OL_TYPE);
+    for (std::map<std::string, HfstTransducer *>::iterator it = definitions.begin();
+         it != definitions.end(); ++it) {
         delete it->second;
     }
-    if (disjunct_expressions)
-    {
-        if (delim == '\n')
-        {
-            // hfst_set_formula(disjunction,
-            //                  string(line).substr(0 ,strlen(line) - 1) + "...",
-            //                  "X");
-        }
-        else
-        {
-//              hfst_set_formula(disjunction, string(line) + "...", "X");
-        }
-        outstream << disjunction;
-    }
-    free(line);
-    free(first_line);
     return EXIT_SUCCESS;
 }
 

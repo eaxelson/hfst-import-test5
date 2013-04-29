@@ -20,7 +20,6 @@ extern std::map<std::string,hfst::HfstTransducer*> definitions;
 extern HfstTransducer* last_compiled;
 extern ImplementationType format;
 
-extern std::map<std::string, hfst::HfstTransducer> named_transducers;
 struct PmatchUtilityTransducers;
 extern PmatchUtilityTransducers utils;
 const std::string RC_ENTRY_SYMBOL = "@_PMATCH_RC_ENTRY_@";
@@ -73,9 +72,10 @@ double get_weight(const char* s);
 /**
  * @brief compile new transducer
  */
-HfstTransducer* compile(const std::string& pmatch,
-                        std::map<std::string,hfst::HfstTransducer*>& defs,
-                        hfst::ImplementationType type);
+std::map<std::string, HfstTransducer*>
+    compile(const std::string& pmatch,
+            std::map<std::string,hfst::HfstTransducer*>& defs,
+            hfst::ImplementationType type);
 
 /**
  * @brief Given a text file, read it line by line and return an acceptor
