@@ -51,6 +51,24 @@ class XreCompiler
   //!        defined by @a xre in later phases of compilation.
   void define(const std::string& name, const std::string& xre);
 
+  //! @brief Add a function macro.
+  //!        Compilers will replace arcs labeled function_name(arg1, arg2, ... , argN)
+  //!        with the transducer defined by @a xre in later phases of compilation.
+  //! @param name        The name of the function. It must end with a left bracket '('.
+  //! @param arguments   The names of the function arguments in order.
+  //! @param xre         The regexp defining the function.
+  //!
+  //! For example, a call
+  //!
+  //!   define_function("Foo("), args, "[ [foo|bar] baz+ ]");
+  //!
+  //! where args is ("foo", "bar", "baz"), defines a function named Foo( that
+  //! accepts the disjunction of its first and second arguments concatenated with
+  //! one or more its third argument.
+  void define_function(const std::string& name, 
+                       const std::vector<std::string>& arguments, 
+                       const std::string& xre);
+
   //! @brief Add a definition macro.
   //!        Compilers will replace arcs labeled @a name, with the transducer
   //!        \a transducer in later phases of compilation.

@@ -194,7 +194,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
        }
        | DEFINE_FUNCTION REGEX {
-            hfst::xfst::xfst_->define($1, $1, $2);
+            hfst::xfst::xfst_->define_function($1, $2);
             free($1);
             free($2);
        }
