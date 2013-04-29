@@ -46,6 +46,8 @@
          hfst::HfstTransducer* transducer;
          hfst::HfstTransducerPair* transducerPair;
          hfst::HfstTransducerPairVector* transducerPairVector;
+         std::pair<std::string, hfst::HfstTransducer*>* transducerDefinition;
+         std::map<std::string, hfst::HfstTransducer*>* transducerDefinitions;
     
          std::pair<hfst::xeroxRules::ReplaceArrow, std::vector<hfst::xeroxRules::Rule> >* replaceRuleVectorWithArrow;
          std::pair< hfst::xeroxRules::ReplaceArrow, hfst::xeroxRules::Rule>* replaceRuleWithArrow;   
@@ -65,7 +67,9 @@
 
 %type <replaceArrow> REPLACE_ARROW
 
-%type <transducer> PMATCH REGEXP1 REGEXP2  REGEXP4 REGEXP5 REGEXP6 REGEXP7
+%type <transducerDefinitions> PMATCH
+%type <transducerDefinition> DEFINITION
+%type <transducer> REGEXP1 REGEXP2 REGEXP4 REGEXP5 REGEXP6 REGEXP7
 REGEXP8 REGEXP9 REGEXP10 REGEXP11 REGEXP12 LABEL
 REPLACE REGEXP3
 %type <replaceRuleVectorWithArrow> PARALLEL_RULES
@@ -136,10 +140,22 @@ PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 
 
 
-PMATCH: REGEXP1 {
-    $1->minimize();
-    hfst::pmatch::last_compiled = $1;
-    $$ = hfst::pmatch::last_compiled;
+PMATCH: DEFINITION {
+    hfst::pmatch::definitions.insert(*$1);
+//    $$ = &hfst::pmatch::definitions;
+    delete $1;
+ } |
+ PMATCH DEFINITION {
+     hfst::pmatch::definitions.insert(*$2);
+//     $$ = &hfst::pmatch::definitions;
+     delete $2;
+ }
+;
+
+DEFINITION: DEFINE SYMBOL REGEXP1 {
+    $3->set_name($2);
+    $3->minimize();
+    $$ = new std::pair<std::string, hfst::HfstTransducer*>($2, $3);
  }
 ;
 
@@ -147,13 +163,6 @@ REGEXP1: REGEXP2 END_OF_EXPRESSION { }
 | REGEXP2 END_OF_WEIGHTED_EXPRESSION {
     $1->set_final_weights($2);
     $$ = $1;
- }
-| DEFINE SYMBOL REGEXP1 {
-    $3->set_name($2);
-    $3->minimize();
-    hfst::pmatch::named_transducers.insert(
-        std::pair<std::string,hfst::HfstTransducer>($2, HfstTransducer(*($3))));
-    $$ = $3;
  }
 //| REGEXP2 {
    
@@ -819,8 +828,8 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
                             hfst::pmatch::format);
  }
 | SYMBOL {
-    if (hfst::pmatch::named_transducers.count($1) != 0) {
-        $$ = new HfstTransducer(hfst::pmatch::named_transducers[$1]);
+    if (hfst::pmatch::definitions.count($1) != 0) {
+        $$ = new HfstTransducer(* hfst::pmatch::definitions[$1]);
   } else {
      $$ = new HfstTransducer($1, $1, hfst::pmatch::format);
     }
@@ -849,8 +858,7 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
 ;
 
 INSERT: INS_LEFT SYMBOL RIGHT_PARENTHESIS {
-    if(hfst::pmatch::named_transducers.count($2) != 0) {
-//           std::cerr << "Ins " << $2 << " found" << std::endl;
+    if(hfst::pmatch::definitions.count($2) != 0) {
         char * Ins_trans = hfst::pmatch::get_Ins_transition($2);
         $$ = new HfstTransducer(
             Ins_trans, Ins_trans, hfst::pmatch::format);

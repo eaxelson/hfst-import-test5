@@ -339,30 +339,32 @@ get_weight(const char *s)
     return rv;
 }
 
-HfstTransducer*
+std::map<std::string, HfstTransducer*>
 compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         ImplementationType impl)
 {
     // lock here?
+    definitions.clear();
     data = strdup(pmatch.c_str());
     startptr = data;
     len = strlen(data);
-    definitions = defs;
+//    definitions = defs;
     format = impl;
     pmatchparse();
     free(startptr);
     data = 0;
     len = 0;
-    if (pmatchnerrs == 0)
-      {
-        HfstTransducer* rv = new HfstTransducer(*last_compiled);
-        delete last_compiled;
-        return rv;
-      }
-    else
-      {
-        return new HfstTransducer(impl);
-      }
+//     if (pmatchnerrs == 0)
+//       {
+//         HfstTransducer* rv = new HfstTransducer(*last_compiled);
+//         delete last_compiled;
+//         return rv;
+//       }
+//     else
+//       {
+//         return new HfstTransducer(impl);
+//       }
+    return std::map<std::string, hfst::HfstTransducer*>(definitions);
 }
 
 HfstTransducer * read_text(char * filename, ImplementationType type)

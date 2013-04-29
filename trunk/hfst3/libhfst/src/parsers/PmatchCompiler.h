@@ -54,7 +54,7 @@ class PmatchCompiler
   //! @brief Compile a transducer defined by @a pmatch.
   //!        May return a pointer to @e empty transducer on non-fatal error.
   //!        A null pointer is returned on fatal error, if abort is not called.
-  HfstTransducer* compile(const std::string& pmatch);
+  std::map<std::string, HfstTransducer*> compile(const std::string& pmatch);
 
   private:
   std::map<std::string,hfst::HfstTransducer*> definitions_;

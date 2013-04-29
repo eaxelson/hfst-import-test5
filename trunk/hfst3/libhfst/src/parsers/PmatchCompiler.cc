@@ -22,11 +22,13 @@ PmatchCompiler::PmatchCompiler(hfst::ImplementationType impl) :
 void
 PmatchCompiler::define(const std::string& name, const std::string& pmatch)
 {
-  HfstTransducer* compiled = compile(pmatch);
-  definitions_[name] = compiled;
+  compile(pmatch);
+  if (definitions.count(name) != 0) {
+      definitions_[name] = definitions[name];
+  }
 }
 
-HfstTransducer*
+std::map<std::string, HfstTransducer*>
 PmatchCompiler::compile(const std::string& pmatch)
 {
   return hfst::pmatch::compile(pmatch, definitions_, format_);
