@@ -450,13 +450,11 @@ LexcCompiler::compileLexical()
         HfstTransducer joinerPair = joiner.repeat_n(2);
         HfstTransducer morphotax = sigmaStar.disjunct(joinerPair);
         morphotax.repeat_star();
-        fprintf(stderr, "DBG: morphotax like\n");
-        std::cerr << morphotax;
         morphotax = start.concatenate(morphotax).concatenate(end).minimize();
         lexicons = lexicons.compose(morphotax);
         lexicons.substitute(joinerEnc, "@_EPSILON_SYMBOL_@").minimize();
       }
-    if (noFlags_.find(initialLexiconName_) == noFlags_.end())
+    if (noFlags_.find(initialLexiconName_) != noFlags_.end())
       {
         // now same for initial lexicon and finale
         string startEnc = initialLexiconName_;
