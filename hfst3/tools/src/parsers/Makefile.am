@@ -41,3 +41,6 @@ hfst_xfst2fst_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS) -lread
 xfst-parser.cc: xfst-parser.yy
 
 xfst-lexer.cc: xfst-lexer.ll
+
+xfst-parser.h:xfst-parser.hh
+	cp xfst-parser.hh xfst-parser.h
