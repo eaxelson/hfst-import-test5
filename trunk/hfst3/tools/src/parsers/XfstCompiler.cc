@@ -31,6 +31,8 @@ using std::map;
 using std::queue;
 using std::stack;
 
+using std::ostringstream;
+
 #include <cstdio>
 #include <cstdlib>
 #include <glob.h>
@@ -613,18 +615,75 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           }
         else
           {
-            arg = arg + prototype[i];
+            arg += prototype[i];
           }
       }
+    // last argument
+    args.push_back(arg);
+
     return true;
+  }
+
+  /* Convert each argument name in \a arguments in \a xre with a special symbol 
+     "@function_name(argno@" where argno is a number defining which argument
+     of the function is being replaced. 
+
+     For example, if we have a function Foo(x, y, z) defined with regex [ x y+ z x* ],
+     the regex is converted into ["@Foo(1@" "@Foo(2@"+ "@Foo(3@" "@Foo(1@"* ].
+  */
+  std::string convert_argument_symbols
+  (const std::vector<std::string> & arguments,
+   const std::string & xre,
+   const std::string & function_name,
+   hfst::xre::XreCompiler & xre_)
+  {
+    std::string retval(xre);
+    unsigned int arg_number = 1;
+
+    for (std::vector<std::string>::const_iterator arg = arguments.begin();
+         arg != arguments.end(); arg++)
+      {
+        std::set<unsigned int> arg_positions 
+          = xre_.get_positions_of_symbol_in_xre(*arg, retval);
+
+        std::string new_retval = std::string("");
+        std::string substituting_argument = "\"@" + function_name + 
+          (static_cast<ostringstream*>( &(ostringstream() << arg_number) )->str()) + "@\"";
+
+        // go through retval
+        for (unsigned int i=0; i < retval.length(); i++)
+          {
+            // argument to be replaced begins at this position
+            if (arg_positions.find(i) != arg_positions.end())
+              {
+                arg_positions.erase(i); // case will not be handled again
+
+                new_retval.append(substituting_argument);
+                // skip rest of the original symbol by advancing i to
+                // point to the last char in the original symbol
+                for (unsigned int offset=1; offset < arg->length(); offset++)
+                  {
+                    ++i;
+                  }
+              }
+            // else, just copy
+            else
+              {
+                new_retval += retval[i];
+              }
+          }
+
+        retval = new_retval;
+        ++arg_number;
+      }
+
+    return retval;
   }
 
   XfstCompiler&
   XfstCompiler::define_function(const char* prototype,
                                 const char* xre)
     {
-      //fprintf(stderr, "define_function: %s, %s\n", prototype, xre);
-
       std::string name = "";
       std::vector<std::string> arguments;
 
@@ -642,52 +701,18 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           exit(1);
         }
 
-      if (! xre_.define_function(name, arguments, std::string(xre)))
+      std::string xre_converted = convert_argument_symbols(arguments, xre, name, xre_);
+        
+      if (! xre_.define_function(name, arguments, xre_converted))
         {
           fprintf(stderr, "Error when defining function\n");
           exit(1);
         }
-        
+
+      fprintf(stderr, "Defined function '%s'\n", xre_converted.c_str());
+
       prompt();
       return *this;
-
-      /*
-      fprintf(stderr, "Extracted name '%s' and arguments (", name.c_str());
-      for (std::vector<std::string>::const_iterator it = arguments.begin();
-           it != arguments.end(); it++)
-        {
-          if (it != arguments.begin())
-            {
-              fprintf(stderr, ", ");
-            }
-          fprintf(stderr, "%s", it->c_str());
-        }
-      fprintf(stderr, ")\n");
-      */
-
-      /*
-      HfstTransducer* compiled = xre_.compile(xre);
-      char* signature = static_cast<char*>
-        (malloc(sizeof(char)*strlen(name)+strlen(prototype)+1));
-      const char* s = name;
-      char* p = signature;
-      while (*s != '\0')
-        {
-          *p = *s;
-          s++;
-          p++;
-        }
-      s = prototype;
-      while (*s != '\0')
-        {
-          *p = *s;
-          s++;
-          p++;
-        }
-      *p = '\0';
-      functions_[signature] = compiled;
-      prompt();
-      return *this;*/
     }
 
   XfstCompiler&

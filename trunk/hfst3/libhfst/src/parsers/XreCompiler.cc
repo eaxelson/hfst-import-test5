@@ -9,6 +9,11 @@
 #ifndef UNIT_TEST
 
 namespace hfst { namespace xre {
+
+    unsigned int cr=0;
+    std::set<unsigned int> positions;
+    char * position_symbol = NULL;
+
 XreCompiler::XreCompiler() : 
     definitions_(),
     function_definitions_(),
@@ -95,6 +100,18 @@ HfstTransducer*
 XreCompiler::compile(const std::string& xre)
 {
   return hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, format_);
+}
+
+std::set<unsigned int> XreCompiler::get_positions_of_symbol_in_xre
+(const std::string & symbol, const std::string & xre)
+{
+  position_symbol = strdup(symbol.c_str());
+  positions.clear();
+  cr=0;
+  (void) hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, format_);
+  free(position_symbol);
+  position_symbol = NULL;
+  return positions;
 }
 
 }}

@@ -83,6 +83,9 @@ class XreCompiler
   //!        A null pointer is returned on fatal error, if abort is not called.
   HfstTransducer* compile(const std::string& xre);
 
+  std::set<unsigned int> get_positions_of_symbol_in_xre
+    (const std::string & symbol, const std::string & xre);
+
   //! @brief Whether transducer names defined with function 'define' are expanded.
   //!        Default is false.
   void set_expand_definitions(bool expand);
