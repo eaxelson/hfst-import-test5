@@ -176,15 +176,15 @@ LexcCompiler::addStringEntry(const string& data,
       }
     if (stringTries_.find(currentLexiconName_) == stringTries_.end())
       {
-        stringTries_.insert(pair<string,HfstTransducer>(currentLexiconName_,
-                                                        HfstTransducer(format_)));
+        stringTries_.insert(pair<string,HfstTransducer*>(currentLexiconName_,
+                                                        new HfstTransducer(format_)));
       }
     HfstTransducer joiner(encodedCont, tokenizer_, format_);
     newPath.concatenate(joiner).minimize();
-    stringTries_[currentLexiconName_].disjunct(newPath);
+    stringTries_[currentLexiconName_]->disjunct(newPath);
     if ((currentEntries_ % 50) == 0)
       {
-        stringTries_[currentLexiconName_].minimize();
+        stringTries_[currentLexiconName_]->minimize();
       }
     if (!quiet_)
       {
@@ -222,15 +222,15 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
       }
     if (stringTries_.find(currentLexiconName_) == stringTries_.end())
       {
-        stringTries_.insert(pair<string,HfstTransducer>(currentLexiconName_,
-                                                        HfstTransducer(format_)));
+        stringTries_.insert(pair<string,HfstTransducer*>(currentLexiconName_,
+                                                       new HfstTransducer(format_)));
       }
     HfstTransducer joiner(encodedCont, tokenizer_, format_);
     newPath.concatenate(joiner).minimize();
-    stringTries_[currentLexiconName_].disjunct(newPath);
+    stringTries_[currentLexiconName_]->disjunct(newPath);
     if ((currentEntries_ % 50) == 0)
       {
-        stringTries_[currentLexiconName_].minimize();
+        stringTries_[currentLexiconName_]->minimize();
       }
     if (!quiet_)
       {
@@ -270,10 +270,10 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
     // FIXME: add all implicit chars to multichar symbols
     if (regexps_.find(currentLexiconName_) == regexps_.end())
       {
-        regexps_.insert(pair<string,HfstTransducer>(currentLexiconName_,
-                                                    HfstTransducer(format_)));
+        regexps_.insert(pair<string,HfstTransducer*>(currentLexiconName_,
+                                                   new HfstTransducer(format_)));
       }
-    regexps_[currentLexiconName_].disjunct(*newPaths).minimize();
+    regexps_[currentLexiconName_]->disjunct(*newPaths).minimize();
     if (!quiet_)
       {
         if ((currentEntries_ % 10000) == 0)
@@ -394,11 +394,11 @@ LexcCompiler::compileLexical()
         HfstTransducer lexicon(format_);
         if (stringTries_.find(*s) != stringTries_.end())
           {
-            lexicon.disjunct(stringTries_[*s]);
+            lexicon.disjunct(*stringTries_[*s]);
           }
         if (regexps_.find(*s) != regexps_.end())
           {
-            lexicon.disjunct(regexps_[*s]);
+            lexicon.disjunct(*regexps_[*s]);
           }
         lexicon = leftJoiner.concatenate(lexicon).minimize();
         if (verbose_)
