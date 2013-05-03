@@ -123,8 +123,8 @@ class LexcCompiler
   hfst::HfstTokenizer tokenizer_;
   hfst::xre::XreCompiler xre_;
   std::string initialLexiconName_;
-  std::map<std::string,hfst::HfstTransducer> stringTries_;
-  std::map<std::string,hfst::HfstTransducer> regexps_;
+  std::map<std::string,hfst::HfstTransducer*> stringTries_;
+  std::map<std::string,hfst::HfstTransducer*> regexps_;
   std::set<std::string> lexiconNames_;
   std::set<std::string> noFlags_;
   std::set<std::string> continuations_;
