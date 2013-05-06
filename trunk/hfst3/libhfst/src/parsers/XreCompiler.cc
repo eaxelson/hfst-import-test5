@@ -32,6 +32,12 @@ void
 XreCompiler::define(const std::string& name, const std::string& xre)
 {
   HfstTransducer* compiled = compile(xre);
+  if (compiled == NULL)
+    {
+      fprintf(stderr, "error in XreCompiler::define: xre '%s' could not be parsed, leaving %s undefined\n", 
+              xre.c_str(), name.c_str());
+      return;
+    }
   definitions_[name] = compiled;
 }
 
@@ -43,20 +49,9 @@ XreCompiler::define(const std::string& name, const HfstTransducer & transducer)
 
 bool
 XreCompiler::define_function(const std::string& name, 
-                             const std::vector<std::string>& arguments,
+                             unsigned int arguments,
                              const std::string& xre)
-{
-  for (std::vector<std::string>::const_iterator it = arguments.begin();
-       it != arguments.end(); it++)
-    {
-      if (definitions_.find(*it) != definitions_.end())
-        {
-          fprintf(stderr, "Error: function argument %s is already a defined variable\n",
-                  it->c_str());
-          return false;
-        }
-    }
-  
+{ 
   function_arguments_[name] = arguments;
   function_definitions_[name] = xre;
   return true;
@@ -108,9 +103,16 @@ std::set<unsigned int> XreCompiler::get_positions_of_symbol_in_xre
   position_symbol = strdup(symbol.c_str());
   positions.clear();
   cr=0;
-  (void) hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, format_);
+  HfstTransducer * compiled = 
+    hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, format_);
   free(position_symbol);
   position_symbol = NULL;
+  if (compiled == NULL)
+    {
+      fprintf(stderr, "error in XreCompiler::get_positions_of_symbol_in_xre: xre '%s' "
+              "could not be parsed, positions of symbol %s not found\n", 
+              xre.c_str(), symbol.c_str());
+    }
   return positions;
 }
 

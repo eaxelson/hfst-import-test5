@@ -52,21 +52,21 @@ class XreCompiler
   void define(const std::string& name, const std::string& xre);
 
   //! @brief Add a function macro.
-  //!        Compilers will replace arcs labeled function_name(arg1, arg2, ... , argN)
-  //!        with the transducer defined by @a xre in later phases of compilation.
-  //! @param name        The name of the function. It must end with a left bracket '('.
-  //! @param arguments   The names of the function arguments in order.
-  //! @param xre         The regexp defining the function.
-  //!
-  //! For example, a call
-  //!
-  //!   define_function("Foo("), args, "[ [foo|bar] baz+ ]");
-  //!
-  //! where args is ("foo", "bar", "baz"), defines a function named Foo( that
-  //! accepts the disjunction of its first and second arguments concatenated with
-  //! one or more its third argument.
+  //!        Compilers will replace call to function \a name with the transducer
+  //!        defined by \a xre when the function is called.
+  //! @param name       The name of the function. It must end with a left parenthesis '('.
+  //! @param arguments  The number of arguments that the function takes.
+  //! @param xre        The regex defining the function. Function arguments must be named
+  //!                   as '"@name(N@"' where name is \a name (without the left parenthesis)
+  //!                   and N the order of the argument.
+  //! For example a definition 
+  //!   define_function("Concat(", 2, " [\"@Concat(1@\" \"@Concat(2@\"] ");
+  //! defines a function that calculates the concatenation of its first and second arguments.
+  //! A call
+  //!   compile.("[ Concat(foo, bar) ];");
+  //! then returns a transducer [ foo bar ].
   bool define_function(const std::string& name, 
-                       const std::vector<std::string>& arguments, 
+                       unsigned int arguments,
                        const std::string& xre);
 
   //! @brief Add a definition macro.
@@ -101,7 +101,7 @@ class XreCompiler
   private:
   std::map<std::string,hfst::HfstTransducer*> definitions_;
   std::map<std::string, std::string> function_definitions_;
-  std::map<std::string, std::vector<std::string> > function_arguments_;
+  std::map<std::string, unsigned int > function_arguments_;
   hfst::ImplementationType format_;
 
 }
