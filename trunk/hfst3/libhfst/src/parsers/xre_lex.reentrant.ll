@@ -78,6 +78,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 }
 
 
+
 "~"   { CR; return COMPLEMENT; }
 "\\"  { CR; return TERM_COMPLEMENT; }
 "&"   { CR; return INTERSECTION; }
@@ -242,6 +243,12 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     yylval->label = hfst::xre::strip_percents(yytext);
     return SYMBOL;
 }  
+
+{NAME_CH}+"(" {
+    CR;
+    yylval->label = yytext;
+    return FUNCTION_NAME;
+}
 
 ";\t"{WEIGHT} {
     CR; 

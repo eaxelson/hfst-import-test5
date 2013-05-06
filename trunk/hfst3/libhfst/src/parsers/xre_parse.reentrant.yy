@@ -23,7 +23,15 @@ extern bool harmonize_;
 using hfst::xre::harmonize_;
 
 union YYSTYPE;
+class yy_buffer_state;
+typedef yy_buffer_state * YY_BUFFER_STATE;
 typedef void * yyscan_t;
+
+extern int yyparse(yyscan_t);
+extern int yylex_init (yyscan_t*);
+extern YY_BUFFER_STATE yy_scan_string (const char *, yyscan_t);
+extern void yy_delete_buffer (YY_BUFFER_STATE, yyscan_t);
+extern int yylex_destroy (yyscan_t);
 
 extern int yyerror(yyscan_t, const char*);
 extern int yyerror(const char*);
@@ -178,24 +186,29 @@ REGEXP2: REPLACE
               return EXIT_FAILURE;
             }
             else {
-              fprintf(stderr, "function %s@%i) called: function definitions not yet implemented, returning an empty transducer\n", $1, (int)$2->size());
-              $$ = new hfst::HfstTransducer(hfst::xre::format);
+              yyscan_t scanner;
+              yylex_init(&scanner);
+              YY_BUFFER_STATE bs = yy_scan_string(hfst::xre::get_function_xre($1),scanner);
+
+              fprintf(stderr, "scanned string: '%s'\n", hfst::xre::get_function_xre($1)); // DEBUG
+
+              hfst::xre::define_function_args($1, $2);
+              yyparse(scanner);
+              hfst::xre::undefine_function_args($1);
+
+              yy_delete_buffer(bs,scanner);
+              yylex_destroy(scanner);
+
+              $$ = hfst::xre::last_compiled;              
+
+              // fprintf(stderr, "function %s@%i) called: function definitions not yet implemented, returning an empty transducer\n", $1, (int)$2->size());
+              // $$ = new hfst::HfstTransducer(hfst::xre::format);
             }
         }
         // substitute
        | SUB1 SUB2 SUB3 {
             StringPair tmp($2, $2);
             HfstTransducer * tmpTr = new HfstTransducer(* $1);
-
-            // to avoid harmonization of SUB1 with SUB3 
-	    // (not needed after adding the harmonize parameter to substitute)
-            /*StringSet transducerAlphabet = $3->get_alphabet();
-            for (StringSet::const_iterator s = transducerAlphabet.begin();
-                       s != transducerAlphabet.end();
-                       ++s)
-            {
-                tmpTr->insert_to_alphabet(s->c_str());
-            }*/
 
 	    bool empty_replace_transducer=false;
 	    HfstTransducer empty(hfst::xre::format);
