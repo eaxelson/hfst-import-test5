@@ -430,9 +430,9 @@ namespace hfst
           ReplaceType replType( rule.get_replType() );
 
           ImplementationType type = mappingPairVector[0].first.get_type();
+
           //printf("mapping 1 \n");
           //mappingPairVector[0].first.write_in_att_format(stdout, 1);
-
 
           //printf("mapping 2 \n");
           //mappingPairVector[0].second.write_in_att_format(stdout, 1);
@@ -444,7 +444,7 @@ namespace hfst
                 //mappingPairVector[0].first.substitute(StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@"), StringPair(markupMarker, markupMarker) ).minimize();
 
                 HfstTransducer oneMappingPair(mappingPairVector[i].first);
-            //oneMappingPair.insert_to_alphabet("x");
+                //oneMappingPair.insert_to_alphabet("x");
 
                 // if it is markup rule, substitute epsilon in left mapping with marker
                 if ( mappingPairVector[i].second.get_property("isMarkup") == "yes" )
@@ -487,28 +487,58 @@ namespace hfst
 
             //printf("mapping all after cross product \n");
             //mapping.write_in_att_format(stdout, 1);
-            // needed in case of ? -> x replacement
+
+
+            // Identity (normal)
+            HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+            HfstTransducer identity (identityPair);
+            identity.repeat_star().minimize();
+
+
+            // In case of ? -> x replacement
+            // If left side is empty, return identity transducer
+            // If right side is empty, return identity transducer
+            //    with alphabet from the left side
+            HfstTransducer empty(type);
+            if ( mapping.compare(empty) )
+            {
+                mapping = identity;
+                if (mappingPairVector[0].second.compare(empty))
+                {
+                    //printf("alphabet: \n");
+                    StringSet transducerAlphabet = mappingPairVector[0].first.get_alphabet();
+                    for (StringSet::const_iterator s = transducerAlphabet.begin();
+                                   s != transducerAlphabet.end();
+                                   ++s)
+                        {
+                            //printf("%s \n", s->c_str());
+                            mapping.insert_to_alphabet(s->c_str());
+                        }
+                    //printf("------------------ \n");
+                }
+            }
+
             mapping.insert_to_alphabet(leftMarker);
             mapping.insert_to_alphabet(rightMarker);
             mapping.insert_to_alphabet(tmpMarker);
 
-          HfstTransducer leftBracket(leftMarker, TOK, type);
-          HfstTransducer rightBracket(rightMarker, TOK, type);
-          HfstTransducer leftBracket2(leftMarker2, TOK, type);
-          HfstTransducer rightBracket2(rightMarker2, TOK, type);
-          HfstTransducer tmpBracket(tmpMarker, TOK, type);
+            HfstTransducer leftBracket(leftMarker, TOK, type);
+            HfstTransducer rightBracket(rightMarker, TOK, type);
+            HfstTransducer leftBracket2(leftMarker2, TOK, type);
+            HfstTransducer rightBracket2(rightMarker2, TOK, type);
+            HfstTransducer tmpBracket(tmpMarker, TOK, type);
 
-          // Surround mapping with brackets
-          HfstTransducer tmpMapping(leftBracket);
-          tmpMapping.concatenate(mapping).concatenate(rightBracket).minimize();
+            // Surround mapping with brackets
+            HfstTransducer tmpMapping(leftBracket);
+            tmpMapping.concatenate(mapping).concatenate(rightBracket).minimize();
 
-          HfstTransducer mappingWithBrackets(tmpMapping);
+            HfstTransducer mappingWithBrackets(tmpMapping);
 
-          //printf("mappingWithBrackets: \n");
-          //mappingWithBrackets.minimize().write_in_att_format(stdout, 1);
+            //printf("mappingWithBrackets: \n");
+            //mappingWithBrackets.minimize().write_in_att_format(stdout, 1);
 
             // Identity pair
-            HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+           // HfstTransducer identityPair = HfstTransducer::identity_pair( type );
             // for non-optional replacements
             if ( optional != true )
             {
@@ -2034,22 +2064,22 @@ namespace hfst
 
           HfstTransducer retval( bracketedReplace(rule, optional) );
 
-//printf("---bracketed replace done---: \n");
-//retval.minimize().write_in_att_format(stdout, 1);
+          //printf("---bracketed replace done---: \n");
+          //retval.minimize().write_in_att_format(stdout, 1);
 
           // for epenthesis rules
           // it can't have more than one epsilon repetition in a row
 
           retval = noRepetitionConstraint( retval );
 
-//printf("-----noRepetitionConstraint-----: \n");
-//retval.write_in_att_format(stdout, 1);
+          //printf("-----noRepetitionConstraint-----: \n");
+          //retval.write_in_att_format(stdout, 1);
 
           // deals with boundary symbol, must be before mostBracketsStarConstraint
          retval = applyBoundaryMark( retval );
 
-//printf("----after applyBoundaryMark: ----\n");
-//retval.write_in_att_format(stdout, 1);
+         //printf("----after applyBoundaryMark: ----\n");
+         //retval.write_in_att_format(stdout, 1);
           if ( !optional )
           {
 
@@ -2057,13 +2087,13 @@ namespace hfst
               // Epenthesis rules behave differently if used mostBracketsPlusConstraint
               //retval = mostBracketsPlusConstraint(retval);
               retval = mostBracketsStarConstraint(retval);
-//printf("after non optional: \n");
-//retval.write_in_att_format(stdout, 1);
+              //printf("after non optional: \n");
+              //retval.write_in_att_format(stdout, 1);
           }
           retval = removeB2Constraint(retval);
           retval = removeMarkers( retval );
-//printf("after removeMarkers: \n");
-//retval.write_in_att_format(stdout, 1);
+          //printf("after removeMarkers: \n");
+          //retval.write_in_att_format(stdout, 1);
           return retval;
       }
 
@@ -2806,8 +2836,9 @@ int main(int argc, char * argv[])
 
             test1b( types[i]);
 
-            // ? -> a it doesn't work because of apply boundary thing
+            // ? -> a
             test1c( types[i]);
+
 
             // a -> b || .#. _ ;
             test1d( types[i]);
@@ -2866,8 +2897,6 @@ int main(int argc, char * argv[])
 
             // a -> b b , a -> b
             test7g( types[i] );
-        // TODO
-        //    test8( types[i] );
 
             test9a( types[i] );
             test9b( types[i] );
@@ -2875,8 +2904,7 @@ int main(int argc, char * argv[])
             // rules with empty language
             test10a( types[i] );
             // empty -> non-empty
-            // TODO
-            //test10b( types[i] );
+            test10b( types[i] );
 
             // restriction functions =>
 
