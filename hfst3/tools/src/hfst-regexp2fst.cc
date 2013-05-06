@@ -238,7 +238,7 @@ process_stream(HfstOutputStream& outstream)
       HfstTransducer* compiled;
       verbose_printf("Compiling expression %u\n", line_count);
       compiled = comp.compile(exp);
-      if (xrenerrs > 0)
+      if (compiled == NULL) //if (xrenerrs > 0)
         {
           if (line_separated)
             {
@@ -282,7 +282,7 @@ process_stream(HfstOutputStream& outstream)
   return EXIT_SUCCESS;
 }
 
-extern int xredebug;
+//extern int xredebug;
 
 int main( int argc, char **argv ) 
   {
@@ -294,7 +294,7 @@ int main( int argc, char **argv )
       }
     if (debug)
       {
-        xredebug = 1;
+        //xredebug = 1;
       }
 
   // close buffers, we use streams

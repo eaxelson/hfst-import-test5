@@ -1,4 +1,4 @@
-%option 8Bit batch noyylineno noyywrap nounput prefix="xre"
+%option 8Bit batch noyylineno noyywrap nounput reentrant bison-bridge
 
 %{
 
@@ -12,18 +12,22 @@
 #include "xre_parse.h"
 #include "xre_utils.h"
 
-
 #undef YY_INPUT
 #define YY_INPUT(buf, retval, maxlen)   (retval = hfst::xre::getinput(buf, maxlen))
 
-namespace hfst { namespace xre {
-extern unsigned int cr;
-extern std::set<unsigned int> positions;
-extern char * position_symbol;
+// These variablese are used when scanning a regex for a given SYMBOL
+// when performing variable substitution in function definition.
+namespace hfst { 
+  namespace xre {
+    extern unsigned int cr; // number of characters read
+    extern std::set<unsigned int> positions; // positions of a given SYMBOL
+    extern char * position_symbol;  // the given SYMBOL
 } }
 
-extern
-void xreerror(char *text);
+// increment the number of characters read
+#define CR hfst::xre::cr += (unsigned int)strlen(yytext)
+
+extern int yylex ( YYSTYPE * lvalp, yyscan_t scanner );
 
 %}
 
@@ -68,194 +72,201 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 
 
 {BRACED} {
-  hfst::xre::cr += (unsigned int)strlen(xretext);
-  xrelval.label = hfst::xre::strip_curly(xretext);
+  CR;
+  yylval->label = hfst::xre::strip_curly(yytext);
   return CURLY_BRACKETS;
 }
 
 
-"~"   { hfst::xre::cr += (unsigned int)strlen(xretext); return COMPLEMENT; }
-"\\"  { hfst::xre::cr += (unsigned int)strlen(xretext); return TERM_COMPLEMENT; }
-"&"   { hfst::xre::cr += (unsigned int)strlen(xretext); return INTERSECTION; }
-"-"   { hfst::xre::cr += (unsigned int)strlen(xretext); return MINUS; }
 
-"$."  { hfst::xre::cr += (unsigned int)strlen(xretext); return CONTAINMENT_ONCE; }
-"$?"  { hfst::xre::cr += (unsigned int)strlen(xretext); return CONTAINMENT_OPT; }
-"$"   { hfst::xre::cr += (unsigned int)strlen(xretext); return CONTAINMENT; }
+"~"   { CR; return COMPLEMENT; }
+"\\"  { CR; return TERM_COMPLEMENT; }
+"&"   { CR; return INTERSECTION; }
+"-"   { CR; return MINUS; }
 
-"+"   { hfst::xre::cr += (unsigned int)strlen(xretext); return PLUS; }
-"*"   { hfst::xre::cr += (unsigned int)strlen(xretext); return STAR; }
+"$."  { CR; return CONTAINMENT_ONCE; }
+"$?"  { CR; return CONTAINMENT_OPT; }
+"$"   { CR; return CONTAINMENT; }
 
-"./." { hfst::xre::cr += (unsigned int)strlen(xretext); return IGNORE_INTERNALLY; }
-"/"   { hfst::xre::cr += (unsigned int)strlen(xretext); return IGNORING; }
+"+"   { CR; return PLUS; }
+"*"   { CR; return STAR; }
 
-"|"   { hfst::xre::cr += (unsigned int)strlen(xretext); return UNION; }
+"./." { CR; return IGNORE_INTERNALLY; }
+"/"   { CR; return IGNORING; }
 
-"<>"  { hfst::xre::cr += (unsigned int)strlen(xretext); return SHUFFLE; }
-"<"   { hfst::xre::cr += (unsigned int)strlen(xretext); return BEFORE; }
-">"   { hfst::xre::cr += (unsigned int)strlen(xretext); return AFTER; }
+"|"   { CR; return UNION; }
 
-".o." { hfst::xre::cr += (unsigned int)strlen(xretext); return COMPOSITION; }
-".O." { hfst::xre::cr += (unsigned int)strlen(xretext); return LENIENT_COMPOSITION; }
-".x." { hfst::xre::cr += (unsigned int)strlen(xretext); return CROSS_PRODUCT; }
-".P." { hfst::xre::cr += (unsigned int)strlen(xretext); return UPPER_PRIORITY_UNION; }
-".p." { hfst::xre::cr += (unsigned int)strlen(xretext); return LOWER_PRIORITY_UNION; }
-".-u." { hfst::xre::cr += (unsigned int)strlen(xretext); return UPPER_MINUS; }
-".-l." { hfst::xre::cr += (unsigned int)strlen(xretext); return LOWER_MINUS; }
-"`" {   hfst::xre::cr += (unsigned int)strlen(xretext); return SUBSTITUTE_LEFT; }
+"<>"  { CR; return SHUFFLE; }
+"<"   { CR; return BEFORE; }
+">"   { CR; return AFTER; }
 
-"\\<=" { hfst::xre::cr += (unsigned int)strlen(xretext); return LEFT_RESTRICTION; }
-"<=>" { hfst::xre::cr += (unsigned int)strlen(xretext); return LEFT_RIGHT_ARROW; }
-"<=" { hfst::xre::cr += (unsigned int)strlen(xretext); return LEFT_ARROW; }
-"=>" { hfst::xre::cr += (unsigned int)strlen(xretext); return RIGHT_ARROW; }
+".o." { CR; return COMPOSITION; }
+".O." { CR; return LENIENT_COMPOSITION; }
+".x." { CR; return CROSS_PRODUCT; }
+".P." { CR; return UPPER_PRIORITY_UNION; }
+".p." { CR; return LOWER_PRIORITY_UNION; }
+".-u." { CR; return UPPER_MINUS; }
+".-l." { CR; return LOWER_MINUS; }
+"`" {   CR; return SUBSTITUTE_LEFT; }
 
-"->" { hfst::xre::cr += (unsigned int)strlen(xretext); return REPLACE_RIGHT; }
-"(->)" { hfst::xre::cr += (unsigned int)strlen(xretext); return OPTIONAL_REPLACE_RIGHT; }
-"<-" { hfst::xre::cr += (unsigned int)strlen(xretext); return REPLACE_LEFT; }
-"(<-)" { hfst::xre::cr += (unsigned int)strlen(xretext); return OPTIONAL_REPLACE_LEFT; }
-"<->" { hfst::xre::cr += (unsigned int)strlen(xretext); return REPLACE_LEFT_RIGHT; }
-"(<->)" { hfst::xre::cr += (unsigned int)strlen(xretext); return OPTIONAL_REPLACE_LEFT_RIGHT; }
-"@->" { hfst::xre::cr += (unsigned int)strlen(xretext); return LTR_LONGEST_MATCH; }
-"@>" { hfst::xre::cr += (unsigned int)strlen(xretext); return LTR_SHORTEST_MATCH; }
-"->@" { hfst::xre::cr += (unsigned int)strlen(xretext); return RTL_LONGEST_MATCH; }
-">@" { hfst::xre::cr += (unsigned int)strlen(xretext); return RTL_SHORTEST_MATCH; }
+"\\<=" { CR; return LEFT_RESTRICTION; }
+"<=>" { CR; return LEFT_RIGHT_ARROW; }
+"<=" { CR; return LEFT_ARROW; }
+"=>" { CR; return RIGHT_ARROW; }
 
-"||" { hfst::xre::cr += (unsigned int)strlen(xretext); return REPLACE_CONTEXT_UU; }
-"//" { hfst::xre::cr += (unsigned int)strlen(xretext); return REPLACE_CONTEXT_LU; }
-"\\\\" { hfst::xre::cr += (unsigned int)strlen(xretext); return REPLACE_CONTEXT_UL; }
-"\\//" { hfst::xre::cr += (unsigned int)strlen(xretext); return REPLACE_CONTEXT_LL; }
-"_"+ { hfst::xre::cr += (unsigned int)strlen(xretext); return CENTER_MARKER; }
-"..."+ { hfst::xre::cr += (unsigned int)strlen(xretext); return MARKUP_MARKER; }
+"->" { CR; return REPLACE_RIGHT; }
+"(->)" { CR; return OPTIONAL_REPLACE_RIGHT; }
+"<-" { CR; return REPLACE_LEFT; }
+"(<-)" { CR; return OPTIONAL_REPLACE_LEFT; }
+"<->" { CR; return REPLACE_LEFT_RIGHT; }
+"(<->)" { CR; return OPTIONAL_REPLACE_LEFT_RIGHT; }
+"@->" { CR; return LTR_LONGEST_MATCH; }
+"@>" { CR; return LTR_SHORTEST_MATCH; }
+"->@" { CR; return RTL_LONGEST_MATCH; }
+">@" { CR; return RTL_SHORTEST_MATCH; }
 
-"\\\\\\" { hfst::xre::cr += (unsigned int)strlen(xretext); return LEFT_QUOTIENT; }
+"||" { CR; return REPLACE_CONTEXT_UU; }
+"//" { CR; return REPLACE_CONTEXT_LU; }
+"\\\\" { CR; return REPLACE_CONTEXT_UL; }
+"\\//" { CR; return REPLACE_CONTEXT_LL; }
+"_"+ { CR; return CENTER_MARKER; }
+"..."+ { CR; return MARKUP_MARKER; }
+
+"\\\\\\" { CR; return LEFT_QUOTIENT; }
 
 "^"{UINTEGER}","{UINTEGER} { 
-    hfst::xre::cr += (unsigned int)strlen(xretext);
-    xrelval.values = hfst::xre::get_n_to_k(xretext);
+    CR;
+    yylval->values = hfst::xre::get_n_to_k(yytext);
     return CATENATE_N_TO_K;
 }
 
 "^{"{UINTEGER}","{UINTEGER}"}" {
-    hfst::xre::cr += (unsigned int)strlen(xretext);
-    xrelval.values = hfst::xre::get_n_to_k(xretext);
+    CR;
+    yylval->values = hfst::xre::get_n_to_k(yytext);
     return CATENATE_N_TO_K;
 }
 
 "^>"{UINTEGER} { 
-    hfst::xre::cr += (unsigned int)strlen(xretext);
-    xrelval.value = strtol(xretext + 2, 0, 10);
+    CR;
+    yylval->value = strtol(yytext + 2, 0, 10);
     return CATENATE_N_PLUS; 
 }
 
 "^<"{UINTEGER} { 
-    hfst::xre::cr += (unsigned int)strlen(xretext);
-    xrelval.value = strtol(xretext + 2, 0, 10);
+    CR;
+    yylval->value = strtol(yytext + 2, 0, 10);
     return CATENATE_N_MINUS;
 }
 
 "^"{UINTEGER}                  { 
-    hfst::xre::cr += (unsigned int)strlen(xretext);
-    xrelval.value = strtol(xretext + 1, 0, 10);
+    CR;
+    yylval->value = strtol(yytext + 1, 0, 10);
     return CATENATE_N;
 }
 
-".r" { hfst::xre::cr += (unsigned int)strlen(xretext); return REVERSE; }
-".i" { hfst::xre::cr += (unsigned int)strlen(xretext); return INVERT; }
-".u" { hfst::xre::cr += (unsigned int)strlen(xretext); return UPPER; }
-".l" { hfst::xre::cr += (unsigned int)strlen(xretext); return LOWER; }
+".r" { CR; return REVERSE; }
+".i" { CR; return INVERT; }
+".u" { CR; return UPPER; }
+".l" { CR; return LOWER; }
 
 "@bin\""[^""]+"\""|"@\""[^""]+"\"" { 
-    hfst::xre::cr += (unsigned int)strlen(xretext);
-    xrelval.label = hfst::xre::get_quoted(xretext);
+    CR;
+    yylval->label = hfst::xre::get_quoted(yytext);
     return READ_BIN;
 }
 
 "@txt\""[^""]+"\"" {
-    hfst::xre::cr += (unsigned int)strlen(xretext);
-    xrelval.label = hfst::xre::get_quoted(xretext);
+    CR;
+    yylval->label = hfst::xre::get_quoted(yytext);
     return READ_TEXT;
 }
 
 "@stxt\""[^""]+"\"" {
-    hfst::xre::cr += (unsigned int)strlen(xretext);
-    xrelval.label = hfst::xre::get_quoted(xretext);
+    CR;
+    yylval->label = hfst::xre::get_quoted(yytext);
     return READ_SPACED;
 }
 
 "@pl\""[^""]+"\"" {
-    hfst::xre::cr += (unsigned int)strlen(xretext);
-    xrelval.label = hfst::xre::get_quoted(xretext);
+    CR;
+    yylval->label = hfst::xre::get_quoted(yytext);
     return READ_PROLOG;
 }
 
 "@re\""[^""]+"\"" {
-    hfst::xre::cr += (unsigned int)strlen(xretext);
-    xrelval.label = hfst::xre::get_quoted(xretext);
+    CR;
+    yylval->label = hfst::xre::get_quoted(yytext);
     return READ_RE;
 }
 
-"[." { hfst::xre::cr += (unsigned int)strlen(xretext); return LEFT_BRACKET_DOTTED; }
-".]" { hfst::xre::cr += (unsigned int)strlen(xretext); return RIGHT_BRACKET_DOTTED; }
-"[" { hfst::xre::cr += (unsigned int)strlen(xretext); return LEFT_BRACKET; }
-"]" { hfst::xre::cr += (unsigned int)strlen(xretext); return RIGHT_BRACKET; }
-"(" { hfst::xre::cr += (unsigned int)strlen(xretext); return LEFT_PARENTHESIS; }
-")" { hfst::xre::cr += (unsigned int)strlen(xretext); return RIGHT_PARENTHESIS; }
+"[." { CR; return LEFT_BRACKET_DOTTED; }
+".]" { CR; return RIGHT_BRACKET_DOTTED; }
+"[" { CR; return LEFT_BRACKET; }
+"]" { CR; return RIGHT_BRACKET; }
+"(" { CR; return LEFT_PARENTHESIS; }
+")" { CR; return RIGHT_PARENTHESIS; }
 
 
-{LWSP}":"{LWSP} { hfst::xre::cr += (unsigned int)strlen(xretext); return PAIR_SEPARATOR_SOLE; }
-^":"$ { hfst::xre::cr += (unsigned int)strlen(xretext); return PAIR_SEPARATOR_SOLE; }
-{LWSP}":" { hfst::xre::cr += (unsigned int)strlen(xretext); return PAIR_SEPARATOR_WO_LEFT; }
-":"{LWSP} { hfst::xre::cr += (unsigned int)strlen(xretext); return PAIR_SEPARATOR_WO_RIGHT; }
-":" { hfst::xre::cr += (unsigned int)strlen(xretext); return PAIR_SEPARATOR; }
+{LWSP}":"{LWSP} { CR; return PAIR_SEPARATOR_SOLE; }
+^":"$ { CR; return PAIR_SEPARATOR_SOLE; }
+{LWSP}":" { CR; return PAIR_SEPARATOR_WO_LEFT; }
+":"{LWSP} { CR; return PAIR_SEPARATOR_WO_RIGHT; }
+":" { CR; return PAIR_SEPARATOR; }
 
 "::"{WEIGHT} {
-    hfst::xre::cr += (unsigned int)strlen(xretext); 
-    xrelval.weight = hfst::xre::get_weight(xretext + 2);
+    CR; 
+    yylval->weight = hfst::xre::get_weight(yytext + 2);
     return WEIGHT;
 }
 
 "\""[^""]+"\"" {
-    hfst::xre::cr += (unsigned int)strlen(xretext); 
-    xrelval.label = hfst::xre::parse_quoted(xretext); 
+    CR; 
+    yylval->label = hfst::xre::parse_quoted(yytext); 
     return QUOTED_LITERAL;
 }
 
-",," { hfst::xre::cr += (unsigned int)strlen(xretext); return COMMACOMMA; }
-"," { hfst::xre::cr += (unsigned int)strlen(xretext); return COMMA; }
+",," { CR; return COMMACOMMA; }
+"," { CR; return COMMA; }
 
-"\"\"" { hfst::xre::cr += (unsigned int)strlen(xretext); return EPSILON_TOKEN; }
-"0" { hfst::xre::cr += (unsigned int)strlen(xretext); return EPSILON_TOKEN; }
-"[]" { hfst::xre::cr += (unsigned int)strlen(xretext); return EPSILON_TOKEN; }
-"?" { hfst::xre::cr += (unsigned int)strlen(xretext); return ANY_TOKEN; }
+"\"\"" { CR; return EPSILON_TOKEN; }
+"0" { CR; return EPSILON_TOKEN; }
+"[]" { CR; return EPSILON_TOKEN; }
+"?" { CR; return ANY_TOKEN; }
 
 {NAME_CH}+ {
     if (hfst::xre::position_symbol != NULL) {
-      if (strcmp(hfst::xre::position_symbol, xretext) == 0) {
+      if (strcmp(hfst::xre::position_symbol, yytext) == 0) {
         hfst::xre::positions.insert(hfst::xre::cr);
       }
     }
-    hfst::xre::cr += (unsigned int)strlen(xretext);
-    xrelval.label = hfst::xre::strip_percents(xretext);
+    CR;
+    yylval->label = hfst::xre::strip_percents(yytext);
     return SYMBOL;
 }  
 
+{NAME_CH}+"(" {
+    CR;
+    yylval->label = yytext;
+    return FUNCTION_NAME;
+}
+
 ";\t"{WEIGHT} {
-    hfst::xre::cr += (unsigned int)strlen(xretext); 
-    xrelval.weight = hfst::xre::get_weight(xretext + 2);
+    CR; 
+    yylval->weight = hfst::xre::get_weight(yytext + 2);
     return END_OF_WEIGHTED_EXPRESSION;
 }
 
 ";" { 
-    hfst::xre::cr += (unsigned int)strlen(xretext); 
+    CR; 
     return END_OF_EXPRESSION;
 }
 
-{LWSP}* { hfst::xre::cr += (unsigned int)strlen(xretext); /* ignorable whitespace */ }
+{LWSP}* { CR; /* ignorable whitespace */ }
 
-("!"|"#")[^\n]*$ { hfst::xre::cr += (unsigned int)strlen(xretext); /* ignore comments */ }
+("!"|"#")[^\n]*$ { CR; /* ignore comments */ }
 
 . { 
-    hfst::xre::cr += (unsigned int)strlen(xretext); 
+    CR; 
     return LEXER_ERROR;
 }
 

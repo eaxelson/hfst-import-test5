@@ -703,7 +703,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
       std::string xre_converted = convert_argument_symbols(arguments, xre, name, xre_);
         
-      if (! xre_.define_function(name, arguments, xre_converted))
+      if (! xre_.define_function(name, arguments.size(), xre_converted))
         {
           fprintf(stderr, "Error when defining function\n");
           exit(1);

@@ -18,7 +18,7 @@ extern char* startptr;
 extern size_t len;
 extern std::map<std::string,hfst::HfstTransducer*> definitions;
 extern std::map<std::string,std::string> function_definitions;
-extern std::map<std::string,std::vector<std::string> > function_arguments;
+extern std::map<std::string,unsigned int> function_arguments;
 extern HfstTransducer* last_compiled;
 extern ImplementationType format;
 
@@ -63,7 +63,7 @@ double get_weight(const char* s);
 HfstTransducer* compile(const std::string& xre,
                         std::map<std::string,hfst::HfstTransducer*>& defs,
                         std::map<std::string,std::string>& func_defs,
-                        std::map<std::string,std::vector<std::string> > func_args,
+                        std::map<std::string,unsigned int> func_args,
                         hfst::ImplementationType type);
 
 /** 
@@ -72,9 +72,14 @@ HfstTransducer* compile(const std::string& xre,
  */
 HfstTransducer* expand_definition(HfstTransducer* tr, const char* symbol);
 
+ void define_function_args(const char * name, const std::vector<HfstTransducer> * args);
+ void undefine_function_args(const char * name);
+
+ const char * get_function_xre(const char * name);
+
 bool is_definition(const char* symbol);
 
-bool is_valid_function_call(const char * name, std::vector<HfstTransducer> * args);
+bool is_valid_function_call(const char * name, const std::vector<HfstTransducer> * args);
 
 /** @brief Parse "input:output", ":output", "input:" or ":". */
  HfstTransducer* xfst_label_to_transducer(const char* input, const char* output);

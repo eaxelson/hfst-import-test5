@@ -13,27 +13,44 @@
 
 using std::string;
 using std::map;
+using std::ostringstream;
 
-extern char* xretext;
-extern int xreparse();
-extern int xrenerrs;
+//extern char* yytext;
+//extern int yyparse();
+//extern int yynerrs;
+
+class yy_buffer_state;
+typedef yy_buffer_state * YY_BUFFER_STATE;
+typedef void * yyscan_t;
+extern int yyparse(yyscan_t);
+extern int yylex_init (yyscan_t*);
+extern YY_BUFFER_STATE yy_scan_string (const char *, yyscan_t);
+extern void yy_delete_buffer (YY_BUFFER_STATE, yyscan_t);
+extern int yylex_destroy (yyscan_t);
+
+int yyerror(void*, const char*)
+{
+  return 0;
+}
 
 int
-xreerror(const char *msg)
+yyerror(const char *msg)
 {
+  /*
 #ifndef NDEBUG
     fprintf(stderr, "*** xre parsing failed: %s\n", msg);
     if (strlen(hfst::xre::data) < 60)
     {
         fprintf(stderr, "***    parsing %s [near %s]\n", hfst::xre::data,
-                xretext);
+                yytext);
     }
     else
     {
         fprintf(stderr, "***    parsing %60s [near %s]...\n", 
-                hfst::xre::data, xretext);
+                hfst::xre::data, yytext);
     }
 #endif
+  */
     return 0;
 }
 
@@ -45,7 +62,7 @@ namespace xre
 char* data;
 std::map<std::string,hfst::HfstTransducer*> definitions;
   std::map<std::string,std::string>  function_definitions;
-  std::map<std::string,std::vector<std::string> > function_arguments;
+  std::map<std::string,unsigned int> function_arguments;
 char* startptr;
 hfst::HfstTransducer* last_compiled;
 hfst::ImplementationType format;
@@ -346,7 +363,7 @@ get_weight(const char *s)
 HfstTransducer*
 compile(const string& xre, map<string,HfstTransducer*>& defs,
         map<string, string>& func_defs,
-        map<string, std::vector<string> > func_args,
+        map<string, unsigned int > func_args,
         ImplementationType impl)
 {
     // lock here?
@@ -357,11 +374,20 @@ compile(const string& xre, map<string,HfstTransducer*>& defs,
     function_definitions = func_defs;
     function_arguments = func_args;
     format = impl;
-    xreparse();
+
+    yyscan_t scanner;
+    yylex_init(&scanner);
+    YY_BUFFER_STATE bs = yy_scan_string(startptr,scanner);
+    
+    int parse_retval = yyparse(scanner);
+
+    yy_delete_buffer(bs,scanner);
+    yylex_destroy(scanner);
+
     free(startptr);
     data = 0;
     len = 0;
-    if (xrenerrs == 0)
+    if (parse_retval == 0) // if (yynerrs == 0)
       {
         HfstTransducer* rv = new HfstTransducer(*last_compiled);
         delete last_compiled;
@@ -369,16 +395,16 @@ compile(const string& xre, map<string,HfstTransducer*>& defs,
       }
     else
       {
-        return new HfstTransducer(impl);
+        return NULL;
       }
 }
 
 bool is_valid_function_call
-(const char * name, std::vector<HfstTransducer> * args)
+(const char * name, const std::vector<HfstTransducer> * args)
 {
   std::map<std::string, std::string>::const_iterator name2xre
     = function_definitions.find(name);
-  std::map<std::string, std::vector<std::string> >::const_iterator name2args
+  std::map<std::string, unsigned int >::const_iterator name2args
     = function_arguments.find(name);
 
   if (name2xre == function_definitions.end() || 
@@ -388,27 +414,60 @@ bool is_valid_function_call
       return false;
     }
 
-  StringVector arg_names = name2args->second;
+  unsigned int number_of_args = name2args->second;
 
-  if ( arg_names.size() != args->size())
+  if ( number_of_args != args->size())
     {
       fprintf(stderr, "Wrong number of arguments: function '%s' expects %i, %i given\n", 
-              name, (int)arg_names.size(), (int)args->size());
+              name, (int)number_of_args, (int)args->size());
       return false;
     }
 
-  for (StringVector::const_iterator it = arg_names.begin();
-      it != arg_names.end(); it++)
-    {
-      if (is_definition(it->c_str()))
-        {
-          fprintf(stderr, "Function '%s' has argument named '%s' which is already a defined variable\n", 
-                  name, it->c_str());
-          return false;
-        }
-    }
-
   return true;
+}
+
+const char * get_function_xre(const char * name)
+{
+  std::map<std::string,std::string>::const_iterator it 
+    = function_definitions.find(name);
+  if (it == function_definitions.end())
+    {
+      return NULL;
+    }
+  return it->second.c_str();
+}
+
+void define_function_args(const char * name, const std::vector<HfstTransducer> * args)
+{
+  if (! is_valid_function_call(name, args))
+    {
+      fprintf(stderr, "Could not define function args\n");
+      exit(1);
+    }
+  unsigned int arg_number = 1;
+  for (std::vector<HfstTransducer>::const_iterator it = args->begin();
+       it != args->end(); it++)
+    {
+      std::string function_arg = "@" + std::string(name) +
+        (static_cast<ostringstream*>( &(ostringstream() << arg_number) )->str()) + "@";
+      definitions[function_arg] = new HfstTransducer(*it);
+      arg_number++;
+    }
+}
+
+void undefine_function_args(const char * name)
+{
+  std::map<std::string, unsigned int>::const_iterator it = function_arguments.find(name);
+  if (it == function_arguments.end())
+    {
+      return;
+    }
+  for (unsigned int arg_number = 1; arg_number <= it->second; arg_number++)
+    {
+      std::string function_arg = "@" + std::string(name) +
+        (static_cast<ostringstream*>( &(ostringstream() << arg_number) )->str()) + "@";
+      definitions.erase(function_arg);
+    }
 }
 
 bool is_definition(const char* symbol)
@@ -458,10 +517,11 @@ xfst_label_to_transducer(const char* input, const char* output)
   if ( (is_definition(input) || is_definition(output)) && 
        strcmp(input, output) != 0 )
     {
-      char msg[256];
-      sprintf(msg, "invalid use of definitions in label %s:%s", 
-              get_print_format(input), get_print_format(output));
-      xreerror(msg);
+      // TODO, FIX:
+      //char msg[256];
+      //sprintf(msg, "invalid use of definitions in label %s:%s", 
+      //        get_print_format(input), get_print_format(output));
+      //yyerror(msg);
     }
   if  (strcmp(input, hfst::internal_unknown.c_str()) == 0 && 
        strcmp(output, hfst::internal_unknown.c_str()) == 0)
