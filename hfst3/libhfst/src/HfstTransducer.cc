@@ -4658,6 +4658,25 @@ HfstTransducer * HfstTransducer::read_lexc_ptr(const std::string &filename,
         hfst::lexc::LexcCompiler compiler(type);
         compiler.parse(filename.c_str());
         retval = compiler.compileLexical();
+
+        /*
+        std::map<std::string,hfst::HfstTransducer> stringTriesPrint_;
+        stringTriesPrint_ = compiler.getStringTries();
+
+        cout << "\n size: " << stringTriesPrint_.size() << endl;
+
+
+        std::map<std::string,hfst::HfstTransducer>:: iterator it;
+
+        for ( std::map<std::string,hfst::HfstTransducer>::iterator it=stringTriesPrint_.begin(); it!=stringTriesPrint_.end(); ++it )
+        {
+            std::cout << "string" << it->first << " => tr:" <<  '\n';
+        it->second.minimize().write_in_att_format(stdout, 1);
+        }
+         */
+
+
+
         return retval;
         break;
       }

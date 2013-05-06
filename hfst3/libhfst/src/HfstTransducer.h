@@ -75,6 +75,11 @@ namespace hfst
   namespace xfst {
     class XfstCompiler;
   }
+  namespace xeroxRules
+  {
+      class Rule;
+      HfstTransducer bracketedReplace( const Rule &rule, bool optional);
+  }
 
   using hfst::implementations::HfstOlTransducer;
 
@@ -1595,6 +1600,8 @@ transducer.transform_weights(&func);
     friend class hfst::implementations::ConversionFunctions;
     friend class HfstGrammar;
     friend class xfst::XfstCompiler;
+    //friend HfstTransducer bracketedReplace( const hfst::xeroxRules::Rule &rule, bool optional);
+    friend hfst::HfstTransducer hfst::xeroxRules::bracketedReplace(const hfst::xeroxRules::Rule&, bool);
   };
 
   /** \brief Write transducer \a t in AT&T format to ostream \a out.

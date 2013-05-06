@@ -26,12 +26,6 @@ TESTS=better-cola-machine-test.sh \
  # finnish-ot-prosody-test.sh - bug somewhere
  #		probably problem with alphabet minimization (containment in xfst, replace rules context in foma)
   
- # 	monish-guesser-analyzer-test.sh  ---- weird error with foma type when tested with foma - bug No 110
-
- # lingala - can't make att from xfst: *** ERROR: Sorry. This network is too large to be saved as an AT&T-format transducer file by xfst. You need to license a professional version of this program. ***
- #		problem with alphabet minimization (containment in xfst, replace rules context in foma)
- 
- # finnish-prosody.sh - not standard
  
  
 EXTRA_DIST=xfst-att-to-hfst-att.sh remove-complement.sh test-example.sh \

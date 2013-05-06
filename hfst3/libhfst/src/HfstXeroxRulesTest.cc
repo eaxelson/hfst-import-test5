@@ -974,7 +974,7 @@ void test10a( ImplementationType type )
 }
 // empty language replacements
 // ~[?*] -> a
-/* TODO
+// TODO
 void test10b( ImplementationType type )
 {
     HfstTokenizer TOK;
@@ -992,21 +992,21 @@ void test10b( ImplementationType type )
     HfstTransducer identityPair = HfstTransducer::identity_pair( type );
     HfstTransducer result1(identityPair);
     result1.repeat_star().minimize();
-    result1.insert_to_alphabet("a");
+    //result1.insert_to_alphabet("a");
 
 
     HfstTransducer replaceTr(type);
     replaceTr = replace(rule, false);
 
-printf("replaceTr: \n");
-replaceTr.write_in_att_format(stdout, 1);
+    //printf("replaceTr: \n");
+    //replaceTr.write_in_att_format(stdout, 1);
 
-printf("result1: \n");
-result1.write_in_att_format(stdout, 1);
+    //printf("result1: \n");
+    //result1.write_in_att_format(stdout, 1);
 
     assert(replaceTr.compare(result1));
 }
-*/
+
 
 
 // replace left d <- ca || ca_c  ( input: c a c a c a c )
@@ -1092,49 +1092,6 @@ void test9b( ImplementationType type )
     assert(tmp2.compare(result1));
 
 }
-
-
-/*
-// ab->x  ab_a
-void test8( ImplementationType type )
-{
-
-    HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-
-
-    // Mapping
-    HfstTransducer mapping1("a","b", TOK, type);
-    HfstTransducer mapping2("b","a", TOK, type);
-    mapping1.disjunct(mapping2).minimize();
-
-
-    HfstTransducer input1("abba", TOK, type);
-    HfstTransducer result1("abba", "baab", TOK, type);
-
-    Rule rule(mapping1);
-
-    // Unconditional  optional replace
-    HfstTransducer replaceTr(type);
-    replaceTr = replace(rule, false);
-
-
-    //printf("transducer: \n");
-    //replaceTr.write_in_att_format(stdout, 1);
-
-    //HfstOutputStream output( replaceTr.get_type() );
-    //output << replaceTr;
-
-    HfstTransducer tmp2(type);
-    tmp2 = input1;
-    tmp2.compose(replaceTr).minimize();
-    //printf("abba optional: \n");
-    //tmp2.write_in_att_format(stdout, 1);
-    assert(tmp2.compare(result1));
-
-}
-*/
-
 
 // ab->x  ab_a
 void test1( ImplementationType type )
