@@ -83,6 +83,8 @@ class XreCompiler
   //!        A null pointer is returned on fatal error, if abort is not called.
   HfstTransducer* compile(const std::string& xre);
 
+  std::string get_error_message();
+
   std::set<unsigned int> get_positions_of_symbol_in_xre
     (const std::string & symbol, const std::string & xre);
 

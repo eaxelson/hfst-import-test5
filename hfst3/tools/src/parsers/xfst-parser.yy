@@ -35,8 +35,6 @@ extern int hxfstlineno;
 void hxfsterror(const char *text);
 int hxfstlex(void);
 
-
-
 %}
 
 // ouch

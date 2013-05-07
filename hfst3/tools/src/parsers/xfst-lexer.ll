@@ -584,6 +584,7 @@ LWSP [\t ]*
 <REGEX_STATE>. {
     hxfsterror("Unexpected character when parsing REGEX\n");
     fprintf(stderr, "%s", hxfsttext);
+    BEGIN(INITIAL); 
     return ERROR;
 }
 
