@@ -136,126 +136,133 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       
   }
 
-  /* Create an hfst_ol::Transducer equivalent to HfstBasicTransducer \a t.
-     \a weighted defined whether the created transducer is weighted. */
-  hfst_ol::Transducer * ConversionFunctions::
-  hfst_basic_transducer_to_hfst_ol
-  (const HfstBasicTransducer * t, bool weighted, std::string options)
-  {
-      const float packing_aggression = 0.85;
-      const int floor_jump_threshold = 4; // a packing aggression parameter
-      bool quick = options == "quick";
-      typedef std::set<std::string> StringSet;
-      using hfst_ol::SymbolNumber;
-      using hfst_ol::NO_SYMBOL_NUMBER;
-      // The transition array is indexed starting from this constant
-      const unsigned int TA_OFFSET = 2147483648u;
+typedef std::set<std::string> StringSet;
+using hfst_ol::SymbolNumber;
+using hfst_ol::NO_SYMBOL_NUMBER;
 
-      // Symbols must be in the following order in an optimized-lookup
-      // transducer:
-      // 1) epsilon
-      // 2) other input symbols
-      // 3) symbols that aren't used as input symbols
-      // Flag diacritics must be indexed as if they were symbol #0
-      // (epsilon) and otherwise have a proper unique number,
-      // but they can appear anywhere in the alphabet.
-      
-      // In this case we implement an optimisation where flag diacritics
-      // appear at the end of the alphabet. This allows us to ignore
-      // them for indexing purposes, which potentially makes the index
-      // table smaller and faster to pack.
+void get_states_and_symbols(
+    const HfstBasicTransducer * t,
+    std::vector<hfst_ol::StatePlaceholder> & state_placeholders,
+    hfst_ol::SymbolTable & symbol_table,
+    SymbolNumber & seen_input_symbols,
+    std::set<SymbolNumber> & flag_symbols,
+    hfst_ol::Transducer * harmonizer)
+{
+    // Symbols must be in the following order in an optimized-lookup
+    // transducer:
+    // 1) epsilon
+    // 2) other input symbols
+    // 3) symbols that aren't used as input symbols
+    // Flag diacritics must be indexed as if they were symbol #0
+    // (epsilon) and otherwise have a proper unique number,
+    // but they can appear anywhere in the alphabet.
+    
+    // In this case we implement an optimisation where flag diacritics
+    // appear at the end of the alphabet. This allows us to ignore
+    // them for indexing purposes, which potentially makes the index
+    // table smaller and faster to pack.
+    
+    // We also gather information about possible gaps in the state numbering,
+    // because we want it to be contiguous from now on.
 
-      // We also gather information about possible gaps in the state numbering,
-      // because we want it to be contiguous from now on.
+    // If we have been told to use a certain symbol table,
+    // there's no need to keep track of symbols here.
+    StringSet * input_symbols = new StringSet();
+    StringSet * flag_diacritics = new StringSet();
+    StringSet * other_symbols = new StringSet();
+    
+    std::map<unsigned int, unsigned int> * relabeled_states =
+        new std::map<unsigned int, unsigned int>();
+    unsigned int first_transition = 0;
+    unsigned int source_state=0;
+    for (HfstBasicTransducer::const_iterator it = t->begin(); 
+         it != t->end(); ++it) {
+        unsigned int state_number = state_placeholders.size();
+        if (state_number != source_state) {
+            relabeled_states->operator[](source_state) = state_number;
+        }
+        hfst_ol::Weight final_w = 0.0;
+        if (t->is_final_state(source_state)) {
+            final_w = t->get_final_weight(source_state);    
+        }
+        state_placeholders.push_back(hfst_ol::StatePlaceholder(
+                                         state_number,
+                                         t->is_final_state(source_state),
+                                         first_transition,
+                                         final_w));
+        ++first_transition; // there's a padding entry between states
+        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
+                 = it->begin();
+             tr_it != it->end(); ++tr_it) {
+            ++first_transition;
+            // If we don't already have a symbol table, collect symbols
+            if (harmonizer == NULL) {
+                if (FdOperation::is_diacritic(tr_it->get_input_symbol())) {
+                    flag_diacritics->insert(tr_it->get_input_symbol());
+                } else {
+                    input_symbols->insert(tr_it->get_input_symbol());
+                }
+                other_symbols->insert(tr_it->get_output_symbol());
+            }
+        }
+        source_state++;
+    }
 
-      StringSet * input_symbols = new StringSet();
-      StringSet * flag_diacritics = new StringSet();
-      StringSet * other_symbols = new StringSet();
-      
-      std::vector<hfst_ol::StatePlaceholder> state_placeholders;
+    std::map<std::string, SymbolNumber> * string_symbol_map =
+        new std::map<std::string, SymbolNumber>();
 
-      std::map<unsigned int, unsigned int> * relabeled_states =
-      new std::map<unsigned int, unsigned int>();
-      unsigned int first_transition = 0;
-
-      unsigned int source_state=0;
-      for (HfstBasicTransducer::const_iterator it = t->begin(); 
-           it != t->end(); ++it) {
-      unsigned int state_number = state_placeholders.size();
-      if (state_number != source_state) {
-          relabeled_states->operator[](source_state) = state_number;
-      }
-      hfst_ol::Weight final_w = 0.0;
-      if (t->is_final_state(source_state)) {
-          final_w = t->get_final_weight(source_state);    
-      }
-      state_placeholders.push_back(hfst_ol::StatePlaceholder(
-                       state_number,
-                       t->is_final_state(source_state),
-                       first_transition,
-                       final_w));
-      ++first_transition; // there's a padding entry between states
-          for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
-           = it->begin();
-               tr_it != it->end(); ++tr_it) {
-          ++first_transition;
-              if (FdOperation::is_diacritic(tr_it->get_input_symbol())) {
-                  flag_diacritics->insert(tr_it->get_input_symbol());
-              } else {
-                  input_symbols->insert(tr_it->get_input_symbol());
-              }
-              other_symbols->insert(tr_it->get_output_symbol());
-          }
-      source_state++;
-      }
-      
-      SymbolNumber seen_input_symbols = 1; // We always have epsilon
-      hfst_ol::SymbolTable symbol_table;
-      std::set<SymbolNumber> flag_symbols;
-
-      std::map<std::string, SymbolNumber> * string_symbol_map =
-      new std::map<std::string, SymbolNumber>();
-
-      // 1) epsilon
-      string_symbol_map->operator[](internal_epsilon) = symbol_table.size();
-      symbol_table.push_back(internal_epsilon);
-
-      // 2) input symbols
-      for (std::set<std::string>::iterator it = input_symbols->begin();
-           it != input_symbols->end(); ++it) {
-          if (!is_epsilon(*it)) {
-              string_symbol_map->operator[](*it) = symbol_table.size();
-              symbol_table.push_back(*it);
-              ++seen_input_symbols;
-          }
-      }
-
-      // 3) Flag diacritics
-      for (std::set<std::string>::iterator it = flag_diacritics->begin();
-           it != flag_diacritics->end(); ++it) {
-          if (!is_epsilon(*it)) {
-              string_symbol_map->operator[](*it) = symbol_table.size();
-              flag_symbols.insert(symbol_table.size());
-              symbol_table.push_back(*it);
-              // don't increment seen_input_symbols - we use it for
-              // indexing
-          }
-      }
-
-      // 4) non-input symbols
-      for (std::set<std::string>::iterator it = other_symbols->begin();
-           it != other_symbols->end(); ++it) {
-          if (!is_epsilon(*it) and input_symbols->count(*it) == 0 and
+    // Collect symbols if we need to
+    if (harmonizer == NULL) {
+        
+        // 1) epsilon
+        string_symbol_map->operator[](internal_epsilon) = symbol_table.size();
+        symbol_table.push_back(internal_epsilon);
+        
+        // 2) input symbols
+        for (std::set<std::string>::iterator it = input_symbols->begin();
+             it != input_symbols->end(); ++it) {
+            if (!is_epsilon(*it)) {
+                string_symbol_map->operator[](*it) = symbol_table.size();
+                symbol_table.push_back(*it);
+                ++seen_input_symbols;
+            }
+        }
+        
+        // 3) Flag diacritics
+        for (std::set<std::string>::iterator it = flag_diacritics->begin();
+             it != flag_diacritics->end(); ++it) {
+            if (!is_epsilon(*it)) {
+                string_symbol_map->operator[](*it) = symbol_table.size();
+                flag_symbols.insert(symbol_table.size());
+                symbol_table.push_back(*it);
+                // don't increment seen_input_symbols - we use it for
+                // indexing
+            }
+        }
+        
+        // 4) non-input symbols
+        for (std::set<std::string>::iterator it = other_symbols->begin();
+             it != other_symbols->end(); ++it) {
+            if (!is_epsilon(*it) and input_symbols->count(*it) == 0 and
               flag_diacritics->count(*it) == 0) {
-              string_symbol_map->operator[](*it) = symbol_table.size();
-              symbol_table.push_back(*it);
-          }
-      }
-
-      delete input_symbols;
-      delete flag_diacritics;
-      delete other_symbols;
-
+                string_symbol_map->operator[](*it) = symbol_table.size();
+                symbol_table.push_back(*it);
+            }
+        }
+        
+    } else {
+        symbol_table = harmonizer->get_symbol_table();
+        seen_input_symbols = harmonizer->get_header().input_symbol_count();
+        for (SymbolNumber i = 0; i < symbol_table.size(); ++i) {
+            if (harmonizer->get_alphabet().is_flag_diacritic(i)) {
+                flag_symbols.insert(i);
+            }
+        }
+    }
+    delete input_symbols;
+    delete flag_diacritics;
+    delete other_symbols;
+        
     // Do a second pass over the transitions, figuring out everything
     // about the states except starting indices
 
@@ -293,6 +300,31 @@ unsigned int hfst_ol_to_hfst_basic_add_state
     }
     delete relabeled_states;
     delete string_symbol_map;
+}
+
+  /* Create an hfst_ol::Transducer equivalent to HfstBasicTransducer \a t.
+     \a weighted defined whether the created transducer is weighted. */
+  hfst_ol::Transducer * ConversionFunctions::
+  hfst_basic_transducer_to_hfst_ol
+  (const HfstBasicTransducer * t, bool weighted, std::string options,
+   hfst_ol::Transducer * harmonizer)
+  {
+      const float packing_aggression = 0.85;
+      const int floor_jump_threshold = 4; // a packing aggression parameter
+      bool quick = options == "quick";
+      // The transition array is indexed starting from this constant
+      const unsigned int TA_OFFSET = 2147483648u;
+      
+      std::vector<hfst_ol::StatePlaceholder> state_placeholders;
+      hfst_ol::SymbolTable symbol_table;
+      SymbolNumber seen_input_symbols = 1; // We always have epsilon
+      std::set<SymbolNumber> flag_symbols;
+      get_states_and_symbols(t,
+                             state_placeholders,
+                             symbol_table,
+                             seen_input_symbols,
+                             flag_symbols,
+                             harmonizer);
 
     // For determining the index table we first sort the states (excepting
     // the starting state) by number of different input symbols.
