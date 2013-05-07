@@ -209,13 +209,14 @@ namespace implementations {
 
 #endif // HAVE_OPENFST 
   
-
+  
+  
   static HfstBasicTransducer * hfst_ol_to_hfst_basic_transducer
     (hfst_ol::Transducer * t);
 
   static hfst_ol::Transducer * hfst_basic_transducer_to_hfst_ol
       (const HfstBasicTransducer * t, bool weighted,
-       std::string options="");
+       std::string options="", hfst_ol::Transducer * harmonizer = NULL);
 
   /* Define here the functions that convert between HfstBasicTransducer and 
      your transducer class. */
