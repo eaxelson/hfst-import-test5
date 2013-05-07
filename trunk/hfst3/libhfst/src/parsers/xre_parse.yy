@@ -84,8 +84,8 @@ int yylex ( YYSTYPE * , yyscan_t );
 %type <mappingWithArrow> MAPPINGPAIR
 
 %type <contextWithMark> CONTEXTS_WITH_MARK
-%type <transducerPairVector> CONTEXTS_VECTOR, RESTR_CONTEXTS_VECTOR
-%type <transducerPair> CONTEXT, RESTR_CONTEXT
+%type <transducerPairVector> CONTEXTS_VECTOR RESTR_CONTEXTS_VECTOR
+%type <transducerPair> CONTEXT RESTR_CONTEXT
 %type <replType>  CONTEXT_MARK
 %type <label>     HALFARC SUB2
 
@@ -134,9 +134,6 @@ int yylex ( YYSTYPE * , yyscan_t );
 %token LEXER_ERROR
 %token END_OF_EXPRESSION
 %token PAIR_SEPARATOR PAIR_SEPARATOR_SOLE 
-       PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
-%token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
-%token LEXER_ERROR
 %nonassoc <label> QUOTED_LITERAL
 %%
 
@@ -179,36 +176,6 @@ REGEXP2: REPLACE
        | REGEXP2 LENIENT_COMPOSITION REPLACE {
             $$ = & $1->lenient_composition(*$3).minimize();
             delete $3;
-        }
-        // function call
-       | FUNCTION REGEXP_LIST RIGHT_PARENTHESIS {
-            if (! hfst::xre::is_valid_function_call($1, $2)) {
-              return EXIT_FAILURE;
-            }
-            else {
-              yyscan_t scanner;
-              yylex_init(&scanner);
-              YY_BUFFER_STATE bs = yy_scan_string(hfst::xre::get_function_xre($1),scanner);
-
-              fprintf(stderr, "scanned string: '%s'\n", hfst::xre::get_function_xre($1)); // DEBUG
-
-              hfst::xre::define_function_args($1, $2);
-              int parse_retval = yyparse(scanner);
-              hfst::xre::undefine_function_args($1);
-
-              yy_delete_buffer(bs,scanner);
-              yylex_destroy(scanner);
-
-              $$ = hfst::xre::last_compiled;              
-
-              if (parse_retval != 0)
-              {
-                YYABORT;
-              }
-
-              // fprintf(stderr, "function %s@%i) called: function definitions not yet implemented, returning an empty transducer\n", $1, (int)$2->size());
-              // $$ = new hfst::HfstTransducer(hfst::xre::format);
-            }
         }
         // substitute
        | SUB1 SUB2 SUB3 {
@@ -379,9 +346,8 @@ MAPPINGPAIR_VECTOR: MAPPINGPAIR_VECTOR COMMA MAPPINGPAIR
     
 MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
       {
-        // std::cerr << "mapping : r2 arrow r2"<< std::endl;
-	hfst::xre::warn_about_special_symbols_in_replace($1);  
-	hfst::xre::warn_about_special_symbols_in_replace($3);  
+	  hfst::xre::warn_about_special_symbols_in_replace($1);  
+	  hfst::xre::warn_about_special_symbols_in_replace($3);  
           HfstTransducerPair mappingPair(*$1, *$3);
           $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
 
@@ -395,7 +361,7 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
           HfstTransducerPair mappingPair = create_mapping_for_mark_up_replace( tmpMappingPair, marks );
           
           $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
-         delete $1, $3, $5;
+          delete $1, $3, $5;
       }
       | REPLACE REPLACE_ARROW REPLACE MARKUP_MARKER
       {
@@ -406,7 +372,7 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
           HfstTransducerPair mappingPair = create_mapping_for_mark_up_replace( tmpMappingPair, marks );
                    
           $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
-         delete $1, $3;
+          delete $1, $3;
       }
       | REPLACE REPLACE_ARROW MARKUP_MARKER REPLACE
       {
@@ -416,7 +382,7 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
           HfstTransducerPair mappingPair = create_mapping_for_mark_up_replace( tmpMappingPair, marks );
           
           $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
-         delete $1, $4;
+          delete $1, $4;
       }
        | LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED REPLACE_ARROW REPLACE
       {
@@ -430,9 +396,7 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
       }
       | LEFT_BRACKET_DOTTED REPLACE RIGHT_BRACKET_DOTTED REPLACE_ARROW REPLACE
       {
-        //  HfstTransducer mappingTr(*$2);
-        //  mappingTr.cross_product(*$5);
-		  HfstTransducerPair mappingPair(*$2, *$5);
+	  HfstTransducerPair mappingPair(*$2, *$5);
           $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($4, mappingPair);
           delete $2, $5;
       }
@@ -456,14 +420,8 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
 
 // Contexts: ( ie. || k _ f , ... , f _ s )
 CONTEXTS_WITH_MARK:  CONTEXT_MARK CONTEXTS_VECTOR
-         {
-       
-         //std::cerr << "context w mark: conMark conVect"<< std::endl;      
-         
+         {       
          $$ =  new std::pair< ReplaceType, HfstTransducerPairVector> ($1, *$2);
-         //$$ = $2;
-         //std::cerr << "Context Mark: \n" << $1  << std::endl;
-   
          }  
          ;
 CONTEXTS_VECTOR: CONTEXT
@@ -493,13 +451,11 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
          }
       | REPLACE CENTER_MARKER
          {
-           // std::cerr << "Mapping: \n" << *$1  << std::endl;
             HfstTransducer t1(*$1);
             t1.minimize().prune_alphabet(false);
 
             HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
             
-           // std::cerr << "Epsilon: \n" << epsilon  << std::endl;
             $$ = new HfstTransducerPair(t1, epsilon);
             delete $1; 
          }
@@ -923,6 +879,34 @@ LABEL: HALFARC {
         free($1);
 	free($3);
      }
+        // function call
+       | FUNCTION REGEXP_LIST RIGHT_PARENTHESIS {
+            if (! hfst::xre::is_valid_function_call($1, $2)) {
+              return EXIT_FAILURE;
+            }
+            else {
+              yyscan_t scanner;
+              yylex_init(&scanner);
+              YY_BUFFER_STATE bs = yy_scan_string(hfst::xre::get_function_xre($1),scanner);
+
+              hfst::xre::define_function_args($1, $2);
+              int parse_retval = yyparse(scanner);
+              hfst::xre::undefine_function_args($1);
+
+              yy_delete_buffer(bs,scanner);
+              yylex_destroy(scanner);
+
+              $$ = hfst::xre::last_compiled;              
+
+              if (parse_retval != 0)
+              {
+                YYABORT;
+              }
+
+              // fprintf(stderr, "function %s@%i) called: function definitions not yet implemented, returning an empty transducer\n", $1, (int)$2->size());
+              // $$ = new hfst::HfstTransducer(hfst::xre::format);
+            }
+        }
      /*
      | QUOTE {
         HfstTokenizer TOK;

@@ -69,6 +69,9 @@ class XreCompiler
                        unsigned int arguments,
                        const std::string& xre);
 
+  bool is_definition(const std::string& name);
+  bool is_function_definition(const std::string& name);
+
   //! @brief Add a definition macro.
   //!        Compilers will replace arcs labeled @a name, with the transducer
   //!        \a transducer in later phases of compilation.
@@ -85,8 +88,8 @@ class XreCompiler
 
   std::string get_error_message();
 
-  std::set<unsigned int> get_positions_of_symbol_in_xre
-    (const std::string & symbol, const std::string & xre);
+  bool get_positions_of_symbol_in_xre
+    (const std::string & symbol, const std::string & xre, std::set<unsigned int> & positions);
 
   //! @brief Whether transducer names defined with function 'define' are expanded.
   //!        Default is false.
