@@ -91,6 +91,12 @@ void XreCompiler::set_verbosity(bool verbose, FILE * file)
     }
 }
 
+std::string 
+XreCompiler::get_error_message()
+{
+  return "";
+}
+
 HfstTransducer*
 XreCompiler::compile(const std::string& xre)
 {

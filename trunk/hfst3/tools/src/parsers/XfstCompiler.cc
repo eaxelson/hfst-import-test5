@@ -554,8 +554,11 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::define(const char* name, const char* xre)
     {
       HfstTransducer* compiled = xre_.compile(xre);
-      xre_.define(name, xre);
-      definitions_[name] = compiled;
+      if (compiled != NULL)
+        {
+          xre_.define(name, xre);
+          definitions_[name] = compiled;
+        }
       prompt();
       return *this;
     }
@@ -1320,8 +1323,11 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       HfstTransducer * substituted = xre_.compile(subst_regex);
       xre_.undefine("TempXfstTransducerName");
 
-      stack_.push(substituted);
-      print_transducer_info();
+      if (substituted != NULL)
+        {
+          stack_.push(substituted);
+          print_transducer_info();
+        }
       prompt();
       return *this;
     }
@@ -2094,20 +2100,27 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::read_regex(FILE* infile)
     {
 #define MAX_FILE_SIZE 10000000
+      HfstTransducer* compiled = NULL;
       size_t read = 0;
       char* file_data = static_cast<char*>
         (malloc(sizeof(char)*MAX_FILE_SIZE+1));
       read = fread(file_data, sizeof(char), MAX_FILE_SIZE, infile);
       if ((read > 0) && (read < MAX_FILE_SIZE) && (feof(infile)))
         {
-          HfstTransducer* compiled = xre_.compile(file_data);
-          stack_.push(compiled);
+          compiled = xre_.compile(file_data);
+          if (compiled != NULL)
+            {
+              stack_.push(compiled);
+            }
         }
       else if (!feof(infile))
         {
           fprintf(stderr, "regex file longer than buffer :-(\n");
         }
-      print_transducer_info();
+      if (compiled != NULL)
+        {
+          print_transducer_info();
+        }
       prompt();
       return *this;
     }
@@ -2116,8 +2129,11 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::read_regex(const char* indata)
     {
       HfstTransducer* compiled = xre_.compile(indata);
-      stack_.push(compiled);
-      print_transducer_info();
+      if (compiled != NULL)
+        {
+          stack_.push(compiled);
+          print_transducer_info();
+        }
       prompt();
       return *this;
     }
@@ -2980,9 +2996,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       hxfstin = infile;
       xfst_ = this;
-      //YY_BUFFER_STATE bs = hxfst_create_buffer(hxfstin, 32000);
       int rv = hxfstparse();
-      //hxfst_delete_buffer(bs);
       return rv;
     }
   int
@@ -2995,9 +3009,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           return -1;
         }
       xfst_ = this;
-      //YY_BUFFER_STATE bs = hxfst_create_buffer(hxfstin, 32000);
       int rv = hxfstparse();
-      //hxfst_delete_buffer(bs);
       fclose(hxfstin);
       return rv;
     }
@@ -3009,6 +3021,10 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     YY_BUFFER_STATE bs = hxfst_scan_string(line);
     int rv = hxfstparse();
     hxfst_delete_buffer(bs);
+    if (rv != 0)
+      {
+        prompt();
+      }
     return rv;
   }
   int
@@ -3027,7 +3043,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler&
   XfstCompiler::print_properties(FILE* outfile)
     {
-      fprintf(outfile, "missiing print properties %s:%d\n", __FILE__, __LINE__);
+      fprintf(outfile, "missing print properties %s:%d\n", __FILE__, __LINE__);
       return *this;
     }
   XfstCompiler& 

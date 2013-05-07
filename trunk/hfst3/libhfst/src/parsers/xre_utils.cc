@@ -27,31 +27,29 @@ extern int yylex_init (yyscan_t*);
 extern YY_BUFFER_STATE yy_scan_string (const char *, yyscan_t);
 extern void yy_delete_buffer (YY_BUFFER_STATE, yyscan_t);
 extern int yylex_destroy (yyscan_t);
+extern char * yyget_text(yyscan_t);
 
-int yyerror(void*, const char*)
+int yyerror(yyscan_t scanner, const char* msg)
 {
+  fprintf(stderr, "*** xre parsing failed: %s\n", msg);
+  if (strlen(hfst::xre::data) < 60)
+    {
+      fprintf(stderr, "***    parsing %s [near %s]\n", hfst::xre::data,
+              yyget_text(scanner));
+    }
+  else
+    {
+      fprintf(stderr, "***    parsing %60s [near %s]...\n", 
+              hfst::xre::data, yyget_text(scanner));
+    }
   return 0;
 }
 
 int
 yyerror(const char *msg)
 {
-  /*
-#ifndef NDEBUG
-    fprintf(stderr, "*** xre parsing failed: %s\n", msg);
-    if (strlen(hfst::xre::data) < 60)
-    {
-        fprintf(stderr, "***    parsing %s [near %s]\n", hfst::xre::data,
-                yytext);
-    }
-    else
-    {
-        fprintf(stderr, "***    parsing %60s [near %s]...\n", 
-                hfst::xre::data, yytext);
-    }
-#endif
-  */
-    return 0;
+  fprintf(stderr, "*** xre parsing failed: %s\n", msg);
+  return 0;
 }
 
 namespace hfst 
