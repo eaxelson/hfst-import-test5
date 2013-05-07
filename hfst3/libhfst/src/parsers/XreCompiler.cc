@@ -57,6 +57,21 @@ XreCompiler::define_function(const std::string& name,
   return true;
 }
 
+bool
+XreCompiler::is_definition(const std::string & name)
+{
+  if (definitions_.find(name) != definitions_.end())
+    return true;
+  return false;
+}
+
+bool
+XreCompiler::is_function_definition(const std::string & name)
+{
+  if (function_definitions_.find(name) != function_definitions_.end())
+    return true;
+  return false;
+}
 
 void
 XreCompiler::undefine(const std::string& name) 
@@ -103,8 +118,8 @@ XreCompiler::compile(const std::string& xre)
   return hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, format_);
 }
 
-std::set<unsigned int> XreCompiler::get_positions_of_symbol_in_xre
-(const std::string & symbol, const std::string & xre)
+bool XreCompiler::get_positions_of_symbol_in_xre
+(const std::string & symbol, const std::string & xre, std::set<unsigned int> & positions_)
 {
   position_symbol = strdup(symbol.c_str());
   positions.clear();
@@ -115,11 +130,13 @@ std::set<unsigned int> XreCompiler::get_positions_of_symbol_in_xre
   position_symbol = NULL;
   if (compiled == NULL)
     {
-      fprintf(stderr, "error in XreCompiler::get_positions_of_symbol_in_xre: xre '%s' "
+      /*fprintf(stderr, "error in XreCompiler::get_positions_of_symbol_in_xre: xre '%s' "
               "could not be parsed, positions of symbol %s not found\n", 
-              xre.c_str(), symbol.c_str());
+              xre.c_str(), symbol.c_str());*/
+      return false;
     }
-  return positions;
+  positions_ = positions;
+  return true;
 }
 
 }}

@@ -556,8 +556,18 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       HfstTransducer* compiled = xre_.compile(xre);
       if (compiled != NULL)
         {
+          bool was_defined = xre_.is_definition(name);
           xre_.define(name, xre);
           definitions_[name] = compiled;
+
+          if (verbose_) 
+            {
+              if (was_defined)
+                fprintf(stderr, "Redefined");
+              else
+                fprintf(stderr, "Defined");
+              fprintf(stderr, " '%s'\n", name); 
+            }          
         }
       prompt();
       return *this;
@@ -646,8 +656,11 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     for (std::vector<std::string>::const_iterator arg = arguments.begin();
          arg != arguments.end(); arg++)
       {
-        std::set<unsigned int> arg_positions 
-          = xre_.get_positions_of_symbol_in_xre(*arg, retval);
+        std::set<unsigned int> arg_positions; 
+        if (! xre_.get_positions_of_symbol_in_xre(*arg, retval, arg_positions))
+          {
+            return std::string("");
+          }
 
         std::string new_retval = std::string("");
         std::string substituting_argument = "\"@" + function_name + 
@@ -692,27 +705,45 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
       if (! extract_function_name(prototype, name))
         {
-          fprintf(stderr, "Error extrating function name from prototype '%s'\n",
+          fprintf(stderr, "Error extracting function name from prototype '%s'\n",
                   prototype);
-          exit(1);
+          prompt();
+          return *this;
         }
 
       if (! extract_function_arguments(prototype, arguments))
         {
-          fprintf(stderr, "Error extrating function arguments from prototype '%s'\n",
+          fprintf(stderr, "Error extracting function arguments from prototype '%s'\n",
                   prototype);
-          exit(1);
+          prompt();
+          return *this;
         }
 
       std::string xre_converted = convert_argument_symbols(arguments, xre, name, xre_);
-        
+      if (xre_converted == std::string(""))
+        {
+          fprintf(stderr, "Error parsing function definition '%s'\n", xre);
+          prompt();
+          return *this;
+        }
+
+      bool was_defined = xre_.is_function_definition(name);
+
       if (! xre_.define_function(name, arguments.size(), xre_converted))
         {
           fprintf(stderr, "Error when defining function\n");
-          exit(1);
+          prompt();
+          return *this;
         }
 
-      fprintf(stderr, "Defined function '%s'\n", xre_converted.c_str());
+      if (verbose_) 
+        {
+          if (was_defined)
+            fprintf(stderr, "Redefined");
+          else
+            fprintf(stderr, "Defined");
+          fprintf(stderr, " function '%s@%i)'\n", name.c_str(), (int)arguments.size()); 
+        }
 
       prompt();
       return *this;
