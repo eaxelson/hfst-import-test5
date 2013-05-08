@@ -34,7 +34,7 @@
 #include "HfstSymbolDefs.h"
 
 #include "lexc-utils.h"
-#include "lexc-parser.hh"
+#include "lexc-parser.h"
 
 using std::string;
 

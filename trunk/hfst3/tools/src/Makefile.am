@@ -182,7 +182,7 @@ endif
 
 noinst_HEADERS= \
 	calculate_functions.h hfst-commandline.h hfst-program-options.h \
-	hfst-compiler.hh HfstCompiler.h HfstBasic.h HfstAlphabet.h HfstUtf8.h \
+	hfst-compiler.h HfstCompiler.h HfstBasic.h HfstAlphabet.h HfstUtf8.h \
 	inc/check-params-binary.h inc/check-params-common.h \
 	inc/check-params-unary.h  inc/getopt-cases-binary.h \
 	inc/getopt-cases-common.h inc/getopt-cases-error.h  \
@@ -307,10 +307,10 @@ install-exec-hook:
 		$(LN_S) -f hfst-disjunct$(EXEEXT) hfst-union$(EXEEXT)
 #		$(LN_S) -f hfst-preprocess-for-optimized-lookup-format$(EXEEXT) hfst-preprocess-for-optimised-lookup-format$(EXEEXT) &&
 
-BUILT_SOURCES=hfst-scanner.hh hfst-compiler.hh $(hfst_lexc2fst_BUILT) 
+BUILT_SOURCES=hfst-scanner.h hfst-compiler.h $(hfst_lexc2fst_BUILT) 
 
 # make make realise headers automatically follow from flexing
-hfst-scanner.hh: hfst-scanner.cc
+hfst-scanner.h: hfst-scanner.cc
 
 hfst_calculate_CXXFLAGS= -Wall -Wno-error -Wno-sign-compare -Wno-deprecated
 
@@ -319,7 +319,5 @@ AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c 
 
 ## To build h-files from hh-files.
-#hfst-compiler.h:hfst-compiler.hh
-#	cp hfst-compiler.hh hfst-compiler.h
-
-CLEANFILES=$(BUILT_SOURCES)
+hfst-compiler.h:hfst-compiler.hh
+	cp hfst-compiler.hh hfst-compiler.h

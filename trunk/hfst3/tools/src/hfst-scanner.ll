@@ -15,7 +15,7 @@
 #include <string.h>
 
 #include "HfstCompiler.h"
-#include "hfst-compiler.hh"
+#include "hfst-compiler.h"
 #include "HfstBasic.h"
 #include "HfstUtf8.h"
 #include "HfstTransducer.h"

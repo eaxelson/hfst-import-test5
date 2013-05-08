@@ -17,7 +17,7 @@
 
 SUBDIRS=test
 
-BUILT_SOURCES=xfst-parser.hh xfst-parser.cc xfst-lexer.cc
+BUILT_SOURCES=xfst-parser.h xfst-parser.cc xfst-lexer.cc
 
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
@@ -28,7 +28,7 @@ if WANT_XFST2FST
 MAYBE_XFST=hfst-xfst2fst
 endif
 
-noinst_HEADERS = XfstCompiler.h xfst-utils.h xfst-parser.hh
+noinst_HEADERS = XfstCompiler.h xfst-utils.h xfst-parser.h
 
 HFST_COMMON_SRC=../hfst-program-options.cc ../hfst-commandline.cc ../hfst-tool-metadata.cc ../HfstStrings2FstTokenizer.cc
 
@@ -42,7 +42,5 @@ xfst-parser.cc: xfst-parser.yy
 
 xfst-lexer.cc: xfst-lexer.ll
 
-#xfst-parser.h:xfst-parser.hh
-#	cp xfst-parser.hh xfst-parser.h
-
-CLEANFILES=$(BUILT_SOURCES)
+xfst-parser.h:xfst-parser.hh
+	cp xfst-parser.hh xfst-parser.h
