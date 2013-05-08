@@ -38,7 +38,7 @@ using std::set_difference;
 #include "HfstTransducer.h"
 #include "XreCompiler.h"
 #include "lexc-utils.h"
-#include "lexc-parser.h"
+#include "lexc-parser.hh"
 #include "xre_utils.h"
 
 using hfst::HfstTransducer;

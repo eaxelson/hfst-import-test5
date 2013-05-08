@@ -9,7 +9,7 @@
 #include "HfstInputStream.h"
 #include "HfstXeroxRules.h"
 
-#include "pmatch_parse.h"
+#include "pmatch_parse.hh"
 #include "pmatch_utils.h"
 
 
