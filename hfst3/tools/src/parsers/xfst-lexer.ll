@@ -23,7 +23,7 @@
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif
-#include "xfst-parser.hh"
+#include "xfst-parser.h"
 #include "xfst-utils.h"
 
 #include <assert.h>

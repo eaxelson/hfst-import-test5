@@ -9,7 +9,7 @@
 #include "HfstInputStream.h"
 #include "HfstXeroxRules.h"
 
-#include "xre_parse.hh"
+#include "xre_parse.h"
 #include "xre_utils.h"
 
 #undef YY_INPUT
