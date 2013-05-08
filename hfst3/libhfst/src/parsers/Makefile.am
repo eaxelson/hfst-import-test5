@@ -19,15 +19,15 @@ noinst_LTLIBRARIES=libhfstparsers.la
 
 XRE_SRCS=xre_lex.ll xre_parse.yy xre_utils.cc XreCompiler.cc
 XRE_HDRS=XreCompiler.h xre_utils.h
-XRE_BUILT=xre_parse.h xre_parse.cc xre_lex.cc
+XRE_BUILT=xre_parse.hh xre_parse.cc xre_lex.cc
 
 PMATCH_SRCS=pmatch_lex.ll pmatch_parse.yy pmatch_utils.cc PmatchCompiler.cc
 PMATCH_HDRS=PmatchCompiler.h pmatch_utils.h
-PMATCH_BUILT=pmatch_parse.h pmatch_parse.cc pmatch_lex.cc
+PMATCH_BUILT=pmatch_parse.hh pmatch_parse.cc pmatch_lex.cc
 
 LEXC_SRCS=lexc-lexer.ll lexc-parser.yy lexc-utils.cc LexcCompiler.cc
 LEXC_HDRS=LexcCompiler.h lexc-utils.h
-LEXC_BUILT=lexc-parser.h
+LEXC_BUILT=lexc-parser.hh
 
 BUILT_SOURCES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT)
 
@@ -46,14 +46,14 @@ else
   AM_CPPFLAGS+= -I${top_srcdir}/back-ends/openfst/src/include
 endif
 
-xre_parse.h:xre_parse.hh
-	cp xre_parse.hh xre_parse.h
-
-lexc-parser.h:lexc-parser.hh
-	cp lexc-parser.hh lexc-parser.h
-
-pmatch_parse.h:pmatch_parse.hh
-	cp pmatch_parse.hh pmatch_parse.h
+#xre_parse.h:xre_parse.hh
+#	cp xre_parse.hh xre_parse.h
+#
+#lexc-parser.h:lexc-parser.hh
+#	cp lexc-parser.hh lexc-parser.h
+#
+#pmatch_parse.h:pmatch_parse.hh
+#	cp pmatch_parse.hh pmatch_parse.h
 
 # headers of parsers
 hfstincludedir = $(includedir)/hfst
@@ -77,3 +77,4 @@ XreCompiler_LDADD=../libhfst.la
 
 TESTS=$(LIBHFST_PARSER_TSTS)
 
+CLEANFILES=$(BUILT_SOURCES)
