@@ -316,10 +316,12 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
    //my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *,
    //                                    my_namespace::MyFst *),
    //#endif
-   HfstTransducer &another, bool harmonize)
+   HfstTransducer &another_tr, bool harmonize)
   {
-    if (this->type != another.type)
+    if (this->type != another_tr.type)
       HFST_THROW(TransducerTypeMismatchException);
+
+    HfstTransducer another(another_tr);
 
     /* prevent harmonization, if needed */
     if (! harmonize)
