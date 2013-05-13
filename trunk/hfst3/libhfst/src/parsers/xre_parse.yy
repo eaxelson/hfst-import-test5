@@ -750,10 +750,11 @@ REGEXP9: REGEXP10 { }
             $$ = & $1->repeat_n($2);
         }
        | REGEXP9 CATENATE_N_PLUS {
-            $$ = & $1->repeat_n_plus($2);
+            //std::cerr << "value is ::::: \n"<< $2 << std::endl; 
+            $$ = & $1->repeat_n_plus($2+1);
         }
        | REGEXP9 CATENATE_N_MINUS {
-            $$ = & $1->repeat_n_minus($2);
+            $$ = & $1->repeat_n_minus($2-1);
         }
        | REGEXP9 CATENATE_N_TO_K {
             $$ = & $1->repeat_n_to_k($2[0], $2[1]);
