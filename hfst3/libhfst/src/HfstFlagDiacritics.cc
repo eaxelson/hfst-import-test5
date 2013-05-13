@@ -30,8 +30,6 @@ bool FdOperation::is_diacritic(const std::string& diacritic_string)
       break;
     case 'U':
       break;
-    case 'I': // Ins tag, needs to be considered a flag
-        break;
     default:
       return false;
     }
