@@ -18,6 +18,7 @@
 #endif // HAVE_OPENFST
 
 #include "transducer.h"
+#include "pmatch.h"
 
 namespace hfst_ol {
     
