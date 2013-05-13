@@ -208,21 +208,20 @@ void get_states_and_symbols(
         source_state++;
     }
 
-    std::map<std::string, SymbolNumber> * string_symbol_map =
-        new std::map<std::string, SymbolNumber>();
+    std::map<std::string, SymbolNumber> string_symbol_map;
 
     // Collect symbols if we need to
     if (harmonizer == NULL) {
         
         // 1) epsilon
-        string_symbol_map->operator[](internal_epsilon) = symbol_table.size();
+        string_symbol_map[internal_epsilon] = symbol_table.size();
         symbol_table.push_back(internal_epsilon);
         
         // 2) input symbols
         for (std::set<std::string>::iterator it = input_symbols->begin();
              it != input_symbols->end(); ++it) {
             if (!is_epsilon(*it)) {
-                string_symbol_map->operator[](*it) = symbol_table.size();
+                string_symbol_map[*it] = symbol_table.size();
                 symbol_table.push_back(*it);
                 ++seen_input_symbols;
             }
@@ -232,7 +231,7 @@ void get_states_and_symbols(
         for (std::set<std::string>::iterator it = flag_diacritics->begin();
              it != flag_diacritics->end(); ++it) {
             if (!is_epsilon(*it)) {
-                string_symbol_map->operator[](*it) = symbol_table.size();
+                string_symbol_map[*it] = symbol_table.size();
                 flag_symbols.insert(symbol_table.size());
                 symbol_table.push_back(*it);
                 // don't increment seen_input_symbols - we use it for
@@ -245,13 +244,14 @@ void get_states_and_symbols(
              it != other_symbols->end(); ++it) {
             if (!is_epsilon(*it) and input_symbols->count(*it) == 0 and
               flag_diacritics->count(*it) == 0) {
-                string_symbol_map->operator[](*it) = symbol_table.size();
+                string_symbol_map[*it] = symbol_table.size();
                 symbol_table.push_back(*it);
             }
         }
         
     } else {
         symbol_table = harmonizer->get_symbol_table();
+        string_symbol_map = harmonizer->get_alphabet().build_string_symbol_map();
         seen_input_symbols = harmonizer->get_header().input_symbol_count();
         for (SymbolNumber i = 0; i < symbol_table.size(); ++i) {
             if (harmonizer->get_alphabet().is_flag_diacritic(i)) {
@@ -278,10 +278,9 @@ void get_states_and_symbols(
         }
             // check for previously unseen inputs
             if (state_placeholders[state_number].inputs.count(
-                    string_symbol_map->operator[](
-                                    tr_it->get_input_symbol())) == 0) {
+                    string_symbol_map[tr_it->get_input_symbol()]) == 0) {
                 state_placeholders[state_number].inputs[
-                    string_symbol_map->operator[](tr_it->get_input_symbol())] =
+                    string_symbol_map[tr_it->get_input_symbol()]] =
                     std::vector<hfst_ol::TransitionPlaceholder>();
             }
         unsigned int target = tr_it->get_target_state();
@@ -290,16 +289,14 @@ void get_states_and_symbols(
         }
             hfst_ol::TransitionPlaceholder trans(
                 target,
-                string_symbol_map->operator[](tr_it->get_output_symbol()),
+                string_symbol_map[tr_it->get_output_symbol()],
                 tr_it->get_weight());
             state_placeholders[state_number]
-                .inputs[string_symbol_map->operator[](
-            tr_it->get_input_symbol())].push_back(trans);
+                .inputs[string_symbol_map[tr_it->get_input_symbol()]].push_back(trans);
         }
     source_state++;
     }
     delete relabeled_states;
-    delete string_symbol_map;
 }
 
   /* Create an hfst_ol::Transducer equivalent to HfstBasicTransducer \a t.
@@ -307,13 +304,20 @@ void get_states_and_symbols(
   hfst_ol::Transducer * ConversionFunctions::
   hfst_basic_transducer_to_hfst_ol
   (const HfstBasicTransducer * t, bool weighted, std::string options,
-   hfst_ol::Transducer * harmonizer)
+   HfstTransducer * harmonizer)
   {
       const float packing_aggression = 0.85;
       const int floor_jump_threshold = 4; // a packing aggression parameter
       bool quick = options == "quick";
       // The transition array is indexed starting from this constant
       const unsigned int TA_OFFSET = 2147483648u;
+
+      // If we got a harmonizer, we
+      // unpack the raw optimized-lookup backend from it
+      hfst_ol::Transducer * harmonizer_ol = NULL;
+      if (harmonizer != NULL) {
+          harmonizer_ol = harmonizer->implementation.hfst_ol;
+      }
       
       std::vector<hfst_ol::StatePlaceholder> state_placeholders;
       hfst_ol::SymbolTable symbol_table;
@@ -324,7 +328,7 @@ void get_states_and_symbols(
                              symbol_table,
                              seen_input_symbols,
                              flag_symbols,
-                             harmonizer);
+                             harmonizer_ol);
 
     // For determining the index table we first sort the states (excepting
     // the starting state) by number of different input symbols.
@@ -484,9 +488,17 @@ void get_states_and_symbols(
                                    wtransition_table);
   }
 
+HfstTransducer * ConversionFunctions::hfst_ol_to_hfst_transducer(hfst_ol::Transducer * t)
+{
+    HfstTransducer * retval = new HfstTransducer(HFST_OL_TYPE);
+    retval->implementation.hfst_ol = new hfst_ol::Transducer(*t);
+    return retval;
+}
 
 
-                 }}
+
+
+}}
 #else // MAIN_TEST was defined
 
 #include <iostream>
