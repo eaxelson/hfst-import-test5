@@ -43,6 +43,7 @@ using std::pair;
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
+#include "implementations/ConvertTransducerFormat.h"
 #include "parsers/PmatchCompiler.h"
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
@@ -156,15 +157,63 @@ process_stream(HfstOutputStream& outstream)
     }
     definitions = comp.compile(file_contents);
     
-    // When done compiling everything, look for TOP and output it first
+    // First we need to collect a unified alphabet from all the transducers.
+    std::string unified_alphabet;
+    hfst::HfstTokenizer tok;
+    for (std::map<std::string, HfstTransducer *>::const_iterator it =
+             definitions.begin(); it != definitions.end(); ++it) {
+        hfst::StringSet string_set = it->second->get_alphabet();
+        for (hfst::StringSet::const_iterator sym = string_set.begin();
+             sym != string_set.end(); ++sym) {
+            unified_alphabet.append(*sym);
+            tok.add_multichar_symbol(*sym);
+        }
+    }
+    // Now we make a dummy transducer with that alphabet
+    HfstTransducer dummy(unified_alphabet, tok, compilation_format);
+    // Then we convert it...
+    HfstTransducer * harmonizer = &dummy.convert(hfst::HFST_OL_TYPE);
+
+    // Use these for naughty intermediate steps to make sure
+    // everything has the same alphabet
+    hfst::HfstBasicTransducer * intermediate_tmp;
+    hfst_ol::Transducer * harmonized_tmp;
+    hfst::HfstTransducer * output_tmp;
+
+    // When done compiling everything, look for TOP and output it first.
     if (definitions.count("TOP") == 1) {
-        outstream << (*definitions["TOP"]).convert(hfst::HFST_OL_TYPE);
+        intermediate_tmp = hfst::implementations::ConversionFunctions::
+            hfst_transducer_to_hfst_basic_transducer(*definitions["TOP"]);
+        harmonized_tmp = hfst::implementations::ConversionFunctions::
+            hfst_basic_transducer_to_hfst_ol(intermediate_tmp,
+                                             false, // unweighted
+                                             "", // no special options
+                                             harmonizer); // harmonize with this
+        output_tmp = hfst::implementations::ConversionFunctions::
+            hfst_ol_to_hfst_transducer(harmonized_tmp);
+        output_tmp->set_name("TOP");
+        outstream << *output_tmp;
         delete definitions["TOP"];
         definitions.erase("TOP");
+        delete intermediate_tmp;
+        delete output_tmp;
     }
-    for (std::map<std::string, HfstTransducer *>::iterator it = definitions.begin();
-         it != definitions.end(); ++it) {
+    for (std::map<std::string, HfstTransducer *>::iterator it =
+             definitions.begin(); it != definitions.end(); ++it) {
+        intermediate_tmp = hfst::implementations::ConversionFunctions::
+            hfst_transducer_to_hfst_basic_transducer(*(it->second));
+        harmonized_tmp = hfst::implementations::ConversionFunctions::
+            hfst_basic_transducer_to_hfst_ol(intermediate_tmp,
+                                             false, // unweighted
+                                             "", // no special options
+                                             harmonizer); // harmonize with this
+        output_tmp = hfst::implementations::ConversionFunctions::
+            hfst_ol_to_hfst_transducer(harmonized_tmp);
+        output_tmp->set_name(it->first);
+        outstream << *output_tmp;;
         delete it->second;
+        delete intermediate_tmp;
+        delete output_tmp;
     }
     return EXIT_SUCCESS;
 }
