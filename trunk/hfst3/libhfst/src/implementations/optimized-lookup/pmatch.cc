@@ -84,7 +84,10 @@ void PmatchContainer::add_special_symbol(const std::string & str,
     } else if (str == "@_BOUNDARY_@") {
         special_symbols[boundary] = symbol_number;
     } else if (is_end_tag(str)) {
-        end_tag_map[symbol_number] = str.substr(16, str.size() - 18);
+        // Fetch the part between @_PMATCH_ENDTAG_ and _@
+        end_tag_map[symbol_number] = str.substr(
+            sizeof("@_PMATCH_ENDTAG_") - 1,
+            str.size() - (sizeof("@_PMATCH_ENDTAG__@") - 1));
     } else if (is_insertion(str)) {
         rtn_names[name_from_insertion(str)] = symbol_number;
     }
@@ -104,12 +107,12 @@ bool PmatchContainer::is_end_tag(const SymbolNumber symbol) const
 
 bool PmatchContainer::is_insertion(const std::string & symbol)
 {
-    return symbol.find("@I.") == 0 && symbol.rfind("@") == symbol.size() - 2;
+    return symbol.find("@I.") == 0 && symbol.rfind("@") == symbol.size() - 1;
 }
 
 std::string PmatchContainer::name_from_insertion(const std::string & symbol)
 {
-    return symbol.substr(2, symbol.size() - 3);
+    return symbol.substr(sizeof("@I.") - 1, symbol.size() - (sizeof("@I.@") - 1));
 }
 
 std::string PmatchContainer::end_tag(const SymbolNumber symbol)
@@ -305,7 +308,6 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
     RtnVariables rtn_front;
     rtn_front.candidate_input_pos = NULL;
     rtn_front.output_tape_head = NULL;
-    rtn_front.locals = locals_front;
     rtn_stack.push(rtn_front);
 
 
@@ -392,21 +394,20 @@ void PmatchTransducer::match(SymbolNumber ** input_tape_entry,
 void PmatchTransducer::rtn_call(SymbolNumber * input_tape_entry,
                                 SymbolNumber * output_tape_entry)
 {
-    // rtn_stack.push(rtn_stack.top());
-    // rtn_stack.top().locals = local_stack.top();
-    // rtn_stack.top().candidate_input_pos = input_tape_entry;
-    // locals.output_tape_head = output_tape_entry;
-    // locals.flag_state = alphabet.get_fd_table();
-    // locals.tape_step = 1;
-    // locals.context = none;
-    // locals.context_placeholder = NULL;
-    // local_stack.push(locals);
+    rtn_stack.push(rtn_stack.top());
+    rtn_stack.top().candidate_input_pos = input_tape_entry;
+    rtn_stack.top().output_tape_head = output_tape_entry;
+    local_stack.push(local_stack.top());
+    local_stack.top().flag_state = alphabet.get_fd_table();
+    local_stack.top().tape_step = 1;
+    local_stack.top().context = none;
+    local_stack.top().context_placeholder = NULL;
     get_analyses(input_tape_entry, output_tape_entry, 0);
 }
 
 void PmatchTransducer::rtn_exit(void)
 {
-    local_stack.pop();
+    rtn_stack.pop();
 }
 
 // void PmatchTransducer::take_best_path(void)
@@ -508,12 +509,31 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
             ++i;
             // It could be an insert statement... (gee, this function should
             // probably be refactored
-//        }
-//        else if (rtns.count(transition_table[i].input) != 0) {
-//            SymbolNumberVector old_best = locals_stack.top().best_result;
-//            SymbolNumber * old_candidate = locals_stack.top().candidate_input_pos;
-//            rtns->operator[](transition_table[i].input).rtn_call(input_tape, output_tape);
-            
+        }
+        else if (rtns.count(transition_table[i].input) != 0) {
+            SymbolNumber * original_output = output_tape;
+            SymbolNumber * original_input = input_tape;
+            // Pass control
+            PmatchTransducer * rtn_target = rtns[transition_table[i].input];
+            rtn_target->rtn_call(input_tape, output_tape);
+            // Fetch the result
+            for(SymbolNumberVector::const_iterator it =
+                    rtn_target->rtn_stack.top().best_result.begin();
+                it != rtn_target->rtn_stack.top().best_result.end();
+                ++it) {
+                *output_tape = *it;
+                ++output_tape;
+            }
+            input_tape = rtn_target->rtn_stack.top().candidate_input_pos;
+            rtn_target->rtn_exit();
+            // We're back in this transducer and continue where we left off
+            if (input_tape != original_input) {
+                // the rtn advanced the tape
+            get_analyses(input_tape,
+                         output_tape,
+                         transition_table[i].target);
+            }
+            ++i;
         } else { // it's not epsilon and it's not a flag or Ins, so nothing to do
             return;
         }

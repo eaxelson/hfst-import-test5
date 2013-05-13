@@ -125,7 +125,6 @@ namespace hfst_ol {
             SymbolNumber * candidate_input_pos;
             SymbolNumber * output_tape_head;
             SymbolNumberVector best_result;
-            LocalVariables locals;
         };
 
         std::stack<LocalVariables> local_stack;
@@ -206,7 +205,6 @@ namespace hfst_ol {
         void note_analysis(SymbolNumber * input_tape, SymbolNumber * output_tape);
 
     };
-
 
 }
 
