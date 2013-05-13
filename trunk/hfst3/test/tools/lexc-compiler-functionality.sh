@@ -27,7 +27,7 @@ fi
 
 
 if ! test -x $TOOLDIR/hfst-lexc2fst ; then
-    echo missing hfst-lexc2fst, assuming configured off, skipping
+    echo "missing hfst-lexc2fst, assuming configured off, skipping"
     exit 73
 fi
 
