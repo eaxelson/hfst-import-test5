@@ -217,7 +217,7 @@ typedef union YYSTYPE
      int  type;
 }
 /* Line 1529 of yacc.c.  */
-#line 221 "regex.tab.h"
+#line 221 "regex.h"
         YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

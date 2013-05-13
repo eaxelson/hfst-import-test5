@@ -1683,7 +1683,7 @@ static yyconst flex_int32_t yy_rule_can_match_eol[126] =
 #define YY_NO_INPUT 1
 #line 23 "regex.l"
 #include <stdio.h>
-#include "regex.tab.h"
+#include "regex.h"
 #include "foma.h"
 #define YY_USER_ACTION yylloc->first_line = yylloc->last_line = yylineno; yylloc->first_column = yycolumn; yylloc->last_column = yycolumn+yyleng-1; yycolumn += yyleng;
 
