@@ -180,6 +180,10 @@ REGEXP2: REPLACE
     hfst::pmatch::add_end_tag($1, $3);
     $$ = hfst::pmatch::add_pmatch_delimiters($1);
  }
+| REGEXP2 ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
+    hfst::pmatch::add_end_tag($1, $3);
+    $$ = hfst::pmatch::add_pmatch_delimiters($1);
+ }
 | REGEXP2 COMPOSITION REPLACE {
        
     $$ = & $1->compose(*$3);
@@ -864,6 +868,7 @@ INSERT: INS_LEFT SYMBOL RIGHT_PARENTHESIS {
             Ins_trans, Ins_trans, hfst::pmatch::format);
         $$->set_name($2);
         free(Ins_trans);
+        hfst::pmatch::inserted_transducers.insert($2);
     } else {
         pmatcherror("Named transducer not previously Defined");
     }

@@ -44,6 +44,7 @@ namespace pmatch
 
 char* data;
 std::map<std::string,hfst::HfstTransducer*> definitions;
+std::set<std::string> inserted_transducers;
 char* startptr;
 hfst::HfstTransducer* last_compiled;
 hfst::ImplementationType format;
@@ -345,6 +346,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
 {
     // lock here?
     definitions.clear();
+    inserted_transducers.clear();
     data = strdup(pmatch.c_str());
     startptr = data;
     len = strlen(data);
@@ -364,7 +366,18 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
 //       {
 //         return new HfstTransducer(impl);
 //       }
-    return std::map<std::string, hfst::HfstTransducer*>(definitions);
+    std::map<std::string, hfst::HfstTransducer*> retval;
+    for (std::map<std::string, hfst::HfstTransducer*>::const_iterator it =
+             definitions.begin(); it != definitions.end(); ++it) {
+        // We keep TOP and any inserted transducers
+        if (it->first.compare("TOP") == 0 ||
+            inserted_transducers.count(it->first) != 0) {
+            retval.insert(*it);
+        } else {
+            delete it->second;
+        }
+    }
+    return retval;
 }
 
 HfstTransducer * read_text(char * filename, ImplementationType type)

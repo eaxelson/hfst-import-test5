@@ -9,6 +9,7 @@
 #define GUARD_pmatch_utils_h
 
 #include <map>
+#include <set>
 #include "HfstTransducer.h"
 
 namespace hfst { namespace pmatch {
@@ -17,6 +18,7 @@ extern char* data;
 extern char* startptr;
 extern size_t len;
 extern std::map<std::string,hfst::HfstTransducer*> definitions;
+extern std::set<std::string> inserted_transducers;
 extern HfstTransducer* last_compiled;
 extern ImplementationType format;
 
@@ -87,6 +89,8 @@ HfstTransducer * read_text(char * filename,
 /** @brief Return a transducer that accepts a single string from an array of
  *  char *. 
  */
+
+/* First some magic templates for compile-time length checking */
 
 template<typename T, size_t N>
     HfstTransducer * acceptor_from_cstr(
