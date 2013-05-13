@@ -409,10 +409,18 @@ LexcCompiler::compileLexical()
       }
     // repeat star to overgenerate
     lexicons.repeat_star().minimize();
+
+    //printf("lexicons: \n");
+    //lexicons.write_in_att_format(stdout, 1);
+
     if (verbose_)
       {
         fprintf(stderr, "\n" "calculating correct lexicon combinations...");
       }
+
+
+    // for every lex_joiner in noFlags, find only atrings where it occurs twice in a row
+    // and then replace those joiners with epsilons
     for (set<string>::const_iterator s = noFlags_.begin();
          s != noFlags_.end();
          ++s)
@@ -449,11 +457,29 @@ LexcCompiler::compileLexical()
         sigmaStar.repeat_star();
         HfstTransducer joinerPair = joiner.repeat_n(2);
         HfstTransducer morphotax = sigmaStar.disjunct(joinerPair);
-        morphotax.repeat_star();
-        morphotax = start.concatenate(morphotax).concatenate(end).minimize();
+        morphotax.repeat_star().minimize();
+
+        // Root and # will always be flags
+        // If we put Lex joiners root and #, compostition won't work
+        //   morphotax = start.concatenate(morphotax).concatenate(end).minimize();
+
+         // this is done after the for loop
+         //lexicons.substitute("@@ANOTHER_EPSILON@@", "$ANOTHER_EPSILON$").minimize();
+
+        // It is necessary to harmonize them before composition
+        lexicons.harmonize_flag_diacritics(morphotax);
+
+        //printf("lexicons after harmonize: \n");
+        //lexicons.write_in_att_format(stdout, 1);
+
         lexicons = lexicons.compose(morphotax);
+
+        //printf("lexicons after compose: \n");
+        //lexicons.write_in_att_format(stdout, 1);
         lexicons.substitute(joinerEnc, "@_EPSILON_SYMBOL_@").minimize();
       }
+    /*
+    // this is removed under assumption that Root can't be in noFlags
     if (noFlags_.find(initialLexiconName_) != noFlags_.end())
       {
         // now same for initial lexicon and finale
@@ -477,12 +503,21 @@ LexcCompiler::compileLexical()
         HfstTransducer morphotax = sigmaStar.disjunct(joinerPair);
         morphotax.repeat_star();
         morphotax = start.concatenate(morphotax).concatenate(end).minimize();
+
+        //printf("morphotax2: \n");
+        //morphotax.write_in_att_format(stdout, 1);
+
         lexicons = lexicons.compose(morphotax);
+
+        //printf("lexicons2: \n");
+        //lexicons.write_in_att_format(stdout, 1);
+
         lexicons.substitute(startEnc, "@_EPSILON_SYMBOL_@").minimize();
         lexicons.substitute(endEnc, "@_EPSILON_SYMBOL_@");
       }
     else
       {
+      */
         string startEnc = initialLexiconName_;
         flagJoinerEncode(startEnc, false);
         HfstTransducer start(startEnc, startEnc, format_);
@@ -495,13 +530,16 @@ LexcCompiler::compileLexical()
                     " %s .* #, ", initialLexiconName_.c_str());
           }
         lexicons = start.concatenate(lexicons).concatenate(end);
-      }
+    //  }
+
+
     lexicons.substitute("@ZERO@", "0");
     lexicons.substitute("@@ANOTHER_EPSILON@@", "@_EPSILON_SYMBOL_@");
     if (verbose_)
       {
         fprintf(stderr, "Converting...\n");
       }
+
     HfstTransducer* rv = new HfstTransducer(lexicons);
     if (verbose_)
       {
