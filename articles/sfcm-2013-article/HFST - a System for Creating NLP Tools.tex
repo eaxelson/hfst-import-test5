@@ -1113,20 +1113,17 @@ release packages that include a source tarball (compilable on all
 aforementioned platforms), Debian binaries (for Linux), a MacPort
 distribution (for MacOS X) and an NSIS installer (for Windows).
 
-Another layer of portability is attained by HFST's programming
-language bindings via SWIG. It is possible to use the full HFST library
-through its SWIG interfaces in all supported systems with Python
-versions 2 and 3.
-
-
 \subsection{Other Usability Improvements}
 % Erik
 
 We offer four new command line tools since 2011. The most important are the native XFST
 parser hfst-xfst and the tagging tool hfst-tagger. Also two functions
 that were earlier available only through the API can now be used as
-command line tools: hfst-shuffle and hfst-prune-alphabet. Some existing
-tools also have new features: hfst-fst2txt can write to dot/graphviz
+command line tools: hfst-shuffle and hfst-prune-alphabet. The former is a special operation 
+that freely interleaves the symbols of any two strings recognized by respective transducers.    
+The latter removes symbols that do not occur in the transitions of the transducer from its alphabet. 
+Two existing tools that perform transducer-to-text conversion also have new features: 
+hfst-fst2txt can write to dot/graphviz
 and PCKIMMO format and hfst-fst2strings has a new parameter that
 controls its output to achieve better interoperability with other
 command line tools.
