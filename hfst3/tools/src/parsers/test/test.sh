@@ -79,7 +79,7 @@ do
     for testfile in compose_net concatenate_net union_net ignore_net invert_net minus_net intersect_net \
 	determinize_net epsilon_remove_net invert_net minimize_net negate_net \
 	one_plus_net prune_net reverse_net sort_net upper_side_net zero_plus_net lower_side_net \
-	define
+	define define_function
     do
 	rm -f result result1 result2
 	if ! (ls $testfile.xfst 2> /dev/null); then
@@ -156,7 +156,7 @@ do
 	    fi
 	done
     done
-    
+
 
 ## add properties
 # alias

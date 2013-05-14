@@ -653,6 +653,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     std::string retval(xre);
     unsigned int arg_number = 1;
 
+    //fprintf(stderr, "convert_argument_symbols: converting %s\n", retval.c_str()); // DEBUG
+
     for (std::vector<std::string>::const_iterator arg = arguments.begin();
          arg != arguments.end(); arg++)
       {
@@ -661,6 +663,13 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           {
             return std::string("");
           }
+        /*fprintf(stderr, "  converting %i arguments '%s' at positions ", (int)arg_positions.size(), arg->c_str());
+        for (std::set<unsigned int>::const_iterator IT = arg_positions.begin(); 
+             IT != arg_positions.end(); IT++)
+          {
+            fprintf(stderr, " %i ", *IT);
+          }
+          fprintf(stderr, " in '%s'\n", retval.c_str()); // DEBUG */
 
         std::string new_retval = std::string("");
         std::string substituting_argument = "\"@" + function_name + 
@@ -672,6 +681,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             // argument to be replaced begins at this position
             if (arg_positions.find(i) != arg_positions.end())
               {
+                //fprintf(stderr, "    replacing at position %i\n", i); // DEBUG
                 arg_positions.erase(i); // case will not be handled again
 
                 new_retval.append(substituting_argument);

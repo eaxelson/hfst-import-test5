@@ -22,6 +22,7 @@ EXTRA_DIST=test.sh \
 	upper_side_net.xfst upper_side_net.att \
 	lower_side_net.xfst lower_side_net.att \
 	define.xfst define.att \
+	define_function.xfst define_function.att \
 	define_fail.xfst \
 	eliminate_flag.xfst eliminate_flag.output \
 	set_variable.xfst set_variable.output \

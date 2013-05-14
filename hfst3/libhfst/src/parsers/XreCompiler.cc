@@ -52,6 +52,7 @@ XreCompiler::define_function(const std::string& name,
                              unsigned int arguments,
                              const std::string& xre)
 { 
+  //fprintf(stderr, "XreCompiler: defining function %s(@%i) = [%s]\n", name.c_str(), arguments, xre.c_str()); // DEBUG
   function_arguments_[name] = arguments;
   function_definitions_[name] = xre;
   return true;
