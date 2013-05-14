@@ -525,7 +525,8 @@ class XfstCompiler
   hfst::twolc::TwolcCompiler twolc_;
 #endif
   std::map<std::string,hfst::HfstTransducer*> definitions_;
-  std::map<std::string,hfst::HfstTransducer*> functions_;
+  std::map<std::string,std::string> function_definitions_;
+  std::map<std::string,unsigned int> function_arguments_;
   std::stack<hfst::HfstTransducer*> stack_;
   std::map<std::string,hfst::HfstTransducer*> names_;
   std::map<std::string,std::string> aliases_;

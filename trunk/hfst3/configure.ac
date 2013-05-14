@@ -524,11 +524,11 @@ AC_PROG_MAKE_SET
 AC_PATH_PROG([DOXYGEN], [doxygen], [no])
 AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
 
-AC_MSG_CHECKING([for bison])
-YACC_VERSION=$($YACC --version | grep 'bison' | cut -d' ' -f4 | cut -d'.' -f1-2)
-YACC_VERSION=$(echo "$YACC_VERSION*100" | bc | cut -d'.' -f1)
-AC_PATH_PROGS_FEATURE_CHECK(BISON, [bison], [[test $YACC_VERSION -gt 260 && ac_cv_path_BISON=$ac_path_BISON ac_path_BISON_found=: ]], [AC_MSG_ERROR([Hfst requires bison version 2.6 or newer.])])
-AC_MSG_RESULT([$ac_cv_path_BISON])
+#AC_MSG_CHECKING([for bison])
+#YACC_VERSION=$($YACC --version | grep 'bison' | cut -d' ' -f4 | cut -d'.' -f1-2)
+#YACC_VERSION=$(echo "$YACC_VERSION*100" | bc | cut -d'.' -f1)
+#AC_PATH_PROGS_FEATURE_CHECK(BISON, [bison], [[test $YACC_VERSION -gt 260 && ac_cv_path_BISON=$ac_path_BISON ac_path_BISON_found=: ]], [AC_MSG_ERROR([Hfst requires bison version 2.6 or newer.])])
+#AC_MSG_RESULT([$ac_cv_path_BISON])
 
 # Checks for libraries
 

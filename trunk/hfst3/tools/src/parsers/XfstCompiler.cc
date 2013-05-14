@@ -648,7 +648,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   (const std::vector<std::string> & arguments,
    const std::string & xre,
    const std::string & function_name,
-   hfst::xre::XreCompiler & xre_)
+   hfst::xre::XreCompiler & xre_, 
+   bool user_friendly_argument_names=false)
   {
     std::string retval(xre);
     unsigned int arg_number = 1;
@@ -672,9 +673,18 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           fprintf(stderr, " in '%s'\n", retval.c_str()); // DEBUG */
 
         std::string new_retval = std::string("");
-        std::string substituting_argument = "\"@" + function_name + 
-          (static_cast<ostringstream*>( &(ostringstream() << arg_number) )->str()) + "@\"";
-
+        std::string substituting_argument;
+        if (user_friendly_argument_names)
+          {
+            substituting_argument = "ARGUMENT" +
+              (static_cast<ostringstream*>( &(ostringstream() << arg_number) )->str());
+          }
+        else
+          {
+            substituting_argument = "\"@" + function_name + 
+              (static_cast<ostringstream*>( &(ostringstream() << arg_number) )->str()) + "@\"";
+          }
+     
         // go through retval
         for (unsigned int i=0; i < retval.length(); i++)
           {
@@ -754,6 +764,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             fprintf(stderr, "Defined");
           fprintf(stderr, " function '%s@%i)'\n", name.c_str(), (int)arguments.size()); 
         }
+
+      function_arguments_[name] = arguments.size();
+      function_definitions_[std::string(name)] = convert_argument_symbols(arguments, xre, "", xre_, true);
 
       prompt();
       return *this;
@@ -1402,16 +1415,32 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       prompt();
       return *this;
     }
+
   XfstCompiler& 
   XfstCompiler::print_defined(FILE* outfile)
     {
+      bool definitions = false;
       for (map<string,HfstTransducer*>::const_iterator def 
              = definitions_.begin(); def != definitions_.end();
            ++def)
-        {
-          fprintf(outfile, "%10s ? bytes. ? states, ? arcs, ? paths\n",
-                  def->first.c_str());
+        {         
+          definitions = true;
+          fprintf(outfile, "%10s ? bytes. %i states, %i arcs, ? paths\n",
+                  def->first.c_str(), def->second->number_of_states(), def->second->number_of_arcs());
         }
+      if (!definitions)
+        fprintf(outfile, "No defined symbols.\n");
+
+      definitions = false;
+      for (map<string,string>::const_iterator func = function_definitions_.begin();
+           func != function_definitions_.end(); func++)
+        {
+          definitions = true;
+          fprintf(outfile, "%10s@%i) %s\n", func->first.c_str(), function_arguments_[func->first], func->second.c_str());
+        }
+      if (!definitions)
+        fprintf(stderr, "No function definitions.\n");
+
       prompt();
       return *this;
     }
@@ -2031,10 +2060,10 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::write_function(const char* name, const char* outfile)
     {
-      if (outfile == 0)
+      /*if (outfile == 0)
         {
           fprintf(stdout, "%10s: %p\n", name, functions_[name]);
-        }
+          }*/
       prompt();
       return *this;
     }
