@@ -155,10 +155,13 @@ process_stream(HfstOutputStream& outstream)
     while ((c = fgetc(inputfile)) != EOF) {
         file_contents.push_back(c);
     }
-    definitions = comp.compile(file_contents);
+    if (file_contents.size() > 1) {
+        definitions = comp.compile(file_contents);
+    }
     
     // First we need to collect a unified alphabet from all the transducers.
     std::string unified_alphabet;
+//    hfst::StringSet non_input_symbols;
     hfst::HfstTokenizer tok;
     for (std::map<std::string, HfstTransducer *>::const_iterator it =
              definitions.begin(); it != definitions.end(); ++it) {
@@ -169,11 +172,19 @@ process_stream(HfstOutputStream& outstream)
             tok.add_multichar_symbol(*sym);
         }
     }
+    if (unified_alphabet.empty()) {
+        // We don't recognise anything, go home early
+        std::cerr << program_name << ": Empty ruleset, nothing to write\n";
+        return EXIT_FAILURE;
+    }
     // Now we make a dummy transducer with that alphabet
     HfstTransducer dummy(unified_alphabet, tok, compilation_format);
+    if (unified_alphabet.empty()) {
+        
+    }
+    
     // Then we convert it...
     HfstTransducer * harmonizer = &dummy.convert(hfst::HFST_OL_TYPE);
-
     // Use these for naughty intermediate steps to make sure
     // everything has the same alphabet
     hfst::HfstBasicTransducer * intermediate_tmp;
