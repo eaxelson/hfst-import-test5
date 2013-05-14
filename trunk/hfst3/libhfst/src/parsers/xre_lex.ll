@@ -24,7 +24,7 @@ namespace hfst {
     extern char * position_symbol;  // the given SYMBOL
 } }
 
-// increment the number of characters read
+// a macro that increments the number of characters read
 #define CR hfst::xre::cr += (unsigned int)strlen(yytext)
 
 extern int yylex ( YYSTYPE * lvalp, yyscan_t scanner );

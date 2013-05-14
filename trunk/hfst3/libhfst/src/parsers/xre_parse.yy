@@ -16,9 +16,13 @@ using namespace hfst::implementations;
 
 #include "xre_utils.h"
 
-namespace hfst { namespace xre {
-extern bool harmonize_;
-}}
+namespace hfst { 
+  namespace xre {
+    // number of characters read, used for scanning function definition xre for argument symbols
+    extern unsigned int cr;
+    extern bool harmonize_;
+  }
+}
 
 using hfst::xre::harmonize_;
 
@@ -886,12 +890,21 @@ LABEL: HALFARC {
               return EXIT_FAILURE;
             }
             else {
+              // create a new scanner for evaluating the function
               yyscan_t scanner;
               yylex_init(&scanner);
               YY_BUFFER_STATE bs = yy_scan_string(hfst::xre::get_function_xre($1),scanner);
 
+              // define special variables so that function arguments get the values given in regexp list
               hfst::xre::define_function_args($1, $2);
+
+              // if we are scanning a function definition for argument symbols, 
+              // do not include the characters read when evaluating functions inside it 
+              unsigned int chars_read = hfst::xre::cr;
+
               int parse_retval = yyparse(scanner);
+
+              hfst::xre::cr = chars_read;
               hfst::xre::undefine_function_args($1);
 
               yy_delete_buffer(bs,scanner);
@@ -903,9 +916,6 @@ LABEL: HALFARC {
               {
                 YYABORT;
               }
-
-              // fprintf(stderr, "function %s@%i) called: function definitions not yet implemented, returning an empty transducer\n", $1, (int)$2->size());
-              // $$ = new hfst::HfstTransducer(hfst::xre::format);
             }
         }
      /*
