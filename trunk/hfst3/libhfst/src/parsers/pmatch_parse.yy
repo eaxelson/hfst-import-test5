@@ -835,7 +835,11 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
     if (hfst::pmatch::definitions.count($1) != 0) {
         $$ = new HfstTransducer(* hfst::pmatch::definitions[$1]);
   } else {
-     $$ = new HfstTransducer($1, $1, hfst::pmatch::format);
+        if (strlen($1) == 0) {
+            $$ = new HfstTransducer(hfst::pmatch::format);
+        } else {
+            $$ = new HfstTransducer($1, $1, hfst::pmatch::format);
+        }
     }
     free($1);
  }
