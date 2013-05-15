@@ -81,6 +81,7 @@ void match_and_print(hfst_ol::PmatchContainer & container,
         input_text.erase(input_text.size() -1, 1);
     }
     outstream << container.match(input_text);
+    outstream << std::endl;
 }
 
 int process_input(hfst_ol::PmatchContainer & container,
