@@ -72,6 +72,17 @@ print_usage()
     fprintf(message_out, "\n");
 }
 
+void match_and_print(hfst_ol::PmatchContainer & container,
+                std::ostream & outstream,
+                std::string & input_text)
+{
+    if (input_text.size() > 0) {
+        // Remove final newline
+        input_text.erase(input_text.size() -1, 1);
+    }
+    outstream << container.match(input_text);
+}
+
 int process_input(hfst_ol::PmatchContainer & container,
                   std::ostream & outstream)
 {
@@ -82,11 +93,9 @@ int process_input(hfst_ol::PmatchContainer & container,
         if (!blankline_separated) {
             // newline separated
             input_text = line;
-            input_text.erase(input_text.size() -1, 1);
-            outstream << container.match(input_text);
+            match_and_print(container, outstream, input_text);
         } else if (line[0] == '\n') {
-            input_text.erase(input_text.size() -1, 1);
-            outstream << container.match(input_text);
+            match_and_print(container, outstream, input_text);
             input_text.clear();
         } else {
             input_text.append(line);
@@ -95,8 +104,7 @@ int process_input(hfst_ol::PmatchContainer & container,
         line = NULL;
     }
     if (blankline_separated && !input_text.empty()) {
-        input_text.erase(input_text.size() -1, 1);
-        outstream << container.match(input_text);
+        match_and_print(container, outstream, input_text);
     }
 //         if (c == '\n') {
 //             if (blankline_separated) {
