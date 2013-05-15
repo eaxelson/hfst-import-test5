@@ -447,7 +447,7 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
   bool first_transducer=true;
   while(instream.is_good())
   {
-    if (!first_transducer && !print_separator_after_each_transducer)
+    if (!first_transducer && print_separator_after_each_transducer)
       outstream << "--" << std::endl;
     first_transducer=false;
     

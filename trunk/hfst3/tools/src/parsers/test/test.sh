@@ -157,6 +157,7 @@ do
 	done
     done
 
+    rm -f result tmp1 tmp2 foo
 
 ## add properties
 # alias
