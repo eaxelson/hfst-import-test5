@@ -237,7 +237,7 @@ std::string PmatchContainer::stringify_output(void)
     return stringify(output);
 }
 
-std::string PmatchContainer::stringify(SymbolNumberVector & str)
+std::string PmatchContainer::stringify(const SymbolNumberVector & str)
 {
     std::string retval;
     std::stack<unsigned int> start_tag_pos;
@@ -374,7 +374,9 @@ void PmatchContainer::initialize_input(const char * input)
     input_tape[i] = special_symbols[boundary];
     input_tape[i+1] = NO_SYMBOL_NUMBER;
     // Place input_tape beyond the opening NO_SYMBOL
-    ++input_tape;
+    while (*input_tape == NO_SYMBOL_NUMBER) {
+        ++input_tape;
+    }
     return;
 }
 
@@ -453,7 +455,7 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
 
                 } else {
                     // We're going to do some context checking
-//                    std::cerrs << "Entered context, stack is " << local_stack.size() << std::endl;
+//                    std::cerr << "Entered context, stack is " << local_stack.size() << std::endl;
                     local_stack.top().context_placeholder = input_tape;
                     if (local_stack.top().context == LC ||
                         local_stack.top().context == NLC) {
