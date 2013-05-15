@@ -86,6 +86,13 @@ class XreCompiler
   //!        A null pointer is returned on fatal error, if abort is not called.
   HfstTransducer* compile(const std::string& xre);
 
+  //! @brief Compile a transducer defined by @a xre and set the value of @a
+  //!        as the number of characters read from @a xre. The characters after
+  //!        the regular expression that was succesfully parsed are ignored.
+  //!        May return a pointer to @e empty transducer on non-fatal error.
+  //!        A null pointer is returned on fatal error, if abort is not called.
+  HfstTransducer* compile_first(const std::string& xre, unsigned int & chars_read);
+
   std::string get_error_message();
 
   bool get_positions_of_symbol_in_xre

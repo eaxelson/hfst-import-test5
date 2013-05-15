@@ -22,6 +22,7 @@ namespace hfst {
     extern unsigned int cr; // number of characters read
     extern std::set<unsigned int> positions; // positions of a given SYMBOL
     extern char * position_symbol;  // the given SYMBOL
+    extern bool allow_extra_text_at_end;
 } }
 
 // a macro that increments the number of characters read
@@ -266,8 +267,13 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 ("!"|"#")[^\n]*$ { CR; /* ignore comments */ }
 
 . { 
-    CR; 
-    return LEXER_ERROR;
+    if (hfst::xre::allow_extra_text_at_end) {
+      ; /* ignore rest */
+    }
+    else {
+      CR; 
+      return LEXER_ERROR;
+    }
 }
 
 %%
