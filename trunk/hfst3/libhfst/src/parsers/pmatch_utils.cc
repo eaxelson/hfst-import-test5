@@ -45,6 +45,7 @@ namespace pmatch
 char* data;
 std::map<std::string,hfst::HfstTransducer*> definitions;
 std::set<std::string> inserted_transducers;
+std::set<std::string> unsatisfied_insertions;
 char* startptr;
 hfst::HfstTransducer* last_compiled;
 hfst::ImplementationType format;
@@ -347,6 +348,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     // lock here?
     definitions.clear();
     inserted_transducers.clear();
+    unsatisfied_insertions.clear();
     data = strdup(pmatch.c_str());
     startptr = data;
     len = strlen(data);
@@ -356,17 +358,19 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     free(startptr);
     data = 0;
     len = 0;
-//     if (pmatchnerrs == 0)
-//       {
-//         HfstTransducer* rv = new HfstTransducer(*last_compiled);
-//         delete last_compiled;
-//         return rv;
-//       }
-//     else
-//       {
-//         return new HfstTransducer(impl);
-//       }
     std::map<std::string, hfst::HfstTransducer*> retval;
+    for (std::set<std::string>::const_iterator it =
+             unsatisfied_insertions.begin();
+         it != unsatisfied_insertions.end(); ++it) {
+        if (definitions.count(*it) == 0) {
+            std::cerr << "Inserted transducer "
+                      << *it << " was never defined!\n";
+            return retval;
+        }
+    }
+    if (pmatchnerrs != 0) {
+        return retval;
+    }
     for (std::map<std::string, hfst::HfstTransducer*>::const_iterator it =
              definitions.begin(); it != definitions.end(); ++it) {
         // We keep TOP and any inserted transducers
