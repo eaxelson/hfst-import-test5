@@ -92,7 +92,7 @@ int process_input(hfst_ol::PmatchContainer & container,
         free(line);
         line = NULL;
     }
-    if (!input_text.empty()) {
+    if (blankline_separated && !input_text.empty()) {
         outstream << container.match(input_text);
     }
 //         if (c == '\n') {
