@@ -19,6 +19,7 @@ extern char* startptr;
 extern size_t len;
 extern std::map<std::string,hfst::HfstTransducer*> definitions;
 extern std::set<std::string> inserted_transducers;
+extern std::set<std::string> unsatisfied_insertions;
 extern HfstTransducer* last_compiled;
 extern ImplementationType format;
 

@@ -866,17 +866,16 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
 ;
 
 INSERT: INS_LEFT SYMBOL RIGHT_PARENTHESIS {
-    if(hfst::pmatch::definitions.count($2) != 0) {
-        char * Ins_trans = hfst::pmatch::get_Ins_transition($2);
-        $$ = new HfstTransducer(
-            Ins_trans, Ins_trans, hfst::pmatch::format);
-        $$->set_name($2);
-        free(Ins_trans);
-        hfst::pmatch::inserted_transducers.insert($2);
-    } else {
-        pmatcherror("Named transducer not previously Defined");
+    if(hfst::pmatch::definitions.count($2) == 0) {
+        hfst::pmatch::unsatisfied_insertions.insert($2);
     }
- }
+    char * Ins_trans = hfst::pmatch::get_Ins_transition($2);
+    $$ = new HfstTransducer(
+        Ins_trans, Ins_trans, hfst::pmatch::format);
+    $$->set_name($2);
+    free(Ins_trans);
+    hfst::pmatch::inserted_transducers.insert($2);
+}
 ;
 
 RIGHT_CONTEXT: RC_LEFT REPLACE RIGHT_PARENTHESIS {
