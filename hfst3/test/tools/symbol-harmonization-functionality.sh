@@ -93,6 +93,7 @@ for ext in .sfst .ofst .foma; do
 	echo "concatenate #2" ${FFLAG}
 	exit 1;
     fi
+    rm -f concatenation
 
 
     ## conjunction
@@ -116,6 +117,7 @@ for ext in .sfst .ofst .foma; do
 	echo "concatenate #2" ${FFLAG}
 	exit 1;
     fi
+    rm -f conjunction
 
 
     # disjunction
@@ -139,6 +141,7 @@ for ext in .sfst .ofst .foma; do
 	echo "concatenate #2" ${FFLAG}
 	exit 1;
     fi
+    rm -f disjunction
 
 
     ## subtraction
@@ -162,6 +165,7 @@ for ext in .sfst .ofst .foma; do
 	echo "subtract #2" ${FFLAG}
 	exit 1;
     fi
+    rm -f subtraction
 
 
     ## substitution
