@@ -21,6 +21,7 @@ namespace hfst {
     // number of characters read, used for scanning function definition xre for argument symbols
     extern unsigned int cr;
     extern bool harmonize_;
+    extern bool allow_extra_text_at_end;
   }
 }
 

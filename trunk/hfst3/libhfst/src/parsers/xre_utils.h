@@ -66,6 +66,16 @@ HfstTransducer* compile(const std::string& xre,
                         std::map<std::string,unsigned int> func_args,
                         hfst::ImplementationType type);
 
+/**
+ * @brief compile new transducer defined by the first regex in @a xre.
+ */
+HfstTransducer* compile_first(const std::string& xre,
+                              std::map<std::string,hfst::HfstTransducer*>& defs,
+                              std::map<std::string,std::string>& func_defs,
+                              std::map<std::string,unsigned int> func_args,
+                              hfst::ImplementationType type,
+                              unsigned int & chars_read);
+
 /** 
  * @brief For a single-transition transducer, if the transition symbol is a name for
  * transducer definition, expand the transition into the corresponding transducer.

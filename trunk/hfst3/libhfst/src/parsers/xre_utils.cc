@@ -29,6 +29,13 @@ extern void yy_delete_buffer (YY_BUFFER_STATE, yyscan_t);
 extern int yylex_destroy (yyscan_t);
 extern char * yyget_text(yyscan_t);
 
+namespace hfst { 
+  namespace xre {
+    extern unsigned int cr; // number of characters read, defined in XreCompiler.cc
+    bool allow_extra_text_at_end = false;
+  }
+}
+
 int yyerror(yyscan_t scanner, const char* msg)
 {
   fprintf(stderr, "*** xre parsing failed: %s\n", msg);
@@ -378,6 +385,52 @@ compile(const string& xre, map<string,HfstTransducer*>& defs,
     YY_BUFFER_STATE bs = yy_scan_string(startptr,scanner);
     
     int parse_retval = yyparse(scanner);
+
+    yy_delete_buffer(bs,scanner);
+    yylex_destroy(scanner);
+
+    free(startptr);
+    data = 0;
+    len = 0;
+    if (parse_retval == 0) // if (yynerrs == 0)
+      {
+        HfstTransducer* rv = new HfstTransducer(*last_compiled);
+        delete last_compiled;
+        return rv;
+      }
+    else
+      {
+        return NULL;
+      }
+}
+
+  // todo: Contains lots of code copied directly from compile(...), should be rewritten..
+HfstTransducer*
+compile_first(const string& xre, map<string,HfstTransducer*>& defs,
+              map<string, string>& func_defs,
+              map<string, unsigned int > func_args,
+              ImplementationType impl,
+              unsigned int & chars_read)
+{
+    // lock here?
+    data = strdup(xre.c_str());
+    startptr = data;
+    len = strlen(data);
+    definitions = defs;
+    function_definitions = func_defs;
+    function_arguments = func_args;
+    format = impl;
+
+    yyscan_t scanner;
+    yylex_init(&scanner);
+    YY_BUFFER_STATE bs = yy_scan_string(startptr,scanner);
+
+    bool tmp = hfst::xre::allow_extra_text_at_end;
+    hfst::xre::allow_extra_text_at_end = true;
+    hfst::xre::cr = 0;
+    int parse_retval = yyparse(scanner);
+    chars_read = hfst::xre::cr;
+    hfst::xre::allow_extra_text_at_end = tmp;
 
     yy_delete_buffer(bs,scanner);
     yylex_destroy(scanner);

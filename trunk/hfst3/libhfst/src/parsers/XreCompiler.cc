@@ -119,6 +119,12 @@ XreCompiler::compile(const std::string& xre)
   return hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, format_);
 }
 
+HfstTransducer*
+XreCompiler::compile_first(const std::string& xre, unsigned int & chars_read)
+{
+  return hfst::xre::compile_first(xre, definitions_, function_definitions_, function_arguments_, format_, chars_read);
+}
+
 bool XreCompiler::get_positions_of_symbol_in_xre
 (const std::string & symbol, const std::string & xre, std::set<unsigned int> & positions_)
 {
