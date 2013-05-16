@@ -22,7 +22,6 @@ namespace hfst {
     extern unsigned int cr; // number of characters read
     extern std::set<unsigned int> positions; // positions of a given SYMBOL
     extern char * position_symbol;  // the given SYMBOL
-    extern bool allow_extra_text_at_end;
 } }
 
 // a macro that increments the number of characters read
@@ -262,18 +261,15 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     return END_OF_EXPRESSION;
 }
 
-{LWSP}* { CR; /* ignorable whitespace */ }
+{LWSP}* { CR; /*fprintf(stderr, "ignoring whitespace '%s'..\n", yytext); */ /* ignorable whitespace */ }
 
-("!"|"#")[^\n]*$ { CR; /* ignore comments */ }
+("!"|"#")[^\n]*$ { CR; /* fprintf(stderr, "ignoring comment '%s'..\n", yytext); */ /* ignore comments */ }
+
+("!"|"#")[^\n]* { CR; /* fprintf(stderr, "ignoring comment '%s'..\n", yytext); */ /* ignore comments */ }
 
 . { 
-    if (hfst::xre::allow_extra_text_at_end) {
-      ; /* ignore rest */
-    }
-    else {
-      CR; 
-      return LEXER_ERROR;
-    }
+    CR; 
+    return LEXER_ERROR;
 }
 
 %%

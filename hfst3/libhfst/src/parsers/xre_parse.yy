@@ -149,15 +149,21 @@ REGEXP1: REGEXP2 END_OF_EXPRESSION {
       // std::cerr << "regexp1:regexp2 end of expr \n"<< std::endl; 
        hfst::xre::last_compiled = & $1->minimize();
        $$ = hfst::xre::last_compiled;
+       if (hfst::xre::allow_extra_text_at_end) {
+         return 0;
+       }
    }
    | REGEXP2 END_OF_WEIGHTED_EXPRESSION {
         //std::cerr << "regexp1:regexp2 end of wighted expr \n"<< std::endl; 
         hfst::xre::last_compiled = & $1->minimize().set_final_weights($2);
         $$ = hfst::xre::last_compiled;
+        if (hfst::xre::allow_extra_text_at_end) {
+          return 0;
+        }
    }
    | REGEXP2 {
    
-    //    std::cerr << "regexp1:regexp2\n"<< *$1 << std::endl; 
+        //std::cerr << "regexp1:regexp2\n"<< *$1 << std::endl; 
         hfst::xre::last_compiled = & $1->minimize();
         $$ = hfst::xre::last_compiled;
    }

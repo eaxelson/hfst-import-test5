@@ -335,7 +335,7 @@ class XfstCompiler
   //! @brief Compile file data as one regex and save on stack.
   XfstCompiler& read_regex(FILE* infile);
   //! @brief Compile regex of @a indata and save on stack.
-  XfstCompiler& read_regex(const char* indata);
+  XfstCompiler& read_regex(const char* indata, unsigned int & chars_read);
   //! @brief Read prolog form transducer from @a infile
   XfstCompiler& read_prolog(FILE* infile);
   //! @brief Read prolog form transducer from @a indata

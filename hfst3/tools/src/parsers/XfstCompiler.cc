@@ -2196,9 +2196,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     }
 
   XfstCompiler& 
-  XfstCompiler::read_regex(const char* indata)
+  XfstCompiler::read_regex(const char* indata, unsigned int & chars_read)
     {
-      HfstTransducer* compiled = xre_.compile(indata);
+      HfstTransducer* compiled = xre_.compile_first(indata, chars_read);
       if (compiled != NULL)
         {
           stack_.push(compiled);
