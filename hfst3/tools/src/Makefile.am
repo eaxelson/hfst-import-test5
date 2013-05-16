@@ -188,7 +188,7 @@ noinst_HEADERS= \
 	inc/getopt-cases-common.h inc/getopt-cases-error.h  \
 	inc/getopt-cases-unary.h  inc/globals-binary.h      \
 	inc/globals-common.h      inc/globals-unary.h \
-	HfstStrings2FstTokenizer.h \
+	HfstStrings2FstTokenizer.h hfst-file-to-mem.h \
 	hfst-tool-metadata.h hfst-optimized-lookup.h \
 	guessify_fst.h generate_model_forms.h
 # parsers/XreCompiler.h parsers/xre_utils.h
@@ -274,7 +274,7 @@ hfst_pmatch_SOURCES=hfst-pmatch.cc $(HFST_COMMON_SRC)
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
 hfst_prune_alphabet_SOURCES=hfst-prune-alphabet.cc $(HFST_COMMON_SRC)
 hfst_push_weights_SOURCES=hfst-push-weights.cc $(HFST_COMMON_SRC)
-hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc $(HFST_COMMON_SRC)
+hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc hfst-file-to-mem.cc $(HFST_COMMON_SRC)
 hfst_pmatch2fst_SOURCES=hfst-pmatch2fst.cc $(HFST_COMMON_SRC)
 hfst_remove_epsilons_SOURCES=hfst-remove-epsilons.cc $(HFST_COMMON_SRC)
 hfst_repeat_SOURCES=hfst-repeat.cc $(HFST_COMMON_SRC)
