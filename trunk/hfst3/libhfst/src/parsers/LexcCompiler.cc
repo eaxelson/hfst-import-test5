@@ -448,16 +448,45 @@ LexcCompiler::compileLexical()
         string joinerEnc = *s;
         joinerEncode(joinerEnc);
         HfstTransducer joiner(joinerEnc, joinerEnc, format_);
-        string endEnc = "#";
-        joinerEncode(endEnc);
-        HfstTransducer end(endEnc, endEnc, format_);
+     //   string endEnc = "#";
+     //   joinerEncode(endEnc);
+     //   HfstTransducer end(endEnc, endEnc, format_);
         HfstTransducer sigmaStar("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@",
                                  format_);
-        sigmaStar = sigmaStar.subtract(start).subtract(end).subtract(joiner);
+
+        sigmaStar.insert_to_alphabet(joinerEnc);
+
+    //    sigmaStar = sigmaStar.subtract(start).subtract(end).subtract(joiner);
         sigmaStar.repeat_star();
         HfstTransducer joinerPair = joiner.repeat_n(2);
-        HfstTransducer morphotax = sigmaStar.disjunct(joinerPair);
-        morphotax.repeat_star().minimize();
+
+        //HfstTransducer morphotax = sigmaStar.disjunct(joinerPair);
+        //morphotax.repeat_star().minimize();
+
+
+
+
+
+
+
+
+
+     HfstTransducer morphotax(sigmaStar);
+     morphotax.concatenate(joinerPair).concatenate(sigmaStar).minimize();
+
+   //  printf("morph: \n");
+   //  morphotax.write_in_att_format(stdout, 1);
+
+
+     morphotax.disjunct(sigmaStar).minimize();
+     //printf("morph: \n");
+     //morphotax.write_in_att_format(stdout, 1);
+
+
+//morphotax.harmonize_flag_diacritics(lexicons);
+
+//printf("morph: \n");
+//morphotax.write_in_att_format(stdout, 1);
 
         // Root and # will always be flags
         // If we put Lex joiners root and #, compostition won't work
@@ -472,11 +501,22 @@ LexcCompiler::compileLexical()
         //printf("lexicons after harmonize: \n");
         //lexicons.write_in_att_format(stdout, 1);
 
+
+    //    lexicons.substitute("@_LEXC_JOINER.D_@", "$_LEXC_JOINER.D_$").minimize();
+
+
         lexicons = lexicons.compose(morphotax);
+
+        //printf("lexicons compose: \n");
+        //lexicons.write_in_att_format(stdout, 1);
 
         //printf("lexicons after compose: \n");
         //lexicons.write_in_att_format(stdout, 1);
         lexicons.substitute(joinerEnc, "@_EPSILON_SYMBOL_@").minimize();
+
+        //printf("lexicons joiner: \n");
+        //lexicons.write_in_att_format(stdout, 1);
+
       }
     /*
     // this is removed under assumption that Root can't be in noFlags
