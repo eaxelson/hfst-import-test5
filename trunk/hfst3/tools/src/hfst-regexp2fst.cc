@@ -212,8 +212,23 @@ process_stream(HfstOutputStream& outstream)
       delim = ';';
     }
   char* first_line = 0;
-  while (hfst_getdelim(&line, &len, delim, inputfile) != -1)
+  while (true)
     {
+      if (line_separated)
+        { 
+          if (hfst_getdelim(&line, &len, delim, inputfile) == -1)
+            {
+              break;
+            }
+        }
+      else  
+        {
+          // todo: use parsing instead
+          if (hfst_getdelim(&line, &len, delim, inputfile) == -1)
+            {
+              break;
+            }
+        }
       if (first_line == 0)
         {
           first_line = strdup(line);
@@ -229,11 +244,6 @@ process_stream(HfstOutputStream& outstream)
           verbose_printf("Skipping whitespace expression #%u", line_count);
           continue;
         }
-      //if (*exp == '!')
-      //  {
-      //    verbose_printf("Skipping comment");
-      //    continue;
-      //  }
       transducer_n++;
       HfstTransducer* compiled;
       verbose_printf("Compiling expression %u\n", line_count);

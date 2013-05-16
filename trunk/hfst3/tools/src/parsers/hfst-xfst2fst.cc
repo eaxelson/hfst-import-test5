@@ -30,6 +30,7 @@
 #include "hfst-program-options.h"
 #include "hfst-tool-metadata.h"
 #include "inc/globals-common.h"
+#include "hfst-file-to-mem.h"
 
 static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
 static char* scriptfilename = NULL;
@@ -156,49 +157,11 @@ parse_options(int argc, char** argv)
   return EXIT_CONTINUE;
 }
 
-// Based on a function in foma written by Mans Hulden.
-// Read the file 'filename' to memory and return a pointer to it.
-// Filename "<stdout>" uses stdout for reading.
-// Returns NULL if file cannot be opened or read or memory cannot be allocated.
-char *file_to_mem(const char *filename) {
-
-  FILE   *infile;
-  size_t  numbytes;
-  char   *buffer;
-  infile = (strcmp(filename, "<stdout>") == 0)? stdout : fopen(filename, "r");
-  if(infile == NULL) 
-    {
-      error(EXIT_FAILURE, 0, "Error opening file '%s'\n", filename);
-      return NULL;
-    }
-  fseek(infile, 0L, SEEK_END);
-  numbytes = ftell(infile);
-  fseek(infile, 0L, SEEK_SET);
-  // FIX: use malloc instead
-  buffer = (char*)xxmalloc((numbytes+1) * sizeof(char));
-  if(buffer == NULL) 
-    {
-      error(EXIT_FAILURE, 0, "Error allocating memory to read file '%s'\n", filename);
-      return NULL;
-    }
-  if (fread(buffer, sizeof(char), numbytes, infile) != numbytes) 
-    {
-      error(EXIT_FAILURE, 0, "Error reading file '%s' to memory\n", filename);
-      return NULL;
-    }
-  if (strcmp(filename, "<stdout>") != 0)
-    {
-      fclose(infile);
-    }
-  *(buffer+numbytes)='\0';
-  return(buffer);
-}
-
 // Parse file 'filename' using compiler 'comp'.
 // Filename "<stdout>" uses stdout for reading.
 int parse_file(const char* filename, hfst::xfst::XfstCompiler &comp)
 {
-  char* line = file_to_mem(filename);
+  char* line = hfst_file_to_mem(filename);
   if (NULL == line) 
     {
       return EXIT_FAILURE;
