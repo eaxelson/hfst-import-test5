@@ -1,4 +1,4 @@
-%option 8Bit batch nounput noyywrap prefix="hxfst"
+%option 8Bit batch noyywrap prefix="hxfst"
 
 %{
 //! @file xfst-lexer.ll
@@ -25,12 +25,15 @@
 #endif
 #include "xfst-parser.h"
 #include "xfst-utils.h"
+#include "XfstCompiler.h"
 
 #include <assert.h>
 
 extern void hxfsterror(const char *text);
 
 int source_stack_size = 0;
+
+int regex_state = -1;
 
 %}
 
@@ -575,9 +578,25 @@ LWSP [\t ]*
     return ZERO_PLUS;
 }
 
-<REGEX_STATE>[^;]*";" {
+<REGEX_STATE>(.|"\n"|"\r")* {
     BEGIN(0);
-    hxfstlval.name = hfst::xfst::strstrip(hxfsttext);
+    unsigned int chars_read = 0;
+    unsigned int total_length = (unsigned int)strlen(hxfsttext);
+
+    //if (regex_state == REGEX_STATE_READ_REGEX)
+      hfst::xfst::xfst_->read_regex(hxfsttext, chars_read);
+
+    if (total_length > 0) {
+      char * text_read = strdup(hxfsttext);
+      for(unsigned int i=total_length-1; i >= chars_read; i--)
+      {
+        unput(*(text_read+i));
+        //std::cerr << "unput: " << *(text_read+i) << std::endl; // DEBUG
+      }
+      free(text_read); 
+    }
+    //hxfstlval.name = hfst::xfst::strstrip(hxfsttext);
+    hxfstlval.name = strdup(""); // a dummy value
     return REGEX;
 }
 
@@ -664,11 +683,11 @@ LWSP [\t ]*
     return CTRLD;
 }
 
-[\n\r] { /* skip newline */ }
+[\n\r] { /* fprintf(stderr, "xfst: skipping newline\n"); */ /* skip newline */ }
 
-[\t ]* { /* skip whitespace */ }
+[\t ]* { /* fprintf(stderr, "xfst: skipping whitespace '%s'\n", yytext); */ /* skip whitespace */ }
 
-"!".*$ { /* skip comments */ }
+"!"[^\n]* { /* fprintf(stderr, "xfst: skipping comment '%s'\n", yytext); */ /* skip comments */ }
 
 <<EOF>> {
     --source_stack_size;

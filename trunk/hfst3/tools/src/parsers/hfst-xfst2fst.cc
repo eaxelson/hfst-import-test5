@@ -160,11 +160,11 @@ parse_options(int argc, char** argv)
 // Read the file 'filename' to memory and return a pointer to it.
 // Filename "<stdout>" uses stdout for reading.
 // Returns NULL if file cannot be opened or read or memory cannot be allocated.
-char *file_to_mem(char *filename) {
+char *file_to_mem(const char *filename) {
 
-  FILE    *infile;
-  size_t    numbytes;
-  char *buffer;
+  FILE   *infile;
+  size_t  numbytes;
+  char   *buffer;
   infile = (strcmp(filename, "<stdout>") == 0)? stdout : fopen(filename, "r");
   if(infile == NULL) 
     {
@@ -198,14 +198,14 @@ char *file_to_mem(char *filename) {
 // Filename "<stdout>" uses stdout for reading.
 int parse_file(const char* filename, hfst::xfst::XfstCompiler &comp)
 {
-  char* line = file_to_mem(startupfilename);
-  if (NULL == line)
+  char* line = file_to_mem(filename);
+  if (NULL == line) 
     {
       return EXIT_FAILURE;
     }
   if (0 != comp.parse_line(line))
     {
-      error(EXIT_FAILURE, 0, "error when parsing startupfile\n");
+      error(EXIT_FAILURE, 0, "error when parsing file %s\n", filename);
       return EXIT_FAILURE;
     }
   free(line);
@@ -312,6 +312,16 @@ int main(int argc, char** argv)
       char line[256];
       while (cin.getline(line, 256))
         {
+          // insert missing '\n'
+          for(unsigned int i=0; i < 255; i++)
+            {
+              if (line[i] == '\0')
+                {
+                  line[i] = '\n'; // todo: windows?
+                  line[i+1] = '\0';
+                  break;
+                }
+            }
           if (line[0] == '!' || line[0] == '#') // skip comment line
             continue;
           comp.parse_line(line);

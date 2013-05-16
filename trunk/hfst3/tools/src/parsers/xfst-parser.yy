@@ -691,14 +691,16 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->read_prolog(stdin);
        }
        | READ_REGEX REGEX {
-            hfst::xfst::xfst_->read_regex($2);
+            // this happens already in the lexer
+            //hfst::xfst::xfst_->read_regex($2);
             free($2);
        }
        | READ_REGEX REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->read_regex(hfst::xfst::xfst_fopen($2, "r"));
        }
        | READ_REGEX NAMETOKEN_LIST SEMICOLON END_COMMAND {
-            hfst::xfst::xfst_->read_regex($2);
+            unsigned int foo = 0;
+            hfst::xfst::xfst_->read_regex($2, foo);
             free($2);
        }
        | READ_SPACED REDIRECT_IN END_COMMAND {
