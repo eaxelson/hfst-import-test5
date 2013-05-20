@@ -158,7 +158,7 @@ parse_options(int argc, char** argv)
 }
 
 // Parse file 'filename' using compiler 'comp'.
-// Filename "<stdout>" uses stdout for reading.
+// Filename "<stdin>" uses stdin for reading.
 int parse_file(const char* filename, hfst::xfst::XfstCompiler &comp)
 {
   char* line = hfst_file_to_mem(filename);
