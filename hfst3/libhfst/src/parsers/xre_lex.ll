@@ -1,4 +1,4 @@
-%option 8Bit batch noyylineno noyywrap nounput reentrant bison-bridge
+%option 8Bit batch noyylineno noyywrap nounput reentrant bison-bridge prefix="xre"
 
 %{
 
@@ -27,7 +27,7 @@ namespace hfst {
 // a macro that increments the number of characters read
 #define CR hfst::xre::cr += (unsigned int)strlen(yytext)
 
-extern int yylex ( YYSTYPE * lvalp, yyscan_t scanner );
+extern int xrelex ( YYSTYPE * lvalp, yyscan_t scanner );
 
 %}
 
