@@ -95,6 +95,13 @@ class XreCompiler
 
   std::string get_error_message();
 
+  //! @brief Whether the last regex compiled contained only comments.
+  //!        
+  //! In that case, the last call to compile ot compile_first has returned NULL,
+  //! which also signals an error during regex compilation.
+
+  bool contained_only_comments();
+
   bool get_positions_of_symbol_in_xre
     (const std::string & symbol, const std::string & xre, std::set<unsigned int> & positions);
 

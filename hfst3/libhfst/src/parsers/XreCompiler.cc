@@ -113,6 +113,12 @@ XreCompiler::get_error_message()
   return "";
 }
 
+bool
+XreCompiler::contained_only_comments()
+{
+  return contains_only_comments;
+}
+
 HfstTransducer*
 XreCompiler::compile(const std::string& xre)
 {

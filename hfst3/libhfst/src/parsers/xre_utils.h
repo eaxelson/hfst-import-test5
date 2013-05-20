@@ -20,6 +20,7 @@ extern std::map<std::string,hfst::HfstTransducer*> definitions;
 extern std::map<std::string,std::string> function_definitions;
 extern std::map<std::string,unsigned int> function_arguments;
 extern HfstTransducer* last_compiled;
+extern bool contains_only_comments;
 extern ImplementationType format;
 
 void set_substitution_function_symbol(const std::string &symbol);

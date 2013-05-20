@@ -212,10 +212,9 @@ process_stream(HfstOutputStream& outstream)
   // Another problem is that compile_first is not eager enough, so comments
   // at the end get not parsed until next call which then gives an error
   // message (for example the line 'cat ; ! a comment').
-  if (false && !line_separated)
+  if (!line_separated)
     {
-      char * filebuf = hfst_file_to_mem(inputfilename);
-      fprintf(stderr, "filebuf: '%s'\n", filebuf);
+      char * filebuf_ = hfst_file_to_mem(inputfilename);
       unsigned int chars_read = 0;
       HfstTransducer * compiled;
 
@@ -223,22 +222,42 @@ process_stream(HfstOutputStream& outstream)
         {
           transducer_n++;
           verbose_printf("Compiling expression #%i\n", (int)transducer_n);
-          compiled = comp.compile_first(filebuf, chars_read);
+          compiled = comp.compile_first(filebuf_, chars_read);
+          if (compiled == NULL)
+            {
+              if (comp.contained_only_comments())
+                {
+                  if (transducer_n == 1)
+                    {
+                      warning(0, 0, "input contains only whitespace or comments");
+                    }
+                  break;
+                }
+              else
+                {
+                  error(EXIT_FAILURE, 0, "%s: XRE parsing failed"
+                        "in expression #%u separated by semicolons", inputfilename,
+                        (unsigned int)transducer_n);
+                }
+            }
           for (unsigned int i=0; i < chars_read; i++)
             {
-              filebuf++;
+              filebuf_++;
             }
-          if (disjunct_expressions)
+          if (compiled != NULL)
             {
-              disjunction.disjunct(*compiled, harmonize);
+              if (disjunct_expressions)
+                {
+                  disjunction.disjunct(*compiled, harmonize);
+                }
+              else
+                {
+                  hfst_set_name(*compiled, "?", "xre");
+                  outstream << *compiled;
+                }
+              delete compiled;
             }
-          else
-            {
-              hfst_set_name(*compiled, "?", "xre");
-              outstream << *compiled;
-            }
-          delete compiled;
-          if (*filebuf == '\0')
+          if (*filebuf_ == '\0')
             {
               break;
             }
@@ -273,28 +292,40 @@ process_stream(HfstOutputStream& outstream)
           compiled = comp.compile(exp);
           if (compiled == NULL) //if (xrenerrs > 0)
             {
-              if (line_separated)
+              if (comp.contained_only_comments())
                 {
+                  if (transducer_n == 1)
+                    {
+                      warning(0, 0, "input contains only whitespace or comments");
+                    }
+                  break;
+                }
+              else {
+              //if (line_separated)
+              //{
                   error_at_line(EXIT_FAILURE, 0, inputfilename, line_count,
                                 "XRE parsing failed");
+              }
+                  //else
+                  //{
+                  //error(EXIT_FAILURE, 0, "%s: XRE parsing failed"
+                  //      "in expression #%u separated semicolons", inputfilename,
+                  //      line_count);
+                  //}
+            }
+          if (compiled != NULL)
+            {
+              if (disjunct_expressions)
+                {
+                  disjunction.disjunct(*compiled, harmonize);
                 }
               else
                 {
-                  error(EXIT_FAILURE, 0, "%s: XRE parsing failed"
-                        "in expression #%u separated semicolons", inputfilename,
-                        line_count);
+                  hfst_set_name(*compiled, "?", "xre");
+                  outstream << *compiled;
                 }
+              delete compiled;
             }
-          if (disjunct_expressions)
-            {
-              disjunction.disjunct(*compiled, harmonize);
-            }
-          else
-            {
-              hfst_set_name(*compiled, "?", "xre");
-              outstream << *compiled;
-            }
-          delete compiled;
         }
     }
 
