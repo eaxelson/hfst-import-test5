@@ -32,18 +32,19 @@ class yy_buffer_state;
 typedef yy_buffer_state * YY_BUFFER_STATE;
 typedef void * yyscan_t;
 
-extern int yyparse(yyscan_t);
-extern int yylex_init (yyscan_t*);
-extern YY_BUFFER_STATE yy_scan_string (const char *, yyscan_t);
-extern void yy_delete_buffer (YY_BUFFER_STATE, yyscan_t);
-extern int yylex_destroy (yyscan_t);
+extern int xreparse(yyscan_t);
+extern int xrelex_init (yyscan_t*);
+extern YY_BUFFER_STATE xre_scan_string (const char *, yyscan_t);
+extern void xre_delete_buffer (YY_BUFFER_STATE, yyscan_t);
+extern int xrelex_destroy (yyscan_t);
 
-extern int yyerror(yyscan_t, const char*);
-extern int yyerror(const char*);
-int yylex ( YYSTYPE * , yyscan_t );
+extern int xreerror(yyscan_t, const char*);
+extern int xreerror(const char*);
+int xrelex ( YYSTYPE * , yyscan_t );
 
 %}
 
+%name-prefix="xre"
 %define api.pure
 %lex-param {void * scanner}
 %parse-param {void * scanner}
@@ -284,7 +285,7 @@ REPLACE : REGEXP3 { }
                  break;
                case E_REPLACE_RIGHT_MARKUP:
                default:
-                yyerror("Unhandled arrow stuff I suppose");
+                xreerror("Unhandled arrow stuff I suppose");
                 break;
             }
        
@@ -339,7 +340,7 @@ MAPPINGPAIR_VECTOR: MAPPINGPAIR_VECTOR COMMA MAPPINGPAIR
 
          if ($1->first != $3->first)
          {
-            yyerror("Replace arrows should be the same. Calculated as if all replacements had the first arrow.");
+            xreerror("Replace arrows should be the same. Calculated as if all replacements had the first arrow.");
             //exit(1);
          }
  
@@ -541,7 +542,7 @@ REPLACE_ARROW: REPLACE_RIGHT
 ////////////////
 REGEXP3: REGEXP4 { }
        | REGEXP3 SHUFFLE REGEXP4 {
-            yyerror("No shuffle");
+            xreerror("No shuffle");
             $$ = $1;
             delete $3;
         }
@@ -565,14 +566,14 @@ REGEXP4: REGEXP5 { }
         }
        // doesn't exist in xfst
        | REGEXP4 LEFT_ARROW REGEXP5 CENTER_MARKER REGEXP5 {
-            yyerror("No Arrows");
+            xreerror("No Arrows");
             $$ = $1;
             delete $3;
             delete $5;
         }
        // doesn't exist in xfst
        | REGEXP4 LEFT_RIGHT_ARROW REGEXP5 CENTER_MARKER REGEXP5 {
-            yyerror("No Arrows");
+            xreerror("No Arrows");
             $$ = $1;
             delete $3;
             delete $5;
@@ -640,12 +641,12 @@ REGEXP5: REGEXP6 { }
             delete $3;
         }
        | REGEXP5 UPPER_MINUS REGEXP6 {
-            yyerror("No upper minus");
+            xreerror("No upper minus");
             $$ = $1;
             delete $3;
         }
        | REGEXP5 LOWER_MINUS REGEXP6 {
-            yyerror("No lower minus");
+            xreerror("No lower minus");
             $$ = $1;
             delete $3;
         }
@@ -676,12 +677,12 @@ REGEXP7: REGEXP8 { }
             delete $3;
         }
        | REGEXP7 IGNORE_INTERNALLY REGEXP8 {
-            yyerror("No ignoring internally");
+            xreerror("No ignoring internally");
             $$ = $1;
             delete $3;
         }
        | REGEXP7 LEFT_QUOTIENT REGEXP8 {
-            yyerror("No left quotient");
+            xreerror("No left quotient");
             $$ = $1;
             delete $3;
         }
@@ -788,7 +789,7 @@ REGEXP10: REGEXP11 { }
         }
         /*
        | SUBSTITUTE_LEFT REGEXP10 COMMA REGEXP10 COMMA REGEXP10 RIGHT_BRACKET {
-            yyerror("no substitute");
+            xreerror("no substitute");
             $$ = $2;
         }
         */
@@ -843,16 +844,16 @@ REGEXP12: LABEL { }
             free($1);
         }
         | READ_TEXT {
-            yyerror("no read text");
+            xreerror("no read text");
         }
         | READ_SPACED {
-            yyerror("no read spaced");
+            xreerror("no read spaced");
         }
         | READ_PROLOG {
-            yyerror("no read prolog");
+            xreerror("no read prolog");
         }
         | READ_RE {
-            yyerror("Definitely no read regex");
+            xreerror("Definitely no read regex");
         }
         ;
 
@@ -905,8 +906,8 @@ LABEL: HALFARC {
             else {
               // create a new scanner for evaluating the function
               yyscan_t scanner;
-              yylex_init(&scanner);
-              YY_BUFFER_STATE bs = yy_scan_string(hfst::xre::get_function_xre($1),scanner);
+              xrelex_init(&scanner);
+              YY_BUFFER_STATE bs = xre_scan_string(hfst::xre::get_function_xre($1),scanner);
 
               // define special variables so that function arguments get the values given in regexp list
               hfst::xre::define_function_args($1, $2);
@@ -915,13 +916,13 @@ LABEL: HALFARC {
               // do not include the characters read when evaluating functions inside it 
               unsigned int chars_read = hfst::xre::cr;
 
-              int parse_retval = yyparse(scanner);
+              int parse_retval = xreparse(scanner);
 
               hfst::xre::cr = chars_read;
               hfst::xre::undefine_function_args($1);
 
-              yy_delete_buffer(bs,scanner);
-              yylex_destroy(scanner);
+              xre_delete_buffer(bs,scanner);
+              xrelex_destroy(scanner);
 
               $$ = hfst::xre::last_compiled;              
 

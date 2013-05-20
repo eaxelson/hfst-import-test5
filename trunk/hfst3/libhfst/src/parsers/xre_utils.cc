@@ -15,19 +15,15 @@ using std::string;
 using std::map;
 using std::ostringstream;
 
-//extern char* yytext;
-//extern int yyparse();
-//extern int yynerrs;
-
 class yy_buffer_state;
 typedef yy_buffer_state * YY_BUFFER_STATE;
 typedef void * yyscan_t;
-extern int yyparse(yyscan_t);
-extern int yylex_init (yyscan_t*);
-extern YY_BUFFER_STATE yy_scan_string (const char *, yyscan_t);
-extern void yy_delete_buffer (YY_BUFFER_STATE, yyscan_t);
-extern int yylex_destroy (yyscan_t);
-extern char * yyget_text(yyscan_t);
+extern int xreparse(yyscan_t);
+extern int xrelex_init (yyscan_t*);
+extern YY_BUFFER_STATE xre_scan_string (const char *, yyscan_t);
+extern void xre_delete_buffer (YY_BUFFER_STATE, yyscan_t);
+extern int xrelex_destroy (yyscan_t);
+extern char * xreget_text(yyscan_t);
 
 namespace hfst { 
   namespace xre {
@@ -36,24 +32,24 @@ namespace hfst {
   }
 }
 
-int yyerror(yyscan_t scanner, const char* msg)
+int xreerror(yyscan_t scanner, const char* msg)
 {
   fprintf(stderr, "*** xre parsing failed: %s\n", msg);
   if (strlen(hfst::xre::data) < 60)
     {
       fprintf(stderr, "***    parsing %s [near %s]\n", hfst::xre::data,
-              yyget_text(scanner));
+              xreget_text(scanner));
     }
   else
     {
       fprintf(stderr, "***    parsing %60s [near %s]...\n", 
-              hfst::xre::data, yyget_text(scanner));
+              hfst::xre::data, xreget_text(scanner));
     }
   return 0;
 }
 
 int
-yyerror(const char *msg)
+xreerror(const char *msg)
 {
   fprintf(stderr, "*** xre parsing failed: %s\n", msg);
   return 0;
@@ -384,13 +380,13 @@ compile(const string& xre, map<string,HfstTransducer*>& defs,
     contains_only_comments = false;
 
     yyscan_t scanner;
-    yylex_init(&scanner);
-    YY_BUFFER_STATE bs = yy_scan_string(startptr,scanner);
+    xrelex_init(&scanner);
+    YY_BUFFER_STATE bs = xre_scan_string(startptr,scanner);
     
-    int parse_retval = yyparse(scanner);
+    int parse_retval = xreparse(scanner);
 
-    yy_delete_buffer(bs,scanner);
-    yylex_destroy(scanner);
+    xre_delete_buffer(bs,scanner);
+    xrelex_destroy(scanner);
 
     free(startptr);
     data = 0;
@@ -427,18 +423,18 @@ compile_first(const string& xre, map<string,HfstTransducer*>& defs,
     contains_only_comments = false;
 
     yyscan_t scanner;
-    yylex_init(&scanner);
-    YY_BUFFER_STATE bs = yy_scan_string(startptr,scanner);
+    xrelex_init(&scanner);
+    YY_BUFFER_STATE bs = xre_scan_string(startptr,scanner);
 
     bool tmp = hfst::xre::allow_extra_text_at_end;
     hfst::xre::allow_extra_text_at_end = true;
     hfst::xre::cr = 0;
-    int parse_retval = yyparse(scanner);
+    int parse_retval = xreparse(scanner);
     chars_read = hfst::xre::cr;
     hfst::xre::allow_extra_text_at_end = tmp;
 
-    yy_delete_buffer(bs,scanner);
-    yylex_destroy(scanner);
+    xre_delete_buffer(bs,scanner);
+    xrelex_destroy(scanner);
 
     free(startptr);
     data = 0;
