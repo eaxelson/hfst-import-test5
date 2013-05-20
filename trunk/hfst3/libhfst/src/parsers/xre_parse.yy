@@ -143,7 +143,13 @@ int yylex ( YYSTYPE * , yyscan_t );
 %%
 
 
-XRE: REGEXP1 { }
+XRE: REGEXP1 { } 
+     | 
+     { 
+       // only comments
+       hfst::xre::contains_only_comments = true;
+       return 0;
+     }
      ;
 REGEXP1: REGEXP2 END_OF_EXPRESSION {
       // std::cerr << "regexp1:regexp2 end of expr \n"<< std::endl; 

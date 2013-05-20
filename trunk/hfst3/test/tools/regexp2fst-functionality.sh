@@ -40,14 +40,13 @@ for i in sfst openfst-tropical foma; do
         exit 1
     fi
 
-    #echo "skipping left-arrow-with-semicolon-comment.xre test"
-    #if ! $TOOLDIR/hfst-regexp2fst -S -f $i $srcdir/left-arrow-with-semicolon-comment.xre > test.fst ; then
-    #    exit 1
-    #fi
-    #echo "skipping left-arrow-with-semicolon-many-comments.xre test"
-    #if ! $TOOLDIR/hfst-regexp2fst -S -f $i $srcdir/left-arrow-with-semicolon-many-comments.xre > test.fst ; then
-    #    exit 1
-    #fi
+    if ! $TOOLDIR/hfst-regexp2fst -S -f $i $srcdir/left-arrow-with-semicolon-comment.xre > test.fst ; then
+        exit 1
+    fi
+
+    if ! $TOOLDIR/hfst-regexp2fst -S -f $i $srcdir/left-arrow-with-semicolon-many-comments.xre > test.fst ; then
+        exit 1
+    fi
 
 done
 

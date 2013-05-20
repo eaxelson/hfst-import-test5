@@ -70,6 +70,7 @@ std::map<std::string,hfst::HfstTransducer*> definitions;
   std::map<std::string,unsigned int> function_arguments;
 char* startptr;
 hfst::HfstTransducer* last_compiled;
+bool contains_only_comments = false;
 hfst::ImplementationType format;
 size_t len;
 
@@ -380,6 +381,8 @@ compile(const string& xre, map<string,HfstTransducer*>& defs,
     function_arguments = func_args;
     format = impl;
 
+    contains_only_comments = false;
+
     yyscan_t scanner;
     yylex_init(&scanner);
     YY_BUFFER_STATE bs = yy_scan_string(startptr,scanner);
@@ -392,7 +395,7 @@ compile(const string& xre, map<string,HfstTransducer*>& defs,
     free(startptr);
     data = 0;
     len = 0;
-    if (parse_retval == 0) // if (yynerrs == 0)
+    if (parse_retval == 0 && !contains_only_comments) // if (yynerrs == 0)
       {
         HfstTransducer* rv = new HfstTransducer(*last_compiled);
         delete last_compiled;
@@ -421,6 +424,8 @@ compile_first(const string& xre, map<string,HfstTransducer*>& defs,
     function_arguments = func_args;
     format = impl;
 
+    contains_only_comments = false;
+
     yyscan_t scanner;
     yylex_init(&scanner);
     YY_BUFFER_STATE bs = yy_scan_string(startptr,scanner);
@@ -438,7 +443,7 @@ compile_first(const string& xre, map<string,HfstTransducer*>& defs,
     free(startptr);
     data = 0;
     len = 0;
-    if (parse_retval == 0) // if (yynerrs == 0)
+    if (parse_retval == 0 && !contains_only_comments) // if (yynerrs == 0)
       {
         HfstTransducer* rv = new HfstTransducer(*last_compiled);
         delete last_compiled;
