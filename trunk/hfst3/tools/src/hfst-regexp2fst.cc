@@ -47,6 +47,7 @@ using std::pair;
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 #include "hfst-tool-metadata.h"
+#include "hfst-file-to-mem.h"
 
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
@@ -201,90 +202,115 @@ process_stream(HfstOutputStream& outstream)
   comp.set_verbosity(true, stderr);
   comp.set_harmonization(harmonize);
   HfstTransducer disjunction(output_format);
-  //outstream.open();
-  int delim = '\n';
-  if (line_separated)
+
+  char delim = (line_separated)? '\n' : ';';  
+  char* first_line = 0;
+
+  // todo: Not yet working until we know how weights should be handled, 
+  // For example input 'cat ; 3' is ambiguous 
+  // (regex [cat] with weight 3 or regex [cat] followed by regex [3])
+  // Another problem is that compile_first is not eager enough, so comments
+  // at the end get not parsed until next call which then gives an error
+  // message (for example the line 'cat ; ! a comment').
+  if (false && !line_separated)
     {
-      delim = '\n';
+      char * filebuf = hfst_file_to_mem(inputfilename);
+      fprintf(stderr, "filebuf: '%s'\n", filebuf);
+      unsigned int chars_read = 0;
+      HfstTransducer * compiled;
+
+      while(true)
+        {
+          transducer_n++;
+          verbose_printf("Compiling expression #%i\n", (int)transducer_n);
+          compiled = comp.compile_first(filebuf, chars_read);
+          for (unsigned int i=0; i < chars_read; i++)
+            {
+              filebuf++;
+            }
+          if (disjunct_expressions)
+            {
+              disjunction.disjunct(*compiled, harmonize);
+            }
+          else
+            {
+              hfst_set_name(*compiled, "?", "xre");
+              outstream << *compiled;
+            }
+          delete compiled;
+          if (*filebuf == '\0')
+            {
+              break;
+            }
+        }
     }
   else
     {
-      delim = ';';
-    }
-  char* first_line = 0;
-  while (true)
-    {
-      if (line_separated)
-        { 
+      while (true)
+        {
           if (hfst_getdelim(&line, &len, delim, inputfile) == -1)
             {
               break;
             }
-        }
-      else  
-        {
-          // todo: use parsing instead
-          if (hfst_getdelim(&line, &len, delim, inputfile) == -1)
+          if (first_line == 0)
             {
-              break;
+              first_line = strdup(line);
             }
-        }
-      if (first_line == 0)
-        {
-          first_line = strdup(line);
-        }
-      char* exp = line;
-      while ((*exp == '\n') || (*exp == '\r') || (*exp == ' '))
-        {
-          exp++;
-        }
-      line_count++;
-      if (*exp == '\0')
-        {
-          verbose_printf("Skipping whitespace expression #%u", line_count);
-          continue;
-        }
-      transducer_n++;
-      HfstTransducer* compiled;
-      verbose_printf("Compiling expression %u\n", line_count);
-      compiled = comp.compile(exp);
-      if (compiled == NULL) //if (xrenerrs > 0)
-        {
-          if (line_separated)
+          char* exp = line;
+          while ((*exp == '\n') || (*exp == '\r') || (*exp == ' '))
             {
-              error_at_line(EXIT_FAILURE, 0, inputfilename, line_count,
-                        "XRE parsing failed");
+              exp++;
+            }
+          line_count++;
+          if (*exp == '\0')
+            {
+              verbose_printf("Skipping whitespace expression #%u", line_count);
+              continue;
+            }
+          transducer_n++;
+          HfstTransducer* compiled;
+          verbose_printf("Compiling expression %u\n", line_count);
+          compiled = comp.compile(exp);
+          if (compiled == NULL) //if (xrenerrs > 0)
+            {
+              if (line_separated)
+                {
+                  error_at_line(EXIT_FAILURE, 0, inputfilename, line_count,
+                                "XRE parsing failed");
+                }
+              else
+                {
+                  error(EXIT_FAILURE, 0, "%s: XRE parsing failed"
+                        "in expression #%u separated semicolons", inputfilename,
+                        line_count);
+                }
+            }
+          if (disjunct_expressions)
+            {
+              disjunction.disjunct(*compiled, harmonize);
             }
           else
             {
-              error(EXIT_FAILURE, 0, "%s: XRE parsing failed"
-                   "in expression #%u separated semicolons", inputfilename,
-                   line_count);
+              hfst_set_name(*compiled, "?", "xre");
+              outstream << *compiled;
             }
+          delete compiled;
         }
-      if (disjunct_expressions)
+    }
+
+
+  if (disjunct_expressions)
+    {
+      if (delim == '\n')
         {
-          disjunction.disjunct(*compiled, harmonize);
+          hfst_set_name(disjunction, 
+                        "?",
+                        "xre");
         }
       else
         {
-          hfst_set_name(*compiled, "?", "xre");
-          outstream << *compiled;
+          hfst_set_name(disjunction, "?", "xre");
         }
-      delete compiled;
-    }
-  if (disjunct_expressions)
-    {
-          if (delim == '\n')
-            {
-              hfst_set_name(disjunction, 
-                            "?",
-                            "xre");
-            }
-          else
-            {
-              hfst_set_name(disjunction, "?", "xre");
-            }
       outstream << disjunction;
     }
   free(line);
