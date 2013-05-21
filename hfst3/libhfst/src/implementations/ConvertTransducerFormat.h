@@ -23,18 +23,22 @@
 #include <map>
 
 #if HAVE_OPENFST
-#include "fst/fstlib.h"
+#ifdef WINDOWS
+#include "back-ends/openfstwin/src/include/fst/fstlib.h"
+#else 
+#include "back-ends/openfst/src/include/fst/fstlib.h"
+#endif // WINDOWS
 #endif // HAVE_OPENFST
 
 #if HAVE_SFST
-#include "sfst/fst.h"
+#include "back-ends/sfst/fst.h"
 #endif // HAVE_SFST
 
 #if HAVE_FOMA
 #ifndef _FOMALIB_H_
 #define _FOMALIB_H_
 #include <stdbool.h>
-#include "fomalib.h"
+#include "back-ends/foma/fomalib.h"
 #endif // _FOMALIB_H_
 #endif // HAVE_FOMA
 
