@@ -22,7 +22,7 @@
 
 #ifndef _FOMALIB_H_
 #define _FOMALIB_H_
-#include "fomalib.h"
+#include "back-ends/foma/fomalib.h"
 #endif
 
 #ifndef WINDOWS

@@ -15,7 +15,13 @@
 #include "HfstSymbolDefs.h"
 #include "HfstExceptionDefs.h"
 #include "HfstFlagDiacritics.h"
-#include "fst/fstlib.h"
+
+#ifdef WINDOWS
+#include "back-ends/openfstwin/src/include/fst/fstlib.h"
+#else
+#include "back-ends/openfst/src/include/fst/fstlib.h"
+#endif // WINDOWS
+
 #include "HfstExtractStrings.h"
 #include <cstdio>
 #include <string>
