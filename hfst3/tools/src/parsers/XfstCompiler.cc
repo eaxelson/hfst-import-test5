@@ -569,6 +569,11 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
               fprintf(stderr, " '%s'\n", name); 
             }          
         }
+      else
+        {
+          fprintf(stderr, "Could not define variable %s:\n%s\n", 
+                  name, xre_.get_error_message().c_str());
+        }
       prompt();
       return *this;
     }
@@ -1161,6 +1166,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     if (stack_.size() < 1)
       {
         fprintf(stderr, "Empty stack.\n");
+        prompt();
         return NULL;
       }
     return stack_.top();
@@ -1382,6 +1388,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           stack_.push(substituted);
           print_transducer_info();
         }
+      // todo: handle also the case: (substituted == NULL)
       prompt();
       return *this;
     }
@@ -2182,6 +2189,11 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             {
               stack_.push(compiled);
             }
+          else
+            {
+              fprintf(stderr, "Error when compiling file:\n%s\n",
+                      xre_.get_error_message().c_str());
+            }
         }
       else if (!feof(infile))
         {
@@ -2203,6 +2215,11 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {
           stack_.push(compiled);
           print_transducer_info();
+        }
+      else
+        {
+          fprintf(stderr, "Error reading regex:\n%s\n",
+                  xre_.get_error_message().c_str());
         }
       prompt();
       return *this;

@@ -29,29 +29,38 @@ namespace hfst {
   namespace xre {
     extern unsigned int cr; // number of characters read, defined in XreCompiler.cc
     bool allow_extra_text_at_end = false;
+    extern std::string error_message;
   }
 }
 
 int xreerror(yyscan_t scanner, const char* msg)
-{
-  fprintf(stderr, "*** xre parsing failed: %s\n", msg);
+{ 
+  char buffer [1024];
+
+  int n = sprintf(buffer, "*** xre parsing failed: %s\n", msg);
   if (strlen(hfst::xre::data) < 60)
     {
-      fprintf(stderr, "***    parsing %s [near %s]\n", hfst::xre::data,
-              xreget_text(scanner));
+      n = sprintf(buffer+n, "***    parsing %s [near %s]\n", hfst::xre::data,
+                  xreget_text(scanner));
     }
   else
     {
-      fprintf(stderr, "***    parsing %60s [near %s]...\n", 
-              hfst::xre::data, xreget_text(scanner));
+      n = sprintf(buffer+n, "***    parsing %60s [near %s]...\n", 
+                  hfst::xre::data, xreget_text(scanner));
     }
+
+  buffer[1023] == '\0';
+  hfst::xre::error_message = std::string(buffer);
   return 0;
 }
 
 int
 xreerror(const char *msg)
 {
-  fprintf(stderr, "*** xre parsing failed: %s\n", msg);
+  char buffer [1024];
+  int n = sprintf(buffer, "*** xre parsing failed: %s\n", msg);
+  buffer[1023] == '\0';
+  hfst::xre::error_message = std::string(buffer);
   return 0;
 }
 

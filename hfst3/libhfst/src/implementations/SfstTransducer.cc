@@ -1332,26 +1332,26 @@ int main(int argc, char * argv[])
     std::cout << "Unit tests for " __FILE__ ":";
 
     // Test alphabet pruning
-    Transducer * t = SfstTransducer::define_transducer("a", "b");
+    SFST::Transducer * t = SfstTransducer::define_transducer("a", "b");
 
-    Transducer * t_input = SfstTransducer::extract_input_language(t);
+    SFST::Transducer * t_input = SfstTransducer::extract_input_language(t);
     std::cout << "#1.5" << std::endl;
     assert( does_sfst_alphabet_contain(t_input, "a") && 
         does_sfst_alphabet_contain(t_input, "b")  );
 
-    Transducer * t_output = SfstTransducer::extract_output_language(t);
+    SFST::Transducer * t_output = SfstTransducer::extract_output_language(t);
     assert( does_sfst_alphabet_contain(t_output, "a") && 
         does_sfst_alphabet_contain(t_output, "b")  );
 
-    Transducer * t_min = SfstTransducer::minimize(t_input);
+    SFST::Transducer * t_min = SfstTransducer::minimize(t_input);
     assert( does_sfst_alphabet_contain(t_min, "a") && 
         does_sfst_alphabet_contain(t_min, "b")  );
 
-    Transducer * t_eps_free = SfstTransducer::remove_epsilons(t_output);
+    SFST::Transducer * t_eps_free = SfstTransducer::remove_epsilons(t_output);
     assert( does_sfst_alphabet_contain(t_eps_free, "a") && 
         does_sfst_alphabet_contain(t_eps_free, "b")  );
 
-    Transducer * t_subst = SfstTransducer::substitute(t, "a", "c");
+    SFST::Transducer * t_subst = SfstTransducer::substitute(t, "a", "c");
     assert( does_sfst_alphabet_contain(t_subst, "a") && 
         does_sfst_alphabet_contain(t_subst, "b")  && 
         does_sfst_alphabet_contain(t_subst, "c") );    

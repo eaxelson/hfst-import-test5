@@ -287,7 +287,11 @@ int main(int argc, char** argv)
             }
           if (line[0] == '!' || line[0] == '#') // skip comment line
             continue;
-          comp.parse_line(line);
+          if (0 != comp.parse_line(line))
+            {
+              error(EXIT_FAILURE, 0, "line '%s' could not be parsed\n", line);
+              return EXIT_FAILURE;
+            }
         }
     }
   else
