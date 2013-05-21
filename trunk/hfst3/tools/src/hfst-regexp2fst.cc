@@ -52,8 +52,6 @@ using std::pair;
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
 
-extern int xrenerrs;
-
 using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
 using hfst::HfstTransducer;
@@ -235,6 +233,7 @@ process_stream(HfstOutputStream& outstream)
                 }
               else
                 {
+                  std::cerr << comp.get_error_message() << std::endl;
                   error(EXIT_FAILURE, 0, "%s: XRE parsing failed"
                         "in expression #%u separated by semicolons", inputfilename,
                         (unsigned int)transducer_n);
@@ -290,7 +289,7 @@ process_stream(HfstOutputStream& outstream)
           HfstTransducer* compiled;
           verbose_printf("Compiling expression %u\n", line_count);
           compiled = comp.compile(exp);
-          if (compiled == NULL) //if (xrenerrs > 0)
+          if (compiled == NULL)
             {
               if (comp.contained_only_comments())
                 {
@@ -303,8 +302,9 @@ process_stream(HfstOutputStream& outstream)
               else {
               //if (line_separated)
               //{
-                  error_at_line(EXIT_FAILURE, 0, inputfilename, line_count,
-                                "XRE parsing failed");
+                std::cerr << comp.get_error_message() << std::endl;
+                error_at_line(EXIT_FAILURE, 0, inputfilename, line_count,
+                              "XRE parsing failed");
               }
                   //else
                   //{

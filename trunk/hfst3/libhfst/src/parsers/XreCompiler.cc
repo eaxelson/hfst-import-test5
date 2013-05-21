@@ -13,6 +13,7 @@ namespace hfst { namespace xre {
     unsigned int cr=0;
     std::set<unsigned int> positions;
     char * position_symbol = NULL;
+    std::string error_message;
 
 XreCompiler::XreCompiler() : 
     definitions_(),
@@ -110,7 +111,7 @@ void XreCompiler::set_verbosity(bool verbose, FILE * file)
 std::string 
 XreCompiler::get_error_message()
 {
-  return "";
+  return error_message;
 }
 
 bool

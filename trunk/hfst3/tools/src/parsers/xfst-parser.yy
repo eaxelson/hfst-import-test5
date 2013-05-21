@@ -827,12 +827,16 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | COMPILE_REPLACE_UPPER END_COMMAND {
             hfst::xfst::xfst_->compile_replace_upper_net();
        }
-       | NAMETOKEN {
+       | END_COMMAND {
+            hfst::xfst::xfst_->prompt();
+       }
+       | NAMETOKEN END_COMMAND {
             fprintf(stderr, "Command %s is not recognised\n", $1);
+            hfst::xfst::xfst_->prompt();
        }
        ;
 
-       END_COMMAND: NEWLINE | ;
+END_COMMAND: NEWLINE | ;
 
 COMMAND_SEQUENCE: COMMAND_SEQUENCE NAMETOKEN {
                     $$ = static_cast<char*>(malloc(sizeof(char)*strlen($1)+strlen($2)+2));
