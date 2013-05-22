@@ -335,7 +335,7 @@ class XfstCompiler
   //! @brief Compile file data as one regex and save on stack.
   XfstCompiler& read_regex(FILE* infile);
   //! @brief Compile regex of @a indata and save on stack.
-  XfstCompiler& read_regex(const char* indata, unsigned int & chars_read);
+  XfstCompiler& read_regex(const char* indata);
   //! @brief Read prolog form transducer from @a infile
   XfstCompiler& read_prolog(FILE* infile);
   //! @brief Read prolog form transducer from @a indata
@@ -430,6 +430,27 @@ class XfstCompiler
   //! @todo missing from HFST
   XfstCompiler& compile_replace_upper_net();
 
+
+  /* This function is used by xfst lexer to determine where a regex starting from 
+     \a indata ends. 
+     It needs to parse \a chars_read characters from \a indata. The resulting
+     transducer is stored in variable 'latest_regex_compiled'. 
+
+     For example, if we have the input
+     
+     regex foo:bar ! this is a comment with a semicolon;
+     baz;
+     print net
+
+     the xfst lexer would read "regex" and then call 'compile_regex' on the substring
+     starting right after "regex". 'compile_regex' would then read until the semicolon
+     ending the regex, i.e. the one right after "baz" and store the resulting transducer
+     to 'latest_regex_compiled'.
+
+     The xfst lexer could then put back all characters after index chars_read and
+     continue lexical analysis there, i.e. from "print net".
+  */
+  XfstCompiler& compile_regex(const char * indata, unsigned int & chars_read);
 
   //! @brief Sekrit HFST raw command mode!
   XfstCompiler& hfst(const char* data);
@@ -537,6 +558,11 @@ class XfstCompiler
   hfst::ImplementationType format_;
   bool verbose_;
   bool verbose_prompt_;
+  /* The latest regex that has been compiled when 'compile_regex' has been
+     called. The xfst lexer often needs to parse regexps in order to determine
+     where they end before giving them to the actual parser. By storing the result
+     in this variable, there is no need to parse a regexp again on the parse level. */
+  hfst::HfstTransducer * latest_regex_compiled;
 }
 ;
 

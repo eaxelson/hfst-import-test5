@@ -289,8 +289,9 @@ int main(int argc, char** argv)
             continue;
           if (0 != comp.parse_line(line))
             {
-              error(EXIT_FAILURE, 0, "line '%s' could not be parsed\n", line);
-              return EXIT_FAILURE;
+              fprintf(stderr, "line '%s' could not be parsed\n", line);
+              //error(EXIT_FAILURE, 0, "line '%s' could not be parsed\n", line);
+              //return EXIT_FAILURE;
             }
         }
     }
@@ -315,8 +316,9 @@ int main(int argc, char** argv)
           
           if (0 != comp.parse_line(buf))
             {
-              error(EXIT_FAILURE, 0, "line '%s' could not be parsed\n", buf);
-              return EXIT_FAILURE;
+              fprintf(stderr, "line '%s' could not be parsed\n", buf);
+              //error(EXIT_FAILURE, 0, "line '%s' could not be parsed\n", buf);
+              //return EXIT_FAILURE;
             }
           
           free(promptline);

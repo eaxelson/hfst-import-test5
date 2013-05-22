@@ -71,7 +71,8 @@ namespace xfst {
         xre_(hfst::TROPICAL_OPENFST_TYPE),
         format_(hfst::TROPICAL_OPENFST_TYPE),
         verbose_(false),
-        verbose_prompt_(false)
+        verbose_prompt_(false),
+        latest_regex_compiled(NULL)
       {
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
@@ -103,7 +104,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         xre_(impl),
         format_(impl),
         verbose_(false),
-        verbose_prompt_(false)
+        verbose_prompt_(false),
+        latest_regex_compiled(NULL)
       {
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
@@ -553,12 +555,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::define(const char* name, const char* xre)
     {
-      HfstTransducer* compiled = xre_.compile(xre);
+      HfstTransducer* compiled = latest_regex_compiled; // xre_.compile(xre);
       if (compiled != NULL)
         {
           bool was_defined = xre_.is_definition(name);
           xre_.define(name, xre);
-          definitions_[name] = compiled;
+          definitions_[name] = new HfstTransducer(*compiled);
 
           if (verbose_) 
             {
@@ -675,7 +677,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           {
             fprintf(stderr, " %i ", *IT);
           }
-          fprintf(stderr, " in '%s'\n", retval.c_str()); // DEBUG */
+          fprintf(stderr, " in '%s'\n", retval.c_str()); // DEBUG*/
 
         std::string new_retval = std::string("");
         std::string substituting_argument;
@@ -2208,17 +2210,28 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     }
 
   XfstCompiler& 
-  XfstCompiler::read_regex(const char* indata, unsigned int & chars_read)
+  XfstCompiler::compile_regex(const char* indata, unsigned int & chars_read)
+  {
+    if (latest_regex_compiled != NULL)
+      {
+        delete latest_regex_compiled;
+      }
+    latest_regex_compiled = xre_.compile_first(indata, chars_read);
+    return *this;
+  }
+
+  XfstCompiler& 
+  XfstCompiler::read_regex(const char* indata)
     {
-      HfstTransducer* compiled = xre_.compile_first(indata, chars_read);
+      HfstTransducer* compiled = latest_regex_compiled; // xre_.compile(indata);
       if (compiled != NULL)
         {
-          stack_.push(compiled);
+          stack_.push(new HfstTransducer(*compiled));
           print_transducer_info();
         }
       else
         {
-          fprintf(stderr, "Error reading regex:\n%s\n",
+          fprintf(stderr, "Error reading regex '%s':\n%s\n", indata, 
                   xre_.get_error_message().c_str());
         }
       prompt();

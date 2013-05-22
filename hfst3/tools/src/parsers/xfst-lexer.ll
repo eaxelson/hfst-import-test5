@@ -23,6 +23,11 @@
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif
+
+namespace hfst {
+  class HfstTransducer;
+}
+
 #include "xfst-parser.h"
 #include "xfst-utils.h"
 #include "XfstCompiler.h"
@@ -32,8 +37,6 @@
 extern void hxfsterror(const char *text);
 
 int source_stack_size = 0;
-
-int regex_state = -1;
 
 %}
 
@@ -80,7 +83,7 @@ XRETOKEN {XRECHAR}+
  */
 NAMECHAR {A7UNRESTRICTED}|{U8H}|{EC}
 NAMETOKEN [A-Za-z]{NAMECHAR}*
-PROTOTYPE {NAMETOKEN}"("[a-zA-Z ,]*")"
+PROTOTYPE {NAMETOKEN}"("[a-zA-Z_0-9 ,]*")"
 RANGE {NAMECHAR}"-"{NAMECHAR}
 NUMBER [1-9][0-9]*|[0-9]
 
@@ -583,20 +586,26 @@ LWSP [\t ]*
     unsigned int chars_read = 0;
     unsigned int total_length = (unsigned int)strlen(hxfsttext);
 
-    //if (regex_state == REGEX_STATE_READ_REGEX)
-      hfst::xfst::xfst_->read_regex(hxfsttext, chars_read);
+    (void) hfst::xfst::xfst_->compile_regex(hxfsttext, chars_read);
+
+    char buf [chars_read+1]; 
+    //strncpy(buf, hxfsttext, chars_read);
+    for (unsigned int i=0; i < chars_read; i++)
+    { 
+      buf[i] = hxfsttext[i];
+    }
+    buf[chars_read] = '\0';
+    hxfstlval.text = strdup(buf);
 
     if (total_length > 0) {
       char * text_read = strdup(hxfsttext);
       for(unsigned int i=total_length-1; i >= chars_read; i--)
       {
         unput(*(text_read+i));
-        //std::cerr << "unput: " << *(text_read+i) << std::endl; // DEBUG
       }
       free(text_read); 
     }
-    //hxfstlval.name = hfst::xfst::strstrip(hxfsttext);
-    hxfstlval.name = strdup(""); // a dummy value
+   
     return REGEX;
 }
 
@@ -653,7 +662,7 @@ LWSP [\t ]*
     return RANGE;
 }
 
-"("[a-zA-Z_ ,]*")" {
+"("[a-zA-Z_0-9 ,]*")" {
     hxfstlval.name = strdup(hxfsttext);
     return PROTOTYPE;
 }

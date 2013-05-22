@@ -27,6 +27,10 @@
 #include <string>
 using std::string;
 
+namespace hfst {
+  class HfstTransducer;
+}
+
 #include "XfstCompiler.h"
 #include "xfst-utils.h"
 
@@ -54,7 +58,7 @@ int hxfstlex(void);
     void* nothing;
 }
 
-%token <text> APROPOS DESCRIBE ECHO SYSTEM QUIT REGEX HFST
+%token <text> APROPOS DESCRIBE ECHO SYSTEM QUIT HFST
 %token <name> NAMETOKEN GLOB PROTOTYPE LABEL
               DEFINE_NAME DEFINE_FUNCTION
 %token <number> NUMBER
@@ -86,6 +90,8 @@ int hxfstlex(void);
        PUSH_DEFINED READ_LEXC READ_ATT TWOSIDED_FLAGS WRITE_ATT
        ERROR
        NEWLINE
+
+%token <text> REGEX
     
 %type <text> COMMAND_SEQUENCE NAMETOKEN_LIST LABEL_LIST
 %%
@@ -97,7 +103,6 @@ XFST_SCRIPT: COMMAND_LIST
 COMMAND_LIST: COMMAND_LIST COMMAND 
             | COMMAND
             ;
-
 
 COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->add_props(hfst::xfst::xfst_fopen($2, "w"));
@@ -691,16 +696,14 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->read_prolog(stdin);
        }
        | READ_REGEX REGEX {
-            // this happens already in the lexer
-            //hfst::xfst::xfst_->read_regex($2);
+            hfst::xfst::xfst_->read_regex($2);
             free($2);
        }
        | READ_REGEX REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->read_regex(hfst::xfst::xfst_fopen($2, "r"));
        }
        | READ_REGEX NAMETOKEN_LIST SEMICOLON END_COMMAND {
-            unsigned int foo = 0;
-            hfst::xfst::xfst_->read_regex($2, foo);
+            hfst::xfst::xfst_->read_regex($2);
             free($2);
        }
        | READ_SPACED REDIRECT_IN END_COMMAND {
@@ -831,7 +834,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->prompt();
        }
        | NAMETOKEN END_COMMAND {
-            fprintf(stderr, "Command %s is not recognised\n", $1);
+            fprintf(stderr, "Command %s is not recognised.\n", $1);
             hfst::xfst::xfst_->prompt();
        }
        ;
