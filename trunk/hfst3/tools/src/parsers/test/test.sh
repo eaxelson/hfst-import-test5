@@ -1,6 +1,6 @@
 #!/bin/sh
 
-exit 77;
+#exit 77;
 
 XFST_TOOL="../hfst-xfst2fst -s"
 STRINGS2FST="../../hfst-strings2fst -S"
@@ -28,6 +28,7 @@ do
 	-e "define Bar bar;" -e "define Baz baz;" > /dev/null); # 2> /dev/null
     then
 	${REMOVE} ${EXTRA_FILES}
+        echo "fail #1";
 	exit 1
     fi
 
@@ -35,6 +36,7 @@ do
     if ! (echo "foo bar Baz" | ${STRINGS2FST} -f $format | ${COMPARE} tmp);
     then
 	#${REMOVE} ${EXTRA_FILES}
+        echo "fail #2";
 	exit 1
     fi
 
@@ -44,27 +46,32 @@ do
 	if ! ((echo "regex "$word";" && echo "save stack tmp") | ${XFST_TOOL} -f $format > /dev/null 2> /dev/null;);
 	then
 	    ${REMOVE} ${EXTRA_FILES}
+            echo "fail #3";
 	    exit 1
 	fi
         # Test that the result is as intended.
 	if ! (echo $word | ${STRINGS2FST} -f $format | ${COMPARE} tmp);
 	then
 	    ${REMOVE} ${EXTRA_FILES}
+            echo "fail #4";
 	    exit 1
 	fi
     done
 
     ## Test that using special symbols in replace rules yields an error message
     if ! (echo 'regex a -> "@_foo_@";' | ../hfst-xfst2fst -f $format > /dev/null 2> tmp && grep "warning:" tmp > /dev/null); then
+        echo "fail #5";
 	exit 1;
     fi
     # silent mode
     if (echo 'regex a -> "@_foo_@";' | ../hfst-xfst2fst -s -f $format > /dev/null 2> tmp && grep "warning:" tmp > /dev/null); then
+        echo "fail #6";
 	exit 1;
     fi
 
     ## Test that the transducer info is correct
     if ! (echo 'regex [a|b|c|d|e] ([d|e|f|g]);' | ../hfst-xfst2fst -f $format > tmp 2> /dev/null); then
+        echo "fail #7";
         exit 1;
     fi
     if (! grep "3 states" tmp > /dev/null); then

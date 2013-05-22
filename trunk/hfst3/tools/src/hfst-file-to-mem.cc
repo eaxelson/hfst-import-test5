@@ -3,13 +3,14 @@
 #include "hfst-commandline.h"
 #include <cstdlib>
 
-#include <stdbool.h>
-#include "../../back-ends/foma/fomalib.h" // todo: find the exact header where xxmalloc is defined
+//#include <stdbool.h>
+//#include "../../back-ends/foma/fomalib.h" // todo: find the exact header where xxmalloc is defined
 
 char * hfst_stdin_to_mem()
 {
   size_t maxbytes = 1000000;
   size_t numbytes = 0;
+  // fix: slow
   char * buffer = (char*)malloc((maxbytes) * sizeof(char));
   if(buffer == NULL)
     {
@@ -59,7 +60,7 @@ char * hfst_file_to_mem(const char *filename) {
   fseek(infile, 0L, SEEK_END);
   numbytes = ftell(infile);
   fseek(infile, 0L, SEEK_SET);
-  // FIX: use malloc instead                 
+
   buffer = (char*)malloc((numbytes+1) * sizeof(char));
   if(buffer == NULL)
     {
