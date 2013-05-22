@@ -10,7 +10,7 @@ char * hfst_stdin_to_mem()
 {
   size_t maxbytes = 1000000;
   size_t numbytes = 0;
-  char * buffer = (char*)xxmalloc((maxbytes) * sizeof(char));
+  char * buffer = (char*)malloc((maxbytes) * sizeof(char));
   if(buffer == NULL)
     {
       error(EXIT_FAILURE, 0, "Error allocating memory to read file '<stdin>'\n");
@@ -60,7 +60,7 @@ char * hfst_file_to_mem(const char *filename) {
   numbytes = ftell(infile);
   fseek(infile, 0L, SEEK_SET);
   // FIX: use malloc instead                 
-  buffer = (char*)xxmalloc((numbytes+1) * sizeof(char));
+  buffer = (char*)malloc((numbytes+1) * sizeof(char));
   if(buffer == NULL)
     {
       error(EXIT_FAILURE, 0, "Error allocating memory to read file '%s'\n", filename);
