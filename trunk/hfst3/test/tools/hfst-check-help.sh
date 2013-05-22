@@ -1,8 +1,22 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
 
-TWOLC_TOOL=hfst-twolc/src/hfst-twolc-loc
-TAGGER_TOOLS=$TOOLDIR"/hfst-tagger/src/hfst-tag "$TOOLDIR"/hfst-tagger/src/hfst-train-tagger-loc"
+HFST_TOOLS="hfst-affix-guessify hfst-calculate hfst-compare hfst-compose \
+hfst-compose-intersect hfst-concatenate hfst-conjunct hfst-determinize \
+hfst-disjunct hfst-edit-metadata hfst-format hfst-fst2fst \
+hfst-fst2strings hfst-fst2txt hfst-grep hfst-guess hfst-guessify \
+hfst-head hfst-info hfst-invert hfst-lexc hfst-lexc2fst \
+hfst-lookup hfst-minimize hfst-multiply hfst-name \
+hfst-optimized-lookup hfst-pair-test hfst-pmatch hfst-pmatch2fst \
+hfst-project hfst-prune-alphabet hfst-push-weights hfst-regexp2fst \
+hfst-remove-epsilons hfst-repeat hfst-reverse hfst-reweight \
+hfst-shuffle hfst-split hfst-strings2fst hfst-substitute \
+hfst-subtract hfst-summarize hfst-tail hfst-traverse \
+hfst-txt2fst"
+
+TWOLC_TOOLS="hfst-twolc/src/hfst-twolc-loc"
+TAGGER_TOOLS="hfst-tagger/src/hfst-tag /hfst-tagger/src/hfst-train-tagger-loc"
+PROC_TOOLS="hfst-proc/hfst-apertium-proc"
 
 # Extension for executables
 EXT=
@@ -11,7 +25,7 @@ if (uname | egrep "MINGW|mingw" 2>1 > /dev/null); then
     # Executables have an exe extension
     EXT=".exe";
     # We use system call version of the shell script
-    TWOLC_TOOL=hfst-twolc/src/hfst-twolc-system
+    TWOLC_TOOLS=hfst-twolc/src/hfst-twolc-system
     # Tagger tool shell script not implemented for windows (MinGW)
     TAGGER_TOOLS=
 fi
@@ -30,52 +44,55 @@ fi
 # when testing. They also print their help messages to standard error
 # to avoid giving the message to the next tool in the pipeline.
 #
-for f in $TOOLDIR/hfst-* $TOOLDIR/hfst-proc/hfst-* $TAGGER_TOOLS \
-    $TOOLDIR/$TWOLC_TOOL ; do
-    # Skip deprecated tools that can still lay around somewhere
-    if [ "$f" != "$TOOLDIR/hfst-xfst2fst""$EXT" -a \
-        "$f" != "$TOOLDIR/hfst-lexc-compiler""$EXT" -a \
-        "$f" != "$TOOLDIR/hfst-twolc-system""$EXT" -a \
-        "$f" != "$TOOLDIR/hfst-duplicate""$EXT" -a \
-        "$f" != "$TOOLDIR/hfst-preprocess-for-optimized-lookup-format""$EXT" -a \
-        "$f" != "$TOOLDIR/hfst-strip-header""$EXT" -a \
-        "$f" != "$TOOLDIR/hfst-train-tagger-system""$EXT" ]; then
-        if [ -x "$f" -a ! -d "$f" ] ; then
-            if [ "$f" != "$TOOLDIR/hfst-tagger/src/hfst-train-tagger-loc" -a \
-                "$f" != "$TOOLDIR/""$TWOLC_TOOL" ] ; then
-                if ! "$f" --help > help.out ; then
-                    rm help.out
-                    echo $f has broken help
-                    exit 1
-                fi
-                if ! grep -q '^Usage: hfst-' help.out > /dev/null ; then
-                    rm help.out
-                    echo $f has malformed help
-                    exit 1
-                fi
-            else
-                if ! "$f" --help 2> help.out ; then
-                    rm help.out
-                    echo $f has broken help
-                    exit 1
-                fi
-                if ! grep -q '^Usage: hfst-' help.out > /dev/null ; then
-                    rm help.out
-                    echo $f has malformed help
-                    exit 1
-                fi
-            fi
-            if [ "$verbose" != "false" ]; then
-                echo "PASS: "$f
-            fi
+for f in $HFST_TOOLS $PROC_TOOLS ; do
+    prog=$TOOLDIR/$f
+    if [ -e "$prog" ] ; then
+        if ! "$prog" --help > help.out ; then
+            rm help.out
+            echo $prog has broken help
+            exit 1
+        fi
+        if ! grep -q '^Usage: hfst-' help.out > /dev/null ; then
+            rm help.out
+            echo $prog has malformed help
+            exit 1
+        fi
+        if [ "$verbose" != "false" ]; then
+            echo "PASS: "$prog
         fi
     else
         if [ "$verbose" != "false" ]; then
-            echo "Skipping "$f"..."
+            echo "Skipping "$prog"..."
         fi
-    fi
-    
+    fi    
 done
 
 rm help.out
 
+# We allow twolc and tagger tools to print their help messages to standard error..
+for f in $TWOLC_TOOLS $TAGGER_TOOLS; do
+    prog=$TOOLDIR/$f
+    if [ -e "$prog" ] ; then
+        if ! "$prog" --help > help1.out 2> help2.out ; then
+            rm -f help1.out help2.out
+            echo $prog has broken help
+            exit 1
+        fi
+        if ! grep -q '^Usage: hfst-' help1.out > /dev/null ; then
+            if ! grep -q '^Usage: hfst-' help2.out > /dev/null ; then
+                rm -f help1.out help2.out
+                echo $prog has malformed help
+                exit 1
+            fi
+        fi
+        if [ "$verbose" != "false" ]; then
+            echo "PASS: "$prog
+        fi
+    else
+        if [ "$verbose" != "fase" ]; then
+            echo "Skipping "$prog"..."
+        fi
+    fi    
+done
+
+rm -f help.out1 help.out2
