@@ -24,6 +24,17 @@ AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/tools/src $(GLIB_CPPFLAGS) -Wno-deprecated
 
+AM_CPPFLAGS += -I${top_srcdir}/back-ends/foma \
+                -I${top_srcdir}/back-ends
+
+if WANT_MINGW
+  AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfstwin/src/include \
+                 -I${top_srcdir}/back-ends/dlfcn -DWINDOWS
+else
+  AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfst/src/include
+endif
+
+
 if WANT_XFST2FST
 MAYBE_XFST=hfst-xfst2fst
 endif
@@ -34,7 +45,12 @@ HFST_COMMON_SRC=../hfst-program-options.cc ../hfst-commandline.cc ../hfst-tool-m
 
 bin_PROGRAMS=$(MAYBE_XFST)
 hfst_xfst2fst_SOURCES = xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc hfst-xfst2fst.cc $(HFST_COMMON_SRC)
-hfst_xfst2fst_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS) -lreadline
+
+if WANT_READLINE
+  hfst_xfst2fst_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS) -lreadline
+else
+  hfst_xfst2fst_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS)
+endif
 
 #xfst-parser.h: xfst-parser.cc
 

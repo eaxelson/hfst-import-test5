@@ -698,6 +698,8 @@ LWSP [\t ]*
 
 "!"[^\n]* { /* fprintf(stderr, "xfst: skipping comment '%s'\n", yytext); */ /* skip comments */ }
 
+"#"[^\n]* { /* fprintf(stderr, "xfst: skipping comment '%s'\n", yytext); */ /* skip comments */ }
+
 <<EOF>> {
     --source_stack_size;
     if (source_stack_size < 0) {

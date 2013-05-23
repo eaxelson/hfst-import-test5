@@ -35,7 +35,10 @@ using std::ostringstream;
 
 #include <cstdio>
 #include <cstdlib>
-#include <glob.h>
+
+#ifndef WINDOWS
+  #include <glob.h>
+#endif // WINDOWS
 
 #include "XfstCompiler.h"
 #include "xfst-utils.h"
@@ -1457,6 +1460,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::print_dir(const char* globdata, FILE* outfile)
     {
+#ifndef WINDOWS
       glob_t globbuf;
 
       int rv = glob(globdata, 0, NULL, &globbuf);
@@ -1471,6 +1475,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {
           fprintf(outfile, "glob(%s) = %d\n", globdata, rv);
         }
+#else
+      fprintf(stderr, "print dir not implemented for windows\n");
+#endif // WINDOWS
       prompt();
       return *this;
     }
