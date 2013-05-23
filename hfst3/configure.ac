@@ -122,6 +122,7 @@ AC_ARG_WITH([readline],
                             [use readline for interactive programs @<:@default=no@:>@])],
             [with_readline=$withval],
             [with_readline=no])
+AM_CONDITIONAL([WANT_READLINE], [test x$with_readline != xno])
 
 # allow programs to be built separately (sort alphabetically)
 AC_ARG_ENABLE([affix_guessify],

@@ -164,6 +164,7 @@ int parse_file(const char* filename, hfst::xfst::XfstCompiler &comp)
   char* line = hfst_file_to_mem(filename);
   if (NULL == line) 
     {
+      error(EXIT_FAILURE, 0, "error when reading file %s\n", filename);
       return EXIT_FAILURE;
     }
   if (0 != comp.parse_line(line))
@@ -173,6 +174,14 @@ int parse_file(const char* filename, hfst::xfst::XfstCompiler &comp)
     }
   free(line);
   return 0;
+}
+
+void insert_zeroes(char * array, unsigned int number)
+{
+  for (unsigned int i=0; i<number; i++)
+    {
+      array[i] = '\0'; 
+    }
 }
 
 int main(int argc, char** argv)
@@ -251,7 +260,8 @@ int main(int argc, char** argv)
   if (pipemode) 
     {
       verbose_printf("Reading from standard input...\n");
-      if (parse_file("<stdout>", comp) == EXIT_FAILURE)
+      if (parse_file("<stdin>", comp) == EXIT_FAILURE)
+        //if (0 != comp.parse(stdin)) segfaults with scriptfiles..
         {
           return EXIT_FAILURE;
         }
@@ -272,27 +282,33 @@ int main(int argc, char** argv)
       if (!silent)
         comp.prompt();
       // support for backspace
-      char line[256];
+
+      std::string expression = "";
+      unsigned int lines = 0;
+
+      char line [256];
+      insert_zeroes(line, 256);
+
       while (cin.getline(line, 256))
         {
-          // insert missing '\n'
-          for(unsigned int i=0; i < 255; i++)
+          std::string linestr(line);
+          expression += linestr;
+
+          if (expression.size() > 0 && expression.at(expression.size()-1) == '\\')
             {
-              if (line[i] == '\0')
-                {
-                  line[i] = '\n'; // todo: windows?
-                  line[i+1] = '\0';
-                  break;
-                }
+              expression.at(expression.size()-1) = '\n';
+              if (!silent)
+                comp.prompt();
+              continue;
             }
-          if (line[0] == '!' || line[0] == '#') // skip comment line
-            continue;
-          if (0 != comp.parse_line(line))
+          expression += "\n";
+
+          if (0 != comp.parse_line(expression.c_str()))
             {
-              fprintf(stderr, "line '%s' could not be parsed\n", line);
-              //error(EXIT_FAILURE, 0, "line '%s' could not be parsed\n", line);
-              //return EXIT_FAILURE;
+              fprintf(stderr, "expression '%s' could not be parsed\n", expression.c_str());
             }
+
+          expression = "";
         }
     }
   else
@@ -304,23 +320,32 @@ int main(int argc, char** argv)
       comp.setPromptVerbosity(false); // prompts handled manually
       char *buf = NULL;               // result from readline
       rl_bind_key('\t',rl_abort);     // disable auto-complet
+      std::string expression = "";    // the whole expression (possibly several lines)
 
       char* promptline = (!silent) ? comp.get_prompt() : strdup("");
       while((buf = readline(promptline)) != NULL)
         {
-          if (buf[0] == '!' || buf[0] == '#') // skip comment line
-            continue;
+          std::string bufstr(buf);
+          expression += bufstr;
+
+          if (expression.size() > 0 && expression.at(expression.size()-1) == '\\')
+            {
+              expression.at(expression.size()-1) = '\n';
+              free(promptline);
+              promptline = (!silent) ? comp.get_prompt() : strdup("");
+              continue;
+            }
+          expression += "\n";
 
           if (buf[0] != 0) {
-            add_history(buf); }
+            add_history(expression.c_str()); }
           
-          if (0 != comp.parse_line(buf))
+          if (0 != comp.parse_line(expression.c_str()))
             {
-              fprintf(stderr, "line '%s' could not be parsed\n", buf);
-              //error(EXIT_FAILURE, 0, "line '%s' could not be parsed\n", buf);
-              //return EXIT_FAILURE;
+              fprintf(stderr, "expression '%s' could not be parsed\n", expression.c_str());
             }
           
+          expression = "";
           free(promptline);
           promptline = (!silent) ? comp.get_prompt() : strdup("");
         }
