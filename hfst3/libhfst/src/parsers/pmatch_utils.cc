@@ -395,10 +395,15 @@ HfstTransducer * read_text(char * filename, ImplementationType type)
         std::cerr << "Pmatch: could not open text file " << filename <<
             " for reading\n";
     } else {
+        size_t n = 0;
         while(infile.good()) {
             std::getline(infile, line);
             if(!line.empty()) {
+                ++n;
                 retval->disjunct(HfstTransducer(line, tok, type));
+                if (n % 50 == 0) {
+                    retval->minimize();
+                }
             }
         }
     }
