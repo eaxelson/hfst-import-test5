@@ -74,7 +74,7 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   cat_weight_initial.hfst cat_weight_middle.hfst dog2cat.hfst \
 		   dog.hfst infinitely_ambiguous.hfst infinitely_ambiguous_with_flags.hfst unification_flags.hfst unification_flags_fail.hfst non_minimal.hfst rule1.hfst \
 		   rule2.hfst summarize_test1.hfst summarize_test2.hfst tac.hfst \
-		   epsilon.hfst epsilon2cat.hfst cat2epsilon.hfst \
+		   epsilon.hfst another_epsilon.hfst epsilon2cat.hfst cat2epsilon.hfst \
 		   unknown-star.hfst identity-star.hfst unknown2a.hfst identity.hfst \
 		   heavycat.hfst abid.hfst unk2unk.hfst unk_or_id_star.hfst a2b.hfst \
 		   a2b_complement.hfst a2b_input_projection_complement.hfst empty.hfst \
@@ -105,7 +105,7 @@ SFST_CHECKS=0to3cats.sfst 2to4cats.sfst 4cats.sfst\
 			ab_shuffle_bc.sfst id_shuffle_id.sfst aid_shuffle_idb.sfst \
 			prunable_alphabet.sfst non_prunable_alphabet_1.sfst non_prunable_alphabet_2.sfst id.sfst \
 			a2a_or_a2b_or_a2unk.sfst a2b_or_b2b_or_unk2b.sfst unk2unk_or_id.sfst \
-			a_or_id.sfst id_star_a_b_c.sfst
+			a_or_id.sfst id_star_a_b_c.sfst epsilon.sfst another_epsilon.sfst
 endif
 if WANT_OPENFST
 OFST_CHECKS=0to3cats.ofst \
@@ -126,7 +126,7 @@ OFST_CHECKS=0to3cats.ofst \
 			ab_shuffle_bc.ofst id_shuffle_id.ofst aid_shuffle_idb.ofst \
 			prunable_alphabet.ofst non_prunable_alphabet_1.ofst non_prunable_alphabet_2.ofst id.ofst \
 			a2a_or_a2b_or_a2unk.ofst a2b_or_b2b_or_unk2b.ofst unk2unk_or_id.ofst \
-			a_or_id.ofst id_star_a_b_c.ofst
+			a_or_id.ofst id_star_a_b_c.ofst epsilon.ofst another_epsilon.ofst
 endif
 if WANT_FOMA
 FOMA_CHECKS=0to3cats.foma 2to4cats.foma 4cats.foma \
@@ -146,14 +146,14 @@ FOMA_CHECKS=0to3cats.foma 2to4cats.foma 4cats.foma \
 			ab_shuffle_bc.foma id_shuffle_id.foma aid_shuffle_idb.foma \
 			prunable_alphabet.foma non_prunable_alphabet_1.foma non_prunable_alphabet_2.foma id.foma \
 			a2a_or_a2b_or_a2unk.foma a2b_or_b2b_or_unk2b.foma unk2unk_or_id.foma \
-			a_or_id.foma id_star_a_b_c.foma
+			a_or_id.foma id_star_a_b_c.foma epsilon.foma another_epsilon.foma
 endif
 
 check_DATA=$(DEFAULT_CHECKS) $(SFST_CHECKS) $(OFST_CHECKS) $(FOMA_CHECKS) $(OL_CHECKS)
 
 FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 cat2cat_or_CAT_uppercased.txt cat2CAT_uppercased.txt \
-		 cat2epsilon.txt cat2dog.txt \
+		 cat2epsilon.txt another_epsilon.txt cat2dog.txt \
 		 cat+dog.txt catdog.txt cat_or_dog.txt cat.txt CAT_uppercased2cat.txt \
 		 CAT_uppercased.txt cat_weight_final.txt cat_weight_initial.txt \
 		 cat_weight_middle.txt dog2cat.txt dog.txt\

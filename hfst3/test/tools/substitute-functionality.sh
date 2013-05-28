@@ -19,4 +19,19 @@ for i in "" .sfst .ofst .foma; do
             exit 1
         fi
     fi
+    if test -f another_epsilon$i -a -f epsilon$i ; then
+        if ! $TOOLDIR/hfst-substitute -s -i another_epsilon$i -f '@@ANOTHER_EPSILON@@' -t '@0@' > test ; then
+            echo "fail: could not substitute"
+            exit 1
+        fi
+        if ! $TOOLDIR/hfst-compare -s test epsilon$i  ; then
+            echo "fail: test and epsilon"$i" differ"
+            exit 1
+        fi
+        if $TOOLDIR/hfst-summarize --verbose test 2> /dev/null | grep "sigma" | grep '@@ANOTHER_EPSILON@@' > /dev/null ; then
+            echo "fail: @@ANOTHER_EPSILON@@ is still in the alphabet after substitution"
+            exit 1
+        fi
+        rm test
+    fi
 done
