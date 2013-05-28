@@ -1048,7 +1048,10 @@ code on top of an existing morphological analyzer. E.g.  given the Finnish sente
 phrases as illustrated in the following sentence with a gloss:
 
 \ex
-\begingl
+% Without [everygla=], each word in \gla seems to be displayed as "it"
+% in italics. Why? Is it a version problem with expex.sty? How could
+% we have the words in \gla in italics?
+\begingl[everygla=]
 \gla Miljoona$_1$ kärpästä$_1$ voi$_2$ olla$_2$ väärässä$_3$ paikassa$_3$//
 \glb million-{\sc Num} fly-{\sc Par} can-{\sc AuxV} be-{\sc InfV} wrong-{\sc Ine} place-{\sc Ine}//
 \glft `A million flies can be in the wrong place' //
