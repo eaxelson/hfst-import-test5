@@ -2658,7 +2658,8 @@ HfstTransducer &HfstTransducer::substitute
   // if there are implementations available, use them
 
 #if HAVE_SFST
-  if (this->type == SFST_TYPE && input_side && output_side)
+  // do not use until substituted symbols are correctly erased from the alphabet
+  if (false && (this->type == SFST_TYPE && input_side && output_side))
     {
       hfst::implementations::Transducer * tmp =
     this->sfst_interface.substitute
@@ -2669,7 +2670,8 @@ HfstTransducer &HfstTransducer::substitute
     }
 #endif
 #if HAVE_OPENFST
-    if (this->type == TROPICAL_OPENFST_TYPE && input_side && output_side)
+  // do not use until substituted symbols are correctly erased from the alphabet
+  if (false && (this->type == TROPICAL_OPENFST_TYPE && input_side && output_side))
       {
     fst::StdVectorFst * tmp =
       this->tropical_ofst_interface.substitute
