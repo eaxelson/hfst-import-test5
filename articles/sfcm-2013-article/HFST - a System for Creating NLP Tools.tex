@@ -688,15 +688,17 @@ system can combine multiple context conditions in a similar way.
 \subsubsection{Converting a Swedish Named Entity Recognizer to Use
   Pmatch.}
 
-The Swedish named entity recognizer works on tokenized running text
+We have converted a Swedish named entity recognizer \cite{kokkinakis/2003}
+developed at the University of Gothenburg to use Pmatch.
+The Swedish NER tool works on tokenized running text
 input: punctuation marks are separated from words by spaces but the
 words are not annotated in any way. In contrast, the forthcoming
 Finnish NER tool will work on annotated text, which makes it easier to
 write more general rules, in particular for a morphologically rich
 language such as Finnish.
 
-The original implementation of the Swedish named entity recognizer
-\cite{kokkinakis/2003} contained 24 different recognizers running in a
+The original implementation of the Swedish NER tool
+contained 24 different recognizers running in a
 pipeline and a correction filter run after each stage. 21 of the
 recognizers and the correction filter had been written using
 Flex\footnote{\url{http://flex.sourceforge.net/}} rules; the remaining three
@@ -917,11 +919,12 @@ faster on the average than the Flex version, which we consider as a
 significant improvement. On our test
 machine\footnote{The test machine had Intel Xeon X7560 processors
   running at 2.27 GHz.}, the average compilation time of
-a single recognizer was reduced from 53 minutes to under five minutes,
-and the slowest one from 288 minutes (almost five hours) to 36 minutes.
+a single recognizer was reduced from 53 minutes to 5.5 minutes,
+and the slowest one from 288 minutes (almost five hours) to 54 minutes.
 We will also investigate further
-ways to improve compilation speed. In contrast, the Pmatch NER was
-about three times slower at run time than the Flex NER.
+ways to improve compilation speed. In contrast, at run time the Pmatch
+NER recognizers were about three times slower on the average
+than the Flex NER ones.
 % This speed required the use of a left context condition
 % of a whitespace or sentence boundary; without the context, the running
 % times were many times longer.
