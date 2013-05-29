@@ -87,6 +87,14 @@ LWSP [\t\r\n ]
     return OPTCAP_LEFT;
 }
 
+"ToLower(" {
+    return TOLOWER_LEFT;
+}
+
+"ToUpper(" {
+    return TOUPPER_LEFT;
+}
+
 "Ins(" {
     return INS_LEFT;
 }
