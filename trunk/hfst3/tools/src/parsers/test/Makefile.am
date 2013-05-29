@@ -34,5 +34,6 @@ EXTRA_DIST=test.sh \
 	shortest_string.xfst shortest_string.output \
 	test_sublanguage_true.xfst test_sublanguage_false.xfst \
 	test_overlap_true.xfst test_overlap_false.xfst \
-	test_true.output test_false.output
+	test_true.output test_false.output \
+	quit-on-fail.xfst
 check_DATA=test.sh

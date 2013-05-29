@@ -463,6 +463,8 @@ class XfstCompiler
   //! @brief Parse @a line
   int parse_line(char line[]);
   int parse_line(std::string line);
+  //! @brief Use readline library to read input in apply up etc.
+  XfstCompiler& setReadline(bool readline);
   //! @brief Print prompts and XFST outputs
   XfstCompiler& setVerbosity(bool verbosity);
   //! @brief Print prompts
@@ -485,6 +487,9 @@ class XfstCompiler
   XfstCompiler& read_text_or_spaced(FILE *infile, bool spaces);
   XfstCompiler& load_stack_or_definitions(const char *infilename, bool definitions);
   XfstCompiler& add_loaded_definition(HfstTransducer * t);
+
+  // exit with failure status if quit-on-fail is ON
+  void xfst_fail();
 
   //! @brief Perform lookup on the top transducer using strings in \a infile.
   //! \a direction specifies whether apply is done on input (up) or output (down) 
@@ -540,6 +545,7 @@ class XfstCompiler
   XfstCompiler& print_bool(bool value);
   XfstCompiler& read_prop_line(char* line);
 
+  bool use_readline_;
   hfst::xre::XreCompiler xre_;
   hfst::lexc::LexcCompiler lexc_;
 #if HAVE_TWOLC

@@ -234,6 +234,11 @@ int main(int argc, char** argv)
 
   // Create XfstCompiler
   hfst::xfst::XfstCompiler comp(output_format);
+#ifdef HAVE_READLINE
+  comp.setReadline(use_readline);
+#else
+  comp.setReadline(false);
+#endif
   comp.setVerbosity(!silent);
 
   // If needed, execute scripts given in command line
@@ -285,11 +290,12 @@ int main(int argc, char** argv)
 
       std::string expression = "";
       unsigned int lines = 0;
+      const unsigned int MAX_LINE_LENGTH = 1024;
 
-      char line [256];
-      insert_zeroes(line, 256);
+      char line [MAX_LINE_LENGTH];
+      insert_zeroes(line, MAX_LINE_LENGTH);
 
-      while (cin.getline(line, 256))
+      while (cin.getline(line, MAX_LINE_LENGTH))
         {
           std::string linestr(line);
           expression += linestr;
@@ -301,9 +307,8 @@ int main(int argc, char** argv)
                 comp.prompt();
               continue;
             }
-          expression += "\n";
 
-          if (0 != comp.parse_line(expression.c_str()))
+          if (0 != comp.parse_line((expression + "\n").c_str()))
             {
               fprintf(stderr, "expression '%s' could not be parsed\n", expression.c_str());
             }
@@ -323,6 +328,7 @@ int main(int argc, char** argv)
       std::string expression = "";    // the whole expression (possibly several lines)
 
       char* promptline = (!silent) ? comp.get_prompt() : strdup("");
+
       while((buf = readline(promptline)) != NULL)
         {
           std::string bufstr(buf);
@@ -335,12 +341,11 @@ int main(int argc, char** argv)
               promptline = (!silent) ? comp.get_prompt() : strdup("");
               continue;
             }
-          expression += "\n";
 
           if (buf[0] != 0) {
             add_history(expression.c_str()); }
-          
-          if (0 != comp.parse_line(expression.c_str()))
+
+          if (0 != comp.parse_line((expression + "\n").c_str()))
             {
               fprintf(stderr, "expression '%s' could not be parsed\n", expression.c_str());
             }

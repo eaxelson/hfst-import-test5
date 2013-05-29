@@ -71,6 +71,7 @@ namespace xfst {
 
   
     XfstCompiler::XfstCompiler() :
+        use_readline_(false),
         xre_(hfst::TROPICAL_OPENFST_TYPE),
         format_(hfst::TROPICAL_OPENFST_TYPE),
         verbose_(false),
@@ -104,6 +105,7 @@ namespace xfst {
       }
         
 XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
+        use_readline_(false),
         xre_(impl),
         format_(impl),
         verbose_(false),
@@ -135,6 +137,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         variables_["verbose"] = "OFF";
         prompt();
       }
+
+  void XfstCompiler::xfst_fail()
+  {
+    if (variables_["quit-on-fail"] == "ON") 
+      {
+        exit(EXIT_FAILURE); 
+      }
+  }
 
     XfstCompiler&
     XfstCompiler::add_prop_line(char* line)
@@ -737,6 +747,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {
           fprintf(stderr, "Error extracting function name from prototype '%s'\n",
                   prototype);
+          xfst_fail();
           prompt();
           return *this;
         }
@@ -745,6 +756,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {
           fprintf(stderr, "Error extracting function arguments from prototype '%s'\n",
                   prototype);
+          xfst_fail();
           prompt();
           return *this;
         }
@@ -753,6 +765,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       if (xre_converted == std::string(""))
         {
           fprintf(stderr, "Error parsing function definition '%s'\n", xre);
+          xfst_fail();
           prompt();
           return *this;
         }
@@ -762,6 +775,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       if (! xre_.define_function(name, arguments.size(), xre_converted))
         {
           fprintf(stderr, "Error when defining function\n");
+          xfst_fail();
           prompt();
           return *this;
         }
@@ -976,6 +990,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {
           fprintf(stderr, "Unable to read transducers from %s\n", 
                   to_filename(infilename));
+          xfst_fail();
           prompt();
           return *this;
         }
@@ -1190,8 +1205,13 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       HfstTransducer * tmp = this->top();
       if (NULL == tmp)
         return *this;
-      HfstTransducer id(hfst::internal_identity, tmp->get_type());
-      this->print_bool(id.compare(*tmp, false));
+
+      HfstTransducer tmp_input(*tmp);
+      tmp_input.input_project();
+      HfstTransducer tmp_output(*tmp);
+      tmp_output.output_project();
+
+      this->print_bool(tmp_input.compare(tmp_output, false));
       prompt();
       return *this;
     }
@@ -2202,6 +2222,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             {
               fprintf(stderr, "Error when compiling file:\n%s\n",
                       xre_.get_error_message().c_str());
+              xfst_fail();
             }
         }
       else if (!feof(infile))
@@ -2240,6 +2261,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {
           fprintf(stderr, "Error reading regex '%s':\n%s\n", indata, 
                   xre_.get_error_message().c_str());
+          xfst_fail();
         }
       prompt();
       return *this;
@@ -2415,6 +2437,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     catch (const FunctionNotImplementedException & e)
       {
         fprintf(stderr, "function not available.\n");
+        xfst_fail();
         stack_.push(result);
       }
 
@@ -2453,6 +2476,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           catch (const TransducersAreNotAutomataException & e)
             {
               fprintf(stderr, "transducers are not automata\n");
+              xfst_fail();
               stack_.push(another);
               stack_.push(result);
               prompt();
@@ -2461,6 +2485,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             }
         default:
           fprintf(stderr, "ERROR: unknown binary operation\n");
+          xfst_fail();
           break;
         }
 
@@ -2840,16 +2865,19 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   char * XfstCompiler::xfst_getline(FILE * file)
   {
 #ifdef HAVE_READLINE
-    char *buf = NULL;               // result from readline
-    rl_bind_key('\t',rl_abort);     // disable auto-complet
-
-    if((buf = readline("")) != NULL)
+    if (use_readline_)
       {
-        if (buf[0] != '\0')
-          add_history(buf);
+        char *buf = NULL;               // result from readline
+        rl_bind_key('\t',rl_abort);     // disable auto-complet
+        
+        if((buf = readline("")) != NULL)
+          {
+            if (buf[0] != '\0')
+              add_history(buf);
+          }
+        return buf;
       }
-    return buf;
-#else
+#endif
     char* line_ = 0;
     size_t len = 0;
     ssize_t read;
@@ -2860,7 +2888,6 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         return NULL;
       }
       return line_;
-#endif
   }
 
   int XfstCompiler::current_history_index()
@@ -3079,6 +3106,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       catch (const HfstException & e)
         {
           fprintf(stderr, "error reading file in att format\n");
+          xfst_fail();
         }
       prompt();
       return *this;
@@ -3153,6 +3181,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       fprintf(outfile, "missing print properties %s:%d\n", __FILE__, __LINE__);
       return *this;
     }
+  XfstCompiler&
+  XfstCompiler::setReadline(bool readline)
+  {
+    use_readline_ = readline;
+    return *this;
+  }
   XfstCompiler& 
   XfstCompiler::setVerbosity(bool verbosity)
     {
