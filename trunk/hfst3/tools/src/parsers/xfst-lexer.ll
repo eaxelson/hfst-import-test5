@@ -93,6 +93,7 @@ LWSP [\t ]*
 
 %x REGEX_STATE
 %x SOURCE_STATE
+%x APPLY_STATE
 %%
 
 "add properties"|"add" {
@@ -100,11 +101,23 @@ LWSP [\t ]*
 }
 
 "apply up"|"up" {
-    return APPLY_UP;
+    if (hfst::xfst::xfst_->getReadInteractiveTextFromStdin()) {
+        return APPLY_UP;
+    }
+    else {
+        BEGIN(APPLY_STATE);
+        return APPLY_UP;
+    }
 }
 
 "apply down"|"down" {
-    return APPLY_DOWN;
+    if (hfst::xfst::xfst_->getReadInteractiveTextFromStdin()) {
+        return APPLY_DOWN;
+    }
+    else {
+        BEGIN(APPLY_STATE);
+        return APPLY_DOWN;
+    }
 }
 
 "apply med"|"med" {
@@ -581,6 +594,44 @@ LWSP [\t ]*
     return ZERO_PLUS;
 }
 
+<APPLY_STATE>(.|"\n"|"\r")* {
+    BEGIN(0);
+
+    std::string str(hxfsttext);
+    std::size_t found = str.find("<ctrl-d>");
+
+    // the rest is input to apply 
+    if (found == std::string::npos) {
+        hxfstlval.text = hxfsttext;
+        return APPLY_INPUT;
+    }
+
+    // there are other commands after the input to apply
+    unsigned int total_length = (unsigned int)strlen(hxfsttext);
+    char buf [(unsigned int)found + 1];
+    for (unsigned int i=0; i < (unsigned int)found; i++)
+    { 
+      buf[i] = hxfsttext[i];
+    }
+    buf[(unsigned int)found] = '\0';
+    hxfstlval.text = strdup(buf);
+
+    // put back the rest of the input text, excluding the "<ctrl-d>"
+    if (total_length > 0) {
+      // unput modifies hxfsttext, so it must be copied before unputting
+      char * text_read = strdup(hxfsttext);
+      for(unsigned int i=total_length-1; 
+          i >= ((unsigned int)found + (unsigned int)strlen("<ctrl-d>"));
+          i--)
+      {
+        unput(*(text_read+i));
+      }
+      free(text_read); 
+    }
+
+    return APPLY_INPUT;
+}
+
 <REGEX_STATE>(.|"\n"|"\r")* {
     BEGIN(0);
     unsigned int chars_read = 0;
@@ -589,7 +640,6 @@ LWSP [\t ]*
     (void) hfst::xfst::xfst_->compile_regex(hxfsttext, chars_read);
 
     char buf [chars_read+1]; 
-    //strncpy(buf, hxfsttext, chars_read);
     for (unsigned int i=0; i < chars_read; i++)
     { 
       buf[i] = hxfsttext[i];
@@ -607,13 +657,6 @@ LWSP [\t ]*
     }
    
     return REGEX;
-}
-
-<REGEX_STATE>. {
-    hxfsterror("Unexpected character when parsing REGEX\n");
-    fprintf(stderr, "%s", hxfsttext);
-    BEGIN(INITIAL); 
-    return ERROR;
 }
 
 <SOURCE_STATE>[A-Za-z]{NAMECHAR}* {  

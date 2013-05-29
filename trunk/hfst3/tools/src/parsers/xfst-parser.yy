@@ -92,6 +92,7 @@ int hxfstlex(void);
        NEWLINE
 
 %token <text> REGEX
+%token <text> APPLY_INPUT
     
 %type <text> COMMAND_SEQUENCE NAMETOKEN_LIST LABEL_LIST
 %%
@@ -119,6 +120,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | APPLY_UP END_COMMAND {
        	    hfst::xfst::xfst_->apply_up(stdin);
        }
+       | APPLY_UP APPLY_INPUT END_COMMAND {
+       	    hfst::xfst::xfst_->apply_up($2);
+       }
        | APPLY_UP NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->apply_up($2);
             free($2);
@@ -132,6 +136,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        }
        | APPLY_DOWN END_COMMAND {
             hfst::xfst::xfst_->apply_down(stdin);
+       }
+       | APPLY_DOWN APPLY_INPUT END_COMMAND {
+       	    hfst::xfst::xfst_->apply_down($2);
        }
        | APPLY_DOWN NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->apply_down($2);
