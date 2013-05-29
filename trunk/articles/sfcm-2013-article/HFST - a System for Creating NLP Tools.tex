@@ -51,7 +51,7 @@ The paper presents and evaluates various NLP tools that have been created using 
 % Krister
 In natural language processing, finite-state string transducer methods have been found useful for solving a number of practical problems ranging from language identification via morphological processing and generation to part-of-speech tagging and named-entity recognition as long as the problems lend themselves to a formulation based on matching and transforming local context.
 
-In this paper, we present and evaluate various tools that have been created using HFST--Helsinki Finite-State Technology\footnote{http://hfst.sf.net} and outline the minimal extensions that this has required to a pure FST system. In particular, we describe an implementation of p-match presented by Karttunen at SFCM 2011~\cite{karttunen/2011} and its application to a large-scale named-entity recognizer for Swedish.
+In this paper, we present and evaluate various tools that have been created using HFST--Helsinki Finite-State Technology\footnote{\url{http://hfst.sf.net}} and outline the minimal extensions that this has required to a pure FST system. In particular, we describe an implementation of p-match presented by Karttunen at SFCM 2011~\cite{karttunen/2011} and its application to a large-scale named-entity recognizer for Swedish.
 
 The paper is structured into Section~\ref{hfst:structural-layout} on applications and their evaluation. In Section~\ref{hfst:env-examples}, we present examples of user environments supported by HFST. In Section~\ref{hfst:solutions}, we present some of the solutions and extensions needed to implement the applications. This is followed by the Sections~\ref{hfst:discussion} and \ref{hfst:conclusion} with an outline of some future work and the discussion, respectively.
 
@@ -100,9 +100,9 @@ containing newspaper text. For Swedish, we used more general text.
 For Dutch we used the Alpino treebank~\cite{bouma/2000}, for English
 we used the Penn Treebank~\cite{marcus/1993}, for Estonian we used the
 Estonian National
-Corpus\footnote{http://www.cl.ut.ee/korpused/segakorpus/}, for
+Corpus\footnote{\url{http://www.cl.ut.ee/korpused/segakorpus/}}, for
 Finnish we used text from the largest Finnish newspaper Helsingin
-Sanomat year 1995\footnote{http://www.csc.fi/kielipankki/}, for
+Sanomat year 1995\footnote{\url{http://www.csc.fi/kielipankki/}}, for
 German we used the TIGER Corpus~\cite{brants/2002} and for Swedish we
 used Talbanken~\cite{einarsson/1976}.
 
@@ -228,7 +228,7 @@ as well as analysis. This is described in Section~\ref{sec:morph-generation}.
 
 \begin{sloppypar}
 Constructing a morphological guesser from
-OMorFi\footnote{http://code.google.com/p/omorfi/}--The open-source
+OMorFi\footnote{\url{http://code.google.com/p/omorfi/}}--The open-source
 Finnish morphology~\cite{pirinen/2008}, the three top guesses for
 ``twiitin'' are (the markup is slightly simplified): \small
 \begin{verbatim}
@@ -1116,7 +1116,7 @@ systems, including Cygwin under Windows, Mac OS X and Linux.
 Compilation is also possible on MinGW under Windows.
 
 Fresh versions of HFST source code can be fetched from our Subversion
-repository at Sourceforge\footnote{hfst.sf.net}. We also offer, approximately twice a month, new
+repository at Sourceforge\footnote{\url{http://hfst.sf.net}}. We also offer, approximately twice a month, new
 release packages that include a source tarball (compilable on all the
 aforementioned platforms), Debian binaries (for Linux), a MacPort
 distribution (for MacOS X) and an NSIS installer (for Windows).
@@ -1188,7 +1188,7 @@ hfst[1]:
 
 To test \verb+hfst-xfst2fst+, we have compiled 17 out of the 22 XFST exercises
 that are found on the homepage of Beesley and Karttunen's book Finite
-State Morphology. We have omitted the exercises that do not include an
+State Morphology\footnote{\url{http://www.fsmbook.com}}. We have omitted the exercises that do not include an
 answer. We have compiled the exercises
 using both Xerox's XFST and HFST's \texttt{hfst-xfst} and compared the results
 for equivalence. We have also tested the funcionality of the
