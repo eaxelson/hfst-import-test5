@@ -1,6 +1,6 @@
 #!/bin/sh
 
-exit 77;
+#exit 77;
 
 XFST_TOOL="../hfst-xfst2fst -s --pipe-mode"
 STRINGS2FST="../../hfst-strings2fst -S"
@@ -135,7 +135,8 @@ do
 	    echo "skipping missing test for "$testfile"..."
 	    continue
 	fi
-	if ! (cat $testfile.xfst | ../hfst-xfst2fst --pipe-mode -f $format -s > tmp); then
+        # apply up/down leak to stdout with readline..
+	if ! (cat $testfile.xfst | ../hfst-xfst2fst --no-readline -f $format -s > tmp); then
 	    echo "ERROR: in compiling "$testfile.xfst
 	    exit 1;
 	fi
@@ -164,6 +165,20 @@ do
 		exit 1;
 	    fi
 	done
+    done
+
+    for file in quit-on-fail.xfst
+    do
+        if (cat $file | ../hfst-xfst2fst -f $format > tmp 2> /dev/null); then
+            echo "ERROR: in compiling "$file
+            exit 1;
+        fi
+        if (grep '^fail' tmp > /dev/null); then
+            echo "ERROR: in testing "$file
+        fi
+        if ! (grep '^pass' tmp > /dev/null); then
+            echo "ERROR: in testing "$file
+        fi
     done
 
     rm -f result tmp1 tmp2 foo
