@@ -49,25 +49,25 @@ The paper presents and evaluates various NLP tools that have been created using 
 
 \section*{Introduction}
 % Krister
-In natural language processing, finite-state string transducer methods have been found useful for solving a number of practical problems ranging from language identification via morphological processing and generation to part-of-speech tagging and named-entity recognition as long as the problems lend them selves to a formulation based on matching and transforming local context.
+In natural language processing, finite-state string transducer methods have been found useful for solving a number of practical problems ranging from language identification via morphological processing and generation to part-of-speech tagging and named-entity recognition as long as the problems lend themselves to a formulation based on matching and transforming local context.
 
-In this paper, we present and evaluate various tools that have been created using HFST--Helsinki Finite-State Technology\footnote{http://hfst.sf.net} and outlines the minimal extensions that this has required to a pure FST system. In particular, we describe an implementation of p-match presented by Karttunen at SFCM 2011~\cite{karttunen/2011} and its application to a large-scale named-entity recognizer for Swedish.
+In this paper, we present and evaluate various tools that have been created using HFST--Helsinki Finite-State Technology\footnote{http://hfst.sf.net} and outline the minimal extensions that this has required to a pure FST system. In particular, we describe an implementation of p-match presented by Karttunen at SFCM 2011~\cite{karttunen/2011} and its application to a large-scale named-entity recognizer for Swedish.
 
 The paper is structured into Section~\ref{hfst:structural-layout} on applications and their evaluation. In Section~\ref{hfst:env-examples}, we present examples of user environments supported by HFST. In Section~\ref{hfst:solutions}, we present some of the solutions and extensions needed to implement the applications. This is followed by the Sections~\ref{hfst:discussion} and \ref{hfst:conclusion} with an outline of some future work and the discussion, respectively.
 
 \section{Applications and Tests}\label{hfst:structural-layout}
-In this section, we describe and evaluate some applications implemented with HFST. When processing text corpora, it is useful first to identify the language of the text before analyzing its words morphologically. Words unknown to the morphological lexicon need a guesser derived from the lexicon. The reverse operation of morphological analysis is morphological generation. Generating inflections of words unknown to the morphological lexicon can be used for eliciting information from native speakers before adding the words to the lexicon. For information extraction it is important to be able to identify multi-word expressions such as named entities, for which purpose HFST has a pattern matching tool. Finally, we also describe a traditional application area of finite-state morphology, i.e. spell-checking and spelling correction, which now gets a uniform implementation using weighted finite-state technology. 
+In this section, we describe and evaluate some applications implemented with HFST. When processing text corpora, it is useful first to identify the language of the text before analyzing its words morphologically. Words unknown to the morphological lexicon need a guesser derived from the lexicon. The reverse operation of morphological analysis is morphological generation. Generating inflections of words unknown to the morphological lexicon can be used for eliciting information from native speakers before adding the words to the lexicon. For information extraction, it is important to be able to identify multi-word expressions such as named entities, for which purpose HFST has a pattern matching tool. Finally, we also describe a traditional application area of finite-state morphology, i.e. spell-checking and spelling correction, which now gets a uniform implementation using weighted finite-state technology. 
 
 \subsection{Language identification}
 % Miikka
 Language identification is the task of recognizing the language of a
 text or text fragment. It is useful in applications that need to
 process documents written in various languages where the language
-might not be explicitly marked in the document. For example a translation
+might not be explicitly marked in the document. For example, a translation
 application might need to identify the language of a document in order
 to apply the correct translation model. Another example is a speller
-for Finnish, which might need to identify paragraphs that are written in
-English, in order not to perform spell-checking on the paragraphs.
+for Finnish, which might need to identify paragraphs written in
+English, in order not to spell-check those paragraphs.
 
 In this section we outline how to use HFST tagger tools and language
 identification tools for creating language identifiers. We also
@@ -137,8 +137,8 @@ languages.
 \begin{table}
 \small
 \begin{center}
-\caption{We give accuracy of the language guesser per language and for
-  all languages.}\label{tab:lang-id-acc}
+\caption{Accuracy of the language guesser per language and for
+  all languages}\label{tab:lang-id-acc}
 \begin{tabular}{l|l}
 Language & Accuracy\\
 \hline
@@ -155,11 +155,11 @@ ALL      & ~~~99.5\%
 \end{table}
 
 We ran the language identifier for test sentences from all six
-languages (totally 1200 sentences) and computed the accuracy of the
-language identification system as the $corr / all$, where $corr$ is
+languages (1200 sentences in total) and computed the accuracy of the
+language identification system as $corr / all$, where $corr$ is
 the number of sentences whose language was correctly guessed and $all$
 is the number of all sentences. In Table~\ref{tab:lang-id-acc}, we
-show results for each individual language and all languages
+show results for each individual language and all the languages
 combined. 
 
 Of all sentences, 99.5\% were correctly classified, which demonstrates
@@ -186,32 +186,32 @@ sentence as belonging to an unknown language.
 \label{sec: morph-guessers}
 % Juha, Miikka
 
-Language technological applications for agglutinating languages like
-Finnish and Hungarian benefit greatly from high coverage morphological
+Language technology applications for agglutinating languages such as
+Finnish and Hungarian benefit greatly from high-coverage morphological
 analyzers, which supply word forms with their morphological
 analyses. This makes applications dependent on the coverage of the
-morphological analyzer. Building a high coverage morphological
-analyzer (with recall over 95\%) is a substantial task and even with a
-high coverage analyzer domain specific vocabulary presents a
-challenge. Therefore accurate methods for dealing with out of
-vocabulary words are needed.
+morphological analyzer. Building a high-coverage morphological
+analyzer (with recall over 95\%) is a substantial task, and even with a
+high-coverage analyzer, domain-specific vocabulary presents a
+challenge. Therefore, accurate methods for dealing with
+out-of-vocabulary words are needed.
 
 With HFST tools it is possible to use an existing morphological
 analyzer to construct a morphological guesser based on word
-suffixes. Suffix based guessing is sufficient for many agglutinating
+suffixes. Suffix-based guessing is sufficient for many agglutinating
 languages such as Finnish~\cite{linden/2009/nodalida}, where most
 inflection and derivation is marked using suffixes. Even if a word is
 not recognized by the morphological analyzer, the analyzer is likely
-to recognize some words which inflect similarly as the unknown
+to recognize some words which inflect similarly to the unknown
 word. These can be used for guessing the inflection of the unknown
 word.
 
 Guessing of an unknown word like ``twiitin'' (the genitive form of
-``twiitti'' tweet in Finnish) is based on finding recognized word
-forms like ``sviitin'' (genitive form of ``sviitti'' hotel suite in
-Finnish), that have long suffixes such as ``-iitin'', which match the
+``twiitti'', tweet in Finnish) is based on finding recognized word
+forms like ``sviitin'' (genitive form of ``sviitti'', hotel suite in
+Finnish) that have long suffixes, such as ``-iitin'', which match the
 suffixes of the unrecognized word. The longer the common suffix, the
-likelier it is that the unrecognized word has the same inflection as
+more likely it is that the unrecognized word has the same inflection as
 the known word. The guesser will output morphological analyses for
 ``twiitin'' in order of likelihood.
 
@@ -223,7 +223,7 @@ be utilized.
 
 If the morphological analyzer marks declension class, the guesser can
 also be used for guessing the declension class. If the declension
-class is marked, the guesser can be used for generation of word forms
+class is marked, the guesser can be used for the generation of word forms
 as well as analysis. This is described in Section~\ref{sec:morph-generation}.
 
 \begin{sloppypar}
@@ -247,10 +247,10 @@ among others the noun ``sviitti''.
 
 \subsection{Language Generation for Out-of-Vocabulary Words}
 \label{sec:morph-generation}
-Natural language user interfaces like dialogue systems, need a
+Natural-language user interfaces, such as dialogue systems, need a
 language generation component for generating messages for the
 user. The aim is to supply the user with information about the
-internal state of some database containing information like airline
+internal state of some database containing information such as airline
 connections or weather phenomena.
 
 Language generation systems for agglutinating languages will benefit
@@ -292,17 +292,18 @@ the stem ``twiit'' is neutral with respect to vowel harmony.
 
 The morphological guesser has proven to be a useful tool when adding 
 large bulks of new vocabulary to a lexicon. We tested this on the Finnish Open Source
-lexcion OMorFi. According to our experience with handling ca. 260.000 proper nouns, the guesser achieved
+lexicon OMorFi. According to our experience with handling ca. 260.000 proper nouns, the guesser achieved
 roughly 90\% accuracy in assigning the correct inflection class to new
-lexicon entries on the first guess so the manual work needed was reduced to only
+lexicon entries on the first guess, so the manual work needed was reduced to only
 checking the guesser's results and correcting ca. 10\% of the suggested
 entries. 
 
-The names to be added to the lexicon were already in base form, so we could benefit from accepting only suggestions by the guesser in nominative case [CASE=NOM]. The data was presented to native speakers with key word forms generated for each entry so that they did not need to understand the linguistic encoding scheme:
+The names to be added to the lexicon were already in base form, so we
+could benefit from accepting only suggestions by the guesser in the nominative case \texttt{[CASE=NOM]}. The data was presented to native speakers with key word forms generated for each entry, so that they did not need to understand the linguistic encoding scheme:
 \small
 \begin{verbatim}
 Aura     9 Aura : Auraa : Aurat : Aurain, Aurojen : Auroja : Auroihin
-Oura    10 Oura :Ouraa : Ourat : Ourain, Ourien : Ouria : Ouriin
+Oura    10 Oura : Ouraa : Ourat : Ourain, Ourien : Ouria : Ouriin
 Pura    10 Pura : Puraa : Purat : Purain, Purien : Puria : Puriin
 Saura     9  Saura : Sauraa : Saurat : Saurain, Saurojen : Sauroja : Sauroihin
 Peura     9  Peura : Peuraa :  Peurat : Peurain, Peurojen : Peuroja : Peuroihin
@@ -330,7 +331,8 @@ the facts that the place names most often have endings corresponding
 to regular nouns, whereas the organization and company names often
 contain foreign and acronym components not recognized by the guesser.
 
-When doing bulk additions of large amounts of lexical entries based on their suffixes, it is practical to sort them in alphabetical order according to the end of the word. As the first guess was very often correct only one guess was provided. If the first guess is marked as incorrect by a native speaker, several words needing the same correction are likely to follow so its is quick to apply the same correction.
+When doing bulk additions of large numbers of lexical entries based on
+their suffixes, it is practical to sort the entries alphabetically according to the end of the word. As the first guess was very often correct, only one guess was provided. If the first guess is marked as incorrect by a native speaker, several words needing the same correction are likely to follow, so it is quick to apply the same correction.
 
 % \begin{table}
 % \small
@@ -429,7 +431,7 @@ The last batch of our proper names consisted of ca. 6,600
 organization names. These included mostly Finnish but to some extent
 also international companies, societies and other
 organizations. Before handling the organizations, the geographical
-names were incorporated into Omorfi and the guesser rebuilt. With this
+names were incorporated into Omorfi and the guesser was rebuilt. With this
 guesser, we got 86\% of the organization names correctly assigned 
 and 3\% correctly with some additions. This was a significant improvement over the 
 initial guesser.
@@ -483,39 +485,39 @@ initial guesser.
 % \item More?
 % \end{itemize}
 
-\subsection{Named Entity Recognition}
+\subsection{Named-Entity Recognition}
 % Jyrki, Juha (Sam?)
 Names of named entities are among the most important key words in information retrieval. In addition, names indicate agents and objects which are important in information extraction. Often named entities are denoted by multi-word expressions. In HFST, a pattern-matching tool, {\tt hfst-pmatch}, has been implemented for identifying multi-word expressions and recognizing named entities.
 
 \subsubsection{Background.}
 % An important application of the Pmatch tool is rule-based named entity
 % recognition (NER). 
-In his keynote speech at SFCM 2011, Karttunen presented toy examples of named entity recognition (NER) with
-his FST pattern matching tool (\texttt{pmatch}) \cite{karttunen/2011}. 
+In his keynote speech at SFCM 2011, Karttunen presented toy examples of named-entity recognition (NER) with
+his FST pattern matching tool (\texttt{pmatch})~\cite{karttunen/2011}. 
 The HFST Pmatch tool has been modelled after
 Karttunen's, but it is an independent implementation with
 some differences in features. We have
-converted a full-scale named entity recognizer for Swedish to use
+converted a full-scale named-entity recognizer for Swedish to use
 HFST Pmatch, and we are in the process of developing one for Finnish.
 
-A named entity recognizer marks names in a text, typically with
-information on the type (class) of the name \cite{nadeau/2007}. Major
+A named-entity recognizer marks names in a text, typically with
+information on the type (class) of the name~\cite{nadeau/2007}. Major
 types of names include persons, locations, organizations, events and
 works of art. NER tools often also recognize temporal and numeric
 expressions. Names and their types can be recognized based on internal
 evidence, i.e. the structure of the name itself (e.g., \textit{ACME
   Inc.} probably denotes a company), or based on external evidence,
 i.e. the context of the name (e.g., \textit{she works for ACME};
-\textit{ACME hired a new CEO}) \cite{mcdonald/1996}. In
+\textit{ACME hired a new CEO})~\cite{mcdonald/1996}. In
 addition, NER tools typically use gazetteers, lists of known names, to
 ensure that high-frequency names are recognized with the correct type.
 
-\subsubsection{Named Entity Recognition with Pmatch.}
+\subsubsection{Named-Entity Recognition with Pmatch.}
 \label{pmatch_for_ner}
 
 A key feature of Pmatch that makes it well-suited for NER is the ability
 to add XML-style tags around substrings matching a regular expression,
-as in \cite{karttunen/2011}. Such regular expressions are
+as in~\cite{karttunen/2011}. Such regular expressions are
 specified by suffixing the expression with
 \texttt{EndTag(\textit{TagName})}. For example, the following
 expressions mark company names ending in a company designator:
@@ -531,8 +533,8 @@ Define TOP CorpSuffix ;
 \noindent
 The built-in set \texttt{Whitespace} denotes any whitespace character
 and \texttt{UppercaseAlpha} any uppercase letter. String literals are
-enclosed in double quotation marks where Karttunen's FST uses curly braces
-\cite{karttunen/2011}.
+enclosed in double quotation marks where Karttunen's FST uses curly
+braces~\cite{karttunen/2011}.
 For matching, Pmatch considers the regular expression with the special
 name \texttt{TOP}. Thus, to be able to tag the company names with the
 expression \texttt{CorpSuffix}, \texttt{TOP} must refer to it.
@@ -556,7 +558,7 @@ merger with <EnamexOrgCrp>Home Computers Inc</EnamexOrgCrp> .
 
 Pmatch considers leftmost longest matches of \texttt{TOP} in the input
 and adds the tags specified in \texttt{TOP} or the expressions to
-which it refers. If several subexpressions have the same leftmost
+which \texttt{TOP} refers. If several subexpressions have the same leftmost
 longest match in the input, it is unspecified (but deterministic)
 which one Pmatch
 chooses. To disambiguate between matches, context conditions can be
@@ -598,7 +600,7 @@ For example:
 Rörelseresultatet för <EnamexOrgCrp>Comp Systems</EnamexOrgCrp> ...
 \end{verbatim}
 
-As in \cite{karttunen/2011}, the regular expression in \texttt{LC()}
+As in~\cite{karttunen/2011}, the regular expression in \texttt{LC()}
 specifies a left context that must precede the actual match.
 Similarly, \texttt{RC()}
 specifies a right context that must follow the match. \texttt{NLC()}
@@ -635,7 +637,7 @@ Context conditions may be combined with conjunction and disjunction.
 
 Conjunctive context conditions can also be specified at several stages in the
 expressions. For example, a name is marked as a sports event by the
-following expressions only if it is followed by a space and
+following expressions only if it is followed by a space and the word
 \textit{spelades} (`was played') (right context expression from
 \texttt{EvnAtlIntl}) and preceded by a space or sentence boundary
 (\texttt{\#}) (left context expression from \texttt{TOP}):
@@ -649,7 +651,7 @@ Define TOP EvnAtlIntl LC(Whitespace | #) ;
 \noindent
 In this case, the left context condition in \texttt{TOP} is considered
 for all the \texttt{EndTag} expressions contained or included in
-\texttt{TOP}. Karttunen \cite{karttunen/2011} does not mention if his
+\texttt{TOP}. Karttunen~\cite{karttunen/2011} does not mention if his
 system can combine multiple context conditions in a similar way.
 
 % \subsubsection{Transductions with Pmatch.}
@@ -685,10 +687,10 @@ system can combine multiple context conditions in a similar way.
 % ... säger Computers vd <EnamexPrsHum>Svensson</EnamexPrsHum>
 % \end{verbatim}
 
-\subsubsection{Converting a Swedish Named Entity Recognizer to Use
+\subsubsection{Converting a Swedish Named-Entity Recognizer to Use
   Pmatch.}
 
-We have converted a Swedish named entity recognizer \cite{kokkinakis/2003}
+We have converted a Swedish named-entity recognizer~\cite{kokkinakis/2003}
 developed at the University of Gothenburg to use Pmatch.
 The Swedish NER tool works on tokenized running text
 input: punctuation marks are separated from words by spaces but the
@@ -697,7 +699,7 @@ Finnish NER tool will work on annotated text, which makes it easier to
 write more general rules, in particular for a morphologically rich
 language such as Finnish.
 
-The original implementation of the Swedish NER tool
+The original implementation of the Swedish NER tool~\cite{kokkinakis/2003}
 contained 24 different recognizers running in a
 pipeline and a correction filter run after each stage. 21 of the
 recognizers and the correction filter had been written using
@@ -829,7 +831,7 @@ Define TOP [LocStr | PrsHum | ...] LC(Boundary) RC(Boundary) ;
 \noindent
 The context conditions in \texttt{TOP} allow a name to be recognized
 only at word boundaries. The name lists could be replaced with
-full-fledged morphological analyzers allowing recognition
+full-fledged morphological analyzers allowing the recognition
 of inflected words or names.
 
 % \begin{verbatim}
@@ -924,7 +926,7 @@ and the slowest one from 288 minutes (almost five hours) to 54 minutes.
 We will also investigate further
 ways to improve compilation speed. In contrast, at run time the Pmatch
 NER recognizers were about three times slower on the average
-than the Flex NER ones.
+than the Flex ones.
 % This speed required the use of a left context condition
 % of a whitespace or sentence boundary; without the context, the running
 % times were many times longer.
@@ -934,7 +936,7 @@ FSTs for the Swedish NER is over three gigabytes, which is about eight times as 
 executables compiled from the Flex files. However, the FST sizes
 will be reduced as soon as expression caching and sequentialization
 are implemented in Pmatch. Using a recursive transition network
-feature similar to Karttunen's \cite{karttunen/2011} \texttt{Ins()}
+feature similar to Karttunen's~\cite{karttunen/2011} \texttt{Ins()}
 will further reduce the FSTs and their compile times.
 
 \subsection{Spell-checking}
@@ -982,10 +984,10 @@ word-forms of a language. The spelling correction is $(w \circ E \circ L)_1$,
 where $E$ is a two-tape automaton containing the error model, and $_1$ is
 a projection to the surface language.
 
-As an example of the simplicity of this process, we obtained an open source
+As an example of the simplicity of this process, we obtained an open-source
 German morphological analyzer
 morphisto\footnote{\url{http://code.google.com/p/morphisto/}} to generate a
-spell-checker, trained it with word-forms extracted from German
+spell-checker, trained it with word-forms extracted from the German
 Wikipedia\footnote{\url{http://de.wikipedia.org}} and applied it to Wikipedia
 data to find spelling errors and correct them. The whole script for this can be found
 in our version
@@ -1067,7 +1069,7 @@ auxiliary followed by a lexical verb and a noun phrase is an adjective and a nou
 in an agreeing case.  The three pairs of words can be identified as common
 chunks in Finnish and having specific rules for these pairs
 will give a reasonable baseline surface syntax for applications where a more
-elaborate syntactical structure is not required.
+elaborate syntactic structure is not required.
 
 \subsubsection{A Chatroom Morphology Tool.}
 % Sam
@@ -1113,9 +1115,9 @@ current versions are available or compilable on all POSIX-supporting
 systems, including Cygwin under Windows, Mac OS X and Linux. 
 Compilation is also possible on MinGW under Windows.
 
-Fresh versions of HFST source code can be fetched from our svn
+Fresh versions of HFST source code can be fetched from our Subversion
 repository at Sourceforge\footnote{hfst.sf.net}. We also offer, approximately twice a month, new
-release packages that include a source tarball (compilable on all
+release packages that include a source tarball (compilable on all the
 aforementioned platforms), Debian binaries (for Linux), a MacPort
 distribution (for MacOS X) and an NSIS installer (for Windows).
 
@@ -1123,16 +1125,17 @@ distribution (for MacOS X) and an NSIS installer (for Windows).
 % Erik
 
 We offer four new command line tools since 2011. The most important are the native XFST
-parser hfst-xfst and the tagging tool hfst-tagger. Also two functions
+parser \texttt{hfst-xfst} and the tagging tool \texttt{hfst-tagger}. Also two functions
 that were earlier available only through the API can now be used as
-command line tools: hfst-shuffle and hfst-prune-alphabet. The former is a special operation 
-that freely interleaves the symbols of any two strings recognized by respective transducers.    
+command-line tools: \texttt{hfst-shuffle} and \texttt{hfst-prune-alphabet}. The former is a special operation 
+that freely interleaves the symbols of any two strings recognized by
+the respective transducers.    
 The latter removes symbols that do not occur in the transitions of the transducer from its alphabet. 
 Two existing tools that perform transducer-to-text conversion also have new features: 
-hfst-fst2txt can write to dot/graphviz
-and PCKIMMO format and hfst-fst2strings has a new parameter that
+\texttt{hfst-fst2txt} can write to dot/graphviz
+and PCKIMMO format and \texttt{hfst-fst2strings} has a new parameter that
 controls its output to achieve better interoperability with other
-command line tools.
+command-line tools.
 
 There is some additional control over special symbols as we have added a parameter
 for binary operators controlling whether unknown and identity transitions
@@ -1143,29 +1146,29 @@ transition in a given state matches.
 We have kept the number of dependencies in HFST as low as possible.
 All back-ends (SFST, OpenFst and foma) are now bundled with
 HFST. There is no longer a need to install them separately or worry about
-having the right version. We also made modifications to the
-back-end libraries, for instance some of the compile time warnings are now fixed or
-suppressed. GNU- and bash-specific commands were also removed from
+having the right version. We have also made modifications to the
+back-end libraries; for instance, some of the compile-time warnings are now fixed or
+suppressed. GNU- and Bash-specific commands were also removed from
 the scripts to make them more portable.
 
 \section{Under the Hood}\label{hfst:solutions}
 
-In the following section, we describe some of the technical solutions required to implement the HFST library and the applications addressed in the previous sections as well as some minor design differences with regard to XFST.
+In the following section, we describe some of the technical solutions required to implement the HFST library and the applications addressed in the previous sections, as well as some minor design differences with regard to XFST.
 
 \subsection{An independent XFST module}
 % Erik (Erik)
 
-The HFST command line tools include an XFST parser tool that can be used
+The HFST command-line tools include an XFST parser tool that can be used
 in interactive mode or to compile script files. The tool implements the
 same functionalities as the original XFST (Xerox Finite-State Tool)
 which is a general-purpose utility for computing with finite-state
-networks. There are over 100 commands in hfst-xfst, the same as those documented in the
+networks. There are over 100 commands in \texttt{hfst-xfst}, the same as those documented in the
 Xerox tool. In addition, there is an option to independently use
-the regular expression parser which the hfst-xfst module was built on through the
+the regular expression parser which the \texttt{hfst-xfst} module was built on through the
 \verb+hfst-regexp2fst+ tool for those who wish to parse
-regular expressions in bash scripts.
+regular expressions in Bash scripts.
 
-Below is an example of using hfst-xfst in interactive
+Below is an example of using \texttt{hfst-xfst} in interactive
 mode where we define two transducer variables, use them in a regular
 expression and print random words recognized by the expression.
 
@@ -1187,10 +1190,10 @@ To test \verb+hfst-xfst2fst+, we have compiled 17 out of the 22 XFST exercises
 that are found on the homepage of Beesley and Karttunen's book Finite
 State Morphology. We have omitted the exercises that do not include an
 answer. We have compiled the exercises
-using both Xerox's XFST and HFST's hfst-xfst and compared the results
+using both Xerox's XFST and HFST's \texttt{hfst-xfst} and compared the results
 for equivalence. We have also tested the funcionality of the
 \verb+hfst-regexp2fst+ tool by rewriting the original exercises
-using hfst command line tools (other than hfst-xfst).
+using HFST command line tools (other than \texttt{hfst-xfst}).
 
 % Senka, Miikka
 Although we are aiming at complete backward compability with XFST, we
@@ -1257,9 +1260,11 @@ rule), \textbf{complement}, \textbf{containments}, \textbf{intersection},
 \textbf{minus}. However, it seems that XFST prunes the alphabet only if at
 least one of the operands contains the unknown symbol and if the result does not
 contain the any symbol. Therefore, if the above commands were run in the \verb+hfst-xfst2fst+
-environment, the resulting alphabet is different from that of XFST being in both cases \verb+a+, \verb+b+.
+environment, the resulting alphabet is different from that of XFST,
+being \verb+a+, \verb+b+ in both cases.
 
-In HFST, the alphabet pruning only removes symbols from the alphabet if pruning has no effect on the function of the transducer.
+In HFST, the alphabet pruning only removes symbols from the alphabet
+if the pruning has no effect on the function of the transducer.
 Therefore, we have not managed to find an example in which the above difference influences
 the correctness of the result, but pruning the alphabet results in a slightly smaller transducer.
 
@@ -1270,7 +1275,7 @@ in~\cite{karttunen/2011}, while
 of obvious practical interest, lacked a free implementation and certain
 useful features, such as flag diacritics. The idea of implementing
 something similar for an existing FST library became apparent, and
-ultimately the HFST team became motivated to design a rule-based named entity
+ultimately the HFST team became motivated to design a rule-based named-entity
 recogniser (NER) by first implementing a subset of Pmatch deemed
 necessary for that purpose. Beyond the tagging concept,
 runtime contexts, named subnetworks and various utilities were most crucial and
@@ -1280,23 +1285,25 @@ An overview of the relevant features is presented in Section~\ref{pmatch_for_ner
 Building on an existing Xerox-oriented regex parser API (in \verb+libhfst+) and a
 runtime-oriented transducer format with support for flag diacritics
 (\verb+hfst-optimized-lookup+, see \cite{silfverberg/2009} and
-\cite{hfst/2011}), remaining requisites were
+\cite{hfst/2011}), the remaining requisites were:
 
 \begin{enumerate}
 \item A mechanism for naming and retrieving transducers during compilation.
 \item A scheme of control symbols to direct the runtime operation of the matching.
 \item Logic for compiling new features.
 \item A runtime tool that particularly needs to deal with the non-FST or
-state-preserving aspects of pmatch.
+state-preserving aspects of Pmatch.
 \end{enumerate}
 
 We will first overview the details of some features.
 
-\subsubsection{Named Entity Tagging.}
+\subsubsection{Named-Entity Tagging.}
 A straightforward way to accomplish tagging at the beginning and end of matches
 of first, last and complete names might look like this:
 
+\noindent
 \begin{tikzpicture}[shorten >=1pt,node distance=2.8cm,auto,on grid] 
+\small
    \node[state,initial] (q_0)   {$q_0$}; 
    \node[state] (q_1) [above right=of q_0] {$q_1$}; 
    \node[state] (q_2) [right=of q_0] {$q_2$}; 
@@ -1324,7 +1331,7 @@ large lists and multiple sources of this type of ambiguity, size inefficiencies
 can become serious.
 
 One idea of Pmatch was to recognise the shared prefix in the first name ``John''
-and the entire name ``John Bardin'' and defer tag-writing until the entity
+and the entire name ``John Bardin'' and to defer tag-writing until the entity
 has become unambiguous. In HFST, this is accomplished by detecting the tag directive
 during compilation and prefixing the subnetwork in question with an entry marker.
 After matching is complete, the entry marker is resolved in linear time with
@@ -1344,7 +1351,9 @@ for each symbol in result:
 
 With just the entry and end tags, the network simplifies to:
 
-\begin{tikzpicture}[shorten >=1pt,node distance=3cm,auto,on grid] 
+\noindent
+\begin{tikzpicture}[shorten >=1pt,node distance=2.8cm,auto,on grid] 
+\small
    \node[state,initial] (q_0)   {$q_0$}; 
    \node[state] (q_1) [right=of q_0] {$q_1$}; 
    \node[state] (q_2) [above right=of q_1] {$q_2$}; 
@@ -1376,9 +1385,9 @@ matching in a state stack.
 Additionally, a stack for preserving the input tape position
 and the output tape content during each RTN (recursive transition
 network) invocation must be kept separately from the runtime
-context-checking stack. Otherwise, transition data is not duplicated
+context-checking stack. Otherwise, transition data is not duplicated,
 and these stacks are the only arbitrary amounts of memory reserved
-for accomplishing non-finite state extensions.
+for accomplishing non-finite-state extensions.
 
 \subsubsection{Transduction.}
 Each matching rule is by default compiled as an identity transduction.
@@ -1389,7 +1398,7 @@ performed with automata, but with arbitrary transducers.
 
 \section{Future Work}\label{hfst:discussion}
 
-The idea of combining linguistic rules and statistical models is intriguing but non-trivial. However, a pure finite-state left-to-right system is likely to be less efficient for syntactic parsing than a chart-based system so the solution is probably to add linguistic constraints in the form of weighted finite-state constraints to a statistical parser before estimating the weights.
+The idea of combining linguistic rules and statistical models is intriguing but non-trivial. However, a pure finite-state left-to-right system is likely to be less efficient for syntactic parsing than a chart-based system, so the solution is probably to add linguistic constraints in the form of weighted finite-state constraints to a statistical parser before estimating the weights.
 
 % Miikka
 While existing statistical models like HMMs and PCFGs can incorporate
@@ -1397,7 +1406,7 @@ much useful information for tasks like part-of-speech tagging and
 syntactic parsing, there are phenomena like non-local congruence which are
 too complex to estimate for these models. Probably because of this, there
 has been a growing interest in combining rule-based and statistical
-methods in core NLP tasks like part-of-speech tagging and syntactic
+methods in core NLP tasks, such as part-of-speech tagging and syntactic
 parsing~\cite{manning/2011}. Such a combination presents challenges
 both for statistical estimation and inference methods and for the
 representation of linguistic information in a way which is compatible
@@ -1407,13 +1416,13 @@ Finite-state transducers and automata can be used for expressing
 linguistically relevant phenomena for tagging and parsing as regular
 string sets. The validity of this approach is demonstrated by the
 success of parsing systems like Constraint
-Grammar~\cite{karlsson/1990} which utilizes finite-state
+Grammar~\cite{karlsson/1990}, which utilizes finite-state
 constraints. Weighted machines offer the added benefit of expressing
 phenomena as fuzzy sets in a compact way. This makes them an excellent
 candidate for adding linguistic knowledge to statistical models.
 
 \section{Conclusion}\label{hfst:conclusion}
-The paper presented various NLP tools implemented with HFST and the minimal extensions they required to a pure finite-state system. In particular, the paper described an implementation of a full-scale named-entity recognizer for Swedish using p-match achieving a 10-fold compile time speed up compared with the original flex implementation.
+The paper presented various NLP tools implemented with HFST and the minimal extensions they required to a pure finite-state system. In particular, the paper described an implementation of a full-scale named-entity recognizer for Swedish using p-match achieving a 10-fold compile-time speed-up compared with the original Flex implementation.
 
 \subsubsection*{Acknowledgments}
 The research leading to these results has received funding from FIN-CLARIN, Langnet and the
