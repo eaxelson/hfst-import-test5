@@ -139,6 +139,7 @@ parse_options(int argc, char** argv)
             break;
           case 'p':
             pipemode = true;
+            use_readline = false;
             break;
           case 'r':
             use_readline = false;
@@ -265,6 +266,7 @@ int main(int argc, char** argv)
   if (pipemode) 
     {
       verbose_printf("Reading from standard input...\n");
+      comp.setReadInteractiveTextFromStdin(false);
       if (parse_file("<stdin>", comp) == EXIT_FAILURE)
         //if (0 != comp.parse(stdin)) segfaults with scriptfiles..
         {
@@ -284,6 +286,7 @@ int main(int argc, char** argv)
     {
       verbose_printf("Starting interactive mode...\n");
       comp.setPromptVerbosity(!silent);
+      comp.setReadInteractiveTextFromStdin(true);
       if (!silent)
         comp.prompt();
       // support for backspace
@@ -323,6 +326,7 @@ int main(int argc, char** argv)
 
       verbose_printf("Starting interactive mode...\n");
       comp.setPromptVerbosity(false); // prompts handled manually
+      comp.setReadInteractiveTextFromStdin(true);
       char *buf = NULL;               // result from readline
       rl_bind_key('\t',rl_abort);     // disable auto-complet
       std::string expression = "";    // the whole expression (possibly several lines)

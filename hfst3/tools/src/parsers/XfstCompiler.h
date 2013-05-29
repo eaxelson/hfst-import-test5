@@ -465,6 +465,12 @@ class XfstCompiler
   int parse_line(std::string line);
   //! @brief Use readline library to read input in apply up etc.
   XfstCompiler& setReadline(bool readline);
+  //! @brief Read input from stdin in apply up etc.
+  XfstCompiler& setReadInteractiveTextFromStdin(bool value);
+  //! @brief Whether readline is used.
+  bool getReadline();
+  //! @brief Whether stdin is used.
+  bool getReadInteractiveTextFromStdin();
   //! @brief Print prompts and XFST outputs
   XfstCompiler& setVerbosity(bool verbosity);
   //! @brief Print prompts
@@ -546,6 +552,7 @@ class XfstCompiler
   XfstCompiler& read_prop_line(char* line);
 
   bool use_readline_;
+  bool read_interactive_text_from_stdin_;
   hfst::xre::XreCompiler xre_;
   hfst::lexc::LexcCompiler lexc_;
 #if HAVE_TWOLC

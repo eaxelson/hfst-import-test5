@@ -72,6 +72,7 @@ namespace xfst {
   
     XfstCompiler::XfstCompiler() :
         use_readline_(false),
+        read_interactive_text_from_stdin_(false),
         xre_(hfst::TROPICAL_OPENFST_TYPE),
         format_(hfst::TROPICAL_OPENFST_TYPE),
         verbose_(false),
@@ -106,6 +107,7 @@ namespace xfst {
         
 XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         use_readline_(false),
+        read_interactive_text_from_stdin_(false),
         xre_(impl),
         format_(impl),
         verbose_(false),
@@ -462,7 +464,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       {
         char* s = strdup(indata);
         char* line = strtok(s, "\n");
-        while (line != NULL)
+        while (line != NULL && (strcmp(line, "<ctrl-d>") != 0))
           {
             apply_up_line(line);
             line = strtok(NULL, "\n");
@@ -483,7 +485,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       {
         char* s = strdup(indata);
         char* line = strtok(s, "\n");
-        while (line != NULL)
+        while (line != NULL && (strcmp(line, "<ctrl-d>") != 0))
           {
             apply_down_line(line);
             line = strtok(NULL, "\n");
@@ -3186,6 +3188,22 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   {
     use_readline_ = readline;
     return *this;
+  }
+  XfstCompiler&
+  XfstCompiler::setReadInteractiveTextFromStdin(bool value)
+  {
+    read_interactive_text_from_stdin_ = value;
+    return *this;
+  }
+  bool
+  XfstCompiler::getReadline()
+  {
+    return use_readline_;
+  }
+  bool
+  XfstCompiler::getReadInteractiveTextFromStdin()
+  {
+    return read_interactive_text_from_stdin_;
   }
   XfstCompiler& 
   XfstCompiler::setVerbosity(bool verbosity)

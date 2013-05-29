@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#exit 77;
+exit 77;
 
 XFST_TOOL="../hfst-xfst2fst -s --pipe-mode"
 STRINGS2FST="../../hfst-strings2fst -S"
@@ -136,7 +136,7 @@ do
 	    continue
 	fi
         # apply up/down leak to stdout with readline..
-	if ! (cat $testfile.xfst | ../hfst-xfst2fst --no-readline -f $format -s > tmp); then
+	if ! (cat $testfile.xfst | ../hfst-xfst2fst --pipe-mode -f $format -s > tmp); then
 	    echo "ERROR: in compiling "$testfile.xfst
 	    exit 1;
 	fi
