@@ -343,7 +343,7 @@ get_weight(const char *s)
 
 std::map<std::string, HfstTransducer*>
 compile(const string& pmatch, map<string,HfstTransducer*>& defs,
-        ImplementationType impl)
+        ImplementationType impl, bool verbose)
 {
     // lock here?
     definitions.clear();
@@ -373,6 +373,9 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     }
     for (std::map<std::string, hfst::HfstTransducer*>::const_iterator it =
              definitions.begin(); it != definitions.end(); ++it) {
+        if (verbose) {
+            print_size_info(it->second);
+        }
         // We keep TOP and any inserted transducers
         if (it->first.compare("TOP") == 0 ||
             inserted_transducers.count(it->first) != 0) {
@@ -382,6 +385,23 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         }
     }
     return retval;
+}
+
+void print_size_info(HfstTransducer * net)
+{
+    HfstBasicTransducer tmp(*net);
+    size_t states = 0;
+    size_t arcs = 0;
+    for(HfstBasicTransducer::const_iterator state_it = tmp.begin();
+        state_it != tmp.end(); ++state_it) {
+        ++states;
+        for(HfstBasicTransducer::HfstTransitions::const_iterator tr_it =
+                state_it->begin(); tr_it != state_it->end(); ++tr_it) {
+            ++arcs;
+        }
+    }
+    std::cerr << net->get_name() << " has " << states << " states and " <<
+        arcs << " arcs" << std::endl;;
 }
 
 HfstTransducer * read_text(char * filename, ImplementationType type)

@@ -78,7 +78,10 @@ double get_weight(const char* s);
 std::map<std::string, HfstTransducer*>
     compile(const std::string& pmatch,
             std::map<std::string,hfst::HfstTransducer*>& defs,
-            hfst::ImplementationType type);
+            hfst::ImplementationType type,
+            bool verbose);
+
+void print_size_info(HfstTransducer * net);
 
 /**
  * @brief Given a text file, read it line by line and return an acceptor
