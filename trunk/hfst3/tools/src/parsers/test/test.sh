@@ -1,6 +1,6 @@
 #!/bin/sh
 
-exit 77;
+#exit 77;
 
 XFST_TOOL="../hfst-xfst2fst -s --pipe-mode"
 STRINGS2FST="../../hfst-strings2fst -S"
