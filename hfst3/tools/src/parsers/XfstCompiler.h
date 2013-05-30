@@ -431,70 +431,105 @@ class XfstCompiler
   XfstCompiler& compile_replace_upper_net();
 
 
-  /* This function is used by xfst lexer to determine where a regex starting from 
-     \a indata ends. 
-     It needs to parse \a chars_read characters from \a indata. The resulting
-     transducer is stored in variable 'latest_regex_compiled'. 
-
-     For example, if we have the input
+  /* Compile a regex string starting from \a indata, store the resulting
+     transducer to variable XfstCompiler::latest_regex_compiled and 
+     store the number of characters read from \a indata to \a chars_read.
+     
+     This function is used by the xfst lexer to determine where a regex 
+     starting from \a indata ends. For example, if we have the input
      
      regex foo:bar ! this is a comment with a semicolon;
      baz;
      print net
 
-     the xfst lexer would read "regex" and then call 'compile_regex' on the substring
-     starting right after "regex". 'compile_regex' would then read until the semicolon
-     ending the regex, i.e. the one right after "baz" and store the resulting transducer
-     to 'latest_regex_compiled'.
+     the xfst lexer would read "regex" and then call 'compile_regex' on
+     the substring starting right after "regex". 'compile_regex' would
+     then read until the semicolon ending the regex, i.e. the one right
+     after "baz" and store the resulting transducer to 
+     'latest_regex_compiled'.
 
-     The xfst lexer could then put back all characters after index chars_read and
-     continue lexical analysis there, i.e. from "print net".
+     The xfst lexer could then put back all characters after index
+     chars_read and continue lexical analysis there, i.e. from
+     "print net".
   */
   XfstCompiler& compile_regex(const char * indata, unsigned int & chars_read);
 
   //! @brief Sekrit HFST raw command mode!
-  XfstCompiler& hfst(const char* data);
+  XfstCompiler& hfst(const char * data);
   //! @brief Get current stack of compiler
   const std::stack<HfstTransducer*>& get_stack() const;
   //! @brief Parse from @a infile
-  int parse(FILE* infile);
+  int parse(FILE * infile);
   //! @brief Parse @a filename
-  int parse(const char* filename);
+  int parse(const char * filename);
   //! @brief Parse @a line
-  int parse_line(char line[]);
+  int parse_line(char line []);
   int parse_line(std::string line);
-  //! @brief Use readline library to read input in apply up etc.
+  //! @brief Define whether readline library is used to read input in apply up etc.
   XfstCompiler& setReadline(bool readline);
-  //! @brief Read input from stdin in apply up etc.
+  //! @brief Define whether input is read from stdin in apply up etc.
   XfstCompiler& setReadInteractiveTextFromStdin(bool value);
-  //! @brief Whether readline is used.
+  //! @brief Whether readline is used to read input in apply up etc.
   bool getReadline();
-  //! @brief Whether stdin is used.
+  //! @brief Whether stdin is used to read input in apply up etc.
   bool getReadInteractiveTextFromStdin();
-  //! @brief Print prompts and XFST outputs
+  //! @brief Define wheter prompts and XFST outputs are printed.
   XfstCompiler& setVerbosity(bool verbosity);
-  //! @brief Print prompts
+  //! @brief Define wheter prompts are printed.
   XfstCompiler& setPromptVerbosity(bool verbosity);
-  //! @brief Explicitly print the prompt
+  //! @brief Explicitly print the prompt to stdout.
   const XfstCompiler& prompt() const;
-  //! @brief Get the prompt
+  //! @brief Get the prompt string.
   char* get_prompt() const;
 
  protected:
-  XfstCompiler& print_apply_prompt(ApplyDirection direction);
+  //! @brief Get the prompt that is used when applying up or down 
+  //! (as specified by \a direction).
+  const char* get_apply_prompt(ApplyDirection direction);
+  //! @brief Get the print symbol for \a symbol.
+  //! @see print_flags
   const char* get_print_symbol(const char* symbol);
+  //! @brief Print \a n first paths (or all, if n is negative) 
+  //! from \a paths to \a outfile.
   XfstCompiler& print_paths(const hfst::HfstTwoLevelPaths &paths, 
                             FILE* outfile=stdout, int n=-1);
+  //! @brief Print \a n first paths (or all, if n is negative) 
+  //! from \a paths to \a outfile.
   XfstCompiler& print_paths(const hfst::HfstOneLevelPaths &paths, 
                             FILE* outfile=stdout, int n=-1);
+  //! @brief Print the longest string of topmost transducer in the stack
+  //! (if print_size is false) or the size of that string (if print_size is true) 
+  //! to \a outfile.
   XfstCompiler& print_longest_string_or_its_size(FILE* outfile, bool print_size);
-  XfstCompiler& print_words(const char* name, unsigned int number,
-                            FILE* outfile, Level level);
+  //! @brief Try to extract a maximum of \a number paths from topmost
+  //! transducer in the stack and print them to \a outfile. \a level
+  //! defines whether the input or output level is printed or both are printed.
+  XfstCompiler& print_words(unsigned int number,
+                            FILE * outfile, Level level);
+  //! @brief Read strings (with or without spaces between the symbols,
+  //! as defined by \a spaces) from \a infile, disjunct them into
+  //! a single transducer and push it to the stack.
   XfstCompiler& read_text_or_spaced(FILE *infile, bool spaces);
+  //! @brief Read transducers from file \a infilename and either push
+  //! them to the stack (if \a definitions is false) or add them as definitions
+  //! (if \a definitions is true).
+  //!
+  //! Transducers are pushed to the stack in the order they are read from the file.
+  //! This is because 'write_stack' writes the transducers starting from the 
+  //! bottom-most transducer in the stack.
+  //!
+  //! Definitions are added using the function 'add_loaded_definition'.
   XfstCompiler& load_stack_or_definitions(const char *infilename, bool definitions);
+
+  //! @brief Add a transducer definition with name given by 't.get_name()'
+  //! and value \a t.
+  //! If a transducer with the same name exists, it is overwritten.
+  //! If 't.get_name()' gives an empty string, no definition is added.
+  //! In both cases, a warning message is printed.
   XfstCompiler& add_loaded_definition(HfstTransducer * t);
 
-  // exit with failure status if quit-on-fail is ON
+  //! @brief Exit with failure status if quit-on-fail is ON, 
+  //! else do nothing.
   void xfst_fail();
 
   //! @brief Perform lookup on the top transducer using strings in \a infile.
@@ -529,9 +564,11 @@ class XfstCompiler
   HfstTransducer * top();
 
   //! @brief Get next line from \a file. Return NULL if end of file is reached.
-  char * xfst_getline(FILE * file);
+  //! Use \a promptstr as prompt for readline, or print it to stderr if readline is not in use.
+  char * xfst_getline(FILE * file, const std::string & promptstr = "");
   
-  char * remove_newline(char *);
+  //! @brief Remove newline ('\n' and '\r') from the end of \a str. 
+  char * remove_newline(char * str);
 
   //! @brief Get current readline history index.
   int current_history_index();

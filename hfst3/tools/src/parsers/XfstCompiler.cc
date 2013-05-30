@@ -398,34 +398,35 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         return *this;
       }
 
-  XfstCompiler&
-  XfstCompiler::print_apply_prompt(ApplyDirection direction)
+  const char *
+  XfstCompiler::get_apply_prompt(ApplyDirection direction)
   {
     if (! verbose_) {
-      return *this;
+      return "";
     }
     if (direction == APPLY_UP_DIRECTION) {
-      fprintf(stdout, "apply up> ");
+      return "apply up> ";
     }
     else if (direction == APPLY_DOWN_DIRECTION) {
-      fprintf(stdout, "apply down> ");
+      return "apply down> ";
     }
-    return *this;
+    return "";
   }
 
     XfstCompiler&
     XfstCompiler::apply(FILE* infile, ApplyDirection direction)
       {
         char * line = NULL;
+        const char * promptstr = "";
 
         if (infile == stdin)
-          print_apply_prompt(direction);
+          promptstr = get_apply_prompt(direction);
 
         int ind = current_history_index();
 
         bool ctrl_d_end = false;
 
-        while ((line = xfst_getline(infile)) != NULL)
+        while ((line = xfst_getline(infile, promptstr)) != NULL)
           {
             if (strcmp(line, "<ctrl-d>") == 0 || strcmp(line, "<ctrl-d>\n") == 0)
               {
@@ -439,11 +440,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             else if (direction == APPLY_DOWN_DIRECTION) {
               apply_down_line(line);
             }
-            
-            if (infile == stdin) {
-              print_apply_prompt(direction);
-            }
           }
+
         if (infile == stdin && ! ctrl_d_end)
           fprintf(stdout, "\n");
 
@@ -1822,7 +1820,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
                                   unsigned int number,
                                   FILE* outfile)
     {
-      return print_words("", number, outfile, LOWER_LEVEL);
+      return print_words(number, outfile, LOWER_LEVEL);
     }
   XfstCompiler& 
   XfstCompiler::print_random_lower(unsigned int number, FILE* outfile)
@@ -1839,7 +1837,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::print_upper_words(const char* /* name */, unsigned int number,
                                   FILE* outfile)
     {
-      return print_words("", number, outfile, UPPER_LEVEL);
+      return print_words(number, outfile, UPPER_LEVEL);
     }
   XfstCompiler&
   XfstCompiler::print_random_upper(unsigned int number, FILE* outfile)
@@ -1854,14 +1852,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     }
 
   XfstCompiler& 
-  XfstCompiler::print_words(const char* /* name */, unsigned int number,
+  XfstCompiler::print_words(unsigned int number,
                             FILE* outfile)
   {
-    return print_words("", number, outfile, BOTH_LEVELS);
+    return print_words(number, outfile, BOTH_LEVELS);
   }
 
   XfstCompiler& 
-  XfstCompiler::print_words(const char* /* name */, unsigned int number,
+  XfstCompiler::print_words(unsigned int number,
                             FILE* outfile, Level level)
     {
       HfstTransducer * tmp = this->top();
@@ -2864,7 +2862,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     return line;
   }
 
-  char * XfstCompiler::xfst_getline(FILE * file)
+  char * XfstCompiler::xfst_getline(FILE * file, const std::string & promptstr)
   {
 #ifdef HAVE_READLINE
     if (use_readline_)
@@ -2872,7 +2870,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         char *buf = NULL;               // result from readline
         rl_bind_key('\t',rl_abort);     // disable auto-complet
         
-        if((buf = readline("")) != NULL)
+        if((buf = readline(promptstr.c_str())) != NULL)
           {
             if (buf[0] != '\0')
               add_history(buf);
@@ -2880,10 +2878,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         return buf;
       }
 #endif
+
     char* line_ = 0;
     size_t len = 0;
     ssize_t read;
 
+    fprintf(stderr, "%s", promptstr.c_str());
     read = getline(&line_, &len, file);
     if (read == -1)
       {
