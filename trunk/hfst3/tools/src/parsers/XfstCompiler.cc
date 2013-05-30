@@ -66,9 +66,12 @@ extern void hxfst_delete_buffer(YY_BUFFER_STATE);
 using hfst::implementations::HfstBasicTransducer;
 using hfst::implementations::HfstBasicTransition;
 
+#define GET_TOP(x) HfstTransducer * x = this->top(); if ((x) == NULL) { return *this; }
+
 namespace hfst { 
 namespace xfst {
 
+  static const char * APPLY_END_STRING = "<ctrl-d>";
   
     XfstCompiler::XfstCompiler() :
         use_readline_(false),
@@ -221,18 +224,19 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
               something_printed = true;
             }
 
-          } // path went through
+          } // path gone through
 
         fprintf(outfile, "\n");
         --n;
 
-      } // n paths went through
+      } // n paths gone through
 
     return *this;
   }
 
   XfstCompiler&
-  XfstCompiler::print_paths(const hfst::HfstTwoLevelPaths &paths, FILE* outfile /* =stdout */, int n /* = -1*/)
+  XfstCompiler::print_paths(const hfst::HfstTwoLevelPaths &paths, 
+                            FILE* outfile /* =stdout */, int n /* = -1*/)
   { 
     // go through n paths
     for (hfst::HfstTwoLevelPaths::const_iterator it = paths.begin();
@@ -257,8 +261,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
             fprintf(outfile, "%s", print_symbol);
 
-            if (strcmp(print_symbol, "") != 0)
+            if (strcmp(print_symbol, "") != 0) {
               something_printed = true;
+            }
 
             print_symbol = get_print_symbol(p->second.c_str());
             
@@ -282,8 +287,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     XfstCompiler&
     XfstCompiler::apply_line(char* line, ApplyDirection direction)
       {
+        GET_TOP(tmp);
         char* token = strstrip(line);
-        HfstTransducer* tmp = stack_.top();
         if (direction == APPLY_DOWN_DIRECTION)
           {
             // lookdown not yet implemented in HFST
@@ -303,12 +308,11 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         if (paths->empty()) {
           fprintf(stdout, "???\n");
         }
+
         delete paths;
-        if (direction == APPLY_DOWN_DIRECTION)
-          {
-            // free memory reserved for temporary transducer
-            delete tmp;
-          }
+        if (direction == APPLY_DOWN_DIRECTION) {
+          delete tmp;
+        }
         return *this;
       }
 
@@ -413,27 +417,36 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     return "";
   }
 
-    XfstCompiler&
-    XfstCompiler::apply(FILE* infile, ApplyDirection direction)
+  XfstCompiler&
+  XfstCompiler::apply(FILE* infile, ApplyDirection direction)
       {
         char * line = NULL;
-        const char * promptstr = "";
+        // prompt is printed only when reading from the user
+        const char * promptstr 
+          = (infile == stdin)? get_apply_prompt(direction) : "";
 
-        if (infile == stdin)
-          promptstr = get_apply_prompt(direction);
+        int ind = current_history_index();  // readline history to return to
 
-        int ind = current_history_index();
-
-        bool ctrl_d_end = false;
-
-        while ((line = xfst_getline(infile, promptstr)) != NULL)
+        // get lines from infile..
+        while (true)
           {
-            if (strcmp(line, "<ctrl-d>") == 0 || strcmp(line, "<ctrl-d>\n") == 0)
+            line = xfst_getline(infile, promptstr);
+            // .. until end of file...
+            if (line == NULL)
               {
-                ctrl_d_end = true;
+                // the next command must start on a fresh line
+                if (infile == stdin) {
+                  fprintf(stdout, "\n");
+                }
+                break;
+              }
+            // .. or until special end string
+            if (strcmp(remove_newline(line), APPLY_END_STRING) == 0)
+              {
                 break;
               }
 
+            // apply line
             if (direction == APPLY_UP_DIRECTION) {
               apply_up_line(line);
             }
@@ -442,9 +455,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             }
           }
 
-        if (infile == stdin && ! ctrl_d_end)
-          fprintf(stdout, "\n");
-
+        // ignore all readline history given to the apply command
         ignore_history_after_index(ind);
         prompt();
         return *this;
@@ -462,7 +473,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       {
         char* s = strdup(indata);
         char* line = strtok(s, "\n");
-        while (line != NULL && (strcmp(line, "<ctrl-d>") != 0))
+        while (line != NULL && (strcmp(line, APPLY_END_STRING) != 0))
           {
             apply_up_line(line);
             line = strtok(NULL, "\n");
@@ -483,7 +494,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       {
         char* s = strdup(indata);
         char* line = strtok(s, "\n");
-        while (line != NULL && (strcmp(line, "<ctrl-d>") != 0))
+        while (line != NULL && (strcmp(line, APPLY_END_STRING) != 0))
           {
             apply_down_line(line);
             line = strtok(NULL, "\n");
@@ -568,7 +579,10 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::define(const char* name, const char* xre)
     {
-      HfstTransducer* compiled = latest_regex_compiled; // xre_.compile(xre);
+      // When calling this function, the regex \a indata should already have
+      // been compiled into a transducer which should have been stored to
+      // the variable latest_regex_compiled.
+      HfstTransducer* compiled = latest_regex_compiled;
       if (compiled != NULL)
         {
           bool was_defined = xre_.is_definition(name);
@@ -603,10 +617,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     for (unsigned int i=0; prototype[i] != 0; i++)
       {
         name = name + prototype[i];
-        if (prototype[i] == '(')
-          {
-            return true;
-          }
+        if (prototype[i] == '(') {
+          return true;
+        }
       }
     return false; // no starting parenthesis found
   }
@@ -621,10 +634,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     unsigned int i=0;
     while(prototype[i] != '(')
       {
-        if (prototype[i] == '\0')
-          {
-            return false; // function name ended too early
-          }
+        if (prototype[i] == '\0') {
+          return false; // function name ended too early
+        }
         ++i;
       }
     ++i; // skip the "(" in function name
@@ -633,23 +645,18 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     std::string arg = "";
     for ( ; prototype[i] != ')'; i++)
       {
-        if (prototype[i] == '\0') // no closing parenthesis found
-          {
-            return false;
-          }
-        else if (prototype[i] == ' ') // skip whitespace
-          {
-            ;
-          }
-        else if (prototype[i] == ',') // end of argument
-          {
-            args.push_back(arg);
-            arg = "";
-          }
-        else
-          {
-            arg += prototype[i];
-          }
+        if (prototype[i] == '\0') { // no closing parenthesis found
+          return false;
+        }
+        else if (prototype[i] == ' ') { // skip whitespace
+        }
+        else if (prototype[i] == ',') { // end of argument
+          args.push_back(arg);
+          arg = "";
+        }
+        else {
+          arg += prototype[i];
+        }
       }
     // last argument
     args.push_back(arg);
@@ -680,10 +687,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
          arg != arguments.end(); arg++)
       {
         std::set<unsigned int> arg_positions; 
-        if (! xre_.get_positions_of_symbol_in_xre(*arg, retval, arg_positions))
-          {
-            return std::string("");
-          }
+        if (! xre_.get_positions_of_symbol_in_xre(*arg, retval, arg_positions)) {
+          return std::string("");
+        }
         /*fprintf(stderr, "  converting %i arguments '%s' at positions ", (int)arg_positions.size(), arg->c_str());
         for (std::set<unsigned int>::const_iterator IT = arg_positions.begin(); 
              IT != arg_positions.end(); IT++)
@@ -723,7 +729,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
                   }
               }
             // else, just copy
-            else
+            else 
               {
                 new_retval += retval[i];
               }
@@ -782,10 +788,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
       if (verbose_) 
         {
-          if (was_defined)
-            fprintf(stderr, "Redefined");
-          else
-            fprintf(stderr, "Defined");
+          if (was_defined) {
+            fprintf(stderr, "Redefined"); 
+          }
+          else {
+            fprintf(stderr, "Defined"); 
+          }
           fprintf(stderr, " function '%s@%i)'\n", name.c_str(), (int)arguments.size()); 
         }
 
@@ -818,10 +826,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler&
   XfstCompiler::unlist(const char* name)
     {
-      if (lists_.find(name) != lists_.end())
-        {
-          lists_.erase(lists_.find(name));
-        }
+      if (lists_.find(name) != lists_.end()) {
+        lists_.erase(lists_.find(name));
+      }
       prompt();
       return *this;
     }
@@ -860,10 +867,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::clear()
     {
-      while (!stack_.empty())
-        {
-          stack_.pop();
-        }
+      while (!stack_.empty()) {
+        stack_.pop();
+      }
       prompt();
       return *this;
     }
@@ -898,7 +904,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       for (map<string,HfstTransducer*>::const_iterator def 
              = definitions_.begin(); def != definitions_.end();
-           ++def)
+           ++def) 
         {
           stack_.push(new HfstTransducer(*(def->second)));
         }
@@ -950,10 +956,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
   static const char * to_filename(const char * file)
   {
-    if (file == 0)
-      return "<stdin>";
-    else
-      return file;
+    if (file == 0) {
+      return "<stdin>"; 
+    }
+    else {
+      return file; 
+    }
   }
 
   XfstCompiler&
@@ -1033,7 +1041,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::load_stack(const char* infilename)
     {
-      return this->load_stack_or_definitions(infilename, false); // stack
+      return this->load_stack_or_definitions(infilename, false);
     }
 
   XfstCompiler& 
@@ -1047,7 +1055,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::compact_sigma()
     {
-      stack_.top()->prune_alphabet();
+      GET_TOP(top);
+      top->prune_alphabet();
       prompt();
       return *this;
     }
@@ -1055,10 +1064,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::eliminate_flag(const char* name)
     {
-      HfstTransducer * tmp = this->top();
-      if (NULL == tmp)
-        return *this;
-
+      GET_TOP(tmp);
       std::string name_(name);
       tmp->eliminate_flag(name);
       prompt();
@@ -1068,10 +1074,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::eliminate_flags()
     {
-      HfstTransducer * tmp = this->top();
-      if (NULL == tmp)
-        return *this;
-
+      GET_TOP(tmp);
       tmp->eliminate_flags();
       prompt();
       return *this;
@@ -1203,8 +1206,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::test_id()
     {
       HfstTransducer * tmp = this->top();
-      if (NULL == tmp)
+      if (NULL == tmp) {
         return *this;
+      }
 
       HfstTransducer tmp_input(*tmp);
       tmp_input.input_project();
@@ -1219,8 +1223,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::test_upper_bounded()
     {
       HfstTransducer * temp = this->top();
-      if (NULL == temp)
+      if (NULL == temp) {
         return *this;
+      }
       
       HfstTransducer tmp(*temp);
       tmp.output_project();
@@ -1234,8 +1239,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::test_uni(Level level)
     {
       HfstTransducer * temp = this->top();
-      if (NULL == temp)
+      if (NULL == temp) {
         return *this;
+      }
 
       HfstTransducer tmp(*temp);
       tmp.input_project();
@@ -1263,8 +1269,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::test_lower_bounded()
     {
       HfstTransducer * temp = this->top();
-      if (NULL == temp)
+      if (NULL == temp) {
         return *this;
+      }
       
       HfstTransducer tmp(*temp);
       tmp.input_project();
@@ -1288,8 +1295,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::test_null(bool invert_test_result)
     {
       HfstTransducer * tmp = this->top();
-      if (NULL == tmp)
+      if (NULL == tmp) {
         return *this;
+      }
 
       HfstTransducer empty(tmp->get_type());
       bool value = empty.compare(*tmp, false);
@@ -1378,9 +1386,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::substitute(const char* src, const char* target)
     {
-      HfstTransducer* top = this->top();
-      if (top == NULL)
-        return *this;
+      GET_TOP(top);
 
       stack_.pop();
       top->substitute(target, src);
@@ -1393,9 +1399,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::substitute_list(const char* list, const char* target)
     {
-      HfstTransducer* top = this->top();
-      if (top == NULL)
-        return *this;
+      GET_TOP(top);
+
       stack_.pop();
 
       // `[ [TR] , s , L ]
@@ -1513,9 +1518,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler&
   XfstCompiler::print_labels(FILE* outfile)
   {
-    HfstTransducer* topmost = this->top();
-    if (topmost == NULL)
-      return *this;
+    GET_TOP(topmost);
     return this->print_labels(outfile, topmost);
   }
 
@@ -1581,9 +1584,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::print_label_count(FILE* outfile)
     {
-    HfstTransducer* topmost = this->top();
-    if (topmost == NULL)
-      return *this;
+    GET_TOP(topmost);
 
     std::map<std::pair<std::string, std::string>, unsigned int > label_map;
     HfstBasicTransducer fsm(*topmost);
@@ -1665,9 +1666,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::print_shortest_string(FILE* outfile)
     {
-      HfstTransducer* topmost = this->top();
-      if (topmost == NULL)
-        return *this;
+      GET_TOP(topmost);
 
       HfstTwoLevelPaths paths;
       this->shortest_string(topmost, paths);
@@ -1686,21 +1685,17 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::print_shortest_string_size(FILE* outfile)
     {
-      HfstTransducer* topmost = this->top();
-      if (topmost == NULL)
-        return *this;
+      GET_TOP(topmost);
 
       HfstTwoLevelPaths paths;
       this->shortest_string(topmost, paths);
 
-      if (paths.size() == 0)
-        {
-          fprintf(stdout, "transducer is empty\n");
-        }
-      else
-        {
-          fprintf(outfile, "%i\n", (int)(paths.begin()->second.size()));
-        }
+      if (paths.size() == 0) {
+        fprintf(stdout, "transducer is empty\n");
+      }
+      else {
+        fprintf(outfile, "%i\n", (int)(paths.begin()->second.size()));
+      }
       prompt();
       return *this;
     }
@@ -1708,9 +1703,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler&
   XfstCompiler::print_longest_string_or_its_size(FILE* outfile, bool print_size)
   {
-      HfstTransducer* topmost = this->top();
-      if (topmost == NULL)
-        return *this;
+    GET_TOP(topmost);
 
       HfstTransducer tmp_lower(*topmost);
       HfstTransducer tmp_upper(*topmost);
@@ -1816,8 +1809,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     }
 
   XfstCompiler& 
-  XfstCompiler::print_lower_words(const char* /* name */,
-                                  unsigned int number,
+  XfstCompiler::print_lower_words(unsigned int number,
                                   FILE* outfile)
     {
       return print_words(number, outfile, LOWER_LEVEL);
@@ -1834,7 +1826,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       return *this;
     }
   XfstCompiler& 
-  XfstCompiler::print_upper_words(const char* /* name */, unsigned int number,
+  XfstCompiler::print_upper_words(unsigned int number,
                                   FILE* outfile)
     {
       return print_words(number, outfile, UPPER_LEVEL);
@@ -1862,9 +1854,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::print_words(unsigned int number,
                             FILE* outfile, Level level)
     {
-      HfstTransducer * tmp = this->top();
-      if (tmp == NULL)
-        return *this;
+      GET_TOP(tmp);
 
       HfstTransducer temp(*tmp);
 
@@ -1906,9 +1896,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::print_random_words(unsigned int number, FILE* outfile)
     {
-      HfstTransducer * tmp = this->top();
-      if (tmp == NULL)
-        return *this;
+      GET_TOP(tmp);
 
       hfst::HfstTwoLevelPaths paths;
       tmp->extract_random_paths(paths, number);
@@ -1919,9 +1907,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::print_name(FILE* outfile)
     {
-      HfstTransducer * tmp = this->top();
-      if (tmp == NULL)
-        return *this;
+      GET_TOP(tmp);
 
       for (std::map<std::string, HfstTransducer*>::const_iterator it 
              = names_.begin(); it != names_.end(); it++)
@@ -1941,9 +1927,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::print_net(FILE* outfile)
     {
-      HfstTransducer * tmp = this->top();
-      if (tmp == NULL)
-        return *this;
+      GET_TOP(tmp);
       tmp->write_in_att_format(outfile);
       prompt();
       return *this;
@@ -2251,7 +2235,10 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::read_regex(const char* indata)
     {
-      HfstTransducer* compiled = latest_regex_compiled; // xre_.compile(indata);
+      // When calling this function, the regex \a indata should already have
+      // been compiled into a transducer which should have been stored to
+      // the variable latest_regex_compiled.
+      HfstTransducer* compiled = latest_regex_compiled;
       if (compiled != NULL)
         {
           stack_.push(new HfstTransducer(*compiled));
@@ -2348,9 +2335,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::complete_net()
     {
-      HfstTransducer* topmost = this->top();
-      if (topmost == NULL)
-        return *this;
+      GET_TOP(topmost);
 
       HfstBasicTransducer fsm(*topmost);
       fsm.complete();
@@ -2384,9 +2369,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler&
   XfstCompiler::apply_unary_operation(UnaryOperation operation)
   {
-    HfstTransducer* result = this->top();
-    if (result == NULL)
-      return *this;
+    GET_TOP(result);
     this->pop();
 
     try 
@@ -2571,9 +2554,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::label_net()
     {
-      HfstTransducer* topmost = this->top();
-      if (topmost == NULL)
-        return *this;
+      GET_TOP(topmost);
 
       HfstTransducer * result = new HfstTransducer(topmost->get_type());
       
@@ -2703,9 +2684,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::sigma_net()
     {
-      HfstTransducer * tmp = this->top();
-      if (tmp == NULL)
-        return *this;
+      GET_TOP(tmp);
 
       StringSet alpha = tmp->get_alphabet();
       StringPairSet alpha_ = hfst::symbols::to_string_pair_set(alpha);
@@ -2959,9 +2938,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler&
   XfstCompiler::inspect_net()
     {
-      HfstTransducer * t = this->top();
-      if (t == NULL)
-        return *this;
+      GET_TOP(t);
 
       HfstBasicTransducer net(*t);
 
@@ -3116,9 +3093,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::write_att(FILE* infile)
     {
-      HfstTransducer * tmp = this->top();
-      if (tmp == NULL)
-        return *this;
+      GET_TOP(tmp);
       tmp->write_in_att_format(infile);
       prompt();
       return *this;

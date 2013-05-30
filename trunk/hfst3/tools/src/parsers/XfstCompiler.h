@@ -264,17 +264,17 @@ class XfstCompiler
   //! @brief Print length of longest string
   XfstCompiler& print_longest_string_size(FILE* outfile);
   //! @brief Print strings of lower language
-  XfstCompiler& print_lower_words(const char* name, unsigned int number,
+  XfstCompiler& print_lower_words(unsigned int number,
                                   FILE* outfile);
   //! @brief Print random strings of lower language
   XfstCompiler& print_random_lower(unsigned int number, FILE* outfile);
   //! @brief Print astrings of upper language
-  XfstCompiler& print_upper_words(const char* name, unsigned int number,
+  XfstCompiler& print_upper_words(unsigned int number,
                                   FILE* outfile);
   //! @brief Print random strings of upper language
   XfstCompiler& print_random_upper(unsigned int number, FILE* outfile);
   //! @brief Print pair strings of language
-  XfstCompiler& print_words(const char* name, unsigned int number,
+  XfstCompiler& print_words(unsigned int number,
                             FILE* outfile);
   //! @brief Print random pair strings of language
   XfstCompiler& print_random_words(unsigned int number, FILE* outfile);
@@ -335,6 +335,9 @@ class XfstCompiler
   //! @brief Compile file data as one regex and save on stack.
   XfstCompiler& read_regex(FILE* infile);
   //! @brief Compile regex of @a indata and save on stack.
+  //! Actually, the function assumes that the function compile_regex has
+  //! been called earlier when extracting the portion of input that
+  //! constitutes the regex \a indata.
   XfstCompiler& read_regex(const char* indata);
   //! @brief Read prolog form transducer from @a infile
   XfstCompiler& read_prolog(FILE* infile);
@@ -458,12 +461,13 @@ class XfstCompiler
   XfstCompiler& hfst(const char * data);
   //! @brief Get current stack of compiler
   const std::stack<HfstTransducer*>& get_stack() const;
-  //! @brief Parse from @a infile
+  //! @brief Parse input from @a infile
   int parse(FILE * infile);
-  //! @brief Parse @a filename
+  //! @brief Parse file @a filename
   int parse(const char * filename);
   //! @brief Parse @a line
   int parse_line(char line []);
+  //! @brief Parse @a line
   int parse_line(std::string line);
   //! @brief Define whether readline library is used to read input in apply up etc.
   XfstCompiler& setReadline(bool readline);
