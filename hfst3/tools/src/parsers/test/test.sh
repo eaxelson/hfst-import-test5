@@ -128,7 +128,7 @@ do
 
     ## Test that the result of testfile.xfst (written to standard output)
     ## is the same as testfile.output
-    for testfile in apply_up apply_down print_stack print_labels print_label_tally \
+    for testfile in print_stack print_labels print_label_tally \
 	shortest_string set_variable eliminate_flag info
     do
 	if ! (ls $testfile.xfst 2> /dev/null); then
@@ -145,6 +145,28 @@ do
 	    exit 1;
 	fi
     done
+
+    ## Interactive commands
+    for testfile in apply_up apply_down
+    do
+	if ! (ls $testfile.xfst 2> /dev/null); then
+	    echo "skipping missing test for "$testfile"..."
+	    continue
+	fi
+        # apply up/down leak to stdout with readline..
+        for param in --pipe-mode --no-readline
+        do
+	    if ! (cat $testfile.xfst | ../hfst-xfst2fst $param -f $format -s > tmp); then
+	    echo "ERROR: in compiling "$testfile.xfst" with parameters "$param
+	    exit 1;
+	    fi
+	    if ! ($DIFF tmp $testfile.output); then
+	        echo "ERROR: in result from "$testfile.xfst" with parameters "$param
+	        exit 1;
+	    fi
+        done
+    done
+
 
     ## Test that the results of testfile_true.xfst and testfile_false.xfst (written to file tmp)
     ## contain the lines listed in files test_true.input and test_false.output, respectively.

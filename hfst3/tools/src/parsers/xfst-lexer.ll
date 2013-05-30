@@ -101,20 +101,28 @@ LWSP [\t ]*
 }
 
 "apply up"|"up" {
-    if (hfst::xfst::xfst_->getReadInteractiveTextFromStdin()) {
+    if (hfst::xfst::xfst_->getReadInteractiveTextFromStdin()) 
+    {
+        // let XfstCompiler take care of the input to apply up command
         return APPLY_UP;
     }
-    else {
+    else 
+    {
+        // read input to apply up command
         BEGIN(APPLY_STATE);
         return APPLY_UP;
     }
 }
 
 "apply down"|"down" {
-    if (hfst::xfst::xfst_->getReadInteractiveTextFromStdin()) {
+    if (hfst::xfst::xfst_->getReadInteractiveTextFromStdin()) 
+    {
+        // let XfstCompiler take care of the input to apply down command
         return APPLY_DOWN;
     }
-    else {
+    else 
+    {
+        // read input to apply down command    
         BEGIN(APPLY_STATE);
         return APPLY_DOWN;
     }
@@ -595,33 +603,41 @@ LWSP [\t ]*
 }
 
 <APPLY_STATE>(.|"\n"|"\r")* {
+    // ^ to return input to apply up/down command, first read everything
+
     BEGIN(0);
 
+    // search for a special end string
     std::string str(hxfsttext);
-    std::size_t found = str.find("<ctrl-d>");
+    std::size_t end_found = str.find("<ctrl-d>"); 
 
-    // the rest is input to apply 
-    if (found == std::string::npos) {
+    // CASE 1: no end string found: the rest is input to apply 
+    if (end_found == std::string::npos) {
         hxfstlval.text = hxfsttext;
         return APPLY_INPUT;
     }
 
-    // there are other commands after the input to apply
+    // CASE 2: there are other commands after the input to apply
     unsigned int total_length = (unsigned int)strlen(hxfsttext);
-    char buf [(unsigned int)found + 1];
-    for (unsigned int i=0; i < (unsigned int)found; i++)
+    unsigned int endpos = (unsigned int)end_found; 
+
+    // copy the input to apply and set is as return value
+    char buf [endpos + 1];
+    for (unsigned int i=0; i < endpos; i++)
     { 
       buf[i] = hxfsttext[i];
     }
-    buf[(unsigned int)found] = '\0';
+    buf[endpos] = '\0';
     hxfstlval.text = strdup(buf);
 
     // put back the rest of the input text, excluding the "<ctrl-d>"
-    if (total_length > 0) {
+    if (total_length > 0) 
+    {
       // unput modifies hxfsttext, so it must be copied before unputting
       char * text_read = strdup(hxfsttext);
+      // unputting must be done in reverse order
       for(unsigned int i=total_length-1; 
-          i >= ((unsigned int)found + (unsigned int)strlen("<ctrl-d>"));
+          i >= (endpos + (unsigned int)strlen("<ctrl-d>"));
           i--)
       {
         unput(*(text_read+i));
@@ -632,14 +648,22 @@ LWSP [\t ]*
     return APPLY_INPUT;
 }
 
+
 <REGEX_STATE>(.|"\n"|"\r")* {
+    // ^ to return input to regex command, first read everything
+
     BEGIN(0);
+
     unsigned int chars_read = 0;
     unsigned int total_length = (unsigned int)strlen(hxfsttext);
 
+    // compile regex to find out where it ends
+    // as a positive side effect, the regex is also conveniently compiled 
+    // into a transducer which is stored in XfstCompiler::latest_regex_compiled
     (void) hfst::xfst::xfst_->compile_regex(hxfsttext, chars_read);
 
-    char buf [chars_read+1]; 
+    // copy the input to regex and set is as return value
+    char buf [chars_read+1];
     for (unsigned int i=0; i < chars_read; i++)
     { 
       buf[i] = hxfsttext[i];
@@ -647,8 +671,12 @@ LWSP [\t ]*
     buf[chars_read] = '\0';
     hxfstlval.text = strdup(buf);
 
-    if (total_length > 0) {
+    // put back the rest of the input text
+    if (total_length > 0) 
+    {
+      // unput modifies hxfsttext, so it must be copied before unputting
       char * text_read = strdup(hxfsttext);
+      // unputting must be done in reverse order
       for(unsigned int i=total_length-1; i >= chars_read; i--)
       {
         unput(*(text_read+i));
@@ -659,13 +687,19 @@ LWSP [\t ]*
     return REGEX;
 }
 
-<SOURCE_STATE>[A-Za-z]{NAMECHAR}* {  
+<SOURCE_STATE>[A-Za-z]{NAMECHAR}* {
+  // ^ include directive
+
   FILE * tmp = NULL;
-  if ((tmp = fopen(hfst::xfst::strstrip(hxfsttext), "r" )) != NULL) {
-    printf("Opening file '%s'.\n", hfst::xfst::strstrip(hxfsttext));       
+  if ((tmp = fopen(hfst::xfst::strstrip(hxfsttext), "r" )) != NULL) 
+  {
+    printf("Opening file '%s'.\n", hfst::xfst::strstrip(hxfsttext));
+    // push the included text onto the lexer stack
     hxfstpush_buffer_state(hxfst_create_buffer(tmp, 32000));
     ++source_stack_size;
-  } else {
+  } 
+  else 
+  {
     printf("Error opening file '%s'\n",hfst::xfst::strstrip(hxfsttext));
   } 
   BEGIN(INITIAL); 
@@ -735,19 +769,18 @@ LWSP [\t ]*
     return CTRLD;
 }
 
-[\n\r] { /* fprintf(stderr, "xfst: skipping newline\n"); */ /* skip newline */ }
-
-[\t ]* { /* fprintf(stderr, "xfst: skipping whitespace '%s'\n", yytext); */ /* skip whitespace */ }
-
-"!"[^\n]* { /* fprintf(stderr, "xfst: skipping comment '%s'\n", yytext); */ /* skip comments */ }
-
-"#"[^\n]* { /* fprintf(stderr, "xfst: skipping comment '%s'\n", yytext); */ /* skip comments */ }
+[\n\r]     { /* skip newline */ }
+[\t ]*     { /* skip whitespace */ }
+"!"[^\n]*  { /* skip comments */ }
+"#"[^\n]*  { /* skip comments */ }
 
 <<EOF>> {
     --source_stack_size;
+    // end of input
     if (source_stack_size < 0) {
       yyterminate();
     }
+    // EOF encountered because reaching end of included input 
     else {
       hxfstpop_buffer_state();
     }
