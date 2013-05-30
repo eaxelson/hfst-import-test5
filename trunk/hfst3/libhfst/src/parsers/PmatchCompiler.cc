@@ -29,9 +29,9 @@ PmatchCompiler::define(const std::string& name, const std::string& pmatch)
 }
 
 std::map<std::string, HfstTransducer*>
-PmatchCompiler::compile(const std::string& pmatch)
+PmatchCompiler::compile(const std::string& pmatch, bool verbose)
 {
-  return hfst::pmatch::compile(pmatch, definitions_, format_);
+    return hfst::pmatch::compile(pmatch, definitions_, format_, verbose);
 }
 
 }}

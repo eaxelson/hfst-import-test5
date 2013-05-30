@@ -156,7 +156,7 @@ process_stream(HfstOutputStream& outstream)
         file_contents.push_back(c);
     }
     if (file_contents.size() > 1) {
-        definitions = comp.compile(file_contents);
+        definitions = comp.compile(file_contents, verbose);
     }
     
     // First we need to collect a unified alphabet from all the transducers.
