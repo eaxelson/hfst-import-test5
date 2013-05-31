@@ -318,6 +318,3 @@ hfst_calculate_CXXFLAGS= -Wall -Wno-error -Wno-sign-compare -Wno-deprecated
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c 
 
-## To build h-files from hh-files.
-hfst-compiler.h:hfst-compiler.hh
-	cp hfst-compiler.hh hfst-compiler.h

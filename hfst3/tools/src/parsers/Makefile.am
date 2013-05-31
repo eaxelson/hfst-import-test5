@@ -58,5 +58,3 @@ xfst-parser.cc: xfst-parser.yy
 
 xfst-lexer.cc: xfst-lexer.ll
 
-xfst-parser.h:xfst-parser.hh
-	cp xfst-parser.hh xfst-parser.h
