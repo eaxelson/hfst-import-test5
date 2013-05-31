@@ -1,5 +1,5 @@
 regex a:b c:d;
 regex A:B C:D;
 invert net
-print net
+write att
 quit

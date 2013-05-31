@@ -67,6 +67,7 @@ using hfst::implementations::HfstBasicTransducer;
 using hfst::implementations::HfstBasicTransition;
 
 #define GET_TOP(x) HfstTransducer * x = this->top(); if ((x) == NULL) { return *this; }
+#define IF_NULL_PROMPT_AND_RETURN_THIS(x) if (x == NULL) { prompt(); return *this; }
 
 namespace hfst { 
 namespace xfst {
@@ -195,9 +196,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   }
 
   XfstCompiler&
-  XfstCompiler::print_paths(const hfst::HfstOneLevelPaths &paths, FILE* outfile /* =stdout */, int n /* = -1*/)
+  XfstCompiler::print_paths
+  (const hfst::HfstOneLevelPaths &paths, 
+   FILE* outfile /* =stdout */, 
+   int n /* = -1*/)
   {
-    // go through n paths
+    // go through at most n paths
     for (hfst::HfstOneLevelPaths::const_iterator it = paths.begin();
          n != 0 && it != paths.end(); it++)
       {
@@ -229,16 +233,18 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         fprintf(outfile, "\n");
         --n;
 
-      } // n paths gone through
+      } // at most n paths gone through
 
     return *this;
   }
 
   XfstCompiler&
-  XfstCompiler::print_paths(const hfst::HfstTwoLevelPaths &paths, 
-                            FILE* outfile /* =stdout */, int n /* = -1*/)
+  XfstCompiler::print_paths
+  (const hfst::HfstTwoLevelPaths &paths, 
+   FILE* outfile /* =stdout */, 
+   int n /* = -1*/)
   { 
-    // go through n paths
+    // go through at most n paths
     for (hfst::HfstTwoLevelPaths::const_iterator it = paths.begin();
          n != 0 && it != paths.end(); it++)
       {
@@ -279,7 +285,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         fprintf(outfile, "\n");
         --n;
 
-      } // n paths went through
+      } // at most n paths went through
 
     return *this;
   }
@@ -681,34 +687,29 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     std::string retval(xre);
     unsigned int arg_number = 1;
 
-    //fprintf(stderr, "convert_argument_symbols: converting %s\n", retval.c_str()); // DEBUG
-
-    for (std::vector<std::string>::const_iterator arg = arguments.begin();
-         arg != arguments.end(); arg++)
+    for (std::vector<std::string>::const_iterator arg 
+           = arguments.begin(); arg != arguments.end(); arg++)
       {
         std::set<unsigned int> arg_positions; 
-        if (! xre_.get_positions_of_symbol_in_xre(*arg, retval, arg_positions)) {
-          return std::string("");
-        }
-        /*fprintf(stderr, "  converting %i arguments '%s' at positions ", (int)arg_positions.size(), arg->c_str());
-        for (std::set<unsigned int>::const_iterator IT = arg_positions.begin(); 
-             IT != arg_positions.end(); IT++)
+        if (! xre_.get_positions_of_symbol_in_xre
+            (*arg, retval, arg_positions) ) 
           {
-            fprintf(stderr, " %i ", *IT);
+            return std::string("");
           }
-          fprintf(stderr, " in '%s'\n", retval.c_str()); // DEBUG*/
 
         std::string new_retval = std::string("");
         std::string substituting_argument;
         if (user_friendly_argument_names)
           {
             substituting_argument = "ARGUMENT" +
-              (static_cast<ostringstream*>( &(ostringstream() << arg_number) )->str());
+              (static_cast<ostringstream*>
+               ( &(ostringstream() << arg_number) )->str());
           }
         else
           {
             substituting_argument = "\"@" + function_name + 
-              (static_cast<ostringstream*>( &(ostringstream() << arg_number) )->str()) + "@\"";
+              (static_cast<ostringstream*>
+               ( &(ostringstream() << arg_number) )->str()) + "@\"";
           }
      
         // go through retval
@@ -717,13 +718,13 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             // argument to be replaced begins at this position
             if (arg_positions.find(i) != arg_positions.end())
               {
-                //fprintf(stderr, "    replacing at position %i\n", i); // DEBUG
                 arg_positions.erase(i); // case will not be handled again
 
                 new_retval.append(substituting_argument);
                 // skip rest of the original symbol by advancing i to
                 // point to the last char in the original symbol
-                for (unsigned int offset=1; offset < arg->length(); offset++)
+                for (unsigned int offset=1; 
+                     offset < arg->length(); offset++)
                   {
                     ++i;
                   }
@@ -751,8 +752,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
       if (! extract_function_name(prototype, name))
         {
-          fprintf(stderr, "Error extracting function name from prototype '%s'\n",
-                  prototype);
+          fprintf(stderr, "Error extracting function name "
+                  "from prototype '%s'\n", prototype);
           xfst_fail();
           prompt();
           return *this;
@@ -760,14 +761,15 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
       if (! extract_function_arguments(prototype, arguments))
         {
-          fprintf(stderr, "Error extracting function arguments from prototype '%s'\n",
-                  prototype);
+          fprintf(stderr, "Error extracting function arguments "
+                  "from prototype '%s'\n", prototype);
           xfst_fail();
           prompt();
           return *this;
         }
 
-      std::string xre_converted = convert_argument_symbols(arguments, xre, name, xre_);
+      std::string xre_converted 
+        = convert_argument_symbols(arguments, xre, name, xre_);
       if (xre_converted == std::string(""))
         {
           fprintf(stderr, "Error parsing function definition '%s'\n", xre);
@@ -794,11 +796,13 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           else {
             fprintf(stderr, "Defined"); 
           }
-          fprintf(stderr, " function '%s@%i)'\n", name.c_str(), (int)arguments.size()); 
+          fprintf(stderr, " function '%s@%i)'\n", 
+                  name.c_str(), (int)arguments.size()); 
         }
 
       function_arguments_[name] = arguments.size();
-      function_definitions_[std::string(name)] = convert_argument_symbols(arguments, xre, "", xre_, true);
+      function_definitions_[std::string(name)] 
+        = convert_argument_symbols(arguments, xre, "", xre_, true);
 
       prompt();
       return *this;
@@ -844,7 +848,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::load_definitions(const char * infilename)
     {
-      return this->load_stack_or_definitions(infilename, true); // definitions
+      return this->load_stack_or_definitions
+        (infilename, true /* definitions*/ );
     }
 
   XfstCompiler& 
@@ -970,72 +975,102 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     std::string def_name = t->get_name();
     if (def_name == "")
       {
-        fprintf(stderr, "warning: loaded transducer definition has no name, skipping it\n");
+        fprintf(stderr, "warning: loaded transducer definition "
+                "has no name, skipping it\n");
         return *this;
       }
     std::map<std::string, HfstTransducer*>::const_iterator it 
       = definitions_.find(def_name);
     if (it != definitions_.end())
       {
-        fprintf(stderr, "warning: a definition named '%s' already exists, overwriting it\n", def_name.c_str());
+        fprintf(stderr, "warning: a definition named '%s' "
+                "already exists, overwriting it\n", def_name.c_str());
         definitions_.erase(def_name);
       }
     definitions_[def_name] = t;
     return *this;
   }
 
-  XfstCompiler&
-  XfstCompiler::load_stack_or_definitions(const char* infilename, bool load_definitions)
+  void
+  XfstCompiler::convert_format_of_transducer_read_from_file
+  (HfstTransducer * t, const char * filename /* = NULL*/)
   {
+    if (t->get_type() != format_)
+      {
+        if (verbose_)
+          {
+            fprintf(stderr, "warning: converting transducer type from %s to %s",
+                    hfst::implementation_type_to_format(t->get_type()),
+                    hfst::implementation_type_to_format(format_));
+            if (filename != NULL)
+              {
+                fprintf(stderr, "when reading from file '%s'",
+                        to_filename(filename));
+              }
+            if (! hfst::HfstTransducer::is_safe_conversion(t->get_type(), format_))
+              {
+                fprintf(stderr, " (loss of information is possible)");
+              }
+            fprintf(stderr, "\n");
+          }
+        t->convert(format_);
+      }
+  }
+
+  HfstInputStream *
+  XfstCompiler::open_hfst_input_stream(const char * infilename)
+  {
+    assert(infilename != NULL);
     HfstInputStream* instream = 0;
-      try 
-        {
-          instream = (infilename != 0) ?
-            new HfstInputStream(infilename):
-            new HfstInputStream();
-        }
-      catch (NotTransducerStreamException ntse)
-        {
-          fprintf(stderr, "Unable to read transducers from %s\n", 
-                  to_filename(infilename));
-          xfst_fail();
-          prompt();
-          return *this;
-        }
-      while (instream->is_good())
-        {
-          HfstTransducer* t = new HfstTransducer(*instream);
+    try 
+      {
+        instream = (infilename != 0) ?
+          new HfstInputStream(infilename):
+          new HfstInputStream();
+      }
+    catch (NotTransducerStreamException ntse)
+      {
+        fprintf(stderr, "Unable to read transducers from %s\n", 
+                to_filename(infilename));
+        xfst_fail();
+        return NULL;
+      }
+    return instream;
+  }
 
-          if (t->get_type() != format_)
-            {
-              if (verbose_)
-                {
-                  fprintf(stderr, "warning: converting transducer type from %s to %s "
-                          "when reading from file '%s'",
-                          hfst::implementation_type_to_format(t->get_type()),
-                          hfst::implementation_type_to_format(format_),
-                          to_filename(infilename));
-                  if (! hfst::HfstTransducer::is_safe_conversion(t->get_type(), format_))
-                    {
-                      fprintf(stderr, " (loss of information is possible)");
-                    }
-                  fprintf(stderr, "\n");
-                }
-              t->convert(format_);
-            }
+  XfstCompiler&
+  XfstCompiler::load_stack_or_definitions
+  (const char* infilename, bool load_definitions)
+  {
+    // Try to open the stream to file infilename
+    HfstInputStream * instream = open_hfst_input_stream(infilename);
+    IF_NULL_PROMPT_AND_RETURN_THIS(instream);
 
-          if (load_definitions)
-            {
-              add_loaded_definition(t);
-            }
-          else
-            {
-              stack_.push(t);
-              print_transducer_info();
-            }
-        }
-      prompt();
-      return *this;
+    // Read transducers from stream
+    while (instream->is_good())
+      {
+        HfstTransducer* t = new HfstTransducer(*instream);
+        
+        // Convert transducer format, if needed
+        convert_format_of_transducer_read_from_file(t, infilename);
+        
+        // Add transducer as definition..
+        if (load_definitions)
+          {
+            add_loaded_definition(t);
+          }
+        // ..or push it to stack.
+        else
+          {
+            stack_.push(t);
+            print_transducer_info();
+          }
+      }
+    
+    instream->close();
+    delete instream;
+    prompt();
+    return *this;
   }
 
   XfstCompiler& 
@@ -1928,7 +1963,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::print_net(FILE* outfile)
     {
       GET_TOP(tmp);
-      tmp->write_in_att_format(outfile);
+      HfstBasicTransducer basic(*tmp);
+      basic.write_in_xfst_format(outfile);
       prompt();
       return *this;
     }

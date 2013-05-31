@@ -1,7 +1,7 @@
 define Foo foo;
 regex Foo:Foo Foo;
-print net
+write att
 define Foobar foo:bar;
 regex Foobar Foobar;
 echo --
-print net
+write att

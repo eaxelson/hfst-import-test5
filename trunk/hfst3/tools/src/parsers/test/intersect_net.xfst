@@ -3,5 +3,5 @@ regex a:b;
 regex [b:c | a:b | d:e];
 regex [a:b | b:c];
 intersect net
-print net
+write att
 quit
