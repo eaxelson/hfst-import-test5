@@ -36,5 +36,7 @@ EXTRA_DIST=test.sh \
 	test_overlap_true.xfst test_overlap_false.xfst \
 	test_true.output test_false.output \
 	quit-on-fail.xfst print_net.xfst print_net.output \
-	print_net.alternative_output
+	print_net.alternative_output \
+	inspect_net.xfst inspect_net.output \
+	inspect_net.alternative_output
 check_DATA=test.sh

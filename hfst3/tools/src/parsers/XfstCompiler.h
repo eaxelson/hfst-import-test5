@@ -501,6 +501,9 @@ class XfstCompiler
   //! from \a paths to \a outfile.
   XfstCompiler& print_paths(const hfst::HfstOneLevelPaths &paths, 
                             FILE* outfile=stdout, int n=-1);
+  // A method used by function print_longest_string_or_its_size.
+  XfstCompiler& print_one_string_or_its_size
+    (FILE* outfile, const HfstTwoLevelPaths & paths, const char * level, bool print_size);
   //! @brief Print the longest string of topmost transducer in the stack
   //! (if print_size is false) or the size of that string (if print_size is true) 
   //! to \a outfile.
@@ -516,8 +519,9 @@ class XfstCompiler
   XfstCompiler& read_text_or_spaced(FILE *infile, bool spaces);
 
   //! @brief Convert format of \a t read from file \a filename to common
-  //! format used by this xfst compiler and print a warning message, if needed.
-  void convert_format_of_transducer_read_from_file
+  //! format used by this xfst compiler and print a warning message 
+  //! about loss of information during conversion, if needed.
+  void convert_to_common_format
     (HfstTransducer * t, const char * filename = NULL);
 
   //! @brief Open HfstInputStream to file \a filename.
