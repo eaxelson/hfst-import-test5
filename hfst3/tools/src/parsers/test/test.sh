@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#exit 77;
+exit 77;
 
 XFST_TOOL="../hfst-xfst2fst -s --pipe-mode"
 STRINGS2FST="../../hfst-strings2fst -S"
@@ -129,7 +129,7 @@ do
     ## Test that the result of testfile.xfst (written to standard output)
     ## is the same as testfile.output
     for testfile in print_stack print_labels print_label_tally \
-	shortest_string set_variable eliminate_flag info
+	shortest_string set_variable eliminate_flag info print_net
     do
 	if ! (ls $testfile.xfst 2> /dev/null); then
 	    echo "skipping missing test for "$testfile"..."
@@ -140,9 +140,20 @@ do
 	    echo "ERROR: in compiling "$testfile.xfst
 	    exit 1;
 	fi
-	if ! ($DIFF tmp $testfile.output); then
-	    echo "ERROR: in result from "$testfile.xfst
-	    exit 1;
+	if ! ($DIFF tmp $testfile.output > tmpdiff); then
+            if (ls $testfile.alternative_output > /dev/null 2> /dev/null); then
+                if ! ($DIFF tmp $testfile.alternative_output); then
+                    rm -f tmpdiff
+                    echo "ERROR: in result from "$testfile.xfst
+                    exit 1;
+                fi
+            else
+                cat tmpdiff
+                rm -f tmpdiff
+	        echo "ERROR: in result from "$testfile.xfst
+	        exit 1;
+            fi
+            rm -f tmpdiff
 	fi
     done
 

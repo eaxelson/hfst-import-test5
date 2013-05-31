@@ -514,6 +514,16 @@ class XfstCompiler
   //! as defined by \a spaces) from \a infile, disjunct them into
   //! a single transducer and push it to the stack.
   XfstCompiler& read_text_or_spaced(FILE *infile, bool spaces);
+
+  //! @brief Convert format of \a t read from file \a filename to common
+  //! format used by this xfst compiler and print a warning message, if needed.
+  void convert_format_of_transducer_read_from_file
+    (HfstTransducer * t, const char * filename = NULL);
+
+  //! @brief Open HfstInputStream to file \a filename.
+  //! Print an error message and return NULL, if not succesful.
+  HfstInputStream * open_hfst_input_stream(const char * filename);
+
   //! @brief Read transducers from file \a infilename and either push
   //! them to the stack (if \a definitions is false) or add them as definitions
   //! (if \a definitions is true).

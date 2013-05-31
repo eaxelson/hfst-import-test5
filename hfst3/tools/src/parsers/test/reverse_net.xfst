@@ -3,5 +3,5 @@ regex c:d;
 regex b:c;
 regex [a:b c:d];
 reverse net
-print net
+write att
 quit

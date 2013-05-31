@@ -3,5 +3,5 @@ regex a:b;
 regex b:c;
 regex [a:b | b:c];
 minus net
-print net
+write att
 quit

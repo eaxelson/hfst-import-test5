@@ -35,5 +35,6 @@ EXTRA_DIST=test.sh \
 	test_sublanguage_true.xfst test_sublanguage_false.xfst \
 	test_overlap_true.xfst test_overlap_false.xfst \
 	test_true.output test_false.output \
-	quit-on-fail.xfst
+	quit-on-fail.xfst print_net.xfst print_net.output \
+	print_net.alternative_output
 check_DATA=test.sh

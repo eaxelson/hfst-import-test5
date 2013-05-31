@@ -148,6 +148,9 @@
      /* States of the graph and their transitions. */
          HfstStates state_vector;
 
+     /* The initial state number. */
+         static const HfstState INITIAL_STATE = 0;
+
      /* Datatype for the final states and their weights in a graph. */
          typedef std::map<HfstState,typename C::WeightType> FinalWeightMap;
      /* The final states and their weights in the graph. */
@@ -698,13 +701,176 @@
            return symbol;
          }
 
+         void print_xfst_state(std::ostream & os, HfstState state)
+         {
+           if (state == INITIAL_STATE)
+             {
+               os << "S";
+             }
+           if (is_final_state(state))
+             {
+               os << "f";
+             }
+           os <<  "s" << state;
+         }
+
+         void print_xfst_state(FILE * file, HfstState state)
+         {
+           if (state == INITIAL_STATE)
+             {
+               fprintf(file, "S");
+             }
+           if (is_final_state(state))
+             {
+               fprintf(file, "f");
+             }
+           fprintf(file, "s%i", state);
+         }
+
+         void print_xfst_arc(std::ostream & os, C data)
+         {
+           // replace all spaces, epsilons and tabs
+           if (data.get_input_symbol() !=
+               data.get_output_symbol())
+             {
+               os << "<";
+             } 
+           os << replace_all
+             (replace_all
+              (data.get_input_symbol(),
+               "@_EPSILON_SYMBOL_@", "0"),
+              "\t", "@_TAB_@");
+           if (data.get_input_symbol() !=
+               data.get_output_symbol())
+             {
+               os << ":" <<  
+                 replace_all
+                 (replace_all
+                  (data.get_output_symbol(), 
+                   "@_EPSILON_SYMBOL_@", "0"),
+                  "\t", "@_TAB_@");
+             }
+           if (data.get_input_symbol() !=
+               data.get_output_symbol())
+             {
+               os << ">";
+             }
+         }
+
+         void print_xfst_arc(FILE * file, C data)
+         {
+           if (data.get_input_symbol() !=
+               data.get_output_symbol())
+             {
+               fprintf(file, "<");
+             }                       
+           // replace all spaces, epsilons and tabs
+           fprintf(file, "%s",  
+                   replace_all
+                   (replace_all
+                    (data.get_input_symbol(), 
+                     "@_EPSILON_SYMBOL_@", "0"),
+                    "\t", "@_TAB_@").c_str());
+           if (data.get_input_symbol() !=
+               data.get_output_symbol())
+             {
+               fprintf(file, ":%s",
+                       replace_all
+                       (replace_all
+                        (data.get_output_symbol(),
+                         "@_EPSILON_SYMBOL_@", "0"),
+                        "\t", "@_TAB_@").c_str());
+             }
+           if (data.get_input_symbol() !=
+               data.get_output_symbol())
+             {
+               fprintf(file, ">");
+             }
+         }
+
        public:
+
+         /** @brief Write the graph in xfst text format to ostream \a os.
+             \a write_weights defines whether weights are printed (todo). */
+         void write_in_xfst_format(std::ostream &os, bool write_weights=true) 
+         {
+           (void)write_weights; // todo
+           unsigned int source_state=0;
+           for (iterator it = begin(); it != end(); it++)
+             {
+               print_xfst_state(os, source_state);
+               os << ":\t";
+
+               if (it->begin() == it->end())
+                 {
+                   os << "(no arcs)";
+                 }
+               else
+                 {
+                   for (typename HfstTransitions::iterator tr_it
+                          = it->begin();
+                        tr_it != it->end(); tr_it++)
+                     {
+                       if (tr_it != it->begin())
+                         {
+                           os << ", ";
+                         }
+                       C data = tr_it->get_transition_data();
+                       print_xfst_arc(data);
+
+                       os << " -> ";
+                       print_xfst_state(tr_it->get_target_state());
+                     }
+                 }
+               os << "." << std::endl;
+               source_state++;
+             }          
+         }
+
+         /** @brief Write the graph in xfst text format to FILE \a file.
+             \a write_weights defines whether weights are printed (todo). */
+         void write_in_xfst_format(FILE * file, bool write_weights=true) 
+         {
+           (void)write_weights;
+           unsigned int source_state=0;
+           for (iterator it = begin(); it != end(); it++)
+             {
+               print_xfst_state(file, source_state);
+               fprintf(file, ":\t");
+
+               if (it->begin() == it->end())
+                 {
+                   fprintf(file, "(no arcs)");
+                 }
+               else
+                 {
+                   for (typename HfstTransitions::iterator tr_it
+                          = it->begin();
+                        tr_it != it->end(); tr_it++)
+                     {
+                       if (tr_it != it->begin())
+                         {
+                           fprintf(file, ", ");
+                         }
+                       C data = tr_it->get_transition_data();
+
+                       print_xfst_arc(file, data);
+
+                       fprintf(file, " -> ");
+                       print_xfst_state(file, tr_it->get_target_state());
+                     }
+                 }
+               fprintf(file, ".\n");
+               source_state++;
+             }          
+         }
+         
 
          /** @brief Write the graph in AT&T format to ostream \a os.
              \a write_weights defines whether weights are printed. */
          void write_in_att_format(std::ostream &os, bool write_weights=true) 
          {
-       unsigned int source_state=0;
+           unsigned int source_state=0;
            for (iterator it = begin(); it != end(); it++)
              {
                for (typename HfstTransitions::iterator tr_it
@@ -750,7 +916,7 @@
              \a write_weights defines whether weights are printed. */
          void write_in_att_format(FILE *file, bool write_weights=true) 
          {
-       unsigned int source_state=0;
+           unsigned int source_state=0;
            for (iterator it = begin(); it != end(); it++)
              {
                for (typename HfstTransitions::iterator tr_it
@@ -1963,8 +2129,7 @@
            (const StringPairVector &spv, typename C::WeightType weight) 
          {
            StringPairVector::const_iterator it = spv.begin();
-           HfstState initial_state = 0;
-           HfstState final_state = disjunct(spv, it, initial_state);
+           HfstState final_state = disjunct(spv, it, INITIAL_STATE);
 
            // Set the weight of final state
            if (is_final_state(final_state)) 
@@ -2323,9 +2488,8 @@
            std::set<HfstState> epsilon_path_states;
            epsilon_path_states.insert(0);
            unsigned int index=0;
-           HfstState initial_state=0;
 
-           return is_lookup_infinitely_ambiguous(s, index, initial_state,
+           return is_lookup_infinitely_ambiguous(s, index, INITIAL_STATE,
                                                  epsilon_path_states);
          }
 
