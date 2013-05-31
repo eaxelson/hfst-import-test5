@@ -67,6 +67,8 @@ using hfst::implementations::HfstBasicTransducer;
 using hfst::implementations::HfstBasicTransition;
 
 #define GET_TOP(x) HfstTransducer * x = this->top(); if ((x) == NULL) { return *this; }
+#define PROMPT_AND_RETURN_THIS prompt(); return *this;
+#define PRINT_INFO_PROMPT_AND_RETURN_THIS print_transducer_info(); prompt(); return *this;
 #define IF_NULL_PROMPT_AND_RETURN_THIS(x) if (x == NULL) { prompt(); return *this; }
 
 namespace hfst { 
@@ -280,12 +282,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
                 fprintf(outfile, ":%s", print_symbol);
               }
 
-          } // path went through
+          } // path gone through
 
         fprintf(outfile, "\n");
         --n;
 
-      } // at most n paths went through
+      } // at most n paths gone through
 
     return *this;
   }
@@ -389,8 +391,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             add_prop_line(line);
           }
         free(line);
-        prompt();
-        return *this;
+        PROMPT_AND_RETURN_THIS;
       }
 
     XfstCompiler& 
@@ -404,8 +405,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             line = strtok(NULL, "\n");
           }
         free(s);
-        prompt();
-        return *this;
+        PROMPT_AND_RETURN_THIS;
       }
 
   const char *
@@ -463,8 +463,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
         // ignore all readline history given to the apply command
         ignore_history_after_index(ind);
-        prompt();
-        return *this;
+        PROMPT_AND_RETURN_THIS;
       }
 
 
@@ -485,8 +484,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             line = strtok(NULL, "\n");
           }
         free(s);
-        prompt();
-        return *this;
+        PROMPT_AND_RETURN_THIS;
       }
 
     XfstCompiler&
@@ -506,8 +504,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             line = strtok(NULL, "\n");
           }
         free(s);
-        prompt();
-        return *this;
+        PROMPT_AND_RETURN_THIS;
       }
     XfstCompiler&
     XfstCompiler::apply_med(FILE* infile)
@@ -533,16 +530,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             line = strtok(NULL, "\n");
           }
         free(s);
-        prompt();
-        return *this;
+        PROMPT_AND_RETURN_THIS;
       }
 
     XfstCompiler&
     XfstCompiler::define_alias(const char* name, const char* commands)
       {
         aliases_[name] = commands;
-        prompt();
-        return *this;
+        PROMPT_AND_RETURN_THIS;
       }
 
     XfstCompiler& 
@@ -578,8 +573,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           }
         free(p);
         lists_[name] = l;
-        prompt();
-        return *this;
+        PROMPT_AND_RETURN_THIS;
       }
 
   XfstCompiler& 
@@ -588,12 +582,11 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       // When calling this function, the regex \a indata should already have
       // been compiled into a transducer which should have been stored to
       // the variable latest_regex_compiled.
-      HfstTransducer* compiled = latest_regex_compiled;
-      if (compiled != NULL)
+      if (latest_regex_compiled != NULL)
         {
           bool was_defined = xre_.is_definition(name);
           xre_.define(name, xre);
-          definitions_[name] = new HfstTransducer(*compiled);
+          definitions_[name] = new HfstTransducer(*latest_regex_compiled);
 
           if (verbose_) 
             {
@@ -609,8 +602,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           fprintf(stderr, "Could not define variable %s:\n%s\n", 
                   name, xre_.get_error_message().c_str());
         }
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   
@@ -755,8 +747,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           fprintf(stderr, "Error extracting function name "
                   "from prototype '%s'\n", prototype);
           xfst_fail();
-          prompt();
-          return *this;
+          PROMPT_AND_RETURN_THIS;
         }
 
       if (! extract_function_arguments(prototype, arguments))
@@ -764,8 +755,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           fprintf(stderr, "Error extracting function arguments "
                   "from prototype '%s'\n", prototype);
           xfst_fail();
-          prompt();
-          return *this;
+          PROMPT_AND_RETURN_THIS;
         }
 
       std::string xre_converted 
@@ -774,8 +764,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {
           fprintf(stderr, "Error parsing function definition '%s'\n", xre);
           xfst_fail();
-          prompt();
-          return *this;
+          PROMPT_AND_RETURN_THIS;
         }
 
       bool was_defined = xre_.is_function_definition(name);
@@ -784,8 +773,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {
           fprintf(stderr, "Error when defining function\n");
           xfst_fail();
-          prompt();
-          return *this;
+          PROMPT_AND_RETURN_THIS;
         }
 
       if (verbose_) 
@@ -804,8 +792,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       function_definitions_[std::string(name)] 
         = convert_argument_symbols(arguments, xre, "", xre_, true);
 
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
@@ -823,8 +810,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           name = strtok(NULL, " ");
         }
       free(s);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
@@ -833,16 +819,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       if (lists_.find(name) != lists_.end()) {
         lists_.erase(lists_.find(name));
       }
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
   XfstCompiler::name(const char* name)
     {
       names_[name] = stack_.top();
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -857,16 +841,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       fprintf(stderr, "Apropoo %s:%d\n",
               __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
   XfstCompiler::describe(const char* /* text */)
     {
       fprintf(stderr, "HELP! %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -875,17 +857,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       while (!stack_.empty()) {
         stack_.pop();
       }
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
   XfstCompiler::pop()
     {
       stack_.pop();
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -894,14 +873,11 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       if (definitions_.find(name) == definitions_.end())
         {
           fprintf(stderr, "no such defined network: '%s'\n", name);
-          prompt();
-          return *this;
+          PROMPT_AND_RETURN_THIS;
         }
 
       stack_.push(definitions_[name]);
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -914,9 +890,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           stack_.push(new HfstTransducer(*(def->second)));
         }
 
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -933,17 +907,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           stack_.push(tmp.front());
           tmp.pop();
         }
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
   XfstCompiler::rotate()
     {
       if (stack_.empty())
         {
-          prompt();
-          return *this;
+          PROMPT_AND_RETURN_THIS;
         }
         
       stack<HfstTransducer*> tmp;
@@ -954,9 +925,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         }
       stack_ = tmp;
 
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
 
   static const char * to_filename(const char * file)
@@ -992,8 +961,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   }
 
   void
-  XfstCompiler::convert_format_of_transducer_read_from_file
-  (HfstTransducer * t, const char * filename /* = NULL*/)
+  XfstCompiler::convert_to_common_format
+  (HfstTransducer * t, const char * filename /*=NULL*/)
   {
     if (t->get_type() != format_)
       {
@@ -1052,7 +1021,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         HfstTransducer* t = new HfstTransducer(*instream);
         
         // Convert transducer format, if needed
-        convert_format_of_transducer_read_from_file(t, infilename);
+        convert_to_common_format(t, infilename);
         
         // Add transducer as definition..
         if (load_definitions)
@@ -1069,8 +1038,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     
     instream->close();
     delete instream;
-    prompt();
-    return *this;
+    PROMPT_AND_RETURN_THIS;
   }
 
   XfstCompiler& 
@@ -1084,16 +1052,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       fprintf(stderr, "cannot collect epsilon loops %s:%d\n", __FILE__,
               __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::compact_sigma()
     {
       GET_TOP(top);
       top->prune_alphabet();
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -1102,8 +1068,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       GET_TOP(tmp);
       std::string name_(name);
       tmp->eliminate_flag(name);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -1111,16 +1076,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       GET_TOP(tmp);
       tmp->eliminate_flags();
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
   XfstCompiler::echo(const char* text)
     {
       fprintf(stdout, "%s\n", text);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -1148,16 +1111,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {
           fprintf(stderr, "system %s returned %d\n", command, rv);
         }
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
   XfstCompiler::set(const char* name, const char* text)
     {
       variables_[name] = text;
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -1166,16 +1127,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       char* num = static_cast<char*>(malloc(sizeof(char)*31));
       sprintf(num, "%u", number);
       variables_[name] = num;
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
   XfstCompiler::show(const char* name)
     {
       fprintf(stdout, "variable %s = %s\n", name, variables_[name].c_str());
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -1188,8 +1147,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           fprintf(stderr, "%20s:%5s: <EXPLANATION MISSING>\n", 
                   var->first.c_str(), var->second.c_str());
         }
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -1234,8 +1192,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::test_funct()
     {
       fprintf(stderr, "test funct missing %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
   XfstCompiler::test_id()
@@ -1251,8 +1208,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       tmp_output.output_project();
 
       this->print_bool(tmp_input.compare(tmp_output, false));
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::test_upper_bounded()
@@ -1267,8 +1223,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       tmp.minimize();
       
       this->print_bool(! tmp.is_cyclic());
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::test_uni(Level level)
@@ -1292,8 +1247,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
                 "not recognized\n");
 
       this->print_bool(value);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::test_upper_uni()
@@ -1313,8 +1267,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       tmp.minimize();
       
       this->print_bool(! tmp.is_cyclic());
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::test_lower_uni()
@@ -1340,8 +1293,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         value = !value;
       this->print_bool(value);
 
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
@@ -1351,8 +1303,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       {
         fprintf(stderr, "Not enough networks on stack. "
                 "Operation requires at least 2.\n");
-        prompt();
-        return *this;
+        PROMPT_AND_RETURN_THIS;
       }
       std::stack<HfstTransducer*> copied_stack(stack_); 
 
@@ -1373,8 +1324,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             if(topmost_transducer.compare(empty))
               {
                 this->print_bool(false);
-                prompt();
-                return *this;
+                PROMPT_AND_RETURN_THIS;
               }
             break;
           case TEST_SUBLANGUAGE_:
@@ -1384,8 +1334,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
               if(! intersection.compare(topmost_transducer))
                 {
                   this->print_bool(false);
-                  prompt();
-                  return *this;
+                  PROMPT_AND_RETURN_THIS;
                 }
               topmost_transducer = next_transducer;
               break;
@@ -1396,8 +1345,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           }
       }
       this->print_bool(true);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
   }
 
   XfstCompiler& 
@@ -1414,8 +1362,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::test_unambiguous()
     {
       fprintf(stderr, "test unambiguous missing %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -1427,9 +1374,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       top->substitute(target, src);
       stack_.push(top);
 
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::substitute_list(const char* list, const char* target)
@@ -1454,8 +1399,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           print_transducer_info();
         }
       // todo: handle also the case: (substituted == NULL)
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -1468,8 +1412,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           fprintf(outfile, "alias %10s %s", 
                   alias->first.c_str(), alias->second.c_str());
         }
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
           
   XfstCompiler& 
@@ -1477,15 +1420,13 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       fprintf(outfile, "missing %s arc count %s:%d\n", level,
               __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_arc_count(FILE* outfile)
     {
       fprintf(outfile, "missing arc count %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -1498,7 +1439,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {         
           definitions = true;
           fprintf(outfile, "%10s ? bytes. %i states, %i arcs, ? paths\n",
-                  def->first.c_str(), def->second->number_of_states(), def->second->number_of_arcs());
+                  def->first.c_str(), def->second->number_of_states(), 
+                  def->second->number_of_arcs());
         }
       if (!definitions)
         fprintf(outfile, "No defined symbols.\n");
@@ -1508,13 +1450,13 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
            func != function_definitions_.end(); func++)
         {
           definitions = true;
-          fprintf(outfile, "%10s@%i) %s\n", func->first.c_str(), function_arguments_[func->first], func->second.c_str());
+          fprintf(outfile, "%10s@%i) %s\n", func->first.c_str(), 
+                  function_arguments_[func->first], func->second.c_str());
         }
       if (!definitions)
         fprintf(stderr, "No function definitions.\n");
 
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -1538,16 +1480,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 #else
       fprintf(stderr, "print dir not implemented for windows\n");
 #endif // WINDOWS
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
   XfstCompiler::print_flags(FILE* outfile)
     {
       fprintf(outfile, "missing print flags %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   
   XfstCompiler&
@@ -1570,8 +1510,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {
           return this->print_labels(outfile, it->second);
         }
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -1605,15 +1544,13 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       fprintf(outfile, "\n");
       fprintf(outfile, "Size: %i\n", (int)label_set.size());
 
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_labelmaps(FILE* outfile)
     {
       fprintf(outfile, "missing label-maps %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -1651,8 +1588,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         }
       fprintf(outfile, "\n");
 
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
@@ -1666,8 +1602,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {
           fprintf(outfile, "%s ", s->c_str());
         }
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -1685,8 +1620,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
               fprintf(outfile, "%s ", s->c_str());
             }
         }
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
@@ -1714,8 +1648,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {
           print_paths(paths, outfile);
         }
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_shortest_string_size(FILE* outfile)
@@ -1731,104 +1664,94 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       else {
         fprintf(outfile, "%i\n", (int)(paths.begin()->second.size()));
       }
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
+
+  XfstCompiler&
+  XfstCompiler::print_one_string_or_its_size
+  (FILE* outfile, const HfstTwoLevelPaths & paths, const char * level, bool print_size)
+  {
+    assert(level != NULL);
+    fprintf(outfile, "%s", level);
+    if (print_size)
+      {
+        fprintf(outfile, "%i\n", (int)paths.begin()->second.size());
+      }
+    else
+      {
+        print_paths(paths, outfile, 1);
+      }
+    return *this;
+  }
 
   XfstCompiler&
   XfstCompiler::print_longest_string_or_its_size(FILE* outfile, bool print_size)
   {
     GET_TOP(topmost);
 
-      HfstTransducer tmp_lower(*topmost);
-      HfstTransducer tmp_upper(*topmost);
-      tmp_lower.output_project().minimize();
-      tmp_upper.input_project().minimize();
+    // Variables needed to find out some properties about the transducer
+    HfstTransducer tmp_lower(*topmost); 
+    HfstTransducer tmp_upper(*topmost);
+    tmp_lower.output_project().minimize(); 
+    tmp_upper.input_project().minimize();
 
-      HfstTwoLevelPaths paths_upper;
-      HfstTwoLevelPaths paths_lower;
+    HfstTwoLevelPaths paths_upper;
+    HfstTwoLevelPaths paths_lower;
+    bool upper_is_cyclic = false;
+    bool lower_is_cyclic = false;
+    bool transducer_is_empty = false;
 
-      bool upper_is_cyclic = false;
-      bool lower_is_cyclic = false;
-      bool transducer_is_empty = false;
+    try { // Transducer is empty if neither upper..
+      transducer_is_empty = 
+        ! tmp_upper.extract_longest_paths(paths_upper, 
+                                          variables_["obey-flags"] == "ON");
+    }
+    catch (const TransducerIsCyclicException & e) {
+      upper_is_cyclic = true;
+    }
+    
+    try { // ..nor lower paths can be extracted.
+      transducer_is_empty = 
+        ! tmp_lower.extract_longest_paths(paths_lower, 
+                                          variables_["obey-flags"] == "ON");
+    }
+    catch (const TransducerIsCyclicException & e) {
+      lower_is_cyclic = true;
+    }
 
-      try
+    // Print the results:
+    // first, the special cases,
+    if (upper_is_cyclic && lower_is_cyclic) {
+      fprintf(stdout, "transducer is cyclic\n");
+    }
+    else if (transducer_is_empty) {
+      fprintf(stdout, "transducer is empty\n");
+    }
+    // then the usual: 
+    else {
+      // warn about flag diacritics
+      if (variables_["show-flags"] == "OFF" && 
+          (tmp_upper.has_flag_diacritics() || 
+           tmp_lower.has_flag_diacritics()) )
         {
-          transducer_is_empty = 
-            ! tmp_upper.extract_longest_paths(paths_upper, 
-                                              variables_["obey-flags"] == "ON");
+          fprintf(stdout, "warning: longest string may have flag diacritics that are not shown\n");
+          fprintf(stdout, "         but are used in calculating its length (use 'eliminate flags')\n");
         }
-      catch (const TransducerIsCyclicException & e)
-        {
-          upper_is_cyclic = true;
-        }
+      
+      // print one longest string of the upper level, if not cyclic
+      if (upper_is_cyclic) {
+        fprintf(outfile, "Upper level is cyclic.\n"); }
+      else {
+        print_one_string_or_its_size(outfile, paths_upper, "Upper", print_size); }
+      
+      // print one longest string of the lower level, if not cyclic
+        if (lower_is_cyclic) {
+          fprintf(outfile, "Lower level is cyclic.\n"); }
+        else {
+          print_one_string_or_its_size(outfile, paths_lower, "Lower", print_size); }
+    }
 
-      try
-        {
-          transducer_is_empty = 
-            ! tmp_lower.extract_longest_paths(paths_lower, 
-                                              variables_["obey-flags"] == "ON");
-        }
-      catch (const TransducerIsCyclicException & e)
-        {
-          lower_is_cyclic = true;
-        }
-
-      if (upper_is_cyclic && lower_is_cyclic)
-        {
-          fprintf(stdout, "transducer is cyclic\n");
-        }
-      else if (transducer_is_empty)
-        {
-          fprintf(stdout, "transducer is empty\n");
-        }
-      else
-        {
-          if (variables_["show-flags"] == "OFF" && 
-              (tmp_upper.has_flag_diacritics() || 
-               tmp_lower.has_flag_diacritics()) )
-            {
-              fprintf(stdout, "warning: longest string may have flag diacritics that are not shown\n");
-              fprintf(stdout, "         but are used in calculating its length (use 'eliminate flags')\n");
-            }
-
-          if (upper_is_cyclic)
-            {
-              fprintf(outfile, "Upper level is cyclic.\n");
-            }
-          else
-            {
-              fprintf(outfile, "Upper: ");
-              if (print_size)
-                {
-                  fprintf(outfile, "%i\n", (int)paths_upper.begin()->second.size());
-                }
-              else
-                {
-                  print_paths(paths_upper, outfile, 1);
-                }
-            }
-
-          if (lower_is_cyclic)
-            {
-              fprintf(outfile, "Lower level is cyclic.\n");
-            }
-          else
-            {
-              fprintf(outfile, "Lower: ");
-              if (print_size)
-                {
-                  fprintf(outfile, "%i\n", (int)paths_lower.begin()->second.size());
-                }
-              else
-                {
-                  print_paths(paths_lower, outfile, 1);
-                }
-            }
-        }
-
-      prompt();
-      return *this;
+    PROMPT_AND_RETURN_THIS;
   }
 
   XfstCompiler& 
@@ -1857,8 +1780,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       tmp.output_project();
       tmp.extract_random_paths(paths, number);
       print_paths(paths, outfile);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_upper_words(unsigned int number,
@@ -1874,8 +1796,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       tmp.input_project();
       tmp.extract_random_paths(paths, number);
       print_paths(paths, outfile);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -1906,8 +1827,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         default:
           fprintf(stderr, "ERROR: argument given to function 'print_words'\n"
                   "not recognized\n");
-          prompt();
-          return *this;
+          PROMPT_AND_RETURN_THIS;
         }
 
       HfstTwoLevelPaths results;
@@ -1924,8 +1844,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
       print_paths(results, outfile);
 
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -1936,8 +1855,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       hfst::HfstTwoLevelPaths paths;
       tmp->extract_random_paths(paths, number);
       print_paths(paths, outfile);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_name(FILE* outfile)
@@ -1950,14 +1868,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           if (tmp == it->second)
             {
               fprintf(outfile, "Name: %s\n", it->first.c_str());
-              prompt();
-              return *this;
+              PROMPT_AND_RETURN_THIS;
             }
         }
 
       fprintf(outfile, "No name.\n");
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_net(FILE* outfile)
@@ -1965,15 +1881,13 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       GET_TOP(tmp);
       HfstBasicTransducer basic(*tmp);
       basic.write_in_xfst_format(outfile);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_net(const char* /*name*/, FILE* outfile)
     {
       fprintf(outfile, "missing print net %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   static bool is_special_symbol(const std::string &s)
@@ -2010,52 +1924,45 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       hfst::StringSet alpha = stack_.top()->get_alphabet();
       print_alphabet(alpha, outfile);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_sigma(const char* /*name*/, FILE* outfile)
     {
       fprintf(outfile, "missing print sigma %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_sigma_count(FILE* outfile)
     {
       fprintf(outfile, "missing print sigma count %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_sigma_word_count(const char* level, FILE* outfile)
     {
       fprintf(outfile, "missing %s sigma word count %s:%d\n", level,
               __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_sigma_word_count(FILE* outfile)
     {
       fprintf(outfile, "missing sigma word count %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_size(const char* name, FILE* outfile)
     {
       fprintf(outfile, "%10s: ", name);
       fprintf(outfile, "? bytes. ? states, ? arcs, ? paths.\n");
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_size(FILE* outfile)
     {
       fprintf(outfile, "? bytes. ? states, ? arcs, ? paths.\n");
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_stack(FILE* outfile)
@@ -2074,44 +1981,38 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           stack_.push(tmp.top());
           tmp.pop();
         }
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
         
   XfstCompiler& 
   XfstCompiler::write_dot(FILE* outfile)
     {
       fprintf(outfile, "missing write dot %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
   XfstCompiler::write_dot(const char* /*name*/, FILE* outfile)
     {
       fprintf(outfile, "missing write dot %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::write_prolog(FILE* outfile)
     {
       fprintf(outfile, "missing write prolog %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::write_spaced(FILE* outfile)
     {
       fprintf(outfile, "missing write spaced %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::write_text(FILE* outfile)
     {
       fprintf(outfile, "missing write text %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::write_function(const char* name, const char* outfile)
@@ -2120,8 +2021,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {
           fprintf(stdout, "%10s: %p\n", name, functions_[name]);
           }*/
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::write_definition(const char* name, const char* outfile)
@@ -2129,8 +2029,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       if (definitions_.find(name) == definitions_.end())
         {
           fprintf(stderr, "no such defined network: '%s'\n", name);
-          prompt();
-          return *this;
+          PROMPT_AND_RETURN_THIS;
         }
 
       HfstOutputStream* outstream = (outfile != 0) ?
@@ -2141,8 +2040,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       *outstream << tmp;
       outstream->close();
       delete outstream;
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::write_definitions(const char* outfile)
@@ -2150,8 +2048,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       if (definitions_.empty())
         {
           fprintf(stderr, "no defined networks\n");
-          prompt();
-          return *this;
+          PROMPT_AND_RETURN_THIS;
         }
 
       HfstOutputStream* outstream = (outfile != 0) ?
@@ -2167,8 +2064,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         }
       outstream->close();
       delete outstream;
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
@@ -2191,8 +2087,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           stack_.push(tmp.top());
           tmp.pop();
         }
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::read_props(FILE* infile)
@@ -2205,8 +2100,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             add_prop_line(line);
           }
         free(line);
-        prompt();
-        return *this;
+        PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::read_props(const char* indata)
@@ -2219,8 +2113,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             line = strtok(NULL, "\n");
           }
         free(s);
-        prompt();
-        return *this;
+        PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::read_regex(FILE* infile)
@@ -2253,8 +2146,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         {
           print_transducer_info();
         }
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -2286,24 +2178,19 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
                   xre_.get_error_message().c_str());
           xfst_fail();
         }
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::read_prolog(FILE* /* infile */)
     {
       fprintf(stderr, "missing read prolog %s:%d\n", __FILE__, __LINE__);
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::read_prolog(const char* /* indata */)
     {
       fprintf(stderr, "missing read prolog %s:%d\n", __FILE__, __LINE__);
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::read_spaced(FILE* infile)
@@ -2314,9 +2201,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::read_spaced(const char* /* indata */)
     {
       fprintf(stderr, "missing read spaced %s:%d\n", __FILE__, __LINE__);
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::read_text_or_spaced(FILE* infile, bool spaces)
@@ -2336,10 +2221,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     
     tmp->minimize();
     stack_.push(tmp);
-    
-    print_transducer_info();
-    prompt();
-    return *this;
+    PRINT_INFO_PROMPT_AND_RETURN_THIS;
   }
   XfstCompiler& 
   XfstCompiler::read_text(FILE* infile)
@@ -2350,9 +2232,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::read_text(const char* /* indata */)
     {
       fprintf(stderr, "missing read text %s:%d\n", __FILE__, __LINE__);
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -2364,9 +2244,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           fprintf(stderr, "Empty stack.\n");
           return *this;
         }
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::complete_net()
@@ -2379,10 +2257,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       stack_.pop();
       delete topmost;
       stack_.push(result);
-
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -2460,8 +2335,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         stack_.push(result);
       }
 
-    prompt();
-    return *this;
+    PROMPT_AND_RETURN_THIS;
   }
 
   XfstCompiler&
@@ -2511,9 +2385,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       result->minimize();
       delete another;
       stack_.push(result);
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
   }
 
   XfstCompiler&
@@ -2557,9 +2429,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         delete t;
       }
     stack_.push(result);
-    print_transducer_info();
-    prompt();
-    return *this;
+    PRINT_INFO_PROMPT_AND_RETURN_THIS;
   }
 
   XfstCompiler& 
@@ -2621,9 +2491,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       delete topmost;
       stack_.push(result);
 
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -2656,9 +2524,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         }
       HfstTransducer* t = stack_.top();
       names_[s] = t;
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::negate_net()
@@ -2683,9 +2549,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       delete t;
       
       stack_.push(result);
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::one_plus_net()
@@ -2727,25 +2591,19 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       HfstTransducer * sigma = new HfstTransducer(alpha_, format_);
       
       stack_.push(sigma);
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::sort_net()
     {
       fprintf(stderr, "cannot sort net %s:%d\n", __FILE__, __LINE__);
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::substring_net()
     {
       fprintf(stderr, "missing substring net %s:%d\n", __FILE__, __LINE__);
-      print_transducer_info();
-      prompt();
-      return *this;
+      PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
   XfstCompiler::union_net()
@@ -2758,16 +2616,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       fprintf(outfile, "file info not implemented (cf. summarize) %s:%d\n",
               __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
   XfstCompiler::print_properties(const char* /* name */, FILE* outfile)
     {
       fprintf(outfile, "missing print properties %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   // For 'inspect_net': print to stdout all arcs in 
@@ -3011,8 +2867,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
               if (whole_path.size() < 2)  // exit if already in the start state
                 {
                   ignore_history_after_index(ind);
-                  prompt();
-                  return *this;
+                  PROMPT_AND_RETURN_THIS;
                 }
               else if (! return_to_level(whole_path, shortest_path, 
                                          whole_path.size() - 1))
@@ -3020,8 +2875,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
                   fprintf(stdout, "FATAL ERROR: could not return to level '%i'\n", 
                           (int)(whole_path.size() - 1));
                   ignore_history_after_index(ind);
-                  prompt();
-                  return *this;
+                  PROMPT_AND_RETURN_THIS;
                 }
             }
           // case (2): back to state number N
@@ -3036,16 +2890,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
                 {
                   fprintf(stdout, "FATAL ERROR: could not return to level '%i'\n", level);
                   ignore_history_after_index(ind);
-                  prompt();
-                  return *this;
+                  PROMPT_AND_RETURN_THIS;
                 }
             }
           // case (3): exit program
           else if (strcmp(line, "0\n") == 0 || strcmp(line, "0") == 0)
             {
               ignore_history_after_index(ind);
-              prompt();
-              return *this;
+              PROMPT_AND_RETURN_THIS;
             }
           // case (4): follow arc
           else
@@ -3077,37 +2929,32 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         } // end of while loop
 
       ignore_history_after_index(ind);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
   XfstCompiler::compile_replace_upper_net()
     {
       fprintf(stderr, "missing compile_replace_upper net %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
   XfstCompiler::compile_replace_lower_net()
     {
       fprintf(stderr, "missing compile_replace_lower net %s:%d\n", __FILE__, __LINE__);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
   XfstCompiler::hfst(const char* text)
     {
       fprintf(stderr, "HFST: %s\n", text);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
   XfstCompiler::read_lexc(FILE* infile)
     {
       lexc_.parse(infile);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
   XfstCompiler::read_att(FILE* infile)
@@ -3123,16 +2970,14 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           fprintf(stderr, "error reading file in att format\n");
           xfst_fail();
         }
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::write_att(FILE* infile)
     {
       GET_TOP(tmp);
       tmp->write_in_att_format(infile);
-      prompt();
-      return *this;
+      PROMPT_AND_RETURN_THIS;
     }
   const std::stack<HfstTransducer*>&
   XfstCompiler::get_stack() const 

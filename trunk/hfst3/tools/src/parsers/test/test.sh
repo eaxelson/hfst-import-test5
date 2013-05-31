@@ -1,6 +1,6 @@
 #!/bin/sh
 
-exit 77;
+#exit 77;
 
 XFST_TOOL="../hfst-xfst2fst -s --pipe-mode"
 STRINGS2FST="../../hfst-strings2fst -S"
@@ -158,7 +158,7 @@ do
     done
 
     ## Interactive commands
-    for testfile in apply_up apply_down
+    for testfile in apply_up apply_down inspect_net
     do
 	if ! (ls $testfile.xfst 2> /dev/null); then
 	    echo "skipping missing test for "$testfile"..."
@@ -167,13 +167,28 @@ do
         # apply up/down leak to stdout with readline..
         for param in --pipe-mode --no-readline
         do
+            # 'inspect net' requires input from stdin
+            if (test "$param" = "--pipe-mode" -a "$testfile" = "inspect_net"); then
+                continue
+            fi
 	    if ! (cat $testfile.xfst | ../hfst-xfst2fst $param -f $format -s > tmp); then
 	    echo "ERROR: in compiling "$testfile.xfst" with parameters "$param
 	    exit 1;
 	    fi
-	    if ! ($DIFF tmp $testfile.output); then
-	        echo "ERROR: in result from "$testfile.xfst" with parameters "$param
-	        exit 1;
+	    if ! ($DIFF tmp $testfile.output > tmpdiff); then
+                if (ls $testfile.alternative_output > /dev/null 2> /dev/null); then
+                    if ! ($DIFF tmp $testfile.alternative_output); then
+                        rm -f tmpdiff
+                        echo "ERROR: in result from "$testfile.xfst
+                        exit 1;
+                    fi
+                else
+                    cat tmpdiff
+                    rm -f tmpdiff
+	            echo "ERROR: in result from "$testfile.xfst
+	            exit 1;
+                fi
+                rm -f tmpdiff
 	    fi
         done
     done
