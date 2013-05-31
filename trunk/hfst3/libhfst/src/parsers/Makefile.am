@@ -46,15 +46,6 @@ else
   AM_CPPFLAGS+= -I${top_srcdir}/back-ends/openfst/src/include
 endif
 
-xre_parse.h:xre_parse.hh
-	cp xre_parse.hh xre_parse.h
-
-lexc-parser.h:lexc-parser.hh
-	cp lexc-parser.hh lexc-parser.h
-
-pmatch_parse.h:pmatch_parse.hh
-	cp pmatch_parse.hh pmatch_parse.h
-
 # headers of parsers
 hfstincludedir = $(includedir)/hfst
 extincludedir = $(hfstincludedir)/parsers
