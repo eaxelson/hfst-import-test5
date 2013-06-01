@@ -575,8 +575,8 @@ which one Pmatch
 chooses. To disambiguate between matches, context conditions can be
 added to the matching regular expressions.
 If a part of the input does not match \texttt{TOP} or only matches a
-subexpression without an \texttt{EndTag},
-Pmatch outputs it as such.
+subexpression without an \texttt{EndTag} or any transductions,
+Pmatch outputs it unaltered.
 
 HFST Pmatch regular expressions may also contain transductions that can add
 extra output or discard specified parts of the input. Even though they
