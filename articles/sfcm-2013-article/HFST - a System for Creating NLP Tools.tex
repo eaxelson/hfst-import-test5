@@ -43,15 +43,15 @@ juha.kuokkala, jyrki.niemi, tommi.pirinen, miikka.silfverberg\}@helsinki.fi}}
 
 \begin{abstract}
 %Krister
-The paper presents and evaluates various NLP tools that have been created using the open source library HFST--Helsinki Finite-State Technology and outlines the minimal extensions that this has required to a pure finite-state system. In particular, the paper describes an implementation and application of p-match presented by Karttunen at SFCM 2011.
-\keywords{finite-state technology, language identification, morphological guessers, spell-checking, named-entity recognition, language generation, parsing, HFST, XFST, p-match}
+The paper presents and evaluates various NLP tools that have been created using the open source library HFST--Helsinki Finite-State Technology and outlines the minimal extensions that this has required to a pure finite-state system. In particular, the paper describes an implementation and application of Pmatch presented by Karttunen at SFCM 2011.
+\keywords{finite-state technology, language identification, morphological guessers, spell-checking, named-entity recognition, language generation, parsing, HFST, XFST, Pmatch}
 \end{abstract}
 
 \section*{Introduction}
 % Krister
 In natural language processing, finite-state string transducer methods have been found useful for solving a number of practical problems ranging from language identification via morphological processing and generation to part-of-speech tagging and named-entity recognition as long as the problems lend themselves to a formulation based on matching and transforming local context.
 
-In this paper, we present and evaluate various tools that have been created using HFST--Helsinki Finite-State Technology\footnote{\url{http://hfst.sf.net}} and outline the minimal extensions that this has required to a pure FST system. In particular, we describe an implementation of p-match presented by Karttunen at SFCM 2011~\cite{karttunen/2011} and its application to a large-scale named-entity recognizer for Swedish.
+In this paper, we present and evaluate various tools that have been created using HFST--Helsinki Finite-State Technology\footnote{\url{http://hfst.sf.net}} and outline the minimal extensions that this has required to a pure FST system. In particular, we describe an implementation of Pmatch presented by Karttunen at SFCM 2011~\cite{karttunen/2011} and its application to a large-scale named-entity recognizer for Swedish.
 
 The paper is structured into Section~\ref{hfst:structural-layout} on applications and their evaluation. In Section~\ref{hfst:env-examples}, we present examples of user environments supported by HFST. In Section~\ref{hfst:solutions}, we present some of the solutions and extensions needed to implement the applications. This is followed by the Sections~\ref{hfst:discussion} and \ref{hfst:conclusion} with an outline of some future work and the discussion, respectively.
 
@@ -1426,7 +1426,7 @@ phenomena as fuzzy sets in a compact way. This makes them an excellent
 candidate for adding linguistic knowledge to statistical models.
 
 \section{Conclusion}\label{hfst:conclusion}
-The paper presented various NLP tools implemented with HFST and the minimal extensions they required to a pure finite-state system. In particular, the paper described an implementation of a full-scale named-entity recognizer for Swedish using p-match achieving a 10-fold compile-time speed-up compared with the original Flex implementation.
+The paper presented various NLP tools implemented with HFST and the minimal extensions they required to a pure finite-state system. In particular, the paper described an implementation of a full-scale named-entity recognizer for Swedish using Pmatch achieving a 10-fold compile-time speed-up compared with the original Flex implementation.
 
 \subsubsection*{Acknowledgments}
 The research leading to these results has received funding from FIN-CLARIN, Langnet and the
