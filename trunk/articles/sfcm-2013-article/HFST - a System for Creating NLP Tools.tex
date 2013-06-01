@@ -211,7 +211,7 @@ to recognize some words which inflect similarly to the unknown
 word. These can be used for guessing the inflection of the unknown
 word.
 
-Guessing of an unknown word like ``twiitin'' (the genitive form of
+The guessing of an unknown word like ``twiitin'' (the genitive form of
 ``twiitti'', tweet in Finnish) is based on finding recognized word
 forms like ``sviitin'' (genitive form of ``sviitti'', hotel suite in
 Finnish) that have long suffixes, such as ``-iitin'', which match the
@@ -267,7 +267,7 @@ recognized by the morphological analyzer.
 
 HFST morphological guessers presented in Section~\ref{sec:
   morph-guessers} can be used for generation as well as morphological
-analysis. For example using the OMorFi morphology for Finnish, the
+analysis. For example, using the OMorFi morphology for Finnish, the
 best morphological guess for the unknown word ``twiitin'' is
 \begin{verbatim}
   twiit  [POS=NOUN] [GUESS_CATEGORY=5]  [NUM=SG][CASE=GEN]
@@ -495,7 +495,10 @@ initial guesser.
 
 \subsection{Named-Entity Recognition}
 % Jyrki, Juha (Sam?)
-Names of named entities are among the most important key words in information retrieval. In addition, names indicate agents and objects which are important in information extraction. Often named entities are denoted by multi-word expressions. In HFST, a pattern-matching tool, {\tt hfst-pmatch}, has been implemented for identifying multi-word expressions and recognizing named entities.
+Named entities are among the most important elements of interest in information retrieval.
+In addition, names indicate agents and objects which are important in information extraction.
+Often named entities are denoted by multi-word expressions. In HFST, a pattern-matching tool,
+{\tt hfst-pmatch}, has been implemented for identifying multi-word expressions and recognizing named entities.
 
 \subsubsection{Background.}
 % An important application of the Pmatch tool is rule-based named entity
