@@ -49,14 +49,18 @@ The paper presents and evaluates various NLP tools that have been created using 
 
 \section*{Introduction}
 % Krister
-In natural language processing, finite-state string transducer methods have been found useful for solving a number of practical problems ranging from language identification via morphological processing and generation to part-of-speech tagging and named-entity recognition as long as the problems lend themselves to a formulation based on matching and transforming local context.
+In natural language processing, finite-state string transducer methods have been found useful for solving a number of practical problems ranging from language identification via morphological processing and generation to part-of-speech tagging and named-entity recognition, as long as the problems lend themselves to a formulation based on matching and transforming local context.
 
+% NOTE: repetitive of the abstract
 In this paper, we present and evaluate various tools that have been created using HFST--Helsinki Finite-State Technology\footnote{\url{http://hfst.sf.net}} and outline the minimal extensions that this has required to a pure FST system. In particular, we describe an implementation of Pmatch presented by Karttunen at SFCM 2011~\cite{karttunen/2011} and its application to a large-scale named-entity recognizer for Swedish.
 
-The paper is structured into Section~\ref{hfst:structural-layout} on applications and their evaluation. In Section~\ref{hfst:env-examples}, we present examples of user environments supported by HFST. In Section~\ref{hfst:solutions}, we present some of the solutions and extensions needed to implement the applications. This is followed by the Sections~\ref{hfst:discussion} and \ref{hfst:conclusion} with an outline of some future work and the discussion, respectively.
+The paper is structured as follows: Section~\ref{hfst:structural-layout} is on applications and their evaluation.
+In Section~\ref{hfst:env-examples}, we present examples of user environments supported by HFST.
+In Section~\ref{hfst:solutions}, we present some of the solutions and extensions needed to implement the applications.
+This is followed by the Sections~\ref{hfst:discussion} and \ref{hfst:conclusion} with an outline of some future work and the discussion, respectively.
 
 \section{Applications and Tests}\label{hfst:structural-layout}
-In this section, we describe and evaluate some applications implemented with HFST. When processing text corpora, it is useful first to identify the language of the text before analyzing its words morphologically. Words unknown to the morphological lexicon need a guesser derived from the lexicon. The reverse operation of morphological analysis is morphological generation. Generating inflections of words unknown to the morphological lexicon can be used for eliciting information from native speakers before adding the words to the lexicon. For information extraction, it is important to be able to identify multi-word expressions such as named entities, for which purpose HFST has a pattern matching tool. Finally, we also describe a traditional application area of finite-state morphology, i.e. spell-checking and spelling correction, which now gets a uniform implementation using weighted finite-state technology. 
+In this section, we describe and evaluate some applications implemented with HFST. When processing text corpora, it is useful to first identify the language of the text before analyzing its words morphologically. Words unknown to the morphological lexicon need a guesser derived from the lexicon. The reverse operation of morphological analysis is morphological generation. Generating inflections of words unknown to the morphological lexicon can be used for eliciting information from native speakers before adding the words to the lexicon. For information extraction, it is important to be able to identify multi-word expressions such as named entities, for which purpose HFST has a pattern matching tool. Finally, we also describe a traditional application area of finite-state morphology, i.e. spell-checking and spelling correction, which is now servd by a uniform implementation using weighted finite-state technology. 
 
 \subsection{Language identification}
 % Miikka
