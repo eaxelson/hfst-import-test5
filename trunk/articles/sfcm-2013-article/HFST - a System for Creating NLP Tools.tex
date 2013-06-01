@@ -729,7 +729,7 @@ filter modifies, removes and adds new tags based on existing ones.
 Motivations for reimplementing the Swedish recognizer in Pmatch
 included the slow compilation of some of the Flex rule sets, which
 hindered testing changes to the rules, and a
-wish to be able to use a single tool or
+desire to be able to use a single tool or
 formalism for all the components of the recognizer.
 
 Since both Flex and Pmatch are based on regular expressions and
@@ -945,7 +945,7 @@ than the Flex ones.
 The total size of the current Pmatch
 FSTs for the Swedish NER is over three gigabytes, which is about eight times as large as the
 executables compiled from the Flex files. However, the FST sizes
-will be reduced as soon as expression caching and sequentialization
+will be reduced as soon as expression caching
 are implemented in Pmatch. Using a recursive transition network
 feature similar to Karttunen's~\cite{karttunen/2011} \texttt{Ins()}
 will further reduce the FSTs and their compile times.
