@@ -1153,7 +1153,7 @@ command-line tools.
 There is some additional control over special symbols as we have added a parameter
 for binary operators controlling whether unknown and identity transitions
 are expanded, the default being true. We also have a new special
-symbol, the default symbol matching any symbol if no other
+symbol, the \verb+default+ symbol matching any symbol if no other
 transition in a given state matches.
 
 We have kept the number of dependencies in HFST as low as possible.
@@ -1166,7 +1166,9 @@ the scripts to make them more portable.
 
 \section{Under the Hood}\label{hfst:solutions}
 
-In the following section, we describe some of the technical solutions required to implement the HFST library and the applications addressed in the previous sections, as well as some minor design differences with regard to XFST.
+In the following section, we describe some of the technical choices made to implement
+the HFST library and the applications addressed in the previous sections, as well
+as some minor design differences with regard to XFST.
 
 \subsection{An independent XFST module}
 % Erik (Erik)
@@ -1271,8 +1273,8 @@ HFST's \verb+hfst-xfst2fst+ always prunes the alphabet after the following opera
 \textbf{replace rules} (contexts are also pruned before being compiled with the
 rule), \textbf{complement}, \textbf{containments}, \textbf{intersection},
 \textbf{minus}. However, it seems that XFST prunes the alphabet only if at
-least one of the operands contains the unknown symbol and if the result does not
-contain the any symbol. Therefore, if the above commands were run in the \verb+hfst-xfst2fst+
+least one of the operands contains the \verb+unknown+ symbol and if the result does not
+contain the \verb+any+ symbol. Therefore, if the above commands were run in the \verb+hfst-xfst2fst+
 environment, the resulting alphabet is different from that of XFST,
 being \verb+a+, \verb+b+ in both cases.
 
