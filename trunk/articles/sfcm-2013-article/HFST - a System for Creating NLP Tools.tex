@@ -954,7 +954,7 @@ will further reduce the FSTs and their compile times.
 % Tommi
 Using weighted finite-state methods for spell-checking and correction 
 is a relatively recent branch of study in spell-checking research. The concept
-is simple: finite-state morphological analyzers can easily be ported
+is simple: finite-state morphological analyzers can easily be transformed
 into spell-checking dictionaries providing a language model for the correctly
 spelled words in the spell-checking system. A baseline finite-state model for
 correcting spelling errors can be inferred from the language model by creating
@@ -981,7 +981,8 @@ The error model can be improved from the baseline Levenshtein-Damerau distance
 metric as well. For this purpose we need an error corpus, i.e., a set of
 errors with their frequencies. This can be semi-automatically extracted from
 weakly annotated sources, such as Wikipedia. From Wikipedia we get, among 
-other things, word-to-word corrections. It is possible to use the specific
+other things, word-to-word corrections by inspecting the commit messages
+from Wikipedia's logs. It is possible to use the specific
 word-to-word corrections to create an extension of common confusables to the
 error model. Another way is to re-align the corrections using the
 Damerau-Levenshtein algorithm and train the original character distance measure with
@@ -1012,7 +1013,8 @@ to~\cite{pirinen2012improving}.
 
 \section{Examples for User Environments}\label{hfst:env-examples}
 
-In this section, we provide some examples of how to implement your own applications on top of the HFST library using Python. The HFST library and its Python bindings are readily installable in all major operating systems.
+In this section, we provide some examples of how to implement applications on top of the HFST library using Python.
+The HFST library and its Python bindings are readily installable in all major operating systems.
 
 \subsection{An Interface in Python}
 % Erik, Tommi
