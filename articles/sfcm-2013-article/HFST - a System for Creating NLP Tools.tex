@@ -60,7 +60,7 @@ In Section~\ref{hfst:solutions}, we present some of the solutions and extensions
 This is followed by the Sections~\ref{hfst:discussion} and \ref{hfst:conclusion} with an outline of some future work and the discussion, respectively.
 
 \section{Applications and Tests}\label{hfst:structural-layout}
-In this section, we describe and evaluate some applications implemented with HFST. When processing text corpora, it is useful to first identify the language of the text before analyzing its words morphologically. Words unknown to the morphological lexicon need a guesser derived from the lexicon. The reverse operation of morphological analysis is morphological generation. Generating inflections of words unknown to the morphological lexicon can be used for eliciting information from native speakers before adding the words to the lexicon. For information extraction, it is important to be able to identify multi-word expressions such as named entities, for which purpose HFST has a pattern matching tool. Finally, we also describe a traditional application area of finite-state morphology, i.e. spell-checking and spelling correction, which is now servd by a uniform implementation using weighted finite-state technology. 
+In this section, we describe and evaluate some applications implemented with HFST. When processing text corpora, it is useful to first identify the language of the text before analyzing its words morphologically. Words unknown to the morphological lexicon need a guesser derived from the lexicon. The reverse operation of morphological analysis is morphological generation. Generating inflections of words unknown to the morphological lexicon can be used for eliciting information from native speakers before adding the words to the lexicon. For information extraction, it is important to be able to identify multi-word expressions such as named entities, for which purpose HFST has a pattern matching tool. Finally, we also describe a traditional application area of finite-state morphology, i.e. spell-checking and spelling correction, which is now served by a uniform implementation using weighted finite-state technology. 
 
 \subsection{Language identification}
 % Miikka
@@ -946,7 +946,7 @@ The total size of the current Pmatch
 FSTs for the Swedish NER is over three gigabytes, which is about eight times as large as the
 executables compiled from the Flex files. However, the FST sizes
 will be reduced as soon as expression caching
-are implemented in Pmatch. Using a recursive transition network
+is implemented in Pmatch. Using a recursive transition network
 feature similar to Karttunen's~\cite{karttunen/2011} \texttt{Ins()}
 will further reduce the FSTs and their compile times.
 
@@ -1206,12 +1206,12 @@ that are found on the homepage of Beesley and Karttunen's book Finite
 State Morphology\footnote{\url{http://www.fsmbook.com}}. We have omitted the exercises that do not include an
 answer. We have compiled the exercises
 using both Xerox's XFST and HFST's \texttt{hfst-xfst} and compared the results
-for equivalence. We have also tested the funcionality of the
+for equivalence. We have also tested the functionality of the
 \verb+hfst-regexp2fst+ tool by rewriting the original exercises
 using HFST command line tools (other than \texttt{hfst-xfst}).
 
 % Senka, Miikka
-Although we are aiming at complete backward compability with XFST, we
+Although we are aiming at complete backward compatibility with XFST, we
 have noticed that in some borderline cases the results may differ 
 when using replace rules in regular expressions.
 One example in which XFST and \verb+hfst-xfst2fst+ may
