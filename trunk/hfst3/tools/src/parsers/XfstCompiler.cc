@@ -75,6 +75,9 @@ namespace hfst {
 namespace xfst {
 
   static const char * APPLY_END_STRING = "<ctrl-d>";
+  FILE * outstream_ = stdout;
+  FILE * warnstream_ = stderr;
+  FILE * errorstream_ = stderr;
   
     XfstCompiler::XfstCompiler() :
       help(StringMap()),
@@ -174,7 +177,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         if (*p == '\0')
           {
             assert(*p != '\0');
-            fprintf(stderr, "no colon in line\n");
+            fprintf(errorstream_, "no colon in line\n");
           }
         p++;
         while (isspace(*p))
@@ -318,7 +321,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
         this->print_paths(*paths);
         if (paths->empty()) {
-          fprintf(stdout, "???\n");
+          fprintf(outstream_, "???\n");
         }
 
         delete paths;
@@ -343,7 +346,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     XfstCompiler&
     XfstCompiler::apply_med_line(char* /*line*/)
       {
-        fprintf(stderr, "Missing apply med %s:%d\n", __FILE__, __LINE__);
+        fprintf(errorstream_, "Missing apply med %s:%d\n", __FILE__, __LINE__);
 #if 0
         char* token = strstrip(line);
         HfstTransducer top = stack_.top();
@@ -372,7 +375,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         if (*p == '\0')
           {
             assert(*p != '\0');
-            fprintf(stderr, "no colon in line\n");
+            fprintf(errorstream_, "no colon in line\n");
           }
         p++;
         while (isspace(*p))
@@ -446,7 +449,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
               {
                 // the next command must start on a fresh line
                 if (infile == stdin) {
-                  fprintf(stdout, "\n");
+                  fprintf(outstream_, "\n");
                 }
                 break;
               }
@@ -550,7 +553,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       {
         if ((strlen(start) > 1) || (strlen(end) > 1))
           {
-            fprintf(stderr, "unsupported unicode range %s-%s\n", start, end);
+            fprintf(errorstream_, "unsupported unicode range %s-%s\n", start, end);
           }
         list<string> l;
         for (char c = *start; c < *end; c++)
@@ -595,15 +598,15 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           if (verbose_) 
             {
               if (was_defined)
-                fprintf(stderr, "Redefined");
+                fprintf(outstream_, "Redefined");
               else
-                fprintf(stderr, "Defined");
-              fprintf(stderr, " '%s'\n", name); 
+                fprintf(outstream_, "Defined");
+              fprintf(outstream_, " '%s'\n", name); 
             }          
         }
       else
         {
-          fprintf(stderr, "Could not define variable %s:\n%s\n", 
+          fprintf(errorstream_, "Could not define variable %s:\n%s\n", 
                   name, xre_.get_error_message().c_str());
         }
       PROMPT_AND_RETURN_THIS;
@@ -748,7 +751,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
       if (! extract_function_name(prototype, name))
         {
-          fprintf(stderr, "Error extracting function name "
+          fprintf(errorstream_, "Error extracting function name "
                   "from prototype '%s'\n", prototype);
           xfst_fail();
           PROMPT_AND_RETURN_THIS;
@@ -756,7 +759,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
       if (! extract_function_arguments(prototype, arguments))
         {
-          fprintf(stderr, "Error extracting function arguments "
+          fprintf(errorstream_, "Error extracting function arguments "
                   "from prototype '%s'\n", prototype);
           xfst_fail();
           PROMPT_AND_RETURN_THIS;
@@ -766,7 +769,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         = convert_argument_symbols(arguments, xre, name, xre_);
       if (xre_converted == std::string(""))
         {
-          fprintf(stderr, "Error parsing function definition '%s'\n", xre);
+          fprintf(errorstream_, "Error parsing function definition '%s'\n", xre);
           xfst_fail();
           PROMPT_AND_RETURN_THIS;
         }
@@ -775,7 +778,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
       if (! xre_.define_function(name, arguments.size(), xre_converted))
         {
-          fprintf(stderr, "Error when defining function\n");
+          fprintf(errorstream_, "Error when defining function\n");
           xfst_fail();
           PROMPT_AND_RETURN_THIS;
         }
@@ -897,7 +900,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           if (string_found(text, it->first) ||
               string_found(text, it->second) )
             {
-              std::cerr << it->first << "\t";
+              fprintf(outstream_, "%s\t", it->first .c_str());
               describe(it->first.c_str());
             }
         }
@@ -909,17 +912,17 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       if (strcmp(text, "") == 0)
         {
-          fprintf(stderr, "describe|help <command>\n");
+          fprintf(outstream_, "describe|help <command>\n");
         }
       std::map<std::string,std::string>::const_iterator it 
         = help.find(text);
       if (it == help.end())
         {
-          fprintf(stderr, "no such command: %s\n", text);
+          fprintf(outstream_, "no such command: %s\n", text);
         }
       else
         {
-          fprintf(stderr, "%s\n", it->second.c_str());
+          fprintf(outstream_, "%s\n", it->second.c_str());
         }
       PROMPT_AND_RETURN_THIS;
     }
@@ -945,7 +948,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       if (definitions_.find(name) == definitions_.end())
         {
-          fprintf(stderr, "no such defined network: '%s'\n", name);
+          fprintf(outstream_, "no such defined network: '%s'\n", name);
           PROMPT_AND_RETURN_THIS;
         }
 
@@ -1017,7 +1020,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     std::string def_name = t->get_name();
     if (def_name == "")
       {
-        fprintf(stderr, "warning: loaded transducer definition "
+        fprintf(warnstream_, "warning: loaded transducer definition "
                 "has no name, skipping it\n");
         return *this;
       }
@@ -1025,7 +1028,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       = definitions_.find(def_name);
     if (it != definitions_.end())
       {
-        fprintf(stderr, "warning: a definition named '%s' "
+        fprintf(warnstream_, "warning: a definition named '%s' "
                 "already exists, overwriting it\n", def_name.c_str());
         definitions_.erase(def_name);
       }
@@ -1041,19 +1044,19 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       {
         if (verbose_)
           {
-            fprintf(stderr, "warning: converting transducer type from %s to %s",
+            fprintf(warnstream_, "warning: converting transducer type from %s to %s",
                     hfst::implementation_type_to_format(t->get_type()),
                     hfst::implementation_type_to_format(format_));
             if (filename != NULL)
               {
-                fprintf(stderr, "when reading from file '%s'",
+                fprintf(warnstream_, "when reading from file '%s'",
                         to_filename(filename));
               }
             if (! hfst::HfstTransducer::is_safe_conversion(t->get_type(), format_))
               {
-                fprintf(stderr, " (loss of information is possible)");
+                fprintf(warnstream_, " (loss of information is possible)");
               }
-            fprintf(stderr, "\n");
+            fprintf(warnstream_, "\n");
           }
         t->convert(format_);
       }
@@ -1072,7 +1075,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       }
     catch (NotTransducerStreamException ntse)
       {
-        fprintf(stderr, "Unable to read transducers from %s\n", 
+        fprintf(errorstream_, "Unable to read transducers from %s\n", 
                 to_filename(infilename));
         xfst_fail();
         return NULL;
@@ -1155,7 +1158,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::echo(const char* text)
     {
-      fprintf(stdout, "%s\n", text);
+      fprintf(outstream_, "%s\n", text);
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -1164,11 +1167,11 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       if (verbose_ && (strcmp(message, "dodongo") == 0))
         {
-          fprintf(stdout, "dislikes smoke.\n");
+          fprintf(outstream_, "dislikes smoke.\n");
         }
       else if (verbose_)
         {
-          fprintf(stdout, "%s.\n", message);
+          fprintf(outstream_, "%s.\n", message);
         }
       else
         ;
@@ -1206,7 +1209,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::show(const char* name)
     {
-      fprintf(stdout, "variable %s = %s\n", name, variables_[name].c_str());
+      fprintf(outstream_, "variable %s = %s\n", name, variables_[name].c_str());
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -1246,7 +1249,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler::print_bool(bool value)
   {
     int printval = (value)? 1 : 0; 
-    fprintf(stdout, "%i, (1 = TRUE, 0 = FALSE)\n", printval);
+    fprintf(outstream_, "%i, (1 = TRUE, 0 = FALSE)\n", printval);
     return *this;
   }
   HfstTransducer *
@@ -1316,7 +1319,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       else if (level == LOWER_LEVEL)
         value = ! id.compare(tmp, false);
       else
-        fprintf(stderr, "ERROR: argument given to function 'test_uni'\n"
+        fprintf(errorstream_, "ERROR: argument given to function 'test_uni'\n"
                 "not recognized\n");
 
       this->print_bool(value);
@@ -1413,7 +1416,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
               break;
             }
           default:
-            fprintf(stderr, "ERROR: unknown test operation\n");
+            fprintf(errorstream_, "ERROR: unknown test operation\n");
             break;
           }
       }
@@ -1715,7 +1718,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
       if (paths.size() == 0)
         {
-          fprintf(stdout, "transducer is empty\n");
+          fprintf(outstream_, "transducer is empty\n");
         }
       else
         {
@@ -1732,7 +1735,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       this->shortest_string(topmost, paths);
 
       if (paths.size() == 0) {
-        fprintf(stdout, "transducer is empty\n");
+        fprintf(outstream_, "transducer is empty\n");
       }
       else {
         fprintf(outfile, "%i\n", (int)(paths.begin()->second.size()));
@@ -1795,10 +1798,10 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     // Print the results:
     // first, the special cases,
     if (upper_is_cyclic && lower_is_cyclic) {
-      fprintf(stdout, "transducer is cyclic\n");
+      fprintf(outstream_, "transducer is cyclic\n");
     }
     else if (transducer_is_empty) {
-      fprintf(stdout, "transducer is empty\n");
+      fprintf(outstream_, "transducer is empty\n");
     }
     // then the usual: 
     else {
@@ -1807,8 +1810,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           (tmp_upper.has_flag_diacritics() || 
            tmp_lower.has_flag_diacritics()) )
         {
-          fprintf(stdout, "warning: longest string may have flag diacritics that are not shown\n");
-          fprintf(stdout, "         but are used in calculating its length (use 'eliminate flags')\n");
+          fprintf(warnstream_ ,"warning: longest string may have flag diacritics that are not shown\n");
+          fprintf(warnstream_, "         but are used in calculating its length (use 'eliminate flags')\n");
         }
       
       // print one longest string of the upper level, if not cyclic
@@ -1898,7 +1901,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         case BOTH_LEVELS:
           break;
         default:
-          fprintf(stderr, "ERROR: argument given to function 'print_words'\n"
+          fprintf(errorstream_, "ERROR: argument given to function 'print_words'\n"
                   "not recognized\n");
           PROMPT_AND_RETURN_THIS;
         }
@@ -1911,7 +1914,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         }
       catch (const TransducerIsCyclicException & e)
         {
-          fprintf(stderr, "warning: transducer is cyclic, limiting the number of cycles to 5\n");
+          fprintf(warnstream_, "warning: transducer is cyclic, limiting the number of cycles to 5\n");
           temp.extract_paths(results, number, 5);
         }
 
@@ -2092,7 +2095,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       /*if (outfile == 0)
         {
-          fprintf(stdout, "%10s: %p\n", name, functions_[name]);
+          fprintf(outstream_, "%10s: %p\n", name, functions_[name]);
           }*/
       PROMPT_AND_RETURN_THIS;
     }
@@ -2206,7 +2209,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             }
           else
             {
-              fprintf(stderr, "Error when compiling file:\n%s\n",
+              fprintf(errorstream_, "Error when compiling file:\n%s\n",
                       xre_.get_error_message().c_str());
               xfst_fail();
             }
@@ -2247,7 +2250,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         }
       else
         {
-          fprintf(stderr, "Error reading regex '%s':\n%s\n", indata, 
+          fprintf(errorstream_, "Error reading regex '%s':\n%s\n", indata, 
                   xre_.get_error_message().c_str());
           xfst_fail();
         }
@@ -2394,7 +2397,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             result->prune();
             break;
           default:
-            fprintf(stderr, "ERROR: unknown unary operation\n");
+            fprintf(errorstream_, "ERROR: unknown unary operation\n");
             break;
           }
 
@@ -2450,7 +2453,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
               break;
             }
         default:
-          fprintf(stderr, "ERROR: unknown binary operation\n");
+          fprintf(errorstream_, "ERROR: unknown binary operation\n");
           xfst_fail();
           break;
         }
@@ -2495,7 +2498,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
             result->shuffle(*t);
             break;
           default:
-            fprintf(stderr, "ERROR: unknown binary operation\n");
+            fprintf(errorstream_, "ERROR: unknown binary operation\n");
             break;
           }
         stack_.pop();
@@ -2699,7 +2702,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       PROMPT_AND_RETURN_THIS;
     }
 
-  // For 'inspect_net': print to stdout all arcs in 
+  // For 'inspect_net': print to outstream_ all arcs in 
   // \a transitions. Return the number of arcs.
   static unsigned int print_arcs
   (const HfstBasicTransducer::HfstTransitions & transitions)
@@ -2711,28 +2714,28 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       {
         if (first_loop) 
           {
-            fprintf(stdout, "Arcs:");
+            fprintf(outstream_, "Arcs:");
             first_loop = false;
           }
         else
           {
-            fprintf(stdout, ", ");
+            fprintf(outstream_, ", ");
           }
         std::string isymbol = it->get_input_symbol();
         std::string osymbol = it->get_output_symbol();
 
         if (isymbol == osymbol)
           {
-            fprintf(stdout, " %i. %s", arc_number, isymbol.c_str());
+            fprintf(outstream_, " %i. %s", arc_number, isymbol.c_str());
           }
         else
           {
-            fprintf(stdout, " %i. %s:%s", arc_number, 
+            fprintf(outstream_, " %i. %s:%s", arc_number, 
                     isymbol.c_str(), osymbol.c_str());
           }
         arc_number++;
       }
-    fprintf(stdout, "\n");
+    fprintf(outstream_, "\n");
     return arc_number - 1;
   }
 
@@ -2741,10 +2744,10 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   (const std::vector<unsigned int> & whole_path,
    const std::vector<unsigned int> & shortest_path)
   {
-    fprintf(stdout, "Level %i", (int)whole_path.size());
+    fprintf(outstream_, "Level %i", (int)whole_path.size());
     if (shortest_path.size() < whole_path.size())
       {
-        fprintf(stdout, " (= %i)", (int)shortest_path.size());
+        fprintf(outstream_, " (= %i)", (int)shortest_path.size());
       }
   }
 
@@ -2863,15 +2866,15 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   {
     if (number == EOF || number == 0)
       {
-        fprintf(stdout, "could not read arc number\n");
+        fprintf(outstream_, "could not read arc number\n");
         return false;
       }
     else if (number < 1 || number > number_of_arcs)
       {
         if (number_of_arcs < 1) 
-          fprintf(stdout, "state has no arcs\n");
+          fprintf(outstream_, "state has no arcs\n");
         else 
-          fprintf(stdout, "arc number must be between %i and %i\n",
+          fprintf(outstream_, "arc number must be between %i and %i\n",
                   1, number_of_arcs);
         return false;
       }
@@ -2883,13 +2886,13 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   {
     if (level == EOF || level == 0)
       {
-        fprintf(stdout, "could not read level number "
+        fprintf(outstream_, "could not read level number "
                 "(type '0' if you wish to exit program)\n");
         return false;
       }
     else if (level < 0 || level > whole_path_length)
       {
-        fprintf(stdout, "no such level: '%i' (current level is %i)\n",
+        fprintf(outstream_, "no such level: '%i' (current level is %i)\n",
                 level, (int)whole_path_length );
         return false;
       }
@@ -2907,7 +2910,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
       HfstBasicTransducer net(*t);
 
-      fprintf(stdout, "%s", inspect_net_help_msg);
+      fprintf(outstream_, "%s", inspect_net_help_msg);
 
       // path of states visited, can contain loops
       std::vector<unsigned int> whole_path;
@@ -2918,9 +2921,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       print_level(whole_path, shortest_path);
 
       if (net.is_final_state(0))
-        fprintf(stdout, " (final)");
+        fprintf(outstream_, " (final)");
       
-      fprintf(stdout, "\n");
+      fprintf(outstream_, "\n");
 
       // transitions of current state
       HfstBasicTransducer::HfstTransitions transitions = net[0];
@@ -2945,7 +2948,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
               else if (! return_to_level(whole_path, shortest_path, 
                                          whole_path.size() - 1))
                 {
-                  fprintf(stdout, "FATAL ERROR: could not return to level '%i'\n", 
+                  fprintf(errorstream_, "FATAL ERROR: could not return to level '%i'\n", 
                           (int)(whole_path.size() - 1));
                   ignore_history_after_index(ind);
                   PROMPT_AND_RETURN_THIS;
@@ -2961,7 +2964,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
                 }
               else if (! return_to_level(whole_path, shortest_path, level))
                 {
-                  fprintf(stdout, "FATAL ERROR: could not return to level '%i'\n", level);
+                  fprintf(errorstream_, "FATAL ERROR: could not return to level '%i'\n", level);
                   ignore_history_after_index(ind);
                   PROMPT_AND_RETURN_THIS;
                 }
@@ -2983,7 +2986,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
               else
                 {
                   HfstBasicTransition tr = transitions[number - 1];
-                  fprintf(stdout, "  %s:%s --> ", tr.get_input_symbol().c_str(), 
+                  fprintf(outstream_, "  %s:%s --> ", tr.get_input_symbol().c_str(), 
                           tr.get_output_symbol().c_str());
                   append_state_to_paths(whole_path, shortest_path, tr.get_target_state());
                 }
@@ -2994,9 +2997,9 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
           print_level(whole_path, shortest_path);
           if (net.is_final_state(whole_path.back()))
             {
-              fprintf(stdout, " (final)");
+              fprintf(outstream_, " (final)");
             }
-          fprintf(stdout, "\n");
+          fprintf(outstream_, "\n");
           number_of_arcs = print_arcs(transitions);
 
         } // end of while loop
@@ -3040,7 +3043,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         }
       catch (const HfstException & e)
         {
-          fprintf(stderr, "error reading file in att format\n");
+          fprintf(errorstream_, "error reading file in att format\n");
           xfst_fail();
         }
       PROMPT_AND_RETURN_THIS;
@@ -3153,7 +3156,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       if (verbose_prompt_ && verbose_)
         {
-          fprintf(stdout, "hfst[" SIZE_T_SPECIFIER "]: ", stack_.size());
+          fprintf(outstream_, "hfst[" SIZE_T_SPECIFIER "]: ", stack_.size());
         }
       return *this;
     }
@@ -3172,7 +3175,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       if (verbose_ && !stack_.empty())
         {
           HfstTransducer* top = stack_.top();
-          fprintf(stdout, "? bytes. %i states, %i arcs, ? paths\n",
+          fprintf(outstream_, "? bytes. %i states, %i arcs, ? paths\n",
                   top->number_of_states(), top->number_of_arcs());
         }
       return *this;
@@ -3180,7 +3183,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
   void XfstCompiler::init_help()
   {
-    help[std::string("print net")] = std::string("Print the top net on stack in xfst format.");
+    // todo: for all commands:
+    // help[std::string("command")] = std::string("command description");
   }
 
 // silly globls
