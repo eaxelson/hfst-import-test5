@@ -225,11 +225,11 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
        }
        // help
-       | APROPOS { 
+       | APROPOS END_COMMAND { 
             hfst::xfst::xfst_->apropos($1);
             free($1);
        }
-       | DESCRIBE { 
+       | DESCRIBE END_COMMAND { 
             hfst::xfst::xfst_->describe($1);
        }
        // stack

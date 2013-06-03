@@ -241,8 +241,18 @@ LWSP [\t ]*
     return EXTRACT_UNAMBIGUOUS;
 }
 
+"apropos"{WSP}+.* {
+    hxfstlval.text = hfst::xfst::strstrip(hxfsttext + strlen("describe "));
+    return DESCRIBE;
+}
 
-("help"|"describe") {
+"help"{WSP}+.* {
+    hxfstlval.text = hfst::xfst::strstrip(hxfsttext + strlen("help "));
+    return DESCRIBE;
+}
+
+("help"|"apropos"){WSP}* {
+    hxfstlval.text = strdup("");
     return DESCRIBE;
 }
 
