@@ -77,6 +77,7 @@ namespace xfst {
   static const char * APPLY_END_STRING = "<ctrl-d>";
   
     XfstCompiler::XfstCompiler() :
+      help(StringMap()),
         use_readline_(false),
         read_interactive_text_from_stdin_(false),
         xre_(hfst::TROPICAL_OPENFST_TYPE),
@@ -85,6 +86,7 @@ namespace xfst {
         verbose_prompt_(false),
         latest_regex_compiled(NULL)
       {
+        init_help();
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
         variables_["assert"] = "OFF";
@@ -112,6 +114,7 @@ namespace xfst {
       }
         
 XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
+  help(StringMap()),
         use_readline_(false),
         read_interactive_text_from_stdin_(false),
         xre_(impl),
@@ -120,6 +123,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         verbose_prompt_(false),
         latest_regex_compiled(NULL)
       {
+        init_help();
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
         variables_["assert"] = "OFF";
@@ -836,18 +840,87 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         (infilename, true /* definitions*/ );
     }
 
+  static std::string to_upper_case(const std::string & str)
+  {
+    std::string retval;
+    for (unsigned int i=0; i<str.length(); i++)
+      {
+        if (str[i] >= 97 && str[i] <= 122)
+          {
+            retval.append(1, str[i] - 32);
+          }
+        else
+          {
+            retval.append(1, str[i]);
+          }
+      }
+    return retval;
+  }
+
+  static bool allow_char(char c)
+  {
+    //std::cerr << "allow_char: " << c << std::endl;
+    if (c == ' ' || c == '\n' || c == '\t' || c == '.' ||
+        c == '-' || c == ':' | c == ';')
+      return true;
+    return false;
+  }
+
+  static bool string_found(const std::string & str_, const std::string & text_)
+  {
+    //std::cerr << "string_found: " << str << ", " << text << std::endl;
+
+    std::string str = to_upper_case(str_); 
+    std::string text = to_upper_case(text_); 
+    std::size_t pos = text.find(str);
+    if (pos == std::string::npos)
+      {
+        return false;
+      }
+    if (pos == 0 || allow_char(text[pos-1]))
+      {
+        if (pos+str.length() == text.length() ||
+            allow_char(text[pos+str.length()]))
+          {
+            return true;
+          }
+      }
+    return false;
+  }
+
   XfstCompiler& 
-  XfstCompiler::apropos(const char* /* text */)
+  XfstCompiler::apropos(const char* text )
     {
-      fprintf(stderr, "Apropoo %s:%d\n",
-              __FILE__, __LINE__);
+      for (StringMap::const_iterator it = help.begin();
+           it != help.end(); it++)
+        {
+          if (string_found(text, it->first) ||
+              string_found(text, it->second) )
+            {
+              std::cerr << it->first << "\t";
+              describe(it->first.c_str());
+            }
+        }
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
-  XfstCompiler::describe(const char* /* text */)
+  XfstCompiler::describe(const char* text)
     {
-      fprintf(stderr, "HELP! %s:%d\n", __FILE__, __LINE__);
+      if (strcmp(text, "") == 0)
+        {
+          fprintf(stderr, "describe|help <command>\n");
+        }
+      std::map<std::string,std::string>::const_iterator it 
+        = help.find(text);
+      if (it == help.end())
+        {
+          fprintf(stderr, "no such command: %s\n", text);
+        }
+      else
+        {
+          fprintf(stderr, "%s\n", it->second.c_str());
+        }
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -3104,6 +3177,12 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         }
       return *this;
     }
+
+  void XfstCompiler::init_help()
+  {
+    help[std::string("print net")] = std::string("Print the top net on stack in xfst format.");
+  }
+
 // silly globls
 XfstCompiler* xfst_ = 0;
 

@@ -60,10 +60,16 @@ namespace xfst {
 
   enum TestOperation { TEST_SUBLANGUAGE_, TEST_OVERLAP_ };
 
+  typedef std::map<std::string,std::string> StringMap;
+
 //! @brief Xfst compiler contains all the methods and variables a session of
 //! XFST script parser needs.
 class XfstCompiler
 {
+  private:
+  StringMap help;
+  void init_help();
+
   public:
   //! @brief Construct compiler for unknown format transducers.
   XfstCompiler();
