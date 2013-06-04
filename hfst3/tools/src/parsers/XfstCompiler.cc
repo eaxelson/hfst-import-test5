@@ -912,10 +912,15 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     {
       if (strcmp(text, "") == 0)
         {
-          fprintf(outstream_, "describe|help <command>\n");
+          for(StringMap::const_iterator it = help.begin();
+              it != help.end(); it++)
+            {
+              fprintf(outstream_, "%-30s %s\n", 
+                      it->first.c_str(), it->second.c_str());
+            }
+          PROMPT_AND_RETURN_THIS;
         }
-      std::map<std::string,std::string>::const_iterator it 
-        = help.find(text);
+      StringMap::const_iterator it = help.find(text);
       if (it == help.end())
         {
           fprintf(outstream_, "no such command: %s\n", text);
@@ -3183,8 +3188,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
 
   void XfstCompiler::init_help()
   {
-    // todo: for all commands:
-    // help[std::string("command")] = std::string("command description");
+#include "init_help.cc"
   }
 
 // silly globls
