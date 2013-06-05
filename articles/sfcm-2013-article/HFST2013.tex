@@ -3,8 +3,9 @@
 \usepackage{llncsdoc}
 
 %% PDFLaTeX
-% \usepackage[T1]{fontenc}
+\usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage{lmodern}
 \usepackage{textcomp}      % for ° symbol
 
 \usepackage{multirow}
@@ -51,7 +52,7 @@ juha.kuokkala, jyrki.niemi, tommi.pirinen, miikka.silfverberg\}@helsinki.fi}}
 
 \begin{abstract}
 %Krister
-The paper presents and evaluates various NLP tools that have been created using the open source library HFST--Helsinki Finite-State Technology and outlines the minimal extensions that this has required to a pure finite-state system. In particular, the paper describes an implementation and application of Pmatch presented by Karttunen at SFCM 2011.
+The paper presents and evaluates various NLP tools that have been created using the open source library HFST -- Helsinki Finite-State Technology and outlines the minimal extensions that this has required to a pure finite-state system. In particular, the paper describes an implementation and application of Pmatch presented by Karttunen at SFCM 2011.
 \keywords{finite-state technology, language identification, morphological guessers, spell-checking, named-entity recognition, language generation, parsing, HFST, XFST, Pmatch}
 \end{abstract}
 
@@ -60,7 +61,7 @@ The paper presents and evaluates various NLP tools that have been created using 
 In natural language processing, finite-state string transducer methods have been found useful for solving a number of practical problems ranging from language identification via morphological processing and generation to part-of-speech tagging and named-entity recognition, as long as the problems lend themselves to a formulation based on matching and transforming local context.
 
 % NOTE: repetitive of the abstract
-In this paper, we present and evaluate various tools that have been created using HFST--Helsinki Finite-State Technology\footnote{\url{http://hfst.sf.net}} and outline the minimal extensions that this has required to a pure FST system. In particular, we describe an implementation of Pmatch presented by Karttunen at SFCM 2011~\cite{karttunen/2011} and its application to a large-scale named-entity recognizer for Swedish.
+In this paper, we present and evaluate various tools that have been created using HFST -- Helsinki Finite-State Technology\footnote{\url{http://hfst.sf.net}} and outline the minimal extensions that this has required to a pure FST system. In particular, we describe an implementation of Pmatch presented by Karttunen at SFCM 2011~\cite{karttunen/2011} and its application to a large-scale named-entity recognizer for Swedish.
 
 The paper is structured as follows: Section~\ref{hfst:structural-layout} is on applications and their evaluation.
 In Section~\ref{hfst:env-examples}, we present examples of user environments supported by HFST.
@@ -199,6 +200,7 @@ sentence as belonging to an unknown language.
 \label{sec: morph-guessers}
 % Juha, Miikka
 
+\begin{sloppypar}
 Language technology applications for agglutinating languages such as
 Finnish and Hungarian benefit greatly from high-coverage morphological
 analyzers, which supply word forms with their morphological
@@ -208,6 +210,7 @@ analyzer (with recall over 95\%) is a substantial task, and even with a
 high-coverage analyzer, domain-specific vocabulary presents a
 challenge. Therefore, accurate methods for dealing with
 out-of-vocabulary words are needed.
+\end{sloppypar}
 
 With HFST tools it is possible to use an existing morphological
 analyzer to construct a morphological guesser based on word
@@ -241,15 +244,15 @@ as well as analysis. This is described in Section~\ref{sec:morph-generation}.
 
 \begin{sloppypar}
 Constructing a morphological guesser from
-OMorFi\footnote{\url{http://code.google.com/p/omorfi/}}--The open-source
+OMorFi\footnote{\url{http://code.google.com/p/omorfi/}} -- The open-source
 Finnish morphology~\cite{pirinen/2008}, the three top guesses for
-``twiitin'' are (the markup is slightly simplified): \small
+``twiitin'' are (the markup is slightly simplified): { \small
 \begin{verbatim}
   twiit  [POS=NOUN] [GUESS_CATEGORY=5]  [NUM=SG][CASE=GEN]
   twiiti [POS=NOUN] [GUESS_CATEGORY=33] [NUM=SG][CASE=NOM]
   twiit  [POS=VERB] [GUESS_CATEGORY=53] [VOICE=ACT][MOOD=INDV] ...
 \end{verbatim}
-\normalsize
+}
 The first field corresponds to the stem of the word, the second field
 to its main part of speech and the third to its declension class. The
 fourth field shows the inflectional and derivational information of
@@ -277,15 +280,19 @@ HFST morphological guessers presented in Section~\ref{sec:
   morph-guessers} can be used for generation as well as morphological
 analysis. For example, using the OMorFi morphology for Finnish, the
 best morphological guess for the unknown word ``twiitin'' is
+{ \small
 \begin{verbatim}
   twiit  [POS=NOUN] [GUESS_CATEGORY=5]  [NUM=SG][CASE=GEN]
 \end{verbatim}
+}
 Replacing the inflectional information {\tt [NUM=SG][CASE=GEN]}
 (singular genitive case) by {\tt [NUM=PL][CASE=PAR]} (plural
 partitive case) gives the analysis
+{ \small
 \begin{verbatim}
   twiit  [POS=NOUN] [GUESS_CATEGORY=5]  [NUM=PL][CASE=PAR]
 \end{verbatim}
+}
 which can be fed back to the guesser to generate the surface forms
 ``twiitteja'' and ``twiittejä''. The latter one is correct, though the
 first one would also be possible in theory, since the variation
@@ -316,18 +323,20 @@ could benefit from accepting only suggestions by the guesser in the nominative c
 \texttt{[CASE=NOM]}. The data was presented to native speakers with key word forms 
 generated for each entry, which could be used to distinguish between different inflection classes,
 so that it was not necessary to understand the linguistic encoding scheme:
-\small
+{ \small
 \begin{verbatim}
 Aura     9 Aura : Auraa : Aurat : Aurain, Aurojen : Auroja : Auroihin
 Oura    10 Oura : Ouraa : Ourat : Ourain, Ourien : Ouria : Ouriin
 Pura    10 Pura : Puraa : Purat : Purain, Purien : Puria : Puriin
-Saura     9  Saura : Sauraa : Saurat : Saurain, Saurojen : Sauroja : Sauroihin
-Peura     9  Peura : Peuraa :  Peurat : Peurain, Peurojen : Peuroja : Peuroihin
+Saura    9 Saura : Sauraa : Saurat : Saurain, Saurojen : Sauroja :
+           Sauroihin
+Peura    9 Peura : Peuraa :  Peurat : Peurain, Peurojen : Peuroja :
+           Peuroihin
 Tiura   10 Tiura : Tiuraa : Tiurat : Tiurain, Tiurien : Tiuria : Tiuriin
 Heikura 13 Heikura : Heikuraa : Heikurat : Heikurojen, Heikuroiden, 
            Heikuroitten : Heikuroja, Heikuroita : Heikuroihin
 \end{verbatim}
-\normalsize
+}
 
 %New lexical entries were added to the system in
 %several batches and the guesser was rebuilt after each batch. The
@@ -541,12 +550,14 @@ specified by suffixing the expression with
 \texttt{EndTag(\textit{TagName})}. For example, the following
 expressions mark company names ending in a company designator:
 
+{ \small
 \begin{verbatim}
 Define NSTag [? - [Whitespace|"<"|">"]] ;
 Define CorpSuffix [UppercaseAlpha NSTag+ " "]+ ["Corp" | "Inc"]
     EndTag(EnamexOrgCrp) ;
 Define TOP CorpSuffix ;
 \end{verbatim}
+}
 
 \begin{sloppypar}
 \noindent
@@ -565,15 +576,19 @@ regular expression definitions of the form \texttt{Define
 \end{sloppypar}
 
 The above expressions mark the company names in the following input:
+{ \small
 \begin{verbatim}
 Computer Systems Corp announced a merger with Home Computers Inc .
 \end{verbatim}
+}
 \noindent
 The output is:
+{ \small
 \begin{verbatim}
-<EnamexOrgCrp>Computer Systems Corp</EnamexOrgCrp> announced a
-merger with <EnamexOrgCrp>Home Computers Inc</EnamexOrgCrp> .
+<EnamexOrgCrp>Computer Systems Corp</EnamexOrgCrp> announced a merger
+with <EnamexOrgCrp>Home Computers Inc</EnamexOrgCrp> .
 \end{verbatim}
+}
 
 Pmatch considers leftmost longest matches of \texttt{TOP} in the input
 and adds the tags specified in \texttt{TOP} or the expressions to
@@ -606,18 +621,22 @@ following expressions mark the capitalized words following
 \textit{rörelseresultatet för} (`operating profit of') with
 \texttt{EnamexOrgCrp}:
 
+{ \small
 \begin{verbatim}
 Define CapWord2 UppercaseAlpha NSTag+ ;
 Define OrgCrpOpProfit CapWord2 [" " CapWord2]*
     EndTag(EnamexOrgCrp) LC("Rörelseresultatet för ") ;
 Define TOP OrgCrpOpProfit ;
 \end{verbatim}
+}
 
 \noindent
 For example:
+{ \small
 \begin{verbatim}
 Rörelseresultatet för <EnamexOrgCrp>Comp Systems</EnamexOrgCrp> ...
 \end{verbatim}
+}
 
 As in~\cite{karttunen/2011}, the regular expression in \texttt{LC()}
 specifies a left context that must precede the actual match.
@@ -661,11 +680,13 @@ following expressions only if it is followed by a space and the word
 \texttt{EvnAtlIntl}) and preceded by a space or sentence boundary
 (\texttt{\#}) (left context expression from \texttt{TOP}):
 
+{ \small
 \begin{verbatim}
 Define EvnAtlIntl [CapWord2 " "]+ "International "
     EndTag(EnamexEvnAtl) RC(" spelades") ;
 Define TOP EvnAtlIntl LC(Whitespace | #) ;
 \end{verbatim}
+}
 
 \noindent
 In this case, the left context condition in \texttt{TOP} is considered
@@ -804,10 +825,12 @@ subtraction or both. For example, to prevent capitalized
 \textit{järnväg} (`railway') from matching a more general expression
 marking street names, it is subtracted from the more general pattern:
 %
+{ \small
 \begin{verbatim}
 Define LocStrSwe
     [Capword2 "väg" ("en")] - "Järnväg" EndTag(EnamexLocStr) ;
 \end{verbatim}
+}
 
 With some modifications to account for the lack of ordering, the
 Pmatch rules were able to recognize and classify the same names as the
@@ -839,6 +862,7 @@ disjunction of strings, each line as one disjunct. The gazetteer has
 been divided into files by the type of the name:
 \end{sloppypar}
 
+{ \small
 \begin{verbatim}
 Define LocStr @txt"LocStr.txt" EndTag(EnamexLocStr) ;
 Define PrsHum @txt"PrsHum.txt" EndTag(EnamexPrsHum) ;
@@ -846,6 +870,7 @@ Define PrsHum @txt"PrsHum.txt" EndTag(EnamexPrsHum) ;
 Define Boundary [" " | #] ;
 Define TOP [LocStr | PrsHum | ...] LC(Boundary) RC(Boundary) ;
 \end{verbatim}
+}
 
 \noindent
 The context conditions in \texttt{TOP} allow a name to be recognized
@@ -894,13 +919,17 @@ encoding the precise type in attributes. The tags used by Pmatch can
 be converted to this format with Pmatch transductions or with a simple
 script. For example, the Pmatch-tagged text
 %
+{ \small
 \begin{verbatim}
 <EnamexOrgCrp>Computer Systems Corp</EnamexOrgCrp>
 \end{verbatim}
+}
 is converted to
+{ \small
 \begin{verbatim}
 <ENAMEX TYPE="ORG" SBT="CRP">Computer Systems Corp</ENAMEX>
 \end{verbatim}
+}
 
 % The original Swedish NER system marks names with fairly generic XML
 % elements, with attributes in the start tag that specify the more
@@ -1041,6 +1070,7 @@ applications.
 Below is an example of iterating through the states and transitions of
 an HFST transducer using Python bindings:
 
+{ \small
 \begin{verbatim}
 # Go through all states in fsm       
 for state in fsm.states():
@@ -1048,9 +1078,11 @@ for state in fsm.states():
     for transition in fsm.transitions(state):
         # do something
 \end{verbatim}
+}
 
 And the same using the HFST API directly:
 
+{ \small
 \begin{verbatim}
 // Go through all states in fsm
 for (HfstBasicTransducer::const_iterator it = fsm.begin();
@@ -1064,6 +1096,7 @@ for (HfstBasicTransducer::const_iterator it = fsm.begin();
         }
     }
 \end{verbatim}
+}
 
 The Python bindings in particular make it easy to use language models
 developed for HFST in rapid prototyping of advanced tools. For example, a
@@ -1074,10 +1107,10 @@ code on top of an existing morphological analyzer. E.g.  given the Finnish sente
 phrases as illustrated in the following sentence with a gloss:
 
 \ex
-% Without [everygla=], each word in \gla seems to be displayed as "it"
-% in italics. Why? Is it a version problem with expex.sty? How could
-% we have the words in \gla in italics?
-\begingl[everygla=]
+% When using XeLaTeX, without [everygla=], each word in \gla seems to
+% be displayed as "it" in italics. With PDFLaTeX, it would seem to
+% work correctly.
+\begingl %[everygla=]
 \gla Miljoona$_1$ kärpästä$_1$ voi$_2$ olla$_2$ väärässä$_3$ paikassa$_3$//
 \glb million-{\sc Num} fly-{\sc Par} can-{\sc AuxV} be-{\sc InfV} wrong-{\sc Ine} place-{\sc Ine}//
 \glft `A million flies can be in the wrong place' //
@@ -1105,6 +1138,7 @@ log file.
 The pertinent Python code for performing lookup on an appropriate transducer
 is as simple as:
 
+{ \small
 \begin{verbatim}
 with libhfst
     transducer = HfstTransducer(HfstInputStream("transducer.hfst"))
@@ -1112,16 +1146,19 @@ with libhfst
     for result in vectorize(results):
         irc_message(result)
 \end{verbatim}
+}
 
 For more than just providing analyses of words, either the underlying transducer
 or the bot can be customized to allow specific queries:
 
+{ \small
 \begin{verbatim}
 <user> hfstbot: kintereellä
 <hfstbot> user: kinner<N><Sg><Ade>
 <user> hfstbot: gen kinner<N><Pl><Nom>
 <hfstbot> user: kintereet
 \end{verbatim}
+}
 
 In this case, the user wants to see the analysis for ``kintereellä'',
 which translates to ``on the hock''. Being informed that it is
@@ -1195,6 +1232,7 @@ Below is an example of using \texttt{hfst-xfst} in interactive
 mode where we define two transducer variables, use them in a regular
 expression and print random words recognized by the expression.
 
+{ \small
 \begin{verbatim}
 $ hfst-xfst2fst 
 hfst[0]: define Foo foo;
@@ -1208,6 +1246,7 @@ foobaz
 foobazbar
 hfst[1]: 
 \end{verbatim}
+}
 
 To test \verb+hfst-xfst2fst+, we have compiled 17 out of the 22 XFST exercises
 that are found on the homepage of Beesley and Karttunen's book Finite
@@ -1226,9 +1265,11 @@ One example in which XFST and \verb+hfst-xfst2fst+ may
 give different results is the longest match.
 
 By definition, in left-to-right longest match: 
+{ \small
 \begin{verbatim}
 A @-> B || L _ R
 \end{verbatim}
+}
 where \verb+A+, \verb+B+, \verb+L+ and \verb+R+ denote languages, the
 expression \verb+A+ matches input left-to-right and replaces only the longest
 match at each step.
@@ -1236,6 +1277,7 @@ match at each step.
 Therefore, a left-to-right longest match is supposed to give exactly one output
 string for each input string. However, when compiled using XFST, both of the following left-to-right
 longest match rules result in transducers which for input \verb+aabbaax+ give two outputs: \verb+aaxx+ and \verb+xxx+.
+{ \small
 \begin{verbatim}
 xfst[0]: regex a+ b+ | b+ a+ @-> x \\ _ x ;
 3.1 Kb. 8 states, 31 arcs, Circular.
@@ -1248,6 +1290,7 @@ xfst[2]: down aabbaax
 aaxx
 xxx
 \end{verbatim}
+}
 
 In the examples, the \verb+\\+ sign denotes that the left context \verb+L+ is to be
 matched on the input side of the relation and the right context \verb+R+ is to
@@ -1268,6 +1311,7 @@ Furthermore, we have noticed that there are some differences in pruning the alph
 after performing certain operations.
 These two examples will give the same transition graphs, but different alphabet
 sets if compiled with XFST:
+{ \small
 \begin{verbatim}
 regex [a | b | c ] & $[a | b] ;
 resulting alphabet: a, b
@@ -1276,6 +1320,7 @@ resulting alphabet: a, b
 regex [a | b | c ] & [a | b] ;
 resulting alphabet: a, b, c
 \end{verbatim}
+}
 
 HFST's \verb+hfst-xfst2fst+ always prunes the alphabet after the following operations:
 \textbf{replace rules} (contexts are also pruned before being compiled with the
@@ -1360,6 +1405,7 @@ during compilation and prefixing the subnetwork in question with an entry marker
 After matching is complete, the entry marker is resolved in linear time with
 a simple position stack (in pseudocode):
 
+{ \small
 \begin{verbatim}
 for each symbol in result:
     if symbol == entry marker:
@@ -1371,6 +1417,7 @@ for each symbol in result:
     else:
          append symbol
 \end{verbatim}
+}
 
 With just the entry and end tags, the network simplifies to:
 
