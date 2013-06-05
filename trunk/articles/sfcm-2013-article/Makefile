@@ -1,4 +1,4 @@
-PDFLATEX = xelatex
+PDFLATEX = pdflatex
 LATEXFLAGS	= 
 BIBTEX		= bibtex
 BIBTEXFLAGS	= 
