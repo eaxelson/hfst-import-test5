@@ -7,34 +7,34 @@ SCPFLAGS	=
 
 .PHONY: all
 
-all: HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.pdf
+all: HFST2013.pdf
 
 # using pdflatex, xelatex etc.
-HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.pdf: HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.tex sfcm-2013.bib
-	$(PDFLATEX) $(PDFLATEXFLAGS) HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.tex
-	if grep 'undefined citations' HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.log > /dev/null || \
-			grep 'Citation.*undefined' HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.log > /dev/null ; then \
-		$(BIBTEX) $(BIBTEXFLAGS) HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools ;\
-		$(PDFLATEX) $(PDFLATEXFLAGS) HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.tex ;\
+HFST2013.pdf: HFST2013.tex sfcm-2013.bib
+	$(PDFLATEX) $(PDFLATEXFLAGS) HFST2013.tex
+	if grep 'undefined citations' HFST2013.log > /dev/null || \
+			grep 'Citation.*undefined' HFST2013.log > /dev/null ; then \
+		$(BIBTEX) $(BIBTEXFLAGS) HFST2013 ;\
+		$(PDFLATEX) $(PDFLATEXFLAGS) HFST2013.tex ;\
 	fi
-	if grep 'Warning: Label(s) may' HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.log > /dev/null || \
-			grep 'Rerun' HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.log > /dev/null || \
-			grep 'Warning: Citation' HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.log > /dev/null; then \
-		$(PDFLATEX) $(PDFLATEXFLAGS) HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.tex ;\
+	if grep 'Warning: Label(s) may' HFST2013.log > /dev/null || \
+			grep 'Rerun' HFST2013.log > /dev/null || \
+			grep 'Warning: Citation' HFST2013.log > /dev/null; then \
+		$(PDFLATEX) $(PDFLATEXFLAGS) HFST2013.tex ;\
 	fi
-	if grep 'Warning: Label(s) may' HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.log > /dev/null || \
-			grep 'Rerun' HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.log > /dev/null || \
-			grep 'Warning: Citation' HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.log > /dev/null; then \
-		$(PDFLATEX) $(PDFLATEXFLAGS) HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.tex ;\
+	if grep 'Warning: Label(s) may' HFST2013.log > /dev/null || \
+			grep 'Rerun' HFST2013.log > /dev/null || \
+			grep 'Warning: Citation' HFST2013.log > /dev/null; then \
+		$(PDFLATEX) $(PDFLATEXFLAGS) HFST2013.tex ;\
 	fi
-	if grep 'Warning: Label(s) may' HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.log > /dev/null || \
-			grep 'Rerun' HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.log > /dev/null || \
-			grep 'Warning: Citation' HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.log > /dev/null; then \
-		$(PDFLATEX) $(PDFLATEXFLAGS) HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.tex ;\
+	if grep 'Warning: Label(s) may' HFST2013.log > /dev/null || \
+			grep 'Rerun' HFST2013.log > /dev/null || \
+			grep 'Warning: Citation' HFST2013.log > /dev/null; then \
+		$(PDFLATEX) $(PDFLATEXFLAGS) HFST2013.tex ;\
 	fi
-	if grep 'Warning: Label(s) may' HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.log > /dev/null || \
-			grep 'Rerun' HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.log > /dev/null || \
-			grep 'Warning: Citation' HFST\ -\ a\ System\ for\ Creating\ NLP\ Tools.log > /dev/null; then \
+	if grep 'Warning: Label(s) may' HFST2013.log > /dev/null || \
+			grep 'Rerun' HFST2013.log > /dev/null || \
+			grep 'Warning: Citation' HFST2013.log > /dev/null; then \
 		echo 'THE RESULT CONTAINS BROKEN REFERENCES, CITATIONS OR SOMETHING' ;\
 	fi
 
