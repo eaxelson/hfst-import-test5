@@ -325,7 +325,7 @@ int main(int argc, char** argv)
   for (std::vector<char*>::const_iterator cmd = execute_commands.begin();
        cmd != execute_commands.end(); cmd++)
     {
-      verbose_printf("Executing xfst command '%s' given on command line...\n", *cmd);
+      verbose_printf("Executing xfst command '%s' given on command line\n", *cmd);
       if (0 != comp.parse_line(*cmd))
         {
           error(EXIT_FAILURE, 0, "command '%s' could not be parsed\n", *cmd);

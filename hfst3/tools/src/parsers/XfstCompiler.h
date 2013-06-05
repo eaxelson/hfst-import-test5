@@ -66,10 +66,6 @@ namespace xfst {
 //! XFST script parser needs.
 class XfstCompiler
 {
-  private:
-  StringMap help;
-  void init_help();
-
   public:
   //! @brief Construct compiler for unknown format transducers.
   XfstCompiler();
