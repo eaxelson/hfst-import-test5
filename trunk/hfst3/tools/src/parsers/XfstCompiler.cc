@@ -71,6 +71,10 @@ using hfst::implementations::HfstBasicTransition;
 #define PRINT_INFO_PROMPT_AND_RETURN_THIS print_transducer_info(); prompt(); return *this;
 #define IF_NULL_PROMPT_AND_RETURN_THIS(x) if (x == NULL) { prompt(); return *this; }
 
+#include "xfst_commands.h"
+#include "name2cmd.h"
+#include "init_help.cc"
+
 namespace hfst { 
 namespace xfst {
 
@@ -80,16 +84,15 @@ namespace xfst {
   FILE * errorstream_ = stderr;
   
     XfstCompiler::XfstCompiler() :
-      help(StringMap()),
         use_readline_(false),
         read_interactive_text_from_stdin_(false),
         xre_(hfst::TROPICAL_OPENFST_TYPE),
         format_(hfst::TROPICAL_OPENFST_TYPE),
         verbose_(false),
-        verbose_prompt_(false),
         latest_regex_compiled(NULL)
-      {
-        init_help();
+    {       
+      init_name2cmd();
+      init_help_messages();
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
         variables_["assert"] = "OFF";
@@ -115,18 +118,17 @@ namespace xfst {
         variables_["verbose"] = "OFF";
         prompt();
       }
-        
-XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
-  help(StringMap()),
+
+    XfstCompiler::XfstCompiler(ImplementationType impl) :
         use_readline_(false),
         read_interactive_text_from_stdin_(false),
         xre_(impl),
         format_(impl),
         verbose_(false),
-        verbose_prompt_(false),
         latest_regex_compiled(NULL)
-      {
-        init_help();
+    {       
+      init_name2cmd();
+      init_help_messages();
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
         variables_["assert"] = "OFF";
@@ -843,6 +845,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         (infilename, true /* definitions*/ );
     }
 
+  // Convert \a str to upper case.
   static std::string to_upper_case(const std::string & str)
   {
     std::string retval;
@@ -860,6 +863,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     return retval;
   }
 
+  // Whether \a c is allowed before or after a word when
+  // searching for the word in text.
   static bool allow_char(char c)
   {
     //std::cerr << "allow_char: " << c << std::endl;
@@ -869,6 +874,8 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
     return false;
   }
 
+  // Whether word \a str_ is found in text \a text_.
+  // Punctuation characters and upper/lower case are handled in this function.
   static bool string_found(const std::string & str_, const std::string & text_)
   {
     //std::cerr << "string_found: " << str << ", " << text << std::endl;
@@ -894,14 +901,39 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler& 
   XfstCompiler::apropos(const char* text )
     {
-      for (StringMap::const_iterator it = help.begin();
-           it != help.end(); it++)
+      // Go through all command help messages.
+      for(Command2HelpMessages::const_iterator it = help_messages.begin();
+          it != help_messages.end(); it++)
         {
-          if (string_found(text, it->first) ||
-              string_found(text, it->second) )
+          //std::cerr << "apropos: " << it->first << std::endl;
+          // Check also alternative command names for each command
+          bool some_name_matches = false;
+          Cmd2Names::const_iterator find_all_names = cmd2names.find(it->first);
+          if (find_all_names != cmd2names.end()) // this should always be true..
             {
-              fprintf(outstream_, "%s\t", it->first .c_str());
-              describe(it->first.c_str());
+              StringVector all_names = find_all_names->second;
+              for (StringVector::const_iterator nameit = all_names.begin();
+                   nameit != all_names.end(); nameit++)
+                {
+                  //std::cerr << "  " << *nameit << std::endl;
+                  if (string_found(text, *nameit))
+                    {
+                      some_name_matches = true;
+                      break;
+                    }
+                }
+            }
+          // Go through all help messages for a command.
+          for(StringPairVector::const_iterator msg_it = it->second.begin();
+              msg_it != it->second.end(); msg_it++)
+            {
+              if (string_found(text, msg_it->first) || 
+                  string_found(text, msg_it->second) ||
+                  some_name_matches)
+                {
+                  fprintf(outstream_, "%-30s %s\n", 
+                          msg_it->first.c_str(), msg_it->second.c_str());
+                }
             }
         }
       PROMPT_AND_RETURN_THIS;
@@ -910,24 +942,40 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler&
   XfstCompiler::describe(const char* text)
     {
+      // Print all command help messages, if no command given.
       if (strcmp(text, "") == 0)
         {
-          for(StringMap::const_iterator it = help.begin();
-              it != help.end(); it++)
+          for(Command2HelpMessages::const_iterator it = help_messages.begin();
+              it != help_messages.end(); it++)
             {
-              fprintf(outstream_, "%-30s %s\n", 
-                      it->first.c_str(), it->second.c_str());
+              for(StringPairVector::const_iterator msg_it = it->second.begin();
+                  msg_it != it->second.end(); msg_it++)
+                {
+                  fprintf(outstream_, "%-30s %s\n", 
+                          msg_it->first.c_str(), msg_it->second.c_str());
+                }
             }
           PROMPT_AND_RETURN_THIS;
         }
-      StringMap::const_iterator it = help.find(text);
-      if (it == help.end())
+
+      // Else, print the help message(s) for the command.
+      Name2Cmd::const_iterator it = name2cmd.find(text);
+      if (it == name2cmd.end())
         {
           fprintf(outstream_, "no such command: %s\n", text);
+          PROMPT_AND_RETURN_THIS;
         }
-      else
+      StringPairVector messages = get_help_messages(it->second);
+      if (messages.size() == 0)
         {
-          fprintf(outstream_, "%s\n", it->second.c_str());
+          fprintf(outstream_, "no help exists for command: %s\n", text);
+          PROMPT_AND_RETURN_THIS;
+        }
+      for(StringPairVector::const_iterator msg_it = messages.begin();
+          msg_it != messages.end(); msg_it++)
+        {
+          fprintf(outstream_, "%-30s %s\n", 
+                  msg_it->first.c_str(), msg_it->second.c_str());
         }
       PROMPT_AND_RETURN_THIS;
     }
@@ -3185,11 +3233,6 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
         }
       return *this;
     }
-
-  void XfstCompiler::init_help()
-  {
-#include "init_help.cc"
-  }
 
 // silly globls
 XfstCompiler* xfst_ = 0;
