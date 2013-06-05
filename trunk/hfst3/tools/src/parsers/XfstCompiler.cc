@@ -92,7 +92,7 @@ namespace xfst {
         latest_regex_compiled(NULL)
     {       
       init_name2cmd();
-      init_help_messages();
+      init_descriptions();
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
         variables_["assert"] = "OFF";
@@ -128,7 +128,7 @@ namespace xfst {
         latest_regex_compiled(NULL)
     {       
       init_name2cmd();
-      init_help_messages();
+      init_descriptions();
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
         variables_["assert"] = "OFF";
@@ -868,9 +868,14 @@ namespace xfst {
   static bool allow_char(char c)
   {
     //std::cerr << "allow_char: " << c << std::endl;
-    if (c == ' ' || c == '\n' || c == '\t' || c == '.' ||
-        c == '-' || c == ':' | c == ';')
-      return true;
+    std::string allowed_chars = " \n\t.,;:?!-/'\"<>()|";
+    for (size_t i=0; i < allowed_chars.size(); i++)
+      {
+        if (allowed_chars[i] == c)
+          {
+            return true;
+          }
+      }
     return false;
   }
 
@@ -902,8 +907,8 @@ namespace xfst {
   XfstCompiler::apropos(const char* text )
     {
       // Go through all command help messages.
-      for(Command2HelpMessages::const_iterator it = help_messages.begin();
-          it != help_messages.end(); it++)
+      for(Command2Descriptions::const_iterator it = command_descriptions.begin();
+          it != command_descriptions.end(); it++)
         {
           //std::cerr << "apropos: " << it->first << std::endl;
           // Check also alternative command names for each command
@@ -945,8 +950,8 @@ namespace xfst {
       // Print all command help messages, if no command given.
       if (strcmp(text, "") == 0)
         {
-          for(Command2HelpMessages::const_iterator it = help_messages.begin();
-              it != help_messages.end(); it++)
+          for(Command2Descriptions::const_iterator it = command_descriptions.begin();
+              it != command_descriptions.end(); it++)
             {
               for(StringPairVector::const_iterator msg_it = it->second.begin();
                   msg_it != it->second.end(); msg_it++)
@@ -965,7 +970,7 @@ namespace xfst {
           fprintf(outstream_, "no such command: %s\n", text);
           PROMPT_AND_RETURN_THIS;
         }
-      StringPairVector messages = get_help_messages(it->second);
+      StringPairVector messages = get_descriptions(it->second);
       if (messages.size() == 0)
         {
           fprintf(outstream_, "no help exists for command: %s\n", text);
