@@ -1,7 +1,4 @@
-
-
 # Data
-echo "DATA ---"
 
 echo "{kalastelet} | {kalasteleminen} | {ilmoittautuminen} | \
                  {järjestelmättömyydestänsä} | {kalastelemme} | \
@@ -15,7 +12,6 @@ echo "{kalastelet} | {kalasteleminen} | {ilmoittautuminen} | \
                  {merkonomin} ;" | $2/hfst-regexp2fst -f $1 > FinnWords
 
 # Basic definitions
-echo "BASIC DEFINITIONS ---"
 
 echo '[u | y | i]' | $2/hfst-regexp2fst -f $1 > HighV                          # High vowel
 echo '[e | o | ö]' | $2/hfst-regexp2fst -f $1 > MidV                          # Mid vowel
@@ -41,13 +37,14 @@ echo '[@"Light" @"P"+]' | $2/hfst-regexp2fst -f $1 > Heavy                      
 
 echo '[@"Heavy" | @"Light"]' | $2/hfst-regexp2fst -f $1 > S                           # Syllable
 echo '[@"S" & $@"SV"]' | $2/hfst-regexp2fst -f $1 > SS                                # Stressed syllable
+
 echo '[@"S" & ~$@"SV"]' | $2/hfst-regexp2fst -f $1 > US                               # Unstressed syllable
 echo '[@"S" & $@"MSV"] ' | $2/hfst-regexp2fst -f $1 > MSS                             # Syllable with main stress
 echo '[@"S" "." @"S"]' | $2/hfst-regexp2fst -f $1 > BF                                # Binary foot
 
 
 # Gen
-echo "-- GEN ---"
+#echo "-- GEN ---"
 
 # A diphthong is a combination of two unlike vowels that together form
 # the nucleus of a syllable. In general, Finnish diphthongs end in a high vowel.
@@ -61,7 +58,7 @@ echo ' [. .] -> "." || [@"HighV" | @"MidV"] _ @"LowV" , i _ [@"MidV" - e] , u _ 
 # words such as ate.isti 'atheist' must be partially syllabified in the
 # lexicon.
 
-echo "1"
+
 echo '@"C"* @"V"+ @"C"* @-> ... "." || _ @"C" @"V"' | $2/hfst-regexp2fst -f $1 > Syllabify
 
 
@@ -70,10 +67,11 @@ echo '@"C"* @"V"+ @"C"* @-> ... "." || _ @"C" @"V"' | $2/hfst-regexp2fst -f $1 >
 
 echo 'a (->) á|à , e (->) é|è , i (->) í|ì , o (->) ó|ò , u (->) ú|ù , y (->) ý|y` , ä (->) ä´|ä` , ö (->) ö´|ö` || @"E" @"C"* _ ' | $2/hfst-regexp2fst -f $1 > Stress
               
-echo "3"
+
 # Scan the word, optionally dividing it to any combination of
 # unary, binary, and ternary feet. Each foot must contain at least
 # one stressed syllable.
+
 
 echo '[[@"S" ("." @"S" ("." @"S")) & $@"SS"] (->) "(" ... ")" || @"E" _ @"E"]' | $2/hfst-regexp2fst -f $1 > Scan
 
@@ -81,15 +79,11 @@ echo '[[@"S" ("." @"S" ("." @"S")) & $@"SS"] (->) "(" ... ")" || @"E" _ @"E"]' |
 # function produces a great number of output candidates for
 # even short words. Long words have millions of possible outputs.
 
-echo "4"
 echo '[@"MarkNonDiphthongs" .o. @"Syllabify" .o. @"Stress" .o. @"Scan"]' | $2/hfst-regexp2fst -f $1 > Gen
-
-
-
 
 # OT constraints
 
-echo "--- OT constraints --- "
+#echo "--- OT constraints --- "
 
 # We use asterisks to mark constraint violations. Ordinary constraints
 # such as Lapse assign single asterisks as the violation marks and the
@@ -102,7 +96,7 @@ echo "--- OT constraints --- "
 echo '${*}' | $2/hfst-regexp2fst -f $1 > Viol
 
 
-echo "1"
+
 # We prune candidates with "lenient composition" that eliminates
 # candidates that violate the constraint provided that at least
 # one output candidate survives.
@@ -126,8 +120,6 @@ echo '~[@"Viol"^16]' | $2/hfst-regexp2fst -f $1 > Viol15
 
 
 
-echo "2"
-
 
 # This eliminates the violation marks after the candidate set has
 # been pruned by a constraint.
@@ -135,11 +127,11 @@ echo "2"
 echo '{*} -> 0' | $2/hfst-regexp2fst -f $1 > Pardon
 
 
-echo "3"
+
 
 # Constraints
 
-echo "CONSTRAINTS---"
+#echo "CONSTRAINTS---"
 
 # In this section we define nine constraints for Finnish prosody,
 # listed in the order of their ranking: MainStress, Clash, AlignLeft,
@@ -153,28 +145,28 @@ echo "CONSTRAINTS---"
 
 echo '[@"B" @"MSS" ~$@"MSS"]' | $2/hfst-regexp2fst -f $1 > MainStress 
 
-echo "c1"
+
 # Clash: No stress on adjacent syllables.
 # define Clash SS -> ... {*} || SS B _ ;
 echo '@"SS" -> ... {*} || @"SS" @"B" _ ' | $2/hfst-regexp2fst -f $1 > Clash 
 
-echo "c2"
+
 
 # Align-Left: The stressed syllable is initial in the foot.
 
 echo '@"SV" -> ... {*} || .#. ~[?* "(" @"C"*] _ ' | $2/hfst-regexp2fst -f $1 > AlignLeft 
 
-echo "c3"
+
 # Foot-Bin: Feet are minimally bimoraic and maximally bisyllabic.
 # define FootBin ["(" Light ")" | "(" S ["." S]^>1] -> ... {*} ;
 echo '["(" @"Light" ")" | "(" @"S" ["." @"S"]^>1] -> ... {*} ' | $2/hfst-regexp2fst -f $1 > FootBin 
-echo "c4"
+
 
 # Lapse: Every unstressed syllable must be adjacent to a stressed
 # syllable.
 # define Lapse US -> ... {*} || [B US B] _ [B US B];
 echo '@"US" -> ... {*} || [@"B" @"US" @"B"] _ [@"B" @"US" @"B"]' | $2/hfst-regexp2fst -f $1 > Lapse 
-echo "c5"
+
 
 # Non-Final: The final syllable is not stressed.
 
@@ -184,12 +176,12 @@ echo '@"SS" -> ... {*} || _ ~$@"S" .#.' | $2/hfst-regexp2fst -f $1 > NonFinal
 # Stress-To-Weight: Stressed syllables are heavy.
 
 echo '[@"SS" & @"Light"] -> ... {*} || _ ")"| @"E"' | $2/hfst-regexp2fst -f $1 > StressToWeight 
-echo "c6"
+
 
 # License-&#963;: Syllables are parsed into feet.
 
     echo '@"S" -> ... {*} || @"E" _ @"E"' | $2/hfst-regexp2fst -f $1 > Parse 
-echo "c7"
+
 
 # All-Ft-Left: Every foot starts at the beginning of a
 #              prosodic word.
@@ -204,28 +196,22 @@ echo '[ "(" -> ... {*} || .#. @"SB" _ .o. "(" -> ... {*}^2 || .#. @"SB"^2 _ .o. 
 #echo '"(" -> ... {*}^7 || .#. @"SB"^7 _ '  | $2/hfst-regexp2fst -f $1 > a6
 #echo '"(" -> ... {*}^8 || .#. @"SB"^8 _ ' | $2/hfst-regexp2fst -f $1 > a7
 
-#echo '--a comp'
-#echo '@"a0" .o. @"a1" .o. @"a2" .o. @"a3" .o. @"a4" .o. @"a5" .o. @"a6" .o. @"a7"' | $2/hfst-regexp2fst -f $1 > AllFeetFirst
 
 # Evaluation
-echo "c8"
 # Computing the prosody for FinnWords
 
 # Some constraints can always be satisfied; some constraints are
 # violated many times. The limits have been chosen to produce
 # a unique winner in all the 25 test cases in FinnWords.
 
-echo "[FinnWords .o. Gen \
-       .o. MainStress \
-       .o. Clash .O. Viol0 .o. Pardon \
-       .o. AlignLeft .O. Viol0 \
-       .o. FootBin .O. Viol0 .o. Pardon \
-       .o. Lapse .O. Viol3 .O. Viol2 .O. Viol1 .O. Viol0 .o. Pardon \
-       .o. NonFinal .O. Viol0 .o. Pardon \
-       .o. StressToWeight .O. Viol3 .O. Viol2 .O. Viol1 .O. Viol0 .o. Pardon \
-       .o. Parse .O. Viol3 .O. Viol2 .O. Viol1 .O. Viol0 .o. Pardon \
-       .o. AllFeetFirst .O. Viol15 .O. Viol14 .O. Viol13 \
-           Viol12 .O. Viol11 .O. Viol10 .O. Viol9 .O. Viol8 .O. Viol7 .O. \
-           Viol6  .O. Viol5  .O. Viol4  .O. Viol3 .O. Viol2 .O. Viol1 .O. \
-           Viol0 .o. Pardon \
-      ]" | $2/hfst-regexp2fst -f $1 > FinnishOTProsody.hfst.hfst
+echo '[@"FinnWords" .o. @"Gen" .o. @"MainStress" .o. @"Clash" .O. @"Viol0" .o. @"Pardon" .o. @"AlignLeft" .O. @"Viol0" .o. @"FootBin" .O. @"Viol0" .o. @"Pardon" .o. @"Lapse" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"NonFinal" .O. @"Viol0" .o. @"Pardon" .o. @"StressToWeight" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"Parse" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"AllFeetFirst" .O. @"Viol15" .O. @"Viol14" .O. @"Viol13" @"Viol12" .O. @"Viol11" .O. @"Viol10" .O. @"Viol9" .O. @"Viol8" .O. @"Viol7" .O. @"Viol6"  .O. @"Viol5"  .O. @"Viol4"  .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" ]' | $2/hfst-regexp2fst -f $1 > FinnishOTProsody.hfst.hfst
+
+
+#echo '[ @"MainStress" .o. @"Clash" .O. @"Viol0" .o. @"Pardon" .o. @"AlignLeft" .O. @"Viol0" ]' | $2/hfst-regexp2fst -f $1 > FinnishOTProsody.hfst.hfst
+
+
+
+
+
+
+#echo '[@"FinnWords" .o. @"Gen" .o. @"MainStress" .o. @"Clash" .O. @"Viol0" .o. @"Pardon" .o. @"AlignLeft" .O. @"Viol0" .o. @"FootBin" .O. @"Viol0" .o. @"Pardon" .o. @"Lapse" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"NonFinal" .O. @"Viol0" .o. @"Pardon" .o. @"StressToWeight" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"Parse" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" ]' | $2/hfst-regexp2fst -f $1 > FinnishOTProsody.hfst.hfst

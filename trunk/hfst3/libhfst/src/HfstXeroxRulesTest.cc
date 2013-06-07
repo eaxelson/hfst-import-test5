@@ -4,6 +4,76 @@ using namespace implementations;
 using namespace hfst::xeroxRules;
 
 
+// harmonization of special symbole
+void test8( ImplementationType type )
+{
+    HfstTokenizer TOK;
+    TOK.add_multichar_symbol("@_SYMBOLA_@");
+    TOK.add_multichar_symbol("@_SYMBOLB_@");
+
+    HfstTransducer a("a@_SYMBOLA_@", TOK, type);
+
+    HfstTransducer b("@_SYMBOLB_@", TOK, type);
+
+
+    HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+    HfstTransducer identity (identityPair);
+    identity.repeat_star().minimize();
+    printf("alphabet before: \n");
+    StringSet transducerAlphabet = identity.get_alphabet();
+    for (StringSet::const_iterator s = transducerAlphabet.begin();
+                   s != transducerAlphabet.end();
+                   ++s)
+        {
+            printf("%s \n", s->c_str());
+        }
+    printf("------------------ \n");
+
+
+     a.concatenate(identity);
+
+
+     printf("alphabet after: \n");
+     transducerAlphabet = identity.get_alphabet();
+     for (StringSet::const_iterator s = transducerAlphabet.begin();
+                    s != transducerAlphabet.end();
+                    ++s)
+         {
+             printf("%s \n", s->c_str());
+         }
+     printf("------------------ \n");
+
+
+
+
+     identity.subtract(b).minimize();
+
+
+     printf("------a\n");
+     a.write_in_att_format(stdout, 1);
+
+     printf("identity\n");
+     identity.write_in_att_format(stdout, 1);
+
+
+         printf("alphabet: \n");
+         transducerAlphabet = identity.get_alphabet();
+         for (StringSet::const_iterator s = transducerAlphabet.begin();
+                        s != transducerAlphabet.end();
+                        ++s)
+             {
+                 printf("%s \n", s->c_str());
+                 //printf("in alph: %s", alphabet[i] ) ;
+             }
+         printf("------------------ \n");
+
+
+
+   // assert(a.compare(b));
+}
+
+
+
 // a < b ;
 void before_test1( ImplementationType type )
 {

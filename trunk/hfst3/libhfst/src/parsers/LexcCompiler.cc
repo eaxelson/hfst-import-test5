@@ -26,6 +26,7 @@
 #include <set>
 #include <vector>
 #include <algorithm>
+#include <ctime>
 
 using std::string;
 using std::map;
@@ -407,6 +408,14 @@ LexcCompiler::compileLexical()
           }
         lexicons.disjunct(lexicon).minimize();
       }
+
+  // printf("lexicons: \n");
+  //  lexicons.write_in_att_format(stdout, 1);
+
+    lexicons.substitute("@ZERO@", "0");
+    lexicons.substitute("@@ANOTHER_EPSILON@@", "@_EPSILON_SYMBOL_@");
+    lexicons.prune_alphabet();
+
     // repeat star to overgenerate
     lexicons.repeat_star().minimize();
 
@@ -417,6 +426,109 @@ LexcCompiler::compileLexical()
       {
         fprintf(stderr, "\n" "calculating correct lexicon combinations...");
       }
+
+
+
+    string startEncP = initialLexiconName_;
+    flagJoinerEncode(startEncP, false);
+    string startEncR = initialLexiconName_;
+    flagJoinerEncode(startEncR, true);
+    HfstTransducer start(startEncP, startEncP, format_);
+    HfstTransducer startP(startEncP, startEncP, format_);
+    string endEncR = "#";
+    flagJoinerEncode(endEncR, true);
+    string endEncP = "#";
+     flagJoinerEncode(endEncP, false);
+    HfstTransducer end(endEncR, endEncR, format_);
+
+
+
+    if (verbose_)
+      {
+        fprintf(stderr, "Using flags for... "
+                " %s .* #, ", initialLexiconName_.c_str());
+      }
+    lexicons = start.concatenate(lexicons).concatenate(end).minimize();
+
+    //printf("lexicons with first and last: \n");
+    //lexicons.write_in_att_format(stdout, 1);
+    lexicons.substitute("@_EPSILON_SYMBOL_@", "_TMP_EPS_").minimize();
+
+
+
+
+/////////////
+    printf ("\nSet of pairs & unknown..\n");
+       int t0 = time(NULL);
+    HfstBasicTransducer fsm(lexicons);
+
+    StringPairSet setOfPairs;
+
+    // Go through all states
+      for (HfstBasicTransducer::const_iterator it = fsm.begin();
+       it != fsm.end(); it++ )
+        {
+          // Go through all transitions
+      for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
+             = it->begin(); tr_it != it->end(); tr_it++)
+        {
+
+          if ( tr_it->get_input_symbol() != tr_it->get_output_symbol())
+          {
+              String alph1 = tr_it->get_input_symbol();
+              String alph2 = tr_it->get_output_symbol();
+                setOfPairs.insert(StringPair(alph1, alph2));
+          }
+        }
+        }
+
+    HfstTransducer unknown(setOfPairs, format_);
+
+    int t1 = time(NULL);
+    printf ("time: %d secs\n", t1 - t0);
+
+
+
+
+    HfstTransducer identity("@_IDENTITY_SYMBOL_@", format_);
+    HfstTransducer identityStar(identity);
+    identityStar.repeat_star().minimize();
+
+
+
+ 
+    printf ("sigma star...\n");
+    t0 = time(NULL);
+    // setOfPairs.insert(StringPair("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@"));
+    HfstTransducer sigmaStar(setOfPairs, format_, false);
+        sigmaStar.disjunct(identity).repeat_star().minimize();
+    t1 = time(NULL);
+    printf ("sigma star time = %d secs\n", t1 - t0);
+
+
+    //printf("unknown: \n");
+    //unknown.write_in_att_format(stdout, 1);
+
+    //printf("sigmaStar: \n");
+    //sigmaStar.write_in_att_format(stdout, 1);
+
+///////
+
+
+
+    // HfstTransducer identityPlus(identity);
+    //identityPlus.repeat_plus().minimize();
+
+
+
+    // Root, hash
+    HfstTransducer startR(startEncR, startEncR, format_);
+    HfstTransducer endP(endEncP, endEncP, format_);
+
+    HfstTransducer root(startP);
+    root.concatenate(startR).minimize();
+    HfstTransducer hash(endP);
+    hash.concatenate(end).minimize();
 
 
     // for every lex_joiner in noFlags, find only atrings where it occurs twice in a row
@@ -442,139 +554,170 @@ LexcCompiler::compileLexical()
                     " %s -> %s -> #, ", initialLexiconName_.c_str(),
                     s->c_str());
           }
-        string startEnc = initialLexiconName_;
-        joinerEncode(startEnc);
-        HfstTransducer start(startEnc, startEnc, format_);
+
+
         string joinerEnc = *s;
         joinerEncode(joinerEnc);
         HfstTransducer joiner(joinerEnc, joinerEnc, format_);
-     //   string endEnc = "#";
-     //   joinerEncode(endEnc);
-     //   HfstTransducer end(endEnc, endEnc, format_);
-        HfstTransducer sigmaStar("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@",
-                                 format_);
-
-        sigmaStar.insert_to_alphabet(joinerEnc);
-
-    //    sigmaStar = sigmaStar.subtract(start).subtract(end).subtract(joiner);
-        sigmaStar.repeat_star();
-        HfstTransducer joinerPair = joiner.repeat_n(2);
-
-        //HfstTransducer morphotax = sigmaStar.disjunct(joinerPair);
-        //morphotax.repeat_star().minimize();
 
 
 
 
 
 
+        //////////////////2nd version
+
+    //HfstTransducer identity("@_IDENTITY_SYMBOL_@", format_);
+    //HfstTransducer identityStar(identity);
+    //identityStar.repeat_star().minimize();
 
 
 
-     HfstTransducer morphotax(sigmaStar);
-     morphotax.concatenate(joinerPair).concatenate(sigmaStar).minimize();
 
-   //  printf("morph: \n");
-   //  morphotax.write_in_att_format(stdout, 1);
+        HfstTransducer identityWoJoin("@_IDENTITY_SYMBOL_@", format_);
+        identityWoJoin.insert_to_alphabet(joinerEnc);
 
 
-     morphotax.disjunct(sigmaStar).minimize();
-     //printf("morph: \n");
-     //morphotax.write_in_att_format(stdout, 1);
+        HfstTransducer iWoJoniUnk(identityWoJoin);
+        iWoJoniUnk.disjunct(unknown).minimize();
 
 
-//morphotax.harmonize_flag_diacritics(lexicons);
 
-//printf("morph: \n");
-//morphotax.write_in_att_format(stdout, 1);
+        //printf("iWoJoniUnk: \n");
+        //iWoJoniUnk.write_in_att_format(stdout, 1);
 
-        // Root and # will always be flags
-        // If we put Lex joiners root and #, compostition won't work
-        //   morphotax = start.concatenate(morphotax).concatenate(end).minimize();
 
-         // this is done after the for loop
-         //lexicons.substitute("@@ANOTHER_EPSILON@@", "$ANOTHER_EPSILON$").minimize();
+        printf ("\nBuilding subpart...\n");
+        int t0 = time(NULL);
 
-        // It is necessary to harmonize them before composition
-        lexicons.harmonize_flag_diacritics(morphotax);
+        HfstTransducer subPart(sigmaStar);
+        subPart.concatenate(iWoJoniUnk).minimize();
+        subPart.concatenate(joiner)
+                .concatenate(iWoJoniUnk)
+                .concatenate(sigmaStar).minimize();
 
-        //printf("lexicons after harmonize: \n");
+
+    //printf("subPart: \n");
+    //subPart.write_in_att_format(stdout, 1);
+
+
+
+        t1 = time(NULL);
+        printf ("Building subpart time = %d secs\n", t1 - t0);
+
+        //printf("lexicons before subtract: \n");
         //lexicons.write_in_att_format(stdout, 1);
 
+        if (verbose_)
+          {
+            fprintf(stderr, "\nSubtracting... \n");
 
-    //    lexicons.substitute("@_LEXC_JOINER.D_@", "$_LEXC_JOINER.D_$").minimize();
+          }
+        t0 = time(NULL);
+        lexicons.subtract(subPart).minimize();
+        t1 = time(NULL);
+        printf ("time = %d secs\n", t1 - t0);
 
 
-        lexicons = lexicons.compose(morphotax);
+    //printf("lexicons --subtract: \n");
+    //lexicons.write_in_att_format(stdout, 1);
 
-        //printf("lexicons compose: \n");
-        //lexicons.write_in_att_format(stdout, 1);
 
-        //printf("lexicons after compose: \n");
-        //lexicons.write_in_att_format(stdout, 1);
+
+        HfstTransducer startAnyThing(startP);
+        startAnyThing.concatenate(identityStar).minimize();
+
+
+    //printf("startAnyThing: \n");
+    //startAnyThing.write_in_att_format(stdout, 1);
+
+
+        HfstTransducer anyThingEnd(identityStar);
+        anyThingEnd.concatenate(end).minimize();
+
+        //printf("anyThingEnd: \n");
+        //anyThingEnd.write_in_att_format(stdout, 1);
+
+
+        if (verbose_)
+          {
+            fprintf(stderr, "\nComposing start... \n");
+          }
+        t0 = time(NULL);
+        lexicons.compose(startAnyThing).minimize();
+        t1 = time(NULL);
+        printf ("time = %d secs\n", t1 - t0);
+
+   //  printf("lexicons --root: \n");
+   //  lexicons.write_in_att_format(stdout, 1);
+
+        if (verbose_)
+          {
+            fprintf(stderr, "\nComposing end... \n");
+          }
+
+        t0 = time(NULL);
+        lexicons.compose(anyThingEnd).minimize();
+        t1 = time(NULL);
+        printf ("time = %d secs\n", t1 - t0);
+
+
+
+
+
+        //////////////////---------
         lexicons.substitute(joinerEnc, "@_EPSILON_SYMBOL_@").minimize();
 
-        //printf("lexicons joiner: \n");
-        //lexicons.write_in_att_format(stdout, 1);
+     //printf("lexicons joiner epsilon: \n");
+     //lexicons.write_in_att_format(stdout, 1);
 
       }
-    /*
-    // this is removed under assumption that Root can't be in noFlags
-    if (noFlags_.find(initialLexiconName_) != noFlags_.end())
-      {
-        // now same for initial lexicon and finale
-        string startEnc = initialLexiconName_;
-        joinerEncode(startEnc);
-        HfstTransducer start(startEnc, startEnc, format_);
-        HfstTransducer joiner(startEnc, startEnc, format_);
-        string endEnc = "#";
-        joinerEncode(endEnc);
-        HfstTransducer end(endEnc, endEnc, format_);
-        if (verbose_)
-          {
-            fprintf(stderr, "Morphotaxing... "
-                    " %s .* #, ", initialLexiconName_.c_str());
-          }
-        HfstTransducer sigmaStar("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@",
-                                 format_);
-        sigmaStar = sigmaStar.subtract(start).subtract(end).subtract(joiner);
-        sigmaStar.repeat_star();
-        HfstTransducer joinerPair = joiner.repeat_n(2);
-        HfstTransducer morphotax = sigmaStar.disjunct(joinerPair);
-        morphotax.repeat_star();
-        morphotax = start.concatenate(morphotax).concatenate(end).minimize();
-
-        //printf("morphotax2: \n");
-        //morphotax.write_in_att_format(stdout, 1);
-
-        lexicons = lexicons.compose(morphotax);
-
-        //printf("lexicons2: \n");
-        //lexicons.write_in_att_format(stdout, 1);
-
-        lexicons.substitute(startEnc, "@_EPSILON_SYMBOL_@").minimize();
-        lexicons.substitute(endEnc, "@_EPSILON_SYMBOL_@");
-      }
-    else
-      {
-      */
-        string startEnc = initialLexiconName_;
-        flagJoinerEncode(startEnc, false);
-        HfstTransducer start(startEnc, startEnc, format_);
-        string endEnc = "#";
-        flagJoinerEncode(endEnc, true);
-        HfstTransducer end(endEnc, endEnc, format_);
-        if (verbose_)
-          {
-            fprintf(stderr, "Using flags for... "
-                    " %s .* #, ", initialLexiconName_.c_str());
-          }
-        lexicons = start.concatenate(lexicons).concatenate(end);
-    //  }
 
 
-    lexicons.substitute("@ZERO@", "0");
-    lexicons.substitute("@@ANOTHER_EPSILON@@", "@_EPSILON_SYMBOL_@");
+
+
+
+
+    lexicons.substitute("_TMP_EPS_", "@_EPSILON_SYMBOL_@").minimize();
+
+
+    if (verbose_)
+    {
+    fprintf(stderr, "\nChanging flags... \n");
+    }
+
+
+    t0 = time(NULL);
+
+
+    // Change fake flags to real flags
+    lexicons.prune_alphabet();
+    //printf("alphabet lexicons: \n");
+    StringSet transducerAlphabet = lexicons.get_alphabet();
+    for (StringSet::const_iterator s = transducerAlphabet.begin();
+                   s != transducerAlphabet.end();
+                   ++s)
+    {
+        //printf("%s \n", s->c_str());
+        String alph = *s;
+    if ( alph[0] == '$' )
+    {
+        // TODO: do this only for strings that look like $.....$
+        replace(alph.begin(), alph.end(), '$', '@');
+
+        //std::cout << alph << '\n';
+        lexicons.substitute(*s, alph).minimize();
+    }
+
+    }
+    lexicons.prune_alphabet();
+
+
+    t1 = time(NULL);
+    printf ("time = %d secs\n", t1 - t0);
+
+    // lexicons.substitute("@ZERO@", "0");
+   // lexicons.substitute("@@ANOTHER_EPSILON@@", "@_EPSILON_SYMBOL_@");
     if (verbose_)
       {
         fprintf(stderr, "Converting...\n");
