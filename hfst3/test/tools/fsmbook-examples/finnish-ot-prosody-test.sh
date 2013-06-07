@@ -4,7 +4,7 @@
 # Rules must be implemented before all directories can be tested. 
 
 
-cd YaleShooting;
+cd FinnishOTProsody;
 if make check; then
     cd ..;
     exit 0;

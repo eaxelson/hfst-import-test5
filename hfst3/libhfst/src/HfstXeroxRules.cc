@@ -207,16 +207,16 @@ namespace hfst
           HfstTransducer rightBracket(rightMarker, TOK, type);
 
 
-          t.insert_freely(leftBracket).minimize();
-          t.insert_freely(rightBracket).minimize();
+          t.insert_freely(leftBracket, false).minimize();
+          t.insert_freely(rightBracket, false).minimize();
 
           if ( !optional )
           {
               HfstTransducer leftBracket2(leftMarker2, TOK, type);
               HfstTransducer rightBracket2(rightMarker2, TOK, type);
 
-              t.insert_freely(leftBracket2).minimize();
-              t.insert_freely(rightBracket2).minimize();
+              t.insert_freely(leftBracket2, false).minimize();
+              t.insert_freely(rightBracket2, false).minimize();
           }
           //return retval;
 
@@ -239,11 +239,6 @@ namespace hfst
 
           for ( unsigned int i = 0; i < ContextVector.size(); i++ )
           {
-             //printf("firstContext \n");
-             //ContextVector[i].first.write_in_att_format(stdout, 1);
-
-             //printf("secondContext \n");
-             //ContextVector[i].second.write_in_att_format(stdout, 1);
 
             // Expand context with mapping
             // Cr' = (Rc .*) << Markers (<,>,|) .o. [I:I | <a:b>]*
@@ -251,15 +246,21 @@ namespace hfst
             // (same for left context)
 
             // Lc = (*. Lc) << {<,>}
-            HfstTransducer firstContext(identityExpanded);
+  
+            HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+            HfstTransducer identityStar(identityPair);
+            identityStar.repeat_star();
+
+            HfstTransducer firstContext( identityStar);
             firstContext.concatenate(ContextVector[i].first).minimize();
 
             insertFreelyAllTheBrackets( firstContext, optional );
 
             // Rc =  (Rc .*) << {<,>}
             HfstTransducer secondContext(ContextVector[i].second);
-            secondContext.concatenate(identityExpanded).minimize();
+            secondContext.concatenate(identityStar).minimize();
             insertFreelyAllTheBrackets( secondContext, optional);
+
 
             /* RULE:    LC:        RC:
              * up        up        up
@@ -281,6 +282,7 @@ namespace hfst
 
                 leftContextExpanded.compose(identityExpanded).minimize();
                 rightContextExpanded.compose(identityExpanded).minimize();
+
             }
             // left context is in lower language, right in upper ( // )
             if ( replType == REPL_RIGHT )
@@ -323,10 +325,6 @@ namespace hfst
             TOK.add_multichar_symbol(boundaryMarker);
             HfstTransducer boundary(boundaryMarker, TOK, type);
 
-            HfstTransducer identityPair = HfstTransducer::identity_pair( type );
-            //identityPair.insert_to_alphabet(boundaryMarker);
-            HfstTransducer identityStar(identityPair);
-            identityStar.repeat_star();
             identityStar.insert_to_alphabet(boundaryMarker);
 
             // to firstContext
@@ -382,7 +380,7 @@ namespace hfst
 
               unionContextReplace.disjunct(oneContextReplace).minimize();
           }
-          return unionContextReplace;
+         return unionContextReplace;
       }
 
 
@@ -623,8 +621,8 @@ namespace hfst
           HfstTransducer bracketedReplace(identityExpanded);
           bracketedReplace.concatenate(mappingWithBracketsAndTmpBoundary).concatenate(identityExpanded).minimize();
 
-          //printf("bracketedReplace: \n");
-          //bracketedReplace.write_in_att_format(stdout, 1);
+          //printf("mappingWithBracketsAndTmpBoundary: \n");
+          //mappingWithBracketsAndTmpBoundary.write_in_att_format(stdout, 1);
 
           //printf("identityExpanded: \n");
           //identityExpanded.write_in_att_format(stdout, 1);
@@ -640,17 +638,17 @@ namespace hfst
 
 
 
-          //printf("unionContextReplace: \n");
-          //unionContextReplace.write_in_att_format(stdout, 1);
 
-
+          //printf("bracketedReplace \n");
+          //bracketedReplace.write_in_att_format(stdout, 1);
 
 
           // subtract all mappings in contexts from replace without contexts
           HfstTransducer replaceWithoutContexts(bracketedReplace);
           replaceWithoutContexts.subtract(unionContextReplace).minimize();
 
-
+          //printf("replaceWithoutContexts \n");
+          //replaceWithoutContexts.write_in_att_format(stdout, 1);
 
           // remove tmpMaprker
           replaceWithoutContexts.substitute(StringPair(tmpMarker, tmpMarker), StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@")).minimize();
@@ -2924,6 +2922,9 @@ int main(int argc, char * argv[])
             restriction_test8( types[i] );
 
             before_test1( types[i] );
+
+            //harmonization of special symbols
+            //test8( types[i] );
 
           }
 
