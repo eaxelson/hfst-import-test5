@@ -964,23 +964,29 @@ namespace xfst {
         }
 
       // Else, print the help message(s) for the command.
-      Name2Cmd::const_iterator it = name2cmd.find(text);
-      if (it == name2cmd.end())
+      XfstCommandSet commands = get_commands(text);
+      if (commands.size() == 0)
         {
           fprintf(outstream_, "no such command: %s\n", text);
           PROMPT_AND_RETURN_THIS;
         }
-      StringPairVector messages = get_descriptions(it->second);
-      if (messages.size() == 0)
+      bool descriptions_found = false;
+      for (XfstCommandSet::const_iterator cmd_it = commands.begin();
+           cmd_it != commands.end(); cmd_it++)
         {
-          fprintf(outstream_, "no help exists for command: %s\n", text);
-          PROMPT_AND_RETURN_THIS;
+          StringPairVector descriptions = get_descriptions(*cmd_it);
+          for (StringPairVector::const_iterator descriptions_it = descriptions.begin();
+               descriptions_it != descriptions.end(); descriptions_it++)
+            {
+              descriptions_found = true;
+              fprintf(outstream_, "%-30s %s\n", 
+                      descriptions_it->first.c_str(), 
+                      descriptions_it->second.c_str());
+            }
         }
-      for(StringPairVector::const_iterator msg_it = messages.begin();
-          msg_it != messages.end(); msg_it++)
+      if (! descriptions_found)
         {
-          fprintf(outstream_, "%-30s %s\n", 
-                  msg_it->first.c_str(), msg_it->second.c_str());
+          fprintf(outstream_, "no descriptions found for command '%s'\n", text);
         }
       PROMPT_AND_RETURN_THIS;
     }

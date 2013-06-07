@@ -6,6 +6,7 @@ namespace hfst {
     typedef std::map<hfst::xfst::XfstCommand, StringPairVector > Command2Descriptions;
 
     Command2Descriptions command_descriptions;
+    Command2Descriptions full_command_descriptions;
 
     StringPairVector get_descriptions(hfst::xfst::XfstCommand cmd)
     {
@@ -21,6 +22,11 @@ namespace hfst {
     void add_description(hfst::xfst::XfstCommand cmd, const std::string & name, const std::string & description)
     {
       command_descriptions[cmd].push_back(std::pair<std::string, std::string>(name, description));
+    }
+
+    void add_full_description(hfst::xfst::XfstCommand cmd, const std::string & name, const std::string & description)
+    {
+      full_command_descriptions[cmd].push_back(std::pair<std::string, std::string>(name, description));
     }
 
     void init_descriptions()
@@ -50,8 +56,8 @@ namespace hfst {
       add_description(EXTRACT_AMBIGUOUS_CMD, "extract unambiguous", "extracts the unambiguous paths of a transducer");
       add_description(DESCRIBE_CMD, "help", "lists all commands");
       add_description(DESCRIBE_CMD, "help <name>", "prints help message of a command");
-      add_description(DESCRIBE_CMD, "help license", "prints license");
-      add_description(DESCRIBE_CMD, "help warranty", "prints warranty information");
+      add_description(LICENCE_CMD, "help license", "prints license");
+      add_description(WARRANTY_CMD, "help warranty", "prints warranty information");
       add_description(IGNORE_CMD, "ignore net", "applies ignore to top two FSMs on stack");
       add_description(INTERSECT_CMD, "intersect net", "intersects FSMs on stack");
       add_description(INVERT_CMD, "invert net", "inverts top FSM");
