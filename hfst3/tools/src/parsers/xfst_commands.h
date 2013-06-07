@@ -28,6 +28,8 @@ namespace hfst {
       EXTRACT_AMBIGUOUS_CMD,
       EXTRACT_UNAMBIGUOUS_CMD,
       DESCRIBE_CMD,
+      LICENCE_CMD,
+      WARRANTY_CMD,
       HFST_CMD,
       IGNORE_CMD,
       INTERSECT_CMD,
