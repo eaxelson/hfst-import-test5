@@ -1,3 +1,958 @@
+2013-04-09 09:17  eaxelson
+
+	* test/tools/Makefile.am: Now tests for tools that are disabled by
+	  default are only carried out if the tools are enabled...
+
+2013-04-09 06:09  eaxelson
+
+	* check_installation/check-tools.sh,
+	  check_installation/copy-tool-tests.sh,
+	  test/tools/lexc-compiler-functionality.sh,
+	  test/tools/lexc2fst-stress.sh, test/tools/proc-functionality.sh:
+	  Fixed a couple of bugs noticed when installing HFST on Hippu.
+
+2013-04-09 03:57  eaxelson
+
+	* test/tools/Makefile.am,
+	  test/tools/lexc-compiler-functionality.sh,
+	  test/tools/proc-functionality.sh,
+	  tools/src/parsers/test/Makefile.am: hfst-xfst2fst tests are now
+	  skipped if --enable-xfst2fst is not specified.
+	  lexc-compiler-functionality-sh and proc-functionality.sh also
+	  return a skip value.
+
+2013-04-08 12:41  eaxelson
+
+	* configure.ac, test/tools/proc-functionality.sh,
+	  tools/src/hfst-lexc.cc: Now foma and sfst backends are enabled by
+	  default in configure.
+
+2013-04-08 11:57  eaxelson
+
+	* test/tools/Makefile.am, test/tools/fst2strings-functionality.sh,
+	  test/tools/lexc-compiler-functionality.sh,
+	  test/tools/lexc-functionality.sh,
+	  test/tools/proc-functionality.sh,
+	  tools/src/hfst-lexc-compiler.cc, tools/src/hfst-lexc.cc: Now
+	  hfst-lexc uses only foma. hfst-lexc2fst tests skipped as
+	  experimental. Flag tests in hfst-fst2strings are also skipped
+	  until flags are thoroughly tested.
+
+2013-04-07 19:02  mpsilfve
+
+	* tools/src/hfst-compose-intersect.cc: Fixed missing parameter in
+	  fprintf in warning message in hfst-compose-intersect. It was
+	  causing a segfault on some systems.
+
+2013-04-05 13:33  eaxelson
+
+	* libhfst/src/HfstSymbolDefs.cc, libhfst/src/HfstSymbolDefs.h,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  test/tools/Makefile.am, test/tools/fst2strings-functionality.sh,
+	  test/tools/unification_flags.txt: At least unification flags are
+	  now handled correctly in hfst-fst2strings.
+
+2013-04-05 11:08  eaxelson
+
+	* libhfst/src/HfstLookupFlagDiacritics.cc,
+	  libhfst/src/HfstLookupFlagDiacritics.h, libhfst/src/Makefile.am,
+	  libhfst/src/implementations/SfstTransducer.cc,
+	  tools/src/HfstLookupFlagDiacritics.cc,
+	  tools/src/HfstLookupFlagDiacritics.h, tools/src/Makefile.am:
+	  Moved HfstLookupFlagDiacritics functionality from tools/src/ to
+	  libhfst/src/.
+
+2013-04-05 10:28  eaxelson
+
+	* libhfst/src/HfstSymbolDefs.cc, libhfst/src/HfstSymbolDefs.h,
+	  libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  libhfst/src/implementations/TropicalWeightTransducer.h:
+	  Tentatively added HfstTransducer::extract_random_paths_fd. Flags
+	  still need to be processed right.
+
+2013-04-04 08:26  eaxelson
+
+	* test/tools/Makefile.am,
+	  test/tools/infinitely_ambiguous_with_flags.txt,
+	  test/tools/lookup-functionality.sh, tools/src/hfst-lookup.cc: Now
+	  hfst-lookup warns about infinitely ambiguous transducers. Fixes
+	  bug #168.
+
+2013-04-03 14:44  eaxelson
+
+	* test/tools/Makefile.am, tools/src/parsers/test/Makefile.am: Added
+	  missing files to Makefiles noticed during distcheck.
+
+2013-04-03 13:07  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc: Added warnings to xfst
+	  compiler when using longest-string(-size) with flags.
+
+2013-04-02 16:43  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc: Tentatively added commands
+	  longest-string and longest-string-size to xfst parser.
+
+2013-04-02 15:32  eaxelson
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc: Added function
+	  HfstTransitionGraph::longest_string_size.
+
+2013-03-28 13:05  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc: Tentatively added function
+	  HfstTransitionGraph::top_sort().
+
+2013-03-28 08:56  eaxelson
+
+	* tools/src/hfst-pmatch.cc: Added option --version to hfst-pmatch.
+
+2013-03-27 13:20  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Make sure minimization
+	  always gets done
+
+2013-03-27 12:10  eaxelson
+
+	* libhfst/src/HfstTransducer.h, tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/hfst-xfst2fst.cc,
+	  tools/src/parsers/test/apply_down.output,
+	  tools/src/parsers/test/apply_up.output,
+	  tools/src/parsers/test/apply_up.xfst: Added more test to xfst
+	  parser. Now comments are handled correctly in xfst. Edited
+	  documentation in HfstTransducer.h.
+
+2013-03-27 10:05  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h,
+	  libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h, tools/src/hfst-pmatch.cc,
+	  tools/src/hfst-pmatch2fst.cc: Merge from pmatch dev branch, with
+	  a change related to read_lexc -> read_lexc_ptr.
+
+2013-03-26 14:14  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/apply_down.output,
+	  tools/src/parsers/test/apply_down.xfst,
+	  tools/src/parsers/test/apply_up.output,
+	  tools/src/parsers/test/apply_up.xfst,
+	  tools/src/parsers/test/set_variable.output,
+	  tools/src/parsers/test/set_variable.xfst,
+	  tools/src/parsers/test/test.sh: Now xre parser can parse
+	  expression '{foo}:{bar}' correctly. Also added variable tests to
+	  xfst parser.
+
+2013-03-26 09:33  eaxelson
+
+	* libhfst/src/implementations/FomaTransducer.cc,
+	  libhfst/src/implementations/SfstTransducer.cc,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/shortest_string.output,
+	  tools/src/parsers/test/shortest_string.xfst,
+	  tools/src/parsers/test/test.sh: Added a test for xfst's
+	  shortest-string. Also fixed a bug in including the epsilon string
+	  in HfstTransducer::extract_paths.
+
+2013-03-25 15:22  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/LogWeightTransducer.cc,
+	  libhfst/src/implementations/LogWeightTransducer.h,
+	  libhfst/src/implementations/SfstTransducer.cc,
+	  libhfst/src/implementations/SfstTransducer.h,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  libhfst/src/implementations/TropicalWeightTransducer.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/define.att,
+	  tools/src/parsers/test/define.xfst,
+	  tools/src/parsers/test/define_fail.xfst,
+	  tools/src/parsers/test/test.sh: Added new xfst tests, also added
+	  function HfstTransducer::is_automaton.
+
+2013-03-25 13:33  mie
+
+	* libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/lexc-utils.h: Invert lexc flags
+
+2013-03-25 11:49  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/test/compose_net.xfst,
+	  tools/src/parsers/test/concatenate_net.xfst,
+	  tools/src/parsers/test/determinize_net.xfst,
+	  tools/src/parsers/test/eliminate_flag.xfst,
+	  tools/src/parsers/test/eliminate_flags.xfst,
+	  tools/src/parsers/test/epsilon_remove_net.xfst,
+	  tools/src/parsers/test/ignore_net.xfst,
+	  tools/src/parsers/test/intersect_net.xfst,
+	  tools/src/parsers/test/invert_net.xfst,
+	  tools/src/parsers/test/lower_side_net.xfst,
+	  tools/src/parsers/test/minimize_net.xfst,
+	  tools/src/parsers/test/minus_net.xfst,
+	  tools/src/parsers/test/negate_net.xfst,
+	  tools/src/parsers/test/one_plus_net.xfst,
+	  tools/src/parsers/test/reverse_net.xfst,
+	  tools/src/parsers/test/test.sh,
+	  tools/src/parsers/test/union_net.xfst,
+	  tools/src/parsers/test/upper_side_net.xfst,
+	  tools/src/parsers/test/zero_plus_net.xfst: Renamed again some
+	  testfiles in xfst..
+
+2013-03-25 10:28  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/apply_down.grep,
+	  tools/src/parsers/test/apply_down.output,
+	  tools/src/parsers/test/apply_up.grep,
+	  tools/src/parsers/test/apply_up.output,
+	  tools/src/parsers/test/print_label_tally.grep,
+	  tools/src/parsers/test/print_label_tally.output,
+	  tools/src/parsers/test/print_labels.grep,
+	  tools/src/parsers/test/print_labels.output,
+	  tools/src/parsers/test/print_stack.grep,
+	  tools/src/parsers/test/print_stack.output,
+	  tools/src/parsers/test/test.sh,
+	  tools/src/parsers/test/test_false.grep,
+	  tools/src/parsers/test/test_false.output,
+	  tools/src/parsers/test/test_true.grep,
+	  tools/src/parsers/test/test_true.output: Edited xfst tests.
+
+2013-03-22 15:22  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h,
+	  tools/src/parsers/XfstCompiler.cc: Documented flag elimination
+	  function. Fixed some bugs in using transducer definitions.
+
+2013-03-22 10:16  eaxelson
+
+	* tools/src/hfst-lexc-compiler.cc,
+	  tools/src/parsers/test/eliminate_flag.xfst,
+	  tools/src/parsers/test/eliminate_flags.att,
+	  tools/src/parsers/test/eliminate_flags.xfst,
+	  tools/src/parsers/test/test.sh: Added a new test for flag
+	  elimination.
+
+2013-03-21 14:28  eaxelson
+
+	* libhfst/src/HfstFlagDiacritics.h, libhfst/src/HfstTransducer.cc,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/eliminate_flag.att,
+	  tools/src/parsers/test/eliminate_flag.xfst,
+	  tools/src/parsers/test/eliminate_flags.att,
+	  tools/src/parsers/test/eliminate_flags.xfst,
+	  tools/src/parsers/test/test.sh: Added tests for xfst parser's
+	  function eliminate flags.
+
+2013-03-21 13:51  eaxelson
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/implementations/FomaTransducer.cc,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/parsers/XreCompiler.cc,
+	  libhfst/src/parsers/XreCompiler.h,
+	  tools/src/parsers/XfstCompiler.cc: Wrote more flag elimination
+	  functionalitites.
+
+2013-03-21 09:48  mpsilfve
+
+	* tools/src/hfst-twolc/src/htwolcpre1.yy,
+	  tools/src/hfst-twolc/src/htwolcpre2.yy,
+	  tools/src/hfst-twolc/src/htwolcpre3.yy,
+	  tools/src/hfst-twolc/test/Makefile.am,
+	  tools/src/hfst-twolc/test/test61,
+	  tools/src/hfst-twolc/test/test61.txt_fst: Added x: center rules
+	  and tests for them.
+
+2013-03-21 09:21  mpsilfve
+
+	* tools/src/hfst-twolc/src/commandline_src/CommandLine.cc,
+	  tools/src/hfst-twolc/src/commandline_src/CommandLine.h,
+	  tools/src/hfst-twolc/src/htwolcpre3.yy,
+	  tools/src/hfst-twolc/src/rule_src/RightArrowRuleContainer.cc,
+	  tools/src/hfst-twolc/src/rule_src/RightArrowRuleContainer.h,
+	  tools/src/hfst-twolc/src/rule_src/TwolCGrammar.cc,
+	  tools/src/hfst-twolc/src/rule_src/TwolCGrammar.h: Restored long
+	  option name --resolve.
+
+2013-03-21 08:36  mpsilfve
+
+	* tools/src/hfst-twolc/src/htwolcpre1.yy: Fixed problem where
+	  definitions in pair expression were caught too late which
+	  resulted in weird syntax warnings.
+
+2013-03-20 15:25  mie
+
+	* libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/lexc-utils.cc,
+	  libhfst/src/parsers/lexc-utils.h: Maybe use flags instead of
+	  joiners in legacy lexc compilation.
+
+2013-03-20 15:03  eaxelson
+
+	* back-ends/foma/flags.c, back-ends/foma/fomalib.h,
+	  libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/FomaTransducer.cc,
+	  libhfst/src/implementations/FomaTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc: Started implementing flag
+	  elimination function.
+
+2013-03-18 14:47  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/print_label_tally.grep,
+	  tools/src/parsers/test/print_label_tally.xfst,
+	  tools/src/parsers/test/test.sh: Added new functions to xfst
+	  parser.
+
+2013-03-18 10:37  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/print_labels.grep,
+	  tools/src/parsers/test/print_labels.xfst,
+	  tools/src/parsers/test/test.sh,
+	  tools/src/parsers/test/test_false.grep,
+	  tools/src/parsers/test/test_overlap_false.xfst,
+	  tools/src/parsers/test/test_overlap_true.xfst,
+	  tools/src/parsers/test/test_sublanguage_false.xfst,
+	  tools/src/parsers/test/test_sublanguage_true.xfst,
+	  tools/src/parsers/test/test_true.grep,
+	  tools/src/parsers/xfst-lexer.ll: Added new test for xfst parser.
+
+2013-03-15 12:01  eaxelson
+
+	* tools/src/parsers/test/test.sh: Set property executable ON:
+	  test.sh.
+
+2013-03-15 09:02  mpsilfve
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h:
+	  Again doing flag diacritic filtering in flag diacritic
+	  harmonization, since it turned out not to be a problem after all.
+
+2013-03-14 21:36  mpsilfve
+
+	* libhfst/src/HfstTransducer.cc: insert_freely_missing_flags(...)
+	  no longer uses insert_freely(...) becauses successive invocations
+	  of insert_freely without intervening minimizations cause
+	  exponential state growth.
+
+2013-03-14 19:57  mpsilfve
+
+	* tools/src/hfst-compose.cc: compose-call in hfst-compose now does
+	  flag filtering only if flag harmonization was done
+
+2013-03-14 15:04  mpsilfve
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  tools/src/hfst-compose.cc: Changes that permit new filtering of
+	  illegal flag paths hopefully wothout affecting performance.
+
+2013-03-14 15:03  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/apply_down.grep,
+	  tools/src/parsers/test/apply_down.xfst,
+	  tools/src/parsers/test/apply_up.grep,
+	  tools/src/parsers/test/apply_up.xfst,
+	  tools/src/parsers/test/print_stack.grep,
+	  tools/src/parsers/test/print_stack.xfst,
+	  tools/src/parsers/test/test.sh: Added more tests for xfst.
+
+2013-03-14 14:14  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/hfst-xfst2fst.cc,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/determinize_net.att,
+	  tools/src/parsers/test/determinize_net.xfst,
+	  tools/src/parsers/test/epsilon_remove_net.att,
+	  tools/src/parsers/test/epsilon_remove_net.xfst,
+	  tools/src/parsers/test/lower_side_net.att,
+	  tools/src/parsers/test/lower_side_net.xfst,
+	  tools/src/parsers/test/minimize_net.att,
+	  tools/src/parsers/test/minimize_net.xfst,
+	  tools/src/parsers/test/negate_net.att,
+	  tools/src/parsers/test/negate_net.xfst,
+	  tools/src/parsers/test/one_plus_net.att,
+	  tools/src/parsers/test/one_plus_net.xfst,
+	  tools/src/parsers/test/reverse_net.att,
+	  tools/src/parsers/test/reverse_net.xfst,
+	  tools/src/parsers/test/test.sh,
+	  tools/src/parsers/test/upper_side_net.att,
+	  tools/src/parsers/test/upper_side_net.xfst,
+	  tools/src/parsers/test/zero_plus_net.att,
+	  tools/src/parsers/test/zero_plus_net.xfst,
+	  tools/src/parsers/xfst-parser.yy: Added more tests for xfst
+	  parser.
+
+2013-03-14 11:29  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/hfst-xfst2fst.cc: Now readline is disabled by
+	  default in xfst parser unless configure is run with
+	  --with-readline.
+
+2013-03-14 09:53  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, tools/src/parsers/XfstCompiler.cc:
+	  Changed 'HFST_THROW' into 'HFST_THROW_MESSAGE' in
+	  HfstTransducer::eliminate_flag(s). Should fix bug #163.
+
+2013-03-13 13:36  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h: Renamed some of the functions
+	  in xfst parser.
+
+2013-03-13 11:22  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc: Now readline history of
+	  'inspect net' is ignored when returning from 'inspect net'.
+
+2013-03-12 15:45  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc: Commented code.
+
+2013-03-12 14:55  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc: Now 'inspect net' should work
+	  for all cases.
+
+2013-03-12 13:09  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h: Tentatively added 'inspect net'
+	  to xfst parser.
+
+2013-03-11 14:10  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h: Edited XfstCompiler
+
+2013-03-11 11:58  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/intersect_net.att,
+	  tools/src/parsers/test/intersect_net.xfst,
+	  tools/src/parsers/test/minus_net.att,
+	  tools/src/parsers/test/minus_net.xfst,
+	  tools/src/parsers/test/test.sh, tools/src/parsers/xfst-parser.yy:
+	  Added new tests to xfst parser and implemented interactive lookup
+	  mode.
+
+2013-03-11 09:28  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/compose_net.att,
+	  tools/src/parsers/test/compose_net.xfst,
+	  tools/src/parsers/test/concatenate_net.att,
+	  tools/src/parsers/test/concatenate_net.xfst,
+	  tools/src/parsers/test/ignore_net.att,
+	  tools/src/parsers/test/ignore_net.xfst,
+	  tools/src/parsers/test/invert_net.att,
+	  tools/src/parsers/test/invert_net.xfst,
+	  tools/src/parsers/test/test.sh,
+	  tools/src/parsers/test/union_net.att,
+	  tools/src/parsers/test/union_net.xfst,
+	  tools/src/parsers/xfst-lexer.ll,
+	  tools/src/parsers/xfst-parser.yy,
+	  tools/src/parsers/xfst_commands: Added more tests to xfst parser.
+
+2013-03-07 12:44  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/FomaTransducer.cc,
+	  libhfst/src/implementations/FomaTransducer.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/test/compose_net.att,
+	  tools/src/parsers/test/compose_net.xfst,
+	  tools/src/parsers/test/test.sh, tools/src/parsers/xfst_commands:
+	  Tentatively added functions HfstTransducer::eliminate_flag(s).
+	  Added function 'compose_net' to xfst parser.
+
+2013-03-06 20:17  eaxelson
+
+	* back-ends/foma/apply.c, back-ends/foma/constructions.c,
+	  back-ends/foma/foma.c, back-ends/foma/foma.h,
+	  back-ends/foma/fomalib.h, back-ends/foma/fomalibconf.h,
+	  back-ends/foma/iface.c, back-ends/foma/lex.cmatrix.c,
+	  back-ends/foma/lex.interface.c, back-ends/foma/lex.lexc.c,
+	  back-ends/foma/lex.yy.c, back-ends/foma/lexc.l,
+	  back-ends/foma/regex.l, back-ends/foma/regex.tab.c,
+	  back-ends/foma/regex.y, back-ends/foma/rewrite.c,
+	  back-ends/foma/sigma.c, back-ends/foma/spelling.c,
+	  test/tools/symbol-harmonization-functionality.sh: Updated to foma
+	  version 0.9.17.
+
+2013-03-06 12:51  eaxelson
+
+	* libhfst/src/HfstTransducer.cc: Added test for
+	  HfstTransducer::remove_from_alphabet.
+
+2013-03-05 15:49  mpsilfve
+
+	* libhfst/src/HfstTransducer.h: Changed bool static
+	  is_safe_conversion(...) to static bool is_safe_conversion(...)
+	  because syntax error.
+
+2013-03-05 10:55  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy: Now regex parser substitution
+	  does not add substituting symbols to the alphabet of the
+	  transducer to be substituted. It is not needed anymore since
+	  there is a parameter 'harmonize' in
+	  HfstTransducer::substitute(StringPair&, HfstTransducer&).
+
+2013-03-04 11:25  eaxelson
+
+	* libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  tools/src/hfst-fst2strings.cc: Now HfstTransducer::n_best throws
+	  an HfstFatalException if OpenFst fails to allocate enough memory.
+	  Kind of fixes bug #159.
+
+2013-03-04 10:22  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/parsers/XreCompiler.cc,
+	  libhfst/src/parsers/XreCompiler.h,
+	  libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h,
+	  test/tools/symbol-harmonization-functionality.sh,
+	  tools/src/hfst-regexp2fst.cc, tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/test/test.sh: Now hfst-regexp2fst and
+	  hfst-xfst2fst both give a warning message if the user writes a
+	  replace rule that contains special symbols.
+
+2013-03-03 21:45  eaxelson
+
+	* test/tools/symbol-harmonization-functionality.sh: Added more
+	  symbol harmonization tests.
+
+2013-03-03 13:46  eaxelson
+
+	* libhfst/src/parsers/xre_utils.cc,
+	  test/tools/symbol-harmonization-functionality.sh: Commented code.
+
+2013-03-03 13:19  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h,
+	  test/tools/symbol-harmonization-functionality.sh: Now the regex
+	  parser parses [x:?] so that it includes the transition [x:x].
+	  This also happens in xfst and foma.
+
+2013-03-03 11:41  eaxelson
+
+	* libhfst/src/implementations/FomaTransducer.cc,
+	  libhfst/src/parsers/xre_parse.yy,
+	  test/tools/lexc-compiler-functionality.sh,
+	  test/tools/symbol-harmonization-functionality.sh: Now regex
+	  parser interprets ?:? in the same way as xfst or foma, i.e. as
+	  unknown-to-unknown OR identity-to-identity.
+
+2013-03-02 13:02  eaxelson
+
+	* libhfst/src/implementations/FomaTransducer.cc,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h,
+	  test/tools/compare-functionality.sh,
+	  test/tools/symbol-harmonization-functionality.sh,
+	  tools/src/parsers/commands.help, tools/src/parsers/foma_commands,
+	  tools/src/parsers/foma_commands.help,
+	  tools/src/parsers/xfst_commands,
+	  tools/src/parsers/xfst_commands.help: Implemented substitution
+	  with an empty set in regex parser.
+
+2013-03-01 14:54  mpsilfve
+
+	* tools/src/hfst-twolc/src/htwolcpre1.yy: Fixed hfst-twolc.bug
+	  which inserted all diacritics into the first set that was
+	  declared.
+
+2013-03-01 10:17  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy,
+	  test/tools/symbol-harmonization-functionality.sh: Now xre parser
+	  never performs harmonization in substitution or ignoring.
+
+2013-03-01 10:02  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy,
+	  test/tools/symbol-harmonization-functionality.sh: Fixed a bug in
+	  xre substitution.
+
+2013-02-28 22:59  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/parsers/xre_parse.yy,
+	  test/tools/symbol-harmonization-functionality.sh,
+	  tools/src/hfst-twolc/src/htwolcpre3.yy,
+	  tools/src/hfst-twolc/src/rule_src/OtherSymbolTransducer.cc,
+	  tools/src/hfst-twolc/src/rule_src/OtherSymbolTransducer.h: Added
+	  a bool parameter to control harmonization in
+	  HfstTransducer::substitute(SymbolPair, HfstTransducer). Fixed xre
+	  parser so that it doesn't harmonize when performing substitution.
+	  Also changed call to substitute function in twolc but preserved
+	  the harmonization.
+
+2013-02-28 21:18  eaxelson
+
+	* libhfst/src/HfstApply.cc, libhfst/src/HfstTransducer.cc,
+	  libhfst/src/HfstTransducer.h, libhfst/src/HfstXeroxRules.cc,
+	  libhfst/src/HfstXeroxRulesTest.cc,
+	  test/tools/symbol-harmonization-functionality.sh: Now binary
+	  operations never harmonize special symbols of form @_.*_@. To
+	  make xerox rules work, the marker symbols @_SOME_MARKER_@ had to
+	  be changed to @SOME_MARKER@ so that they get harmonized as they
+	  did earlier.
+
+2013-02-28 12:30  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/parsers/xre_parse.yy:
+	  Now insert_freely also takes a parameter that tells whether
+	  harmonization is carried out.
+
+2013-02-28 11:55  eaxelson
+
+	* test/tools/symbol-harmonization-functionality.sh,
+	  tools/src/hfst-concatenate.cc, tools/src/hfst-conjunct.cc,
+	  tools/src/hfst-disjunct.cc, tools/src/hfst-subtract.cc: Now there
+	  is an option --do-not-harmonize for all binary command line
+	  tools.
+
+2013-02-28 11:32  eaxelson
+
+	* libhfst/src/HfstApply.cc, libhfst/src/HfstTransducer.cc,
+	  test/tools/symbol-harmonization-functionality.sh,
+	  tools/src/hfst-concatenate.cc: Fixed some bugs in harmonization.
+
+2013-02-27 17:02  mpsilfve
+
+	* tools/src/hfst-twolc/src/rule_src/OtherSymbolTransducer.cc,
+	  tools/src/hfst-twolc/src/rule_src/OtherSymbolTransducer.h: Fixed
+	  missing bool parameter problem.
+
+2013-02-27 16:14  eaxelson
+
+	* libhfst/src/HfstApply.cc, libhfst/src/HfstTransducer.cc,
+	  libhfst/src/HfstTransducer.h, libhfst/src/hfst_apply_schemas.h,
+	  libhfst/src/parsers/XreCompiler.cc,
+	  libhfst/src/parsers/XreCompiler.h,
+	  libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc, test/tools/Makefile.am,
+	  test/tools/a_or_id.txt, test/tools/compare-functionality.sh,
+	  test/tools/symbol-harmonization-functionality.sh,
+	  tools/src/hfst-compare.cc, tools/src/hfst-regexp2fst.cc: Added a
+	  flag -H to hfst-compare and hfst-regexp2fst that turns off
+	  unknown harmonization.
+
+2013-02-27 13:37  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  test/tools/Makefile.am, test/tools/a2a_or_a2b_or_a2unk.txt,
+	  test/tools/a2b_or_b2b_or_unk2b.txt,
+	  test/tools/symbol-harmonization-functionality.sh,
+	  test/tools/unk2unk_or_id.txt, tools/src/hfst-compose.cc: Added a
+	  bool argument to binary transducer functions that controls
+	  whether harmonization is carried out. Also added harmonization
+	  tests.
+
+2013-02-26 14:06  eaxelson
+
+	* back-ends/foma/lex.lexc.c, back-ends/foma/lexc.l,
+	  back-ends/foma/lexcread.c,
+	  test/tools/lexc-compiler-functionality.sh,
+	  test/tools/lexc-functionality.sh, tools/src/hfst-lexc.cc: Now
+	  hfst-lexc writes all messages to stderr. Fixes bug #68.
+
+2013-02-26 10:25  eaxelson
+
+	* libhfst/src/implementations/FomaTransducer.cc: Now
+	  FomaTransducer::define_transducer(symbol1, symbol2) works also if
+	  symbol1 == symbol2 == identity. Fixes bug #110.
+
+2013-02-26 09:42  eaxelson
+
+	* libhfst/src/implementations/SfstTransducer.cc,
+	  libhfst/src/implementations/SfstTransducer.h: SfstTransducer.h no
+	  longer uses generic word 'Transducer'. Fixes bug #130.
+
+2013-02-26 09:19  eaxelson
+
+	* tools/src/HfstCompiler.cc, tools/src/HfstCompiler.h,
+	  tools/src/hfst-compiler.yy: Now hfst-sfstpl2fst finds included
+	  files in the same directory where its input file is located.
+	  Fixes bug #145.
+
+2013-02-26 08:25  eaxelson
+
+	* libhfst/src/HfstInputStream.cc, tools/src/hfst-fst2txt.cc: Now
+	  hfst-fst2txt prints an error message instead of segfaulting when
+	  given an input stream whose transducers do not have the same
+	  type. Fixes bug #115.
+
+2013-02-25 15:58  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/FomaTransducer.cc,
+	  libhfst/src/implementations/FomaTransducer.h,
+	  libhfst/src/implementations/SfstTransducer.cc,
+	  libhfst/src/implementations/SfstTransducer.h,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  libhfst/src/implementations/TropicalWeightTransducer.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/hfst-xfst2fst.cc: Implemented functions
+	  number_of_states and number_of_arcs.
+
+2013-02-25 13:52  moshagen
+
+	* test/tools/fsmbook-examples/Lingala, tools/src/parsers: Ignore
+	  generated files.
+
+2013-02-25 13:24  eaxelson
+
+	* tools/src/parsers/hfst-xfst2fst.cc,
+	  tools/src/parsers/test/test.sh: Now all xfst files are read in a
+	  buffer and parsed with XfstCompiler.parse_line.
+
+2013-02-22 16:51  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/hfst-xfst2fst.cc,
+	  tools/src/parsers/test/test.sh: Now xfst parser can parse regexps
+	  that are on several lines.
+
+2013-02-22 16:17  eaxelson
+
+	* tools/src/parsers/hfst-xfst2fst.cc,
+	  tools/src/parsers/test/test.sh, tools/src/parsers/xfst-lexer.ll,
+	  tools/src/parsers/xfst-parser.yy: Edited xfst parser.
+
+2013-02-22 10:48  eaxelson
+
+	* configure.ac, tools/src/parsers, tools/src/parsers/Makefile.am,
+	  tools/src/parsers/test, tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/test.sh, tools/src/parsers/xfst-parser.yy:
+	  Added tests for hfst-xfst2fst.
+
+2013-02-19 16:39  eaxelson
+
+	* tools/src/parsers/Makefile.am, tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/hfst-xfst2fst.cc: Added main program from
+	  XfstCompiler.cc to hfst-xfst2fst.cc.
+
+2013-02-19 13:45  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc: More command line options
+	  added to hfst-xfst2fst.
+
+2013-02-19 12:32  eaxelson
+
+	* tools/src/parsers/Makefile.am, tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h: Parameter handling added to
+	  hfst-xfst2fst.
+
+2013-02-18 20:58  eaxelson
+
+	* tools/src/parsers/Makefile.am, tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/commands.help,
+	  tools/src/parsers/xfst-parser.yy: Now hfst-xfst2fst works with
+	  readline functionalities if a temporary file is used for
+	  buffering commands.
+
+2013-02-18 11:37  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/parsers/xre_parse.yy,
+	  test/tools/fsmbook-examples/FinnishOTProsody/FinnishOTProsody.hfst.script:
+	  Replace rules compilation - boundary marker added to begining/end
+	  of all contexts which don't containt it
+
+2013-02-15 16:51  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/xfst-parser.yy: Added more functions to the
+	  xfst interface.
+
+2013-02-15 15:01  eaxelson
+
+	* libhfst/src/parsers/XreCompiler.cc,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h: Added more functions to the
+	  xfst interface.
+
+2013-02-14 19:43  eaxelson
+
+	* libhfst/src/parsers/XreCompiler.cc,
+	  libhfst/src/parsers/XreCompiler.h: Added variable undefinition to
+	  xfst parser.
+
+2013-02-14 19:30  eaxelson
+
+	* libhfst/src/parsers/XreCompiler.cc,
+	  libhfst/src/parsers/XreCompiler.h,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h,
+	  tools/src/parsers/XfstCompiler.cc: Now definition expansion can
+	  be controlled in XreCompiler through a function
+	  set_expand_definitions. If they are always expanded, lexc syntax
+	  is not parsed correctly.
+
+2013-02-14 10:27  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h: Added definition expansion to
+	  the xre parser.
+
+2013-02-13 14:10  eaxelson
+
+	* libhfst/src/Makefile.am, tools/src/parsers/Makefile.am,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h: Made a couple of fixes to xfst
+	  parser.
+
+2013-02-13 11:26  eaxelson
+
+	* configure.ac, libhfst/src/Makefile.am, tools/src/Makefile.am,
+	  tools/src/parsers/Makefile.am: Tentatively added
+	  tools/src/parsers as a part of the automake build.
+
+2013-02-08 09:56  eaxelson
+
+	* check_installation/check-morphologies.sh,
+	  check_installation/morphology_tests/finnish-analyze.output,
+	  check_installation/morphology_tests/omorfi-analyze.input,
+	  check_installation/morphology_tests/omorfi-analyze.output,
+	  check_installation/morphology_tests/omorfi-generate.input,
+	  check_installation/morphology_tests/omorfi-generate.output:
+	  Updated morphology installation tests, now omorfi is included.
+
+2013-02-07 08:06  eaxelson
+
+	* swig/setup.py: Updated version number in swig setup file.
+
+2013-02-05 09:03  eaxelson
+
+	* check_installation/check-tools.sh, swig/test/test_std_streams.sh:
+	  Now installation tests skip sfst or foma if they are not found.
+
+2013-02-04 13:30  eaxelson
+
+	* NSIS/README: Edited NSIS README.
+
+2013-02-04 11:56  eaxelson
+
+	* NSIS/README, NSIS/copy_files.sh, NSIS/hfst_installer.nsi: Updated
+	  NSIS files.
+
+2013-02-02 12:09  mie
+
+	* test/tools/Makefile.am, test/tools/compounds2.txt,
+	  test/tools/proc-compounds2-out.strings,
+	  test/tools/proc-compounds2.strings,
+	  test/tools/proc-functionality.sh: New apertium proc space
+	  handling test from bug [#153].
+
+2013-02-01 11:03  eaxelson
+
+	* check_installation/check-tools.sh,
+	  check_installation/dist-README, swig/test/test_std_streams.sh:
+	  Small fixes to swig and installation checks.
+
+2013-02-01 10:18  eaxelson
+
+	* check_installation/check-swig.sh, check_installation/dist-README,
+	  swig/README, swig/test/test_std_streams.sh: Added documentation.
+
+2013-02-01 09:11  eaxelson
+
+	* swig/test/test.sh, swig/test/test_std_streams.sh: Made small
+	  fixes to swig tests.
+
+2013-02-01 08:08  eaxelson
+
+	* check_installation/check-tools.sh,
+	  test/tools/permutate-file-params.sh: Made permutate-file-params
+	  test silent. Edited check-tools.sh so that it handles --prefix
+	  parameter right.
+
+2013-02-01 07:45  eaxelson
+
+	* check_installation/check-tools.sh,
+	  check_installation/copy-tool-tests.sh,
+	  check_installation/test-empty-input.sh,
+	  check_installation/test-help.sh,
+	  check_installation/test-hfst-twolc.sh,
+	  check_installation/test-hfst-xfst.sh,
+	  check_installation/test-version.sh: Updated hfst tool checks-
+
+2013-01-31 13:22  sdrobac
+
+	* configure.ac, libhfst/src/parsers/xre_parse.yy,
+	  test/tools/fsmbook-examples/Lingala/Lingala.hfst.script,
+	  test/tools/fsmbook-examples/Lingala/Lingala.xfst.script,
+	  test/tools/fsmbook-examples/Makefile.am: Fixed Lingala and
+	  MonishGuesserAnalyzer fsmbook tests, minor changes in regexp
+
+2013-01-31 10:05  eaxelson
+
+	* check_installation/copy-tool-tests.sh,
+	  check_installation/test-empty-input.sh: Updated installation
+	  checks.
+
+2013-01-30 17:20  sdrobac
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/parsers/xre_parse.yy,
+	  test/tools/fsmbook-examples/Lingala/Lingala.hfst.script,
+	  test/tools/fsmbook-examples/Lingala/Lingala.xfst.script: In
+	  substitute (symbol_pair, transducer) added harmonization with the
+	  symbol_par. Also, updated substitute in regexp
+
+2013-01-30 12:42  eaxelson
+
+	* ChangeLog, NEWS, configure.ac, libhfst/src/Makefile.am: Ready for
+	  release 3.4.3.
+
 2013-01-30 12:26  sdrobac
 
 	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRulesTest.cc,
