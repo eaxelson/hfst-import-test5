@@ -5,6 +5,20 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.4.5
+---------------------------
+
+* Several improvements to pmatch tools
+
+* Function calls supported in xre parser
+
+* A bug in replace rules with term complement in context fixed
+
+* Some fixes to the lexc parser
+
+* Now option combination --obey-flags --random works in hfst-fst2strings
+
+
 Noteworthy changes in 3.4.4
 ---------------------------
 

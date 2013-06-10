@@ -71,10 +71,6 @@ using hfst::implementations::HfstBasicTransition;
 #define PRINT_INFO_PROMPT_AND_RETURN_THIS print_transducer_info(); prompt(); return *this;
 #define IF_NULL_PROMPT_AND_RETURN_THIS(x) if (x == NULL) { prompt(); return *this; }
 
-#include "xfst_commands.h"
-#include "name2cmd.h"
-#include "init_help.cc"
-
 namespace hfst { 
 namespace xfst {
 
@@ -91,8 +87,6 @@ namespace xfst {
         verbose_(false),
         latest_regex_compiled(NULL)
     {       
-      init_name2cmd();
-      init_descriptions();
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
         variables_["assert"] = "OFF";
@@ -127,8 +121,6 @@ namespace xfst {
         verbose_(false),
         latest_regex_compiled(NULL)
     {       
-      init_name2cmd();
-      init_descriptions();
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
         variables_["assert"] = "OFF";
@@ -906,88 +898,21 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::apropos(const char* text )
     {
-      // Go through all command help messages.
-      for(Command2Descriptions::const_iterator it = command_descriptions.begin();
-          it != command_descriptions.end(); it++)
-        {
-          //std::cerr << "apropos: " << it->first << std::endl;
-          // Check also alternative command names for each command
-          bool some_name_matches = false;
-          Cmd2Names::const_iterator find_all_names = cmd2names.find(it->first);
-          if (find_all_names != cmd2names.end()) // this should always be true..
-            {
-              StringVector all_names = find_all_names->second;
-              for (StringVector::const_iterator nameit = all_names.begin();
-                   nameit != all_names.end(); nameit++)
-                {
-                  //std::cerr << "  " << *nameit << std::endl;
-                  if (string_found(text, *nameit))
-                    {
-                      some_name_matches = true;
-                      break;
-                    }
-                }
-            }
-          // Go through all help messages for a command.
-          for(StringPairVector::const_iterator msg_it = it->second.begin();
-              msg_it != it->second.end(); msg_it++)
-            {
-              if (string_found(text, msg_it->first) || 
-                  string_found(text, msg_it->second) ||
-                  some_name_matches)
-                {
-                  fprintf(outstream_, "%-30s %s\n", 
-                          msg_it->first.c_str(), msg_it->second.c_str());
-                }
-            }
-        }
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
   XfstCompiler::describe(const char* text)
     {
-      // Print all command help messages, if no command given.
-      if (strcmp(text, "") == 0)
+      /*const char * message = get_help_message(text);
+      if (message != NULL)
         {
-          for(Command2Descriptions::const_iterator it = command_descriptions.begin();
-              it != command_descriptions.end(); it++)
-            {
-              for(StringPairVector::const_iterator msg_it = it->second.begin();
-                  msg_it != it->second.end(); msg_it++)
-                {
-                  fprintf(outstream_, "%-30s %s\n", 
-                          msg_it->first.c_str(), msg_it->second.c_str());
-                }
-            }
-          PROMPT_AND_RETURN_THIS;
+          fprintf(outstream_, "%s", message);
         }
-
-      // Else, print the help message(s) for the command.
-      XfstCommandSet commands = get_commands(text);
-      if (commands.size() == 0)
+      else
         {
           fprintf(outstream_, "no such command: %s\n", text);
-          PROMPT_AND_RETURN_THIS;
-        }
-      bool descriptions_found = false;
-      for (XfstCommandSet::const_iterator cmd_it = commands.begin();
-           cmd_it != commands.end(); cmd_it++)
-        {
-          StringPairVector descriptions = get_descriptions(*cmd_it);
-          for (StringPairVector::const_iterator descriptions_it = descriptions.begin();
-               descriptions_it != descriptions.end(); descriptions_it++)
-            {
-              descriptions_found = true;
-              fprintf(outstream_, "%-30s %s\n", 
-                      descriptions_it->first.c_str(), 
-                      descriptions_it->second.c_str());
-            }
-        }
-      if (! descriptions_found)
-        {
-          fprintf(outstream_, "no descriptions found for command '%s'\n", text);
-        }
+          }*/
       PROMPT_AND_RETURN_THIS;
     }
 
