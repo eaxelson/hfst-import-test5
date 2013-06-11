@@ -1,241 +1,410 @@
-#define COMMAND(x, y) if (command_matches(text, x)) { return help_message(x, y); }
-#define CASE_()
+namespace hfst {
+  namespace xfst {
 
-bool command_matches(const char * text, const char * commands)
+#define HELP_MODE_ONE_COMMAND 0
+#define HELP_MODE_ALL_COMMANDS 1
+#define HELP_MODE_APROPOS 2
+
+// handle case: if text matches, list all command names, and return
+#define COMMAND(names, args, description) if (handle_case(names, args, description, text, message, help_mode, true)) { return true; }
+// handle case: if text matches, do not list all command names, and continue
+#define CONT_COMMAND(names, args, description) handle_case(names, args, description, text, message, help_mode, false)
+// not full command
+#define AMBIGUOUS_COMMAND(name, namelist) if (!skip_ambiguous_cases && handle_ambiguous_case(name, namelist, text, message, help_mode)) { return true; }
+
+// Convert \a str to upper case.
+std::string to_upper_case(const std::string & str)
 {
+  std::string retval;
+  for (unsigned int i=0; i<str.length(); i++) {
+    if (str[i] >= 97 && str[i] <= 122) {
+      retval.append(1, str[i] - 32); }
+    else {
+      retval.append(1, str[i]); } }
+  return retval;
+}
+
+// Whether \a c is allowed before or after a word when
+// searching for the word in text.
+bool allow_char(char c)
+{
+  std::string allowed_chars = " \n\t.,;:?!-/'\"<>()|";
+  for (size_t i=0; i < allowed_chars.size(); i++)
+    {
+      if (allowed_chars[i] == c) {
+        return true; }
+    }
   return false;
 }
 
-const char * help_message(const char * commands, const char * description)
+// Whether word \a str_ is found in text \a text_.
+// Punctuation characters and upper/lower case are handled in this function.
+bool string_found_in_text(const std::string & str_, const std::string & text_)
 {
-  return NULL;
+  std::string str = to_upper_case(str_);
+  std::string text = to_upper_case(text_);
+  std::size_t pos = text.find(str);
+  if (pos == std::string::npos) 
+    {
+      return false;
+    }
+  if (pos == 0 || allow_char(text[pos-1])) 
+    {
+      if (pos+str.length() == text.length() ||
+          allow_char(text[pos+str.length()]))
+        {
+          return true;
+        }
+    }
+  return false;
 }
 
-bool get_help_message(const std::string & text, std::string & message, bool all_messages /*=false*/)
+
+// E.g. "foo <filename>, bar (optional argument), baz baz"
+std::vector<std::string> namelist_to_name_vector(const std::string & namelist)
 {
-  COMMAND("ambiguous upper, ambiguous", "returns the input words which have multiple paths in a transducer");
-  AMBIGUOUS_COMMAND("apply down, down", "apply down <string>, apply down");
-  COMMAND("apply down <string>, down <string>" "apply <string> down to the top network on stack");
-  COMMAND("apply down, down" "enter apply down mode (Ctrl-D exits)");
-  AMBIGUOUS_COMMAND("apply up, up", "apply up <string>, apply up");
-  COMMAND("apply up <string>, up <string>" "apply <string> up to the top network on stack");
-  COMMAND("apply up, up" "enter apply up mode (Ctrl-D exits)");
-  //COMMAND("apply med <string>, apply med" "find approximate matches to string in top network by minimum edit distance");
-  COMMAND("apropos <string>, apropos" "search help for <string>");
-  COMMAND("add properties, add", "<no description>");
-  COMMAND("alias", "<no description>");
-  COMMAND("cleanup net, cleanup", "<no description>");
-  COMMAND("clear stack, clear", "clear stack" "clears the stack");
-  COMMAND("collect epsilon-loops, epsilon-loops", "<no description>");
+  //std::cerr << "namelist_to_name_vector: " << namelist << std::endl; // DEBUG
+  std::vector<std::string> names;
+  size_t pos=0; // latest name start position
+  for (size_t i=0; i < namelist.length(); i++)
+    {
+      if (namelist[i] == ',')
+        {
+          names.push_back(std::string(namelist, pos, i-pos));
+          //std::cerr << "  " << names.back() << std::endl; // DEBUG
+          i++;
+          while(namelist[i] == ' ')           
+            {
+              i++;
+            }
+          pos = i;
+          i--;
+        }
+    }
+  names.push_back(std::string(namelist, pos, std::string::npos));
+  //std::cerr << "  " << names.back() << std::endl; // DEBUG
+  return names;
+}
+    
+    void append_help_message(const std::string & namelist, const std::string & arguments, const std::string & description, std::string & message, bool all_names = true)
+{
+  size_t NAME_AND_ARGUMENTS_FIELD_WIDTH = 30;
+
+  std::vector<std::string> names = namelist_to_name_vector(namelist);
+
+  message.append(names.front());
+  message.append(" ");
+  message.append(arguments);
+
+  size_t name_and_arguments_length 
+    = names.front().length() + 1 + arguments.length();
+
+  if (name_and_arguments_length > NAME_AND_ARGUMENTS_FIELD_WIDTH)
+    message.append(1, ' ');
+  else
+    message.append(NAME_AND_ARGUMENTS_FIELD_WIDTH - name_and_arguments_length, ' ');
+
+  message.append(description);
+  message.append("\n");
+
+  if (all_names && names.size() > 1)
+    {
+      for (std::vector<std::string>::const_iterator it = names.begin();
+           it != names.end(); it++)
+        {
+          if (it == names.begin())
+            {
+              message.append("(");
+              continue;
+            }
+          else if (it != ++(names.begin()))
+            {
+              message.append(", ");
+            }
+          message.append(*it);
+        }
+      message.append(")\n");
+    }
+}
+
+bool text_found(const std::string & text, const std::string & names, const std::string & description)
+{
+  return (string_found_in_text(text, names) || string_found_in_text(text, description));
+}
+
+
+bool text_matches_some_name(const std::string & text, const std::string & namelist)
+{
+  std::vector<std::string> names = namelist_to_name_vector(namelist);
+  for (std::vector<std::string>::const_iterator it = names.begin();
+       it != names.end(); it++)
+    {
+      if (text == *it)
+        {
+          return true;
+        }
+    }
+  return false;
+}
+
+    bool get_help_message(const std::string & text, std::string & message, int help_mode, bool skip_ambiguous_cases=false);
+
+bool handle_ambiguous_case(const std::string & name, const std::string & namelist, 
+                           const std::string & text, std::string & message, int help_mode)
+{
+  if (help_mode == HELP_MODE_ALL_COMMANDS ||
+      help_mode == HELP_MODE_APROPOS)
+    {
+      return false; // do nothing, and continue because all commands are gone through
+    }
+  // HELP_MODE_ONE_COMMAND
+  if (name != text)
+    {
+      return false;
+    }
+  std::vector<std::string> names = namelist_to_name_vector(namelist);
+  for (std::vector<std::string>::const_iterator it = names.begin();
+       it != names.end(); it++)
+    {
+      if (it != names.begin())
+        message.append("##\n");
+      (void)get_help_message(*it, message, help_mode, true);
+    }  
+  return true;
+}
+
+bool handle_case(const std::string & names, const std::string & arguments, 
+                 const std::string & description, const std::string & text,
+                 std::string & message, int help_mode, bool all_names=true)
+{
+  if (help_mode == HELP_MODE_ALL_COMMANDS)
+    {
+      append_help_message(names, arguments, description, message, all_names);
+      return false; // go through all commands
+    }
+  else if (help_mode == HELP_MODE_APROPOS)
+    {
+      if (text_found(text, names, description))
+        {
+          append_help_message(names, arguments, description, message, all_names);
+        }
+      return false; // continue search
+    }
+  else // HELP_MODE_ONE_COMMAND 
+    {
+      if (text_matches_some_name(text, names))
+        {
+          append_help_message(names, arguments, description, message, all_names);
+          return true; // command found
+        }
+      return false; // continue search
+    }
+}
+
+// Generate help message(s) for command(s) named \a text and append the help message(s)
+// to \a message. \a help_mode defines whether we are generating help messages for \a text,
+// all commands (in that case, \a message is ignored) or for commands that contain or 
+// whose help messages contain the word \a text.
+// @return Whether the help message could be generated.
+    bool get_help_message(const std::string & text, std::string & message, int help_mode,
+                          bool skip_ambiguous_cases)
+{
+  if (help_mode == HELP_MODE_APROPOS && text == "")
+    {
+      return get_help_message("apropos", message, HELP_MODE_ONE_COMMAND);
+    }
+
+  std::string message_at_start(message);
+
+  COMMAND("ambiguous upper, ambiguous", "", 
+          "returns the input words which have multiple paths in a transducer");
+    
+  CONT_COMMAND("apply down, down", "<string>", 
+              "apply <string> down to the top network on stack");
+  
+  COMMAND("apply down, down", "", 
+          "enter apply down mode (Ctrl-D exits)");
+  
+  CONT_COMMAND("apply up, up", "<string>",
+              "apply <string> up to the top network on stack");
+  
+  COMMAND("apply up, up", "",
+          "enter apply up mode (Ctrl-D exits)");
+  //COMMAND("apply med <string>, apply med", "find approximate matches to string in top network by minimum edit distance");
+  COMMAND("apropos", "<string>",
+          "search help for <string>");
+  COMMAND("add properties, add", "", 
+          "<no description>");
+  COMMAND("alias", "", 
+          "<no description>");
+  COMMAND("cleanup net, cleanup", "", 
+          "<no description>");
+  COMMAND("clear stack, clear", "", 
+          "clears the stack");
+  COMMAND("collect epsilon-loops, epsilon-loops", "", 
+          "<no description>");
   //"compile-replace lower, com-rep lower"
   //"compile-replace upper, com-rep upper"
-  COMMAND("compact sigma" "removes redundant symbols from FSM");
-  COMMAND("complete net, comlete" "completes the FSM");
-  COMMAND("compose net, compose" "composes networks on stack");
-  COMMAND("concatenate net, concatenate" "concatenates networks on stack");
-  COMMAND("crossproduct net, crossproduct" "cross-product of top two FSMs on stack");
-  AMBIGUOUS_COMMAND("define", "define <name> <r.e.>, define <fname>(<v1,..,vn>) <r.e.>)");
-  COMMAND("define <name> <r.e.>" "define a network");
-  COMMAND("define <fname>(<v1,..,vn>) <r.e.>" "define function");
-  COMMAND("determinize net, determinize, determinize net, determinise", "determinizes top FSM on stack"); 
-  COMMAND("echo <string>, echo" "echo a string");
-  COMMAND("edit properties, edit", "<no description>");
+  COMMAND("compact sigma", "", "removes redundant symbols from FSM");
+  COMMAND("complete net, complete", "", "completes the FSM");
+  COMMAND("compose net, compose", "", "composes networks on stack");
+  COMMAND("concatenate net, concatenate", "", "concatenates networks on stack");
+  COMMAND("crossproduct net, crossproduct", "", "cross-product of top two FSMs on stack");
+  CONT_COMMAND("define", "<name> <r.e.>", "define a network");
+  COMMAND("define", "<fname>(<v1,..,vn>) <r.e.>", "define function");
+  COMMAND("determinize net, determinize, determinise net, determinise", "", "determinizes top FSM on stack"); 
+  COMMAND("echo", "<string>", "echo a string");
+  COMMAND("edit properties, edit", "", "<no description>");
   //"epsilon-remove net, epsilon-remove"
-  COMMAND("eliminate flag <name>" "eliminate flag <name> diacritics from the top network");
-  COMMAND("eliminate flags" "eliminate all flag diacritics from the top network");
-  COMMAND("export cmatrix (filename)" "export the confusion matrix as an AT&T transducer");
-  COMMAND("extract ambiguous" "extracts the ambiguous paths of a transducer");
-  COMMAND("extract unambiguous" "extracts the unambiguous paths of a transducer");
-  COMMAND("hfst", "<no description>");
-  COMMAND("ignore net, ignore" "applies ignore to top two FSMs on stack");
-  COMMAND("intersect net, intersect, conjunct net, conjunct" "intersects FSMs on stack");
-  COMMAND("invert net, invert" "inverts top FSM");
-  COMMAND("inspect, inspect net", "<no description>");
-  AMBIGUOUS_COMMAND("help", "help, help <name>, help licence, help warranty");
-  COMMAND("help", "lists all commands");
-  COMMAND("help <name>", "prints help message of a command");
-  COMMAND("help license, help licence", "prints license");
-  COMMAND("help warranty", "prints warranty information");
-  COMMAND("label net" "extracts all attested symbol pairs from FSM");
-  COMMAND("letter machine" "Converts top FSM to a letter machine");
-  COMMAND("list", "<no description>");
+  COMMAND("eliminate flag", "<name>", "eliminate flag <name> diacritics from the top network");
+  COMMAND("eliminate flags", "", "eliminate all flag diacritics from the top network");
+  COMMAND("export cmatrix", "(filename)", "export the confusion matrix as an AT&T transducer");
+  COMMAND("extract ambiguous", "", "extracts the ambiguous paths of a transducer");
+  COMMAND("extract unambiguous", "", "extracts the unambiguous paths of a transducer");
+  COMMAND("hfst", "", "<no description>");
+  COMMAND("ignore net, ignore", "", "applies ignore to top two FSMs on stack");
+  COMMAND("intersect net, intersect, conjunct net, conjunct", "", "intersects FSMs on stack");
+  COMMAND("invert net, invert", "", "inverts top FSM");
+  COMMAND("inspect, inspect net", "", "<no description>");
+  AMBIGUOUS_COMMAND("help", "help, help license, help warranty");
+  CONT_COMMAND("help", "", "lists all commands");
+  COMMAND("help", "<name>", "prints help message of a command");
+  COMMAND("help license, help licence", "", "prints license");
+  COMMAND("help warranty", "", "prints warranty information");
+  COMMAND("label net", "", "extracts all attested symbol pairs from FSM");
+  COMMAND("letter machine", "", "Converts top FSM to a letter machine");
+  COMMAND("list", "", "<no description>");
   AMBIGUOUS_COMMAND("load", "load stack, load defined");
-  COMMAND("load stack <filename>, load <filename>" "Loads networks and pushes them on the stack");
-  COMMAND("load defined <filename>, loadd <filename>" "Restores defined networks from file");
-  COMMAND("lower-side net, lower-side" "takes lower projection of top FSM");
-  COMMAND("minimize net, minimize, minimise net, minimise", "minimizes top FSM");
-  COMMAND("minus net, minus, subtract", "subtracts networks on stack");
-  COMMAND("name net <string>, name", "names top FSM");
-  COMMAND("negate net, negate", "complements top FSM");
-  COMMAND("one-plus net, one-plus", "Kleene plus on top FSM");
-  return NULL;
+  COMMAND("load stack, load", "<filename>", "Loads networks and pushes them on the stack");
+  COMMAND("load defined, loadd", "<filename>", "Restores defined networks from file");
+  COMMAND("lower-side net, lower-side", "", "takes lower projection of top FSM");
+  COMMAND("minimize net, minimize, minimise net, minimise", "", "minimizes top FSM");
+  COMMAND("minus net, minus, subtract", "", "subtracts networks on stack");
+  COMMAND("name net, name", "<string>", "names top FSM");
+  COMMAND("negate net, negate", "", "complements top FSM");
+  COMMAND("one-plus net, one-plus", "", "Kleene plus on top FSM");
+  COMMAND("pop, pop stack", "", "remove top FSM from stack");
+  AMBIGUOUS_COMMAND("print", "print aliases, print arc-tally, print defined, print definition, print directory, "
+                    "print dot, print att, print file-info, print flags, print labels, print label-maps, print label-tally, "
+                    "print list, print lists, print longest-string, print longest-string-size, print lower-words, "
+                    "print name, print net, print properties, print random-lower, print random-upper, print random-words, "
+                    "print shortest-string-size, print shortest-string, print sigma, print sigma-tally, print size, "
+                    "print stack, print upper-words, print words");
+  AMBIGUOUS_COMMAND("write", "write definition, write dot, write att, print properties, write prolog, write text, write spaced-text");
+  COMMAND("print aliases, aliases", "", "<no description>");
+  COMMAND("print arc-tally, arc-tally", "", "<no description>");
+  // print cmatrix
+  COMMAND("print defined, pdefined", "", "prints defined symbols and functions");
+  COMMAND("write definition, wdef, write definitions, wdefs", "", "<no description>");
+  COMMAND("print directory, directory", "", "<no description>");
+  COMMAND("write dot, wdot, dot", "", "prints top FSM in Graphviz dot format");
+  COMMAND("write att, att", "", "<no description>");
+  COMMAND("print file-info, file-info", "", "<no description>");
+  COMMAND("print flags, flags", "", "<no description>");
+  COMMAND("print labels, labels", "", "<no description>");
+  COMMAND("print label-maps, label-maps", "", "<no description>");
+  COMMAND("print label-tally, label-tally", "", "<no description>");
+  COMMAND("print list", "", "<no description>");
+  COMMAND("print lists", "", "<no description>");
+  COMMAND("print longest-string, longest-string, pls", "", "<no description>");
+  COMMAND("print longest-string-size, longest-string-size, plz", "", "<no description>");
+  COMMAND("print lower-words, lower-words", "", "prints words on the lower-side of top FSM");
+  COMMAND("print name, pname", "", "prints the name of the top FSM");
+  COMMAND("print net", "", "prints all information about top FSM");
+  COMMAND("print properties, print props, write properties, write props", "", "<no description>");
+  COMMAND("print random-lower, random-lower", "", "prints random words from lower side");
+  COMMAND("print random-upper, random-upper", "", "prints random words from upper side");
+  COMMAND("print random-words, random-words", "", "prints random words from top FSM");
+  COMMAND("print shortest-string-size, print shortest-string-length, psss, pssl", "", "prints length of shortest string");
+  COMMAND("print shortest-string, shortest-string, pss", "", "prints the shortest string of the top FSM");
+  COMMAND("print sigma, sigma", "", "prints the alphabet of the top FSM");
+  COMMAND("print sigma-tally, sigma-tally, sitally, print sigma-word-tally", "", "<no description>");
+  COMMAND("print size, size", "", "prints size information about top FSM");
+  COMMAND("print stack, stack", "", "<no description>");
+  COMMAND("print upper-words, upper-words", "", "<no description>");
+  COMMAND("print words, words", "", "<no description>");
+  COMMAND("prune net, prune", "", "makes top network coaccessible");
+  COMMAND("push (defined)", "<name>", "adds a defined FSM to top of stack");
+  COMMAND("quit, exit, bye, stop, hyvästi, au revoir, näkemiin, viszlát, auf wiedersehen, has", "", "exit foma");
+  COMMAND("read lexc", "(<filename>)", "read and compile lexc format file");
+  COMMAND("read att", "(<filename>)", "read a file in AT&T FSM format and add to top of stack");
+  COMMAND("read properties, rprops", "", "<no description>");
+  COMMAND("read prolog, rpl", "<filename>", "reads prolog format file");
+  COMMAND("read regex, regex", "", "read a regular expression");
+  COMMAND("read spaced-text, rs", "(<filename>)", "compile space-separated words/word-pairs separated by newlines into a FST");
+  COMMAND("read text, rt", "(<filename>)", "compile a list of words separated by newlines into an automaton");
+  //"read cmatrix <filename>", "read a confusion matrix and associate it with the network on top of the stack"
+  COMMAND("reverse net, reverse", "", "reverses top FSM");
+  COMMAND("rotate stack, rotate", "", "rotates stack");
+  COMMAND("save defined, saved", "<filename>", "save all defined networks to binary file");
+  COMMAND("save stack, save, ss", "<filename>", "save stack to binary file");
+  COMMAND("set", "<variable> <ON|OFF>", "sets a global variable (see show variables)");
+  AMBIGUOUS_COMMAND("show", "show variables, show variable");
+  COMMAND("show variables", "", "prints all variable/value pairs");
+  COMMAND("show variable, show", "<name>", "show variable/value pair <name>");
+  COMMAND("shuffle net, shuffle", "", "asynchronous product on top two FSMs on stack");
+  COMMAND("sigma net", "", "Extracts the alphabet and creates a FSM that accepts all single symbols in it");
+  COMMAND("source", "<file>", "read and compile script file <file>");
+  AMBIGUOUS_COMMAND("sort", "sort net, sort in, sort out");
+  COMMAND("sort net, sort", "", "sorts arcs topologically on top FSM");
+  COMMAND("sort in", "", "sorts input arcs by sigma numbers on top FSM");
+  COMMAND("sort out", "", "sorts output arcs by sigma number on top FSM");
+  AMBIGUOUS_COMMAND("substitute", "substitute defined <X> for <Y>, substitute symbol <X> for <Y>");
+  COMMAND("substitute defined", "<X> for <Y>", "substitutes defined network X at all arcs containing Y");
+  //"substitute label"
+  COMMAND("substitute symbol", "<X> for <Y>", "substitutes all occurrences of Y in an arc with X");
+  COMMAND("substring", "", "<no description>");
+  COMMAND("system", "<cmd>", "execute the system command <cmd>");
+  AMBIGUOUS_COMMAND("test", "test unambiguous, test equivalent, test functional, test identity, test lower-universal, "
+                    "test upper-universal, test non-null, test null, test lower-bounded, test overlap, test sequential, "
+                    "test star-free, test sublanguage, test upper-bounded");
+  COMMAND("test unambiguous", "", "test if top FST is unambiguous");
+  COMMAND("test equivalent, equivalent, te", "", "test if the top two FSMs are equivalent");
+  COMMAND("test functional, functional, tf", "", "test if the top FST is functional (single-valued)");
+  COMMAND("test identity, identity, ti", "", "test if top FST represents identity relations only");
+  COMMAND("test lower-universal. lower-universal, tlu", "", "test if lower side is ..");
+  COMMAND("test upper-universal, upper-universal, tuu", "", "test if upper side is ..");
+  COMMAND("test non-null, tnn", "", "test if top machine is not the empty language");
+  COMMAND("test null, tnu", "", "test if top machine is the empty language");
+  COMMAND("test lower-bounded, lower-bounded, tlb", "", "<no description>");
+  COMMAND("test overlap, overlap, to", "", "<no description>");
+  COMMAND("test sequential", "", "tests if top machine is sequential");
+  COMMAND("test star-free", "", "test if top FSM is star-free");
+  COMMAND("test sublanguage, sublanguage, ts", "", "<no description>");
+  COMMAND("test upper-bounded, upper-bounded, tub", "", "<no description>");
+  COMMAND("turn stack, turn", "", "turns stack upside down");
+  COMMAND("twosided flag-diacritics, tfd", "", "changes flags to always be identity pairs");
+  COMMAND("undefine", "<name>", "remove <name> from defined networks");
+  COMMAND("unlist", "", "<no description>");
+  COMMAND("union net, union, disjunct", "", "union of top two FSMs");
+  COMMAND("upper-side net, upper-side", "", "upper projection of top FSM");
+  COMMAND("view net", "", "display top network (if supported)");
+  COMMAND("write spaced-text, wspaced-text", "", "<no description>");
+  COMMAND("write text, wt", "", "<no description>");
+  COMMAND("write prolog, wpl", "(> filename)", "writes top network to prolog format file/stdout");
+  COMMAND("write att", "(> <filename>)", "writes top network to AT&T format file/stdout");
+  COMMAND("zero-plus net, zero-plus", "", "Kleene star on top fsm");
+  AMBIGUOUS_COMMAND("variable", "variable compose-tristate, variable show-flags, variable obey-flags, variable minimal, "
+                    "variable print-pairs, variable print-space, variable print-sigma, variable quit-on-fail, "
+                    "variable recursive-define, variable verbose, variable hopcroft-min, variable med-limit, "
+                    "variable med-cutoff, variable att-epsilon");
+  COMMAND("variable compose-tristate", "", "use the tristate composition algorithm");
+  COMMAND("variable show-flags", "", "show flag diacritics in `apply'");
+  COMMAND("variable obey-flags", "", "obey flag diacritics in `apply'");
+  COMMAND("variable minimal", "", "minimize resulting FSMs");
+  COMMAND("variable print-pairs", "", "always print both sides when applying");
+  COMMAND("variable print-space", "", "print spaces between symbols");
+  COMMAND("variable print-sigma", "", "print the alphabet when printing network");
+  COMMAND("variable quit-on-fail", "", "Abort operations when encountering errors");
+  COMMAND("variable recursive-define", "", "Allow recursive definitions");
+  COMMAND("variable verbose", "", "Verbosity of interface");
+  COMMAND("variable hopcroft-min", "", "ON = Hopcroft minimization, OFF = Brzozowski minimization");
+  COMMAND("variable med-limit", "", "the limit on number of matches in apply med");
+  COMMAND("variable med-cutoff", "", "the cost limit for terminating a search in apply med");
+  COMMAND("variable att-epsilon", "", "the EPSILON symbol when reading/writing AT&T files");
+  
+  return (message != message_at_start);
 }
 
-
-
-
-
-"pop, pop stack"
-"print aliases, aliases"
-"print arc-tally, arc-tally"
-"print defined, pdefined"
-"write definition, wdef, write definitions, wdefs"
-"print directory, directory"
-"write dot, wdot, dot"
-"write att, att"
-"print file-info, file-info"
-"print flags, flags"
-"print labels, labels"
-"print label-maps, label-maps"
-"print label-tally, label-tally"
-"print list"
-"print lists"
-"print longest-string, longest-string, pls"
-"print longest-string-size, longest-string-size, plz"
-"print lower-words, lower-words"
-"print name, pname"
-"print net"
-"print properties, print props, write properties, write props"
-"print random-lower, random-lower"
-"print random-upper, random-upper"
-"print random-words, random-words"
-"print shortest-string-size, print shortest-string-length, "
-"print shortest-string, shortest-string, pss"
-"print sigma, sigma"
-"print sigma-tally, sigma-tally, sitally, print sigma-word-tally"
-"print size, size"
-"print stack, stack"
-"print upper-words, upper-words"
-"print words, words"
-"prune net, prune"
-"push, push defined"
-"quit, exit, bye, stop, hyvästi, au revoir, näkemiin, viszlát, auf wiedersehen, has"
-"lexc, read lexc"
-"att, read att"
-"read properties, rprops"
-"read prolog, rpl"
-"regex, read regex"
-"rs, read spaced-text"
-"rt, read text"
-"reverse net, reverse"
-"rotate, rotate stack"
-"save defined, saved"
-"save stack, save, ss"
-"set"
-"show variables"
-"show variable, show"
-"shuffle net, shuffle"
-"sigma net"
-"sort net, sort"
-"sort in"
-"sort out"
-"source"
-"substitute defined"
-"for"
-"substitute label"
-"substitute symbol"
-"substring net, substring"
-"system"
-"test equivalent, equivalent, te"
-"test functional, functional, tf"
-"test identity, identity, ti"
-"test lower-bounded, lower-bounded, tlb"
-"test lower-universal, lower-universal, tlu"
-"test non-null, tnn"
-"test null, tnu"
-"test overlap, overlap, to"
-"test sublanguage, sublanguage, ts"
-"test upper-bounded, upper-bounded, tub"
-"test upper-universal, upper-universal, tuu"
-"test unambiguous"
-"turn, turn stack"
-"twosided flag-diacritics, tfd"
-"undefine"
-"unlist"
-"union net, union, disjunct"
-"upper-side net, upper-side"
-"view net"
-"wpl, write prolog, wspaced-text"
-"write spaced-text"
-"wt, write text"
-"zero-plus net, zero-plus"
-
-
-"read regex" "read a regular expression"
-
-
-
-
-
-
-"pop stack" "remove top FSM from stack"
-"print cmatrix" "prints the confusion matrix associated with the top network in tabular format"
-"print defined" "prints defined symbols and functions"
-"print dot (>filename)" "prints top FSM in Graphviz dot format"
-"print lower-words" "prints words on the lower-side of top FSM"
-"print name" "prints the name of the top FSM"
-"print net" "prints all information about top FSM"
-"print random-lower" "prints random words from lower side"
-"print random-upper" "prints random words from upper side"
-"print random-words" "prints random words from top FSM"
-"print sigma" "prints the alphabet of the top FSM"
-"print size" "prints size information about top FSM"
-"print shortest-string" "prints the shortest string of the top FSM"
-"print shortest-string-size" "prints length of shortest string"
-"prune net" "makes top network coaccessible"
-"push (defined) <name>" "adds a defined FSM to top of stack"
-"quit" "exit foma"
-"read att <filename>" "read a file in AT&T FSM format and add to top of stack"
-"read cmatrix <filename>" "read a confusion matrix and associate it with the network on top of the stack"
-"read prolog <filename>" "reads prolog format file"
-"read lexc <filename>" "read and compile lexc format file"
-"read spaced-text <filename>" "compile space-separated words/word-pairs separated by newlines into a FST"
-"read text <filename>" "compile a list of words separated by newlines into an automaton"
-"reverse net" "reverses top FSM"
-"rotate stack" "rotates stack"
-"save defined <filename>" "save all defined networks to binary file"
-"save stack <filename>" "save stack to binary file"
-"set <variable> <ON|OFF>" "sets a global variable (see show variables)"
-"show variables" "prints all variable/value pairs"
-"shuffle net" "asynchronous product on top two FSMs on stack"
-"sigma net" "Extracts the alphabet and creates a FSM that accepts all single symbols in it"
-"source <file>" "read and compile script file"
-"sort net" "sorts arcs topologically on top FSM"
-"sort in" "sorts input arcs by sigma numbers on top FSM"
-"sort out" "sorts output arcs by sigma number on top FSM"
-"substitute defined X for Y" "substitutes defined network X at all arcs containing Y "
-"substitute symbol X for Y" "substitutes all occurrences of Y in an arc with X"
-"system <cmd>" "execute a system command"
-"test unambiguous" "test if top FST is unambiguous"
-"test equivalent" "test if the top two FSMs are equivalent"
-"test functional" "test if the top FST is functional (single-valued)"
-"test identity" "test if top FST represents identity relations only"
-"test lower-universal" "test if lower side is Σ*"
-"test upper-universal" "test if upper side is Σ*"
-"test non-null" "test if top machine is not the empty language"
-"test null" "test if top machine is the empty language"
-"test sequential" "tests if top machine is sequential"
-"test star-free" "test if top FSM is star-free"
-"turn stack" "turns stack upside down"
-"twosided flag-diacritics" "changes flags to always be identity pairs"
-"undefine <name>" "remove <name> from defined networks"
-"union net" "union of top two FSMs"
-"upper-side net" "upper projection of top FSM"
-"view net" "display top network (if supported)"
-"zero-plus net" "Kleene star on top fsm"
-"variable compose-tristate" "use the tristate composition algorithm"
-"variable show-flags" "show flag diacritics in `apply'"
-"variable obey-flags" "obey flag diacritics in `apply'"
-"variable minimal" "minimize resulting FSMs"
-"variable print-pairs" "always print both sides when applying"
-"variable print-space" "print spaces between symbols"
-"variable print-sigma" "print the alphabet when printing network"
-"quit-on-fail" "Abort operations when encountering errors"
-"variable recursive-define" "Allow recursive definitions"
-"variable verbose" "Verbosity of interface"
-"variable hopcroft-min" "ON = Hopcroft minimization, OFF = Brzozowski minimization"
-"variable med-limit" "the limit on number of matches in apply med"
-"variable med-cutoff" "the cost limit for terminating a search in apply med"
-"variable att-epsilon" "the EPSILON symbol when reading/writing AT&T files"
-"write prolog (> filename)" "writes top network to prolog format file/stdout"
-"write att (> <filename>)" "writes top network to AT&T format file/stdout"
+}
+}

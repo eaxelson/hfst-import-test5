@@ -71,6 +71,8 @@ using hfst::implementations::HfstBasicTransition;
 #define PRINT_INFO_PROMPT_AND_RETURN_THIS print_transducer_info(); prompt(); return *this;
 #define IF_NULL_PROMPT_AND_RETURN_THIS(x) if (x == NULL) { prompt(); return *this; }
 
+#include "help_message.cc"
+
 namespace hfst { 
 namespace xfst {
 
@@ -837,6 +839,7 @@ namespace xfst {
         (infilename, true /* definitions*/ );
     }
 
+#ifdef FOO
   // Convert \a str to upper case.
   static std::string to_upper_case(const std::string & str)
   {
@@ -894,25 +897,37 @@ namespace xfst {
       }
     return false;
   }
+#endif // FOO
 
   XfstCompiler& 
   XfstCompiler::apropos(const char* text )
     {
+      std::string message;
+      if (!get_help_message(text, message, HELP_MODE_APROPOS))
+        {
+          fprintf(outstream_, "nothing found for '%s'\n", text);
+        }
+      else
+        {
+          fprintf(outstream_, "%s", message.c_str());
+        }
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
   XfstCompiler::describe(const char* text)
     {
-      /*const char * message = get_help_message(text);
-      if (message != NULL)
+      int help_mode = (strcmp(text, "") == 0)? 
+        HELP_MODE_ALL_COMMANDS : HELP_MODE_ONE_COMMAND;
+      std::string message;
+      if (!get_help_message(text, message, help_mode))
         {
-          fprintf(outstream_, "%s", message);
+          fprintf(outstream_, "no help found for '%s'\n", text);
         }
       else
         {
-          fprintf(outstream_, "no such command: %s\n", text);
-          }*/
+          fprintf(outstream_, "%s", message.c_str());
+        }
       PROMPT_AND_RETURN_THIS;
     }
 
