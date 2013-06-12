@@ -23,7 +23,7 @@
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif
-#include "lexc-parser.h"
+#include "lexc-parser.hh"
 #include "lexc-utils.h"
 
 #include <assert.h>
