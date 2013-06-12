@@ -89,7 +89,7 @@ htwolcpre3_SOURCES=htwolcpre3.yy scanner3.ll HfstTwolcDefs.h \
 hfst_twolc_system_SOURCES=hfst-twolc-system.cc
 
 # some systems might require all these
-BUILT_SOURCES=htwolcpre1.h htwolcpre2.h htwolcpre3.h
+BUILT_SOURCES=htwolcpre1.hh htwolcpre2.hh htwolcpre3.hh
 
 hfst-twolc$(EXEEXT): hfst-twolc.sh
 	cat $< | sed -e 's|BINDIR|$(bindir)|' > $@
