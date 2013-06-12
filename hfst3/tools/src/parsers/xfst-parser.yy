@@ -674,6 +674,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | SAVE_PROLOG REDIRECT_OUT END_COMMAND {
             hfst::xfst::xfst_->write_prolog(hfst::xfst::xfst_fopen($2, "w"));
        }
+       | SAVE_PROLOG NAMETOKEN END_COMMAND {
+            hfst::xfst::xfst_->write_prolog(hfst::xfst::xfst_fopen($2, "w"));
+       }
        | SAVE_PROLOG END_COMMAND {
             hfst::xfst::xfst_->write_prolog(stdout);
        }

@@ -2079,7 +2079,12 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::write_prolog(FILE* outfile)
     {
-      fprintf(outfile, "missing write prolog %s:%d\n", __FILE__, __LINE__);
+      GET_TOP(topmost);
+      std::string name = topmost->get_name();
+      if (name == "")
+        name = "NO_NAME";
+      HfstBasicTransducer fsm(*topmost);
+      fsm.write_in_prolog_format(outfile, name);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
