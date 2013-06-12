@@ -26,7 +26,7 @@
 
 #include "rule_src/TwolCGrammar.h"
 
-#include "htwolcpre3.h"
+#include "htwolcpre3.hh"
   /*
 #include "io_src/InputReader.h"
 
