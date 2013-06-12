@@ -1,15 +1,22 @@
-namespace hfst {
-  namespace xfst {
+namespace hfst 
+{
+namespace xfst 
+{
 
+typedef std::vector<std::string> StringVector;
+
+// find help message for a certain command
 #define HELP_MODE_ONE_COMMAND 0
+// get all commands and their help messages
 #define HELP_MODE_ALL_COMMANDS 1
+// get all command-help message pairs, where a certain word is found
 #define HELP_MODE_APROPOS 2
 
-// handle case: if text matches, list all command names, and return
+// handle case: if text matches, list all command names, and possibly return
 #define COMMAND(names, args, description) if (handle_case(names, args, description, text, message, help_mode, true)) { return true; }
 // handle case: if text matches, do not list all command names, and continue
 #define CONT_COMMAND(names, args, description) handle_case(names, args, description, text, message, help_mode, false)
-// not full command
+// handle case: if text matches and ambiguous cases are not ignored, list help messages for all matching commands and possibly return
 #define AMBIGUOUS_COMMAND(name, namelist) if (!skip_ambiguous_cases && handle_ambiguous_case(name, namelist, text, message, help_mode)) { return true; }
 
 // Convert \a str to upper case.
@@ -24,14 +31,13 @@ std::string to_upper_case(const std::string & str)
   return retval;
 }
 
-// Whether \a c is allowed before or after a word when
-// searching for the word in text.
-bool allow_char(char c)
+// Whether \a c is a punctuation character.
+bool is_punctuation_char(char c)
 {
-  std::string allowed_chars = " \n\t.,;:?!-/'\"<>()|";
-  for (size_t i=0; i < allowed_chars.size(); i++)
+  std::string chars = " \n\t.,;:?!-/'\"<>()|";
+  for (size_t i=0; i < chars.size(); i++)
     {
-      if (allowed_chars[i] == c) {
+      if (chars[i] == c) {
         return true; }
     }
   return false;
@@ -39,58 +45,70 @@ bool allow_char(char c)
 
 // Whether word \a str_ is found in text \a text_.
 // Punctuation characters and upper/lower case are handled in this function.
-bool string_found_in_text(const std::string & str_, const std::string & text_)
+bool word_found_in_text(const std::string & str_, const std::string & text_)
 {
+  // Convert both arguments to upper case, so case does not matter.
   std::string str = to_upper_case(str_);
   std::string text = to_upper_case(text_);
+  // Find str_ in text_:
   std::size_t pos = text.find(str);
+  // (1) If not found, return false
   if (pos == std::string::npos) 
     {
       return false;
     }
-  if (pos == 0 || allow_char(text[pos-1])) 
+  // (2) if found, see whether both preceeding and succeeding
+  // characters, if they exist, are punctuation characters:
+  if (pos == 0 || is_punctuation_char(text[pos-1]))
     {
       if (pos+str.length() == text.length() ||
-          allow_char(text[pos+str.length()]))
+          is_punctuation_char(text[pos+str.length()]))
         {
+          // If they are, return true,
           return true;
         }
     }
+  // if not, return false.
   return false;
 }
 
 
-// E.g. "foo <filename>, bar (optional argument), baz baz"
-std::vector<std::string> namelist_to_name_vector(const std::string & namelist)
+// Convert the list of names separated by commas \a namelist into a vector of names.
+StringVector namelist_to_name_vector(const std::string & namelist)
 {
-  //std::cerr << "namelist_to_name_vector: " << namelist << std::endl; // DEBUG
-  std::vector<std::string> names;
+  StringVector names;
   size_t pos=0; // latest name start position
+  // Go through the namelist char by char:
   for (size_t i=0; i < namelist.length(); i++)
     {
+      // If a separating comma is found,
       if (namelist[i] == ',')
         {
+          // add the name to vector,
           names.push_back(std::string(namelist, pos, i-pos));
-          //std::cerr << "  " << names.back() << std::endl; // DEBUG
+          // and skip empty space after the comma.
           i++;
-          while(namelist[i] == ' ')           
-            {
-              i++;
-            }
-          pos = i;
-          i--;
+          while(namelist[i] == ' ') {
+            i++;
+          }
+          pos = i; // next name starts here
+          i--;     // i will be incremented in the for loop
         }
     }
+  // Add the last name to vector.
   names.push_back(std::string(namelist, pos, std::string::npos));
-  //std::cerr << "  " << names.back() << std::endl; // DEBUG
   return names;
 }
     
-    void append_help_message(const std::string & namelist, const std::string & arguments, const std::string & description, std::string & message, bool all_names = true)
+// Append help message for command known by names in \a namelist, taking arguments
+// listed in \a arguments, and described by \a description to \a message. 
+// \a all_names defines whether all names in \a namelist are included or just the first one.
+void append_help_message(const std::string & namelist, const std::string & arguments, 
+                         const std::string & description, std::string & message, bool all_names = true)
 {
   size_t NAME_AND_ARGUMENTS_FIELD_WIDTH = 30;
 
-  std::vector<std::string> names = namelist_to_name_vector(namelist);
+  StringVector names = namelist_to_name_vector(namelist);
 
   message.append(names.front());
   message.append(" ");
@@ -107,9 +125,12 @@ std::vector<std::string> namelist_to_name_vector(const std::string & namelist)
   message.append(description);
   message.append("\n");
 
+  // If all names are included and there is more than one name,
+  // list names starting from the second name separated by commas,
+  // inside parenthesis.
   if (all_names && names.size() > 1)
     {
-      for (std::vector<std::string>::const_iterator it = names.begin();
+      for (StringVector::const_iterator it = names.begin();
            it != names.end(); it++)
         {
           if (it == names.begin())
@@ -127,16 +148,10 @@ std::vector<std::string> namelist_to_name_vector(const std::string & namelist)
     }
 }
 
-bool text_found(const std::string & text, const std::string & names, const std::string & description)
-{
-  return (string_found_in_text(text, names) || string_found_in_text(text, description));
-}
-
-
 bool text_matches_some_name(const std::string & text, const std::string & namelist)
 {
-  std::vector<std::string> names = namelist_to_name_vector(namelist);
-  for (std::vector<std::string>::const_iterator it = names.begin();
+  StringVector names = namelist_to_name_vector(namelist);
+  for (StringVector::const_iterator it = names.begin();
        it != names.end(); it++)
     {
       if (text == *it)
@@ -162,8 +177,8 @@ bool handle_ambiguous_case(const std::string & name, const std::string & namelis
     {
       return false;
     }
-  std::vector<std::string> names = namelist_to_name_vector(namelist);
-  for (std::vector<std::string>::const_iterator it = names.begin();
+  StringVector names = namelist_to_name_vector(namelist);
+  for (StringVector::const_iterator it = names.begin();
        it != names.end(); it++)
     {
       if (it != names.begin())
@@ -173,6 +188,11 @@ bool handle_ambiguous_case(const std::string & name, const std::string & namelis
   return true;
 }
 
+// If \a text matches (depending on \a help_mode) a command known by names
+// listed in \a names, taking arguments \a arguments, described by \a description,
+// add help message for the command to \a message. \a all_names defines whether
+// all names in \a names are included or just the first one. 
+// Return whether the search should continue (depends on \a help_mode). 
 bool handle_case(const std::string & names, const std::string & arguments, 
                  const std::string & description, const std::string & text,
                  std::string & message, int help_mode, bool all_names=true)
@@ -184,7 +204,8 @@ bool handle_case(const std::string & names, const std::string & arguments,
     }
   else if (help_mode == HELP_MODE_APROPOS)
     {
-      if (text_found(text, names, description))
+      if (word_found_in_text(text, names) ||
+          word_found_in_text(text, description))
         {
           append_help_message(names, arguments, description, message, all_names);
         }
@@ -204,21 +225,26 @@ bool handle_case(const std::string & names, const std::string & arguments,
 // Generate help message(s) for command(s) named \a text and append the help message(s)
 // to \a message. \a help_mode defines whether we are generating help messages for \a text,
 // all commands (in that case, \a message is ignored) or for commands that contain or 
-// whose help messages contain the word \a text.
+// whose help messages contain the word \a text. \a skip_ambiguous_cases defines whether
+// ambiguous cases where \a text matches more than one command are ignored.
 // @return Whether the help message could be generated.
     bool get_help_message(const std::string & text, std::string & message, int help_mode,
                           bool skip_ambiguous_cases)
 {
+  // Apropos with no arguments -> return help message for apropos.
   if (help_mode == HELP_MODE_APROPOS && text == "")
     {
       return get_help_message("apropos", message, HELP_MODE_ONE_COMMAND);
     }
 
+  // To see whether any help message was appended.
   std::string message_at_start(message);
 
   COMMAND("ambiguous upper, ambiguous", "", 
           "returns the input words which have multiple paths in a transducer");
     
+  AMBIGUOUS_COMMAND("apply", "apply down, apply up");
+
   CONT_COMMAND("apply down, down", "<string>", 
               "apply <string> down to the top network on stack");
   
@@ -402,7 +428,8 @@ bool handle_case(const std::string & names, const std::string & arguments,
   COMMAND("variable med-limit", "", "the limit on number of matches in apply med");
   COMMAND("variable med-cutoff", "", "the cost limit for terminating a search in apply med");
   COMMAND("variable att-epsilon", "", "the EPSILON symbol when reading/writing AT&T files");
-  
+
+  // If any message was appended.
   return (message != message_at_start);
 }
 

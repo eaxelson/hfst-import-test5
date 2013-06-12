@@ -415,6 +415,24 @@
 
      }
 
+     HfstTransitionGraphAlphabet symbols_used()
+     {
+       HfstTransitionGraphAlphabet retval;
+       for (iterator it = begin(); it != end(); it++)
+         {
+           for (typename HfstTransitions::iterator tr_it
+                  = it->begin();
+                tr_it != it->end(); tr_it++)
+             {
+               C data = tr_it->get_transition_data();
+               
+               retval.insert(data.get_input_symbol());
+               retval.insert(data.get_output_symbol());
+             }
+         }
+       return retval;
+     }
+
          /** @brief Remove all symbols that do not occur in transitions of
              the graph from its alphabet. 
 
@@ -426,20 +444,7 @@
          void prune_alphabet(bool force=true) {
 
            // Which symbols occur in the graph
-           HfstTransitionGraphAlphabet symbols_found;
-
-           for (iterator it = begin(); it != end(); it++)
-             {
-               for (typename HfstTransitions::iterator tr_it
-                      = it->begin();
-                    tr_it != it->end(); tr_it++)
-                 {
-                   C data = tr_it->get_transition_data();
-
-                   symbols_found.insert(data.get_input_symbol());
-                   symbols_found.insert(data.get_output_symbol());
-                 }
-             }
+           HfstTransitionGraphAlphabet symbols_found = symbols_used();
 
            // Whether unknown or identity symbols are used
            bool unknowns_or_identities_used = 
@@ -827,6 +832,168 @@
              }          
          }
 
+         // note: unknown and identity are both '?'
+         std::string prologize_symbol(const std::string & symbol)
+         {
+           if (symbol == "0")
+             return "%0";
+           if (symbol == "?")
+             return "%?";
+           if (symbol == "@_EPSILON_SYMBOL_@")
+             return "0";
+           if (symbol == "@_UNKNOWN_SYMBOL_@")
+             return "?";
+           if(symbol == "@_IDENTITY_SYMBOL_@")
+             return "?";
+           // prepend a backslash to a double quote
+           std::string symbol_(symbol);
+           return replace_all(symbol_, "\"", "\\\"");
+         }
+
+         // caveat: '?' is always unknown
+         std::string deprologize_symbol(const std::string & symbol)
+         {
+           if (symbol == "%0")
+             return "0";
+           if (symbol == "%?")
+             return "?";
+           if (symbol == "0")
+             return "@_EPSILON_SYMBOL_@";
+           if (symbol == "?")
+             return "@_UNKNOWN_SYMBOL_@";
+           // remove the escaping backslash in front of a double quote
+           std::string symbol_(symbol);
+           return replace_all(symbol_, "\\\"", "\"");
+         }
+
+         // Extract input and output symbols, if possible, from prolog arc 
+         // \a str and store them to \a isymbol and \a osymbol. 
+         // Return whether symbols were succesfully extracted.
+         bool get_prolog_arc_symbols
+           (const std::string & str, std::string & isymbol, std::string & osymbol)
+         {
+           // find positions of double quotes
+           std::vector<unsigned int> quote_positions;
+           for (size_t i=0; i < str.length(); i++)
+             {
+               if (str[i] == '"')
+                 {
+                   if (i == 0)
+                     quote_positions.push_back(i);
+                   else if (str[i-1] == '\\')
+                     ; // skip backslash-escaped double quotes
+                   else
+                     quote_positions.push_back(i);
+                 }
+             }
+           // "foo"
+           if (quote_positions.size() == 2)
+             {
+               if (quote_positions[0] != 0 ||
+                   quote_positions[1] != str.length()-1)
+                 return false; // extra characters outside quotes
+             }
+           // "foo":"bar"
+           else if (quote_positions.size() == 4)
+             {
+               if (quote_positions[0] != 0 ||
+                   quote_positions[3] != str.length()-1)
+                 return false;  // extra characters outside quotes
+               if (quote_positions[2] - quote_positions[1] != 2)
+                 return false;  // missing colon between inner quotes
+               if (str[quote_positions[1] + 1] != ':')
+                 return false;  // else than colon between inner quotes
+             }
+           // not valid prolog arc
+           else
+             {
+               return false;
+             }
+           
+           // "foo"
+           if (quote_positions.size() == 2)
+             {
+               // "foo" -> foo
+               std::string symbol(str, quote_positions[0]+1, quote_positions[1]);
+               isymbol = deprologize_symbol(symbol);
+               if (isymbol == "@_UNKNOWN_SYMBOL_@") // single unknown -> identity
+                 isymbol = "@_IDENTITY_SYMBOL_@";
+               osymbol = isymbol;
+             }
+           // "foo":"bar"
+           else
+             {
+               // "foo" -> foo, "bar" -> bar
+               std::string insymbol(str, quote_positions[0]+1, quote_positions[1]);
+               std::string outsymbol(str, quote_positions[2]+1, quote_positions[3]);
+               isymbol = deprologize_symbol(insymbol);
+               osymbol = deprologize_symbol(outsymbol);
+             }
+           return true;
+         }
+
+         void print_prolog_arc_symbols(FILE * file, C data)
+         {
+           std::string symbol = prologize_symbol(data.get_input_symbol());
+           fprintf(file, "\"%s\"", symbol.c_str());
+
+           if (data.get_input_symbol() !=
+               data.get_output_symbol() || 
+               data.get_input_symbol() == "@_UNKNOWN_SYMBOL_@")
+             {
+               symbol = prologize_symbol(data.get_output_symbol());
+               fprintf(file, ":\"%s\"", symbol.c_str());
+             }
+         }
+
+         /** @brief Write the graph in prolog format to FILE \a file.
+             \a write_weights defines whether weights are printed (todo). */
+         void write_in_prolog_format(FILE * file, const std::string & name, 
+                                     bool write_weights=true) 
+         {
+           (void)write_weights;
+           unsigned int source_state=0;
+           const char * identifier = name.c_str();
+           // Print the name.
+           fprintf(file, "network(%s).\n", identifier);
+
+           // Print symbols that are in the alphabet but not used in arcs.
+           HfstTransitionGraphAlphabet symbols_used_ = symbols_used();
+           initialize_alphabet(symbols_used_); // exclude special symbols
+           for (typename HfstTransitionGraphAlphabet::const_iterator it 
+                  = alphabet.begin(); it != alphabet.end(); it++)
+             {
+               if (symbols_used_.find(*it) == symbols_used_.end())
+                 {
+                   fprintf(file, "symbol(%s, \"%s\")\n", identifier, it->c_str());
+                 }
+             }
+
+           // Print arcs.
+           for (iterator it = begin(); it != end(); it++)
+             {
+               for (typename HfstTransitions::iterator tr_it
+                      = it->begin();
+                    tr_it != it->end(); tr_it++)
+                 {
+                   fprintf(file, "arc(%s, %i, %i, ",
+                           identifier, source_state, tr_it->get_target_state());
+                   C data = tr_it->get_transition_data();
+                   print_prolog_arc_symbols(file, data);
+                   fprintf(file, ").\n");
+                 }
+               source_state++;
+             }
+
+           // Print final states.
+           for (typename FinalWeightMap::const_iterator it 
+                  = this->final_weight_map.begin();
+                it != this->final_weight_map.end(); it++)
+             {
+               fprintf(file, "final(%s, %i).\n", identifier, it->first);
+             }
+         }
+
          /** @brief Write the graph in xfst text format to FILE \a file.
              \a write_weights defines whether weights are printed (todo). */
          void write_in_xfst_format(FILE * file, bool write_weights=true) 
@@ -864,6 +1031,8 @@
                source_state++;
              }          
          }
+
+         
          
 
          /** @brief Write the graph in AT&T format to ostream \a os.
