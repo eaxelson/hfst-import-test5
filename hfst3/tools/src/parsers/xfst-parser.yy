@@ -106,7 +106,9 @@ COMMAND_LIST: COMMAND_LIST COMMAND
             ;
 
 COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
-            hfst::xfst::xfst_->add_props(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->add_props(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | ADD_PROPS NAMETOKEN_LIST CTRLD {
             hfst::xfst::xfst_->add_props($2);
@@ -128,7 +130,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
        }
        | APPLY_UP REDIRECT_IN END_COMMAND {
-            hfst::xfst::xfst_->apply_up(hfst::xfst::xfst_fopen($2, "r"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "r");
+            hfst::xfst::xfst_->apply_up(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | APPLY_UP END_COMMAND NAMETOKEN_LIST END_SUB {
             hfst::xfst::xfst_->apply_up($3);
@@ -145,7 +149,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
        }
        | APPLY_DOWN REDIRECT_IN END_COMMAND {
-            hfst::xfst::xfst_->apply_down(hfst::xfst::xfst_fopen($2, "r"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "r");
+            hfst::xfst::xfst_->apply_down(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | APPLY_DOWN END_COMMAND NAMETOKEN_LIST END_SUB {
             hfst::xfst::xfst_->apply_down($3);
@@ -156,7 +162,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
        }
        | APPLY_MED REDIRECT_IN END_COMMAND {
-            hfst::xfst::xfst_->apply_med(hfst::xfst::xfst_fopen($2, "r"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "r");
+            hfst::xfst::xfst_->apply_med(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | APPLY_MED END_COMMAND NAMETOKEN_LIST END_SUB {
             hfst::xfst::xfst_->apply_med($3);
@@ -369,13 +377,17 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        }
        // prints
        | PRINT_ALIASES REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_aliases(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "r");
+            hfst::xfst::xfst_->print_aliases(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_ALIASES END_COMMAND {
             hfst::xfst::xfst_->print_aliases(stdout);
        }
        | PRINT_ARCCOUNT REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_arc_count(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_arc_count(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_ARCCOUNT NAMETOKEN END_COMMAND {
             if (strcmp($2, "upper") && strcmp($2, "lower"))
@@ -390,33 +402,43 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->print_arc_count(stdout);
        }
        | PRINT_DEFINED REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_defined(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_defined(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_DEFINED END_COMMAND {
             hfst::xfst::xfst_->print_defined(stdout);
        }
        | PRINT_DIR GLOB REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_dir($2, hfst::xfst::xfst_fopen($3, "w"));
-            free($2);
+            FILE * f = hfst::xfst::xfst_fopen($3, "w");
+            hfst::xfst::xfst_->print_dir($2, f);
+            hfst::xfst::xfst_fclose(f, $3);
+            free($3);
        }
        | PRINT_DIR GLOB END_COMMAND {
             hfst::xfst::xfst_->print_dir($2, stdout);
             free($2);
        }
        | PRINT_DIR REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_dir("*", hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_dir("*", f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_DIR END_COMMAND {
             hfst::xfst::xfst_->print_dir("*", stdout);
        }
        | PRINT_FILE_INFO REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_file_info(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_file_info(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_FILE_INFO END_COMMAND {
             hfst::xfst::xfst_->print_file_info(stdout);
        }
        | PRINT_FLAGS REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_flags(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_flags(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_FLAGS END_COMMAND {
             hfst::xfst::xfst_->print_flags(stdout);
@@ -426,19 +448,25 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
        }
        | PRINT_LABELS REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_labels(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_labels(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_LABELS END_COMMAND {
             hfst::xfst::xfst_->print_labels(stdout);
        }
        | PRINT_LABEL_COUNT REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_label_count(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_label_count(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_LABEL_COUNT END_COMMAND {
             hfst::xfst::xfst_->print_label_count(stdout);
        }
        | PRINT_LIST NAMETOKEN REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_list($2, hfst::xfst::xfst_fopen($3, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($3, "w");
+            hfst::xfst::xfst_->print_list($2, f);
+            hfst::xfst::xfst_fclose(f, $3);
             free($2);
        }
        | PRINT_LIST NAMETOKEN END_COMMAND {
@@ -446,37 +474,49 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
        }
        | PRINT_LISTS REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_list(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_list(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_LISTS END_COMMAND {
             hfst::xfst::xfst_->print_list(stdout);
        }
        | PRINT_LONGEST_STRING REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_longest_string(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_longest_string(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_LONGEST_STRING END_COMMAND {
             hfst::xfst::xfst_->print_longest_string(stdout);
        }
        | PRINT_LONGEST_STRING_SIZE REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_longest_string_size(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_longest_string_size(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_LONGEST_STRING_SIZE END_COMMAND {
             hfst::xfst::xfst_->print_longest_string_size(stdout);
        }
        | PRINT_NAME REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_name(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_name(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_NAME END_COMMAND {
             hfst::xfst::xfst_->print_name(stdout);
        }
        | PRINT_SHORTEST_STRING REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_shortest_string(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_shortest_string(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_SHORTEST_STRING END_COMMAND {
             hfst::xfst::xfst_->print_shortest_string(stdout);
        }
        | PRINT_SHORTEST_STRING_SIZE REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_shortest_string_size(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_shortest_string_size(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_SHORTEST_STRING_SIZE END_COMMAND {
             hfst::xfst::xfst_->print_shortest_string_size(stdout);
@@ -493,7 +533,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->print_lower_words($2, stdout);
        }
        | PRINT_LOWER_WORDS REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_lower_words(0, hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_lower_words(0, f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_RANDOM_LOWER NUMBER END_COMMAND {
             hfst::xfst::xfst_->print_random_lower($2, stdout);
@@ -502,10 +544,14 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->print_random_lower(15, stdout);
        }
        | PRINT_RANDOM_LOWER REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_random_lower(15, hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_random_lower(15, f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_RANDOM_LOWER NUMBER REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_random_lower($2, hfst::xfst::xfst_fopen($3, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($3, "w");
+            hfst::xfst::xfst_->print_random_lower($2, f);
+            hfst::xfst::xfst_fclose(f, $3);
        }
        | PRINT_UPPER_WORDS NAMETOKEN NUMBER END_COMMAND {
             hfst::xfst::xfst_->print_upper_words($3, stdout);
@@ -518,7 +564,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->print_upper_words($2, stdout);
        }
        | PRINT_UPPER_WORDS REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_upper_words(0, hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_upper_words(0, f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_RANDOM_UPPER NUMBER END_COMMAND {
             hfst::xfst::xfst_->print_random_upper($2, stdout);
@@ -527,10 +575,14 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->print_random_upper(15, stdout);
        }
        | PRINT_RANDOM_UPPER NUMBER REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_random_upper($2, hfst::xfst::xfst_fopen($3, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($3, "w");
+            hfst::xfst::xfst_->print_random_upper($2, f);
+            hfst::xfst::xfst_fclose(f, $3);
        }
        | PRINT_RANDOM_UPPER REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_random_upper(15, hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_random_upper(15, f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_WORDS NAMETOKEN NUMBER END_COMMAND {
             hfst::xfst::xfst_->print_words($3, stdout);
@@ -547,10 +599,14 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->print_words(0, stdout);
        }
        | PRINT_WORDS NUMBER REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_words($2, hfst::xfst::xfst_fopen($3, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($3, "w");
+            hfst::xfst::xfst_->print_words($2, f);
+            hfst::xfst::xfst_fclose(f, $3);
        }
        | PRINT_WORDS REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_words(0, hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_words(0, f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_RANDOM_WORDS NUMBER END_COMMAND {
             hfst::xfst::xfst_->print_random_words($2, stdout);
@@ -559,17 +615,23 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->print_random_words(15, stdout);
        }
        | PRINT_RANDOM_WORDS NUMBER REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_random_words($2, hfst::xfst::xfst_fopen($3, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($3, "w");
+            hfst::xfst::xfst_->print_random_words($2, f);
+            hfst::xfst::xfst_fclose(f, $3);
        }
        | PRINT_RANDOM_WORDS REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_random_words(15, hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_random_words(15, f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->print_net($2, stdout);
             free($2);
        }
        | PRINT REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_net(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_net(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT END_COMMAND {
             hfst::xfst::xfst_->print_net(stdout);
@@ -582,20 +644,26 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->print_properties(stdout);
        }
        | PRINT_PROPS REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_properties(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_properties(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_SIGMA NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->print_sigma($2, stdout);
             free($2);
        }
        | PRINT_SIGMA REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_sigma(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_sigma(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_SIGMA END_COMMAND {
             hfst::xfst::xfst_->print_sigma(stdout);
        }
        | PRINT_SIGMA_COUNT REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_sigma_count(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_sigma_count(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_SIGMA_COUNT END_COMMAND {
             hfst::xfst::xfst_->print_sigma_count(stdout);
@@ -610,7 +678,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
        }
        | PRINT_SIGMA_WORD_COUNT REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_sigma_word_count(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_sigma_word_count(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_SIGMA_WORD_COUNT END_COMMAND {
             hfst::xfst::xfst_->print_sigma_word_count(stdout);
@@ -620,19 +690,25 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
        }
        | PRINT_SIZE REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_size(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_size(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_SIZE END_COMMAND {
             hfst::xfst::xfst_->print_size(stdout);
        }
        | PRINT_STACK REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_stack(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_stack(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_STACK END_COMMAND {
             hfst::xfst::xfst_->print_stack(stdout);
        }
        | PRINT_LABELMAPS REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->print_labelmaps(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_labelmaps(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        // writes
        | SAVE_DOT NAMETOKEN END_COMMAND {
@@ -640,7 +716,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
        }
        | SAVE_DOT REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->write_dot(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->write_dot(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | SAVE_DOT END_COMMAND {
             hfst::xfst::xfst_->write_dot(stdout);
@@ -672,35 +750,47 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
        }
        | SAVE_PROLOG REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->write_prolog(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->write_prolog(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | SAVE_PROLOG NAMETOKEN END_COMMAND {
-            hfst::xfst::xfst_->write_prolog(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->write_prolog(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | SAVE_PROLOG END_COMMAND {
             hfst::xfst::xfst_->write_prolog(stdout);
        }
        | SAVE_SPACED REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->write_spaced(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->write_spaced(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | SAVE_SPACED END_COMMAND {
             hfst::xfst::xfst_->write_spaced(stdout);
        }
        | SAVE_TEXT REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->write_text(hfst::xfst::xfst_fopen($2, "w"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->write_text(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | SAVE_TEXT END_COMMAND {
             hfst::xfst::xfst_->write_text(stdout);
        }
        // reads
        | READ_PROPS REDIRECT_IN END_COMMAND {
-            hfst::xfst::xfst_->read_props(hfst::xfst::xfst_fopen($2, "r"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "r");
+            hfst::xfst::xfst_->read_props(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | READ_PROPS END_COMMAND {
             hfst::xfst::xfst_->read_props(stdin);
        }
        | READ_PROLOG NAMETOKEN END_COMMAND {
-            hfst::xfst::xfst_->read_prolog(hfst::xfst::xfst_fopen($2, "r"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "r");
+            hfst::xfst::xfst_->read_prolog(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | READ_PROLOG END_COMMAND {
             hfst::xfst::xfst_->read_prolog(stdin);
@@ -710,46 +800,60 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
        }
        | READ_REGEX REDIRECT_IN END_COMMAND {
-            hfst::xfst::xfst_->read_regex(hfst::xfst::xfst_fopen($2, "r"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "r");
+            hfst::xfst::xfst_->read_regex(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | READ_REGEX NAMETOKEN_LIST SEMICOLON END_COMMAND {
             hfst::xfst::xfst_->read_regex($2);
             free($2);
        }
        | READ_SPACED REDIRECT_IN END_COMMAND {
-            hfst::xfst::xfst_->read_spaced(hfst::xfst::xfst_fopen($2, "r"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "r");
+            hfst::xfst::xfst_->read_spaced(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | READ_SPACED NAMETOKEN_LIST CTRLD {
             hfst::xfst::xfst_->read_spaced($2);
             free($2);
        }
        | READ_TEXT REDIRECT_IN END_COMMAND {
-            hfst::xfst::xfst_->read_text(hfst::xfst::xfst_fopen($2, "r"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "r");
+            hfst::xfst::xfst_->read_text(f);
+            hfst::xfst::xfst_fclose(f, $2);
        }
        | READ_TEXT NAMETOKEN_LIST CTRLD {
             hfst::xfst::xfst_->read_text($2);
             free($2);
        }
        | READ_LEXC NAMETOKEN END_COMMAND {
-            hfst::xfst::xfst_->read_lexc(hfst::xfst::xfst_fopen($2, "r"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "r");
+            hfst::xfst::xfst_->read_lexc(f);
+            hfst::xfst::xfst_fclose(f, $2);
             free($2);
        }
        | READ_LEXC NAMETOKEN_LIST CTRLD {
             hfst::xfst::xfst_->read_lexc(stdin);
        }
        | READ_ATT NAMETOKEN END_COMMAND {
-            hfst::xfst::xfst_->read_att(hfst::xfst::xfst_fopen($2, "r"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "r");
+            hfst::xfst::xfst_->read_att(f);
+            hfst::xfst::xfst_fclose(f, $2);
             free($2);
        }
        | WRITE_ATT END_COMMAND {
             hfst::xfst::xfst_->write_att(stdout);       
        }
        | WRITE_ATT REDIRECT_OUT END_COMMAND {
-            hfst::xfst::xfst_->write_att(hfst::xfst::xfst_fopen($2, "wb"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->write_att(f);
+            hfst::xfst::xfst_fclose(f, $2);
             free($2);
        }
        | WRITE_ATT NAMETOKEN END_COMMAND {
-            hfst::xfst::xfst_->write_att(hfst::xfst::xfst_fopen($2, "wb"));
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->write_att(f);
+            hfst::xfst::xfst_fclose(f, $2);
             free($2);
        }
        // net ops

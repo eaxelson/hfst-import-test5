@@ -2266,10 +2266,20 @@ namespace xfst {
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
-  XfstCompiler::read_prolog(FILE* /* infile */)
+  XfstCompiler::read_prolog(FILE* infile)
     {
-      fprintf(stderr, "missing read prolog %s:%d\n", __FILE__, __LINE__);
-      PRINT_INFO_PROMPT_AND_RETURN_THIS;
+      try {
+        unsigned int linecount=0;
+        HfstBasicTransducer tr = 
+          HfstBasicTransducer::read_in_prolog_format(infile, linecount);
+        stack_.push(new HfstTransducer(tr, format_));
+        PRINT_INFO_PROMPT_AND_RETURN_THIS;
+      } 
+      catch (const NotValidPrologFormatException & e)
+        {
+          fprintf(errorstream_, "%s\n", e().c_str());
+          PROMPT_AND_RETURN_THIS;
+        }
     }
   XfstCompiler& 
   XfstCompiler::read_prolog(const char* /* indata */)

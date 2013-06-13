@@ -177,6 +177,9 @@
              The value pointed by the iterator is of type HfstTransitions. */
          typedef typename HfstStates::const_iterator const_iterator;
 
+         /** @brief The name of the graph. */
+         std::string name;
+
          /** @brief The states of the graph. */
          std::vector<HfstState> states() const {
            std::vector<HfstState> retval(this->get_max_state()+1, 0);
@@ -193,7 +196,7 @@
              zero and is not a final state, i.e. create an empty graph. */
        HfstTransitionGraph(void) {
            initialize_alphabet(alphabet);
-       HfstTransitions tr;
+           HfstTransitions tr;
            state_vector.push_back(tr);
          }
 
@@ -833,7 +836,7 @@
          }
 
          // note: unknown and identity are both '?'
-         std::string prologize_symbol(const std::string & symbol)
+         static std::string prologize_symbol(const std::string & symbol)
          {
            if (symbol == "0")
              return "%0";
@@ -851,7 +854,7 @@
          }
 
          // caveat: '?' is always unknown
-         std::string deprologize_symbol(const std::string & symbol)
+         static std::string deprologize_symbol(const std::string & symbol)
          {
            if (symbol == "%0")
              return "0";
@@ -869,9 +872,11 @@
          // Extract input and output symbols, if possible, from prolog arc 
          // \a str and store them to \a isymbol and \a osymbol. 
          // Return whether symbols were succesfully extracted.
-         bool get_prolog_arc_symbols
+         static bool get_prolog_arc_symbols
            (const std::string & str, std::string & isymbol, std::string & osymbol)
          {
+           //std::cerr << "get_prolog_arc_symbols from '" << str << "'.." << std::endl;
+
            // find positions of double quotes
            std::vector<unsigned int> quote_positions;
            for (size_t i=0; i < str.length(); i++)
@@ -886,6 +891,17 @@
                      quote_positions.push_back(i);
                  }
              }
+
+           //std::cerr << "quote_positions: ";
+           for (std::vector<unsigned int>::const_iterator it = quote_positions.begin();
+                it != quote_positions.end(); it++)
+             {
+               //if (it != quote_positions.begin())
+                 //std::cerr << ", ";
+                 //std::cerr << *it;
+             }
+           //std::cerr << std::endl;
+
            // "foo"
            if (quote_positions.size() == 2)
              {
@@ -897,16 +913,26 @@
            else if (quote_positions.size() == 4)
              {
                if (quote_positions[0] != 0 ||
-                   quote_positions[3] != str.length()-1)
-                 return false;  // extra characters outside quotes
+                   quote_positions[3] != str.length()-1) 
+                 {
+                   //std::cerr << "error: extra characters" << std::endl; 
+                   return false;  // extra characters outside quotes
+                 }
                if (quote_positions[2] - quote_positions[1] != 2)
-                 return false;  // missing colon between inner quotes
+                 {
+                   //std::cerr << "error: missing colon" << std::endl; 
+                   return false;  // missing colon between inner quotes
+                 }
                if (str[quote_positions[1] + 1] != ':')
-                 return false;  // else than colon between inner quotes
+                 {
+                   //std::cerr << "error: else than colon" << std::endl; 
+                   return false;  // else than colon between inner quotes
+                 }
              }
            // not valid prolog arc
            else
              {
+               //std::cerr << "size of quote_positions is not 2 or 4" << std::endl; // DEBUG
                return false;
              }
            
@@ -914,7 +940,7 @@
            if (quote_positions.size() == 2)
              {
                // "foo" -> foo
-               std::string symbol(str, quote_positions[0]+1, quote_positions[1]);
+               std::string symbol(str, quote_positions[0]+1, quote_positions[1]-quote_positions[0]-1);
                isymbol = deprologize_symbol(symbol);
                if (isymbol == "@_UNKNOWN_SYMBOL_@") // single unknown -> identity
                  isymbol = "@_IDENTITY_SYMBOL_@";
@@ -924,15 +950,16 @@
            else
              {
                // "foo" -> foo, "bar" -> bar
-               std::string insymbol(str, quote_positions[0]+1, quote_positions[1]);
-               std::string outsymbol(str, quote_positions[2]+1, quote_positions[3]);
+               std::string insymbol(str, quote_positions[0]+1, quote_positions[1]-quote_positions[0]-1);
+               std::string outsymbol(str, quote_positions[2]+1, quote_positions[3]-quote_positions[2]-1);
                isymbol = deprologize_symbol(insymbol);
                osymbol = deprologize_symbol(outsymbol);
              }
+           //std::cerr << "..returning true" << std::endl;
            return true;
          }
 
-         void print_prolog_arc_symbols(FILE * file, C data)
+         static void print_prolog_arc_symbols(FILE * file, C data)
          {
            std::string symbol = prologize_symbol(data.get_input_symbol());
            fprintf(file, "\"%s\"", symbol.c_str());
@@ -945,6 +972,20 @@
                fprintf(file, ":\"%s\"", symbol.c_str());
              }
          }
+         
+         static void print_prolog_arc_symbols(std::ostream & os, C data)
+         {
+           std::string symbol = prologize_symbol(data.get_input_symbol());
+           os << "\"" << symbol << "\"";
+
+           if (data.get_input_symbol() !=
+               data.get_output_symbol() || 
+               data.get_input_symbol() == "@_UNKNOWN_SYMBOL_@")
+             {
+               symbol = prologize_symbol(data.get_output_symbol());
+               os << ":\"" << symbol << "\"";
+             }
+         }
 
          /** @brief Write the graph in prolog format to FILE \a file.
              \a write_weights defines whether weights are printed (todo). */
@@ -955,6 +996,11 @@
            unsigned int source_state=0;
            const char * identifier = name.c_str();
            // Print the name.
+           if (name.find(",") != std::string::npos)
+             {
+               std::string msg("no commas allowed in the name of prolog networks");
+               HFST_THROW_MESSAGE(HfstException, msg);
+             }
            fprintf(file, "network(%s).\n", identifier);
 
            // Print symbols that are in the alphabet but not used in arcs.
@@ -993,6 +1039,311 @@
                fprintf(file, "final(%s, %i).\n", identifier, it->first);
              }
          }
+
+         /** @brief Write the graph in prolog format to ostream \a os.
+             \a write_weights defines whether weights are printed (todo). */
+         void write_in_prolog_format(std::ostream & os, const std::string & name, 
+                                     bool write_weights=true) 
+         {
+           (void)write_weights;
+           unsigned int source_state=0;
+
+           // Print the name.
+           if (name.find(",") != std::string::npos)
+             {
+               std::string msg("no commas allowed in the name of prolog networks");
+               HFST_THROW_MESSAGE(HfstException, msg);
+             }
+           os << "network(" << name << ")." << std::endl;
+
+           // Print symbols that are in the alphabet but not used in arcs.
+           HfstTransitionGraphAlphabet symbols_used_ = symbols_used();
+           initialize_alphabet(symbols_used_); // exclude special symbols
+           for (typename HfstTransitionGraphAlphabet::const_iterator it 
+                  = alphabet.begin(); it != alphabet.end(); it++)
+             {
+               if (symbols_used_.find(*it) == symbols_used_.end())
+                 {
+                   os << "symbol(" << name << ", \"" << *it << "\")" << std::endl;
+                 }
+             }
+
+           // Print arcs.
+           for (iterator it = begin(); it != end(); it++)
+             {
+               for (typename HfstTransitions::iterator tr_it
+                      = it->begin();
+                    tr_it != it->end(); tr_it++)
+                 {
+                   os << "arc(" << name << ", " << source_state << ", " << tr_it->get_target_state() << ", ";
+                   C data = tr_it->get_transition_data();
+                   print_prolog_arc_symbols(os, data);
+                   os << ")." << std::endl;
+                 }
+               source_state++;
+             }
+
+           // Print final states.
+           for (typename FinalWeightMap::const_iterator it 
+                  = this->final_weight_map.begin();
+                it != this->final_weight_map.end(); it++)
+             {
+               os << "final(" << name << ", " << it->first <<  ")." << std::endl;
+             }
+         }
+         
+         // If \a str is of format ".+", change it to .+ and return true.
+         // Else, return false.
+         static bool strip_quotes_from_both_sides(std::string & str)
+         {
+           if (str.size() < 3)
+             return false;
+           if (str[0] != '"' || str[str.length()-1] != '"')
+             return false;
+           str.erase(0, 1);
+           str.erase(str.length()-1, 1);
+           return true;
+         }
+
+         // If \a str is of format .+)", change it to .+ and return true.
+         // Else, return false.
+         static bool strip_ending_parenthesis_and_comma(std::string & str)
+         {
+           if (str.size() < 3)
+             return false;
+           if (str[str.length()-2] != ')' || str[str.length()-1] != '.')
+             return false;
+           str.erase(str.length()-2);
+           return true;
+         }
+
+         static bool parse_prolog_network_line(const std::string & line, std::string & name)
+         {
+           // 'network(NAME).'
+           char namearr[100];
+           int n = sscanf(line.c_str(), "network(%s", namearr);
+           if (n != 1)
+             return false;
+
+           std::string namestr(namearr);
+           // strip the ending ")." from namestr
+           if (!strip_ending_parenthesis_and_comma(namestr))
+             return false;
+
+           name = namestr;
+           return true;
+         }
+
+         static bool parse_prolog_arc_line(const std::string & line, HfstTransitionGraph & graph)
+         {
+           char namestr[100];
+           char sourcestr[100];
+           char targetstr[100];
+           char symbolstr[100];
+           //std::cerr << "trying to parse line '" << line << "' as arc.." << std::endl;
+           int n = sscanf(line.c_str(), "arc(%[^,], %[^,], %[^,], %s", namestr, sourcestr, targetstr, symbolstr);
+
+           std::string symbol(symbolstr);
+           // strip the ending ")." from symbolstr
+           if (!strip_ending_parenthesis_and_comma(symbol))
+             return false;
+
+           //std::cerr << "number of formatters extracted: " << n << ":" << std::endl;
+           //std::cerr << "namestr: '" << namestr << "'" << std::endl;
+           //std::cerr << "sourcestr: '" << sourcestr << "'" << std::endl;
+           //std::cerr << "targetstr: '" << targetstr << "'" << std::endl;
+           //std::cerr << "symbol: '" << symbol << "'" << std::endl;
+
+           if (n != 4)
+             return false;
+           if (std::string(namestr) != graph.name)
+             {
+               //return false; FIX THIS
+             }
+
+           unsigned int source = atoi(sourcestr);
+           unsigned int target = atoi(targetstr);
+
+           std::string isymbol = "";
+           std::string osymbol = "";
+           if (!get_prolog_arc_symbols(symbol, isymbol, osymbol))
+             return false;
+
+           graph.add_transition(source, HfstTransition<C>(target, isymbol, osymbol, 0));
+           return true;
+         }
+
+         static bool parse_prolog_final_line(const std::string & line, HfstTransitionGraph & graph)
+         {
+           //std::cerr << "parse_prolog_final_line: " << line << std::endl;
+           // 'final(NAME, number).'
+           char namestr[100];
+           char finalstr[100];
+           int n = sscanf(line.c_str(), "final(%[^,], %[^)]).", namestr, finalstr);
+
+           if (n != 2)
+             {
+               //std::cerr << "..failed" << std::endl;
+               return false;
+             }
+           //if (std::string(namestr) != graph.name) FIX THIS
+           //  return false;
+
+           graph.set_final_weight(atoi(finalstr), 0);
+           return true;
+         }
+
+         static bool parse_prolog_symbol_line(const std::string & line, HfstTransitionGraph & graph)
+         {
+           //std::cerr << "parse_prolog_symbol_line: '" << line << "'" << std::endl;
+           // 'symbol(NAME, "foo").'
+           char namearr[100];
+           char symbolarr[100];
+           int n = sscanf(line.c_str(), "symbol(%[^,], %s", namearr, symbolarr);
+           
+           if (n != 2)
+             return false;
+
+           std::string namestr(namearr);
+           std::string symbolstr(symbolarr);
+
+           if (namestr != graph.name)
+             return false;
+
+           //std::cerr << "symbolstr: " << symbolstr << "'" << std::endl;
+
+           if (! strip_ending_parenthesis_and_comma(symbolstr))
+             return false;
+
+           //sstd::cerr << "symbolstr: " << symbolstr << "'" << std::endl;
+
+           if (! strip_quotes_from_both_sides(symbolstr))
+             return false;
+           
+           graph.add_symbol_to_alphabet(symbolstr);
+           return true;
+         }
+
+         // Erase newlines from the end of \a str and return \a str.
+         static std::string strip_newlines(std::string & str)
+         {
+           for (signed int i=(signed int)str.length()-1; i >= 0; --i)
+             {
+               if (str[i] == '\n' || str[i] == '\r')
+                 str.erase(i, 1);
+               else
+                 break;
+             }
+           return str;
+         }
+
+         // Try to get a line from \a is (if \a file == NULL)
+         // or from \a file. If succesfull, strip the line from newlines,
+         // increment \a linecount by one and return the line.
+         // Else, throw an EndOfStreamException.
+         static std::string get_stripped_line
+           (std::istream & is, FILE * file, unsigned int & linecount)
+         {
+           char line [255];
+
+           if (file == NULL) { /* we use streams */
+             if (not is.getline(line,255).eof())
+               HFST_THROW(EndOfStreamException);
+           }
+           else { /* we use FILEs */            
+             if (NULL == fgets(line, 255, file))
+               HFST_THROW(EndOfStreamException);
+           }
+           linecount++;
+
+           std::string linestr(line);
+           return strip_newlines(linestr);       
+         }
+
+         /* Create an HfstTransitionGraph as defined in prolog format 
+            in istream \a is or FILE \a file.
+
+            The functions is called by functions 
+            read_in_prolog_format(istream&) and
+            read_in_prolog_format(FILE*). 
+            If \a file is NULL, it is ignored and \a is is used.
+            If \a file is not NULL, it is used and \a is is ignored. */
+         static HfstTransitionGraph read_in_prolog_format
+           (std::istream &is, FILE *file, unsigned int & linecount) 
+         {
+
+           HfstTransitionGraph retval;
+           std::string linestr;
+           
+           try 
+             {
+               linestr = get_stripped_line(is, file, linecount);
+               //std::cerr << "get_stripped_line: " << linestr << std::endl; // DEBUG
+             }             
+           catch (const EndOfStreamException & e) 
+             {
+               HFST_THROW(NotValidPrologFormatException); 
+             }
+
+           if (! parse_prolog_network_line(linestr, retval.name))
+             {
+               std::string message("first line not valid prolog: ");
+               message.append(linestr);
+               HFST_THROW_MESSAGE(NotValidPrologFormatException, message);
+             }
+           //std::cerr << "  ok" << std::endl;
+
+           while(true)
+             {
+               try 
+                 {
+                   linestr = get_stripped_line(is, file, linecount);
+                   //std::cerr << "get_stripped_line: " << linestr << std::endl; // DEBUG
+                 }             
+               catch (const EndOfStreamException & e) 
+                 {
+                   return retval;
+                 }
+               if (! (parse_prolog_arc_line(linestr, retval) ||
+                      parse_prolog_final_line(linestr, retval) ||
+                      parse_prolog_symbol_line(linestr, retval)) )
+                 {
+                   std::string message("line not valid prolog: ");
+                   message.append(linestr);
+                   HFST_THROW_MESSAGE(NotValidPrologFormatException, message);
+                 }
+               //std::cerr << "  ok" << std::endl;
+             }
+           HFST_THROW(NotValidPrologFormatException); // this should not happen
+         }
+
+         static HfstTransitionGraph read_in_prolog_format
+           (std::istream &is,
+            unsigned int & linecount) 
+         {
+           return read_in_prolog_format
+             (is, NULL /* a dummy variable */,
+              linecount);
+         }
+
+         static HfstTransitionGraph read_in_prolog_format
+           (FILE *file, 
+            unsigned int & linecount) 
+         {
+           return read_in_prolog_format
+             (std::cin /* a dummy variable */,
+              file, linecount);
+         }       
+
+         static HfstTransitionGraph read_in_prolog_format
+           (HfstFile &file, 
+            unsigned int & linecount)
+         {
+           return read_in_att_format(std::cin /* a dummy variable */, file.get_file(),
+                                     linecount);
+         }
+
+
 
          /** @brief Write the graph in xfst text format to FILE \a file.
              \a write_weights defines whether weights are printed (todo). */

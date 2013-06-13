@@ -58,6 +58,15 @@ namespace hfst { namespace xfst {
        }
 #endif
 
+void
+xfst_fclose(FILE * file, const char * name)
+{
+  if (0 != fclose(file))
+    {
+      fprintf(stderr, "Unable to close %s: %s\n", name, strerror(errno));
+    }
+}
+
 FILE*
 xfst_fopen(const char* path, const char* mode)
   {
