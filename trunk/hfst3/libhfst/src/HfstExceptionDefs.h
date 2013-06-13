@@ -228,6 +228,7 @@ fprintf(stderr, "Read %i transducers in total.\n", (int)transducers.size());
 */
 HFST_EXCEPTION_CHILD_DECLARATION(NotValidAttFormatException);
 
+HFST_EXCEPTION_CHILD_DECLARATION(NotValidPrologFormatException);
 
 HFST_EXCEPTION_CHILD_DECLARATION(NotValidLexcFormatException);
 
