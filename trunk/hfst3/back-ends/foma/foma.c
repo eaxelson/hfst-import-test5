@@ -22,27 +22,40 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <time.h>
+
+#ifdef HAVE_READLINE
 #include <readline/readline.h>
+#endif // HAVE_READLINE
+
 #include "foma.h"
 
 /* Front-end behavior variables */
 int pipe_mode = 0;
 int quiet_mode = 0;
+
+#ifdef HAVE_READLINE
 static int use_readline = 1;
+#else
+static int use_readline = 0;
+#endif // HAVE_READLINE
 
 int promptmode = PROMPT_MAIN;
 int apply_direction;
 
 /* Variable to pass the position of rl completion to our completer */
+#ifdef HAVE_READLINE
 static int smatch;
+#endif // HAVE_READLINE
 
 char *usagestring = "Usage: foma [-e \"command\"] [-f run-once-script] [-l startupscript] [-p] [-q] [-s] [-v]\n";
 
+#ifdef HAVE_READLINE
 static char** my_completion(const char*, int ,int);
 char *my_generator(const char* , int);
 char *cmd [] = {"ambiguous upper","apply down","apply med","apply up","apropos","assert-stack","clear stack","compact sigma","complete net","compose net","concatenate net","crossproduct net","define","determinize net","echo","eliminate flags","eliminate flag","export cmatrix","extract ambiguous","extract unambiguous","factorize","help license","help warranty","ignore net","intersect net","invert net","label net","letter machine","load defined","lower-side net","minimize net","name net","negate net","one-plus net","pop stack","print defined","print dot","print lower-words","print cmatrix","print name","print net","print random-lower","print random-upper","print random-words","print sigma","print size","print shortest-string","print shortest-string-length","print upper-words","prune net","push defined","quit","read att","read cmatrix","read prolog","read lexc","read regex","read spaced-text","read text","reverse net","rotate stack","save defined","save stack","sequentialize","set","show variables","show variable","shuffle net","sigma","sigma net","source","sort in","sort net","sort out","substitute defined","substitute symbol","system","test unambiguous","test star-free","test equivalent","test functional","test identity","test lower-universal","test upper-universal","test non-null","test null","test sequential","turn stack","twosided flag-diacritics","undefine","union net","upper-side net","view net","write att","write prolog","zero-plus net",NULL};
 
 char *abbrvcmd [] = {"ambiguous","down","up","med","size","loadd","lower-words","upper-words","net","random-lower","random-upper","random-words","regex","rpl","au revoir","bye","exit","saved","seq","ss","stack","tunam","tid","tfu","tlu","tuu","tnu","tnn","tseq","tsf","equ","pss","psz","ratt","tfd","hyvästi","watt","wpl","examb","exunamb",NULL};
+#endif // HAVE_READLINE
 
 /* #include "yy.tab.h" */
 
@@ -69,19 +82,24 @@ char *rl_gets(char *prompt) {
     
     /* If the buffer has already been allocated,
        return the memory to the free pool. */
+#ifdef HAVE_READLINE
     if (use_readline == 1) {
         if (line_read) {
             free(line_read);
             line_read = (char *)NULL;
         }
     }
+
     if (use_readline == 0) {
+#endif // HAVE_READLINE
         printf("%s",prompt);
         line_read = fgets(no_readline_line, 511, stdin);
         if (line_read != NULL) {
             strip_newline(line_read);
         }
-    } else {
+#ifdef HAVE_READLINE
+    }
+    else {
         line_read = readline(prompt);
     }
     
@@ -92,6 +110,7 @@ char *rl_gets(char *prompt) {
             add_history(line_read);
         
     }
+#endif // HAVE_READLINE
     return (line_read);
 }
 
@@ -148,9 +167,13 @@ int main(int argc, char *argv[]) {
 
     if (!pipe_mode && !quiet_mode) 
         printf("%s",disclaimer);
+
+#ifdef HAVE_READLINE
     rl_basic_word_break_characters = " >";
 
     rl_attempted_completion_function = my_completion;
+#endif // HAVE_READLINE
+
     for(;;) {
         if (promptmode == PROMPT_MAIN)
             sprintf(prompt, "foma[%i]: ",stack_size());
@@ -193,7 +216,7 @@ void print_help() {
     printf("-v\t\tprint version number\n");
 }
 
-
+#ifdef HAVE_READLINE
 static char **my_completion(const char *text, int start, int end) {
     char **matches;
 
@@ -238,3 +261,4 @@ char *my_generator(const char *text, int state) {
     /* If no names matched, then return NULL. */
     return ((char *)NULL);
 }
+#endif // HAVE_READLINE
