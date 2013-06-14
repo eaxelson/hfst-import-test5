@@ -869,96 +869,6 @@
            return replace_all(symbol_, "\\\"", "\"");
          }
 
-         // Extract input and output symbols, if possible, from prolog arc 
-         // \a str and store them to \a isymbol and \a osymbol. 
-         // Return whether symbols were succesfully extracted.
-         static bool get_prolog_arc_symbols
-           (const std::string & str, std::string & isymbol, std::string & osymbol)
-         {
-           //std::cerr << "get_prolog_arc_symbols from '" << str << "'.." << std::endl;
-
-           // find positions of double quotes
-           std::vector<unsigned int> quote_positions;
-           for (size_t i=0; i < str.length(); i++)
-             {
-               if (str[i] == '"')
-                 {
-                   if (i == 0)
-                     quote_positions.push_back(i);
-                   else if (str[i-1] == '\\')
-                     ; // skip backslash-escaped double quotes
-                   else
-                     quote_positions.push_back(i);
-                 }
-             }
-
-           //std::cerr << "quote_positions: ";
-           for (std::vector<unsigned int>::const_iterator it = quote_positions.begin();
-                it != quote_positions.end(); it++)
-             {
-               //if (it != quote_positions.begin())
-                 //std::cerr << ", ";
-                 //std::cerr << *it;
-             }
-           //std::cerr << std::endl;
-
-           // "foo"
-           if (quote_positions.size() == 2)
-             {
-               if (quote_positions[0] != 0 ||
-                   quote_positions[1] != str.length()-1)
-                 return false; // extra characters outside quotes
-             }
-           // "foo":"bar"
-           else if (quote_positions.size() == 4)
-             {
-               if (quote_positions[0] != 0 ||
-                   quote_positions[3] != str.length()-1) 
-                 {
-                   //std::cerr << "error: extra characters" << std::endl; 
-                   return false;  // extra characters outside quotes
-                 }
-               if (quote_positions[2] - quote_positions[1] != 2)
-                 {
-                   //std::cerr << "error: missing colon" << std::endl; 
-                   return false;  // missing colon between inner quotes
-                 }
-               if (str[quote_positions[1] + 1] != ':')
-                 {
-                   //std::cerr << "error: else than colon" << std::endl; 
-                   return false;  // else than colon between inner quotes
-                 }
-             }
-           // not valid prolog arc
-           else
-             {
-               //std::cerr << "size of quote_positions is not 2 or 4" << std::endl; // DEBUG
-               return false;
-             }
-           
-           // "foo"
-           if (quote_positions.size() == 2)
-             {
-               // "foo" -> foo
-               std::string symbol(str, quote_positions[0]+1, quote_positions[1]-quote_positions[0]-1);
-               isymbol = deprologize_symbol(symbol);
-               if (isymbol == "@_UNKNOWN_SYMBOL_@") // single unknown -> identity
-                 isymbol = "@_IDENTITY_SYMBOL_@";
-               osymbol = isymbol;
-             }
-           // "foo":"bar"
-           else
-             {
-               // "foo" -> foo, "bar" -> bar
-               std::string insymbol(str, quote_positions[0]+1, quote_positions[1]-quote_positions[0]-1);
-               std::string outsymbol(str, quote_positions[2]+1, quote_positions[3]-quote_positions[2]-1);
-               isymbol = deprologize_symbol(insymbol);
-               osymbol = deprologize_symbol(outsymbol);
-             }
-           //std::cerr << "..returning true" << std::endl;
-           return true;
-         }
-
          static void print_prolog_arc_symbols(FILE * file, C data)
          {
            std::string symbol = prologize_symbol(data.get_input_symbol());
@@ -1134,32 +1044,108 @@
            return true;
          }
 
+         // Get positions of \a c in \a str. If \a esc is precedes
+         // \a c, \a c is not included.
+         static std::vector<unsigned int> get_positions_of_unescaped_char
+           (const std::string & str, char c, char esc)
+         {
+           std::vector<unsigned int> retval;
+           for (size_t i=0; i < str.length(); i++)
+             {
+               if (str[i] == c)
+                 {
+                   if (i == 0)
+                     retval.push_back(i);
+                   else if (str[i-1] == esc)
+                     ; // skip escaped chars
+                   else
+                     retval.push_back(i);
+                 }
+             }
+           return retval;
+         }
+
+         // Extract input and output symbols, if possible, from prolog arc 
+         // \a str and store them to \a isymbol and \a osymbol. 
+         // Return whether symbols were succesfully extracted.
+         // \a str must be of format "foo":"bar" or "foo"
+         static bool get_prolog_arc_symbols
+           (const std::string & str, std::string & isymbol, std::string & osymbol)
+         {
+           // find positions of non-escaped double quotes (todo: double double-quote?)
+           std::vector<unsigned int> quote_positions
+             = get_positions_of_unescaped_char(str, '"', '\\');
+
+           // "foo"
+           if (quote_positions.size() == 2)
+             {
+               if (quote_positions[0] != 0 ||
+                   quote_positions[1] != str.length()-1)
+                 return false; // extra characters outside quotes
+             }
+           // "foo":"bar"
+           else if (quote_positions.size() == 4)
+             {
+               if (quote_positions[0] != 0 ||
+                   quote_positions[3] != str.length()-1) 
+                 {
+                   return false;  // extra characters outside quotes
+                 }
+               if (quote_positions[2] - quote_positions[1] != 2)
+                 {
+                   return false;  // missing colon between inner quotes
+                 }
+               if (str[quote_positions[1] + 1] != ':')
+                 {
+                   return false;  // else than colon between inner quotes
+                 }
+             }
+           // not valid prolog arc
+           else
+             {
+               return false;
+             }
+           
+           // "foo"
+           if (quote_positions.size() == 2)
+             {
+               // "foo" -> foo
+               std::string symbol(str, quote_positions[0]+1, quote_positions[1]-quote_positions[0]-1);
+               isymbol = deprologize_symbol(symbol);
+               if (isymbol == "@_UNKNOWN_SYMBOL_@") // single unknown -> identity
+                 isymbol = "@_IDENTITY_SYMBOL_@";
+               osymbol = isymbol;
+             }
+           // "foo":"bar"
+           else
+             {
+               // "foo" -> foo, "bar" -> bar
+               std::string insymbol(str, quote_positions[0]+1, quote_positions[1]-quote_positions[0]-1);
+               std::string outsymbol(str, quote_positions[2]+1, quote_positions[3]-quote_positions[2]-1);
+               isymbol = deprologize_symbol(insymbol);
+               osymbol = deprologize_symbol(outsymbol);
+             }
+
+           return true;
+         }
+
          static bool parse_prolog_arc_line(const std::string & line, HfstTransitionGraph & graph)
          {
-           char namestr[100];
-           char sourcestr[100];
-           char targetstr[100];
-           char symbolstr[100];
-           //std::cerr << "trying to parse line '" << line << "' as arc.." << std::endl;
-           int n = sscanf(line.c_str(), "arc(%[^,], %[^,], %[^,], %s", namestr, sourcestr, targetstr, symbolstr);
+           char namestr[100]; char sourcestr[100];
+           char targetstr[100]; char symbolstr[100];
+
+           int n = sscanf(line.c_str(), "arc(%[^,], %[^,], %[^,], %s", 
+                          namestr, sourcestr, targetstr, symbolstr);
 
            std::string symbol(symbolstr);
            // strip the ending ")." from symbolstr
            if (!strip_ending_parenthesis_and_comma(symbol))
              return false;
 
-           //std::cerr << "number of formatters extracted: " << n << ":" << std::endl;
-           //std::cerr << "namestr: '" << namestr << "'" << std::endl;
-           //std::cerr << "sourcestr: '" << sourcestr << "'" << std::endl;
-           //std::cerr << "targetstr: '" << targetstr << "'" << std::endl;
-           //std::cerr << "symbol: '" << symbol << "'" << std::endl;
-
            if (n != 4)
              return false;
            if (std::string(namestr) != graph.name)
-             {
-               //return false; FIX THIS
-             }
+             return false;
 
            unsigned int source = atoi(sourcestr);
            unsigned int target = atoi(targetstr);
@@ -1175,7 +1161,6 @@
 
          static bool parse_prolog_final_line(const std::string & line, HfstTransitionGraph & graph)
          {
-           //std::cerr << "parse_prolog_final_line: " << line << std::endl;
            // 'final(NAME, number).'
            char namestr[100];
            char finalstr[100];
@@ -1183,11 +1168,10 @@
 
            if (n != 2)
              {
-               //std::cerr << "..failed" << std::endl;
                return false;
              }
-           //if (std::string(namestr) != graph.name) FIX THIS
-           //  return false;
+           if (std::string(namestr) != graph.name)
+             return false;
 
            graph.set_final_weight(atoi(finalstr), 0);
            return true;
@@ -1195,7 +1179,6 @@
 
          static bool parse_prolog_symbol_line(const std::string & line, HfstTransitionGraph & graph)
          {
-           //std::cerr << "parse_prolog_symbol_line: '" << line << "'" << std::endl;
            // 'symbol(NAME, "foo").'
            char namearr[100];
            char symbolarr[100];
@@ -1210,12 +1193,8 @@
            if (namestr != graph.name)
              return false;
 
-           //std::cerr << "symbolstr: " << symbolstr << "'" << std::endl;
-
            if (! strip_ending_parenthesis_and_comma(symbolstr))
              return false;
-
-           //sstd::cerr << "symbolstr: " << symbolstr << "'" << std::endl;
 
            if (! strip_quotes_from_both_sides(symbolstr))
              return false;
@@ -1278,7 +1257,6 @@
            try 
              {
                linestr = get_stripped_line(is, file, linecount);
-               //std::cerr << "get_stripped_line: " << linestr << std::endl; // DEBUG
              }             
            catch (const EndOfStreamException & e) 
              {
@@ -1291,14 +1269,12 @@
                message.append(linestr);
                HFST_THROW_MESSAGE(NotValidPrologFormatException, message);
              }
-           //std::cerr << "  ok" << std::endl;
 
            while(true)
              {
                try 
                  {
                    linestr = get_stripped_line(is, file, linecount);
-                   //std::cerr << "get_stripped_line: " << linestr << std::endl; // DEBUG
                  }             
                catch (const EndOfStreamException & e) 
                  {
@@ -1312,7 +1288,6 @@
                    message.append(linestr);
                    HFST_THROW_MESSAGE(NotValidPrologFormatException, message);
                  }
-               //std::cerr << "  ok" << std::endl;
              }
            HFST_THROW(NotValidPrologFormatException); // this should not happen
          }

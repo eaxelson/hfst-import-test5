@@ -185,6 +185,7 @@ void insert_zeroes(char * array, unsigned int number)
     }
 }
 
+#ifdef HAVE_READLINE
 // By Mans Hulden
 char *cmd [] = 
   {"ambiguous upper","apply down","apply med","apply up","apropos","assert-stack",
@@ -262,7 +263,7 @@ static char **my_completion(const char *text, int start, int end) {
 
   return (matches);
 }
-
+#endif // HAVE_READLINE
 
 int main(int argc, char** argv)
 {

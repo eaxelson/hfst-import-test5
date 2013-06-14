@@ -15,7 +15,11 @@ libfoma_la_SOURCES = int_stack.c define.c determinize.c apply.c \
 
 hfst_foma_LDADD = $(top_builddir)/back-ends/foma/libfoma.la
 
+if WANT_READLINE
 hfst_foma_LDFLAGS=-lreadline -lz 
+else
+hfst_foma_LDFLAGS=-lz 
+endif
 
 if HAVE_TERMCAP
 hfst_foma_LDFLAGS += -ltermcap
