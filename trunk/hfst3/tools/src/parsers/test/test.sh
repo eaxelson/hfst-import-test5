@@ -215,7 +215,7 @@ do
 	done
     done
 
-    for file in quit-on-fail.xfst
+    for file in quit-on-fail.xfst assert.xfst
     do
         if (cat $file | ../hfst-xfst2fst -s -f $format > tmp 2> /dev/null); then
             echo "ERROR: in compiling "$file

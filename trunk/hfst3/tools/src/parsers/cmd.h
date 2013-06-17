@@ -7,6 +7,7 @@ char * cmd [] =
 "apply med",
 "apply up",
 "apropos",
+"assert",
 "cleanup net",
 "clear stack",
 "collect epsilon-loops",
