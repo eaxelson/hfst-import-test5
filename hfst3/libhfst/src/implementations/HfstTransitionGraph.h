@@ -694,9 +694,9 @@
          }
 
          /* Replace all strings \a str1 in \a symbol with \a str2. */
-         static std::string replace_all(std::string symbol, 
-                            const std::string &str1,
-                            const std::string &str2)
+         static void replace_all(std::string & symbol, 
+                                 const std::string &str1,
+                                 const std::string &str2)
          {
            size_t pos = symbol.find(str1);
            while (pos != std::string::npos) // while there are str1:s to replace
@@ -706,7 +706,7 @@
                pos = symbol.find               // find next str1
                  (str1, pos+str2.size());      
              }
-           return symbol;
+           return;
          }
 
          void print_xfst_state(std::ostream & os, HfstState state)
@@ -743,20 +743,17 @@
              {
                os << "<";
              } 
-           os << replace_all
-             (replace_all
-              (data.get_input_symbol(),
-               "@_EPSILON_SYMBOL_@", "0"),
-              "\t", "@_TAB_@");
+           std::string s = data.get_input_symbol();
+           replace_all(s, "@_EPSILON_SYMBOL_@", "0");
+           replace_all(s, "\t", "@_TAB_@");
+           os << s;
            if (data.get_input_symbol() !=
                data.get_output_symbol())
              {
-               os << ":" <<  
-                 replace_all
-                 (replace_all
-                  (data.get_output_symbol(), 
-                   "@_EPSILON_SYMBOL_@", "0"),
-                  "\t", "@_TAB_@");
+               s = data.get_output_symbol();
+               replace_all(s, "@_EPSILON_SYMBOL_@", "0");
+               replace_all(s, "\t", "@_TAB_@");
+               os << ":" << s; 
              }
            if (data.get_input_symbol() !=
                data.get_output_symbol())
@@ -773,21 +770,18 @@
                fprintf(file, "<");
              }                       
            // replace all spaces, epsilons and tabs
-           fprintf(file, "%s",  
-                   replace_all
-                   (replace_all
-                    (data.get_input_symbol(), 
-                     "@_EPSILON_SYMBOL_@", "0"),
-                    "\t", "@_TAB_@").c_str());
+           std::string s = data.get_input_symbol();
+           replace_all(s, "@_EPSILON_SYMBOL_@", "0");
+           replace_all(s, "\t", "@_TAB_@");
+           fprintf(file, "%s", s.c_str());
+
            if (data.get_input_symbol() !=
                data.get_output_symbol())
              {
-               fprintf(file, ":%s",
-                       replace_all
-                       (replace_all
-                        (data.get_output_symbol(),
-                         "@_EPSILON_SYMBOL_@", "0"),
-                        "\t", "@_TAB_@").c_str());
+               s = data.get_output_symbol();
+               replace_all(s, "@_EPSILON_SYMBOL_@", "0");
+               replace_all(s, "\t", "@_TAB_@");
+               fprintf(file, ":%s", s.c_str());
              }
            if (data.get_input_symbol() !=
                data.get_output_symbol())
@@ -849,8 +843,9 @@
            if(symbol == "@_IDENTITY_SYMBOL_@")
              return "?";
            // prepend a backslash to a double quote
-           std::string symbol_(symbol);
-           return replace_all(symbol_, "\"", "\\\"");
+           std::string retval(symbol);
+           replace_all(retval, "\"", "\\\"");
+           return retval;
          }
 
          // caveat: '?' is always unknown
@@ -865,8 +860,9 @@
            if (symbol == "?")
              return "@_UNKNOWN_SYMBOL_@";
            // remove the escaping backslash in front of a double quote
-           std::string symbol_(symbol);
-           return replace_all(symbol_, "\\\"", "\"");
+           std::string retval(symbol);
+           replace_all(retval, "\\\"", "\"");
+           return retval;
          }
 
          static void print_prolog_arc_symbols(FILE * file, C data)
@@ -921,7 +917,7 @@
              {
                if (symbols_used_.find(*it) == symbols_used_.end())
                  {
-                   fprintf(file, "symbol(%s, \"%s\")\n", identifier, it->c_str());
+                   fprintf(file, "symbol(%s, \"%s\").\n", identifier, it->c_str());
                  }
              }
 
@@ -1374,24 +1370,21 @@
                  {
                    C data = tr_it->get_transition_data();
 
+                   std::string isymbol = data.get_input_symbol();
+                   replace_all(isymbol, " ", "@_SPACE_@");
+                   replace_all(isymbol, "@_EPSILON_SYMBOL_@", "@0@");
+                   replace_all(isymbol, "\t", "@_TAB_@");
+
+                   std::string osymbol = data.get_output_symbol();
+                   replace_all(osymbol, " ", "@_SPACE_@");
+                   replace_all(osymbol, "@_EPSILON_SYMBOL_@", "@0@");
+                   replace_all(osymbol, "\t", "@_TAB_@");
+
                    os <<  source_state << "\t" 
                       <<  tr_it->get_target_state() << "\t"
-                 // replace all spaces, epsilons and tabs
-                      <<  
-             replace_all
-             (replace_all
-              (replace_all(data.get_input_symbol(), 
-                   " ", "@_SPACE_@"),
-               "@_EPSILON_SYMBOL_@", "@0@"),
-              "\t", "@_TAB_@")
-                      << "\t"
-                      <<  
-             replace_all
-             (replace_all
-              (replace_all(data.get_output_symbol(), 
-                   " ", "@_SPACE_@"),
-               "@_EPSILON_SYMBOL_@", "@0@"),
-              "\t", "@_TAB_@");
+                      <<  isymbol << "\t"
+                      <<  osymbol;
+
                    if (write_weights)
                      os <<  "\t" << data.get_weight(); 
                    os << "\n";
@@ -1420,22 +1413,21 @@
                  {
                    C data = tr_it->get_transition_data();
 
+                   std::string isymbol = data.get_input_symbol();
+                   replace_all(isymbol, " ", "@_SPACE_@");
+                   replace_all(isymbol, "@_EPSILON_SYMBOL_@", "@0@");
+                   replace_all(isymbol, "\t", "@_TAB_@");
+
+                   std::string osymbol = data.get_output_symbol();
+                   replace_all(osymbol, " ", "@_SPACE_@");
+                   replace_all(osymbol, "@_EPSILON_SYMBOL_@", "@0@");
+                   replace_all(osymbol, "\t", "@_TAB_@");
+
                    fprintf(file, "%i\t%i\t%s\t%s",
                            source_state,
                            tr_it->get_target_state(),
-                   // replace all spaces and epsilons
-               replace_all
-               (replace_all
-                (replace_all(data.get_input_symbol(), 
-                     " ", "@_SPACE_@"),
-                 "@_EPSILON_SYMBOL_@", "@0@"),
-                "\t", "@_TAB_@").c_str(),
-               replace_all
-               (replace_all
-                (replace_all(data.get_output_symbol(),
-                     " ", "@_SPACE_@"),
-                 "@_EPSILON_SYMBOL_@", "@0@"),
-                "\t", "@_TAB_@").c_str());
+                           isymbol.c_str(),
+                           osymbol.c_str());
 
                    if (write_weights)
                      fprintf(file, "\t%f",
@@ -1467,22 +1459,22 @@
                  {
                    C data = tr_it->get_transition_data();
 
+                   std::string isymbol = data.get_input_symbol();
+                   replace_all(isymbol, " ", "@_SPACE_@");
+                   replace_all(isymbol, "@_EPSILON_SYMBOL_@", "@0@");
+                   replace_all(isymbol, "\t", "@_TAB_@");
+
+                   std::string osymbol = data.get_output_symbol();
+                   replace_all(osymbol, " ", "@_SPACE_@");
+                   replace_all(osymbol, "@_EPSILON_SYMBOL_@", "@0@");
+                   replace_all(osymbol, "\t", "@_TAB_@");
+
                    cw = sprintf(ptr + cwt, "%i\t%i\t%s\t%s",
-                           source_state,
-                           tr_it->get_target_state(),
-                   // replace all spaces and epsilons
-               replace_all
-               (replace_all
-                (replace_all(data.get_input_symbol(), 
-                     " ", "@_SPACE_@"),
-                 "@_EPSILON_SYMBOL_@", "@0@"),
-                "\t", "@_TAB_@").c_str(),
-               replace_all
-               (replace_all
-                (replace_all(data.get_output_symbol(),
-                     " ", "@_SPACE_@"),
-                 "@_EPSILON_SYMBOL_@", "@0@"),
-                "\t", "@_TAB_@").c_str());
+                                source_state,
+                                tr_it->get_target_state(),
+                                isymbol.c_str(),
+                                osymbol.c_str());
+                   
                    cwt = cwt + cw;
 
                    if (write_weights)
@@ -1630,23 +1622,16 @@
                std::string output_symbol=std::string(a4);
 
                // replace "@_SPACE_@"s with " " and "@0@"s with 
-               // "@_EPSILON_SYMBOL_@"
-               input_symbol 
-         = replace_all 
-         (replace_all
-          (replace_all
-           (replace_all(input_symbol, "@_SPACE_@", " "),
-            "@0@", "@_EPSILON_SYMBOL_@"),
-           "@_TAB_@", "\t"),
-          "@_COLON_@", ":");
-           output_symbol 
-         = replace_all
-         (replace_all
-          (replace_all
-           (replace_all(output_symbol, "@_SPACE_@", " "),
-            "@0@", "@_EPSILON_SYMBOL_@"),
-           "@_TAB_@", "\t"),
-          "@_COLON_@", ":");
+               // "@_EPSILON_SYMBOL_@" 
+               replace_all(input_symbol, "@_SPACE_@", " ");
+               replace_all(input_symbol, "@0@", "@_EPSILON_SYMBOL_@");
+               replace_all(input_symbol, "@_TAB_@", "\t");
+               replace_all(input_symbol, "@_COLON_@", ":");
+
+               replace_all(output_symbol, "@_SPACE_@", " ");
+               replace_all(output_symbol, "@0@", "@_EPSILON_SYMBOL_@");
+               replace_all(output_symbol, "@_TAB_@", "\t");
+               replace_all(output_symbol, "@_COLON_@", ":");
 
                if (epsilon_symbol.compare(input_symbol) == 0)
                  input_symbol="@_EPSILON_SYMBOL_@";

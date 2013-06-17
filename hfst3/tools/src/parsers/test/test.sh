@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#exit 77;
+exit 77;
 
 XFST_TOOL="../hfst-xfst2fst -s --pipe-mode"
 STRINGS2FST="../../hfst-strings2fst -S"
@@ -88,7 +88,7 @@ do
     for testfile in compose_net concatenate_net union_net ignore_net invert_net minus_net intersect_net \
 	determinize_net epsilon_remove_net invert_net minimize_net negate_net \
 	one_plus_net prune_net reverse_net sort_net upper_side_net zero_plus_net lower_side_net \
-	define define_function
+	define define_function prolog
     do
 	rm -f result result1 result2
 	if ! (ls $testfile.xfst 2> /dev/null); then
@@ -217,15 +217,17 @@ do
 
     for file in quit-on-fail.xfst
     do
-        if (cat $file | ../hfst-xfst2fst -f $format > tmp 2> /dev/null); then
+        if (cat $file | ../hfst-xfst2fst -s -f $format > tmp 2> /dev/null); then
             echo "ERROR: in compiling "$file
             exit 1;
         fi
         if (grep '^fail' tmp > /dev/null); then
             echo "ERROR: in testing "$file
+            exit 1;
         fi
         if ! (grep '^pass' tmp > /dev/null); then
             echo "ERROR: in testing "$file
+            exit 1;
         fi
     done
 
