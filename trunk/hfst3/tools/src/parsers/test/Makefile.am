@@ -38,5 +38,6 @@ EXTRA_DIST=test.sh \
 	quit-on-fail.xfst print_net.xfst print_net.output \
 	print_net.alternative_output \
 	inspect_net.xfst inspect_net.output \
-	inspect_net.alternative_output
+	inspect_net.alternative_output \
+	prolog.xfst prolog.att
 check_DATA=test.sh
