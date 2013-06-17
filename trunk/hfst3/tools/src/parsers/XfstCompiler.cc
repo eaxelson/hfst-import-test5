@@ -70,6 +70,7 @@ using hfst::implementations::HfstBasicTransition;
 #define PROMPT_AND_RETURN_THIS prompt(); return *this;
 #define PRINT_INFO_PROMPT_AND_RETURN_THIS print_transducer_info(); prompt(); return *this;
 #define IF_NULL_PROMPT_AND_RETURN_THIS(x) if (x == NULL) { prompt(); return *this; }
+#define MAYBE_MINIMIZE(x) if (variables_["minimal"] == "ON") { x->minimize(); }
 
 #include "help_message.cc"
 
@@ -1452,6 +1453,7 @@ namespace xfst {
 
       stack_.pop();
       top->substitute(target, src);
+      MAYBE_MINIMIZE(top);
       stack_.push(top);
 
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
@@ -1475,6 +1477,7 @@ namespace xfst {
 
       if (substituted != NULL)
         {
+          MAYBE_MINIMIZE(substituted);
           stack_.push(substituted);
           print_transducer_info();
         }
@@ -2214,6 +2217,7 @@ namespace xfst {
           compiled = xre_.compile(file_data);
           if (compiled != NULL)
             {
+              MAYBE_MINIMIZE(compiled);
               stack_.push(compiled);
             }
           else
@@ -2255,6 +2259,7 @@ namespace xfst {
       if (compiled != NULL)
         {
           stack_.push(new HfstTransducer(*compiled));
+          MAYBE_MINIMIZE(stack_.top());
           print_transducer_info();
         }
       else
@@ -2273,6 +2278,7 @@ namespace xfst {
         HfstBasicTransducer tr = 
           HfstBasicTransducer::read_in_prolog_format(infile, linecount);
         stack_.push(new HfstTransducer(tr, format_));
+        MAYBE_MINIMIZE(stack_.top());
         PRINT_INFO_PROMPT_AND_RETURN_THIS;
       } 
       catch (const NotValidPrologFormatException & e)
@@ -2351,6 +2357,7 @@ namespace xfst {
       HfstTransducer * result = new HfstTransducer(fsm, topmost->get_type());
       stack_.pop();
       delete topmost;
+      MAYBE_MINIMIZE(result);
       stack_.push(result);
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
@@ -2420,6 +2427,7 @@ namespace xfst {
             break;
           }
 
+        MAYBE_MINIMIZE(result);
         stack_.push(result);
         print_transducer_info();
       }
@@ -2477,7 +2485,7 @@ namespace xfst {
           break;
         }
 
-      result->minimize();
+      MAYBE_MINIMIZE(result);
       delete another;
       stack_.push(result);
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
@@ -2523,6 +2531,7 @@ namespace xfst {
         stack_.pop();
         delete t;
       }
+    MAYBE_MINIMIZE(result);
     stack_.push(result);
     PRINT_INFO_PROMPT_AND_RETURN_THIS;
   }
@@ -2643,6 +2652,7 @@ namespace xfst {
       result->subtract(*t);
       delete t;
       
+      MAYBE_MINIMIZE(result);
       stack_.push(result);
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
@@ -2685,6 +2695,7 @@ namespace xfst {
       StringPairSet alpha_ = hfst::symbols::to_string_pair_set(alpha);
       HfstTransducer * sigma = new HfstTransducer(alpha_, format_);
       
+      MAYBE_MINIMIZE(sigma);
       stack_.push(sigma);
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
@@ -3057,6 +3068,7 @@ namespace xfst {
       try
         {
           HfstTransducer * tmp = new HfstTransducer(infile, format_);
+          MAYBE_MINIMIZE(tmp);
           stack_.push(tmp);
           print_transducer_info();
         }
@@ -3196,6 +3208,11 @@ namespace xfst {
           HfstTransducer* top = stack_.top();
           fprintf(outstream_, "? bytes. %i states, %i arcs, ? paths\n",
                   top->number_of_states(), top->number_of_arcs());
+          std::map<std::string,std::string>::const_iterator it = variables_.find("print-sigma");
+          if (it != variables_.end() && it->second == "ON")
+            {
+              (const_cast<XfstCompiler*>(this))->print_sigma(outstream_);
+            }
         }
       return *this;
     }

@@ -58,4 +58,4 @@ xfst-parser.cc: xfst-parser.yy
 
 xfst-lexer.cc: xfst-lexer.ll
 
-EXTRA_DIST=init_help.cc
+EXTRA_DIST=init_help.cc cmd.h abbrcmd.h
