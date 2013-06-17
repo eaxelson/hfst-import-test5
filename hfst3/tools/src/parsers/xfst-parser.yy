@@ -87,7 +87,7 @@ int hxfstlex(void);
        COMPILE_REPLACE_UPPER CLEANUP ADD_PROPS PRINT_SIGMA_WORD_COUNT SHUFFLE
        COLON SAVE_TEXT DETERMINIZE SIGMA COMPILE_REPLACE_LOWER UNION
        PRINT_DIR LIST LOWER_SIDE MINIMIZE MINUS PRINT_NAME PRUNE_NET
-       PUSH_DEFINED READ_LEXC READ_ATT TWOSIDED_FLAGS WRITE_ATT
+       PUSH_DEFINED READ_LEXC READ_ATT TWOSIDED_FLAGS WRITE_ATT ASSERT
        ERROR
        NEWLINE
 
@@ -358,6 +358,43 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        }
        | TEST_UNAMBIGUOUS END_COMMAND {
             hfst::xfst::xfst_->test_unambiguous();
+       }
+       // assertions
+       | ASSERT TEST_EQ END_COMMAND {
+            hfst::xfst::xfst_->test_eq(true);
+       }
+       | ASSERT TEST_FUNCT END_COMMAND {
+            hfst::xfst::xfst_->test_funct(true);
+       }
+       | ASSERT TEST_ID END_COMMAND {
+            hfst::xfst::xfst_->test_id(true);
+       }
+       | ASSERT TEST_LOWER_BOUNDED END_COMMAND {
+            hfst::xfst::xfst_->test_lower_bounded(true);
+       }
+       | ASSERT TEST_LOWER_UNI END_COMMAND {
+            hfst::xfst::xfst_->test_lower_uni(true);
+       }
+       | ASSERT TEST_UPPER_BOUNDED END_COMMAND {
+            hfst::xfst::xfst_->test_upper_bounded(true);
+       }
+       | ASSERT TEST_UPPER_UNI END_COMMAND {
+            hfst::xfst::xfst_->test_upper_uni(true);
+       }
+       | ASSERT TEST_NONNULL END_COMMAND {
+            hfst::xfst::xfst_->test_nonnull(true);
+       }
+       | ASSERT TEST_NULL END_COMMAND {
+            hfst::xfst::xfst_->test_null(true);
+       }
+       | ASSERT TEST_OVERLAP END_COMMAND {
+            hfst::xfst::xfst_->test_overlap(true);
+       }
+       | ASSERT TEST_SUBLANGUAGE END_COMMAND {
+            hfst::xfst::xfst_->test_sublanguage(true);
+       }
+       | ASSERT TEST_UNAMBIGUOUS END_COMMAND {
+            hfst::xfst::xfst_->test_unambiguous(true);
        }
        // substitutes
        | SUBSTITUTE_NAMED NAMETOKEN FOR LABEL END_COMMAND {

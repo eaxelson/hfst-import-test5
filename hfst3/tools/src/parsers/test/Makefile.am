@@ -39,5 +39,5 @@ EXTRA_DIST=test.sh \
 	print_net.alternative_output \
 	inspect_net.xfst inspect_net.output \
 	inspect_net.alternative_output \
-	prolog.xfst prolog.att
+	prolog.xfst prolog.att assert.xfst
 check_DATA=test.sh

@@ -150,6 +150,10 @@ LWSP [\t ]*
     return APROPOS;
 }
 
+"assert" {
+    return ASSERT;
+}
+
 "cleanup net"|"cleanup" {
     return CLEANUP;
 }
@@ -239,11 +243,6 @@ LWSP [\t ]*
 
 "extract unambiguous" {
     return EXTRACT_UNAMBIGUOUS;
-}
-
-"apropos"{WSP}+.* {
-    hxfstlval.text = hfst::xfst::strstrip(hxfsttext + strlen("describe "));
-    return DESCRIBE;
 }
 
 "help"{WSP}+.* {

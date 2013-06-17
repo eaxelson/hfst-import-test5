@@ -178,46 +178,46 @@ class XfstCompiler
   //! @brief Show all variables
   XfstCompiler& show();
 
-  XfstCompiler& test_uni(Level level);
+  XfstCompiler& test_uni(Level level, bool assertion=false);
 
   //! @brief Test top transducer in stack for equivalence
   //! @todo tests are not implemented
-  XfstCompiler& test_eq();
+  XfstCompiler& test_eq(bool assertion=false);
   //! @brief Test top transducer in stack for functionality
   //! @todo tests are not implemented
-  XfstCompiler& test_funct();
+  XfstCompiler& test_funct(bool assertion=false);
   //! @brief Test top transducer in stack for identity
   //! @todo tests are not implemented
-  XfstCompiler& test_id();
+  XfstCompiler& test_id(bool assertion=false);
   //! @brief Test top transducer in stack for upper language boundedness
   //! @todo tests are not implemented
-  XfstCompiler& test_upper_bounded();
+  XfstCompiler& test_upper_bounded(bool assertion=false);
   //! @brief Test top transducer in stack for upper language universality
   //! @todo tests are not implemented
-  XfstCompiler& test_upper_uni();
+  XfstCompiler& test_upper_uni(bool assertion=false);
   //! @brief Test top transducer in stack for lower language boundedness
   //! @todo tests are not implemented
-  XfstCompiler& test_lower_bounded();
+  XfstCompiler& test_lower_bounded(bool assertion=false);
   //! @brief Test top transducer in stack for lower language universality
   //! @todo tests are not implemented
-  XfstCompiler& test_lower_uni();
+  XfstCompiler& test_lower_uni(bool assertion=false);
   //! @brief Test top transducer in stack for not emptiness
   //! @todo tests are not implemented
-  XfstCompiler& test_nonnull();
+  XfstCompiler& test_nonnull(bool assertion=false);
   //! @brief Test top transducer in stack for emptiness
   //! \a invert_test_result defines whether the result is inverted
   //! (so that 'test_nonnull' can be implemented with the same function).
   //! @todo tests are not implemented
-  XfstCompiler& test_null(bool invert_test_result=false);
+  XfstCompiler& test_null(bool invert_test_result=false, bool assertion=false);
   //! @brief Test top transducer in stack for overlapping
   //! @todo tests are not implemented
-  XfstCompiler& test_overlap();
+  XfstCompiler& test_overlap(bool assertion=false);
   //! @brief Test top transducer in stack for sublanguage
   //! @todo tests are not implemented
-  XfstCompiler& test_sublanguage();
+  XfstCompiler& test_sublanguage(bool assertion=false);
   //! @brief Test top transducer in stack for unambiguity
   //! @todo tests are not implemented
-  XfstCompiler& test_unambiguous();
+  XfstCompiler& test_unambiguous(bool assertion=false);
 
   //! @brief Substitute labels @a src by @a target.
   XfstCompiler& substitute(const char* src, const char* target);
@@ -293,7 +293,7 @@ class XfstCompiler
   //! @brief Print all symbols of network named @a name
   XfstCompiler& print_sigma(const char* name, FILE* outfile);
   //! @brief Print all symbols of network
-  XfstCompiler& print_sigma(FILE* outfile);
+  XfstCompiler& print_sigma(FILE* outfile, bool prompt=true);
   //! @brief Print nnumber of symbols in network
   XfstCompiler& print_sigma_count(FILE* outfile);
   //! @brief Print number of paths with all symbols on @a level
@@ -577,7 +577,7 @@ class XfstCompiler
   XfstCompiler& apply_binary_operation_iteratively(BinaryOperation operation);
 
   //! @brief Print the result of \a operation when applied to the whole stack.
-  XfstCompiler& test_operation(TestOperation operation);
+  XfstCompiler& test_operation(TestOperation operation, bool assertion=false);
 
   //! @brief The topmost transducer in the stack.
   //! If empty, print a warning message and return NULL.

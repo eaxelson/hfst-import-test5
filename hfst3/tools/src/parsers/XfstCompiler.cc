@@ -71,6 +71,7 @@ using hfst::implementations::HfstBasicTransition;
 #define PRINT_INFO_PROMPT_AND_RETURN_THIS print_transducer_info(); prompt(); return *this;
 #define IF_NULL_PROMPT_AND_RETURN_THIS(x) if (x == NULL) { prompt(); return *this; }
 #define MAYBE_MINIMIZE(x) if (variables_["minimal"] == "ON") { x->minimize(); }
+#define MAYBE_ASSERT(assertion, value) if (!value && assertion && (variables_["quit-on-fail"] == "ON")) { exit(EXIT_FAILURE); }
 
 #include "help_message.cc"
 
@@ -101,7 +102,7 @@ namespace xfst {
         variables_["name-nets"] = "OFF";
         variables_["obey-flags"] = "ON";
         variables_["print-pairs"] = "OFF";
-        variables_["print-sigma"] = "ON";
+        variables_["print-sigma"] = "OFF";
         variables_["print-space"] = "OFF";
         variables_["quit-on-fail"] = "ON";
         variables_["quote-special"] = "OFF";
@@ -135,7 +136,7 @@ namespace xfst {
         variables_["name-nets"] = "OFF";
         variables_["obey-flags"] = "ON";
         variables_["print-pairs"] = "OFF";
-        variables_["print-sigma"] = "ON";
+        variables_["print-sigma"] = "OFF";
         variables_["print-space"] = "OFF";
         variables_["quit-on-fail"] = "ON";
         variables_["quote-special"] = "OFF";
@@ -1232,7 +1233,7 @@ namespace xfst {
     }
 
   XfstCompiler& 
-  XfstCompiler::test_eq() 
+  XfstCompiler::test_eq(bool assertion) 
     {
       if (stack_.size() < 2)
         {
@@ -1244,9 +1245,11 @@ namespace xfst {
       stack_.pop();
       HfstTransducer* second = stack_.top();
       stack_.pop();
-      print_bool(first->compare(*second, false));
+      bool result = first->compare(*second, false);
+      print_bool(result);
       stack_.push(second);
       stack_.push(first);
+      MAYBE_ASSERT(assertion, result);
       return *this;
     }
 
@@ -1270,13 +1273,14 @@ namespace xfst {
   }  
 
   XfstCompiler& 
-  XfstCompiler::test_funct()
+  XfstCompiler::test_funct(bool assertion)
     {
       fprintf(stderr, "test funct missing %s:%d\n", __FILE__, __LINE__);
+      //MAYBE_ASSERT(assertion, result);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
-  XfstCompiler::test_id()
+  XfstCompiler::test_id(bool assertion)
     {
       HfstTransducer * tmp = this->top();
       if (NULL == tmp) {
@@ -1288,11 +1292,13 @@ namespace xfst {
       HfstTransducer tmp_output(*tmp);
       tmp_output.output_project();
 
-      this->print_bool(tmp_input.compare(tmp_output, false));
+      bool result = tmp_input.compare(tmp_output, false);
+      this->print_bool(result);
+      MAYBE_ASSERT(assertion, result);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
-  XfstCompiler::test_upper_bounded()
+  XfstCompiler::test_upper_bounded(bool assertion)
     {
       HfstTransducer * temp = this->top();
       if (NULL == temp) {
@@ -1303,11 +1309,13 @@ namespace xfst {
       tmp.output_project();
       tmp.minimize();
       
-      this->print_bool(! tmp.is_cyclic());
+      bool result = ! tmp.is_cyclic();
+      this->print_bool(result);
+      MAYBE_ASSERT(assertion, result);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
-  XfstCompiler::test_uni(Level level)
+  XfstCompiler::test_uni(Level level, bool assertion)
     {
       HfstTransducer * temp = this->top();
       if (NULL == temp) {
@@ -1328,15 +1336,16 @@ namespace xfst {
                 "not recognized\n");
 
       this->print_bool(value);
+      MAYBE_ASSERT(assertion, value);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
-  XfstCompiler::test_upper_uni()
+  XfstCompiler::test_upper_uni(bool assertion)
     {
-      return this->test_uni(UPPER_LEVEL);
+      return this->test_uni(UPPER_LEVEL, assertion);
     }
   XfstCompiler& 
-  XfstCompiler::test_lower_bounded()
+  XfstCompiler::test_lower_bounded(bool assertion)
     {
       HfstTransducer * temp = this->top();
       if (NULL == temp) {
@@ -1347,21 +1356,24 @@ namespace xfst {
       tmp.input_project();
       tmp.minimize();
       
-      this->print_bool(! tmp.is_cyclic());
+      bool result = ! tmp.is_cyclic();
+      this->print_bool(result);
+      MAYBE_ASSERT(assertion, result);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
-  XfstCompiler::test_lower_uni()
+  XfstCompiler::test_lower_uni(bool assertion)
     {
-      return this->test_uni(LOWER_LEVEL);
+      return this->test_uni(LOWER_LEVEL, assertion);
     }
   XfstCompiler& 
-  XfstCompiler::test_nonnull()
+  XfstCompiler::test_nonnull(bool assertion)
     {
-      return this->test_null(true);
+      return this->test_null(true, assertion);
     }
   XfstCompiler& 
-  XfstCompiler::test_null(bool invert_test_result)
+  XfstCompiler::test_null(bool invert_test_result,
+                          bool assertion)
     {
       HfstTransducer * tmp = this->top();
       if (NULL == tmp) {
@@ -1374,11 +1386,12 @@ namespace xfst {
         value = !value;
       this->print_bool(value);
 
+      MAYBE_ASSERT(assertion, value);
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
-  XfstCompiler::test_operation(TestOperation operation)
+  XfstCompiler::test_operation(TestOperation operation, bool assertion)
   {
     if (stack_.size() < 2)
       {
@@ -1405,6 +1418,7 @@ namespace xfst {
             if(topmost_transducer.compare(empty))
               {
                 this->print_bool(false);
+                MAYBE_ASSERT(assertion, false);
                 PROMPT_AND_RETURN_THIS;
               }
             break;
@@ -1415,6 +1429,7 @@ namespace xfst {
               if(! intersection.compare(topmost_transducer))
                 {
                   this->print_bool(false);
+                  MAYBE_ASSERT(assertion, false);
                   PROMPT_AND_RETURN_THIS;
                 }
               topmost_transducer = next_transducer;
@@ -1426,23 +1441,25 @@ namespace xfst {
           }
       }
       this->print_bool(true);
+      MAYBE_ASSERT(assertion, true);
       PROMPT_AND_RETURN_THIS;
   }
 
   XfstCompiler& 
-  XfstCompiler::test_overlap()
+  XfstCompiler::test_overlap(bool assertion)
     {
-      return this->test_operation(TEST_OVERLAP_);
+      return this->test_operation(TEST_OVERLAP_, assertion);
     }
   XfstCompiler& 
-  XfstCompiler::test_sublanguage()
+  XfstCompiler::test_sublanguage(bool assertion)
     {
-      return this->test_operation(TEST_SUBLANGUAGE_);
+      return this->test_operation(TEST_SUBLANGUAGE_, assertion);
     }
   XfstCompiler& 
-  XfstCompiler::test_unambiguous()
+  XfstCompiler::test_unambiguous(bool assertion)
     {
       fprintf(stderr, "test unambiguous missing %s:%d\n", __FILE__, __LINE__);
+      //MAYBE_ASSERT(assertion, result);
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -2003,11 +2020,13 @@ namespace xfst {
   }
 
   XfstCompiler& 
-  XfstCompiler::print_sigma(FILE* outfile)
+  XfstCompiler::print_sigma(FILE* outfile, bool prompt)
     {
       hfst::StringSet alpha = stack_.top()->get_alphabet();
       print_alphabet(alpha, outfile);
-      PROMPT_AND_RETURN_THIS;
+      if (prompt)
+        this->prompt();
+      return *this;
     }
   XfstCompiler& 
   XfstCompiler::print_sigma(const char* /*name*/, FILE* outfile)
@@ -3211,7 +3230,7 @@ namespace xfst {
           std::map<std::string,std::string>::const_iterator it = variables_.find("print-sigma");
           if (it != variables_.end() && it->second == "ON")
             {
-              (const_cast<XfstCompiler*>(this))->print_sigma(outstream_);
+              (const_cast<XfstCompiler*>(this))->print_sigma(outstream_, false /* no prompt*/);
             }
         }
       return *this;
