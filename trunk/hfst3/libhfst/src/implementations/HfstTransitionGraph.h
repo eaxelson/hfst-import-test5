@@ -547,6 +547,30 @@
            state_vector[s].push_back(transition);
      }
 
+     /** @brief Remove transition \a transition from state \a s.
+                \a remove_symbols_from_alphabet defines whether
+                symbols in \a transition are removed from the alphabet
+                if they are no longer used in the graph.
+
+         If \a state or \a transition does not exist, nothing is done. */
+     void remove_transition(HfstState s, const HfstTransition<C> & transition,
+                            bool remove_symbols_from_alphabet=false)
+     {
+       if (state_vector.size() > s)
+         state_vector[s].erase(transition);
+       else
+         return;
+
+       if (remove_symbols_from_alphabet)
+         {
+           HfstTransitionGraphAlphabet alpha = this->symbols_used();
+           if (alpha.find(transition.get_input_symbol()) == alpha.end())
+             this->remove_symbol_from_alphabet(transition.get_input_symbol());
+           if (alpha.find(transition.get_output_symbol()) == alpha.end())
+             this->remove_symbol_from_alphabet(transition.get_output_symbol());
+         }
+     }
+
          /** @brief Whether state \a s is final. 
          FIXME: return positive infinity instead if not final. */
          bool is_final_state(HfstState s) const {
