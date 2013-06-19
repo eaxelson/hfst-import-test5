@@ -219,10 +219,10 @@ class XfstCompiler
   //! @todo tests are not implemented
   XfstCompiler& test_unambiguous(bool assertion=false);
 
-  //! @brief Substitute labels @a src by @a target.
-  XfstCompiler& substitute(const char* src, const char* target);
-  //! @brief Substitute all labels in @a list by @a target.
-  XfstCompiler& substitute_list(const char* list, const char* target);
+  //! @brief Substitute all labels @a list by @a target.
+  XfstCompiler& substitute_label(const char* list, const char* target);
+  //! @brief Substitute all symbols in @a list by @a target.
+  XfstCompiler& substitute_symbol(const char* list, const char* target);
 
   //! @brief Print aliases
   XfstCompiler& print_aliases(FILE* outfile);

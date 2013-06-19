@@ -277,7 +277,7 @@ LWSP [\t ]*
 }
 
 "label net" {
-    return LABEL;
+    return LABEL_NET;
 }
 
 "list" {

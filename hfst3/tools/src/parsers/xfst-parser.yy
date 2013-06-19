@@ -59,7 +59,7 @@ int hxfstlex(void);
 }
 
 %token <text> APROPOS DESCRIBE ECHO SYSTEM QUIT HFST
-%token <name> NAMETOKEN GLOB PROTOTYPE LABEL
+%token <name> NAMETOKEN NAMECHAR GLOB PROTOTYPE
               DEFINE_NAME DEFINE_FUNCTION
 %token <number> NUMBER
 %token <list> RANGE
@@ -87,14 +87,14 @@ int hxfstlex(void);
        COMPILE_REPLACE_UPPER CLEANUP ADD_PROPS PRINT_SIGMA_WORD_COUNT SHUFFLE
        COLON SAVE_TEXT DETERMINIZE SIGMA COMPILE_REPLACE_LOWER UNION
        PRINT_DIR LIST LOWER_SIDE MINIMIZE MINUS PRINT_NAME PRUNE_NET
-       PUSH_DEFINED READ_LEXC READ_ATT TWOSIDED_FLAGS WRITE_ATT ASSERT
+       PUSH_DEFINED READ_LEXC READ_ATT TWOSIDED_FLAGS WRITE_ATT ASSERT LABEL_NET
        ERROR
        NEWLINE
 
 %token <text> REGEX
 %token <text> APPLY_INPUT
     
-%type <text> COMMAND_SEQUENCE NAMETOKEN_LIST LABEL_LIST
+%type <text> COMMAND_SEQUENCE NAMETOKEN_LIST LABEL_LIST LABEL
 %%
 
 XFST_SCRIPT: COMMAND_LIST 
@@ -397,18 +397,18 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->test_unambiguous(true);
        }
        // substitutes
-       | SUBSTITUTE_NAMED NAMETOKEN FOR LABEL END_COMMAND {
-            hfst::xfst::xfst_->substitute($2, $4);
+       | SUBSTITUTE_NAMED NAMETOKEN FOR NAMETOKEN END_COMMAND {
+            hfst::xfst::xfst_->substitute_symbol($2, $4); // TODO!
             free($2);
             free($4);
        }
        | SUBSTITUTE_LABEL LABEL_LIST FOR LABEL END_COMMAND {
-            hfst::xfst::xfst_->substitute($2, $4);
+            hfst::xfst::xfst_->substitute_label($2, $4);
             free($2);
             free($4);
        }
        | SUBSTITUTE_SYMBOL NAMETOKEN_LIST FOR NAMETOKEN END_COMMAND {
-            hfst::xfst::xfst_->substitute_list($2, $4);
+            hfst::xfst::xfst_->substitute_symbol($2, $4);
             free($2);
             free($4);
        }
@@ -972,7 +972,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | UNION END_COMMAND {
             hfst::xfst::xfst_->union_net();
        }
-       | LABEL END_COMMAND {
+       | LABEL_NET END_COMMAND {
             hfst::xfst::xfst_->label_net();
        }
        | COMPILE_REPLACE_LOWER END_COMMAND {
@@ -1021,32 +1021,6 @@ COMMAND_SEQUENCE: COMMAND_SEQUENCE NAMETOKEN {
                 }
                 ;
 
-
-LABEL_LIST: LABEL_LIST LABEL {
-            $$ = static_cast<char*>(malloc(sizeof(char)*strlen($1) + strlen($2) + 1));
-            char* s = $1;
-            char* r = $$;
-            while (*s != '\0')
-            {
-                *r = *s;
-                r++;
-                s++;
-            }
-            s = $2;
-            while (*s != '\0')
-            {
-                *r = *s;
-                r++;
-                s++;
-            }
-            *r = '\0';
-          }
-          | LABEL {
-            $$ = $1;
-          }
-          ;
-
-
 NAMETOKEN_LIST: NAMETOKEN_LIST NAMETOKEN {
                 $$ = static_cast<char*>(malloc(sizeof(char)*strlen($1)+strlen($2)+2));
                 char* s = $1;
@@ -1069,6 +1043,40 @@ NAMETOKEN_LIST: NAMETOKEN_LIST NAMETOKEN {
                 *r = '\0';
              }
              | NAMETOKEN {
+                $$ = $1;
+             }
+             ;
+
+LABEL: NAMETOKEN COLON NAMETOKEN {
+                $$ = strdup((std::string($1) + std::string(":") + std::string($3)).c_str());
+                }
+                | NAMETOKEN {
+                $$ = $1;
+                }
+                ;
+
+LABEL_LIST: LABEL_LIST LABEL {
+                $$ = static_cast<char*>(malloc(sizeof(char)*strlen($1)+strlen($2)+2));
+                char* s = $1;
+                char* r = $$;
+                while (*s != '\0')
+                {
+                    *r = *s;
+                    r++;
+                    s++;
+                }
+                *r = ' ';
+                r++;
+                s = $2;
+                while (*s != '\0')
+                {
+                    *r = *s;
+                    r++;
+                    s++;
+                }
+                *r = '\0';
+             }
+             | LABEL {
                 $$ = $1;
              }
              ;
