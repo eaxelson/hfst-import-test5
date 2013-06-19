@@ -72,6 +72,7 @@ using hfst::implementations::HfstBasicTransition;
 #define IF_NULL_PROMPT_AND_RETURN_THIS(x) if (x == NULL) { prompt(); return *this; }
 #define MAYBE_MINIMIZE(x) if (variables_["minimal"] == "ON") { x->minimize(); }
 #define MAYBE_ASSERT(assertion, value) if (!value && assertion && (variables_["quit-on-fail"] == "ON")) { exit(EXIT_FAILURE); }
+#define MAYBE_QUIT if(variables_["quit-on-fail"] == "ON") { exit(EXIT_FAILURE); }
 
 #include "help_message.cc"
 
@@ -98,6 +99,7 @@ namespace xfst {
         variables_["copyright-owner"] = "Copyleft (c) University of Helsinki";
         variables_["directory"] = "OFF";
         variables_["flag-is-epsilon"] = "OFF";
+        variables_["hopcroft-min"] = "ON";
         variables_["minimal"] = "ON";
         variables_["name-nets"] = "OFF";
         variables_["obey-flags"] = "ON";
@@ -132,6 +134,7 @@ namespace xfst {
         variables_["copyright-owner"] = "Copyleft (c) University of Helsinki";
         variables_["directory"] = "OFF";
         variables_["flag-is-epsilon"] = "OFF";
+        variables_["hopcroft-min"] = "ON";
         variables_["minimal"] = "ON";
         variables_["name-nets"] = "OFF";
         variables_["obey-flags"] = "ON";
@@ -1200,6 +1203,13 @@ namespace xfst {
   XfstCompiler::set(const char* name, const char* text)
     {
       variables_[name] = text;
+      if (strcmp(name, "hopcroft-min") == 0)
+        {
+          if (strcmp(text, "ON") == 0)
+            hfst::set_minimization_algorithm(hfst::HOPCROFT);
+          if (strcmp(text, "OFF") == 0)
+            hfst::set_minimization_algorithm(hfst::BRZOZOWSKI);
+        }
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -1463,20 +1473,85 @@ namespace xfst {
       PROMPT_AND_RETURN_THIS;
     }
 
+  static StringVector tokenize_string(const char * str_, char separator)
+  {
+    StringVector retval;
+    std::string str(str_);
+    size_t pos = 0;
+    for (size_t i=0; i < str.size(); i++)
+      {
+        if (str[i] == separator)
+          {
+            retval.push_back(std::string(str, pos, i-pos));
+            pos = i+1;
+          }
+      }
+    retval.push_back(std::string(str, pos));
+    return retval;
+  }
+
+  static StringPair string_vector_to_string_pair(const StringVector & sv)
+  {
+    StringPair sp;
+    if (sv.size() == 2)
+      {
+        sp.first = sv[0];
+        sp.second = sv[1];
+      }
+    else if (sv.size() == 1)
+      {
+        sp.first = sv[0];
+        sp.second = sv[0];
+      }
+    else
+      {
+        throw "error: string vector cannot be converted into string pair";
+      }
+    return sp;
+  }
+
   XfstCompiler& 
-  XfstCompiler::substitute(const char* src, const char* target)
+  XfstCompiler::substitute_label(const char* list, const char* target)
     {
       GET_TOP(top);
 
-      stack_.pop();
-      top->substitute(target, src);
-      MAYBE_MINIMIZE(top);
-      stack_.push(top);
+      StringVector labels = tokenize_string(list, ' ');
+      StringPairSet symbol_pairs;
+      for (StringVector::const_iterator it = labels.begin();
+           it != labels.end(); it++)
+        {
+          StringVector sv = tokenize_string(it->c_str(), ':');
+          try 
+            {
+              StringPair sp = string_vector_to_string_pair(sv);
+              symbol_pairs.insert(sp);
+            }
+          catch (const char * msg)
+            {
+              fprintf(errorstream_, "error: could not substitute with '%s'\n", list);
+              MAYBE_QUIT;
+              PROMPT_AND_RETURN_THIS;
+            }
+        }
 
-      PRINT_INFO_PROMPT_AND_RETURN_THIS;
+      StringVector target_vector = tokenize_string(target, ':');
+      try 
+        {
+          StringPair target_label = string_vector_to_string_pair(target_vector);
+          top->substitute(target_label, symbol_pairs);
+        }
+      catch (const char * msg)
+        {
+          fprintf(errorstream_, "error: could not substitute '%s'\n", target);
+          MAYBE_QUIT;
+        }
+
+      MAYBE_MINIMIZE(top);
+      PROMPT_AND_RETURN_THIS;
     }
+
   XfstCompiler& 
-  XfstCompiler::substitute_list(const char* list, const char* target)
+  XfstCompiler::substitute_symbol(const char* list, const char* target)
     {
       GET_TOP(top);
 
