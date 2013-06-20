@@ -96,11 +96,11 @@ LWSP [\t ]*
 %x APPLY_STATE
 %%
 
-"add properties"|"add" {
+^{LWSP}("add properties"|"add") {
     return ADD_PROPS;
 }
 
-"apply up"|"up" {
+^{LWSP}("apply up"|"up") {
     if (hfst::xfst::xfst_->getReadInteractiveTextFromStdin()) 
     {
         // let XfstCompiler take care of the input to apply up command
@@ -114,7 +114,7 @@ LWSP [\t ]*
     }
 }
 
-"apply down"|"down" {
+^{LWSP}("apply down"|"down") {
     if (hfst::xfst::xfst_->getReadInteractiveTextFromStdin()) 
     {
         // let XfstCompiler take care of the input to apply down command
@@ -128,69 +128,69 @@ LWSP [\t ]*
     }
 }
 
-"apply med"|"med" {
+^{LWSP}("apply med"|"med") {
     return APPLY_MED;
 }
 
-"ambiguous upper"|"ambiguous" {
+^{LWSP}("ambiguous upper"|"ambiguous") {
     return AMBIGUOUS;
 }
 
-"alias" {
+^{LWSP}"alias" {
     return DEFINE_ALIAS;
 }
 
-"apropos"{WSP}+.* {
+^{LWSP}"apropos"{WSP}+.* {
     hxfstlval.text = hfst::xfst::strstrip(hxfsttext + strlen("apropos "));
     return APROPOS;
 }
 
-"apropos"{WSP}* {
+^{LWSP}"apropos"{WSP}* {
     hxfstlval.text = strdup("");
     return APROPOS;
 }
 
-"assert" {
+^{LWSP}"assert" {
     return ASSERT;
 }
 
-"cleanup net"|"cleanup" {
+^{LWSP}("cleanup net"|"cleanup") {
     return CLEANUP;
 }
 
-"clear"|"clear stack" {
+^{LWSP}("clear"|"clear stack") {
     return CLEAR;
 }
 
-"collect epsilon-loops"|"epsilon-loops" {
+^{LWSP}("collect epsilon-loops"|"epsilon-loops") {
     return COLLECT_EPSILON_LOOPS;
 }
 
-"compact sigma" {
+^{LWSP}"compact sigma" {
     return COMPACT_SIGMA;
 }
 
-"compile-replace lower"|"com-rep lower" {
+^{LWSP}("compile-replace lower"|"com-rep lower") {
     return COMPILE_REPLACE_LOWER;
 }
 
-"compile-replace upper"|"com-rep upper" {
+^{LWSP}("compile-replace upper"|"com-rep upper") {
     return COMPILE_REPLACE_UPPER;
 }
 
-"complete net"|"complete" {
+^{LWSP}("complete net"|"complete") {
     return COMPLETE;
 }
 
-"compose net"|"compose" {
+^{LWSP}("compose net"|"compose") {
     return COMPOSE;
 }
 
-"concatenate net"|"concatenate" {
+^{LWSP}("concatenate net"|"concatenate") {
     return CONCATENATE;
 }
 
-"crossproduct net"|"crossproduct" {
+^{LWSP}("crossproduct net"|"crossproduct") {
     return CROSSPRODUCT;
 }
 
@@ -207,7 +207,7 @@ LWSP [\t ]*
     return DEFINE_NAME;
 }
 
-"determinize net"|"determinize"|"determinise net"|"determinise" {
+^{LWSP}("determinize net"|"determinize"|"determinise net"|"determinise") {
     return DETERMINIZE;
 }
 
@@ -216,32 +216,32 @@ LWSP [\t ]*
     return ECHO;
 }
 
-"echo"{WSP}* {
+^{LWSP}"echo"{WSP}* {
     hxfstlval.text = strdup("");
     return ECHO;
 }
 
-"edit properties"|"edit" {
+^{LWSP}("edit properties"|"edit") {
     return EDIT_PROPS;
 }
 
-"eliminate flag" {
+^{LWSP}"eliminate flag" {
     return ELIMINATE_FLAG;
 }
 
-"eliminate flags" {
+^{LWSP}"eliminate flags" {
     return ELIMINATE_ALL;
 }
 
-"epsilon-remove net"|"epsilon-remove" {
+^{LWSP}("epsilon-remove net"|"epsilon-remove") {
     return EPSILON_REMOVE;
 }
 
-"extract ambiguous" {
+^{LWSP}"extract ambiguous" {
     return EXTRACT_AMBIGUOUS;
 }
 
-"extract unambiguous" {
+^{LWSP}"extract unambiguous" {
     return EXTRACT_UNAMBIGUOUS;
 }
 
@@ -250,7 +250,7 @@ LWSP [\t ]*
     return DESCRIBE;
 }
 
-("help"|"apropos"){WSP}* {
+^{LWSP}("help"|"apropos"){WSP}* {
     hxfstlval.text = strdup("");
     return DESCRIBE;
 }
@@ -260,254 +260,254 @@ LWSP [\t ]*
     return HFST;
 }
 
-"ignore net"|"ignore" {
+^{LWSP}("ignore net"|"ignore") {
     return IGNORE;
 }
 
-"intersect net"|"intersect"|"conjunct" {
+^{LWSP}("intersect net"|"intersect"|"conjunct") {
     return INTERSECT;
 }
 
-"inspect"|"inspect net" {
+^{LWSP}("inspect"|"inspect net") {
     return INSPECT;
 }
 
-"invert net"|"invert" {
+^{LWSP}("invert net"|"invert") {
     return INVERT;
 }
 
-"label net" {
+^{LWSP}("label net") {
     return LABEL_NET;
 }
 
-"list" {
+^{LWSP}("list") {
     return LIST;
 }
 
-"load defined"|"loadd" {
+^{LWSP}("load defined"|"loadd") {
     return LOADD;
 }
 
-"load"|"load stack" {
+^{LWSP}("load"|"load stack") {
     return LOADS;
 }
 
-"lower-side net"|"lower-side" {
+^{LWSP}("lower-side net"|"lower-side") {
     return LOWER_SIDE;
 }
 
-"minimize net"|"minimize"|"minimise" {
+^{LWSP}("minimize net"|"minimize"|"minimise") {
     return MINIMIZE;
 }
 
-"minus net"|"minus"|"subtract" {
+^{LWSP}("minus net"|"minus"|"subtract") {
     return MINUS;
 }
 
-"name net"|"name" {
+^{LWSP}("name net"|"name") {
     return NAME;
 }
 
-"negate net"|"negate" {
+^{LWSP}("negate net"|"negate") {
     return NEGATE;
 }
 
-"one-plus net"|"one-plus" {
+^{LWSP}("one-plus net"|"one-plus") {
     return ONE_PLUS;
 }
 
-"pop"|"pop stack" {
+^{LWSP}("pop"|"pop stack") {
     return POP;
 }
 
-"print aliases"|"aliases" {
+^{LWSP}("print aliases"|"aliases") {
     return PRINT_ALIASES;
 }
-"print arc-tally"|"arc-tally" {
+^{LWSP}("print arc-tally"|"arc-tally") {
     return PRINT_ARCCOUNT;
 }
-"print defined"|"pdefined" {
+^{LWSP}("print defined"|"pdefined") {
     return PRINT_DEFINED;
 }
-"write definition"|"wdef" {
+^{LWSP}("write definition"|"wdef") {
     return SAVE_DEFINITION;
 }
 
-"write definitions"|"wdefs" {
+^{LWSP}("write definitions"|"wdefs") {
     return SAVE_DEFINITIONS;
 }
 
-"print directory"|"directory" {
+^{LWSP}("print directory"|"directory") {
     return PRINT_DIR;
 }
 
-"write dot"|"wdot"|"dot" {
+^{LWSP}("write dot"|"wdot"|"dot") {
     return SAVE_DOT;
 }
-"write att"|"att" {
+^{LWSP}("write att"|"att") {
     return WRITE_ATT;
 }
 
-"print file-info"|"file-info" {
+^{LWSP}("print file-info"|"file-info") {
     return PRINT_FILE_INFO;
 }
-"print flags"|"flags" {
+^{LWSP}("print flags"|"flags") {
     return PRINT_FLAGS;
 }
-"print labels"|"labels" {
+^{LWSP}("print labels"|"labels") {
     return PRINT_LABELS;
 }
-"print label-maps"|"label-maps" {
+^{LWSP}("print label-maps"|"label-maps") {
     return PRINT_LABELMAPS;
 }
-"print label-tally"|"label-tally" {
+^{LWSP}("print label-tally"|"label-tally") {
     return PRINT_LABEL_COUNT;
 }
-"print list" {
+^{LWSP}"print list" {
     return PRINT_LIST;
 }
-"print lists" {
+^{LWSP}"print lists" {
     return PRINT_LISTS;
 }
-"print longest-string"|"longest-string"|"pls" {
+^{LWSP}("print longest-string"|"longest-string"|"pls") {
     return PRINT_LONGEST_STRING;
 }
-"print longest-string-size"|"longest-string-size"|"plz" {
+^{LWSP}("print longest-string-size"|"longest-string-size"|"plz") {
     return PRINT_LONGEST_STRING_SIZE;
 }
-"print lower-words"|"lower-words" {
+^{LWSP}("print lower-words"|"lower-words") {
     return PRINT_LOWER_WORDS;
 }
-"print name"|"pname" {
+^{LWSP}("print name"|"pname") {
     return PRINT_NAME;
 }
-"print net" {
+^{LWSP}("print net") {
     return PRINT;
 }
-("print"|"write")" properties"|"props" {
+^{LWSP}("print"|"write")" "("properties"|"props") {
     return PRINT_PROPS;
 }
-"print random-lower"|"random-lower" {
+^{LWSP}("print random-lower"|"random-lower") {
     return PRINT_RANDOM_LOWER;
 }
-"print random-upper"|"random-upper" {
+^{LWSP}("print random-upper"|"random-upper") {
     return PRINT_RANDOM_UPPER;
 }
-"print random-words"|"random-words" {
+^{LWSP}("print random-words"|"random-words") {
     return PRINT_RANDOM_WORDS;
 }
-"print shortest-string-"("size"|"length")|"shortest-string-size"|"psz" {
+^{LWSP}("print shortest-string-"("size"|"length")|"shortest-string-size"|"psz") {
     return PRINT_SHORTEST_STRING_SIZE;
 }
-"print shortest-string"|"shortest-string"|"pss" {
+^{LWSP}("print shortest-string"|"shortest-string"|"pss") {
     return PRINT_SHORTEST_STRING;
 }
-"print sigma"|"sigma" {
+^{LWSP}("print sigma"|"sigma") {
     return PRINT_SIGMA;
 }
-"print sigma-tally"|"sigma-tally"|"sitally" {
+^{LWSP}("print sigma-tally"|"sigma-tally"|"sitally") {
     return PRINT_SIGMA_COUNT;
 }
-"print sigma-word-tally" {
+^{LWSP}"print sigma-word-tally" {
     return PRINT_SIGMA_WORD_COUNT;
 }
-"print size"|"size" {
+^{LWSP}("print size"|"size") {
     return PRINT_SIZE;
 }
-"print stack"|"stack" {
+^{LWSP}("print stack"|"stack") {
     return PRINT_STACK;
 }
-"print upper-words"|"upper-words" {
+^{LWSP}("print upper-words"|"upper-words") {
     return PRINT_UPPER_WORDS;
 }
 
-"print words"|"words" {
+^{LWSP}("print words"|"words") {
     return PRINT_WORDS;
 }
-"prune net"|"prune" {
+^{LWSP}("prune net"|"prune") {
     return PRUNE_NET;
 }
 
 
-"push"|"push defined" {
+^{LWSP}("push"|"push defined") {
     return PUSH_DEFINED;
 }
 
-"quit"|"exit"|"bye"|"stop"|"hyvästi"|"au revoir"|"näkemiin"|"viszlát"|"auf wiedersehen"|"hasta la vista"|"arrivederci"|"dodongo" {
-    hxfstlval.name = strdup(yytext);
-    return QUIT;
+^{LWSP}("quit"|"exit"|"bye") {
+    hxfstlval.name = strdup("");         
+    return QUIT;                         
 }
 
-"lexc"|"read lexc" {
+^{LWSP}("lexc"|"read lexc") {
     return READ_LEXC;
 }
 
-"att"|"read att" {
+^{LWSP}("att"|"read att") {
     return READ_ATT;
 }
 
-"read properties"|"rprops" {
+^{LWSP}("read properties"|"rprops") {
     return READ_PROPS;
 }
-"read prolog"|"rpl" {
+^{LWSP}("read prolog"|"rpl") {
     return READ_PROLOG;
 }
-"regex"|"read regex" {
+^{LWSP}("regex"|"read regex") {
     BEGIN(REGEX_STATE);
     return READ_REGEX;
 }
-"rs"|"read spaced-text" {
+^{LWSP}("rs"|"read spaced-text") {
     return READ_SPACED;
 }
-"rt"|"read text" {
+^{LWSP}("rt"|"read text") {
     return READ_TEXT;
 }
 
-"reverse net"|"reverse" {
+^{LWSP}("reverse net"|"reverse") {
     return REVERSE;
 }
 
-"rotate"|"rotate stack" {
+^{LWSP}("rotate"|"rotate stack") {
     return ROTATE;
 }
 
-"save defined"|"saved" {
+^{LWSP}("save defined"|"saved") {
     return SAVE_DEFINITIONS;
 }
 
-"save stack"|"save"|"ss" {
+^{LWSP}("save stack"|"save"|"ss") {
     return SAVE_STACK;
 }
 
-"set" {
+^{LWSP}"set" {
     return SET;
 }
 
-"show variables" {
+^{LWSP}"show variables" {
     return SHOW_ALL;
 }
 
-"show variable"|"show" {
+^{LWSP}("show variable"|"show") {
     return SHOW;
 }
 
-"shuffle net"|"shuffle" {
+^{LWSP}("shuffle net"|"shuffle") {
     return SHUFFLE;
 }
 
-"sigma net" {
+^{LWSP}"sigma net" {
     return SIGMA;
 }
 
-"sort net"|"sort" {
+^{LWSP}("sort net"|"sort") {
     return SORT;
 }
 
-"source" {
+^{LWSP}"source" {
     BEGIN(SOURCE_STATE);
 }
 
-"substitute defined" {
+^{LWSP}"substitute defined" {
     return SUBSTITUTE_NAMED;
 }
 
@@ -515,15 +515,15 @@ LWSP [\t ]*
     return FOR;
 }
 
-"substitute label" {
+^{LWSP}"substitute label" {
     return SUBSTITUTE_LABEL;
 }
 
-"substitute symbol" {
+^{LWSP}"substitute symbol" {
     return SUBSTITUTE_SYMBOL;
 }
 
-"substring net"|"substring" {
+^{LWSP}("substring net"|"substring") {
     return SUBSTRING;
 }
 
@@ -569,45 +569,45 @@ LWSP [\t ]*
     return TEST_UNAMBIGUOUS;
 }
 
-"turn"|"turn stack" {
+^{LWSP}("turn"|"turn stack") {
     return TURN;
 }
 
-"twosided flag-diacritics"|"tfd" {
+^{LWSP}("twosided flag-diacritics"|"tfd") {
     return TWOSIDED_FLAGS;
 }
 
-"undefine" {
+^{LWSP}"undefine" {
     return UNDEFINE;
 }
 
-"unlist" {
+^{LWSP}"unlist" {
     return UNLIST;
 }
 
-"union net"|"union"|"disjunct" {
+^{LWSP}("union net"|"union"|"disjunct") {
     return UNION;
 }
 
-"upper-side net"|"upper-side" {
+^{LWSP}("upper-side net"|"upper-side") {
     return UPPER_SIDE;
 }
 
-"view net" {
+^{LWSP}"view net" {
     return VIEW;
 }
 
-"wpl"|"write prolog" {
+^{LWSP}("wpl"|"write prolog") {
     return SAVE_PROLOG;
 }
-"wspaced-text"|"write spaced-text" {
+^{LWSP}("wspaced-text"|"write spaced-text") {
     return SAVE_SPACED;
 }
-"wt"|"write text" {
+^{LWSP}("wt"|"write text") {
     return SAVE_TEXT;
 }
 
-"zero-plus net"|"zero-plus" {
+^{LWSP}("zero-plus net"|"zero-plus") {
     return ZERO_PLUS;
 }
 
