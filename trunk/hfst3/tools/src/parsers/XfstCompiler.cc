@@ -1473,14 +1473,15 @@ namespace xfst {
       PROMPT_AND_RETURN_THIS;
     }
 
-  static StringVector tokenize_string(const char * str_, char separator)
+  // Tokenize string \a s using \a c as separator.
+  static StringVector tokenize_string(const char * s, char c)
   {
     StringVector retval;
-    std::string str(str_);
+    std::string str(s);
     size_t pos = 0;
     for (size_t i=0; i < str.size(); i++)
       {
-        if (str[i] == separator)
+        if (str[i] == c)
           {
             retval.push_back(std::string(str, pos, i-pos));
             pos = i+1;
@@ -1490,6 +1491,7 @@ namespace xfst {
     return retval;
   }
 
+  // Convert StringVector \a sv into StringPair.
   static StringPair string_vector_to_string_pair(const StringVector & sv)
   {
     StringPair sp;
@@ -1515,11 +1517,13 @@ namespace xfst {
     {
       GET_TOP(top);
 
+      // tokenize list into labels
       StringVector labels = tokenize_string(list, ' ');
       StringPairSet symbol_pairs;
       for (StringVector::const_iterator it = labels.begin();
            it != labels.end(); it++)
         {
+          // tokenize labels into string pairs
           StringVector sv = tokenize_string(it->c_str(), ':');
           try 
             {
@@ -1534,6 +1538,7 @@ namespace xfst {
             }
         }
 
+      // tokenize target label into string pair
       StringVector target_vector = tokenize_string(target, ':');
       try 
         {
@@ -1557,12 +1562,11 @@ namespace xfst {
 
       stack_.pop();
 
-      // `[ [TR] , s , L ]
+      // use regex parser:  `[ [TR] , s , L ]
       xre_.define("TempXfstTransducerName", *top);
       std::string subst_regex("`[ [TempXfstTransducerName] , ");
-      subst_regex = subst_regex + std::string(target) + " , ";
-      subst_regex = subst_regex +  std::string(list);
-      subst_regex = subst_regex + " ]";
+      subst_regex += std::string(target) + " , " 
+        +  std::string(list) + " ]";
 
       HfstTransducer * substituted = xre_.compile(subst_regex);
       xre_.undefine("TempXfstTransducerName");
