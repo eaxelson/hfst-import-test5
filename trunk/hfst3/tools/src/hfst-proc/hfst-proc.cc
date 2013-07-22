@@ -292,26 +292,13 @@ int main(int argc, char **argv)
       processCompounds = true;
       break;
     case 'c':
-    case 'w':
-      if(capitalization==0)
-        capitalization=c;
-      else
-      {
-        std::cerr << "Multiple capitalisation modes given" << std::endl;
-        print_short_help();
-        return EXIT_FAILURE;
-      }
+      capitalization=c;
       break;
-
+    case 'w':
+      capitalization=c;
+      break;
     case 'X':
-      if(capitalization==0)
-        capitalization=c;
-      else
-      {
-        std::cerr << "Multiple capitalisation modes given" << std::endl;
-        print_short_help();
-        return EXIT_FAILURE;
-      }
+      capitalization=c;
       break;
     
     case 'z':
