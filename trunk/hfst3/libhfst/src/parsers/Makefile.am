@@ -31,6 +31,8 @@ LEXC_BUILT=lexc-parser.hh
 
 BUILT_SOURCES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT)
 
+CLEANFILES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) lexc-lexer.cc lexc-parser.cc
+
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
