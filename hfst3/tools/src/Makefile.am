@@ -309,6 +309,8 @@ install-exec-hook:
 
 BUILT_SOURCES=hfst-scanner.h hfst-compiler.hh $(hfst_lexc2fst_BUILT) 
 
+CLEANFILES=hfst-scanner.h hfst-compiler.hh hfst-compiler.cc $(hfst_lexc2fst_BUILT) 
+
 # make make realise headers automatically follow from flexing
 hfst-scanner.h: hfst-scanner.cc
 
