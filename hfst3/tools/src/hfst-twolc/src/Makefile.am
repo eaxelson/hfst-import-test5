@@ -105,6 +105,16 @@ hfst-twolc-loc$(EXEEXT): hfst-twolc.sh
 clean-local:
 	-rm -f hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT) hfst-twolc-system$(EXEEXT)
 
+if HH_EXTENSION_USED
+else
+htwolcpre1.hh: htwolcpre1.h
+	mv $< $@
+htwolcpre2.hh: htwolcpre2.h
+	mv $< $@
+htwolcpre3.hh: htwolcpre3.h
+	mv $< $@
+endif
+
 HFST_TWOLC_TESTS=string_manipulation InputReader Alphabet \
                  OtherSymbolTransducer Rule LeftArrowRule RightArrowRule \
                  RuleContainer LeftArrowRuleContainer RightArrowRuleContainer \
