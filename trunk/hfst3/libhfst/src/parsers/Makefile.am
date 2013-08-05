@@ -36,6 +36,16 @@ CLEANFILES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) lexc-lexer.cc lexc-parser.
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
+if HH_EXTENSION_USED
+else
+xre_parse.hh: xre_parse.h
+	mv $< $@
+pmatch_parse.hh: pmatch_parse.h
+	mv $< $@
+lexc-parser.hh: lexc-parser.h
+	mv $< $@
+endif
+
 libhfstparsers_la_SOURCES=$(SFST_SRCS) $(XRE_SRCS) $(PMATCH_SRCS) $(LEXC_SRCS)
 
 AM_CPPFLAGS=-I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/libhfst/src \

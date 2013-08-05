@@ -320,3 +320,9 @@ hfst_calculate_CXXFLAGS= -Wall -Wno-error -Wno-sign-compare -Wno-deprecated
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c 
 
+if HH_EXTENSION_USED
+else
+hfst-compiler.hh: hfst-compiler.h
+	mv $< $@
+endif
+

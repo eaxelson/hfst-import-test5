@@ -519,6 +519,9 @@ LEX_VERSION=`$LEX --version`
 AS_IF([test -z "`echo "$LEX_VERSION" | grep 'flex 2\.[[5-9]]\.[[3-9][4-9]]'`"],
       [AC_MSG_WARN([Building hfst successfully requires flex newer than 2.5.33 on some platforms. Unless you are building with pre-flex-generated sources, building will probably fail.])])
 
+# if automake is >= 1.12
+AM_CONDITIONAL([HH_EXTENSION_USED], [automake --version | head -1 | grep ' 1\.1[2-9]'])
+
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
