@@ -398,7 +398,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        }
        // substitutes
        | SUBSTITUTE_NAMED NAMETOKEN FOR NAMETOKEN END_COMMAND {
-            hfst::xfst::xfst_->substitute_symbol($2, $4); // TODO!
+            hfst::xfst::xfst_->substitute_named($2, $4); // TODO!
             free($2);
             free($4);
        }
