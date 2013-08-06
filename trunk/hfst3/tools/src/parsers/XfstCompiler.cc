@@ -1513,6 +1513,47 @@ namespace xfst {
   }
 
   XfstCompiler& 
+  XfstCompiler::substitute_named(const char* variable, const char* label)
+    {
+      GET_TOP(top);
+
+      std::map<std::string, HfstTransducer*>::const_iterator it 
+        = definitions_.find(variable);
+      if (it == definitions_.end())
+        {
+          fprintf(errorstream_, "no such definition '%s', cannot substitute\n", 
+                  variable);
+          return *this;
+        }
+      
+      HfstBasicTransducer fsm(*top);
+      
+      for (HfstBasicTransducer::const_iterator it = fsm.begin();       
+           it != fsm.end(); it++ ) 
+        {      
+          for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it  
+                 = it->begin(); tr_it != it->end(); tr_it++)       
+            {
+              std::string labelstr(label);
+              std::string isymbol = tr_it->get_input_symbol();
+              std::string osymbol = tr_it->get_output_symbol();
+              if (isymbol != osymbol && 
+                  (isymbol == labelstr || osymbol == labelstr))
+                {
+                  fprintf(errorstream_, "label '%s' is used as a symbol on one "
+                          "side of an arc, cannot subtitute\n", label);
+                  return *this;
+                }
+            }
+        }
+
+      StringPair labelpair(label, label);
+      top->substitute(labelpair, *(it->second));
+
+      return *this;
+    }
+
+  XfstCompiler& 
   XfstCompiler::substitute_label(const char* list, const char* target)
     {
       GET_TOP(top);

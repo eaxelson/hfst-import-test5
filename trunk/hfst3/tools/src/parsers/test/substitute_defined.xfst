@@ -1,0 +1,13 @@
+define Foo a:d c:d;
+regex x y:z x;
+substitute defined Foo for x
+minimize net
+write att
+echo --
+regex x y:z x;
+substitute defined Foo for y
+write att
+echo --
+substitute defined Bar for x
+write att
+quit

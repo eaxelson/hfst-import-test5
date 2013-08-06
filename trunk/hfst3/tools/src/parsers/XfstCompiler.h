@@ -219,6 +219,8 @@ class XfstCompiler
   //! @todo tests are not implemented
   XfstCompiler& test_unambiguous(bool assertion=false);
 
+
+  XfstCompiler& substitute_named(const char* variable, const char* label);
   //! @brief Substitute all labels @a list by @a target.
   XfstCompiler& substitute_label(const char* list, const char* target);
   //! @brief Substitute all symbols in @a list by @a target.
