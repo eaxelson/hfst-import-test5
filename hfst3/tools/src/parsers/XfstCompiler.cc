@@ -1551,6 +1551,7 @@ namespace xfst {
 
       StringPair labelpair(label, label);
       top->substitute(labelpair, *(it->second));
+      top->remove_from_alphabet(label);
 
       MAYBE_MINIMIZE(top);
       PROMPT_AND_RETURN_THIS;
