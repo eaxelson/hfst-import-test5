@@ -1836,7 +1836,7 @@
 
            return;
          }
-
+         
          /* A function that performs in-place substitutions in the graph
             as defined in \a substitutions. */
          void substitute_(const HfstNumberPairSubstitutions &substitutions)
@@ -1884,10 +1884,41 @@
            return;
          }
 
+         /* A function that performs in-place removal of all transitions
+            equivalent to \a sp in the graph. */
+         void remove_transitions(const HfstSymbolPair &sp)
+         {
+           unsigned int input_number = C::get_number(sp.first);
+           unsigned int output_number = C::get_number(sp.second);
+
+           // ----- Go through all states -----
+           for (iterator it = begin(); it != end(); it++)
+             {
+               // Go through all transitions of the current state
+               for (unsigned int i=0; i < it->size(); i++)
+                 {
+                   HfstTransition<C> &tr_it = it->operator[](i);
+
+                   // If a match was found, remove the transition:
+                   if (tr_it.get_input_number() == input_number &&
+                       tr_it.get_output_number() == output_number)
+                     {
+                       it->erase(it->begin()+i);
+                     }
+                 }
+             }
+           // todo: handle the alphabet
+         }
+
          /* A function that performs in-place-substitution in the graph. */
          void substitute_(const HfstSymbolPair &old_sp, 
                           const HfstSymbolPairSet &new_sps)
          {
+           if (new_sps.empty())
+             {
+               return remove_transitions(old_sp);
+             }
+
            unsigned int old_input_number = C::get_number(old_sp.first);
            unsigned int old_output_number = C::get_number(old_sp.second);
 
@@ -1922,7 +1953,7 @@
                           C::get_number(IT->second),
                           tr_it.get_weight(),
                           true);
-
+                       
                        it->operator[](i) = tr;
 
                        // and schedule the rest of the substituting transitions
@@ -1943,7 +1974,7 @@
                      } // (substitution and scheduling done)       
 
                  } // (all transitions of a state gone through)
-
+               
                // Add the new transitions to the current state
                for (typename HfstTransitions
                       ::const_iterator NIT = new_transitions.begin();
@@ -1970,9 +2001,10 @@
              syms.insert(C::get_number(it->second));
            }
            prune_alphabet_after_substitution(syms);
-
+           
            return;
-     }
+         }
+             
 
      /* A function that performs in-place-substitution in the graph. */
      void substitute_(bool (*func)
@@ -3211,7 +3243,7 @@
       HfstFastTransducer;
 
  
-  }
+       }
    
 }
 
