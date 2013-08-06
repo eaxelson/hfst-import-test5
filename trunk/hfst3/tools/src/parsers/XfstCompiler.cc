@@ -106,7 +106,7 @@ namespace xfst {
         variables_["print-pairs"] = "OFF";
         variables_["print-sigma"] = "OFF";
         variables_["print-space"] = "OFF";
-        variables_["quit-on-fail"] = "ON";
+        variables_["quit-on-fail"] = "OFF";
         variables_["quote-special"] = "OFF";
         variables_["random-seed"] = "ON";
         variables_["recode-cp1252"] = "NEVER";
@@ -141,7 +141,7 @@ namespace xfst {
         variables_["print-pairs"] = "OFF";
         variables_["print-sigma"] = "OFF";
         variables_["print-space"] = "OFF";
-        variables_["quit-on-fail"] = "ON";
+        variables_["quit-on-fail"] = "OFF";
         variables_["quote-special"] = "OFF";
         variables_["random-seed"] = "ON";
         variables_["recode-cp1252"] = "NEVER";
@@ -1523,7 +1523,8 @@ namespace xfst {
         {
           fprintf(errorstream_, "no such definition '%s', cannot substitute\n", 
                   variable);
-          return *this;
+          MAYBE_QUIT;
+          PROMPT_AND_RETURN_THIS;
         }
       
       HfstBasicTransducer fsm(*top);
@@ -1541,8 +1542,9 @@ namespace xfst {
                   (isymbol == labelstr || osymbol == labelstr))
                 {
                   fprintf(errorstream_, "label '%s' is used as a symbol on one "
-                          "side of an arc, cannot subtitute\n", label);
-                  return *this;
+                          "side of an arc, cannot substitute\n", label);
+                  MAYBE_QUIT;
+                  PROMPT_AND_RETURN_THIS;
                 }
             }
         }
@@ -1550,7 +1552,8 @@ namespace xfst {
       StringPair labelpair(label, label);
       top->substitute(labelpair, *(it->second));
 
-      return *this;
+      MAYBE_MINIMIZE(top);
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -1559,23 +1562,27 @@ namespace xfst {
       GET_TOP(top);
 
       // tokenize list into labels
-      StringVector labels = tokenize_string(list, ' ');
       StringPairSet symbol_pairs;
-      for (StringVector::const_iterator it = labels.begin();
-           it != labels.end(); it++)
+
+      if (strcmp("NOTHING", list) != 0)
         {
-          // tokenize labels into string pairs
-          StringVector sv = tokenize_string(it->c_str(), ':');
-          try 
+          StringVector labels = tokenize_string(list, ' ');
+          for (StringVector::const_iterator it = labels.begin();
+               it != labels.end(); it++)
             {
-              StringPair sp = string_vector_to_string_pair(sv);
-              symbol_pairs.insert(sp);
-            }
-          catch (const char * msg)
-            {
-              fprintf(errorstream_, "error: could not substitute with '%s'\n", list);
-              MAYBE_QUIT;
-              PROMPT_AND_RETURN_THIS;
+              // tokenize labels into string pairs
+              StringVector sv = tokenize_string(it->c_str(), ':');
+              try 
+                {
+                  StringPair sp = string_vector_to_string_pair(sv);
+                  symbol_pairs.insert(sp);
+                }
+              catch (const char * msg)
+                {
+                  fprintf(errorstream_, "error: could not substitute with '%s'\n", list);
+                  MAYBE_QUIT;
+                  PROMPT_AND_RETURN_THIS;
+                }
             }
         }
 
@@ -1603,11 +1610,14 @@ namespace xfst {
 
       stack_.pop();
 
+      std::string liststr(list);
+      if (liststr == "NOTHING")
+        liststr = "";
+
       // use regex parser:  `[ [TR] , s , L ]
       xre_.define("TempXfstTransducerName", *top);
       std::string subst_regex("`[ [TempXfstTransducerName] , ");
-      subst_regex += std::string(target) + " , " 
-        +  std::string(list) + " ]";
+      subst_regex += std::string(target) + " , " + liststr + " ]";
 
       HfstTransducer * substituted = xre_.compile(subst_regex);
       xre_.undefine("TempXfstTransducerName");
