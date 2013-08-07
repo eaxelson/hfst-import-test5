@@ -4,73 +4,46 @@ using namespace implementations;
 using namespace hfst::xeroxRules;
 
 
-// harmonization of special symbole
+// a -> b || ? - a _
 void test8( ImplementationType type )
 {
     HfstTokenizer TOK;
-    TOK.add_multichar_symbol("@_SYMBOLA_@");
-    TOK.add_multichar_symbol("@_SYMBOLB_@");
-
-    HfstTransducer a("a@_SYMBOLA_@", TOK, type);
-
-    HfstTransducer b("@_SYMBOLB_@", TOK, type);
-
+    HfstTransducer a("a", TOK, type);
+    HfstTransducer b("b", TOK, type);
 
     HfstTransducer identityPair = HfstTransducer::identity_pair( type );
-    HfstTransducer identity (identityPair);
-    identity.repeat_star().minimize();
-    printf("alphabet before: \n");
-    StringSet transducerAlphabet = identity.get_alphabet();
-    for (StringSet::const_iterator s = transducerAlphabet.begin();
-                   s != transducerAlphabet.end();
-                   ++s)
-        {
-            printf("%s \n", s->c_str());
-        }
-    printf("------------------ \n");
 
+    HfstTransducer leftMapping(identityPair);
+    leftMapping.subtract(a);
 
-     a.concatenate(identity);
+    // Mapping
+    HfstTransducerPair mappingPair( leftMapping, HfstTransducer(type));
 
+    HfstTransducerPairVector mappingPairVector;
+    mappingPairVector.push_back(mappingPair);
 
-     printf("alphabet after: \n");
-     transducerAlphabet = identity.get_alphabet();
-     for (StringSet::const_iterator s = transducerAlphabet.begin();
-                    s != transducerAlphabet.end();
-                    ++s)
-         {
-             printf("%s \n", s->c_str());
-         }
-     printf("------------------ \n");
+    // Rule
+    Rule rule(mappingPairVector);
 
+    // result
+    HfstTransducer input1("maa", TOK, type);
+    HfstTransducer result1("mba", TOK, type);
 
+    HfstTransducer replaceTr(type);
+    replaceTr = replace(rule, false);
 
+    //printf("replaceTr: \n");
+    //replaceTr.write_in_att_format(stdout, 1);
 
-     identity.subtract(b).minimize();
+    HfstTransducer tmp(type);
+    tmp = input1;
+    tmp.compose(replaceTr).minimize();
+    //printf("after compose with bac\n");
+    //tmp2.write_in_att_format(stdout, 1);
 
-
-     printf("------a\n");
-     a.write_in_att_format(stdout, 1);
-
-     printf("identity\n");
-     identity.write_in_att_format(stdout, 1);
-
-
-         printf("alphabet: \n");
-         transducerAlphabet = identity.get_alphabet();
-         for (StringSet::const_iterator s = transducerAlphabet.begin();
-                        s != transducerAlphabet.end();
-                        ++s)
-             {
-                 printf("%s \n", s->c_str());
-                 //printf("in alph: %s", alphabet[i] ) ;
-             }
-         printf("------------------ \n");
-
-
-
-   // assert(a.compare(b));
+    assert(tmp.compare(result1));
 }
+
 
 
 

@@ -2828,7 +2828,8 @@ int main(int argc, char * argv[])
 
           // std::cout << "----- Type --------- " << i << std::endl;
 
-
+            // a -> b || ? - a _
+            //test8( types[i] );
 
             test1( types[i] );
 
@@ -2923,8 +2924,7 @@ int main(int argc, char * argv[])
 
             before_test1( types[i] );
 
-            //harmonization of special symbols
-            //test8( types[i] );
+
 
           }
 
