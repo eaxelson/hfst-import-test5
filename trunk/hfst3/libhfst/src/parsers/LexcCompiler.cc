@@ -531,6 +531,9 @@ LexcCompiler::compileLexical()
     hash.concatenate(end).minimize();
 
 
+    HfstTransducer subPartsUnion(format_);
+    HfstSymbolSubstitutions allJoinersToEpsilon;
+
     // for every lex_joiner in noFlags, find only atrings where it occurs twice in a row
     // and then replace those joiners with epsilons
     for (set<string>::const_iterator s = noFlags_.begin();
@@ -567,11 +570,6 @@ LexcCompiler::compileLexical()
 
         //////////////////2nd version
 
-    //HfstTransducer identity("@_IDENTITY_SYMBOL_@", format_);
-    //HfstTransducer identityStar(identity);
-    //identityStar.repeat_star().minimize();
-
-
 
 
         HfstTransducer identityWoJoin("@_IDENTITY_SYMBOL_@", format_);
@@ -593,30 +591,45 @@ LexcCompiler::compileLexical()
         HfstTransducer subPart(sigmaStar);
         subPart.concatenate(iWoJoniUnk).minimize();
         subPart.concatenate(joiner)
-                .concatenate(iWoJoniUnk)
-                .concatenate(sigmaStar).minimize();
+              .concatenate(iWoJoniUnk)
+              .concatenate(sigmaStar).minimize();
 
 
-    //printf("subPart: \n");
-    //subPart.write_in_att_format(stdout, 1);
+        //printf("subPart: \n");
+        //subPart.write_in_att_format(stdout, 1);
 
 
 
         t1 = time(NULL);
         printf ("Building subpart time = %d secs\n", t1 - t0);
 
-        //printf("lexicons before subtract: \n");
-        //lexicons.write_in_att_format(stdout, 1);
 
-        if (verbose_)
-          {
-            fprintf(stderr, "\nSubtracting... \n");
-
-          }
+        printf ("\nSubpart disjunct...\n");
         t0 = time(NULL);
-        lexicons.subtract(subPart).minimize();
+        subPartsUnion.disjunct(subPart).minimize();
         t1 = time(NULL);
         printf ("time = %d secs\n", t1 - t0);
+
+
+        allJoinersToEpsilon.insert(StringPair(joinerEnc, "@_EPSILON_SYMBOL_@"));
+
+
+      }
+
+
+
+    //printf("lexicons before subtract: \n");
+    //lexicons.write_in_att_format(stdout, 1);
+
+    if (verbose_)
+    {
+      fprintf(stderr, "\nSubtracting... \n");
+
+    }
+    t0 = time(NULL);
+    lexicons.subtract(subPartsUnion).minimize();
+    t1 = time(NULL);
+    printf ("time = %d secs\n", t1 - t0);
 
 
     //printf("lexicons --subtract: \n");
@@ -624,57 +637,55 @@ LexcCompiler::compileLexical()
 
 
 
-        HfstTransducer startAnyThing(startP);
-        startAnyThing.concatenate(identityStar).minimize();
+    HfstTransducer startAnyThing(startP);
+    startAnyThing.concatenate(identityStar).minimize();
 
 
     //printf("startAnyThing: \n");
     //startAnyThing.write_in_att_format(stdout, 1);
 
 
-        HfstTransducer anyThingEnd(identityStar);
-        anyThingEnd.concatenate(end).minimize();
+    HfstTransducer anyThingEnd(identityStar);
+    anyThingEnd.concatenate(end).minimize();
 
-        //printf("anyThingEnd: \n");
-        //anyThingEnd.write_in_att_format(stdout, 1);
-
-
-        if (verbose_)
-          {
-            fprintf(stderr, "\nComposing start... \n");
-          }
-        t0 = time(NULL);
-        lexicons.compose(startAnyThing).minimize();
-        t1 = time(NULL);
-        printf ("time = %d secs\n", t1 - t0);
-
-   //  printf("lexicons --root: \n");
-   //  lexicons.write_in_att_format(stdout, 1);
-
-        if (verbose_)
-          {
-            fprintf(stderr, "\nComposing end... \n");
-          }
-
-        t0 = time(NULL);
-        lexicons.compose(anyThingEnd).minimize();
-        t1 = time(NULL);
-        printf ("time = %d secs\n", t1 - t0);
+    //printf("anyThingEnd: \n");
+    //anyThingEnd.write_in_att_format(stdout, 1);
 
 
+    if (verbose_)
+    {
+      fprintf(stderr, "\nComposing start... \n");
+    }
+    t0 = time(NULL);
+    lexicons.compose(startAnyThing).minimize();
+    t1 = time(NULL);
+    printf ("time = %d secs\n", t1 - t0);
+
+    //  printf("lexicons --root: \n");
+    //  lexicons.write_in_att_format(stdout, 1);
+
+    if (verbose_)
+    {
+      fprintf(stderr, "\nComposing end... \n");
+    }
+
+    t0 = time(NULL);
+    lexicons.compose(anyThingEnd).minimize();
+    t1 = time(NULL);
+    printf ("time = %d secs\n", t1 - t0);
 
 
 
-        //////////////////---------
-        lexicons.substitute(joinerEnc, "@_EPSILON_SYMBOL_@").minimize();
-
-     //printf("lexicons joiner epsilon: \n");
-     //lexicons.write_in_att_format(stdout, 1);
-
-      }
 
 
+    //////////////////---------
+    //lexicons.substitute(joinerEnc, "@_EPSILON_SYMBOL_@").minimize();
 
+    lexicons.substitute(allJoinersToEpsilon).minimize();
+
+
+    //printf("lexicons joiner epsilon: \n");
+    //lexicons.write_in_att_format(stdout, 1);
 
 
 
