@@ -552,7 +552,7 @@ expand_definition(HfstTransducer* tr, const char* symbol)
         {
           if (strcmp(it->first.c_str(), symbol) == 0)
             {
-              tr->substitute(hfst::StringPair(symbol,symbol), *(it->second));
+              tr->substitute(hfst::StringPair(symbol,symbol), *(it->second), false); // do not harmonize
               tr->remove_from_alphabet(symbol);
               break;
             }

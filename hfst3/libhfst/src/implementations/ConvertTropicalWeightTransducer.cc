@@ -41,13 +41,13 @@ namespace hfst { namespace implementations
     // An empty transducer
     if (t->Start() == fst::kNoStateId)
       {      
-	/* An empty OpenFst transducer does not necessarily have to have
-	   an input or output symbol table. */
-	if (inputsym != NULL) {
-	  for ( fst::SymbolTableIterator it = 
-		  fst::SymbolTableIterator(*(inputsym));
+        /* An empty OpenFst transducer does not necessarily have to have
+           an input or output symbol table. */
+        if (inputsym != NULL) {
+          for ( fst::SymbolTableIterator it = 
+                  fst::SymbolTableIterator(*(inputsym));
               not it.Done(); it.Next() ) {
-	  assert(it.Symbol() != "");
+          assert(it.Symbol() != "");
 
           if (it.Value() != 0) // epsilon is not inserted
             net->add_symbol_to_alphabet( it.Symbol() );
@@ -57,16 +57,16 @@ namespace hfst { namespace implementations
          symbol table. If the transducer is an HFST tropical transducer, it
          can have an output symbol table, but it is equivalent to the 
          input symbol table. */
-	if (not has_hfst_header && outputsym != NULL) {
-	  for ( fst::SymbolTableIterator it = 
-		  fst::SymbolTableIterator(*(outputsym));
-		not it.Done(); it.Next() ) {
-	    assert(it.Symbol() != "");
-	    if (it.Value() != 0) // epsilon is not inserted
-	      net->add_symbol_to_alphabet( it.Symbol() );
-	  }    
-	}
-	return;
+        if (not has_hfst_header && outputsym != NULL) {
+          for ( fst::SymbolTableIterator it = 
+                  fst::SymbolTableIterator(*(outputsym));
+                not it.Done(); it.Next() ) {
+            assert(it.Symbol() != "");
+            if (it.Value() != 0) // epsilon is not inserted
+              net->add_symbol_to_alphabet( it.Symbol() );
+          }    
+        }
+        return;
       }
 
     /* A non-empty OpenFst transducer must have at least an input symbol table.
@@ -87,25 +87,25 @@ namespace hfst { namespace implementations
 
     if (inputsym != NULL) 
       {
-	for ( fst::SymbolTableIterator it = 
-		fst::SymbolTableIterator(*(inputsym));
-	      not it.Done(); it.Next() ) 
-	  {
-	    assert(it.Symbol() != "");
-	    if (it.Value() != 0) // epsilon is not inserted
-	      net->add_symbol_to_alphabet( it.Symbol() );
-	  }    
+        for ( fst::SymbolTableIterator it = 
+                fst::SymbolTableIterator(*(inputsym));
+              not it.Done(); it.Next() ) 
+          {
+            assert(it.Symbol() != "");
+            if (it.Value() != 0) // epsilon is not inserted
+              net->add_symbol_to_alphabet( it.Symbol() );
+          }    
       }
     if (outputsym != NULL)
       {
-	for ( fst::SymbolTableIterator it = 
-		fst::SymbolTableIterator(*(outputsym));
-	      not it.Done(); it.Next() ) 
-	  {
-	    assert(it.Symbol() != "");
-	    if (it.Value() != 0) // epsilon is not inserted
-	      net->add_symbol_to_alphabet( it.Symbol() );
-	  }        
+        for ( fst::SymbolTableIterator it = 
+                fst::SymbolTableIterator(*(outputsym));
+              not it.Done(); it.Next() ) 
+          {
+            assert(it.Symbol() != "");
+            if (it.Value() != 0) // epsilon is not inserted
+              net->add_symbol_to_alphabet( it.Symbol() );
+          }        
       }
   }
 
@@ -127,6 +127,7 @@ namespace hfst { namespace implementations
     handle_symbol_tables(t, net, has_hfst_header);
     
     StringVector symbol_vector = TropicalWeightTransducer::get_symbol_vector(t);
+
     std::vector<unsigned int> harmonization_vector 
       = HfstTropicalTransducerTransitionData::get_harmonization_vector(symbol_vector);
     
@@ -138,46 +139,57 @@ namespace hfst { namespace implementations
     
     /* Go through all states */
     for (fst::StateIterator<fst::StdVectorFst> siter(*t); 
-	 not siter.Done(); siter.Next()) 
+         not siter.Done(); siter.Next()) 
       {
-	StateId s = siter.Value();
-	
-	HfstState origin = s;
-	if (origin == (unsigned int)initial_state)
-	  origin = 0;
-	else if (origin == 0)
-	  origin = (unsigned int)initial_state;
-	
-	unsigned int number_of_arcs = t->NumArcs(s);
-	net->initialize_transition_vector(s, number_of_arcs);
-	
-	/* Go through all transitions in a state */
-	for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
-	     !aiter.Done(); aiter.Next())
-	  {
-	    const fst::StdArc &arc = aiter.Value();
-	    
-	    HfstState target = arc.nextstate;
-	    if (target == (unsigned int)initial_state)
-	      target = 0;
-	    else if (target == 0)
-	      target = (unsigned int)initial_state;
-	    
-	    net->add_transition(origin, 
-				HfstBasicTransition
-				(target,
-				 harmonization_vector[arc.ilabel],
-				 harmonization_vector[arc.olabel],
-				 arc.weight.Value(),
-				 false), // dummy parameter needed because numbers are used 
-				false); // do not insert symbols to alphabet
-	  } 
-	
-	if (t->Final(s) != fst::TropicalWeight::Zero()) {
-	  // Set the state as final
-	  net->set_final_weight(origin, t->Final(s).Value());
-	}
-	
+        StateId s = siter.Value();
+        
+        HfstState origin = s;
+        if (origin == (unsigned int)initial_state)
+          origin = 0;
+        else if (origin == 0)
+          origin = (unsigned int)initial_state;
+        
+        unsigned int number_of_arcs = t->NumArcs(s);
+        net->initialize_transition_vector(s, number_of_arcs);
+        
+        /* Go through all transitions in a state */
+        for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
+             !aiter.Done(); aiter.Next())
+          {
+            const fst::StdArc &arc = aiter.Value();
+            
+            HfstState target = arc.nextstate;
+            if (target == (unsigned int)initial_state)
+              target = 0;
+            else if (target == 0)
+              target = (unsigned int)initial_state;
+
+            if (arc.ilabel >= symbol_vector.size())
+              {
+                std::cerr << "FATAL ERROR: input number " << arc.ilabel << " not in symbol_vector" << std::endl;
+                exit(1);
+              }
+            if (arc.olabel >= symbol_vector.size())
+              {
+                std::cerr << "FATAL ERROR: output number " << arc.olabel << " not in symbol_vector" << std::endl;
+                exit(1);
+              }
+
+            net->add_transition(origin, 
+                                HfstBasicTransition
+                                (target,
+                                 harmonization_vector[arc.ilabel],
+                                 harmonization_vector[arc.olabel],
+                                 arc.weight.Value(),
+                                 false), // dummy parameter needed because numbers are used 
+                                false); // do not insert symbols to alphabet
+          } 
+        
+        if (t->Final(s) != fst::TropicalWeight::Zero()) {
+          // Set the state as final
+          net->set_final_weight(origin, t->Final(s).Value());
+        }
+        
       }
     
     // Copy the alphabet
@@ -234,18 +246,18 @@ namespace hfst { namespace implementations
           {
             // Copy the transition
 
-	    unsigned int in = tr_it->get_input_number();
-	    unsigned int out = tr_it->get_output_number();
+            unsigned int in = tr_it->get_input_number();
+            unsigned int out = tr_it->get_output_number();
 
-	    t->AddArc
-	      (state_vector[source_state],
-	       fst::StdArc
-	       ( in,
-		 out,
-		 tr_it->get_weight(),
-		 state_vector[tr_it->get_target_state()]));
+            t->AddArc
+              (state_vector[source_state],
+               fst::StdArc
+               ( in,
+                 out,
+                 tr_it->get_weight(),
+                 state_vector[tr_it->get_target_state()]));
           } // ... set of transitions gone through
-	source_state++;
+        source_state++;
       } // ... all states gone through
     
     // Go through the final states...
@@ -254,8 +266,8 @@ namespace hfst { namespace implementations
          it != net->final_weight_map.end(); it++) 
       {
         t->SetFinal
-	  (state_vector[it->first],
-	   it->second);
+          (state_vector[it->first],
+           it->second);
       }
     // ... final states gone through
     

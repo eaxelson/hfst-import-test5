@@ -1,4 +1,7 @@
-regex x:y x z:x;
+regex x:y x z:x ?;
+substitute symbol bar for foo
+write att
+echo --
 substitute symbol X for x
 write att
 echo --

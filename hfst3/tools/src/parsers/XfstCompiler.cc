@@ -1609,6 +1609,14 @@ namespace xfst {
     {
       GET_TOP(top);
 
+      StringSet alpha = top->get_alphabet();
+      if (alpha.find(target) == alpha.end())
+        {
+          fprintf(errorstream_, "no occurrences of symbol '%s', cannot substitute\n", target);
+          MAYBE_QUIT;
+          PROMPT_AND_RETURN_THIS;
+        }
+
       stack_.pop();
 
       std::string liststr(list);
