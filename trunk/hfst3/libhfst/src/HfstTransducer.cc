@@ -2852,10 +2852,11 @@ HfstTransducer &HfstTransducer::substitute
 #if HAVE_OPENFST
     if (this->type == TROPICAL_OPENFST_TYPE)
     {
-        this->tropical_ofst_interface.substitute
+      this->tropical_ofst_interface.substitute
         (implementation.tropical_ofst,
          symbol_pair,transducer.implementation.tropical_ofst);
-        return *this;
+
+      return *this;
     }
     if (this->type == LOG_OPENFST_TYPE)
     {

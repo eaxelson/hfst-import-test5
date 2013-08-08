@@ -1550,8 +1550,14 @@ namespace xfst {
         }
 
       StringPair labelpair(label, label);
-      top->substitute(labelpair, *(it->second));
-      top->remove_from_alphabet(label);
+
+      // debug
+      std::cerr << "substituting label pair " << std::string(label) << " with transducer:" << std::endl;
+      std::cerr << *(it->second) << std::endl;
+      std::cerr << "in transducer:" << std::endl;
+      std::cerr << *top << std::endl;
+
+      top->substitute(labelpair, *(it->second), false);
 
       MAYBE_MINIMIZE(top);
       PROMPT_AND_RETURN_THIS;
@@ -1627,7 +1633,6 @@ namespace xfst {
       xre_.define("TempXfstTransducerName", *top);
       std::string subst_regex("`[ [TempXfstTransducerName] , ");
       subst_regex += std::string(target) + " , " + liststr + " ]";
-
       HfstTransducer * substituted = xre_.compile(subst_regex);
       xre_.undefine("TempXfstTransducerName");
 
@@ -1637,7 +1642,11 @@ namespace xfst {
           stack_.push(substituted);
           print_transducer_info();
         }
-      // todo: handle also the case: (substituted == NULL)
+      else
+        {
+          fprintf(errorstream_, "fatal error in substitution, exiting program\n");
+          exit(EXIT_FAILURE);
+        }
       PROMPT_AND_RETURN_THIS;
     }
 

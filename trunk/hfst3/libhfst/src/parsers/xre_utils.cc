@@ -617,6 +617,14 @@ xfst_label_to_transducer(const char* input, const char* output)
   return retval;
 }
 
+  void warn(const char * msg)
+  {
+    if (!verbose_)
+      return;
+    
+    fprintf(warning_stream, "%s", msg);
+  }
+
 void warn_about_special_symbols_in_replace(HfstTransducer * t)
 {
   if (!verbose_)

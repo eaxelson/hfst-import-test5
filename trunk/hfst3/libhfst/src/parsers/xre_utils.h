@@ -95,6 +95,7 @@ bool is_valid_function_call(const char * name, const std::vector<HfstTransducer>
 /** @brief Parse "input:output", ":output", "input:" or ":". */
  HfstTransducer* xfst_label_to_transducer(const char* input, const char* output);
 
+ void warn(const char * msg);
  void warn_about_special_symbols_in_replace(HfstTransducer *t);
 
 } } // namespaces
