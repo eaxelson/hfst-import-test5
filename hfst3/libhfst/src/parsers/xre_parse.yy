@@ -199,12 +199,18 @@ REGEXP2: REPLACE
        | SUB1 SUB2 SUB3 {
 
             StringSet alpha = $1->get_alphabet();
-            if (alpha.find($2) == alpha.end())
+            if (hfst::xre::is_definition($2))
+            {
+                hfst::xre::warn("warning: using definition as an ordinary label, cannot substitute\n");
+                $$ = $1;
+            }
+            else if (alpha.find($2) == alpha.end())
             {
                 $$ = $1;
             }
             else
             {
+                alpha = $3->get_alphabet();
 
                 StringPair tmp($2, $2);
                 HfstTransducer * tmpTr = new HfstTransducer(*$1);
@@ -245,7 +251,10 @@ REGEXP2: REPLACE
                         tmpTr->invert().compose(replaceTr).invert();
 	        }
             
-                // tmpTr->remove_from_alphabet($2);
+                if (alpha.find($2) == alpha.end())
+                {
+                  tmpTr->remove_from_alphabet($2);
+                }
                 tmpTr->minimize();
                 $$ = tmpTr;
                 delete($1, $2, $3);

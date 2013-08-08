@@ -7,3 +7,13 @@ write att
 echo --
 substitute label NOTHING for a:b
 write att
+echo --
+regex x:y x z:x ?;
+substitute label X for x
+write att
+echo --
+substitute label a:b c for X
+write att
+echo --
+substitute label NOTHING for a:b
+write att

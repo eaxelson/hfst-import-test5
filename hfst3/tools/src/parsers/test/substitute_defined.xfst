@@ -10,4 +10,11 @@ write att
 echo --
 substitute defined Bar for x
 write att
+echo --
+regex a ?;
+write att
+echo --
+define Bar a:b;
+substitute defined Bar for a
+write att
 quit
