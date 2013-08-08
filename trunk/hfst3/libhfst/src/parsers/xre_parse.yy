@@ -197,48 +197,59 @@ REGEXP2: REPLACE
         }
         // substitute
        | SUB1 SUB2 SUB3 {
-            StringPair tmp($2, $2);
-            HfstTransducer * tmpTr = new HfstTransducer(* $1);
 
-	    bool empty_replace_transducer=false;
-	    HfstTransducer empty(hfst::xre::format);
-	    if (empty.compare(*$3))
-	    {
-		empty_replace_transducer=true;
-	    }	
-
-	    if (empty_replace_transducer)
-	    {
-	        // substitute all transitions {b:a, a:b, b:b} with b:b
-		// as they will be removed anyway
-		hfst::xre::set_substitution_function_symbol($2);
-		tmpTr->substitute(&hfst::xre::substitution_function);
-	    }	
-
-            // `[ a:b, b, x y ]
-            // substitute b with x | y
-            tmpTr->substitute(tmp, *$3, false); // no harmonization
-
-	    if (!empty_replace_transducer) 
+            StringSet alpha = $1->get_alphabet();
+            if (alpha.find($2) == alpha.end())
             {
-               // a:b .o. b -> x | y
-               // [[a:b].i .o. b -> x | y].i - this is for cases when b is on left side
+                $$ = $1;
+            }
+            else
+            {
 
-	       // build Replace transducer
-               HfstTransducerPair mappingPair(HfstTransducer($2, $2, hfst::xre::format), *$3);
-               HfstTransducerPairVector mappingPairVector;
-               mappingPairVector.push_back(mappingPair);
-               Rule rule(mappingPairVector);
-               HfstTransducer replaceTr(hfst::xre::format);
-               replaceTr = replace(rule, false);
+                StringPair tmp($2, $2);
+                HfstTransducer * tmpTr = new HfstTransducer(*$1);
 
-               tmpTr->compose(replaceTr).minimize();
-               tmpTr->invert().compose(replaceTr).invert();
-	    }
+	        bool empty_replace_transducer=false;
+	        HfstTransducer empty(hfst::xre::format);
+	        if (empty.compare(*$3))
+	        {
+                        empty_replace_transducer=true;
+	        }	
+
+	        if (empty_replace_transducer)
+	        {
+                        // substitute all transitions {b:a, a:b, b:b} with b:b
+		        // as they will be removed anyway
+		        hfst::xre::set_substitution_function_symbol($2);
+		        tmpTr->substitute(&hfst::xre::substitution_function);
+	        }	
+
+                // `[ a:b, b, x y ]
+                // substitute b with x | y
+                tmpTr->substitute(tmp, *$3, false); // no harmonization
+
+	        if (!empty_replace_transducer) 
+                {
+                        // a:b .o. b -> x | y
+                        // [[a:b].i .o. b -> x | y].i - this is for cases when b is on left side
+
+	                // build Replace transducer
+                        HfstTransducerPair mappingPair(HfstTransducer($2, $2, hfst::xre::format), *$3);
+                        HfstTransducerPairVector mappingPairVector;
+                        mappingPairVector.push_back(mappingPair);
+                        Rule rule(mappingPairVector);
+                        HfstTransducer replaceTr(hfst::xre::format);
+                        replaceTr = replace(rule, false);
+
+                        tmpTr->compose(replaceTr).minimize();
+                        tmpTr->invert().compose(replaceTr).invert();
+	        }
             
-	    tmpTr->minimize();
-            $$ = tmpTr;
-            delete($1, $2, $3);
+                // tmpTr->remove_from_alphabet($2);
+                tmpTr->minimize();
+                $$ = tmpTr;
+                delete($1, $2, $3);
+            }
          }
         ;
 
