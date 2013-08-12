@@ -768,14 +768,20 @@
                os << "<";
              } 
            std::string s = data.get_input_symbol();
+           replace_all(s, "?", "\"?\"");
            replace_all(s, "@_EPSILON_SYMBOL_@", "0");
+           replace_all(s, "@_UNKNOWN_SYMBOL_@", "?");
+           replace_all(s, "@_IDENTITY_SYMBOL_@", "?");
            replace_all(s, "\t", "@_TAB_@");
            os << s;
            if (data.get_input_symbol() !=
                data.get_output_symbol())
              {
                s = data.get_output_symbol();
+               replace_all(s, "?", "\"?\"");
                replace_all(s, "@_EPSILON_SYMBOL_@", "0");
+               replace_all(s, "@_UNKNOWN_SYMBOL_@", "?");
+               replace_all(s, "@_IDENTITY_SYMBOL_@", "?");
                replace_all(s, "\t", "@_TAB_@");
                os << ":" << s; 
              }
@@ -795,7 +801,10 @@
              }                       
            // replace all spaces, epsilons and tabs
            std::string s = data.get_input_symbol();
+           replace_all(s, "?", "\"?\"");
            replace_all(s, "@_EPSILON_SYMBOL_@", "0");
+           replace_all(s, "@_UNKNOWN_SYMBOL_@", "?");
+           replace_all(s, "@_IDENTITY_SYMBOL_@", "?");
            replace_all(s, "\t", "@_TAB_@");
            fprintf(file, "%s", s.c_str());
 
@@ -803,7 +812,10 @@
                data.get_output_symbol())
              {
                s = data.get_output_symbol();
+               replace_all(s, "?", "\"?\"");
                replace_all(s, "@_EPSILON_SYMBOL_@", "0");
+               replace_all(s, "@_UNKNOWN_SYMBOL_@", "?");
+               replace_all(s, "@_IDENTITY_SYMBOL_@", "?");
                replace_all(s, "\t", "@_TAB_@");
                fprintf(file, ":%s", s.c_str());
              }
