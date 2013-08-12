@@ -38,6 +38,8 @@ FILE* xfst_fopen(const char* path, const char* mode);
 //! @brief Strips initial and final white space and strdups
 char* strstrip(const char* s);
 
+ int nametoken_to_number(const char * token);
+
 //! @brief extracts the variable substring part from token.
 //! Omits constant string prefix, suffix and optionally strips spaces.
 char* strdup_nonconst_part(const char* token, 

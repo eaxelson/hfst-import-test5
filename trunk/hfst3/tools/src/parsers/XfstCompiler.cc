@@ -587,10 +587,16 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::define(const char* name, const char* xre)
     {
+      if (hfst::xfst::nametoken_to_number(name) >= 0)
+        {
+          fprintf(errorstream_, "Could not define variable, '%s' is not a valid name\n",
+                  name);
+        }
+
       // When calling this function, the regex \a indata should already have
       // been compiled into a transducer which should have been stored to
       // the variable latest_regex_compiled.
-      if (latest_regex_compiled != NULL)
+      else if (latest_regex_compiled != NULL)
         {
           bool was_defined = xre_.is_definition(name);
           xre_.define(name, xre);
@@ -2859,6 +2865,9 @@ namespace xfst {
       GET_TOP(tmp);
 
       StringSet alpha = tmp->get_alphabet();
+      alpha.erase("@_UNKNOWN_SYMBOL_@");
+      alpha.erase("@_IDENTITY_SYMBOL_@");
+      alpha.erase("@_EPSILON_SYMBOL_@");
       StringPairSet alpha_ = hfst::symbols::to_string_pair_set(alpha);
       HfstTransducer * sigma = new HfstTransducer(alpha_, format_);
       

@@ -23,6 +23,7 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
 
 #include <cstdlib>
 #include <cassert>
@@ -191,6 +192,17 @@ strstrip(const char* s)
     }
     return rv;
 }
+
+    int nametoken_to_number(const char * token)
+    {
+      std::string tokenstr(token);
+      std::stringstream str(tokenstr);
+      unsigned int x;
+      str >> x;
+      if (!str)
+        return -1;
+      return (int)x;
+    }
 
 char*
 strdup_nonconst_part(const char* token, const char* prefix,
