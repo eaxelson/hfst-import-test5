@@ -171,13 +171,17 @@ std::string PmatchContainer::parse_name_from_hfst3_header(std::istream & f)
             HFST_THROW(TransducerHeaderException);
         }
         char type[remaining_header_len];
+        bool type_defined = false;
         char name[remaining_header_len];
+        bool name_defined = false;
         int i = 0;
         while (i < remaining_header_len) {
-            if (strstr(headervalue + i, "type")) {
+            if (!type_defined && strstr(headervalue + i, "type")) {
                 strcpy(type, headervalue + i + strlen("type") + 1);
-            } else if (strstr(headervalue + i, "name")) {
+                type_defined = true;
+            } else if (!name_defined && strstr(headervalue + i, "name")) {
                 strcpy(name, headervalue + i + strlen("name") + 1);
+                name_defined = true;
             }
             while (i < remaining_header_len &&
                    headervalue[i] != '\0') {
