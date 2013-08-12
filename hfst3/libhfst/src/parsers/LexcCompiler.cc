@@ -463,24 +463,38 @@ LexcCompiler::compileLexical()
     HfstBasicTransducer fsm(lexicons);
 
     StringPairSet setOfPairs;
+    bool hasPairs = false;
 
     // Go through all states
-      for (HfstBasicTransducer::const_iterator it = fsm.begin();
-       it != fsm.end(); it++ )
-        {
-          // Go through all transitions
-      for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
-             = it->begin(); tr_it != it->end(); tr_it++)
+    for (HfstBasicTransducer::const_iterator it = fsm.begin();
+    it != fsm.end(); it++ )
+    {
+        // Go through all transitions
+        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
+         = it->begin(); tr_it != it->end(); tr_it++)
         {
 
-          if ( tr_it->get_input_symbol() != tr_it->get_output_symbol())
-          {
-              String alph1 = tr_it->get_input_symbol();
-              String alph2 = tr_it->get_output_symbol();
+            if ( tr_it->get_input_symbol() != tr_it->get_output_symbol())
+            {
+                hasPairs = true;
+                String alph1 = tr_it->get_input_symbol();
+                String alph2 = tr_it->get_output_symbol();
                 setOfPairs.insert(StringPair(alph1, alph2));
-          }
+            }
         }
-        }
+    }
+
+    /*
+      printf("------------------ \n");
+     for (StringPairSet::const_iterator s = setOfPairs.begin();
+                    s != setOfPairs.end();
+                    ++s)
+         {
+             printf("%s , %s \n", s->first.c_str(), s->second.c_str());
+             //printf("in alph: %s", alphabet[i] ) ;
+         }
+     printf("------------------ \n");
+     */
 
     HfstTransducer unknown(setOfPairs, format_);
 
@@ -501,6 +515,7 @@ LexcCompiler::compileLexical()
     t0 = time(NULL);
     // setOfPairs.insert(StringPair("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@"));
     HfstTransducer sigmaStar(setOfPairs, format_, false);
+
         sigmaStar.disjunct(identity).repeat_star().minimize();
     t1 = time(NULL);
     printf ("sigma star time = %d secs\n", t1 - t0);
@@ -576,8 +591,15 @@ LexcCompiler::compileLexical()
         identityWoJoin.insert_to_alphabet(joinerEnc);
 
 
+        //printf("identityWoJoin: \n");
+        //identityWoJoin.write_in_att_format(stdout, 1);
+
+
+
         HfstTransducer iWoJoniUnk(identityWoJoin);
-        iWoJoniUnk.disjunct(unknown).minimize();
+        // Disjunct with unknown only if there are some unknown pairs
+        // otherwise, unknown is empty transducer
+        if ( hasPairs ) iWoJoniUnk.disjunct(unknown).minimize();
 
 
 
@@ -590,6 +612,10 @@ LexcCompiler::compileLexical()
 
         HfstTransducer subPart(sigmaStar);
         subPart.concatenate(iWoJoniUnk).minimize();
+
+        //printf("small subpart: \n");
+        //subPart.write_in_att_format(stdout, 1);
+
         subPart.concatenate(joiner)
               .concatenate(iWoJoniUnk)
               .concatenate(sigmaStar).minimize();
@@ -616,9 +642,7 @@ LexcCompiler::compileLexical()
 
       }
 
-
-
-    //printf("lexicons before subtract: \n");
+    //  printf("lexicons before subtract: \n");
     //lexicons.write_in_att_format(stdout, 1);
 
     if (verbose_)
