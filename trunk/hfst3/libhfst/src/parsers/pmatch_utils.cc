@@ -545,12 +545,20 @@ HfstTransducer * PmatchUtilityTransducers::make_lowerfy(ImplementationType type)
 HfstTransducer * PmatchUtilityTransducers::optcap(HfstTransducer & t)
 {
     HfstTokenizer tok;
-    HfstTransducer lower_to_upper_or_vice_versa(*capify);
-    lower_to_upper_or_vice_versa.disjunct(*lowerfy);
-    lower_to_upper_or_vice_versa.concatenate(HfstTransducer::identity_pair(
-                                                 t.get_type()).repeat_star());
+    HfstTransducer optcap(*capify);
+    optcap.disjunct(*lowerfy);
+    optcap.disjunct(*latin1_alpha_acceptor);
+    HfstTransducer anything(HfstTransducer::identity_pair(t.get_type()));
+    HfstTransducer anything_but_whitespace(anything.subtract(
+                                               *latin1_whitespace_acceptor));
+    HfstTransducer optcap_one_word(optcap);
+    optcap_one_word.concatenate(anything_but_whitespace.repeat_star());
+    /* If we consider to cross the word boundary */ 
+    HfstTransducer more_words(*latin1_whitespace_acceptor);
+    more_words.concatenate(optcap_one_word);
+    more_words.repeat_star();
     HfstTransducer * retval = new HfstTransducer(t);
-    retval->compose(lower_to_upper_or_vice_versa);
+    retval->compose(optcap_one_word.concatenate(more_words));
     retval->output_project();
     retval->disjunct(t);
     return retval;
@@ -563,6 +571,7 @@ HfstTransducer * PmatchUtilityTransducers::tolower(HfstTransducer & t)
     lowercase.disjunct(*latin1_numeral_acceptor);
     lowercase.disjunct(*latin1_punct_acceptor);
     lowercase.disjunct(*latin1_whitespace_acceptor);
+    lowercase.disjunct(*latin1_lowercase_acceptor);
     HfstTransducer * retval = new HfstTransducer(t);
     retval->compose(lowercase.repeat_star());
     retval->output_project();
@@ -576,6 +585,7 @@ HfstTransducer * PmatchUtilityTransducers::toupper(HfstTransducer & t)
     uppercase.disjunct(*latin1_numeral_acceptor);
     uppercase.disjunct(*latin1_punct_acceptor);
     uppercase.disjunct(*latin1_whitespace_acceptor);
+    uppercase.disjunct(*latin1_uppercase_acceptor);
     HfstTransducer * retval = new HfstTransducer(t);
     retval->compose(uppercase.repeat_star());
     retval->output_project();
