@@ -1498,22 +1498,38 @@ namespace xfst {
   }
 
   // Convert StringVector \a sv into StringPair.
-  static StringPair string_vector_to_string_pair(const StringVector & sv)
+  static StringPair symbol_vector_to_symbol_pair(const StringVector & sv)
   {
     StringPair sp;
     if (sv.size() == 2)
       {
-        sp.first = sv[0];
-        sp.second = sv[1];
+        if (sv[0] == "?") {
+          sp.first = "@_UNKNOWN_SYMBOL_@"; }
+        else if (sv[0] == "0") {
+          sp.first = "@_EPSILON_SYMBOL_@"; }
+        else {
+          sp.first = sv[0]; }
+
+        if (sv[1] == "?") {
+          sp.second = "@_UNKNOWN_SYMBOL_@"; }
+        else if (sv[1] == "0") {
+          sp.second = "@_EPSILON_SYMBOL_@"; }
+        else {
+          sp.second = sv[1]; }
       }
     else if (sv.size() == 1)
       {
-        sp.first = sv[0];
-        sp.second = sv[0];
+        if (sv[0] == "?") { // special case "?"
+          sp.first = "@_IDENTITY_SYMBOL_@"; }
+        else if (sv[0] == "0") {
+          sp.first = "@_EPSILON_SYMBOL_@"; }
+        else {
+          sp.first = sv[0]; }
+        sp.second = sp.first;
       }
     else
       {
-        throw "error: string vector cannot be converted into string pair";
+        throw "error: symbol vector cannot be converted into symbol pair";
       }
     return sp;
   }
@@ -1587,7 +1603,7 @@ namespace xfst {
               StringVector sv = tokenize_string(it->c_str(), ':');
               try 
                 {
-                  StringPair sp = string_vector_to_string_pair(sv);
+                  StringPair sp = symbol_vector_to_symbol_pair(sv);
                   symbol_pairs.insert(sp);
                 }
               catch (const char * msg)
@@ -1603,7 +1619,32 @@ namespace xfst {
       StringVector target_vector = tokenize_string(target, ':');
       try 
         {
-          StringPair target_label = string_vector_to_string_pair(target_vector);
+          StringPair target_label = symbol_vector_to_symbol_pair(target_vector);
+
+          HfstBasicTransducer fsm(*top);
+          bool target_label_found = false;
+
+          for (HfstBasicTransducer::const_iterator it = fsm.begin();       
+               it != fsm.end() && !target_label_found; it++ ) 
+            {      
+              for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it  
+                     = it->begin(); tr_it != it->end(); tr_it++)       
+                {
+                  if (target_label.first == tr_it->get_input_symbol() &&
+                      target_label.second == tr_it->get_output_symbol())
+                    {
+                      target_label_found = true;
+                      break;
+                    }
+                }
+            }
+          if (!target_label_found)
+            {
+              fprintf(errorstream_, "no occurrences of '%s:%s'\n", 
+                      target_label.first.c_str(), target_label.second.c_str());
+              PROMPT_AND_RETURN_THIS;
+            }
+
           top->substitute(target_label, symbol_pairs);
         }
       catch (const char * msg)
