@@ -82,10 +82,9 @@ XRETOKEN {XRECHAR}+
  * - any %-escaped UTF-8
  */
 NAMECHAR {A7UNRESTRICTED}|{U8H}|{EC}
-NAMETOKEN [A-Za-z]{NAMECHAR}*
+NAMETOKEN {NAMECHAR}{NAMECHAR}*
 PROTOTYPE {NAMETOKEN}"("[a-zA-Z_0-9 ,]*")"
 RANGE {NAMECHAR}"-"{NAMECHAR}
-NUMBER [1-9][0-9]*|[0-9]
 
 /* White space */
 WSP [\t ]
@@ -768,10 +767,6 @@ LWSP [\t ]*
 {NAMETOKEN} {
     hxfstlval.name = strdup(hxfsttext);
     return NAMETOKEN;
-}
-{NUMBER} {
-    hxfstlval.number = strtoul(hxfsttext, 0, 10);
-    return NUMBER;
 }
 
 [\x04] {
