@@ -775,7 +775,8 @@
            replace_all(s, "\t", "@_TAB_@");
            os << s;
            if (data.get_input_symbol() !=
-               data.get_output_symbol())
+               data.get_output_symbol() ||
+               data.get_output_symbol() == "@_UNKNOWN_SYMBOL_@")
              {
                s = data.get_output_symbol();
                replace_all(s, "?", "\"?\"");
@@ -809,7 +810,8 @@
            fprintf(file, "%s", s.c_str());
 
            if (data.get_input_symbol() !=
-               data.get_output_symbol())
+               data.get_output_symbol() ||
+               data.get_output_symbol() == "@_UNKNOWN_SYMBOL_@")
              {
                s = data.get_output_symbol();
                replace_all(s, "?", "\"?\"");
@@ -1900,8 +1902,11 @@
             equivalent to \a sp in the graph. */
          void remove_transitions(const HfstSymbolPair &sp)
          {
-           unsigned int input_number = C::get_number(sp.first);
-           unsigned int output_number = C::get_number(sp.second);
+           unsigned int in_match = C::get_number(sp.first);
+           unsigned int out_match = C::get_number(sp.second);
+
+           bool in_match_used = false;
+           bool out_match_used = false;
 
            // ----- Go through all states -----
            for (iterator it = begin(); it != end(); it++)
@@ -1912,14 +1917,25 @@
                    HfstTransition<C> &tr_it = it->operator[](i);
 
                    // If a match was found, remove the transition:
-                   if (tr_it.get_input_number() == input_number &&
-                       tr_it.get_output_number() == output_number)
+                   unsigned int in_tr = tr_it.get_input_number();
+                   unsigned int out_tr = tr_it.get_output_number();
+                   if (in_tr == in_match && out_tr == out_match) {
+                     it->erase(it->begin()+i); }
+                   else 
                      {
-                       it->erase(it->begin()+i);
+                       if (in_tr == in_match || out_tr == in_match) {
+                         in_match_used=true; }
+                       if (in_tr == out_match || out_tr == out_match) {
+                         out_match_used=true; }
                      }
                  }
              }
-           // todo: handle the alphabet
+
+           // Handle the alphabet
+           if (!in_match_used) {
+             alphabet.erase(sp.first); }
+           if (!out_match_used) {
+             alphabet.erase(sp.second); }
          }
 
          /* A function that performs in-place-substitution in the graph. */
@@ -2007,11 +2023,13 @@
            // Remove symbols that were removed because of substitutions
            // (or didn't occur in the graph in the first place)
            std::set<unsigned int> syms;
-           for (typename HfstSymbolPairSet::const_iterator it = new_sps.begin();
+           /*for (typename HfstSymbolPairSet::const_iterator it = new_sps.begin();
                 it != new_sps.end(); it++) {
              syms.insert(C::get_number(it->first));
-             syms.insert(C::get_number(it->second));
-           }
+             syms.insert(C::get_number(it->second)); ?????????
+             }*/
+           syms.insert(old_input_number);
+           syms.insert(old_output_number);
            prune_alphabet_after_substitution(syms);
            
            return;
