@@ -1574,10 +1574,11 @@ namespace xfst {
       StringPair labelpair(label, label);
 
       // debug
-      std::cerr << "substituting label pair " << std::string(label) << " with transducer:" << std::endl;
+      /*std::cerr << "substituting label pair " << std::string(label) << " with transducer:" << std::endl;
       std::cerr << *(it->second) << std::endl;
       std::cerr << "in transducer:" << std::endl;
-      std::cerr << *top << std::endl;
+      std::cerr << *top << std::endl;*/
+
 
       top->substitute(labelpair, *(it->second), false);
 
