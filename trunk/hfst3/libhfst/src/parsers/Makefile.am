@@ -39,11 +39,11 @@ AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 if HH_EXTENSION_USED
 else
 xre_parse.hh: xre_parse.h
-	mv $< $@
+	mv -f $< $@
 pmatch_parse.hh: pmatch_parse.h
-	mv $< $@
+	mv -f $< $@
 lexc-parser.hh: lexc-parser.h
-	mv $< $@
+	mv -f $< $@
 endif
 
 libhfstparsers_la_SOURCES=$(SFST_SRCS) $(XRE_SRCS) $(PMATCH_SRCS) $(LEXC_SRCS)
