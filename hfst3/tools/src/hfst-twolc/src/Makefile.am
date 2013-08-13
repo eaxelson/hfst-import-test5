@@ -108,11 +108,11 @@ clean-local:
 if HH_EXTENSION_USED
 else
 htwolcpre1.hh: htwolcpre1.h
-	mv $< $@
+	mv -f $< $@
 htwolcpre2.hh: htwolcpre2.h
-	mv $< $@
+	mv -f $< $@
 htwolcpre3.hh: htwolcpre3.h
-	mv $< $@
+	mv -f $< $@
 endif
 
 HFST_TWOLC_TESTS=string_manipulation InputReader Alphabet \

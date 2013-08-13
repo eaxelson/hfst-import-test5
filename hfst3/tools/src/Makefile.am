@@ -323,6 +323,6 @@ AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 if HH_EXTENSION_USED
 else
 hfst-compiler.hh: hfst-compiler.h
-	mv $< $@
+	mv -f $< $@
 endif
 
