@@ -92,7 +92,9 @@ do
         substitute_symbol_1 substitute_symbol_2 substitute_symbol_3 \
         substitute_symbol_4 substitute_symbol_5 substitute_symbol_6 \
         substitute_label_1 substitute_label_2 substitute_label_3 substitute_label_4 \
-        substitute_label_5 substitute_label_6 substitute_label_7 substitute_label_8
+        substitute_label_5 substitute_label_6 substitute_label_7 substitute_label_8 \
+        substitute_defined_1 substitute_defined_2 substitute_defined_3 \
+        substitute_defined_4 substitute_defined_5 substitute_defined_6
     do
 	rm -f result result1 result2
 	if ! (ls $testfile.xfst 2> /dev/null); then

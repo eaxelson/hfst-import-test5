@@ -1549,6 +1549,21 @@ namespace xfst {
           PROMPT_AND_RETURN_THIS;
         }
       
+      std::string labelstr(label);
+      if (labelstr == "?")
+        labelstr = std::string("@_IDENTITY_SYMBOL_@");
+      if (labelstr == "0")
+        labelstr = std::string("@_EPSILON_SYMBOL_@");
+
+      StringSet alpha = top->get_alphabet();
+      if (alpha.find(labelstr) == alpha.end())
+        {
+          fprintf(errorstream_, "no occurrences of label '%s', cannot substitute\n", 
+                  label);
+          MAYBE_QUIT;
+          PROMPT_AND_RETURN_THIS;
+        }
+
       HfstBasicTransducer fsm(*top);
       
       for (HfstBasicTransducer::const_iterator it = fsm.begin();       
@@ -1557,7 +1572,6 @@ namespace xfst {
           for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it  
                  = it->begin(); tr_it != it->end(); tr_it++)       
             {
-              std::string labelstr(label);
               std::string isymbol = tr_it->get_input_symbol();
               std::string osymbol = tr_it->get_output_symbol();
               if (isymbol != osymbol && 
@@ -1571,17 +1585,16 @@ namespace xfst {
             }
         }
 
-      StringPair labelpair(label, label);
-
-      // debug
-      /*std::cerr << "substituting label pair " << std::string(label) << " with transducer:" << std::endl;
-      std::cerr << *(it->second) << std::endl;
-      std::cerr << "in transducer:" << std::endl;
-      std::cerr << *top << std::endl;*/
-
-
+      StringPair labelpair(labelstr, labelstr);
+      alpha = it->second->get_alphabet();
       top->substitute(labelpair, *(it->second), false);
 
+      if (labelstr != "@_EPSILON_SYMBOL_@" && labelstr != "@_IDENTITY_SYMBOL_@" &&
+          alpha.find(labelstr) == alpha.end())
+        {
+          top->remove_from_alphabet(labelstr);
+        }
+      
       MAYBE_MINIMIZE(top);
       PROMPT_AND_RETURN_THIS;
     }
@@ -1641,7 +1654,7 @@ namespace xfst {
             }
           if (!target_label_found)
             {
-              fprintf(errorstream_, "no occurrences of '%s:%s'\n", 
+              fprintf(errorstream_, "no occurrences of '%s:%s', cannot substitute\n", 
                       target_label.first.c_str(), target_label.second.c_str());
               PROMPT_AND_RETURN_THIS;
             }
