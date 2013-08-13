@@ -68,19 +68,19 @@ namespace hfst { namespace implementations
     {
         // If the start state has not yet been encountered.
       if (not start_state_found) {
-	start_state_id = (fsm)->state_no; // define the start state
-	start_state_found=true;           // define that it is found
+        start_state_id = (fsm)->state_no; // define the start state
+        start_state_found=true;           // define that it is found
       }
       // If the start state is encountered again, 
       else if ((fsm)->state_no == start_state_id) {
-	// do nothing.
+        // do nothing.
       }
       // If there are several initial states in foma transducer,
       else {
-	// throw an exception.
-	HFST_THROW_MESSAGE
-	  (HfstFatalException,
-	   "Foma transducer has more than one start state");
+        // throw an exception.
+        HFST_THROW_MESSAGE
+          (HfstFatalException,
+           "Foma transducer has more than one start state");
       }
     }
 
@@ -91,7 +91,7 @@ namespace hfst { namespace implementations
     struct sigma * p = t->sigma;
     while (p != NULL) {
       if (p->symbol == NULL)
-	break;
+        break;
       net->add_symbol_to_alphabet(std::string(p->symbol));
       p = p->next;
     }
@@ -100,19 +100,19 @@ namespace hfst { namespace implementations
   /* Copy the alphabet of hfst basic transducer \a hfst_fsm
      to fsm construct handle \a h. */
   static void copy_alphabet(const HfstBasicTransducer * hfst_fsm,
-			    struct fsm_construct_handle * h)
+                            struct fsm_construct_handle * h)
   {
     const HfstBasicTransducer::HfstTransitionGraphAlphabet & alpha
       = hfst_fsm->get_alphabet();
     for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
            = alpha.begin();
-	 it != alpha.end(); it++)
+         it != alpha.end(); it++)
       {
-	const char * symbol = it->c_str();
-	if ( fsm_construct_check_symbol(h,const_cast<char*>(symbol)) == -1 ) {
-	  fsm_construct_add_symbol(h,const_cast<char*>(symbol));
-	}
-	//free(symbol);
+        const char * symbol = it->c_str();
+        if ( fsm_construct_check_symbol(h,const_cast<char*>(symbol)) == -1 ) {
+          fsm_construct_add_symbol(h,const_cast<char*>(symbol));
+        }
+        //free(symbol);
       }
   }
 
@@ -158,10 +158,10 @@ namespace hfst { namespace implementations
     // and initialize the transition vector of the net accordingly
     if ((fsm+i)->target != -1 )
       {
-	unsigned int number_of_transitions = get_number_of_transitions(fsm+i);
-	net->initialize_transition_vector
-	  ((fsm+i)->state_no, 
-	   number_of_transitions);
+        unsigned int number_of_transitions = get_number_of_transitions(fsm+i);
+        net->initialize_transition_vector
+          ((fsm+i)->state_no, 
+           number_of_transitions);
       }
 
     // 1. If the source state is an initial state in foma:
@@ -192,10 +192,12 @@ namespace hfst { namespace implementations
 
   // If there was not an initial state in foma transducer,
   if (not start_state_found) {
-    // throw an exception.
-    HFST_THROW_MESSAGE
+    copy_alphabet(t, net);
+    return net; // we assume that the transducer is empty.
+    // instead of throwing an exception.
+    /*HFST_THROW_MESSAGE
       (HfstFatalException,
-       "Foma transducer has no start state");
+      "Foma transducer has no start state");*/
   }
   
   /* If start state number (N) is not zero, swap state numbers N and zero 
@@ -284,8 +286,8 @@ namespace hfst { namespace implementations
             //free(input);
             //free(output);
           }
-	// ----- transitions gone through -----
-	source_state++;
+        // ----- transitions gone through -----
+        source_state++;
       }  
     // ----- all states gone through -----
     
