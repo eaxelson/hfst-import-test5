@@ -733,29 +733,43 @@
            return;
          }
 
+         static void xfstize(std::string & symbol)
+         {
+           std::string escaped_symbol;
+           for (size_t pos = 0; pos < symbol.size(); pos++)
+             {
+               if (symbol[pos] == '%')
+                 escaped_symbol.append("\"%\"");
+               else if (symbol[pos] == '"')
+                 escaped_symbol.append("%\"");
+               else if (symbol[pos] == '?')
+                 escaped_symbol.append("\"?\"");
+               else
+                 escaped_symbol.append(1, symbol[pos]);
+             }
+           symbol = escaped_symbol;
+         }
+
+         static void xfstize_symbol(std::string & symbol)
+         {
+           xfstize(symbol);
+           replace_all(symbol, "@_EPSILON_SYMBOL_@", "0");
+           replace_all(symbol, "@_UNKNOWN_SYMBOL_@", "?");
+           replace_all(symbol, "@_IDENTITY_SYMBOL_@", "?");
+           replace_all(symbol, "\t", "@_TAB_@");
+         }
+
          void print_xfst_state(std::ostream & os, HfstState state)
          {
-           if (state == INITIAL_STATE)
-             {
-               os << "S";
-             }
-           if (is_final_state(state))
-             {
-               os << "f";
-             }
-           os <<  "s" << state;
+           if (state == INITIAL_STATE) { os << "S"; }
+           if (is_final_state(state)) { os << "f"; }
+           os << "s" << state;
          }
 
          void print_xfst_state(FILE * file, HfstState state)
          {
-           if (state == INITIAL_STATE)
-             {
-               fprintf(file, "S");
-             }
-           if (is_final_state(state))
-             {
-               fprintf(file, "f");
-             }
+           if (state == INITIAL_STATE) { fprintf(file, "S"); }
+           if (is_final_state(state)) { fprintf(file, "f"); }
            fprintf(file, "s%i", state);
          }
 
@@ -763,27 +777,19 @@
          {
            // replace all spaces, epsilons and tabs
            if (data.get_input_symbol() !=
-               data.get_output_symbol())
+               data.get_output_symbol()) 
              {
                os << "<";
              } 
            std::string s = data.get_input_symbol();
-           replace_all(s, "?", "\"?\"");
-           replace_all(s, "@_EPSILON_SYMBOL_@", "0");
-           replace_all(s, "@_UNKNOWN_SYMBOL_@", "?");
-           replace_all(s, "@_IDENTITY_SYMBOL_@", "?");
-           replace_all(s, "\t", "@_TAB_@");
+           xfstize_symbol(s);
            os << s;
            if (data.get_input_symbol() !=
                data.get_output_symbol() ||
                data.get_output_symbol() == "@_UNKNOWN_SYMBOL_@")
              {
                s = data.get_output_symbol();
-               replace_all(s, "?", "\"?\"");
-               replace_all(s, "@_EPSILON_SYMBOL_@", "0");
-               replace_all(s, "@_UNKNOWN_SYMBOL_@", "?");
-               replace_all(s, "@_IDENTITY_SYMBOL_@", "?");
-               replace_all(s, "\t", "@_TAB_@");
+               xfstize_symbol(s);
                os << ":" << s; 
              }
            if (data.get_input_symbol() !=
@@ -799,14 +805,10 @@
                data.get_output_symbol())
              {
                fprintf(file, "<");
-             }                       
+             }
            // replace all spaces, epsilons and tabs
            std::string s = data.get_input_symbol();
-           replace_all(s, "?", "\"?\"");
-           replace_all(s, "@_EPSILON_SYMBOL_@", "0");
-           replace_all(s, "@_UNKNOWN_SYMBOL_@", "?");
-           replace_all(s, "@_IDENTITY_SYMBOL_@", "?");
-           replace_all(s, "\t", "@_TAB_@");
+           xfstize_symbol(s);
            fprintf(file, "%s", s.c_str());
 
            if (data.get_input_symbol() !=
@@ -814,11 +816,7 @@
                data.get_output_symbol() == "@_UNKNOWN_SYMBOL_@")
              {
                s = data.get_output_symbol();
-               replace_all(s, "?", "\"?\"");
-               replace_all(s, "@_EPSILON_SYMBOL_@", "0");
-               replace_all(s, "@_UNKNOWN_SYMBOL_@", "?");
-               replace_all(s, "@_IDENTITY_SYMBOL_@", "?");
-               replace_all(s, "\t", "@_TAB_@");
+               xfstize_symbol(s);
                fprintf(file, ":%s", s.c_str());
              }
            if (data.get_input_symbol() !=
