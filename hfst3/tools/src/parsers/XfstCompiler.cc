@@ -658,16 +658,16 @@ namespace xfst {
     for ( ; prototype[i] != ')'; i++)
       {
         if (prototype[i] == '\0') { // no closing parenthesis found
-          return false;
+          return false; 
         }
         else if (prototype[i] == ' ') { // skip whitespace
-        }
+        }                           
         else if (prototype[i] == ',') { // end of argument
           args.push_back(arg);
           arg = "";
         }
         else {
-          arg += prototype[i];
+          arg += prototype[i]; 
         }
       }
     // last argument
@@ -873,7 +873,6 @@ namespace xfst {
   // searching for the word in text.
   static bool allow_char(char c)
   {
-    //std::cerr << "allow_char: " << c << std::endl;
     std::string allowed_chars = " \n\t.,;:?!-/'\"<>()|";
     for (size_t i=0; i < allowed_chars.size(); i++)
       {
@@ -889,8 +888,6 @@ namespace xfst {
   // Punctuation characters and upper/lower case are handled in this function.
   static bool string_found(const std::string & str_, const std::string & text_)
   {
-    //std::cerr << "string_found: " << str << ", " << text << std::endl;
-
     std::string str = to_upper_case(str_); 
     std::string text = to_upper_case(text_); 
     std::size_t pos = text.find(str);
