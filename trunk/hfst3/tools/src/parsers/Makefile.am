@@ -17,6 +17,14 @@
 
 SUBDIRS=test
 
+hfst_xfst2fst_SOURCES = xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc hfst-xfst2fst.cc $(HFST_COMMON_SRC)
+
+if HH_EXTENSION_USED
+else
+xfst-parser.hh: xfst-parser.h
+	mv -f $< $@
+endif
+
 BUILT_SOURCES=xfst-parser.hh xfst-parser.cc xfst-lexer.cc
 
 AM_YFLAGS=-d
@@ -44,7 +52,6 @@ noinst_HEADERS = XfstCompiler.h xfst-utils.h xfst-parser.hh
 HFST_COMMON_SRC=../hfst-program-options.cc ../hfst-commandline.cc ../hfst-tool-metadata.cc ../HfstStrings2FstTokenizer.cc ../hfst-file-to-mem.cc
 
 bin_PROGRAMS=$(MAYBE_XFST)
-hfst_xfst2fst_SOURCES = xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc hfst-xfst2fst.cc $(HFST_COMMON_SRC)
 
 if WANT_READLINE
   hfst_xfst2fst_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS) -lreadline
