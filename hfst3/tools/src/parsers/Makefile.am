@@ -25,7 +25,8 @@ xfst-parser.hh: xfst-parser.h
 	ln -s $< $@
 endif
 
-BUILT_SOURCES=xfst-parser.hh xfst-parser.cc xfst-lexer.cc
+BUILT_SOURCES=xfst-parser.cc xfst-lexer.cc
+CLEANFILES=xfst-parser.cc xfst-lexer.cc xfst-parser.hh xfst-parser.h
 
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c

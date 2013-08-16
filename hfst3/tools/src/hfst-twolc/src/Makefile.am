@@ -92,6 +92,7 @@ hfst_twolc_system_SOURCES=hfst-twolc-system.cc
 BUILT_SOURCES=htwolcpre1.hh htwolcpre2.hh htwolcpre3.hh
 
 CLEANFILES=htwolcpre1.hh htwolcpre2.hh htwolcpre3.hh \
+	   htwolcpre1.h htwolcpre2.h htwolcpre3.h \
 	   htwolcpre1.cc htwolcpre2.cc htwolcpre3.cc
 
 hfst-twolc$(EXEEXT): hfst-twolc.sh
@@ -108,11 +109,11 @@ clean-local:
 if HH_EXTENSION_USED
 else
 htwolcpre1.hh: htwolcpre1.h
-	mv -f $< $@
+	ln -s $< $@
 htwolcpre2.hh: htwolcpre2.h
-	mv -f $< $@
+	ln -s $< $@
 htwolcpre3.hh: htwolcpre3.h
-	mv -f $< $@
+	ln -s $< $@
 endif
 
 HFST_TWOLC_TESTS=string_manipulation InputReader Alphabet \

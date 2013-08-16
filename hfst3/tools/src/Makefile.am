@@ -307,9 +307,9 @@ install-exec-hook:
 		$(LN_S) -f hfst-disjunct$(EXEEXT) hfst-union$(EXEEXT)
 #		$(LN_S) -f hfst-preprocess-for-optimized-lookup-format$(EXEEXT) hfst-preprocess-for-optimised-lookup-format$(EXEEXT) &&
 
-BUILT_SOURCES=hfst-scanner.h hfst-compiler.hh $(hfst_lexc2fst_BUILT) 
+BUILT_SOURCES=hfst-scanner.h $(hfst_lexc2fst_BUILT) 
 
-CLEANFILES=hfst-scanner.h hfst-compiler.hh hfst-compiler.cc $(hfst_lexc2fst_BUILT) 
+CLEANFILES=hfst-scanner.h hfst-compiler.hh hfst-compiler.h hfst-compiler.cc $(hfst_lexc2fst_BUILT) 
 
 # make make realise headers automatically follow from flexing
 hfst-scanner.h: hfst-scanner.cc
@@ -323,6 +323,6 @@ AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 if HH_EXTENSION_USED
 else
 hfst-compiler.hh: hfst-compiler.h
-	mv -f $< $@
+	ln -s $< $@
 endif
 
