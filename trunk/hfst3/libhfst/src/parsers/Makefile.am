@@ -19,19 +19,21 @@ noinst_LTLIBRARIES=libhfstparsers.la
 
 XRE_SRCS=xre_lex.ll xre_parse.yy xre_utils.cc XreCompiler.cc
 XRE_HDRS=XreCompiler.h xre_utils.h
-XRE_BUILT=xre_parse.hh xre_parse.cc xre_lex.cc
+XRE_BUILT=xre_parse.cc xre_lex.cc
 
 PMATCH_SRCS=pmatch_lex.ll pmatch_parse.yy pmatch_utils.cc PmatchCompiler.cc
 PMATCH_HDRS=PmatchCompiler.h pmatch_utils.h
-PMATCH_BUILT=pmatch_parse.hh pmatch_parse.cc pmatch_lex.cc
+PMATCH_BUILT=pmatch_parse.cc pmatch_lex.cc
 
 LEXC_SRCS=lexc-lexer.ll lexc-parser.yy lexc-utils.cc LexcCompiler.cc
 LEXC_HDRS=LexcCompiler.h lexc-utils.h
-LEXC_BUILT=lexc-parser.hh
+LEXC_BUILT=
 
 BUILT_SOURCES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT)
 
-CLEANFILES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) lexc-lexer.cc lexc-parser.cc
+CLEANFILES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) lexc-lexer.cc lexc-parser.cc \
+xre_parse.hh pmatch_parse.hh lexc-parser.hh \
+xre_parse.h pmatch_parse.h lexc-parser.h
 
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
@@ -39,11 +41,11 @@ AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 if HH_EXTENSION_USED
 else
 xre_parse.hh: xre_parse.h
-	mv -f $< $@
+	ln -s $< $@
 pmatch_parse.hh: pmatch_parse.h
-	mv -f $< $@
+	ln -s $< $@
 lexc-parser.hh: lexc-parser.h
-	mv -f $< $@
+	ln -s $< $@
 endif
 
 libhfstparsers_la_SOURCES=$(SFST_SRCS) $(XRE_SRCS) $(PMATCH_SRCS) $(LEXC_SRCS)
