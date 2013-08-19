@@ -378,7 +378,9 @@ void PmatchContainer::initialize_input(const char * input)
     input_tape[i] = special_symbols[boundary];
     input_tape[i+1] = NO_SYMBOL_NUMBER;
     // Place input_tape beyond the opening NO_SYMBOL
-    while (*input_tape == NO_SYMBOL_NUMBER) {
+    ++input_tape;
+    // If the boundary marker is NO_SYMBOL (unused), skip it too
+    if (*input_tape == NO_SYMBOL_NUMBER) {
         ++input_tape;
     }
     return;
