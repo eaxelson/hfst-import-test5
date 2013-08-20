@@ -873,7 +873,44 @@ REGEXP12: LABEL { }
             xreerror("no read prolog");
         }
         | READ_RE {
-            xreerror("Definitely no read regex");
+            FILE * f = NULL;
+            f = fopen($1, "r");
+            if (f == NULL) {
+              xreerror("File cannot be opened.\n");
+              YYABORT;
+            }
+            else {
+              // read the regex in a string
+              std::ifstream ifs($1);
+              std::stringstream buffer;
+              buffer << ifs.rdbuf();
+              char * regex_string = strdup(buffer.str().c_str());
+
+              // create a new scanner for evaluating the regex
+              yyscan_t scanner;
+              xrelex_init(&scanner);
+              YY_BUFFER_STATE bs = xre_scan_string(regex_string, scanner);
+
+              unsigned int chars_read = hfst::xre::cr;
+              hfst::xre::cr = 0;
+
+              int parse_retval = xreparse(scanner);
+
+              xre_delete_buffer(bs,scanner);
+              xrelex_destroy(scanner);
+
+              free(regex_string);
+
+              hfst::xre::cr = chars_read;
+
+              $$ = hfst::xre::last_compiled;
+
+              if (parse_retval != 0)
+              {
+                xreerror("Error parsing regex.\n");
+                YYABORT;
+              }
+            }
         }
         ;
 
