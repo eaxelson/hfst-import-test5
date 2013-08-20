@@ -289,7 +289,7 @@ parse_quoted(const char *s)
               case 'x':
                   {
                     char* endp;
-                    int i = strtol(p + 2, &endp, 10);
+                    int i = strtol(p + 2, &endp, 16);
                     if ( 0 < i && i <= 127)
                       {
                         *r = static_cast<char>(i);
