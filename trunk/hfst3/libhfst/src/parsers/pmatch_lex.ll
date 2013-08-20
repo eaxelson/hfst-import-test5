@@ -247,7 +247,7 @@ LWSP [\t\r\n ]
     return WEIGHT;
 }
 
-"\""[^""]+"\"" {
+"\""([^"\""]|"\\\"")+"\"" {
     pmatchlval.label = hfst::pmatch::parse_quoted(pmatchtext); 
     return QUOTED_LITERAL;
 }
