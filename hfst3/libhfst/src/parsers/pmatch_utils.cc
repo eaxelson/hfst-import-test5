@@ -466,6 +466,7 @@ HfstTransducer * PmatchUtilityTransducers::make_latin1_acceptor(ImplementationTy
       retval->disjunct(*tmp); delete tmp;
       tmp = make_latin1_punct_acceptor(); retval->disjunct(*tmp); delete tmp;
       tmp = make_latin1_whitespace_acceptor(); retval->disjunct(*tmp); delete tmp;
+      retval->minimize();
       return retval;
   }
 
@@ -474,6 +475,7 @@ HfstTransducer * PmatchUtilityTransducers::make_latin1_alpha_acceptor(Implementa
       HfstTransducer * retval = make_latin1_lowercase_acceptor();
       HfstTransducer * tmp = make_latin1_uppercase_acceptor();
       retval->disjunct(*tmp); delete tmp;
+      retval->minimize();
       return retval;
   }
 
@@ -482,6 +484,7 @@ HfstTransducer * PmatchUtilityTransducers::make_latin1_lowercase_acceptor(Implem
       HfstTransducer * retval = acceptor_from_cstr(latin1_lower, type);
       HfstTransducer * tmp = make_combining_accent_acceptor();
       retval->disjunct(*tmp); delete tmp;
+      retval->minimize();
       return retval;
   }
 
@@ -490,6 +493,7 @@ HfstTransducer * PmatchUtilityTransducers::make_latin1_uppercase_acceptor(Implem
       HfstTransducer * retval = acceptor_from_cstr(latin1_upper, type);
       HfstTransducer * tmp = make_combining_accent_acceptor();
       retval->disjunct(*tmp); delete tmp;
+      retval->minimize();
       return retval;
   }
 
@@ -508,6 +512,7 @@ HfstTransducer * PmatchUtilityTransducers::make_latin1_numeral_acceptor(Implemen
           retval->disjunct(HfstTransducer(std::string(1, *it), type));
       }
       return retval;
+      retval->minimize();
   }
 
 HfstTransducer * PmatchUtilityTransducers::make_latin1_punct_acceptor(ImplementationType type)
@@ -528,6 +533,10 @@ HfstTransducer * PmatchUtilityTransducers::make_capify(ImplementationType type)
         retval->disjunct(HfstTransducer(latin1_lower[i], latin1_upper[i],
                                         tok, type));
     }
+    HfstTransducer accents(*combining_accent_acceptor);
+    accents.optionalize();
+    retval->concatenate(accents);
+    retval->minimize();
     return retval;
 }
 
@@ -539,6 +548,10 @@ HfstTransducer * PmatchUtilityTransducers::make_lowerfy(ImplementationType type)
         retval->disjunct(HfstTransducer(latin1_upper[i], latin1_lower[i],
                                         tok, type));
     }
+    HfstTransducer accents(*combining_accent_acceptor);
+    accents.optionalize();
+    retval->concatenate(accents);
+    retval->minimize();
     return retval;
 }
 
@@ -561,6 +574,7 @@ HfstTransducer * PmatchUtilityTransducers::optcap(HfstTransducer & t)
     retval->compose(optcap_one_word.concatenate(more_words));
     retval->output_project();
     retval->disjunct(t);
+    retval->minimize();
     return retval;
 }
 
@@ -575,6 +589,7 @@ HfstTransducer * PmatchUtilityTransducers::tolower(HfstTransducer & t)
     HfstTransducer * retval = new HfstTransducer(t);
     retval->compose(lowercase.repeat_star());
     retval->output_project();
+    retval->minimize();
     return retval;
 }
 
@@ -589,6 +604,7 @@ HfstTransducer * PmatchUtilityTransducers::toupper(HfstTransducer & t)
     HfstTransducer * retval = new HfstTransducer(t);
     retval->compose(uppercase.repeat_star());
     retval->output_project();
+    retval->minimize();
     return retval;
 }
 
