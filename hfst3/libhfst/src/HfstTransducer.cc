@@ -3001,11 +3001,11 @@ HfstTransducer &HfstTransducer::compose
  bool harmonize)
 { is_trie = false;
 
-    if (this->type != another.type)
-    HFST_THROW_MESSAGE(HfstTransducerTypeMismatchException,
-               "HfstTransducer::compose");
-
     HfstTransducer * another_copy = new HfstTransducer(another);
+
+    if (this->type != another_copy->type) {
+        another_copy->convert(this->type);
+    }
 
     /* prevent harmonization, if needed */
     if (! harmonize)
