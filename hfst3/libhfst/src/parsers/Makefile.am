@@ -27,7 +27,7 @@ PMATCH_BUILT=pmatch_parse.cc pmatch_lex.cc
 
 LEXC_SRCS=lexc-lexer.ll lexc-parser.yy lexc-utils.cc LexcCompiler.cc
 LEXC_HDRS=LexcCompiler.h lexc-utils.h
-LEXC_BUILT=
+LEXC_BUILT=lexc-parser.cc lexc-lexer.cc
 
 BUILT_SOURCES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT)
 
