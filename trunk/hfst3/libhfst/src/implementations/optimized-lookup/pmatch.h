@@ -118,6 +118,7 @@ namespace hfst_ol {
             char tape_step;
             SymbolNumber * context_placeholder;
             ContextChecking context;
+            bool identity_symbol_trap;
         };
 
         struct RtnVariables

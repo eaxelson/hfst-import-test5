@@ -308,6 +308,7 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
     locals_front.tape_step = 1;
     locals_front.context = none;
     locals_front.context_placeholder = NULL;
+    locals_front.identity_symbol_trap = false;
     local_stack.push(locals_front);
     RtnVariables rtn_front;
     rtn_front.candidate_input_pos = NULL;
@@ -395,6 +396,7 @@ void PmatchTransducer::match(SymbolNumber ** input_tape_entry,
     local_stack.top().context = none;
     local_stack.top().tape_step = 1;
     local_stack.top().context_placeholder = NULL;
+    local_stack.top().identity_symbol_trap = false;
     get_analyses(*input_tape_entry, *output_tape_entry, 0);
     *input_tape_entry = rtn_stack.top().candidate_input_pos;
 }
@@ -410,6 +412,7 @@ void PmatchTransducer::rtn_call(SymbolNumber * input_tape_entry,
     local_stack.top().tape_step = 1;
     local_stack.top().context = none;
     local_stack.top().context_placeholder = NULL;
+    local_stack.top().identity_symbol_trap = false;
     get_analyses(input_tape_entry, output_tape_entry, 0);
 }
 
@@ -570,7 +573,14 @@ void PmatchTransducer::find_transitions(SymbolNumber input,
     while (transition_table[i].input != NO_SYMBOL_NUMBER) {
         if (transition_table[i].input == input) {
             if (!checking_context()) {
-                *output_tape = transition_table[i].output;
+                SymbolNumber output = transition_table[i].output;
+                if (input == alphabet.get_identity_symbol()) {
+                // we got here via identity, so look back in the
+                // input tape to find the symbol we want to write
+                    output = *(input_tape - 1);
+                }
+
+                *output_tape = output;
                 get_analyses(input_tape,
                              output_tape + 1,
                              transition_table[i].target);
@@ -580,6 +590,7 @@ void PmatchTransducer::find_transitions(SymbolNumber input,
                              output_tape,
                              transition_table[i].target);
             }
+            local_stack.top().identity_symbol_trap = false;
         } else {
             return;
         }
@@ -597,6 +608,7 @@ void PmatchTransducer::find_index(SymbolNumber input,
                          input_tape,
                          output_tape,
                          index_table[i+input].target - TRANSITION_TARGET_TABLE_START);
+        local_stack.top().identity_symbol_trap = false;
     }
 }
 
@@ -606,6 +618,7 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
 {
     if (indexes_transition_table(i))
     {
+        local_stack.top().identity_symbol_trap = true;
         i -= TRANSITION_TARGET_TABLE_START;
         
         try_epsilon_transitions(input_tape,
@@ -628,8 +641,13 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
                          input_tape,
                          output_tape,
                          i+1);
+        if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER &&
+            local_stack.top().identity_symbol_trap == true) {
+            find_transitions(alphabet.get_identity_symbol(),
+                             input_tape, output_tape, i+1);
+        }
     } else {
-
+        local_stack.top().identity_symbol_trap = true;
         try_epsilon_indices(input_tape,
                             output_tape,
                             i+1);
@@ -650,7 +668,12 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
                    input_tape,
                    output_tape,
                    i+1);
-        
+        if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER &&
+            local_stack.top().identity_symbol_trap == true) {
+            find_index(alphabet.get_identity_symbol(),
+                       input_tape, output_tape, i+1);
+        }
+
     }
 }
 
