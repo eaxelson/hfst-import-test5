@@ -89,7 +89,7 @@ htwolcpre3_SOURCES=htwolcpre3.yy scanner3.ll HfstTwolcDefs.h \
 hfst_twolc_system_SOURCES=hfst-twolc-system.cc
 
 # some systems might require all these
-BUILT_SOURCES=htwolcpre1.hh htwolcpre2.hh htwolcpre3.hh
+BUILT_SOURCES=htwolcpre1.cc htwolcpre2.cc htwolcpre3.cc
 
 CLEANFILES=htwolcpre1.hh htwolcpre2.hh htwolcpre3.hh \
 	   htwolcpre1.h htwolcpre2.h htwolcpre3.h \
