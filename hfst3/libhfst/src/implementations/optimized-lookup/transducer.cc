@@ -37,6 +37,8 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
             unknown_symbol = i;
         } else if (hfst::is_default(str)) {
             default_symbol = i;
+        } else if (hfst::is_identity(str)) {
+            identity_symbol = i;
         }
         if(!is) {
             HFST_THROW(TransducerHasWrongTypeException);
