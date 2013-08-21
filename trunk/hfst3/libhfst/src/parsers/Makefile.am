@@ -31,9 +31,9 @@ LEXC_BUILT=lexc-parser.cc lexc-lexer.cc
 
 BUILT_SOURCES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT)
 
-CLEANFILES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) lexc-lexer.cc lexc-parser.cc \
-xre_parse.hh pmatch_parse.hh lexc-parser.hh \
-xre_parse.h pmatch_parse.h lexc-parser.h
+CLEANFILES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) \
+             xre_parse.hh pmatch_parse.hh lexc-parser.hh \
+             xre_parse.h  pmatch_parse.h  lexc-parser.h
 
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
