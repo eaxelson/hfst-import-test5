@@ -66,6 +66,7 @@ class HfstStrings2FstTokenizer
   //! The parameter spaces tells whether spaces have been used to separate 
   //! symbols.
   StringPairVector tokenize_string_pair(const std::string &str,bool spaces);
+
  protected:
 
   HfstTokenizer tokenizer;

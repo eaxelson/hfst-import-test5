@@ -62,6 +62,7 @@ EXTRA_DIST=test.sh \
 	inspect_net.alternative_output \
 	prolog.xfst prolog.att assert.xfst \
 	at_re_1.xfst at_re_1.att at_re_2.xfst at_re_2.att \
-	at_re_3.xfst at_re_3.att \
-	a2b.re at_re_a2b.re
+	at_re_3.xfst at_re_3.att a2b.re at_re_a2b.re \
+	at_txt.xfst at_stxt.xfst at_txt_and_stxt.xfst \
+	words.txt words.stxt
 check_DATA=test.sh

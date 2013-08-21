@@ -857,17 +857,59 @@ REGEXP12: LABEL { }
         | LABEL WEIGHT { 
             $$ = & $1->set_final_weights($2);
         }
-        | READ_BIN {
+        | READ_BIN { // todo: case that file does not exist
             hfst::HfstInputStream instream($1);
             $$ = new HfstTransducer(instream);
             instream.close();
             free($1);
         }
         | READ_TEXT {
-            xreerror("no read text");
+            FILE * f = NULL;
+            f = fopen($1, "r");
+            if (f == NULL) {
+              xreerror("File cannot be opened.\n");
+              YYABORT;
+            }
+            else {
+              HfstBasicTransducer tmp;
+              HfstTokenizer tok;
+              char line [1000];
+
+              while( fgets(line, 1000, f) != NULL )
+              {
+                hfst::xre::strip_newline(line);
+                StringPairVector spv = tok.tokenize(line);
+                tmp.disjunct(spv, 0);
+              }
+              fclose(f);
+              HfstTransducer * retval = new HfstTransducer(tmp, hfst::xre::format); 
+              retval->minimize();
+              $$ = retval;
+            }
         }
         | READ_SPACED {
-            xreerror("no read spaced");
+            FILE * f = NULL;
+            f = fopen($1, "r");
+            if (f == NULL) {
+              xreerror("File cannot be opened.\n");
+              YYABORT;
+            }
+            else {
+              HfstTokenizer tok;
+              HfstBasicTransducer tmp;
+              char line [1000];
+
+              while( fgets(line, 1000, f) != NULL )
+              {
+                hfst::xre::strip_newline(line);
+                StringPairVector spv = HfstTokenizer::tokenize_space_separated(line);
+                tmp.disjunct(spv, 0);
+              }
+              fclose(f);
+              HfstTransducer * retval = new HfstTransducer(tmp, hfst::xre::format); 
+              retval->minimize();
+              $$ = retval;
+            }
         }
         | READ_PROLOG {
             xreerror("no read prolog");
@@ -877,9 +919,11 @@ REGEXP12: LABEL { }
             f = fopen($1, "r");
             if (f == NULL) {
               xreerror("File cannot be opened.\n");
+              fclose(f);
               YYABORT;
             }
             else {
+              fclose(f);
               // read the regex in a string
               std::ifstream ifs($1);
               std::stringstream buffer;

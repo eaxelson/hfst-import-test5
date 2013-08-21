@@ -117,6 +117,8 @@ namespace hfst
     /** \brief Tokenize the string \a input_string. */
     StringVector tokenize_one_level(const std::string &input_string) const;
 
+    static StringPairVector tokenize_space_separated(const std::string & str);
+
     /** \brief Tokenize the string pair \a input_string : \a output_string. 
 
         If one string has more tokens than the other, epsilons will be

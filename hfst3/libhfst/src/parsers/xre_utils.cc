@@ -142,6 +142,17 @@ getinput(char *buf, int maxlen)
 }
 
 char*
+strip_newline(char *s)
+{
+  for (unsigned int pos = 0; s[pos] != '\0'; pos++)
+    {
+      if (s[pos] == '\n' || s[pos] == '\r')
+        s[pos] = '\0';
+    }
+  return s;
+}
+
+char*
 strip_curly(const char *s)
 {
     const char *c = s;

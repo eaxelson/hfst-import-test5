@@ -110,7 +110,6 @@ const
 { return (s == "") or (skip_symbol_set.find(s) != skip_symbol_set.end()); }
 
 void
-
 HfstTokenizer::add_multichar_symbol(const string& symbol)
 {  multi_char_symbols.add(symbol.c_str()); }
 
@@ -158,6 +157,43 @@ StringVector HfstTokenizer::tokenize_one_level
   return sv;
 }
 
+StringPairVector HfstTokenizer::tokenize_space_separated(const std::string & str)
+{
+  check_utf8_correctness(str);
+
+  StringPairVector retval;
+  size_t pos = 0;
+  // position where a symbol begins, not yet defined
+  size_t symbol_pos = std::string::npos;
+
+  while (pos < str.size())
+    {
+      // end of symbol reached
+      if (str[pos] == ' ' && symbol_pos != std::string::npos)
+        {
+          std::string symbol(str, symbol_pos, pos - symbol_pos);
+          retval.push_back(StringPair(symbol, symbol));
+          symbol_pos = std::string::npos; // next symbol not yet found
+        }
+      // next symbol found
+      else if (str[pos] != ' ' && symbol_pos == std::string::npos)
+        {
+          symbol_pos = pos;
+        }
+      else 
+        {}
+      ++pos;
+    }
+  
+  // last symbol
+  if (symbol_pos != std::string::npos)
+    {
+      std::string symbol(str, symbol_pos, std::string::npos);
+      retval.push_back(StringPair(symbol, symbol));
+    }
+
+  return retval;
+}
 
 StringPairVector HfstTokenizer::tokenize
 (const string& input_string,const string& output_string) const
