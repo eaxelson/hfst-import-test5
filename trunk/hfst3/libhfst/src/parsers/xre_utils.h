@@ -43,6 +43,8 @@ char* strip_curly(const char *s);
  */
 char* strip_percents(const char *s);
 
+ char* strip_newline(char *s);
+
 /**
  * @brief add percents to string to form valid XRE symbol.
  */
