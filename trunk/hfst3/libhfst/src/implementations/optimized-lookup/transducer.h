@@ -313,6 +313,7 @@ protected:
     hfst::FdTable<SymbolNumber> fd_table;
     SymbolNumber unknown_symbol;
     SymbolNumber default_symbol;
+    SymbolNumber identity_symbol;
     
   
 public:
@@ -321,6 +322,7 @@ public:
             symbol_table.push_back("@_EPSILON_SYMBOL_@");
             unknown_symbol = NO_SYMBOL_NUMBER;
             default_symbol = NO_SYMBOL_NUMBER;
+            identity_symbol = NO_SYMBOL_NUMBER;
         }
     TransducerAlphabet(std::istream& is, SymbolNumber symbol_count);
     TransducerAlphabet(const SymbolTable& st);
@@ -361,6 +363,8 @@ public:
         { return unknown_symbol; }
     SymbolNumber get_default_symbol(void) const
         { return default_symbol; }
+    SymbolNumber get_identity_symbol(void) const
+        { return identity_symbol; }
     void add_symbol(char * symbol);
     
 };
