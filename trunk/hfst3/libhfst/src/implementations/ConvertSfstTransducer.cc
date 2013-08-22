@@ -56,21 +56,21 @@ namespace hfst { namespace implementations
       // and initialize the transition vector of net for maximum efficiency
       unsigned int number_of_arcs=0;
       for( SFST::ArcsIter p(arcs); p; p++ ) {
-	number_of_arcs++;
+        number_of_arcs++;
       }      
       net->initialize_transition_vector(node->index, number_of_arcs);
       
       // Go through all transitions and copy them to \a net
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
-	
+        
         net->add_transition
-	  (node->index, 
-	   HfstBasicTransition
-	   (arc->target_node()->index,
-	    harmonization_vector.at(arc->label().lower_char()),
-	    harmonization_vector.at(arc->label().upper_char()),
-	    0, false), false);
+          (node->index, 
+           HfstBasicTransition
+           (arc->target_node()->index,
+            harmonization_vector.at(arc->label().lower_char()),
+            harmonization_vector.at(arc->label().upper_char()),
+            0, false), false);
       }
       
       if (node->is_final()) {
@@ -80,9 +80,9 @@ namespace hfst { namespace implementations
       // Call this function recursively for all target nodes
       // of the transitions
       for( SFST::ArcsIter p(arcs); p; p++ ) {
-	SFST::Arc *arc=p;
-	sfst_to_hfst_basic_transducer
-	  (arc->target_node(), net, harmonization_vector);
+        SFST::Arc *arc=p;
+        sfst_to_hfst_basic_transducer
+          (arc->target_node(), net, harmonization_vector);
       }
     }
   }
@@ -100,10 +100,10 @@ namespace hfst { namespace implementations
     for (SFST::Alphabet::CharMap::const_iterator it 
            = CM.begin(); it != CM.end(); it++) 
       {
-	if (it->first != 0)
-	  alphabet_before.insert(std::string(it->second));
-	else
-	  alphabet_before.insert(internal_epsilon);
+        if (it->first != 0)
+          alphabet_before.insert(std::string(it->second));
+        else
+          alphabet_before.insert(internal_epsilon);
       }  
 #endif
 
@@ -136,9 +136,10 @@ namespace hfst { namespace implementations
     for (SFST::Alphabet::CharMap::const_iterator it 
            = cm.begin(); it != cm.end(); it++) 
       {
+        assert(strcmp(it->second, "") != 0);
         if (it->first != 0) { // The epsilon symbol "<>" is not inserted
-	  net->alphabet.insert(std::string(it->second));
-	}
+          net->alphabet.insert(std::string(it->second));
+        }
       }
     
 #ifdef DEBUG_CONVERSION
@@ -162,10 +163,10 @@ namespace hfst { namespace implementations
     
     // Copy the alphabet
     for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
-	   = net->alphabet.begin();
-	 it != net->alphabet.end(); it++) {
+           = net->alphabet.begin();
+         it != net->alphabet.end(); it++) {
       if (not is_epsilon(*it) && not is_unknown(*it) && not is_identity(*it))
-	t->alphabet.add_symbol(it->c_str(), net->get_symbol_number(*it));
+        t->alphabet.add_symbol(it->c_str(), net->get_symbol_number(*it));
     }
     
     // How symbols occurring in the basic transducer must be recoded
@@ -188,34 +189,34 @@ namespace hfst { namespace implementations
     // Go through all states
     unsigned int source_state=0;
     for (HfstBasicTransducer::const_iterator it = net->begin();
-	 it != net->end(); it++)
+         it != net->end(); it++)
       {
-	// Go through the set of transitions in each state
-	for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
-	       = it->begin();
-	     tr_it != it->end(); tr_it++)
-	  {
-	    // input and output numbers in the transition
-	    SFST::Label l
-	      (harm.at(tr_it->get_input_number()),
-	       harm.at(tr_it->get_output_number()));
-	    
-	    // Copy transition to node
-	    state_vector[source_state]->add_arc
-	      (l, state_vector[tr_it->get_target_state()], t);	    
-	  }
-	source_state++;
+        // Go through the set of transitions in each state
+        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
+               = it->begin();
+             tr_it != it->end(); tr_it++)
+          {
+            // input and output numbers in the transition
+            SFST::Label l
+              (harm.at(tr_it->get_input_number()),
+               harm.at(tr_it->get_output_number()));
+            
+            // Copy transition to node
+            state_vector[source_state]->add_arc
+              (l, state_vector[tr_it->get_target_state()], t);      
+          }
+        source_state++;
       }
     
     // Go through the final states
     for (HfstBasicTransducer::FinalWeightMap::const_iterator it 
-	   = net->final_weight_map.begin();
-	 it != net->final_weight_map.end(); it++) 
+           = net->final_weight_map.begin();
+         it != net->final_weight_map.end(); it++) 
       {
-	if (it->first >= state_vector.size()) { // should not happen..
-	  state_vector.push_back(t->new_node());
-	}
-	state_vector[it->first]->set_final(1);
+        if (it->first >= state_vector.size()) { // should not happen..
+          state_vector.push_back(t->new_node());
+        }
+        state_vector[it->first]->set_final(1);
       }
     
     return t;

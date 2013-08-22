@@ -22,7 +22,7 @@ hfst_xfst2fst_SOURCES = xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.
 if HH_EXTENSION_USED
 else
 xfst-parser.hh: xfst-parser.h
-	ln -s $< $@
+	cp $< $@
 endif
 
 BUILT_SOURCES=xfst-parser.cc xfst-lexer.cc
