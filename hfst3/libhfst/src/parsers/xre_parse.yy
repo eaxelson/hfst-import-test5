@@ -912,7 +912,28 @@ REGEXP12: LABEL { }
             }
         }
         | READ_PROLOG {
-            xreerror("no read prolog");
+            FILE * f = NULL;
+            f = fopen($1, "r");
+            if (f == NULL) {
+              xreerror("File cannot be opened.\n");
+              YYABORT;
+            }
+            else {
+              try {
+                unsigned int linecount = 0;
+                HfstBasicTransducer tmp = HfstBasicTransducer::read_in_prolog_format(f, linecount);
+                fclose(f);
+                HfstTransducer * retval = new HfstTransducer(tmp, hfst::xre::format);
+                retval->minimize();
+                $$ = retval;
+              }
+              catch (const HfstException & e) {
+                (void) e; // todo handle the exception
+                fclose(f);
+                xreerror("Error reading prolog file.\n");
+                YYABORT;
+              }
+            }
         }
         | READ_RE {
             FILE * f = NULL;
