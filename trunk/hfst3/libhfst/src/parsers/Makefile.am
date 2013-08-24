@@ -40,10 +40,13 @@ AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
 if HH_EXTENSION_USED
 else
+xre_lex.ll: xre_parse.hh
 xre_parse.hh: xre_parse.h
 	cp $< $@
+pmatch_lex.ll: pmatch_parse.hh
 pmatch_parse.hh: pmatch_parse.h
 	cp $< $@
+lexc-lexer.ll: lexc-parser.hh
 lexc-parser.hh: lexc-parser.h
 	cp $< $@
 endif
