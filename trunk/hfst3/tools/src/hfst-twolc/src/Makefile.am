@@ -108,14 +108,14 @@ clean-local:
 
 if HH_EXTENSION_USED
 else
-scanner1.ll: htwolcpre1.hh
-htwolcpre1.hh: htwolcpre1.h
+scanner1.ll: htwolcpre1.h
+htwolcpre1.h: htwolcpre1.hh
 	cp $< $@
-scanner2.ll: htwolcpre2.hh
-htwolcpre2.hh: htwolcpre2.h
+scanner2.ll: htwolcpre2.h
+htwolcpre2.h: htwolcpre2.hh
 	cp $< $@
-scanner3.ll: htwolcpre3.hh
-htwolcpre3.hh: htwolcpre3.h
+scanner3.ll: htwolcpre3.h
+htwolcpre3.h: htwolcpre3.hh
 	cp $< $@
 endif
 
