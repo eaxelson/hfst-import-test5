@@ -32,22 +32,22 @@ LEXC_BUILT=lexc-parser.cc lexc-lexer.cc
 BUILT_SOURCES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT)
 
 CLEANFILES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) \
-             xre_parse.hh pmatch_parse.hh lexc-parser.hh \
-             xre_parse.h  pmatch_parse.h  lexc-parser.h
+             xre_parse.hh pmatch_parse.hh lexc-parser.hh
 
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
 if HH_EXTENSION_USED
 else
-xre_lex.ll: xre_parse.h
-xre_parse.h: xre_parse.hh
+CLEANFILES+=xre_parse.h  pmatch_parse.h  lexc-parser.h
+xre_lex.ll: xre_parse.hh
+xre_parse.hh: xre_parse.h
 	cp $< $@
-pmatch_lex.ll: pmatch_parse.h
-pmatch_parse.h: pmatch_parse.hh
+pmatch_lex.ll: pmatch_parse.hh
+pmatch_parse.hh: pmatch_parse.h
 	cp $< $@
-lexc-lexer.ll: lexc-parser.h
-lexc-parser.h: lexc-parser.hh
+lexc-lexer.ll: lexc-parser.hh
+lexc-parser.hh: lexc-parser.h
 	cp $< $@
 endif
 
