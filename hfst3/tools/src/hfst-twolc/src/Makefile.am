@@ -92,7 +92,6 @@ hfst_twolc_system_SOURCES=hfst-twolc-system.cc
 BUILT_SOURCES=htwolcpre1.cc htwolcpre2.cc htwolcpre3.cc
 
 CLEANFILES=htwolcpre1.hh htwolcpre2.hh htwolcpre3.hh \
-	   htwolcpre1.h htwolcpre2.h htwolcpre3.h \
 	   htwolcpre1.cc htwolcpre2.cc htwolcpre3.cc
 
 hfst-twolc$(EXEEXT): hfst-twolc.sh
@@ -108,14 +107,16 @@ clean-local:
 
 if HH_EXTENSION_USED
 else
-scanner1.ll: htwolcpre1.h
-htwolcpre1.h: htwolcpre1.hh
+CLEANFILES+=htwolcpre1.h htwolcpre2.h htwolcpre3.h
+
+scanner1.ll: htwolcpre1.hh
+htwolcpre1.hh: htwolcpre1.h
 	cp $< $@
-scanner2.ll: htwolcpre2.h
-htwolcpre2.h: htwolcpre2.hh
+scanner2.ll: htwolcpre2.hh
+htwolcpre2.hh: htwolcpre2.h
 	cp $< $@
-scanner3.ll: htwolcpre3.h
-htwolcpre3.h: htwolcpre3.hh
+scanner3.ll: htwolcpre3.hh
+htwolcpre3.hh: htwolcpre3.h
 	cp $< $@
 endif
 

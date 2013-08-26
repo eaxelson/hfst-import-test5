@@ -19,14 +19,15 @@ SUBDIRS=test
 
 hfst_xfst2fst_SOURCES = xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc hfst-xfst2fst.cc $(HFST_COMMON_SRC)
 
+BUILT_SOURCES=xfst-parser.cc xfst-lexer.cc
+CLEANFILES=xfst-parser.cc xfst-lexer.cc xfst-parser.hh
+
 if HH_EXTENSION_USED
 else
-xfst-parser.h: xfst-parser.hh
+CLEANFILES+=xfst-parser.h
+xfst-parser.hh: xfst-parser.h
 	cp $< $@
 endif
-
-BUILT_SOURCES=xfst-parser.cc xfst-lexer.cc
-CLEANFILES=xfst-parser.cc xfst-lexer.cc xfst-parser.hh xfst-parser.h
 
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
