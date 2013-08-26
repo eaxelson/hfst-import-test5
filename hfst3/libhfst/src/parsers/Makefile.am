@@ -37,8 +37,7 @@ CLEANFILES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) \
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
-if HH_EXTENSION_USED
-else
+if !HH_EXTENSION_USED
 CLEANFILES+=xre_parse.h  pmatch_parse.h  lexc-parser.h
 xre_lex.ll: xre_parse.hh
 xre_parse.hh: xre_parse.h
