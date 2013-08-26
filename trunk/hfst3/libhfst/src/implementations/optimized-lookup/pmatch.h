@@ -22,6 +22,7 @@ namespace hfst_ol {
     protected:
         TransducerAlphabet alphabet;
         Encoder * encoder;
+        SymbolNumber orig_symbol_count;
         SymbolNumber symbol_count;
         PmatchTransducer * toplevel;
         RtnMap rtns;
@@ -118,7 +119,7 @@ namespace hfst_ol {
             char tape_step;
             SymbolNumber * context_placeholder;
             ContextChecking context;
-            bool identity_symbol_trap;
+            bool default_symbol_trap;
         };
 
         struct RtnVariables
@@ -135,6 +136,7 @@ namespace hfst_ol {
         std::vector<SimpleIndex> index_table;
 
         TransducerAlphabet & alphabet;
+        SymbolNumber orig_symbol_count;
     
         RtnMap & rtns;
         std::map<SpecialSymbol, SymbolNumber> & markers;

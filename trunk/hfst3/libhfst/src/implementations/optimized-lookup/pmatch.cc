@@ -16,7 +16,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
     // for once more established
     
     TransducerHeader header(inputstream);
-    symbol_count = header.symbol_count();
+    orig_symbol_count = symbol_count = header.symbol_count();
     alphabet = TransducerAlphabet(inputstream, header.symbol_count());
 
     // Retrieve extra special symbols from the alphabet
@@ -302,13 +302,14 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
     rtns(rtn_map),
     markers(marker_symbols)
 {
+    orig_symbol_count = alphabet.get_symbol_table().size();
     // initialize the stack for local variables
     LocalVariables locals_front;
     locals_front.flag_state = alphabet.get_fd_table();
     locals_front.tape_step = 1;
     locals_front.context = none;
     locals_front.context_placeholder = NULL;
-    locals_front.identity_symbol_trap = false;
+    locals_front.default_symbol_trap = false;
     local_stack.push(locals_front);
     RtnVariables rtn_front;
     rtn_front.candidate_input_pos = NULL;
@@ -396,7 +397,7 @@ void PmatchTransducer::match(SymbolNumber ** input_tape_entry,
     local_stack.top().context = none;
     local_stack.top().tape_step = 1;
     local_stack.top().context_placeholder = NULL;
-    local_stack.top().identity_symbol_trap = false;
+    local_stack.top().default_symbol_trap = false;
     get_analyses(*input_tape_entry, *output_tape_entry, 0);
     *input_tape_entry = rtn_stack.top().candidate_input_pos;
 }
@@ -412,7 +413,7 @@ void PmatchTransducer::rtn_call(SymbolNumber * input_tape_entry,
     local_stack.top().tape_step = 1;
     local_stack.top().context = none;
     local_stack.top().context_placeholder = NULL;
-    local_stack.top().identity_symbol_trap = false;
+    local_stack.top().default_symbol_trap = false;
     get_analyses(input_tape_entry, output_tape_entry, 0);
 }
 
@@ -590,7 +591,7 @@ void PmatchTransducer::find_transitions(SymbolNumber input,
                              output_tape,
                              transition_table[i].target);
             }
-            local_stack.top().identity_symbol_trap = false;
+            local_stack.top().default_symbol_trap = false;
         } else {
             return;
         }
@@ -608,7 +609,7 @@ void PmatchTransducer::find_index(SymbolNumber input,
                          input_tape,
                          output_tape,
                          index_table[i+input].target - TRANSITION_TARGET_TABLE_START);
-        local_stack.top().identity_symbol_trap = false;
+        local_stack.top().default_symbol_trap = false;
     }
 }
 
@@ -618,7 +619,7 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
 {
     if (indexes_transition_table(i))
     {
-        local_stack.top().identity_symbol_trap = true;
+        local_stack.top().default_symbol_trap = true;
         i -= TRANSITION_TARGET_TABLE_START;
         
         try_epsilon_transitions(input_tape,
@@ -641,13 +642,21 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
                          input_tape,
                          output_tape,
                          i+1);
-        if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER &&
-            local_stack.top().identity_symbol_trap == true) {
+        if (input >= orig_symbol_count &&
+            alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER) {
             find_transitions(alphabet.get_identity_symbol(),
-                             input_tape, output_tape, i+1);
+                             input_tape,
+                             output_tape,
+                             i+1);
         }
+            
+        // if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER &&
+        //     local_stack.top().default_symbol_trap == true) {
+        //     find_transitions(alphabet.get_identity_symbol(),
+        //                      input_tape, output_tape, i+1);
+        // }
     } else {
-        local_stack.top().identity_symbol_trap = true;
+        local_stack.top().default_symbol_trap = true;
         try_epsilon_indices(input_tape,
                             output_tape,
                             i+1);
@@ -668,11 +677,20 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
                    input_tape,
                    output_tape,
                    i+1);
-        if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER &&
-            local_stack.top().identity_symbol_trap == true) {
+
+        if (input >= orig_symbol_count &&
+            alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER) {
             find_index(alphabet.get_identity_symbol(),
-                       input_tape, output_tape, i+1);
+                       input_tape,
+                       output_tape,
+                       i+1);
         }
+
+        // if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER &&
+        //     local_stack.top().default_symbol_trap == true) {
+        //     find_index(alphabet.get_identity_symbol(),
+        //                input_tape, output_tape, i+1);
+        // }
 
     }
 }
