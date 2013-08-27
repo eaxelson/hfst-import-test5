@@ -891,6 +891,13 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_fclose(f, $2);
             free($2);
        }
+       | WRITE_ATT NAMETOKEN NAMETOKEN NAMETOKEN END_COMMAND {
+            // todo: handle input and output symbol tables
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->write_att(f);
+            hfst::xfst::xfst_fclose(f, $2);
+            free($2);
+       }
        // net ops
        | CLEANUP END_COMMAND {
             hfst::xfst::xfst_->cleanup_net();
