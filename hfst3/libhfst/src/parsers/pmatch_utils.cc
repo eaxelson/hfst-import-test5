@@ -182,11 +182,11 @@ get_LC_transition(const char *s)
 HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex)
 {
     HfstTransducer * delimited_regex = new HfstTransducer(hfst::internal_epsilon,
-                                                          "@_PMATCH_ENTRY_@",
+                                                          "@PMATCH_ENTRY@",
                                                           regex->get_type());
     delimited_regex->concatenate(*regex);
     delimited_regex->concatenate(HfstTransducer(hfst::internal_epsilon,
-                                                "@_PMATCH_EXIT_@",
+                                                "@PMATCH_EXIT@",
                                                 regex->get_type()));
     delete regex;
     delimited_regex->minimize();
@@ -196,7 +196,7 @@ HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex)
 void add_end_tag(HfstTransducer * regex, std::string tag)
 {
     HfstTransducer end_tag(hfst::internal_epsilon,
-                           "@_PMATCH_ENDTAG_" + tag + "_@",
+                           "@PMATCH_ENDTAG" + tag + "@",
                            regex->get_type());
     regex->concatenate(end_tag);
 }

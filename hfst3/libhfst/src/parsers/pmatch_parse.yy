@@ -918,9 +918,9 @@ LEFT_CONTEXT: LC_LEFT REPLACE RIGHT_PARENTHESIS {
         hfst::internal_epsilon, hfst::pmatch::LC_EXIT_SYMBOL, hfst::pmatch::format);
     lc_entry->concatenate($2->reverse());
     lc_entry->concatenate(*lc_exit);
-    lc_entry->substitute("@_PMATCH_ENTRY_@", "@_PMATCH_TMP_@");
-    lc_entry->substitute("@_PMATCH_EXIT_@", "@_PMATCH_ENTRY_@");
-    lc_entry->substitute("@_PMATCH_TMP_@", "@_PMATCH_EXIT_@");
+    lc_entry->substitute("@PMATCH_ENTRY@", "@_PMATCH_TMP_@");
+    lc_entry->substitute("@PMATCH_EXIT@", "@PMATCH_ENTRY@");
+    lc_entry->substitute("@_PMATCH_TMP_@", "@PMATCH_EXIT@");
     $$ = lc_entry;
     delete $2;
     delete lc_exit;
