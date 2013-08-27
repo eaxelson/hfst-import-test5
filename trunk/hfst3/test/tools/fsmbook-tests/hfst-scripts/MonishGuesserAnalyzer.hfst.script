@@ -32,4 +32,4 @@ echo '[ %^U -> u , %^O -> o , %^Ó -> ó , %^A -> a || @"BackV" ?* _ ]' \
 echo '[ %^U -> i , %^O -> e , %^Ó -> é , %^A -> ä ]' \
        | $2/hfst-regexp2fst -f $1 > Rule2  
 
-echo '[ @"Root" (@"Suff1") @"Suff2" (@"Suff3") @"Suff4" ]' | $2/hfst-regexp2fst -f $1 | $2/hfst-compose -2 Rule1 | $2/hfst-compose -2 Rule2 > MonishGuesserAnalyzer.hfst.hfst
+echo '[ @"Root" (@"Suff1") @"Suff2" (@"Suff3") @"Suff4" ]' | $2/hfst-regexp2fst -f $1 | $2/hfst-compose -2 Rule1 | $2/hfst-compose -2 Rule2 > Result

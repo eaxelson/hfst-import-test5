@@ -42,5 +42,5 @@ echo "-" | $2/$TOOLDIR/hfst-strings2fst -f $1 | $2/$TOOLDIR/hfst-concatenate -2 
 
 $2/$TOOLDIR/hfst-disjunct OneToNine.hfst Teens.hfst | $2/$TOOLDIR/hfst-disjunct -2 Tens.hfst > OneToNinetyNine.hfst;
 
-cp OneToNinetyNine.hfst EnglishNumerals
+cp OneToNinetyNine.hfst Result
 

@@ -191,4 +191,5 @@ regex VerbLex
         .o.
        Cleanup ;
 
-write att Result FOO BAR
+# result is too big to be written in att format..
+write att Result
