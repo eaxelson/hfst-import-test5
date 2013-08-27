@@ -69,25 +69,25 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
 void PmatchContainer::add_special_symbol(const std::string & str,
                                          SymbolNumber symbol_number)
 {
-    if (str == "@_PMATCH_ENTRY_@") {
+    if (str == "@PMATCH_ENTRY@") {
         special_symbols[entry] = symbol_number;
-    } else if (str == "@_PMATCH_EXIT_@") {
+    } else if (str == "@PMATCH_EXIT@") {
         special_symbols[exit] = symbol_number;
-    } else if (str == "@_PMATCH_LC_ENTRY_@") {
+    } else if (str == "@PMATCH_LC_ENTRY@") {
         special_symbols[LC_entry] = symbol_number;
-    } else if (str == "@_PMATCH_RC_ENTRY_@") {
+    } else if (str == "@PMATCH_RC_ENTRY@") {
         special_symbols[RC_entry] = symbol_number;
-    } else if (str == "@_PMATCH_LC_EXIT_@") {
+    } else if (str == "@PMATCH_LC_EXIT@") {
         special_symbols[LC_exit] = symbol_number;
-    } else if (str == "@_PMATCH_RC_EXIT_@") {
+    } else if (str == "@PMATCH_RC_EXIT@") {
         special_symbols[RC_exit] = symbol_number;
-    } else if (str == "@_BOUNDARY_@") {
+    } else if (str == "@BOUNDARY@") {
         special_symbols[boundary] = symbol_number;
     } else if (is_end_tag(str)) {
         // Fetch the part between @_PMATCH_ENDTAG_ and _@
         end_tag_map[symbol_number] = str.substr(
-            sizeof("@_PMATCH_ENDTAG_") - 1,
-            str.size() - (sizeof("@_PMATCH_ENDTAG__@") - 1));
+            sizeof("@PMATCH_ENDTAG") - 1,
+            str.size() - (sizeof("@PMATCH_ENDTAG@") - 1));
     } else if (is_insertion(str)) {
         rtn_names[name_from_insertion(str)] = symbol_number;
     }
@@ -96,8 +96,8 @@ void PmatchContainer::add_special_symbol(const std::string & str,
 
 bool PmatchContainer::is_end_tag(const std::string & symbol)
 {
-    return symbol.find("@_PMATCH_ENDTAG_") == 0 &&
-        symbol.rfind("_@") == symbol.size() - 2;
+    return symbol.find("@PMATCH_ENDTAG") == 0 &&
+        symbol.rfind("@") == symbol.size() - 1;
 }
 
 bool PmatchContainer::is_end_tag(const SymbolNumber symbol) const
