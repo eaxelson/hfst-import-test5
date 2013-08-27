@@ -204,7 +204,7 @@ echo '[ "(" -> ... {*} || .#. @"SB" _ .o. "(" -> ... {*}^2 || .#. @"SB"^2 _ .o. 
 # violated many times. The limits have been chosen to produce
 # a unique winner in all the 25 test cases in FinnWords.
 
-echo '[@"FinnWords" .o. @"Gen" .o. @"MainStress" .o. @"Clash" .O. @"Viol0" .o. @"Pardon" .o. @"AlignLeft" .O. @"Viol0" .o. @"FootBin" .O. @"Viol0" .o. @"Pardon" .o. @"Lapse" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"NonFinal" .O. @"Viol0" .o. @"Pardon" .o. @"StressToWeight" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"Parse" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"AllFeetFirst" .O. @"Viol15" .O. @"Viol14" .O. @"Viol13" @"Viol12" .O. @"Viol11" .O. @"Viol10" .O. @"Viol9" .O. @"Viol8" .O. @"Viol7" .O. @"Viol6"  .O. @"Viol5"  .O. @"Viol4"  .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" ]' | $2/hfst-regexp2fst -f $1 > FinnishOTProsody.hfst.hfst
+echo '[@"FinnWords" .o. @"Gen" .o. @"MainStress" .o. @"Clash" .O. @"Viol0" .o. @"Pardon" .o. @"AlignLeft" .O. @"Viol0" .o. @"FootBin" .O. @"Viol0" .o. @"Pardon" .o. @"Lapse" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"NonFinal" .O. @"Viol0" .o. @"Pardon" .o. @"StressToWeight" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"Parse" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"AllFeetFirst" .O. @"Viol15" .O. @"Viol14" .O. @"Viol13" @"Viol12" .O. @"Viol11" .O. @"Viol10" .O. @"Viol9" .O. @"Viol8" .O. @"Viol7" .O. @"Viol6"  .O. @"Viol5"  .O. @"Viol4"  .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" ]' | $2/hfst-regexp2fst -f $1 > Result
 
 
 #echo '[ @"MainStress" .o. @"Clash" .O. @"Viol0" .o. @"Pardon" .o. @"AlignLeft" .O. @"Viol0" ]' | $2/hfst-regexp2fst -f $1 > FinnishOTProsody.hfst.hfst
@@ -214,4 +214,4 @@ echo '[@"FinnWords" .o. @"Gen" .o. @"MainStress" .o. @"Clash" .O. @"Viol0" .o. @
 
 
 
-#echo '[@"FinnWords" .o. @"Gen" .o. @"MainStress" .o. @"Clash" .O. @"Viol0" .o. @"Pardon" .o. @"AlignLeft" .O. @"Viol0" .o. @"FootBin" .O. @"Viol0" .o. @"Pardon" .o. @"Lapse" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"NonFinal" .O. @"Viol0" .o. @"Pardon" .o. @"StressToWeight" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"Parse" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" ]' | $2/hfst-regexp2fst -f $1 > FinnishOTProsody
+#echo '[@"FinnWords" .o. @"Gen" .o. @"MainStress" .o. @"Clash" .O. @"Viol0" .o. @"Pardon" .o. @"AlignLeft" .O. @"Viol0" .o. @"FootBin" .O. @"Viol0" .o. @"Pardon" .o. @"Lapse" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"NonFinal" .O. @"Viol0" .o. @"Pardon" .o. @"StressToWeight" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"Parse" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" ]' | $2/hfst-regexp2fst -f $1 > Result

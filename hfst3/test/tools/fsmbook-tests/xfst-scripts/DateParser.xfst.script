@@ -62,7 +62,7 @@ define Div4  [4 | 8 | N* [Even [%0 | 4 | 8] | Odd [2 | 6]]];
 # Leap years are divisible by 4 but we subtract centuries
 # that are not divisible by 400. Note the double
 # subtraction. [[N+ - Div4] {00}] includes 1900 but not 2000.
-define LeapYear [Div4 - [[N+ - Div4] {00}]] ;
+define LeapYear [Div4 - [[N+ - Div4] {00}]];
 
 # Note the [.#. | \N] at the end of the right context.
 # 2405 is not a leap year although the year 240 was (in principle).

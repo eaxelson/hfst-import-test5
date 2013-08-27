@@ -1,26 +1,26 @@
-TOOLDIR=" ../../../../tools/src/./"
+# $2 is tooldir
 
 # We start our version of the Yale Shooting xfst script with a few simple 
 # definitions
 
-echo 'load | loaded | shoot | alive' | $TOOLDIR/hfst-regexp2fst -f $1 > Proposition 
-echo '[%+ | %- | F] @"Proposition" ' | $TOOLDIR/hfst-regexp2fst -f $1 > Valuation 
-echo '%[ (@"Valuation" [%, @"Valuation"]*) %]' | $TOOLDIR/hfst-regexp2fst -f $1 > Frame 
+echo 'load | loaded | shoot | alive' | $2/hfst-regexp2fst -f $1 > Proposition 
+echo '[%+ | %- | F] @"Proposition" ' | $2/hfst-regexp2fst -f $1 > Valuation 
+echo '%[ (@"Valuation" [%, @"Valuation"]*) %]' | $2/hfst-regexp2fst -f $1 > Frame 
 
 # With these definitions, the expression Frame+ describes an infinite language
 # of frame sequences including the one above for the Yale Shooting scenario.
 # In order to implement the constraints on inert fluents such as loaded and
 # alive, it is convenient to start with a few auxiliary definitions.
 
-echo '@"Frame" & $[%+ loaded] & ~$[%- loaded]' | $TOOLDIR/hfst-regexp2fst -f $1 \
+echo '@"Frame" & $[%+ loaded] & ~$[%- loaded]' | $2/hfst-regexp2fst -f $1 \
   > Loaded 
-echo '@"Frame" & $[%+ load] & ~$[%- load]' | $TOOLDIR/hfst-regexp2fst -f $1 > Load 
-echo '@"Frame" & $[%+ shoot] & ~$[%- shoot]' | $TOOLDIR/hfst-regexp2fst -f $1 \
+echo '@"Frame" & $[%+ load] & ~$[%- load]' | $2/hfst-regexp2fst -f $1 > Load 
+echo '@"Frame" & $[%+ shoot] & ~$[%- shoot]' | $2/hfst-regexp2fst -f $1 \
 > Shoot 
-echo '@"Frame" & $[%+ alive] & ~$[%- alive]' | $TOOLDIR/hfst-regexp2fst -f $1 \
+echo '@"Frame" & $[%+ alive] & ~$[%- alive]' | $2/hfst-regexp2fst -f $1 \
 > Alive 
-echo '@"Frame" & $[F loaded]' | $TOOLDIR/hfst-regexp2fst -f $1 > FLoaded 
-echo '@"Frame" & $[F alive]' | $TOOLDIR/hfst-regexp2fst -f $1 > FAlive 
+echo '@"Frame" & $[F loaded]' | $2/hfst-regexp2fst -f $1 > FLoaded 
+echo '@"Frame" & $[F alive]' | $2/hfst-regexp2fst -f $1 > FAlive 
 
 # Each of the definitions above is a constraint on frames denoting the set of
 # compatible frames. For example, Loaded picks out the frames where the gun
@@ -34,36 +34,36 @@ echo '@"Frame" & $[F alive]' | $TOOLDIR/hfst-regexp2fst -f $1 > FAlive
 # The Inertia constraints on adjacent frames can be stated as follows. 
 # We start with loaded.
 
-echo '[@"Loaded" & ~@"FLoaded" => _ @"Loaded" | .#.] & [@"Loaded" => .#. | @"Loaded" | @"FLoaded" _ ]' | $TOOLDIR/hfst-regexp2fst -f $1 > InertLoaded;
+echo '[@"Loaded" & ~@"FLoaded" => _ @"Loaded" | .#.] & [@"Loaded" => .#. | @"Loaded" | @"FLoaded" _ ]' | $2/hfst-regexp2fst -f $1 > InertLoaded;
 
 # The constraint consists of two restrictions. The first restriction says that a frame that contains +loaded and doesn't contain Floaded must be followed by a frame containing +loaded unless it is the last frame of the sequence. The second constraint says that a frame containing +loaded must be preceded by a frame containing +loaded or Floaded (possibly both) unless it is the first frame of the sequence. The first restriction prohibits frame pairs such as [+loaded][-loaded] where loadedness does not persist. The second restriction prohibits frame pairs such as [+alive][+loaded] where +loaded appears in a frame without a either +loaded or Floaded in the preceding frame. Note that the constraints allow both [+loaded,Floaded][-loaded] and [+loaded,Floaded][+loaded]. In the latter case, the F force was applied to loaded but it did not have any effect.
 
 # The inertness constraint on alive has the same form:
 
 echo '[@"Alive" & ~@"FAlive" => _ @"Alive" | .#.] & [@"Alive" => .#. | @"Alive" | @"FAlive" _ ]' | \
-$TOOLDIR/hfst-regexp2fst -f $1 > InertAlive
+$2/hfst-regexp2fst -f $1 > InertAlive
 
 # To express the idea that a +load action in a frame enables +loaded in the next frame, we need a constraint that forces Floaded to be included in every frame that contains +load. Unlike the two inert rules that constrain pairs of adjacent frames, the next three principles constrain single frames.
 
-echo '~[@"Load" & ~@"FLoaded"]' | $TOOLDIR/hfst-regexp2fst -f $1 > LoadFLoaded 
+echo '~[@"Load" & ~@"FLoaded"]' | $2/hfst-regexp2fst -f $1 > LoadFLoaded 
 
 # A frame such as [+load] is not allowed. To satisfy the constraint it must be expanded to [+load,Floaded] or reduced to []. Similarly, we want to say that shooting is always potentially life-threatening:
 
-echo '~[@"Shoot" & ~@"FAlive"]' | $TOOLDIR/hfst-regexp2fst -f $1 > ShootFAlive 
+echo '~[@"Shoot" & ~@"FAlive"]' | $2/hfst-regexp2fst -f $1 > ShootFAlive 
 
 # The ShootFAlive constraint prohibits frames such as [+alive,+shoot] where +shoot appears without Falive. Unless we are shooting with a fully loaded revolver, firing a gun might make the gun unloaded, so we need:
 
-echo '~[@"Shoot" & ~@"FLoaded"]' | $TOOLDIR/hfst-regexp2fst -f $1 > ShootFLoaded 
+echo '~[@"Shoot" & ~@"FLoaded"]' | $2/hfst-regexp2fst -f $1 > ShootFLoaded 
 
 # To show that the five constraints, InertLoaded, InertAlive, LoadFLoaded, ShootFAlive, ShootFLoaded, have the intended effect, we can start with a partial description of the Yale Shooting problem. In the initial frame the target is alive and the gun unloaded. In the second frame the gun is loaded. After zero or more frames, a shooting occurs.
 
 echo '[@"Alive" & ~@"Loaded"] @"Load" @"Frame"* @"Shoot" @"Frame"' | \
-  $TOOLDIR/hfst-regexp2fst -f $1 > YaleShooting 
+  $2/hfst-regexp2fst -f $1 > YaleShooting 
 
 # The above description is incomplete in that the four or more frames in the sequence to not constrain each other in any way. Only three frames are partially specified. In order to enforce the principles we have set up, we intersect this underspecified frame sequence with our five contstraints:
 
-echo '@"YaleShooting" & @"InertLoaded" & @"InertAlive" & @"LoadFLoaded" & @"ShootFAlive" & @"ShootFLoaded"' | $TOOLDIR/hfst-regexp2fst -f $1 \
-> YaleShooting.hfst.hfst
+echo '@"YaleShooting" & @"InertLoaded" & @"InertAlive" & @"LoadFLoaded" & @"ShootFAlive" & @"ShootFLoaded"' | $2/hfst-regexp2fst -f $1 \
+> Result
 
 rm -f FAlive ShootFLoaded Load ShootFAlive Proposition Loaded InertLoaded Frame Shoot LoadFLoaded FLoaded TMP Alive Valuation InertAlive
 
