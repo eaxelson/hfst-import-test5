@@ -31,3 +31,4 @@ $TOOLDIR/hfst-conjunct BidirPaths BidirPathsReversed > Palindromes
 
 $TOOLDIR/hfst-fst2strings Palindromes | grep -v "\-\-" | sort | uniq > result
 
+rm -f BidirPaths English BidirPathsReversed MinTwoChars BidirEnglish Palindromes

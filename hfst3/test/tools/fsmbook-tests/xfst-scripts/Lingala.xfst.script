@@ -191,5 +191,5 @@ regex VerbLex
         .o.
        Cleanup ;
 
-# result is too big to be written in att format..
-write att Result
+write prolog > Result
+

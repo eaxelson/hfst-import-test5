@@ -46,4 +46,4 @@
 
     push Solution
 
-    write att Result FOO BAR
+    write prolog > Result

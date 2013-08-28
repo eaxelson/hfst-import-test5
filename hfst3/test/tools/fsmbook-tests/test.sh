@@ -16,7 +16,7 @@ common_format="openfst-tropical"
 
 # DateParser  
 
-for example in Lingala \
+for example in \
     BetterColaMachine \
     BrazilianPortuguese1 \
     BrazilianPortuguese2 \
@@ -55,10 +55,10 @@ do
         
         # Convert all results to hfst binary transducers in common format
         # for comparison
-        cat Result_from_xfst | ./xfst-att-to-hfst-att.sh > tmp && \
-            mv tmp Result_from_xfst
-        cat Result_from_xfst | $tooldir/hfst-txt2fst -f $common_format > tmp && \
-            mv tmp Result_from_xfst
+        if ! (cat Result_from_xfst | $tooldir/hfst-txt2fst --prolog -f $common_format > tmp && \
+            mv tmp Result_from_xfst); then
+            exit 1;
+        fi
 
         #cat Result_from_hfst | $tooldir/hfst-txt2fst -f $common_format > tmp && \
         #mv tmp Result_from_hfst
@@ -72,8 +72,13 @@ do
         #fi
         if ! ($tooldir/hfst-compare -q Result_from_xfst Result_from_hfst_script); then
             echo "  FAIL: Results from xfst and hfst script differ in test "$example
+            echo "  (writing them to files "$example".xfst and "$example".hfst"
+            cp Result_from_xfst $example.xfst
+            cp Result_from_hfst_script $example.hfst
         fi
     else
         echo "WARNING: missing files, skipping test "$example
     fi
 done
+
+rm -f Result_from_xfst Result_from_hfst Result_from_hfst_script

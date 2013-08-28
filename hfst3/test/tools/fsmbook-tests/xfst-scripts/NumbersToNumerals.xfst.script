@@ -39,4 +39,4 @@ define OneToNinetyNine [ OneToNine | Teens | Tens ];
 
 push OneToNinetyNine
 
-write att Result FOO BAR
+write prolog > Result

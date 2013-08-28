@@ -271,7 +271,7 @@ regex [FinnWords .o. Gen
            Viol0 .o. Pardon
       ];
 
-write att Result
+write prolog > Result
 
 # print lower-words
 
