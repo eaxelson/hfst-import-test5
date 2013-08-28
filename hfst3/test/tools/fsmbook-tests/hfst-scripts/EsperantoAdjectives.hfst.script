@@ -25,3 +25,5 @@ do
 done
 
 $TOOLDIR/hfst-minimize Result > EsperantoAdjectives
+
+rm -f Case AdjPrefix Result Adjectives AdjEnd Number Adj

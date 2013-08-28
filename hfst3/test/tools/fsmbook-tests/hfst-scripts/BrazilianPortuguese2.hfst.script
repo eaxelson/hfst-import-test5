@@ -38,4 +38,5 @@ echo  '[ s -> z || @"Vowel" _ @"Vowel" ]' \
   " .o. " \
   "[ z -> s || _ .#. ]" | $2/$TOOLDIR/hfst-regexp2fst -f $1 > Result
 
+rm Vowel
 

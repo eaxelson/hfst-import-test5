@@ -139,3 +139,12 @@ echo '\@"L" -> 0' | $2/hfst-regexp2fst -f $1 > Cleanup
 
 # Build the Lingala Verb Transducer
 echo  '@"VerbLex" .o. @"R301" .o. @"R302" .o. @"R303" .o. @"R304" .o. @"R305" .o. @"R306" .o. @"R307" .o. @"R308" .o. @"R309" .o. @"R310" .o. @"R311" .o. @"R312" .o. @"R313" .o. @"R314" .o. @"R315" .o. @"R316" .o. @"R201" .o. @"R101" .o. @"R102" .o. @"R103" .o. @"R104" .o. @"R105" .o. @"R106" .o. @"R107" .o. @"R108" .o. @"R109" .o. @"R110" .o. @"R111" .o. @"R112" .o. @"R113" .o. @"R114" .o. @"R115" .o. @"R116" .o. @"R117" .o. @"R401" .o. @"R402" .o. @"R501" .o. @"Cleanup" ' | $2/hfst-regexp2fst -f $1 > Result
+
+rm -f R313 Person2 R115 R314 R116 Person3 R117 R315 R316
+rm -f RAgr10 RAgr11 SubjAgr Agreement PresTense Tense R201
+rm -f R401 R402 Cleanup L ObjAgr Stems PastTense VerbLex
+rm -f Agr RAgr1 RAgr2 Features RAgr3 RAgr4 RAgr5 RAgr6
+rm -f RAgr7 R101 RAgr8 RAgr9 R102 R301 R103 R104 R302 R501
+rm -f R105 R303 R106 R304 Number R107 R305 R108 R306 R307
+rm -f R109 R308 FutTense R309 R110 R111 R310 R112 R311 R113
+rm -f Person1 Gender3 R312 R114

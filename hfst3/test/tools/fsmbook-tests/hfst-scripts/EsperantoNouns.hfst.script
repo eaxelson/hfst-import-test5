@@ -22,3 +22,5 @@ do
 done
 
 $TOOLDIR/hfst-minimize Result > EsperantoNouns
+
+rm -f Number Nouns Case Result Nmf Nend

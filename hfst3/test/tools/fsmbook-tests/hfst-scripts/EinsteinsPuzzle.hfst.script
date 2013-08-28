@@ -175,3 +175,14 @@ done
 # We can make the constraint easily by filtering the previous output with the command grep "fish":
 
 $2/$TOOLDIR/hfst-fst2strings Result.hfst | grep "fish" > result
+
+rm -f House.hfst C10.hfst C14.hfst coffee.hfst cats.hfst dogs.hfst milk.hfst
+rm -f green.hfst horses.hfst BlueMaster.hfst C11_1.hfst C4.hfst Swede.hfst 
+rm -f Dane.hfst C15_1.hfst tea.hfst C8.hfst Color.hfst Prince.hfst bier.hfst
+rm -f C11.hfst blue.hfst C15.hfst Norwegian.hfst Dunhill.hfst C10_1.hfst
+rm -f birds.hfst C1.hfst HouseSeparator.hfst C11_2.hfst C5.hfst C14_1.hfst
+rm -f C15_2.hfst red.hfst C9.hfst white.hfst water.hfst Blend.hfst C12.hfst
+rm -f Nationality.hfst C10_2.hfst C2.hfst pi.hfst C14_2.hfst C6.hfst
+rm -f pi_house.hfst Result.hfst Englishman.hfst C13.hfst Pet.hfst fish.hfst
+rm -f PallMall.hfst C3.hfst Houses.hfst Drink.hfst Cigarette.hfst German.hfst
+rm -f C7.hfst yellow.hfst

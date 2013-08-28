@@ -215,3 +215,11 @@ echo '[@"FinnWords" .o. @"Gen" .o. @"MainStress" .o. @"Clash" .O. @"Viol0" .o. @
 
 
 #echo '[@"FinnWords" .o. @"Gen" .o. @"MainStress" .o. @"Clash" .O. @"Viol0" .o. @"Pardon" .o. @"AlignLeft" .O. @"Viol0" .o. @"FootBin" .O. @"Viol0" .o. @"Pardon" .o. @"Lapse" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"NonFinal" .O. @"Viol0" .o. @"Pardon" .o. @"StressToWeight" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" .O. @"Viol0" .o. @"Pardon" .o. @"Parse" .O. @"Viol3" .O. @"Viol2" .O. @"Viol1" ]' | $2/hfst-regexp2fst -f $1 > Result
+
+ 
+rm -f Lapse Gen Parse B C E LowV Syllabify P MSS S SB MSV V
+rm -f FinnWords Viol10 Viol11 SSV Heavy Viol12 USV Viol13 Viol14
+rm -f Viol15 Pardon SS SV Viol0 Viol1 Viol2 Viol3 Viol4 Viol5
+rm -f Viol6 FootBin Viol7 Viol8 Viol9 NonFinal HighV AllFeetFirst
+rm -f Clash StressToWeight AlignLeft Light Viol Stress Scan BF US
+rm -f MainStress MarkNonDiphthongs MidV

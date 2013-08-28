@@ -44,3 +44,6 @@ $2/$TOOLDIR/hfst-disjunct OneToNine.hfst Teens.hfst | $2/$TOOLDIR/hfst-disjunct 
 
 cp OneToNinetyNine.hfst Result
 
+rm -f OneToNine.hfst TeenTen.hfst Epsilon.hfst Tens.hfst TenStem.hfst
+rm -f OneToNinetyNine.hfst Teen.hfst TMP.hfst TenElevenTwelve.hfst
+rm -f Teens.hfst
