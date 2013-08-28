@@ -10,6 +10,7 @@
 
 #include "pmatch_utils.h"
 #include "HfstTransducer.h"
+#include "tools/src/HfstUtf8.h"
 
 using std::string;
 using std::map;
@@ -196,7 +197,7 @@ HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex)
 void add_end_tag(HfstTransducer * regex, std::string tag)
 {
     HfstTransducer end_tag(hfst::internal_epsilon,
-                           "@PMATCH_ENDTAG" + tag + "@",
+                           "@PMATCH_ENDTAG_" + tag + "@",
                            regex->get_type());
     regex->concatenate(end_tag);
 }
@@ -276,6 +277,16 @@ parse_quoted(const char *s)
                 p = p + 2;
                 break;
               case 'u':
+                // if (strlen(p) < 6) {
+                //     fprintf(stderr, "Couldn't parse unicode escape in %s", p);
+                //     ++p;
+                //     *r = '\0';
+                //     break;
+                // }
+                // char[4] escape_sequence;
+                // memcpy(escape_sequence, p+2, 4);
+                // unsigned int codepoint = strtol(escape_sequence, NULL, 16);
+                
                 fprintf(stderr, "Unimplemented: parse unicode escapes in %s", p);
                 *r = '\0';
                 r++;
