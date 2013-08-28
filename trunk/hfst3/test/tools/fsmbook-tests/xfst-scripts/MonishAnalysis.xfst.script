@@ -38,5 +38,5 @@ define Rules [ %^U -> u , %^O -> o , %^Ó -> ó , %^A -> a || BackV ?* _ ]
                   [ %^U -> i , %^O -> e , %^Ó -> é , %^A -> ä ] ;
 
 read regex [ Root (Suff1) Suff2 (Suff3) Suff4 ] .o. Rules ;
-write att Result FOO BAR
+write prolog > Result
 

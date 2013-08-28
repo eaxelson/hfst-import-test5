@@ -38,4 +38,4 @@ read regex [ s -> z || Vowel _ Vowel ]
 .o.
 [ z -> s || _ .#. ];
 
-write att Result FOO BAR
+write prolog > Result

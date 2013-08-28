@@ -46,3 +46,6 @@ echo "0:ty" | $2/$TOOLDIR/hfst-strings2fst -f $1 | $2/$TOOLDIR/hfst-disjunct TMP
 # We finally disjunct all numbers.
 
 $2/$TOOLDIR/hfst-disjunct OneToNine.hfst Teens.hfst | $2/$TOOLDIR/hfst-disjunct Tens.hfst > Result
+
+rm -f Epsilon2Teen.hfst Teens.hfst TMP OneToNine.hfst TeenTen.hfst
+rm -f Tens.hfst Teens_.hfst TenStem.hfst Special.hfst One2Epsilon.hfst

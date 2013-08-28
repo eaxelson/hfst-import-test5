@@ -10,4 +10,4 @@ define Solution [ D -> N^2, Q -> N^5 ];
 
 regex Solution;
 
-write att Result FOO BAR
+write prolog > Result

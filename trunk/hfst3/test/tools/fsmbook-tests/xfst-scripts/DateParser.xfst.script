@@ -75,4 +75,4 @@ define DateParser [ValidDates @-> "<DATE>" ... "</DATE>"] ;
 
 push DateParser
 
-write att Result FOO BAR
+write prolog > Result

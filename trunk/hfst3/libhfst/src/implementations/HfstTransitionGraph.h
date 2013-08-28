@@ -1166,7 +1166,7 @@
            char namestr[100]; char sourcestr[100];
            char targetstr[100]; char symbolstr[100];
 
-           int n = sscanf(line.c_str(), "arc(%[^,], %[^,], %[^,], %s", 
+           int n = sscanf(line.c_str(), "arc(%[^,], %[^,], %[^,], %[^\t\n]", 
                           namestr, sourcestr, targetstr, symbolstr);
 
            std::string symbol(symbolstr);
@@ -1285,15 +1285,28 @@
 
            HfstTransitionGraph retval;
            std::string linestr;
-           
-           try 
+
+           while(true)
              {
-               linestr = get_stripped_line(is, file, linecount);
-             }             
-           catch (const EndOfStreamException & e) 
-             {
-               HFST_THROW(NotValidPrologFormatException); 
+               try 
+                 {
+                   linestr = get_stripped_line(is, file, linecount);
+                 }             
+               catch (const EndOfStreamException & e) 
+                 {
+                   HFST_THROW(NotValidPrologFormatException); 
+                 }
+
+               if (linestr.length() != 0 && linestr[0] == '#')
+                 {
+                   continue; // comment line
+                 }
+               else
+                 {
+                   break; // first non-comment line
+                 }
              }
+
 
            if (! parse_prolog_network_line(linestr, retval.name))
              {

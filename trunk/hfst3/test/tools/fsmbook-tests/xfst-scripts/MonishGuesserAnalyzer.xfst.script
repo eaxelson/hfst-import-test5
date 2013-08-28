@@ -36,4 +36,4 @@ define Rules [ %^U -> u , %^O -> o, %^Ó -> ó , %^A -> a || BackV ?* _ ]
 
 read regex Verbs .o. Rules ;
 
-write att Result FOO BAR
+write prolog > Result

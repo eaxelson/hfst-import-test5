@@ -29,8 +29,12 @@ echo ' @"PlusOrMinusNine"  .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > 
 
 
 
-rm -f PlusOrMinus.hfst.hfst
+rm -f Result
 
 for i in One Two Three Four Five Six Seven Eight Nine Ten; do \
-  cat "PlusOrMinus"$i >> PlusOrMinus.hfst.hfst;
+  cat "PlusOrMinus"$i >> Result;
 done
+
+rm -f PlusOrMinusSix CarryUp PlusOrMinusThree PlusOrMinusTwo PlusOrMinusFour
+rm -f N NoLeadingZero PlusOrMinusOne Z PlusOrMinusFive PlusOrMinusNine
+rm -f AddUp PlusOrMinusSeven PlusOrMinusTen PlusOrMinusEight
