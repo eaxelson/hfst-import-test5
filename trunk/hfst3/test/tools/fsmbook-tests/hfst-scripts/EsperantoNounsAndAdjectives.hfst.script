@@ -36,3 +36,6 @@ $TOOLDIR/hfst-disjunct NounStem AdjectiveStem > Stems
 $TOOLDIR/hfst-concatenate Number Case | $TOOLDIR/hfst-concatenate -1 Stems > Result
 
 $TOOLDIR/hfst-minimize Result > EsperantoNounsAndAdjectives
+
+rm -f Adj NounStem Result AdjRoots Adjend Number Stems NounPrefix
+rm -f AdjPrefixes NounRoots Case Nmf Nend AdjectiveStem

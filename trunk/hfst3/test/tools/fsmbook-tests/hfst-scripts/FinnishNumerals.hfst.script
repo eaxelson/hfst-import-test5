@@ -39,3 +39,6 @@ $2/$TOOLDIR/hfst-invert FinnishNumerals.hfst | $2/$TOOLDIR/hfst-compose TMP | $2
 $2/$TOOLDIR/hfst-invert FinnishToEnglishNumerals | $2/$TOOLDIR/hfst-minimize > EnglishToFinnishNumerals
 
 
+rm -f FinnishNumerals.hfst 10.hfst 1to9.hfst 2to9.hfst 20to99.hfst 0toEps.hfst
+rm -f 1toEps.hfst EpsToToista.hfst FinnishToEnglishNumerals TMP 11to19.hfst
+rm -f EpsToKymmenta.hfst

@@ -40,3 +40,6 @@ echo '[ @"Root" (@"Suff1") @"Suff2" (@"Suff3") @"Suff4" ]' | \
      $2/hfst-regexp2fst -f $1 | \
      $2/hfst-compose -2 Rule1 | $2/hfst-compose -2 Rule2 \
        > Result
+
+rm -f BackV Rule1 Rule2 MorphoV FrontV Root Suff1
+rm -f Suff2 Suff3 Suff4

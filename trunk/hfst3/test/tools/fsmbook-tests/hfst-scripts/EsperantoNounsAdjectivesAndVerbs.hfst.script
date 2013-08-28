@@ -67,3 +67,7 @@ $TOOLDIR/hfst-concatenate -2 Aspect | $TOOLDIR/hfst-concatenate -2 Vend > Verbs
 
 $TOOLDIR/hfst-disjunct NounAdjs Verbs | $TOOLDIR/hfst-minimize \
   > EsperantoNounsAdjectivesAndVerbs
+
+rm -f NounStem NounAdjStems Aspect Verbs NounAdjs VerbRoots AdjRoots
+rm -f Adjend Number AugDimNize NounPrefix AugDimFem AdjPrefixes
+rm -f VerbPrefixes NounRoots Case Nmf Nend AdjectiveStem Vend Verb Adj
