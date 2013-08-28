@@ -84,10 +84,10 @@ void PmatchContainer::add_special_symbol(const std::string & str,
     } else if (str == "@BOUNDARY@") {
         special_symbols[boundary] = symbol_number;
     } else if (is_end_tag(str)) {
-        // Fetch the part between @_PMATCH_ENDTAG_ and _@
+        // Fetch the part between @PMATCH_ENDTAG_ and @
         end_tag_map[symbol_number] = str.substr(
-            sizeof("@PMATCH_ENDTAG") - 1,
-            str.size() - (sizeof("@PMATCH_ENDTAG@") - 1));
+            sizeof("@PMATCH_ENDTAG_") - 1,
+            str.size() - (sizeof("@PMATCH_ENDTAG_@") - 1));
     } else if (is_insertion(str)) {
         rtn_names[name_from_insertion(str)] = symbol_number;
     }
