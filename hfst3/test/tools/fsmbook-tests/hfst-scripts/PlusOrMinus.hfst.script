@@ -17,15 +17,15 @@ echo ' [ "0" => .#. @"N" @"Z"* _ , .#. _ .#. ]'  | $2/hfst-regexp2fst -f $1 > No
 
 echo ' @"CarryUp" .o. @"AddUp" .o. @"NoLeadingZero" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusOne
 
-echo ' @"PlusOrMinusOne"  .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusTwo
-echo ' @"PlusOrMinusTwo"  .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusThree
-echo ' @"PlusOrMinusThree"  .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusFour
-echo ' @"PlusOrMinusFour"  .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusFive
-echo ' @"PlusOrMinusFive"  .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusSix
-echo ' @"PlusOrMinusSix"  .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusSeven
-echo ' @"PlusOrMinusSeven"  .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusEight
-echo ' @"PlusOrMinusEight"  .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 >  PlusOrMinusNine
-echo ' @"PlusOrMinusNine"  .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusTen    
+echo ' @"PlusOrMinusOne" .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusTwo
+echo ' @"PlusOrMinusTwo" .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusThree
+echo ' @"PlusOrMinusThree" .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusFour
+echo ' @"PlusOrMinusFour" .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusFive
+echo ' @"PlusOrMinusFive" .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusSix
+echo ' @"PlusOrMinusSix" .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusSeven
+echo ' @"PlusOrMinusSeven" .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusEight
+echo ' @"PlusOrMinusEight" .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 >  PlusOrMinusNine
+echo ' @"PlusOrMinusNine" .o. @"PlusOrMinusOne" ' | $2/hfst-regexp2fst -f $1 > PlusOrMinusTen    
 
 
 

@@ -48,53 +48,17 @@ define PlusOrMinusNine  [PlusOrMinusEight .o. PlusOrMinusOne];
 define PlusOrMinusTen   [PlusOrMinusNine  .o. PlusOrMinusOne];
 
 
-# Save the transducers in a file
+# Save the transducers in prolog format
 
 push PlusOrMinusOne
-save stack PlusOrMinusOne
-# write prolog > PlusOrMinusOne.prolog
-clear stack
 push PlusOrMinusTwo
-save stack PlusOrMinusTwo
-# write prolog > PlusOrMinusTwo.prolog
-clear stack
 push PlusOrMinusThree
-save stack PlusOrMinusThree
-# write prolog > PlusOrMinusThree.prolog
-clear stack
 push PlusOrMinusFour
-# save stack PlusOrMinusFour
-write prolog > PlusOrMinusFour.prolog
-clear stack
 push PlusOrMinusFive
-# save stack PlusOrMinusFive
-write prolog > PlusOrMinusFive.prolog
-clear stack
 push PlusOrMinusSix
-# save stack PlusOrMinusSix
-write prolog > PlusOrMinusSix.prolog
-clear stack
 push PlusOrMinusSeven
-# save stack PlusOrMinusSeven
-write prolog > PlusOrMinusSeven.prolog
-clear stack
 push PlusOrMinusEight
-# save stack PlusOrMinusEight
-write prolog > PlusOrMinusEight.prolog
-clear stack
 push PlusOrMinusNine
-# save stack PlusOrMinusNine
-write prolog > PlusOrMinusNine.prolog
-clear stack
 push PlusOrMinusTen
-# save stack PlusOrMinusTen
-write prolog > PlusOrMinusTen.prolog
-clear stack
 
-
-#echo apply up input: 24
-#apply up 24
-
-#echo apply down input: 64
-#apply down 64
-
+write prolog > Result
