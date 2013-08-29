@@ -32,8 +32,8 @@ $2/$TOOLDIR/hfst-disjunct 1to9.hfst 10.hfst | $2/$TOOLDIR/hfst-disjunct 11to19.h
 
 # To get transducers that map Finnish to English numerals and vice versa, we use
 # composition and inversion.
-# NOTE: we assume that the file NumbersToNumerals.hfst is already created
-$2/$TOOLDIR/hfst-fst2fst -f $1 ../NumbersToNumerals/NumbersToNumerals.hfst.hfst > TMP
+# NOTE: we assume that the file NumbersToNumerals is already created
+$2/$TOOLDIR/hfst-fst2fst -f $1 NumbersToNumerals > TMP
 
 $2/$TOOLDIR/hfst-invert FinnishNumerals.hfst | $2/$TOOLDIR/hfst-compose TMP | $2/$TOOLDIR/hfst-minimize > FinnishToEnglishNumerals
 $2/$TOOLDIR/hfst-invert FinnishToEnglishNumerals | $2/$TOOLDIR/hfst-minimize > EnglishToFinnishNumerals
