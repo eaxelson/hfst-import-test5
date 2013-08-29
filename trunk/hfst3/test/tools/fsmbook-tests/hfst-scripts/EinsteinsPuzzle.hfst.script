@@ -174,7 +174,7 @@ done
 # One missing constraint is that someone keeps fish, as indicated by the original question "Who keeps the fish?". 
 # We can make the constraint easily by filtering the previous output with the command grep "fish":
 
-$2/$TOOLDIR/hfst-fst2strings Result.hfst | grep "fish" > result
+mv Result.hfst Result
 
 rm -f House.hfst C10.hfst C14.hfst coffee.hfst cats.hfst dogs.hfst milk.hfst
 rm -f green.hfst horses.hfst BlueMaster.hfst C11_1.hfst C4.hfst Swede.hfst 
@@ -185,4 +185,4 @@ rm -f C15_2.hfst red.hfst C9.hfst white.hfst water.hfst Blend.hfst C12.hfst
 rm -f Nationality.hfst C10_2.hfst C2.hfst pi.hfst C14_2.hfst C6.hfst
 rm -f pi_house.hfst Result.hfst Englishman.hfst C13.hfst Pet.hfst fish.hfst
 rm -f PallMall.hfst C3.hfst Houses.hfst Drink.hfst Cigarette.hfst German.hfst
-rm -f C7.hfst yellow.hfst
+rm -f C7.hfst yellow.hfst Result.hfst
