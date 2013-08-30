@@ -1320,6 +1320,10 @@
                try 
                  {
                    linestr = get_stripped_line(is, file, linecount);
+                   if (linestr == "") // prolog separator 
+                     {
+                       return retval;
+                     }
                  }             
                catch (const EndOfStreamException & e) 
                  {
