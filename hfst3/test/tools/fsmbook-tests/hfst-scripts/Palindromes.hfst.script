@@ -4,7 +4,7 @@
 # for example, "madam" and "dog". We wish to keep "madam" (reversed "madam") and
 # eliminate "dog" (reversed "god").
 
-cat words.txt | $2/hfst-strings2fst -f $1 > English
+cat lexicon/english_lexicon.txt | $2/hfst-strings2fst -f $1 > English
 
 # We intersect English with its reverse. We only take into account
 # words that contain at least two characters. (Words like "a"
