@@ -12,14 +12,16 @@ backend_formats="openfst-tropical sfst foma"
 common_format="openfst-tropical" 
 
 # todo: fix and add:
-#   DateParser
-#   NumbersToNumerals (FinnishNumerals hfst script depends on this)
+#   DateParser: xfst rule of type [ ? @-> foo ... bar ] is compiled differently by hfst-regexp2fst and xfst
 #   PlusOrMinus
+
+# NOTE: FinnishNumerals depends on NumbersToNumerals, so they must be compiled in the right order.
 
 examples="BetterColaMachine BrazilianPortuguese1 BrazilianPortuguese2 EnglishNumerals "\
 "EsperantoAdjectives EsperantoNounsAdjectivesAndVerbs EsperantoNounsAndAdjectivesWithTags "\
 "EsperantoNounsAndAdjectives EsperantoNouns FinnishOTProsody Lingala "\
-"MonishAnalysis MonishGuesserAnalyzer YaleShooting FinnishProsody Palindromes EinsteinsPuzzle"
+"MonishAnalysis MonishGuesserAnalyzer NumbersToNumerals FinnishNumerals "\
+"YaleShooting FinnishProsody Palindromes EinsteinsPuzzle"
 
 if ! [ "$1" = "" ]; then
     examples=$1
@@ -58,6 +60,15 @@ do
     for format in $backend_formats; 
     do
         echo "  compiling hfst script with back-end format "$format".."
+
+        if [ "$example" = "FinnishNumerals" ]; then
+            if ! [ -f tmpdir/NumbersToNumerals ]; then
+                echo "FAIL: missing file tmpdir/NumbersToNumerals in test FinnishNumerals,"
+                echo "      the test NumbersToNumerals must be run first"
+                exit 1
+            fi
+        fi
+
         if ! ($SH hfst-scripts/$example.hfst.script $format $tooldir); then
             exit 1
         fi
@@ -68,7 +79,7 @@ do
         if ! [ "$example" = "FinnishNumerals" -o \
             "$example" = "FinnishProsody" -o \
             "$example" = "Palindromes" ]; then
-            # (a special case)
+            # special case 1
             if [ "$example" = "EinsteinsPuzzle" ]; then
                 if ! ($tooldir/hfst-fst2strings --xfst=print-space Result_from_xfst | grep "German coffee Prince fish" > /dev/null); then
                     echo "FAIL"
@@ -77,23 +88,52 @@ do
                       grep "fish" | grep "German coffee Prince fish" > /dev/null); then
                     echo "FAIL"
                 fi
-            else 
-                if ! ($tooldir/hfst-compare -q Result_from_xfst Result_from_hfst_script_$format); then
-                    echo "  FAIL: Results from xfst and hfst scripts ("$format") differ in test "$example", storing results in files:"
-                    echo "    log/"$example.result_from_xfst_script_using_xfst_tool 
+                continue
+            fi
+            # special case 2
+            if [ "$example" = "NumbersToNumerals" ]; then
+                if ! [ -d tmpdir ]; then
+                    mkdir tmpdir
+                fi
+                cp Result_from_xfst tmpdir/NumbersToNumerals # needed in FinnishNumerals
+                $tooldir/hfst-fst2strings Result_from_xfst | sort > tmp_xfst
+                $tooldir/hfst-fst2strings Result_from_hfst_script_$format | sort > tmp_hfst
+                if ! (diff tmp_xfst tmp_hfst); then
+                    echo "FAIL"
+                fi
+                rm -f tmp_hfst tmp_xfst
+                continue
+            fi
+            if ! ($tooldir/hfst-compare -q Result_from_xfst Result_from_hfst_script_$format); then
+                echo "  FAIL: Results from xfst and hfst scripts ("$format") differ in test "$example", storing results in files:"
+                echo "    log/"$example.result_from_xfst_script_using_xfst_tool 
+                echo "    log/"$example.result_from_hfst_script_using_backend_format_$format
+                if ! [ -d log ]; then
+                    mkdir log
+                fi
+                cp Result_from_xfst log/$example.result_from_xfst_script_using_xfst_tool
+                cp Result_from_hfst_script_$format log/$example.result_from_hfst_script_using_backend_format_$format
+            fi
+            
+        # or with the result in common format.
+        else
+            # special case
+            if [ "$example" = "FinnishNumerals" -a "$format" = "sfst" ]; then
+                echo "    skipping comparing the results, result from SFST will be big because of epsilon handling in composition.."
+                continue
+            fi
+
+            if ! [ "$format" = "$common_format" ]; then
+                if ! ($tooldir/hfst-compare -q Result_from_hfst_script_$common_format Result_from_hfst_script_$format); then
+                    echo -n "  FAIL: Results from hfst scripts ("$format" and "$common_format") differ in test "$example
+                    echo ", storing results in files:"
                     echo "    log/"$example.result_from_hfst_script_using_backend_format_$format
+                    echo "    log/"$example.result_from_hfst_script_using_backend_format_$common_format
                     if ! [ -d log ]; then
                         mkdir log
                     fi
-                    cp Result_from_xfst log/$example.result_from_xfst_script_using_xfst_tool
+                    cp Result_from_hfst_script_$common_format log/$example.result_from_hfst_script_using_backend_format_$common_format
                     cp Result_from_hfst_script_$format log/$example.result_from_hfst_script_using_backend_format_$format
-                fi
-            fi
-        # or with the result in common format.
-        else
-            if ! [ "$format" = "$common_format" ]; then
-                if ! ($tooldir/hfst-compare -q Result_from_hfst_script_$common_format Result_from_hfst_script_$format); then
-                    echo "  FAIL: Results from hfst scripts ("$format" and "$common_format") differ in test "$example
                 fi
             fi
         fi
