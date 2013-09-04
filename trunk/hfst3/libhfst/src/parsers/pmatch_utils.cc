@@ -433,10 +433,8 @@ HfstTransducer * read_text(char * filename, ImplementationType type)
             std::getline(infile, line);
             if(!line.empty()) {
                 ++n;
-                retval->disjunct(HfstTransducer(line, tok, type));
-                if (n % 50 == 0) {
-                    retval->minimize();
-                }
+                StringPairVector spv = tok.tokenize(line);
+                retval->disjunct(spv);
             }
         }
     }
