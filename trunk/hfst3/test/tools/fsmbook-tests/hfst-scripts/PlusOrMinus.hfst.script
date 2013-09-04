@@ -9,8 +9,8 @@ echo '["0" | @"N"]' | $2/hfst-regexp2fst -f $1 > Z
 
 echo '[ 1 <- [. .] || .#. _ "0"+ .#. ] .o.  [ 1 -> 0 || .#. _ "0"+ .#. ]' | $2/hfst-regexp2fst -f $1 > CarryUp
 
-
 echo ' [ 1 <- "0", 2 <- 1, 3 <- 2, 4 <- 3,  5  <- 4, 6 <-  5 , 7 <- 6, 8 <- 7, 9 <- 8, "0" <- 9 || .#. ("+") @"Z"* _ 9* .#. ]' | $2/hfst-regexp2fst -f $1 > AddUp
+
 echo ' [ "0" => .#. @"N" @"Z"* _ , .#. _ .#. ]'  | $2/hfst-regexp2fst -f $1 > NoLeadingZero
 
 # PlusOrMinusOne.hfst maps any natural number N to (N-1), and vice versa.

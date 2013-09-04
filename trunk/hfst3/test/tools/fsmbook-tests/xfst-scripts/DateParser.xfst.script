@@ -70,10 +70,8 @@ define LeapDates {February 29, } => _ LeapYear [.#. | \N];
 
 define ValidDates [AllDates & MaxDays & LeapDates];
 
-push ValidDates
+define DateParser [ValidDates @-> "<DATE>" ... "</DATE>"] ;
 
-# define DateParser [ValidDates @-> "<DATE>" ... "</DATE>"] ;
-
-# push DateParser
+push DateParser
 
 write prolog > Result

@@ -50,15 +50,15 @@ define PlusOrMinusTen   [PlusOrMinusNine  .o. PlusOrMinusOne];
 
 # Save the transducers in prolog format
 
-push PlusOrMinusOne
-push PlusOrMinusTwo
-push PlusOrMinusThree
-push PlusOrMinusFour
-push PlusOrMinusFive
-push PlusOrMinusSix
-push PlusOrMinusSeven
-push PlusOrMinusEight
-push PlusOrMinusNine
 push PlusOrMinusTen
+push PlusOrMinusNine
+push PlusOrMinusEight
+push PlusOrMinusSeven
+push PlusOrMinusSix
+push PlusOrMinusFive
+push PlusOrMinusFour
+push PlusOrMinusThree
+push PlusOrMinusTwo
+push PlusOrMinusOne
 
 write prolog > Result

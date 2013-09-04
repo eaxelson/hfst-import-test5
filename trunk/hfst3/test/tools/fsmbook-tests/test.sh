@@ -13,14 +13,13 @@ common_format="openfst-tropical"
 
 # todo: fix and add:
 #   DateParser: xfst rule of type [ ? @-> foo ... bar ] is compiled differently by hfst-regexp2fst and xfst
-#   PlusOrMinus
 
 # NOTE: FinnishNumerals depends on NumbersToNumerals, so they must be compiled in the right order.
 
 examples="BetterColaMachine BrazilianPortuguese1 BrazilianPortuguese2 EnglishNumerals "\
 "EsperantoAdjectives EsperantoNounsAdjectivesAndVerbs EsperantoNounsAndAdjectivesWithTags "\
 "EsperantoNounsAndAdjectives EsperantoNouns FinnishOTProsody Lingala "\
-"MonishAnalysis MonishGuesserAnalyzer NumbersToNumerals FinnishNumerals "\
+"MonishAnalysis MonishGuesserAnalyzer NumbersToNumerals PlusOrMinus FinnishNumerals "\
 "YaleShooting FinnishProsody Palindromes EinsteinsPuzzle"
 
 if ! [ "$1" = "" ]; then
@@ -35,6 +34,7 @@ do
     if ! [ "$example" = "FinnishNumerals" -o \
         "$example" = "FinnishProsody" -o \
         "$example" = "Palindromes" ]; then
+
         # compile with xfst/foma..
         if [ "$example" = "FinnishOTProsody" -o \
             "$example" = "Lingala" -o \
@@ -54,6 +54,26 @@ do
             mv tmp Result_from_xfst); then
             exit 1;
         fi
+
+        # Also compile with hfst-xfst using all back-end formats..
+        for format in $backend_formats; 
+        do
+            echo "  compiling with hfst-xfst using back-end format "$format".."
+            if ! ($HFST -f $format -F xfst-scripts/$example.xfst.script > /dev/null 2> /dev/null); then
+                exit 1;
+            fi
+            # and convert from prolog to openfst-tropical and compare the results.
+            if ! (cat Result | $tooldir/hfst-txt2fst --prolog -f $common_format > tmp && \
+                mv tmp Result_from_hfst_xfst); then
+                exit 1;
+            fi
+            if ! ($tooldir/hfst-compare -q Result_from_xfst Result_from_hfst_xfst); then
+                echo "FAIL: results from xfst and hfst-xfst ("$format") are not equivalent"
+                # todo: log results and remove Result_from_xfst and Result_from_hfst_xfst
+                # exit 1;
+            fi
+        done
+
     fi
 
     # (2) Compile hfst script with all back-end formats and compare the results..
