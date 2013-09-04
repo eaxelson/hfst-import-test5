@@ -25,10 +25,10 @@ extern ImplementationType format;
 
 struct PmatchUtilityTransducers;
 extern PmatchUtilityTransducers utils;
-const std::string RC_ENTRY_SYMBOL = "@_PMATCH_RC_ENTRY_@";
-const std::string RC_EXIT_SYMBOL = "@_PMATCH_RC_EXIT_@";
-const std::string LC_ENTRY_SYMBOL = "@_PMATCH_LC_ENTRY_@";
-const std::string LC_EXIT_SYMBOL = "@_PMATCH_LC_EXIT_@";
+const std::string RC_ENTRY_SYMBOL = "@PMATCH_RC_ENTRY@";
+const std::string RC_EXIT_SYMBOL = "@PMATCH_RC_EXIT@";
+const std::string LC_ENTRY_SYMBOL = "@PMATCH_LC_ENTRY@";
+const std::string LC_EXIT_SYMBOL = "@PMATCH_LC_EXIT@";
 
 /**
  * @brief input handling function for flex that parses strings.
