@@ -135,8 +135,8 @@ template<typename T, size_t N>
     static const char * combining_accents[] =
     {
         // Combining accents: grave, acute, circumflex, tilde, overline,
-        // diaresis, cedilla
-        "\u0300", "\u0301", "\u0302", "\u0303", "\u0305", "\u0308", "\u0327",
+        // diaresis, charon, cedilla
+        "\u0300", "\u0301", "\u0302", "\u0303", "\u0305", "\u0308", "\u030C", "\u0327",
         // Small solidus and large combining solidus
         "\u0337", "\u0338"
     };
