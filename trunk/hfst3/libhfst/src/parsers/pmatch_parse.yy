@@ -155,7 +155,6 @@ PMATCH: DEFINITION {
 DEFINITION: DEFINE SYMBOL REGEXP1 {
     $3->set_name($2);
     $3->minimize();
-    $3 = hfst::pmatch::add_pmatch_delimiters($3);
     $$ = new std::pair<std::string, hfst::HfstTransducer*>($2, $3);
  }
 ;

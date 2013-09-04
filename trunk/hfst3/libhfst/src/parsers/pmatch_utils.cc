@@ -382,7 +382,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     if (pmatchnerrs != 0) {
         return retval;
     }
-    for (std::map<std::string, hfst::HfstTransducer*>::const_iterator it =
+    for (std::map<std::string, hfst::HfstTransducer*>::iterator it =
              definitions.begin(); it != definitions.end(); ++it) {
         if (verbose) {
             print_size_info(it->second);
@@ -390,7 +390,9 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         // We keep TOP and any inserted transducers
         if (it->first.compare("TOP") == 0 ||
             inserted_transducers.count(it->first) != 0) {
-            retval.insert(*it);
+            retval.insert(std::pair<std::string, hfst::HfstTransducer*>(
+                              it->first,
+                              add_pmatch_delimiters(it->second)));
         } else {
             delete it->second;
         }
