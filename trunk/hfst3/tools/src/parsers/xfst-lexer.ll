@@ -779,6 +779,8 @@ LWSP [\t ]*
 "#"[^\n]*  { /* skip comments */ }
 "#"\n      { /* skip an empty comment */ }
 "#"+\n     { /* skip an empty comment */ }
+"!"\n      { /* skip an empty comment */ }
+"!"+\n     { /* skip an empty comment */ }
 
 <<EOF>> {
     --source_stack_size;
