@@ -276,7 +276,6 @@ SUB3: SYMBOL_LIST RIGHT_BRACKET {  $$ = $1;  }  // symbol list
 REPLACE : REGEXP3 { }
        |  PARALLEL_RULES
          {
-          // std::cerr << "replace:parallel_rules"<< std::endl;        
             switch ( $1->first )
             {
                case E_REPLACE_RIGHT:
@@ -1008,6 +1007,20 @@ LABEL: HALFARC {
      }
      | PAIR_SEPARATOR_SOLE {
 	$$ = hfst::xre::xfst_label_to_transducer(hfst::internal_unknown.c_str(), hfst::internal_unknown.c_str());
+     }
+     | HALFARC PAIR_SEPARATOR CURLY_BRACKETS {
+        HfstTokenizer TOK;
+        TOK.add_multichar_symbol($1);
+        $$ = new HfstTransducer($1, $3, TOK, hfst::xre::format);
+        free($1);
+        free($3);
+     }
+     | CURLY_BRACKETS PAIR_SEPARATOR HALFARC {
+        HfstTokenizer TOK;
+        TOK.add_multichar_symbol($3);
+        $$ = new HfstTransducer($1, $3, TOK, hfst::xre::format);
+        free($1);
+        free($3);
      }
      | CURLY_BRACKETS {
         HfstTokenizer TOK;

@@ -38,6 +38,28 @@ define Rule15 [ t -> C || _ [ i | í ] ];
 
 define Rule16 [ z -> s || _ .#. ];
 
+# debugging..
+push Rule1
+push Rule2
+push Rule3
+push Rule4
+push Rule5
+push Rule6
+push Rule7
+push Rule8
+push Rule9
+push Rule10
+push Rule11
+push Rule12
+push Rule13
+push Rule14
+push Rule15
+push Rule16
+write prolog > Rules
+clear stack
+
+# Rule10: differences in results from xfst and hfst-xfst (openfst-tropical)
+
 read regex Rule1 .o. Rule2 .o. Rule3 .o. Rule4 .o. Rule5 .o. Rule6 .o.
            Rule7 .o. Rule8 .o. Rule9 .o. Rule10 .o. Rule11 .o. Rule12 .o.
            Rule13 .o. Rule14 .o. Rule15 .o. Rule16 ; 
