@@ -563,6 +563,10 @@ expand_definition(HfstTransducer* tr, const char* symbol)
         {
           if (strcmp(it->first.c_str(), symbol) == 0)
             {
+              /*              std::cerr << "expanding definition " << std::string(symbol) << " to:" << std::endl; // DEBUG
+              std::cerr << *(it->second) << std::endl; // DEBUG
+              std::cerr << "in: " << std::endl;
+              std::cerr << *tr << std::endl;*/
               tr->substitute(hfst::StringPair(symbol,symbol), *(it->second), false); // do not harmonize
               tr->remove_from_alphabet(symbol);
               break;

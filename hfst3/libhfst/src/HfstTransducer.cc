@@ -2778,7 +2778,6 @@ HfstTransducer &HfstTransducer::substitute
 (const StringPair &symbol_pair,
  HfstTransducer &transducer, bool harmonize)
 { 
-
     if (this->type != transducer.type) {
     HFST_THROW_MESSAGE(TransducerTypeMismatchException,
                "HfstTransducer::substitute"); }
@@ -2787,6 +2786,20 @@ HfstTransducer &HfstTransducer::substitute
       HFST_THROW_MESSAGE
     (EmptyStringException, 
      "substitute(const StringPair&, HfstTransducer&)");
+
+#if HAVE_SFST && HAVE_OPENFST
+    if (this->type == SFST_TYPE)
+      {
+        HfstTransducer this_copy(*this);
+        this_copy.convert(TROPICAL_OPENFST_TYPE);
+        HfstTransducer transducer_copy(transducer);
+        transducer_copy.convert(TROPICAL_OPENFST_TYPE);
+        HfstTransducer retval = this_copy.substitute(symbol_pair, transducer_copy, harmonize);
+        retval.convert(SFST_TYPE);
+        *this = retval;
+        return *this;
+      }
+#endif
 
     HfstTransducer pairTransducer(symbol_pair.first, symbol_pair.second, this->type);
     if (! harmonize)
@@ -2835,17 +2848,6 @@ HfstTransducer &HfstTransducer::substitute
         implementation.foma = 
         ConversionFunctions::hfst_basic_transducer_to_foma(net);
         delete net;
-        return *this;
-    }
-#endif
-#if HAVE_SFST
-    if (this->type == SFST_TYPE)
-    {
-        hfst::implementations::Transducer * tmp =
-        this->sfst_interface.substitute
-        (implementation.sfst, symbol_pair, transducer.implementation.sfst);
-        delete implementation.sfst;
-        implementation.sfst = tmp;
         return *this;
     }
 #endif

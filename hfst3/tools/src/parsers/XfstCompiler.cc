@@ -599,7 +599,8 @@ namespace xfst {
       else if (latest_regex_compiled != NULL)
         {
           bool was_defined = xre_.is_definition(name);
-          xre_.define(name, xre);
+          if (!was_defined)
+            xre_.define(name, xre);
           definitions_[name] = new HfstTransducer(*latest_regex_compiled);
 
           if (verbose_) 
@@ -2307,12 +2308,31 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::write_prolog(FILE* outfile)
     {
-      GET_TOP(topmost);
-      std::string name = topmost->get_name();
-      if (name == "")
-        name = "NO_NAME";
-      HfstBasicTransducer fsm(*topmost);
-      fsm.write_in_prolog_format(outfile, name);
+      if (stack_.size() < 1)
+        {
+          fprintf(stderr, "Empty stack.\n");
+          PROMPT_AND_RETURN_THIS;
+        }
+      std::stack<hfst::HfstTransducer*> reverse_stack;
+      while (stack_.size() != 0)
+        {
+          HfstTransducer * tr = stack_.top();
+          std::string name = tr->get_name();
+          if (name == "")
+            name = "NO_NAME";
+          HfstBasicTransducer fsm(*tr);
+          fsm.write_in_prolog_format(outfile, name);
+          if (stack_.size() != 1) // separator
+            fprintf(outfile, "\n");
+          reverse_stack.push(tr);
+          stack_.pop();
+        }
+      while (reverse_stack.size() != 0)
+        {
+          HfstTransducer * tr = reverse_stack.top();
+          stack_.push(tr);
+          reverse_stack.pop();
+        }
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
