@@ -5,6 +5,18 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.4.6
+---------------------------
+
+* Improvements to pmatch functionalities
+
+* Some fixes to twolc, proc and lexc tools
+
+* New operators added to the regexp parser
+
+* Reading in prolog format supported in hfst-txt2fst
+
+
 Noteworthy changes in 3.4.5
 ---------------------------
 

@@ -1,3 +1,752 @@
+2013-09-05 13:57  eaxelson
+
+	* tools/src/parsers/xfst-lexer.ll: Now empty comments starting with
+	  one or more exclamation marks are also parsed right.
+
+2013-09-05 11:58  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  test/tools/fsmbook-tests/test.sh,
+	  test/tools/fsmbook-tests/xfst-scripts/BrazilianPortuguese2.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/NumbersToNumerals.xfst.script,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/xfst-lexer.ll: Fixed errors noticed during
+	  hfst-xfst2fst tests.
+
+2013-09-04 19:13  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: One more special symbol
+	  spelling to rectify...
+
+2013-09-04 12:53  eaxelson
+
+	* test/tools/fsmbook-tests/hfst-scripts/PlusOrMinus.hfst.script,
+	  test/tools/fsmbook-tests/test.sh,
+	  test/tools/fsmbook-tests/xfst-scripts/DateParser.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/PlusOrMinus.xfst.script:
+	  Fixed a bug in fsmbook tests.
+
+2013-09-04 12:03  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.h: Forgot to make context
+	  markers non-special too!
+
+2013-09-04 10:40  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.h: Add a couple of useful
+	  combining accents
+
+2013-09-04 10:39  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.cc: Use (faster) string
+	  disjunction instead of full disjunction for word lists
+
+2013-09-04 10:07  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc: Make only TOP, networks with
+	  EndTag() and networks with Ins() get the special
+	  @PMATCH_ENTRY@ etc. delimiters. This should make various
+	  operations on
+	  networks that don't use these features work.
+
+2013-08-30 13:26  eaxelson
+
+	* test/tools/fsmbook-tests/hfst-scripts/Palindromes.hfst.script,
+	  test/tools/fsmbook-tests/lexicon,
+	  test/tools/fsmbook-tests/lexicon/english_lexicon.txt: Added
+	  missing file.
+
+2013-08-30 13:05  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h: Now allowing
+	  several prolog networks in one file, separated by empty lines.
+
+2013-08-30 10:38  eaxelson
+
+	* test/tools/fsmbook-tests/hfst-scripts/DateParser.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/FinnishNumerals.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/NumbersToNumerals.hfst.script,
+	  test/tools/fsmbook-tests/test.sh,
+	  test/tools/fsmbook-tests/xfst-scripts/DateParser.xfst.script:
+	  Added tests to fsmbook test set.
+
+2013-08-29 13:37  eaxelson
+
+	* test/tools/fsmbook-tests/hfst-scripts/EinsteinsPuzzle.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/FinnishNumerals.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/Palindromes.hfst.script,
+	  test/tools/fsmbook-tests/test.sh: Now Palindroms test works.
+
+2013-08-29 11:55  eaxelson
+
+	* test/tools/fsmbook-tests/hfst-scripts/EsperantoAdjectives.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EsperantoNouns.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EsperantoNounsAdjectivesAndVerbs.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EsperantoNounsAndAdjectives.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EsperantoNounsAndAdjectivesWithTags.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/PlusOrMinus.hfst.script,
+	  test/tools/fsmbook-tests/test.sh,
+	  test/tools/fsmbook-tests/xfst-scripts/EsperantoAdjectives.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/EsperantoNouns.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/EsperantoNounsAdjectivesAndVerbs.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/EsperantoNounsAndAdjectives.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/EsperantoNounsAndAdjectivesWithTags.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/PlusOrMinus.xfst.script:
+	  Fsmbook test Esperanto is now divided in several script files.
+
+2013-08-28 14:01  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  test/tools/fsmbook-tests/hfst-scripts/MonishGuesserAnalyzer.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/NumbersToNumerals.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/Palindromes.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/PlusOrMinus.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/YaleShooting.hfst.script,
+	  test/tools/fsmbook-tests/test.sh,
+	  test/tools/fsmbook-tests/xfst-prolog-to-hfst-att.sh,
+	  test/tools/fsmbook-tests/xfst-scripts/BetterColaMachine.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/BrazilianPortuguese1.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/BrazilianPortuguese2.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/DateParser.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/EinsteinsPuzzle.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/EnglishNumerals.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/FinnishOTProsody.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/Lingala.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/MonishAnalysis.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/MonishGuesserAnalyzer.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/NumbersToNumerals.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/YaleShooting.xfst.script,
+	  tools/src/hfst-txt2fst.cc: Now using prolog format to convert
+	  between transducer formats in fsmbook tests. Also added the
+	  option --prolog to hfst-txt2fst and fixed a small bug in prolog
+	  parsing in HfstTransitionGraph::read_in_prolog_format.
+
+2013-08-28 08:15  eaxelson
+
+	* test/tools/fsmbook-tests/hfst-scripts/BrazilianPortuguese1.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/BrazilianPortuguese2.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EinsteinsPuzzle.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EnglishNumerals.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EsperantoAdjectives.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EsperantoNouns.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EsperantoNounsAdjectivesAndVerbs.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EsperantoNounsAndAdjectives.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EsperantoNounsAndAdjectivesWithTags.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/FinnishNumerals.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/FinnishOTProsody.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/FinnishProsody.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/Lingala.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/MonishAnalysis.hfst.script:
+	  Remove generated files in hfst scripts.
+
+2013-08-28 07:22  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.cc: Correct internal endtag
+	  format in utils too
+
+2013-08-28 06:50  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc: Endtags
+	  look like @PMATCH_ENDTAG_foo@, not @PMATCH_ENDTAGfoo@
+
+2013-08-27 13:49  eaxelson
+
+	* test/tools/fsmbook-tests/hfst-scripts/BrazilianPortuguese1.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/BrazilianPortuguese2.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/DateParser.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EnglishNumerals.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/FinnishOTProsody.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/Lingala.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/MonishAnalysis.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/MonishGuesserAnalyzer.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/NumbersToNumerals.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/PlusOrMinus.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/YaleShooting.hfst.script,
+	  test/tools/fsmbook-tests/test.sh,
+	  test/tools/fsmbook-tests/xfst-att-to-hfst-att.sh,
+	  test/tools/fsmbook-tests/xfst-prolog-to-hfst-att.sh,
+	  test/tools/fsmbook-tests/xfst-scripts/DateParser.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/FinnishOTProsody.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/Lingala.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/YaleShooting.xfst.script:
+	  Fixed a couple of bugs.
+
+2013-08-27 11:25  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Correct typo that was
+	  suppressing the functioning of CATENATE_N
+
+2013-08-27 10:59  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc: Rename internal symbols not
+	  to match is_special_symbol() to let them
+	  pass through eg. composition operations
+
+2013-08-27 10:52  eaxelson
+
+	* test/tools/fsmbook-examples/test-foma.sh,
+	  test/tools/fsmbook-tests, test/tools/fsmbook-tests/hfst-scripts,
+	  test/tools/fsmbook-tests/hfst-scripts/BetterColaMachine.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/BrazilianPortuguese1.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/BrazilianPortuguese2.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/DateParser.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EinsteinsPuzzle.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EnglishNumerals.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EsperantoAdjectives.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EsperantoNouns.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EsperantoNounsAdjectivesAndVerbs.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EsperantoNounsAndAdjectives.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/EsperantoNounsAndAdjectivesWithTags.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/FinnishNumerals.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/FinnishOTProsody.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/FinnishProsody.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/Lingala.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/MonishAnalysis.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/MonishGuesserAnalyzer.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/NumbersToNumerals.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/Palindromes.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/PlusOrMinus.hfst.script,
+	  test/tools/fsmbook-tests/hfst-scripts/YaleShooting.hfst.script,
+	  test/tools/fsmbook-tests/lexc-files,
+	  test/tools/fsmbook-tests/lexc-files/EsperantoAdjectives.lexc,
+	  test/tools/fsmbook-tests/lexc-files/EsperantoNouns.lexc,
+	  test/tools/fsmbook-tests/lexc-files/EsperantoNounsAdjectivesAndVerbs.lexc,
+	  test/tools/fsmbook-tests/lexc-files/EsperantoNounsAndAdjectives.lexc,
+	  test/tools/fsmbook-tests/lexc-files/EsperantoNounsAndAdjectivesWithTags.lexc,
+	  test/tools/fsmbook-tests/test.sh,
+	  test/tools/fsmbook-tests/xfst-scripts,
+	  test/tools/fsmbook-tests/xfst-scripts/BetterColaMachine.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/BrazilianPortuguese1.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/BrazilianPortuguese2.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/DateParser.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/EinsteinsPuzzle.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/EnglishNumerals.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/FinnishOTProsody.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/Lingala.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/MonishAnalysis.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/MonishGuesserAnalyzer.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/NumbersToNumerals.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/PlusOrMinus.xfst.script,
+	  test/tools/fsmbook-tests/xfst-scripts/YaleShooting.xfst.script:
+	  Added tentatively directory fsmbook-tests which will replace the
+	  directory fsmbook-examples.
+
+2013-08-27 10:45  eaxelson
+
+	* tools/src/parsers/xfst-parser.yy: Added the variant 'write att
+	  outfile isymfile osymfile' of 'write att' to the xfst parser.
+
+2013-08-26 19:13  hardwick
+
+	* configure.ac: A hopefully working test for HH_EXTENSION_USED -
+	  unfortunately it appears
+	  that automake lines not in a make target are included regardless
+
+2013-08-26 18:54  hardwick
+
+	* libhfst/src/parsers/Makefile.am: Eliminate else branch
+
+2013-08-26 18:41  hardwick
+
+	* configure.ac: A better value for the HH_EXTENSION_USED variable?
+
+2013-08-26 14:19  hardwick
+
+	* libhfst/src/parsers/Makefile.am, tools/src/Makefile.am,
+	  tools/src/hfst-twolc/src/Makefile.am,
+	  tools/src/parsers/Makefile.am: Eliminate references to .h targets
+	  when HH_EXTENSION_USED is unset,
+	  which was perhaps bothering automakes >=1.12
+
+2013-08-26 11:23  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h: A (more)
+	  correct understanding of IDENTITY.
+
+2013-08-26 09:57  moshagen
+
+	* libhfst/src/parsers/Makefile.am, tools/src/Makefile.am,
+	  tools/src/hfst-twolc/src/Makefile.am,
+	  tools/src/parsers/Makefile.am: Switched the *.h - *.hh dependency
+	  around, from *.hh: *.h, to *.h: *.hh. This seems to have fixed
+	  the *.hh build issues on MacOSX. I have no idea whether this will
+	  work or break (on) other systems. Please test!
+
+2013-08-24 11:43  hardwick
+
+	* libhfst/src/parsers/Makefile.am,
+	  tools/src/hfst-twolc/src/Makefile.am: Some systems need to be
+	  told that .ll files depend on .hh files so things get
+	  generated in the right order
+
+2013-08-22 11:01  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/at_pl.att,
+	  tools/src/parsers/test/at_pl.xfst,
+	  tools/src/parsers/test/network.prolog,
+	  tools/src/parsers/test/test.sh: Added '@pl' operator to the xre
+	  parser. Testing it with hfst-xfst.
+
+2013-08-22 07:04  eaxelson
+
+	* libhfst/src/implementations/ConvertSfstTransducer.cc,
+	  libhfst/src/parsers/Makefile.am, tools/src/Makefile.am,
+	  tools/src/hfst-twolc/src/Makefile.am,
+	  tools/src/parsers/Makefile.am: Fixed the h/hh issue once again,
+	  now trying to copy instead of linking. Also added assertions when
+	  converting from sfst to basic transducer format.
+
+2013-08-21 21:48  moshagen
+
+	* libhfst/src/parsers/Makefile.am: Removed redundant filenames,
+	  added whitespace.
+
+2013-08-21 21:13  moshagen
+
+	* tools/src/hfst-twolc/src/Makefile.am: Changing the BUILT_SOURCES
+	  to list the cc files instead of the hh files seems to fix the
+	  header file issues for twolc.
+
+2013-08-21 09:53  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h: Some
+	  support for identity transitions
+
+2013-08-21 09:46  eaxelson
+
+	* libhfst/src/HfstTokenizer.cc, libhfst/src/HfstTokenizer.h,
+	  libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h,
+	  tools/src/HfstStrings2FstTokenizer.h,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/at_stxt.att,
+	  tools/src/parsers/test/at_stxt.xfst,
+	  tools/src/parsers/test/at_txt.att,
+	  tools/src/parsers/test/at_txt.xfst,
+	  tools/src/parsers/test/at_txt_and_stxt.att,
+	  tools/src/parsers/test/at_txt_and_stxt.xfst,
+	  tools/src/parsers/test/test.sh,
+	  tools/src/parsers/test/words.stxt,
+	  tools/src/parsers/test/words.txt: Implemented '@txt' and '@stxt'
+	  operators in xre parser. Also testing them through the xfst
+	  parser.
+
+2013-08-21 08:50  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Make
+	  the alphabet know about IDENTITY
+
+2013-08-21 08:30  hardwick
+
+	* libhfst/src/parsers/Makefile.am: Uncomprehendingly fill in the
+	  blanks for the LEXC_BUILT target
+
+2013-08-21 05:24  hardwick
+
+	* libhfst/src/HfstTransducer.cc: When composing incompatible types,
+	  instead of throwing an exception,
+	  convert the latter type to the former for composition (as per
+	  hfst-compose's message).
+
+2013-08-21 05:22  hardwick
+
+	* tools/src/Makefile.am: --force symlink to .h/.hh target
+
+2013-08-20 13:16  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: Add combining accents to the
+	  end of the capitalizing and lowercase-ifying
+	  utility transducers.
+	  Also more aggressive minimize utility transducers.
+
+2013-08-20 09:47  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.cc: Character constants like
+	  \xNN are two hexadecimal numbers, not decimal
+
+2013-08-20 09:39  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll: Allow escaped quotes on quoted
+	  literals
+
+2013-08-20 08:55  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/a2b.re,
+	  tools/src/parsers/test/at_re_1.att,
+	  tools/src/parsers/test/at_re_1.xfst,
+	  tools/src/parsers/test/at_re_2.att,
+	  tools/src/parsers/test/at_re_2.xfst,
+	  tools/src/parsers/test/at_re_3.att,
+	  tools/src/parsers/test/at_re_3.xfst,
+	  tools/src/parsers/test/at_re_a2b.re,
+	  tools/src/parsers/test/test.sh: Implemented '@re' operation in
+	  xre parser. Added test cases for it in the regexp parser tests.
+
+2013-08-19 18:10  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc: Fix bug
+	  with input tape initialization in certain circumstances.
+	  
+	  When boundary is NO_SYMBOL and input has length 0, we can't use
+	  a loop for finding the true beginning of the tape. This was
+	  causing
+	  segfaults and nasty garbled state for the input tape.
+
+2013-08-16 13:13  eaxelson
+
+	* libhfst/src/parsers/Makefile.am, tools/src/Makefile.am,
+	  tools/src/hfst-twolc/src/Makefile.am,
+	  tools/src/parsers/Makefile.am: Changed rm -f to ln -s in the
+	  Makefiles when handling the h/hh rules.
+
+2013-08-16 10:19  hardwick
+
+	* tools/src/parsers/Makefile.am: ln instead of mv in .h/.hh rule
+
+2013-08-16 10:09  hardwick
+
+	* tools/src/parsers/Makefile.am: Check for .h/.hh yacc convention
+	  and mv accordingly
+
+2013-08-14 14:08  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc: Made some modifications to the
+	  xfst print format, removed comments from xfst compiler.
+
+2013-08-14 09:53  eaxelson
+
+	* tools/src/parsers/test/substitute_label_1.att,
+	  tools/src/parsers/test/substitute_label_1.xfst,
+	  tools/src/parsers/test/substitute_label_2.att,
+	  tools/src/parsers/test/substitute_label_2.xfst,
+	  tools/src/parsers/test/substitute_label_3.att,
+	  tools/src/parsers/test/substitute_label_3.xfst,
+	  tools/src/parsers/test/substitute_label_4.att,
+	  tools/src/parsers/test/substitute_label_4.xfst,
+	  tools/src/parsers/test/substitute_label_5.att,
+	  tools/src/parsers/test/substitute_label_5.xfst,
+	  tools/src/parsers/test/substitute_label_6.att,
+	  tools/src/parsers/test/substitute_label_6.xfst,
+	  tools/src/parsers/test/substitute_label_7.att,
+	  tools/src/parsers/test/substitute_label_7.xfst: Added missing
+	  files.
+
+2013-08-13 13:33  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/substitute_defined_1.att,
+	  tools/src/parsers/test/substitute_defined_1.xfst,
+	  tools/src/parsers/test/substitute_defined_2.att,
+	  tools/src/parsers/test/substitute_defined_2.xfst,
+	  tools/src/parsers/test/substitute_defined_3.att,
+	  tools/src/parsers/test/substitute_defined_3.xfst,
+	  tools/src/parsers/test/substitute_defined_4.att,
+	  tools/src/parsers/test/substitute_defined_4.xfst,
+	  tools/src/parsers/test/substitute_defined_5.att,
+	  tools/src/parsers/test/substitute_defined_5.xfst,
+	  tools/src/parsers/test/substitute_defined_6.att,
+	  tools/src/parsers/test/substitute_defined_6.xfst,
+	  tools/src/parsers/test/test.sh: Added substitute defined tests to
+	  xfst parser.
+
+2013-08-13 12:22  sdrobac
+
+	* libhfst/src/parsers/Makefile.am, tools/src/Makefile.am,
+	  tools/src/hfst-twolc/src/Makefile.am: Added -f to mv header files
+
+2013-08-13 09:36  eaxelson
+
+	* libhfst/src/implementations/ConvertFomaTransducer.cc,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/test/test.sh: Fixed a bug in converting an
+	  empty foma transducer into an HfstBasicTransducer.
+
+2013-08-12 15:10  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/substitute_label.att,
+	  tools/src/parsers/test/substitute_label.xfst,
+	  tools/src/parsers/test/substitute_label_8.att,
+	  tools/src/parsers/test/substitute_label_8.xfst,
+	  tools/src/parsers/test/test.sh: Added more substitute tests for
+	  xfst parser and fixed some issues with alphabet in substitution
+	  functions.
+
+2013-08-12 13:19  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc: Fixes bug
+	  with Ins()erted transducers named "name"
+
+2013-08-12 13:12  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Add toplevel delimiters (in
+	  addition to ones associated with EndTags).
+	  Fixes a bug when endtags aren't used but insertions are.
+
+2013-08-12 12:27  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.cc: ToLower, ToUpper and OptCap
+	  made (more) compatible with Karttunen's pmatch
+
+2013-08-12 11:41  sdrobac
+
+	* libhfst/src/parsers/LexcCompiler.cc: Fixed bug in
+	  LexcCompiler.cc, one that was causing wrong compilation of
+	  noflags in cases when there were only identities in lexicon
+
+2013-08-12 10:16  eaxelson
+
+	* tools/src/parsers/test/substitute_symbol.att: Forgot to remove
+	  old test file.
+
+2013-08-12 10:15  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/substitute_symbol.xfst,
+	  tools/src/parsers/test/substitute_symbol_1.att,
+	  tools/src/parsers/test/substitute_symbol_1.xfst,
+	  tools/src/parsers/test/substitute_symbol_2.att,
+	  tools/src/parsers/test/substitute_symbol_2.xfst,
+	  tools/src/parsers/test/substitute_symbol_3.att,
+	  tools/src/parsers/test/substitute_symbol_3.xfst,
+	  tools/src/parsers/test/substitute_symbol_4.att,
+	  tools/src/parsers/test/substitute_symbol_4.xfst,
+	  tools/src/parsers/test/substitute_symbol_5.att,
+	  tools/src/parsers/test/substitute_symbol_5.xfst,
+	  tools/src/parsers/test/substitute_symbol_6.att,
+	  tools/src/parsers/test/substitute_symbol_6.xfst,
+	  tools/src/parsers/test/test.sh: Divided xfst substitute tests to
+	  several files. Fixed a bug in printing unknowns in xfst format.
+
+2013-08-12 08:45  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/test/substitute_symbol.xfst,
+	  tools/src/parsers/xfst-lexer.ll,
+	  tools/src/parsers/xfst-parser.yy,
+	  tools/src/parsers/xfst-utils.cc, tools/src/parsers/xfst-utils.h:
+	  Now allowing more variable names.
+
+2013-08-08 14:32  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/test/substitute_defined.xfst,
+	  tools/src/parsers/test/substitute_label.att,
+	  tools/src/parsers/test/substitute_label.xfst,
+	  tools/src/parsers/test/substitute_symbol.xfst,
+	  tools/src/parsers/test/test.sh: Now substituting symbol with
+	  symbols(s) removes the original symbol from the alphabet.
+
+2013-08-08 09:25  eaxelson
+
+	* libhfst/src/implementations/ConvertTropicalWeightTransducer.cc,
+	  libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/test/substitute_symbol.att,
+	  tools/src/parsers/test/substitute_symbol.xfst: Fixed a bug in xre
+	  substitution: disabled harmonization that caused unknown symbols
+	  to be expanded to temporary variables.
+
+2013-08-07 09:11  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRulesTest.cc,
+	  libhfst/src/parsers/LexcCompiler.cc: Minor changes to lexc2fst
+	  and xfst rules
+
+2013-08-06 13:35  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc: Not substituting a symbol pair
+	  with an empty set of symbols removes the transitions equivalent
+	  to the symbol pair.
+
+2013-08-06 11:36  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/substitute_label.att,
+	  tools/src/parsers/test/substitute_label.xfst,
+	  tools/src/parsers/test/substitute_symbol.att,
+	  tools/src/parsers/test/substitute_symbol.xfst,
+	  tools/src/parsers/test/test.sh: Added tests for substitute
+	  functionalities.
+
+2013-08-06 09:29  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/substitute_defined.att,
+	  tools/src/parsers/test/substitute_defined.xfst,
+	  tools/src/parsers/test/test.sh, tools/src/parsers/xfst-parser.yy:
+	  Added 'substitute defined' to the xfst parser.
+
+2013-08-05 12:55  eaxelson
+
+	* configure.ac, libhfst/src/parsers/Makefile.am,
+	  tools/src/Makefile.am, tools/src/hfst-twolc/src/Makefile.am: Now
+	  configure checks the version of automake and renames the header
+	  files generated by flex, if needed.
+
+2013-08-05 10:19  eaxelson
+
+	* libhfst/src/parsers/Makefile.am, tools/src/Makefile.am,
+	  tools/src/hfst-twolc/src/Makefile.am: Now 'make clean' removes
+	  also files generated by flex/bison.
+
+2013-07-22 17:18  spectre360
+
+	* tools/src/hfst-proc/hfst-proc.cc: capitalisation modes: last on
+	  wins
+
+2013-07-22 13:44  spectre360
+
+	* tools/src/hfst-proc/hfst-proc.cc: update
+
+2013-06-20 11:41  eaxelson
+
+	* tools/src/parsers/test/test.sh: Oops, forgot to exclude xfst
+	  testing from make check..
+
+2013-06-20 11:40  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc: Added documentation.
+
+2013-06-20 10:23  eaxelson
+
+	* tools/src/parsers/xfst-lexer.ll: Now most of the keywords are
+	  interpreted as such unless they are at the beginning of the line.
+
+2013-06-19 11:29  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h, tools/src/parsers/test/test.sh,
+	  tools/src/parsers/xfst-lexer.ll,
+	  tools/src/parsers/xfst-parser.yy: Added substitute
+	  functionalities to xfst parser.
+
+2013-06-18 13:47  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h: Added function
+	  'remove_from_alphabet' to HfstTransitionGraph.
+
+2013-06-17 14:18  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h, tools/src/parsers/cmd.h,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/assert.xfst,
+	  tools/src/parsers/test/test.sh, tools/src/parsers/xfst-lexer.ll,
+	  tools/src/parsers/xfst-parser.yy: Added command 'assert' to xfst
+	  parser.
+
+2013-06-17 13:15  eaxelson
+
+	* tools/src/parsers/Makefile.am, tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/abbrcmd.h, tools/src/parsers/cmd.h,
+	  tools/src/parsers/hfst-xfst2fst.cc: Now all commands are given by
+	  tab if readline is used.
+
+2013-06-17 10:55  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/prolog.att,
+	  tools/src/parsers/test/prolog.xfst,
+	  tools/src/parsers/test/test.sh: Added tests for writing and
+	  reading prolog files in hfst-xfst2fst. Also fixed a small typo in
+	  writing in prolog format.
+
+2013-06-14 13:56  eaxelson
+
+	* back-ends/foma/Makefile.am, back-ends/foma/foma.c,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/hfst-xfst2fst.cc: Removed implicit readline
+	  requirements from hfst-xfst.cc and foma.c. Also edited prolog
+	  functions in HfstTransitionGraph.h.
+
+2013-06-13 13:58  eaxelson
+
+	* libhfst/src/HfstExceptionDefs.cc,
+	  libhfst/src/HfstExceptionDefs.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/test/test.sh, tools/src/parsers/xfst-parser.yy,
+	  tools/src/parsers/xfst-utils.cc, tools/src/parsers/xfst-utils.h:
+	  Now reading and writing in prolog format works. Also addded some
+	  exceptions for prolog handling.
+
+2013-06-12 13:30  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/help_message.cc,
+	  tools/src/parsers/xfst-parser.yy: Added prolog printing functions
+	  to HfstTransitionGraph.
+
+2013-06-12 13:04  spectre360
+
+	* tools/src/Makefile.am, tools/src/parsers/Makefile.am: more header
+	  renaming (see commit for r3377)
+
+2013-06-12 12:55  spectre360
+
+	* tools/src/hfst-twolc/src/Makefile.am,
+	  tools/src/hfst-twolc/src/scanner1.ll,
+	  tools/src/hfst-twolc/src/scanner2.ll,
+	  tools/src/hfst-twolc/src/scanner3.ll: change header file names --
+	  this will break compatibility with automake < 1.12 see
+	  http://lists.gnu.org/archive/html/automake/2012-09/msg00017.html
+
+2013-06-12 12:34  spectre360
+
+	* libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/Makefile.am,
+	  libhfst/src/parsers/lexc-lexer.ll,
+	  libhfst/src/parsers/lexc-utils.cc,
+	  libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/xre_lex.ll: changes to names of generated
+	  header files --- pending testing
+
+2013-06-11 13:27  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/help_message.cc: Now apropos and help messages
+	  work in xfst parser.
+
+2013-06-10 13:13  spectre360
+
+	* autogen.sh: bump required versions of automake and libtool
+
+2013-06-10 10:57  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am, tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/help_message.cc,
+	  tools/src/parsers/test/test.sh: Ready for release 3.4.5.
+
 2013-06-07 10:49  sdrobac
 
 	* configure.ac, libhfst/src/HfstXeroxRules.cc,
