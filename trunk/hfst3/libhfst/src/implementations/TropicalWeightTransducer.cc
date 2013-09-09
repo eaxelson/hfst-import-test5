@@ -84,6 +84,39 @@ namespace hfst { namespace implementations
     t->SetInputSymbols(&st);
   }
 
+  void TropicalWeightTransducer::get_first_input_symbols
+  (StdVectorFst *t, StateId s, std::set<StateId> & visited_states, StringSet & symbols)
+  {
+    visited_states.insert(s);
+    for (fst::ArcIterator<StdVectorFst> aiter(*t,s); 
+         !aiter.Done(); aiter.Next())
+      {
+        const StdArc &arc = aiter.Value();
+        assert(t->InputSymbols() != NULL);
+        std::string sym = t->InputSymbols()->Find(arc.ilabel);
+        assert(sym != "");
+
+        if ((!FdOperation::is_diacritic(sym)) && arc.ilabel != 0 )
+          {
+            symbols.insert(t->InputSymbols()->Find(arc.ilabel));
+          }
+        if (visited_states.find(arc.nextstate) == visited_states.end())
+          {
+            get_first_input_symbols(t, arc.nextstate, visited_states, symbols);
+          }
+      }
+  }
+
+  StringSet TropicalWeightTransducer::get_first_input_symbols(StdVectorFst *t)
+  {
+    assert(t->InputSymbols() != NULL);
+    StringSet symbols;
+    StateId s = t->Start();
+    std::set<StateId> visited_states;
+    get_first_input_symbols(t, s, visited_states, symbols);
+    return symbols;
+  }
+
   StringSet TropicalWeightTransducer::get_alphabet(StdVectorFst *t)
   {
     assert(t->InputSymbols() != NULL);

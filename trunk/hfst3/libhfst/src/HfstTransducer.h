@@ -674,6 +674,10 @@ in \a ifile.
     to the transducer. */
     StringSet get_alphabet() const;
 
+    /** \brief Get first input level symbols of strings recognized 
+        (or rejected, if they end in a non-final state) by the transducer. */
+    StringSet get_first_input_symbols() const;
+
     /** \brief Explicitely insert \a symbol to the alphabet 
     of the transducer. 
 

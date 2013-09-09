@@ -65,8 +65,8 @@ print_usage()
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out, "\n");
     fprintf(message_out, 
-	    "The parameter --verbose gives more extensive information on\n"
-	    "the properties of a transducer.\n");
+            "The parameter --verbose gives more extensive information on\n"
+            "the properties of a transducer.\n");
     fprintf(message_out, "\n");
     print_report_bugs();
     fprintf(message_out, "\n");
@@ -367,7 +367,7 @@ process_stream(HfstInputStream& instream)
                   "arc type: ???\n");
           break;
         }
-      delete trans;
+      //delete trans;
       fprintf(outfile, "input symbol table: yes\n"
               "output symbol table: yes\n"
               "# of states: " SIZE_T_SPECIFIER "\n"
@@ -495,6 +495,26 @@ process_stream(HfstInputStream& instream)
             {
               fprintf(outfile, "<Unknown in used transducer format>\n");
             }
+          // ADDED
+          if (trans->get_type() == hfst::TROPICAL_OPENFST_TYPE)
+            {
+              StringSet ss = trans->get_first_input_symbols();
+              fprintf(outfile, "first input symbols:\n");
+              first = true;
+              for (StringSet::const_iterator s = ss.begin();
+                   s != ss.end();
+                   ++s)
+                {
+                  if (!first) 
+                    {
+                      fprintf(outfile, ", ");
+                    }
+                  fprintf(outfile, "%s", s->c_str());
+                  first = false;
+                }
+              fprintf(outfile, "\n");
+            }
+          delete trans;
         }
     }
 
