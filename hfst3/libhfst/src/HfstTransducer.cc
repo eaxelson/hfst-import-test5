@@ -220,6 +220,35 @@ HfstTransducer &HfstTransducer::prune_alphabet(bool force)
   return convert_to_hfst_transducer(net);;
 }
 
+StringSet HfstTransducer::get_first_input_symbols() const
+{
+    switch(type)
+    {
+#if HAVE_SFST
+    case SFST_TYPE:
+        HFST_THROW_MESSAGE(FunctionNotImplementedException, "get_first_input_symbols");
+#endif
+#if HAVE_OPENFST
+    case TROPICAL_OPENFST_TYPE:
+        return tropical_ofst_interface.get_first_input_symbols
+        (implementation.tropical_ofst);
+    case LOG_OPENFST_TYPE:
+        HFST_THROW_MESSAGE(FunctionNotImplementedException, "get_first_input_symbols");
+#endif
+#if HAVE_FOMA
+    case FOMA_TYPE:
+        HFST_THROW_MESSAGE(FunctionNotImplementedException, "get_first_input_symbols");
+#endif
+    case ERROR_TYPE:
+        HFST_THROW(TransducerHasWrongTypeException);
+    case HFST_OL_TYPE:
+    case HFST_OLW_TYPE:
+        HFST_THROW_MESSAGE(FunctionNotImplementedException, "get_first_input_symbols");
+    default:
+        HFST_THROW_MESSAGE(FunctionNotImplementedException, "get_first_input_symbols");
+    }    
+}
+
 StringSet HfstTransducer::get_alphabet() const
 {
     switch(type)

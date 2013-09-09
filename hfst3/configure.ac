@@ -520,7 +520,8 @@ AS_IF([test -z "`echo "$LEX_VERSION" | grep 'flex 2\.[[5-9]]\.[[3-9][4-9]]'`"],
       [AC_MSG_WARN([Building hfst successfully requires flex newer than 2.5.33 on some platforms. Unless you are building with pre-flex-generated sources, building will probably fail.])])
 
 # if automake is >= 1.12
-AM_CONDITIONAL([HH_EXTENSION_USED], [test "`automake --version | head -1 | grep ' 1\.1[2-9]'`" = ""])
+#AM_CONDITIONAL([HH_EXTENSION_USED], [test "`automake --version | head -1 | grep ' 1\.1[2-9]'`" = ""])
+AM_CONDITIONAL([HH_EXTENSION_USED], [false])
 
 AC_PROG_INSTALL
 AC_PROG_LN_S
@@ -659,8 +660,6 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 libhfst/src/parsers/Makefile 
                  libhfst/hfst.pc 
 		 tools/Makefile tools/src/Makefile tools/src/hfst-proc/Makefile
-		 tools/src/parsers/Makefile
-		 tools/src/parsers/test/Makefile
 		 tools/src/hfst-twolc/Makefile
 		 tools/src/hfst-twolc/src/Makefile
 		 tools/src/hfst-twolc/test/Makefile
