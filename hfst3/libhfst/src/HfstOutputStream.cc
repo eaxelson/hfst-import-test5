@@ -39,7 +39,7 @@ namespace hfst
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
         implementation.tropical_ofst = 
-          new hfst::implementations::TropicalWeightOutputStream();
+          new hfst::implementations::TropicalWeightOutputStream(hfst_format);
         break;
       case LOG_OPENFST_TYPE:
         implementation.log_ofst = 
@@ -49,13 +49,13 @@ namespace hfst
 #if HAVE_FOMA
       case FOMA_TYPE:
         implementation.foma = 
-          new hfst::implementations::FomaOutputStream();
+          new hfst::implementations::FomaOutputStream(hfst_format);
         break;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
       case MY_TRANSDUCER_LIBRARY_TYPE:
         implementation.my_transducer_library = 
-          new hfst::implementations::MyTransducerLibraryOutputStream();
+          new hfst::implementations::MyTransducerLibraryOutputStream(hfst_format);
         break;
 #endif
       case HFST_OL_TYPE:
@@ -109,13 +109,13 @@ namespace hfst
 #if HAVE_FOMA
       case FOMA_TYPE:
         implementation.foma = 
-          new hfst::implementations::FomaOutputStream(filename);
+          new hfst::implementations::FomaOutputStream(filename, hfst_format);
         break;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
       case MY_TRANSDUCER_LIBRARY_TYPE:
         implementation.my_transducer_library =
-          new hfst::implementations::MyTransducerLibraryOutputStream(filename);
+          new hfst::implementations::MyTransducerLibraryOutputStream(filename, hfst_format);
         break;
 #endif
       case HFST_OL_TYPE:
