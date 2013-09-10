@@ -2,6 +2,8 @@
 TOOLDIR=../../tools/src
 for i in  .hfst .sfst .ofst .foma; do
 
+if (([ ".hfst" = "$i" ]) || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
+
     if test -f prunable_alphabet$i -a non_prunable_alphabet_1$i -a non_prunable_alphabet_2$i; then
 
 	# Prunable alphabet
@@ -46,6 +48,7 @@ for i in  .hfst .sfst .ofst .foma; do
 	done
 
     fi
+fi
 
 done
 

@@ -11,6 +11,7 @@ cat $srcdir/cat.txt | tr -d '\r' > TMP;
 mv TMP $srcdir/cat.txt;
 
 for i in "" .sfst .ofst .foma; do
+if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
     if test -f cat$i ; then
         if ! $TOOLDIR/hfst-fst2txt -D < cat$i > test.txt ; then
             exit 1
@@ -31,4 +32,5 @@ for i in "" .sfst .ofst .foma; do
         fi
         rm test.txt
     fi
+fi
 done

@@ -1,6 +1,7 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
 for i in "" .sfst .ofst .foma; do
+if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
     if test -f cat2dog$i -a -f dog2cat$i ; then
         if ! (cat cat2dog$i dog2cat$i | $TOOLDIR/hfst-split) ; then
             exit 1
@@ -15,4 +16,5 @@ for i in "" .sfst .ofst .foma; do
         fi
         rm 1.hfst 2.hfst;
     fi
+fi
 done

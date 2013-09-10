@@ -6,6 +6,7 @@ if [ "$srcdir" = "" ]; then
 fi
 
 for i in "" .sfst .ofst .foma; do
+if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
     FFLAG=
     case $i in
         .sfst)
@@ -75,5 +76,6 @@ for i in "" .sfst .ofst .foma; do
         fi
         rm test.hfst
     fi
+fi
 done
 

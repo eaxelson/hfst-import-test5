@@ -8,7 +8,7 @@ $TOOLDIR/hfst-format -l > TMP;
 
 # test what strings the transducer [a:b (ID:ID)*] recognizes
 for i in "" .sfst .ofst .foma; do
-
+if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
     if test -f abid$i ; then
 
 	if ! echo "aa" | $TOOLDIR/hfst-lookup -s abid$i \
@@ -94,7 +94,7 @@ for i in "" .sfst .ofst .foma; do
 	fi
 
     fi
-
+fi
 done
 
 rm TMP

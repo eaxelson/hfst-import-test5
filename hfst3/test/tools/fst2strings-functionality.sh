@@ -1,6 +1,7 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
 for i in "" .sfst .ofst .foma; do
+if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
     if test -f cat$i ; then
         if ! $TOOLDIR/hfst-fst2strings cat$i > test.strings ; then
             echo turning cat$i to strings failed
@@ -50,11 +51,11 @@ for i in "" .sfst .ofst .foma; do
             fi
         done
     fi
-
+fi
 done
 
 for i in "" .sfst .ofst .foma; do
-
+if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
     # Test the empty transducer
     if test -f empty$i ; then
 	if ! $TOOLDIR/hfst-fst2strings -r 20 empty$i > /dev/null ; then
@@ -77,5 +78,5 @@ for i in "" .sfst .ofst .foma; do
         fi
 
     fi
-
+fi
 done

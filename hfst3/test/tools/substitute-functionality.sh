@@ -1,6 +1,7 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
 for i in "" .sfst .ofst .foma; do
+if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
     if test -f cat$i -a -f dog$i ; then
         if ! $TOOLDIR/hfst-substitute -s cat$i -F $srcdir/cat2dog.substitute > test ; then
             exit 1
@@ -34,4 +35,5 @@ for i in "" .sfst .ofst .foma; do
         fi
         rm test
     fi
+fi
 done
