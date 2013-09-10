@@ -29,21 +29,20 @@ done
 
 for format in sfst openfst-tropical foma
 do
-    if ! ($TOOLDIR/hfst-format --list-formats | grep $format > /dev/null) ; then
-	continue;
-    fi
+    if ($TOOLDIR/hfst-format --list-formats | grep $format > /dev/null) ; then
     
-    # [?] with empty sigma and [?] with sigma {a} are not equal
-    echo "[?]" | $TOOLDIR/hfst-regexp2fst -f $format > tmp1;
-    echo "[?-a]" | $TOOLDIR/hfst-regexp2fst -f $format > tmp2;
-    $TOOLDIR/hfst-fst2txt tmp1 > tmp1.txt;
-    $TOOLDIR/hfst-fst2txt tmp2 > tmp2.txt;
-    if ! (diff tmp1.txt tmp2.txt); then
-	echo "not equal #1"
-	exit 1;
-    fi
-    if $TOOLDIR/hfst-compare -s tmp1 tmp2; then
-	echo "not equal #2"
-	exit 1;
+        # [?] with empty sigma and [?] with sigma {a} are not equal
+        echo "[?]" | $TOOLDIR/hfst-regexp2fst -f $format > tmp1;
+        echo "[?-a]" | $TOOLDIR/hfst-regexp2fst -f $format > tmp2;
+        $TOOLDIR/hfst-fst2txt tmp1 > tmp1.txt;
+        $TOOLDIR/hfst-fst2txt tmp2 > tmp2.txt;
+        if ! (diff tmp1.txt tmp2.txt); then
+	    echo "not equal #1"
+	    exit 1;
+        fi
+        if $TOOLDIR/hfst-compare -s tmp1 tmp2; then
+	    echo "not equal #2"
+	    exit 1;
+        fi
     fi
 done

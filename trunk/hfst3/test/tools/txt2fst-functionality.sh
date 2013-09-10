@@ -1,6 +1,7 @@
 #!/bin/sh
 TOOLDIR=../../tools/src
 for i in "" .sfst .ofst .foma; do
+if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null); then
     FFLAG=
     case $i in
         .sfst)
@@ -21,4 +22,5 @@ for i in "" .sfst .ofst .foma; do
         fi
         rm test
     fi
+fi
 done
