@@ -7,6 +7,7 @@
 
 namespace hfst_ol {
 
+
     class PmatchTransducer;
     typedef std::map<SymbolNumber, PmatchTransducer *> RtnMap;
     enum SpecialSymbol{entry,
@@ -17,26 +18,40 @@ namespace hfst_ol {
                        RC_exit,
                        boundary};
 
+    class PmatchAlphabet: public TransducerAlphabet {
+    protected:
+        RtnMap rtns;
+        std::map<SpecialSymbol, SymbolNumber> special_symbols;
+        std::map<SymbolNumber, std::string> end_tag_map;
+        std::map<std::string, SymbolNumber> rtn_names;
+        static bool is_end_tag(const std::string & symbol);
+        bool is_end_tag(const SymbolNumber symbol) const;
+        static bool is_insertion(const std::string & symbol);
+        static std::string name_from_insertion(
+            const std::string & symbol);
+        std::string end_tag(const SymbolNumber symbol);
+        std::string start_tag(const SymbolNumber symbol);
+
+    public:
+        PmatchTransducer(std::istream& is, SymbolNumber symbol_count);
+        void add_special_symbol(const std::string & str, SymbolNumber symbol_number);
+        std::string stringify(const SymbolNumberVector & str);
+    };
+
+
     class PmatchContainer
     {
     protected:
-        TransducerAlphabet alphabet;
+        PmatchAlphabet alphabet;
         Encoder * encoder;
         SymbolNumber orig_symbol_count;
         SymbolNumber symbol_count;
         PmatchTransducer * toplevel;
-        RtnMap rtns;
         SymbolNumber * input_tape;
         SymbolNumber * orig_input_tape;
         SymbolNumber * output_tape;
         SymbolNumber * orig_output_tape;
         SymbolNumberVector output;
-
-        std::map<SpecialSymbol, SymbolNumber> special_symbols;
-        std::map<SymbolNumber, std::string> end_tag_map;
-        std::map<std::string, SymbolNumber> rtn_names;
-
-        void add_special_symbol(const std::string & str, SymbolNumber symbol_number);
 
     public:
         PmatchContainer(std::istream & is);
@@ -50,16 +65,7 @@ namespace hfst_ol {
         bool has_queued_input(void);
         void copy_to_output(const SymbolNumberVector & best_result);
         std::string stringify_output(void);
-        std::string stringify(const SymbolNumberVector & str);
-
         static std::string parse_name_from_hfst3_header(std::istream & f);
-        static bool is_end_tag(const std::string & symbol);
-        bool is_end_tag(const SymbolNumber symbol) const;
-        static bool is_insertion(const std::string & symbol);
-        static std::string name_from_insertion(
-            const std::string & symbol);
-        std::string end_tag(const SymbolNumber symbol);
-        std::string start_tag(const SymbolNumber symbol);
 
     };
 
@@ -135,7 +141,7 @@ namespace hfst_ol {
         std::vector<SimpleTransition> transition_table;
         std::vector<SimpleIndex> index_table;
 
-        TransducerAlphabet & alphabet;
+        PmatchAlphabet & alphabet;
         SymbolNumber orig_symbol_count;
     
         RtnMap & rtns;
