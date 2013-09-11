@@ -166,8 +166,6 @@ namespace hfst {
       static fsm * eliminate_flags(fsm * t);
       static fsm * eliminate_flag(fsm * t, const std::string & flag);
 
-      // 1 == FAIL, 2 == SUCCEED, 3 == NONE
-      static int is_valid_flag_combination(const std::string & flag1, const std::string & flag2);
     };
 
 } }

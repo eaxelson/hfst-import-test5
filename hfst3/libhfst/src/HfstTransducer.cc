@@ -1461,6 +1461,137 @@ static void substitute_escaped_flags(HfstTransducer * filter)
   return;
 }
 
+#define FLAG_UNIFY 1
+#define FLAG_CLEAR 2
+#define FLAG_DISALLOW 4
+#define FLAG_NEGATIVE 8
+#define FLAG_POSITIVE 16
+#define FLAG_REQUIRE 32
+#define FLAG_EQUAL 64
+
+#define FLAG_FAIL    1
+#define FLAG_SUCCEED 2
+#define FLAG_NONE    3
+
+
+static int flag_build
+(int ftype, char *fname, char *fvalue, int fftype, char *ffname, char *ffvalue) {
+  int eq, selfnull;
+
+    selfnull = 0; /* If current flag has no value, e.g. @R.A@ */
+    if (strcmp(fname,ffname) != 0)
+        return FLAG_NONE;
+    
+    if (fvalue == NULL) {
+        fvalue = strdup("");
+        selfnull = 1;
+    }
+    
+    if (ffvalue == NULL)
+        ffvalue = strdup("");
+
+    eq = strcmp(fvalue, ffvalue);
+    /* U flags */
+    if (ftype == FLAG_UNIFY && fftype == FLAG_POSITIVE && eq == 0)
+        return FLAG_SUCCEED;
+    if (ftype == FLAG_UNIFY && fftype == FLAG_CLEAR)
+        return FLAG_SUCCEED;
+    if (ftype == FLAG_UNIFY && fftype == FLAG_UNIFY && eq != 0)
+        return FLAG_FAIL;
+    if (ftype == FLAG_UNIFY && fftype == FLAG_POSITIVE && eq != 0)
+        return FLAG_FAIL;
+    if (ftype == FLAG_UNIFY && fftype == FLAG_NEGATIVE && eq == 0)
+        return FLAG_FAIL;
+
+    /* R flag with value = 0 */
+    if (ftype == FLAG_REQUIRE && fftype == FLAG_UNIFY && selfnull)
+        return FLAG_SUCCEED;
+    if (ftype == FLAG_REQUIRE && fftype == FLAG_POSITIVE && selfnull)
+        return FLAG_SUCCEED;
+    if (ftype == FLAG_REQUIRE && fftype == FLAG_NEGATIVE && selfnull)
+        return FLAG_SUCCEED;
+    if (ftype == FLAG_REQUIRE && fftype == FLAG_CLEAR && selfnull)
+        return FLAG_FAIL;
+
+    /* R flag with value */
+    if (ftype == FLAG_REQUIRE && fftype == FLAG_POSITIVE && eq == 0 && !selfnull)
+        return FLAG_SUCCEED;
+    if (ftype == FLAG_REQUIRE && fftype == FLAG_UNIFY && eq == 0 && !selfnull)
+        return FLAG_SUCCEED;
+    if (ftype == FLAG_REQUIRE && fftype == FLAG_POSITIVE && eq != 0 && !selfnull)
+        return FLAG_FAIL;
+    if (ftype == FLAG_REQUIRE && fftype == FLAG_UNIFY && eq != 0 && !selfnull)
+        return FLAG_FAIL;
+    if (ftype == FLAG_REQUIRE && fftype == FLAG_NEGATIVE && !selfnull)
+        return FLAG_FAIL;
+    if (ftype == FLAG_REQUIRE && fftype == FLAG_CLEAR && !selfnull)
+        return FLAG_FAIL;
+
+    /* D flag with value = 0 */
+    if (ftype == FLAG_DISALLOW && fftype == FLAG_CLEAR && selfnull)
+        return FLAG_SUCCEED;
+    if (ftype == FLAG_DISALLOW && fftype == FLAG_POSITIVE && selfnull)
+        return FLAG_FAIL;
+    if (ftype == FLAG_DISALLOW && fftype == FLAG_UNIFY && selfnull)
+        return FLAG_FAIL;
+    if (ftype == FLAG_DISALLOW && fftype == FLAG_NEGATIVE && selfnull)
+        return FLAG_FAIL;
+
+    /* D flag with value */
+    if (ftype == FLAG_DISALLOW && fftype == FLAG_POSITIVE && eq != 0 && !selfnull)
+        return FLAG_SUCCEED;
+    if (ftype == FLAG_DISALLOW && fftype == FLAG_CLEAR && !selfnull)
+        return FLAG_SUCCEED;
+    if (ftype == FLAG_DISALLOW && fftype == FLAG_NEGATIVE  && eq == 0 && !selfnull)
+        return FLAG_SUCCEED;
+    if (ftype == FLAG_DISALLOW && fftype == FLAG_POSITIVE && eq == 0 && !selfnull)
+        return FLAG_FAIL;
+    if (ftype == FLAG_DISALLOW && fftype == FLAG_UNIFY && eq == 0 && !selfnull)
+        return FLAG_FAIL;
+    if (ftype == FLAG_DISALLOW && fftype == FLAG_NEGATIVE  && eq != 0 && !selfnull)
+        return FLAG_FAIL;
+
+    return FLAG_NONE;
+}
+
+
+static int hfst_operator_to_char(const std::string & op)
+{
+  if (op[0] == 'U')
+    return FLAG_UNIFY;
+  if (op[0] == 'C')
+    return FLAG_CLEAR;
+  if (op[0] == 'D')
+    return FLAG_DISALLOW;
+  if (op[0] == 'N')
+    return FLAG_NEGATIVE;
+  if (op[0] == 'P')
+    return FLAG_POSITIVE;
+  if (op[0] == 'R')
+    return FLAG_REQUIRE;
+  throw "invalid operator";
+}
+
+static int is_valid_flag_combination
+(const std::string & flag1, const std::string & flag2)
+{
+  int operator1 = hfst_operator_to_char(FdOperation::get_operator(flag1));
+  char * feature1 = strdup(FdOperation::get_feature(flag1).c_str());
+  char * value1 = strdup(FdOperation::get_value(flag1).c_str());
+
+  int operator2 = hfst_operator_to_char(FdOperation::get_operator(flag2));
+  char * feature2 = strdup(FdOperation::get_feature(flag2).c_str());
+  char * value2 = strdup(FdOperation::get_value(flag2).c_str());
+
+  int result = flag_build(operator1, feature1, value1,
+                          operator2, feature2, value2);
+
+  free(feature1); free(value1); free(feature2); free(value2);
+
+  return result;
+}
+
+
 /* @brief Get flag filter for transducer \a transducer. 
    @param transducer The transducer that is going to be filtered. 
    @param flags The set of all flags in \a transducer. 
@@ -1469,10 +1600,6 @@ static void substitute_escaped_flags(HfstTransducer * filter)
 static HfstTransducer * get_flag_filter
 (const HfstTransducer * transducer, const StringSet & flags, const String & flag)
 {
-#if ! HAVE_FOMA
-  throw "get_flag_filter: no foma";
-#else
-
   ImplementationType type = transducer->get_type();
   bool flag_found = false;
   HfstTransducer * filter = NULL;
@@ -1491,7 +1618,7 @@ static HfstTransducer * get_flag_filter
           for (StringSet::const_iterator ff = flags.begin();
                ff != flags.end(); ff++)
             {
-              int fstatus = FomaTransducer::is_valid_flag_combination(*f, *ff);
+              int fstatus = is_valid_flag_combination(*f, *ff);
 
               if (fstatus == 1) {
                 fail_flags.disjunct(HfstTransducer("_" + *ff, type));
@@ -1528,7 +1655,6 @@ static HfstTransducer * get_flag_filter
     }
 
   return filter;
-#endif
 }
 
 // Replace arcs in \a transducer that use flag \a flag with epsilon arcs
@@ -1588,7 +1714,6 @@ HfstTransducer &HfstTransducer::eliminate_flag(const std::string & flag)
   HfstBasicTransducer basic(*this);
   StringSet flags = basic.get_flags();
   HfstTransducer * filter = get_flag_filter(this, flags, flag);
-
   if (filter != NULL) 
     {
       HfstTransducer filter_copy(*filter);
@@ -5404,3 +5529,4 @@ int main(int argc, char * argv[])
 }
 
 #endif // MAIN_TEST
+
