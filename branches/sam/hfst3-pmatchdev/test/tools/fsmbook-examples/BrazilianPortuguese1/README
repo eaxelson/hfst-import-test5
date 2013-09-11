@@ -1,0 +1,8 @@
+1. BrazilianPortuguese1.xfst.script change "write att" line to:
+write prolog > BrazilianPortuguese1
+
+2. run this to create att file:
+
+sudo xfst -f BrazilianPortuguese1.xfst.script
+cat BrazilianPortuguese1 | ../xfst-prolog-to-hfst-att.sh \
+  > BrazilianPortuguese1.xfst.att
