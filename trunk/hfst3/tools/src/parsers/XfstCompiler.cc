@@ -106,6 +106,7 @@ namespace xfst {
         variables_["print-pairs"] = "OFF";
         variables_["print-sigma"] = "OFF";
         variables_["print-space"] = "OFF";
+        variables_["print-weight"] = "OFF";
         variables_["quit-on-fail"] = "OFF";
         variables_["quote-special"] = "OFF";
         variables_["random-seed"] = "ON";
@@ -1206,6 +1207,11 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::set(const char* name, const char* text)
     {
+      if (variables_.find(name) == variables_.end())
+        {
+          fprintf(warnstream_, "no such variable: '%s'\n", name);
+          PROMPT_AND_RETURN_THIS;
+        }
       variables_[name] = text;
       if (strcmp(name, "hopcroft-min") == 0)
         {
@@ -1220,6 +1226,11 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::set(const char* name, unsigned int number)
     {
+      if (variables_.find(name) == variables_.end())
+        {
+          fprintf(warnstream_, "no such variable: '%s'\n", name);
+          PROMPT_AND_RETURN_THIS;
+        }
       char* num = static_cast<char*>(malloc(sizeof(char)*31));
       sprintf(num, "%u", number);
       variables_[name] = num;
@@ -2187,7 +2198,7 @@ namespace xfst {
     {
       GET_TOP(tmp);
       HfstBasicTransducer basic(*tmp);
-      basic.write_in_xfst_format(outfile);
+      basic.write_in_xfst_format(outfile, variables_["print-weight"] == "ON");
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
@@ -2321,7 +2332,7 @@ namespace xfst {
           if (name == "")
             name = "NO_NAME";
           HfstBasicTransducer fsm(*tr);
-          fsm.write_in_prolog_format(outfile, name);
+          fsm.write_in_prolog_format(outfile, name, variables_["print-weight"] == "ON");
           if (stack_.size() != 1) // separator
             fprintf(outfile, "\n");
           reverse_stack.push(tr);
@@ -3331,7 +3342,7 @@ namespace xfst {
   XfstCompiler::write_att(FILE* infile)
     {
       GET_TOP(tmp);
-      tmp->write_in_att_format(infile);
+      tmp->write_in_att_format(infile, variables_["print-weight"] == "ON");
       PROMPT_AND_RETURN_THIS;
     }
   const std::stack<HfstTransducer*>&
