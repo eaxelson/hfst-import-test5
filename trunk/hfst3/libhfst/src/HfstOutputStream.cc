@@ -49,7 +49,7 @@ namespace hfst
 #if HAVE_FOMA
       case FOMA_TYPE:
         implementation.foma = 
-          new hfst::implementations::FomaOutputStream(hfst_format);
+          new hfst::implementations::FomaOutputStream();
         break;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
@@ -109,7 +109,7 @@ namespace hfst
 #if HAVE_FOMA
       case FOMA_TYPE:
         implementation.foma = 
-          new hfst::implementations::FomaOutputStream(filename, hfst_format);
+          new hfst::implementations::FomaOutputStream(filename);
         break;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
