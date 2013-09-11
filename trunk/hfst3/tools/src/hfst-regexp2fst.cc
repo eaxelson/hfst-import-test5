@@ -88,7 +88,7 @@ print_usage()
 "      --norm (todo)         Divide each weight by sum of all weights\n"
 "      --log (todo)          Take negative logarithm of each weight\n"
 "  -l, --line                Input is line separated (default)\n"
-"  -S, --semicolon           Input is semicolon separated\n"
+"  -S, --semicolon           Input is semicolon separated (weights not supported)\n"
 "  -e, --epsilon=EPS         Map EPS as zero.\n"
 "  -H, --do-not-harmonize    Do not expand '?' symbols.\n");
         fprintf(message_out, "\n");
@@ -103,9 +103,11 @@ print_usage()
             );
 
         fprintf(message_out, "Examples:\n"
-"  echo \" c:d a:o t:g \" | %s \n"
-"  echo \" cat ; dog \" | %s -S   create transducers \"cat\" and \"dog\"\n"
-            "\n", program_name, program_name);
+"  echo \" c:d a:o t:g \" | %s       create transducer {cat}:{dog}\n"
+"  echo \" c:d a:o t:g ; 3\" | %s    same but with weight 3\n"
+"  echo \" cat ; dog ; 3 \" | %s -S  create transducers\n"
+"                                               \"cat\" and \"dog\" and \"3\"\n"
+                "\n", program_name, program_name, program_name);
         print_report_bugs();
         fprintf(message_out, "\n");
         print_more_info();
