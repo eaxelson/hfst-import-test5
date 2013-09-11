@@ -250,9 +250,18 @@ std::string PmatchContainer::stringify(const SymbolNumberVector & str)
         if (*it == special_symbols[entry]) {
             start_tag_pos.push(retval.size());
         } else if (*it == special_symbols[exit]) {
-            start_tag_pos.pop();
+            if (start_tag_pos.size() != 0) {
+                start_tag_pos.pop();
+            }
         } else if (is_end_tag(*it)) {
-            retval.insert(start_tag_pos.top(), start_tag(*it));
+            unsigned int pos;
+            if (start_tag_pos.size() == 0) {
+                std::cerr << "Warning: end tag without start tag\n";
+                pos = 0;
+            } else {
+                pos = start_tag_pos.top();
+            }
+            retval.insert(pos, start_tag(*it));
             retval.append(end_tag(*it));
         } else if (*it == special_symbols[boundary]) {
             continue;
@@ -544,6 +553,10 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
             get_analyses(input_tape,
                          output_tape,
                          transition_table[i].target);
+            // Finally we go back to where we were so the
+            // other possible paths get a shot
+            input_tape = original_input;
+            output_tape = original_output;
             }
             ++i;
         } else { // it's not epsilon and it's not a flag or Ins, so nothing to do
@@ -579,7 +592,9 @@ void PmatchTransducer::find_transitions(SymbolNumber input,
                 // we got here via identity, so look back in the
                 // input tape to find the symbol we want to write
                     output = *(input_tape - 1);
-                }
+                }/* else if (input == alphabet.get_unknown_symbol()) {
+                    if (output == *(input_tape - 1)
+                    }*/
 
                 *output_tape = output;
                 get_analyses(input_tape,
@@ -649,6 +664,12 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
                              output_tape,
                              i+1);
         }
+/*        if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER) {
+            find_transitions(alphabet.get_unknown_symbol(),
+                             input_tape,
+                             output_tape,
+                             i+1);
+                             }*/
             
         // if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER &&
         //     local_stack.top().default_symbol_trap == true) {
@@ -685,7 +706,13 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
                        output_tape,
                        i+1);
         }
-
+/*            if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER) {
+                find_index(alphabet.get_unknown_symbol(),
+                           input_tape,
+                           output_tape,
+                           i+1);
+            }
+            }*/
         // if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER &&
         //     local_stack.top().default_symbol_trap == true) {
         //     find_index(alphabet.get_identity_symbol(),
