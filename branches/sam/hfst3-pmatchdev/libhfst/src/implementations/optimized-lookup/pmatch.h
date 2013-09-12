@@ -24,17 +24,18 @@ namespace hfst_ol {
         std::map<SpecialSymbol, SymbolNumber> special_symbols;
         std::map<SymbolNumber, std::string> end_tag_map;
         std::map<std::string, SymbolNumber> rtn_names;
-        static bool is_end_tag(const std::string & symbol);
         bool is_end_tag(const SymbolNumber symbol) const;
-        static bool is_insertion(const std::string & symbol);
-        static std::string name_from_insertion(
-            const std::string & symbol);
         std::string end_tag(const SymbolNumber symbol);
         std::string start_tag(const SymbolNumber symbol);
 
     public:
-        PmatchTransducer(std::istream& is, SymbolNumber symbol_count);
+        PmatchAlphabet(std::istream& is, SymbolNumber symbol_count);
+        static bool is_end_tag(const std::string & symbol);
+        static bool is_insertion(const std::string & symbol);
+        static std::string name_from_insertion(
+            const std::string & symbol);
         void add_special_symbol(const std::string & str, SymbolNumber symbol_number);
+        void add_rtn(PmatchTransducer * rtn, SymbolNumber s);
         std::string stringify(const SymbolNumberVector & str);
     };
 
@@ -61,7 +62,6 @@ namespace hfst_ol {
         bool has_unsatisfied_rtns(void) const;
         std::string get_unsatisfied_rtn_name(void) const;
         std::string match(std::string & input);
-        void add_rtn(PmatchTransducer * rtn, SymbolNumber s);
         bool has_queued_input(void);
         void copy_to_output(const SymbolNumberVector & best_result);
         std::string stringify_output(void);

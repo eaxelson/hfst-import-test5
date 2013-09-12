@@ -64,7 +64,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
     TransducerHeader header(inputstream);
     orig_symbol_count = symbol_count = header.symbol_count();
     alphabet = PmatchAlphabet(inputstream, header.symbol_count());
-
+    
     
     encoder = new Encoder(alphabet.get_symbol_table(), header.input_symbol_count());
     toplevel = new hfst_ol::PmatchTransducer(
@@ -86,8 +86,8 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
                                           header.index_table_size(),
                                           header.target_table_size(),
                                           alphabet);
-        if (rtn_names.count(transducer_name) != 0) {
-            add_rtn(rtn, rtn_names[transducer_name]);
+        if (alphabet.rtn_names.count(transducer_name) != 0) {
+            alphabet.add_rtn(rtn, alphabet.rtn_names[transducer_name]);
         } else {
             delete rtn;
         }
@@ -207,7 +207,7 @@ std::string PmatchContainer::parse_name_from_hfst3_header(std::istream & f)
 
 
 
-void PmatchContainer::add_rtn(PmatchTransducer * rtn, SymbolNumber s)
+void PmatchAlphabet::add_rtn(PmatchTransducer * rtn, SymbolNumber s)
 {
     rtns.insert(std::pair<SymbolNumber, PmatchTransducer *>(s, rtn));
 }
