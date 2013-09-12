@@ -46,6 +46,7 @@ using hfst::ImplementationType;
 #include "inc/globals-binary.h"
 
 static bool harmonize=true;
+static bool eliminate_flags=false;
 
 void
 print_usage()
@@ -58,8 +59,8 @@ print_usage()
         print_common_binary_program_options(message_out);
         fprintf(message_out,
                 "Harmonization:\n"
-                "  -H, --do-not-harmonize Do not harmonize symbols.\n");
-        //                "  -F, --harmonize-flags  Harmonize flag diacritics.\n");
+                "  -H, --do-not-harmonize Do not harmonize symbols.\n"
+                "  -e, --eliminate-flags  Eliminate flag diacritics.\n");
         fprintf(message_out, "\n");
         print_common_binary_program_parameter_instructions(message_out);
         fprintf(message_out, "\n");
@@ -89,11 +90,12 @@ parse_options(int argc, char** argv)
           HFST_GETOPT_COMMON_LONG,
           HFST_GETOPT_BINARY_LONG,
           {"do-not-harmonize", no_argument, 0, 'H'},
+          {"eliminate-flags", no_argument, 0, 'e'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_BINARY_SHORT "H",
+                             HFST_GETOPT_BINARY_SHORT "He",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -105,6 +107,9 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-binary.h"
         case 'H':
           harmonize=false;
+          break;
+        case 'e':
+          eliminate_flags=true;
           break;
 
 #include "inc/getopt-cases-error.h"
@@ -156,6 +161,12 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
         }
         try
           {
+            if (eliminate_flags)
+              {
+                verbose_printf("Eliminating flags...\n");
+                first->eliminate_flags();
+                second->eliminate_flags();
+              }
             if (first->compare(*second, harmonize))
               {
                 if (transducer_n_first == 1)

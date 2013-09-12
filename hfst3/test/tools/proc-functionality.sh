@@ -99,7 +99,7 @@ fi
 rm test.strings
 
 ## skip new test introduced in version 3014...
-echo "skipping some test cases.."
+echo "note: skipping some test cases.."
 exit 77
 
 #if ! $TOOLDIR/hfst-proc/hfst-apertium-proc compounds2.hfstol < $srcdir/proc-compounds2.strings | tr -d '\r' > test.strings ; then

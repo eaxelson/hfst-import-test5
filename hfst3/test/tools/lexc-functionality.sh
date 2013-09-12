@@ -18,8 +18,8 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
 LEXCXFAIL="xfail.bogus.lexc xfail.ISO-8859-1.lexc xfail.lexicon-semicolon.lexc"
 
 if ! ($TOOLDIR/hfst-format --test-format foma ) ; then
-    echo "skipping lexc tests as foma back-end is not available"
-    exit 0;
+    echo "note: skipping lexc tests as foma back-end is not available"
+    exit 77;
 fi
 
 if [ "$srcdir" = "" ]; then
