@@ -458,7 +458,7 @@ LexcCompiler::compileLexical()
 
 
 /////////////
-    printf ("\nSet of pairs & unknown..\n");
+    /// printf ("\nSet of pairs & unknown..\n");
        int t0 = time(NULL);
     HfstBasicTransducer fsm(lexicons);
 
@@ -499,7 +499,7 @@ LexcCompiler::compileLexical()
     HfstTransducer unknown(setOfPairs, format_);
 
     int t1 = time(NULL);
-    printf ("time: %d secs\n", t1 - t0);
+    /// printf ("time: %d secs\n", t1 - t0);
 
 
 
@@ -511,14 +511,14 @@ LexcCompiler::compileLexical()
 
 
  
-    printf ("sigma star...\n");
+    /// printf ("sigma star...\n");
     t0 = time(NULL);
     // setOfPairs.insert(StringPair("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@"));
     HfstTransducer sigmaStar(setOfPairs, format_, false);
 
         sigmaStar.disjunct(identity).repeat_star().minimize();
     t1 = time(NULL);
-    printf ("sigma star time = %d secs\n", t1 - t0);
+    /// printf ("sigma star time = %d secs\n", t1 - t0);
 
 
     //printf("unknown: \n");
@@ -607,7 +607,7 @@ LexcCompiler::compileLexical()
         //iWoJoniUnk.write_in_att_format(stdout, 1);
 
 
-        printf ("\nBuilding subpart...\n");
+        /// printf ("\nBuilding subpart...\n");
         int t0 = time(NULL);
 
         HfstTransducer subPart(sigmaStar);
@@ -627,14 +627,14 @@ LexcCompiler::compileLexical()
 
 
         t1 = time(NULL);
-        printf ("Building subpart time = %d secs\n", t1 - t0);
+        /// printf ("Building subpart time = %d secs\n", t1 - t0);
 
 
-        printf ("\nSubpart disjunct...\n");
+        /// printf ("\nSubpart disjunct...\n");
         t0 = time(NULL);
         subPartsUnion.disjunct(subPart).minimize();
         t1 = time(NULL);
-        printf ("time = %d secs\n", t1 - t0);
+        /// printf ("time = %d secs\n", t1 - t0);
 
 
         allJoinersToEpsilon.insert(StringPair(joinerEnc, "@_EPSILON_SYMBOL_@"));
@@ -653,7 +653,7 @@ LexcCompiler::compileLexical()
     t0 = time(NULL);
     lexicons.subtract(subPartsUnion).minimize();
     t1 = time(NULL);
-    printf ("time = %d secs\n", t1 - t0);
+    /// printf ("time = %d secs\n", t1 - t0);
 
 
     //printf("lexicons --subtract: \n");
@@ -683,7 +683,7 @@ LexcCompiler::compileLexical()
     t0 = time(NULL);
     lexicons.compose(startAnyThing).minimize();
     t1 = time(NULL);
-    printf ("time = %d secs\n", t1 - t0);
+    /// printf ("time = %d secs\n", t1 - t0);
 
     //  printf("lexicons --root: \n");
     //  lexicons.write_in_att_format(stdout, 1);
@@ -696,7 +696,7 @@ LexcCompiler::compileLexical()
     t0 = time(NULL);
     lexicons.compose(anyThingEnd).minimize();
     t1 = time(NULL);
-    printf ("time = %d secs\n", t1 - t0);
+    /// printf ("time = %d secs\n", t1 - t0);
 
 
 
@@ -749,7 +749,7 @@ LexcCompiler::compileLexical()
 
 
     t1 = time(NULL);
-    printf ("time = %d secs\n", t1 - t0);
+    /// printf ("time = %d secs\n", t1 - t0);
 
     // lexicons.substitute("@ZERO@", "0");
    // lexicons.substitute("@@ANOTHER_EPSILON@@", "@_EPSILON_SYMBOL_@");

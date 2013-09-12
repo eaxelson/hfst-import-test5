@@ -51,5 +51,4 @@ for i in sfst openfst-tropical foma; do
 done
 
 rm -f test.fst
-echo "skipping some test cases.."
-exit 77
+exit 0
