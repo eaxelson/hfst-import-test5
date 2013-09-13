@@ -5,8 +5,9 @@ namespace hfst_ol {
 
 PmatchContainer::PmatchContainer(std::istream & inputstream)
 {
-    orig_input_tape = ((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN)));
-    orig_output_tape = ((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN)));
+    io_size = MAX_IO_LEN;
+    orig_input_tape = ((SymbolNumber*)(malloc(sizeof(SymbolNumber)*io_size)));
+    orig_output_tape = ((SymbolNumber*)(malloc(sizeof(SymbolNumber)*io_size)));
     input_tape = orig_input_tape;
     output_tape = orig_output_tape;
             
@@ -354,6 +355,22 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
 
 void PmatchContainer::initialize_input(const char * input)
 {
+    if (strlen(input) > io_size - 4) {
+        free(orig_input_tape);
+        free(orig_output_tape);
+        orig_input_tape = ((SymbolNumber*)(malloc(10*sizeof(SymbolNumber)*strlen(input))));
+        orig_output_tape = ((SymbolNumber*)(malloc(10*sizeof(SymbolNumber)*strlen(input))));
+        if (orig_input_tape == NULL || orig_output_tape == NULL) {
+            std::cerr << "Failed to allocate input buffer of length " << strlen(input) << std::endl;
+            free(orig_input_tape);
+            free(orig_output_tape);
+            orig_input_tape = ((SymbolNumber*)(malloc(sizeof(SymbolNumber)*io_size)));
+            orig_output_tape = ((SymbolNumber*)(malloc(sizeof(SymbolNumber)*io_size)));
+        } else {
+            io_size = 10*strlen(input);
+        }
+        output_tape = orig_output_tape;
+    }
     input_tape = orig_input_tape;
     char * input_str = const_cast<char *>(input);
     char ** input_str_ptr = &input_str;
@@ -361,7 +378,7 @@ void PmatchContainer::initialize_input(const char * input)
     input_tape[0] = NO_SYMBOL_NUMBER;
     input_tape[1] = special_symbols[boundary];
     int i = 2;
-    while (**input_str_ptr != 0) {
+    while (**input_str_ptr != 0 && i < io_size - 4) {
         char * original_input_loc = *input_str_ptr;
         k = encoder->find_key(input_str_ptr);
         if (k == NO_SYMBOL_NUMBER) {
