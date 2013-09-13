@@ -653,12 +653,12 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
         SymbolNumber input = *input_tape;
         input_tape += local_stack.top().tape_step;
 
-        find_transitions(input,
-                         input_tape,
-                         output_tape,
-                         i+1);
-        if (input >= orig_symbol_count &&
-            alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER) {
+        if (input < orig_symbol_count) {
+            find_transitions(input,
+                             input_tape,
+                             output_tape,
+                             i+1);
+        } else if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER) {
             find_transitions(alphabet.get_identity_symbol(),
                              input_tape,
                              output_tape,
@@ -694,13 +694,12 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
         SymbolNumber input = *input_tape;
         input_tape += local_stack.top().tape_step;
 
-        find_index(input,
-                   input_tape,
-                   output_tape,
-                   i+1);
-
-        if (input >= orig_symbol_count &&
-            alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER) {
+        if (input < orig_symbol_count) {
+            find_index(input,
+                       input_tape,
+                       output_tape,
+                       i+1);
+        } else if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER) {
             find_index(alphabet.get_identity_symbol(),
                        input_tape,
                        output_tape,
