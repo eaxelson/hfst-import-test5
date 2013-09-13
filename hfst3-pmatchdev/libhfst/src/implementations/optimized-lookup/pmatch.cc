@@ -20,6 +20,10 @@ PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
     
 }
 
+PmatchAlphabet::PmatchAlphabet(void):
+    TransducerAlphabet()
+{}
+
 void PmatchAlphabet::add_special_symbol(const std::string & str,
                                          SymbolNumber symbol_number)
 {
@@ -49,10 +53,18 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
 }
 
 
+
 PmatchContainer::PmatchContainer(std::istream & inputstream)
 {
-    orig_input_tape = ((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN)));
-    orig_output_tape = ((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN)));
+    TransducerHeader header(inputstream);
+    orig_symbol_count = symbol_count = header.symbol_count();
+    alphabet = PmatchAlphabet(inputstream, header.symbol_count());
+
+    io_size = MAX_IO_LEN;
+    orig_input_tape = ((SymbolNumber*)
+                       (malloc(sizeof(SymbolNumber)*io_size)));
+    orig_output_tape = ((SymbolNumber*)
+                        (malloc(sizeof(SymbolNumber)*io_size)));
     input_tape = orig_input_tape;
     output_tape = orig_output_tape;
             
@@ -60,12 +72,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
     transducer_name = parse_name_from_hfst3_header(inputstream);
     // the first transducer should be called eg. "TOP", this could be tested
     // for once more established
-    
-    TransducerHeader header(inputstream);
-    orig_symbol_count = symbol_count = header.symbol_count();
-    alphabet = PmatchAlphabet(inputstream, header.symbol_count());
-    
-    
+
     encoder = new Encoder(alphabet.get_symbol_table(), header.input_symbol_count());
     toplevel = new hfst_ol::PmatchTransducer(
         inputstream,
@@ -354,6 +361,22 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
 
 void PmatchContainer::initialize_input(const char * input)
 {
+    if (strlen(input) > io_size - 4) {
+        free(orig_input_tape);
+        free(orig_output_tape);
+        orig_input_tape = ((SymbolNumber*)(malloc(10*sizeof(SymbolNumber)*strlen(input))));
+        orig_output_tape = ((SymbolNumber*)(malloc(10*sizeof(SymbolNumber)*strlen(input))));
+        if (orig_input_tape == NULL || orig_output_tape == NULL) {
+            std::cerr << "Failed to allocate input buffer of length " << strlen(input) << std::endl;
+            free(orig_input_tape);
+            free(orig_output_tape);
+            orig_input_tape = ((SymbolNumber*)(malloc(sizeof(SymbolNumber)*io_size)));
+            orig_output_tape = ((SymbolNumber*)(malloc(sizeof(SymbolNumber)*io_size)));
+        } else {
+            io_size = 10*strlen(input);
+        }
+        output_tape = orig_output_tape;
+    }
     input_tape = orig_input_tape;
     char * input_str = const_cast<char *>(input);
     char ** input_str_ptr = &input_str;
@@ -361,7 +384,7 @@ void PmatchContainer::initialize_input(const char * input)
     input_tape[0] = NO_SYMBOL_NUMBER;
     input_tape[1] = special_symbols[boundary];
     int i = 2;
-    while (**input_str_ptr != 0) {
+    while (**input_str_ptr != 0 && i < io_size - 4 ) {
         char * original_input_loc = *input_str_ptr;
         k = encoder->find_key(input_str_ptr);
         if (k == NO_SYMBOL_NUMBER) {
@@ -653,12 +676,12 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
         SymbolNumber input = *input_tape;
         input_tape += local_stack.top().tape_step;
 
-        find_transitions(input,
-                         input_tape,
-                         output_tape,
-                         i+1);
-        if (input >= orig_symbol_count &&
-            alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER) {
+        if (input < orig_symbol_count) {
+            find_transitions(input,
+                             input_tape,
+                             output_tape,
+                             i+1);
+        } else if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER) {
             find_transitions(alphabet.get_identity_symbol(),
                              input_tape,
                              output_tape,
@@ -694,13 +717,12 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
         SymbolNumber input = *input_tape;
         input_tape += local_stack.top().tape_step;
 
-        find_index(input,
-                   input_tape,
-                   output_tape,
-                   i+1);
-
-        if (input >= orig_symbol_count &&
-            alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER) {
+        if (input < orig_symbol_count) {
+            find_index(input,
+                       input_tape,
+                       output_tape,
+                       i+1);
+        } else if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER) {
             find_index(alphabet.get_identity_symbol(),
                        input_tape,
                        output_tape,
