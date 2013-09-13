@@ -26,6 +26,7 @@ namespace hfst_ol {
         SymbolNumber symbol_count;
         PmatchTransducer * toplevel;
         RtnMap rtns;
+        size_t io_size;
         SymbolNumber * input_tape;
         SymbolNumber * orig_input_tape;
         SymbolNumber * output_tape;
@@ -51,7 +52,6 @@ namespace hfst_ol {
         void copy_to_output(const SymbolNumberVector & best_result);
         std::string stringify_output(void);
         std::string stringify(const SymbolNumberVector & str);
-
         static std::string parse_name_from_hfst3_header(std::istream & f);
         static bool is_end_tag(const std::string & symbol);
         bool is_end_tag(const SymbolNumber symbol) const;
