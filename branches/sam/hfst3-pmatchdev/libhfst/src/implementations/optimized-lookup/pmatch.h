@@ -30,6 +30,7 @@ namespace hfst_ol {
 
     public:
         PmatchAlphabet(std::istream& is, SymbolNumber symbol_count);
+        PmatchAlphabet(void);
         static bool is_end_tag(const std::string & symbol);
         static bool is_insertion(const std::string & symbol);
         static std::string name_from_insertion(
@@ -48,6 +49,7 @@ namespace hfst_ol {
         SymbolNumber orig_symbol_count;
         SymbolNumber symbol_count;
         PmatchTransducer * toplevel;
+        size_t io_size;
         SymbolNumber * input_tape;
         SymbolNumber * orig_input_tape;
         SymbolNumber * output_tape;
