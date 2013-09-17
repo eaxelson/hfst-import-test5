@@ -56,6 +56,11 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
 
 PmatchContainer::PmatchContainer(std::istream & inputstream)
 {
+    std::string transducer_name;
+    transducer_name = parse_name_from_hfst3_header(inputstream);
+    // the first transducer should be called eg. "TOP", this could be tested
+    // for once more established
+
     TransducerHeader header(inputstream);
     orig_symbol_count = symbol_count = header.symbol_count();
     alphabet = PmatchAlphabet(inputstream, header.symbol_count());
@@ -67,12 +72,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
                         (malloc(sizeof(SymbolNumber)*io_size)));
     input_tape = orig_input_tape;
     output_tape = orig_output_tape;
-            
-    std::string transducer_name;
-    transducer_name = parse_name_from_hfst3_header(inputstream);
-    // the first transducer should be called eg. "TOP", this could be tested
-    // for once more established
-
+    
     encoder = new Encoder(alphabet.get_symbol_table(), header.input_symbol_count());
     toplevel = new hfst_ol::PmatchTransducer(
         inputstream,
@@ -494,8 +494,8 @@ void PmatchTransducer::note_analysis(SymbolNumber * input_tape,
         rtn_stack.top().candidate_input_pos = input_tape;
     } else if (true && input_tape == rtn_stack.top().candidate_input_pos) {
         SymbolNumberVector discarded(rtn_stack.top().output_tape_head, output_tape);
-        std::cerr << "\n\tWarning: conflicting matches found, discarding:\n"
-                  << alphabet.stringify(discarded) << std::endl;
+        std::cerr << "\n\tWarning: conflicting matches found, discarding:\n\t"
+                  << alphabet.stringify(discarded) << std::endl << std::endl;
             }
 }
 
