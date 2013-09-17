@@ -27,6 +27,7 @@ namespace hfst_ol {
         bool is_end_tag(const SymbolNumber symbol) const;
         std::string end_tag(const SymbolNumber symbol);
         std::string start_tag(const SymbolNumber symbol);
+        bool verbose;
 
     public:
         PmatchAlphabet(std::istream& is, SymbolNumber symbol_count);
@@ -43,6 +44,8 @@ namespace hfst_ol {
         PmatchTransducer * get_rtn(SymbolNumber symbol);
         SymbolNumber get_special(SpecialSymbol special) const;
         std::string stringify(const SymbolNumberVector & str);
+        void be_verbose(void) { verbose = true; }
+        bool is_verbose(void) { return verbose; }
     };
 
 
@@ -73,6 +76,7 @@ namespace hfst_ol {
         void copy_to_output(const SymbolNumberVector & best_result);
         std::string stringify_output(void);
         static std::string parse_name_from_hfst3_header(std::istream & f);
+        void be_verbose(void) { alphabet.be_verbose(); }
 
     };
 

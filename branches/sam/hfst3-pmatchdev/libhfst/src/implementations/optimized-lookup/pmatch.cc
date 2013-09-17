@@ -5,7 +5,8 @@ namespace hfst_ol {
 
 PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
                                SymbolNumber symbol_count):
-    TransducerAlphabet(inputstream, symbol_count)
+    TransducerAlphabet(inputstream, symbol_count),
+    verbose(false)
 {
     special_symbols[entry] = NO_SYMBOL_NUMBER;
     special_symbols[exit] = NO_SYMBOL_NUMBER;
@@ -216,8 +217,6 @@ std::string PmatchContainer::parse_name_from_hfst3_header(std::istream & f)
         HFST_THROW(TransducerHeaderException);
     }
 }
-
-
 
 void PmatchAlphabet::add_rtn(PmatchTransducer * rtn, std::string const & name)
 {
@@ -490,10 +489,13 @@ void PmatchTransducer::note_analysis(SymbolNumber * input_tape,
                                      SymbolNumber * output_tape)
 {
     if (input_tape > rtn_stack.top().candidate_input_pos) {
-        rtn_stack.top().best_result.assign(rtn_stack.top().output_tape_head, output_tape);
+        rtn_stack.top().best_result.assign(
+            rtn_stack.top().output_tape_head, output_tape);
         rtn_stack.top().candidate_input_pos = input_tape;
-    } else if (true && input_tape == rtn_stack.top().candidate_input_pos) {
-        SymbolNumberVector discarded(rtn_stack.top().output_tape_head, output_tape);
+    } else if (alphabet.is_verbose() &&
+               input_tape == rtn_stack.top().candidate_input_pos) {
+        SymbolNumberVector discarded(rtn_stack.top().output_tape_head,
+                                     output_tape);
         std::cerr << "\n\tWarning: conflicting matches found, discarding:\n\t"
                   << alphabet.stringify(discarded) << std::endl << std::endl;
             }
