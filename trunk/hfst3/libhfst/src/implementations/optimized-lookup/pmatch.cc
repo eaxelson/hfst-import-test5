@@ -3,25 +3,11 @@
 
 namespace hfst_ol {
 
-PmatchContainer::PmatchContainer(std::istream & inputstream)
+PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
+                               SymbolNumber symbol_count):
+    TransducerAlphabet(inputstream, symbol_count),
+    verbose(false)
 {
-    io_size = MAX_IO_LEN;
-    orig_input_tape = ((SymbolNumber*)(malloc(sizeof(SymbolNumber)*io_size)));
-    orig_output_tape = ((SymbolNumber*)(malloc(sizeof(SymbolNumber)*io_size)));
-    input_tape = orig_input_tape;
-    output_tape = orig_output_tape;
-            
-    std::string transducer_name;
-    transducer_name = parse_name_from_hfst3_header(inputstream);
-    // the first transducer should be called eg. "TOP", this could be tested
-    // for once more established
-    
-    TransducerHeader header(inputstream);
-    orig_symbol_count = symbol_count = header.symbol_count();
-    alphabet = TransducerAlphabet(inputstream, header.symbol_count());
-
-    // Retrieve extra special symbols from the alphabet
-
     special_symbols[entry] = NO_SYMBOL_NUMBER;
     special_symbols[exit] = NO_SYMBOL_NUMBER;
     special_symbols[LC_entry] = NO_SYMBOL_NUMBER;
@@ -29,45 +15,17 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
     special_symbols[RC_entry] = NO_SYMBOL_NUMBER;
     special_symbols[RC_exit] = NO_SYMBOL_NUMBER;
     special_symbols[boundary] = NO_SYMBOL_NUMBER;
-
-    const SymbolTable & symbol_table = alphabet.get_symbol_table();
     for (SymbolNumber i = 1; i < symbol_table.size(); ++i) {
         add_special_symbol(symbol_table[i], i);
     }
     
-    encoder = new Encoder(alphabet.get_symbol_table(), header.input_symbol_count());
-    toplevel = new hfst_ol::PmatchTransducer(
-        inputstream,
-        header.index_table_size(),
-        header.target_table_size(),
-        alphabet,
-        rtns,
-        special_symbols);
-    while (inputstream.good()) {
-        try {
-            transducer_name = parse_name_from_hfst3_header(inputstream);
-        } catch (TransducerHeaderException & e) {
-            break;
-        }
-        header = TransducerHeader(inputstream);
-        TransducerAlphabet dummy = TransducerAlphabet(
-            inputstream, header.symbol_count());
-        hfst_ol::PmatchTransducer * rtn =
-            new hfst_ol::PmatchTransducer(inputstream,
-                                          header.index_table_size(),
-                                          header.target_table_size(),
-                                          alphabet,
-                                          rtns,
-                                          special_symbols);
-        if (rtn_names.count(transducer_name) != 0) {
-            add_rtn(rtn, rtn_names[transducer_name]);
-        } else {
-            delete rtn;
-        }
-    }
 }
 
-void PmatchContainer::add_special_symbol(const std::string & str,
+PmatchAlphabet::PmatchAlphabet(void):
+    TransducerAlphabet()
+{}
+
+void PmatchAlphabet::add_special_symbol(const std::string & str,
                                          SymbolNumber symbol_number)
 {
     if (str == "@PMATCH_ENTRY@") {
@@ -95,28 +53,77 @@ void PmatchContainer::add_special_symbol(const std::string & str,
         
 }
 
-bool PmatchContainer::is_end_tag(const std::string & symbol)
+
+
+PmatchContainer::PmatchContainer(std::istream & inputstream)
 {
-    return symbol.find("@PMATCH_ENDTAG") == 0 &&
+    std::string transducer_name;
+    transducer_name = parse_name_from_hfst3_header(inputstream);
+    // the first transducer should be called eg. "TOP", this could be tested
+    // for once more established
+
+    TransducerHeader header(inputstream);
+    orig_symbol_count = symbol_count = header.symbol_count();
+    alphabet = PmatchAlphabet(inputstream, header.symbol_count());
+
+    io_size = MAX_IO_LEN;
+    orig_input_tape = ((SymbolNumber*)
+                       (malloc(sizeof(SymbolNumber)*io_size)));
+    orig_output_tape = ((SymbolNumber*)
+                        (malloc(sizeof(SymbolNumber)*io_size)));
+    input_tape = orig_input_tape;
+    output_tape = orig_output_tape;
+    
+    encoder = new Encoder(alphabet.get_symbol_table(), header.input_symbol_count());
+    toplevel = new hfst_ol::PmatchTransducer(
+        inputstream,
+        header.index_table_size(),
+        header.target_table_size(),
+        alphabet);
+    while (inputstream.good()) {
+        try {
+            transducer_name = parse_name_from_hfst3_header(inputstream);
+        } catch (TransducerHeaderException & e) {
+            break;
+        }
+        header = TransducerHeader(inputstream);
+        TransducerAlphabet dummy = TransducerAlphabet(
+            inputstream, header.symbol_count());
+        hfst_ol::PmatchTransducer * rtn =
+            new hfst_ol::PmatchTransducer(inputstream,
+                                          header.index_table_size(),
+                                          header.target_table_size(),
+                                          alphabet);
+        if (!alphabet.has_rtn(transducer_name)) {
+            alphabet.add_rtn(rtn, transducer_name);
+        } else {
+            delete rtn;
+        }
+    }
+}
+
+bool PmatchAlphabet::is_end_tag(const std::string & symbol)
+{
+    return symbol.find("@PMATCH_ENDTAG_") == 0 &&
         symbol.rfind("@") == symbol.size() - 1;
 }
 
-bool PmatchContainer::is_end_tag(const SymbolNumber symbol) const
+bool PmatchAlphabet::is_end_tag(const SymbolNumber symbol) const
 {
     return end_tag_map.count(symbol) == 1;
 }
 
-bool PmatchContainer::is_insertion(const std::string & symbol)
+bool PmatchAlphabet::is_insertion(const std::string & symbol)
 {
     return symbol.find("@I.") == 0 && symbol.rfind("@") == symbol.size() - 1;
 }
 
-std::string PmatchContainer::name_from_insertion(const std::string & symbol)
+std::string PmatchAlphabet::name_from_insertion(const std::string & symbol)
 {
     return symbol.substr(sizeof("@I.") - 1, symbol.size() - (sizeof("@I.@") - 1));
 }
 
-std::string PmatchContainer::end_tag(const SymbolNumber symbol)
+std::string PmatchAlphabet::end_tag(const SymbolNumber symbol)
 {
     if (end_tag_map.count(symbol) == 0) {
         return "";
@@ -125,7 +132,7 @@ std::string PmatchContainer::end_tag(const SymbolNumber symbol)
     }
 }
 
-std::string PmatchContainer::start_tag(const SymbolNumber symbol)
+std::string PmatchAlphabet::start_tag(const SymbolNumber symbol)
 {
     if (end_tag_map.count(symbol) == 0) {
         return "";
@@ -141,10 +148,15 @@ PmatchContainer::~PmatchContainer(void)
     free(orig_output_tape);
     delete encoder;
     delete toplevel;
+}
+
+PmatchAlphabet::~PmatchAlphabet(void)
+{
     for (RtnMap::iterator it = rtns.begin();
          it != rtns.end(); ++it) {
         delete it->second;
     }
+
 }
 
 std::string PmatchContainer::parse_name_from_hfst3_header(std::istream & f)
@@ -206,11 +218,30 @@ std::string PmatchContainer::parse_name_from_hfst3_header(std::istream & f)
     }
 }
 
-
-
-void PmatchContainer::add_rtn(PmatchTransducer * rtn, SymbolNumber s)
+void PmatchAlphabet::add_rtn(PmatchTransducer * rtn, std::string const & name)
 {
-    rtns.insert(std::pair<SymbolNumber, PmatchTransducer *>(s, rtn));
+    SymbolNumber symbol = rtn_names[name];
+    rtns.insert(std::pair<SymbolNumber, PmatchTransducer *>(symbol, rtn));
+}
+
+bool PmatchAlphabet::has_rtn(std::string const & name) const
+{
+    return rtns.count(rtn_names.at(name)) != 0;
+}
+
+bool PmatchAlphabet::has_rtn(SymbolNumber symbol) const
+{
+    return rtns.count(symbol) != 0;
+}
+
+PmatchTransducer * PmatchAlphabet::get_rtn(SymbolNumber symbol)
+{
+    return rtns[symbol];
+}
+
+SymbolNumber PmatchAlphabet::get_special(SpecialSymbol special) const
+{
+    return special_symbols.at(special);
 }
 
 std::string PmatchContainer::match(std::string & input)
@@ -239,10 +270,10 @@ void PmatchContainer::copy_to_output(const SymbolNumberVector & best_result)
 
 std::string PmatchContainer::stringify_output(void)
 {
-    return stringify(output);
+    return alphabet.stringify(output);
 }
 
-std::string PmatchContainer::stringify(const SymbolNumberVector & str)
+std::string PmatchAlphabet::stringify(const SymbolNumberVector & str)
 {
     std::string retval;
     std::stack<unsigned int> start_tag_pos;
@@ -267,7 +298,7 @@ std::string PmatchContainer::stringify(const SymbolNumberVector & str)
         } else if (*it == special_symbols[boundary]) {
             continue;
         } else {
-            retval.append(alphabet.string_from_symbol(*it));
+            retval.append(string_from_symbol(*it));
         }
     }
     return retval;
@@ -305,12 +336,8 @@ bool PmatchContainer::has_queued_input(void)
 PmatchTransducer::PmatchTransducer(std::istream & is,
                                    TransitionTableIndex index_table_size,
                                    TransitionTableIndex transition_table_size,
-                                   TransducerAlphabet & alpha,
-                                   RtnMap & rtn_map,
-                                   std::map<SpecialSymbol, SymbolNumber> & marker_symbols):
-    alphabet(alpha),
-    rtns(rtn_map),
-    markers(marker_symbols)
+                                   PmatchAlphabet & alpha):
+    alphabet(alpha)
 {
     orig_symbol_count = alphabet.get_symbol_table().size();
     // initialize the stack for local variables
@@ -376,9 +403,9 @@ void PmatchContainer::initialize_input(const char * input)
     char ** input_str_ptr = &input_str;
     SymbolNumber k = NO_SYMBOL_NUMBER;
     input_tape[0] = NO_SYMBOL_NUMBER;
-    input_tape[1] = special_symbols[boundary];
+    input_tape[1] = alphabet.get_special(boundary);
     int i = 2;
-    while (**input_str_ptr != 0 && i < io_size - 4) {
+    while (**input_str_ptr != 0 && i < io_size - 4 ) {
         char * original_input_loc = *input_str_ptr;
         k = encoder->find_key(input_str_ptr);
         if (k == NO_SYMBOL_NUMBER) {
@@ -403,7 +430,7 @@ void PmatchContainer::initialize_input(const char * input)
         input_tape[i] = k;
         ++i;
     }
-    input_tape[i] = special_symbols[boundary];
+    input_tape[i] = alphabet.get_special(boundary);
     input_tape[i+1] = NO_SYMBOL_NUMBER;
     // Place input_tape beyond the opening NO_SYMBOL
     ++input_tape;
@@ -462,13 +489,16 @@ void PmatchTransducer::note_analysis(SymbolNumber * input_tape,
                                      SymbolNumber * output_tape)
 {
     if (input_tape > rtn_stack.top().candidate_input_pos) {
-        rtn_stack.top().best_result.assign(rtn_stack.top().output_tape_head, output_tape);
+        rtn_stack.top().best_result.assign(
+            rtn_stack.top().output_tape_head, output_tape);
         rtn_stack.top().candidate_input_pos = input_tape;
-    }
-//     if (warn && input_tape == rtn_stack.top().candidate_input_pos) {
-//         std::cerr << "\n\tWarning: conflicting matches found, discarding:\n"
-//                   << s
-//     }
+    } else if (alphabet.is_verbose() &&
+               input_tape == rtn_stack.top().candidate_input_pos) {
+        SymbolNumberVector discarded(rtn_stack.top().output_tape_head,
+                                     output_tape);
+        std::cerr << "\n\tWarning: conflicting matches found, discarding:\n\t"
+                  << alphabet.stringify(discarded) << std::endl << std::endl;
+            }
 }
 
 void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
@@ -481,6 +511,10 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
         // is a context-checking marker.
         if (transition_table[i].input == 0) {
             SymbolNumber output = transition_table[i].output;
+            if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER &&
+                output == alphabet.get_unknown_symbol()) {
+                output = *(input_tape - 1);
+            }
             if (!checking_context()) {
                 if (!try_entering_context(output)) {
                     *output_tape = output;
@@ -548,11 +582,12 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
             // It could be an insert statement... (gee, this function should
             // probably be refactored
         }
-        else if (rtns.count(transition_table[i].input) != 0) {
+        else if (alphabet.has_rtn(transition_table[i].input)) {
             SymbolNumber * original_output = output_tape;
             SymbolNumber * original_input = input_tape;
             // Pass control
-            PmatchTransducer * rtn_target = rtns[transition_table[i].input];
+            PmatchTransducer * rtn_target =
+                alphabet.get_rtn(transition_table[i].input);
             rtn_target->rtn_call(input_tape, output_tape);
             // Fetch the result
             for(SymbolNumberVector::const_iterator it =
@@ -609,10 +644,10 @@ void PmatchTransducer::find_transitions(SymbolNumber input,
                 // we got here via identity, so look back in the
                 // input tape to find the symbol we want to write
                     output = *(input_tape - 1);
-                }/* else if (input == alphabet.get_unknown_symbol()) {
-                    if (output == *(input_tape - 1)
-                    }*/
-
+                } else if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER &&
+                           output == alphabet.get_unknown_symbol()) {
+                    output = *(input_tape - 1);
+                }
                 *output_tape = output;
                 get_analyses(input_tape,
                              output_tape + 1,
@@ -681,12 +716,12 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
                              output_tape,
                              i+1);
         }
-/*        if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER) {
+        if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER) {
             find_transitions(alphabet.get_unknown_symbol(),
                              input_tape,
                              output_tape,
                              i+1);
-                             }*/
+        }
             
         // if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER &&
         //     local_stack.top().default_symbol_trap == true) {
@@ -722,13 +757,12 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
                        output_tape,
                        i+1);
         }
-/*            if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER) {
-                find_index(alphabet.get_unknown_symbol(),
-                           input_tape,
-                           output_tape,
-                           i+1);
-            }
-            }*/
+        if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER) {
+            find_index(alphabet.get_unknown_symbol(),
+                       input_tape,
+                       output_tape,
+                       i+1);
+        }
         // if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER &&
         //     local_stack.top().default_symbol_trap == true) {
         //     find_index(alphabet.get_identity_symbol(),
@@ -745,12 +779,12 @@ bool PmatchTransducer::checking_context(void) const
 
 bool PmatchTransducer::try_entering_context(SymbolNumber symbol)
 {
-    if (symbol == markers[LC_entry]) {
+    if (symbol == alphabet.get_special(LC_entry)) {
         local_stack.push(local_stack.top());
         local_stack.top().context = LC;
         local_stack.top().tape_step = -1;
         return true;
-    } else if (symbol == markers[RC_entry]) {
+    } else if (symbol == alphabet.get_special(RC_entry)) {
         local_stack.push(local_stack.top());
         local_stack.top().context = RC;
         local_stack.top().tape_step = 1;
@@ -764,14 +798,14 @@ bool PmatchTransducer::try_exiting_context(SymbolNumber symbol)
 {
     switch (local_stack.top().context) {
     case LC:
-        if (symbol == markers[LC_exit]) {
+        if (symbol == alphabet.get_special(LC_exit)) {
             exit_context();
             return true;
         } else {
             return false;
         }
     case RC:
-        if (symbol == markers[RC_exit]) {
+        if (symbol == alphabet.get_special(RC_exit)) {
             exit_context();
             return true;
         } else {
