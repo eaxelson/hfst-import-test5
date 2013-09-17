@@ -84,7 +84,6 @@ REPLACE REGEXP3
 
 %type <transducer> OPTCAP TOLOWER TOUPPER INSERT RIGHT_CONTEXT LEFT_CONTEXT
 
-
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
 %nonassoc <label> QUOTED_LITERAL SYMBOL
 
@@ -210,10 +209,6 @@ REGEXP2: REPLACE
  }
 ;
 
-
-       
-       
-       
 ////////////////////////////
 // Replace operators
 ///////////////////////////
@@ -736,6 +731,24 @@ REGEXP11: REGEXP12 { }
 | WHITESPACE {
     $$ = new HfstTransducer(*hfst::pmatch::utils.latin1_whitespace_acceptor);
  }
+// Bodyless contexts
+
+| LEFT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
+    hfst::pmatch::add_end_tag($1, $3);
+    $$ = $1;
+}
+| LEFT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
+    hfst::pmatch::add_end_tag($1, $3);
+    $$ = $1;
+}
+| RIGHT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
+    hfst::pmatch::add_end_tag($1, $3);
+    $$ = $1;
+}
+| RIGHT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
+    hfst::pmatch::add_end_tag($1, $3);
+    $$ = $1;
+}
 ;
 
 OPTCAP: OPTCAP_LEFT REGEXP11 RIGHT_PARENTHESIS {
@@ -780,8 +793,6 @@ REGEXP12: LABEL { }
     $$ = hfst::HfstTransducer::read_lexc_ptr($1, hfst::TROPICAL_OPENFST_TYPE);
     free($1);
   }
-| LEFT_CONTEXT { }
-| RIGHT_CONTEXT { }
 ;
 
 LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
