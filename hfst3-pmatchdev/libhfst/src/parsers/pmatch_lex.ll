@@ -41,9 +41,9 @@ EC "%"{U8C}
 /* any ASCII */
 A7 [\x00-\x7e]
 /* special meaning in pmatch */
-A7RESTRICTED [- |<>%:;@0~\\&?$+*/_(){}\]\[-]
+A7RESTRICTED [- |<>%^:;@0~\\&?$+*/_(){}\]\[-]
 /* non-restricted ASCII */
-A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%:;@~\\&?$+*/_(){}\]\[-]
+A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%^:;@~\\&?$+*/_(){}\]\[-]
 
 WEIGHT [0-9]+(\.[0-9]+)?
 
