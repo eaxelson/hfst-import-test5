@@ -780,6 +780,8 @@ REGEXP12: LABEL { }
     $$ = hfst::HfstTransducer::read_lexc_ptr($1, hfst::TROPICAL_OPENFST_TYPE);
     free($1);
   }
+| LEFT_CONTEXT { }
+| RIGHT_CONTEXT { }
 ;
 
 LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
