@@ -104,7 +104,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
 
 bool PmatchAlphabet::is_end_tag(const std::string & symbol)
 {
-    return symbol.find("@PMATCH_ENDTAG") == 0 &&
+    return symbol.find("@PMATCH_ENDTAG_") == 0 &&
         symbol.rfind("@") == symbol.size() - 1;
 }
 
@@ -511,6 +511,10 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
         // is a context-checking marker.
         if (transition_table[i].input == 0) {
             SymbolNumber output = transition_table[i].output;
+            if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER &&
+                output == alphabet.get_unknown_symbol()) {
+                output = *(input_tape - 1);
+            }
             if (!checking_context()) {
                 if (!try_entering_context(output)) {
                     *output_tape = output;
@@ -640,10 +644,10 @@ void PmatchTransducer::find_transitions(SymbolNumber input,
                 // we got here via identity, so look back in the
                 // input tape to find the symbol we want to write
                     output = *(input_tape - 1);
-                }/* else if (input == alphabet.get_unknown_symbol()) {
-                    if (output == *(input_tape - 1)
-                    }*/
-
+                } else if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER &&
+                           output == alphabet.get_unknown_symbol()) {
+                    output = *(input_tape - 1);
+                }
                 *output_tape = output;
                 get_analyses(input_tape,
                              output_tape + 1,
@@ -712,12 +716,12 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
                              output_tape,
                              i+1);
         }
-/*        if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER) {
+        if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER) {
             find_transitions(alphabet.get_unknown_symbol(),
                              input_tape,
                              output_tape,
                              i+1);
-                             }*/
+        }
             
         // if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER &&
         //     local_stack.top().default_symbol_trap == true) {
@@ -753,13 +757,12 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
                        output_tape,
                        i+1);
         }
-/*            if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER) {
-                find_index(alphabet.get_unknown_symbol(),
-                           input_tape,
-                           output_tape,
-                           i+1);
-            }
-            }*/
+        if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER) {
+            find_index(alphabet.get_unknown_symbol(),
+                       input_tape,
+                       output_tape,
+                       i+1);
+        }
         // if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER &&
         //     local_stack.top().default_symbol_trap == true) {
         //     find_index(alphabet.get_identity_symbol(),

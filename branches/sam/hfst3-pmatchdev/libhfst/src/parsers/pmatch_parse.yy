@@ -695,8 +695,8 @@ REGEXP9: REGEXP10 { }
 
 REGEXP10: REGEXP11 { }
 | TERM_COMPLEMENT REGEXP10 {
-    HfstTransducer* any = new HfstTransducer(hfst::internal_unknown,
-                                             hfst::internal_unknown,
+    HfstTransducer* any = new HfstTransducer(hfst::internal_identity,
+                                             hfst::internal_identity,
                                              hfst::pmatch::format);
     $$ = & ( any->subtract(*$2));
     delete $2;
@@ -917,9 +917,9 @@ LEFT_CONTEXT: LC_LEFT REPLACE RIGHT_PARENTHESIS {
         hfst::internal_epsilon, hfst::pmatch::LC_EXIT_SYMBOL, hfst::pmatch::format);
     lc_entry->concatenate($2->reverse());
     lc_entry->concatenate(*lc_exit);
-    lc_entry->substitute("@PMATCH_ENTRY@", "@_PMATCH_TMP_@");
+    lc_entry->substitute("@PMATCH_ENTRY@", "@PMATCH_TMP@");
     lc_entry->substitute("@PMATCH_EXIT@", "@PMATCH_ENTRY@");
-    lc_entry->substitute("@_PMATCH_TMP_@", "@PMATCH_EXIT@");
+    lc_entry->substitute("@PMATCH_TMP@", "@PMATCH_EXIT@");
     $$ = lc_entry;
     delete $2;
     delete lc_exit;

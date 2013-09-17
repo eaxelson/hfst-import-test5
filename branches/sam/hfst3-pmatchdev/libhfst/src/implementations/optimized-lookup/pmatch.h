@@ -7,7 +7,6 @@
 
 namespace hfst_ol {
 
-
     class PmatchTransducer;
     typedef std::map<SymbolNumber, PmatchTransducer *> RtnMap;
     enum SpecialSymbol{entry,
