@@ -198,7 +198,7 @@ void get_states_and_symbols(
             // If we don't already have a symbol table, collect symbols
             if (harmonizer == NULL) {
                 if (FdOperation::is_diacritic(tr_it->get_input_symbol()) ||
-                    hfst_ol::PmatchContainer::is_insertion(
+                    hfst_ol::PmatchAlphabet::is_insertion(
                         tr_it->get_input_symbol())) {
                     flag_diacritics->insert(tr_it->get_input_symbol());
                 } else {
@@ -257,7 +257,7 @@ void get_states_and_symbols(
         seen_input_symbols = harmonizer->get_header().input_symbol_count();
         for (SymbolNumber i = 0; i < symbol_table.size(); ++i) {
             if (harmonizer->get_alphabet().is_flag_diacritic(i) ||
-                hfst_ol::PmatchContainer::is_insertion(symbol_table[i])) {
+                hfst_ol::PmatchAlphabet::is_insertion(symbol_table[i])) {
                 flag_symbols.insert(i);
             }
         }

@@ -84,7 +84,6 @@ REPLACE REGEXP3
 
 %type <transducer> OPTCAP TOLOWER TOUPPER INSERT RIGHT_CONTEXT LEFT_CONTEXT
 
-
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
 %nonassoc <label> QUOTED_LITERAL SYMBOL
 
@@ -210,10 +209,6 @@ REGEXP2: REPLACE
  }
 ;
 
-
-       
-       
-       
 ////////////////////////////
 // Replace operators
 ///////////////////////////
@@ -678,10 +673,10 @@ REGEXP9: REGEXP10 { }
     $$ = & $1->repeat_n($2);
  }
 | REGEXP9 CATENATE_N_PLUS {
-    $$ = & $1->repeat_n_plus($2);
+    $$ = & $1->repeat_n_plus($2 + 1);
  }
 | REGEXP9 CATENATE_N_MINUS {
-    $$ = & $1->repeat_n_minus($2);
+    $$ = & $1->repeat_n_minus($2 - 1);
  }
 | REGEXP9 CATENATE_N_TO_K {
     $$ = & $1->repeat_n_to_k($2[0], $2[1]);
@@ -695,8 +690,8 @@ REGEXP9: REGEXP10 { }
 
 REGEXP10: REGEXP11 { }
 | TERM_COMPLEMENT REGEXP10 {
-    HfstTransducer* any = new HfstTransducer(hfst::internal_unknown,
-                                             hfst::internal_unknown,
+    HfstTransducer* any = new HfstTransducer(hfst::internal_identity,
+                                             hfst::internal_identity,
                                              hfst::pmatch::format);
     $$ = & ( any->subtract(*$2));
     delete $2;
@@ -736,6 +731,24 @@ REGEXP11: REGEXP12 { }
 | WHITESPACE {
     $$ = new HfstTransducer(*hfst::pmatch::utils.latin1_whitespace_acceptor);
  }
+// Bodyless contexts
+
+| LEFT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
+    hfst::pmatch::add_end_tag($1, $3);
+    $$ = $1;
+}
+| LEFT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
+    hfst::pmatch::add_end_tag($1, $3);
+    $$ = $1;
+}
+| RIGHT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
+    hfst::pmatch::add_end_tag($1, $3);
+    $$ = $1;
+}
+| RIGHT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
+    hfst::pmatch::add_end_tag($1, $3);
+    $$ = $1;
+}
 ;
 
 OPTCAP: OPTCAP_LEFT REGEXP11 RIGHT_PARENTHESIS {
@@ -917,9 +930,9 @@ LEFT_CONTEXT: LC_LEFT REPLACE RIGHT_PARENTHESIS {
         hfst::internal_epsilon, hfst::pmatch::LC_EXIT_SYMBOL, hfst::pmatch::format);
     lc_entry->concatenate($2->reverse());
     lc_entry->concatenate(*lc_exit);
-    lc_entry->substitute("@PMATCH_ENTRY@", "@_PMATCH_TMP_@");
+    lc_entry->substitute("@PMATCH_ENTRY@", "@PMATCH_TMP@");
     lc_entry->substitute("@PMATCH_EXIT@", "@PMATCH_ENTRY@");
-    lc_entry->substitute("@_PMATCH_TMP_@", "@PMATCH_EXIT@");
+    lc_entry->substitute("@PMATCH_TMP@", "@PMATCH_EXIT@");
     $$ = lc_entry;
     delete $2;
     delete lc_exit;
