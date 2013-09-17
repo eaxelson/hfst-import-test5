@@ -31,12 +31,17 @@ namespace hfst_ol {
     public:
         PmatchAlphabet(std::istream& is, SymbolNumber symbol_count);
         PmatchAlphabet(void);
+        ~PmatchAlphabet(void);
         static bool is_end_tag(const std::string & symbol);
         static bool is_insertion(const std::string & symbol);
         static std::string name_from_insertion(
             const std::string & symbol);
         void add_special_symbol(const std::string & str, SymbolNumber symbol_number);
-        void add_rtn(PmatchTransducer * rtn, SymbolNumber s);
+        void add_rtn(PmatchTransducer * rtn, std::string const & name);
+        bool has_rtn(std::string const & name) const;
+        bool has_rtn(SymbolNumber symbol) const;
+        PmatchTransducer * get_rtn(SymbolNumber symbol);
+        SymbolNumber get_special(SpecialSymbol special) const;
         std::string stringify(const SymbolNumberVector & str);
     };
 
@@ -146,9 +151,6 @@ namespace hfst_ol {
         PmatchAlphabet & alphabet;
         SymbolNumber orig_symbol_count;
     
-        RtnMap & rtns;
-        std::map<SpecialSymbol, SymbolNumber> & markers;
-
         // The mutually recursive lookup-handling functions
 
         void try_epsilon_transitions(SymbolNumber * input_tape,
@@ -183,9 +185,7 @@ namespace hfst_ol {
         PmatchTransducer(std::istream& is,
                          TransitionTableIndex index_table_size,
                          TransitionTableIndex transition_table_size,
-                         TransducerAlphabet & alphabet,
-                         RtnMap & rtns,
-                         std::map<SpecialSymbol, SymbolNumber> & markers);
+                         PmatchAlphabet & alphabet);
 
         void display() const;
 
