@@ -93,8 +93,8 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
                                           header.index_table_size(),
                                           header.target_table_size(),
                                           alphabet);
-        if (alphabet.rtn_names.count(transducer_name) != 0) {
-            alphabet.add_rtn(rtn, alphabet.rtn_names[transducer_name]);
+        if (!alphabet.has_rtn(transducer_name)) {
+            alphabet.add_rtn(rtn, transducer_name);
         } else {
             delete rtn;
         }
@@ -147,10 +147,15 @@ PmatchContainer::~PmatchContainer(void)
     free(orig_output_tape);
     delete encoder;
     delete toplevel;
+}
+
+PmatchAlphabet::~PmatchAlphabet(void)
+{
     for (RtnMap::iterator it = rtns.begin();
          it != rtns.end(); ++it) {
         delete it->second;
     }
+
 }
 
 std::string PmatchContainer::parse_name_from_hfst3_header(std::istream & f)
@@ -214,9 +219,30 @@ std::string PmatchContainer::parse_name_from_hfst3_header(std::istream & f)
 
 
 
-void PmatchAlphabet::add_rtn(PmatchTransducer * rtn, SymbolNumber s)
+void PmatchAlphabet::add_rtn(PmatchTransducer * rtn, std::string const & name)
 {
-    rtns.insert(std::pair<SymbolNumber, PmatchTransducer *>(s, rtn));
+    SymbolNumber symbol = rtn_names[name];
+    rtns.insert(std::pair<SymbolNumber, PmatchTransducer *>(symbol, rtn));
+}
+
+bool PmatchAlphabet::has_rtn(std::string const & name) const
+{
+    return rtns.count(rtn_names.at(name)) != 0;
+}
+
+bool PmatchAlphabet::has_rtn(SymbolNumber symbol) const
+{
+    return rtns.count(symbol) != 0;
+}
+
+PmatchTransducer * PmatchAlphabet::get_rtn(SymbolNumber symbol)
+{
+    return rtns[symbol];
+}
+
+SymbolNumber PmatchAlphabet::get_special(SpecialSymbol special) const
+{
+    return special_symbols.at(special);
 }
 
 std::string PmatchContainer::match(std::string & input)
@@ -243,7 +269,7 @@ void PmatchContainer::copy_to_output(const SymbolNumberVector & best_result)
     }
 }
 
-std::string PmatchTransducer::stringify_output(void)
+std::string PmatchContainer::stringify_output(void)
 {
     return alphabet.stringify(output);
 }
@@ -273,7 +299,7 @@ std::string PmatchAlphabet::stringify(const SymbolNumberVector & str)
         } else if (*it == special_symbols[boundary]) {
             continue;
         } else {
-            retval.append(alphabet.string_from_symbol(*it));
+            retval.append(string_from_symbol(*it));
         }
     }
     return retval;
@@ -311,12 +337,8 @@ bool PmatchContainer::has_queued_input(void)
 PmatchTransducer::PmatchTransducer(std::istream & is,
                                    TransitionTableIndex index_table_size,
                                    TransitionTableIndex transition_table_size,
-                                   TransducerAlphabet & alpha,
-                                   RtnMap & rtn_map,
-                                   std::map<SpecialSymbol, SymbolNumber> & marker_symbols):
-    alphabet(alpha),
-    rtns(rtn_map),
-    markers(marker_symbols)
+                                   PmatchAlphabet & alpha):
+    alphabet(alpha)
 {
     orig_symbol_count = alphabet.get_symbol_table().size();
     // initialize the stack for local variables
@@ -382,7 +404,7 @@ void PmatchContainer::initialize_input(const char * input)
     char ** input_str_ptr = &input_str;
     SymbolNumber k = NO_SYMBOL_NUMBER;
     input_tape[0] = NO_SYMBOL_NUMBER;
-    input_tape[1] = special_symbols[boundary];
+    input_tape[1] = alphabet.get_special(boundary);
     int i = 2;
     while (**input_str_ptr != 0 && i < io_size - 4 ) {
         char * original_input_loc = *input_str_ptr;
@@ -409,7 +431,7 @@ void PmatchContainer::initialize_input(const char * input)
         input_tape[i] = k;
         ++i;
     }
-    input_tape[i] = special_symbols[boundary];
+    input_tape[i] = alphabet.get_special(boundary);
     input_tape[i+1] = NO_SYMBOL_NUMBER;
     // Place input_tape beyond the opening NO_SYMBOL
     ++input_tape;
@@ -473,7 +495,7 @@ void PmatchTransducer::note_analysis(SymbolNumber * input_tape,
     } else if (true && input_tape == rtn_stack.top().candidate_input_pos) {
         SymbolNumberVector discarded(rtn_stack.top().output_tape_head, output_tape);
         std::cerr << "\n\tWarning: conflicting matches found, discarding:\n"
-                  << stringify(discarded) << std::endl;
+                  << alphabet.stringify(discarded) << std::endl;
             }
 }
 
@@ -554,11 +576,12 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
             // It could be an insert statement... (gee, this function should
             // probably be refactored
         }
-        else if (rtns.count(transition_table[i].input) != 0) {
+        else if (alphabet.has_rtn(transition_table[i].input)) {
             SymbolNumber * original_output = output_tape;
             SymbolNumber * original_input = input_tape;
             // Pass control
-            PmatchTransducer * rtn_target = rtns[transition_table[i].input];
+            PmatchTransducer * rtn_target =
+                alphabet.get_rtn(transition_table[i].input);
             rtn_target->rtn_call(input_tape, output_tape);
             // Fetch the result
             for(SymbolNumberVector::const_iterator it =
@@ -751,12 +774,12 @@ bool PmatchTransducer::checking_context(void) const
 
 bool PmatchTransducer::try_entering_context(SymbolNumber symbol)
 {
-    if (symbol == markers[LC_entry]) {
+    if (symbol == alphabet.get_special(LC_entry)) {
         local_stack.push(local_stack.top());
         local_stack.top().context = LC;
         local_stack.top().tape_step = -1;
         return true;
-    } else if (symbol == markers[RC_entry]) {
+    } else if (symbol == alphabet.get_special(RC_entry)) {
         local_stack.push(local_stack.top());
         local_stack.top().context = RC;
         local_stack.top().tape_step = 1;
@@ -770,14 +793,14 @@ bool PmatchTransducer::try_exiting_context(SymbolNumber symbol)
 {
     switch (local_stack.top().context) {
     case LC:
-        if (symbol == markers[LC_exit]) {
+        if (symbol == alphabet.get_special(LC_exit)) {
             exit_context();
             return true;
         } else {
             return false;
         }
     case RC:
-        if (symbol == markers[RC_exit]) {
+        if (symbol == alphabet.get_special(RC_exit)) {
             exit_context();
             return true;
         } else {
