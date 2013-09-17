@@ -222,5 +222,8 @@ int main(int argc, char ** argv)
 // return process_input(container, outstream);
 // fb.close();
 //     } else {
+    if (verbose) {
+        container.be_verbose();
+    }
     return process_input(container, std::cout);
 }
