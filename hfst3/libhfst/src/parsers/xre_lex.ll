@@ -220,10 +220,11 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 }
 
 "\""[^""]+"\"" {
-    CR; 
-    yylval->label = hfst::xre::parse_quoted(yytext); 
+    CR;
+    yylval->label = hfst::xre::parse_quoted(yytext);
     return QUOTED_LITERAL;
 }
+
 
 ",," { CR; return COMMACOMMA; }
 "," { CR; return COMMA; }
@@ -233,7 +234,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 "[]" { CR; return EPSILON_TOKEN; }
 "?" { CR; return ANY_TOKEN; }
 
-{NAME_CH}+ {
+"0"({NAME_CH}|"0")+ {
     if (hfst::xre::position_symbol != NULL) {
       if (strcmp(hfst::xre::position_symbol, yytext) == 0) {
         hfst::xre::positions.insert(hfst::xre::cr);
@@ -244,7 +245,24 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     return SYMBOL;
 }  
 
-{NAME_CH}+"(" {
+{NAME_CH}({NAME_CH}|"0")* {
+    if (hfst::xre::position_symbol != NULL) {
+      if (strcmp(hfst::xre::position_symbol, yytext) == 0) {
+        hfst::xre::positions.insert(hfst::xre::cr);
+      }
+    }
+    CR;
+    yylval->label = hfst::xre::strip_percents(yytext);
+    return SYMBOL;
+}  
+
+{NAME_CH}({NAME_CH}|"0")*"(" {
+    CR;
+    yylval->label = yytext;
+    return FUNCTION_NAME;
+}
+
+"0"({NAME_CH}|"0")+"(" {
     CR;
     yylval->label = yytext;
     return FUNCTION_NAME;
