@@ -51,6 +51,7 @@ char* startptr;
 hfst::HfstTransducer* last_compiled;
 hfst::ImplementationType format;
 size_t len;
+bool verbose;
 
 std::map<std::string, hfst::HfstTransducer> named_transducers;
 PmatchUtilityTransducers utils;
@@ -354,7 +355,7 @@ get_weight(const char *s)
 
 std::map<std::string, HfstTransducer*>
 compile(const string& pmatch, map<string,HfstTransducer*>& defs,
-        ImplementationType impl, bool verbose)
+        ImplementationType impl, bool be_verbose)
 {
     // lock here?
     definitions.clear();
@@ -363,6 +364,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     data = strdup(pmatch.c_str());
     startptr = data;
     len = strlen(data);
+    verbose = be_verbose;
 //    definitions = defs;
     format = impl;
     pmatchparse();
@@ -384,9 +386,6 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     }
     for (std::map<std::string, hfst::HfstTransducer*>::iterator it =
              definitions.begin(); it != definitions.end(); ++it) {
-        if (verbose) {
-            print_size_info(it->second);
-        }
         // We keep TOP and any inserted transducers
         if (it->first.compare("TOP") == 0 ||
             inserted_transducers.count(it->first) != 0) {

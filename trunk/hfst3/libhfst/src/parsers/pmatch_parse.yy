@@ -155,6 +155,9 @@ DEFINITION: DEFINE SYMBOL REGEXP1 {
     $3->set_name($2);
     $3->minimize();
     $$ = new std::pair<std::string, hfst::HfstTransducer*>($2, $3);
+    if (hfst::pmatch::verbose) {
+        hfst::pmatch::print_size_info($3);
+    }
  }
 ;
 
