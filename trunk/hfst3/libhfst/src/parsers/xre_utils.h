@@ -45,6 +45,8 @@ char* strip_percents(const char *s);
 
  char* strip_newline(char *s);
 
+ char* strip_final_whitespace(char *s);
+
 /**
  * @brief add percents to string to form valid XRE symbol.
  */

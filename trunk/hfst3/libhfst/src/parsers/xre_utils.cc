@@ -153,6 +153,27 @@ strip_newline(char *s)
 }
 
 char*
+strip_final_whitespace(char *s)
+{
+  unsigned int pos = 0;
+  while(s[pos] != '\0') {
+    pos++;
+  }
+  if (pos == 0)
+    return s;
+  pos--;
+
+  while(s[pos] == '\n' || s[pos] == '\r' || s[pos] == '\t' || s[pos] == ' ') {
+    s[pos] = '\0'; 
+    if (pos == 0)
+      break;
+    else
+      pos--;
+  }
+  return s;
+}
+
+char*
 strip_curly(const char *s)
 {
     const char *c = s;

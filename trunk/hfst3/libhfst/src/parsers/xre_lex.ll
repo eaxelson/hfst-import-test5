@@ -52,8 +52,8 @@ EC "%"{U8C}
 A7 [\x00-\x7e]
 /* special meaning in xre */
 A7RESTRICTED [- |<>%!,^:;@0~\\&?$+*/_(){}\]\[-]
-/* non-restricted ASCII */
-A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%!,^:;@0~\\&?$+*/_(){}\]\[-]
+/* non-restricted ASCII (added ") */
+A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%!,^:;"@0~\\&?$+*/_(){}\]\[-]
 
 WEIGHT [0-9]+(\.[0-9]+)?
 
@@ -206,6 +206,19 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 "(" { CR; return LEFT_PARENTHESIS; }
 ")" { CR; return RIGHT_PARENTHESIS; }
 
+"\""[^"]+"\""{LWSP}+ {
+    CR;
+    yylval->label = hfst::xre::parse_quoted(hfst::xre::strip_final_whitespace(yytext));
+    //fprintf(stderr, "returning quoted literal: %s...\n", yylval->label);
+    return QUOTED_LITERAL;
+}
+
+"\""[^"]+"\"" {
+    CR;
+    yylval->label = hfst::xre::parse_quoted(yytext);
+    //fprintf(stderr, "returning quoted literal: %s...\n", yylval->label);
+    return QUOTED_LITERAL_CONT;
+}
 
 {LWSP}":"{LWSP} { CR; return PAIR_SEPARATOR_SOLE; }
 ^":"$ { CR; return PAIR_SEPARATOR_SOLE; }
@@ -219,13 +232,6 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     return WEIGHT;
 }
 
-"\""[^""]+"\"" {
-    CR;
-    yylval->label = hfst::xre::parse_quoted(yytext);
-    return QUOTED_LITERAL;
-}
-
-
 ",," { CR; return COMMACOMMA; }
 "," { CR; return COMMA; }
 
@@ -233,6 +239,28 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 "0" { CR; return EPSILON_TOKEN; }
 "[]" { CR; return EPSILON_TOKEN; }
 "?" { CR; return ANY_TOKEN; }
+
+"0"({NAME_CH}|"0")+{LWSP}+ {
+    if (hfst::xre::position_symbol != NULL) {
+      if (strcmp(hfst::xre::position_symbol, yytext) == 0) {
+        hfst::xre::positions.insert(hfst::xre::cr);
+      }
+    }
+    CR;
+    yylval->label = hfst::xre::strip_percents(hfst::xre::strip_final_whitespace(yytext));
+    return SYMBOL;
+}  
+
+{NAME_CH}({NAME_CH}|"0")*{LWSP}+ {
+    if (hfst::xre::position_symbol != NULL) {
+      if (strcmp(hfst::xre::position_symbol, yytext) == 0) {
+        hfst::xre::positions.insert(hfst::xre::cr);
+      }
+    }
+    CR;
+    yylval->label = hfst::xre::strip_percents(hfst::xre::strip_final_whitespace(yytext));
+    return SYMBOL;
+}  
 
 "0"({NAME_CH}|"0")+ {
     if (hfst::xre::position_symbol != NULL) {
@@ -242,7 +270,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     }
     CR;
     yylval->label = hfst::xre::strip_percents(yytext);
-    return SYMBOL;
+    return SYMBOL_CONT;
 }  
 
 {NAME_CH}({NAME_CH}|"0")* {
@@ -253,7 +281,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     }
     CR;
     yylval->label = hfst::xre::strip_percents(yytext);
-    return SYMBOL;
+    return SYMBOL_CONT;
 }  
 
 {NAME_CH}({NAME_CH}|"0")*"(" {
@@ -267,6 +295,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     yylval->label = yytext;
     return FUNCTION_NAME;
 }
+
 
 ";\t"{WEIGHT} {
     CR; 
@@ -285,7 +314,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     return END_OF_EXPRESSION;
 }
 
-{LWSP}* { CR; /*fprintf(stderr, "ignoring whitespace '%s'..\n", yytext); */ /* ignorable whitespace */ }
+{LWSP}* { CR; /* fprintf(stderr, "ignoring whitespace '%s'..\n", yytext); */ /* ignorable whitespace */ }
 
 ("!"|"#")[^\n]*$ { CR; /* fprintf(stderr, "ignoring comment '%s'..\n", yytext); */ /* ignore comments */ }
 
