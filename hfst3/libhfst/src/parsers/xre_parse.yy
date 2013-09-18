@@ -99,7 +99,7 @@ int xrelex ( YYSTYPE * , yyscan_t );
 %type <label> FUNCTION                 // function call
 
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
-%nonassoc <label> SYMBOL CURLY_BRACKETS
+%nonassoc <label> SYMBOL SYMBOL_CONT CURLY_BRACKETS
 
 %left  CROSS_PRODUCT COMPOSITION LENIENT_COMPOSITION INTERSECTION
 %left  CENTER_MARKER MARKUP_MARKER
@@ -140,12 +140,13 @@ int xrelex ( YYSTYPE * , yyscan_t );
 %token LEXER_ERROR
 %token END_OF_EXPRESSION
 %token PAIR_SEPARATOR PAIR_SEPARATOR_SOLE 
-%nonassoc <label> QUOTED_LITERAL
+%nonassoc <label> QUOTED_LITERAL QUOTED_LITERAL_CONT
+
 %%
 
 
 XRE: REGEXP1 { } 
-     | 
+     |
      { 
        // only comments
        hfst::xre::contains_only_comments = true;
@@ -1076,7 +1077,8 @@ LABEL: HALFARC {
      */
      ;
 
-HALFARC: SYMBOL
+HALFARC: SYMBOL {}
+     | SYMBOL_CONT {}
      | EPSILON_TOKEN {
         $$ = strdup(hfst::internal_epsilon.c_str());
      }
@@ -1084,6 +1086,7 @@ HALFARC: SYMBOL
         $$ = strdup(hfst::internal_unknown.c_str());
      }
      | QUOTED_LITERAL  {}
+     | QUOTED_LITERAL_CONT  {}
      | BOUNDARY_MARKER {
         $$ = strdup("@#@");
      }
