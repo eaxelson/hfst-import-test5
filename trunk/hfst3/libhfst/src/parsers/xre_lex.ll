@@ -209,14 +209,14 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 "\""[^"]+"\""{LWSP}+ {
     CR;
     yylval->label = hfst::xre::parse_quoted(hfst::xre::strip_final_whitespace(yytext));
-    //fprintf(stderr, "returning quoted literal: %s...\n", yylval->label);
+    // fprintf(stderr, "returning QUOTED_LITERAL '%s'...\n", yylval->label); // DEBUG
     return QUOTED_LITERAL;
 }
 
 "\""[^"]+"\"" {
     CR;
     yylval->label = hfst::xre::parse_quoted(yytext);
-    //fprintf(stderr, "returning quoted literal: %s...\n", yylval->label);
+    // fprintf(stderr, "returning QUOTED_LITERAL_CONT '%s'...\n", yylval->label); // DEBUG
     return QUOTED_LITERAL_CONT;
 }
 
@@ -248,6 +248,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     }
     CR;
     yylval->label = hfst::xre::strip_percents(hfst::xre::strip_final_whitespace(yytext));
+    // fprintf(stderr, "returning SYMBOL '%s'...\n", yylval->label); // DEBUG
     return SYMBOL;
 }  
 
@@ -259,6 +260,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     }
     CR;
     yylval->label = hfst::xre::strip_percents(hfst::xre::strip_final_whitespace(yytext));
+    // fprintf(stderr, "returning SYMBOL '%s'...\n", yylval->label); // DEBUG
     return SYMBOL;
 }  
 
@@ -270,6 +272,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     }
     CR;
     yylval->label = hfst::xre::strip_percents(yytext);
+    // fprintf(stderr, "returning SYMBOL_CONT '%s'...\n", yylval->label); // DEBUG
     return SYMBOL_CONT;
 }  
 
@@ -281,6 +284,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     }
     CR;
     yylval->label = hfst::xre::strip_percents(yytext);
+    // fprintf(stderr, "returning SYMBOL_CONT '%s'...\n", yylval->label); // DEBUG
     return SYMBOL_CONT;
 }  
 
