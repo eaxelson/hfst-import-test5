@@ -94,12 +94,13 @@ int xrelex ( YYSTYPE * , yyscan_t );
 %type <transducerPair> CONTEXT RESTR_CONTEXT
 %type <replType>  CONTEXT_MARK
 %type <label>     HALFARC SUB2
+%type <label>     SYMBOL_OR_QUOTED
 
 %type <transducerVector> REGEXP_LIST   // function call
 %type <label> FUNCTION                 // function call
 
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
-%nonassoc <label> SYMBOL CURLY_BRACKETS
+%nonassoc <label> SYMBOL SYMBOL_CONT CURLY_BRACKETS
 
 %left  CROSS_PRODUCT COMPOSITION LENIENT_COMPOSITION INTERSECTION
 %left  CENTER_MARKER MARKUP_MARKER
@@ -140,7 +141,7 @@ int xrelex ( YYSTYPE * , yyscan_t );
 %token LEXER_ERROR
 %token END_OF_EXPRESSION
 %token PAIR_SEPARATOR PAIR_SEPARATOR_SOLE 
-%nonassoc <label> QUOTED_LITERAL
+%nonassoc <label> QUOTED_LITERAL QUOTED_LITERAL_CONT
 %%
 
 
@@ -1076,14 +1077,19 @@ LABEL: HALFARC {
      */
      ;
 
-HALFARC: SYMBOL
+SYMBOL_OR_QUOTED: SYMBOL 
+     | QUOTED_LITERAL
+     | SYMBOL_CONT
+     | QUOTED_LITERAL_CONT
+     ;
+
+HALFARC: SYMBOL_OR_QUOTED
      | EPSILON_TOKEN {
         $$ = strdup(hfst::internal_epsilon.c_str());
      }
      | ANY_TOKEN {
         $$ = strdup(hfst::internal_unknown.c_str());
      }
-     | QUOTED_LITERAL  {}
      | BOUNDARY_MARKER {
         $$ = strdup("@#@");
      }
