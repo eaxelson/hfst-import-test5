@@ -93,7 +93,7 @@ int xrelex ( YYSTYPE * , yyscan_t );
 %type <transducerPairVector> CONTEXTS_VECTOR RESTR_CONTEXTS_VECTOR
 %type <transducerPair> CONTEXT RESTR_CONTEXT
 %type <replType>  CONTEXT_MARK
-%type <label>     HALFARC SUB2
+%type <label>     HALFARC WHOLE_SYMBOL SYMBOL_CONTINUATION SUB2
 
 %type <transducerVector> REGEXP_LIST   // function call
 %type <label> FUNCTION                 // function call
@@ -1077,16 +1077,26 @@ LABEL: HALFARC {
      */
      ;
 
+SYMBOL_CONTINUATION: SYMBOL_CONT { $$ = $1; }
+     | QUOTED_LITERAL_CONT { $$ = $1; }
+     | SYMBOL_CONTINUATION SYMBOL_CONT { $$ = hfst::xre::concat_symbols($1, $2); free($1); free($2); }
+     | SYMBOL_CONTINUATION QUOTED_LITERAL_CONT { $$ = hfst::xre::concat_symbols($1, $2); free($1); free($2); }
+
+WHOLE_SYMBOL: SYMBOL_CONTINUATION { $$ = $1; }
+     | SYMBOL_CONTINUATION SYMBOL { $$ = hfst::xre::concat_symbols($1, $2); free($1); free($2); }
+     | SYMBOL_CONTINUATION QUOTED_LITERAL { $$ = hfst::xre::concat_symbols($1, $2); free($1); free($2); }
+
 HALFARC: SYMBOL {}
-     | SYMBOL_CONT {}
+     | QUOTED_LITERAL  {}
+     | WHOLE_SYMBOL {
+        $$ = $1;  
+     }
      | EPSILON_TOKEN {
         $$ = strdup(hfst::internal_epsilon.c_str());
      }
      | ANY_TOKEN {
         $$ = strdup(hfst::internal_unknown.c_str());
      }
-     | QUOTED_LITERAL  {}
-     | QUOTED_LITERAL_CONT  {}
      | BOUNDARY_MARKER {
         $$ = strdup("@#@");
      }

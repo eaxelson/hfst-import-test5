@@ -403,6 +403,15 @@ get_weight(const char *s)
     return rv;
 }
 
+char*
+concat_symbols(const char *s1, const char *s2)
+{
+  std::string string1(s1);
+  std::string string2(s2);
+  std::string concatenation = string1 + string2;
+  return strdup(concatenation.c_str());
+}
+
 HfstTransducer*
 compile(const string& xre, map<string,HfstTransducer*>& defs,
         map<string, string>& func_defs,
