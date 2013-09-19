@@ -153,27 +153,6 @@ strip_newline(char *s)
 }
 
 char*
-strip_final_whitespace(char *s)
-{
-  unsigned int pos = 0;
-  while(s[pos] != '\0') {
-    pos++;
-  }
-  if (pos == 0)
-    return s;
-  pos--;
-
-  while(s[pos] == '\n' || s[pos] == '\r' || s[pos] == '\t' || s[pos] == ' ') {
-    s[pos] = '\0'; 
-    if (pos == 0)
-      break;
-    else
-      pos--;
-  }
-  return s;
-}
-
-char*
 strip_curly(const char *s)
 {
     const char *c = s;
@@ -401,15 +380,6 @@ get_weight(const char *s)
     rv = strtod(weightstart, &endp);
     assert(endp != weightstart);
     return rv;
-}
-
-char*
-concat_symbols(const char *s1, const char *s2)
-{
-  std::string string1(s1);
-  std::string string2(s2);
-  std::string concatenation = string1 + string2;
-  return strdup(concatenation.c_str());
 }
 
 HfstTransducer*
