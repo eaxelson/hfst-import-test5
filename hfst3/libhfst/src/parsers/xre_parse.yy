@@ -16,12 +16,21 @@ using namespace hfst::implementations;
 
 #include "xre_utils.h"
 
+char* concat_and_free(char* s1, char *s2)
+{
+  std::string retval = std::string(s1) + std::string(s2);
+  free(s1);
+  free(s2);
+  return strdup(retval.c_str());
+}
+
 namespace hfst { 
   namespace xre {
     // number of characters read, used for scanning function definition xre for argument symbols
     extern unsigned int cr;
     extern bool harmonize_;
     extern bool allow_extra_text_at_end;
+    extern bool symbol_read;
   }
 }
 
@@ -94,7 +103,7 @@ int xrelex ( YYSTYPE * , yyscan_t );
 %type <transducerPair> CONTEXT RESTR_CONTEXT
 %type <replType>  CONTEXT_MARK
 %type <label>     HALFARC SUB2
-%type <label>     SYMBOL_OR_QUOTED
+%type <label>     SYMBOL_OR_QUOTED SYMBOL_OR_QUOTED_CONTINUATION
 
 %type <transducerVector> REGEXP_LIST   // function call
 %type <label> FUNCTION                 // function call
@@ -957,7 +966,9 @@ REGEXP12: LABEL { }
               YY_BUFFER_STATE bs = xre_scan_string(regex_string, scanner);
 
               unsigned int chars_read = hfst::xre::cr;
+              bool symbol_read_ = hfst::xre::symbol_read;
               hfst::xre::cr = 0;
+              hfst::xre::symbol_read = false;
 
               int parse_retval = xreparse(scanner);
 
@@ -967,6 +978,7 @@ REGEXP12: LABEL { }
               free(regex_string);
 
               hfst::xre::cr = chars_read;
+              hfst::xre::symbol_read = symbol_read_;
 
               $$ = hfst::xre::last_compiled;
 
@@ -1060,7 +1072,7 @@ LABEL: HALFARC {
               xre_delete_buffer(bs,scanner);
               xrelex_destroy(scanner);
 
-              $$ = hfst::xre::last_compiled;              
+              $$ = hfst::xre::last_compiled;
 
               if (parse_retval != 0)
               {
@@ -1077,10 +1089,16 @@ LABEL: HALFARC {
      */
      ;
 
-SYMBOL_OR_QUOTED: SYMBOL 
-     | QUOTED_LITERAL
-     | SYMBOL_CONT
+SYMBOL_OR_QUOTED_CONTINUATION: SYMBOL_CONT
      | QUOTED_LITERAL_CONT
+     | SYMBOL_CONT SYMBOL_OR_QUOTED_CONTINUATION { $$ = concat_and_free($1, $2); }
+     | QUOTED_LITERAL_CONT SYMBOL_OR_QUOTED_CONTINUATION { $$ = concat_and_free($1, $2); }
+     ;
+
+SYMBOL_OR_QUOTED: SYMBOL
+     | QUOTED_LITERAL
+     | SYMBOL SYMBOL_OR_QUOTED_CONTINUATION { $$ = concat_and_free($1, $2); }
+     | QUOTED_LITERAL SYMBOL_OR_QUOTED_CONTINUATION { $$ = concat_and_free($1, $2); }
      ;
 
 HALFARC: SYMBOL_OR_QUOTED

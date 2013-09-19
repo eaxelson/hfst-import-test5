@@ -22,12 +22,11 @@ namespace hfst {
     extern unsigned int cr; // number of characters read
     extern std::set<unsigned int> positions; // positions of a given SYMBOL
     extern char * position_symbol;  // the given SYMBOL
+    extern bool symbol_read;
 } }
 
-bool xre_symbol_read = false;
-
 // a macro that increments the number of characters read
-#define CR hfst::xre::cr += (unsigned int)strlen(yytext); xre_symbol_read = false;
+#define CR hfst::xre::cr += (unsigned int)strlen(yytext); hfst::xre::symbol_read = false;
 
 extern int xrelex ( YYSTYPE * lvalp, yyscan_t scanner );
 
@@ -222,12 +221,16 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 }
 
 "\""[^""]+"\"" {
-    CR;
     yylval->label = hfst::xre::parse_quoted(yytext);
-    if (xre_symbol_read) {
+    if (hfst::xre::symbol_read) {
+      CR;
+      hfst::xre::symbol_read = true;
+      // fprintf(stderr, "returning QUOTED_LITERAL_CONT '%s'...\n", yylval->label); // DEBUG
       return QUOTED_LITERAL_CONT;
     }
-    xre_symbol_read = true;
+    CR;
+    hfst::xre::symbol_read = true;
+    // fprintf(stderr, "returning QUOTED_LITERAL '%s'...\n", yylval->label); // DEBUG
     return QUOTED_LITERAL;
 }
 
@@ -246,12 +249,16 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
         hfst::xre::positions.insert(hfst::xre::cr);
       }
     }
-    CR;
     yylval->label = hfst::xre::strip_percents(yytext);
-    if (xre_symbol_read) {
+    if (hfst::xre::symbol_read) {
+      CR;
+      hfst::xre::symbol_read = true;
+      // fprintf(stderr, "returning SYMBOL_CONT '%s'...\n", yylval->label); // DEBUG
       return SYMBOL_CONT;
     }
-    xre_symbol_read = true;
+    CR;
+    hfst::xre::symbol_read = true;
+    // fprintf(stderr, "returning SYMBOL '%s'...\n", yylval->label); // DEBUG
     return SYMBOL;
 }  
 
@@ -261,12 +268,16 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
         hfst::xre::positions.insert(hfst::xre::cr);
       }
     }
-    CR;
     yylval->label = hfst::xre::strip_percents(yytext);
-    if (xre_symbol_read) {
+    if (hfst::xre::symbol_read) {
+      CR;
+      hfst::xre::symbol_read = true;
+      // fprintf(stderr, "returning SYMBOL_CONT '%s'...\n", yylval->label); // DEBUG
       return SYMBOL_CONT;
     }
-    xre_symbol_read = true;
+    CR;
+    hfst::xre::symbol_read = true;
+    // fprintf(stderr, "returning SYMBOL '%s'...\n", yylval->label); // DEBUG
     return SYMBOL;
 }  
 
