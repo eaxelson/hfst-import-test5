@@ -24,8 +24,10 @@ namespace hfst {
     extern char * position_symbol;  // the given SYMBOL
 } }
 
+bool xre_symbol_read = false;
+
 // a macro that increments the number of characters read
-#define CR hfst::xre::cr += (unsigned int)strlen(yytext)
+#define CR hfst::xre::cr += (unsigned int)strlen(yytext); xre_symbol_read = false;
 
 extern int xrelex ( YYSTYPE * lvalp, yyscan_t scanner );
 
@@ -222,6 +224,10 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 "\""[^""]+"\"" {
     CR;
     yylval->label = hfst::xre::parse_quoted(yytext);
+    if (xre_symbol_read) {
+      return QUOTED_LITERAL_CONT;
+    }
+    xre_symbol_read = true;
     return QUOTED_LITERAL;
 }
 
@@ -242,6 +248,10 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     }
     CR;
     yylval->label = hfst::xre::strip_percents(yytext);
+    if (xre_symbol_read) {
+      return SYMBOL_CONT;
+    }
+    xre_symbol_read = true;
     return SYMBOL;
 }  
 
@@ -253,6 +263,10 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     }
     CR;
     yylval->label = hfst::xre::strip_percents(yytext);
+    if (xre_symbol_read) {
+      return SYMBOL_CONT;
+    }
+    xre_symbol_read = true;
     return SYMBOL;
 }  
 
@@ -285,7 +299,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     return END_OF_EXPRESSION;
 }
 
-{LWSP}* { CR; /*fprintf(stderr, "ignoring whitespace '%s'..\n", yytext); */ /* ignorable whitespace */ }
+{LWSP}+ { CR; /*fprintf(stderr, "ignoring whitespace '%s'..\n", yytext); */ /* ignorable whitespace */ }
 
 ("!"|"#")[^\n]*$ { CR; /* fprintf(stderr, "ignoring comment '%s'..\n", yytext); */ /* ignore comments */ }
 
