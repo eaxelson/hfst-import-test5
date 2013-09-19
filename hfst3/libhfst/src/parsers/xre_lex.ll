@@ -50,10 +50,10 @@ EC "%"{U8C}
 
 /* any ASCII */
 A7 [\x00-\x7e]
-/* special meaning in xre */
-A7RESTRICTED [- |<>%!,^:;@0~\\&?$+*/_(){}\]\[-]
-/* non-restricted ASCII */
-A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%!,^:;@0~\\&?$+*/_(){}\]\[-]
+/* special meaning in xre testing " */
+A7RESTRICTED [- |<>%!,^:";@0~\\&?$+*/_(){}\]\[-] 
+/* non-restricted ASCII testing " */
+A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%!,^:";@0~\\&?$+*/_(){}\]\[-]
 
 WEIGHT [0-9]+(\.[0-9]+)?
 
