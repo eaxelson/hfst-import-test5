@@ -3492,6 +3492,13 @@ HfstTransducer &HfstTransducer::cross_product( const HfstTransducer &another, bo
     HfstTransducer retval(a1);
     retval.compose(b1).minimize();
 
+    // TODO: Expand ?:? transitions to ?:?|? 
+    // (cannot be added until regexp parser compiles rule [ ? @-> foo ... bar] correctly)
+    //StringPairSet id_or_unk;
+    //id_or_unk.insert(StringPair("@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@"));
+    //id_or_unk.insert(StringPair("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@"));
+    //retval.substitute(StringPair("@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@"), id_or_unk);
+
     retval.remove_from_alphabet("@_MARK_@");
 
     *this = retval;
