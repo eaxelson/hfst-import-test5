@@ -98,7 +98,7 @@ echo '`[@"RAgr9", Func, Sub]' | $2/hfst-regexp2fst -f $1 > R115
 echo '`[@"RAgr10", Func, Sub]' | $2/hfst-regexp2fst -f $1 > R116
 echo '`[@"RAgr11", Func, Sub]' | $2/hfst-regexp2fst -f $1 > R117
 
-echo '[[. .] -> {ko} || "<" _ [$[Fut ":" Immed]]] ' | $2/hfst-regexp2fst -f $1 > R201
+echo '[[. .] -> {ko} || "<" _ [$[Fut":"Immed]]] ' | $2/hfst-regexp2fst -f $1 > R201
 
 # Singular specific object markers
 

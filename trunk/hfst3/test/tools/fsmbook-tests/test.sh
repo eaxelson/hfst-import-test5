@@ -16,7 +16,7 @@ common_format="openfst-tropical"
 
 # NOTE: FinnishNumerals depends on NumbersToNumerals, so they must be compiled in the right order.
 
-examples="BetterColaMachine BrazilianPortuguese1 BrazilianPortuguese2 EnglishNumerals "\
+examples="BetterColaMachine BrazilianPortuguese1 BrazilianPortuguese2 DateParser EnglishNumerals "\
 "EsperantoAdjectives EsperantoNounsAdjectivesAndVerbs EsperantoNounsAndAdjectivesWithTags "\
 "EsperantoNounsAndAdjectives EsperantoNouns FinnishOTProsody Lingala "\
 "MonishAnalysis MonishGuesserAnalyzer NumbersToNumerals PlusOrMinus FinnishNumerals "\
@@ -63,8 +63,12 @@ do
         if [ 0 -eq 0 ]; then
         for format in $backend_formats; 
         do
+            if (! $tooldir/hfst-format --list-formats | grep $format > /dev/null); then
+                echo "  skipping compilation with hfst-xfst using back-end format "$format" as it is not available"
+                continue;
+            fi
             echo "  compiling with hfst-xfst using back-end format "$format".."
-            if ! ($HFST -f $format -F xfst-scripts/$example.xfst.script > /dev/null 2> LOG); then
+            if ! ($HFST -f $format -F xfst-scripts/$example.xfst.script 2> LOG); then
                 echo "----- an error occurred in compilation, (maybe) exiting -----"
                 cat LOG;
                 # exit 1;
@@ -91,9 +95,14 @@ do
     fi
 
     # (2) Compile hfst script with all back-end formats and compare the results..
-    if [ 0 -eq 1 ]; then
+    if [ 0 -eq 0 ]; then
     for format in $backend_formats; 
     do
+        if (! $tooldir/hfst-format --list-formats | grep $format > /dev/null); then
+            echo "  skipping compilation of hfst script using back-end format "$format" as it is not available"
+            continue;
+        fi
+
         echo "  compiling hfst script with back-end format "$format".."
 
         if [ "$example" = "FinnishNumerals" ]; then
