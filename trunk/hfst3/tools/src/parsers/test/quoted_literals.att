@@ -1,0 +1,18 @@
+0	1	foo	bar
+1
+--
+0	1	foo	bar
+1
+--
+0	1	foo	bar
+1
+--
+0	1	foobar	foobar
+1
+--
+0	1	foo:bar	foo:bar
+1
+--
+0	1	foo	foo
+1	2	bar	bar
+2

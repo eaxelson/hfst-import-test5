@@ -42,6 +42,8 @@ EXTRA_DIST=test.sh \
 	substitute_defined_4.xfst substitute_defined_4.att \
 	substitute_defined_5.xfst substitute_defined_5.att \
 	substitute_defined_6.xfst substitute_defined_6.att \
+	replace_identity.xfst replace_identity.att \
+	quoted_literals.xfst quoted_literals.att \
 	define.xfst define.att \
 	define_function.xfst define_function.att \
 	define_fail.xfst \

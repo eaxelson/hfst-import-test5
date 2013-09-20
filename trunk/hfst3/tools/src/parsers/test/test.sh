@@ -95,7 +95,9 @@ do
         substitute_label_5 substitute_label_6 substitute_label_7 substitute_label_8 \
         substitute_defined_1 substitute_defined_2 substitute_defined_3 \
         substitute_defined_4 substitute_defined_5 substitute_defined_6 \
-        at_re_1 at_re_2 at_re_3 at_txt at_stxt at_txt_and_stxt at_pl # substitute_symbol_6 fails on sfst..
+        at_re_1 at_re_2 at_re_3 at_txt at_stxt at_txt_and_stxt at_pl \
+        quoted_literals
+        # substitute_symbol_6 fails on sfst, replace_identity on all formats..
     do
 	rm -f result result1 result2
 	if ! (ls $testfile.xfst 2> /dev/null); then
