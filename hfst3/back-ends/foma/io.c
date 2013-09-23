@@ -77,15 +77,29 @@ static void io_error() {
   fprintf(stderr, "ERROR: functions in io.c omitted on Windows."); 
   exit(1); }
 struct io_buf_handle *io_init() { 
-  io_error(); return; }
+  io_error(); return NULL; }
 void io_free(struct io_buf_handle *iobh) { 
   io_error(); return; }
 size_t io_gz_file_to_mem (struct io_buf_handle *iobh, char *filename) { 
-  io_error(); return; }
+  io_error(); return 0; }
 struct fsm *io_net_read(struct io_buf_handle *iobh, char **net_name) { 
-  io_error(); return; }
+  io_error(); return NULL; }
 struct fsm *fsm_read_binary_file(char *filename) {
-  io_error(); return; }
+  io_error(); return NULL; }
+struct fsm *fsm_read_binary_file_multiple(fsm_read_binary_handle fsrh) {
+  io_error(); return NULL; }
+fsm_read_binary_handle fsm_read_binary_file_multiple_init(char *filename) {
+  io_error(); return NULL; }
+struct fsm *read_att(char *filename) {
+  io_error(); return NULL; }
+struct fsm *fsm_read_prolog(char *filename) {
+  io_error(); return NULL; }
+int load_defined(char *filename) {
+  io_error(); return 0; }
+int save_defined(char *filename) {
+  io_error(); return 0; }
+int write_prolog (struct fsm *net, char *filename) {
+  io_error(); return 0; }
 #else
 
 // HFST addition
