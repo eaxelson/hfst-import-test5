@@ -219,7 +219,7 @@ Installation from the sources
 INSTALL describes the GNU build system in detail, but for most users the usual::
 
     ./configure
-    ./scripts/h2hh.sh
+    ./scripts/generate-cc-files.sh
     make
     (as root) make install
 
@@ -227,9 +227,9 @@ should result in a local installation and::
 
     (as root) make uninstall
 
-in its uninstallation. The script *h2hh.sh* compiles all flex/bison-generated
-files and makes sure that the generated header files have the right extension,
-i.e. hh and not h.
+in its uninstallation. The script *generate-cc-files.sh* compiles all 
+flex/bison-generated files and makes sure that the generated header 
+files have the right extension, i.e. hh and not h.
 
 If you aren't going to be linking to the library after
 building it and don't need to be able to send debugging information, you can
