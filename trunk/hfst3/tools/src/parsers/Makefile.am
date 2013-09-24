@@ -22,12 +22,7 @@ hfst_xfst2fst_SOURCES = xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.
 BUILT_SOURCES=xfst-parser.cc xfst-lexer.cc
 CLEANFILES=xfst-parser.cc xfst-lexer.cc xfst-parser.hh
 
-if HH_EXTENSION_USED
-else
-CLEANFILES+=xfst-parser.h
-xfst-parser.hh: xfst-parser.h
-	cp $< $@
-endif
+CLEANFILES+=xfst-parser.hh
 
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c

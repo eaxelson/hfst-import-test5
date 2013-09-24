@@ -521,7 +521,6 @@ AS_IF([test -z "`echo "$LEX_VERSION" | grep 'flex 2\.[[5-9]]\.[[3-9][4-9]]'`"],
 
 # if automake is >= 1.12
 #AM_CONDITIONAL([HH_EXTENSION_USED], [test "`automake --version | head -1 | grep ' 1\.1[2-9]'`" = ""])
-AM_CONDITIONAL([HH_EXTENSION_USED], [false])
 
 AC_PROG_INSTALL
 AC_PROG_LN_S

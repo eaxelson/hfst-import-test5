@@ -105,20 +105,11 @@ hfst-twolc-loc$(EXEEXT): hfst-twolc.sh
 clean-local:
 	-rm -f hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT) hfst-twolc-system$(EXEEXT)
 
-if HH_EXTENSION_USED
-else
-CLEANFILES+=htwolcpre1.h htwolcpre2.h htwolcpre3.h
+CLEANFILES+=htwolcpre1.hh htwolcpre2.hh htwolcpre3.hh
 
 scanner1.ll: htwolcpre1.hh
-htwolcpre1.hh: htwolcpre1.h
-	cp $< $@
 scanner2.ll: htwolcpre2.hh
-htwolcpre2.hh: htwolcpre2.h
-	cp $< $@
 scanner3.ll: htwolcpre3.hh
-htwolcpre3.hh: htwolcpre3.h
-	cp $< $@
-endif
 
 HFST_TWOLC_TESTS=string_manipulation InputReader Alphabet \
                  OtherSymbolTransducer Rule LeftArrowRule RightArrowRule \

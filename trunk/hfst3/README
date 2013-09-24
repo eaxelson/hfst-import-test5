@@ -109,9 +109,9 @@ Compilation requirements
   - to disable OpenFST support, configure switch ``--without-openfst`` may
     be used
 
-- To use the SFST_ backend (optional):
+- To use the SFST_ backend (default):
 
-  - the SFST library version 1.4.6g is bundled with HFST but not included
+  - the SFST library version 1.4.6g is bundled with HFST and included
     by default when building HFST
 
   - SFST requires readline and ncurses
@@ -120,16 +120,16 @@ Compilation requirements
     does **not** require the SFST library to be installed; the library is only
     used for library-stuff like reading SFST format automata.
 
-  - to enable SFST backend, configure switch ``--with-sfst`` must be used
+  - to disable SFST backend, configure switch ``--without-sfst`` must be used
 
-- To use the foma_ backend (optional):
+- To use the foma_ backend (default):
 
-  - the foma library version 0.9.16alpha is bundled with HFST but not included
+  - the foma library version 0.9.16alpha is bundled with HFST and included
     be default when building HFST
 
   - foma requires editline, termcap (or ncurses) and zlib libraries to compile
 
-  - to enable foma backend, configure switch ``--with-foma`` may be used
+  - to disable foma backend, configure switch ``--without-foma`` may be used
 
   - the *hfst-xfst* frontend currently **requires** foma binary; foma library
     is not needed to be linked for this
@@ -219,6 +219,7 @@ Installation from the sources
 INSTALL describes the GNU build system in detail, but for most users the usual::
 
     ./configure
+    ./scripts/h2hh.sh
     make
     (as root) make install
 
@@ -226,7 +227,11 @@ should result in a local installation and::
 
     (as root) make uninstall
 
-in its uninstallation. If you aren't going to be linking to the library after
+in its uninstallation. The script *h2hh.sh* compiles all flex/bison-generated
+files and makes sure that the generated header files have the right extension,
+i.e. hh and not h.
+
+If you aren't going to be linking to the library after
 building it and don't need to be able to send debugging information, you can
 save a considerable amount of space and memory by doing::
 
