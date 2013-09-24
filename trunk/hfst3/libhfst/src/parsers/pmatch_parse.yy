@@ -736,22 +736,22 @@ REGEXP11: REGEXP12 { }
  }
 // Bodyless contexts
 
-| LEFT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
-    hfst::pmatch::add_end_tag($1, $3);
-    $$ = $1;
-}
-| LEFT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
-    hfst::pmatch::add_end_tag($1, $3);
-    $$ = $1;
-}
-| RIGHT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
-    hfst::pmatch::add_end_tag($1, $3);
-    $$ = $1;
-}
-| RIGHT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
-    hfst::pmatch::add_end_tag($1, $3);
-    $$ = $1;
-}
+// | LEFT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
+//     hfst::pmatch::add_end_tag($1, $3);
+//     $$ = $1;
+// }
+// | LEFT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
+//     hfst::pmatch::add_end_tag($1, $3);
+//     $$ = $1;
+// }
+// | RIGHT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
+//     hfst::pmatch::add_end_tag($1, $3);
+//     $$ = $1;
+// }
+// | RIGHT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
+//     hfst::pmatch::add_end_tag($1, $3);
+//     $$ = $1;
+// }
 ;
 
 OPTCAP: OPTCAP_LEFT REGEXP11 RIGHT_PARENTHESIS {
