@@ -37,18 +37,10 @@ CLEANFILES=$(XRE_BUILT) $(PMATCH_BUILT) $(LEXC_BUILT) \
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
-if !HH_EXTENSION_USED
-CLEANFILES+=xre_parse.h  pmatch_parse.h  lexc-parser.h
+CLEANFILES+=xre_parse.hh  pmatch_parse.hh  lexc-parser.hh
 xre_lex.ll: xre_parse.hh
-xre_parse.hh: xre_parse.h
-	cp $< $@
 pmatch_lex.ll: pmatch_parse.hh
-pmatch_parse.hh: pmatch_parse.h
-	cp $< $@
 lexc-lexer.ll: lexc-parser.hh
-lexc-parser.hh: lexc-parser.h
-	cp $< $@
-endif
 
 libhfstparsers_la_SOURCES=$(SFST_SRCS) $(XRE_SRCS) $(PMATCH_SRCS) $(LEXC_SRCS)
 
