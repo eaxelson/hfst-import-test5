@@ -1,7 +1,8 @@
 # programs
 XFST="/home/eaxelson/xfst/bin/xfst -q"
 FOMA="foma -q"
-HFST="../../../tools/src/parsers/hfst-xfst2fst -q"
+HFST_TOOL="../../../tools/src/parsers/hfst-xfst2fst"
+HFST=$HFST_TOOL" -q"
 SH="/bin/bash"
 
 # location of hfst tools
@@ -59,15 +60,19 @@ do
             exit 1;
         fi
 
-        # Also compile with hfst-xfst using all back-end formats..
+        # Also compile with hfst-xfst2fst using all back-end formats..
         if [ 0 -eq 0 ]; then
         for format in $backend_formats; 
         do
-            if (! $tooldir/hfst-format --list-formats | grep $format > /dev/null); then
-                echo "  skipping compilation with hfst-xfst using back-end format "$format" as it is not available"
+            if ! [ -x $HFST_TOOL ]; then
+                echo "  warning: skipping compilation with hfst-xfst2fst, assuming configured off"
                 continue;
             fi
-            echo "  compiling with hfst-xfst using back-end format "$format".."
+            if (! $tooldir/hfst-format --list-formats | grep $format > /dev/null); then
+                echo "  skipping compilation with hfst-xfst2fst using back-end format "$format" as it is not available"
+                continue;
+            fi
+            echo "  compiling with hfst-xfst2fst using back-end format "$format".."
             if ! ($HFST -f $format -F xfst-scripts/$example.xfst.script 2> LOG); then
                 echo "----- an error occurred in compilation, (maybe) exiting -----"
                 cat LOG;
@@ -79,7 +84,7 @@ do
                 exit 1;
             fi
             if ! ($tooldir/hfst-compare -q Result_from_xfst Result_from_hfst_xfst); then
-                echo "FAIL: results from xfst and hfst-xfst ("$format") are not equivalent, storing results in files:"
+                echo "FAIL: results from xfst and hfst-xfst2fst ("$format") are not equivalent, storing results in files:"
                 echo "    log/"$example.result_from_xfst_script_using_xfst_tool 
                 echo "    log/"$example.result_from_hfst_xfst_using_backend_format_$format
                 if ! [ -d log ]; then

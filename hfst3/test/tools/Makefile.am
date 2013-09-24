@@ -21,7 +21,7 @@
 
 # test fsmbook-examples after establishing that simple tools work
 if WANT_FSMBOOK_TESTS
-SUBDIRS=. fsmbook-examples
+SUBDIRS=. fsmbook-tests
 endif
 
 if WANT_STRESSTESTS

@@ -636,24 +636,7 @@ AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul 
 # config files
 AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  test/libhfst/Makefile test/tools/Makefile
-		 test/tools/fsmbook-examples/Makefile
-		 test/tools/fsmbook-examples/EnglishNumerals/Makefile
-		 test/tools/fsmbook-examples/NumbersToNumerals/Makefile
-		 test/tools/fsmbook-examples/FinnishNumerals/Makefile
-		 test/tools/fsmbook-examples/EinsteinsPuzzle/Makefile
-		 test/tools/fsmbook-examples/Esperanto/Makefile
-		 test/tools/fsmbook-examples/BrazilianPortuguese1/Makefile
-		 test/tools/fsmbook-examples/BrazilianPortuguese2/Makefile
-		 test/tools/fsmbook-examples/MonishAnalysis/Makefile
-		 test/tools/fsmbook-examples/BetterColaMachine/Makefile
-		 test/tools/fsmbook-examples/DateParser/Makefile
-		 test/tools/fsmbook-examples/YaleShooting/Makefile
-		 test/tools/fsmbook-examples/PlusOrMinus/Makefile
-		 test/tools/fsmbook-examples/Palindromes/Makefile
-		 test/tools/fsmbook-examples/FinnishOTProsody/Makefile
-		 test/tools/fsmbook-examples/FinnishProsody/Makefile
-		 test/tools/fsmbook-examples/MonishGuesserAnalyzer/Makefile
-		 test/tools/fsmbook-examples/Lingala/Makefile
+                 test/tools/fsmbook-tests/Makefile
                  libhfst/Makefile libhfst/src/Makefile
                  libhfst/src/implementations/Makefile
 		 libhfst/src/parsers/Makefile 
