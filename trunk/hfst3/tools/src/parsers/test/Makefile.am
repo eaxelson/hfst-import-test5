@@ -1,5 +1,4 @@
 ## Process this file with automake to produce Makefile.in
-
 if WANT_XFST2FST
 TESTS=test.sh
 endif
