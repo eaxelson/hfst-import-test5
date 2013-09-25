@@ -20,9 +20,7 @@
 # If compare doesn't function 99 % of other tests will fail anyways
 
 # test fsmbook-examples after establishing that simple tools work
-if WANT_FSMBOOK_TESTS
 SUBDIRS=. fsmbook-tests
-endif
 
 if WANT_STRESSTESTS
 STRESSES=lexc2fst-stress.sh lookup-stress.sh proc-stress.sh valgrind.sh

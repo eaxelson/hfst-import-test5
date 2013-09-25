@@ -648,6 +648,8 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 tools/src/hfst-tagger/Makefile
 		 tools/src/hfst-tagger/src/Makefile
 		 tools/src/hfst-tagger/test/Makefile
+                 tools/src/parsers/Makefile
+                 tools/src/parsers/test/Makefile
 		 back-ends/Makefile
 		 back-ends/dlfcn/Makefile
 		 back-ends/openfstwin/Makefile

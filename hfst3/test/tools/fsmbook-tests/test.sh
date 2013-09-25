@@ -196,3 +196,6 @@ for format in $backend_formats;
 do 
     rm -f Result_from_hfst_script_$format
 done
+
+# return a skip value because failing tests do not return a fail value..
+exit 77
