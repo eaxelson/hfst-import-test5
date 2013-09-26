@@ -473,6 +473,7 @@ void PmatchTransducer::rtn_call(SymbolNumber * input_tape_entry,
 void PmatchTransducer::rtn_exit(void)
 {
     rtn_stack.pop();
+    local_stack.pop();
 }
 
 // void PmatchTransducer::take_best_path(void)
