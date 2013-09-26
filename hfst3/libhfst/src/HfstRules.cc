@@ -295,20 +295,20 @@ namespace hfst
       
       std::string leftm("@_LEFT_MARKER_@");
       std::string rightm("@_RIGHT_MARKER_@");
-      std::string epsilon(internal_epsilon);
+      std::string epsilon(INTERNAL_EPSILON);
 
       // HfstTransducer pi(alphabet, type);
 
       // Create the insert boundary transducer (.|<>:<L>|<>:<R>)*    
       StringPairSet pi1 = alphabet;
-      pi1.insert(StringPair(internal_epsilon, leftm));
-      pi1.insert(StringPair(internal_epsilon, rightm));
+      pi1.insert(StringPair(INTERNAL_EPSILON, leftm));
+      pi1.insert(StringPair(INTERNAL_EPSILON, rightm));
       HfstTransducer ibt(pi1, type, true);
 
       // Create the remove boundary transducer (.|<L>:<>|<R>:<>)*    
       StringPairSet pi2 = alphabet;
-      pi2.insert(StringPair(leftm, internal_epsilon));
-      pi2.insert(StringPair(rightm, internal_epsilon));
+      pi2.insert(StringPair(leftm, INTERNAL_EPSILON));
+      pi2.insert(StringPair(rightm, INTERNAL_EPSILON));
       HfstTransducer rbt(pi2, type, true);
 
       // Add the markers to the alphabet
@@ -456,98 +456,98 @@ namespace hfst
 
     // Left arrow replace up without context
     HfstTransducer left_replace_up(HfstTransducer &mapping,
-				   bool	optional,
-				   StringPairSet &alphabet)
+                                   bool optional,
+                                   StringPairSet &alphabet)
     {
       
       if ( optional )
-    	{
-	  return replace_up(mapping, 1, alphabet).invert();
-    	}
+        {
+          return replace_up(mapping, 1, alphabet).invert();
+        }
       else
-    	{
-	  return replace_up(mapping, 0, alphabet).invert();
-    	}
+        {
+          return replace_up(mapping, 0, alphabet).invert();
+        }
     }
 
     // Left arrow replace up
     HfstTransducer left_replace_up (HfstTransducerPair &context,
-				    HfstTransducer &mapping,
-				    bool optional,
-				    StringPairSet &alphabet)
+                                    HfstTransducer &mapping,
+                                    bool optional,
+                                    StringPairSet &alphabet)
     {
       if ( optional )
-    	{
-	  return replace_up(context, mapping, 1, alphabet).invert();
-    	}
+        {
+          return replace_up(context, mapping, 1, alphabet).invert();
+        }
       else
-    	{
-	  return replace_up(context, mapping, 0, alphabet).invert();
-    	}
+        {
+          return replace_up(context, mapping, 0, alphabet).invert();
+        }
     }
 
     // Left arrow replace down (XFST's version)
-    HfstTransducer left_replace_down_karttunen(	HfstTransducerPair &context,
-						HfstTransducer &mapping,
-						bool optional,
-						StringPairSet &alphabet)
+    HfstTransducer left_replace_down_karttunen( HfstTransducerPair &context,
+                                                HfstTransducer &mapping,
+                                                bool optional,
+                                                StringPairSet &alphabet)
     {
       if ( optional )
-    	{
-	  return replace_down_karttunen(context, mapping, 1, alphabet).invert();
-    	}
+        {
+          return replace_down_karttunen(context, mapping, 1, alphabet).invert();
+        }
       else
-    	{
-	  return replace_down_karttunen(context, mapping, 0, alphabet).invert();
-    	}
+        {
+          return replace_down_karttunen(context, mapping, 0, alphabet).invert();
+        }
     }
 
     // Left arrow replace down (SFST's version)
-    HfstTransducer left_replace_down (	HfstTransducerPair &context,
-					HfstTransducer &mapping,
-					bool optional,
-					StringPairSet &alphabet)
+    HfstTransducer left_replace_down (  HfstTransducerPair &context,
+                                        HfstTransducer &mapping,
+                                        bool optional,
+                                        StringPairSet &alphabet)
     {
       if ( optional )
-    	{
-	  return replace_down(context, mapping, 1, alphabet).invert();
-    	}
+        {
+          return replace_down(context, mapping, 1, alphabet).invert();
+        }
       else
-    	{
-	  return replace_down(context, mapping, 0, alphabet).invert();
-    	}
+        {
+          return replace_down(context, mapping, 0, alphabet).invert();
+        }
     }
 
     // Left arrow replace left
     HfstTransducer left_replace_left ( HfstTransducerPair &context,
-				       HfstTransducer &mapping,
-				       bool optional,
-				       StringPairSet &alphabet)
+                                       HfstTransducer &mapping,
+                                       bool optional,
+                                       StringPairSet &alphabet)
     {
       if ( optional )
-	{
-	  return replace_left(context, mapping, 1, alphabet).invert();
-    	}
+        {
+          return replace_left(context, mapping, 1, alphabet).invert();
+        }
       else
-	{
-	  return replace_left(context, mapping, 0, alphabet).invert();
-    	}
+        {
+          return replace_left(context, mapping, 0, alphabet).invert();
+        }
     }
 
     // Left arrow replace right
-    HfstTransducer left_replace_right (	HfstTransducerPair &context,
-					HfstTransducer &mapping,
-					bool optional,
-					StringPairSet &alphabet)
+    HfstTransducer left_replace_right ( HfstTransducerPair &context,
+                                        HfstTransducer &mapping,
+                                        bool optional,
+                                        StringPairSet &alphabet)
     {
       if ( optional )
-    	{
-	  return replace_right(context, mapping, 1, alphabet).invert();
-    	}
+        {
+          return replace_right(context, mapping, 1, alphabet).invert();
+        }
       else
-    	{
-	  return replace_right(context, mapping, 0, alphabet).invert();
-    	}
+        {
+          return replace_right(context, mapping, 0, alphabet).invert();
+        }
     }
 
     HfstTransducer restriction(HfstTransducerPairVector &contexts, 
@@ -587,7 +587,7 @@ namespace hfst
       HfstTransducer pi_star(alphabet, type, true);
       
       // center transducer
-      HfstTransducer l1(internal_epsilon, type);
+      HfstTransducer l1(INTERNAL_EPSILON, type);
       l1.concatenate(pi_star);
       l1.concatenate(mt);
       l1.concatenate(mapping);
@@ -610,7 +610,7 @@ namespace hfst
       for (HfstTransducerPairVector::const_iterator it = contexts.begin();
            it != contexts.end(); it++)
         {
-          HfstTransducer ct(internal_epsilon, type);
+          HfstTransducer ct(INTERNAL_EPSILON, type);
           ct.concatenate(pi_star);
           ct.concatenate(it->first);
           ct.concatenate(mt);          
@@ -628,7 +628,7 @@ namespace hfst
         HfstTransducer retval(alphabet, type, true);
         HfstTransducer tmp1(l1);
         tmp1.subtract(l2);
-        tmp1.substitute(marker,internal_epsilon);
+        tmp1.substitute(marker,INTERNAL_EPSILON);
         retval.subtract(tmp1);
         return retval;
       }
@@ -637,7 +637,7 @@ namespace hfst
         HfstTransducer retval(alphabet, type, true);
         HfstTransducer tmp1(l2);
         tmp1.subtract(l1);
-        tmp1.substitute(marker, internal_epsilon);
+        tmp1.substitute(marker, INTERNAL_EPSILON);
         retval.subtract(tmp1);
         return retval;
       }
@@ -648,13 +648,13 @@ namespace hfst
         HfstTransducer retval1(alphabet, type, true);
         HfstTransducer tmp1(l1);
         tmp1.subtract(l2);
-        tmp1.substitute(marker, internal_epsilon);
+        tmp1.substitute(marker, INTERNAL_EPSILON);
         retval1.subtract(tmp1);
 
         HfstTransducer retval2(alphabet, type, true);
         HfstTransducer tmp2(l2);
         tmp2.subtract(l1);
-        tmp2.substitute(marker, internal_epsilon);
+        tmp2.substitute(marker, INTERNAL_EPSILON);
         retval2.subtract(tmp2);
 
         return retval1.intersect(retval2);
@@ -739,120 +739,120 @@ using namespace hfst::rules;
  */
 void right_arrow_test1( ImplementationType type )
 {
-	HfstTokenizer TOK;
-	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        HfstTokenizer TOK;
+        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-	// Set mapping
-	HfstTransducer mapping("ca", "d", TOK, type);
+        // Set mapping
+        HfstTransducer mapping("ca", "d", TOK, type);
 
-	// Set context
-	HfstTransducer left("ca", TOK, type);
-	HfstTransducer right("c", type);
-	HfstTransducerPair context = HfstTransducerPair( left, right );
+        // Set context
+        HfstTransducer left("ca", TOK, type);
+        HfstTransducer right("c", type);
+        HfstTransducerPair context = HfstTransducerPair( left, right );
 
-	// Set alphabet
-	StringPair a1 = StringPair("a", "a");
-	StringPair a2 = StringPair("c", "c");
-	StringPair a3 = StringPair("d", "d");
-	StringPairSet alphabet;
-	alphabet.insert(a1);
-	alphabet.insert(a2);
-	alphabet.insert(a3);
+        // Set alphabet
+        StringPair a1 = StringPair("a", "a");
+        StringPair a2 = StringPair("c", "c");
+        StringPair a3 = StringPair("d", "d");
+        StringPairSet alphabet;
+        alphabet.insert(a1);
+        alphabet.insert(a2);
+        alphabet.insert(a3);
 
-	// Input stream
-	HfstTransducer input1("cacacac", TOK, type);
-	HfstTransducer input2("cac", TOK, type);
+        // Input stream
+        HfstTransducer input1("cacacac", TOK, type);
+        HfstTransducer input2("cac", TOK, type);
 
-	/* RIGHT ARROW RULE
-	 *
-	 * To test right arrow rule, it's needed to compose input transducer with the rule transducer
-	 * Input_transducer .o. right_arrow_rule_tr
-	 */
+        /* RIGHT ARROW RULE
+         *
+         * To test right arrow rule, it's needed to compose input transducer with the rule transducer
+         * Input_transducer .o. right_arrow_rule_tr
+         */
 
-	HfstTransducer replaceUp	= replace_up(context, mapping, 0, alphabet);
-	HfstTransducer replaceDown	= replace_down_karttunen(context, mapping, 0, alphabet);
-	HfstTransducer replaceLeft	= replace_left(context, mapping, 0, alphabet);
-	HfstTransducer replaceRight = replace_right(context, mapping, 0, alphabet);
+        HfstTransducer replaceUp        = replace_up(context, mapping, 0, alphabet);
+        HfstTransducer replaceDown      = replace_down_karttunen(context, mapping, 0, alphabet);
+        HfstTransducer replaceLeft      = replace_left(context, mapping, 0, alphabet);
+        HfstTransducer replaceRight = replace_right(context, mapping, 0, alphabet);
 
-	HfstTransducer replaceUpWithoutContext	= replace_up(mapping, 0, alphabet);
+        HfstTransducer replaceUpWithoutContext  = replace_up(mapping, 0, alphabet);
 
-	HfstTransducer replaceUpOptional	= replace_up(context, mapping, 1, alphabet);
-	HfstTransducer replaceDownOptional	= replace_down_karttunen(context, mapping, 1, alphabet);
-	HfstTransducer replaceLeftOptional	= replace_left(context, mapping, 1, alphabet);
-	HfstTransducer replaceRightOptional = replace_right(context, mapping, 1, alphabet);
+        HfstTransducer replaceUpOptional        = replace_up(context, mapping, 1, alphabet);
+        HfstTransducer replaceDownOptional      = replace_down_karttunen(context, mapping, 1, alphabet);
+        HfstTransducer replaceLeftOptional      = replace_left(context, mapping, 1, alphabet);
+        HfstTransducer replaceRightOptional = replace_right(context, mapping, 1, alphabet);
 
-	HfstTransducer replaceUpWithoutContextOptional	= replace_up(mapping, 1, alphabet);
+        HfstTransducer replaceUpWithoutContextOptional  = replace_up(mapping, 1, alphabet);
 
-	// Results for right arrow rule
+        // Results for right arrow rule
 
-	// ca -> d || ca_c  ( input: cacacac )
-	HfstTransducer result_right1("cacacac", "cad@_EPSILON_SYMBOL_@d@_EPSILON_SYMBOL_@c", TOK, type);
-	// ca (->) d || ca_c  ( input: cacacac )
-	HfstTransducer result_right1_optional(result_right1);
-	result_right1_optional.disjunct(input1);
-	// ca -> d (Without context)( input: cacacac )
-	HfstTransducer result_right1WithoutContext("cacacac", "d@_EPSILON_SYMBOL_@d@_EPSILON_SYMBOL_@d@_EPSILON_SYMBOL_@c", TOK, type);
-	// ca (->) d (Without context, optional)( input: cacacac )
-	HfstTransducer result_right1WithoutContextOptional("cac", "d@_EPSILON_SYMBOL_@c", TOK, type);
-	result_right1WithoutContextOptional.disjunct(input2);
-	// ca -> d \\ ca_c  ( input: cacacac )
-	HfstTransducer result_right2("cacacac", "cacad@_EPSILON_SYMBOL_@c", TOK, type);
-	// ca (->) d \\ ca_c  ( input: cacacac )
-	HfstTransducer result_right2_optional(result_right2);
-	result_right2_optional.disjunct(input1);
-	// ca -> d // ca_c  ( input: cacacac )
-	HfstTransducer result_right3("cacacac", "cad@_EPSILON_SYMBOL_@cac", TOK, type);
-	// ca (->) d // ca_c  ( input: cacacac )
-	HfstTransducer result_right3_optional(result_right3);
-	result_right3_optional.disjunct(input1);
-	// ca -> d \/ ca_c  ( input: cacacac )
-	HfstTransducer result_right4(type);
-	result_right4.disjunct(result_right2).minimize().disjunct(result_right3).minimize();
-	// ca (->) d \/ ca_c  ( input: cacacac )
-	HfstTransducer result_right4_optional(result_right4);
-	result_right4_optional.disjunct(input1).minimize();
+        // ca -> d || ca_c  ( input: cacacac )
+        HfstTransducer result_right1("cacacac", "cad@_EPSILON_SYMBOL_@d@_EPSILON_SYMBOL_@c", TOK, type);
+        // ca (->) d || ca_c  ( input: cacacac )
+        HfstTransducer result_right1_optional(result_right1);
+        result_right1_optional.disjunct(input1);
+        // ca -> d (Without context)( input: cacacac )
+        HfstTransducer result_right1WithoutContext("cacacac", "d@_EPSILON_SYMBOL_@d@_EPSILON_SYMBOL_@d@_EPSILON_SYMBOL_@c", TOK, type);
+        // ca (->) d (Without context, optional)( input: cacacac )
+        HfstTransducer result_right1WithoutContextOptional("cac", "d@_EPSILON_SYMBOL_@c", TOK, type);
+        result_right1WithoutContextOptional.disjunct(input2);
+        // ca -> d \\ ca_c  ( input: cacacac )
+        HfstTransducer result_right2("cacacac", "cacad@_EPSILON_SYMBOL_@c", TOK, type);
+        // ca (->) d \\ ca_c  ( input: cacacac )
+        HfstTransducer result_right2_optional(result_right2);
+        result_right2_optional.disjunct(input1);
+        // ca -> d // ca_c  ( input: cacacac )
+        HfstTransducer result_right3("cacacac", "cad@_EPSILON_SYMBOL_@cac", TOK, type);
+        // ca (->) d // ca_c  ( input: cacacac )
+        HfstTransducer result_right3_optional(result_right3);
+        result_right3_optional.disjunct(input1);
+        // ca -> d \/ ca_c  ( input: cacacac )
+        HfstTransducer result_right4(type);
+        result_right4.disjunct(result_right2).minimize().disjunct(result_right3).minimize();
+        // ca (->) d \/ ca_c  ( input: cacacac )
+        HfstTransducer result_right4_optional(result_right4);
+        result_right4_optional.disjunct(input1).minimize();
 
-	// RIGHT ARROW RULE
-	// -> || Replace up
-	HfstTransducer tmp = input1;
-	tmp.compose(replaceUp).minimize();
-	assert ( tmp.compare( result_right1 ) );
-	// (->) || Replace up optional
-	tmp = input1;
-	tmp.compose(replaceUpOptional).minimize();
-	assert ( tmp.compare( result_right1_optional ) );
-	// -> Replace up without context
-	tmp = input1;
-	tmp.compose(replaceUpWithoutContext).minimize();
-	assert ( tmp.compare( result_right1WithoutContext ) );
-	// (->) Replace up without context Optional
-	tmp = input2;
-	tmp.compose(replaceUpWithoutContextOptional).minimize();
-	assert ( tmp.compare( result_right1WithoutContextOptional ) );
-	// -> \\ Replace left
-	tmp = input1;
-	tmp.compose(replaceLeft).minimize();
-	assert ( tmp.compare( result_right2 ) );
-	// (->) \\ Replace left optional
-	tmp = input1;
-	tmp.compose(replaceLeftOptional).minimize();
-	assert ( tmp.compare( result_right2_optional ) );
-	// -> // Replace right
-	tmp = input1;
-	tmp.compose(replaceRight).minimize();
-	assert ( tmp.compare( result_right3 ) );
-	// (->) // Replace right optional
-	tmp = input1;
-	tmp.compose(replaceRightOptional).minimize();
-	assert ( tmp.compare( result_right3_optional ) );
-	// -> \/ Replace down
-	tmp = input1;
-	tmp.compose(replaceDown).minimize();
-	assert ( tmp.compare( result_right4 ) );
-	// (->) \/ Replace down optional
-	tmp = input1;
-	tmp.compose(replaceDownOptional).minimize();
-	assert ( tmp.compare( result_right4_optional ) );
+        // RIGHT ARROW RULE
+        // -> || Replace up
+        HfstTransducer tmp = input1;
+        tmp.compose(replaceUp).minimize();
+        assert ( tmp.compare( result_right1 ) );
+        // (->) || Replace up optional
+        tmp = input1;
+        tmp.compose(replaceUpOptional).minimize();
+        assert ( tmp.compare( result_right1_optional ) );
+        // -> Replace up without context
+        tmp = input1;
+        tmp.compose(replaceUpWithoutContext).minimize();
+        assert ( tmp.compare( result_right1WithoutContext ) );
+        // (->) Replace up without context Optional
+        tmp = input2;
+        tmp.compose(replaceUpWithoutContextOptional).minimize();
+        assert ( tmp.compare( result_right1WithoutContextOptional ) );
+        // -> \\ Replace left
+        tmp = input1;
+        tmp.compose(replaceLeft).minimize();
+        assert ( tmp.compare( result_right2 ) );
+        // (->) \\ Replace left optional
+        tmp = input1;
+        tmp.compose(replaceLeftOptional).minimize();
+        assert ( tmp.compare( result_right2_optional ) );
+        // -> // Replace right
+        tmp = input1;
+        tmp.compose(replaceRight).minimize();
+        assert ( tmp.compare( result_right3 ) );
+        // (->) // Replace right optional
+        tmp = input1;
+        tmp.compose(replaceRightOptional).minimize();
+        assert ( tmp.compare( result_right3_optional ) );
+        // -> \/ Replace down
+        tmp = input1;
+        tmp.compose(replaceDown).minimize();
+        assert ( tmp.compare( result_right4 ) );
+        // (->) \/ Replace down optional
+        tmp = input1;
+        tmp.compose(replaceDownOptional).minimize();
+        assert ( tmp.compare( result_right4_optional ) );
 
 }
 /*
@@ -860,79 +860,79 @@ void right_arrow_test1( ImplementationType type )
  */
 void right_arrow_test2( ImplementationType type )
 {
-	HfstTokenizer TOK;
-	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        HfstTokenizer TOK;
+        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-	// Both contexts are epsilon transducers
+        // Both contexts are epsilon transducers
 
-	// Set context
-	HfstTransducer leftEpsilon("@_EPSILON_SYMBOL_@", type);
-	HfstTransducer rightEpsilon("@_EPSILON_SYMBOL_@", type);
+        // Set context
+        HfstTransducer leftEpsilon("@_EPSILON_SYMBOL_@", type);
+        HfstTransducer rightEpsilon("@_EPSILON_SYMBOL_@", type);
 
-	HfstTransducerPair contextEpsilon = HfstTransducerPair( leftEpsilon, rightEpsilon );
+        HfstTransducerPair contextEpsilon = HfstTransducerPair( leftEpsilon, rightEpsilon );
 
-	// Set mapping
-	HfstTransducer mapping("a", "d", TOK, type);
+        // Set mapping
+        HfstTransducer mapping("a", "d", TOK, type);
 
-	// Set alphabet
-	StringPair a1 = StringPair("a", "a");
-	StringPair a2 = StringPair("c", "c");
-	StringPair a3 = StringPair("d", "d");
-	StringPairSet alphabet;
-	alphabet.insert(a1);
-	alphabet.insert(a2);
-	alphabet.insert(a3);
+        // Set alphabet
+        StringPair a1 = StringPair("a", "a");
+        StringPair a2 = StringPair("c", "c");
+        StringPair a3 = StringPair("d", "d");
+        StringPairSet alphabet;
+        alphabet.insert(a1);
+        alphabet.insert(a2);
+        alphabet.insert(a3);
 
-	// Input stream
-	HfstTransducer input1("caadaaa", TOK, type);
+        // Input stream
+        HfstTransducer input1("caadaaa", TOK, type);
 
-	HfstTransducer replaceUp	= replace_up(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceDown	= replace_down_karttunen(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceLeft	= replace_left(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceRight = replace_right(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceUp        = replace_up(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceDown      = replace_down_karttunen(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceLeft      = replace_left(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceRight = replace_right(contextEpsilon, mapping, 0, alphabet);
 
-	HfstTransducer replaceUpOptional	= replace_up(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceDownOptional	= replace_down_karttunen(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceLeftOptional	= replace_left(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceRightOptional = replace_right(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceUpOptional        = replace_up(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceDownOptional      = replace_down_karttunen(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceLeftOptional      = replace_left(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceRightOptional = replace_right(contextEpsilon, mapping, 1, alphabet);
 
-	// results
-	HfstTransducer result1("caadaaa", "cdddddd", TOK, type);
-	HfstTransducer result1Optional(type);
-	result1Optional.disjunct(result1).minimize().disjunct(input1).minimize();
+        // results
+        HfstTransducer result1("caadaaa", "cdddddd", TOK, type);
+        HfstTransducer result1Optional(type);
+        result1Optional.disjunct(result1).minimize().disjunct(input1).minimize();
 
-	// -> ||
-	HfstTransducer tmp = input1;
-	tmp.compose(replaceUp).minimize();
-	assert ( tmp.compare( result1 ) );
-	// (->) ||
-	tmp = input1;
-	tmp.compose(replaceUpOptional).minimize();
-	assert ( tmp.compare( result1Optional ) );
-	// -> \\  Replace left
-	tmp = input1;
-	tmp.compose(replaceLeft).minimize();
-	assert ( tmp.compare( result1 ) );
-	// (->) \\  Replace left optional
-	tmp = input1;
-	tmp.compose(replaceLeftOptional).minimize();
-	assert ( tmp.compare( result1Optional ) );
-	// -> //
-	tmp = input1;
-	tmp.compose(replaceRight).minimize();
-	assert ( tmp.compare( result1 ) );
-	// (->) //
-	tmp = input1;
-	tmp.compose(replaceRightOptional).minimize();
-	assert ( tmp.compare( result1Optional ) );
-	// -> \/
-	tmp = input1;
-	tmp.compose(replaceDown).minimize();
-	assert ( tmp.compare( result1 ) );
-	// (->) \/
-	tmp = input1;
-	tmp.compose(replaceDownOptional).minimize();
-	assert ( tmp.compare( result1Optional ) );
+        // -> ||
+        HfstTransducer tmp = input1;
+        tmp.compose(replaceUp).minimize();
+        assert ( tmp.compare( result1 ) );
+        // (->) ||
+        tmp = input1;
+        tmp.compose(replaceUpOptional).minimize();
+        assert ( tmp.compare( result1Optional ) );
+        // -> \\  Replace left
+        tmp = input1;
+        tmp.compose(replaceLeft).minimize();
+        assert ( tmp.compare( result1 ) );
+        // (->) \\  Replace left optional
+        tmp = input1;
+        tmp.compose(replaceLeftOptional).minimize();
+        assert ( tmp.compare( result1Optional ) );
+        // -> //
+        tmp = input1;
+        tmp.compose(replaceRight).minimize();
+        assert ( tmp.compare( result1 ) );
+        // (->) //
+        tmp = input1;
+        tmp.compose(replaceRightOptional).minimize();
+        assert ( tmp.compare( result1Optional ) );
+        // -> \/
+        tmp = input1;
+        tmp.compose(replaceDown).minimize();
+        assert ( tmp.compare( result1 ) );
+        // (->) \/
+        tmp = input1;
+        tmp.compose(replaceDownOptional).minimize();
+        assert ( tmp.compare( result1Optional ) );
 
 }
 /*
@@ -940,81 +940,81 @@ void right_arrow_test2( ImplementationType type )
  */
 void right_arrow_test3( ImplementationType type )
 {
-	HfstTokenizer TOK;
-	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        HfstTokenizer TOK;
+        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-	// Set context
-	HfstTransducer leftEpsilon("@_EPSILON_SYMBOL_@", type);
-	HfstTransducer right("d", type);
-	HfstTransducerPair contextEpsilon = HfstTransducerPair( leftEpsilon, right );
+        // Set context
+        HfstTransducer leftEpsilon("@_EPSILON_SYMBOL_@", type);
+        HfstTransducer right("d", type);
+        HfstTransducerPair contextEpsilon = HfstTransducerPair( leftEpsilon, right );
 
-	// Set mapping
-	HfstTransducer mapping("a", "d", TOK, type);
+        // Set mapping
+        HfstTransducer mapping("a", "d", TOK, type);
 
-	// Set alphabet
-	StringPair a1 = StringPair("a", "a");
-	StringPair a2 = StringPair("c", "c");
-	StringPair a3 = StringPair("d", "d");
-	StringPairSet alphabet;
-	alphabet.insert(a1);
-	alphabet.insert(a2);
-	alphabet.insert(a3);
+        // Set alphabet
+        StringPair a1 = StringPair("a", "a");
+        StringPair a2 = StringPair("c", "c");
+        StringPair a3 = StringPair("d", "d");
+        StringPairSet alphabet;
+        alphabet.insert(a1);
+        alphabet.insert(a2);
+        alphabet.insert(a3);
 
-	// Input stream
-	HfstTransducer input1("caadaaa", TOK, type);
+        // Input stream
+        HfstTransducer input1("caadaaa", TOK, type);
 
-	// Create replace transducers
-	HfstTransducer replaceUp	= replace_up(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceDown	= replace_down_karttunen(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceLeft	= replace_left(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceRight = replace_right(contextEpsilon, mapping, 0, alphabet);
+        // Create replace transducers
+        HfstTransducer replaceUp        = replace_up(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceDown      = replace_down_karttunen(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceLeft      = replace_left(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceRight = replace_right(contextEpsilon, mapping, 0, alphabet);
 
-	HfstTransducer replaceUpOptional	= replace_up(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceDownOptional	= replace_down_karttunen(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceLeftOptional	= replace_left(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceRightOptional = replace_right(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceUpOptional        = replace_up(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceDownOptional      = replace_down_karttunen(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceLeftOptional      = replace_left(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceRightOptional = replace_right(contextEpsilon, mapping, 1, alphabet);
 
-	// Results
-	HfstTransducer result1("caadaaa", "caddaaa", TOK, type);
-	HfstTransducer result1Optional(type);
-	result1Optional.disjunct(result1).minimize().disjunct(input1).minimize();
+        // Results
+        HfstTransducer result1("caadaaa", "caddaaa", TOK, type);
+        HfstTransducer result1Optional(type);
+        result1Optional.disjunct(result1).minimize().disjunct(input1).minimize();
 
-	HfstTransducer result2("caadaaa", "cdddaaa", TOK, type);
-	HfstTransducer result2Optional(type);
-	result2Optional.disjunct(result2).minimize().disjunct(input1).minimize();
+        HfstTransducer result2("caadaaa", "cdddaaa", TOK, type);
+        HfstTransducer result2Optional(type);
+        result2Optional.disjunct(result2).minimize().disjunct(input1).minimize();
 
-	// -> ||
-	HfstTransducer tmp = input1;
-	tmp.compose(replaceUp).minimize();
-	assert ( tmp.compare( result1 ) );
-	// (->) ||
-	tmp = input1;
-	tmp.compose(replaceUpOptional).minimize();
-	assert ( tmp.compare( result1Optional ) );
-	// -> \\  Replace left
-	tmp = input1;
-	tmp.compose(replaceLeft).minimize();
-	assert ( tmp.compare( result2 ) );
-	// (->) \\  Replace left optional
-	tmp = input1;
-	tmp.compose(replaceLeftOptional).minimize();
-	assert ( tmp.compare( result2Optional ) );
-	// -> //
-	tmp = input1;
-	tmp.compose(replaceRight).minimize();
-	assert ( tmp.compare( result1 ) );
-	// (->) //
-	tmp = input1;
-	tmp.compose(replaceRightOptional).minimize();
-	assert ( tmp.compare( result1Optional ) );
-	// -> \/
-	tmp = input1;
-	tmp.compose(replaceDown).minimize();
-	assert ( tmp.compare( result2 ) );
-	// (->) \/
-	tmp = input1;
-	tmp.compose(replaceDownOptional).minimize();
-	assert ( tmp.compare( result2Optional ) );
+        // -> ||
+        HfstTransducer tmp = input1;
+        tmp.compose(replaceUp).minimize();
+        assert ( tmp.compare( result1 ) );
+        // (->) ||
+        tmp = input1;
+        tmp.compose(replaceUpOptional).minimize();
+        assert ( tmp.compare( result1Optional ) );
+        // -> \\  Replace left
+        tmp = input1;
+        tmp.compose(replaceLeft).minimize();
+        assert ( tmp.compare( result2 ) );
+        // (->) \\  Replace left optional
+        tmp = input1;
+        tmp.compose(replaceLeftOptional).minimize();
+        assert ( tmp.compare( result2Optional ) );
+        // -> //
+        tmp = input1;
+        tmp.compose(replaceRight).minimize();
+        assert ( tmp.compare( result1 ) );
+        // (->) //
+        tmp = input1;
+        tmp.compose(replaceRightOptional).minimize();
+        assert ( tmp.compare( result1Optional ) );
+        // -> \/
+        tmp = input1;
+        tmp.compose(replaceDown).minimize();
+        assert ( tmp.compare( result2 ) );
+        // (->) \/
+        tmp = input1;
+        tmp.compose(replaceDownOptional).minimize();
+        assert ( tmp.compare( result2Optional ) );
 }
 
 /*
@@ -1022,81 +1022,81 @@ void right_arrow_test3( ImplementationType type )
  */
 void right_arrow_test4( ImplementationType type )
 {
-	HfstTokenizer TOK;
-	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        HfstTokenizer TOK;
+        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-	// Set context
-	HfstTransducer left("d", type);
-	HfstTransducer rightEpsilon("@_EPSILON_SYMBOL_@", type);
-	HfstTransducerPair contextEpsilon = HfstTransducerPair( left, rightEpsilon );
+        // Set context
+        HfstTransducer left("d", type);
+        HfstTransducer rightEpsilon("@_EPSILON_SYMBOL_@", type);
+        HfstTransducerPair contextEpsilon = HfstTransducerPair( left, rightEpsilon );
 
-	// Set mapping
-	HfstTransducer mapping("a", "d", TOK, type);
+        // Set mapping
+        HfstTransducer mapping("a", "d", TOK, type);
 
-	// Set alphabet
-	StringPair a1 = StringPair("a", "a");
-	StringPair a2 = StringPair("c", "c");
-	StringPair a3 = StringPair("d", "d");
-	StringPairSet alphabet;
-	alphabet.insert(a1);
-	alphabet.insert(a2);
-	alphabet.insert(a3);
+        // Set alphabet
+        StringPair a1 = StringPair("a", "a");
+        StringPair a2 = StringPair("c", "c");
+        StringPair a3 = StringPair("d", "d");
+        StringPairSet alphabet;
+        alphabet.insert(a1);
+        alphabet.insert(a2);
+        alphabet.insert(a3);
 
-   	// Inpust stream
-	HfstTransducer input1("caadaaa", TOK, type);
+        // Inpust stream
+        HfstTransducer input1("caadaaa", TOK, type);
 
-	// Replace transducers
-	HfstTransducer replaceUp	= replace_up(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceDown	= replace_down_karttunen(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceLeft	= replace_left(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceRight = replace_right(contextEpsilon, mapping, 0, alphabet);
+        // Replace transducers
+        HfstTransducer replaceUp        = replace_up(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceDown      = replace_down_karttunen(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceLeft      = replace_left(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceRight = replace_right(contextEpsilon, mapping, 0, alphabet);
 
-	HfstTransducer replaceUpOptional	= replace_up(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceDownOptional	= replace_down_karttunen(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceLeftOptional	= replace_left(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceRightOptional = replace_right(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceUpOptional        = replace_up(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceDownOptional      = replace_down_karttunen(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceLeftOptional      = replace_left(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceRightOptional = replace_right(contextEpsilon, mapping, 1, alphabet);
 
-	// Results
-	HfstTransducer result1("caadaaa", "caaddaa", TOK, type);
-	HfstTransducer result1Optional(type);
-	result1Optional.disjunct(result1).minimize().disjunct(input1).minimize();
+        // Results
+        HfstTransducer result1("caadaaa", "caaddaa", TOK, type);
+        HfstTransducer result1Optional(type);
+        result1Optional.disjunct(result1).minimize().disjunct(input1).minimize();
 
-	HfstTransducer result2("caadaaa", "caadddd", TOK, type);
-	HfstTransducer result2Optional(type);
-	result2Optional.disjunct(result2).minimize().disjunct(input1).minimize();
+        HfstTransducer result2("caadaaa", "caadddd", TOK, type);
+        HfstTransducer result2Optional(type);
+        result2Optional.disjunct(result2).minimize().disjunct(input1).minimize();
 
-	// -> ||
-	HfstTransducer tmp = input1;
-	tmp.compose(replaceUp).minimize();
-	assert ( tmp.compare( result1 ) );
-	// (->) ||
-	tmp = input1;
-	tmp.compose(replaceUpOptional).minimize();
-	assert ( tmp.compare( result1Optional ) );
-	// -> \\  Replace left
-	tmp = input1;
-	tmp.compose(replaceLeft).minimize();
-	assert ( tmp.compare( result1 ) );
-	// (->) \\  Replace left optional
-	tmp = input1;
-	tmp.compose(replaceLeftOptional).minimize();
-	assert ( tmp.compare( result1Optional ) );
-	// -> //
-	tmp = input1;
-	tmp.compose(replaceRight).minimize();
-	assert ( tmp.compare( result2 ) );
-	// (->) //
-	tmp = input1;
-	tmp.compose(replaceRightOptional).minimize();
-	assert ( tmp.compare( result2Optional ) );
-	// -> \/  Replace down
-	tmp = input1;
-	tmp.compose(replaceDown).minimize();
-	assert ( tmp.compare( result2 ) );
-	// (->) \/  Replace down optional
-	tmp = input1;
-	tmp.compose(replaceDownOptional).minimize();
-	assert ( tmp.compare( result2Optional ) );
+        // -> ||
+        HfstTransducer tmp = input1;
+        tmp.compose(replaceUp).minimize();
+        assert ( tmp.compare( result1 ) );
+        // (->) ||
+        tmp = input1;
+        tmp.compose(replaceUpOptional).minimize();
+        assert ( tmp.compare( result1Optional ) );
+        // -> \\  Replace left
+        tmp = input1;
+        tmp.compose(replaceLeft).minimize();
+        assert ( tmp.compare( result1 ) );
+        // (->) \\  Replace left optional
+        tmp = input1;
+        tmp.compose(replaceLeftOptional).minimize();
+        assert ( tmp.compare( result1Optional ) );
+        // -> //
+        tmp = input1;
+        tmp.compose(replaceRight).minimize();
+        assert ( tmp.compare( result2 ) );
+        // (->) //
+        tmp = input1;
+        tmp.compose(replaceRightOptional).minimize();
+        assert ( tmp.compare( result2Optional ) );
+        // -> \/  Replace down
+        tmp = input1;
+        tmp.compose(replaceDown).minimize();
+        assert ( tmp.compare( result2 ) );
+        // (->) \/  Replace down optional
+        tmp = input1;
+        tmp.compose(replaceDownOptional).minimize();
+        assert ( tmp.compare( result2Optional ) );
 
 }
 /*
@@ -1104,130 +1104,130 @@ void right_arrow_test4( ImplementationType type )
  */
 void left_arrow_test1( ImplementationType type )
 {
-	HfstTokenizer TOK;
-	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        HfstTokenizer TOK;
+        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-	// Set mapping
-	HfstTransducer mapping("ca", "d", TOK, type);
+        // Set mapping
+        HfstTransducer mapping("ca", "d", TOK, type);
 
-	// Set context
-	HfstTransducer left("ca", TOK, type);
-	HfstTransducer right("c", type);
-	HfstTransducerPair context = HfstTransducerPair( left, right );
+        // Set context
+        HfstTransducer left("ca", TOK, type);
+        HfstTransducer right("c", type);
+        HfstTransducerPair context = HfstTransducerPair( left, right );
 
-	// Set alphabet
-	StringPair a1 = StringPair("a", "a");
-	StringPair a2 = StringPair("c", "c");
-	StringPair a3 = StringPair("d", "d");
-	StringPairSet alphabet;
-	alphabet.insert(a1);
-	alphabet.insert(a2);
-	alphabet.insert(a3);
+        // Set alphabet
+        StringPair a1 = StringPair("a", "a");
+        StringPair a2 = StringPair("c", "c");
+        StringPair a3 = StringPair("d", "d");
+        StringPairSet alphabet;
+        alphabet.insert(a1);
+        alphabet.insert(a2);
+        alphabet.insert(a3);
 
-	// Input stream
-	HfstTransducer input1("cacacac", TOK, type);
-	HfstTransducer input2("cac", TOK, type);
+        // Input stream
+        HfstTransducer input1("cacacac", TOK, type);
+        HfstTransducer input2("cac", TOK, type);
 
-	// Results:
-	// d <- ca || ca_c  ( input: cacacac )
-	HfstTransducer result_left1("cad@_EPSILON_SYMBOL_@d@_EPSILON_SYMBOL_@c", "cacacac", TOK, type);
-	// d <- ca Without context ( input: cacacac )
-	HfstTransducer result_left1_WithoutContext("d@_EPSILON_SYMBOL_@d@_EPSILON_SYMBOL_@d@_EPSILON_SYMBOL_@c", "cacacac", TOK, type);
-	// ca (<-) d || ca_c  ( input: cacacac )
-	HfstTransducer result_left1_optional(result_left1);
-	result_left1_optional.disjunct(input1);
-	// ca (<-) d Without context ( input: cacacac )
-	HfstTransducer result_left1_WithoutContext_optional("d@_EPSILON_SYMBOL_@c", "cac", TOK, type);
-	result_left1_WithoutContext_optional.disjunct(input2);
+        // Results:
+        // d <- ca || ca_c  ( input: cacacac )
+        HfstTransducer result_left1("cad@_EPSILON_SYMBOL_@d@_EPSILON_SYMBOL_@c", "cacacac", TOK, type);
+        // d <- ca Without context ( input: cacacac )
+        HfstTransducer result_left1_WithoutContext("d@_EPSILON_SYMBOL_@d@_EPSILON_SYMBOL_@d@_EPSILON_SYMBOL_@c", "cacacac", TOK, type);
+        // ca (<-) d || ca_c  ( input: cacacac )
+        HfstTransducer result_left1_optional(result_left1);
+        result_left1_optional.disjunct(input1);
+        // ca (<-) d Without context ( input: cacacac )
+        HfstTransducer result_left1_WithoutContext_optional("d@_EPSILON_SYMBOL_@c", "cac", TOK, type);
+        result_left1_WithoutContext_optional.disjunct(input2);
 
-	// d <- ca \\ ca_c  ( input: cacacac )
-	HfstTransducer result_left2("cacad@_EPSILON_SYMBOL_@c", "cacacac",  TOK, type);
-	// ca (<-) d \\ ca_c  ( input: cacacac )
-	HfstTransducer result_left2_optional(result_left2);
-	result_left2_optional.disjunct(input1);
-	// d <- ca // ca_c  ( input: cacacac )
-	HfstTransducer result_left3("cad@_EPSILON_SYMBOL_@cac", "cacacac", TOK, type);
-	// ca (<-) d // ca_c  ( input: cacacac )
-	HfstTransducer result_left3_optional(result_left3);
-	result_left3_optional.disjunct(input1);
-	// d <- ca \/ ca_c  ( input: cacacac )
-	HfstTransducer result_left4(type);
-	result_left4.disjunct(result_left2).minimize().disjunct(result_left3).minimize();
-	// d (<-) ca \/ ca_c  ( input: cacacac )
-	HfstTransducer result_left4_optional(result_left4);
-	result_left4_optional.disjunct(input1);
+        // d <- ca \\ ca_c  ( input: cacacac )
+        HfstTransducer result_left2("cacad@_EPSILON_SYMBOL_@c", "cacacac",  TOK, type);
+        // ca (<-) d \\ ca_c  ( input: cacacac )
+        HfstTransducer result_left2_optional(result_left2);
+        result_left2_optional.disjunct(input1);
+        // d <- ca // ca_c  ( input: cacacac )
+        HfstTransducer result_left3("cad@_EPSILON_SYMBOL_@cac", "cacacac", TOK, type);
+        // ca (<-) d // ca_c  ( input: cacacac )
+        HfstTransducer result_left3_optional(result_left3);
+        result_left3_optional.disjunct(input1);
+        // d <- ca \/ ca_c  ( input: cacacac )
+        HfstTransducer result_left4(type);
+        result_left4.disjunct(result_left2).minimize().disjunct(result_left3).minimize();
+        // d (<-) ca \/ ca_c  ( input: cacacac )
+        HfstTransducer result_left4_optional(result_left4);
+        result_left4_optional.disjunct(input1);
 
-	/* LEFT ARROW RULE
-	 *
-	 * To test left arrow rule, it's needed to compose the rule transducer with the input one
-	 * Left_arrow_rule_tr .o. input_transducer
-	 */
-	HfstTransducer larrow_replaceUp		= left_replace_up(context, mapping, 0, alphabet);
-	HfstTransducer larrow_replaceDown	= left_replace_down_karttunen(context, mapping, 0, alphabet);
-	HfstTransducer larrow_replaceLeft	= left_replace_left(context, mapping, 0, alphabet);
-	HfstTransducer larrow_replaceRight	= left_replace_right(context, mapping, 0, alphabet);
+        /* LEFT ARROW RULE
+         *
+         * To test left arrow rule, it's needed to compose the rule transducer with the input one
+         * Left_arrow_rule_tr .o. input_transducer
+         */
+        HfstTransducer larrow_replaceUp         = left_replace_up(context, mapping, 0, alphabet);
+        HfstTransducer larrow_replaceDown       = left_replace_down_karttunen(context, mapping, 0, alphabet);
+        HfstTransducer larrow_replaceLeft       = left_replace_left(context, mapping, 0, alphabet);
+        HfstTransducer larrow_replaceRight      = left_replace_right(context, mapping, 0, alphabet);
 
-	HfstTransducer larrow_replaceUpWithoutContext	= left_replace_up(mapping, 0, alphabet);
+        HfstTransducer larrow_replaceUpWithoutContext   = left_replace_up(mapping, 0, alphabet);
 
-	HfstTransducer larrow_replaceUpOptional		= left_replace_up(context, mapping, 1, alphabet);
-	HfstTransducer larrow_replaceDownOptional	= left_replace_down_karttunen(context, mapping, 1, alphabet);
-	HfstTransducer larrow_replaceLeftOptional	= left_replace_left(context, mapping, 1, alphabet);
-	HfstTransducer larrow_replaceRightOptional	= left_replace_right(context, mapping, 1, alphabet);
+        HfstTransducer larrow_replaceUpOptional         = left_replace_up(context, mapping, 1, alphabet);
+        HfstTransducer larrow_replaceDownOptional       = left_replace_down_karttunen(context, mapping, 1, alphabet);
+        HfstTransducer larrow_replaceLeftOptional       = left_replace_left(context, mapping, 1, alphabet);
+        HfstTransducer larrow_replaceRightOptional      = left_replace_right(context, mapping, 1, alphabet);
 
-	HfstTransducer larrow_replaceUpWithoutContextOptional	= left_replace_up(mapping, 1, alphabet);
+        HfstTransducer larrow_replaceUpWithoutContextOptional   = left_replace_up(mapping, 1, alphabet);
 
-	// To test left arrow rule, it's needed to compose the rule transducer with the input one
-	// Left_arrow_rule_tr .o. input_transducer
+        // To test left arrow rule, it's needed to compose the rule transducer with the input one
+        // Left_arrow_rule_tr .o. input_transducer
 
-	// <- || Left replace up
-	HfstTransducer tmp = larrow_replaceUp;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result_left1 ) );
+        // <- || Left replace up
+        HfstTransducer tmp = larrow_replaceUp;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result_left1 ) );
 
-	// <- Left replace up without context
-	tmp = larrow_replaceUpWithoutContext;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result_left1_WithoutContext ) );
+        // <- Left replace up without context
+        tmp = larrow_replaceUpWithoutContext;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result_left1_WithoutContext ) );
 
-	// (<-) || Left replace up optional
-	tmp = larrow_replaceUpOptional;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result_left1_optional ) );
+        // (<-) || Left replace up optional
+        tmp = larrow_replaceUpOptional;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result_left1_optional ) );
 
-	// (<-) Left replace up optional without context
-	tmp = larrow_replaceUpWithoutContextOptional;
-	tmp.compose(input2).minimize();
-	assert ( tmp.compare( result_left1_WithoutContext_optional ) );
+        // (<-) Left replace up optional without context
+        tmp = larrow_replaceUpWithoutContextOptional;
+        tmp.compose(input2).minimize();
+        assert ( tmp.compare( result_left1_WithoutContext_optional ) );
 
-	// <- \\ Left replace left
-	tmp = larrow_replaceLeft;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result_left2 ) );
+        // <- \\ Left replace left
+        tmp = larrow_replaceLeft;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result_left2 ) );
 
-	// (<-) \\ Left replace left optional
-	tmp = larrow_replaceLeftOptional;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result_left2_optional ) );
+        // (<-) \\ Left replace left optional
+        tmp = larrow_replaceLeftOptional;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result_left2_optional ) );
 
-	// <- // Left replace right
-	tmp = larrow_replaceRight;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result_left3 ) );
+        // <- // Left replace right
+        tmp = larrow_replaceRight;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result_left3 ) );
 
-	// (<-) // Left replace right optional
-	tmp = larrow_replaceRightOptional;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result_left3_optional ) );
+        // (<-) // Left replace right optional
+        tmp = larrow_replaceRightOptional;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result_left3_optional ) );
 
-	// <-  \/ Left replace down
-	tmp = larrow_replaceDown;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result_left4 ) );
+        // <-  \/ Left replace down
+        tmp = larrow_replaceDown;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result_left4 ) );
 
-	// (<-) \/ Left replace down optional
-	tmp = larrow_replaceDownOptional;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result_left4_optional ) );
+        // (<-) \/ Left replace down optional
+        tmp = larrow_replaceDownOptional;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result_left4_optional ) );
 
 }
 /*
@@ -1235,159 +1235,159 @@ void left_arrow_test1( ImplementationType type )
  */
 void left_arrow_test2( ImplementationType type )
 {
-	HfstTokenizer TOK;
-	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        HfstTokenizer TOK;
+        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-	// Both contexts are epsilon transducers
+        // Both contexts are epsilon transducers
 
-	// Set context
-	HfstTransducer leftEpsilon("@_EPSILON_SYMBOL_@", type);
-	HfstTransducer rightEpsilon("@_EPSILON_SYMBOL_@", type);
-	HfstTransducerPair contextEpsilon = HfstTransducerPair( leftEpsilon, rightEpsilon );
+        // Set context
+        HfstTransducer leftEpsilon("@_EPSILON_SYMBOL_@", type);
+        HfstTransducer rightEpsilon("@_EPSILON_SYMBOL_@", type);
+        HfstTransducerPair contextEpsilon = HfstTransducerPair( leftEpsilon, rightEpsilon );
 
-	// Set mapping
-	HfstTransducer mapping("a", "d", TOK, type);
+        // Set mapping
+        HfstTransducer mapping("a", "d", TOK, type);
 
-	// Set alphabet
-	StringPair a1 = StringPair("a", "a");
-	StringPair a2 = StringPair("c", "c");
-	StringPair a3 = StringPair("d", "d");
-	StringPairSet alphabet;
-	alphabet.insert(a1);
-	alphabet.insert(a2);
-	alphabet.insert(a3);
+        // Set alphabet
+        StringPair a1 = StringPair("a", "a");
+        StringPair a2 = StringPair("c", "c");
+        StringPair a3 = StringPair("d", "d");
+        StringPairSet alphabet;
+        alphabet.insert(a1);
+        alphabet.insert(a2);
+        alphabet.insert(a3);
 
-	// Input stream
-	HfstTransducer input1("caadaaa", TOK, type);
+        // Input stream
+        HfstTransducer input1("caadaaa", TOK, type);
 
-	HfstTransducer replaceUp	= left_replace_up(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceDown	= left_replace_down_karttunen(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceLeft	= left_replace_left(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceRight = left_replace_right(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceUp        = left_replace_up(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceDown      = left_replace_down_karttunen(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceLeft      = left_replace_left(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceRight = left_replace_right(contextEpsilon, mapping, 0, alphabet);
 
-	HfstTransducer replaceUpOptional	= left_replace_up(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceDownOptional	= left_replace_down_karttunen(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceLeftOptional	= left_replace_left(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceRightOptional = left_replace_right(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceUpOptional        = left_replace_up(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceDownOptional      = left_replace_down_karttunen(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceLeftOptional      = left_replace_left(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceRightOptional = left_replace_right(contextEpsilon, mapping, 1, alphabet);
 
-	// results
-	HfstTransducer result1("cdddddd", "caadaaa", TOK, type);
-	HfstTransducer result1Optional(type);
-	result1Optional.disjunct(result1).minimize().disjunct(input1).minimize();
+        // results
+        HfstTransducer result1("cdddddd", "caadaaa", TOK, type);
+        HfstTransducer result1Optional(type);
+        result1Optional.disjunct(result1).minimize().disjunct(input1).minimize();
 
-	// <- ||
-	HfstTransducer tmp = replaceUp;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result1 ) );
-	// (<-) ||
-	tmp = replaceUpOptional;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result1Optional ) );
-	// <- \\  Replace left
-	tmp = replaceLeft;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result1 ) );
-	// (<-) \\  Replace left optional
-	tmp = replaceLeftOptional;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result1Optional ) );
-	// <- //
-	tmp = replaceRight;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result1 ) );
-	// (<-) //
-	tmp = replaceRightOptional;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result1Optional ) );
-	// <- \/
-	tmp = replaceDown;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result1 ) );
-	// (<-) \/
-	tmp = replaceDownOptional;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result1Optional ) );
+        // <- ||
+        HfstTransducer tmp = replaceUp;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result1 ) );
+        // (<-) ||
+        tmp = replaceUpOptional;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result1Optional ) );
+        // <- \\  Replace left
+        tmp = replaceLeft;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result1 ) );
+        // (<-) \\  Replace left optional
+        tmp = replaceLeftOptional;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result1Optional ) );
+        // <- //
+        tmp = replaceRight;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result1 ) );
+        // (<-) //
+        tmp = replaceRightOptional;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result1Optional ) );
+        // <- \/
+        tmp = replaceDown;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result1 ) );
+        // (<-) \/
+        tmp = replaceDownOptional;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result1Optional ) );
 }
 /*
  *  Left context is epsilon transducer
  */
 void left_arrow_test3( ImplementationType type )
 {
-	HfstTokenizer TOK;
-	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        HfstTokenizer TOK;
+        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-	// Set context
-	HfstTransducer leftEpsilon("@_EPSILON_SYMBOL_@", type);
-	HfstTransducer right("d", type);
-	HfstTransducerPair contextEpsilon = HfstTransducerPair( leftEpsilon, right );
+        // Set context
+        HfstTransducer leftEpsilon("@_EPSILON_SYMBOL_@", type);
+        HfstTransducer right("d", type);
+        HfstTransducerPair contextEpsilon = HfstTransducerPair( leftEpsilon, right );
 
-	// Set mapping
-	HfstTransducer mapping("a", "d", TOK, type);
+        // Set mapping
+        HfstTransducer mapping("a", "d", TOK, type);
 
-	// Set alphabet
-	StringPair a1 = StringPair("a", "a");
-	StringPair a2 = StringPair("c", "c");
-	StringPair a3 = StringPair("d", "d");
-	StringPairSet alphabet;
-	alphabet.insert(a1);
-	alphabet.insert(a2);
-	alphabet.insert(a3);
+        // Set alphabet
+        StringPair a1 = StringPair("a", "a");
+        StringPair a2 = StringPair("c", "c");
+        StringPair a3 = StringPair("d", "d");
+        StringPairSet alphabet;
+        alphabet.insert(a1);
+        alphabet.insert(a2);
+        alphabet.insert(a3);
 
-	// Input stream
-	HfstTransducer input1("caadaaa", TOK, type);
+        // Input stream
+        HfstTransducer input1("caadaaa", TOK, type);
 
-	// Create replace transducers
-	HfstTransducer replaceUp	= left_replace_up(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceDown	= left_replace_down_karttunen(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceLeft	= left_replace_left(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceRight = left_replace_right(contextEpsilon, mapping, 0, alphabet);
+        // Create replace transducers
+        HfstTransducer replaceUp        = left_replace_up(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceDown      = left_replace_down_karttunen(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceLeft      = left_replace_left(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceRight = left_replace_right(contextEpsilon, mapping, 0, alphabet);
 
-	HfstTransducer replaceUpOptional	= left_replace_up(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceDownOptional	= left_replace_down_karttunen(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceLeftOptional	= left_replace_left(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceRightOptional = left_replace_right(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceUpOptional        = left_replace_up(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceDownOptional      = left_replace_down_karttunen(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceLeftOptional      = left_replace_left(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceRightOptional = left_replace_right(contextEpsilon, mapping, 1, alphabet);
 
-	// Results
-	HfstTransducer result1("caddaaa", "caadaaa", TOK, type);
-	HfstTransducer result1Optional(type);
-	result1Optional.disjunct(result1).minimize().disjunct(input1).minimize();
+        // Results
+        HfstTransducer result1("caddaaa", "caadaaa", TOK, type);
+        HfstTransducer result1Optional(type);
+        result1Optional.disjunct(result1).minimize().disjunct(input1).minimize();
 
-	HfstTransducer result2("cdddaaa", "caadaaa", TOK, type);
-	HfstTransducer result2Optional(type);
-	result2Optional.disjunct(result2).minimize().disjunct(input1).minimize();
+        HfstTransducer result2("cdddaaa", "caadaaa", TOK, type);
+        HfstTransducer result2Optional(type);
+        result2Optional.disjunct(result2).minimize().disjunct(input1).minimize();
 
-	// <- ||
-	HfstTransducer tmp = replaceUp;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result1 ) );
-	// (<-) ||
-	tmp = replaceUpOptional;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result1Optional ) );
-	// <- \\  Replace left
-	tmp = replaceLeft;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result2 ) );
-	// (<-) \\  Replace left optional
-	tmp = replaceLeftOptional;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result2Optional ) );
-	// <- //
-	tmp = replaceRight;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result1 ) );
-	// (<-) //
-	tmp = replaceRightOptional;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result1Optional ) );
-	// <- \/
-	tmp = replaceDown;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result2 ) );
-	// (<-) \/
-	tmp = replaceDownOptional;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result2Optional ) );
+        // <- ||
+        HfstTransducer tmp = replaceUp;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result1 ) );
+        // (<-) ||
+        tmp = replaceUpOptional;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result1Optional ) );
+        // <- \\  Replace left
+        tmp = replaceLeft;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result2 ) );
+        // (<-) \\  Replace left optional
+        tmp = replaceLeftOptional;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result2Optional ) );
+        // <- //
+        tmp = replaceRight;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result1 ) );
+        // (<-) //
+        tmp = replaceRightOptional;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result1Optional ) );
+        // <- \/
+        tmp = replaceDown;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result2 ) );
+        // (<-) \/
+        tmp = replaceDownOptional;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result2Optional ) );
 }
 
 /*
@@ -1395,80 +1395,80 @@ void left_arrow_test3( ImplementationType type )
  */
 void left_arrow_test4( ImplementationType type )
 {
-	HfstTokenizer TOK;
-	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        HfstTokenizer TOK;
+        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-	// Set context
-	HfstTransducer left("d", type);
-	HfstTransducer rightEpsilon("@_EPSILON_SYMBOL_@", type);
-	HfstTransducerPair contextEpsilon = HfstTransducerPair( left, rightEpsilon );
+        // Set context
+        HfstTransducer left("d", type);
+        HfstTransducer rightEpsilon("@_EPSILON_SYMBOL_@", type);
+        HfstTransducerPair contextEpsilon = HfstTransducerPair( left, rightEpsilon );
 
-	// Set mapping
-	HfstTransducer mapping("a", "d", TOK, type);
+        // Set mapping
+        HfstTransducer mapping("a", "d", TOK, type);
 
-	// Set alphabet
-	StringPair a1 = StringPair("a", "a");
-	StringPair a2 = StringPair("c", "c");
-	StringPair a3 = StringPair("d", "d");
-	StringPairSet alphabet;
-	alphabet.insert(a1);
-	alphabet.insert(a2);
-	alphabet.insert(a3);
+        // Set alphabet
+        StringPair a1 = StringPair("a", "a");
+        StringPair a2 = StringPair("c", "c");
+        StringPair a3 = StringPair("d", "d");
+        StringPairSet alphabet;
+        alphabet.insert(a1);
+        alphabet.insert(a2);
+        alphabet.insert(a3);
 
-   	// Inpust stream
-	HfstTransducer input1("caadaaa", TOK, type);
+        // Inpust stream
+        HfstTransducer input1("caadaaa", TOK, type);
 
-	HfstTransducer replaceUp	= left_replace_up(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceDown	= left_replace_down_karttunen(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceLeft	= left_replace_left(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceRight = left_replace_right(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceUp        = left_replace_up(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceDown      = left_replace_down_karttunen(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceLeft      = left_replace_left(contextEpsilon, mapping, 0, alphabet);
+        HfstTransducer replaceRight = left_replace_right(contextEpsilon, mapping, 0, alphabet);
 
-	HfstTransducer replaceUpOptional	= left_replace_up(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceDownOptional	= left_replace_down_karttunen(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceLeftOptional	= left_replace_left(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceRightOptional = left_replace_right(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceUpOptional        = left_replace_up(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceDownOptional      = left_replace_down_karttunen(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceLeftOptional      = left_replace_left(contextEpsilon, mapping, 1, alphabet);
+        HfstTransducer replaceRightOptional = left_replace_right(contextEpsilon, mapping, 1, alphabet);
 
-	// Results
-	HfstTransducer result1("caaddaa", "caadaaa", TOK, type);
-	HfstTransducer result1Optional(type);
-	result1Optional.disjunct(result1).minimize().disjunct(input1).minimize();
+        // Results
+        HfstTransducer result1("caaddaa", "caadaaa", TOK, type);
+        HfstTransducer result1Optional(type);
+        result1Optional.disjunct(result1).minimize().disjunct(input1).minimize();
 
-	HfstTransducer result2("caadddd", "caadaaa", TOK, type);
-	HfstTransducer result2Optional(type);
-	result2Optional.disjunct(result2).minimize().disjunct(input1).minimize();
+        HfstTransducer result2("caadddd", "caadaaa", TOK, type);
+        HfstTransducer result2Optional(type);
+        result2Optional.disjunct(result2).minimize().disjunct(input1).minimize();
 
-	// <- ||
-	HfstTransducer tmp = replaceUp;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result1 ) );
-	// (<-) ||
-	tmp = replaceUpOptional;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result1Optional ) );
-	// <- \\  Replace left
-	tmp = replaceLeft;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result1 ) );
-	// (<-) \\  Replace left optional
-	tmp = replaceLeftOptional;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result1Optional ) );
-	// <- //
-	tmp = replaceRight;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result2 ) );
-	// (<-) //
-	tmp = replaceRightOptional;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result2Optional ) );
-	// <- \/
-	tmp = replaceDown;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result2 ) );
-	// (<-) \/
-	tmp = replaceDownOptional;
-	tmp.compose(input1).minimize();
-	assert ( tmp.compare( result2Optional ) );
+        // <- ||
+        HfstTransducer tmp = replaceUp;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result1 ) );
+        // (<-) ||
+        tmp = replaceUpOptional;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result1Optional ) );
+        // <- \\  Replace left
+        tmp = replaceLeft;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result1 ) );
+        // (<-) \\  Replace left optional
+        tmp = replaceLeftOptional;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result1Optional ) );
+        // <- //
+        tmp = replaceRight;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result2 ) );
+        // (<-) //
+        tmp = replaceRightOptional;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result2Optional ) );
+        // <- \/
+        tmp = replaceDown;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result2 ) );
+        // (<-) \/
+        tmp = replaceDownOptional;
+        tmp.compose(input1).minimize();
+        assert ( tmp.compare( result2Optional ) );
 }
 
 
@@ -1483,9 +1483,9 @@ int main(int argc, char * argv[])
     for (unsigned int i=0; i < NUMBER_OF_TYPES; i++)
     {
       if (! HfstTransducer::is_implementation_type_available(types[i]))
-	continue;
+        continue;
 
-    	// Normal
+        // Normal
         right_arrow_test1(types[i]);
         left_arrow_test1(types[i]);
         // Both contexts are epsilon transducers

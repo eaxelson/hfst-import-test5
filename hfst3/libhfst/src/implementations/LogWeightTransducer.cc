@@ -1010,9 +1010,9 @@ namespace hfst { namespace implementations
 
   fst::SymbolTable LogWeightTransducer::create_symbol_table(std::string name) {
     fst::SymbolTable st(name);
-    st.AddSymbol(internal_epsilon, 0);
-    st.AddSymbol(internal_unknown, 1);
-    st.AddSymbol(internal_identity, 2);
+    st.AddSymbol(INTERNAL_EPSILON, 0);
+    st.AddSymbol(INTERNAL_UNKNOWN, 1);
+    st.AddSymbol(INTERNAL_IDENTITY, 2);
     return st;
   }
   
