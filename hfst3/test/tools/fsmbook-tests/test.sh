@@ -1,5 +1,5 @@
 # programs
-XFST="/home/eaxelson/xfst/bin/xfst -q"
+XFST="xfst -q"
 FOMA="foma -q"
 HFST_TOOL="../../../tools/src/parsers/hfst-xfst2fst"
 HFST=$HFST_TOOL" -q"
