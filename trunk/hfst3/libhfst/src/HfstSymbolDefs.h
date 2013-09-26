@@ -94,6 +94,11 @@ namespace hfst
   const std::string internal_unknown = "@_UNKNOWN_SYMBOL_@";
   const std::string internal_identity = "@_IDENTITY_SYMBOL_@";
   const std::string internal_default = "@_DEFAULT_SYMBOL_@";
+
+  #define INTERNAL_EPSILON "@_EPSILON_SYMBOL_@"
+  #define INTERNAL_UNKNOWN "@_UNKNOWN_SYMBOL_@"
+  #define INTERNAL_IDENTITY "@_IDENTITY_SYMBOL_@"
+  #define INTERNAL_DEFAULT "@_DEFAULT_SYMBOL_@"
   
   /* Check whether a string is equal to reserved internal representation. */
   bool is_epsilon(std::string const & str);

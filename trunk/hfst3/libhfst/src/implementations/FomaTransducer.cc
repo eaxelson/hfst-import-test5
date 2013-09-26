@@ -217,7 +217,7 @@ namespace hfst { namespace implementations {
     (const std::string &isymbol, const std::string &osymbol)
   { 
     // identity-to-identity gives wrong result if cross product is used
-    if (isymbol == osymbol && isymbol == hfst::internal_identity) {
+    if (isymbol == osymbol && isymbol == std::string(INTERNAL_IDENTITY)) {
       return define_transducer(isymbol);
     }
     return fsm_cross_product( fsm_symbol(const_cast<char*>(isymbol.c_str())), 
@@ -399,9 +399,9 @@ namespace hfst { namespace implementations {
     /* Conversion to HfstBasicTransducer is now used instead. */
   fsm * FomaTransducer::insert_freely(fsm * t, const StringPair &symbol_pair)
   {
-    const char * epsilon = internal_epsilon.c_str();
+    const char * epsilon = INTERNAL_EPSILON;
     char * epsilon_marker = strdup("@_EPSILON_SYMBOL_MARKER_@");
-    const char * identity = internal_identity.c_str();
+    const char * identity = INTERNAL_IDENTITY;
     fsm * eps_marked = 
       fsm_substitute_symbol(t, const_cast<char*>(epsilon), 
                 epsilon_marker);
@@ -705,9 +705,9 @@ namespace hfst { namespace implementations {
     }
     // it seems that the specail symbols are not always included, but foma
     // is still aware of them..
-    alpha.insert(internal_epsilon);
-    alpha.insert(internal_unknown);
-    alpha.insert(internal_identity);
+    alpha.insert(INTERNAL_EPSILON);
+    alpha.insert(INTERNAL_UNKNOWN);
+    alpha.insert(INTERNAL_IDENTITY);
     return alpha;
   }
     
@@ -715,11 +715,11 @@ namespace hfst { namespace implementations {
   (fsm *t, 
    const std::string &symbol)
   {
-    if (symbol == internal_epsilon)
+    if (symbol == std::string(INTERNAL_EPSILON))
       return 0;
-    if (symbol == internal_unknown)
+    if (symbol == std::string(INTERNAL_UNKNOWN))
       return 1;
-    if (symbol == internal_identity)
+    if (symbol == std::string(INTERNAL_IDENTITY))
       return 2;
     const char * c = symbol.c_str();
     for(struct sigma* p = t->sigma; p!=NULL; p=p->next)
