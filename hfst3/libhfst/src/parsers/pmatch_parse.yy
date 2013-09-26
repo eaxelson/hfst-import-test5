@@ -362,7 +362,7 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
       | REPLACE REPLACE_ARROW REPLACE MARKUP_MARKER
       {
    
-          HfstTransducer epsilon(hfst::internal_epsilon, hfst::pmatch::format);
+          HfstTransducer epsilon(INTERNAL_EPSILON, hfst::pmatch::format);
           HfstTransducerPair marks(*$3, epsilon);
           HfstTransducerPair tmpMappingPair(*$1, HfstTransducer(hfst::pmatch::format));
           HfstTransducerPair mappingPair = create_mapping_for_mark_up_replace( tmpMappingPair, marks );
@@ -372,7 +372,7 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
       }
       | REPLACE REPLACE_ARROW MARKUP_MARKER REPLACE
       {
-          HfstTransducer epsilon(hfst::internal_epsilon, hfst::pmatch::format);
+          HfstTransducer epsilon(INTERNAL_EPSILON, hfst::pmatch::format);
           HfstTransducerPair marks(epsilon, *$4);
           HfstTransducerPair tmpMappingPair(*$1, HfstTransducer(hfst::pmatch::format));
           HfstTransducerPair mappingPair = create_mapping_for_mark_up_replace( tmpMappingPair, marks );
@@ -383,7 +383,7 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
       
 | LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED REPLACE_ARROW REPLACE
   {
-      HfstTransducer epsilon(hfst::internal_epsilon, hfst::pmatch::format);
+      HfstTransducer epsilon(INTERNAL_EPSILON, hfst::pmatch::format);
       //HfstTransducer mappingTr(epsilon);
       //mappingTr.cross_product(*$4);
       HfstTransducerPair mappingPair(epsilon, *$4);
@@ -442,7 +442,7 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
 {
     // std::cerr << "Mapping: \n" << *$1  << std::endl;
             
-    HfstTransducer epsilon(hfst::internal_epsilon, hfst::pmatch::format);
+    HfstTransducer epsilon(INTERNAL_EPSILON, hfst::pmatch::format);
             
     // std::cerr << "Epsilon: \n" << epsilon  << std::endl;
     $$ = new HfstTransducerPair(*$1, epsilon);
@@ -450,7 +450,7 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
 }
 | CENTER_MARKER REPLACE
 {
-    HfstTransducer epsilon(hfst::internal_epsilon, hfst::pmatch::format);
+    HfstTransducer epsilon(INTERNAL_EPSILON, hfst::pmatch::format);
     $$ = new HfstTransducerPair(epsilon, *$2);
     delete $2; 
 }
@@ -625,11 +625,11 @@ REGEXP8: REGEXP9 { }
     $$ = $2;
  }
 | CONTAINMENT REGEXP8 {
-    HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
-                                              hfst::internal_unknown,
+    HfstTransducer* left = new HfstTransducer(INTERNAL_UNKNOWN,
+                                              INTERNAL_UNKNOWN,
                                               hfst::pmatch::format);
-    HfstTransducer* right = new HfstTransducer(hfst::internal_unknown,
-                                               hfst::internal_unknown,
+    HfstTransducer* right = new HfstTransducer(INTERNAL_UNKNOWN,
+                                               INTERNAL_UNKNOWN,
                                                hfst::pmatch::format);
     right->repeat_star();
     left->repeat_star();
@@ -640,11 +640,11 @@ REGEXP8: REGEXP9 { }
     delete left;
  }
 | CONTAINMENT_ONCE REGEXP8 {
-    HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
-                                              hfst::internal_unknown,
+    HfstTransducer* left = new HfstTransducer(INTERNAL_UNKNOWN,
+                                              INTERNAL_UNKNOWN,
                                               hfst::pmatch::format);
-    HfstTransducer* right = new HfstTransducer(hfst::internal_unknown,
-                                               hfst::internal_unknown,
+    HfstTransducer* right = new HfstTransducer(INTERNAL_UNKNOWN,
+                                               INTERNAL_UNKNOWN,
                                                hfst::pmatch::format);
     right->repeat_star();
     left->repeat_star();
@@ -655,11 +655,11 @@ REGEXP8: REGEXP9 { }
     delete left;
  }
 | CONTAINMENT_OPT REGEXP8 {
-    HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
-                                              hfst::internal_unknown,
+    HfstTransducer* left = new HfstTransducer(INTERNAL_UNKNOWN,
+                                              INTERNAL_UNKNOWN,
                                               hfst::pmatch::format);
-    HfstTransducer* right = new HfstTransducer(hfst::internal_unknown,
-                                               hfst::internal_unknown,
+    HfstTransducer* right = new HfstTransducer(INTERNAL_UNKNOWN,
+                                               INTERNAL_UNKNOWN,
                                                hfst::pmatch::format);
     right->repeat_star();
     left->repeat_star();
@@ -711,8 +711,8 @@ REGEXP9: REGEXP10 { }
 
 REGEXP10: REGEXP11 { }
 | TERM_COMPLEMENT REGEXP10 {
-    HfstTransducer* any = new HfstTransducer(hfst::internal_identity,
-                                             hfst::internal_identity,
+    HfstTransducer* any = new HfstTransducer(INTERNAL_IDENTITY,
+                                             INTERNAL_IDENTITY,
                                              hfst::pmatch::format);
     $$ = & ( any->subtract(*$2));
     delete $2;
@@ -804,59 +804,59 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
     free($3);
  }
 | SYMBOL PAIR_SEPARATOR EPSILON_TOKEN {
-    $$ = new HfstTransducer($1, hfst::internal_epsilon, hfst::pmatch::format);
+    $$ = new HfstTransducer($1, INTERNAL_EPSILON, hfst::pmatch::format);
     free($1);
  }
 | SYMBOL PAIR_SEPARATOR ANY_TOKEN {
-    $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::pmatch::format);
+    $$ = new HfstTransducer($1, INTERNAL_UNKNOWN, hfst::pmatch::format);
     free($1);
  }
 | EPSILON_TOKEN PAIR_SEPARATOR EPSILON_TOKEN {
-    $$ = new HfstTransducer(hfst::internal_epsilon, 
-                            hfst::internal_epsilon, hfst::pmatch::format);
+    $$ = new HfstTransducer(INTERNAL_EPSILON, 
+                            INTERNAL_EPSILON, hfst::pmatch::format);
  }
 | EPSILON_TOKEN PAIR_SEPARATOR SYMBOL {
-    $$ = new HfstTransducer(hfst::internal_epsilon, $3, hfst::pmatch::format);
+    $$ = new HfstTransducer(INTERNAL_EPSILON, $3, hfst::pmatch::format);
     free($3);
  }
 | EPSILON_TOKEN PAIR_SEPARATOR ANY_TOKEN {
-    $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_unknown,
+    $$ = new HfstTransducer(INTERNAL_EPSILON, INTERNAL_UNKNOWN,
                             hfst::pmatch::format);
  }
 | ANY_TOKEN PAIR_SEPARATOR ANY_TOKEN {
-    $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
+    $$ = new HfstTransducer(INTERNAL_UNKNOWN, INTERNAL_UNKNOWN,
                             hfst::pmatch::format);
  }
 | ANY_TOKEN PAIR_SEPARATOR SYMBOL {
-    $$ = new HfstTransducer(hfst::internal_unknown, $3, hfst::pmatch::format);
+    $$ = new HfstTransducer(INTERNAL_UNKNOWN, $3, hfst::pmatch::format);
     free($3);
  }
 | ANY_TOKEN PAIR_SEPARATOR EPSILON_TOKEN {
-    $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_epsilon,
+    $$ = new HfstTransducer(INTERNAL_UNKNOWN, INTERNAL_EPSILON,
                             hfst::pmatch::format);
  }
 | SYMBOL PAIR_SEPARATOR_WO_RIGHT {
-    $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::pmatch::format);
+    $$ = new HfstTransducer($1, INTERNAL_UNKNOWN, hfst::pmatch::format);
     free($1);
  }
 | EPSILON_TOKEN PAIR_SEPARATOR_WO_RIGHT {
-    $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_unknown,
+    $$ = new HfstTransducer(INTERNAL_EPSILON, INTERNAL_UNKNOWN,
                             hfst::pmatch::format);
  }
 | ANY_TOKEN PAIR_SEPARATOR_WO_RIGHT {
-    $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
+    $$ = new HfstTransducer(INTERNAL_UNKNOWN, INTERNAL_UNKNOWN,
                             hfst::pmatch::format);
  }
 | PAIR_SEPARATOR_WO_LEFT SYMBOL {
-    $$ = new HfstTransducer(hfst::internal_unknown, $2, hfst::pmatch::format);
+    $$ = new HfstTransducer(INTERNAL_UNKNOWN, $2, hfst::pmatch::format);
     free($2);
  }
 | PAIR_SEPARATOR_WO_LEFT ANY_TOKEN {
-    $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
+    $$ = new HfstTransducer(INTERNAL_UNKNOWN, INTERNAL_UNKNOWN,
                             hfst::pmatch::format);
  }
 | PAIR_SEPARATOR_WO_LEFT EPSILON_TOKEN {
-    $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_epsilon,
+    $$ = new HfstTransducer(INTERNAL_UNKNOWN, INTERNAL_EPSILON,
                             hfst::pmatch::format);
  }
 | SYMBOL {
@@ -872,15 +872,15 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
     free($1);
  }
 | PAIR_SEPARATOR_SOLE {
-    $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
+    $$ = new HfstTransducer(INTERNAL_UNKNOWN, INTERNAL_UNKNOWN,
                             hfst::pmatch::format);
   }
 | EPSILON_TOKEN {
-    $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_epsilon,
+    $$ = new HfstTransducer(INTERNAL_EPSILON, INTERNAL_EPSILON,
                             hfst::pmatch::format);
   }
 | ANY_TOKEN {
-    $$ = new HfstTransducer(hfst::internal_identity,
+    $$ = new HfstTransducer(INTERNAL_IDENTITY,
                             hfst::pmatch::format);
   }
 | QUOTED_LITERAL {
@@ -908,9 +908,9 @@ INSERT: INS_LEFT SYMBOL RIGHT_PARENTHESIS {
 
 RIGHT_CONTEXT: RC_LEFT REPLACE RIGHT_PARENTHESIS {
     HfstTransducer * rc_entry = new HfstTransducer(
-        hfst::internal_epsilon, hfst::pmatch::RC_ENTRY_SYMBOL, hfst::pmatch::format);
+        INTERNAL_EPSILON, hfst::pmatch::RC_ENTRY_SYMBOL, hfst::pmatch::format);
     HfstTransducer * rc_exit = new HfstTransducer(
-        hfst::internal_epsilon, hfst::pmatch::RC_EXIT_SYMBOL, hfst::pmatch::format);
+        INTERNAL_EPSILON, hfst::pmatch::RC_EXIT_SYMBOL, hfst::pmatch::format);
     rc_entry->concatenate(*$2);
     rc_entry->concatenate(*rc_exit);
     $$ = rc_entry;
@@ -928,9 +928,9 @@ RIGHT_CONTEXT: RC_LEFT REPLACE RIGHT_PARENTHESIS {
 
 LEFT_CONTEXT: LC_LEFT REPLACE RIGHT_PARENTHESIS {
     HfstTransducer * lc_entry = new HfstTransducer(
-        hfst::internal_epsilon, hfst::pmatch::LC_ENTRY_SYMBOL, hfst::pmatch::format);
+        INTERNAL_EPSILON, hfst::pmatch::LC_ENTRY_SYMBOL, hfst::pmatch::format);
     HfstTransducer * lc_exit = new HfstTransducer(
-        hfst::internal_epsilon, hfst::pmatch::LC_EXIT_SYMBOL, hfst::pmatch::format);
+        INTERNAL_EPSILON, hfst::pmatch::LC_EXIT_SYMBOL, hfst::pmatch::format);
     lc_entry->concatenate($2->reverse());
     lc_entry->concatenate(*lc_exit);
     lc_entry->substitute("@PMATCH_ENTRY@", "@PMATCH_TMP@");
