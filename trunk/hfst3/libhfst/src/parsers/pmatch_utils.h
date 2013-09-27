@@ -25,13 +25,15 @@ extern ImplementationType format;
 extern bool verbose;
 
 struct PmatchUtilityTransducers;
-extern PmatchUtilityTransducers utils;
+//extern PmatchUtilityTransducers* utils;
 const std::string RC_ENTRY_SYMBOL = "@PMATCH_RC_ENTRY@";
 const std::string RC_EXIT_SYMBOL = "@PMATCH_RC_EXIT@";
 const std::string LC_ENTRY_SYMBOL = "@PMATCH_LC_ENTRY@";
 const std::string LC_EXIT_SYMBOL = "@PMATCH_LC_EXIT@";
 const std::string ENTRY_SYMBOL = "@PMATCH_ENTRY@";
 const std::string EXIT_SYMBOL = "@PMATCH_EXIT@";
+
+PmatchUtilityTransducers* get_utils();
 
 /**
  * @brief input handling function for flex that parses strings.
