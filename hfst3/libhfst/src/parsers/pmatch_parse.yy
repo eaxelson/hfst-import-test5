@@ -735,37 +735,37 @@ REGEXP11: REGEXP12 { }
     $$ = new HfstTransducer($2, tok, hfst::pmatch::format);
  }
 | ALPHA {
-    $$ = new HfstTransducer(*hfst::pmatch::utils.latin1_alpha_acceptor);
+    $$ = new HfstTransducer(*hfst::pmatch::get_utils()->latin1_alpha_acceptor);
  }
 | LOWERALPHA {
-    $$ = new HfstTransducer(*hfst::pmatch::utils.latin1_lowercase_acceptor);
+    $$ = new HfstTransducer(*hfst::pmatch::get_utils()->latin1_lowercase_acceptor);
  }
 | UPPERALPHA {
-    $$ = new HfstTransducer(*hfst::pmatch::utils.latin1_uppercase_acceptor);
+    $$ = new HfstTransducer(*hfst::pmatch::get_utils()->latin1_uppercase_acceptor);
  }
 | NUM {
-    $$ = new HfstTransducer(*hfst::pmatch::utils.latin1_numeral_acceptor);
+    $$ = new HfstTransducer(*hfst::pmatch::get_utils()->latin1_numeral_acceptor);
  }
 | PUNCT {
-    $$ = new HfstTransducer(*hfst::pmatch::utils.latin1_punct_acceptor);
+    $$ = new HfstTransducer(*hfst::pmatch::get_utils()->latin1_punct_acceptor);
  }
 | WHITESPACE {
-    $$ = new HfstTransducer(*hfst::pmatch::utils.latin1_whitespace_acceptor);
+    $$ = new HfstTransducer(*hfst::pmatch::get_utils()->latin1_whitespace_acceptor);
  }
 ;
 
 OPTCAP: OPTCAP_LEFT REGEXP11 RIGHT_PARENTHESIS {
-    $$ = hfst::pmatch::utils.optcap(* $2);
+    $$ = hfst::pmatch::get_utils()->optcap(* $2);
 }
 ;
 
 TOLOWER: TOLOWER_LEFT REGEXP11 RIGHT_PARENTHESIS {
-    $$ = hfst::pmatch::utils.tolower(* $2);
+    $$ = hfst::pmatch::get_utils()->tolower(* $2);
 }
 ;
 
 TOUPPER: TOUPPER_LEFT REGEXP11 RIGHT_PARENTHESIS {
-    $$ = hfst::pmatch::utils.toupper(* $2);
+    $$ = hfst::pmatch::get_utils()->toupper(* $2);
 }
 ;
 

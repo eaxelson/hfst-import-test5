@@ -54,8 +54,17 @@ size_t len;
 bool verbose;
 
 std::map<std::string, hfst::HfstTransducer> named_transducers;
-PmatchUtilityTransducers utils;
+PmatchUtilityTransducers* utils=NULL;
 
+PmatchUtilityTransducers*
+get_utils()
+{
+  if (utils == NULL) 
+    {
+      utils = new PmatchUtilityTransducers(); 
+    }
+  return utils;
+}
 
 int*
 get_n_to_k(const char* s)
