@@ -3281,15 +3281,15 @@ HfstTransducer get_flag_path_restriction(const StringSet &_1_flags,
   basic_restriction.add_transition
     (start_state,
      HfstBasicTransition(start_state,
-                         INTERNAL_IDENTITY,
-                         INTERNAL_IDENTITY,
+                         internal_identity,
+                         internal_identity,
                          0.0));
 
   basic_restriction.add_transition
     (seen_2_state,
      HfstBasicTransition(start_state,
-                         INTERNAL_IDENTITY,
-                         INTERNAL_IDENTITY,
+                         internal_identity,
+                         internal_identity,
                          0.0));
 
   // All _1_flags are allowed as long as no _2_flags with no
@@ -3718,8 +3718,8 @@ HfstTransducer &HfstTransducer::compose_intersect
       std::set<std::string> lexicon_alphabet = get_alphabet();
       HfstTokenizer tokenizer;
       tokenizer.add_multichar_symbol("@#@");
-      tokenizer.add_multichar_symbol(INTERNAL_EPSILON);
-      HfstTransducer wb(INTERNAL_EPSILON,"@#@",tokenizer,type);
+      tokenizer.add_multichar_symbol(internal_epsilon);
+      HfstTransducer wb(internal_epsilon,"@#@",tokenizer,type);
       HfstTransducer wb_copy(wb);
 
       // Add the word boundary symbol to the alphabet so harmonization
@@ -3745,12 +3745,12 @@ HfstTransducer &HfstTransducer::compose_intersect
     if (invert)
       { 
         harmonized_lexicon->invert(); 
-        harmonized_lexicon->substitute(StringPair("@#@",INTERNAL_EPSILON),
-                                       StringPair(INTERNAL_EPSILON,"@#@"));
+        harmonized_lexicon->substitute(StringPair("@#@",internal_epsilon),
+                                       StringPair(internal_epsilon,"@#@"));
       }
 
-    harmonized_lexicon->substitute(INTERNAL_IDENTITY,"||_IDENTITY_SYMBOL_||");
-    harmonized_lexicon->substitute(INTERNAL_UNKNOWN,"||_UNKNOWN_SYMBOL_||");
+    harmonized_lexicon->substitute(internal_identity,"||_IDENTITY_SYMBOL_||");
+    harmonized_lexicon->substitute(internal_unknown,"||_UNKNOWN_SYMBOL_||");
 
     if (v.size() == 1) 
     {
@@ -3761,8 +3761,8 @@ HfstTransducer &HfstTransducer::compose_intersect
       if (invert)
         { 
           rule_fst.invert(); 
-          rule_fst.substitute(StringPair(INTERNAL_EPSILON,"@#@"),
-                              StringPair("@#@",INTERNAL_EPSILON));
+          rule_fst.substitute(StringPair(internal_epsilon,"@#@"),
+                              StringPair("@#@",internal_epsilon));
         }
       
       // In case there is only onw rule, compose with that.
@@ -3791,8 +3791,8 @@ HfstTransducer &HfstTransducer::compose_intersect
         if (invert)
           { 
             first_rule_fst.invert(); 
-            first_rule_fst.substitute(StringPair(INTERNAL_EPSILON,"@#@"),
-                                      StringPair("@#@",INTERNAL_EPSILON));
+            first_rule_fst.substitute(StringPair(internal_epsilon,"@#@"),
+                                      StringPair("@#@",internal_epsilon));
           }
 
         HfstTransducer second_rule_fst = v.at(1);
@@ -3802,8 +3802,8 @@ HfstTransducer &HfstTransducer::compose_intersect
         if (invert)
           { 
             second_rule_fst.invert(); 
-            second_rule_fst.substitute(StringPair(INTERNAL_EPSILON,"@#@"),
-                                       StringPair("@#@",INTERNAL_EPSILON));
+            second_rule_fst.substitute(StringPair(internal_epsilon,"@#@"),
+                                       StringPair("@#@",internal_epsilon));
           }
 
         std::vector<implementations::ComposeIntersectRule*> rule_vector;
@@ -3827,8 +3827,8 @@ HfstTransducer &HfstTransducer::compose_intersect
             if (invert)
               { 
                 rule_fst.invert(); 
-                rule_fst.substitute(StringPair(INTERNAL_EPSILON,"@#@"),
-                                    StringPair("@#@",INTERNAL_EPSILON));
+                rule_fst.substitute(StringPair(internal_epsilon,"@#@"),
+                                    StringPair("@#@",internal_epsilon));
               }
         
             rules = new implementations::ComposeIntersectRulePair
@@ -3850,8 +3850,8 @@ HfstTransducer &HfstTransducer::compose_intersect
     
     delete harmonized_lexicon;
     
-    this->substitute("||_IDENTITY_SYMBOL_||",INTERNAL_IDENTITY);
-    this->substitute("||_UNKNOWN_SYMBOL_||",INTERNAL_UNKNOWN);
+    this->substitute("||_IDENTITY_SYMBOL_||",internal_identity);
+    this->substitute("||_UNKNOWN_SYMBOL_||",internal_unknown);
 
     if (convert_to_openfst)
       { this->convert(FOMA_TYPE); }

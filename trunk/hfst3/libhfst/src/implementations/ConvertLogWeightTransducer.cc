@@ -120,9 +120,9 @@ namespace hfst { namespace implementations
             std::string istring = inputsym->Find(arc.ilabel);
             std::string ostring = outputsym->Find(arc.olabel);
             if (arc.ilabel == 0)
-              istring = std::string(INTERNAL_EPSILON);
+              istring = std::string(internal_epsilon);
             if (arc.olabel == 0)
-              ostring = std::string(INTERNAL_EPSILON);
+              ostring = std::string(internal_epsilon);
             net->add_transition(origin, 
                                 HfstBasicTransition
                                 (target,
@@ -166,9 +166,9 @@ namespace hfst { namespace implementations
               std::string istring = inputsym->Find(arc.ilabel);
               std::string ostring = outputsym->Find(arc.olabel);
               if (arc.ilabel == 0)
-                istring = std::string(INTERNAL_EPSILON);
+                istring = std::string(internal_epsilon);
               if (arc.olabel == 0)
-                ostring = std::string(INTERNAL_EPSILON);
+                ostring = std::string(internal_epsilon);
               net->add_transition(origin, 
                                   HfstBasicTransition
                                   (target,
@@ -234,9 +234,9 @@ namespace hfst { namespace implementations
     state_map[0] = start_state;
     
     fst::SymbolTable st("");
-    st.AddSymbol(INTERNAL_EPSILON, 0);
-    st.AddSymbol(INTERNAL_UNKNOWN, 1);
-    st.AddSymbol(INTERNAL_IDENTITY, 2);
+    st.AddSymbol(internal_epsilon, 0);
+    st.AddSymbol(internal_unknown, 1);
+    st.AddSymbol(internal_identity, 2);
     
     // Go through all states
     unsigned int source_state=0;

@@ -136,9 +136,9 @@ namespace hfst { namespace implementations
       alphabet_before.insert(std::string(P->symbol));
       P = P->next;
     }
-    alphabet_before.insert(INTERNAL_EPSILON);
-    alphabet_before.insert(INTERNAL_UNKNOWN);
-    alphabet_before.insert(INTERNAL_IDENTITY);
+    alphabet_before.insert(internal_epsilon);
+    alphabet_before.insert(internal_unknown);
+    alphabet_before.insert(internal_identity);
 #endif // DEBUG_CONVERSION
 
     StringVector symbol_vector = FomaTransducer::get_symbol_vector(t);
@@ -254,9 +254,9 @@ namespace hfst { namespace implementations
 
 #ifdef DEBUG_CONVERSION
     StringSet alphabet_before = hfst_fsm->get_alphabet();
-    alphabet_before.erase(INTERNAL_EPSILON);
-    alphabet_before.erase(INTERNAL_UNKNOWN);
-    alphabet_before.erase(INTERNAL_IDENTITY);
+    alphabet_before.erase(internal_epsilon);
+    alphabet_before.erase(internal_unknown);
+    alphabet_before.erase(internal_identity);
 #endif // DEBUG_CONVERSION    
 
     struct fsm_construct_handle *h;

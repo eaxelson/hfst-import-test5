@@ -216,7 +216,7 @@ StringPairVector HfstTokenizer::tokenize
                                     jt->first));
           ++jt; }
       for ( ; jt != output_spv.end(); ++jt)
-        { spv.push_back(StringPair(INTERNAL_EPSILON,jt->first)); }
+        { spv.push_back(StringPair(internal_epsilon,jt->first)); }
     }
   else
     {
@@ -228,7 +228,7 @@ StringPairVector HfstTokenizer::tokenize
                                    jt->first));
           ++it; }
       for ( ; it != input_spv.end(); ++it)
-        { spv.push_back(StringPair(it->first,INTERNAL_EPSILON)); }
+        { spv.push_back(StringPair(it->first,internal_epsilon)); }
     }
   return spv;
 }

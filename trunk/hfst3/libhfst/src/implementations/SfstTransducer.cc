@@ -380,8 +380,8 @@ namespace hfst { namespace implementations {
     t->alphabet.clear();
     t->alphabet.utf8 = true;
     t->alphabet.add_symbol("<>", 0);
-    t->alphabet.add_symbol(INTERNAL_UNKNOWN, 1);
-    t->alphabet.add_symbol(INTERNAL_IDENTITY, 2);
+    t->alphabet.add_symbol(internal_unknown.c_str(), 1);
+    t->alphabet.add_symbol(internal_identity.c_str(), 2);
   }
 
   Transducer * SfstTransducer::create_empty_transducer(void)
@@ -615,7 +615,7 @@ namespace hfst { namespace implementations {
 
     // unknowns must be replaced with identities
     Transducer * tmp = retval;
-    retval = substitute(retval, INTERNAL_UNKNOWN, INTERNAL_IDENTITY);
+    retval = substitute(retval, internal_unknown, internal_identity);
     delete tmp;
 
     return retval; 
@@ -637,7 +637,7 @@ namespace hfst { namespace implementations {
 
     // unknowns must be replaced with identities
     Transducer * tmp = retval;
-    retval = substitute(retval, INTERNAL_UNKNOWN, INTERNAL_IDENTITY);
+    retval = substitute(retval, internal_unknown, internal_identity);
     delete tmp;
 
     return retval; }
@@ -652,7 +652,7 @@ namespace hfst { namespace implementations {
     t->enumerate_paths(paths);
 
     // paths contains vectors whose alphabet does not have special symbols
-    Transducer *foo = define_transducer(INTERNAL_EPSILON);
+    Transducer *foo = define_transducer(internal_epsilon);
     for (unsigned int i=0; i<(unsigned int)paths.size(); i++) {
       (paths[i])->alphabet.copy(t->alphabet);
       std::pair<Transducer*,Transducer*> harm = harmonize(paths[i],foo,false);
@@ -735,9 +735,9 @@ namespace hfst { namespace implementations {
         ostring = std::string(t->alphabet.write_char(uc));
 
       if (istring.compare("<>") == 0)
-        istring = std::string(INTERNAL_EPSILON);
+        istring = std::string(internal_epsilon);
       if (ostring.compare("<>") == 0)
-        ostring = std::string(INTERNAL_EPSILON);
+        ostring = std::string(internal_epsilon);
 
       spv.push_back(StringPair(istring, ostring));
     
@@ -849,9 +849,9 @@ namespace hfst { namespace implementations {
     std::string ostring 
       = t->alphabet.code2symbol(arc.label().upper_char());
     if (istring.compare("<>") == 0)
-      istring = std::string(INTERNAL_EPSILON);
+      istring = std::string(internal_epsilon);
     if (ostring.compare("<>") == 0)
-      ostring = std::string(INTERNAL_EPSILON);
+      ostring = std::string(internal_epsilon);
 
     path.second.push_back
       (StringPair(istring, ostring));
@@ -1132,7 +1132,7 @@ namespace hfst { namespace implementations {
     for ( SFST::Alphabet::CharMap::const_iterator it = cm.begin();
           it != cm.end(); it++ ) {
       if (strcmp(it->second, "<>") == 0)
-        s.insert(INTERNAL_EPSILON);
+        s.insert(internal_epsilon);
       else
         s.insert( std::string(it->second) );
     }

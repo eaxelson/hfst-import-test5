@@ -295,20 +295,20 @@ namespace hfst
       
       std::string leftm("@_LEFT_MARKER_@");
       std::string rightm("@_RIGHT_MARKER_@");
-      std::string epsilon(INTERNAL_EPSILON);
+      std::string epsilon(internal_epsilon);
 
       // HfstTransducer pi(alphabet, type);
 
       // Create the insert boundary transducer (.|<>:<L>|<>:<R>)*    
       StringPairSet pi1 = alphabet;
-      pi1.insert(StringPair(INTERNAL_EPSILON, leftm));
-      pi1.insert(StringPair(INTERNAL_EPSILON, rightm));
+      pi1.insert(StringPair(internal_epsilon, leftm));
+      pi1.insert(StringPair(internal_epsilon, rightm));
       HfstTransducer ibt(pi1, type, true);
 
       // Create the remove boundary transducer (.|<L>:<>|<R>:<>)*    
       StringPairSet pi2 = alphabet;
-      pi2.insert(StringPair(leftm, INTERNAL_EPSILON));
-      pi2.insert(StringPair(rightm, INTERNAL_EPSILON));
+      pi2.insert(StringPair(leftm, internal_epsilon));
+      pi2.insert(StringPair(rightm, internal_epsilon));
       HfstTransducer rbt(pi2, type, true);
 
       // Add the markers to the alphabet
@@ -587,7 +587,7 @@ namespace hfst
       HfstTransducer pi_star(alphabet, type, true);
       
       // center transducer
-      HfstTransducer l1(INTERNAL_EPSILON, type);
+      HfstTransducer l1(internal_epsilon, type);
       l1.concatenate(pi_star);
       l1.concatenate(mt);
       l1.concatenate(mapping);
@@ -610,7 +610,7 @@ namespace hfst
       for (HfstTransducerPairVector::const_iterator it = contexts.begin();
            it != contexts.end(); it++)
         {
-          HfstTransducer ct(INTERNAL_EPSILON, type);
+          HfstTransducer ct(internal_epsilon, type);
           ct.concatenate(pi_star);
           ct.concatenate(it->first);
           ct.concatenate(mt);          
@@ -628,7 +628,7 @@ namespace hfst
         HfstTransducer retval(alphabet, type, true);
         HfstTransducer tmp1(l1);
         tmp1.subtract(l2);
-        tmp1.substitute(marker,INTERNAL_EPSILON);
+        tmp1.substitute(marker,internal_epsilon);
         retval.subtract(tmp1);
         return retval;
       }
@@ -637,7 +637,7 @@ namespace hfst
         HfstTransducer retval(alphabet, type, true);
         HfstTransducer tmp1(l2);
         tmp1.subtract(l1);
-        tmp1.substitute(marker, INTERNAL_EPSILON);
+        tmp1.substitute(marker, internal_epsilon);
         retval.subtract(tmp1);
         return retval;
       }
@@ -648,13 +648,13 @@ namespace hfst
         HfstTransducer retval1(alphabet, type, true);
         HfstTransducer tmp1(l1);
         tmp1.subtract(l2);
-        tmp1.substitute(marker, INTERNAL_EPSILON);
+        tmp1.substitute(marker, internal_epsilon);
         retval1.subtract(tmp1);
 
         HfstTransducer retval2(alphabet, type, true);
         HfstTransducer tmp2(l2);
         tmp2.subtract(l1);
-        tmp2.substitute(marker, INTERNAL_EPSILON);
+        tmp2.substitute(marker, internal_epsilon);
         retval2.subtract(tmp2);
 
         return retval1.intersect(retval2);
