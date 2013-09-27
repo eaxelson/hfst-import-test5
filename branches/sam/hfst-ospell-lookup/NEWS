@@ -1,0 +1,52 @@
+======================
+ NEWS for hfst-ospell
+======================
+
+This file contains all noteworthy changes in HFST-ospell development between
+releases.  For full listing of changes see ChangeLog.
+
+Noteworthy changes in 0.2.4
+---------------------------
+
+* renamed the package hfstospell (from hfst-ospell), the previous rename caused
+  build issues.
+
+Noteworthy changes in 0.2.3
+---------------------------
+
+* fixed a bug that caused certain types of paths with flag diacritics not to
+  be accepted.
+
+Noteworthy changes in 0.2.2
+---------------------------
+
+* Memory and speed improvements; data structures for automaton changed
+
+* Tests and bug fixes for building
+
+Noteworthy changes in 0.2.1
+---------------------------
+
+* Added support for extracting zipped transducer collections to memory instead
+  of temporary files
+
+* Changed from libxml to libxml++ for XML parsing
+
+Noteworthy changes in 0.2.0
+---------------------------
+
+* Added support for zipped XML based transducer collection format.
+
+* Few new frontends for various experiments
+
+* Lots of metadata everywhere
+
+Noteworthy changes in 0.1.1
+---------------------------
+
+* Added autoconfiscation to avoid bugs like missing Makefile in tarball
+
+Noteworthy changes in 0.1
+-------------------------
+
+* First release
