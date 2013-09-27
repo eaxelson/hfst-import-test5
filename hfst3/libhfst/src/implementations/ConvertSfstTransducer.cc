@@ -103,7 +103,7 @@ namespace hfst { namespace implementations
         if (it->first != 0)
           alphabet_before.insert(std::string(it->second));
         else
-          alphabet_before.insert(INTERNAL_EPSILON);
+          alphabet_before.insert(internal_epsilon);
       }  
 #endif
 
@@ -158,8 +158,8 @@ namespace hfst { namespace implementations
     
     // Create an SFST transducer and insert HFST special symbols to its alphabet
     SFST::Transducer * t = new SFST::Transducer();
-    t->alphabet.add_symbol(INTERNAL_UNKNOWN, 1);
-    t->alphabet.add_symbol(INTERNAL_IDENTITY, 2);
+    t->alphabet.add_symbol(internal_unknown.c_str(), 1);
+    t->alphabet.add_symbol(internal_identity.c_str(), 2);
     
     // Copy the alphabet
     for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
@@ -174,7 +174,7 @@ namespace hfst { namespace implementations
     std::map<std::string, unsigned int> symbol_map = SfstTransducer::get_symbol_map(t);
     // Change from SFST's internal "<>" to HFST's "@_EPSILON_SYMBOL_@"
     symbol_map.erase("<>");
-    symbol_map[INTERNAL_EPSILON] = 0;
+    symbol_map[internal_epsilon] = 0;
     std::vector<unsigned int> harm =
       HfstTropicalTransducerTransitionData::get_reverse_harmonization_vector
       (symbol_map);

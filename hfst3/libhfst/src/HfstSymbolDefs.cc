@@ -19,42 +19,42 @@ namespace hfst {
 
 bool is_epsilon(std::string const & str)
 {
-  return str == std::string(INTERNAL_EPSILON);
+    return str == internal_epsilon;
 }
 
 bool is_unknown(std::string const & str)
 {
-  return str ==  std::string(INTERNAL_UNKNOWN);
+    return str == internal_unknown;
 }
 
 bool is_identity(std::string const & str)
 {
-  return str == std::string(INTERNAL_IDENTITY);
+    return str == internal_identity;
 }
 
 bool is_default(std::string const & str)
 {
-  return str == std::string(INTERNAL_DEFAULT);
+    return str == internal_default;
 }
 
 bool is_epsilon(const char * str)
 {
-  return std::string(str) == std::string(INTERNAL_EPSILON);
+  return std::string(str) == internal_epsilon;
 }
 
 bool is_unknown(const char * str)
 {
-  return std::string(str) == std::string(INTERNAL_UNKNOWN);
+  return std::string(str) == internal_unknown;
 }
 
 bool is_identity(const char * str)
 {
-  return std::string(str) == std::string(INTERNAL_IDENTITY);
+  return std::string(str) == internal_identity;
 }
 
 bool is_default(const char * str)
 {
-  return std::string(str) == std::string(INTERNAL_DEFAULT);
+  return std::string(str) == internal_default;
 }
 
   namespace symbols {

@@ -222,9 +222,9 @@ namespace hfst { namespace implementations
     }
 
     fst::SymbolTable st("");
-    st.AddSymbol(INTERNAL_EPSILON, 0);
-    st.AddSymbol(INTERNAL_UNKNOWN, 1);
-    st.AddSymbol(INTERNAL_IDENTITY, 2);
+    st.AddSymbol(internal_epsilon, 0);
+    st.AddSymbol(internal_unknown, 1);
+    st.AddSymbol(internal_identity, 2);
     
     // Copy the alphabet
     for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 

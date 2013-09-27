@@ -216,8 +216,8 @@ void get_states_and_symbols(
     if (harmonizer == NULL) {
         
         // 1) epsilon
-        string_symbol_map[INTERNAL_EPSILON] = symbol_table.size();
-        symbol_table.push_back(INTERNAL_EPSILON);
+        string_symbol_map[internal_epsilon] = symbol_table.size();
+        symbol_table.push_back(internal_epsilon);
         
         // 2) input symbols
         for (std::set<std::string>::iterator it = input_symbols->begin();
@@ -524,7 +524,7 @@ int main(int argc, char * argv[])
     basic.add_transition(1, hfst::HfstBasicTransition(2, "a", "a", 0));
     basic.add_transition(1, hfst::HfstBasicTransition(2, "a", "b", 0));
     basic.add_transition(0, hfst::HfstBasicTransition(
-                             2, "a", INTERNAL_EPSILON, 0));
+                             2, "a", hfst::internal_epsilon, 0));
     basic.set_final_weight(2, 0);
     hfst::HfstBasicTransducer basic_w(basic);
     basic_w.set_final_weight(2, 1.0);
