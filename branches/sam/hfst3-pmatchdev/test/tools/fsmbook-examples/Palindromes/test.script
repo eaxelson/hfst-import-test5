@@ -1,7 +1,0 @@
-#!/bin/bash
-
-for i in sfst openfst-tropical foma; do
-  echo "Testing" $i "..."
-  sh Palindromes.hfst.script $i
-  diff -q result expected_result && echo "TEST PASSED";
-done
