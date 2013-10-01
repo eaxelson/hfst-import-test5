@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS=std-options
 
-AM_CPPFLAGS= -Wno-deprecated -std=c99 # -D_MSC_VER -DWINDOWS 
+AM_CPPFLAGS= -Wno-deprecated -std=c99
 
 if WANT_MINGW
 AM_CPPFLAGS += -DWINDOWS
@@ -16,9 +16,9 @@ libfoma_la_SOURCES = int_stack.c define.c determinize.c apply.c \
 hfst_foma_LDADD = $(top_builddir)/back-ends/foma/libfoma.la
 
 if WANT_READLINE
-hfst_foma_LDFLAGS=-lreadline -lz 
+hfst_foma_LDFLAGS=-lreadline -lz
 else
-hfst_foma_LDFLAGS=-lz 
+hfst_foma_LDFLAGS=-lz
 endif
 
 if HAVE_TERMCAP
@@ -33,9 +33,10 @@ endif
 endif
 endif
 
-if CAN_FOMAWRAP
+if GENERATE_FOMA_WRAPPER
 bin_PROGRAMS=hfst_foma
 hfst_foma_SOURCES=foma.c stack.c iface.c lex.interface.c lex.cmatrix.c
+AM_CPPFLAGS += -DZLIB
 endif
 
 EXTRA_DIST=foma.h fomalibconf.h fomalib.h lexc.h regex.h 

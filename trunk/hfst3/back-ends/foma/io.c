@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include "foma.h"
-#ifndef WINDOWS
+#ifdef ZLIB
   #include "zlib.h"
 #else
 
@@ -55,24 +55,24 @@ struct io_buf_handle {
 
 struct io_buf_handle *io_init();
 void io_free(struct io_buf_handle *iobh);
-#ifndef WINDOWS // HFST addition
+#ifdef ZLIB // HFST addition
   static int io_gets(struct io_buf_handle *iobh, char *target);
   static size_t io_get_gz_file_size(char *filename);
   static size_t io_get_file_size(char *filename);
   static size_t io_get_regular_file_size(char *filename);
 #endif
 size_t io_gz_file_to_mem (struct io_buf_handle *iobh, char *filename);
-#ifndef WINDOWS // HFST addition
+#ifdef ZLIB // HFST addition
   int foma_net_print(struct fsm *net, gzFile *outfile);
 #endif
 struct fsm *io_net_read(struct io_buf_handle *iobh, char **net_name);
-#ifndef WINDOWS // HFST addition
+#ifdef ZLIB // HFST addition
   static inline int explode_line (char *buf, int *values);
 #endif
 
 // HFST addition; dummy implementations for non-static io functions 
 // that might be called outside io.c.
-#ifdef WINDOWS
+#ifndef ZLIB
 static void io_error() { 
   fprintf(stderr, "ERROR: functions in io.c omitted on Windows."); 
   exit(1); }
@@ -103,7 +103,9 @@ int write_prolog (struct fsm *net, char *filename) {
 #else
 
 // HFST addition
-#ifndef WINDOWS
+#ifdef WINDOWS
+#define LONG_LONG_SPECIFIER "%I64d"
+#else
 #define LONG_LONG_SPECIFIER "%lld"
 #endif
 
@@ -442,7 +444,7 @@ void io_free(struct io_buf_handle *iobh) {
     xxfree(iobh);
 }
 
-#endif // if not WINDOWS; HFST addition
+#endif // if zlib; HFST addition
 
 char *spacedtext_get_next_line(char **text) {
     char *t, *ret;
@@ -555,7 +557,7 @@ struct fsm *fsm_read_text_file(char *filename) {
     return(fsm_trie_done(th));
 }
 
-#ifndef WINDOWS // HFST addition
+#ifdef ZLIB // HFST addition
 
 int fsm_write_binary_file(struct fsm *net, char *filename) {
     gzFile *outfile;
@@ -942,7 +944,7 @@ int foma_net_print(struct fsm *net, gzFile *outfile) {
     return(1);
 }
 
-#endif // if not WINDOWS; HFST addition
+#endif // if not zlib; HFST addition
 
 int net_print_att(struct fsm *net, FILE *outfile) {
     struct fsm_state *fsm;
@@ -969,7 +971,7 @@ int net_print_att(struct fsm *net, FILE *outfile) {
     return(1);
 }
 
-#ifndef WINDOWS // HFST addition
+#ifdef ZLIB // HFST addition
 
 static size_t io_get_gz_file_size(char *filename) {
 
@@ -1038,7 +1040,7 @@ size_t io_gz_file_to_mem(struct io_buf_handle *iobh, char *filename) {
     return(size);
 }
 
-#endif // if not WINDOWS; HFST addition
+#endif // if not zlib; HFST addition
 
 char *file_to_mem(char *name) {
 

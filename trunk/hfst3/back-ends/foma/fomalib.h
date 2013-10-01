@@ -22,7 +22,7 @@ extern "C" {
 #include <inttypes.h>
 #include <string.h>
 
-#ifndef WINDOWS
+#ifdef ZLIB
 #include <zlib.h>
 #endif
 
@@ -303,7 +303,7 @@ FEXPORT int load_defined(char *filename);
 FEXPORT int save_defined();
 FEXPORT int save_stack_att();
 FEXPORT int write_prolog(struct fsm *net, char *filename);
-#ifndef WINDOWS // HFST addition
+#ifdef ZLIB // HFST addition
   FEXPORT int foma_net_print(struct fsm *net, gzFile *outfile);
 #endif
 

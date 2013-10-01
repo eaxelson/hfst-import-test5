@@ -463,14 +463,19 @@ AC_ARG_ENABLE([xfst2fst],
 AM_CONDITIONAL([WANT_XFST2FST], [test x$enable_xfst2fst != xno])
 
 
+# Check if zlib is available
 AC_CHECK_LIB([z], [main], [zlib_exists=yes], [zlib_exists=no])
-AM_CONDITIONAL([CAN_FOMAWRAP], [test "x$enable_xfst" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" != "xno"])
+# Check if foma wrapper is wanted and possible to generate 
+AM_CONDITIONAL([GENERATE_FOMA_WRAPPER], [test "x$enable_xfst" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" != "xno"])
+# The same as a variable..
+AS_IF([test "x$enable_xfst" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" != "xno"], [generate_foma_wrapper=yes], [generate_foma_wrapper=no])
 
-AS_IF([test "x$enable_xfst" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" == "xno"], [warn_about_missing_xfst=yes], [warn_about_missing_xfst=no])
-AS_IF([test "x$enable_xfst" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" != "xno"], [can_fomawrap=yes], [can_fomawrap=no])
+# Check if we have to warn the user for missing foma wrapper because zlib is not available 
+AS_IF([test "x$enable_xfst" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" == "xno"], [warn_about_missing_zlib=yes], [warn_about_missing_zlib=no])
 
-AM_COND_IF([CAN_FOMAWRAP], [], [AM_CONDITIONAL([WANT_XFST], [false])])
-AM_COND_IF([CAN_FOMAWRAP], [], [enable_xfst=no])
+# If foma wrapper is not wanted or possible to generate, set these conditionals/variables to 'no'
+AM_COND_IF([GENERATE_FOMA_WRAPPER], [], [AM_CONDITIONAL([WANT_XFST], [false])])
+AM_COND_IF([GENERATE_FOMA_WRAPPER], [], [enable_xfst=no])
 
 # Disable stress tests by default
 AC_ARG_ENABLE([stress-tests],
@@ -553,7 +558,7 @@ AS_IF([test "x$ac_cv_lib_sfst_main" == xno -a "x$ac_cv_lib_sfst1_main" == xno],
 AC_LANG_POP
 AC_LANG_PUSH([C])
 
-AM_COND_IF([CAN_FOMAWRAP], [AC_CHECK_LIB([z], [main], [], [AC_MSG_FAILURE([foma test failed because zlib.h was not found (--without-foma to disable)])])])
+AM_COND_IF([GENERATE_FOMA_WRAPPER], [AC_CHECK_LIB([z], [main], [], [AC_MSG_FAILURE([foma test failed because zlib.h was not found (--without-foma to disable)])])])
 
 AM_CONDITIONAL(HAVE_NCURSES,[false])
 AM_CONDITIONAL(HAVE_CURSES,[false])
@@ -752,7 +757,7 @@ AS_IF([test "x$enable_tagger" == "xno" -a "x$enable_mingw" == "xno"],
       [AC_MSG_WARN([hfst-train-tagger and hfst-tag are not enabled; you will not be able to train and use taggers; enable using --enable-tagger])])
 AS_IF([test "x$enable_calculate" == "xno"],
       [AC_MSG_WARN([hfst-calculate is not enabled; you will not be able to compile SFST-PL scripts; enable using --enable-calculate])])
-AS_IF([test "x$warn_about_missing_xfst" != "xno"],
+AS_IF([test "x$warn_about_missing_zlib" != "xno"],
       [AC_MSG_WARN([hfst-xfst was disabled because zlib was not found; you will not be able to compile XFST scripts])])
-AS_IF([test "x$can_fomawrap" == "xno" -a "x$warn_about_missing_xfst" == "xno"], 
+AS_IF([test "x$generate_foma_wrapper" == "xno" -a "x$warn_about_missing_zlib" == "xno"], 
       [AC_MSG_WARN([hfst-xfst is not enabled; you will not be able to compile XFST scripts; enable using --with-foma (--enable-xfst)])])
