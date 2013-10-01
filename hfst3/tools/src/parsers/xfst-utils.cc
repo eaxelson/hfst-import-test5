@@ -32,7 +32,7 @@
 
 #include <errno.h>
 
-#include "xfst-parser.h"
+#include "xfst-parser.hh"
 #include "xfst-utils.h"
 
 using std::string;

@@ -42,7 +42,7 @@ using std::ostringstream;
 
 #include "XfstCompiler.h"
 #include "xfst-utils.h"
-#include "xfst-parser.h"
+#include "xfst-parser.hh"
 
 #include "../HfstStrings2FstTokenizer.h"
 

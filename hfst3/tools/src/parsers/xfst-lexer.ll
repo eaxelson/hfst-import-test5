@@ -28,7 +28,7 @@ namespace hfst {
   class HfstTransducer;
 }
 
-#include "xfst-parser.h"
+#include "xfst-parser.hh"
 #include "xfst-utils.h"
 #include "XfstCompiler.h"
 
