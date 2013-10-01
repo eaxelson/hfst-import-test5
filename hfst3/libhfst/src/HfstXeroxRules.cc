@@ -400,19 +400,33 @@ namespace hfst
         TOK.add_multichar_symbol(rightMarker2);
         TOK.add_multichar_symbol(tmpMarker);
         TOK.add_multichar_symbol(markupMarker);
+        TOK.add_multichar_symbol( ".#.");
+
 
 
         HfstTransducerPairVector mappingPairVector( rule.get_mapping() );
-
         HfstTransducerPairVector ContextVector( rule.get_context() );
         ReplaceType replType( rule.get_replType() );
 
         ImplementationType type = mappingPairVector[0].first.get_type();
 
+        // Identity (normal)
+        HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+        HfstTransducer identity (identityPair);
+        identity.repeat_star().minimize();
+
+
         HfstTransducer mapping(type);
         for ( unsigned int i = 0; i < mappingPairVector.size(); i++ )
         {
             HfstTransducer oneMappingPair(mappingPairVector[i].first);
+
+           // printf("oneMappingPair left \n");
+           // oneMappingPair.write_in_att_format(stdout, 1);
+
+
+            //printf("oneMappingPair left \n");
+            //mappingPairVector[i].second.write_in_att_format(stdout, 1);
 
             // if it is markup rule, substitute epsilon in left mapping with marker
             if ( mappingPairVector[i].second.get_property("isMarkup") == "yes" )
@@ -421,6 +435,12 @@ namespace hfst
             }
 
             oneMappingPair.cross_product(mappingPairVector[i].second);
+
+
+           // printf("aftrer cross product \n");
+           //   oneMappingPair.minimize().write_in_att_format(stdout, 1);
+
+
 
             // if it is mark up rule
             if ( mappingPairVector[i].second.get_property("isMarkup") == "yes" )
@@ -442,22 +462,37 @@ namespace hfst
                 oneMappingPair = tmpForCompose;
                 oneMappingPair.remove_from_alphabet(markupMarker);
             }
+            // for removing .#. from the center
+            HfstTransducer identityWithoutBoundary(identity);
+            identityWithoutBoundary.insert_to_alphabet(".#.");
+            HfstTransducer removeHash(identityWithoutBoundary);
+            HfstTransducer boundary(".#.", TOK, type);
+            removeHash.concatenate(boundary).concatenate(identityWithoutBoundary).minimize();
+            //printf("removeHash \n");
+            //removeHash.write_in_att_format(stdout, 1);
+
+
+            //printf("oneMappingPair \n");
+            //oneMappingPair.write_in_att_format(stdout, 1);
+
+
             if ( i == 0 )
             {
-              mapping = oneMappingPair;
+                // remove .#. from the center
+                // center - (?* .#. ?*)
+                oneMappingPair.subtract(removeHash, false).minimize();
+                mapping = oneMappingPair;
             }
             else
             {
-              mapping.disjunct(oneMappingPair).minimize();
+                oneMappingPair.subtract(removeHash, false).minimize();
+                mapping.disjunct(oneMappingPair).minimize();
             }
         }
         //printf("mapping all after cross product \n");
         //mapping.write_in_att_format(stdout, 1);
 
-        // Identity (normal)
-        HfstTransducer identityPair = HfstTransducer::identity_pair( type );
-        HfstTransducer identity (identityPair);
-        identity.repeat_star().minimize();
+
 
         // In case of ? -> x replacement
         // If left side is empty, return identity transducer
@@ -568,6 +603,8 @@ namespace hfst
           if ( ContextVector[0].first.compare(epsilon) && ContextVector[0].second.compare(epsilon) )
           {
               identityExpanded.remove_from_alphabet(tmpMarker);
+              //printf("identityExpanded: \n");
+              //identityExpanded.minimize().write_in_att_format(stdout, 1);
               return identityExpanded;
           }
         }
@@ -1734,12 +1771,22 @@ namespace hfst
 
             retval.compose(tr).minimize();
 
+
+            //printf("first composition: \n");
+            //retval.write_in_att_format(stdout, 1);
+
             // compose with .#. (? - .#.)* .#.
             retval.compose(boundaryAnythingBoundary)
                   .minimize();
 
+            //printf("2. composition: \n");
+            //retval.write_in_att_format(stdout, 1);
+
             // compose with [.#.:0 | ? - .#.]*
             retval.compose(removeBoundary).minimize();
+
+            //printf("3. composition: \n");
+            //retval.write_in_att_format(stdout, 1);
 
             // bring back unknown symbols
             retval.substitute("@TMP_UNKNOWN@", "@_UNKNOWN_SYMBOL_@");
@@ -2161,8 +2208,14 @@ namespace hfst
 
         retval = removeMarkers( retval );
 
+       // printf("LM removeMarkers: \n");
+       // retval.write_in_att_format(stdout, 1);
+
         // deals with boundary symbol
         retval = applyBoundaryMark( retval );
+
+       // printf("LM applyBoundaryMark: \n");
+       // retval.write_in_att_format(stdout, 1);
 
         return retval;
       }
@@ -2659,9 +2712,13 @@ int main(int argc, char * argv[])
             // a+ -> x  a_a
             // also @-> and @>
             test2a( types[i] );
+
             // >@ ->@
             test2b( types[i] );
             test2c( types[i] );
+
+            // ? @-> a ... b;
+            test2d( types[i] );
 
             // testing unconditional replace with and without contexts
 
@@ -2700,7 +2757,6 @@ int main(int argc, char * argv[])
             test7d( types[i] );
             // ? -> x , a -> b
             test7e( types[i] );
-
 
             // markup parallel rules
             //test7e( types[i] );
