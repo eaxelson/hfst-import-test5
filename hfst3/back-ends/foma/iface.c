@@ -47,7 +47,7 @@ extern int g_med_limit ;
 extern int g_med_cutoff ;
 extern char *g_att_epsilon;
 
-#ifndef WINDOWS
+#ifdef ZLIB
 extern int foma_net_print(struct fsm *net, gzFile *outfile);
 #endif
 
@@ -1011,7 +1011,7 @@ void iface_save_stack(char *filename) {
         }
         printf("Writing to file %s.\n", filename);
         for (stack_ptr = stack_find_bottom(); stack_ptr->next != NULL; stack_ptr = stack_ptr->next) {
-#ifndef WINDOWS
+#ifdef ZLIB
             foma_net_print(stack_ptr->fsm, outfile);
 #endif
         }
