@@ -402,7 +402,6 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
       }
       | REPLACE REPLACE_ARROW REPLACE MARKUP_MARKER REPLACE
       {
-      
           HfstTransducerPair marks(*$3, *$5);
           HfstTransducerPair tmpMappingPair(*$1, HfstTransducer(hfst::xre::format));
           HfstTransducerPair mappingPair = create_mapping_for_mark_up_replace( tmpMappingPair, marks );
@@ -412,7 +411,6 @@ MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
       }
       | REPLACE REPLACE_ARROW REPLACE MARKUP_MARKER
       {
-   
           HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
           HfstTransducerPair marks(*$3, epsilon);
           HfstTransducerPair tmpMappingPair(*$1, HfstTransducer(hfst::xre::format));
