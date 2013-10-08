@@ -1,0 +1,25 @@
+# Execute this Makefile with GNU compatible make to recreate the test results
+# and paper for article titled
+# # `blah' in Proceedings of EACL 2014
+
+XELATEX=xelatex
+BIBTEX=bibtex
+
+.PHONY: articles clean
+
+# article
+articles: eacl2014-hyperminimization.pdf
+
+%.pdf: %.dot
+	dot -Tpdf -o$@ $<
+
+eacl2014-hyperminimization.pdf: eacl2014-hyperminimization.tex eacl2014-hyperminimization.bib
+	$(XELATEX) eacl2014-hyperminimization.tex
+	$(BIBTEX)  eacl2014-hyperminimization
+	$(XELATEX) eacl2014-hyperminimization.tex
+	$(XELATEX) eacl2014-hyperminimization.tex
+	$(XELATEX) eacl2014-hyperminimization.tex
+
+clean:
+	-rm -f eacl2014-hyperminimization.aux eacl2014-hyperminimization.bbl \
+		eacl2014-hyperminimization.log eacl2014-hyperminimization.blg
