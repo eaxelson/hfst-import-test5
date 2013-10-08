@@ -22,11 +22,10 @@ namespace hfst {
     extern unsigned int cr; // number of characters read
     extern std::set<unsigned int> positions; // positions of a given SYMBOL
     extern char * position_symbol;  // the given SYMBOL
-    extern bool symbol_read;
 } }
 
 // a macro that increments the number of characters read
-#define CR hfst::xre::cr += (unsigned int)strlen(yytext); hfst::xre::symbol_read = false;
+#define CR hfst::xre::cr += (unsigned int)strlen(yytext);
 
 extern int xrelex ( YYSTYPE * lvalp, yyscan_t scanner );
 
@@ -200,9 +199,9 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
     return READ_RE;
 }
 
-"[.#.]" { hfst::xre::cr += 5; hfst::xre::symbol_read = false; yylval->label = strdup(".#."); return SYMBOL; }
-"[.#." { hfst::xre::cr += 1; hfst::xre::symbol_read = false; unput('.'); unput('#'); unput('.'); return LEFT_BRACKET; }
-".#.]" { hfst::xre::cr += 3; hfst::xre::symbol_read = true; unput(']'); yylval->label = strdup(".#."); return SYMBOL; }
+"[.#.]" { hfst::xre::cr += 5; yylval->label = strdup(".#."); return SYMBOL; }
+"[.#." { hfst::xre::cr += 1; unput('.'); unput('#'); unput('.'); return LEFT_BRACKET; }
+".#.]" { hfst::xre::cr += 3; unput(']'); yylval->label = strdup(".#."); return SYMBOL; }
 "[." { CR; return LEFT_BRACKET_DOTTED; }
 ".]" { CR; return RIGHT_BRACKET_DOTTED; }
 "[" { CR; return LEFT_BRACKET; }
@@ -225,13 +224,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 
 "\""[^""]+"\"" {
     yylval->label = hfst::xre::parse_quoted(yytext);
-    if (hfst::xre::symbol_read) {
-      CR;
-      hfst::xre::symbol_read = true;
-      return QUOTED_LITERAL_CONT;
-    }
     CR;
-    hfst::xre::symbol_read = true;
     return QUOTED_LITERAL;
 }
 
@@ -251,15 +244,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
       }
     }
     yylval->label = hfst::xre::strip_percents(yytext);
-    if (hfst::xre::symbol_read) {
-      CR;
-      hfst::xre::symbol_read = true;
-      // fprintf(stderr, "returning SYMBOL_CONT '%s'...\n", yylval->label); // DEBUG
-      return SYMBOL_CONT;
-    }
     CR;
-    hfst::xre::symbol_read = true;
-    // fprintf(stderr, "returning SYMBOL '%s'...\n", yylval->label); // DEBUG
     return SYMBOL;
 }  
 
@@ -270,15 +255,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
       }
     }
     yylval->label = hfst::xre::strip_percents(yytext);
-    if (hfst::xre::symbol_read) {
-      CR;
-      hfst::xre::symbol_read = true;
-      // fprintf(stderr, "returning SYMBOL_CONT '%s'...\n", yylval->label); // DEBUG
-      return SYMBOL_CONT;
-    }
     CR;
-    hfst::xre::symbol_read = true;
-    // fprintf(stderr, "returning SYMBOL '%s'...\n", yylval->label); // DEBUG
     return SYMBOL;
 }  
 

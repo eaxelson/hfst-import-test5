@@ -2,6 +2,7 @@
 XFST="xfst -q"
 FOMA="foma -q"
 HFST_TOOL="../../../tools/src/parsers/hfst-xfst2fst"
+#HFST=$HFST_TOOL" -q"
 HFST=$HFST_TOOL" -q"
 SH="/bin/bash"
 
@@ -39,8 +40,14 @@ do
         # compile with xfst/foma..
         if [ "$example" = "FinnishOTProsody" -o \
             "$example" = "Lingala" -o \
+            "$example" = "DateParser" -o \
             "$example" = "YaleShooting" ]; then
-            echo "  compiling with foma (result from xfst will be too big).."
+            if [ "$example" = "DateParser" ] ; then
+                echo "  compiling with foma (result from xfst will not be equivalent"
+                echo "  because symbols enclosed in square brackets are not harmonized)"
+            else
+                echo "  compiling with foma (result from xfst will be too big)"
+            fi
             if ! ($FOMA -f xfst-scripts/$example.xfst.script > /dev/null 2> LOG); then
                 echo "failed, (maybe) exiting"
                 cat LOG
@@ -73,7 +80,7 @@ do
                 continue;
             fi
             echo "  compiling with hfst-xfst2fst using back-end format "$format".."
-            if ! ($HFST -f $format -F xfst-scripts/$example.xfst.script 2> LOG); then
+            if ! ($HFST -f $format -F xfst-scripts/$example.xfst.script); then # 2> LOG); then
                 echo "----- an error occurred in compilation, (maybe) exiting -----"
                 cat LOG;
                 # exit 1;
