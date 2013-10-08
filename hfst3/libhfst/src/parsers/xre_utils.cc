@@ -28,7 +28,6 @@ extern char * xreget_text(yyscan_t);
 namespace hfst { 
   namespace xre {
     extern unsigned int cr; // number of characters read, defined in XreCompiler.cc
-    bool symbol_read = false;
     bool allow_extra_text_at_end = false;
     extern std::string error_message;
   }
@@ -404,7 +403,6 @@ compile(const string& xre, map<string,HfstTransducer*>& defs,
     xrelex_init(&scanner);
     YY_BUFFER_STATE bs = xre_scan_string(startptr,scanner);
     
-    hfst::xre::symbol_read = false;
     int parse_retval = xreparse(scanner);
 
     xre_delete_buffer(bs,scanner);
@@ -451,7 +449,7 @@ compile_first(const string& xre, map<string,HfstTransducer*>& defs,
     bool tmp = hfst::xre::allow_extra_text_at_end;
     hfst::xre::allow_extra_text_at_end = true;
     hfst::xre::cr = 0;
-    hfst::xre::symbol_read = false;
+
     int parse_retval = xreparse(scanner);
     chars_read = hfst::xre::cr;
     hfst::xre::allow_extra_text_at_end = tmp;
