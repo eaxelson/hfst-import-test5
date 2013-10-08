@@ -118,7 +118,21 @@ handle_string_pair_entry(const string& upper, const string& lower,
     bool is_glossed = false;
     bool is_heavy = false;
     handle_string_entry_common(cont, gloss, &weight, &is_glossed, &is_heavy);
-    hfst::lexc::lexc_->addStringPairEntry(upper, lower, cont, weight);
+    // handle epsilon "0"
+    if (upper != "0" && lower != "0")
+    {
+       hfst::lexc::lexc_->addStringPairEntry(upper, lower, cont, weight);
+    }
+    else
+    {
+       std::string upper_(upper);
+       std::string lower_(lower);
+       if (upper == "0")
+         upper_ = std::string("");
+       if (lower == "0")
+         lower_ = std::string("");
+       hfst::lexc::lexc_->addStringPairEntry(upper_, lower_, cont, weight);
+    }
 }
 
 static
