@@ -54,12 +54,6 @@ for example in $examples;
 do
     echo "Testing "$example"..."
 
-    if [ "$example" = "EsperantoNounsAdjectivesAndVerbs" -o \
-        "$example" = "EsperantoNounsAndAdjectivesWithTags" ]; then
-        echo "  warning:  skipping test "$example" because hfst lexc cannot compile it correctly"
-        continue
-    fi
-
     if [ "$example" = "EsperantoAdjectives" -o \
         "$example" = "EsperantoNounsAdjectivesAndVerbs" -o \
         "$example" = "EsperantoNounsAndAdjectivesWithTags" -o \
@@ -276,9 +270,9 @@ done
 echo ""
 echo "**********"
 echo "All fsmbook tests that were performed passed."
-echo "Returning a skip value because some Esperanto tests are skipped. Also the result from DateParser test"
-echo "is compared with result from foma instead of xfst, because foma and xfst handle symbols that are"
-echo "enclosed in square brackets differently."
+echo "Returning a skip value because result from DateParser test is compared with result from foma"
+echo "instead of xfst, because foma and xfst handle symbols that are enclosed in square brackets"
+echo "differently."
 echo "**********"
 echo ""
 exit 77
