@@ -29,6 +29,8 @@ FOMA="foma -q"
 HFST=$HFST_TOOL" -q"
 SH="/bin/bash"
 
+compare_flags="-q"
+
 # location of hfst tools
 tooldir="../../../tools/src/"
 # back-end formats used in testing (common format must be listed first as it is used for comparison)    
@@ -52,13 +54,21 @@ for example in $examples;
 do
     echo "Testing "$example"..."
 
+    if [ "$example" = "EsperantoNounsAdjectivesAndVerbs" -o \
+        "$example" = "EsperantoNounsAndAdjectivesWithTags" ]; then
+        echo "  warning:  skipping test "$example" because hfst lexc cannot compile it correctly"
+        continue
+    fi
+
     if [ "$example" = "EsperantoAdjectives" -o \
         "$example" = "EsperantoNounsAdjectivesAndVerbs" -o \
         "$example" = "EsperantoNounsAndAdjectivesWithTags" -o \
         "$example" = "EsperantoNounsAndAdjectives" -o \
         "$example" = "EsperantoNouns" ]; then
-        echo "  skipping "$example" as it uses lexc that doesn't work at the moment.."
-        continue
+        # lexc produces a transducer that has flags
+        compare_flags="-q --eliminate-flags"
+    else
+        compare_flags="-q"
     fi
     
     # (1) If xfst solution exists,
@@ -99,6 +109,7 @@ do
                 cp expected-results/$example.prolog Result
             fi
         fi
+
         # and convert from prolog to openfst-tropical for comparing.
         if ! (cat Result | $tooldir/hfst-txt2fst --prolog -f $common_format > tmp && \
             mv tmp Result_from_xfst); then
@@ -130,7 +141,7 @@ do
                 echo "ERROR: in converting result from hfst prolog to binary format"
                 exit 1;
             fi
-            if ! ($tooldir/hfst-compare -q Result_from_xfst Result_from_hfst_xfst); then
+            if ! ($tooldir/hfst-compare $compare_flags Result_from_xfst Result_from_hfst_xfst); then
                 echo "FAIL: results from xfst and hfst-xfst2fst ("$format") are not equivalent, storing results in files:"
                 echo "    log/"$example.result_from_xfst_script_using_xfst_tool 
                 echo "    log/"$example.result_from_hfst_xfst_using_backend_format_$format
@@ -212,7 +223,7 @@ do
                 rm -f tmp_hfst tmp_xfst
                 continue
             fi
-            if ! ($tooldir/hfst-compare -q Result_from_xfst Result_from_hfst_script_$format); then
+            if ! ($tooldir/hfst-compare $compare_flags Result_from_xfst Result_from_hfst_script_$format); then
                 echo "  FAIL: Results from xfst and hfst scripts ("$format") differ in test "$example", storing results in files:"
                 echo "    log/"$example.result_from_xfst_script_using_xfst_tool 
                 echo "    log/"$example.result_from_hfst_script_using_backend_format_$format
@@ -235,7 +246,7 @@ do
             fi
 
             if ! [ "$format" = "$common_format" ]; then
-                if ! ($tooldir/hfst-compare -q Result_from_hfst_script_$common_format Result_from_hfst_script_$format); then
+                if ! ($tooldir/hfst-compare $compare_flags Result_from_hfst_script_$common_format Result_from_hfst_script_$format); then
                     echo -n "  FAIL: Results from hfst scripts ("$format" and "$common_format") differ in test "$example
                     echo ", storing results in files:"
                     echo "    log/"$example.result_from_hfst_script_using_backend_format_$format
@@ -265,8 +276,8 @@ done
 echo ""
 echo "**********"
 echo "All fsmbook tests that were performed passed."
-echo "Returning a skip value because Esperanto tests were skipped. Also the result from DateParser test"
-echo "was compared with result from foma instead of xfst, because foma and xfst handle symbols that are"
+echo "Returning a skip value because some Esperanto tests are skipped. Also the result from DateParser test"
+echo "is compared with result from foma instead of xfst, because foma and xfst handle symbols that are"
 echo "enclosed in square brackets differently."
 echo "**********"
 echo ""

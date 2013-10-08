@@ -867,6 +867,12 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_fclose(f, $2);
             free($2);
        }
+       | READ_LEXC NAMETOKEN SEMICOLON END_COMMAND {
+            FILE * f = hfst::xfst::xfst_fopen($2, "r");
+            hfst::xfst::xfst_->read_lexc(f);
+            hfst::xfst::xfst_fclose(f, $2);
+            free($2);
+       }
        | READ_LEXC NAMETOKEN_LIST CTRLD {
             hfst::xfst::xfst_->read_lexc(stdin);
        }

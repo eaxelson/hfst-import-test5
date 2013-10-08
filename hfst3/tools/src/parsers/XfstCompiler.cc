@@ -88,6 +88,7 @@ namespace xfst {
         use_readline_(false),
         read_interactive_text_from_stdin_(false),
         xre_(hfst::TROPICAL_OPENFST_TYPE),
+        lexc_(hfst::TROPICAL_OPENFST_TYPE),
         format_(hfst::TROPICAL_OPENFST_TYPE),
         verbose_(false),
         latest_regex_compiled(NULL)
@@ -124,6 +125,7 @@ namespace xfst {
         use_readline_(false),
         read_interactive_text_from_stdin_(false),
         xre_(impl),
+        lexc_(impl),
         format_(impl),
         verbose_(false),
         latest_regex_compiled(NULL)
@@ -3319,6 +3321,18 @@ namespace xfst {
   XfstCompiler::read_lexc(FILE* infile)
     {
       lexc_.parse(infile);
+      HfstTransducer * t = lexc_.compileLexical();
+      if (t == NULL)
+        {
+          fprintf(errorstream_, "error compiling file in lexc format\n");
+          xfst_fail();
+        }
+      else
+        {
+          MAYBE_MINIMIZE(t);
+          stack_.push(t);
+          print_transducer_info();
+        }
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
@@ -3432,6 +3446,7 @@ namespace xfst {
     {
       verbose_ = verbosity;
       xre_.set_verbosity(verbosity, stderr);
+      lexc_.setVerbosity(verbosity);
       return *this;
     }
   XfstCompiler&
