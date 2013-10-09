@@ -33,6 +33,8 @@ const std::string LC_EXIT_SYMBOL = "@PMATCH_LC_EXIT@";
 const std::string ENTRY_SYMBOL = "@PMATCH_ENTRY@";
 const std::string EXIT_SYMBOL = "@PMATCH_EXIT@";
 
+extern std::set<std::string> special_pmatch_symbols;
+
 PmatchUtilityTransducers* get_utils();
 
 /**
