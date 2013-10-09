@@ -55,6 +55,7 @@ bool verbose;
 
 std::map<std::string, hfst::HfstTransducer> named_transducers;
 PmatchUtilityTransducers* utils=NULL;
+std::set<std::string> special_pmatch_symbols;
 
 PmatchUtilityTransducers*
 get_utils()
@@ -167,6 +168,7 @@ get_Ins_transition(const char *s)
     rv = strcpy(rv, "@I.");
     rv = strcat(rv, s);
     rv = strcat(rv, "@");
+    special_pmatch_symbols.insert(rv);
     return rv;
 }
 
@@ -209,6 +211,7 @@ void add_end_tag(HfstTransducer * regex, std::string tag)
     HfstTransducer end_tag(hfst::internal_epsilon,
                            "@PMATCH_ENDTAG_" + tag + "@",
                            regex->get_type());
+    special_pmatch_symbols.insert("@PMATCH_ENDTAG_" + tag + "@");
     regex->concatenate(end_tag);
 }
 
@@ -370,6 +373,15 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     definitions.clear();
     inserted_transducers.clear();
     unsatisfied_insertions.clear();
+
+    special_pmatch_symbols.clear();
+    special_pmatch_symbols.insert(RC_ENTRY_SYMBOL);
+    special_pmatch_symbols.insert(RC_EXIT_SYMBOL);
+    special_pmatch_symbols.insert(LC_ENTRY_SYMBOL);
+    special_pmatch_symbols.insert(LC_EXIT_SYMBOL);
+    special_pmatch_symbols.insert(ENTRY_SYMBOL);
+    special_pmatch_symbols.insert(EXIT_SYMBOL);
+
     data = strdup(pmatch.c_str());
     startptr = data;
     len = strlen(data);
@@ -393,17 +405,32 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     if (pmatchnerrs != 0) {
         return retval;
     }
-    for (std::map<std::string, hfst::HfstTransducer*>::iterator it =
-             definitions.begin(); it != definitions.end(); ++it) {
-        // We keep TOP and any inserted transducers
-        if (it->first.compare("TOP") == 0 ||
-            inserted_transducers.count(it->first) != 0) {
-            retval.insert(std::pair<std::string, hfst::HfstTransducer*>(
-                              it->first,
-                              add_pmatch_delimiters(it->second)));
+    // Our helper for harmonizing all the networks' alphabets with
+    // each other
+    HfstTransducer dummy(format);
+    // We keep TOP and any inserted transducers
+    std::map<std::string, hfst::HfstTransducer *>::iterator defs_itr;
+    for (defs_itr = definitions.begin(); defs_itr != definitions.end();
+         ++defs_itr) {
+        if (defs_itr->first.compare("TOP") == 0 ||
+            inserted_transducers.count(defs_itr->first) != 0) {
+            // In order to avoid expanding special pmatch markers, insert
+            // them first
+            defs_itr->second->insert_to_alphabet(special_pmatch_symbols);
+            dummy.harmonize(*defs_itr->second);
         } else {
-            delete it->second;
+            delete defs_itr->second;
+            definitions.erase(defs_itr);
         }
+    }
+    // Now that dummy is harmonized with everything, we harmonize everything
+    // with dummy and insert them into the result
+    for(defs_itr = definitions.begin(); defs_itr != definitions.end();
+        ++defs_itr) {
+        dummy.harmonize(*defs_itr->second);
+        retval.insert(std::pair<std::string, hfst::HfstTransducer*>(
+                          defs_itr->first,
+                          add_pmatch_delimiters(defs_itr->second)));
     }
     return retval;
 }
