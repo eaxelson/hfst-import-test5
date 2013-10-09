@@ -283,14 +283,6 @@ An example:
     //  my_transducer_library_interface;
     //#endif
 
-    /* Harmonize transducers this and another. In harmonization, 
-       the symbol-to-number correspondencies of this transducer are recoded
-       so that they are equivalent to the ones used in transducer another.
-       Then the unknown and identity symbols are expanded
-       in both transducers. If this and \a another have type FOMA_TYPE, 
-       nothing is done, since foma takes care of harmonization. */
-    void harmonize(HfstTransducer &another);
-
     /* The same as harmonize but does not change \a another but
        returns a harmonized version of that. If this and \a another 
        have type FOMA_TYPE, NULL is returned. */
@@ -678,7 +670,17 @@ in \a ifile.
         (or rejected, if they end in a non-final state) by the transducer. */
     StringSet get_first_input_symbols() const;
 
-    /** \brief Explicitely insert \a symbol to the alphabet 
+    /** \brief Harmonize transducers this and another.
+
+       @note In harmonization, 
+       the symbol-to-number correspondencies of this transducer are recoded
+       so that they are equivalent to the ones used in transducer another.
+       Then the unknown and identity symbols are expanded
+       in both transducers. If this and \a another have type FOMA_TYPE, 
+       nothing is done, since foma takes care of harmonization. */
+    void harmonize(HfstTransducer &another);
+
+    /** \brief Explicitly insert \a symbol to the alphabet 
     of the transducer. 
 
     @note Usually this function is not needed since new symbols are
