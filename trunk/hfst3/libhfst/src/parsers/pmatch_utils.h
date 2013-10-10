@@ -10,6 +10,7 @@
 
 #include <map>
 #include <set>
+#include <time.h>
 #include "HfstTransducer.h"
 
 namespace hfst { namespace pmatch {
@@ -23,6 +24,7 @@ extern std::set<std::string> unsatisfied_insertions;
 extern HfstTransducer* last_compiled;
 extern ImplementationType format;
 extern bool verbose;
+extern clock_t timer;
 
 struct PmatchUtilityTransducers;
 //extern PmatchUtilityTransducers* utils;

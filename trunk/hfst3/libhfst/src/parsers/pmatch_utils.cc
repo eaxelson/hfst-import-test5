@@ -52,6 +52,7 @@ hfst::HfstTransducer* last_compiled;
 hfst::ImplementationType format;
 size_t len;
 bool verbose;
+clock_t timer;
 
 std::map<std::string, hfst::HfstTransducer> named_transducers;
 PmatchUtilityTransducers* utils=NULL;
@@ -388,6 +389,9 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     verbose = be_verbose;
 //    definitions = defs;
     format = impl;
+    if (hfst::pmatch::verbose) {
+        timer = clock();
+    }
     pmatchparse();
     free(startptr);
     data = 0;

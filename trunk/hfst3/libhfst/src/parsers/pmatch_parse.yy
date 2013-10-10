@@ -153,14 +153,18 @@ PMATCH: DEFINITION {
 
 DEFINITION: DEFINE SYMBOL REGEXP1 {
     if (hfst::pmatch::verbose) {
-        std::cerr << "Compiling " << $2 << "\n";
+        std::cerr << "compiling " << $2 << "\n";
     }
     $3->set_name($2);
     $3->minimize();
     $$ = new std::pair<std::string, hfst::HfstTransducer*>($2, $3);
     if (hfst::pmatch::verbose) {
-        std::cerr << "Total: ";
+        std::cerr << "total: ";
         hfst::pmatch::print_size_info($3);
+        double duration = (clock() - hfst::pmatch::timer) /
+            (double) CLOCKS_PER_SEC;
+        std::cerr << "done in " << duration  << " seconds\n";
+        hfst::pmatch::timer = clock();
         std::cerr << std::endl;
     }
  }
