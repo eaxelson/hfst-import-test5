@@ -11,6 +11,7 @@
 #include <map>
 #include <set>
 #include <time.h>
+#include <iomanip>
 #include "HfstTransducer.h"
 
 namespace hfst { namespace pmatch {
