@@ -60,6 +60,18 @@ char* parse_quoted(const char *s);
 int* get_n_to_k(const char* s);
 
 double get_weight(const char* s);
+ 
+/** 
+ * @brief If \a s is of form "<foo>", free \a s and return an escaped version
+ * of it: "@_<foo>_@". Else, return \a s.
+ */
+char* escape_enclosing_angle_brackets(char *s);
+
+/**
+ * @brief Substitute all symbols of form "@_<foo>_@" with "<foo>" in \a t and return \a t.
+ */
+HfstTransducer* unescape_enclosing_angle_brackets(HfstTransducer *t);
+
 /**
  * @brief compile new transducer
  */

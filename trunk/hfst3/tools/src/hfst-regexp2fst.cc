@@ -69,6 +69,7 @@ static bool logarithmic_weights=false;
 static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
 
 static bool harmonize=true;
+static bool harmonize_flags=false;
 
 void
 print_usage()
@@ -79,7 +80,8 @@ print_usage()
         "\n", program_name); 
         print_common_program_options(message_out);
         print_common_unary_program_options(message_out); 
-        fprintf(message_out, "String and format options:\n"
+        fprintf(message_out, 
+"String and format options:\n"
 "  -f, --format=FMT          Write result in FMT format\n"
 "  -j, --disjunct            Disjunct all regexps instead of transforming\n"
 "                            each regexp into a separate transducer\n"
@@ -90,7 +92,9 @@ print_usage()
 "  -l, --line                Input is line separated (default)\n"
 "  -S, --semicolon           Input is semicolon separated (weights not supported)\n"
 "  -e, --epsilon=EPS         Map EPS as zero.\n"
-"  -H, --do-not-harmonize    Do not expand '?' symbols.\n");
+"Harmonization:\n"
+"  -H, --do-not-harmonize    Do not expand '?' symbols.\n"
+"  -F, --harmonize-flags  Harmonize flag diacritics.\n");
         fprintf(message_out, "\n");
 
         fprintf(message_out, 
@@ -134,11 +138,12 @@ parse_options(int argc, char** argv)
           {"semicolon", no_argument, 0, 'S'},
           {"format", required_argument, 0, 'f'},
           {"do-not-harmonize", no_argument, 0, 'H'},
+          {"harmonize-flags", no_argument, 0, 'F'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "je:123lSf:H",
+                             HFST_GETOPT_UNARY_SHORT "je:123lSf:HF",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -176,6 +181,9 @@ parse_options(int argc, char** argv)
         case 'H':
             harmonize=false;
             break;
+        case 'F':
+          harmonize_flags=true;
+          break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -199,8 +207,9 @@ process_stream(HfstOutputStream& outstream)
   size_t len = 0;
   unsigned int line_count = 0;
   XreCompiler comp(output_format);
-  comp.set_verbosity(true, stderr);
+  comp.set_verbosity(verbose, stderr);
   comp.set_harmonization(harmonize);
+  comp.set_flag_harmonization(harmonize_flags);
   HfstTransducer disjunction(output_format);
 
   char delim = (line_separated)? '\n' : ';';  

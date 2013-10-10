@@ -16,24 +16,18 @@ using namespace hfst::implementations;
 
 #include "xre_utils.h"
 
-char* concat_and_free(char* s1, char *s2)
-{
-  std::string retval = std::string(s1) + std::string(s2);
-  free(s1);
-  free(s2);
-  return strdup(retval.c_str());
-}
-
 namespace hfst { 
   namespace xre {
     // number of characters read, used for scanning function definition xre for argument symbols
     extern unsigned int cr;
     extern bool harmonize_;
+    extern bool harmonize_flags_;
     extern bool allow_extra_text_at_end;
   }
 }
 
 using hfst::xre::harmonize_;
+using hfst::xre::harmonize_flags_;
 
 union YYSTYPE;
 class yy_buffer_state;
@@ -152,7 +146,6 @@ int xrelex ( YYSTYPE * , yyscan_t );
 %nonassoc <label> QUOTED_LITERAL
 %%
 
-
 XRE: REGEXP1 { } 
      | 
      { 
@@ -162,7 +155,10 @@ XRE: REGEXP1 { }
      }
      ;
 REGEXP1: REGEXP2 END_OF_EXPRESSION {
-      // std::cerr << "regexp1:regexp2 end of expr \n"<< std::endl; 
+      // std::cerr << "regexp1:regexp2 end of expr \n"<< std::endl;
+       // Symbols of form <foo> are not harmonized in xfst, that is why
+       // they are escaped as @_<foo>_@ and need to be unescaped finally.  
+       // hfst::xre::last_compiled = & hfst::xre::unescape_enclosing_angle_brackets($1)->minimize();
        hfst::xre::last_compiled = & $1->minimize();
        $$ = hfst::xre::last_compiled;
        if (hfst::xre::allow_extra_text_at_end) {
@@ -170,7 +166,10 @@ REGEXP1: REGEXP2 END_OF_EXPRESSION {
        }
    }
    | REGEXP2 END_OF_WEIGHTED_EXPRESSION {
-        //std::cerr << "regexp1:regexp2 end of wighted expr \n"<< std::endl; 
+        //std::cerr << "regexp1:regexp2 end of weighted expr \n"<< std::endl; 
+       // Symbols of form <foo> are not harmonized in xfst, that is why
+       // they are escaped as @_<foo>_@ and need to be unescaped finally.  
+        // hfst::xre::last_compiled = & hfst::xre::unescape_enclosing_angle_brackets($1)->minimize().set_final_weights($2);
         hfst::xre::last_compiled = & $1->minimize().set_final_weights($2);
         $$ = hfst::xre::last_compiled;
         if (hfst::xre::allow_extra_text_at_end) {
@@ -180,6 +179,9 @@ REGEXP1: REGEXP2 END_OF_EXPRESSION {
    | REGEXP2 {
    
         //std::cerr << "regexp1:regexp2\n"<< *$1 << std::endl; 
+       // Symbols of form <foo> are not harmonized in xfst, that is why
+       // they are escaped as @_<foo>_@ and need to be unescaped finally.  
+        // hfst::xre::last_compiled = & hfst::xre::unescape_enclosing_angle_brackets($1)->minimize();
         hfst::xre::last_compiled = & $1->minimize();
         $$ = hfst::xre::last_compiled;
    }
@@ -191,8 +193,18 @@ REGEXP2: REPLACE
             $$ = & $1->minimize();
           //  std::cerr << "regexp2:replace \n"<< std::endl; 
          }
-       | REGEXP2 COMPOSITION REPLACE {
-       	    
+       | REGEXP2 COMPOSITION REPLACE 
+       {
+        if ($1->has_flag_diacritics() || $3->has_flag_diacritics())
+          {
+            if (! harmonize_flags_) {
+                 hfst::xre::warn("warning: at least one of the composition arguments contains flag diacritics that are not harmonized\n");
+            }
+            else {
+                $1->harmonize_flag_diacritics(*$3);
+            }
+          }
+
             $$ = & $1->compose(*$3, harmonize_).minimize();
             delete $3;
         }
@@ -1088,6 +1100,12 @@ SYMBOL_OR_QUOTED: SYMBOL
      ;
 
 HALFARC: SYMBOL_OR_QUOTED
+     {
+       // Symbols of form <foo> are not harmonized in xfst, that is why
+       // they need to be escaped as @_<foo>_@.
+       // $$ = hfst::xre::escape_enclosing_angle_brackets($1); 
+       $$ = $1; 
+     }
      | EPSILON_TOKEN {
         $$ = strdup(hfst::internal_epsilon.c_str());
      }

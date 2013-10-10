@@ -114,6 +114,10 @@ class XreCompiler
   //!        Default is true,
   void set_harmonization(bool harmonize);
 
+  //! @brief Whether composition operator harmonizes the flags of its argument transducers.
+  //!        Default is false.
+  void set_flag_harmonization(bool harmonize_flags);
+
   //! @brief Whether warning messages are printed to \a file.
   //!        Default is false, If verbose==false, \a file is ignored.
   void set_verbosity(bool verbose, FILE * file);
