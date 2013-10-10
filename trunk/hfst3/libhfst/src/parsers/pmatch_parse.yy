@@ -152,19 +152,15 @@ PMATCH: DEFINITION {
 ;
 
 DEFINITION: DEFINE SYMBOL REGEXP1 {
-    if (hfst::pmatch::verbose) {
-        std::cerr << "compiling " << $2 << "\n";
-    }
     $3->set_name($2);
     $3->minimize();
     $$ = new std::pair<std::string, hfst::HfstTransducer*>($2, $3);
     if (hfst::pmatch::verbose) {
-        std::cerr << "total: ";
-        hfst::pmatch::print_size_info($3);
         double duration = (clock() - hfst::pmatch::timer) /
             (double) CLOCKS_PER_SEC;
-        std::cerr << "done in " << duration  << " seconds\n";
         hfst::pmatch::timer = clock();
+        std::cerr << "compiled " << $2 << " in " << duration << " seconds\n";
+        hfst::pmatch::print_size_info($3);
         std::cerr << std::endl;
     }
  }
@@ -871,7 +867,7 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
 | SYMBOL {
     if (hfst::pmatch::definitions.count($1) != 0) {
         if (hfst::pmatch::verbose) {
-            std::cerr << "Including " <<
+            std::cerr << "including " <<
                 hfst::pmatch::definitions[$1]->get_name() << " with ";
             hfst::pmatch::print_size_info(hfst::pmatch::definitions[$1]);
         }
