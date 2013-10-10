@@ -448,8 +448,8 @@ void print_size_info(HfstTransducer * net)
             ++arcs;
         }
     }
-    std::cerr << net->get_name() << " has " << states << " states and " <<
-        arcs << " arcs" << std::endl;;
+    std::cerr << states <<
+        " states and " << arcs << " arcs" << std::endl;
 }
 
 HfstTransducer * read_text(char * filename, ImplementationType type)
