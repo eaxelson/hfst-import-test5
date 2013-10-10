@@ -4,6 +4,7 @@ TESTS=test.sh
 endif
 
 EXTRA_DIST=test.sh \
+	angle_brackets.xfst angle_brackets.att \
 	compose_net.xfst compose_net.att \
 	concatenate_net.xfst concatenate_net.att \
 	union_net.xfst union_net.att \
