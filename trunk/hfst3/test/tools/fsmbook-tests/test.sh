@@ -40,7 +40,7 @@ common_format="openfst-tropical"
 
 # NOTE: FinnishNumerals depends on NumbersToNumerals, so they must be compiled in the right order.
 
-examples="BetterColaMachine BrazilianPortuguese1 BrazilianPortuguese2 DateParser EnglishNumerals "\
+examples="BetterColaMachine BrazilianPortuguese1 BrazilianPortuguese2 EnglishNumerals "\
 "EsperantoAdjectives EsperantoNounsAdjectivesAndVerbs EsperantoNounsAndAdjectivesWithTags "\
 "EsperantoNounsAndAdjectives EsperantoNouns FinnishOTProsody Lingala "\
 "MonishAnalysis MonishGuesserAnalyzer NumbersToNumerals PlusOrMinus FinnishNumerals "\
@@ -74,7 +74,7 @@ do
         if [ "$COMPILE_FROM_SCRATCH" = "true" ]; then
             if [ "$example" = "FinnishOTProsody" -o \
                 "$example" = "Lingala" -o \
-                "$example" = "DateParser" -o \
+                "$example" = "DatParser" -o \
                 "$example" = "YaleShooting" ]; then
                 if [ "$example" = "DateParser" ] ; then
                     echo "  compiling with foma (result from xfst will not be equivalent"
@@ -105,6 +105,7 @@ do
         fi
 
         # and convert from prolog to openfst-tropical for comparing.
+        cp Result Result.prolog
         if ! (cat Result | $tooldir/hfst-txt2fst --prolog -f $common_format > tmp && \
             mv tmp Result_from_xfst); then
             echo "ERROR: in converting result from xfst/foma to hfst format"
