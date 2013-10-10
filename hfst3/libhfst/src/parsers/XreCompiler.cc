@@ -86,6 +86,7 @@ if (definitions_.find(name) != definitions_.end())
 
 extern bool expand_definitions;
 extern bool harmonize_;
+extern bool harmonize_flags_;
 extern bool verbose_;
 extern FILE * warning_stream;
 
@@ -97,6 +98,11 @@ void XreCompiler::set_expand_definitions(bool expand)
 void XreCompiler::set_harmonization(bool harmonize)
 {
   harmonize_=harmonize;
+}
+
+void XreCompiler::set_flag_harmonization(bool harmonize_flags)
+{
+  harmonize_flags_=harmonize_flags;
 }
 
 void XreCompiler::set_verbosity(bool verbose, FILE * file)

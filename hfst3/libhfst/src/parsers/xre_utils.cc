@@ -81,6 +81,7 @@ size_t len;
 
   bool expand_definitions=false;
   bool harmonize_=true;
+  bool harmonize_flags_=false;
   bool verbose_=false;
   FILE * warning_stream=NULL;
 
@@ -363,6 +364,56 @@ parse_quoted(const char *s)
     *r = '\0';
     free(quoted);
     return rv;
+}
+
+// If \a str is of form "@_<foo>_@", insert pair ("@_<foo>_@", "<foo>") into \a substitutions.
+static void insert_angle_bracket_substitutions
+(const std::string & str, hfst::HfstSymbolSubstitutions & substitutions)
+{
+  if (str.length() < 6)
+    return;
+  if (str.substr(0, 3) == "@_<" &&
+      str.substr(str.length()-3, 3) == ">_@")
+    {
+      std::string substituting_str = str.substr(2, str.length()-4);
+      substitutions.insert(StringPair(str, substituting_str));
+    }
+}
+
+char*
+escape_enclosing_angle_brackets(char *s)
+{
+  if (s[0] != '<')
+    return s;
+  unsigned int i=0;
+  while(s[i] != '\0')
+    {
+      i++;
+    }
+  i--;
+  if (s[i] != '>')
+    return s;
+  
+  std::string retval = std::string("@_") + std::string(s) + std::string("_@");
+  free(s);
+  return strdup(retval.c_str());
+}
+
+HfstTransducer*
+unescape_enclosing_angle_brackets(HfstTransducer *t)
+{
+  hfst::HfstSymbolSubstitutions substitutions;
+  StringSet alpha = t->get_alphabet();
+  for (StringSet::const_iterator it = alpha.begin();
+       it != alpha.end(); it++)
+    {
+      insert_angle_bracket_substitutions(*it, substitutions);
+    }
+  if (substitutions.size() == 0)
+    return t;
+
+  t->substitute(substitutions).minimize();
+  return t;
 }
 
 double
