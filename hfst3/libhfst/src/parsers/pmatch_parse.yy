@@ -156,6 +156,7 @@ DEFINITION: DEFINE SYMBOL REGEXP1 {
     $3->minimize();
     $$ = new std::pair<std::string, hfst::HfstTransducer*>($2, $3);
     if (hfst::pmatch::verbose) {
+        std::cerr << std::setiosflags(std::ios::fixed) << std::setprecision(2);
         double duration = (clock() - hfst::pmatch::timer) /
             (double) CLOCKS_PER_SEC;
         hfst::pmatch::timer = clock();

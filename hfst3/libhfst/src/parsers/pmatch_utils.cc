@@ -391,6 +391,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     format = impl;
     if (hfst::pmatch::verbose) {
         timer = clock();
+        std::cerr << std::endl;
     }
     pmatchparse();
     free(startptr);
