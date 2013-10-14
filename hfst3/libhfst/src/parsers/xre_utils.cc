@@ -692,6 +692,27 @@ xfst_label_to_transducer(const char* input, const char* output)
     fprintf(warning_stream, "%s", msg);
   }
 
+void warn_about_symbol(const char * symbol)
+{
+  if (symbol[0] != '@')
+    return;
+  if (symbol[1] != '_')
+    return;
+  unsigned int max_index=2;
+  while(symbol[max_index] != '\0') {
+    max_index++; }
+  max_index--;
+  if (max_index < 3)
+    return;
+  if (symbol[max_index] != '@')
+    return;
+  if (symbol[max_index-1] != '_')
+    return;
+  if (!verbose_)
+    return;
+  fprintf(warning_stream, "warning: symbol '%s' has a special meaning in hfst\n", symbol);
+}
+
 void warn_about_special_symbols_in_replace(HfstTransducer * t)
 {
   if (!verbose_)

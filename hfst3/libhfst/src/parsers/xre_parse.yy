@@ -169,8 +169,8 @@ REGEXP1: REGEXP2 END_OF_EXPRESSION {
         //std::cerr << "regexp1:regexp2 end of weighted expr \n"<< std::endl; 
        // Symbols of form <foo> are not harmonized in xfst, that is why
        // they are escaped as @_<foo>_@ and need to be unescaped finally.  
-        // hfst::xre::last_compiled = & hfst::xre::unescape_enclosing_angle_brackets($1)->minimize().set_final_weights($2);
-        hfst::xre::last_compiled = & $1->minimize().set_final_weights($2);
+        // hfst::xre::last_compiled = & hfst::xre::unescape_enclosing_angle_brackets($1)->minimize().set_final_weights($2, true);
+        hfst::xre::last_compiled = & $1->minimize().set_final_weights($2, true);
         $$ = hfst::xre::last_compiled;
         if (hfst::xre::allow_extra_text_at_end) {
           return 0;
@@ -837,6 +837,9 @@ REGEXP11: REGEXP12 { }
         | LEFT_BRACKET REGEXP2 RIGHT_BRACKET {
             $$ = & $2->minimize();
         }
+        | LEFT_BRACKET REGEXP2 RIGHT_BRACKET WEIGHT {
+            $$ = & $2->set_final_weights($4, true).minimize();
+        }
         | LEFT_PARENTHESIS REGEXP2 RIGHT_PARENTHESIS {
             $$ = & $2->optionalize();
         }
@@ -873,7 +876,7 @@ SYMBOL_LIST: HALFARC {
 
 REGEXP12: LABEL { }
         | LABEL WEIGHT { 
-            $$ = & $1->set_final_weights($2);
+            $$ = & $1->set_final_weights($2, true);
         }
         | READ_BIN { // todo: case that file does not exist
             hfst::HfstInputStream instream($1);
@@ -1104,6 +1107,7 @@ HALFARC: SYMBOL_OR_QUOTED
        // Symbols of form <foo> are not harmonized in xfst, that is why
        // they need to be escaped as @_<foo>_@.
        // $$ = hfst::xre::escape_enclosing_angle_brackets($1); 
+       hfst::xre::warn_about_symbol($1);
        $$ = $1; 
      }
      | EPSILON_TOKEN {

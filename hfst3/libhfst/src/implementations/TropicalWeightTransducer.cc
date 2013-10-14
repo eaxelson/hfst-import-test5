@@ -220,14 +220,24 @@ namespace hfst { namespace implementations
   }
 
   StdVectorFst * TropicalWeightTransducer::set_final_weights
-    (StdVectorFst * t, float weight)
+  (StdVectorFst * t, float weight, bool increment)
   {
     for (fst::StateIterator<StdVectorFst> siter(*t); 
          not siter.Done(); siter.Next())
       {
         StateId s = siter.Value();
         if ( t->Final(s) != TropicalWeight::Zero() )
-          t->SetFinal(s, weight);
+          {
+            if (increment)
+              {
+                float old_weight = t->Final(s).Value();
+                t->SetFinal(s, weight+old_weight);
+              }
+            else
+              {
+                t->SetFinal(s, weight);
+              }
+          }
       }
     return t;
   }
