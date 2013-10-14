@@ -934,7 +934,6 @@
          void write_in_prolog_format(FILE * file, const std::string & name, 
                                      bool write_weights=true) 
          {
-           (void)write_weights;
            unsigned int source_state=0;
            const char * identifier = name.c_str();
            // Print the name.
@@ -968,6 +967,8 @@
                            identifier, source_state, tr_it->get_target_state());
                    C data = tr_it->get_transition_data();
                    print_prolog_arc_symbols(file, data);
+                   if (write_weights) {
+                     fprintf(file, ", %f", data.get_weight()); }
                    fprintf(file, ").\n");
                  }
                source_state++;
@@ -978,7 +979,10 @@
                   = this->final_weight_map.begin();
                 it != this->final_weight_map.end(); it++)
              {
-               fprintf(file, "final(%s, %i).\n", identifier, it->first);
+               fprintf(file, "final(%s, %i", identifier, it->first);
+               if (write_weights) {
+                 fprintf(file, ", %f", get_final_weight(it->second)); }
+               fprintf(file, ").\n");
              }
          }
 
@@ -987,7 +991,6 @@
          void write_in_prolog_format(std::ostream & os, const std::string & name, 
                                      bool write_weights=true) 
          {
-           (void)write_weights;
            unsigned int source_state=0;
 
            // Print the name.
@@ -1020,6 +1023,8 @@
                    os << "arc(" << name << ", " << source_state << ", " << tr_it->get_target_state() << ", ";
                    C data = tr_it->get_transition_data();
                    print_prolog_arc_symbols(os, data);
+                   if (write_weights) {
+                     os << ", " << data.get_weight(); }
                    os << ")." << std::endl;
                  }
                source_state++;
@@ -1030,7 +1035,10 @@
                   = this->final_weight_map.begin();
                 it != this->final_weight_map.end(); it++)
              {
-               os << "final(" << name << ", " << it->first <<  ")." << std::endl;
+               os << "final(" << name << ", " << it->first;
+               if (write_weights) {
+                 os << ", " << it->second; }
+               os <<  ")." << std::endl;
              }
          }
          
@@ -1047,15 +1055,17 @@
            return true;
          }
 
-         // If \a str is of format .+)", change it to .+ and return true.
+         // If \a str is of format .+)\.", change it to .+ and return true.
          // Else, return false.
          static bool strip_ending_parenthesis_and_comma(std::string & str)
          {
+           //std::cerr << "strip_ending_paranthesis_and_comma" << std::endl;
            if (str.size() < 3)
              return false;
            if (str[str.length()-2] != ')' || str[str.length()-1] != '.')
              return false;
            str.erase(str.length()-2);
+           //std::cerr << "  ..returning true with str value '" << str << "'" << std::endl;
            return true;
          }
 
@@ -1163,6 +1173,7 @@
 
          static bool parse_prolog_arc_line(const std::string & line, HfstTransitionGraph & graph)
          {
+           // symbolstr can also contain the weight
            char namestr[100]; char sourcestr[100];
            char targetstr[100]; char symbolstr[100];
 
@@ -1170,42 +1181,112 @@
                           namestr, sourcestr, targetstr, symbolstr);
 
            std::string symbol(symbolstr);
+
+           //std::cerr << "prolog: scanned symbolstr: '" << symbolstr << "'" << std::endl; // DEBUG
+
            // strip the ending ")." from symbolstr
-           if (!strip_ending_parenthesis_and_comma(symbol))
-             return false;
+           if (!strip_ending_parenthesis_and_comma(symbol)) {
+             /*std::cerr << "prolog: stripping failed" << std::endl;*/ return false; } // DEBUG
+
+           //std::cerr << "#1" << std::endl;
 
            if (n != 4)
-             return false;
+             { /*std::cerr << "prolog: n != 4" << std::endl;*/ return false; } // DEBUG
            if (std::string(namestr) != graph.name)
-             return false;
+             { /*std::cerr << "prolog: wrong name" << std::endl; */ return false; } // DEBUG
+
+           //std::cerr << "#2" << std::endl;
 
            unsigned int source = atoi(sourcestr);
            unsigned int target = atoi(targetstr);
 
+           // handle the weight that might be included in symbol string
+           float weight = 0;
+           size_t last_double_quote = symbol.find_last_of('"');
+           size_t last_space = symbol.find_last_of(' ');
+
+           //std::cerr << "#3" << std::endl;
+
+           // at least two double quotes should be found
+           if (last_double_quote == std::string::npos)
+             { /*std::cerr << "prolog: last_double_quote == std::string::npos" << std::endl;*/ return false; } // DEBUG 
+
+           if (last_space == std::string::npos) {
+             //std::cerr << "#4" << std::endl; // no weight
+           }
+           else if (last_double_quote > last_space) {
+             //std::cerr << "#5" << std::endl; // no weight, last space is part of a symbol
+           }
+           else if (last_double_quote + 2 == last_space && last_space < symbol.size()-1) // + 2 because of the comma
+             {
+               std::istringstream buffer(symbol.substr(last_space+1));
+               buffer >> weight;
+               if (buffer.fail()) // a float could not be read
+                 { /*std::cerr << "prolog: buffer failed" << std::endl;*/ return false; } // DEBUG
+               symbol.resize(last_space-1); // get rid of the comma and weight
+               //std::cerr << "#6" << std::endl;
+             }
+           else {
+             /*std::cerr << "prolog: not valid symbol and weight" << std::endl;*/ return false; // not valid symbol and weight
+           }
+
            std::string isymbol = "";
            std::string osymbol = "";
+
+           //std::cerr << "prolog: get_prolog_arc_symbols is called with argument '" << symbol << "'" << std::endl; // DEBUG
+
            if (!get_prolog_arc_symbols(symbol, isymbol, osymbol))
              return false;
 
-           graph.add_transition(source, HfstTransition<C>(target, isymbol, osymbol, 0));
+           graph.add_transition(source, HfstTransition<C>(target, isymbol, osymbol, weight));
            return true;
          }
 
          static bool parse_prolog_final_line(const std::string & line, HfstTransitionGraph & graph)
          {
-           // 'final(NAME, number).'
+           // 'final(NAME, number).' or 'final(NAME, number, weight).'
            char namestr[100];
            char finalstr[100];
-           int n = sscanf(line.c_str(), "final(%[^,], %[^)]).", namestr, finalstr);
+           char weightstr[100];
+           float weight = 0;
 
-           if (n != 2)
+           unsigned int number_of_commas = 0;
+           size_t pos = line.find(',');
+           while (pos != std::string::npos)
+             {
+               number_of_commas++;
+               pos = line.find(',', pos+1);
+             }
+
+           if (number_of_commas == 1)
+             {
+               int n = sscanf(line.c_str(), "final(%[^,], %[^)]).", namestr, finalstr);
+               if (n != 2)
+                 {
+                   /*std::cerr << "parse_prolog_final_line: n != 2" << std::endl;*/ return false; // DEBUG
+                 }
+             }
+           else if (number_of_commas == 2)
+             {
+               int n = sscanf(line.c_str(), "final(%[^,], %[^,], %[^)]).", namestr, finalstr, weightstr);
+               if (n != 3)
+                 {
+                   /*std::cerr << "parse_prolog_final_line: n != 3" << std::endl;*/ return false; // DEBUG
+                 }
+               std::istringstream buffer(weightstr);
+               buffer >> weight;
+               if (buffer.fail())  { // a float could not be read
+                 /*std::cerr << "prolog: final line buffer failed" << std::endl;*/ return false; } // DEBUG
+             }
+           else
              {
                return false;
              }
+
            if (std::string(namestr) != graph.name)
              return false;
 
-           graph.set_final_weight(atoi(finalstr), 0);
+           graph.set_final_weight(atoi(finalstr), weight);
            return true;
          }
 
@@ -1329,6 +1410,9 @@
                  {
                    return retval;
                  }
+               
+               //std::cerr << "prolog: parsing: '" << linestr << "'" << std::endl; // DEBUG
+
                if (! (parse_prolog_arc_line(linestr, retval) ||
                       parse_prolog_final_line(linestr, retval) ||
                       parse_prolog_symbol_line(linestr, retval)) )
