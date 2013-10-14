@@ -8,12 +8,19 @@ BIBTEX=bibtex
 .PHONY: articles clean
 
 # article
-articles: eacl2014-hyperminimization.pdf
+articles: lrec2014-abstract.pdf eacl2014-hyperminimization.pdf
 
 %.pdf: %.dot
 	dot -Tpdf -o$@ $<
 
-eacl2014-hyperminimization.pdf: eacl2014-hyperminimization.tex eacl2014-hyperminimization.bib
+lrec2014-abstract.pdf: lrec2014-abstract.tex lrec2014.bib
+	$(XELATEX) lrec2014-abstract.tex
+	$(BIBTEX)  lrec2014-abstract
+	$(XELATEX) lrec2014-abstract.tex
+	$(XELATEX) lrec2014-abstract.tex
+	$(XELATEX) lrec2014-abstract.tex
+	
+eacl2014-hyperminimization.pdf: eacl2014-hyperminimization.tex lrec2014.bib
 	$(XELATEX) eacl2014-hyperminimization.tex
 	$(BIBTEX)  eacl2014-hyperminimization
 	$(XELATEX) eacl2014-hyperminimization.tex
@@ -22,4 +29,5 @@ eacl2014-hyperminimization.pdf: eacl2014-hyperminimization.tex eacl2014-hypermin
 
 clean:
 	-rm -f eacl2014-hyperminimization.aux eacl2014-hyperminimization.bbl \
-		eacl2014-hyperminimization.log eacl2014-hyperminimization.blg
+		eacl2014-hyperminimization.log eacl2014-hyperminimization.blg \
+		lrec2014-abstract.aux lrec2014-abstract.bbl lrec2014-abstract.log lrec2014-abstract.blg
