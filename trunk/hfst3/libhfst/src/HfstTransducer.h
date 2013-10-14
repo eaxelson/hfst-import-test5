@@ -1514,12 +1514,14 @@ t.substitute(&function);
     // --------------- Weight handling --------------- 
     // -----------------------------------------------
 
-    /** \brief Set the weights of all final states to \a weight. 
+    /** \brief Set the weights of all final states to \a weight.
+        \a increment defines whether the old weight is incremented by \a weight
+        or overwritten.
 
         If the HfstTransducer is of unweighted type 
         (#SFST_TYPE or #FOMA_TYPE), nothing is done.
     */
-    HfstTransducer &set_final_weights(float weight);
+    HfstTransducer &set_final_weights(float weight, bool increment=false);
 
     /** \brief Transform all transition and state weights as defined 
         in \a func. 

@@ -212,7 +212,7 @@ namespace implementations
       static StdVectorFst * subtract(StdVectorFst * t1,
                             StdVectorFst * t2);
       static StdVectorFst * set_weight(StdVectorFst * t,float f);
-      static StdVectorFst * set_final_weights(StdVectorFst * t, float weight);
+      static StdVectorFst * set_final_weights(StdVectorFst * t, float weight, bool increment=false);
       static StdVectorFst * transform_weights
         (StdVectorFst * t,float (*func)(float f));
       static StdVectorFst * push_weights

@@ -111,6 +111,8 @@ bool is_valid_function_call(const char * name, const std::vector<HfstTransducer>
 
  void warn(const char * msg);
  void warn_about_special_symbols_in_replace(HfstTransducer *t);
+ /* Warn about \a symbol if it is of form "@_.*_@" and verbose mode is on. */
+ void warn_about_symbol(const char * symbol);
 
 } } // namespaces
 #endif

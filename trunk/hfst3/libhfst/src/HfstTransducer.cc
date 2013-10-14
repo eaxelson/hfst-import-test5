@@ -3036,13 +3036,13 @@ HfstTransducer &HfstTransducer::substitute
 //
 // -----------------------------------------------------------------------
 
-HfstTransducer &HfstTransducer::set_final_weights(float weight)
+HfstTransducer &HfstTransducer::set_final_weights(float weight, bool increment)
 {
 #if HAVE_OPENFST
     if (this->type == TROPICAL_OPENFST_TYPE) {
     implementation.tropical_ofst  =
         this->tropical_ofst_interface.set_final_weights
-        (this->implementation.tropical_ofst, weight);
+      (this->implementation.tropical_ofst, weight, increment);
     return *this;
     }
     if (this->type == LOG_OPENFST_TYPE) {
