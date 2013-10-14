@@ -13,31 +13,14 @@
 % really have to
 
 \title{Optimising Morphological Analyser Transducers Using Morphological Structure
-and Automatically Induced Flag Diacritics}
-
-\iffalse
-\author{Senka Drobac \\
-Department of Modern Languages \\
-PO Box 24 \\
-00014 University of Helsinki \\
-  {\tt senka.drobac@helsinki.fi} \\\And
-  Tommi A Pirinen \\
-Departmet of Speech Sciences\\
-PO Box 9\\
-00014 University of Helsinki\\
-  {\tt tommi.pirinen@helsinki.fi} \\\And
-  Miikka Silfverberg \\
-  Department of Modern Languages \\
-    PO Box 24 \\
-    00014 University of Helsinki \\
-    {\tt miikka.silfverberg@helsinki.fi} \\}
-\fi
+and Automatically Induced Flag Diacritics - Abstract}
 
 \date{\today}
 
 \begin{document}
 \maketitle
-\begin{abstract}
+
+\section{Rationale}
 
     Flag diacritics enable optimising a finite-state networks by
     combining identical sub-graphs of its transition
@@ -47,19 +30,16 @@ PO Box 9\\
     discovering flag positions in morphological lexicons automatically
     based on the morpheme structure implicit in the language
     description. With this approach, we have gained significant
-    decrease in the size of finite-state networks (up to 96\%) without drastic
-    speed penalties on lookup of word-forms.
-
-\end{abstract}
+    decrease in the size of finite-state networks.
 
 \section{Introduction}
 
 Finite-state transducers are an established way of encoding
 morphological analysers for natural languages. Nevertheless,
-full-scale morphological analyzers can often grow to be too large for
+full-scale morphological analysers can often grow to be too large for
 use cases like spell checkers, which should have moderate memory
 footprint. Large transducers can be optimised by recognising
-equivalent sub-graphs and combining them using special symbols called
+equivalent sub-graphs and combining them by using special symbols called
 flag diacritics, to couple entrance points of the sub-graphs with the
 correct exit points.
 
@@ -87,18 +67,6 @@ This article seeks to address problems associated with flag diacritics
 by using an algorithm for inducing flag positions from the linguistic
 morpheme structure, implicitly present in lexical
 descriptions.
-
-The paper is organised as follows: In section~\ref{sec:background}, we
-introduce the flag diacritics and optimisation problems of
-finite-state automata. In section~\ref{sec:methods}, we describe our
-algorithm for automatic flag induction and modifications to standard
-algebraical operations, which allow operating on transducers
-containing flag diacritics.  In section~\ref{sec:data}, we briefly go
-through the existing language descriptions we use for testing. In
-section~\ref{sec:evaluation}, we show the effects of applying our
-algorithm to the size and lookup speed of the finite-state
-automata. Finally, in section~\ref{sec:discussion}, we evaluate the
-pros and cons of our approach and lay out future improvements.
 
 \section{Background}
 \label{sec:background}
@@ -199,6 +167,14 @@ represented using the pair of flags
 The transducer built from the morphological description in
 figure~\ref{fig:lexc-fin} is shown in figure~\ref{fig:lexc-fin-flag}.
 
+Since real-world morphological descriptions often contain empty, or nearly
+empty, continuation lexicons, inserting flags in those cases only
+increase size of the transducer, without gaining any
+benefits. Therefore, those continuation lexicons are recognized
+during compilation time and skipped when inserting corresponding flag
+diacritics.
+
+% Here should come part with automatically finding which flags not to insert (P1, P2, P3?)
 
 Lexicons that contain flag diacritics can be composed with other
 transducers which also contain flag diacritics without worrying about
@@ -225,6 +201,11 @@ the transducers that are obtained by compiling out flag diacritics
 from the original lexicon $L$ and the original rule $R$.
 
 
+% Add pruning flags!!!
+
+
+% Find out and discuss why tr with lots of flags get big after applying rules
+
 \section{Data}
 \label{sec:data}
 
@@ -242,65 +223,6 @@ available in the Tromsa's language repository.
  
 All operations with transducers were performed using Helsinki Finite
 State Technology tools~\cite{linden2011}.
-
-\section{Evaluation}
-\label{sec:evaluation}
-
-To evaluate the algorithm, we measure the proportional size gains that
-are achieved by the flags we introduce as compared to the equivalent
-transducer without the induced flags. Since introduction of flags
-always causes an overhead in the application time of the transducer,
-we also measure the average running speed of the transducer with our
-flags to get the trade-off ratios.
-
-In table~\ref{table:sizes} there are shown sizes of the original
-transducers compiled with regular lexc compiler, transducers compiled
-with new method that inserts flag diacritics and finally their ratio.
-
-\begin{table}
-    \centering
-    \begin{tabular}{|l|r|r|r|}
-        \hline
-        \bf Language & \bf Original & \bf With flags & \bf \% \\
-        \hline
-        \bf Greenlandic &   261074412   & 8400635 & 3,4\%  \\
-        \bf North Saami &   9152930     & 6789658 & 74\%  \\
-        \bf Erzya       &   3333669     & 2801339 & 84\%  \\
-        \bf Komi Zyryen &   2719971     & 2315384 & 85\%  \\
-        \bf South Saami &   3600902     & 3147213 & 87\%  \\
-        \bf Lule Saami  &   4381573     & 3639278 & 87\%  \\
-        \bf German      &   25836       & 32678   & 126\%  \\
-        \hline
-    \end{tabular}
-    \caption{Sizes of transducers without and with automatic flags (in bytes); Percentage shows size of the flagged transducer in comparison to the original
-    \label{table:sizes}}
-\end{table}
-
-In Table~\ref{table:speed} there are speed measures of optimized
-lookup tool. Before measurements, transducers were transformed to
-HFST's optimized lookup format and the test was done using the
-hfst-lookup tool. In the first column there are results when lookup
-was done with original transducer and the second colum shows results 
-with automatically flagged one. Although our results show that lookup 
-is much slower for transducers that contain automatic flags, even lookup speed
-of 1000 words per second is sufficient for various applications with transducers
-(like spelling correction).
-
-\begin{table}
-    \centering
-    \begin{tabular}{|l|r|r|}
-        \hline
-        \bf Language & \bf Original & \bf With flags \\
-        \hline
-        \bf Greenlandic & 58832 & 4663\\
-        \bf North Saami & 228347  & 1141 \\
-        \bf Erzya & 111394  & 3010\\
-        \bf Lule Saami & 1 21262 & 4352 \\
-        \hline
-    \end{tabular}
-    \caption{Lookup times for transducers without and with automatic flags (in words per second)
-    \label{table:speed}}
-\end{table}
 
 \begin{figure*}
     \includegraphics[width=\textwidth]{transducer.png}
@@ -325,13 +247,6 @@ morphological analyzer for Greenlandic. Since flag diacritics
 themselves take space in the transducer graph, this method did not
 offer great improvements for descriptions where the original
 transducer was small.
-
-Real-world morphological descriptions often contain empty, or nearly
-empty, continuation lexicons. Inserting flags in those cases only
-increase size of the transducer, without gaining any
-benefits. Therefore, those continuation lexicons should be recognized
-during compilation time and skipped when inserting corresponding flag
-diacritics.
 
 While requiring {\tt R} flag diacritics will always occur only once
 for every left continuation lexicon, the results have shown that, for
@@ -360,18 +275,13 @@ further reduce size of transition graphs.
 \label{sec:conclusion}
 
 In this article we showed that by using morphologically motivated
-flags we can improve the size of the large transducers while still
-keeping the processing speeds in reasonable range.  Automatically
+flags we can dramatically improve the size of the large transducers.  Automatically
 inserted flag diacritics would make manual optimization preformed by
 linguists unnecessary, which would result in more readable and easier
-to maintain linguistic descriptions.  \iffalse
-\section*{Acknowledgments}
-The research leading to these results has received funding from the
-European Commission’s 7th Framework Program under grant agreement
-n°238405 (CLARA).  \fi
+to maintain linguistic descriptions.
 
 \bibliographystyle{acl}
-\bibliography{eacl2014-hyperminimization.bib}
+\bibliography{lrec2014.bib}
 
 
 
