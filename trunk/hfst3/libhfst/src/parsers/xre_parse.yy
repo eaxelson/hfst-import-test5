@@ -1107,7 +1107,8 @@ HALFARC: SYMBOL_OR_QUOTED
        // Symbols of form <foo> are not harmonized in xfst, that is why
        // they need to be escaped as @_<foo>_@.
        // $$ = hfst::xre::escape_enclosing_angle_brackets($1); 
-       hfst::xre::warn_about_symbol($1);
+       hfst::xre::warn_about_hfst_special_symbol($1);
+       hfst::xre::warn_about_xfst_special_symbol($1);
        $$ = $1; 
      }
      | EPSILON_TOKEN {

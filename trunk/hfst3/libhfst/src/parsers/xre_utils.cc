@@ -692,7 +692,31 @@ xfst_label_to_transducer(const char* input, const char* output)
     fprintf(warning_stream, "%s", msg);
   }
 
-void warn_about_symbol(const char * symbol)
+void warn_about_xfst_special_symbol(const char * symbol)
+{
+  if (strcmp("all", symbol) == 0) {
+    if (verbose_) {
+      fprintf(warning_stream, "warning: symbol 'all' has no special meaning in hfst\n"); }
+    return;
+  }
+
+  if (symbol[0] != '<')
+    return;
+  unsigned int max_index=1;
+  while(symbol[max_index] != '\0') {
+    max_index++; }
+  max_index--;
+  if (max_index < 1)
+    return;
+
+  if (symbol[max_index] != '>')
+    return;
+  if (!verbose_)
+    return;
+  fprintf(warning_stream, "warning: '%s' is an ordinary symbol in hfst\n", symbol);
+}
+
+void warn_about_hfst_special_symbol(const char * symbol)
 {
   if (symbol[0] != '@')
     return;
@@ -710,7 +734,7 @@ void warn_about_symbol(const char * symbol)
     return;
   if (!verbose_)
     return;
-  fprintf(warning_stream, "warning: symbol '%s' has a special meaning in hfst\n", symbol);
+  fprintf(warning_stream, "warning: '%s' is not an ordinary symbol in hfst\n", symbol);
 }
 
 void warn_about_special_symbols_in_replace(HfstTransducer * t)
