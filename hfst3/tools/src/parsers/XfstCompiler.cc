@@ -144,6 +144,7 @@ namespace xfst {
         variables_["print-pairs"] = "OFF";
         variables_["print-sigma"] = "OFF";
         variables_["print-space"] = "OFF";
+        variables_["print-weight"] = "OFF";
         variables_["quit-on-fail"] = "OFF";
         variables_["quote-special"] = "OFF";
         variables_["random-seed"] = "ON";

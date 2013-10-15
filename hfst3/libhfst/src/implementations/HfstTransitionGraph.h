@@ -717,6 +717,22 @@
 
          }
 
+         static void write_weight(FILE * file, float weight)
+         {
+           //if (weight == 0) // avoid unnecessary 0.000000's
+           //  fprintf(file, "%i", 0); 
+           //else
+           fprintf(file, "%f", weight);
+         }
+
+         static void write_weight(std::ostream & os, float weight)
+         {
+           //if (weight == 0) // avoid unnecessary 0.000000's
+           //  os << 0; 
+           //else
+           os << weight;
+         }
+
          /* Replace all strings \a str1 in \a symbol with \a str2. */
          static void replace_all(std::string & symbol, 
                                  const std::string &str1,
@@ -968,7 +984,9 @@
                    C data = tr_it->get_transition_data();
                    print_prolog_arc_symbols(file, data);
                    if (write_weights) {
-                     fprintf(file, ", %f", data.get_weight()); }
+                     fprintf(file, ", ");
+                     write_weight(file, data.get_weight());
+                   }
                    fprintf(file, ").\n");
                  }
                source_state++;
@@ -980,8 +998,11 @@
                 it != this->final_weight_map.end(); it++)
              {
                fprintf(file, "final(%s, %i", identifier, it->first);
-               if (write_weights) {
-                 fprintf(file, ", %f", get_final_weight(it->second)); }
+               if (write_weights) 
+                 {
+                   fprintf(file, ", ");
+                   write_weight(file, it->second);
+                 }
                fprintf(file, ").\n");
              }
          }
@@ -1024,7 +1045,9 @@
                    C data = tr_it->get_transition_data();
                    print_prolog_arc_symbols(os, data);
                    if (write_weights) {
-                     os << ", " << data.get_weight(); }
+                     os << ", ";
+                     write_weight(os, data.get_weight()); 
+                   }
                    os << ")." << std::endl;
                  }
                source_state++;
@@ -1037,7 +1060,9 @@
              {
                os << "final(" << name << ", " << it->first;
                if (write_weights) {
-                 os << ", " << it->second; }
+                 os << ", ";
+                 write_weight(os, it->second);
+               }
                os <<  ")." << std::endl;
              }
          }
@@ -1059,13 +1084,11 @@
          // Else, return false.
          static bool strip_ending_parenthesis_and_comma(std::string & str)
          {
-           //std::cerr << "strip_ending_paranthesis_and_comma" << std::endl;
            if (str.size() < 3)
              return false;
            if (str[str.length()-2] != ')' || str[str.length()-1] != '.')
              return false;
            str.erase(str.length()-2);
-           //std::cerr << "  ..returning true with str value '" << str << "'" << std::endl;
            return true;
          }
 
@@ -1171,6 +1194,35 @@
            return true;
          }
 
+         static bool extract_weight(std::string & symbol, float & weight)
+         {
+           size_t last_double_quote = symbol.find_last_of('"');
+           size_t last_space = symbol.find_last_of(' ');
+
+           // at least two double quotes should be found
+           if (last_double_quote == std::string::npos)
+             { return false; }
+
+           if (last_space == std::string::npos) {
+             ; // no weight 
+           }
+           else if (last_double_quote > last_space) {
+             ; // no weight, last space is part of a symbol
+           }
+           else if (last_double_quote + 2 == last_space && last_space < symbol.size()-1) // + 2 because of the comma
+             {
+               std::istringstream buffer(symbol.substr(last_space+1));
+               buffer >> weight;
+               if (buffer.fail()) // a float could not be read
+                 { return false; }
+               symbol.resize(last_space-1); // get rid of the comma and weight
+             }
+           else {
+             return false; // not valid symbol and weight
+           }
+           return true;
+         }
+
          static bool parse_prolog_arc_line(const std::string & line, HfstTransitionGraph & graph)
          {
            // symbolstr can also contain the weight
@@ -1182,58 +1234,25 @@
 
            std::string symbol(symbolstr);
 
-           //std::cerr << "prolog: scanned symbolstr: '" << symbolstr << "'" << std::endl; // DEBUG
-
            // strip the ending ")." from symbolstr
-           if (!strip_ending_parenthesis_and_comma(symbol)) {
-             /*std::cerr << "prolog: stripping failed" << std::endl;*/ return false; } // DEBUG
-
-           //std::cerr << "#1" << std::endl;
+           if (!strip_ending_parenthesis_and_comma(symbol)) 
+             { return false; }
 
            if (n != 4)
-             { /*std::cerr << "prolog: n != 4" << std::endl;*/ return false; } // DEBUG
+             { return false; }
            if (std::string(namestr) != graph.name)
-             { /*std::cerr << "prolog: wrong name" << std::endl; */ return false; } // DEBUG
-
-           //std::cerr << "#2" << std::endl;
+             { return false; }
 
            unsigned int source = atoi(sourcestr);
            unsigned int target = atoi(targetstr);
 
            // handle the weight that might be included in symbol string
            float weight = 0;
-           size_t last_double_quote = symbol.find_last_of('"');
-           size_t last_space = symbol.find_last_of(' ');
-
-           //std::cerr << "#3" << std::endl;
-
-           // at least two double quotes should be found
-           if (last_double_quote == std::string::npos)
-             { /*std::cerr << "prolog: last_double_quote == std::string::npos" << std::endl;*/ return false; } // DEBUG 
-
-           if (last_space == std::string::npos) {
-             //std::cerr << "#4" << std::endl; // no weight
-           }
-           else if (last_double_quote > last_space) {
-             //std::cerr << "#5" << std::endl; // no weight, last space is part of a symbol
-           }
-           else if (last_double_quote + 2 == last_space && last_space < symbol.size()-1) // + 2 because of the comma
-             {
-               std::istringstream buffer(symbol.substr(last_space+1));
-               buffer >> weight;
-               if (buffer.fail()) // a float could not be read
-                 { /*std::cerr << "prolog: buffer failed" << std::endl;*/ return false; } // DEBUG
-               symbol.resize(last_space-1); // get rid of the comma and weight
-               //std::cerr << "#6" << std::endl;
-             }
-           else {
-             /*std::cerr << "prolog: not valid symbol and weight" << std::endl;*/ return false; // not valid symbol and weight
-           }
+           if (! extract_weight(symbol, weight))
+             { return false; }
 
            std::string isymbol = "";
            std::string osymbol = "";
-
-           //std::cerr << "prolog: get_prolog_arc_symbols is called with argument '" << symbol << "'" << std::endl; // DEBUG
 
            if (!get_prolog_arc_symbols(symbol, isymbol, osymbol))
              return false;
@@ -1262,21 +1281,17 @@
              {
                int n = sscanf(line.c_str(), "final(%[^,], %[^)]).", namestr, finalstr);
                if (n != 2)
-                 {
-                   /*std::cerr << "parse_prolog_final_line: n != 2" << std::endl;*/ return false; // DEBUG
-                 }
+                 { return false; }
              }
            else if (number_of_commas == 2)
              {
                int n = sscanf(line.c_str(), "final(%[^,], %[^,], %[^)]).", namestr, finalstr, weightstr);
                if (n != 3)
-                 {
-                   /*std::cerr << "parse_prolog_final_line: n != 3" << std::endl;*/ return false; // DEBUG
-                 }
+                 { return false; }
                std::istringstream buffer(weightstr);
                buffer >> weight;
-               if (buffer.fail())  { // a float could not be read
-                 /*std::cerr << "prolog: final line buffer failed" << std::endl;*/ return false; } // DEBUG
+               if (buffer.fail()) // a float could not be read
+                 { return false; }
              }
            else
              {
@@ -1411,8 +1426,6 @@
                    return retval;
                  }
                
-               //std::cerr << "prolog: parsing: '" << linestr << "'" << std::endl; // DEBUG
-
                if (! (parse_prolog_arc_line(linestr, retval) ||
                       parse_prolog_final_line(linestr, retval) ||
                       parse_prolog_symbol_line(linestr, retval)) )
@@ -1522,15 +1535,19 @@
                       <<  isymbol << "\t"
                       <<  osymbol;
 
-                   if (write_weights)
-                     os <<  "\t" << data.get_weight(); 
+                   if (write_weights) {
+                     os <<  "\t";
+                     write_weight(os, data.get_weight());
+                   }
                    os << "\n";
                  }
                if (is_final_state(source_state))
                  {
                    os <<  source_state;
-                   if (write_weights)
-                     os << "\t" <<  get_final_weight(source_state);
+                   if (write_weights) {
+                     os << "\t";
+                     write_weight(os, get_final_weight(source_state));
+                   }
                    os << "\n";
                  }
            source_state++;
@@ -1566,17 +1583,19 @@
                            isymbol.c_str(),
                            osymbol.c_str());
 
-                   if (write_weights)
-                     fprintf(file, "\t%f",
-                             data.get_weight()); 
+                   if (write_weights) {
+                     fprintf(file, "\t");
+                     write_weight(file, data.get_weight());
+                   } 
                    fprintf(file, "\n");
                  }
                if (is_final_state(source_state))
                  {
                    fprintf(file, "%i", source_state);
-                   if (write_weights)
-                     fprintf(file, "\t%f", 
-                             get_final_weight(source_state));
+                   if (write_weights) {
+                     fprintf(file, "\t"); 
+                     write_weight(file, get_final_weight(source_state));
+                   }
                    fprintf(file, "\n");
                  }
            source_state++;
@@ -2932,7 +2951,6 @@
            void set_state_at_distance(HfstState state, unsigned int distance,
                                       bool overwrite)
            {
-             //std::cerr << "set_state_at_distance(" << state << ", " << distance << ")...";
              // see that 'state' does not exceed the maximum state number given in initialization
              if (state > (distance_of_state.size() - 1))
                {

@@ -503,7 +503,7 @@ AM_CONDITIONAL([WANT_FSMBOOK_TESTS], [test x$enable_fsmbook_tests != xno])
 
 
 AS_IF([test "x$enable_fsmbook_tests" != "xno" -a "x$enable_xfst2fst" == "xno"],
-      [AC_MSG_FAILURE([fsmbook tests are not supported if hfst-xfst2fst is disabled; enable hfst-fst2fst (with --enable-xfst2fst) when using --enable-fsmbook-tests])])
+      [AC_MSG_FAILURE([fsmbook tests are not supported if hfst-xfst2fst is disabled; enable hfst-xfst2fst (with --enable-xfst2fst) when using --enable-fsmbook-tests])])
 
 AS_IF([test "x$enable_mingw" != "xno" -a "x$enable_tagger" != "xno"],
       [AC_MSG_FAILURE([hfst-train-tagger and hfst-tag are not supported in MinGW environment; disable tagger tools (with --disable-tagger) when using --enable-mingw])])

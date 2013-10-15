@@ -30,6 +30,9 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
         if ! $TOOLDIR/hfst-fst2txt -f pckimmo < cat$i > test.txt ; then
             exit 1
         fi
+        if ! $TOOLDIR/hfst-fst2txt -f prolog < cat$i > test.txt ; then
+            exit 1
+        fi
         rm test.txt
     fi
 fi

@@ -154,10 +154,15 @@ parse_options(int argc, char** argv)
           {
             format = PCKIMMO_TEXT;
           }
+        else if ((strcmp(optarg, "prolog") == 0) ||
+                 (strcmp(optarg, "Prolog") == 0))
+          {
+            format = PROLOG_TEXT;
+          }
         else
           {
             error(EXIT_FAILURE, 0, "Cannot parse %s as text format; Use one of "
-                  "att, pckimmo, dot", optarg);
+                  "att, pckimmo, dot, prolog", optarg);
           }
         break;
 #include "inc/getopt-cases-error.h"
@@ -549,6 +554,12 @@ process_stream(HfstInputStream& instream, FILE* outf)
       case PCKIMMO_TEXT:
         print_pckimmo(outf, *t);
         break;
+      case PROLOG_TEXT:
+        {
+          HfstBasicTransducer fsm(*t);
+          fsm.write_in_prolog_format(outf,t->get_name(),printw);
+          break;
+        }
       default:
         error(EXIT_FAILURE, 0, "Unknown print format");
       }
