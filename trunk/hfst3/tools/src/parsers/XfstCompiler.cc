@@ -100,6 +100,7 @@ namespace xfst {
         variables_["copyright-owner"] = "Copyleft (c) University of Helsinki";
         variables_["directory"] = "OFF";
         variables_["flag-is-epsilon"] = "OFF";
+        variables_["harmonize-flags"] = "OFF";
         variables_["hopcroft-min"] = "ON";
         variables_["minimal"] = "ON";
         variables_["name-nets"] = "OFF";
@@ -137,6 +138,7 @@ namespace xfst {
         variables_["copyright-owner"] = "Copyleft (c) University of Helsinki";
         variables_["directory"] = "OFF";
         variables_["flag-is-epsilon"] = "OFF";
+        variables_["harmonize-flags"] = "OFF";
         variables_["hopcroft-min"] = "ON";
         variables_["minimal"] = "ON";
         variables_["name-nets"] = "OFF";
@@ -2772,8 +2774,25 @@ namespace xfst {
             result->insert_freely(*t);
             break;
           case COMPOSE_NET:
-            result->compose(*t);
-            break;
+            {
+              if (result->has_flag_diacritics() || t->has_flag_diacritics())
+                {
+                  if (variables_["harmonize-flags"] == "OFF")
+                    {
+                      if (verbose_)
+                        {
+                          fprintf(warnstream_, "At least one of composition arguments contains "
+                                  "flag diacritics. Set harmonize-flags ON to harmonize them.\n");
+                        }
+                    }
+                  else
+                    {
+                      result->harmonize_flag_diacritics(*t);
+                    }
+                }
+              result->compose(*t);
+              break;
+            }
           case CONCATENATE_NET:
             result->concatenate(*t);
             break;
