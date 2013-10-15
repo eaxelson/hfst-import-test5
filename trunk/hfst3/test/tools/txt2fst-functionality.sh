@@ -20,6 +20,12 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
         if ! $TOOLDIR/hfst-compare -s test cat$i  ; then
             exit 1
         fi
+        if ! $TOOLDIR/hfst-txt2fst --prolog $FFLAG $srcdir/cat.prolog > test ; then
+            exit 1
+        fi
+        if ! $TOOLDIR/hfst-compare -s test cat$i  ; then
+            exit 1
+        fi
         rm test
     fi
 fi
