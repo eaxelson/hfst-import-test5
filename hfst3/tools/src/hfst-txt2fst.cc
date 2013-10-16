@@ -57,26 +57,24 @@ print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-           "Convert AT&T tabular format into a binary transducer\n"
+           "Convert AT&T or prolog format into a binary transducer\n"
            "\n", program_name);
 
     print_common_program_options(message_out);
     print_common_unary_program_options(message_out);
-    // fprintf(message_out, (tool-specific options and short descriptions)
-    fprintf(message_out, "Text format options:\n"
-            /*"  -n, --number        If numbers are used instead of symbol names\n"*/
+    fprintf(message_out, "Text and format options:\n"
             "  -f, --format=FMT    Write result using FMT as backend format\n"
-            "  -e, --epsilon=EPS   Interpret string EPS as epsilon\n"
+            "  -e, --epsilon=EPS   Interpret string EPS as epsilon in att format\n"
             "  -p, --prolog        Read prolog format instead of att\n" );
     fprintf(message_out, "\n");
     fprintf(message_out, 
-        "If OUTFILE or INFILE is missing or -,"
-        "standard streams will be used.\n"
+        "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
         "If FMT is not given, OpenFst's tropical format will be used.\n"
         "The possible values for FMT are { foma, openfst-tropical, openfst-log,\n"
-        "sfst, optimized-lookup-weighted, optimized-lookup-unweighted }\n"
-        "If EPS is not given, @0@ will be used\n\n"
-        "Space in transition symbols must be escaped as '@_SPACE_@'.\n"
+        "sfst, optimized-lookup-weighted, optimized-lookup-unweighted }.\n"
+        "If EPS is not given, @0@ will be used.\n\n"
+        "Space in transition symbols must be escaped as '@_SPACE_@' when using\n"
+        "att format."
         "\n"
         );
     fprintf(message_out, "\n");
