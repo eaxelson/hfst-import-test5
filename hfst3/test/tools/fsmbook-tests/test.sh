@@ -5,7 +5,7 @@ COMPILE_XFST_SCRIPT="true"
 COMPILE_HFST_SCRIPT="true"
 EXIT_IF_NOT_EQUIVALENT="true"
 
-HFST_TOOL="../../../tools/src/parsers/hfst-xfst2fst"
+HFST_TOOL="../../../tools/src/parsers/hfst-xfst"
 
 if [ "$COMPILE_XFST_SCRIPT" = "true" ]; then
     if ! (ls $HFST_TOOL > /dev/null); then
@@ -112,21 +112,21 @@ do
             exit 1;
         fi
 
-        # Also compile with hfst-xfst2fst using all back-end formats..
+        # Also compile with hfst-xfst using all back-end formats..
         if [ "$COMPILE_XFST_SCRIPT" == "true" ]; then
         for format in $backend_formats; 
         do
             if ! [ -x $HFST_TOOL ]; then
-                echo "  warning: skipping compilation with hfst-xfst2fst, assuming configured off"
+                echo "  warning: skipping compilation with hfst-xfst, assuming configured off"
                 continue;
             fi
             if (! $tooldir/hfst-format --list-formats | grep $format > /dev/null); then
-                echo "  skipping compilation with hfst-xfst2fst using back-end format "$format" as it is not available"
+                echo "  skipping compilation with hfst-xfst using back-end format "$format" as it is not available"
                 continue;
             fi
-            echo "  compiling with hfst-xfst2fst using back-end format "$format".."
+            echo "  compiling with hfst-xfst using back-end format "$format".."
             if ! ($HFST -f $format -F xfst-scripts/$example.xfst.script); then
-                echo "ERROR: compilation with hfst-xfst2fst failed"
+                echo "ERROR: compilation with hfst-xfst failed"
                 cat LOG;
                 exit 1;
             fi
@@ -137,7 +137,7 @@ do
                 exit 1;
             fi
             if ! ($tooldir/hfst-compare $compare_flags Result_from_xfst Result_from_hfst_xfst); then
-                echo "FAIL: results from xfst and hfst-xfst2fst ("$format") are not equivalent, storing results in files:"
+                echo "FAIL: results from xfst and hfst-xfst ("$format") are not equivalent, storing results in files:"
                 echo "    log/"$example.result_from_xfst_script_using_xfst_tool 
                 echo "    log/"$example.result_from_hfst_xfst_using_backend_format_$format
                 if ! [ -d log ]; then
@@ -271,9 +271,9 @@ done
 echo ""
 echo "**********"
 echo "All fsmbook tests that were performed passed."
-echo "Returning a skip value because result from DateParser test is compared with result from foma"
-echo "instead of xfst, because foma and xfst handle symbols that are enclosed in square brackets"
-echo "differently."
+#echo "Returning a skip value because result from DateParser test is compared with result from foma"
+#echo "instead of xfst, because foma and xfst handle symbols that are enclosed in square brackets"
+#echo "differently."
 echo "**********"
 echo ""
-exit 77
+#exit 77

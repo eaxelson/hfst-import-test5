@@ -29,7 +29,7 @@ if WANT_FOMA
   SUBDIRS += foma
 endif
 
-if WANT_XFST
+if WANT_FOMA_WRAPPER
   SUBDIRS += foma
 endif
 

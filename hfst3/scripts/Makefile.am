@@ -16,7 +16,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 if GENERATE_FOMA_WRAPPER
-bin_SCRIPTS = hfst-foma-wrapper.sh hfst-xfst ${top_srcdir}/back-ends/foma/hfst_foma
-EXTRA_DIST=hfst-xfst
-AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=hfst-foma-wrapper.sh hfst-xfst ${top_srcdir}/back-ends/foma/hfst_foma
+bin_SCRIPTS = hfst-foma-wrapper.sh hfst-foma ${top_srcdir}/back-ends/foma/hfst_foma
+EXTRA_DIST=hfst-foma
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=hfst-foma-wrapper.sh hfst-foma ${top_srcdir}/back-ends/foma/hfst_foma
 endif
