@@ -2,7 +2,7 @@
 
 #exit 77;
 
-XFST_TOOL="../hfst-xfst2fst -s --pipe-mode"
+XFST_TOOL="../hfst-xfst -s --pipe-mode"
 STRINGS2FST="../../hfst-strings2fst -S"
 TXT2FST="../../hfst-txt2fst"
 COMPARE="../../hfst-compare --quiet"
@@ -59,18 +59,18 @@ do
     done
 
     ## Test that using special symbols in replace rules yields an error message
-    if ! (echo 'regex a -> "@_foo_@";' | ../hfst-xfst2fst --pipe-mode -f $format > /dev/null 2> tmp && grep "warning:" tmp > /dev/null); then
+    if ! (echo 'regex a -> "@_foo_@";' | ../hfst-xfst --pipe-mode -f $format > /dev/null 2> tmp && grep "warning:" tmp > /dev/null); then
         echo "fail #5";
 	exit 1;
     fi
     # silent mode
-    if (echo 'regex a -> "@_foo_@";' | ../hfst-xfst2fst --pipe-mode -s -f $format > /dev/null 2> tmp && grep "warning:" tmp > /dev/null); then
+    if (echo 'regex a -> "@_foo_@";' | ../hfst-xfst --pipe-mode -s -f $format > /dev/null 2> tmp && grep "warning:" tmp > /dev/null); then
         echo "fail #6";
 	exit 1;
     fi
 
     ## Test that the transducer info is correct
-    if ! (echo 'regex [a|b|c|d|e] ([d|e|f|g]);' | ../hfst-xfst2fst --pipe-mode -f $format > tmp 2> /dev/null); then
+    if ! (echo 'regex [a|b|c|d|e] ([d|e|f|g]);' | ../hfst-xfst --pipe-mode -f $format > tmp 2> /dev/null); then
         echo "fail #7";
         exit 1;
     fi
@@ -105,7 +105,7 @@ do
 	    echo "skipping missing test for "$testfile"..."
 	    continue
 	fi
-	if ! (cat $testfile.xfst | ../hfst-xfst2fst --pipe-mode -q -f $format > result 2> /dev/null); then
+	if ! (cat $testfile.xfst | ../hfst-xfst --pipe-mode -q -f $format > result 2> /dev/null); then
 	    echo "ERROR: in compiling "$testfile".xfst"
 	    exit 1;
 	fi
@@ -126,7 +126,7 @@ do
 #	    echo "skipping missing test for "$testfile"..."
 #	    continue
 #	fi
-#	if ! (cat $testfile.xfst | ../hfst-xfst2fst -s -f $format 2> tmp > /dev/null); then
+#	if ! (cat $testfile.xfst | ../hfst-xfst -s -f $format 2> tmp > /dev/null); then
 #	    echo "ERROR: in compiling "$testfile".xfst"
 #	    exit 1;
 #	fi
@@ -146,7 +146,7 @@ do
 	    continue
 	fi
         # apply up/down leak to stdout with readline..
-	if ! (cat $testfile.xfst | ../hfst-xfst2fst --pipe-mode -f $format -s > tmp); then
+	if ! (cat $testfile.xfst | ../hfst-xfst --pipe-mode -f $format -s > tmp); then
 	    echo "ERROR: in compiling "$testfile.xfst
 	    exit 1;
 	fi
@@ -181,7 +181,7 @@ do
             if (test "$param" = "--pipe-mode" -a "$testfile" = "inspect_net"); then
                 continue
             fi
-	    if ! (cat $testfile.xfst | ../hfst-xfst2fst $param -f $format -s > tmp); then
+	    if ! (cat $testfile.xfst | ../hfst-xfst $param -f $format -s > tmp); then
 	    echo "ERROR: in compiling "$testfile.xfst" with parameters "$param
 	    exit 1;
 	    fi
@@ -214,7 +214,7 @@ do
 		echo "skipping missing test for "$testfile$testcase"..."
 		continue
 	    fi
-	    if ! (cat $testfile$testcase.xfst | ../hfst-xfst2fst --pipe-mode -s -f $format > tmp); then
+	    if ! (cat $testfile$testcase.xfst | ../hfst-xfst --pipe-mode -s -f $format > tmp); then
 		echo "ERROR: in compiling "$testfile$testcase.xfst
 		exit 1;
 	    fi
@@ -227,7 +227,7 @@ do
 
     for file in quit-on-fail.xfst assert.xfst
     do
-        if (cat $file | ../hfst-xfst2fst -s -f $format > tmp 2> /dev/null); then
+        if (cat $file | ../hfst-xfst -s -f $format > tmp 2> /dev/null); then
             echo "ERROR: in compiling "$file
             exit 1;
         fi

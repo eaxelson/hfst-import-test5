@@ -17,7 +17,7 @@
 
 SUBDIRS=test
 
-hfst_xfst2fst_SOURCES = xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc hfst-xfst2fst.cc $(HFST_COMMON_SRC)
+hfst_xfst_SOURCES = xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc hfst-xfst.cc $(HFST_COMMON_SRC)
 
 BUILT_SOURCES=xfst-parser.cc xfst-lexer.cc
 CLEANFILES=xfst-parser.cc xfst-lexer.cc xfst-parser.hh
@@ -40,8 +40,8 @@ else
 endif
 
 
-if WANT_XFST2FST
-MAYBE_XFST=hfst-xfst2fst
+if WANT_XFST
+MAYBE_XFST=hfst-xfst
 endif
 
 noinst_HEADERS = XfstCompiler.h xfst-utils.h xfst-parser.hh
@@ -51,9 +51,9 @@ HFST_COMMON_SRC=../hfst-program-options.cc ../hfst-commandline.cc ../hfst-tool-m
 bin_PROGRAMS=$(MAYBE_XFST)
 
 if WANT_READLINE
-  hfst_xfst2fst_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS) -lreadline
+  hfst_xfst_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS) -lreadline
 else
-  hfst_xfst2fst_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS)
+  hfst_xfst_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS)
 endif
 
 #xfst-parser.h: xfst-parser.cc
