@@ -69,7 +69,7 @@ print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-        "Print transducer in AT&T tabular format\n"
+        "Print transducer in AT&T, dot, prolog or pckimmo format\n"
         "\n", program_name);
 
     print_common_program_options(message_out);
@@ -87,7 +87,7 @@ print_usage()
           "Unless explicitly requested with option -w or -D, "
       "weights are printed\n" 
           "if and only if the transducer is in weighted format.\n"
-          "TFMT is one of {att, dot, pckimmo}\n"
+          "TFMT is one of {att, dot, prolog, pckimmo}.\n"
     );
     fprintf(message_out, "\n");
     print_report_bugs();
@@ -557,7 +557,10 @@ process_stream(HfstInputStream& instream, FILE* outf)
       case PROLOG_TEXT:
         {
           HfstBasicTransducer fsm(*t);
-          fsm.write_in_prolog_format(outf,t->get_name(),printw);
+          std::string namestr = t->get_name();
+          if (namestr == "")
+            namestr = "NO_NAME";
+          fsm.write_in_prolog_format(outf,namestr,printw);
           break;
         }
       default:

@@ -17,6 +17,6 @@
 
 if GENERATE_FOMA_WRAPPER
 bin_SCRIPTS = hfst-foma-wrapper.sh hfst-foma ${top_srcdir}/back-ends/foma/hfst_foma
-EXTRA_DIST=hfst-foma
+EXTRA_DIST=hfst-foma generate-cc-files.sh
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=hfst-foma-wrapper.sh hfst-foma ${top_srcdir}/back-ends/foma/hfst_foma
 endif

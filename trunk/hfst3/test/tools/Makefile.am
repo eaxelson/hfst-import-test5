@@ -19,7 +19,7 @@
 # prefer alphabetical order, except for core tests others depend upon
 # If compare doesn't function 99 % of other tests will fail anyways
 
-# test fsmbook-examples after establishing that simple tools work
+# test fsmbook tests after establishing that simple tools work
 SUBDIRS=. fsmbook-tests
 
 if WANT_STRESSTESTS
@@ -235,7 +235,9 @@ ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
 EXTRA_FILES=cat2dog.substitute cat.strings cat.txt cats_and_dogs.xre utf-8.strings latin-1.strings c_a_t.strings dos.strings not-contains-a.xre not-contains-a-comment-emptyline.xre parallel-left-arrow-multicom-emptyline.xre  parallel-left-arrow.xre cat.prolog
 
 # files needed for test programs
-EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS) $(TESTS) $(EXTRA_FILES) $(LEXC_TXTS) script.xfst
+EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS) $(TESTS) $(EXTRA_FILES) $(LEXC_TXTS) script.xfst lexc2fst-stress.sh lookup-stress.sh proc-stress.sh valgrind.sh lexc-functionality.sh \
+lexc-compiler-functionality.sh calculate-functionality.sh shuffle-functionality.sh
+
 
 valgrind: $(CHECK_DATA)
 	$(srcdir)/valgrind.sh $(srcdir)
