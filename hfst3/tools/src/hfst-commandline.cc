@@ -40,10 +40,10 @@
 #if HAVE_LANGINFO_H
 #  include <langinfo.h>
 #endif
-#if HAVE_READLINE_READLINE_H
+#if HAVE_READLINE // HAVE_READLINE_READLINE_H
 #  include <readline/readline.h>
 #endif
-#if HAVE_READLINE_HISTORY_H
+#if HAVE_READLINE // HAVE_READLINE_HISTORY_H
 #  include <readline/history.h>
 #endif
 
@@ -491,7 +491,7 @@ hfst_mkstemp(char* templ)
 {
 #ifdef WINDOWS
   error(EXIT_FAILURE, errno, 
-	"'int hfst_mkstemp(char * temp1)' not implemented for windows");
+        "'int hfst_mkstemp(char * temp1)' not implemented for windows");
 #else 
   errno = 0;
   int rv = mkstemp(templ);

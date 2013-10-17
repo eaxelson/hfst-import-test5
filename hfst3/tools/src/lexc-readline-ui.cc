@@ -29,10 +29,10 @@
 #include <cstring>
 #include <cctype>
 
-#if HAVE_READLINE_READLINE_H
+#if HAVE_READLINE // HAVE_READLINE_READLINE_H
 #  include <readline/readline.h>
 #endif
-#if HAVE_READLINE_HISTORY_H
+#if HAVE_READLINE // HAVE_READLINE_HISTORY_H
 #  include <readline/history.h>
 #endif
 
