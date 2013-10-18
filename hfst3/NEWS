@@ -5,6 +5,52 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.5.0
+---------------------------
+
+* a new tool hfst-xfst for compiling xfst scripts and using xfst commands
+  in interactive mode
+
+* wrapper for foma command line tool is renamed to hfst-foma
+
+* changes to the api
+
+  * made HfstTransducer::harmonize() a public member
+
+  * added a boolean argument to function 'set_final_weights' which defines
+    whether existing weights are summed with the new weight or overwritten
+
+  * updated cross product and apply boundary mark in replace rules
+
+* improvements to pmatch tool
+
+  * --verbose output gives neater and more fine-grained information
+
+  * some fixes to ?-expansion
+
+  * more checking and better error diagnostics in case of broken tags
+
+  * time individual compilations
+
+  * fixes to leftmost greediness and overlong input
+
+* changes to other tools
+
+  * added support for weights in prolog format, also added an option 
+    --prolog to hfst-fst2txt
+
+  * added option --eliminate-flags to hfst-compare
+
+  * added option --harmonize-flags to hfst-regex2fst
+
+  * lexc parser handles epsilon '0' correctly
+
+  * better support for quoted literals and marker '.#.' in xre parser
+
+  * added warning messages about hfst-special symbols of form
+    '@_.*_@' to xre parser that are printed in verbose mode
+
+
 Noteworthy changes in 3.4.6
 ---------------------------
 
@@ -438,3 +484,4 @@ Noteworthy changes in release 2.1
 ---------------------------------
 
 * hfst-twolc and hfst-compose-intersect understand # like xerox originals
+
