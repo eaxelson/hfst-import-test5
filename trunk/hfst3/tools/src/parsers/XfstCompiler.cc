@@ -593,16 +593,16 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::define(const char* name, const char* xre)
     {
-      if (hfst::xfst::nametoken_to_number(name) >= 0)
+      /*if (hfst::xfst::nametoken_to_number(name) >= 0)
         {
           fprintf(errorstream_, "Could not define variable, '%s' is not a valid name\n",
                   name);
-        }
+                  }*/
 
       // When calling this function, the regex \a indata should already have
       // been compiled into a transducer which should have been stored to
       // the variable latest_regex_compiled.
-      else if (latest_regex_compiled != NULL)
+      /*else*/ if (latest_regex_compiled != NULL)
         {
           bool was_defined = xre_.is_definition(name);
           if (!was_defined)
@@ -2207,9 +2207,21 @@ namespace xfst {
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
-  XfstCompiler::print_net(const char* /*name*/, FILE* outfile)
+  XfstCompiler::print_net(const char* name, FILE* outfile)
     {
-      fprintf(outfile, "missing print net %s:%d\n", __FILE__, __LINE__);
+      //fprintf(outfile, "missing print net %s:%d\n", __FILE__, __LINE__);
+      std::map<std::string,hfst::HfstTransducer*>::const_iterator it =
+        definitions_.find(name);
+      if (it == definitions_.end())
+        {
+          fprintf(stderr, "no such defined network: '%s'\n", name);
+          PROMPT_AND_RETURN_THIS;
+        }
+      else
+        {
+          HfstBasicTransducer basic(*(it->second));
+          basic.write_in_xfst_format(outfile, variables_["print-weight"] == "ON");
+        }
       PROMPT_AND_RETURN_THIS;
     }
 
