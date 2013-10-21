@@ -83,6 +83,7 @@ REPLACE REGEXP3
 %type <replType>  CONTEXT_MARK
 
 %type <transducer> OPTCAP TOLOWER TOUPPER INSERT RIGHT_CONTEXT LEFT_CONTEXT
+NEGATIVE_RIGHT_CONTEXT NEGATIVE_LEFT_CONTEXT
 
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
 %nonassoc <label> QUOTED_LITERAL SYMBOL
@@ -133,7 +134,8 @@ PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
 
-%nonassoc DEFINE ALPHA LOWERALPHA UPPERALPHA NUM PUNCT WHITESPACE OPTCAP_LEFT TOLOWER_LEFT TOUPPER_LEFT INS_LEFT ENDTAG_LEFT LC_LEFT RC_LEFT
+%nonassoc DEFINE ALPHA LOWERALPHA UPPERALPHA NUM PUNCT WHITESPACE OPTCAP_LEFT
+TOLOWER_LEFT TOUPPER_LEFT INS_LEFT ENDTAG_LEFT LC_LEFT RC_LEFT NLC_LEFT NRC_LEFT
 %%
 
 
@@ -216,6 +218,14 @@ REGEXP2: REPLACE
     $$ = & $2->concatenate(*$1);
     delete $1;
  }
+| REGEXP2 NEGATIVE_RIGHT_CONTEXT {
+    $$ = & $1->concatenate(*$2);
+    delete $2;
+ }
+| REGEXP2 NEGATIVE_LEFT_CONTEXT {
+    $$ = & $2->concatenate(*$1);
+    delete $1;
+ }
 // Bodyless contexts
 
 | LEFT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
@@ -231,6 +241,22 @@ REGEXP2: REPLACE
     $$ = $1;
 }
 | RIGHT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
+    hfst::pmatch::add_end_tag($1, $3);
+    $$ = $1;
+}
+| NEGATIVE_LEFT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
+    hfst::pmatch::add_end_tag($1, $3);
+    $$ = $1;
+}
+| NEGATIVE_LEFT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
+    hfst::pmatch::add_end_tag($1, $3);
+    $$ = $1;
+}
+| NEGATIVE_RIGHT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
+    hfst::pmatch::add_end_tag($1, $3);
+    $$ = $1;
+}
+| NEGATIVE_RIGHT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
     hfst::pmatch::add_end_tag($1, $3);
     $$ = $1;
 }
@@ -930,12 +956,20 @@ RIGHT_CONTEXT: RC_LEFT REPLACE RIGHT_PARENTHESIS {
  }
 ;
 
-//LEFT_CONTEXT: LC_LEFT INSERT LEFT_PARENTHESIS {
-//        char * LC_trans = hfst::pmatch::get_LC_transition($2->get_name().c_str());
-//        $$ = new HfstTransducer(LC_trans, LC_trans, hfst::pmatch::format);
-//        free(LC_trans);
-//     }
-//     ;
+NEGATIVE_RIGHT_CONTEXT: NRC_LEFT REPLACE RIGHT_PARENTHESIS {
+    HfstTransducer * nrc_entry = new HfstTransducer(
+        hfst::internal_epsilon, hfst::pmatch::NRC_ENTRY_SYMBOL, hfst::pmatch::format);
+    HfstTransducer * nrc_exit = new HfstTransducer(
+        hfst::internal_epsilon, hfst::pmatch::NRC_EXIT_SYMBOL, hfst::pmatch::format);
+    nrc_entry->concatenate(*$2);
+    nrc_entry->concatenate(*nrc_exit);
+    nrc_entry->disjunct(HfstTransducer("@PMATCH_PASSTHROUGH@",
+                                       hfst::internal_epsilon, hfst::pmatch::format));
+    $$ = nrc_entry;
+    delete $2;
+    delete nrc_exit;
+ }
+;
 
 LEFT_CONTEXT: LC_LEFT REPLACE RIGHT_PARENTHESIS {
     HfstTransducer * lc_entry = new HfstTransducer(
@@ -950,6 +984,24 @@ LEFT_CONTEXT: LC_LEFT REPLACE RIGHT_PARENTHESIS {
     $$ = lc_entry;
     delete $2;
     delete lc_exit;
+ }
+;
+
+NEGATIVE_LEFT_CONTEXT: NLC_LEFT REPLACE RIGHT_PARENTHESIS {
+    HfstTransducer * nlc_entry = new HfstTransducer(
+        hfst::internal_epsilon, hfst::pmatch::NLC_ENTRY_SYMBOL, hfst::pmatch::format);
+    HfstTransducer * nlc_exit = new HfstTransducer(
+        hfst::internal_epsilon, hfst::pmatch::NLC_EXIT_SYMBOL, hfst::pmatch::format);
+    nlc_entry->concatenate($2->reverse());
+    nlc_entry->concatenate(*nlc_exit);
+    nlc_entry->substitute("@PMATCH_ENTRY@", "@PMATCH_TMP@");
+    nlc_entry->substitute("@PMATCH_EXIT@", "@PMATCH_ENTRY@");
+    nlc_entry->substitute("@PMATCH_TMP@", "@PMATCH_EXIT@");
+    nlc_entry->disjunct(HfstTransducer("@PMATCH_PASSTHROUGH@",
+                                       hfst::internal_epsilon, hfst::pmatch::format));
+    $$ = nlc_entry;
+    delete $2;
+    delete nlc_exit;
  }
 ;
 

@@ -111,6 +111,14 @@ LWSP [\t\r\n ]
     return RC_LEFT;
 }
 
+"NLC(" {
+    return NLC_LEFT;
+}
+
+"NRC(" {
+    return NRC_LEFT;
+}
+
 
 "~"   { return COMPLEMENT; }
 "\\"  { return TERM_COMPLEMENT; }
