@@ -606,6 +606,24 @@ bool is_definition(const char* symbol)
 }
 
 HfstTransducer*
+expand_definition(const char* symbol)
+{
+  if (expand_definitions)
+    {
+      for (std::map<std::string,hfst::HfstTransducer*>::const_iterator it
+             = definitions.begin(); it != definitions.end(); it++) 
+        {
+          if (strcmp(it->first.c_str(), symbol) == 0)
+            {
+              return new HfstTransducer(*(it->second));
+            }
+        }
+    }
+  return new HfstTransducer(symbol, symbol, hfst::xre::format);
+}
+
+
+HfstTransducer*
 expand_definition(HfstTransducer* tr, const char* symbol)
 {
   if (expand_definitions)
@@ -615,12 +633,12 @@ expand_definition(HfstTransducer* tr, const char* symbol)
         {
           if (strcmp(it->first.c_str(), symbol) == 0)
             {
-              /*              std::cerr << "expanding definition " << std::string(symbol) << " to:" << std::endl; // DEBUG
-              std::cerr << *(it->second) << std::endl; // DEBUG
-              std::cerr << "in: " << std::endl;
-              std::cerr << *tr << std::endl;*/
+              StringSet alpha = it->second->get_alphabet();
               tr->substitute(hfst::StringPair(symbol,symbol), *(it->second), false); // do not harmonize
-              tr->remove_from_alphabet(symbol);
+              if (alpha.find(symbol) == alpha.end())
+                tr->remove_from_alphabet(symbol);
+              //if (it->second->get_alphabet().find(symbol) != it->second->get_alphabet().end())
+              //  std::cerr << "WARN: symbol '" << std::string(symbol) << "' was removed" << std::endl;
               break;
             }
         }
@@ -679,7 +697,7 @@ xfst_label_to_transducer(const char* input, const char* output)
     }
 
   if (is_definition(input))
-    retval = expand_definition(retval, input);
+    retval = expand_definition(input); // changed
 
   return retval;
 }
