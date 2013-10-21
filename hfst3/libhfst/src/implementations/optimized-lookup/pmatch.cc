@@ -14,6 +14,11 @@ PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
     special_symbols[LC_exit] = NO_SYMBOL_NUMBER;
     special_symbols[RC_entry] = NO_SYMBOL_NUMBER;
     special_symbols[RC_exit] = NO_SYMBOL_NUMBER;
+    special_symbols[NLC_entry] = NO_SYMBOL_NUMBER;
+    special_symbols[NLC_exit] = NO_SYMBOL_NUMBER;
+    special_symbols[NRC_entry] = NO_SYMBOL_NUMBER;
+    special_symbols[NRC_exit] = NO_SYMBOL_NUMBER;
+    special_symbols[Pmatch_passthrough] = NO_SYMBOL_NUMBER;
     special_symbols[boundary] = NO_SYMBOL_NUMBER;
     for (SymbolNumber i = 1; i < symbol_table.size(); ++i) {
         add_special_symbol(symbol_table[i], i);
@@ -40,6 +45,16 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
         special_symbols[LC_exit] = symbol_number;
     } else if (str == "@PMATCH_RC_EXIT@") {
         special_symbols[RC_exit] = symbol_number;
+    } else if (str == "@PMATCH_NLC_ENTRY@") {
+        special_symbols[NLC_entry] = symbol_number;
+    } else if (str == "@PMATCH_NRC_ENTRY@") {
+        special_symbols[NRC_entry] = symbol_number;
+    } else if (str == "@PMATCH_NLC_EXIT@") {
+        special_symbols[NLC_exit] = symbol_number;
+    } else if (str == "@PMATCH_NRC_EXIT@") {
+        special_symbols[NRC_exit] = symbol_number;
+    } else if (str == "@PMATCH_PASSTHROUGH@") {
+        special_symbols[Pmatch_passthrough] = symbol_number;
     } else if (str == "@BOUNDARY@") {
         special_symbols[boundary] = symbol_number;
     } else if (is_end_tag(str)) {
@@ -347,6 +362,8 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
     locals_front.context = none;
     locals_front.context_placeholder = NULL;
     locals_front.default_symbol_trap = false;
+    locals_front.negative_context_success = false;
+    locals_front.pending_passthrough = false;
     local_stack.push(locals_front);
     RtnVariables rtn_front;
     rtn_front.candidate_input_pos = NULL;
@@ -502,6 +519,14 @@ void PmatchTransducer::note_analysis(SymbolNumber * input_tape,
             }
 }
 
+// void PmatchTransducer::get_initial_input_symbols(
+//     std::set<SymbolNumber> & initials,
+//     TransitionTableIndex i)
+// {
+    
+    
+// }
+
 void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
                                                SymbolNumber * output_tape,
                                                TransitionTableIndex i)
@@ -543,7 +568,17 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
                         local_stack.top().context == NLC) {
                         input_tape += 1; // Undo what we did - this is very inelegant
                     }
+                    // In case we have a negative context, we check to see if the context matched.
+                    // If it did, we schedule a passthrough arc after we've processed epsilons.
+                    bool schedule_passthrough = false;
+                    if((local_stack.top().context == NLC || local_stack.top().context == NRC)
+                       && !local_stack.top().negative_context_success) {
+                        schedule_passthrough = true;
+                    }
                     local_stack.pop();
+                    if (schedule_passthrough) {
+                        local_stack.top().pending_passthrough = true;
+                    }
                     ++i;
                 }
             } else {
@@ -559,6 +594,10 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
                     local_stack.pop();
                     ++i;
                 } else {
+                    if (local_stack.top().negative_context_success == true) {
+                        ++i;
+                        continue;
+                    }
                     // Don't touch output when checking context
                     get_analyses(input_tape,
                                  output_tape,
@@ -693,6 +732,12 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
         try_epsilon_transitions(input_tape,
                                 output_tape,
                                 i+1);
+
+        if (local_stack.top().pending_passthrough) {
+            find_transitions(alphabet.get_special(Pmatch_passthrough),
+                             input_tape, output_tape, i+1);
+            local_stack.top().pending_passthrough = false;
+        }
         
         // Check for finality even if the input string hasn't ended
         if (transition_table[i].final()) {
@@ -734,6 +779,12 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
         try_epsilon_indices(input_tape,
                             output_tape,
                             i+1);
+
+        if (local_stack.top().pending_passthrough) {
+            find_index(alphabet.get_special(Pmatch_passthrough),
+                       input_tape, output_tape, i+1);
+            local_stack.top().pending_passthrough = false;
+        }
         
         if (index_table[i].final()) {
             note_analysis(input_tape, output_tape);
@@ -790,6 +841,16 @@ bool PmatchTransducer::try_entering_context(SymbolNumber symbol)
         local_stack.top().context = RC;
         local_stack.top().tape_step = 1;
         return true;
+    } else if (symbol == alphabet.get_special(NLC_entry)) {
+        local_stack.push(local_stack.top());
+        local_stack.top().context = NLC;
+        local_stack.top().tape_step = -1;
+        return true;
+    } else if (symbol == alphabet.get_special(NRC_entry)) {
+        local_stack.push(local_stack.top());
+        local_stack.top().context = NRC;
+        local_stack.top().tape_step = 1;
+        return true;
     } else {
         return false;
     }
@@ -812,6 +873,16 @@ bool PmatchTransducer::try_exiting_context(SymbolNumber symbol)
         } else {
             return false;
         }
+    case NRC:
+        if (symbol == alphabet.get_special(NRC_exit)) {
+            local_stack.top().negative_context_success = true;
+            return false;
+        }
+    case NLC:
+        if (symbol == alphabet.get_special(NLC_exit)) {
+            local_stack.top().negative_context_success = true;
+            return false;
+        }
     default:
         return false;
     }
@@ -821,6 +892,7 @@ void PmatchTransducer::exit_context(void)
 {
     local_stack.push(local_stack.top());
     local_stack.top().context = none;
+    local_stack.top().negative_context_success = false;
     local_stack.top().tape_step = 1;
 }
 

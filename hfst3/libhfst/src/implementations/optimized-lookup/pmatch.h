@@ -15,6 +15,11 @@ namespace hfst_ol {
                        LC_exit,
                        RC_entry,
                        RC_exit,
+                       NLC_entry,
+                       NLC_exit,
+                       NRC_entry,
+                       NRC_exit,
+                       Pmatch_passthrough,
                        boundary};
 
     class PmatchAlphabet: public TransducerAlphabet {
@@ -136,6 +141,8 @@ namespace hfst_ol {
             SymbolNumber * context_placeholder;
             ContextChecking context;
             bool default_symbol_trap;
+            bool negative_context_success;
+            bool pending_passthrough;
         };
 
         struct RtnVariables
@@ -217,6 +224,7 @@ namespace hfst_ol {
         void rtn_call(SymbolNumber * input_tape_entry, SymbolNumber * output_tape_entry);
         void rtn_exit(void);
         void note_analysis(SymbolNumber * input_tape, SymbolNumber * output_tape);
+//        std::set<SymbolNumber> get_initial_input_symbols();
 
     };
 
