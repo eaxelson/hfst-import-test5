@@ -554,6 +554,11 @@ class XfstCompiler
   //! else do nothing.
   void xfst_fail();
 
+  //! @brief Print alphabet \a alpha to \a outfile. \a unknown and \a identity
+  //! define whether these symbols occur in the transitions of the transducer
+  //! whose alphabet we are printing.
+  void print_alphabet(const StringSet & alpha, bool unknown, bool identity, FILE* outfile);
+
   //! @brief Perform lookup on the top transducer using strings in \a infile.
   //! \a direction specifies whether apply is done on input (up) or output (down) 
   //! side. If infile is stdin, interactive mode with prompts is used.

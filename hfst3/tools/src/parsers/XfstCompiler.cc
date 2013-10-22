@@ -105,6 +105,7 @@ namespace xfst {
         variables_["minimal"] = "ON";
         variables_["name-nets"] = "OFF";
         variables_["obey-flags"] = "ON";
+        variables_["print-foma-sigma"] = "OFF";
         variables_["print-pairs"] = "OFF";
         variables_["print-sigma"] = "OFF";
         variables_["print-space"] = "OFF";
@@ -143,6 +144,7 @@ namespace xfst {
         variables_["minimal"] = "ON";
         variables_["name-nets"] = "OFF";
         variables_["obey-flags"] = "ON";
+        variables_["print-foma-sigma"] = "OFF";
         variables_["print-pairs"] = "OFF";
         variables_["print-sigma"] = "OFF";
         variables_["print-space"] = "OFF";
@@ -2234,35 +2236,100 @@ namespace xfst {
     return false;
   }
 
-  static void print_alphabet(const StringSet & alpha, FILE* outfile)
+  void XfstCompiler::print_alphabet
+  (const StringSet & alpha, bool unknown, bool identity, FILE* outfile)
   {
     unsigned int sigma_count=0;
     fprintf(outfile, "Sigma: ");
+    if (variables_["print-foma-sigma"] == "ON")
+      {
+        if (unknown)
+          fprintf(outfile, "?");
+        if (identity)
+          {
+            if (unknown)
+              fprintf(outfile, ", ");
+            fprintf(outfile, "@");
+          }
+      }
+    else // xfst-style sigma print
+      {
+        if (unknown || identity)
+          fprintf(outfile, "?");
+      }
+
+    bool first_symbol = true;
     for (StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
       {
         if (! is_special_symbol(*it)) 
           {
-            fprintf(outfile, "%s", it->c_str()); 
-            sigma_count++;
-            if (++it != alpha.end()) {
+            if (!first_symbol || unknown || identity)
               fprintf(outfile, ", ");
-            }
-            --it;
+            if (*it == "?")
+              fprintf(outfile, "\"?\"");
+            else if (*it == "@" && variables_["print-foma-sigma"] == "ON")
+              fprintf(outfile, "\"@\"");
+            else
+              fprintf(outfile, "%s", it->c_str());
+            sigma_count++;
+            first_symbol = false;
           }
       }
     fprintf(outfile, "\n");
-    fprintf(outfile, "Size: %d\n", sigma_count);
+    fprintf(outfile, "Size: %d.\n", sigma_count);
   }
 
+  static bool is_unknown_or_identity_used_in_transducer
+  (HfstTransducer * t, bool & unknown, bool & identity)
+  {
+    unknown = false;
+    identity = false;
+
+    HfstBasicTransducer fsm(*t);
+    for (HfstBasicTransducer::const_iterator it = fsm.begin();       
+         it != fsm.end(); it++ ) 
+      {      
+        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it  
+               = it->begin(); tr_it != it->end(); tr_it++)       
+          {            
+            std::string istr = tr_it->get_input_symbol();
+            std::string ostr = tr_it->get_input_symbol();
+            if (istr == hfst::internal_unknown ||
+                ostr == hfst::internal_unknown)
+              unknown = true;
+            else if (istr == hfst::internal_identity ||
+                     ostr == hfst::internal_identity) // should not happen
+              identity = true;
+            else
+              ;
+            if (unknown == true && identity == true)
+              return true;
+          }
+      }
+    if (unknown == true || identity == true)
+      return true;
+    else
+      return false;
+  }
+
+  // todo: flags?
   XfstCompiler& 
   XfstCompiler::print_sigma(FILE* outfile, bool prompt)
     {
-      hfst::StringSet alpha = stack_.top()->get_alphabet();
-      print_alphabet(alpha, outfile);
-      if (prompt)
-        this->prompt();
+      GET_TOP(t);
+      hfst::StringSet alpha = t->get_alphabet();
+
+      // find out whether unknown or identity is used in transitions
+      bool unknown = false;
+      bool identity = false;
+      (void)is_unknown_or_identity_used_in_transducer(t, unknown, identity);
+
+      print_alphabet(alpha, unknown, identity, outfile);
+      if (prompt) {
+        this->prompt(); }
       return *this;
     }
+
   XfstCompiler& 
   XfstCompiler::print_sigma(const char* /*name*/, FILE* outfile)
     {
