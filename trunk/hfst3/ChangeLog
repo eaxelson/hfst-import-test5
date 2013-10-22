@@ -1,3 +1,48 @@
+2013-10-22 06:11  hardwick
+
+	* test/tools/Makefile.am, test/tools/pmatch2fst-functionality.sh,
+	  test/tools/pmatch_blanks.txt: Add a pmatch2fst functionality test
+	  with a regression test
+
+2013-10-22 05:39  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.cc: Fix bug wrt unused networks
+	  were getting erased from their container during
+	  iteration, causing other networks to be skipped
+
+2013-10-21 15:46  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h,
+	  libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.h: A preliminary "true" negative
+	  context facility
+
+2013-10-21 12:54  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h,
+	  tools/src/parsers/XfstCompiler.cc: Transducer definitions are
+	  expanded without calling substitute in xre parser, the new way is
+	  faster and less prone to symbol/alphabet errors. Implemented
+	  'print net NET_NAME' in xfst parser. Allowing variable names that
+	  can be parsed as numbers in xfst parser.
+
+2013-10-18 15:12  moshagen
+
+	* tools/src/parsers: Ignore generated files.
+
+2013-10-18 13:28  moshagen
+
+	* scripts: Ignore generated files.
+
+2013-10-18 10:39  eaxelson
+
+	* ChangeLog, NEWS, configure.ac, libhfst/src/Makefile.am: Ready for
+	  release 3.5.0.
+
 2013-10-17 13:56  eaxelson
 
 	* test/tools/fsmbook-tests/Makefile.am,
