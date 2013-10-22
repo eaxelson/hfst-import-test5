@@ -6,11 +6,14 @@
 #
 
 HFST_PREFIX=`pwd`"/hfst-installation/"
-BACKEND_PREFIX="/usr/local/"
-
 
 HFST_LIBNUMBER=`ls $HFST_PREFIX/lib/ | egrep 'libhfst\.so\.[0-9]+$' \
     | perl -pe 's/libhfst\.so\.([0-9]+)$/\1/'`
+
+
+#  -------------------
+#  Check control files
+#  -------------------
 
 if grep "Version: ?" debian/DEBIAN/control > /dev/null; then
     echo "Version number must be defined in control file!";
@@ -32,7 +35,6 @@ if grep "libhfst ?" debian/DEBIAN/shlibs > /dev/null; then
     exit 1;
 fi
 
-
 for library_mentioned in `cat debian/DEBIAN/shlibs | cut -f1 -d' '`;
 do 
     if (! grep "$library_mentioned" debian/DEBIAN/control > /dev/null); then 
@@ -52,6 +54,8 @@ cd debian/usr/bin;
 
 for tool in $HFST_PREFIX/bin/hfst-*;
 do
+    # copy all tools that are linked to libhfst library
+    # omit older versions
     if (ldd $tool | grep "libhfst\.so\.""$HFST_LIBNUMBER" > /dev/null) ; then
 	if ! (echo $tool | grep "2$" > /dev/null) && \
 	    ! (echo $tool | grep "3$" > /dev/null) && \
@@ -85,9 +89,10 @@ done
 sed -i 's/\/home\/eaxelson\/hfst-code\/debian\/debian-test-copy\/hfst-installation\//\/usr\//' hfst-twolc
 sed -i 's/\/home\/eaxelson\/debian-release\/debian\/debian-test-copy\/hfst-installation\//\/usr\//' hfst-twolc
 
-# hfst-xfst depends on zlib..
-rm -f hfst_foma hfst-foma-wrapper.sh hfst-xfst 1> /dev/null 2> /dev/null
+# foma wrapper depends on zlib..
+rm -f hfst_foma hfst-foma-wrapper.sh hfst-foma-wrapper 1> /dev/null 2> /dev/null
 
+# strip tools
 for tool in hfst-* htwolcpre*;
 do
     if (readelf -a $tool 1> /dev/null 2> /dev/null); then
@@ -106,10 +111,6 @@ cd debian/usr/lib/
 cp $HFST_PREFIX/lib/libhfst.so."$HFST_LIBNUMBER".0.0 .
 ln -s -T libhfst.so."$HFST_LIBNUMBER".0.0 libhfst.so."$HFST_LIBNUMBER"
 ln -s -T libhfst.so."$HFST_LIBNUMBER" libhfst.so
-
-#cp -P $BACKEND_PREFIX/lib/libhfstospell.so.1.0.0 .
-#ln -s -T libhfstospell.so.1.0.0 libhfstospell.so.1
-#ln -s -T libhfstospell.so.1 libhfstospell.so
 
 strip *.so
 chmod 0644 *
@@ -131,6 +132,7 @@ chmod 0755 debian/usr/include/hfst
 
 for manpage in $HFST_PREFIX/share/man/man1/hfst-*.1; 
 do
+    # omit older versions
     if ! (echo $manpage | grep "2\.1" > /dev/null) && \
 	! (echo $manpage | grep "3\.1" > /dev/null);
     then
@@ -146,6 +148,7 @@ done
 cd debian/usr/bin
 for program in *; 
 do  
+    # hfst-twolc is a script, skip it
     if [ "$program" != "hfst-twolc" ]; then
 	if ! [ -L "$program" ]; then 
 	    chrpath -d $program ; 
@@ -202,28 +205,35 @@ fakeroot dpkg-deb --build debian
 
 lintian debian.deb
 
+# change the package name
 PACKAGE_VERSION=`grep 'Version:' ./debian/DEBIAN/control \
     | perl -pe "s/^Version: ([0-9.\-]+) *$/\1/"`
 
+ARCHITECTURE=amd64
+if (grep "i386" debian/DEBIAN/control > /dev/null 2> /dev/null); then
+    ARCHITECTURE=i386
+fi
+
 if test -e debian.deb; then
-    mv debian.deb "hfst-dev_${PACKAGE_VERSION}_amd64.deb";
+    mv debian.deb "hfst-dev_${PACKAGE_VERSION}_${ARCHITECTURE}.deb";
 fi
 
 # unzip the changelog file, so that svn is not confused because it is missing
 gunzip debian/usr/share/doc/hfst-dev/changelog.Debian.gz
 
+
 # To install the package, execute
 # sudo dpkg -i debian.deb
-
+#
 # and to remove
 # sudo dpkg -r foo-dev
-
+#
 # To make a copy without the .svn files
 # tar -c --exclude=.svn debian-test | tar -x -C debian-test-copy
 # cd debian-test-copy
 # mv debian-test/* .
 # rmdir debian-test
-#!/bin/bash
+
 
 
 
