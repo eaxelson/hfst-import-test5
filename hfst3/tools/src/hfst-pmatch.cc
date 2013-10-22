@@ -76,7 +76,7 @@ void match_and_print(hfst_ol::PmatchContainer & container,
                 std::ostream & outstream,
                 std::string & input_text)
 {
-    if (input_text.size() > 0) {
+    if (input_text.size() > 0 && input_text.at(input_text.size() - 1) == '\n') {
         // Remove final newline
         input_text.erase(input_text.size() -1, 1);
     }
@@ -104,32 +104,10 @@ int process_input(hfst_ol::PmatchContainer & container,
         free(line);
         line = NULL;
     }
+    
     if (blankline_separated && !input_text.empty()) {
         match_and_print(container, outstream, input_text);
     }
-//         if (c == '\n') {
-//             if (blankline_separated) {
-//                 if (input_text[input_text.size() - 1] == '\n') {
-//                     std::cerr << "Sending " << input_text << std::endl;
-//                     outstream << container.match(input_text);
-//                     input_text.clear();
-//                     input_line.clear();
-//                 } else {
-//                     // Just a newline, not a blank line
-//                     input_line.push_back(c);
-//                     input_text.append(input_line);
-//                     input_line.clear();
-//                 }
-//             } else {
-//                 // newline separated
-//                 outstream << container.match(input_line);
-//                 input_line.clear();
-//             }
-//         } else {
-//             // a regular char
-//             input_line.push_back(c);
-//         }
-//     }
     return EXIT_SUCCESS;
 }
 
