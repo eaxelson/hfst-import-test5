@@ -423,19 +423,22 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
             // them first
             defs_itr->second->insert_to_alphabet(special_pmatch_symbols);
             dummy.harmonize(*defs_itr->second);
-        } else {
-            delete defs_itr->second;
-            definitions.erase(defs_itr);
         }
     }
+    
     // Now that dummy is harmonized with everything, we harmonize everything
     // with dummy and insert them into the result
     for(defs_itr = definitions.begin(); defs_itr != definitions.end();
         ++defs_itr) {
-        dummy.harmonize(*defs_itr->second);
-        retval.insert(std::pair<std::string, hfst::HfstTransducer*>(
-                          defs_itr->first,
-                          add_pmatch_delimiters(defs_itr->second)));
+        if (defs_itr->first.compare("TOP") == 0 ||
+            inserted_transducers.count(defs_itr->first) != 0) {
+            dummy.harmonize(*defs_itr->second);
+            retval.insert(std::pair<std::string, hfst::HfstTransducer*>(
+                              defs_itr->first,
+                              add_pmatch_delimiters(defs_itr->second)));
+        } else {
+            delete defs_itr->second;
+        }
     }
     return retval;
 }
