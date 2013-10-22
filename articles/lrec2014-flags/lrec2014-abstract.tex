@@ -7,6 +7,12 @@
 \usepackage{xunicode}
 \usepackage{xltxtra}
 
+
+
+
+
+
+
 \setmainfont[Mapping=tex-text]{Times New Roman}
 
 %\setlength\titlebox{6.5cm}    % You can expand the title box if you
@@ -14,6 +20,12 @@
 
 \title{Optimising Morphological Analyser Transducers Using Morphological Structure
 and Automatically Induced Flag Diacritics - Abstract}
+
+\author{Senka Drobac \and Krister Lind\'{e}n \and Tommi A Pirinen \and Miikka Silfverberg  \\
+Department of Modern Languages \\
+PO Box 24 \\
+00014 University of Helsinki \\
+{\tt \{senka.drobac, krister.linden, tommi.pirinen, miikka.silfverberg\}@helsinki.fi}}
 
 \date{\today}
 
@@ -68,7 +80,20 @@ by using an algorithm for inducing flag positions from the linguistic
 morpheme structure, implicitly present in lexical
 descriptions.
 
+\begin{figure*}
+    \includegraphics[width=\textwidth]{transducer.png}
+     \caption{Simplified part of Finnish lexc grammar description with automatic flags
+     \label{fig:lexc-fin-flag}}
+\end{figure*}
+
+\begin{figure*}
+    \includegraphics[width=\textwidth]{gr.png}
+     \caption{Simplified part of Greenlandic lexc grammar description with automatic flags
+     \label{fig:lexc-gr-flag}}
+\end{figure*}
+
 \section{Background}
+
 \label{sec:background}
 
 Finite state morphology~\cite{beesley2003finite} is the
@@ -97,6 +122,9 @@ from the \texttt{Root} lexicon. Each of the nouns in root set of morphemes
 continues rightwards to \texttt{NOUNCASES} set of morphemes, and each
 case morpheme continues towards the special \texttt{\#} lexicon
 signifying the end of a word-form.
+
+
+
 
 \begin{figure}
     \centering
@@ -174,6 +202,7 @@ benefits. Therefore, those continuation lexicons are recognized
 during compilation time and skipped when inserting corresponding flag
 diacritics.
 
+
 % Here should come part with automatically finding which flags not to insert (P1, P2, P3?)
 
 Lexicons that contain flag diacritics can be composed with other
@@ -200,6 +229,25 @@ diacritics will accept exactly the same strings as the composition of
 the transducers that are obtained by compiling out flag diacritics
 from the original lexicon $L$ and the original rule $R$.
 
+In table~\ref{table:sizes} there are shown sizes of the original
+transducers compiled with regular lexc compiler composed with grammar rules, transducers compiled
+with new method that inserts flag diacritics composed with grammar rules and finally their ratio.
+
+\begin{table}
+    \centering
+    \begin{tabular}{|l|r|r|r|}
+        \hline
+        \bf Language & \bf Original & \bf With flags & \bf \% \\
+        \hline
+        \bf Greenlandic &   168   & 17 & 10,1\%  \\
+        \bf North Saami &   12     & 5,7 & 47,5\%  \\
+        \bf Lule Saami  &   5     & 3 & 60,0\%  \\
+        \bf Erzya       &   3,7     & 5,3 & 143,2\%  \\
+        \hline
+    \end{tabular}
+    \caption{Sizes of transducers without and with automatic flags (in megabytes); Percentage shows size of the flagged transducer in comparison to the original
+    \label{table:sizes}}
+\end{table}
 
 % Add pruning flags!!!
 
@@ -214,27 +262,12 @@ language descriptions. For this purpose we have acquired freely
 available, open source language descriptions from University of
 Tromsa's language repository~\cite{moshagen2013building}. The
 languages selected are Greenlandic (kal), North Saami (sme), Erzya
-(myv), Komi Zyryen (kpv), South Sami (sma), Lule Sami (smj) and German
-(deu).
+(myv), and Lule Sami (smj).
 
-Speed performances of North Saami and Erzya were tested by performing
-lookup on Wikipedia texts, while Greenlandic and Lule Saami had texts
-available in the Tromsa's language repository.
- 
 All operations with transducers were performed using Helsinki Finite
 State Technology tools~\cite{linden2011}.
 
-\begin{figure*}
-    \includegraphics[width=\textwidth]{transducer.png}
-     \caption{Simplified part of Finnish lexc grammar description with automatic flags
-     \label{fig:lexc-fin-flag}}
-\end{figure*}
 
-\begin{figure*}
-    \includegraphics[width=\textwidth]{gr.png}
-     \caption{Simplified part of Greenlandic lexc grammar description with automatic flags
-     \label{fig:lexc-gr-flag}}
-\end{figure*}
 
 \section{Discussion}
 \label{sec:discussion}
