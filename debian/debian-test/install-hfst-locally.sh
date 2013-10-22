@@ -26,8 +26,9 @@ cd $HFST_VERSION
 autoreconf -i && \
 ./configure --with-foma --prefix=$HFST_INSTDIR_FULL_PATH \
 --enable-calculate --enable-edit-metadata --enable-lexc \
---enable-tagger --enable-proc --enable-shuffle && \
-../make-h-files.sh && make && make install
+--enable-tagger --enable-proc --enable-shuffle \
+--enable-xfst --enable-foma-wrapper && \
+./scripts/generate-cc-files.sh && make && make install
 
 # Make swig bindings
 cd swig
