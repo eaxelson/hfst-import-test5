@@ -44,6 +44,7 @@ TESTS=hfst-check-version.sh hfst-check-help.sh hfst-check-environment.sh \
 	  txt2fst-functionality.sh fst2txt-functionality.sh \
 	  summarize-functionality.sh proc-functionality.sh \
 	  regexp2fst-functionality.sh \
+	  pmatch2fst-functionality.sh \
 	  split-functionality.sh head-functionality.sh tail-functionality.sh \
 	  format-functionality.sh \
 	  lookup-functionality.sh \
@@ -185,6 +186,7 @@ XRE_TXTS=cats_and_dogs.xre cats_and_dogs_semicolon.xre \
 	 at_file_quote.sfst.xre at_file_quote.foma.xre \
 	 left-arrow-with-semicolon-comment.xre \
 	 left-arrow-with-semicolon-many-comments.xre
+PMATCH_TXTS=pmatch_blanks.txt
 LEXC_TXTS=basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc \
 		  basic.empty-sides.lexc basic.end.lexc basic.escapes.lexc \
 		  basic.infostrings.lexc basic.initial-lexicon-empty.lexc \
@@ -205,7 +207,8 @@ LEXC_TXTS=basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc \
 		  basic.multichar-flag-with-zero.lexc
 #XFST_TXTS=cat-regex.xfst
 ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
-		$(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TEXTS)
+		$(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TEXTS) \
+		$(PMATCH_TEXTS)
 
 # this compilation is used by check target before running the tests
 #%.hfst: %.txt
@@ -235,7 +238,7 @@ ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
 EXTRA_FILES=cat2dog.substitute cat.strings cat.txt cats_and_dogs.xre utf-8.strings latin-1.strings c_a_t.strings dos.strings not-contains-a.xre not-contains-a-comment-emptyline.xre parallel-left-arrow-multicom-emptyline.xre  parallel-left-arrow.xre cat.prolog
 
 # files needed for test programs
-EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS) $(TESTS) $(EXTRA_FILES) $(LEXC_TXTS) script.xfst lexc2fst-stress.sh lookup-stress.sh proc-stress.sh valgrind.sh lexc-functionality.sh \
+EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS) $(TESTS) $(EXTRA_FILES) $(LEXC_TXTS) $(PMATCH_TXTS) script.xfst lexc2fst-stress.sh lookup-stress.sh proc-stress.sh valgrind.sh lexc-functionality.sh \
 lexc-compiler-functionality.sh calculate-functionality.sh shuffle-functionality.sh
 
 
