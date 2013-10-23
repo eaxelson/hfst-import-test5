@@ -609,7 +609,10 @@ namespace xfst {
           bool was_defined = xre_.is_definition(name);
           if (!was_defined)
             xre_.define(name, xre);
-          definitions_[name] = new HfstTransducer(*latest_regex_compiled);
+          HfstTransducer * nu = new HfstTransducer(*latest_regex_compiled); 
+          if (variables_["name-nets"] == "ON")
+            nu->set_name(name);
+          definitions_[name] = nu;
 
           if (verbose_) 
             {
@@ -845,12 +848,12 @@ namespace xfst {
       PROMPT_AND_RETURN_THIS;
     }
 
-  XfstCompiler& 
+  /*XfstCompiler& 
   XfstCompiler::name(const char* name)
     {
       names_[name] = stack_.top();
       PROMPT_AND_RETURN_THIS;
-    }
+      }*/
 
   XfstCompiler& 
   XfstCompiler::load_definitions(const char * infilename)
@@ -960,8 +963,11 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::pop()
     {
-      stack_.pop();
-      PRINT_INFO_PROMPT_AND_RETURN_THIS;
+      if (stack_.empty())
+        fprintf(outstream_, "Stack is empty.\n");
+      else // todo: delete if not definition?
+        stack_.pop();
+      PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
@@ -2464,7 +2470,8 @@ namespace xfst {
         new HfstOutputStream(outfile, format_):
         new HfstOutputStream(format_);
       HfstTransducer tmp(*(definitions_[name]));
-      tmp.set_name(std::string(name));
+      if (variables_["name-nets"] == "ON")
+        tmp.set_name(name);
       *outstream << tmp;
       outstream->close();
       delete outstream;
@@ -2498,8 +2505,8 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::write_stack(const char* filename)
     {
-      fprintf(stderr, "cannot save transducer names %s:%d\n", __FILE__,
-              __LINE__);
+      /*fprintf(stderr, "cannot save transducer names %s:%d\n", __FILE__,
+        __LINE__);*/
       HfstOutputStream* outstream = (filename != 0)?
         new HfstOutputStream(filename, format_):
         new HfstOutputStream(format_);
@@ -2984,6 +2991,7 @@ namespace xfst {
           return *this;
         }
       HfstTransducer* t = stack_.top();
+      t->set_name(s);
       names_[s] = t;
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }

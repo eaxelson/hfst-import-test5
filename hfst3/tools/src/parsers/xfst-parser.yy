@@ -223,7 +223,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
        }
        | NAME NAMETOKEN END_COMMAND {
-            hfst::xfst::xfst_->name($2);
+            hfst::xfst::xfst_->name_net($2);
             free($2);
        }
        | LOADD NAMETOKEN END_COMMAND {
