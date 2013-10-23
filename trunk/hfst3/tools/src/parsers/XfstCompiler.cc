@@ -622,6 +622,7 @@ namespace xfst {
                 fprintf(outstream_, "Defined");
               fprintf(outstream_, " '%s'\n", name); 
             }          
+          original_definitions_[name] = xre;
         }
       else
         {
@@ -817,6 +818,7 @@ namespace xfst {
       function_arguments_[name] = arguments.size();
       function_definitions_[std::string(name)] 
         = convert_argument_symbols(arguments, xre, "", xre_, true);
+      original_function_definitions_[prototype] = xre; 
 
       PROMPT_AND_RETURN_THIS;
     }
@@ -1764,25 +1766,24 @@ namespace xfst {
   XfstCompiler::print_defined(FILE* outfile)
     {
       bool definitions = false;
-      for (map<string,HfstTransducer*>::const_iterator def 
-             = definitions_.begin(); def != definitions_.end();
+      for (map<string,string>::const_iterator def 
+             = original_definitions_.begin(); def != original_definitions_.end();
            ++def)
         {         
           definitions = true;
-          fprintf(outfile, "%10s ? bytes. %i states, %i arcs, ? paths\n",
-                  def->first.c_str(), def->second->number_of_states(), 
-                  def->second->number_of_arcs());
+          fprintf(outfile, "%10s %s\n",
+                  def->first.c_str(), def->second.c_str());
         }
       if (!definitions)
         fprintf(outfile, "No defined symbols.\n");
 
       definitions = false;
-      for (map<string,string>::const_iterator func = function_definitions_.begin();
-           func != function_definitions_.end(); func++)
+      for (map<string,string>::const_iterator func = original_function_definitions_.begin();
+           func != original_function_definitions_.end(); func++)
         {
           definitions = true;
-          fprintf(outfile, "%10s@%i) %s\n", func->first.c_str(), 
-                  function_arguments_[func->first], func->second.c_str());
+          fprintf(outfile, "%10s %s\n", func->first.c_str(), 
+                  func->second.c_str());
         }
       if (!definitions)
         fprintf(stderr, "No function definitions.\n");

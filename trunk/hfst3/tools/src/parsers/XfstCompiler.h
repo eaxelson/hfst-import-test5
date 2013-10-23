@@ -622,7 +622,9 @@ class XfstCompiler
 #if HAVE_TWOLC
   hfst::twolc::TwolcCompiler twolc_;
 #endif
+  std::map<std::string,std::string> original_definitions_;
   std::map<std::string,hfst::HfstTransducer*> definitions_;
+  std::map<std::string,std::string> original_function_definitions_;
   std::map<std::string,std::string> function_definitions_;
   std::map<std::string,unsigned int> function_arguments_;
   std::stack<hfst::HfstTransducer*> stack_;
