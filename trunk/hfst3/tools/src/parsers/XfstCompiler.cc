@@ -2165,12 +2165,18 @@ namespace xfst {
 
       try
         {
-          temp.extract_paths(results, number, -1);
+          if (variables_["obey-flags"] == "OFF")
+            temp.extract_paths(results, number, -1);
+          else
+            temp.extract_paths_fd(results, number, -1);
         }
       catch (const TransducerIsCyclicException & e)
         {
           fprintf(warnstream_, "warning: transducer is cyclic, limiting the number of cycles to 5\n");
-          temp.extract_paths(results, number, 5);
+          if (variables_["obey-flags"] == "OFF")
+            temp.extract_paths(results, number, 5);
+          else
+            temp.extract_paths_fd(results, number, 5);
         }
 
       print_paths(results, outfile);
