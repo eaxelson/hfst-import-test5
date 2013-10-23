@@ -120,7 +120,7 @@ class XfstCompiler
 
   //! @brief Name top network of stack
   //! @todo HFST automata do not remember their names
-  XfstCompiler& name(const char* name);
+  //XfstCompiler& name(const char* name);
 
   //! @brief Load regex macros from file
   //! @todo Definition names cannot be stored in HFST automata binaries
