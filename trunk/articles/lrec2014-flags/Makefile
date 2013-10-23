@@ -20,14 +20,5 @@ lrec2014-abstract.pdf: lrec2014-abstract.tex lrec2014.bib
 	$(XELATEX) lrec2014-abstract.tex
 	$(XELATEX) lrec2014-abstract.tex
 	
-eacl2014-hyperminimization.pdf: eacl2014-hyperminimization.tex lrec2014.bib
-	$(XELATEX) eacl2014-hyperminimization.tex
-	$(BIBTEX)  eacl2014-hyperminimization
-	$(XELATEX) eacl2014-hyperminimization.tex
-	$(XELATEX) eacl2014-hyperminimization.tex
-	$(XELATEX) eacl2014-hyperminimization.tex
-
 clean:
-	-rm -f eacl2014-hyperminimization.aux eacl2014-hyperminimization.bbl \
-		eacl2014-hyperminimization.log eacl2014-hyperminimization.blg \
-		lrec2014-abstract.aux lrec2014-abstract.bbl lrec2014-abstract.log lrec2014-abstract.blg
+	-rm -f lrec2014-abstract.aux lrec2014-abstract.bbl lrec2014-abstract.log lrec2014-abstract.blg
