@@ -1,4 +1,5 @@
 \documentclass[11pt]{article}
+\usepackage{authblk}
 \usepackage{eacl2014}
 \usepackage{url}
 \usepackage{latexsym}
@@ -6,10 +7,6 @@
 \usepackage{fontspec}
 \usepackage{xunicode}
 \usepackage{xltxtra}
-
-
-
-
 
 
 
@@ -21,11 +18,30 @@
 \title{Optimising Morphological Analyser Transducers Using Morphological Structure
 and Automatically Induced Flag Diacritics - Abstract}
 
-\author{Senka Drobac \and Krister Lind\'{e}n \and Tommi A Pirinen \and Miikka Silfverberg  \\
+
+\iffalse
+\author{Senka Drobac//affff \and Krister Lind\'{e}n/affff \and Tommi A Pirinen//bbbb \and Miikka Silfverberg/affff  \\
 Department of Modern Languages \\
 PO Box 24 \\
 00014 University of Helsinki \\
 {\tt \{senka.drobac, krister.linden, tommi.pirinen, miikka.silfverberg\}@helsinki.fi}}
+\institute{bla}
+\fi
+
+
+\author[1]{Senka Drobac}
+\author[1]{Krister Lind\'{e}n}
+\author[2]{Tommi A Pirinen}
+\author[1]{Miikka Silfverberg}
+\affil[1]{Department of Modern Languages, PO Box 24, 00014 University of Helsinki}
+\affil[2]{Department of Speech Sciences, PO Box 9, 00014 University of Helsinki}
+
+
+
+\renewcommand\Authands{ and }
+
+
+
 
 \date{\today}
 
@@ -34,7 +50,7 @@ PO Box 24 \\
 
 \section{Rationale}
 
-    Flag diacritics enable optimising a finite-state networks by
+    Flag diacritics enable optimising finite-state networks by
     combining identical sub-graphs of its transition
     graph. Traditionally, the feature has required linguists to devise
     the optimisations to the graph by hand alongside the morphological
@@ -42,15 +58,15 @@ PO Box 24 \\
     discovering flag positions in morphological lexicons automatically
     based on the morpheme structure implicit in the language
     description. With this approach, we have gained significant
-    decrease in the size of finite-state networks.
+    decrease in the size of finite-state networks while maintaining reasonable application speed.
 
 \section{Introduction}
 
 Finite-state transducers are an established way of encoding
 morphological analysers for natural languages. Nevertheless,
 full-scale morphological analysers can often grow to be too large for
-use cases like spell checkers, which should have moderate memory
-footprint. Large transducers can be optimised by recognising
+use cases like spell checkers, speech processing and shallow parsing, which 
+should have moderate memory footprint. Large transducers can be optimised by recognising
 equivalent sub-graphs and combining them by using special symbols called
 flag diacritics, to couple entrance points of the sub-graphs with the
 correct exit points.
@@ -260,7 +276,7 @@ with new method that inserts flag diacritics composed with grammar rules and fin
 We measure the success of our algorithm using real-world, large scale
 language descriptions. For this purpose we have acquired freely
 available, open source language descriptions from University of
-Tromsa's language repository~\cite{moshagen2013building}. The
+Tromsa's language repository~\cite{moshagen2013building}.\footnote{https://victorio.uit.no/langtech, revision 73836} The
 languages selected are Greenlandic (kal), North Saami (sme), Erzya
 (myv), and Lule Sami (smj).
 
