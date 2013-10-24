@@ -27,10 +27,15 @@ autoreconf -i && \
 ./configure --with-foma --prefix=$HFST_INSTDIR_FULL_PATH \
 --enable-calculate --enable-edit-metadata --enable-lexc \
 --enable-tagger --enable-proc --enable-shuffle \
---enable-xfst --enable-foma-wrapper && \
+--enable-xfst --enable-foma-wrapper --with-readline && \
 ./scripts/generate-cc-files.sh && make && make install
 
 # Make swig bindings
 cd swig
-python setup.py build_ext --inplace
+touch libhfst.i
+python2 setup.py build_ext --inplace
+mv libhfst.py python2-libhfst.py
+touch libhfst.i
+python3 setup.py build_ext --inplace
+mv libhfst.py python3-libhfst.py
 cd ..
