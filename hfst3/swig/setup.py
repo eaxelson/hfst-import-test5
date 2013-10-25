@@ -10,6 +10,8 @@ from distutils.core import setup, Extension
 libhfst_src_path = '../libhfst/src/'
 absolute_libhfst_src_path = os.path.abspath(libhfst_src_path)
 
+# when making the debian package, we can replace extra_link_args
+# with ["-L/usr/lib/", "-Wl,-rpath=/usr/lib/"]
 libhfst_module = Extension('_libhfst',
                            language = "c++",
                            sources = ["libhfst.i"],
@@ -17,11 +19,12 @@ libhfst_module = Extension('_libhfst',
                                         "-I" + absolute_libhfst_src_path, "-Wall"],
                            include_dirs = [absolute_libhfst_src_path],
                            library_dirs = [absolute_libhfst_src_path + "/.libs"],
-                           libraries = ["hfst"]
+                           libraries = ["hfst"],
+                           extra_link_args = []
                            )
 
 setup(name = 'libhfst_swig',
-      version = '3.4.3_beta',
+      version = '3.5.0_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.sourceforge.net',
