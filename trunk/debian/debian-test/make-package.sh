@@ -6,6 +6,7 @@
 #
 
 HFST_PREFIX=`pwd`"/hfst-installation/"
+HFST_SWIG=`pwd`"/hfst-3.5.0/swig/"
 
 HFST_LIBNUMBER=`ls $HFST_PREFIX/lib/ | egrep 'libhfst\.so\.[0-9]+$' \
     | perl -pe 's/libhfst\.so\.([0-9]+)$/\1/'`
@@ -109,11 +110,37 @@ cd ../../..
 cd debian/usr/lib/
 
 cp $HFST_PREFIX/lib/libhfst.so."$HFST_LIBNUMBER".0.0 .
+chrpath -d libhfst.so."$HFST_LIBNUMBER".0.0
 ln -s -T libhfst.so."$HFST_LIBNUMBER".0.0 libhfst.so."$HFST_LIBNUMBER"
 ln -s -T libhfst.so."$HFST_LIBNUMBER" libhfst.so
 
 strip *.so
 chmod 0644 *
+
+# also the python scripts
+mkdir python2.7 &&
+cd python2.7 &&
+mkdir dist-packages &&
+cd dist-packages &&
+for pyfile in hfst_tagger_compute_data_statistics.py tagger_aux.py
+do
+    cp $HFST_PREFIX/lib/python2.7/site-packages/$pyfile .
+done &&
+cp $HFST_SWIG/python2-libhfst.py libhfst.py &&
+cp $HFST_SWIG/_libhfst.so . &&
+strip _libhfst.so &&
+chmod 0644 * &&
+cd ../..
+
+mkdir python3 &&
+cd python3 &&
+mkdir dist-packages &&
+cd dist-packages &&
+cp $HFST_SWIG/python3-libhfst.py libhfst.py &&
+cp $HFST_SWIG/_libhfst.cpython-32mu.so . &&
+strip _libhfst.cpython-32mu.so &&
+chmod 0644 * &&
+cd ../..
 
 cd ../../..
 
