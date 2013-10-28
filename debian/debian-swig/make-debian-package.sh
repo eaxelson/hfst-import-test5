@@ -10,19 +10,19 @@
 # Check program arguments and files that it needs exist
 # -----------------------------------------------------
 
-if [ "$1"="--help" -o "$1"="-h" ]; then
+if [ "$1" = "--help" -o "$1" = "-h" ]; then
     echo "Usage: make-debian-package.sh --version X.Y.Z --python[2|3]"
     echo "X.Y.Z is hfst version number, [2|3] is python version"
     exit
 fi
 
-if ! [ "$1"="--version" ]; then
+if ! [ "$1" = "--version" ]; then
     echo "ERROR: you must give version number (with --version X.Y.Z)"
     exit 1
 fi
 HFST_VERSION=$2
 
-HFST_SWIG_DIR="../debian-test-copy/hfst-"$HFST_VERSION"/swig/"
+HFST_SWIG_DIR=`pwd`"/../debian-test-copy/hfst-"$HFST_VERSION"/swig"
 
 if ! [ -e "$HFST_SWIG_DIR" ]; then
     echo "ERROR: no directory '"$HFST_SWIG_DIR"' (did you give a valid version number?)"
@@ -30,17 +30,17 @@ if ! [ -e "$HFST_SWIG_DIR" ]; then
 fi
 
 PYTHON_VERSION=
-if [ "$3"="--python2" ]; then
+if [ "$3" = "--python2" ]; then
     if ! [ -e $HFST_SWIG_DIR/python2-libhfst.py ]; then
         echo "ERROR: missing file "$HFST_SWIG_DIR"/python2-libhfst.py"
         exit 1
     fi
     if ! [ -e $HFST_SWIG_DIR/_libhfst.so ]; then
-        echo echo "ERROR: missing file "$HFST_SWIG_DIR"/_libhfst.so"
+        echo "ERROR: missing file "$HFST_SWIG_DIR"/_libhfst.so"
         exit 1
     fi
     PYTHON_VERSION=2;
-elif [ "$3"="--python3" ]; then
+elif [ "$3" = "--python3" ]; then
     if ! [ -e $HFST_SWIG_DIR/python3-libhfst.py ]; then
         echo "ERROR: missing file "$HFST_SWIG_DIR"/python3-libhfst.py"
         exit 1
@@ -70,113 +70,55 @@ if ! (grep 'Depends: ' debian/DEBIAN/control | grep $DEBVERSION > /dev/null 2> /
     exit 1
 fi
 
+ARCHITECTURE=amd64
+if (grep "i386" debian/DEBIAN/control > /dev/null 2> /dev/null); then
+    ARCHITECTURE=i386
+fi
 
-#if grep "Version: ?" debian/DEBIAN/control > /dev/null; then
-#    echo "Version number must be defined in control file!";
-#    exit 1;
-#fi
+cd debian/usr/lib
 
-#if grep "Architecture: ?" debian/DEBIAN/control > /dev/null; then
-#    echo "Architecture must be defined in control file!";
-#    exit 1;
-#fi
-
-#if grep "Provides" debian/DEBIAN/control | grep "?" > /dev/null; then
-#    echo "Check provided libraries in control file!";
-#    exit 1;
-#fi
-
-#if grep "libhfst ?" debian/DEBIAN/shlibs > /dev/null; then
-#    echo "Version number must be defined in shlibs file!";
-#    exit 1;
-#fi
-
-
-cd python2.7/dist-packages &&
-for pyfile in libhfst.py _libhfst.so
-do
-    cp 
-done &&
-chmod 0644 * &&
-cd ../..
-
-# and duplicate them for python2.6
-mkdir python2.6 &&
-cd python2.6 &&
-mkdir dist-packages &&
-cd dist-packages &&
-for pyfile in hfst_tagger_compute_data_statistics.py tagger_aux.py
-do
-    cp ../../python2.7/dist-packages/$pyfile .
-done &&
-chmod 0644 * &&
-cd ../..
+if [ "$PYTHON_VERSION" = "2" ]; then
+    mkdir python2.7 &&
+    chmod 775 python2.7 &&
+    cd python2.7 &&
+    mkdir dist-packages &&
+    chmod 775 dist-packages &&
+    cd dist-packages &&
+    cp $HFST_SWIG_DIR/python2-libhfst.py libhfst.py &&
+    chmod 775 libhfst.py &&
+    cp $HFST_SWIG_DIR/_libhfst.so _libhfst.so &&
+    chmod 775 _libhfst.so &&
+    cd ../..
+else
+    mkdir python3 &&
+    chmod 775 python3 &&
+    cd python3 &&
+    mkdir dist-packages &&
+    chmod 775 dist-packages &&
+    cd dist-packages &&
+    cp $HFST_SWIG_DIR/python3-libhfst.py libhfst.py &&
+    chmod 775 libhfst.py &&
+    cp $HFST_SWIG_DIR/_libhfst.cpython-32mu.so _libhfst.so &&
+    chmod 775 _libhfst.so &&
+    cd ../..
+fi
 
 cd ../../..
 
+if [ -e debian/usr/share/doc/hfstpy-dev/changelog.Debian ]; then
+    gzip --force --best debian/usr/share/doc/hfstpy-dev/changelog.Debian;
+fi
 
-# -----------------------
-# Configure the libraries
-# -----------------------
-
-#cp debian/DEBIAN/control debian/control
-#dpkg-shlibdeps debian/usr/bin/*
-#rm debian/control
-
-
-# -----------------------------------------------------
-# gzip the changelog file, if needed, and the man pages
-# -----------------------------------------------------
-
-#if [ -e debian/usr/share/doc/hfst-dev/changelog.Debian ]; then
-#    gzip --force --best debian/usr/share/doc/hfst-dev/changelog.Debian;
-#fi
-
-#gzip --best --force debian/usr/share/man/man1/*.1
-
-
-# ---------------------------------
-# Set file and directory properties
-# ---------------------------------
-
-#chmod 0755 debian/DEBIAN/postinst
-#chmod 0664 debian/DEBIAN/control
-#chmod 0644 debian/DEBIAN/shlibs
-#chmod 0644 debian/usr/share/doc/hfst-dev/changelog.Debian.gz
-#chmod 0644 debian/usr/share/doc/hfst-dev/copyright
-
-#find . -type d -exec chmod 755 {} \; 
-
-
-# -----------------------
-# Make the debian package
-# -----------------------
-
-#fakeroot dpkg-deb --build debian
-
-
-# --------------------------------------------------------------------
-# Test if the package is ok (lintian will probably give some warnings, 
-# see if they should be handled...)
-# --------------------------------------------------------------------
+fakeroot dpkg-deb --build debian
 
 lintian debian.deb
 
-# change the package name
-#PACKAGE_VERSION=`grep 'Version:' ./debian/DEBIAN/control \
-#    | perl -pe "s/^Version: ([0-9.\-]+) *$/\1/"`
-
-#ARCHITECTURE=amd64
-#if (grep "i386" debian/DEBIAN/control > /dev/null 2> /dev/null); then
-#    ARCHITECTURE=i386
-#fi
-
-#if test -e debian.deb; then
-#    mv debian.deb "hfst-dev_${PACKAGE_VERSION}_${ARCHITECTURE}.deb";
-#fi
+if test -e debian.deb; then
+    mv debian.deb "hfstpy-dev_${DEBVERSION}-1_${ARCHITECTURE}.deb";
+fi
 
 # unzip the changelog file, so that svn is not confused because it is missing
-#gunzip debian/usr/share/doc/hfst-dev/changelog.Debian.gz
+gunzip debian/usr/share/doc/hfstpy-dev/changelog.Debian.gz
 
 
 # To install the package, execute
@@ -184,13 +126,3 @@ lintian debian.deb
 #
 # and to remove
 # sudo dpkg -r foo-dev
-#
-# To make a copy without the .svn files
-# tar -c --exclude=.svn debian-test | tar -x -C debian-test-copy
-# cd debian-test-copy
-# mv debian-test/* .
-# rmdir debian-test
-
-
-
-
