@@ -56,9 +56,9 @@ else
 fi
 
 
-#  -------------------
-#  Check control files
-#  -------------------
+#  ---------------------------
+#  Check and edit control file
+#  ---------------------------
 
 DEBVERSION=`echo $HFST_VERSION | sed 's/[0-9].\([0-9].[0-9]\)/\1/'`
 if ! (grep 'Version: ' debian/DEBIAN/control | grep $DEBVERSION > /dev/null 2> /dev/null); then
@@ -75,38 +75,62 @@ if (grep "i386" debian/DEBIAN/control > /dev/null 2> /dev/null); then
     ARCHITECTURE=i386
 fi
 
+if [ "$PYTHON_VERSION" = "2" ]; then
+    sed -i "s/HFSTPY-DEV/hfstpy2-dev/" debian/DEBIAN/control
+    sed -i "s/HFSTPY/hfstpy2/" debian/DEBIAN/control
+    sed -i "s/PYTHON_MIN_VERSION/2.6/" debian/DEBIAN/control
+    mv debian/usr/share/doc/HFSTPY-DEV debian/usr/share/doc/hfstpy2-dev
+    sed -i "s/HFSTPY/hfstpy2/" debian/usr/share/doc/hfstpy2-dev/changelog.Debian
+else
+    sed -i "s/HFSTPY-DEV/hfstpy3-dev/" debian/DEBIAN/control
+    sed -i "s/HFSTPY/hfstpy3/" debian/DEBIAN/control
+    sed -i "s/PYTHON_MIN_VERSION/3.2/" debian/DEBIAN/control
+    mv debian/usr/share/doc/HFSTPY-DEV debian/usr/share/doc/hfstpy3-dev
+    sed -i "s/HFSTPY/hfstpy3/" debian/usr/share/doc/hfstpy3-dev/changelog.Debian
+fi
+
+
 cd debian/usr/lib
 
 if [ "$PYTHON_VERSION" = "2" ]; then
     mkdir python2.7 &&
-    chmod 775 python2.7 &&
+    chmod 755 python2.7 &&
     cd python2.7 &&
     mkdir dist-packages &&
-    chmod 775 dist-packages &&
+    chmod 755 dist-packages &&
     cd dist-packages &&
     cp $HFST_SWIG_DIR/python2-libhfst.py libhfst.py &&
-    chmod 775 libhfst.py &&
+    echo '#!/usr/bin/python' >> tmp &&
+    cat libhfst.py >> tmp &&
+    mv tmp libhfst.py &&
+    chmod 755 libhfst.py &&
     cp $HFST_SWIG_DIR/_libhfst.so _libhfst.so &&
-    chmod 775 _libhfst.so &&
+    strip _libhfst.so &&
+    chmod 755 _libhfst.so &&
     cd ../..
 else
     mkdir python3 &&
-    chmod 775 python3 &&
+    chmod 755 python3 &&
     cd python3 &&
     mkdir dist-packages &&
-    chmod 775 dist-packages &&
+    chmod 755 dist-packages &&
     cd dist-packages &&
     cp $HFST_SWIG_DIR/python3-libhfst.py libhfst.py &&
-    chmod 775 libhfst.py &&
+    echo '#!/usr/bin/python' >> tmp &&
+    cat libhfst.py >> tmp &&
+    mv tmp libhfst.py &&
+    chmod 755 libhfst.py &&
     cp $HFST_SWIG_DIR/_libhfst.cpython-32mu.so _libhfst.so &&
-    chmod 775 _libhfst.so &&
+    strip _libhfst.so &&
+    chmod 755 _libhfst.so &&
     cd ../..
 fi
 
 cd ../../..
 
 if [ -e debian/usr/share/doc/hfstpy-dev/changelog.Debian ]; then
-    gzip --force --best debian/usr/share/doc/hfstpy-dev/changelog.Debian;
+    gzip --force --best debian/usr/share/doc/hfstpy-dev/changelog.Debian
+    chmod 644 debian/usr/share/doc/hfstpy-dev/changelog.Debian.gz
 fi
 
 fakeroot dpkg-deb --build debian
@@ -114,11 +138,35 @@ fakeroot dpkg-deb --build debian
 lintian debian.deb
 
 if test -e debian.deb; then
-    mv debian.deb "hfstpy-dev_${DEBVERSION}-1_${ARCHITECTURE}.deb";
+    if [ "$PYTHON_VERSION" = "2" ]; then
+        mv debian.deb "hfstpy2-dev_${DEBVERSION}-1_${ARCHITECTURE}.deb";
+    else
+        mv debian.deb "hfstpy3-dev_${DEBVERSION}-1_${ARCHITECTURE}.deb";
+    fi
 fi
 
 # unzip the changelog file, so that svn is not confused because it is missing
 gunzip debian/usr/share/doc/hfstpy-dev/changelog.Debian.gz
+
+# delete temporary files
+
+if [ "$PYTHON_VERSION" = "2" ]; then
+    rm -r debian/usr/lib/python2.7/* &&
+    rmdir debian/usr/lib/python2.7 &&
+    mv debian/usr/share/doc/hfstpy2-dev debian/usr/share/doc/HFSTPY-DEV
+    sed -i "s/hfstpy3/HFSTPY/" debian/usr/share/doc/HFSTPY-DEV/changelog.Debian
+    sed -i "s/hfstpy2-dev/HFSTPY-DEV/" debian/DEBIAN/control
+    sed -i "s/hfstpy2/HFSTPY/" debian/DEBIAN/control
+    sed -i "s/python (>= 2.6)/python (>= PYTHON_MIN_VERSION)/" debian/DEBIAN/control
+else
+    rm -r debian/usr/lib/python3/* &&
+    rmdir debian/usr/lib/python3 &&
+    mv debian/usr/share/doc/hfstpy3-dev debian/usr/share/doc/HFSTPY-DEV
+    sed -i "s/hfstpy2/HFSTPY/" debian/usr/share/doc/HFSTPY-DEV/changelog.Debian
+    sed -i "s/hfstpy2-dev/HFSTPY-DEV/" debian/DEBIAN/control
+    sed -i "s/hfstpy2/HFSTPY/" debian/DEBIAN/control
+    sed -i "s/python (>= 3.2)/python (>= PYTHON_MIN_VERSION)/" debian/DEBIAN/control
+fi
 
 
 # To install the package, execute
