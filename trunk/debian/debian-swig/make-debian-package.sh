@@ -6,16 +6,70 @@
 #  -------------------------------------------------
 #
 
-HFST_PREFIX=`pwd`"/hfst-installation/"
-HFST_SWIG=`pwd`"/"
+# -----------------------------------------------------
+# Check program arguments and files that it needs exist
+# -----------------------------------------------------
 
-HFST_LIBNUMBER=`ls $HFST_PREFIX/lib/ | egrep 'libhfst\.so\.[0-9]+$' \
-    | perl -pe 's/libhfst\.so\.([0-9]+)$/\1/'`
+if [ "$1"="--help" -o "$1"="-h" ]; then
+    echo "Usage: make-debian-package.sh --version X.Y.Z --python[2|3]"
+    echo "X.Y.Z is hfst version number, [2|3] is python version"
+    exit
+fi
+
+if ! [ "$1"="--version" ]; then
+    echo "ERROR: you must give version number (with --version X.Y.Z)"
+    exit 1
+fi
+HFST_VERSION=$2
+
+HFST_SWIG_DIR="../debian-test-copy/hfst-"$HFST_VERSION"/swig/"
+
+if ! [ -e "$HFST_SWIG_DIR" ]; then
+    echo "ERROR: no directory '"$HFST_SWIG_DIR"' (did you give a valid version number?)"
+    exit 1
+fi
+
+PYTHON_VERSION=
+if [ "$3"="--python2" ]; then
+    if ! [ -e $HFST_SWIG_DIR/python2-libhfst.py ]; then
+        echo "ERROR: missing file "$HFST_SWIG_DIR"/python2-libhfst.py"
+        exit 1
+    fi
+    if ! [ -e $HFST_SWIG_DIR/_libhfst.so ]; then
+        echo echo "ERROR: missing file "$HFST_SWIG_DIR"/_libhfst.so"
+        exit 1
+    fi
+    PYTHON_VERSION=2;
+elif [ "$3"="--python3" ]; then
+    if ! [ -e $HFST_SWIG_DIR/python3-libhfst.py ]; then
+        echo "ERROR: missing file "$HFST_SWIG_DIR"/python3-libhfst.py"
+        exit 1
+    fi
+    if ! [ -e $HFST_SWIG_DIR/_libhfst.cpython-32mu.so ]; then
+        echo "ERROR: missing file "$HFST_SWIG_DIR"/_libhfst.cpython-32mu.so"
+        exit 1
+    fi
+    PYTHON_VERSION=3;
+else
+    echo "ERROR: you must specify python version (with --python[2|3])"
+    exit 1
+fi
 
 
 #  -------------------
 #  Check control files
 #  -------------------
+
+DEBVERSION=`echo $HFST_VERSION | sed 's/[0-9].\([0-9].[0-9]\)/\1/'`
+if ! (grep 'Version: ' debian/DEBIAN/control | grep $DEBVERSION > /dev/null 2> /dev/null); then
+    echo "ERROR: wrong version number in control file (field 'Version')"
+    exit 1
+fi
+if ! (grep 'Depends: ' debian/DEBIAN/control | grep $DEBVERSION > /dev/null 2> /dev/null); then
+    echo "ERROR: wrong version number in control file (field 'Depends')"
+    exit 1
+fi
+
 
 #if grep "Version: ?" debian/DEBIAN/control > /dev/null; then
 #    echo "Version number must be defined in control file!";
