@@ -20,6 +20,7 @@ extern char* data;
 extern char* startptr;
 extern size_t len;
 extern std::map<std::string,hfst::HfstTransducer*> definitions;
+extern std::set<std::string> def_insed_transducers;
 extern std::set<std::string> inserted_transducers;
 extern std::set<std::string> unsatisfied_insertions;
 extern HfstTransducer* last_compiled;
@@ -37,6 +38,8 @@ const std::string NRC_ENTRY_SYMBOL = "@PMATCH_NRC_ENTRY@";
 const std::string NRC_EXIT_SYMBOL = "@PMATCH_NRC_EXIT@";
 const std::string NLC_ENTRY_SYMBOL = "@PMATCH_NLC_ENTRY@";
 const std::string NLC_EXIT_SYMBOL = "@PMATCH_NLC_EXIT@";
+const std::string PASSTHROUGH_SYMBOL = "@PMATCH_PASSTHROUGH@";
+const std::string BOUNDARY_SYMBOL = "@BOUNDARY@";
 const std::string ENTRY_SYMBOL = "@PMATCH_ENTRY@";
 const std::string EXIT_SYMBOL = "@PMATCH_EXIT@";
 
