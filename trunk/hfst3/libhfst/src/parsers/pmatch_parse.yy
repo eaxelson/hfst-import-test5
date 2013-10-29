@@ -900,7 +900,8 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
  }
 | SYMBOL {
     if (hfst::pmatch::definitions.count($1) != 0) {
-        if (hfst::pmatch::def_insed_transducers.count($1) == 1) {
+        if (!hfst::pmatch::flatten &&
+            hfst::pmatch::def_insed_transducers.count($1) == 1) {
             char * Ins_trans = hfst::pmatch::get_Ins_transition($1);
             $$ = new HfstTransducer(
                 Ins_trans, Ins_trans, hfst::pmatch::format);
@@ -947,15 +948,32 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
 ;
 
 INSERT: INS_LEFT SYMBOL RIGHT_PARENTHESIS {
-    if(hfst::pmatch::definitions.count($2) == 0) {
-        hfst::pmatch::unsatisfied_insertions.insert($2);
+    if (!hfst::pmatch::flatten) {
+        if(hfst::pmatch::definitions.count($2) == 0) {
+            hfst::pmatch::unsatisfied_insertions.insert($2);
+        }
+        char * Ins_trans = hfst::pmatch::get_Ins_transition($2);
+        $$ = new HfstTransducer(
+            Ins_trans, Ins_trans, hfst::pmatch::format);
+        $$->set_name($2);
+        free(Ins_trans);
+        hfst::pmatch::inserted_transducers.insert($2);
+    } else if(hfst::pmatch::definitions.count($2) == 1) {
+        if (hfst::pmatch::verbose) {
+            std::cerr << "including " <<
+                hfst::pmatch::definitions[$2]->get_name() << " with ";
+            hfst::pmatch::print_size_info(hfst::pmatch::definitions[$2]);
+        }
+        $$ = new HfstTransducer(* hfst::pmatch::definitions[$2]);
+    } else {
+        if (strlen($2) == 0) {
+            $$ = new HfstTransducer(hfst::pmatch::format);
+        } else {
+            $$ = new HfstTransducer($2, $2, hfst::pmatch::format);
+        }
     }
-    char * Ins_trans = hfst::pmatch::get_Ins_transition($2);
-    $$ = new HfstTransducer(
-        Ins_trans, Ins_trans, hfst::pmatch::format);
-    $$->set_name($2);
-    free(Ins_trans);
-    hfst::pmatch::inserted_transducers.insert($2);
+    free($2);
+
 }
 ;
 

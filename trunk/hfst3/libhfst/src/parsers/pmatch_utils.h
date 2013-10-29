@@ -26,6 +26,7 @@ extern std::set<std::string> unsatisfied_insertions;
 extern HfstTransducer* last_compiled;
 extern ImplementationType format;
 extern bool verbose;
+extern bool flatten;
 extern clock_t timer;
 
 struct PmatchUtilityTransducers;
@@ -96,7 +97,7 @@ std::map<std::string, HfstTransducer*>
     compile(const std::string& pmatch,
             std::map<std::string,hfst::HfstTransducer*>& defs,
             hfst::ImplementationType type,
-            bool be_verbose);
+            bool be_verbose, bool do_flatten);
 
 void print_size_info(HfstTransducer * net);
 

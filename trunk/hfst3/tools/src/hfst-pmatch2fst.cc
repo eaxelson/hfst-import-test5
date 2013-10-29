@@ -60,11 +60,7 @@ using hfst::pmatch::PmatchCompiler;
 static char *epsilonname=NULL;
 static bool disjunct_expressions=false;
 static bool line_separated = false;
-
-//static unsigned int sum_of_weights=0;
-static bool sum_weights=false;
-static bool normalize_weights=false;
-static bool logarithmic_weights=false;
+static bool flatten = false;
 
 #if HAVE_OPENFST
 static hfst::ImplementationType compilation_format = hfst::TROPICAL_OPENFST_TYPE;
@@ -86,7 +82,8 @@ print_usage()
     print_common_program_options(message_out);
     print_common_unary_program_options(message_out); 
     fprintf(message_out, "String and format options:\n"
-            "  -e, --epsilon=EPS         Map EPS as zero.\n");
+            "  -e, --epsilon=EPS         Map EPS as zero\n"
+            "      --flatten             Compile in all RTNs\n");
     fprintf(message_out, "\n");
 
     fprintf(message_out, 
@@ -118,11 +115,12 @@ parse_options(int argc, char** argv)
                 HFST_GETOPT_COMMON_LONG,
                 HFST_GETOPT_UNARY_LONG,
                 {"epsilon", required_argument, 0, 'e'},
+                {"flatten", no_argument, 0, '1'},
                 {0,0,0,0}
             };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "e::",
+                             HFST_GETOPT_UNARY_SHORT "e:1:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -135,6 +133,9 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-unary.h"
         case 'e':
             epsilonname = hfst_strdup(optarg);
+            break;
+        case '1':
+            flatten = true;
             break;
 #include "inc/getopt-cases-error.h"
         }
@@ -149,6 +150,8 @@ int
 process_stream(HfstOutputStream& outstream)
 {
     PmatchCompiler comp(compilation_format);
+    comp.set_verbose(verbose);
+    comp.set_flatten(flatten);
     std::string file_contents;
     std::map<std::string, HfstTransducer*> definitions;
     int c;
@@ -156,7 +159,7 @@ process_stream(HfstOutputStream& outstream)
         file_contents.push_back(c);
     }
     if (file_contents.size() > 1) {
-        definitions = comp.compile(file_contents, verbose);
+        definitions = comp.compile(file_contents);
     }
     
     // First we need to collect a unified alphabet from all the transducers.

@@ -10,11 +10,15 @@
 
 namespace hfst { namespace pmatch {
 PmatchCompiler::PmatchCompiler() :
+    flatten(false),
+    verbose(false),
     definitions_(),
     format_(hfst::TROPICAL_OPENFST_TYPE)
 {}
 
 PmatchCompiler::PmatchCompiler(hfst::ImplementationType impl) :
+    flatten(false),
+    verbose(false),
     definitions_(),
     format_(impl)
 {}
@@ -29,9 +33,10 @@ PmatchCompiler::define(const std::string& name, const std::string& pmatch)
 }
 
 std::map<std::string, HfstTransducer*>
-PmatchCompiler::compile(const std::string& pmatch, bool verbose)
+PmatchCompiler::compile(const std::string& pmatch)
 {
-    return hfst::pmatch::compile(pmatch, definitions_, format_, verbose);
+    return hfst::pmatch::compile(pmatch, definitions_, format_,
+                                 verbose, flatten);
 }
 
 }}
