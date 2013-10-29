@@ -59,6 +59,10 @@ LWSP [\t\r\n ]
     return DEFINE;
 }
 
+"DefIns" {
+    return DEFINS;
+}
+
 "Alpha" {
     return ALPHA;
 }
@@ -154,7 +158,8 @@ LWSP [\t\r\n ]
 "<=>" { return LEFT_RIGHT_ARROW; }
 "<=" { return LEFT_ARROW; }
 "=>" { return RIGHT_ARROW; }
-"->" { return REPLACE_RIGHT; }
+ /*"->" { return REPLACE_RIGHT; }*/
+"->" { return LTR_LONGEST_MATCH; }
 "(->)" { return OPTIONAL_REPLACE_RIGHT; }
 "<-" { return REPLACE_LEFT; }
 "(<-)" { return OPTIONAL_REPLACE_LEFT; }

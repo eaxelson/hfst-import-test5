@@ -45,6 +45,7 @@ namespace pmatch
 
 char* data;
 std::map<std::string,hfst::HfstTransducer*> definitions;
+std::set<std::string> def_insed_transducers;
 std::set<std::string> inserted_transducers;
 std::set<std::string> unsatisfied_insertions;
 char* startptr;
@@ -372,6 +373,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
 {
     // lock here?
     definitions.clear();
+    def_insed_transducers.clear();
     inserted_transducers.clear();
     unsatisfied_insertions.clear();
 
@@ -380,6 +382,12 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     special_pmatch_symbols.insert(RC_EXIT_SYMBOL);
     special_pmatch_symbols.insert(LC_ENTRY_SYMBOL);
     special_pmatch_symbols.insert(LC_EXIT_SYMBOL);
+    special_pmatch_symbols.insert(NRC_ENTRY_SYMBOL);
+    special_pmatch_symbols.insert(NRC_EXIT_SYMBOL);
+    special_pmatch_symbols.insert(NLC_ENTRY_SYMBOL);
+    special_pmatch_symbols.insert(NLC_EXIT_SYMBOL);
+    special_pmatch_symbols.insert(PASSTHROUGH_SYMBOL);
+    special_pmatch_symbols.insert(BOUNDARY_SYMBOL);
     special_pmatch_symbols.insert(ENTRY_SYMBOL);
     special_pmatch_symbols.insert(EXIT_SYMBOL);
 
@@ -413,6 +421,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     // Our helper for harmonizing all the networks' alphabets with
     // each other
     HfstTransducer dummy(format);
+    dummy.insert_to_alphabet(special_pmatch_symbols);
     // We keep TOP and any inserted transducers
     std::map<std::string, hfst::HfstTransducer *>::iterator defs_itr;
     for (defs_itr = definitions.begin(); defs_itr != definitions.end();

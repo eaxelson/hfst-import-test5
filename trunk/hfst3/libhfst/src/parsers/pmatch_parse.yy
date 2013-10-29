@@ -68,7 +68,7 @@
 %type <replaceArrow> REPLACE_ARROW
 
 %type <transducerDefinitions> PMATCH
-%type <transducerDefinition> DEFINITION
+%type <transducerDefinition> DEFINITION BINDING
 %type <transducer> REGEXP1 REGEXP2 REGEXP4 REGEXP5 REGEXP6 REGEXP7
 REGEXP8 REGEXP9 REGEXP10 REGEXP11 REGEXP12 LABEL
 REPLACE REGEXP3
@@ -82,8 +82,8 @@ REPLACE REGEXP3
 %type <transducerPair> CONTEXT
 %type <replType>  CONTEXT_MARK
 
-%type <transducer> OPTCAP TOLOWER TOUPPER INSERT RIGHT_CONTEXT LEFT_CONTEXT
-NEGATIVE_RIGHT_CONTEXT NEGATIVE_LEFT_CONTEXT
+%type <transducer> OPTCAP TOLOWER TOUPPER INSERT RIGHT_CONTEXT
+LEFT_CONTEXT NEGATIVE_RIGHT_CONTEXT NEGATIVE_LEFT_CONTEXT
 
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
 %nonassoc <label> QUOTED_LITERAL SYMBOL
@@ -134,8 +134,9 @@ PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
 
-%nonassoc DEFINE ALPHA LOWERALPHA UPPERALPHA NUM PUNCT WHITESPACE OPTCAP_LEFT
-TOLOWER_LEFT TOUPPER_LEFT INS_LEFT ENDTAG_LEFT LC_LEFT RC_LEFT NLC_LEFT NRC_LEFT
+%nonassoc DEFINE DEFINS ALPHA LOWERALPHA UPPERALPHA NUM PUNCT WHITESPACE
+OPTCAP_LEFT TOLOWER_LEFT TOUPPER_LEFT INS_LEFT ENDTAG_LEFT LC_LEFT RC_LEFT
+NLC_LEFT NRC_LEFT
 %%
 
 
@@ -153,21 +154,27 @@ PMATCH: DEFINITION {
  }
 ;
 
-DEFINITION: DEFINE SYMBOL REGEXP1 {
-    $3->set_name($2);
-    $3->minimize();
-    $$ = new std::pair<std::string, hfst::HfstTransducer*>($2, $3);
+DEFINITION: DEFINE BINDING { $$ = $2; }
+| DEFINS BINDING {
+     hfst::pmatch::def_insed_transducers.insert($2->first);
+     $$ = $2;
+ }
+;
+
+BINDING: SYMBOL REGEXP1 {
+    $2->set_name($1);
+    $2->minimize();
     if (hfst::pmatch::verbose) {
         std::cerr << std::setiosflags(std::ios::fixed) << std::setprecision(2);
         double duration = (clock() - hfst::pmatch::timer) /
             (double) CLOCKS_PER_SEC;
         hfst::pmatch::timer = clock();
-        std::cerr << "compiled " << $2 << " in " << duration << " seconds\n";
-        hfst::pmatch::print_size_info($3);
+        std::cerr << "compiled " << $1 << " in " << duration << " seconds\n";
+        hfst::pmatch::print_size_info($2);
         std::cerr << std::endl;
     }
- }
-;
+    $$ = new std::pair<std::string, hfst::HfstTransducer*>($1, $2);
+ };
 
 REGEXP1: REGEXP2 END_OF_EXPRESSION { }
 | REGEXP2 END_OF_WEIGHTED_EXPRESSION {
@@ -893,12 +900,21 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
  }
 | SYMBOL {
     if (hfst::pmatch::definitions.count($1) != 0) {
-        if (hfst::pmatch::verbose) {
-            std::cerr << "including " <<
-                hfst::pmatch::definitions[$1]->get_name() << " with ";
-            hfst::pmatch::print_size_info(hfst::pmatch::definitions[$1]);
+        if (hfst::pmatch::def_insed_transducers.count($1) == 1) {
+            char * Ins_trans = hfst::pmatch::get_Ins_transition($1);
+            $$ = new HfstTransducer(
+                Ins_trans, Ins_trans, hfst::pmatch::format);
+            $$->set_name($1);
+            free(Ins_trans);
+            hfst::pmatch::inserted_transducers.insert($1);
+        } else {
+            if (hfst::pmatch::verbose) {
+                std::cerr << "including " <<
+                    hfst::pmatch::definitions[$1]->get_name() << " with ";
+                hfst::pmatch::print_size_info(hfst::pmatch::definitions[$1]);
+            }
+            $$ = new HfstTransducer(* hfst::pmatch::definitions[$1]);
         }
-        $$ = new HfstTransducer(* hfst::pmatch::definitions[$1]);
     } else {
         if (strlen($1) == 0) {
             $$ = new HfstTransducer(hfst::pmatch::format);
