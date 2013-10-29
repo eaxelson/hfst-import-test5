@@ -48,6 +48,7 @@ TESTS=hfst-check-version.sh hfst-check-help.sh hfst-check-environment.sh \
 	  split-functionality.sh head-functionality.sh tail-functionality.sh \
 	  format-functionality.sh \
 	  lookup-functionality.sh \
+	  pmatch-functionality.sh \
 	  symbol-harmonization-functionality.sh \
 	  $(STRESSES)
 
@@ -82,7 +83,7 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   ab_shuffle_bc.hfst id_shuffle_id.hfst aid_shuffle_idb.hfst \
 		   prunable_alphabet.hfst non_prunable_alphabet_1.hfst non_prunable_alphabet_2.hfst id.hfst \
 		   a2a_or_a2b_or_a2unk.hfst a2b_or_b2b_or_unk2b.hfst unk2unk_or_id.hfst \
-		   a_or_id.hfst id_star_a_b_c.hfst
+		   a_or_id.hfst id_star_a_b_c.hfst pmatch_endtag.pmatch
 OL_CHECKS=cat2dog.hfstol cat2dog.genhfstol cat_weight_final.hfstol \
 			proc-caps.hfstol proc-caps.genhfstol \
 			compounds.hfstol compounds2.hfstol
@@ -186,7 +187,7 @@ XRE_TXTS=cats_and_dogs.xre cats_and_dogs_semicolon.xre \
 	 at_file_quote.sfst.xre at_file_quote.foma.xre \
 	 left-arrow-with-semicolon-comment.xre \
 	 left-arrow-with-semicolon-many-comments.xre
-PMATCH_TXTS=pmatch_blanks.txt
+PMATCH_TXTS=pmatch_blanks.txt pmatch_endtag.txt
 LEXC_TXTS=basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc \
 		  basic.empty-sides.lexc basic.end.lexc basic.escapes.lexc \
 		  basic.infostrings.lexc basic.initial-lexicon-empty.lexc \
@@ -208,7 +209,7 @@ LEXC_TXTS=basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc \
 #XFST_TXTS=cat-regex.xfst
 ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
 		$(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TEXTS) \
-		$(PMATCH_TEXTS)
+		$(PMATCH_TXTS)
 
 # this compilation is used by check target before running the tests
 #%.hfst: %.txt
@@ -234,6 +235,9 @@ ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
 #%.genhfstol: %.txt
 .txt.genhfstol:
 	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' -i $< | ${top_builddir}/tools/src/hfst-invert | ${top_builddir}/tools/src/hfst-fst2fst -w -o $@
+
+.txt.pmatch:
+	${top_builddir}/tools/src/hfst-pmatch2fst $< > $@
 
 EXTRA_FILES=cat2dog.substitute cat.strings cat.txt cats_and_dogs.xre utf-8.strings latin-1.strings c_a_t.strings dos.strings not-contains-a.xre not-contains-a-comment-emptyline.xre parallel-left-arrow-multicom-emptyline.xre  parallel-left-arrow.xre cat.prolog
 
