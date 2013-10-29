@@ -99,7 +99,7 @@ rm -f hfst_foma hfst-foma-wrapper.sh hfst-foma-wrapper 1> /dev/null 2> /dev/null
 # strip tools
 for tool in hfst-* htwolcpre*;
 do
-    if ! [ "$tool"="hfst-train-tagger" ]; then
+    if ! [ "$tool" = "hfst-train-tagger" ]; then
         if (readelf -a $tool 1> /dev/null 2> /dev/null); then
 	    strip $tool;
         fi;
@@ -123,35 +123,39 @@ strip *.so
 chmod 0644 *
 
 # also copy tagger python scripts
-mkdir python2.7 &&
-cd python2.7 &&
-mkdir dist-packages &&
-cd dist-packages &&
-for pyfile in hfst_tagger_compute_data_statistics.py tagger_aux.py
-do
-    if [ -e "$HFST_PREFIX/lib/python2.7/site-packages" ]; then
-        cp $HFST_PREFIX/lib/python2.7/site-packages/$pyfile .
-    elif [ -e "$HFST_PREFIX/lib/python2.7/dist-packages" ]; then
-        cp $HFST_PREFIX/lib/python2.7/dist-packages/$pyfile .
-    else
-        echo "ERROR: tagger python scripts not found"
-        exit 1
-    fi
-done &&
-chmod 0644 * &&
-cd ../..
+PY_SRC_DIR=
+PY_TARGET_DIRS=
+if [ -e "$HFST_PREFIX/lib/python2.7" ]; then
+    PY_SRC_DIR="python2.7"
+    PY_TARGET_DIRS="python2.7 python2.6"
+elif [ -e "$HFST_PREFIX/lib/python2.6" ]; then
+    PY_SRC_DIR="python2.6"
+    PY_TARGET_DIRS="python2.6"
+else
+    echo "ERROR: tagger python scripts not found"
+    exit 1
+fi
 
-# and duplicate them for python2.6
-mkdir python2.6 &&
-cd python2.6 &&
-mkdir dist-packages &&
-cd dist-packages &&
-for pyfile in hfst_tagger_compute_data_statistics.py tagger_aux.py
+for py_target_dir in $PY_TARGET_DIRS
 do
-    cp ../../python2.7/dist-packages/$pyfile .
-done &&
-chmod 0644 * &&
-cd ../..
+    mkdir $py_target_dir &&
+    cd $py_target_dir &&
+    mkdir dist-packages &&
+    cd dist-packages &&
+    for pyfile in hfst_tagger_compute_data_statistics.py tagger_aux.py
+    do
+        if [ -e "$HFST_PREFIX/lib/"$PY_SRC_DIR"/site-packages" ]; then
+            cp $HFST_PREFIX/lib/$PY_SRC_DIR/site-packages/$pyfile .
+        elif [ -e "$HFST_PREFIX/lib/"$PY_SRC_DIR"/dist-packages" ]; then
+            cp $HFST_PREFIX/lib/$PY_SRC_DIR/dist-packages/$pyfile .
+        else
+            echo "ERROR: tagger python scripts not found"
+            exit 1
+        fi
+    done &&
+    chmod 0644 * &&
+    cd ../..
+done
 
 cd ../../..
 

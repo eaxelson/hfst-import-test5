@@ -47,12 +47,14 @@ autoreconf -i && \
 # add linker flags -L/usr/lib/ -Wl,-rpath=/usr/lib/
 # so that /usr/local/lib/libhfst.so will not be used
 #
-cd swig
-sed -i 's/extra_link_args = \[\]/extra_link_args = \["-L\/usr\/lib\/", "-Wl,-rpath=\/usr\/lib\/"\]/' setup.py
-touch libhfst.i
-python2 setup.py build_ext --inplace
-mv libhfst.py python2-libhfst.py
-touch libhfst.i
-python3 setup.py build_ext --inplace
-mv libhfst.py python3-libhfst.py
-cd ..
+if [ "$1" = "--with-swig" ]; then
+    cd swig
+    sed -i 's/extra_link_args = \[\]/extra_link_args = \["-L\/usr\/lib\/", "-Wl,-rpath=\/usr\/lib\/"\]/' setup.py
+    touch libhfst.i
+    python setup.py build_ext --inplace
+    mv libhfst.py python2-libhfst.py
+    touch libhfst.i
+    python3 setup.py build_ext --inplace
+    mv libhfst.py python3-libhfst.py
+    cd ..
+fi
