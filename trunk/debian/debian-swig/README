@@ -1,27 +1,42 @@
-This package contains SWIG-generated Python bindings for the
-HFST library. To use the bindings, you need
- 
- - a compatible version of HFST library installed to /usr/lib/ (can be 
-   fetched from http://sourceforge.net/projects/hfst/files/hfst/)
- - Python compiler/interpreter
+This directory contains scripts and files needed to make a
+debian package of swig-generated python bindings for HFST.
 
-To install the bindings, you need to copy the .so and .py files
-so that the Python interpreter will find them. For Python2, you must
-copy the files '_libhfst.so' and 'libhfst.py' (located under directory python2)
-to
+Before you run the scripts in this directory, make sure you
+have run the packaging scripts in directory '../debian-test',
+i.e. you have a directory '../debian-test-copy' that contains
+swig-generated python bindings for HFST (in directory
+'../debian-test-copy/hfst-X.Y.Z/swig').
 
-  /usr/lib/python2.X/dist-packages/
+First:
 
-where 2.X is the version of Python you wish to use (e.g. 2.7). For any 
-version of Python3 it is enough to copy the files '_libhfst.so' and
-'_libhfst.cpython-32mu.so' (located under directory python3) to
+ - Update the version numbers in fields 'Version' and 'Depends'
+   in file debian/DEBIAN/control
+ - Add a new entry in file 
+   debian/usr/share/doc/HFSTPY-DEV/changelog.Debian
+ - Update the timestamp in files 
+   debian/usr/share/doc/HFSTPY-DEV/copyright and
+   debian/usr/share/doc/HFSTPY-DEV/changelog.Debian
 
-  /usr/lib/python3/dist-packages/
+Do not change the values of variables HFSTPY etc, they are
+later automatically replaced with hfstpy[2|3] etc by packaging
+scripts. Commit your changes to trunk. Then run
 
-as all Python3 interpreters share the same directory.
+  ./make-copy.sh && 
+  cd ../debian-swig-copy
 
-After installation you should be able to use the bindings by writing
+This will copy all relevant files under ../debian-swig-copy
+without the .svn files.
 
-  import libhfst
+Continue by running
 
-in the beginning of your Python script.
+  ./make-debian-package --version X.Y.Z --python2 && 
+  ./make-debian-package --version X.Y.Z --python3
+
+where X.Y.Z is the version number of newest HFST release.
+
+At the end, you will have files
+
+  hfstpy2-dev_Y.Z-1_ARCH.deb
+  hfstpy3-dev_Y.Z-1_ARCH.deb
+
+where ARCH is amd64 or i386.
