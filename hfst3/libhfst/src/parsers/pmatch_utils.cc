@@ -53,6 +53,7 @@ hfst::HfstTransducer* last_compiled;
 hfst::ImplementationType format;
 size_t len;
 bool verbose;
+bool flatten;
 clock_t timer;
 
 std::map<std::string, hfst::HfstTransducer> named_transducers;
@@ -369,7 +370,7 @@ get_weight(const char *s)
 
 std::map<std::string, HfstTransducer*>
 compile(const string& pmatch, map<string,HfstTransducer*>& defs,
-        ImplementationType impl, bool be_verbose)
+        ImplementationType impl, bool be_verbose, bool do_flatten)
 {
     // lock here?
     definitions.clear();
@@ -395,6 +396,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     startptr = data;
     len = strlen(data);
     verbose = be_verbose;
+    flatten = do_flatten;
 //    definitions = defs;
     format = impl;
     if (hfst::pmatch::verbose) {

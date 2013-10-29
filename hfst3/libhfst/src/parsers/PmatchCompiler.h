@@ -40,11 +40,17 @@ namespace pmatch {
 //! @brief A compiler holding information needed to compile PMATCHs.
 class PmatchCompiler
 {
+private:
+    bool flatten;
+    bool verbose;
   public:
   //! @brief Construct compiler for unknown format transducers.
   PmatchCompiler();
   //! @brief Create compiler for @a impl format transducers
   PmatchCompiler(hfst::ImplementationType impl);
+
+  void set_flatten(bool val) { flatten = val; }
+  void set_verbose(bool val) { verbose = val; }
 
   //! @brief Add a definition macro.
   //!        Compilers will replace arcs labeled @a name, with the transducer
@@ -54,8 +60,7 @@ class PmatchCompiler
   //! @brief Compile a transducer defined by @a pmatch.
   //!        May return a pointer to @e empty transducer on non-fatal error.
   //!        A null pointer is returned on fatal error, if abort is not called.
-  std::map<std::string, HfstTransducer*> compile(const std::string& pmatch,
-                                                 bool verbose = false);
+  std::map<std::string, HfstTransducer*> compile(const std::string& pmatch);
 
   private:
   std::map<std::string,hfst::HfstTransducer*> definitions_;
