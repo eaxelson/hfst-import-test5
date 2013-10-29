@@ -66,6 +66,9 @@ do
     fi
 done
 
+#copy hfst-train-tagger script
+cp -P $HFST_PREFIX/bin/hfst-train-tagger .
+
 # copy hfst-twolc scripts and executables that it needs
 for tool in hfst-twolc htwolcpre1 htwolcpre2 htwolcpre3;
 do
@@ -96,8 +99,10 @@ rm -f hfst_foma hfst-foma-wrapper.sh hfst-foma-wrapper 1> /dev/null 2> /dev/null
 # strip tools
 for tool in hfst-* htwolcpre*;
 do
-    if (readelf -a $tool 1> /dev/null 2> /dev/null); then
-	strip $tool;
+    if ! [ "$tool"="hfst-train-tagger" ]; then
+        if (readelf -a $tool 1> /dev/null 2> /dev/null); then
+	    strip $tool;
+        fi;
     fi;
 done
 cd ../../..
@@ -117,28 +122,34 @@ ln -s -T libhfst.so."$HFST_LIBNUMBER" libhfst.so
 strip *.so
 chmod 0644 *
 
-# also the python scripts
+# also copy tagger python scripts
 mkdir python2.7 &&
 cd python2.7 &&
 mkdir dist-packages &&
 cd dist-packages &&
 for pyfile in hfst_tagger_compute_data_statistics.py tagger_aux.py
 do
-    cp $HFST_PREFIX/lib/python2.7/site-packages/$pyfile .
+    if [ -e "$HFST_PREFIX/lib/python2.7/site-packages" ]; then
+        cp $HFST_PREFIX/lib/python2.7/site-packages/$pyfile .
+    elif [ -e "$HFST_PREFIX/lib/python2.7/dist-packages" ]; then
+        cp $HFST_PREFIX/lib/python2.7/dist-packages/$pyfile .
+    else
+        echo "ERROR: tagger python scripts not found"
+        exit 1
+    fi
 done &&
-cp $HFST_SWIG/python2-libhfst.py libhfst.py &&
-cp $HFST_SWIG/_libhfst.so . &&
-strip _libhfst.so &&
 chmod 0644 * &&
 cd ../..
 
-mkdir python3 &&
-cd python3 &&
+# and duplicate them for python2.6
+mkdir python2.6 &&
+cd python2.6 &&
 mkdir dist-packages &&
 cd dist-packages &&
-cp $HFST_SWIG/python3-libhfst.py libhfst.py &&
-cp $HFST_SWIG/_libhfst.cpython-32mu.so . &&
-strip _libhfst.cpython-32mu.so &&
+for pyfile in hfst_tagger_compute_data_statistics.py tagger_aux.py
+do
+    cp ../../python2.7/dist-packages/$pyfile .
+done &&
 chmod 0644 * &&
 cd ../..
 

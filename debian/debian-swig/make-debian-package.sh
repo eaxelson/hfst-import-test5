@@ -76,6 +76,7 @@ if (grep "i386" debian/DEBIAN/control > /dev/null 2> /dev/null); then
 fi
 
 
+# set names and versions of python
 if [ "$PYTHON_VERSION" = "2" ]; then
     sed -i "s/HFSTPY-DEV/hfstpy2-dev/" debian/DEBIAN/control
     sed -i "s/HFSTPY/hfstpy2/" debian/DEBIAN/control
@@ -85,7 +86,7 @@ if [ "$PYTHON_VERSION" = "2" ]; then
     mv debian/usr/share/doc/HFSTPY-DEV debian/usr/share/doc/hfstpy2-dev
     chmod 0755 debian/usr/share/doc/hfstpy2-dev
     chmod 0644 debian/usr/share/doc/hfstpy2-dev/changelog.Debian
-else
+else # version 3
     sed -i "s/HFSTPY-DEV/hfstpy3-dev/" debian/DEBIAN/control
     sed -i "s/HFSTPY/hfstpy3/" debian/DEBIAN/control
     sed -i "s/PYTHON_MIN_VERSION/3.2/" debian/DEBIAN/control
@@ -98,6 +99,8 @@ fi
 
 
 cd debian/usr/lib
+
+
 
 if [ "$PYTHON_VERSION" = "2" ]; then
     mkdir python2.7 &&
@@ -115,7 +118,7 @@ if [ "$PYTHON_VERSION" = "2" ]; then
     strip _libhfst.so &&
     chmod 755 _libhfst.so &&
     cd ../..
-else
+else # version 3
     mkdir python3 &&
     chmod 755 python3 &&
     cd python3 &&
@@ -148,6 +151,7 @@ fakeroot dpkg-deb --build debian
 
 lintian debian.deb
 
+# name debian package file
 if test -e debian.deb; then
     if [ "$PYTHON_VERSION" = "2" ]; then
         mv debian.deb "hfstpy2-dev_${DEBVERSION}-1_${ARCHITECTURE}.deb";
