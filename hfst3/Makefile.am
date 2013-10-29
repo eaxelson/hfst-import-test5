@@ -16,6 +16,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ACLOCAL_AMFLAGS = -I m4
+AM_LDFLAGS=-stdlib=libstdc++
 
 SUBDIRS = back-ends libhfst tools test doc man scripts swig
 
