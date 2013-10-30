@@ -207,6 +207,9 @@ namespace implementations
       static StdVectorFst * disjunct
         (StdVectorFst * t, const NumberPairVector &npv);
 
+      static StdVectorFst * disjunct_as_tries(StdVectorFst * t1,
+                                              const StdVectorFst * t2);
+
       static StdVectorFst * intersect(StdVectorFst * t1,
                              StdVectorFst * t2);
       static StdVectorFst * subtract(StdVectorFst * t1,
