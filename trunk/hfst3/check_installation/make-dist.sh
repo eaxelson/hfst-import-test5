@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# Make a distribution tarball check-hfst[-VERSIONNMUBER].tar.gz that
+# Make a distribution tarball check-hfst[-VERSIONNUMBER].tar.gz that
 # contains tools for testing installed hfst tools and morphologies.
 #
 
