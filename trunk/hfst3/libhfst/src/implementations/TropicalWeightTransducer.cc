@@ -2279,6 +2279,13 @@ namespace hfst { namespace implementations
     return -1;    
   }
 
+  fst::StdVectorFst * TropicalWeightTransducer::disjunct_as_tries(fst::StdVectorFst * t1,
+                                                                  const fst::StdVectorFst * t2)
+  {
+    disjunct_as_tries(*(t1), t1->Start(), t2, t2->Start());
+    return t1;
+  }
+
   void TropicalWeightTransducer::disjunct_as_tries(fst::StdVectorFst &t1,
                          StateId t1_state,
                          const fst::StdVectorFst * t2,
