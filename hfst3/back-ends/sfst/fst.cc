@@ -858,9 +858,17 @@ namespace SFST {
     fputc('a',file);
 
     vector<Node*> nodearray;
-    nodeindexing( &nodearray );
+
+    // nodeindexing seems to do nothing to nodearray sometimes,
+    // so made the two following changes for HFST
+    // nodeindexing( &nodearray );  -->
+    std::pair<size_t, size_t> indexing_pair = nodeindexing( &nodearray );
+    
     incr_vmark();
-    unsigned int n=(unsigned)nodearray.size();
+
+    //unsigned int n=(unsigned)nodearray.size();  -->
+    unsigned int n=(unsigned)indexing_pair.first;
+
     fwrite(&n,sizeof(n),1,file);
     store_node( file, root_node(), vmark );
 
