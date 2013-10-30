@@ -36,21 +36,24 @@ cd $TESTDIR
 # Overgenerating some files here..
 for att_file in *.txt;
 do
-    file=`echo $att_file | sed 's/\.txt//'`
-    hfst-txt2fst -e '@0@' $file.txt > $file.hfst
-    if (hfst-format --list-formats | grep 'sfst' > /dev/null); then
-	hfst-txt2fst -f sfst -e '@0@' $file.txt > $file.sfst
-    else
-	echo "warning: sfst back-end not available, assumed skipped off and continuing"
+    if ! [ "$att_file" = "pmatch_blanks.txt" ]; then
+        echo "generating binary transducers from file "$att_file"..."
+        file=`echo $att_file | sed 's/\.txt//'`
+        $PREFIX/hfst-txt2fst -e '@0@' $file.txt > $file.hfst
+        if ($PREFIX/hfst-format --list-formats | grep 'sfst' > /dev/null); then
+	    $PREFIX/hfst-txt2fst -f sfst -e '@0@' $file.txt > $file.sfst
+        else
+	    echo "warning: sfst back-end not available, assumed skipped off and continuing"
+        fi
+        $PREFIX/hfst-txt2fst -f openfst-tropical -e '@0@' $file.txt > $file.ofst
+        if ($PREFIX/hfst-format --list-formats | grep 'foma' > /dev/null); then
+	    $PREFIX/hfst-txt2fst -f foma -e '@0@' $file.txt > $file.foma
+        else
+	    echo "warning: foma back-end not available, assumed skipped off and continuing"
+        fi
+        $PREFIX/hfst-txt2fst -e '@0@' -i $file.txt | $PREFIX/hfst-fst2fst -w -o $file.hfstol
+        $PREFIX/hfst-txt2fst -e '@0@' -i $file.txt | $PREFIX/hfst-invert | $PREFIX/hfst-fst2fst -w -o $file.genhfstol
     fi
-    hfst-txt2fst -f openfst-tropical -e '@0@' $file.txt > $file.ofst
-    if (hfst-format --list-formats | grep 'foma' > /dev/null); then
-	hfst-txt2fst -f foma -e '@0@' $file.txt > $file.foma
-    else
-	echo "warning: foma back-end not available, assumed skipped off and continuing"
-    fi
-    hfst-txt2fst -e '@0@' -i $file.txt | hfst-fst2fst -w -o $file.hfstol
-    hfst-txt2fst -e '@0@' -i $file.txt | hfst-invert | hfst-fst2fst -w -o $file.genhfstol
 done
 
 # Perform the tests
