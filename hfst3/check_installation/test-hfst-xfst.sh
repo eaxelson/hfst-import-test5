@@ -10,7 +10,7 @@ fi
 
 rm -f a2b.script
 echo "regex a:b;" > a2b.script
-echo "save stack a2b.hfst" >> a2b.script 
+echo "save stack a2b.xfst.hfst" >> a2b.script 
 
 for format in sfst openfst-tropical foma;
 do
@@ -19,10 +19,10 @@ do
 	exit 1
     fi
     # Check that the tool produces right result..
-    if ! (echo "a:b" | $1/hfst-strings2fst -f $format | $1/hfst-compare -s a2b.hfst); then
+    if ! (echo "a:b" | $1/hfst-strings2fst -f $format | $1/hfst-compare -s a2b.xfst.hfst); then
 	exit 1
     fi
-    rm -f a2b.hfst
+    rm -f a2b.xfst.hfst
 done
 
 rm -f a2b.script
