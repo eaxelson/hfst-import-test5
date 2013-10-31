@@ -14,5 +14,4 @@ if ! echo "cat" | $TOOLDIR/hfst-pmatch pmatch_endtag.pmatch > test.pmatch;
 	    exit 1
 	fi
 	
-rm TMP
 rm test.pmatch
