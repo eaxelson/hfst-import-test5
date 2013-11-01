@@ -34,11 +34,11 @@ cd $TESTDIR
 
 # Make the transducers needed by the tests.
 # Overgenerating some files here..
-for att_file in *.txt;
+for txt_file in *.txt;
 do
-    if ! [ "$att_file" = "pmatch_blanks.txt" ]; then
-        echo "generating binary transducers from file "$att_file"..."
-        file=`echo $att_file | sed 's/\.txt//'`
+    if ! (echo $txt_file | grep 'pmatch_' > /dev/null 2> /dev/null); then
+        echo "generating binary transducers from file "$txt_file"..."
+        file=`echo $txt_file | sed 's/\.txt//'`
         $PREFIX/hfst-txt2fst -e '@0@' $file.txt > $file.hfst
         if ($PREFIX/hfst-format --list-formats | grep 'sfst' > /dev/null); then
 	    $PREFIX/hfst-txt2fst -f sfst -e '@0@' $file.txt > $file.sfst
@@ -53,23 +53,34 @@ do
         fi
         $PREFIX/hfst-txt2fst -e '@0@' -i $file.txt | $PREFIX/hfst-fst2fst -w -o $file.hfstol
         $PREFIX/hfst-txt2fst -e '@0@' -i $file.txt | $PREFIX/hfst-invert | $PREFIX/hfst-fst2fst -w -o $file.genhfstol
+    else
+        echo "generating pmatch transducer from file "$txt_file"..."
+        if ! [ -x $PREFIX/hfst-pmatch2fst ]; then
+            echo "tool hfst-pmatch2fst not found, assumed skipped off and continuing"
+        else
+            file=`echo $txt_file | sed 's/\.txt//'`
+            $PREFIX/hfst-pmatch2fst $file.txt > $file.pmatch
+        fi
     fi
 done
 
+
 # Perform the tests
+echo ""
+echo "performing tests..."
+echo ""
 for tooltest in *.sh;
 do
     if [ "$tooltest" != "copy-files.sh" -a \
 	"$tooltest" != "lexc2fst-stress.sh" -a \
 	"$tooltest" != "valgrind.sh" -a \
 	"$tooltest" != "lookup-stress.sh" ]; then
-	echo -n "Testing: "$tooltest"...   "
 	if (./$tooltest $PREFIX) ; then
-	    echo "PASS"
+	    printf "%-40s%s\n" $tooltest "PASS"
 	elif [ "$?" -eq "77" ] ; then
-            echo "SKIP"
+            printf "%-40s%s\n" $tooltest "** SKIP **"
         else
-	    echo "FAIL"
+	    printf "%-40s%s\n" $tooltest "*** FAIL ***"
 	fi
     fi
 done

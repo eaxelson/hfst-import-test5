@@ -4,6 +4,11 @@
 # Check all installed HFST morphologies. 
 #
 
+prefix=
+if [ "$1" = "--prefix" ]; then
+    prefix=$2
+fi
+
 
 extension=.sh
 languages="english finnish french german italian omorfi swedish turkish"
@@ -11,9 +16,8 @@ directions="analyze generate"
 format=xerox
 morph_folder=morphology_tests
 
-function fail {
+function exit_prog {
     rm -f input tmp
-    echo "FAIL"
     exit 1
 }
 
@@ -26,40 +30,53 @@ do
     for dir in $directions;
     do
 	prog=$lang-$dir$extension
-	echo -n "Testing "$prog"... "
 
 	# test that the program exists
-	if (! which $prog 2>1 > /dev/null); then
-	    fail
-	fi    
+        if [ "$prefix" = "" ]; then
+	    if (! which $prog 2>1 > /dev/null); then
+                printf "%-32s%s\n" $prog "FAIL: program not found"
+                exit_prog
+	    fi    
+        else
+            if ! [ -x $prefix$prog ]; then
+                printf "%-32s%s\n" $prog "FAIL: program not found or executable"
+                exit_prog
+            fi
+        fi  
 
 	# test that the program handles a non-word 
-	rm -f input
-	echo "foo" > input
-	if (! $prog $format input 2>1 > /dev/null); then
-	    fail
-	fi
+        rm -f input 
+        echo "foo" > input 
+        if (! $prefix$prog $format input 2>1 > /dev/null); then
+	    printf "%-32s%s\n" $prog "FAIL: program cannot handle input 'foo' (given as first argument)"
+            exit_prog 
+        fi
 
-	if (! cat input | $prog $format 2>1 > /dev/null); then
-	    fail
+	if (! cat input | $prefix$prog $format 2>1 > /dev/null); then
+	    printf "%-32s%s\n" $prog "FAIL: program cannot handle input 'foo' (given via standard input)"
+            exit_prog
 	fi
 
 	# test that the program handles a real word
-	if (! $prog $format $morph_folder/$lang-$dir.input > tmp); then
-	    fail
+	if (! $prefix$prog $format $morph_folder/$lang-$dir.input > tmp); then
+	    printf "%-32s%s\n" $prog "FAIL: program cannot handle valid input (given as first argument)"
+            exit_prog
 	fi
 	if (! diff tmp $morph_folder/$lang-$dir.output); then
-	    fail
+	    printf "%-32s%s\n" $prog "FAIL: wrong result for input (given as first argument)"
+            exit_prog
 	fi
 
-	if (! cat $morph_folder/$lang-$dir.input | $prog $format > tmp); then
-	    fail
+	if (! cat $morph_folder/$lang-$dir.input | $prefix$prog $format > tmp); then
+	    printf "%-32s%s\n" $prog "FAIL: program cannot handle valid input (given via standard input)"
+            exit_prog
 	fi
 	if (! diff tmp $morph_folder/$lang-$dir.output); then
-	    fail
+	    printf "%-32s%s\n" $prog "FAIL: wrong result for input (given via standard input)"
+            exit_prog
 	fi
 
-	echo "PASS"
+	printf "%-32s%s\n" $prog "PASS"
     done
 done
 
