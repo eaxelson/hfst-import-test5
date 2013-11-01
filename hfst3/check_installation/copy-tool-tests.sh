@@ -56,4 +56,6 @@ rm lexc-compiler-functionality.sh
 cp ../test-hfst-xfst.sh .
 cp ../test-hfst-twolc.sh .
 
+# The tagger tools are experimental so they are not tested
+
 cd ..
