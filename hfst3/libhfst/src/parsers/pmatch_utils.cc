@@ -422,6 +422,10 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     }
     // Our helper for harmonizing all the networks' alphabets with
     // each other
+    if (hfst::pmatch::verbose) {
+        std::cerr << "Harmonizing... ";
+    }
+
     HfstTransducer dummy(format);
     dummy.insert_to_alphabet(special_pmatch_symbols);
     // We keep TOP and any inserted transducers
@@ -450,6 +454,12 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         } else {
             delete defs_itr->second;
         }
+    }
+    if (hfst::pmatch::verbose) {
+        double duration = (clock() - hfst::pmatch::timer) /
+            (double) CLOCKS_PER_SEC;
+        hfst::pmatch::timer = clock();
+        std::cerr << "harmonized in " << duration << " seconds\n";
     }
     return retval;
 }
