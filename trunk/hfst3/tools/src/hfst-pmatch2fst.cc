@@ -180,11 +180,11 @@ process_stream(HfstOutputStream& outstream)
         hfst::StringSet string_set = it->second->get_alphabet();
         for (hfst::StringSet::const_iterator sym = string_set.begin();
              sym != string_set.end(); ++sym) {
-            if (symbols_seen.count(*sym) != 0) {
+            if (symbols_seen.count(*sym) == 0) {
                 unified_alphabet.append(*sym);
                 tok.add_multichar_symbol(*sym);
+                symbols_seen.insert(*sym);
             }
-            symbols_seen.insert(*sym);
         }
     }
     if (unified_alphabet.empty()) {
