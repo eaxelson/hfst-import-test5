@@ -15,6 +15,7 @@
 using std::string;
 using std::map;
 
+extern int pmatchlineno;
 extern char* pmatchtext;
 extern int pmatchparse();
 extern int pmatchnerrs;
@@ -26,13 +27,13 @@ pmatcherror(const char *msg)
     fprintf(stderr, "*** pmatch parsing failed: %s\n", msg);
     if (strlen(hfst::pmatch::data) < 60)
     {
-        fprintf(stderr, "***    parsing %s [near %s]\n", hfst::pmatch::data,
-                pmatchtext);
+        fprintf(stderr, "*** parsing %s [line %d, near %s]\n",
+                hfst::pmatch::data, pmatchlineno, pmatchtext);
     }
     else
     {
-        fprintf(stderr, "***    parsing %60s [near %s]...\n", 
-                hfst::pmatch::data, pmatchtext);
+        fprintf(stderr, "***    parsing %60s [line %d, near %s]...\n", 
+                hfst::pmatch::data, pmatchlineno, pmatchtext);
     }
 #endif
     return 0;
