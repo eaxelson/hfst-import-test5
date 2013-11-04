@@ -1,4 +1,4 @@
-%option 8Bit batch noyylineno noyywrap nounput prefix="pmatch"
+%option 8Bit batch yylineno noyywrap nounput prefix="pmatch"
 
 %{
 
