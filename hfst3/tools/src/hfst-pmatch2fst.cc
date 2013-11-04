@@ -183,8 +183,8 @@ process_stream(HfstOutputStream& outstream)
             if (symbols_seen.count(*sym) != 0) {
                 unified_alphabet.append(*sym);
                 tok.add_multichar_symbol(*sym);
-                symbols_seen.insert(*sym);
             }
+            symbols_seen.insert(*sym);
         }
     }
     if (unified_alphabet.empty()) {
