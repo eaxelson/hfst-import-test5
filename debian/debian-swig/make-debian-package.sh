@@ -11,48 +11,34 @@
 # -----------------------------------------------------
 
 if [ "$1" = "--help" -o "$1" = "-h" ]; then
-    echo "Usage: make-debian-package.sh --version X.Y.Z --python[2|3]"
-    echo "X.Y.Z is hfst version number, [2|3] is python version"
+    echo "Usage: make-debian-package.sh --version VER --python[2|3] --hfst-dir PATH"
+    echo ""
+    echo "VER (N.N.N) is hfst version number, [2|3] is python version,"
+    echo "PATH is full path to the directory where hfst is installed"
     exit
 fi
 
-if ! [ "$1" = "--version" ]; then
-    echo "ERROR: you must give version number (with --version X.Y.Z)"
-    exit 1
+if ! [[ "$1" = "--version" && ( "$3" = "--python2" || "$3" = "--python3" ) && "$4" = "--hfst-dir" && "$5" != "" ]]; then
+    echo "ERROR: wrong arguments"
+    echo ""
+    echo "Usage: make-debian-package.sh --version VER --python[2|3] --hfst-dir PATH"
+    echo ""
+    echo "VER (N.N.N) is hfst version number, [2|3] is python version,"
+    echo " PATH is full path to the directory where hfst is installed"
+    exit
 fi
+
 HFST_VERSION=$2
 
-HFST_SWIG_DIR=`pwd`"/../debian-test-copy/hfst-"$HFST_VERSION"/swig"
-
+HFST_SWIG_DIR=$5
 if ! [ -e "$HFST_SWIG_DIR" ]; then
-    echo "ERROR: no directory '"$HFST_SWIG_DIR"' (did you give a valid version number?)"
+    echo "ERROR: no directory '"$HFST_SWIG_DIR"'"
     exit 1
 fi
 
-PYTHON_VERSION=
-if [ "$3" = "--python2" ]; then
-    if ! [ -e $HFST_SWIG_DIR/python2-libhfst.py ]; then
-        echo "ERROR: missing file "$HFST_SWIG_DIR"/python2-libhfst.py"
-        exit 1
-    fi
-    if ! [ -e $HFST_SWIG_DIR/_libhfst.so ]; then
-        echo "ERROR: missing file "$HFST_SWIG_DIR"/_libhfst.so"
-        exit 1
-    fi
-    PYTHON_VERSION=2;
-elif [ "$3" = "--python3" ]; then
-    if ! [ -e $HFST_SWIG_DIR/python3-libhfst.py ]; then
-        echo "ERROR: missing file "$HFST_SWIG_DIR"/python3-libhfst.py"
-        exit 1
-    fi
-    if ! [ -e $HFST_SWIG_DIR/_libhfst.cpython-32mu.so ]; then
-        echo "ERROR: missing file "$HFST_SWIG_DIR"/_libhfst.cpython-32mu.so"
-        exit 1
-    fi
-    PYTHON_VERSION=3;
-else
-    echo "ERROR: you must specify python version (with --python[2|3])"
-    exit 1
+PYTHON_VERSION=2
+if [ "$3" = "--python3" ]; then
+    PYTHON_VERSION=3
 fi
 
 

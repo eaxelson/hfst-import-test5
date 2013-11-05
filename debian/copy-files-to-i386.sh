@@ -23,6 +23,7 @@ sudo mkdir $DEBIAN_DIR/debian/debian-swig/
 
 echo "starting copying to "$DEBIAN_DIR
 
+sudo cp copy-directory.sh $DEBIAN_DIR/debian/
 sudo cp ../hfst3/hfst-$VERSION.tar.gz $DEBIAN_DIR/hfst3/
 echo "copied ../hfst3/hfst-"$VERSION".tar.gz"
 sudo cp -R debian-test/* $DEBIAN_DIR/debian/debian-test/

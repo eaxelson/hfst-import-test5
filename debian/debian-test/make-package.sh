@@ -2,11 +2,16 @@
 #
 #  -------------------------------------------------
 #  A script for creating the debian package for HFST
+#  command line tools and API.
 #  -------------------------------------------------
 #
 
-HFST_PREFIX=`pwd`"/hfst-installation/"
-HFST_SWIG=`pwd`"/hfst-3.5.0/swig/"
+if [ "$1" != "--hfst-dir" -o "$2" = "" ]; then
+    echo $0": error: directory where hfst is installed must be given"
+    echo $0" --hfst-dir DIRNAME"
+    exit 1
+fi
+HFST_PREFIX=$2
 
 HFST_LIBNUMBER=`ls $HFST_PREFIX/lib/ | egrep 'libhfst\.so\.[0-9]+$' \
     | perl -pe 's/libhfst\.so\.([0-9]+)$/\1/'`
@@ -89,9 +94,7 @@ do
     sed -i 's/usr\/local\/bin\//usr\/bin\//' $tool;
 done
 
-# replace local paths with /usr/
-sed -i 's/\/home\/eaxelson\/hfst-code\/debian\/debian-test-copy\/hfst-installation\//\/usr\//' hfst-twolc
-sed -i 's/\/home\/eaxelson\/debian-release\/debian\/debian-test-copy\/hfst-installation\//\/usr\//' hfst-twolc
+# TODO: replace local paths with /usr/ in hfst-twolc?
 
 # foma wrapper depends on zlib..
 rm -f hfst_foma hfst-foma-wrapper.sh hfst-foma-wrapper 1> /dev/null 2> /dev/null
