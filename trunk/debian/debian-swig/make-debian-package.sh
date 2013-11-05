@@ -11,33 +11,31 @@
 # -----------------------------------------------------
 
 if [ "$1" = "--help" -o "$1" = "-h" ]; then
-    echo "Usage: make-debian-package.sh --version VER --python[2|3] --hfst-dir PATH"
+    echo "Usage: make-debian-package.sh --python[2|3] --hfst-dir PATH"
     echo ""
-    echo "VER (N.N.N) is hfst version number, [2|3] is python version,"
+    echo "[2|3] is python version,"
     echo "PATH is full path to the directory where hfst is installed"
     exit
 fi
 
-if ! [[ "$1" = "--version" && ( "$3" = "--python2" || "$3" = "--python3" ) && "$4" = "--hfst-dir" && "$5" != "" ]]; then
+if ! [[ ( "$1" = "--python2" || "$1" = "--python3" ) && "$2" = "--hfst-dir" && "$3" != "" ]]; then
     echo "ERROR: wrong arguments"
     echo ""
-    echo "Usage: make-debian-package.sh --version VER --python[2|3] --hfst-dir PATH"
+    echo "Usage: make-debian-package.sh --python[2|3] --hfst-dir PATH"
     echo ""
-    echo "VER (N.N.N) is hfst version number, [2|3] is python version,"
-    echo " PATH is full path to the directory where hfst is installed"
+    echo "[2|3] is python version,"
+    echo "PATH is full path to the directory where hfst is installed"
     exit
 fi
 
-HFST_VERSION=$2
-
-HFST_SWIG_DIR=$5
+HFST_SWIG_DIR=$3
 if ! [ -e "$HFST_SWIG_DIR" ]; then
     echo "ERROR: no directory '"$HFST_SWIG_DIR"'"
     exit 1
 fi
 
 PYTHON_VERSION=2
-if [ "$3" = "--python3" ]; then
+if [ "$1" = "--python3" ]; then
     PYTHON_VERSION=3
 fi
 
@@ -46,7 +44,9 @@ fi
 #  Check and edit control file
 #  ---------------------------
 
-DEBVERSION=`echo $HFST_VERSION | sed 's/[0-9].\([0-9].[0-9]\)/\1/'`
+DEBVERSION=`grep 'Version:' ./debian/DEBIAN/control \
+    | perl -pe "s/^Version: ([0-9.\-]+) *$/\1/"`
+
 if ! (grep 'Version: ' debian/DEBIAN/control | grep $DEBVERSION > /dev/null 2> /dev/null); then
     echo "ERROR: wrong version number in control file (field 'Version')"
     exit 1
@@ -87,23 +87,27 @@ fi
 cd debian/usr/lib
 
 
-
 if [ "$PYTHON_VERSION" = "2" ]; then
-    mkdir python2.7 &&
-    chmod 755 python2.7 &&
-    cd python2.7 &&
-    mkdir dist-packages &&
-    chmod 755 dist-packages &&
-    cd dist-packages &&
-    cp $HFST_SWIG_DIR/python2-libhfst.py libhfst.py &&
-    echo '#!/usr/bin/python' >> tmp &&
-    cat libhfst.py >> tmp &&
-    mv tmp libhfst.py &&
-    chmod 755 libhfst.py &&
-    cp $HFST_SWIG_DIR/_libhfst.so _libhfst.so &&
-    strip _libhfst.so &&
-    chmod 755 _libhfst.so &&
-    cd ../..
+    pythondirs="python2.7 python2.6"
+    for python_dir in $pythondirs
+    do
+        mkdir $python_dir &&
+        chmod 755 $python_dir &&
+        cd $python_dir &&
+        mkdir dist-packages &&
+        chmod 755 dist-packages &&
+        cd dist-packages &&
+        cp $HFST_SWIG_DIR/python2-libhfst.py libhfst.py &&
+        echo '#!/usr/bin/python' >> tmp &&
+        cat libhfst.py >> tmp &&
+        mv tmp libhfst.py &&
+        chmod 755 libhfst.py &&
+        cp $HFST_SWIG_DIR/_libhfst.so _libhfst.so &&
+        chrpath -d _libhfst.so &&
+        strip _libhfst.so &&
+        chmod 755 _libhfst.so &&
+        cd ../..
+    done
 else # version 3
     mkdir python3 &&
     chmod 755 python3 &&
@@ -117,6 +121,7 @@ else # version 3
     mv tmp libhfst.py &&
     chmod 755 libhfst.py &&
     cp $HFST_SWIG_DIR/_libhfst.cpython-32mu.so _libhfst.so &&
+    chrpath -d _libhfst.so &&
     strip _libhfst.so &&
     chmod 755 _libhfst.so &&
     cd ../..
@@ -151,6 +156,8 @@ fi
 if [ "$PYTHON_VERSION" = "2" ]; then
     rm -r debian/usr/lib/python2.7/* &&
     rmdir debian/usr/lib/python2.7 &&
+    rm -r debian/usr/lib/python2.6/* &&
+    rmdir debian/usr/lib/python2.6 &&
     # unzip the changelog file, so that svn is not confused because it is missing
     gunzip debian/usr/share/doc/hfstpy2-dev/changelog.Debian.gz
     sed -i "s/hfstpy2/HFSTPY/" debian/usr/share/doc/hfstpy2-dev/changelog.Debian

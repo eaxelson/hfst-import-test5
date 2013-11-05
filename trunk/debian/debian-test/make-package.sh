@@ -16,42 +16,6 @@ HFST_PREFIX=$2
 HFST_LIBNUMBER=`ls $HFST_PREFIX/lib/ | egrep 'libhfst\.so\.[0-9]+$' \
     | perl -pe 's/libhfst\.so\.([0-9]+)$/\1/'`
 
-
-#  -------------------
-#  Check control files
-#  -------------------
-
-if grep "Version: ?" debian/DEBIAN/control > /dev/null; then
-    echo "Version number must be defined in control file!";
-    exit 1;
-fi
-
-if grep "Architecture: ?" debian/DEBIAN/control > /dev/null; then
-    echo "Architecture must be defined in control file!";
-    exit 1;
-fi
-
-if grep "Provides" debian/DEBIAN/control | grep "?" > /dev/null; then
-    echo "Check provided libraries in control file!";
-    exit 1;
-fi
-
-if grep "libhfst ?" debian/DEBIAN/shlibs > /dev/null; then
-    echo "Version number must be defined in shlibs file!";
-    exit 1;
-fi
-
-for library_mentioned in `cat debian/DEBIAN/shlibs | cut -f1 -d' '`;
-do 
-    if (! grep "$library_mentioned" debian/DEBIAN/control > /dev/null); then 
-	if [ "$library_mentioned" != "libhfst" ]; then
-	    echo "ERROR:" $library_mentioned \
-		"not found in control file but mentioned in shlibs file";
-	    exit 1;
-	fi; 
-    fi;
-done
-
 # -------------------
 # Copy the HFST tools
 # -------------------
@@ -88,21 +52,19 @@ if test -e $HFST_PREFIX/bin/hfst-train-tagger-loc; then
     rm -f $HFST_PREFIX/bin/hfst-train-tagger-loc;
 fi
 
-# replace prefix /usr/local/bin/ with /usr/bin/
+# replace prefix /usr/local/bin/ with /usr/bin/ (is this needed?)
 for tool in hfst-twolc;
 do
     sed -i 's/usr\/local\/bin\//usr\/bin\//' $tool;
 done
 
-# TODO: replace local paths with /usr/ in hfst-twolc?
-
 # foma wrapper depends on zlib..
-rm -f hfst_foma hfst-foma-wrapper.sh hfst-foma-wrapper 1> /dev/null 2> /dev/null
+rm -f hfst_foma hfst-foma-wrapper.sh hfst-foma-wrapper hfst-foma 1> /dev/null 2> /dev/null
 
 # strip tools
 for tool in hfst-* htwolcpre*;
 do
-    if ! [ "$tool" = "hfst-train-tagger" ]; then
+    if [ "$tool" != "hfst-twolc" -a "$tool" != "hfst-train-tagger" ]; then
         if (readelf -a $tool 1> /dev/null 2> /dev/null); then
 	    strip $tool;
         fi;
@@ -127,18 +89,16 @@ chmod 0644 *
 
 # also copy tagger python scripts
 PY_SRC_DIR=
-PY_TARGET_DIRS=
 if [ -e "$HFST_PREFIX/lib/python2.7" ]; then
     PY_SRC_DIR="python2.7"
-    PY_TARGET_DIRS="python2.7 python2.6"
 elif [ -e "$HFST_PREFIX/lib/python2.6" ]; then
     PY_SRC_DIR="python2.6"
-    PY_TARGET_DIRS="python2.6"
 else
     echo "ERROR: tagger python scripts not found"
     exit 1
 fi
 
+PY_TARGET_DIRS="python2.7 python2.6"
 for py_target_dir in $PY_TARGET_DIRS
 do
     mkdir $py_target_dir &&
@@ -193,8 +153,8 @@ done
 cd debian/usr/bin
 for program in *; 
 do  
-    # hfst-twolc is a script, skip it
-    if [ "$program" != "hfst-twolc" ]; then
+    # skip scripts
+    if [ "$program" != "hfst-twolc" -a "$program" != "hfst-train-tagger" ]; then
 	if ! [ -L "$program" ]; then 
 	    chrpath -d $program ; 
 	fi; 
@@ -208,7 +168,12 @@ cd ../../..
 # -----------------------
 
 cp debian/DEBIAN/control debian/control
-dpkg-shlibdeps debian/usr/bin/*
+for tool in debian/usr/bin/*;
+do
+    if [ "$tool" != "debian/usr/bin/hfst-twolc" -a "$tool" != "debian/usr/bin/hfst-train-tagger" ]; then
+        dpkg-shlibdeps $tool
+    fi
+done
 rm debian/control
 
 
@@ -272,13 +237,4 @@ gunzip debian/usr/share/doc/hfst-dev/changelog.Debian.gz
 #
 # and to remove
 # sudo dpkg -r foo-dev
-#
-# To make a copy without the .svn files
-# tar -c --exclude=.svn debian-test | tar -x -C debian-test-copy
-# cd debian-test-copy
-# mv debian-test/* .
-# rmdir debian-test
-
-
-
 

@@ -14,8 +14,6 @@ if [ "$1" != "--hfst-srcdir" -o "$3" != "--hfst-instdir" -o "$4" = "" ]; then
     echo "error: usage: "$0" --hfst-scrdir SRCDIR --hfst-instdir INSTDIR"
     exit 1
 fi
-echo "arguments ok"
-exit 
 
 HFST_SRCDIR=$2
 HFST_INSTDIR=$4
@@ -56,8 +54,10 @@ sed -i 's/extra_link_args = \[\]/extra_link_args = \["-L\/usr\/lib\/", "-Wl,-rpa
 touch libhfst.i
 python setup.py build_ext --inplace
 mv libhfst.py python2-libhfst.py
-touch libhfst.i
-python3 setup.py build_ext --inplace
-mv libhfst.py python3-libhfst.py
+if (which python3 1> /dev/null 2> /dev/null); then
+    touch libhfst.i
+    python3 setup.py build_ext --inplace
+    mv libhfst.py python3-libhfst.py
+fi
 
 cd $ORIG_DIR
