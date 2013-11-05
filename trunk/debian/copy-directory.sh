@@ -28,7 +28,7 @@ else
     mkdir $TARGETDIR
 fi
 
-if ! (tar -c --exclude=.svn --exclude-backups $SOURCEDIR | tar -x -C $TARGETDIR); then
+if ! (tar -c --exclude=.svn $SOURCEDIR | tar -x -C $TARGETDIR); then
     echo $0": error: archiving directory "$SOURCEDIR" and extracting it to "$TARGETDIR" failed"
     exit 1
 fi
