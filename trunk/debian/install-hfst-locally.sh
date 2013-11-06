@@ -54,10 +54,17 @@ sed -i 's/extra_link_args = \[\]/extra_link_args = \["-L\/usr\/lib\/", "-Wl,-rpa
 touch libhfst.i
 python setup.py build_ext --inplace
 mv libhfst.py python2-libhfst.py
+mv _libhfst.so python2-_libhfst.so
 if (which python3 1> /dev/null 2> /dev/null); then
     touch libhfst.i
     python3 setup.py build_ext --inplace
     mv libhfst.py python3-libhfst.py
+    if [ -e _libhfst.so ]; then
+        mv _libhfst.so python3-_libhfst.so
+    fi
+    if [ -e _libhfst.cpython-32mu.so ]; then
+        mv _libhfst.cpython-32mu.so python3-_libhfst.so
+    fi
 fi
 
 cd $ORIG_DIR
