@@ -102,7 +102,7 @@ if [ "$PYTHON_VERSION" = "2" ]; then
         cat libhfst.py >> tmp &&
         mv tmp libhfst.py &&
         chmod 755 libhfst.py &&
-        cp $HFST_SWIG_DIR/_libhfst.so _libhfst.so &&
+        cp $HFST_SWIG_DIR/python2-_libhfst.so _libhfst.so &&
         chrpath -d _libhfst.so &&
         strip _libhfst.so &&
         chmod 755 _libhfst.so &&
@@ -120,7 +120,7 @@ else # version 3
     cat libhfst.py >> tmp &&
     mv tmp libhfst.py &&
     chmod 755 libhfst.py &&
-    cp $HFST_SWIG_DIR/_libhfst.cpython-32mu.so _libhfst.so &&
+    cp $HFST_SWIG_DIR/python3-_libhfst.so _libhfst.so &&
     chrpath -d _libhfst.so &&
     strip _libhfst.so &&
     chmod 755 _libhfst.so &&
