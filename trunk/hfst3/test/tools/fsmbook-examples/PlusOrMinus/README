@@ -1,4 +1,0 @@
-To create PlusOrMinus.xfst.att run test.script:
-sh test.script
-Before running the script, make sure that you have xfst installed 
-and set the correct path to it in the test.script.
