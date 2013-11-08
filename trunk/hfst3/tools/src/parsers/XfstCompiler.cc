@@ -71,13 +71,45 @@ using hfst::implementations::HfstBasicTransition;
 #define PRINT_INFO_PROMPT_AND_RETURN_THIS print_transducer_info(); prompt(); return *this;
 #define IF_NULL_PROMPT_AND_RETURN_THIS(x) if (x == NULL) { prompt(); return *this; }
 #define MAYBE_MINIMIZE(x) if (variables_["minimal"] == "ON") { x->minimize(); }
-#define MAYBE_ASSERT(assertion, value) if (!value && assertion && (variables_["quit-on-fail"] == "ON")) { exit(EXIT_FAILURE); }
+#define MAYBE_ASSERT(assertion, value) if (!value && ((variables_["assert"] == "ON" || assertion) && (variables_["quit-on-fail"] == "ON"))) { exit(EXIT_FAILURE); }
 #define MAYBE_QUIT if(variables_["quit-on-fail"] == "ON") { exit(EXIT_FAILURE); }
 
 #include "help_message.cc"
 
 namespace hfst { 
 namespace xfst {
+
+  static std::map<std::string, std::string> variable_explanations_;
+
+  static void initialize_variable_explanations()
+  {
+    variable_explanations_["assert"] = "quit the application if test result is 0 and quit-on-fail is ON";
+    variable_explanations_["char-encoding"] = "character encoding used";
+    variable_explanations_["copyright-owner"] = "";
+    variable_explanations_["directory"] = "<NOT IMPLEMENTED>";
+    variable_explanations_["flag-is-epsilon"] = "<NOT IMPLEMENTED>";
+    variable_explanations_["harmonize-flags"] = "harmonize flag diacritics before composition";
+    variable_explanations_["hopcroft-min"] = "use hopcroft's minimization algorithm";
+    variable_explanations_["minimal"] = "minimize networks after operations";
+    variable_explanations_["name-nets"] = "stores the name of the network when using 'define'";
+    variable_explanations_["obey-flags"] = "obey flag diacritic constraints";
+    variable_explanations_["print-foma-sigma"] = "print identities as '@'";
+    variable_explanations_["print-pairs"] = "show both sides (upper and lower) of labels";
+    variable_explanations_["print-sigma"] = "show sigma when printing a network";
+    variable_explanations_["print-space"] = "insert a space between symbols when printing words";
+    variable_explanations_["print-weight"] = "show weights when printing words or networks";
+    variable_explanations_["quit-on-fail"] = "quit the application if a command cannot be executed";
+    variable_explanations_["quote-special"] = "enclose special characters in double quotes";
+    variable_explanations_["random-seed"] = "<EXPLANATION MISSING>";
+    variable_explanations_["recode-cp1252"] = "<NOT SUPPORTED>";
+    variable_explanations_["recursive-define"] = "<EXPLANATION MISSING>";
+    variable_explanations_["retokenize"] = "<EXPLANATION MISSING>";
+    variable_explanations_["show-flags"] = "show flag diacritics when printing";
+    variable_explanations_["sort-arcs"] = "<NOT IMPLEMENTED>";
+    variable_explanations_["use-timer"] = "<NOT IMPLEMENTED>";
+    variable_explanations_["use-native-lexc"] = "use hfst's own lexc compiler instead of foma's";
+    variable_explanations_["verbose"] = "print more information";
+  }
 
   static const char * APPLY_END_STRING = "<ctrl-d>";
   FILE * outstream_ = stdout;
@@ -119,7 +151,9 @@ namespace xfst {
         variables_["show-flags"] = "OFF";
         variables_["sort-arcs"] = "MAYBE";
         variables_["use-timer"] = "OFF";
+        variables_["use-native-lexc"] = "OFF";
         variables_["verbose"] = "OFF";
+        initialize_variable_explanations();
         prompt();
       }
 
@@ -158,7 +192,9 @@ namespace xfst {
         variables_["show-flags"] = "OFF";
         variables_["sort-arcs"] = "MAYBE";
         variables_["use-timer"] = "OFF";
+        variables_["use-native-lexc"] = "OFF";
         variables_["verbose"] = "OFF";
+        initialize_variable_explanations();
         prompt();
       }
 
@@ -1255,6 +1291,11 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::show(const char* name)
     {
+      if (variables_.find(name) == variables_.end())
+        {
+          fprintf(warnstream_, "no such variable: '%s'\n", name);
+          PROMPT_AND_RETURN_THIS;
+        }        
       fprintf(outstream_, "variable %s = %s\n", name, variables_[name].c_str());
       PROMPT_AND_RETURN_THIS;
     }
@@ -1266,8 +1307,13 @@ namespace xfst {
            var != variables_.end();
            var++)
         {
-          fprintf(stderr, "%20s:%5s: <EXPLANATION MISSING>\n", 
-                  var->first.c_str(), var->second.c_str());
+          if (var->first == "copyright-owner")
+            fprintf(stderr, "%20s:        %s\n", var->first.c_str(),
+                    var->second.c_str());
+          else
+            fprintf(stderr, "%20s:%6s: %s\n", 
+                    var->first.c_str(), var->second.c_str(),
+                    variable_explanations_[var->first].c_str());
         }
       PROMPT_AND_RETURN_THIS;
     }
@@ -1412,8 +1458,7 @@ namespace xfst {
       return this->test_null(true, assertion);
     }
   XfstCompiler& 
-  XfstCompiler::test_null(bool invert_test_result,
-                          bool assertion)
+  XfstCompiler::test_null(bool invert_test_result, bool assertion)
     {
       HfstTransducer * tmp = this->top();
       if (NULL == tmp) {
@@ -3431,24 +3476,49 @@ namespace xfst {
       fprintf(stderr, "HFST: %s\n", text);
       PROMPT_AND_RETURN_THIS;
     }
+
   XfstCompiler&
-  XfstCompiler::read_lexc(FILE* infile)
-    {
-      lexc_.parse(infile);
-      HfstTransducer * t = lexc_.compileLexical();
-      if (t == NULL)
-        {
-          fprintf(errorstream_, "error compiling file in lexc format\n");
-          xfst_fail();
-        }
-      else
-        {
-          MAYBE_MINIMIZE(t);
-          stack_.push(t);
-          print_transducer_info();
-        }
-      PROMPT_AND_RETURN_THIS;
-    }
+  XfstCompiler::read_lexc_from_file(const char * filename)
+  {
+    if (variables_["use-native-lexc"] == "OFF" && 
+        ! HfstTransducer::is_implementation_type_available(hfst::FOMA_TYPE))
+      {
+        fprintf(errorstream_, 
+                "cannot compile file in lexc format, foma back-end is not available\n"
+                "and variable 'use-native-lexc' is 'OFF'");
+        xfst_fail();
+        PROMPT_AND_RETURN_THIS;
+      }
+
+    HfstTransducer * t = NULL;
+
+    if (variables_["use-native-lexc"] == "ON")
+      {
+        FILE * infile = hfst::xfst::xfst_fopen(filename, "r");        
+        lexc_.parse(infile);
+        t = lexc_.compileLexical();
+        hfst::xfst::xfst_fclose(infile, filename);
+      }
+    else
+      {
+        t = HfstTransducer::read_lexc_ptr(std::string(filename), hfst::FOMA_TYPE, verbose_);
+        if (t != NULL)
+          t->convert(format_);
+      }
+    
+    if (t == NULL)
+      {
+        fprintf(errorstream_, "error compiling file in lexc format\n");
+        xfst_fail();
+        PROMPT_AND_RETURN_THIS;
+      }
+
+    MAYBE_MINIMIZE(t);
+    stack_.push(t);
+    print_transducer_info();
+    PROMPT_AND_RETURN_THIS;
+  }
+
   XfstCompiler&
   XfstCompiler::read_att(FILE* infile)
     {

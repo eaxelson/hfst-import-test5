@@ -124,10 +124,16 @@ AC_ARG_WITH([readline],
             [with_readline=no])
 AM_CONDITIONAL([WANT_READLINE], [test x$with_readline != xno])
 
+AC_ARG_ENABLE([all_tools],
+			  [AS_HELP_STRING([--enable-all-tools],
+							  [build all tools @<:@default=no@:>@])],
+			  [enable_all_tools=$enableval],
+			  [enable_all_tools=no])
+
 # allow programs to be built separately (sort alphabetically)
 AC_ARG_ENABLE([affix_guessify],
-			  [AS_HELP_STRING([--enable-affix_guessify],
-							  [build affix_guessify tool @<:@default=yes@:>@])],
+			  [AS_HELP_STRING([--enable-affix-guessify],
+							  [build affix-guessify tool @<:@default=yes@:>@])],
 			  [enable_affix_guessify=$enableval],
 			  [enable_affix_guessify=yes])
 AM_CONDITIONAL([WANT_AFFIX_GUESSIFY], [test x$enable_affix_guessify != xno])
@@ -135,7 +141,7 @@ AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],
 							  [build calculate tool @<:@default=no@:>@])],
 			  [enable_calculate=$enableval],
-			  [enable_calculate=no])
+			  [enable_calculate=$enable_all_tools])
 AM_CONDITIONAL([WANT_CALCULATE], [test x$enable_calculate != xno])
 AC_ARG_ENABLE([compare],
 			  [AS_HELP_STRING([--enable-compare],
@@ -189,7 +195,7 @@ AC_ARG_ENABLE([expand_equivalences],
 			  [AS_HELP_STRING([--enable-edit-metadata],
 							  [build acx tool @<:@default=no@:>@])],
 			  [enable_expand_equivalences=$enableval],
-			  [enable_expand_equivalences=no])
+			  [enable_expand_equivalences=$enable_all_tools])
 AM_CONDITIONAL([WANT_EXPAND_EQUIVALENCES], [test x$enable_expand_equivalences != xno])
 AC_ARG_ENABLE([edit_metadata],
 			  [AS_HELP_STRING([--enable-edit-metadata],
@@ -261,7 +267,7 @@ AC_ARG_ENABLE([lexc],
               [AS_HELP_STRING([--enable-lexc],
                               [build lexc cli and readline @<:@default=no@:>@])],
               [enable_lexc=$enableval],
-              [enable_lexc=no])
+              [enable_lexc=$enable_all_tools])
 AM_CONDITIONAL([WANT_LEXC], [test "x$enable_lexc" != xno])
 AC_ARG_ENABLE([twolc],
               [AS_HELP_STRING([--enable-twolc],
@@ -273,7 +279,7 @@ AC_ARG_ENABLE([tagger],
               [AS_HELP_STRING([--enable-tagger],
                               [build tagger utilities @<:@default=no@:>@])],
               [enable_tagger=$enableval],
-              [enable_tagger=no])
+              [enable_tagger=$enable_all_tools])
 AM_CONDITIONAL([WANT_TAGGER], [test "x$enable_tagger" != xno])
 AC_ARG_ENABLE([lexc2fst],
               [AS_HELP_STRING([--enable-lexc2fst],
@@ -333,7 +339,7 @@ AC_ARG_ENABLE([proc],
 			  [AS_HELP_STRING([--enable-proc],
 							  [build text processing tool @<:@default=no@:>@])],
 			  [enable_proc=$enableval],
-			  [enable_proc=yes])
+			  [enable_proc=$enable_all_tools])
 AM_CONDITIONAL([WANT_PROC], [test x$enable_proc != xno])
 AC_ARG_ENABLE([push_weights],
 			  [AS_HELP_STRING([--enable-push-weights],
@@ -351,7 +357,7 @@ AC_ARG_ENABLE([xfst],
 			  [AS_HELP_STRING([--enable-xfst],
 							  [build xfst tool @<:@default=no@:>@])],
 			  [enable_xfst=$enableval],
-			  [enable_xfst=no])
+			  [enable_xfst=$enable_all_tools])
 AM_CONDITIONAL([WANT_XFST], [test x$enable_xfst != xno])
 AC_ARG_ENABLE([pmatch2fst],
 			  [AS_HELP_STRING([--enable-pmatch2fst],
@@ -393,7 +399,7 @@ AC_ARG_ENABLE([shuffle],
 			  [AS_HELP_STRING([--enable-shuffle],
 							  [build shuffle tool @<:@default=no@:>@])],
 			  [enable_shuffle=$enableval],
-			  [enable_shuffle=no])
+			  [enable_shuffle=$enable_all_tools])
 AM_CONDITIONAL([WANT_SHUFFLE], [test x$enable_shuffle != xno])
 AC_ARG_ENABLE([strings2fst],
 			  [AS_HELP_STRING([--enable-strings2fst],
@@ -435,7 +441,7 @@ AC_ARG_ENABLE([traverse],
 			  [AS_HELP_STRING([--enable-traverse],
 							  [build traversal tool @<:@default=no@:>@])],
 			  [enable_traverse=$enableval],
-			  [enable_traverse=no])
+			  [enable_traverse=$enable_all_tools])
 AM_CONDITIONAL([WANT_TRAVERSE], [test x$enable_test != xno])
 AC_ARG_ENABLE([test],
 			  [AS_HELP_STRING([--enable-test],
@@ -453,13 +459,13 @@ AC_ARG_ENABLE([foma_wrapper],
 			  [AS_HELP_STRING([--enable-foma-wrapper],
 							  [build foma wrapper tool @<:@default=no@:>@])],
 			  [enable_foma_wrapper=$enableval],
-			  [enable_foma_wrapper=no])
+			  [enable_foma_wrapper=$enable_all_tools])
 AM_CONDITIONAL([WANT_FOMA_WRAPPER], [test x$enable_foma_wrapper != xno])
 AC_ARG_ENABLE([xfst],
 			  [AS_HELP_STRING([--enable-xfst],
 							  [build xfst tool @<:@default=no@:>@])],
 			  [enable_xfst=$enableval],
-			  [enable_xfst=yes])
+			  [enable_xfst=$enable_all_tools])
 AM_CONDITIONAL([WANT_XFST], [test x$enable_xfst != xno])
 
 

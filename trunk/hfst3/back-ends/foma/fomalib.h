@@ -351,9 +351,9 @@ FEXPORT void cmatrix_set_cost(struct fsm *net, char *in, char *out, int cost);
 FEXPORT void cmatrix_print(struct fsm *net);
 FEXPORT void cmatrix_print_att(struct fsm *net, FILE *outfile);
 
-/* Lexc */
-FEXPORT struct fsm *fsm_lexc_parse_file(char *myfile);
-FEXPORT struct fsm *fsm_lexc_parse_string(char *mystring);
+/* Lexc. Verbose parameters added in HFST. */
+  FEXPORT struct fsm *fsm_lexc_parse_file(char *myfile, int verbose);
+  FEXPORT struct fsm *fsm_lexc_parse_string(char *mystring, int verbose);
 
 /*************************/
 /* Construction routines */

@@ -356,7 +356,7 @@ class XfstCompiler
   //! @brief Read text form transducer from @a indata
   XfstCompiler& read_text(const char* indata);
   //! @brief Read lexicons from @a infile
-  XfstCompiler& read_lexc(FILE* infile);
+  XfstCompiler& read_lexc_from_file(const char * filename);
   //! @brief Read lexicons from @a indata
   XfstCompiler& read_lexc(const char* indata);
   //! @brief Read a transducer in att format from @a infile

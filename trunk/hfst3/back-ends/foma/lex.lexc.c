@@ -1340,17 +1340,22 @@ extern struct fsm *current_parse;
 static char *tempstr;
 int lexccolumn = 0;
 
-struct fsm *fsm_lexc_parse_string(char *string) {
+int verbose_lexc_ = 1; // HFST addition
+
+// HFST added parameter verbose
+struct fsm *fsm_lexc_parse_string(char *string, int verbose) {
 
    olddefines = defines;
    YY_BUFFER_STATE my_string_buffer;
+   verbose_lexc_ = verbose;
    my_string_buffer = lexc_scan_string(string);
    lexentries = -1;
    lexclineno = 1;
    lexc_init();
    if (lexclex() != 1) {
      if (lexentries != -1) {
-       fprintf(stderr, "%i\n",lexentries);   // HFST changed stdout to stderr
+       if (verbose == 1)
+         fprintf(stderr, "%i\n",lexentries);   // HFST changed stdout to stderr
      }       
    } 
    lexc_delete_buffer(my_string_buffer);
@@ -1358,10 +1363,10 @@ struct fsm *fsm_lexc_parse_string(char *string) {
    return(lexc_to_fsm());
 }
 
-struct fsm *fsm_lexc_parse_file(char *filename) {
+struct fsm *fsm_lexc_parse_file(char *filename, int verbose) {
   char *mystring;
   mystring = file_to_mem(filename);
-  return(fsm_lexc_parse_string(mystring));					       
+  return(fsm_lexc_parse_string(mystring, verbose));					       
 }
 
 void lexc_trim(char *s) {
@@ -1747,10 +1752,13 @@ YY_RULE_SETUP
 {
   lexc_trim(lexctext+8);
   if (lexentries != -1) {
-    fprintf(stderr, "%i, ",lexentries);   // HFST changed stdout to stderr
+    if (verbose_lexc_ == 1)
+      fprintf(stderr, "%i, ",lexentries);   // HFST changed stdout to stderr
   }
-  fprintf(stderr, "%s...",lexctext+8);  // HFST changed stdout to stderr
-  fflush(stderr);
+  if (verbose_lexc_ == 1) {
+    fprintf(stderr, "%s...",lexctext+8);  // HFST changed stdout to stderr
+    fflush(stderr);
+  }
   lexentries = 0;
   lexc_set_current_lexicon(lexctext+8, SOURCE_LEXICON);
   BEGIN(LEXENTRIES);
@@ -1775,7 +1783,7 @@ YY_RULE_SETUP
     lexc_add_word();
     lexc_clear_current_word();
     lexentries++;
-    if (lexentries %10000 == 0) {
+    if (lexentries %10000 == 0 && verbose_lexc_ == 1) {
       fprintf(stderr, "%i...",lexentries);   // HFST changed stdout to stderr
       fflush(stderr);
     }
@@ -1802,7 +1810,7 @@ YY_RULE_SETUP
     lexc_add_word();
     lexc_clear_current_word();
     lexentries++;
-    if (lexentries %10000 == 0) {
+    if (lexentries %10000 == 0 && verbose_lexc_ == 1) {
       fprintf(stderr, "%i...",lexentries);   // HFST changed stdout to stderr
       fflush(stderr);
     }
@@ -2661,7 +2669,7 @@ YY_BUFFER_STATE lexc_scan_buffer  (char * base, yy_size_t  size )
  * @note If you want to scan bytes that may contain NUL values, then use
  *       lexc_scan_bytes() instead.
  */
-YY_BUFFER_STATE lexc_scan_string (yyconst char * yystr )
+YY_BUFFER_STATE lexc_scan_string (yyconst char * yystr)
 {
     
 	return lexc_scan_bytes(yystr,strlen(yystr) );

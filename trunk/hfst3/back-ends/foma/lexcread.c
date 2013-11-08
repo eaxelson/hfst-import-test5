@@ -26,6 +26,8 @@
 #define WORD_ENTRY 1
 #define REGEX_ENTRY 2
 
+extern int verbose_lexc_;
+
 struct multichar_symbols {
     char *symbol;
     short int sigma_number;
@@ -888,8 +890,10 @@ struct fsm *lexc_to_fsm() {
     struct trans *t;
     int i, j,  linecount;
 
-    fprintf(stderr, "Building lexicon...\n");  // HFST changed from stdout to stderr
-    fflush(stderr);
+    if (verbose_lexc_ == 1) {
+      fprintf(stderr, "Building lexicon...\n");  // HFST changed from stdout to stderr
+      fflush(stderr);
+    }
     lexc_merge_states();
     net = fsm_create("");
     xxfree(net->sigma);
@@ -897,7 +901,7 @@ struct fsm *lexc_to_fsm() {
     lexc_number_states();
     if (hasfinal == 0) {
       fprintf(stderr, "Warning: # is never reached!!!\n");  // HFST changed from stdout to stderr
-        return(fsm_empty_set());
+      return(fsm_empty_set());
     }
     sa = xxmalloc(sizeof(struct statelist)*lexc_statecount);
     for (s = statelist; s != NULL; s = s->next) {
@@ -934,13 +938,19 @@ struct fsm *lexc_to_fsm() {
     sigma_cleanup(net,0);
     sigma_sort(net);
     
-    fprintf(stderr, "Determinizing...\n"); // HFST changed from stdout to stderr
-    fflush(stderr);
+    if (verbose_lexc_ == 1) {
+      fprintf(stderr, "Determinizing...\n"); // HFST changed from stdout to stderr
+      fflush(stderr);
+    }
     net = fsm_determinize(net);
-    fprintf(stderr, "Minimizing...\n"); // HFST changed from stdout to stderr
-    fflush(stderr);
+    if (verbose_lexc_ == 1) {
+      fprintf(stderr, "Minimizing...\n"); // HFST changed from stdout to stderr
+      fflush(stderr);
+    }
     net = fsm_topsort(fsm_minimize(net));
-    fprintf(stderr, "Done!\n"); // HFST changed from stdout to stderr
+    if (verbose_lexc_ == 1) {
+      fprintf(stderr, "Done!\n"); // HFST changed from stdout to stderr
+    }
     return(net);
 }
 

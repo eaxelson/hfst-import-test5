@@ -832,7 +832,7 @@ REGEXP12: LABEL { }
     pmatcherror("Definitely no read regex");
   }
 | READ_LEXC {
-    $$ = hfst::HfstTransducer::read_lexc_ptr($1, hfst::TROPICAL_OPENFST_TYPE);
+    $$ = hfst::HfstTransducer::read_lexc_ptr($1, hfst::TROPICAL_OPENFST_TYPE, hfst::pmatch::verbose);
     free($1);
   }
 ;

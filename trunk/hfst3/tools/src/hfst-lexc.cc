@@ -277,7 +277,7 @@ lexc_streams(HfstOutputStream& outstream)
           }
         else
           {
-            trans = HfstTransducer::read_lexc_ptr(lexcfilenames[i], format);
+            trans = HfstTransducer::read_lexc_ptr(lexcfilenames[i], format, verbose);
             if (0 == trans)
               {
                 error(EXIT_FAILURE, 0, "Could not parse %s correctly.\n"

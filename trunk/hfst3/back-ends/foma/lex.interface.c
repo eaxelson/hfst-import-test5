@@ -7641,7 +7641,7 @@ extern int g_list_limit;
 extern int my_yyparse(char *my_string, int lineno);
 extern void my_cmatrixparse(struct fsm *net, char *my_string);
 extern struct fsm *current_parse;
-extern struct fsm *fsm_lexc_parse_string(char *string);
+extern struct fsm *fsm_lexc_parse_string(char *string, int verbose); // verbose is HFST addition
 extern int interfacelex();
 extern struct fsm *current_parse;
 extern void lexc_trim(char *s);
@@ -9376,7 +9376,7 @@ YY_RULE_SETUP
 #line 598 "interface.l"
 {
   if ((lexcfilein = file_to_mem(trim(interfacetext))) != NULL) {
-     stack_add(fsm_lexc_parse_string(lexcfilein));
+    stack_add(fsm_lexc_parse_string(lexcfilein, 1)); // verbose parameter added in HFST
      xxfree(lexcfilein); 
   } else {
     printf("Error opening file '%s'.\n", interfacetext);

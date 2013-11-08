@@ -158,7 +158,7 @@ namespace hfst {
       static void delete_foma(fsm * net);
       static void print_test(fsm * t);
 
-      static fsm * read_lexc(const std::string &filename);
+      static fsm * read_lexc(const std::string &filename, bool verbose);
 
       static unsigned int number_of_states(fsm * net);
       static unsigned int number_of_arcs(fsm * net);
