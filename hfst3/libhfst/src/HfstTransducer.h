@@ -1560,10 +1560,12 @@ transducer.transform_weights(&func);
     /** \brief Compile a lexc file in file \a filename into an HfstTransducer
     of type \a type and return the transducer. */
     static HfstTransducer * read_lexc_ptr(const std::string &filename,
-                      ImplementationType type);
+                                          ImplementationType type,
+                                          bool verbose);
 
     static HfstTransducer read_lexc(const std::string &filename,
-                                    ImplementationType type);
+                                    ImplementationType type,
+                                    bool verbose);
 
     // *** For commandline programs. ***
 

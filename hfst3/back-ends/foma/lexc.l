@@ -38,17 +38,19 @@ extern struct fsm *current_parse;
 static char *tempstr;
 int lexccolumn = 0;
 
-struct fsm *fsm_lexc_parse_string(char *string) {
+// verbose parameter added in HFST
+struct fsm *fsm_lexc_parse_string(char *string, int verbose) {
 
    olddefines = defines;
    YY_BUFFER_STATE my_string_buffer;
-   my_string_buffer = lexc_scan_string(string);
+   my_string_buffer = lexc_scan_string(string, verbose);
    lexentries = -1;
    lexclineno = 1;
    lexc_init();
    if (lexclex() != 1) {
      if (lexentries != -1) {
-         printf("%i\n",lexentries);
+         if (verbose == 1)
+           printf("%i\n",lexentries);
      }       
    } 
    lexc_delete_buffer(my_string_buffer);
@@ -56,10 +58,11 @@ struct fsm *fsm_lexc_parse_string(char *string) {
    return(lexc_to_fsm());
 }
 
-struct fsm *fsm_lexc_parse_file(char *filename) {
+// verbose parameter added in HFST
+struct fsm *fsm_lexc_parse_file(char *filename, int verbose) {
   char *mystring;
   mystring = file_to_mem(filename);
-  return(fsm_lexc_parse_string(mystring));					       
+  return(fsm_lexc_parse_string(mystring, verbose));					       
 }
 
 void lexc_trim(char *s) {

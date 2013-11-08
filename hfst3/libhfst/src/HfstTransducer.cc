@@ -4787,15 +4787,17 @@ HfstTokenizer HfstTransducer::create_tokenizer()
 }
 
 HfstTransducer HfstTransducer::read_lexc(const std::string &filename,
-                                         ImplementationType type) {
-  HfstTransducer * ptr = read_lexc_ptr(filename, type);
+                                         ImplementationType type,
+                                         bool verbose) {
+  HfstTransducer * ptr = read_lexc_ptr(filename, type, verbose);
   HfstTransducer retval(*ptr);
   delete ptr;
   return retval;
 }
 
 HfstTransducer * HfstTransducer::read_lexc_ptr(const std::string &filename,
-                       ImplementationType type)
+                                               ImplementationType type,
+                                               bool verbose)
 {
   (void)filename;
   if (not is_implementation_type_available(type))
@@ -4807,7 +4809,7 @@ HfstTransducer * HfstTransducer::read_lexc_ptr(const std::string &filename,
     {
 #if HAVE_FOMA
     case FOMA_TYPE:
-      retval->implementation.foma = foma_interface.read_lexc(filename);
+      retval->implementation.foma = foma_interface.read_lexc(filename, verbose);
       retval->type=FOMA_TYPE;
       break;
 #endif
@@ -4821,6 +4823,7 @@ HfstTransducer * HfstTransducer::read_lexc_ptr(const std::string &filename,
 #if HAVE_SFST || HAVE_OPENFST
       {
         hfst::lexc::LexcCompiler compiler(type);
+        compiler.setVerbosity(verbose);
         compiler.parse(filename.c_str());
         retval = compiler.compileLexical();
 
