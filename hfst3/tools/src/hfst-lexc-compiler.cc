@@ -51,6 +51,7 @@ static FILE** lexcfiles = 0;
 static unsigned int lexccount = 0;
 static bool is_input_stdin = true;
 static ImplementationType format = hfst::UNSPECIFIED_TYPE;
+static bool with_flags = false;
 
 void
 print_usage()
@@ -96,11 +97,12 @@ parse_options(int argc, char** argv)
           HFST_GETOPT_COMMON_LONG,
           {"format", required_argument, 0, 'f'},
           {"output", required_argument, 0, 'o'},
+          {"withFlags", no_argument,    0, 'F'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             "f:o:",
+                             "f:o:F",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -112,6 +114,10 @@ parse_options(int argc, char** argv)
         case 'f':
           format = hfst_parse_format_name(optarg);
           break;
+        case 'F':
+          with_flags = true;
+          break;
+
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -199,6 +205,7 @@ lexc_streams(LexcCompiler& lexc, HfstOutputStream& outstream)
 
 int main( int argc, char **argv ) {
     hfst_set_program_name(argv[0], "0.1", "HfstLexc2Fst");
+
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)
     {
@@ -227,7 +234,8 @@ int main( int argc, char **argv ) {
     HfstOutputStream* outstream = (outfile != stdout) ?
         new HfstOutputStream(outfilename, format) :
         new HfstOutputStream(format);
-    LexcCompiler lexc(format);
+    LexcCompiler lexc(format, with_flags);
+   // lexc.with_flags_ = with_flags;
     if (silent)
       {
         lexc.setVerbosity(false);

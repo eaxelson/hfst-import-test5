@@ -35,6 +35,7 @@
 namespace hfst { class HfstTransducer; }
 #include "XreCompiler.h"
 #include "../HfstTokenizer.h"
+#include "../implementations/HfstTransitionGraph.h"
 
 namespace hfst {
 //! @brief Namespace for Xerox LexC related specific functions and classes.
@@ -51,6 +52,10 @@ class LexcCompiler
 
   //! @brief create a lexc compiler with @c impl as transducer format.
   LexcCompiler(hfst::ImplementationType impl);
+
+  //! @brief create a lexc compiler with @c impl as transducer format and @c withFlags
+  // as indicator as the trasnducer should be build with or without flags
+  LexcCompiler(hfst::ImplementationType impl, bool withFlags);
 
   //! @brief compile lexc description from @c infile into current compiler
   LexcCompiler& parse(FILE* infile);
@@ -116,14 +121,23 @@ class LexcCompiler
   //! Works like xerox lexc, for compatibility.
   const LexcCompiler& printConnectedness() const;
 
+
+
+
   private:
   bool quiet_;
   bool verbose_;
+  bool with_flags_;
+
   hfst::ImplementationType format_;
   hfst::HfstTokenizer tokenizer_;
   hfst::xre::XreCompiler xre_;
   std::string initialLexiconName_;
   std::map<std::string,hfst::HfstTransducer*> stringTries_;
+  std::map<std::string,HfstBasicTransducer*> stringVectors_;
+  HfstBasicTransducer stringsTrie_;
+
+
   std::map<std::string,hfst::HfstTransducer*> regexps_;
   std::set<std::string> lexiconNames_;
   std::set<std::string> noFlags_;

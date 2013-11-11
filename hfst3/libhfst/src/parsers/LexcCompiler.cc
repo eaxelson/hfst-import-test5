@@ -41,6 +41,7 @@ using std::set_difference;
 #include "lexc-utils.h"
 #include "lexc-parser.hh"
 #include "xre_utils.h"
+#include "HfstStrings2FstTokenizer.h"
 
 using hfst::HfstTransducer;
 using hfst::implementations::HfstBasicTransducer;
@@ -48,6 +49,16 @@ using hfst::implementations::HfstState;
 using hfst::implementations::HfstBasicTransition;
 using hfst::ImplementationType;
 using hfst::xre::XreCompiler;
+
+
+//using same alg as strings to fst
+static char *epsilonname=NULL; // FIX: use this
+static bool has_spaces=false;
+static bool disjunct_strings=false;
+static bool pairstrings=false;
+static char *multichar_symbol_filename=NULL;
+static StringVector multichar_symbols;
+
 
 // stupid flex and yacc
 extern FILE* hlexcin;
@@ -68,7 +79,8 @@ LexcCompiler::LexcCompiler() :
     initialLexiconName_("Root"),
     totalEntries_(0),
     currentEntries_(0),
-    parseErrors_(false)
+    parseErrors_(false),
+    with_flags_(false)
 {}
 
 LexcCompiler::LexcCompiler(ImplementationType impl) :
@@ -79,7 +91,28 @@ LexcCompiler::LexcCompiler(ImplementationType impl) :
     initialLexiconName_("Root"),
     totalEntries_(0),
     currentEntries_(0),
-    parseErrors_(false)
+    parseErrors_(false),
+    with_flags_(false)
+{
+    tokenizer_.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    tokenizer_.add_multichar_symbol("@0@");
+    tokenizer_.add_multichar_symbol("@ZERO@");
+    tokenizer_.add_multichar_symbol("@@ANOTHER_EPSILON@@");
+    string hash("#");
+    lexiconNames_.insert(hash);
+    tokenizer_.add_multichar_symbol(joinerEncode(hash));
+}
+
+LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags) :
+    quiet_(false),
+    verbose_(false),
+    format_(impl),
+    xre_(impl),
+    initialLexiconName_("Root"),
+    totalEntries_(0),
+    currentEntries_(0),
+    parseErrors_(false),
+    with_flags_(withFlags)
 {
     tokenizer_.add_multichar_symbol("@_EPSILON_SYMBOL_@");
     tokenizer_.add_multichar_symbol("@0@");
@@ -160,15 +193,24 @@ LexcCompiler::addStringEntry(const string& data,
     totalEntries_++;
     continuations_.insert(continuation);
     string encodedCont = string(continuation);
-    if (noFlags_.find(continuation) == noFlags_.end())
-      {
-        encodedCont = flagJoinerEncode(encodedCont, false);
-      }
+    if (with_flags_)
+    {
+        if (noFlags_.find(continuation) == noFlags_.end())
+          {
+            encodedCont = flagJoinerEncode(encodedCont, false);
+          }
+        else
+          {
+            encodedCont = joinerEncode(encodedCont);
+          }
+    }
     else
-      {
+    {
         encodedCont = joinerEncode(encodedCont);
-      }
+    }
     tokenizer_.add_multichar_symbol(encodedCont);
+
+    /*
     HfstTransducer newPath(data + string("@@ANOTHER_EPSILON@@"),
                            tokenizer_, format_);
     if (weight != 0)
@@ -194,6 +236,51 @@ LexcCompiler::addStringEntry(const string& data,
             fprintf(stderr, SIZE_T_SPECIFIER "...", currentEntries_);
           }
       }
+
+    */
+
+    // build string pair vector map
+    //TODO: manage weights
+
+    string joinerEnc = currentLexiconName_;
+    if (with_flags_)
+    {
+        if (noFlags_.find(currentLexiconName_) == noFlags_.end())
+          {
+            flagJoinerEncode(joinerEnc, true);
+          }
+        else
+          {
+            joinerEncode(joinerEnc);
+          }
+    }
+    else
+    {
+        joinerEncode(joinerEnc);
+    }
+
+    tokenizer_.add_multichar_symbol(joinerEnc);
+ //   StringPair newStringPair(data + string("@@ANOTHER_EPSILON@@") + encodedCont,
+ //                                             data + string("@@ANOTHER_EPSILON@@") + encodedCont);
+
+    StringPairVector newVector(tokenizer_.tokenize(joinerEnc + data + encodedCont));
+
+  //  HfstBasicTransducer oneLexicon;
+  //  oneLexicon.disjunct(newVector, 0);
+
+    stringsTrie_.disjunct(newVector, 0);
+
+    /*
+    if (stringVectors_.find(currentLexiconName_) == stringVectors_.end())
+    {
+        stringVectors_.insert(pair<string,HfstBasicTransducer*>(currentLexiconName_,
+                                                      new HfstBasicTransducer()));
+    }
+    stringVectors_[currentLexiconName_]->disjunct(newVector, 0);
+
+*/
+
+
     return *this;
 }
 
@@ -201,19 +288,29 @@ LexcCompiler&
 LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
         const string& continuation, double weight)
 {
+    //printf("upper: %s lower: %s: continuation: %s \n", upper.c_str(), lower.c_str(), continuation.c_str());
+           //identityWoJoin.write_in_att_format(stdout, 1);
     currentEntries_++;
     totalEntries_++;
     continuations_.insert(continuation);
     string encodedCont = string(continuation);
-    if (noFlags_.find(continuation) == noFlags_.end())
-      {
-        encodedCont = flagJoinerEncode(encodedCont, false);
-      }
+    if (with_flags_) {
+        if (noFlags_.find(continuation) == noFlags_.end())
+          {
+            encodedCont = flagJoinerEncode(encodedCont, false);
+          }
+        else
+          {
+            encodedCont = joinerEncode(encodedCont);
+          }
+    }
     else
-      {
+    {
         encodedCont = joinerEncode(encodedCont);
-      }
+    }
     tokenizer_.add_multichar_symbol(encodedCont);
+
+    /*
     HfstTransducer newPath(upper + "@@ANOTHER_EPSILON@@",
                            lower + "@@ANOTHER_EPSILON@@",
                            tokenizer_, format_);
@@ -240,6 +337,89 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
             fprintf(stderr, SIZE_T_SPECIFIER "...", currentEntries_);
           }
       }
+     */
+    // build string pair vector map
+    //TODO: manage weights
+
+    string joinerEnc = currentLexiconName_;
+    if (with_flags_)
+    {
+        if (noFlags_.find(currentLexiconName_) == noFlags_.end())
+          {
+            flagJoinerEncode(joinerEnc, true);
+          }
+        else
+          {
+            joinerEncode(joinerEnc);
+          }
+    }
+    else
+    {
+        joinerEncode(joinerEnc);
+    }
+    tokenizer_.add_multichar_symbol(joinerEnc);
+   // StringPair newStringPair(upper + string("@@ANOTHER_EPSILON@@") + encodedCont,
+   //                                           lower + string("@@ANOTHER_EPSILON@@") + encodedCont);
+
+
+    int upperSize = upper.size();
+    int lowerSize = lower.size();
+
+    StringVector upV;
+    StringVector loV;
+
+    StringPairVector newVector;
+
+    if ( upperSize > lowerSize)
+    {
+        std::string epsilons = "";
+        for(int i=1; i <= upperSize-lowerSize ; i++)
+        {
+            //cout << "another epsilon \n";
+            epsilons = epsilons + string("@@ANOTHER_EPSILON@@");
+
+        }
+        newVector = tokenizer_.tokenize(joinerEnc + upper + encodedCont,
+                            joinerEnc + lower + epsilons + encodedCont);
+    }
+    else if (upperSize < lowerSize)
+    {
+        std::string epsilons = "";
+        for(int i=1; i <= lowerSize-upperSize ; i++)
+        {
+            //cout << "another epsilon \n";
+            epsilons = epsilons + string("@@ANOTHER_EPSILON@@");
+
+        }
+        newVector = tokenizer_.tokenize(joinerEnc + upper + epsilons + encodedCont,
+                            joinerEnc + lower + encodedCont);
+    }
+    else
+    {
+        newVector = tokenizer_.tokenize(joinerEnc + upper + encodedCont,
+                    joinerEnc + lower + encodedCont);
+    }
+
+
+  //  StringPairVector newVector(tokenizer_.tokenize(joinerEnc + upper + string("@@ANOTHER_EPSILON@@") + encodedCont,
+   //         joinerEnc + lower + string("@@ANOTHER_EPSILON@@") + encodedCont));
+
+    /*
+    HfstBasicTransducer oneLexicon;
+    oneLexicon.disjunct(newVector, 0);
+
+    if (stringVectors_.find(currentLexiconName_) == stringVectors_.end())
+    {
+        stringVectors_.insert(pair<string,HfstBasicTransducer*>(currentLexiconName_,
+                                                      new HfstBasicTransducer()));
+    }
+    stringVectors_[currentLexiconName_]->disjunct(newVector, 0);
+     */
+    stringsTrie_.disjunct(newVector, 0);
+
+
+
+
     return *this;
 }
 
@@ -252,14 +432,21 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
     totalEntries_++;
     continuations_.insert(continuation);
     string encodedCont = string(continuation);
-    if (noFlags_.find(continuation) == noFlags_.end())
-      {
-        encodedCont = flagJoinerEncode(encodedCont, false);
-      }
+    if (with_flags_)
+    {
+        if (noFlags_.find(continuation) == noFlags_.end())
+          {
+            encodedCont = flagJoinerEncode(encodedCont, false);
+          }
+        else
+          {
+            encodedCont = joinerEncode(encodedCont);
+          }
+    }
     else
-      {
+    {
         encodedCont = joinerEncode(encodedCont);
-      }
+    }
     tokenizer_.add_multichar_symbol(encodedCont);
     char* xre_encoded = hfst::xre::add_percents(encodedCont.c_str());
     HfstTransducer* newPaths = xre_.compile(regexp + " "  + string(xre_encoded));
@@ -359,112 +546,92 @@ LexcCompiler::setInitialLexiconName(const string& lexiconName)
 HfstTransducer*
 LexcCompiler::compileLexical()
   {
+
     if (parseErrors_)
       {
         return 0;
       }
     printConnectedness();
-    HfstTransducer lexicons(format_);
-    // combine tries with reg.exps and minimize
-    if (verbose_)
-      {
-        fprintf(stderr, "Disjuncting lexicons... ");
-      }
-    for (set<string>::const_iterator s = lexiconNames_.begin();
-         s != lexiconNames_.end();
-         ++s)
-      {
-        if (*s == "#")
-          {
-            continue;
-          }
-        if (verbose_)
-          {
-            fprintf(stderr, "%s", s->c_str());
-          }
-        string joinerEnc = *s;
-        if (noFlags_.find(*s) == noFlags_.end())
-          {
-            flagJoinerEncode(joinerEnc, true);
-          }
-        else
-          {
-            joinerEncode(joinerEnc);
-          }
-        HfstTransducer leftJoiner(joinerEnc, joinerEnc, format_);
-        HfstTransducer lexicon(format_);
-        if (stringTries_.find(*s) != stringTries_.end())
-          {
-            lexicon.disjunct(*stringTries_[*s]);
-          }
-        if (regexps_.find(*s) != regexps_.end())
-          {
-            lexicon.disjunct(*regexps_[*s]);
-          }
-        lexicon = leftJoiner.concatenate(lexicon).minimize();
-        if (verbose_)
-          {
-            fprintf(stderr, " minimising... ");
-          }
-        lexicons.disjunct(lexicon).minimize();
-      }
+/*
+    if( with_flags_)
+        fprintf(stderr, "With Flags \n \n");
+    else
+        fprintf(stderr, "no Flags \n \n");
+*/
 
-  // printf("lexicons: \n");
-  //  lexicons.write_in_att_format(stdout, 1);
-
-    lexicons.substitute("@ZERO@", "0");
-    lexicons.substitute("@@ANOTHER_EPSILON@@", "@_EPSILON_SYMBOL_@");
-    lexicons.prune_alphabet();
-
+    HfstTransducer lexicons(stringsTrie_, format_);
+    lexicons.minimize();
     // repeat star to overgenerate
     lexicons.repeat_star().minimize();
+
+    lexicons.substitute("@@ANOTHER_EPSILON@@", "@_EPSILON_SYMBOL_@");
+    lexicons.substitute("@ZERO@", "0");
+    lexicons.prune_alphabet();
+
+
+    HfstTransducer start(joinerEncode(initialLexiconName_), tokenizer_, format_);
+    string endString = "#";
+    joinerEncode(endString);
+    HfstTransducer end(endString, tokenizer_, format_);
+    lexicons = start.concatenate(lexicons).concatenate(end).minimize();
 
     //printf("lexicons: \n");
     //lexicons.write_in_att_format(stdout, 1);
 
-    if (verbose_)
-      {
-        fprintf(stderr, "\n" "calculating correct lexicon combinations...");
-      }
+    /*
+    // if flags
+
+    // for every lex_joiner in noFlags, find only strings where it occurs twice in a row
+    // and then replace those joiners with epsilons
+    for (set<string>::const_iterator s = noFlags_.begin();
+         s != noFlags_.end();
+         ++s)
+    {
+        ...
+        string joinerEnc = *s;
+        joinerEncode(joinerEnc);
+        HfstTransducer joiner(joinerEnc, joinerEnc, format_);
+     }
+    */
+    HfstBasicTransducer joinersTrie_;
+    HfstSymbolSubstitutions allJoinersToEpsilon;
+    // for every lex_joiner in noFlags, find only strings where it occurs twice in a row
+    // and then replace those joiners with epsilons
+    for (set<string>::const_iterator s = lexiconNames_.begin();
+         s != lexiconNames_.end();
+         ++s)
+    {
+        if (verbose_)
+        {
+        fprintf(stderr, "Morphotaxing... %s ", s->c_str());
+        }
+        string joinerEnc = *s;
+        joinerEncode(joinerEnc);
+        HfstTransducer joiner(joinerEnc, joinerEnc, format_);
 
 
+        // joiners trie version (later compose)
+       // tokenizer_.add_multichar_symbol(joinerEnc);
+        StringPairVector newVector(tokenizer_.tokenize(joinerEnc + joinerEnc));
+        joinersTrie_.disjunct(newVector, 0);
 
-    string startEncP = initialLexiconName_;
-    flagJoinerEncode(startEncP, false);
-    string startEncR = initialLexiconName_;
-    flagJoinerEncode(startEncR, true);
-    HfstTransducer start(startEncP, startEncP, format_);
-    HfstTransducer startP(startEncP, startEncP, format_);
-    string endEncR = "#";
-    flagJoinerEncode(endEncR, true);
-    string endEncP = "#";
-     flagJoinerEncode(endEncP, false);
-    HfstTransducer end(endEncR, endEncR, format_);
+        //printf ("\ninsert...\n");
+        allJoinersToEpsilon.insert(StringPair(joinerEnc, "@_EPSILON_SYMBOL_@"));
+        //printf ("\ndone.\n");
+     }
 
+    string rootJoiner = initialLexiconName_;
+    string hashJoiner = "#";
+    joinerEncode(rootJoiner);
+    joinerEncode(hashJoiner);
 
-
-    if (verbose_)
-      {
-        fprintf(stderr, "Using flags for... "
-                " %s .* #, ", initialLexiconName_.c_str());
-      }
-    lexicons = start.concatenate(lexicons).concatenate(end).minimize();
-
-    //printf("lexicons with first and last: \n");
-    //lexicons.write_in_att_format(stdout, 1);
-    lexicons.substitute("@_EPSILON_SYMBOL_@", "_TMP_EPS_").minimize();
+    allJoinersToEpsilon.insert(StringPair(rootJoiner, "@_EPSILON_SYMBOL_@"));
+    allJoinersToEpsilon.insert(StringPair(hashJoiner, "@_EPSILON_SYMBOL_@"));
 
 
-
-
-/////////////
-    /// printf ("\nSet of pairs & unknown..\n");
-       int t0 = time(NULL);
+    /// get right side of every pair
     HfstBasicTransducer fsm(lexicons);
-
-    StringPairSet setOfPairs;
-    bool hasPairs = false;
-
+    StringSet rightSymbols;
     // Go through all states
     for (HfstBasicTransducer::const_iterator it = fsm.begin();
     it != fsm.end(); it++ )
@@ -473,296 +640,52 @@ LexcCompiler::compileLexical()
         for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
          = it->begin(); tr_it != it->end(); tr_it++)
         {
+            String alph2 = tr_it->get_output_symbol();
 
-            if ( tr_it->get_input_symbol() != tr_it->get_output_symbol())
+            String prefix1("@@ANOTHER_EPSILON@@");
+            String prefix2("$_LEXC_JOINER.");
+            String prefix3("@_");
+            if( alph2.substr(0, prefix1.size()) != prefix1 &&
+                    alph2.substr(0, prefix2.size()) != prefix2 &&
+                    alph2.substr(0, prefix3.size()) != prefix3 )
             {
-                hasPairs = true;
-                String alph1 = tr_it->get_input_symbol();
-                String alph2 = tr_it->get_output_symbol();
-                setOfPairs.insert(StringPair(alph1, alph2));
+                rightSymbols.insert(alph2);
+
             }
         }
     }
 
-    /*
-      printf("------------------ \n");
-     for (StringPairSet::const_iterator s = setOfPairs.begin();
-                    s != setOfPairs.end();
-                    ++s)
-         {
-             printf("%s , %s \n", s->first.c_str(), s->second.c_str());
-             //printf("in alph: %s", alphabet[i] ) ;
-         }
-     printf("------------------ \n");
-     */
+    for ( StringSet::const_iterator it = rightSymbols.begin(); it != rightSymbols.end(); ++it)
+    {
+        String alph = *it;
+        tokenizer_.add_multichar_symbol(alph);
+        StringPairVector newVector(tokenizer_.tokenize(alph));
+        joinersTrie_.disjunct(newVector, 0);
+    }
 
-    HfstTransducer unknown(setOfPairs, format_);
+    HfstTransducer joinersAll(joinersTrie_, format_);
+    joinersAll.repeat_star();
+    joinersAll.minimize();
 
-    int t1 = time(NULL);
-    /// printf ("time: %d secs\n", t1 - t0);
+     //printf("lexicons before compose: \n");
+     //lexicons.write_in_att_format(stdout, 1);
 
+    // printf("joinersAll: \n");
+    // joinersAll.write_in_att_format(stdout, 1);
+    // printf("\n");
 
+    lexicons.compose(joinersAll).minimize();
 
-
-    HfstTransducer identity("@_IDENTITY_SYMBOL_@", format_);
-    HfstTransducer identityStar(identity);
-    identityStar.repeat_star().minimize();
-
-
-
- 
-    /// printf ("sigma star...\n");
-    t0 = time(NULL);
-    // setOfPairs.insert(StringPair("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@"));
-    HfstTransducer sigmaStar(setOfPairs, format_, false);
-
-        sigmaStar.disjunct(identity).repeat_star().minimize();
-    t1 = time(NULL);
-    /// printf ("sigma star time = %d secs\n", t1 - t0);
-
-
-    //printf("unknown: \n");
-    //unknown.write_in_att_format(stdout, 1);
-
-    //printf("sigmaStar: \n");
-    //sigmaStar.write_in_att_format(stdout, 1);
-
-///////
-
-
-
-    // HfstTransducer identityPlus(identity);
-    //identityPlus.repeat_plus().minimize();
-
-
-
-    // Root, hash
-    HfstTransducer startR(startEncR, startEncR, format_);
-    HfstTransducer endP(endEncP, endEncP, format_);
-
-    HfstTransducer root(startP);
-    root.concatenate(startR).minimize();
-    HfstTransducer hash(endP);
-    hash.concatenate(end).minimize();
-
-
-    HfstTransducer subPartsUnion(format_);
-    HfstSymbolSubstitutions allJoinersToEpsilon;
-
-    // for every lex_joiner in noFlags, find only atrings where it occurs twice in a row
-    // and then replace those joiners with epsilons
-    for (set<string>::const_iterator s = noFlags_.begin();
-         s != noFlags_.end();
-         ++s)
-      {
-        if (*s == "#")
-          {
-            // # doesn't form pairs, only works at end
-            continue;
-          }
-        if (*s == initialLexiconName_)
-          {
-            // we compose and remove root lexicon last to avoid difficulties
-            // with its dual meaning
-            continue;
-          }
-        if (verbose_)
-          {
-            fprintf(stderr, "Morphotaxing... "
-                    " %s -> %s -> #, ", initialLexiconName_.c_str(),
-                    s->c_str());
-          }
-
-
-        string joinerEnc = *s;
-        joinerEncode(joinerEnc);
-        HfstTransducer joiner(joinerEnc, joinerEnc, format_);
-
-
-
-
-
-
-        //////////////////2nd version
-
-
-
-        HfstTransducer identityWoJoin("@_IDENTITY_SYMBOL_@", format_);
-        identityWoJoin.insert_to_alphabet(joinerEnc);
-
-
-        //printf("identityWoJoin: \n");
-        //identityWoJoin.write_in_att_format(stdout, 1);
-
-
-
-        HfstTransducer iWoJoniUnk(identityWoJoin);
-        // Disjunct with unknown only if there are some unknown pairs
-        // otherwise, unknown is empty transducer
-        if ( hasPairs ) iWoJoniUnk.disjunct(unknown).minimize();
-
-
-
-        //printf("iWoJoniUnk: \n");
-        //iWoJoniUnk.write_in_att_format(stdout, 1);
-
-
-        /// printf ("\nBuilding subpart...\n");
-        int t0 = time(NULL);
-
-        HfstTransducer subPart(sigmaStar);
-        subPart.concatenate(iWoJoniUnk).minimize();
-
-        //printf("small subpart: \n");
-        //subPart.write_in_att_format(stdout, 1);
-
-        subPart.concatenate(joiner)
-              .concatenate(iWoJoniUnk)
-              .concatenate(sigmaStar).minimize();
-
-
-        //printf("subPart: \n");
-        //subPart.write_in_att_format(stdout, 1);
-
-
-
-        t1 = time(NULL);
-        /// printf ("Building subpart time = %d secs\n", t1 - t0);
-
-
-        /// printf ("\nSubpart disjunct...\n");
-        t0 = time(NULL);
-        subPartsUnion.disjunct(subPart).minimize();
-        t1 = time(NULL);
-        /// printf ("time = %d secs\n", t1 - t0);
-
-
-        allJoinersToEpsilon.insert(StringPair(joinerEnc, "@_EPSILON_SYMBOL_@"));
-
-
-      }
-
-    //  printf("lexicons before subtract: \n");
+    //printf("lexicons --filtered: \n");
     //lexicons.write_in_att_format(stdout, 1);
-
-    if (verbose_)
-    {
-      fprintf(stderr, "\nSubtracting... \n");
-
-    }
-    t0 = time(NULL);
-    lexicons.subtract(subPartsUnion).minimize();
-    t1 = time(NULL);
-    /// printf ("time = %d secs\n", t1 - t0);
-
-
-    //printf("lexicons --subtract: \n");
-    //lexicons.write_in_att_format(stdout, 1);
-
-
-
-    HfstTransducer startAnyThing(startP);
-    startAnyThing.concatenate(identityStar).minimize();
-
-
-    //printf("startAnyThing: \n");
-    //startAnyThing.write_in_att_format(stdout, 1);
-
-
-    HfstTransducer anyThingEnd(identityStar);
-    anyThingEnd.concatenate(end).minimize();
-
-    //printf("anyThingEnd: \n");
-    //anyThingEnd.write_in_att_format(stdout, 1);
-
-
-    if (verbose_)
-    {
-      fprintf(stderr, "\nComposing start... \n");
-    }
-    t0 = time(NULL);
-    lexicons.compose(startAnyThing).minimize();
-    t1 = time(NULL);
-    /// printf ("time = %d secs\n", t1 - t0);
-
-    //  printf("lexicons --root: \n");
-    //  lexicons.write_in_att_format(stdout, 1);
-
-    if (verbose_)
-    {
-      fprintf(stderr, "\nComposing end... \n");
-    }
-
-    t0 = time(NULL);
-    lexicons.compose(anyThingEnd).minimize();
-    t1 = time(NULL);
-    /// printf ("time = %d secs\n", t1 - t0);
-
-
-
-
-
-    //////////////////---------
-    //lexicons.substitute(joinerEnc, "@_EPSILON_SYMBOL_@").minimize();
 
     lexicons.substitute(allJoinersToEpsilon).minimize();
-
-
-    //printf("lexicons joiner epsilon: \n");
-    //lexicons.write_in_att_format(stdout, 1);
-
-
-
-    lexicons.substitute("_TMP_EPS_", "@_EPSILON_SYMBOL_@").minimize();
-
-
-    if (verbose_)
-    {
-    fprintf(stderr, "\nChanging flags... \n");
-    }
-
-
-    t0 = time(NULL);
-
-
-    // Change fake flags to real flags
-    lexicons.prune_alphabet();
-    //printf("alphabet lexicons: \n");
-    StringSet transducerAlphabet = lexicons.get_alphabet();
-    for (StringSet::const_iterator s = transducerAlphabet.begin();
-                   s != transducerAlphabet.end();
-                   ++s)
-    {
-        //printf("%s \n", s->c_str());
-        String alph = *s;
-    if ( alph[0] == '$' )
-    {
-        // TODO: do this only for strings that look like $.....$
-        replace(alph.begin(), alph.end(), '$', '@');
-
-        //std::cout << alph << '\n';
-        lexicons.substitute(*s, alph).minimize();
-    }
-
-    }
     lexicons.prune_alphabet();
 
 
-    t1 = time(NULL);
-    /// printf ("time = %d secs\n", t1 - t0);
-
-    // lexicons.substitute("@ZERO@", "0");
-   // lexicons.substitute("@@ANOTHER_EPSILON@@", "@_EPSILON_SYMBOL_@");
-    if (verbose_)
-      {
-        fprintf(stderr, "Converting...\n");
-      }
 
     HfstTransducer* rv = new HfstTransducer(lexicons);
-    if (verbose_)
-      {
-        fprintf(stderr, "Minimizing...\n");
-      }
+
     rv->minimize();
     return rv;
 }
