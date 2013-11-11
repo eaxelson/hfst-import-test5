@@ -908,11 +908,15 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
             $$->set_name($1);
             free(Ins_trans);
             hfst::pmatch::inserted_transducers.insert($1);
+            if (hfst::pmatch::verbose) {
+                hfst::pmatch::used_definitions.insert($1);
+            }
         } else {
             if (hfst::pmatch::verbose) {
                 std::cerr << "including " <<
                     hfst::pmatch::definitions[$1]->get_name() << " with ";
                 hfst::pmatch::print_size_info(hfst::pmatch::definitions[$1]);
+                hfst::pmatch::used_definitions.insert($1);
             }
             $$ = new HfstTransducer(* hfst::pmatch::definitions[$1]);
         }
@@ -958,11 +962,15 @@ INSERT: INS_LEFT SYMBOL RIGHT_PARENTHESIS {
         $$->set_name($2);
         free(Ins_trans);
         hfst::pmatch::inserted_transducers.insert($2);
+        if (hfst::pmatch::verbose) {
+            hfst::pmatch::used_definitions.insert($2);
+        }
     } else if(hfst::pmatch::definitions.count($2) == 1) {
         if (hfst::pmatch::verbose) {
             std::cerr << "including " <<
                 hfst::pmatch::definitions[$2]->get_name() << " with ";
             hfst::pmatch::print_size_info(hfst::pmatch::definitions[$2]);
+            hfst::pmatch::used_definitions.insert($2);
         }
         $$ = new HfstTransducer(* hfst::pmatch::definitions[$2]);
     } else {

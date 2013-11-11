@@ -23,6 +23,7 @@ extern std::map<std::string,hfst::HfstTransducer*> definitions;
 extern std::set<std::string> def_insed_transducers;
 extern std::set<std::string> inserted_transducers;
 extern std::set<std::string> unsatisfied_insertions;
+extern std::set<std::string> used_definitions;
 extern HfstTransducer* last_compiled;
 extern ImplementationType format;
 extern bool verbose;
@@ -90,6 +91,9 @@ char* parse_quoted(const char *s);
 int* get_n_to_k(const char* s);
 
 double get_weight(const char* s);
+
+void init_globals(void);
+
 /**
  * @brief compile new transducer
  */
