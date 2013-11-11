@@ -56,15 +56,15 @@ A7RESTRICTED [ <>%!;:""]
 /* non-restricted ASCII */
 A7UNRESTRICTED [\x21-\x7e]{-}[ <>%!;:""]
 /* special meaning in xre */
-XRERESTRICTED [- <>%!:;@0~""\\&?$+*/_{}\]\[-]
+XRERESTRICTED [-\t <>%!:;@0~""\\&?$+*/_{}\]\[-]
 /* non-restricted ASCII in XRE */
 XREUNRESTRICTED [\x21-\x7e\n]{-}[- <>%!:;@0~""\\&?$+*/_{}\]\[-]
 
 
 /* RegExp. stuff */
 XREALPHA {XREUNRESTRICTED}|{U8H}|{EC}
-XREOPERATOR [~\\&-/ |+*$_\]\[{}()0?:""]|"@\""|"$."|"$?"|"./."|"<>"|".#."|"."[riul]
-XREQUOTSTRING "\""[^""]*"\""
+XREOPERATOR [~\\&\-/\t |+*$_\]\[{}()0?:""]|"@\""|"$."|"$?"|"./."|"<>"|".#."|"."[riul]
+XREQUOTSTRING "\""([^""\n;]|"%;"|"\\\"")*"\""
 XRECHAR {XREOPERATOR}|{XREALPHA}|{XREQUOTSTRING}
 XRETOKEN {XRECHAR}+
 

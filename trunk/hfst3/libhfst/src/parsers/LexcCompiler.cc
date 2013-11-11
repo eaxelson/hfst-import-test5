@@ -41,7 +41,7 @@ using std::set_difference;
 #include "lexc-utils.h"
 #include "lexc-parser.hh"
 #include "xre_utils.h"
-#include "HfstStrings2FstTokenizer.h"
+#include "../../../tools/src/HfstStrings2FstTokenizer.h"
 
 using hfst::HfstTransducer;
 using hfst::implementations::HfstBasicTransducer;
@@ -64,6 +64,7 @@ static StringVector multichar_symbols;
 extern FILE* hlexcin;
 extern int hlexcparse();
 extern int hlexcnerrs;
+extern void hlexclex_destroy();
 
 #ifndef DEBUG_MAIN
 
@@ -135,6 +136,7 @@ LexcCompiler& LexcCompiler::parse(FILE* infile)
       {
         hfst::lexc::set_infile_name("<unnamed>");
       }
+    hlexclex_destroy();
     hlexcin = infile;
     hlexcparse();
     if (hlexcnerrs > 0)
@@ -147,6 +149,7 @@ LexcCompiler& LexcCompiler::parse(FILE* infile)
 LexcCompiler& LexcCompiler::parse(const char* filename)
 {
     lexc_ = this;
+    hlexclex_destroy();
     hfst::lexc::set_infile_name(filename);
     hlexcin = fopen(filename, "r");
     if (hlexcin == NULL)
@@ -777,7 +780,13 @@ main(int argc, char** argv)
       {
         existence_check = fopen("LexcCompiler_test.lexc", "w");
         assert(existence_check != NULL);
-        fprintf(existence_check, "LEXICON Root\ncat # ;\ndog Plural ;\n");
+        fprintf(existence_check, "Definitions\n"        \
+                "\tdef1 = a\tb c;\n" \
+                "\tdef2 = \"asdf\";\n" \
+                "\tdef3 = \"sdfg\";\n" \
+                "\tdef4 = \"xxx\"; def5 = \"zzz\";\n" \
+                "\tdef6 = \"%;\";\n" \
+                "LEXICON Root\ncat # ;\ndog Plural ;\n");
         fclose(existence_check);
       }
     existence_check = fopen("LexcCompiler_test2.lexc", "r");
@@ -905,4 +914,3 @@ main(int argc, char** argv)
   }
 #endif
 // vim: set ft=cpp.doxygen:
-
