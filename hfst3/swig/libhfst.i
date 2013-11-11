@@ -350,7 +350,7 @@ public:
     void write_in_att_format(HfstFile &ofile, bool write_weights=true) const;
     void write_in_att_format(char * buffer, bool write_weights=true) const;
     virtual ~HfstTransducer(void);
-    static HfstTransducer read_lexc(const std::string &filename, ImplementationType type);
+    static HfstTransducer read_lexc(const std::string &filename, ImplementationType type, bool );
     static HfstTransducer universal_pair(ImplementationType type);
 
     static bool is_implementation_type_available(ImplementationType impl);
