@@ -49,6 +49,7 @@ std::map<std::string,hfst::HfstTransducer*> definitions;
 std::set<std::string> def_insed_transducers;
 std::set<std::string> inserted_transducers;
 std::set<std::string> unsatisfied_insertions;
+std::set<std::string> used_definitions;
 char* startptr;
 hfst::HfstTransducer* last_compiled;
 hfst::ImplementationType format;
@@ -369,15 +370,13 @@ get_weight(const char *s)
     return rv;
 }
 
-std::map<std::string, HfstTransducer*>
-compile(const string& pmatch, map<string,HfstTransducer*>& defs,
-        ImplementationType impl, bool be_verbose, bool do_flatten)
+void init_globals(void)
 {
-    // lock here?
     definitions.clear();
     def_insed_transducers.clear();
     inserted_transducers.clear();
     unsatisfied_insertions.clear();
+    used_definitions.clear();
 
     special_pmatch_symbols.clear();
     special_pmatch_symbols.insert(RC_ENTRY_SYMBOL);
@@ -393,6 +392,14 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     special_pmatch_symbols.insert(ENTRY_SYMBOL);
     special_pmatch_symbols.insert(EXIT_SYMBOL);
 
+}
+
+std::map<std::string, HfstTransducer*>
+compile(const string& pmatch, map<string,HfstTransducer*>& defs,
+        ImplementationType impl, bool be_verbose, bool do_flatten)
+{
+    // lock here?
+    init_globals();
     data = strdup(pmatch.c_str());
     startptr = data;
     len = strlen(data);
@@ -418,13 +425,24 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
             return retval;
         }
     }
+    if (hfst::pmatch::verbose) {
+        std::map<std::string, hfst::HfstTransducer *>::iterator defs_itr;
+        for (defs_itr = definitions.begin(); defs_itr != definitions.end();
+             ++defs_itr) {
+            if (used_definitions.count(defs_itr->first) == 0 &&
+                defs_itr->first.compare("TOP") != 0) {
+                std::cerr << "Warning: " << defs_itr->first << " defined but never used\n";
+            }
+        }
+    }
+
     if (pmatchnerrs != 0) {
         return retval;
     }
     // Our helper for harmonizing all the networks' alphabets with
     // each other
     if (hfst::pmatch::verbose) {
-        std::cerr << "Harmonizing... ";
+        std::cerr << "\nHarmonizing... ";
     }
 
     HfstTransducer dummy(format);
