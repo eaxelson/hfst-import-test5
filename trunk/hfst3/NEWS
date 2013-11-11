@@ -5,6 +5,14 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.5.1
+---------------------------
+
+* improvements and bugfixes to lexc, pmatch and xfst tools
+
+* added an option --enable-all-tools in configure
+
+
 Noteworthy changes in 3.5.0
 ---------------------------
 

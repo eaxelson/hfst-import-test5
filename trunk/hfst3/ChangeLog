@@ -1,3 +1,171 @@
+2013-11-11 08:58  sdrobac
+
+	* libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/LexcCompiler.h,
+	  tools/src/hfst-lexc-compiler.cc: New lexc, but still incomplete
+
+2013-11-08 14:49  eaxelson
+
+	* test/tools/fsmbook-examples: Removed directory fsmbook-examples
+	  as fsmbook-tests replaces it.
+
+2013-11-08 13:50  eaxelson
+
+	* back-ends/foma/fomalib.h, back-ends/foma/lex.interface.c,
+	  back-ends/foma/lex.lexc.c, back-ends/foma/lexc.l,
+	  back-ends/foma/lexcread.c, configure.ac,
+	  libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/FomaTransducer.cc,
+	  libhfst/src/implementations/FomaTransducer.h,
+	  libhfst/src/parsers/pmatch_parse.yy, tools/src/hfst-lexc.cc,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/xfst-parser.yy: Now using foma's lexc parser in
+	  hfst-xfst by default. Also using verbosity of hfst-xfst and
+	  tagger tools in lexc parsing. Also added an option
+	  --enable-all-tools in configure.
+
+2013-11-04 18:09  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_utils.cc: Use flex's newline count as
+	  good-enough parsing error indicator
+
+2013-11-04 12:21  hardwick
+
+	* tools/src/hfst-pmatch2fst.cc: Actually fixing that bug this time
+
+2013-11-04 12:03  hardwick
+
+	* tools/src/hfst-pmatch2fst.cc: Fix typo-bug in previous commit
+
+2013-11-04 11:57  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.cc,
+	  tools/src/hfst-pmatch2fst.cc: Much more verbose printing of time
+	  spent on harmonization and conversion &
+	  a speedup the the process of collecting a unified alphabet
+
+2013-11-01 14:26  eaxelson
+
+	* check_installation/check-morphologies.sh,
+	  check_installation/check-tools.sh,
+	  check_installation/copy-tool-tests.sh: Small fixes to
+	  installation check.
+
+2013-10-31 10:33  eaxelson
+
+	* test/tools/pmatch-functionality.sh,
+	  test/tools/proc-functionality.sh: Removed redundant command 'rm
+	  TMP' from pmatch test. Also removed verbose 'skipping some test
+	  cases' print from proc test, returning a skip value 77 is enough.
+
+2013-10-31 08:38  eaxelson
+
+	* check_installation/test-hfst-xfst.sh: Fixed a typo in test
+	  script.
+
+2013-10-30 11:44  eaxelson
+
+	* check_installation/test-hfst-xfst.sh: Changed temporary
+	  transducer name in test-hfst-xfst so that it does not conflict
+	  with any other transducers used in the tests.
+
+2013-10-30 11:18  eaxelson
+
+	* check_installation/check-tools.sh,
+	  check_installation/make-dist.sh: Skipping pmatch_blanks.txt when
+	  creating binary transducers from att files. Also made
+	  check-tools.sh more verbose. Fixed a typo in make-dist.sh.
+
+2013-10-30 11:16  eaxelson
+
+	* back-ends/sfst/fst.cc: Modified the call to 'nodeindexing' in
+	  SFST::Transducer::store as it seems to leave its argument
+	  unchanged sometimes. Noticed this effect when testing hfst-xfst
+	  and getting a segfault when trying to use a stored transducer.
+
+2013-10-30 11:09  eaxelson
+
+	* libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  libhfst/src/implementations/TropicalWeightTransducer.h: Added
+	  disjunct_as_tries as a public function of
+	  TropicalWeightTransducer.
+
+2013-10-29 11:26  hardwick
+
+	* Makefile.am: Remove ineffectual AM_LDFLAGS line
+
+2013-10-29 10:09  hardwick
+
+	* Makefile.am: Try setting a toplevel LDFLAGS to standardise to the
+	  standards-compliant
+	  libstdc++
+
+2013-10-29 09:46  hardwick
+
+	* test/tools/Makefile.am, test/tools/pmatch-functionality.sh,
+	  test/tools/pmatch_endtag.txt: A pmatch functionality test
+
+2013-10-29 07:16  hardwick
+
+	* libhfst/src/parsers/PmatchCompiler.cc,
+	  libhfst/src/parsers/PmatchCompiler.h,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h, tools/src/hfst-pmatch2fst.cc:
+	  --flatten and make option passing a bit neater
+
+2013-10-29 06:58  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: Add DefIns and make LTR
+	  longest the default RIGHTARROW
+
+2013-10-25 10:40  eaxelson
+
+	* swig/setup.py: Added argument 'extra_link_args' to Extension
+	  constructor. By default it is empty, but when making the debian
+	  package it can be replaced by linker flags that make it use
+	  /usr/lib/ instead of /usr/local/lib/.
+
+2013-10-23 20:48  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h: Print transducer and function
+	  definitions as string pairs in the way they are defined by the
+	  user.
+
+2013-10-23 20:10  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc: Made print paths observe
+	  whether obey-flags is set ON or OFF.
+
+2013-10-23 14:04  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/xfst-parser.yy: Now transducer names are saved.
+
+2013-10-22 20:42  hardwick
+
+	* tools/src/hfst-pmatch.cc: getline() doesn't return a
+	  newline-terminated string if one can't be found;
+	  in this case we mustn't erase the final character.
+
+2013-10-22 09:54  eaxelson
+
+	* ChangeLog: Updated ChangeLog, maybe after a couple of bug fixes
+	  ready to make the actual release..
+
+2013-10-22 09:25  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h: Added variable
+	  'print-foma-sigma' to the xfst parser.
+
 2013-10-22 06:11  hardwick
 
 	* test/tools/Makefile.am, test/tools/pmatch2fst-functionality.sh,
