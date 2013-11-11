@@ -842,6 +842,12 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
     free($1);
     free($3);
  }
+| QUOTED_LITERAL PAIR_SEPARATOR QUOTED_LITERAL {
+    HfstTokenizer tok;
+    $$ = new HfstTransducer($1, $3, tok, hfst::pmatch::format);
+    free($1);
+    free($3);
+}
 | SYMBOL PAIR_SEPARATOR EPSILON_TOKEN {
     $$ = new HfstTransducer($1, hfst::internal_epsilon, hfst::pmatch::format);
     free($1);
