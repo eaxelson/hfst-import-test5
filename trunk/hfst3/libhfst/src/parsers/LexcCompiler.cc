@@ -785,7 +785,7 @@ main(int argc, char** argv)
                 "\tdef2 = \"asdf\";\n" \
                 "\tdef3 = \"sdfg\";\n" \
                 "\tdef4 = \"xxx\"; def5 = \"zzz\";\n" \
-                "\tdef6 = \"%;\";\n" \
+                "\tdef6 = \"%%;\";\n" \
                 "LEXICON Root\ncat # ;\ndog Plural ;\n");
         fclose(existence_check);
       }

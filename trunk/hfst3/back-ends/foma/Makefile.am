@@ -3,7 +3,7 @@ AUTOMAKE_OPTIONS=std-options
 AM_CPPFLAGS= -Wno-deprecated -std=c99
 
 if WANT_MINGW
-AM_CPPFLAGS += -DWINDOWS
+AM_CPPFLAGS += -DWINDOWS -D__NO_MINGW_LFS
 endif
 
 noinst_LTLIBRARIES = libfoma.la
