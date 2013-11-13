@@ -74,7 +74,7 @@ hfst-subtract.exe \
 hfst-summarize.exe \
 hfst-tail.exe \
 hfst-txt2fst.exe \
-hfst-xfst"
+hfst-xfst.exe"
 
 
 cp $LIBDIR/$HFST_LIB .
