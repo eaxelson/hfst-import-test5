@@ -1,3 +1,6 @@
+#ifdef WINDOWS
+typedef long off_t;
+#endif
 
 #line 3 "lex.yy.c"
 

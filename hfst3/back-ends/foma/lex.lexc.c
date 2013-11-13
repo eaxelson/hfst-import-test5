@@ -1,7 +1,9 @@
 #line 22 "lexc.l"
 #define YY_BUF_SIZE 16777216
 
-
+#ifdef WINDOWS
+typedef long off_t;
+#endif
 
 #line 7 "lex.lexc.c"
 
