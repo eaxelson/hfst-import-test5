@@ -259,7 +259,7 @@ char*
 parse_quoted(const char *s)
 {
     char* quoted = get_quoted(s);
-    char* rv = static_cast<char*>(malloc(sizeof(char)*strlen(quoted)));
+    char* rv = static_cast<char*>(malloc(sizeof(char)*strlen(quoted) + 1)); // added + 1
     char* p = quoted;
     char* r = rv;
     while (*p != '\0')
