@@ -511,6 +511,7 @@ namespace xfst {
             else if (direction == APPLY_DOWN_DIRECTION) {
               apply_down_line(line);
             }
+            free(line);
           }
 
         // ignore all readline history given to the apply command
@@ -2717,6 +2718,7 @@ namespace xfst {
         StringPairVector spv = tok.tokenize_pair_string(std::string(line), spaces);
         HfstTransducer line_tr(spv, format_);
         tmp->disjunct(line_tr);
+        free(line);
       }
     
     tmp->minimize();
@@ -3277,7 +3279,7 @@ namespace xfst {
 #endif
 
     char* line_ = 0;
-    size_t len = 0;
+    size_t len = 1024;
     ssize_t read;
 
     fprintf(stderr, "%s", promptstr.c_str());
@@ -3452,6 +3454,7 @@ namespace xfst {
           fprintf(outstream_, "\n");
           number_of_arcs = print_arcs(transitions);
 
+          free(line);
         } // end of while loop
 
       ignore_history_after_index(ind);
