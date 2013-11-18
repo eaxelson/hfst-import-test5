@@ -511,8 +511,8 @@ AM_CONDITIONAL([WANT_FSMBOOK_TESTS], [test x$enable_fsmbook_tests != xno])
 AS_IF([test "x$enable_fsmbook_tests" != "xno" -a "x$enable_xfst" == "xno"],
       [AC_MSG_FAILURE([fsmbook tests are not supported if hfst-xfst is disabled; enable hfst-xfst (with --enable-xfst) when using --enable-fsmbook-tests])])
 
-AS_IF([test "x$enable_mingw" != "xno" -a "x$enable_tagger" != "xno"],
-      [AC_MSG_FAILURE([hfst-train-tagger and hfst-tag are not supported in MinGW environment; disable tagger tools (with --disable-tagger) when using --enable-mingw])])
+#AS_IF([test "x$enable_mingw" != "xno" -a "x$enable_tagger" != "xno"],
+#      [AC_MSG_FAILURE([hfst-train-tagger and hfst-tag are not supported in MinGW environment; disable tagger tools (with --disable-tagger) when using --enable-mingw])])
 
 # Checks for programs
 AC_PROG_CC
@@ -762,7 +762,9 @@ AS_IF([test "x$enable_lexc" == "xno"],
       [AC_MSG_WARN([hfst-lexc is not enabled; hfst-lexc2fst toy will only offer limited support to compile lexc lexicons; enable with --enable-lexc])])
 AS_IF([test "x$enable_twolc" == "xno"],
       [AC_MSG_WARN([hfst-twolc is not enabled; you will not be able to compile xerox twolc grammars; enable using --enable-twolc])])
-AS_IF([test "x$enable_tagger" == "xno" -a "x$enable_mingw" == "xno"],
+
+ # -a "x$enable_mingw" == "xno"],
+AS_IF([test "x$enable_tagger" == "xno"],
       [AC_MSG_WARN([hfst-train-tagger and hfst-tag are not enabled; you will not be able to train and use taggers; enable using --enable-tagger])])
 AS_IF([test "x$enable_calculate" == "xno"],
       [AC_MSG_WARN([hfst-calculate is not enabled; you will not be able to compile SFST-PL scripts; enable using --enable-calculate])])
