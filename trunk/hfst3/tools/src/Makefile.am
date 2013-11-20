@@ -322,3 +322,5 @@ AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 hfst-scanner.hh: hfst-scanner.cc
 CLEANFILES+=hfst-scanner.hh hfst-compiler.hh
 BUILT_SOURCES+=hfst-scanner.hh
+
+#EXTRA_DIST=hfst-scanner.cc hfst-compiler.cc hfst-compiler.hh

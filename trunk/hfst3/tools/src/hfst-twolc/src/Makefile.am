@@ -210,3 +210,7 @@ TwolCGrammar_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
 TwolCGrammar_CXXFLAGS=-DTEST_TWOL_C_GRAMMAR
 
 TESTS=$(HFST_TWOLC_TESTS)
+
+EXTRA_DIST += htwolcpre1.hh htwolcpre2.hh htwolcpre3.hh \
+	   htwolcpre1.cc htwolcpre2.cc htwolcpre3.cc \
+	   scanner1.cc scanner2.cc scanner3.cc

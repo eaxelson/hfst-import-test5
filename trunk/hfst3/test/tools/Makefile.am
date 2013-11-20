@@ -25,32 +25,121 @@ SUBDIRS=. fsmbook-tests
 if WANT_STRESSTESTS
 STRESSES=lexc2fst-stress.sh lookup-stress.sh proc-stress.sh valgrind.sh
 endif
-TESTS=hfst-check-version.sh hfst-check-help.sh hfst-check-environment.sh \
-	  empty-input.sh \
-	  permutate-file-params.sh \
-	  compare-functionality.sh \
-	  concatenate-functionality.sh \
-	  compose-functionality.sh \
-	  conjunct-functionality.sh \
-	  disjunct-functionality.sh \
-	  subtract-functionality.sh \
-	  determinize-functionality.sh minimize-functionality.sh \
-	  remove-epsilons-functionality.sh \
-	  invert-functionality.sh project-functionality.sh \
-	  prune-alphabet-functionality.sh repeat-functionality.sh \
-	  reverse-functionality.sh reweight-functionality.sh \
-	  substitute-functionality.sh \
-	  strings2fst-functionality.sh fst2strings-functionality.sh\
-	  txt2fst-functionality.sh fst2txt-functionality.sh \
-	  summarize-functionality.sh proc-functionality.sh \
-	  regexp2fst-functionality.sh \
-	  pmatch2fst-functionality.sh \
-	  split-functionality.sh head-functionality.sh tail-functionality.sh \
-	  format-functionality.sh \
-	  lookup-functionality.sh \
-	  pmatch-functionality.sh \
-	  symbol-harmonization-functionality.sh \
-	  $(STRESSES)
+
+TESTS=hfst-check-version.sh \
+	hfst-check-help.sh \
+	hfst-check-environment.sh \
+	empty-input.sh \
+	permutate-file-params.sh
+
+if WANT_COMPARE
+TESTS += compare-functionality.sh
+endif
+if WANT_COMPOSE
+TESTS += compose-functionality.sh
+endif
+if WANT_CONCATENATE
+TESTS += concatenate-functionality.sh
+endif
+if WANT_CONJUNCT
+TESTS += conjunct-functionality.sh
+endif
+if WANT_DETERMINIZE
+TESTS += determinize-functionality.sh
+endif
+if WANT_DISJUNCT
+TESTS += disjunct-functionality.sh
+endif
+if WANT_FORMAT
+TESTS += format-functionality.sh
+endif
+if WANT_FST2STRINGS
+TESTS += fst2strings-functionality.sh
+endif
+if WANT_FST2TXT
+TESTS += fst2txt-functionality.sh
+endif
+if WANT_HEAD
+TESTS += head-functionality.sh
+endif
+if WANT_INVERT
+TESTS += invert-functionality.sh
+endif
+if WANT_LOOKUP
+TESTS += lookup-functionality.sh
+endif
+if WANT_MINIMIZE
+TESTS += minimize-functionality.sh
+endif
+if WANT_PMATCH
+TESTS += pmatch2fst-functionality.sh
+TESTS += pmatch-functionality.sh
+endif
+if WANT_PROJECT
+TESTS += project-functionality.sh
+endif
+if WANT_PRUNE_ALPHABET
+TESTS += prune-alphabet-functionality.sh
+endif
+if WANT_REGEXP2FST
+TESTS += regexp2fst-functionality.sh
+endif
+if WANT_REMOVE_EPSILONS
+TESTS += remove-epsilons-functionality.sh
+endif
+if WANT_REPEAT
+TESTS += repeat-functionality.sh
+endif
+if WANT_REVERSE
+TESTS += reverse-functionality.sh
+endif
+if WANT_REWEIGHT
+TESTS += reweight-functionality.sh
+endif
+if WANT_SPLIT
+TESTS += split-functionality.sh
+endif
+if WANT_STRINGS2FST
+TESTS += strings2fst-functionality.sh
+endif
+if WANT_SUBSTITUTE
+TESTS += substitute-functionality.sh
+endif
+if WANT_SUBTRACT
+TESTS += subtract-functionality.sh
+endif
+if WANT_SUMMARIZE
+TESTS += summarize-functionality.sh
+endif
+
+if WANT_FORMAT
+if WANT_COMPARE 
+if WANT_COMPOSE 
+if WANT_REGEXP2FST
+if WANT_MINIMIZE
+if WANT_CONCATENATE
+if WANT_CONJUNCT
+if WANT_DISJUNCT
+if WANT_SUBTRACT
+if WANT_STRINGS2FST
+TESTS += symbol-harmonization-functionality.sh
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+
+if WANT_TAIL
+TESTS += tail-functionality.sh
+endif
+if WANT_TXT2FST
+TESTS += txt2fst-functionality.sh
+endif
 
 if WANT_LEXC
 TESTS += lexc-functionality.sh
@@ -64,6 +153,11 @@ endif
 if WANT_SHUFFLE
 TESTS += shuffle-functionality.sh
 endif
+if WANT_PROC
+TESTS += proc-functionality.sh
+endif
+
+TESTS += $(STRESSES)
 
 # XFAIL_TESTS=incompatible-formats.sh latin-1-strings.sh
 
