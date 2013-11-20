@@ -76,3 +76,4 @@ LexcCompiler_LDADD=../libhfst.la
 
 TESTS=$(LIBHFST_PARSER_TSTS)
 
+EXTRA_DIST=xre_parse.hh pmatch_parse.hh lexc-parser.hh $(BUILT_SOURCES)
