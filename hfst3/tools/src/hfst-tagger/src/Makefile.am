@@ -5,7 +5,7 @@ bin_PROGRAMS=hfst-build-tagger$(EXEEXT) hfst-open-input-file-for-tagger$(EXEEXT)
 hfst-reweight-tagger$(EXEEXT) hfst-train-tagger-system$(EXEEXT)
 bin_SCRIPTS=hfst_tagger_compute_data_statistics.py hfst-train-tagger$(EXEEXT) \
 hfst-train-tagger-loc$(EXEEXT)
-EXTRA_DIST=hfst-train-tagger.sh
+EXTRA_DIST=hfst-train-tagger.sh hfst-train-tagger.bat
 BUILD_MODEL_SRC=$(srcdir)/build_model_src
 USE_MODEL_SRC=$(srcdir)/use_model_src
 AM_CPPFLAGS=-I${top_srcdir}/libhfst/src -Wno-sign-compare -Wno-unused-parameter
