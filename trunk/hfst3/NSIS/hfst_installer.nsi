@@ -1,5 +1,9 @@
 !include LogicLib.nsh
 !include EnvVarUpdate.nsh
+!include StrRep.nsh
+!include ReplaceInFile.nsh
+# !include x64.nsh
+
 
 outfile "HfstInstaller.exe"
 
@@ -60,16 +64,17 @@ section
 	# Install Swig/Python bindings
 	# ----------------------------
 
-	#${If} ${FileExists} "C:\Python27\Lib\site-packages"
-	#      messageBox MB_OK "Found Python directory, installing Swig/Python bindings there (to C:\Python27\Lib\site-packages)."
-	#      setOutPath "C:\Python27\Lib\site-packages\"
-	#${Else}
-	#      messageBox MB_OK "Did not find Python, so installing Swig/Python bindings only locally (to $0)."	
-	#${EndIf}
+	${If} ${FileExists} "C:\Python27\Lib\site-packages"
+	      messageBox MB_OK "Found Python directory, installing Swig/Python bindings there (to C:\Python27\Lib\site-packages)."
+	      setOutPath "C:\Python27\Lib\site-packages\"
+	${Else}
+	      messageBox MB_OK "Did not find Python, so installing Swig/Python bindings only locally (to $0)."	
+	${EndIf}
 
-	messageBox MB_OK "Installing Swig/Python bindings locally (to $0). See README after installation for how to install them to Python directory."	
 	File _libhfst.pyd
 	File libhfst.py
+        File tagger_aux.py
+        # rest of tagger utilities are installed to $0
 
 	setOutPath $0
 
@@ -77,66 +82,70 @@ section
 	# Install libhfst dll and HFST command line tools
 	# -----------------------------------------------
 
-	File libhfst-26.dll
+	File libhfst-31.dll
 
-	File hfst-affix-guessify.exe
-	File hfst-calculate.exe
-	File hfst-compare.exe
-	File hfst-compose.exe
-	File hfst-compose-intersect.exe
-	File hfst-concatenate.exe
-	File hfst-conjunct.exe
-	File hfst-determinize.exe
-	File hfst-disjunct.exe
-	File hfst-edit-metadata.exe
-	File hfst-format.exe
-	File hfst-fst2fst.exe
-	File hfst-fst2strings.exe
-	File hfst-fst2txt.exe
-	File hfst-grep.exe
-	File hfst-guess.exe
-	File hfst-guessify.exe
-	File hfst-head.exe
-	File hfst-info.exe
-	File hfst-invert.exe
-	File hfst-lexc.exe
-	File hfst-lexc2fst.exe
-	File hfst-lookup.exe
-	File hfst-pair-test.exe
-	File hfst-minimize.exe
-	File hfst-multiply.exe
-	File hfst-name.exe
-	File hfst-optimized-lookup.exe
-	File hfst-pmatch.exe
-	File hfst-pmatch2fst.exe
-	File hfst-project.exe
-	File hfst-push-weights.exe
-	File hfst-regexp2fst.exe
-	File hfst-remove-epsilons.exe
-	File hfst-repeat.exe
-	File hfst-reverse.exe
-	File hfst-reweight.exe
-	File hfst-shuffle.exe
-	File hfst-split.exe
-	File hfst-strings2fst.exe
-	File hfst-substitute.exe
-	File hfst-subtract.exe
-	File hfst-summarize.exe
-	File hfst-tail.exe
+        File hfst-affix-guessify.exe
+        File hfst-calculate.exe
+        File hfst-compare.exe
+        File hfst-compose.exe
+        File hfst-compose-intersect.exe
+        File hfst-concatenate.exe
+        File hfst-conjunct.exe
+        File hfst-determinize.exe
+        File hfst-disjunct.exe
+        File hfst-edit-metadata.exe
+        File hfst-format.exe
+        File hfst-fst2fst.exe
+        File hfst-fst2strings.exe
+        File hfst-fst2txt.exe
+        File hfst-grep.exe
+        File hfst-guess.exe
+        File hfst-guessify.exe
+        File hfst-head.exe
+        File hfst-info.exe
+        File hfst-invert.exe
+        File hfst-lexc.exe
+        File hfst-lexc2fst.exe
+        File hfst-lookup.exe
+        File hfst-pair-test.exe
+        File hfst-minimize.exe
+        File hfst-multiply.exe
+        File hfst-name.exe
+        File hfst-optimized-lookup.exe
+        File hfst-pmatch.exe
+        File hfst-pmatch2fst.exe
+        File hfst-project.exe
+        File hfst-push-weights.exe
+        File hfst-regexp2fst.exe
+        File hfst-remove-epsilons.exe
+        File hfst-repeat.exe
+        File hfst-reverse.exe
+        File hfst-reweight.exe
+        File hfst-shuffle.exe
+        File hfst-split.exe
+        File hfst-strings2fst.exe
+        File hfst-substitute.exe
+        File hfst-subtract.exe
+        File hfst-summarize.exe
+        File hfst-tail.exe
+        File hfst-txt2fst.exe
+        File hfst-xfst.exe
 
-	#File hfst-open-input-file-for-tagger.exe
-	#File hfst_tagger_compute_data_statistics.py
-	#File tagger_aux.py
-	#File hfst-build-tagger.exe
-	#File hfst-train-tagger.exe
-	#File hfst-tag.exe
+        !insertmacro _ReplaceInFile hfst-train-tagger.bat HFST_INSTALLATION_DIRECTORY $0
+
+	File hfst-open-input-file-for-tagger.exe
+	File hfst_tagger_compute_data_statistics.py
+	# tagger_aux.py is in the same location as python (version 2) bindings
+	File hfst-build-tagger.exe
+	File hfst-train-tagger.bat
+	File hfst-tag.exe
+
+        !insertmacro _ReplaceInFile hfst-twolc.bat HFST_INSTALLATION_DIRECTORY $0
 
 	File htwolcpre1.exe
 	File htwolcpre2.exe
 	File htwolcpre3.exe
-	File hfst-twolc.exe
-
-	File hfst-txt2fst.exe
+	File hfst-twolc.bat
 
 	messageBox MB_OK "Installation complete. HFST functionalities are in directory $0."
 
@@ -149,4 +158,3 @@ section
 	
 
 sectionEnd
-
