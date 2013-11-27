@@ -148,12 +148,10 @@ parse_options(int argc, char** argv)
             warning(0, 0, "Defaulting to foma type "
                     "(since it has native lexc support)\n");
           }
-        format = hfst::FOMA_TYPE;
       }
     else
       {
         warning(0, 0, "Using foma type (since it has native lexc support)\n");
-        format = hfst::FOMA_TYPE;
       }
 #else
     error(EXIT_FAILURE, 0, "Foma back-end is not enabled\n");
@@ -277,7 +275,7 @@ lexc_streams(HfstOutputStream& outstream)
           }
         else
           {
-            trans = HfstTransducer::read_lexc_ptr(lexcfilenames[i], format, verbose);
+            trans = HfstTransducer::read_lexc_ptr(lexcfilenames[i], hfst::FOMA_TYPE, verbose);
             if (0 == trans)
               {
                 error(EXIT_FAILURE, 0, "Could not parse %s correctly.\n"
@@ -286,6 +284,7 @@ lexc_streams(HfstOutputStream& outstream)
               }
           }
       }
+    trans->convert(format);
     hfst_set_name(*trans, lexcfilenames[0], "lexc");
     hfst_set_formula(*trans, lexcfilenames[0], "L");
     verbose_printf("\nWriting... ");
