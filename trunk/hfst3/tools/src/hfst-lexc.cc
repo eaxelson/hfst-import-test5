@@ -151,7 +151,8 @@ parse_options(int argc, char** argv)
       }
     else
       {
-        warning(0, 0, "Using foma type (since it has native lexc support)\n");
+        if (format != hfst::FOMA_TYPE) {
+          warning(0, 0, "Using foma type (since it has native lexc support)\n"); }
       }
 #else
     error(EXIT_FAILURE, 0, "Foma back-end is not enabled\n");
