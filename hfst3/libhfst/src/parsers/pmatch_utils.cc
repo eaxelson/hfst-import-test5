@@ -295,21 +295,57 @@ parse_quoted(const char *s)
                 p = p + 2;
                 break;
               case 'u':
-                // if (strlen(p) < 6) {
-                //     fprintf(stderr, "Couldn't parse unicode escape in %s", p);
-                //     ++p;
-                //     *r = '\0';
-                //     break;
-                // }
-                // char[4] escape_sequence;
-                // memcpy(escape_sequence, p+2, 4);
-                // unsigned int codepoint = strtol(escape_sequence, NULL, 16);
-                
-                fprintf(stderr, "Unimplemented: parse unicode escapes in %s", p);
-                *r = '\0';
-                r++;
-                p = p + 6;
-                break;
+                  if (strlen(p) < 6) {
+                      // Can't be a valid escape sequence
+                      *r++ = '\\';
+                      *r++ = 'u';
+                      p += 2;
+                  } else {
+                      char buf[5];
+                      memcpy(buf, p+2, 4);
+                      buf[4] = '\0';
+                      unsigned int codepoint = strtol(buf, NULL, 16);
+                      bool u_parse_err = false;
+                      // The following is adapted from an answer at
+                      // http://stackoverflow.com/questions/4607413/c-library-to-convert-unicode-code-points-to-utf8
+                      // My understanding of the magic numbers:
+                      // 0x80 = 128 = 2^7
+                      // 64 = 2^6, 192 = 2^6 + 2^7
+                      // 0x800 = 2048 = 2^11
+                      // 0x1000 = 2^16 etc.
+                      if (codepoint < 0x80) {
+                          buf[0] = codepoint;
+                          buf[1] = '\0';
+                      } else if (codepoint < 0x800) {
+                          buf[0] = 192 + codepoint / 64;
+                          buf[1] = 128 + codepoint % 64;
+                          buf[2] = '\0';
+                      } else if (codepoint - 0xd800u < 0x800) {
+                          u_parse_err = true;
+                      } else if (codepoint < 0x10000) {
+                          buf[0] = 224 + codepoint / 4096;
+                          buf[1] = 128 + codepoint / 64 % 64;
+                          buf[2] = 128 + codepoint % 64;
+                          buf[3] = '\0';
+                      } else if (codepoint < 0x110000) {
+                          buf[0] = 240 + codepoint / 262144;
+                          buf[1] = 128 + codepoint / 4096 % 64;
+                          buf[2] = 128 + codepoint / 64 % 64;
+                          buf[3] = 128 + codepoint % 64;
+                          buf[4] = '\0';
+                      } else {
+                          u_parse_err = true;
+                      }
+                      if (u_parse_err) {
+                          fprintf(stderr, "PMATCH: Failed to parse unicode codepoint\n");
+                          *r++ = '\0';
+                      } else {
+                          strcpy(r, buf);
+                          r += strlen(buf) + 1;
+                      }
+                      p += 6;
+                  }
+                  break;
               case 'v':
                 *r = '\v';
                 r++;
