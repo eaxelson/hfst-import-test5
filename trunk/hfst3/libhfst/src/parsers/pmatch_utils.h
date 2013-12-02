@@ -136,13 +136,15 @@ template<typename T, size_t N>
     return N;
 }
 
+// It is assumed that latin1_upper and latin1_lower have the same length!
+
     static const char * latin1_upper[] =
     {
         "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
         "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "À", "Á",
         "Â", "Ã", "Ä", "Å", "Æ", "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï",
         "Ð", "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "Þ",
-        "ß"
+        "ẞ"
     };
     
     static const char * latin1_lower[] =
