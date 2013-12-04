@@ -33,6 +33,6 @@ installation, add path/to/hfst-top-dir/swig/ to PYTHONPATH and
 path/to/hfst-top-dir/libhfst/src/.libs/ to LD_LIBRARY_PATH.
 
 Demonstration utilities:
-	      omor_query.py, lookup and basic usage
+	      omor_query.py, lookup and basic usage (needs omorfi installed)
 	      hfstBot.py, a irc bot for lookup
 

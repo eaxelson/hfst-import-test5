@@ -1,11 +1,8 @@
 !include LogicLib.nsh
-!include EnvVarUpdate.nsh
 !include StrRep.nsh
 !include ReplaceInFile.nsh
-# !include x64.nsh
 
-
-outfile "HfstInstaller.exe"
+outfile "install-hfst-64-bit.exe"
 
 section
 
@@ -49,9 +46,11 @@ section
 	      File libstdc++-6.dll
 	${EndIf}
 
-	SearchPath $R0 "libgcc_s_dw2-1.dll"
+	# SearchPath $R0 "libgcc_s_dw2-1.dll"
+	SearchPath $R0 "libgcc_s_seh-1.dll"
 	${If} $R0 == ""
-	      File libgcc_s_dw2-1.dll
+	      # File libgcc_s_dw2-1.dll
+	      File libgcc_s_seh-1.dll
 	${EndIf}
 
 
@@ -77,7 +76,7 @@ section
         ${If} $OUTDIR == $0
               File hfst-tag.exe
         ${Else}
-              File hfst_tagger.aux
+              File tagger_aux.py
               setOutPath $0
               File hfst-tag.exe
               # Use installation directory in scripts
@@ -141,21 +140,31 @@ section
         File hfst-txt2fst.exe
         File hfst-xfst.exe
 
-        # Use installation directory in scripts
-        !insertmacro _ReplaceInFile hfst-twolc.bat HFST_INSTALLATION_DIRECTORY $0
-
 	File htwolcpre1.exe
 	File htwolcpre2.exe
 	File htwolcpre3.exe
 	File hfst-twolc.bat
 
+        # Use installation directory in scripts
+        !insertmacro _ReplaceInFile hfst-twolc.bat HFST_INSTALLATION_DIRECTORY $0
+
+	# Install hfst command line script
+
+	File hfst.bat
+
 	messageBox MB_OK "Installation complete. HFST functionalities are in directory $0."
+
+        messageBox MB_YESNO "Do you want to create a shortcut to HFST tools in Start Menu?" IDYES true
+        true:
+		CreateDirectory "$SMPROGRAMS\HFST"
+                CreateShortCut "$SMPROGRAMS\HFST\hfst.lnk" "$0\hfst.bat";
+	
 
 
 	## Add HFST directory to the PATH environment variable
 	## ---------------------------------------------------
 
-	${EnvVarUpdate} $1 "PATH" "A" "HKCU" "$0"
+	# ${EnvVarUpdate} $1 "PATH" "A" "HKCU" "$0"
 	#  messageBox MB_OK "Test: path is: $1."
 	
 

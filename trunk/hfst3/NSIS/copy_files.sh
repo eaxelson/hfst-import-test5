@@ -13,7 +13,8 @@ strip $HFST_DLL
 # (2) dependency dll files
 
 DEPENDENCY_DLL_DIRECTORY=/mingw/bin/
-DEPENDENCY_DLLS="libgcc_s_dw2-1.dll libstdc++-6.dll"
+# DEPENDENCY_DLLS="libgcc_s_dw2-1.dll libstdc++-6.dll"
+DEPENDENCY_DLLS="libgcc_s_seh-1.dll libstdc++-6.dll"
 for dll in $DEPENDENCY_DLLS;
 do
     cp $DEPENDENCY_DLL_DIRECTORY/$dll .;
@@ -21,13 +22,13 @@ done
 
 # (3) Python bindings
 
-SWIG_DIRECTORY=../SWIG/
-SWIG_FILES="_libhfst.pyd libhfst.py"
+#SWIG_DIRECTORY=../SWIG/
+#SWIG_FILES="_libhfst.pyd libhfst.py"
 
-for swigfile in $SWIG_FILES;
-do
-    cp $SWIG_DIRECTORY/$swigfile .;
-done
+#for swigfile in $SWIG_FILES;
+#do
+#    cp $SWIG_DIRECTORY/$swigfile .;
+#done
 
 # (4) tagger tools
 
