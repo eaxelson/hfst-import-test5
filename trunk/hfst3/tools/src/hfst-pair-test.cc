@@ -21,6 +21,11 @@
 #  include <config.h>
 #endif
 
+#ifdef WINDOWS
+#include <io.h>
+#endif
+
+
 #include <iostream>
 #include <fstream>
 
@@ -181,7 +186,7 @@ parse_options(int argc, char** argv)
     if (inputfilename == std::string("<stdin>"))
       { 
         error(EXIT_FAILURE, 0, 
-	      "The rule transducer file needs to be given using option -i."//,
+              "The rule transducer file needs to be given using option -i."//,
               /*inputfilename*/);
       }
     return EXIT_CONTINUE;
@@ -524,7 +529,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
       { exit_code = new_exit_code; }
 
       } // while lines in input
-    free(line);	
+    free(line); 
 
     return exit_code;
 }
@@ -536,6 +541,12 @@ int main( int argc, char **argv ) {
     {
         return retval;
     }
+#ifdef WINDOWS
+    if (pair_test_given)
+      {
+        _setmode(0, _O_BINARY);
+      }
+#endif
     // close buffers, we use streams
     if (inputfile != stdin)
     {

@@ -15,6 +15,10 @@
 #  include <config.h>
 #endif
 
+#ifdef WINDOWS
+#include <io.h>
+#endif
+
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -619,6 +623,10 @@ void reduce_queue(bool variable_symbol)
 
 int main(int argc, char * argv[])
 {
+#ifdef WINDOWS
+  _setmode(1, _O_BINARY);
+#endif
+
   CommandLine command_line(argc,argv);
 
   if (command_line.help or command_line.version)

@@ -21,6 +21,9 @@
 #  include <config.h>
 #endif
 
+#ifdef WINDOWS
+#include <io.h>
+#endif
 
 #include <iostream>
 #include <fstream>
@@ -130,7 +133,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         hfst_set_name(trans, trans, "determinize");
         hfst_set_formula(trans, trans, "⌶");
         outstream << trans;
-	free(inputname);
+        free(inputname);
     }
     instream.close();
     outstream.close();
@@ -139,6 +142,10 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 
 
 int main( int argc, char **argv ) {
+#ifdef WINDOWS
+  _setmode(0, _O_BINARY);
+  _setmode(1, _O_BINARY);
+#endif
     hfst_set_program_name(argv[0], "0.1", "HfstDeterminize");
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)

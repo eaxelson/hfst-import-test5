@@ -21,6 +21,9 @@
 #  include <config.h>
 #endif
 
+#ifdef WINDOWS
+#include <io.h>
+#endif
 
 #include <iostream>
 #include <fstream>
@@ -176,7 +179,7 @@ parse_options(int argc, char** argv)
       if (generate_threshold < 0)
         {
           error(EXIT_FAILURE, 0, "Invalid generate threshold %s. "
-		"Give a positive float.", optarg);
+                "Give a positive float.", optarg);
         }
 
       break;
@@ -214,6 +217,10 @@ parse_options(int argc, char** argv)
 
 int main( int argc, char **argv ) 
 {
+#ifdef WINDOWS
+  _setmode(0, _O_BINARY);
+  _setmode(1, _O_BINARY);
+#endif
   hfst_set_program_name(argv[0], "0.3", "HfstGuess");
   int retval = parse_options(argc, argv);
   if (retval != EXIT_CONTINUE)
@@ -334,12 +341,12 @@ int main( int argc, char **argv )
     if (generate_model_forms)
       {
         StringVectorVector paradigms = get_paradigms(line,
-						     guesses,
-						     *generator,
-						     model_forms,
-						     max_number_of_forms,
-						     generate_threshold);
-	
+                                                     guesses,
+                                                     *generator,
+                                                     model_forms,
+                                                     max_number_of_forms,
+                                                     generate_threshold);
+        
         for (StringVectorVector::const_iterator it = paradigms.begin();
          it != paradigms.end();
          ++it)

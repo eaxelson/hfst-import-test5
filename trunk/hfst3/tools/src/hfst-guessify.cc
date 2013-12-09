@@ -22,6 +22,9 @@
 #  include <config.h>
 #endif
 
+#ifdef WINDOWS
+#include <io.h>
+#endif
 
 #include <iostream>
 #include <fstream>
@@ -82,10 +85,10 @@ print_usage()
     print_common_unary_program_options(message_out);
     fprintf(message_out, "Guesser options:\n"
         "  -p, --default-penalty           Give penalty for skipping one\n"
-	"                                  symbol of input (1.0 by default).\n"
+        "                                  symbol of input (1.0 by default).\n"
         "  -G, --do-not-compile-generator  When compiling the guesser, do\n"
-	"                                  not compile a model form\n"
-	"                                  generator.\n");
+        "                                  not compile a model form\n"
+        "                                  generator.\n");
     fprintf(message_out, "\n");
     fprintf(message_out,
        "All analyses in the morphological analyzer should have the form:\n"
@@ -122,8 +125,8 @@ parse_options(int argc, char** argv)
         HFST_GETOPT_COMMON_LONG,
         HFST_GETOPT_UNARY_LONG,
           // add tool-specific options here
-	    {"default-penalty", required_argument, 0, 'p'},
-	    {"do-not-compile-generator", no_argument, 0, 'G'},
+            {"default-penalty", required_argument, 0, 'p'},
+            {"do-not-compile-generator", no_argument, 0, 'G'},
             {0,0,0,0}
         };
         int option_index = 0;
@@ -141,20 +144,20 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
           // add tool-specific cases here
-	case 'G':
-	  compile_generator = false;
-	  break;
+        case 'G':
+          compile_generator = false;
+          break;
 
-	case 'p':
-	  default_penalty = get_float(optarg);
-	  
-	  if (default_penalty < 0)
-	    {
-	      error(EXIT_FAILURE, 0, "Invalid default penalty %s. "
-		    "Give a positive float.", optarg);
-	    }
-	  
-	  break;
+        case 'p':
+          default_penalty = get_float(optarg);
+          
+          if (default_penalty < 0)
+            {
+              error(EXIT_FAILURE, 0, "Invalid default penalty %s. "
+                    "Give a positive float.", optarg);
+            }
+          
+          break;
 
 #include "inc/getopt-cases-error.h"
         }
@@ -175,19 +178,19 @@ process_stream(HfstInputStream& instream, HfstOutputStream &out)
       HfstTransducer analyzer(instream);
       
       verbose_printf("Compiling guesser from the transducer %s.\n",
-		     analyzer.get_name().c_str());
+                     analyzer.get_name().c_str());
       HfstTransducer guesser = guessify_analyzer(analyzer,default_penalty);
       
 
       if (compile_generator)
-	{ 
-	  verbose_printf("Compiling generator and storing guesser and "
-			 "generator.\n"); 
-	}
+        { 
+          verbose_printf("Compiling generator and storing guesser and "
+                         "generator.\n"); 
+        }
       else
-	{ 
-	  verbose_printf("Storing guesser.\n"); 
-	}
+        { 
+          verbose_printf("Storing guesser.\n"); 
+        }
 
       store_guesser(guesser,out,compile_generator);
     }
@@ -200,6 +203,11 @@ process_stream(HfstInputStream& instream, HfstOutputStream &out)
 
 int main( int argc, char **argv ) 
 {
+#ifdef WINDOWS
+  _setmode(0, _O_BINARY);
+  _setmode(1, _O_BINARY);
+#endif
+
     hfst_set_program_name(argv[0], "0.3", "HfstGuessify");
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)
@@ -221,9 +229,9 @@ int main( int argc, char **argv )
 
     try 
       {
-	instream = (inputfile != stdin ?
-		    new HfstInputStream(inputfilename) : 
-		    new HfstInputStream());
+        instream = (inputfile != stdin ?
+                    new HfstInputStream(inputfilename) : 
+                    new HfstInputStream());
       } 
     catch(const HfstException e)  
       {
@@ -236,9 +244,9 @@ int main( int argc, char **argv )
 
     try 
       {
-	outstream = (outfile != stdout ?
-		     new HfstOutputStream(outfilename,HFST_OLW_TYPE) : 
-		     new HfstOutputStream(HFST_OLW_TYPE));
+        outstream = (outfile != stdout ?
+                     new HfstOutputStream(outfilename,HFST_OLW_TYPE) : 
+                     new HfstOutputStream(HFST_OLW_TYPE));
       } 
     catch(const HfstException e)  
       {

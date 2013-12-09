@@ -21,6 +21,10 @@
 #  include <config.h>
 #endif
 
+#ifdef WINDOWS
+#include <io.h>
+#endif
+
 
 #include <iostream>
 #include <fstream>
@@ -269,6 +273,9 @@ extern int pmatchdebug;
 
 int main( int argc, char **argv ) 
 {
+#ifdef WINDOWS
+  _setmode(1, _O_BINARY);
+#endif
 
 //    pmatchdebug = 1;
 

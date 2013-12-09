@@ -7,6 +7,10 @@
 /*                                                                 */
 /*******************************************************************/
 
+#ifdef WINDOWS
+#include <io.h>
+#endif
+
 #include <stdio.h>
 #include "HfstCompiler.h"
 #include "HfstTransducer.h"
@@ -444,6 +448,10 @@ void get_flags( int *argc, char **argv )
 int main( int argc, char *argv[] )
 
 {
+#ifdef WINDOWS
+  _setmode(1, _O_BINARY);
+#endif
+
   //FILE *file;
 
   hfst_set_program_name(argv[0], "0.1", "HfstSfstPl2Fst");

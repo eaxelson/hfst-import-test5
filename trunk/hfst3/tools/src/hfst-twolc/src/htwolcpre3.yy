@@ -15,6 +15,10 @@
 #  include <config.h>
 #endif
 
+#ifdef WINDOWS
+#include <io.h>
+#endif
+
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -537,6 +541,11 @@ std::string get_name(const std::string &s)
 
 int main(int argc, char * argv[])
 {
+#ifdef WINDOWS
+  _setmode(0, _O_BINARY);
+  _setmode(1, _O_BINARY);
+#endif
+
 #ifdef DEBUG_TWOLC_3_GRAMMAR
   yydebug = 1;
 #endif

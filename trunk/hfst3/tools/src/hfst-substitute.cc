@@ -21,6 +21,10 @@
 #  include <config.h>
 #endif
 
+#ifdef WINDOWS
+#include <io.h>
+#endif
+
 
 #include <iostream>
 #include <fstream>
@@ -160,29 +164,29 @@ print_usage()
             "  -t, --to-label=TLABEL        replace with TLABEL\n"
             "  -T, --to-transducer=TFILE    replace with transducer read from TFILE\n"
             "  -F, --from-file=LABELFILE    read replacements from LABELFILE\n"
-	    "  -R, --in-order               keep the order of the replacements\n"
-	    "                               (with -F)\n"
+            "  -R, --in-order               keep the order of the replacements\n"
+            "                               (with -F)\n"
             "Transient optimisation schemes:\n"
             "  -9, --compose                compose substitutions when possible\n"
            );
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out, 
-	    "LABEL must be a symbol name in single arc in transducer,\n"
-	    "or colon separated pair defining an arc.\n"
+            "LABEL must be a symbol name in single arc in transducer,\n"
+            "or colon separated pair defining an arc.\n"
             "If TFILE is specified, FLABEL must be a pair.\n"
             "LABELFILE is a 2 column tsv file where col 1 is FLABEL\n"
-	    "and col 2 gives TLABEL specifications.\n");
+            "and col 2 gives TLABEL specifications.\n");
     fprintf(message_out,
-	    "\n"
-	    "Examples:\n"
-	    "  %s -i tr.hfst -o tr_relabeled.hfst -f 'a' -t 'A'\n"
-	    "      relabel all symbols 'a' with 'A'\n"
-	    "  %s -i tr.hfst -o tr_relabeled.hfst -f 'a:b' -t 'A:B'\n"
-	    "      relabel all arcs 'a:b' with 'A:B'\n"
-	    "  %s -i tr.hfst -o tr_relabeled.hfst -f 'a:b' -T repl.hfst\n"
-	    "      replace all arcs 'a:b' with transducer repl.hfst\n"
-	    "\n", program_name, program_name, program_name);
+            "\n"
+            "Examples:\n"
+            "  %s -i tr.hfst -o tr_relabeled.hfst -f 'a' -t 'A'\n"
+            "      relabel all symbols 'a' with 'A'\n"
+            "  %s -i tr.hfst -o tr_relabeled.hfst -f 'a:b' -t 'A:B'\n"
+            "      relabel all arcs 'a:b' with 'A:B'\n"
+            "  %s -i tr.hfst -o tr_relabeled.hfst -f 'a:b' -T repl.hfst\n"
+            "      replace all arcs 'a:b' with transducer repl.hfst\n"
+            "\n", program_name, program_name, program_name);
     print_report_bugs();
     fprintf(message_out, "\n");
     print_more_info();
@@ -205,7 +209,7 @@ parse_options(int argc, char** argv)
             {"from-file", required_argument, 0, 'F'},
             {"to-label", required_argument, 0, 't'},
             {"to-transducer", required_argument, 0, 'T'},
-	    {"in-order", no_argument, 0, 'R'},
+            {"in-order", no_argument, 0, 'R'},
             {"compose", no_argument, 0, '9'},
             {0,0,0,0}
         };
@@ -226,11 +230,11 @@ parse_options(int argc, char** argv)
           // add tool-specific cases here
         case 'f':
             from_label = hfst_strdup(optarg);
-	    if (strcmp(from_label, "@0@") == 0)
-	      {
-		free(from_label);
-		from_label = hfst_strdup(hfst::internal_epsilon.c_str());
-	      }
+            if (strcmp(from_label, "@0@") == 0)
+              {
+                free(from_label);
+                from_label = hfst_strdup(hfst::internal_epsilon.c_str());
+              }
             from_pair = label_to_stringpair(from_label);
             if (strlen(from_label) == 0)
               {
@@ -250,11 +254,11 @@ parse_options(int argc, char** argv)
             break;
         case 't':
             to_label = hfst_strdup(optarg);
-	    if (strcmp(to_label, "@0@") == 0)
-	      {
-		free(to_label);
-		to_label = hfst_strdup(hfst::internal_epsilon.c_str());
-	      }
+            if (strcmp(to_label, "@0@") == 0)
+              {
+                free(to_label);
+                to_label = hfst_strdup(hfst::internal_epsilon.c_str());
+              }
             to_pair = label_to_stringpair(to_label);
             if (strlen(to_label) == 0)
               {
@@ -273,10 +277,10 @@ parse_options(int argc, char** argv)
             }
             fclose(f);
             break;
-	case 'R':
-	  //error(EXIT_FAILURE, 0, "option --in-order is not implemented\n");
-	  in_order=true;
-	    break;
+        case 'R':
+          //error(EXIT_FAILURE, 0, "option --in-order is not implemented\n");
+          in_order=true;
+            break;
         case '9':
             compose = true;
             break;
@@ -548,23 +552,23 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
   bool fellback = false;
   while (instream.is_good())
     {
-	// SH 24.8.2011:
-	// for some reason converting between foma and basic transducer
-	// for substitution can leak lots and lots of space.
-	// For this reason we currently do substitution in sfst and finally
-	// convert back to foma.
-	//bool got_foma = false;
+        // SH 24.8.2011:
+        // for some reason converting between foma and basic transducer
+        // for substitution can leak lots and lots of space.
+        // For this reason we currently do substitution in sfst and finally
+        // convert back to foma.
+        //bool got_foma = false;
       transducer_n++;
       HfstTransducer trans(instream);
       /*#if HAVE_SFST
       if (trans.get_type() == hfst::FOMA_TYPE) {
-	if (!silent) {
-	  warning(0, 0, "NB: substitution for foma transducers will be done "
-		  "via conversion to\n"
-		  "SFST and back (if available)\n");
-	}
-	got_foma = true;
-	trans = trans.convert(hfst::SFST_TYPE);
+        if (!silent) {
+          warning(0, 0, "NB: substitution for foma transducers will be done "
+                  "via conversion to\n"
+                  "SFST and back (if available)\n");
+        }
+        got_foma = true;
+        trans = trans.convert(hfst::SFST_TYPE);
       }
       #endif*/
       char* inputname = strdup(trans.get_name().c_str());
@@ -635,64 +639,64 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                                 hfst::internal_epsilon.c_str());
                 }
 
-	      if (from_pair && to_pair) 
-		{
-		  if (!in_order) {
-		    pair_substitution_map->operator[](*from_pair) = *to_pair;
-		    symbol_pair_map_in_use=true;
-		  }
-		  else {
-		    do_substitute(trans, transducer_n);
-		  }
-		}
-	      else if (from_label && to_label) 
-		{
-		  if (!in_order) {
-		    label_substitution_map->operator[](std::string(from_label)) = std::string(to_label);
-		    symbol_map_in_use=true;
-		  }
-		  else {
-		    do_substitute(trans, transducer_n);
-		  }
-		}
-	      else {
-		try 
-		  {
-		    do_substitute(trans, transducer_n);
-		  }
-		catch (FunctionNotImplementedException fnse)
-		  {
-		    if (!warnedAlready)
-		      {
-			if (!silent) {
-			  warning(0, 0, "substitution is not supported for this transducer type"
-				  " falling back to internal formats and trying..."); 
-			}
-			fallback = new HfstBasicTransducer(trans);
-			warnedAlready = true;
-		      }
-		    do_substitute(*fallback, transducer_n);
-		    fellback = true;
-		  }
-		free(from_label);
-		free(to_label);
-	      }
+              if (from_pair && to_pair) 
+                {
+                  if (!in_order) {
+                    pair_substitution_map->operator[](*from_pair) = *to_pair;
+                    symbol_pair_map_in_use=true;
+                  }
+                  else {
+                    do_substitute(trans, transducer_n);
+                  }
+                }
+              else if (from_label && to_label) 
+                {
+                  if (!in_order) {
+                    label_substitution_map->operator[](std::string(from_label)) = std::string(to_label);
+                    symbol_map_in_use=true;
+                  }
+                  else {
+                    do_substitute(trans, transducer_n);
+                  }
+                }
+              else {
+                try 
+                  {
+                    do_substitute(trans, transducer_n);
+                  }
+                catch (FunctionNotImplementedException fnse)
+                  {
+                    if (!warnedAlready)
+                      {
+                        if (!silent) {
+                          warning(0, 0, "substitution is not supported for this transducer type"
+                                  " falling back to internal formats and trying..."); 
+                        }
+                        fallback = new HfstBasicTransducer(trans);
+                        warnedAlready = true;
+                      }
+                    do_substitute(*fallback, transducer_n);
+                    fellback = true;
+                  }
+                free(from_label);
+                free(to_label);
+              }
             } // while getline
           free(line);
 
-	  // perform label-to-label substitution right away
-	  if (!in_order && symbol_map_in_use) 
-	    {
-	      trans.substitute(*label_substitution_map);
-	      symbol_map_in_use=false;
-	    }
+          // perform label-to-label substitution right away
+          if (!in_order && symbol_map_in_use) 
+            {
+              trans.substitute(*label_substitution_map);
+              symbol_map_in_use=false;
+            }
 
-	  // perform symbol pair-to-symbol pair substitution right away
-	  if (!in_order && symbol_pair_map_in_use) 
-	    {
-	      trans.substitute(*pair_substitution_map);
-	      symbol_pair_map_in_use=false;
-	    }
+          // perform symbol pair-to-symbol pair substitution right away
+          if (!in_order && symbol_pair_map_in_use) 
+            {
+              trans.substitute(*pair_substitution_map);
+              symbol_pair_map_in_use=false;
+            }
 
         }
 
@@ -707,10 +711,10 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
             {
               if (!warnedAlready)
                 {
-		  if (!silent) {
-		    warning(0, 0, "substitution is not supported for this transducer type"
-			    " falling back to internal formats and trying...");
-		  }
+                  if (!silent) {
+                    warning(0, 0, "substitution is not supported for this transducer type"
+                            " falling back to internal formats and trying...");
+                  }
                   fallback = new HfstBasicTransducer(trans);
                 }
               do_substitute(*fallback, transducer_n);
@@ -808,7 +812,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
       //trans = HfstTransducer(*fallback, trans.get_type());
       //#if HAVE_SFST
       //      if (got_foma) {
-      //	  trans = trans.convert(hfst::FOMA_TYPE);
+      //          trans = trans.convert(hfst::FOMA_TYPE);
       //      }
       //#endif
       outstream << trans;
@@ -822,6 +826,11 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 
 int main( int argc, char **argv ) 
 {
+#ifdef WINDOWS
+  _setmode(0, _O_BINARY);
+  _setmode(1, _O_BINARY);
+#endif
+
   hfst_set_program_name(argv[0], "0.1", "HfstSubstitute");
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)
@@ -843,11 +852,11 @@ int main( int argc, char **argv )
     if (from_file != NULL)
       {
 #ifdef DEBUG_SUBSTITUTE
-	std::cerr << "from_file != NULL\n" << std::endl;
+        std::cerr << "from_file != NULL\n" << std::endl;
 #endif
-	label_substitution_map = new HfstSymbolSubstitutions();
-	pair_substitution_map = new HfstSymbolPairSubstitutions();
-	// TODO: delete
+        label_substitution_map = new HfstSymbolSubstitutions();
+        pair_substitution_map = new HfstSymbolPairSubstitutions();
+        // TODO: delete
       }
 
     // here starts the buffer handling part

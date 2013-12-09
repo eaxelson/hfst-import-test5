@@ -21,6 +21,11 @@
 #  include <config.h>
 #endif
 
+#ifdef WINDOWS
+#include <io.h>
+#endif
+
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -170,6 +175,10 @@ parse_options(int argc, char** argv)
 
 int main (int argc, char * argv[])
 {
+#ifdef WINDOWS
+  _setmode(0, _O_BINARY);
+#endif
+
   hfst_set_program_name(argv[0], "0.1", "HfstInfo");
   parse_options(argc, argv);
   if (min_version != -1L)
