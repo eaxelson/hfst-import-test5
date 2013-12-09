@@ -21,6 +21,9 @@
 #  include <config.h>
 #endif
 
+#ifdef WINDOWS
+#include <io.h>
+#endif
 
 #include <iostream>
 #include <fstream>
@@ -121,13 +124,13 @@ shuffle_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     size_t transducer_n_first = 0; // transducers read from first stream
     size_t transducer_n_second = 0; // transducers read from second stream
     while (continueReading) {
-	first = new HfstTransducer(firststream);
+        first = new HfstTransducer(firststream);
         transducer_n_first++;
-	if (secondstream.is_good())
-	  {
-	    second = new HfstTransducer(secondstream);
-	    transducer_n_second++;
-	  }
+        if (secondstream.is_good())
+          {
+            second = new HfstTransducer(secondstream);
+            transducer_n_second++;
+          }
         char* firstname = hfst_get_name(*first, firstfilename);
         char* secondname = hfst_get_name(*second, secondfilename);
         if (transducer_n_first == 1)
@@ -152,49 +155,49 @@ shuffle_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                   hfst_strformat(firststream.get_type()),
                   hfst_strformat(secondstream.get_type()));
           }
-	catch (TransducersAreNotAutomataException tanae)
-	  {
-	    error(EXIT_FAILURE, 0, "Could not shuffle %s and %s [" SIZE_T_SPECIFIER "]\n"
-		  "at least one of the input arguments is not an automaton",
-		  firstname, secondname, transducer_n_first);
-	  }
+        catch (TransducersAreNotAutomataException tanae)
+          {
+            error(EXIT_FAILURE, 0, "Could not shuffle %s and %s [" SIZE_T_SPECIFIER "]\n"
+                  "at least one of the input arguments is not an automaton",
+                  firstname, secondname, transducer_n_first);
+          }
 
         hfst_set_name(*first, *first, *second, "union");
         hfst_set_formula(*first, *first, *second, "∪");
         outstream << *first;
 
         continueReading = firststream.is_good() && 
-	  (secondstream.is_good() || transducer_n_second == 1);
+          (secondstream.is_good() || transducer_n_second == 1);
 
-	delete first;
-	first=0;
-	// delete the transducer of second stream, unless we continue reading
-	// the first stream and there is only one transducer in the second 
-	// stream
-	if ((continueReading && secondstream.is_good()) || not continueReading)
-	  {
-	    delete second;
-	    second=0;
-	  }
+        delete first;
+        first=0;
+        // delete the transducer of second stream, unless we continue reading
+        // the first stream and there is only one transducer in the second 
+        // stream
+        if ((continueReading && secondstream.is_good()) || not continueReading)
+          {
+            delete second;
+            second=0;
+          }
 
-	free(firstname);
-	free(secondname);
+        free(firstname);
+        free(secondname);
     }
     
     if (firststream.is_good())
       {
-	error(EXIT_FAILURE, 0, 
-	      "second input '%s' contains fewer transducers than first input"
-	      " '%s'; this is only possible if the second input contains"
-	      " exactly one transducer", 
-	      secondfilename, firstfilename);
+        error(EXIT_FAILURE, 0, 
+              "second input '%s' contains fewer transducers than first input"
+              " '%s'; this is only possible if the second input contains"
+              " exactly one transducer", 
+              secondfilename, firstfilename);
       }
 
     if (secondstream.is_good())
     {
       error(EXIT_FAILURE, 0, "first input '%s' contains fewer transducers than"
-	    " second input '%s'",
-	    firstfilename, secondfilename);
+            " second input '%s'",
+            firstfilename, secondfilename);
     }
 
     firststream.close();
@@ -205,6 +208,11 @@ shuffle_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
 
 
 int main( int argc, char **argv ) {
+#ifdef WINDOWS
+  _setmode(0, _O_BINARY);
+  _setmode(1, _O_BINARY);
+#endif
+
     hfst_set_program_name(argv[0], "0.1", "HfstShuffle");
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)

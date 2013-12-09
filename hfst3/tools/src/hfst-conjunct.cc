@@ -21,6 +21,9 @@
 #  include <config.h>
 #endif
 
+#ifdef WINDOWS
+#include <io.h>
+#endif
 
 #include <iostream>
 #include <fstream>
@@ -228,6 +231,10 @@ conjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
 
 
 int main( int argc, char **argv ) {
+#ifdef WINDOWS
+  _setmode(0, _O_BINARY);
+  _setmode(1, _O_BINARY);
+#endif
     hfst_set_program_name(argv[0], "0.1", "HfstConjunct");
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)

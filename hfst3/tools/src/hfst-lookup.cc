@@ -21,6 +21,10 @@
 #  include <config.h>
 #endif
 
+#ifdef WINDOWS
+#include <io.h>
+#endif
+
 #include <iostream>
 #include <fstream>
 
@@ -1477,6 +1481,14 @@ int main( int argc, char **argv ) {
     {
         return retval;
     }
+
+#ifdef WINDOWS
+    if (lookup_given)
+      {
+        _setmode(0, _O_BINARY);
+      }
+#endif
+
     // close buffers, we use streams
     if (inputfile != stdin)
     {

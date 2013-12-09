@@ -15,6 +15,11 @@
 #  include <config.h>
 #endif
 
+#ifdef WINDOWS
+#include <io.h>
+#endif
+
+
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -293,6 +298,11 @@ void semantic_error(const char * text)
 
 int main(int argc, char * argv[])
 {
+#ifdef WINDOWS
+  _setmode(0, _O_BINARY);
+  _setmode(1, _O_BINARY);
+#endif
+
   CommandLine command_line(argc,argv);
   if (command_line.help or command_line.usage or command_line.version)
     { exit(0); }
