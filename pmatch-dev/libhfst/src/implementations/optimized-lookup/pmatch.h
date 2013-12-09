@@ -92,7 +92,8 @@ namespace hfst_ol {
         static const size_t SIZE = 
             sizeof(SymbolNumber) + 
             sizeof(SymbolNumber) + 
-            sizeof(TransitionTableIndex);
+            sizeof(TransitionTableIndex) +
+            ;
     SimpleTransition(
         SymbolNumber i, SymbolNumber o, TransitionTableIndex t):
         input(i), output(o), target(t) {}
@@ -155,8 +156,8 @@ namespace hfst_ol {
         std::stack<LocalVariables> local_stack;
         std::stack<RtnVariables> rtn_stack;
     
-        std::vector<SimpleTransition> transition_table;
-        std::vector<SimpleIndex> index_table;
+        std::vector<TransitionW> transition_table;
+        std::vector<TransitionWIndex> index_table;
 
         PmatchAlphabet & alphabet;
         SymbolNumber orig_symbol_count;

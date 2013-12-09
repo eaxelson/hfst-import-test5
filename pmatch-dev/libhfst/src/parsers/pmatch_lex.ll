@@ -279,7 +279,7 @@ LWSP [\t\r\n ]
     return SYMBOL;
 }  
 
-";\t"{WEIGHT} {
+";"{WSP}*{WEIGHT} {
     pmatchlval.weight = hfst::pmatch::get_weight(pmatchtext + 2);
     return END_OF_WEIGHTED_EXPRESSION;
 }
