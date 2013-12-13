@@ -2927,7 +2927,6 @@ HfstTransducer &HfstTransducer::substitute
   return convert_to_hfst_transducer(net);  
 }
 
-
 HfstTransducer &HfstTransducer::substitute
 (const StringPair &symbol_pair,
  HfstTransducer &transducer, bool harmonize)
