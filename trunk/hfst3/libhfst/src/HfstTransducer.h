@@ -1509,7 +1509,6 @@ t.substitute(&function);
     HfstTransducer &substitute(const StringPair &symbol_pair,
                                HfstTransducer &transducer, bool harmonize=true);
 
-
     // -----------------------------------------------
     // --------------- Weight handling --------------- 
     // -----------------------------------------------

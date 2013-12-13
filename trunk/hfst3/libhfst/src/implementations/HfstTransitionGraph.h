@@ -2445,38 +2445,40 @@
            HfstState origin_state;
            HfstState target_state;
            typename C::WeightType weight;
+           HfstTransitionGraph * substituting_graph;
 
            substitution_data(HfstState origin, 
                              HfstState target,
-                             typename C::WeightType weight)
+                             typename C::WeightType weight, 
+                             HfstTransitionGraph * substituting)
            {
              origin_state=origin;
              target_state=target;
              this->weight=weight;
+             substituting_graph=substituting;
            }
          };
-
+         
          /* Used in function substitute(const StringPair&, 
                                         HfstTransitionGraph&)
-            Add a copy of \a graph with epsilon transitions between 
+            Add a copy of substituting graph with epsilon transitions between 
             states and with weight as defined in \a sub. */
-         void add_substitution(substitution_data &sub, 
-                               const HfstTransitionGraph &graph) {
-
+         void add_substitution(const substitution_data &sub) {
            // Epsilon transition to initial state of \a graph
            HfstState s = add_state();
            HfstTransition <C> epsilon_transition
              (s, C::get_epsilon(), C::get_epsilon(), 
               sub.weight);
            add_transition(sub.origin_state, epsilon_transition);
-
+           
            /* Offset between state numbers */
            unsigned int offset = s;
-
+           
            // Copy \a graph
+           const HfstTransitionGraph * graph = sub.substituting_graph;
            HfstState source_state=0;
-           for (const_iterator it = graph.begin(); 
-                it != graph.end(); it++)
+           for (const_iterator it = graph->begin(); 
+                it != graph->end(); it++)
              {
                for (typename HfstTransitions::const_iterator tr_it
                       = it->begin();
@@ -2497,8 +2499,8 @@
 
            // Epsilon transitions from final states of \a graph
            for (typename FinalWeightMap::const_iterator it 
-                  = graph.final_weight_map.begin();
-                it != graph.final_weight_map.end(); it++)
+                  = graph->final_weight_map.begin();
+                it != graph->final_weight_map.end(); it++)
              {
                HfstTransition <C> epsilon_transition
                  (sub.target_state, C::get_epsilon(), C::get_epsilon(),
@@ -2532,12 +2534,12 @@
            substitute(const HfstSymbolPair &sp, 
               const HfstTransitionGraph &graph) {
 
-       if ( not ( C::is_valid_symbol(sp.first) &&              
-              C::is_valid_symbol(sp.second) ) ) {
-         HFST_THROW_MESSAGE
-           (EmptyStringException, 
-            "HfstTransitionGraph::substitute(const HfstSymbolPair&, "
-            "const HfstTransitionGraph&)");
+           if ( not ( C::is_valid_symbol(sp.first) &&              
+                      C::is_valid_symbol(sp.second) ) ) {
+             HFST_THROW_MESSAGE
+               (EmptyStringException, 
+                "HfstTransitionGraph::substitute(const HfstSymbolPair&, "
+                "const HfstTransitionGraph&)");
            }
 
 
@@ -2547,12 +2549,12 @@
                alphabet.find(sp.second) == alphabet.end())
              return *this;
 
-           // Where the substituting copies of \a graph
+           // Where the substituting copies of substituting graphs
            // are inserted (source state, target state, weight)
            std::vector<substitution_data> substitutions;
 
            // Go through all states
-       HfstState source_state=0;
+           HfstState source_state=0;
            for (iterator it = begin(); it != end(); it++)
              {
 
@@ -2576,7 +2578,8 @@
                        substitutions.push_back(substitution_data
                                                (source_state, 
                                                 tr_it->get_target_state(), 
-                                                data.get_weight()));
+                                                data.get_weight(),
+                                                const_cast<HfstTransitionGraph *>(&graph)));
                        // schedule the old transition to be deleted
                        old_transitions.push_back(tr_it);
                      }
@@ -2592,7 +2595,7 @@
                  it->erase(*IT);
                }
 
-           source_state++;
+               source_state++;
              }
            // (all states gone trough)
 
@@ -2601,11 +2604,141 @@
                   = substitutions.begin();
                 IT != substitutions.end(); IT++)
              {
-               add_substitution(*IT, graph);
+               add_substitution(*IT);
              }
            return *this;
          }
 
+         // ####
+         // another version of substitute for internal use..
+         // ####
+         typedef std::map<HfstSymbol, HfstTransitionGraph> SubstMap;
+         
+         HfstTransitionGraph &
+           substitute(SubstMap & substitution_map,
+                      bool harmonize) {
+           
+           bool symbol_found = false;
+           for (typename SubstMap::const_iterator it = substitution_map.begin();
+                it != substitution_map.end(); it++)
+             {
+               if ( not ( C::is_valid_symbol(it->first) ))
+                 {
+                   HFST_THROW_MESSAGE(EmptyStringException, 
+                    "HfstTransitionGraph::substitute "
+                    "(const std::map<HfstSymbol, HfstTransitionGraph> &)");
+                 }
+               if (!symbol_found && alphabet.find(it->first) != alphabet.end()) 
+                 {
+                   symbol_found = true;
+                 }
+             }
+           
+           // If none of the symbols to be substituted is known to the graph,
+           // do nothing.
+           if (!symbol_found)
+             {
+               return *this;
+             }
+           
+           std::set<String> substitutions_performed_for_symbols;
+
+           // Where the substituting copies of graphs
+           // are inserted (source state, target state, weight)
+           std::vector<substitution_data> substitutions;
+           
+           // Go through all states
+           HfstState source_state=0;
+           for (iterator it = begin(); it != end(); it++)
+             {
+
+               // The transitions that are substituted, i.e. removed
+               std::stack<typename HfstTransitions::iterator> 
+                 old_transitions;
+
+               // Go through all transitions
+               for (typename HfstTransitions::iterator tr_it
+                      = it->begin();
+                    tr_it != it->end(); tr_it++)
+                 {
+                   C data = tr_it->get_transition_data();
+
+                   // Whether there is anything to substitute 
+                   // in this transition
+                   String istr = data.get_input_symbol();
+                   String ostr = data.get_output_symbol();
+                   typename SubstMap::iterator map_it_input = substitution_map.find(istr);
+                   typename SubstMap::iterator map_it_output = substitution_map.find(ostr);
+
+                   if (map_it_input == substitution_map.end() &&
+                       map_it_output == substitution_map.end())
+                     {
+                       ;
+                     }
+                   else if (istr != ostr)
+                     {
+                       std::string msg("symbol to be substituted must not occur only on one side of transition");
+                       HFST_THROW_MESSAGE(HfstException, msg);
+                     }
+                   else
+                     {
+                       // schedule a substitution
+                       substitution_data sd
+                         (source_state,
+                          tr_it->get_target_state(), 
+                          data.get_weight(),
+                          &(map_it_input->second));
+                       substitutions.push_back(sd);
+                       // schedule the old transition to be deleted
+                       old_transitions.push(tr_it);
+                       // ...
+                       substitutions_performed_for_symbols.insert(istr);
+                     }
+                   // (one transition gone through)
+                 } 
+               // (all transitions in a state gone through)
+
+               // Remove the substituted transitions
+               while (!old_transitions.empty()) 
+                 {
+                   it->erase(old_transitions.top());
+                   old_transitions.pop();
+                 }
+               
+               source_state++;
+             }
+           // (all states gone trough)
+
+           this->write_in_att_format(stderr);
+
+           // Remove all symbols that were substituted
+           for (StringSet::const_iterator sym_it = substitutions_performed_for_symbols.begin();
+                sym_it != substitutions_performed_for_symbols.end(); sym_it++)
+             {
+               if (*sym_it != "@_EPSILON_SYMBOL_@" && *sym_it != "@_UNKNOWN_SYMBOL_@" && *sym_it != "@_IDENTITY_SYMBOL_@")
+                 this->remove_symbol_from_alphabet(*sym_it);
+             }
+
+           // Harmonize the resulting and the substituting graphs, if needed
+           if (harmonize)
+             {
+               for (StringSet::iterator sym_it = substitutions_performed_for_symbols.begin();
+                    sym_it != substitutions_performed_for_symbols.end(); sym_it++)
+                 {
+                   this->harmonize(substitution_map.at(*sym_it));
+                 }
+             }
+
+           // Add the substitutions
+           for (typename std::vector<substitution_data>::iterator IT 
+                  = substitutions.begin();
+                IT != substitutions.end(); IT++)
+             {
+               add_substitution(*IT);
+             }
+
+           return *this;
+         }
 
          /* ----------------------------
                Insert freely functions
