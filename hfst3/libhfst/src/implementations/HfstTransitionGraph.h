@@ -2709,8 +2709,6 @@
              }
            // (all states gone trough)
 
-           this->write_in_att_format(stderr);
-
            // Remove all symbols that were substituted
            for (StringSet::const_iterator sym_it = substitutions_performed_for_symbols.begin();
                 sym_it != substitutions_performed_for_symbols.end(); sym_it++)
