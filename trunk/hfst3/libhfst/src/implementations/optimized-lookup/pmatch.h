@@ -143,6 +143,7 @@ namespace hfst_ol {
             bool default_symbol_trap;
             bool negative_context_success;
             bool pending_passthrough;
+            Weight running_weight;
         };
 
         struct RtnVariables
@@ -150,13 +151,14 @@ namespace hfst_ol {
             SymbolNumber * candidate_input_pos;
             SymbolNumber * output_tape_head;
             SymbolNumberVector best_result;
+            Weight best_weight;
         };
 
         std::stack<LocalVariables> local_stack;
         std::stack<RtnVariables> rtn_stack;
     
-        std::vector<SimpleTransition> transition_table;
-        std::vector<SimpleIndex> index_table;
+        std::vector<TransitionW> transition_table;
+        std::vector<TransitionWIndex> index_table;
 
         PmatchAlphabet & alphabet;
         SymbolNumber orig_symbol_count;

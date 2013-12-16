@@ -166,7 +166,7 @@ process_stream(HfstOutputStream& outstream)
         file_contents.push_back(c);
     }
     if (file_contents.size() > 1) {
-        definitions = comp.compile(file_contents);
+            definitions = comp.compile(file_contents);
     }
 
     if (verbose) {
@@ -200,7 +200,7 @@ process_stream(HfstOutputStream& outstream)
     HfstTransducer dummy(unified_alphabet, tok, compilation_format);
     
     // Then we convert it...
-    HfstTransducer * harmonizer = &dummy.convert(hfst::HFST_OL_TYPE);
+    HfstTransducer * harmonizer = &dummy.convert(hfst::HFST_OLW_TYPE);
     // Use these for naughty intermediate steps to make sure
     // everything has the same alphabet
     hfst::HfstBasicTransducer * intermediate_tmp;
@@ -221,7 +221,7 @@ process_stream(HfstOutputStream& outstream)
             hfst_transducer_to_hfst_basic_transducer(*definitions["TOP"]);
         harmonized_tmp = hfst::implementations::ConversionFunctions::
             hfst_basic_transducer_to_hfst_ol(intermediate_tmp,
-                                             false, // unweighted
+                                             true, // weighted
                                              "", // no special options
                                              harmonizer); // harmonize with this
         output_tmp = hfst::implementations::ConversionFunctions::
@@ -250,7 +250,7 @@ process_stream(HfstOutputStream& outstream)
             hfst_transducer_to_hfst_basic_transducer(*(it->second));
         harmonized_tmp = hfst::implementations::ConversionFunctions::
             hfst_basic_transducer_to_hfst_ol(intermediate_tmp,
-                                             false, // unweighted
+                                             true, // weighted
                                              "", // no special options
                                              harmonizer); // harmonize with this
         output_tmp = hfst::implementations::ConversionFunctions::
@@ -294,8 +294,8 @@ int main( int argc, char **argv )
                    inputfilename, outfilename);
     // here starts the buffer handling part
     HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, hfst::HFST_OL_TYPE) :
-        new HfstOutputStream(hfst::HFST_OL_TYPE);
+        new HfstOutputStream(outfilename, hfst::HFST_OLW_TYPE) :
+        new HfstOutputStream(hfst::HFST_OLW_TYPE);
     process_stream(*outstream);
     free(inputfilename);
     free(outfilename);
