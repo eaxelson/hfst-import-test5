@@ -192,7 +192,7 @@ int main(int argc, char ** argv)
         std::cerr << "Could not open file " << pmatch_filename << std::endl;
         return EXIT_FAILURE;
     }
-    hfst_ol::PmatchContainer container(instream);
+        hfst_ol::PmatchContainer container(instream);
 //     if (outfile != stdout) {
 //         std::filebuf fb;
 // fb.open(outfilename, std::ios::out);
