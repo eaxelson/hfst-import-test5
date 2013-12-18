@@ -108,13 +108,32 @@ joinerEncode(string& s)
     lxs = lxs.append(LEXC_JOINER_END);
     return lxs;
 }
-
 string&
 joinerDecode(string& s)
 {
     assert(s.length() >= 4);
     string& decoded = s;
     size_t jStart = strlen(LEXC_JOINER_START);
+    size_t jEnd = strlen(LEXC_JOINER_END);
+    decoded = decoded.substr(jStart, (s.length() - (jStart + jEnd)));
+    return decoded;
+}
+
+string&
+regExpresionEncode(string& s)
+{
+    string& lxs = s;
+    lxs = lxs.insert(0, REG_EX_START);
+    lxs = lxs.append(LEXC_JOINER_END);
+    return lxs;
+}
+
+string&
+regExpresionDecode(string& s)
+{
+    assert(s.length() >= 4);
+    string& decoded = s;
+    size_t jStart = strlen(REG_EX_START);
     size_t jEnd = strlen(LEXC_JOINER_END);
     decoded = decoded.substr(jStart, (s.length() - (jStart + jEnd)));
     return decoded;
@@ -195,7 +214,7 @@ char*
 strdup_token_positions()
 {
     // N.B. reason for this error format is automagic support by vim/emacs/jedit
-    // must be “filename:lineno:colno-lineno:colno: stuff”
+    // must be â€œfilename:lineno:colno-lineno:colno: stuffâ€�
     // c.f. http://www.gnu.org/prep/standards/standards.html#Errors
     char* filenames_lines_cols = (char*)malloc(sizeof(char) * 
             (strlen(hlexcfilename) + 100));
