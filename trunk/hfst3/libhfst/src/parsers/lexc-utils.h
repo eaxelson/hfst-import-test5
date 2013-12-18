@@ -33,6 +33,8 @@ const char LEXC_FLAG_RIGHT_START[] = "$P.LEXNAME.";
 const char LEXC_FLAG_END[] = "$";
 const char LEXC_DFN_START[] = "@_LEXC_DEFINITION.";
 const char LEXC_DFN_END[] = "_@";
+const char REG_EX_START[] = "$_REG.";
+const char REG_EX_END[] = "_$";
 
 // RECODE LEXC STYLE
 
@@ -53,6 +55,14 @@ std::string& joinerEncode(std::string& s);
 //! @brief Format inner representation of joiner string in readable format as
 //! it was in lexc source.
 std::string& joinerDecode(std::string& s);
+
+//! @brief Find inner representation for regex map key of given joiner name string.
+std::string& regExpresionEncode(std::string& s);
+
+//! @brief Format inner representation of joiner string in readable format as
+//! it was in lexc source.
+std::string& regExpresionDecode(std::string& s);
+
 
 // FLEX HANDLING
 

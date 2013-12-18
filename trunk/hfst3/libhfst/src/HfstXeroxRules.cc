@@ -132,10 +132,21 @@ namespace hfst
 
       HfstTransducer removeMarkers( const HfstTransducer &tr )
       {
+        HfstTransducer retval(tr);
+
+
         String leftMarker("@LM@");
         String rightMarker("@RM@");
 
-        HfstTransducer retval(tr);
+        /*
+        String newEpsilon("$Epsilon$");
+        HfstTokenizer TOK;
+        TOK.add_multichar_symbol(newEpsilon);
+        TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+        TOK.add_multichar_symbol("@_IDENTITY_SYMBOL_@");
+        ImplementationType type = retval.get_type();
+
+*/
 
         retval.substitute(StringPair(leftMarker, leftMarker), StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@")).minimize();
         retval.substitute(StringPair(rightMarker, rightMarker), StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@")).minimize();
@@ -146,8 +157,30 @@ namespace hfst
 
         retval.minimize();
 
+
+        /*
         //printf("tr without markers: \n");
-        //tr.write_in_att_format(stdout, 1);
+        //retval.write_in_att_format(stdout, 1);
+
+
+        //replace tmp_epsilon with real one
+
+        HfstTransducer tmpEpsToEps(newEpsilon, "@_EPSILON_SYMBOL_@", TOK, type);
+        // Identity (normal)
+        HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+        HfstTransducer identity (identityPair);
+        identity.insert_to_alphabet(newEpsilon);
+
+        tmpEpsToEps.disjunct(identity).repeat_star().minimize();
+        //identity.repeat_star().minimize();
+
+        printf("tmpEpsToEps: \n");
+        tmpEpsToEps.write_in_att_format(stdout, 1);
+
+        retval.invert().compose(tmpEpsToEps).invert().minimize();
+        printf("retval: \n");
+        retval.write_in_att_format(stdout, 1);
+        */
         return retval;
       }
 
@@ -393,6 +426,7 @@ namespace hfst
         String leftMarker2("@LM2@");
         String rightMarker2("@RM2@");
         String markupMarker("@MMM@");
+        String newEpsilon("$Epsilon$");
 
         TOK.add_multichar_symbol(leftMarker);
         TOK.add_multichar_symbol(rightMarker);
@@ -400,6 +434,7 @@ namespace hfst
         TOK.add_multichar_symbol(rightMarker2);
         TOK.add_multichar_symbol(tmpMarker);
         TOK.add_multichar_symbol(markupMarker);
+        TOK.add_multichar_symbol(newEpsilon);
         TOK.add_multichar_symbol( ".#.");
 
 
@@ -416,13 +451,27 @@ namespace hfst
         identity.repeat_star().minimize();
 
 
+        HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
         HfstTransducer mapping(type);
         for ( unsigned int i = 0; i < mappingPairVector.size(); i++ )
         {
+            /*
+            HfstTransducer oneMappingPair;
+            if (mappingPairVector[i].first.compare(epsilon))
+            {
+                printf("left is epsilon! \n");
+                oneMappingPair = HfstTransducer(newEpsilon, TOK, type);
+
+            }
+            else
+            {
+                oneMappingPair = mappingPairVector[i].first;
+            }
+             */
             HfstTransducer oneMappingPair(mappingPairVector[i].first);
 
-           // printf("oneMappingPair left \n");
-           // oneMappingPair.write_in_att_format(stdout, 1);
+            //printf("oneMappingPair left \n");
+            //oneMappingPair.write_in_att_format(stdout, 1);
 
 
             //printf("oneMappingPair left \n");
@@ -437,8 +486,8 @@ namespace hfst
             oneMappingPair.cross_product(mappingPairVector[i].second);
 
 
-           // printf("aftrer cross product \n");
-           //   oneMappingPair.minimize().write_in_att_format(stdout, 1);
+           //printf("aftrer cross product \n");
+           //oneMappingPair.minimize().write_in_att_format(stdout, 1);
 
 
 
@@ -667,6 +716,7 @@ namespace hfst
       // bracketed replace for parallel rules
     HfstTransducer parallelBracketedReplace( const std::vector<Rule> &ruleVector, bool optional)
     {
+
         HfstTokenizer TOK;
         TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
         String leftMarker("@LM@");
@@ -2183,7 +2233,7 @@ namespace hfst
       // left to right
     HfstTransducer replace_leftmost_longest_match( const std::vector<Rule> &ruleVector )
     {
-
+        //printf("\n replace_leftmost_longest_match \n");
         HfstTransducer uncondidtionalTr;
         if ( ruleVector.size() == 1 )
         {
@@ -2194,8 +2244,16 @@ namespace hfst
             uncondidtionalTr = parallelBracketedReplace(ruleVector, true);
         }
 
+        //printf("retval unconditional 1 \n");
+        //uncondidtionalTr.write_in_att_format(stdout, 1);
+
+
         HfstTransducer retval (leftMostConstraint(uncondidtionalTr));
-        //retval = leftMostConstraint(uncondidtionalTr);
+
+        //printf("retval leftMostConstraint \n");
+        //retval.write_in_att_format(stdout, 1);
+
+
 
         retval = longestMatchLeftMostConstraint( retval );
 
@@ -2203,19 +2261,32 @@ namespace hfst
         // it can't have more than one epsilon repetition in a row
         retval = noRepetitionConstraint( retval );
 
+
+//        printf("retval epenthesis \n");
+ //       retval.write_in_att_format(stdout, 1);
+
+
+
+
         // remove LM2, RM2
         retval = removeB2Constraint(retval);
 
+//        printf("retval removeB2Constraint \n");
+//        retval.write_in_att_format(stdout, 1);
+
+
+
+
         retval = removeMarkers( retval );
 
-       // printf("LM removeMarkers: \n");
-       // retval.write_in_att_format(stdout, 1);
+//       printf("LM removeMarkers: \n");
+//        retval.write_in_att_format(stdout, 1);
 
         // deals with boundary symbol
         retval = applyBoundaryMark( retval );
 
-       // printf("LM applyBoundaryMark: \n");
-       // retval.write_in_att_format(stdout, 1);
+//        printf("LM applyBoundaryMark: \n");
+//        retval.write_in_att_format(stdout, 1);
 
         return retval;
       }
