@@ -10,6 +10,7 @@
  #include <cassert>
  #include <iostream>
  #include <algorithm>
+ #include <stack>
 
  #include "../HfstSymbolDefs.h"
  #include "../HfstExceptionDefs.h"
