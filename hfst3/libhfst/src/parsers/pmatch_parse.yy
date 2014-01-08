@@ -742,10 +742,6 @@ REGEXP9: REGEXP10 { }
     $$ = & $1->repeat_n_to_k($2[0], $2[1]);
     free($2);
  }
-| INSERT { }
-| OPTCAP { }
-| TOUPPER { }
-| TOLOWER { }
 ;
 
 REGEXP10: REGEXP11 { }
@@ -763,6 +759,9 @@ REGEXP10: REGEXP11 { }
 ;
 
 REGEXP11: REGEXP12 { }
+| REGEXP11 WEIGHT { 
+    $$ = & $1->set_final_weights($2);
+ }
 | LEFT_BRACKET REGEXP2 RIGHT_BRACKET {
     $$ = & $2->minimize();
  }
@@ -791,6 +790,10 @@ REGEXP11: REGEXP12 { }
 | WHITESPACE {
     $$ = new HfstTransducer(*hfst::pmatch::get_utils()->latin1_whitespace_acceptor);
  }
+| INSERT { }
+| OPTCAP { }
+| TOUPPER { }
+| TOLOWER { }
 ;
 
 OPTCAP: OPTCAP_LEFT REGEXP11 RIGHT_PARENTHESIS {
@@ -809,9 +812,6 @@ TOUPPER: TOUPPER_LEFT REGEXP11 RIGHT_PARENTHESIS {
 ;
 
 REGEXP12: LABEL { }
-| LABEL WEIGHT { 
-    $$ = & $1->set_final_weights($2);
- }
 | READ_BIN {
     hfst::HfstInputStream instream($1);
     $$ = new HfstTransducer(instream);
