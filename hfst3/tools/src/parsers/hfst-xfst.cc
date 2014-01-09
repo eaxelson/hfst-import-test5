@@ -20,6 +20,13 @@
 
 #include "XfstCompiler.h"
 
+#ifdef WINDOWS
+  #include <io.h>
+  #include <windows.h>
+#endif
+
+#include "../hfst-string-conversions.h"
+
 #ifdef HAVE_READLINE
   #include <readline/readline.h>
   #include <readline/history.h>
@@ -37,6 +44,7 @@ static char* scriptfilename = NULL;
 static char* startupfilename = NULL;
 static std::vector<char*> execute_commands;
 static bool pipemode = false;
+static bool output_to_console = false;
 #ifdef HAVE_READLINE
   static bool use_readline = true;
 #else
@@ -62,6 +70,7 @@ print_usage()
           "  -l, --startupfile=FILE   Read commands from FILE on startup\n"
           "  -p, --pipe-mode          Read commands from standard input (non-interactive)\n"
           "  -r, --no-readline        Do not use readline library for input\n"
+          "  -k, --output-to-console  Output directly to console (Windows-specific)\n"
           "\n"
           "Option --execute can be invoked many times.\n"
           "If FMT is not given, OpenFst's tropical format will be used.\n"
@@ -91,11 +100,12 @@ parse_options(int argc, char** argv)
             {"startupfile", required_argument, 0, 'l'},
             {"pipe-mode", no_argument, 0, 'p'},
             {"no-readline", no_argument, 0, 'r'},
+            {"output-to-console", no_argument, 0, 'k'},
             {0,0,0,0}
           };
         int option_index = 0;
         // add tool-specific options here
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "f:F:e:l:pr",
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "f:F:e:l:prk",
                              long_options, &option_index);
         if (-1 == c)
           {
@@ -143,6 +153,9 @@ parse_options(int argc, char** argv)
             break;
           case 'r':
             use_readline = false;
+            break;
+          case 'k':
+            output_to_console = true;
             break;
 #include "inc/getopt-cases-error.h"
           }
@@ -296,6 +309,9 @@ int main(int argc, char** argv)
 #endif
   comp.setVerbosity(!silent);
 
+  if (output_to_console)
+    comp.setOutputToConsole(true);
+
   // If needed, execute scripts given in command line
   for (std::vector<char*>::const_iterator cmd = execute_commands.begin();
        cmd != execute_commands.end(); cmd++)
@@ -346,17 +362,27 @@ int main(int argc, char** argv)
       // support for backspace
 
       std::string expression = "";
-      unsigned int lines = 0;
-      const unsigned int MAX_LINE_LENGTH = 1024;
+      //unsigned int lines = 0;
 
+#ifdef WINDOWS
+      SetConsoleCP(65001);
+      const HANDLE stdIn = GetStdHandle(STD_INPUT_HANDLE);
+      WCHAR buffer[0x1000];
+      DWORD numRead = 0;
+      while (ReadConsoleW(stdIn, buffer, sizeof buffer, &numRead, NULL))
+        {
+          std::wstring wstr(buffer);
+          std::string linestr = hfst::wide_string_to_string(wstr);
+          expression += linestr;
+#else
+      const unsigned int MAX_LINE_LENGTH = 1024;
       char line [MAX_LINE_LENGTH];
       insert_zeroes(line, MAX_LINE_LENGTH);
-
       while (cin.getline(line, MAX_LINE_LENGTH))
         {
           std::string linestr(line);
           expression += linestr;
-
+#endif
           if (expression.size() > 0 && expression.at(expression.size()-1) == '\\')
             {
               expression.at(expression.size()-1) = '\n';

@@ -477,10 +477,14 @@ class XfstCompiler
   XfstCompiler& setReadline(bool readline);
   //! @brief Define whether input is read from stdin in apply up etc.
   XfstCompiler& setReadInteractiveTextFromStdin(bool value);
+  //! @brief Define whether output is printed directly to windows console.
+  XfstCompiler& setOutputToConsole(bool value);
   //! @brief Whether readline is used to read input in apply up etc.
   bool getReadline();
   //! @brief Whether stdin is used to read input in apply up etc.
   bool getReadInteractiveTextFromStdin();
+  //! @brief Whether output is printed directly to windows console.
+  bool getOutputToConsole();
   //! @brief Define wheter prompts and XFST outputs are printed.
   XfstCompiler& setVerbosity(bool verbosity);
   //! @brief Define wheter prompts are printed.
@@ -559,6 +563,16 @@ class XfstCompiler
   //! whose alphabet we are printing.
   void print_alphabet(const StringSet & alpha, bool unknown, bool identity, FILE* outfile);
 
+  void print_level
+    (const std::vector<unsigned int> & whole_path,
+     const std::vector<unsigned int> & shortest_path);
+
+  bool can_level_be_reached(int level, size_t whole_path_length);
+
+  bool can_arc_be_followed(int number, unsigned int number_of_arcs);
+
+  unsigned int print_arcs(const HfstBasicTransducer::HfstTransitions & transitions);
+
   //! @brief Perform lookup on the top transducer using strings in \a infile.
   //! \a direction specifies whether apply is done on input (up) or output (down) 
   //! side. If infile is stdin, interactive mode with prompts is used.
@@ -597,6 +611,9 @@ class XfstCompiler
   //! @brief Remove newline ('\n' and '\r') from the end of \a str. 
   char * remove_newline(char * str);
 
+  //! @brief Wrapper for fprintf.
+  int hfst_fprintf(FILE * stream, const char * format, ...) const;
+
   //! @brief Get current readline history index.
   int current_history_index();
 
@@ -617,6 +634,7 @@ class XfstCompiler
 
   bool use_readline_;
   bool read_interactive_text_from_stdin_;
+  bool output_to_console_;
   hfst::xre::XreCompiler xre_;
   hfst::lexc::LexcCompiler lexc_;
 #if HAVE_TWOLC

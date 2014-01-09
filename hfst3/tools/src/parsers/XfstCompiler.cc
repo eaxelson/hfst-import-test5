@@ -2,7 +2,6 @@
 //!
 //! @brief Implemetation of class encapsulating yacc and flex parsers for XFST
 //!        scripts
-
 //       This program is free software: you can redistribute it and/or modify
 //       it under the terms of the GNU General Public License as published by
 //       the Free Software Foundation, version 3 of the License.
@@ -36,9 +35,14 @@ using std::ostringstream;
 #include <cstdio>
 #include <cstdlib>
 
+#include <cstdarg>
+
 #ifndef WINDOWS
   #include <glob.h>
-#endif // WINDOWS
+#else
+  #include <windows.h>
+  #include "../hfst-string-conversions.h"
+#endif  // WINDOWS
 
 #include "XfstCompiler.h"
 #include "xfst-utils.h"
@@ -119,6 +123,7 @@ namespace xfst {
     XfstCompiler::XfstCompiler() :
         use_readline_(false),
         read_interactive_text_from_stdin_(false),
+        output_to_console_(false),
         xre_(hfst::TROPICAL_OPENFST_TYPE),
         lexc_(hfst::TROPICAL_OPENFST_TYPE),
         format_(hfst::TROPICAL_OPENFST_TYPE),
@@ -160,6 +165,7 @@ namespace xfst {
     XfstCompiler::XfstCompiler(ImplementationType impl) :
         use_readline_(false),
         read_interactive_text_from_stdin_(false),
+        output_to_console_(false),
         xre_(impl),
         lexc_(impl),
         format_(impl),
@@ -198,6 +204,47 @@ namespace xfst {
         prompt();
       }
 
+  int XfstCompiler::hfst_fprintf(FILE * stream, const char * format, ...) const
+  {
+    va_list args;
+    va_start(args, format);
+#ifdef WINDOWS
+    if (output_to_console_ && (stream == stdout || stream == stderr))
+      {
+        char buffer [1024];
+        int r = vsprintf(buffer, format, args);
+        va_end(args);
+        if (r < 0)
+          return r;
+        HANDLE stdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+        if (stream == stderr)
+          stdHandle = GetStdHandle(STD_ERROR_HANDLE);
+
+        std::string pstr(buffer);
+        DWORD numWritten = 0;
+        int wchars_num =
+          MultiByteToWideChar(CP_UTF8 , 0 , pstr.c_str() , -1, NULL , 0 );
+        wchar_t* wstr = new wchar_t[wchars_num];
+        MultiByteToWideChar(CP_UTF8 , 0 ,
+                            pstr.c_str() , -1, wstr , wchars_num );
+        int retval = WriteConsoleW(stdHandle, wstr, wchars_num-1, &numWritten, NULL);
+        delete[] wstr;
+
+        return retval;
+      }
+    else
+      {
+        int retval = vfprintf(stream, format, args);
+        va_end(args);
+        return retval;
+      }
+#else
+    int retval = vfprintf(stream, format, args);
+    va_end(args);
+    return retval;
+#endif
+  }
+
   void XfstCompiler::xfst_fail()
   {
     if (variables_["quit-on-fail"] == "ON") 
@@ -222,7 +269,7 @@ namespace xfst {
         if (*p == '\0')
           {
             assert(*p != '\0');
-            fprintf(errorstream_, "no colon in line\n");
+            hfst_fprintf(errorstream_, "no colon in line\n");
           }
         p++;
         while (isspace(*p))
@@ -273,10 +320,10 @@ namespace xfst {
                 something_printed &&                  // not first symbol shown 
                 strcmp(print_symbol, "") != 0)        // something to show
               {
-                fprintf(outfile, " ");
+                hfst_fprintf(outfile, " ");
               }
 
-            fprintf(outfile, "%s", print_symbol);
+            hfst_fprintf(outfile, "%s", print_symbol);
 
             if (strcmp(print_symbol, "") != 0) {
               something_printed = true;
@@ -284,7 +331,7 @@ namespace xfst {
 
           } // path gone through
 
-        fprintf(outfile, "\n");
+        hfst_fprintf(outfile, "\n");
         --n;
 
       } // at most n paths gone through
@@ -316,10 +363,10 @@ namespace xfst {
                 something_printed &&                  // not first symbol shown
                 strcmp(print_symbol, "") != 0)        // something to show
               {
-                fprintf(outfile, " ");
+                hfst_fprintf(outfile, " ");
               }
 
-            fprintf(outfile, "%s", print_symbol);
+            hfst_fprintf(outfile, "%s", print_symbol);
 
             if (strcmp(print_symbol, "") != 0) {
               something_printed = true;
@@ -331,12 +378,12 @@ namespace xfst {
             if (strcmp(print_symbol, "") != 0 &&   // something to show
                 p->first != p->second)             // input and output symbols differ
               {
-                fprintf(outfile, ":%s", print_symbol);
+                hfst_fprintf(outfile, ":%s", print_symbol);
               }
 
           } // path gone through
 
-        fprintf(outfile, "\n");
+        hfst_fprintf(outfile, "\n");
         --n;
 
       } // at most n paths gone through
@@ -366,7 +413,7 @@ namespace xfst {
 
         this->print_paths(*paths);
         if (paths->empty()) {
-          fprintf(outstream_, "???\n");
+          hfst_fprintf(outstream_, "???\n");
         }
 
         delete paths;
@@ -391,7 +438,7 @@ namespace xfst {
     XfstCompiler&
     XfstCompiler::apply_med_line(char* /*line*/)
       {
-        fprintf(errorstream_, "Missing apply med %s:%d\n", __FILE__, __LINE__);
+        hfst_fprintf(errorstream_, "Missing apply med %s:%d\n", __FILE__, __LINE__);
 #if 0
         char* token = strstrip(line);
         HfstTransducer top = stack_.top();
@@ -420,7 +467,7 @@ namespace xfst {
         if (*p == '\0')
           {
             assert(*p != '\0');
-            fprintf(errorstream_, "no colon in line\n");
+            hfst_fprintf(errorstream_, "no colon in line\n");
           }
         p++;
         while (isspace(*p))
@@ -494,7 +541,7 @@ namespace xfst {
               {
                 // the next command must start on a fresh line
                 if (infile == stdin) {
-                  fprintf(outstream_, "\n");
+                  hfst_fprintf(outstream_, "\n");
                 }
                 break;
               }
@@ -599,7 +646,7 @@ namespace xfst {
       {
         if ((strlen(start) > 1) || (strlen(end) > 1))
           {
-            fprintf(errorstream_, "unsupported unicode range %s-%s\n", start, end);
+            hfst_fprintf(errorstream_, "unsupported unicode range %s-%s\n", start, end);
           }
         list<string> l;
         for (char c = *start; c < *end; c++)
@@ -634,7 +681,7 @@ namespace xfst {
     {
       /*if (hfst::xfst::nametoken_to_number(name) >= 0)
         {
-          fprintf(errorstream_, "Could not define variable, '%s' is not a valid name\n",
+          hfst_fprintf(errorstream_, "Could not define variable, '%s' is not a valid name\n",
                   name);
                   }*/
 
@@ -654,16 +701,16 @@ namespace xfst {
           if (verbose_) 
             {
               if (was_defined)
-                fprintf(outstream_, "Redefined");
+                hfst_fprintf(outstream_, "Redefined");
               else
-                fprintf(outstream_, "Defined");
-              fprintf(outstream_, " '%s'\n", name); 
+                hfst_fprintf(outstream_, "Defined");
+              hfst_fprintf(outstream_, " '%s'\n", name); 
             }          
           original_definitions_[name] = xre;
         }
       else
         {
-          fprintf(errorstream_, "Could not define variable %s:\n%s\n", 
+          hfst_fprintf(errorstream_, "Could not define variable %s:\n%s\n", 
                   name, xre_.get_error_message().c_str());
         }
       PROMPT_AND_RETURN_THIS;
@@ -808,7 +855,7 @@ namespace xfst {
 
       if (! extract_function_name(prototype, name))
         {
-          fprintf(errorstream_, "Error extracting function name "
+          hfst_fprintf(errorstream_, "Error extracting function name "
                   "from prototype '%s'\n", prototype);
           xfst_fail();
           PROMPT_AND_RETURN_THIS;
@@ -816,7 +863,7 @@ namespace xfst {
 
       if (! extract_function_arguments(prototype, arguments))
         {
-          fprintf(errorstream_, "Error extracting function arguments "
+          hfst_fprintf(errorstream_, "Error extracting function arguments "
                   "from prototype '%s'\n", prototype);
           xfst_fail();
           PROMPT_AND_RETURN_THIS;
@@ -826,7 +873,7 @@ namespace xfst {
         = convert_argument_symbols(arguments, xre, name, xre_);
       if (xre_converted == std::string(""))
         {
-          fprintf(errorstream_, "Error parsing function definition '%s'\n", xre);
+          hfst_fprintf(errorstream_, "Error parsing function definition '%s'\n", xre);
           xfst_fail();
           PROMPT_AND_RETURN_THIS;
         }
@@ -835,7 +882,7 @@ namespace xfst {
 
       if (! xre_.define_function(name, arguments.size(), xre_converted))
         {
-          fprintf(errorstream_, "Error when defining function\n");
+          hfst_fprintf(errorstream_, "Error when defining function\n");
           xfst_fail();
           PROMPT_AND_RETURN_THIS;
         }
@@ -843,12 +890,12 @@ namespace xfst {
       if (verbose_) 
         {
           if (was_defined) {
-            fprintf(stderr, "Redefined"); 
+            hfst_fprintf(stderr, "Redefined"); 
           }
           else {
-            fprintf(stderr, "Defined"); 
+            hfst_fprintf(stderr, "Defined"); 
           }
-          fprintf(stderr, " function '%s@%i)'\n", 
+          hfst_fprintf(stderr, " function '%s@%i)'\n", 
                   name.c_str(), (int)arguments.size()); 
         }
 
@@ -964,11 +1011,11 @@ namespace xfst {
       std::string message;
       if (!get_help_message(text, message, HELP_MODE_APROPOS))
         {
-          fprintf(outstream_, "nothing found for '%s'\n", text);
+          hfst_fprintf(outstream_, "nothing found for '%s'\n", text);
         }
       else
         {
-          fprintf(outstream_, "%s", message.c_str());
+          hfst_fprintf(outstream_, "%s", message.c_str());
         }
       PROMPT_AND_RETURN_THIS;
     }
@@ -981,11 +1028,11 @@ namespace xfst {
       std::string message;
       if (!get_help_message(text, message, help_mode))
         {
-          fprintf(outstream_, "no help found for '%s'\n", text);
+          hfst_fprintf(outstream_, "no help found for '%s'\n", text);
         }
       else
         {
-          fprintf(outstream_, "%s", message.c_str());
+          hfst_fprintf(outstream_, "%s", message.c_str());
         }
       PROMPT_AND_RETURN_THIS;
     }
@@ -1003,7 +1050,7 @@ namespace xfst {
   XfstCompiler::pop()
     {
       if (stack_.empty())
-        fprintf(outstream_, "Stack is empty.\n");
+        hfst_fprintf(outstream_, "Stack is empty.\n");
       else // todo: delete if not definition?
         stack_.pop();
       PROMPT_AND_RETURN_THIS;
@@ -1014,7 +1061,7 @@ namespace xfst {
     {
       if (definitions_.find(name) == definitions_.end())
         {
-          fprintf(outstream_, "no such defined network: '%s'\n", name);
+          hfst_fprintf(outstream_, "no such defined network: '%s'\n", name);
           PROMPT_AND_RETURN_THIS;
         }
 
@@ -1086,7 +1133,7 @@ namespace xfst {
     std::string def_name = t->get_name();
     if (def_name == "")
       {
-        fprintf(warnstream_, "warning: loaded transducer definition "
+        hfst_fprintf(warnstream_, "warning: loaded transducer definition "
                 "has no name, skipping it\n");
         return *this;
       }
@@ -1094,7 +1141,7 @@ namespace xfst {
       = definitions_.find(def_name);
     if (it != definitions_.end())
       {
-        fprintf(warnstream_, "warning: a definition named '%s' "
+        hfst_fprintf(warnstream_, "warning: a definition named '%s' "
                 "already exists, overwriting it\n", def_name.c_str());
         definitions_.erase(def_name);
       }
@@ -1110,19 +1157,19 @@ namespace xfst {
       {
         if (verbose_)
           {
-            fprintf(warnstream_, "warning: converting transducer type from %s to %s",
+            hfst_fprintf(warnstream_, "warning: converting transducer type from %s to %s",
                     hfst::implementation_type_to_format(t->get_type()),
                     hfst::implementation_type_to_format(format_));
             if (filename != NULL)
               {
-                fprintf(warnstream_, "when reading from file '%s'",
+                hfst_fprintf(warnstream_, "when reading from file '%s'",
                         to_filename(filename));
               }
             if (! hfst::HfstTransducer::is_safe_conversion(t->get_type(), format_))
               {
-                fprintf(warnstream_, " (loss of information is possible)");
+                hfst_fprintf(warnstream_, " (loss of information is possible)");
               }
-            fprintf(warnstream_, "\n");
+            hfst_fprintf(warnstream_, "\n");
           }
         t->convert(format_);
       }
@@ -1141,7 +1188,7 @@ namespace xfst {
       }
     catch (NotTransducerStreamException ntse)
       {
-        fprintf(errorstream_, "Unable to read transducers from %s\n", 
+        hfst_fprintf(errorstream_, "Unable to read transducers from %s\n", 
                 to_filename(infilename));
         xfst_fail();
         return NULL;
@@ -1192,7 +1239,7 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::collect_epsilon_loops()
     {
-      fprintf(stderr, "cannot collect epsilon loops %s:%d\n", __FILE__,
+      hfst_fprintf(stderr, "cannot collect epsilon loops %s:%d\n", __FILE__,
               __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
@@ -1224,7 +1271,7 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::echo(const char* text)
     {
-      fprintf(outstream_, "%s\n", text);
+      hfst_fprintf(outstream_, "%s\n", text);
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -1233,11 +1280,11 @@ namespace xfst {
     {
       if (verbose_ && (strcmp(message, "dodongo") == 0))
         {
-          fprintf(outstream_, "dislikes smoke.\n");
+          hfst_fprintf(outstream_, "dislikes smoke.\n");
         }
       else if (verbose_)
         {
-          fprintf(outstream_, "%s.\n", message);
+          hfst_fprintf(outstream_, "%s.\n", message);
         }
       else
         ;
@@ -1251,7 +1298,7 @@ namespace xfst {
       int rv = ::system(command);
       if (rv != 0)
         {
-          fprintf(stderr, "system %s returned %d\n", command, rv);
+          hfst_fprintf(stderr, "system %s returned %d\n", command, rv);
         }
       PROMPT_AND_RETURN_THIS;
     }
@@ -1261,7 +1308,7 @@ namespace xfst {
     {
       if (variables_.find(name) == variables_.end())
         {
-          fprintf(warnstream_, "no such variable: '%s'\n", name);
+          hfst_fprintf(warnstream_, "no such variable: '%s'\n", name);
           PROMPT_AND_RETURN_THIS;
         }
       variables_[name] = text;
@@ -1280,7 +1327,7 @@ namespace xfst {
     {
       if (variables_.find(name) == variables_.end())
         {
-          fprintf(warnstream_, "no such variable: '%s'\n", name);
+          hfst_fprintf(warnstream_, "no such variable: '%s'\n", name);
           PROMPT_AND_RETURN_THIS;
         }
       char* num = static_cast<char*>(malloc(sizeof(char)*31));
@@ -1294,10 +1341,10 @@ namespace xfst {
     {
       if (variables_.find(name) == variables_.end())
         {
-          fprintf(warnstream_, "no such variable: '%s'\n", name);
+          hfst_fprintf(warnstream_, "no such variable: '%s'\n", name);
           PROMPT_AND_RETURN_THIS;
         }        
-      fprintf(outstream_, "variable %s = %s\n", name, variables_[name].c_str());
+      hfst_fprintf(outstream_, "variable %s = %s\n", name, variables_[name].c_str());
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -1309,10 +1356,10 @@ namespace xfst {
            var++)
         {
           if (var->first == "copyright-owner")
-            fprintf(stderr, "%20s:        %s\n", var->first.c_str(),
+            hfst_fprintf(stderr, "%20s:        %s\n", var->first.c_str(),
                     var->second.c_str());
           else
-            fprintf(stderr, "%20s:%6s: %s\n", 
+            hfst_fprintf(stderr, "%20s:%6s: %s\n", 
                     var->first.c_str(), var->second.c_str(),
                     variable_explanations_[var->first].c_str());
         }
@@ -1324,7 +1371,7 @@ namespace xfst {
     {
       if (stack_.size() < 2)
         {
-          fprintf(stderr, "Not enough networks on stack. "
+          hfst_fprintf(stderr, "Not enough networks on stack. "
                   "Operation requires at least 2.\n");
           return *this;
         }
@@ -1344,7 +1391,7 @@ namespace xfst {
   XfstCompiler::print_bool(bool value)
   {
     int printval = (value)? 1 : 0; 
-    fprintf(outstream_, "%i, (1 = TRUE, 0 = FALSE)\n", printval);
+    hfst_fprintf(outstream_, "%i, (1 = TRUE, 0 = FALSE)\n", printval);
     return *this;
   }
   HfstTransducer *
@@ -1352,7 +1399,7 @@ namespace xfst {
   {
     if (stack_.size() < 1)
       {
-        fprintf(stderr, "Empty stack.\n");
+        hfst_fprintf(stderr, "Empty stack.\n");
         prompt();
         return NULL;
       }
@@ -1362,7 +1409,7 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::test_funct(bool assertion)
     {
-      fprintf(stderr, "test funct missing %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(stderr, "test funct missing %s:%d\n", __FILE__, __LINE__);
       //MAYBE_ASSERT(assertion, result);
       PROMPT_AND_RETURN_THIS;
     }
@@ -1419,7 +1466,7 @@ namespace xfst {
       else if (level == LOWER_LEVEL)
         value = ! id.compare(tmp, false);
       else
-        fprintf(errorstream_, "ERROR: argument given to function 'test_uni'\n"
+        hfst_fprintf(errorstream_, "ERROR: argument given to function 'test_uni'\n"
                 "not recognized\n");
 
       this->print_bool(value);
@@ -1481,7 +1528,7 @@ namespace xfst {
   {
     if (stack_.size() < 2)
       {
-        fprintf(stderr, "Not enough networks on stack. "
+        hfst_fprintf(stderr, "Not enough networks on stack. "
                 "Operation requires at least 2.\n");
         PROMPT_AND_RETURN_THIS;
       }
@@ -1522,7 +1569,7 @@ namespace xfst {
               break;
             }
           default:
-            fprintf(errorstream_, "ERROR: unknown test operation\n");
+            hfst_fprintf(errorstream_, "ERROR: unknown test operation\n");
             break;
           }
       }
@@ -1544,7 +1591,7 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::test_unambiguous(bool assertion)
     {
-      fprintf(stderr, "test unambiguous missing %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(stderr, "test unambiguous missing %s:%d\n", __FILE__, __LINE__);
       //MAYBE_ASSERT(assertion, result);
       PROMPT_AND_RETURN_THIS;
     }
@@ -1613,7 +1660,7 @@ namespace xfst {
         = definitions_.find(variable);
       if (it == definitions_.end())
         {
-          fprintf(errorstream_, "no such definition '%s', cannot substitute\n", 
+          hfst_fprintf(errorstream_, "no such definition '%s', cannot substitute\n", 
                   variable);
           MAYBE_QUIT;
           PROMPT_AND_RETURN_THIS;
@@ -1628,7 +1675,7 @@ namespace xfst {
       StringSet alpha = top->get_alphabet();
       if (alpha.find(labelstr) == alpha.end())
         {
-          fprintf(errorstream_, "no occurrences of label '%s', cannot substitute\n", 
+          hfst_fprintf(errorstream_, "no occurrences of label '%s', cannot substitute\n", 
                   label);
           MAYBE_QUIT;
           PROMPT_AND_RETURN_THIS;
@@ -1647,7 +1694,7 @@ namespace xfst {
               if (isymbol != osymbol && 
                   (isymbol == labelstr || osymbol == labelstr))
                 {
-                  fprintf(errorstream_, "label '%s' is used as a symbol on one "
+                  hfst_fprintf(errorstream_, "label '%s' is used as a symbol on one "
                           "side of an arc, cannot substitute\n", label);
                   MAYBE_QUIT;
                   PROMPT_AND_RETURN_THIS;
@@ -1692,7 +1739,7 @@ namespace xfst {
                 }
               catch (const char * msg)
                 {
-                  fprintf(errorstream_, "error: could not substitute with '%s'\n", list);
+                  hfst_fprintf(errorstream_, "error: could not substitute with '%s'\n", list);
                   MAYBE_QUIT;
                   PROMPT_AND_RETURN_THIS;
                 }
@@ -1724,7 +1771,7 @@ namespace xfst {
             }
           if (!target_label_found)
             {
-              fprintf(errorstream_, "no occurrences of '%s:%s', cannot substitute\n", 
+              hfst_fprintf(errorstream_, "no occurrences of '%s:%s', cannot substitute\n", 
                       target_label.first.c_str(), target_label.second.c_str());
               PROMPT_AND_RETURN_THIS;
             }
@@ -1733,7 +1780,7 @@ namespace xfst {
         }
       catch (const char * msg)
         {
-          fprintf(errorstream_, "error: could not substitute '%s'\n", target);
+          hfst_fprintf(errorstream_, "error: could not substitute '%s'\n", target);
           MAYBE_QUIT;
         }
 
@@ -1749,7 +1796,7 @@ namespace xfst {
       StringSet alpha = top->get_alphabet();
       if (alpha.find(target) == alpha.end())
         {
-          fprintf(errorstream_, "no occurrences of symbol '%s', cannot substitute\n", target);
+          hfst_fprintf(errorstream_, "no occurrences of symbol '%s', cannot substitute\n", target);
           MAYBE_QUIT;
           PROMPT_AND_RETURN_THIS;
         }
@@ -1775,7 +1822,7 @@ namespace xfst {
         }
       else
         {
-          fprintf(errorstream_, "fatal error in substitution, exiting program\n");
+          hfst_fprintf(errorstream_, "fatal error in substitution, exiting program\n");
           exit(EXIT_FAILURE);
         }
       PROMPT_AND_RETURN_THIS;
@@ -1788,7 +1835,7 @@ namespace xfst {
            alias != aliases_.end();
            ++alias)
         {
-          fprintf(outfile, "alias %10s %s", 
+          hfst_fprintf(outfile, "alias %10s %s", 
                   alias->first.c_str(), alias->second.c_str());
         }
       PROMPT_AND_RETURN_THIS;
@@ -1797,14 +1844,14 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::print_arc_count(const char* level, FILE* outfile)
     {
-      fprintf(outfile, "missing %s arc count %s:%d\n", level,
+      hfst_fprintf(outfile, "missing %s arc count %s:%d\n", level,
               __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_arc_count(FILE* outfile)
     {
-      fprintf(outfile, "missing arc count %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(outfile, "missing arc count %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -1817,22 +1864,22 @@ namespace xfst {
            ++def)
         {         
           definitions = true;
-          fprintf(outfile, "%10s %s\n",
+          hfst_fprintf(outfile, "%10s %s\n",
                   def->first.c_str(), def->second.c_str());
         }
       if (!definitions)
-        fprintf(outfile, "No defined symbols.\n");
+        hfst_fprintf(outfile, "No defined symbols.\n");
 
       definitions = false;
       for (map<string,string>::const_iterator func = original_function_definitions_.begin();
            func != original_function_definitions_.end(); func++)
         {
           definitions = true;
-          fprintf(outfile, "%10s %s\n", func->first.c_str(), 
+          hfst_fprintf(outfile, "%10s %s\n", func->first.c_str(), 
                   func->second.c_str());
         }
       if (!definitions)
-        fprintf(stderr, "No function definitions.\n");
+        hfst_fprintf(stderr, "No function definitions.\n");
 
       PROMPT_AND_RETURN_THIS;
     }
@@ -1848,15 +1895,15 @@ namespace xfst {
         {
           for (unsigned int i = 0; i < globbuf.gl_pathc; i++)
             {
-              fprintf(outfile, "%s\n", globbuf.gl_pathv[i]);
+              hfst_fprintf(outfile, "%s\n", globbuf.gl_pathv[i]);
             }
         }
       else
         {
-          fprintf(outfile, "glob(%s) = %d\n", globdata, rv);
+          hfst_fprintf(outfile, "glob(%s) = %d\n", globdata, rv);
         }
 #else
-      fprintf(stderr, "print dir not implemented for windows\n");
+      hfst_fprintf(stderr, "print dir not implemented for windows\n");
 #endif // WINDOWS
       PROMPT_AND_RETURN_THIS;
     }
@@ -1864,7 +1911,7 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::print_flags(FILE* outfile)
     {
-      fprintf(outfile, "missing print flags %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(outfile, "missing print flags %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
   
@@ -1882,7 +1929,7 @@ namespace xfst {
         = definitions_.find(name);
       if (it == definitions_.end())
         {
-          fprintf(outfile, "no such definition '%s'\n", name);
+          hfst_fprintf(outfile, "no such definition '%s'\n", name);
         }
       else
         {
@@ -1909,25 +1956,25 @@ namespace xfst {
             }
         }
         
-      fprintf(outfile, "Labels: ");
+      hfst_fprintf(outfile, "Labels: ");
       for(std::set<std::pair<std::string, std::string> >::const_iterator it
             = label_set.begin(); it != label_set.end(); it++)
         {
           if (it != label_set.begin())
-            fprintf(outfile, ", ");
-          fprintf(outfile, "%s", it->first.c_str());
+            hfst_fprintf(outfile, ", ");
+          hfst_fprintf(outfile, "%s", it->first.c_str());
           if (it->first != it->second)
-            fprintf(outfile, ":%s", it->second.c_str());
+            hfst_fprintf(outfile, ":%s", it->second.c_str());
         }
-      fprintf(outfile, "\n");
-      fprintf(outfile, "Size: %i\n", (int)label_set.size());
+      hfst_fprintf(outfile, "\n");
+      hfst_fprintf(outfile, "Size: %i\n", (int)label_set.size());
 
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_labelmaps(FILE* outfile)
     {
-      fprintf(outfile, "missing label-maps %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(outfile, "missing label-maps %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -1956,15 +2003,15 @@ namespace xfst {
             it= label_map.begin(); it != label_map.end(); it++)
         {
           if (it != label_map.begin())
-            fprintf(outfile, "   ");
-          fprintf(outfile, "%i. ", index);
-          fprintf(outfile, "%s", it->first.first.c_str());
+            hfst_fprintf(outfile, "   ");
+          hfst_fprintf(outfile, "%i. ", index);
+          hfst_fprintf(outfile, "%s", it->first.first.c_str());
           if (it->first.first != it->first.second)
-            fprintf(outfile, ":%s", it->first.second.c_str());
-          fprintf(outfile, " %i", it->second);
+            hfst_fprintf(outfile, ":%s", it->first.second.c_str());
+          hfst_fprintf(outfile, " %i", it->second);
           index++;
         }
-      fprintf(outfile, "\n");
+      hfst_fprintf(outfile, "\n");
 
       PROMPT_AND_RETURN_THIS;
     }
@@ -1973,12 +2020,12 @@ namespace xfst {
   XfstCompiler::print_list(const char* name, FILE* outfile)
     {
       list<string> l = lists_[name];
-      fprintf(outfile, "%10s:", name);
+      hfst_fprintf(outfile, "%10s:", name);
       for (list<string>::const_iterator s = l.begin();
            s != l.end();
            ++s)
         {
-          fprintf(outfile, "%s ", s->c_str());
+          hfst_fprintf(outfile, "%s ", s->c_str());
         }
       PROMPT_AND_RETURN_THIS;
     }
@@ -1990,12 +2037,12 @@ namespace xfst {
            l != lists_.end();
            ++l)
         {
-          fprintf(outfile, "%10s:", l->first.c_str());
+          hfst_fprintf(outfile, "%10s:", l->first.c_str());
           for (list<string>::const_iterator s = l->second.begin();
                s != l->second.end();
                ++s)
             {
-              fprintf(outfile, "%s ", s->c_str());
+              hfst_fprintf(outfile, "%s ", s->c_str());
             }
         }
       PROMPT_AND_RETURN_THIS;
@@ -2020,7 +2067,7 @@ namespace xfst {
 
       if (paths.size() == 0)
         {
-          fprintf(outstream_, "transducer is empty\n");
+          hfst_fprintf(outstream_, "transducer is empty\n");
         }
       else
         {
@@ -2037,10 +2084,10 @@ namespace xfst {
       this->shortest_string(topmost, paths);
 
       if (paths.size() == 0) {
-        fprintf(outstream_, "transducer is empty\n");
+        hfst_fprintf(outstream_, "transducer is empty\n");
       }
       else {
-        fprintf(outfile, "%i\n", (int)(paths.begin()->second.size()));
+        hfst_fprintf(outfile, "%i\n", (int)(paths.begin()->second.size()));
       }
       PROMPT_AND_RETURN_THIS;
     }
@@ -2050,10 +2097,10 @@ namespace xfst {
   (FILE* outfile, const HfstTwoLevelPaths & paths, const char * level, bool print_size)
   {
     assert(level != NULL);
-    fprintf(outfile, "%s", level);
+    hfst_fprintf(outfile, "%s", level);
     if (print_size)
       {
-        fprintf(outfile, "%i\n", (int)paths.begin()->second.size());
+        hfst_fprintf(outfile, "%i\n", (int)paths.begin()->second.size());
       }
     else
       {
@@ -2100,10 +2147,10 @@ namespace xfst {
     // Print the results:
     // first, the special cases,
     if (upper_is_cyclic && lower_is_cyclic) {
-      fprintf(outstream_, "transducer is cyclic\n");
+      hfst_fprintf(outstream_, "transducer is cyclic\n");
     }
     else if (transducer_is_empty) {
-      fprintf(outstream_, "transducer is empty\n");
+      hfst_fprintf(outstream_, "transducer is empty\n");
     }
     // then the usual: 
     else {
@@ -2112,19 +2159,19 @@ namespace xfst {
           (tmp_upper.has_flag_diacritics() || 
            tmp_lower.has_flag_diacritics()) )
         {
-          fprintf(warnstream_ ,"warning: longest string may have flag diacritics that are not shown\n");
-          fprintf(warnstream_, "         but are used in calculating its length (use 'eliminate flags')\n");
+          hfst_fprintf(warnstream_ ,"warning: longest string may have flag diacritics that are not shown\n");
+          hfst_fprintf(warnstream_, "         but are used in calculating its length (use 'eliminate flags')\n");
         }
       
       // print one longest string of the upper level, if not cyclic
       if (upper_is_cyclic) {
-        fprintf(outfile, "Upper level is cyclic.\n"); }
+        hfst_fprintf(outfile, "Upper level is cyclic.\n"); }
       else {
         print_one_string_or_its_size(outfile, paths_upper, "Upper", print_size); }
       
       // print one longest string of the lower level, if not cyclic
         if (lower_is_cyclic) {
-          fprintf(outfile, "Lower level is cyclic.\n"); }
+          hfst_fprintf(outfile, "Lower level is cyclic.\n"); }
         else {
           print_one_string_or_its_size(outfile, paths_lower, "Lower", print_size); }
     }
@@ -2203,7 +2250,7 @@ namespace xfst {
         case BOTH_LEVELS:
           break;
         default:
-          fprintf(errorstream_, "ERROR: argument given to function 'print_words'\n"
+          hfst_fprintf(errorstream_, "ERROR: argument given to function 'print_words'\n"
                   "not recognized\n");
           PROMPT_AND_RETURN_THIS;
         }
@@ -2219,7 +2266,7 @@ namespace xfst {
         }
       catch (const TransducerIsCyclicException & e)
         {
-          fprintf(warnstream_, "warning: transducer is cyclic, limiting the number of cycles to 5\n");
+          hfst_fprintf(warnstream_, "warning: transducer is cyclic, limiting the number of cycles to 5\n");
           if (variables_["obey-flags"] == "OFF")
             temp.extract_paths(results, number, 5);
           else
@@ -2251,12 +2298,12 @@ namespace xfst {
         {
           if (tmp == it->second)
             {
-              fprintf(outfile, "Name: %s\n", it->first.c_str());
+              hfst_fprintf(outfile, "Name: %s\n", it->first.c_str());
               PROMPT_AND_RETURN_THIS;
             }
         }
 
-      fprintf(outfile, "No name.\n");
+      hfst_fprintf(outfile, "No name.\n");
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
@@ -2270,12 +2317,12 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::print_net(const char* name, FILE* outfile)
     {
-      //fprintf(outfile, "missing print net %s:%d\n", __FILE__, __LINE__);
+      //hfst_fprintf(outfile, "missing print net %s:%d\n", __FILE__, __LINE__);
       std::map<std::string,hfst::HfstTransducer*>::const_iterator it =
         definitions_.find(name);
       if (it == definitions_.end())
         {
-          fprintf(stderr, "no such defined network: '%s'\n", name);
+          hfst_fprintf(stderr, "no such defined network: '%s'\n", name);
           PROMPT_AND_RETURN_THIS;
         }
       else
@@ -2299,22 +2346,22 @@ namespace xfst {
   (const StringSet & alpha, bool unknown, bool identity, FILE* outfile)
   {
     unsigned int sigma_count=0;
-    fprintf(outfile, "Sigma: ");
+    hfst_fprintf(outfile, "Sigma: ");
     if (variables_["print-foma-sigma"] == "ON")
       {
         if (unknown)
-          fprintf(outfile, "?");
+          hfst_fprintf(outfile, "?");
         if (identity)
           {
             if (unknown)
-              fprintf(outfile, ", ");
-            fprintf(outfile, "@");
+              hfst_fprintf(outfile, ", ");
+            hfst_fprintf(outfile, "@");
           }
       }
     else // xfst-style sigma print
       {
         if (unknown || identity)
-          fprintf(outfile, "?");
+          hfst_fprintf(outfile, "?");
       }
 
     bool first_symbol = true;
@@ -2323,19 +2370,19 @@ namespace xfst {
         if (! is_special_symbol(*it)) 
           {
             if (!first_symbol || unknown || identity)
-              fprintf(outfile, ", ");
+              hfst_fprintf(outfile, ", ");
             if (*it == "?")
-              fprintf(outfile, "\"?\"");
+              hfst_fprintf(outfile, "\"?\"");
             else if (*it == "@" && variables_["print-foma-sigma"] == "ON")
-              fprintf(outfile, "\"@\"");
+              hfst_fprintf(outfile, "\"@\"");
             else
-              fprintf(outfile, "%s", it->c_str());
+              hfst_fprintf(outfile, "%s", it->c_str());
             sigma_count++;
             first_symbol = false;
           }
       }
-    fprintf(outfile, "\n");
-    fprintf(outfile, "Size: %d.\n", sigma_count);
+    hfst_fprintf(outfile, "\n");
+    hfst_fprintf(outfile, "Size: %d.\n", sigma_count);
   }
 
   static bool is_unknown_or_identity_used_in_transducer
@@ -2392,39 +2439,39 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::print_sigma(const char* /*name*/, FILE* outfile)
     {
-      fprintf(outfile, "missing print sigma %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(outfile, "missing print sigma %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_sigma_count(FILE* outfile)
     {
-      fprintf(outfile, "missing print sigma count %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(outfile, "missing print sigma count %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_sigma_word_count(const char* level, FILE* outfile)
     {
-      fprintf(outfile, "missing %s sigma word count %s:%d\n", level,
+      hfst_fprintf(outfile, "missing %s sigma word count %s:%d\n", level,
               __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_sigma_word_count(FILE* outfile)
     {
-      fprintf(outfile, "missing sigma word count %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(outfile, "missing sigma word count %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_size(const char* name, FILE* outfile)
     {
-      fprintf(outfile, "%10s: ", name);
-      fprintf(outfile, "? bytes. ? states, ? arcs, ? paths.\n");
+      hfst_fprintf(outfile, "%10s: ", name);
+      hfst_fprintf(outfile, "? bytes. ? states, ? arcs, ? paths.\n");
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::print_size(FILE* outfile)
     {
-      fprintf(outfile, "? bytes. ? states, ? arcs, ? paths.\n");
+      hfst_fprintf(outfile, "? bytes. ? states, ? arcs, ? paths.\n");
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
@@ -2434,7 +2481,7 @@ namespace xfst {
       int i = 0;
       while (!stack_.empty())
         {
-          fprintf(outfile, "%10d: ? bytes. ? states, ? arcs, ? paths.\n", i);
+          hfst_fprintf(outfile, "%10d: ? bytes. ? states, ? arcs, ? paths.\n", i);
           tmp.push(stack_.top());
           stack_.pop();
           i++;
@@ -2450,13 +2497,13 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::write_dot(FILE* outfile)
     {
-      fprintf(outfile, "missing write dot %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(outfile, "missing write dot %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
   XfstCompiler::write_dot(const char* /*name*/, FILE* outfile)
     {
-      fprintf(outfile, "missing write dot %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(outfile, "missing write dot %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
@@ -2464,7 +2511,7 @@ namespace xfst {
     {
       if (stack_.size() < 1)
         {
-          fprintf(stderr, "Empty stack.\n");
+          hfst_fprintf(stderr, "Empty stack.\n");
           PROMPT_AND_RETURN_THIS;
         }
       std::stack<hfst::HfstTransducer*> reverse_stack;
@@ -2477,7 +2524,7 @@ namespace xfst {
           HfstBasicTransducer fsm(*tr);
           fsm.write_in_prolog_format(outfile, name, variables_["print-weight"] == "ON");
           if (stack_.size() != 1) // separator
-            fprintf(outfile, "\n");
+            hfst_fprintf(outfile, "\n");
           reverse_stack.push(tr);
           stack_.pop();
         }
@@ -2492,13 +2539,13 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::write_spaced(FILE* outfile)
     {
-      fprintf(outfile, "missing write spaced %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(outfile, "missing write spaced %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::write_text(FILE* outfile)
     {
-      fprintf(outfile, "missing write text %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(outfile, "missing write text %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
@@ -2506,7 +2553,7 @@ namespace xfst {
     {
       /*if (outfile == 0)
         {
-          fprintf(outstream_, "%10s: %p\n", name, functions_[name]);
+          hfst_fprintf(outstream_, "%10s: %p\n", name, functions_[name]);
           }*/
       PROMPT_AND_RETURN_THIS;
     }
@@ -2515,7 +2562,7 @@ namespace xfst {
     {
       if (definitions_.find(name) == definitions_.end())
         {
-          fprintf(stderr, "no such defined network: '%s'\n", name);
+          hfst_fprintf(stderr, "no such defined network: '%s'\n", name);
           PROMPT_AND_RETURN_THIS;
         }
 
@@ -2535,7 +2582,7 @@ namespace xfst {
     {
       if (definitions_.empty())
         {
-          fprintf(stderr, "no defined networks\n");
+          hfst_fprintf(stderr, "no defined networks\n");
           PROMPT_AND_RETURN_THIS;
         }
 
@@ -2558,7 +2605,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::write_stack(const char* filename)
     {
-      /*fprintf(stderr, "cannot save transducer names %s:%d\n", __FILE__,
+      /*hfst_fprintf(stderr, "cannot save transducer names %s:%d\n", __FILE__,
         __LINE__);*/
       HfstOutputStream* outstream = (filename != 0)?
         new HfstOutputStream(filename, format_):
@@ -2622,14 +2669,14 @@ namespace xfst {
             }
           else
             {
-              fprintf(errorstream_, "Error when compiling file:\n%s\n",
+              hfst_fprintf(errorstream_, "Error when compiling file:\n%s\n",
                       xre_.get_error_message().c_str());
               xfst_fail();
             }
         }
       else if (!feof(infile))
         {
-          fprintf(stderr, "regex file longer than buffer :-(\n");
+          hfst_fprintf(stderr, "regex file longer than buffer :-(\n");
         }
       if (compiled != NULL)
         {
@@ -2664,7 +2711,7 @@ namespace xfst {
         }
       else
         {
-          fprintf(errorstream_, "Error reading regex '%s':\n%s\n", indata, 
+          hfst_fprintf(errorstream_, "Error reading regex '%s':\n%s\n", indata, 
                   xre_.get_error_message().c_str());
           xfst_fail();
         }
@@ -2683,14 +2730,14 @@ namespace xfst {
       } 
       catch (const NotValidPrologFormatException & e)
         {
-          fprintf(errorstream_, "%s\n", e().c_str());
+          hfst_fprintf(errorstream_, "%s\n", e().c_str());
           PROMPT_AND_RETURN_THIS;
         }
     }
   XfstCompiler& 
   XfstCompiler::read_prolog(const char* /* indata */)
     {
-      fprintf(stderr, "missing read prolog %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(stderr, "missing read prolog %s:%d\n", __FILE__, __LINE__);
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
@@ -2701,7 +2748,7 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::read_spaced(const char* /* indata */)
     {
-      fprintf(stderr, "missing read spaced %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(stderr, "missing read spaced %s:%d\n", __FILE__, __LINE__);
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
@@ -2733,17 +2780,17 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::read_text(const char* /* indata */)
     {
-      fprintf(stderr, "missing read text %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(stderr, "missing read text %s:%d\n", __FILE__, __LINE__);
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
   XfstCompiler::cleanup_net()
     {
-      fprintf(stderr, "cannot cleanup net %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(stderr, "cannot cleanup net %s:%d\n", __FILE__, __LINE__);
       if (stack_.size() < 1)
         {
-          fprintf(stderr, "Empty stack.\n");
+          hfst_fprintf(stderr, "Empty stack.\n");
           return *this;
         }
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
@@ -2824,7 +2871,7 @@ namespace xfst {
             result->prune();
             break;
           default:
-            fprintf(errorstream_, "ERROR: unknown unary operation\n");
+            hfst_fprintf(errorstream_, "ERROR: unknown unary operation\n");
             break;
           }
 
@@ -2834,7 +2881,7 @@ namespace xfst {
       }
     catch (const FunctionNotImplementedException & e)
       {
-        fprintf(stderr, "function not available.\n");
+        hfst_fprintf(stderr, "function not available.\n");
         xfst_fail();
         stack_.push(result);
       }
@@ -2847,7 +2894,7 @@ namespace xfst {
   {
       if (stack_.size() < 2)
         {
-          fprintf(stderr, "Not enough networks on stack. "
+          hfst_fprintf(stderr, "Not enough networks on stack. "
                   "Operation requires at least 2.\n");
           return *this;
         }
@@ -2872,7 +2919,7 @@ namespace xfst {
             }
           catch (const TransducersAreNotAutomataException & e)
             {
-              fprintf(stderr, "transducers are not automata\n");
+              hfst_fprintf(stderr, "transducers are not automata\n");
               xfst_fail();
               stack_.push(another);
               stack_.push(result);
@@ -2881,7 +2928,7 @@ namespace xfst {
               break;
             }
         default:
-          fprintf(errorstream_, "ERROR: unknown binary operation\n");
+          hfst_fprintf(errorstream_, "ERROR: unknown binary operation\n");
           xfst_fail();
           break;
         }
@@ -2897,7 +2944,7 @@ namespace xfst {
   {
     if (stack_.size() < 1)
       {
-        fprintf(stderr, "Empty stack.\n");
+        hfst_fprintf(stderr, "Empty stack.\n");
         return *this;
       }
     HfstTransducer* result = stack_.top();
@@ -2921,7 +2968,7 @@ namespace xfst {
                     {
                       if (verbose_)
                         {
-                          fprintf(warnstream_, "At least one of composition arguments contains "
+                          hfst_fprintf(warnstream_, "At least one of composition arguments contains "
                                   "flag diacritics. Set harmonize-flags ON to harmonize them.\n");
                         }
                     }
@@ -2943,7 +2990,7 @@ namespace xfst {
             result->shuffle(*t);
             break;
           default:
-            fprintf(errorstream_, "ERROR: unknown binary operation\n");
+            hfst_fprintf(errorstream_, "ERROR: unknown binary operation\n");
             break;
           }
         stack_.pop();
@@ -3041,7 +3088,7 @@ namespace xfst {
     {
       if (stack_.size() < 1)
         {
-          fprintf(stderr, "Empty stack.\n");
+          hfst_fprintf(stderr, "Empty stack.\n");
           return *this;
         }
       HfstTransducer* t = stack_.top();
@@ -3054,7 +3101,7 @@ namespace xfst {
     {
       if (stack_.size() < 1)
         {
-          fprintf(stderr, "Empty stack.\n");
+          hfst_fprintf(stderr, "Empty stack.\n");
           return *this;
         }
 
@@ -3124,13 +3171,13 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::sort_net()
     {
-      fprintf(stderr, "cannot sort net %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(stderr, "cannot sort net %s:%d\n", __FILE__, __LINE__);
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
   XfstCompiler::substring_net()
     {
-      fprintf(stderr, "missing substring net %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(stderr, "missing substring net %s:%d\n", __FILE__, __LINE__);
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
@@ -3142,7 +3189,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::print_file_info(FILE* outfile)
     {
-      fprintf(outfile, "file info not implemented (cf. summarize) %s:%d\n",
+      hfst_fprintf(outfile, "file info not implemented (cf. summarize) %s:%d\n",
               __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
@@ -3150,13 +3197,13 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::print_properties(const char* /* name */, FILE* outfile)
     {
-      fprintf(outfile, "missing print properties %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(outfile, "missing print properties %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
 
   // For 'inspect_net': print to outstream_ all arcs in 
   // \a transitions. Return the number of arcs.
-  static unsigned int print_arcs
+  unsigned int XfstCompiler::print_arcs
   (const HfstBasicTransducer::HfstTransitions & transitions)
   {
     bool first_loop = true;
@@ -3166,40 +3213,40 @@ namespace xfst {
       {
         if (first_loop) 
           {
-            fprintf(outstream_, "Arcs:");
+            hfst_fprintf(outstream_, "Arcs:");
             first_loop = false;
           }
         else
           {
-            fprintf(outstream_, ", ");
+            hfst_fprintf(outstream_, ", ");
           }
         std::string isymbol = it->get_input_symbol();
         std::string osymbol = it->get_output_symbol();
 
         if (isymbol == osymbol)
           {
-            fprintf(outstream_, " %i. %s", arc_number, isymbol.c_str());
+            hfst_fprintf(outstream_, " %i. %s", arc_number, isymbol.c_str());
           }
         else
           {
-            fprintf(outstream_, " %i. %s:%s", arc_number, 
+            hfst_fprintf(outstream_, " %i. %s:%s", arc_number, 
                     isymbol.c_str(), osymbol.c_str());
           }
         arc_number++;
       }
-    fprintf(outstream_, "\n");
+    hfst_fprintf(outstream_, "\n");
     return arc_number - 1;
   }
 
   // For 'inspect_net': print current level.
-  static void print_level
+  void XfstCompiler::print_level
   (const std::vector<unsigned int> & whole_path,
    const std::vector<unsigned int> & shortest_path)
   {
-    fprintf(outstream_, "Level %i", (int)whole_path.size());
+    hfst_fprintf(outstream_, "Level %i", (int)whole_path.size());
     if (shortest_path.size() < whole_path.size())
       {
-        fprintf(outstream_, " (= %i)", (int)shortest_path.size());
+        hfst_fprintf(outstream_, " (= %i)", (int)shortest_path.size());
       }
   }
 
@@ -3278,11 +3325,33 @@ namespace xfst {
       }
 #endif
 
+    hfst_fprintf(stderr, "%s", promptstr.c_str());
+
+#ifdef WINDOWS
+    // if we are reading directly from console
+    if ((file == stdin) && read_interactive_text_from_stdin_)
+      {
+        SetConsoleCP(65001);
+        const HANDLE stdIn = GetStdHandle(STD_INPUT_HANDLE);
+        WCHAR buffer[0x1000];
+        DWORD numRead = 0;
+        if (ReadConsoleW(stdIn, buffer, sizeof buffer, &numRead, NULL))
+          {
+            std::wstring wstr(buffer);
+            std::string linestr = wide_string_to_string(wstr);
+            return strdup(linestr.c_str());
+          }
+        else
+          {
+            return NULL;
+          }
+      }
+#endif
+
     char* line_ = 0;
     size_t len = 1024;
     ssize_t read;
 
-    fprintf(stderr, "%s", promptstr.c_str());
     read = getline(&line_, &len, file);
     if (read == -1)
       {
@@ -3313,38 +3382,38 @@ namespace xfst {
 
   // whether arc \a number can be followed in a state 
   // that has \a number_of_arcs arcs.
-  static bool can_arc_be_followed
+  bool XfstCompiler::can_arc_be_followed
   (int number, unsigned int number_of_arcs)
   {
     if (number == EOF || number == 0)
       {
-        fprintf(outstream_, "could not read arc number\n");
+        hfst_fprintf(outstream_, "could not read arc number\n");
         return false;
       }
     else if (number < 1 || number > number_of_arcs)
       {
         if (number_of_arcs < 1) 
-          fprintf(outstream_, "state has no arcs\n");
+          hfst_fprintf(outstream_, "state has no arcs\n");
         else 
-          fprintf(outstream_, "arc number must be between %i and %i\n",
+          hfst_fprintf(outstream_, "arc number must be between %i and %i\n",
                   1, number_of_arcs);
         return false;
       }
     return true;
   }
 
-  static bool can_level_be_reached
+  bool XfstCompiler::can_level_be_reached
   (int level, size_t whole_path_length)
   {
     if (level == EOF || level == 0)
       {
-        fprintf(outstream_, "could not read level number "
+        hfst_fprintf(outstream_, "could not read level number "
                 "(type '0' if you wish to exit program)\n");
         return false;
       }
     else if (level < 0 || level > whole_path_length)
       {
-        fprintf(outstream_, "no such level: '%i' (current level is %i)\n",
+        hfst_fprintf(outstream_, "no such level: '%i' (current level is %i)\n",
                 level, (int)whole_path_length );
         return false;
       }
@@ -3362,7 +3431,7 @@ namespace xfst {
 
       HfstBasicTransducer net(*t);
 
-      fprintf(outstream_, "%s", inspect_net_help_msg);
+      hfst_fprintf(outstream_, "%s", inspect_net_help_msg);
 
       // path of states visited, can contain loops
       std::vector<unsigned int> whole_path;
@@ -3373,9 +3442,9 @@ namespace xfst {
       print_level(whole_path, shortest_path);
 
       if (net.is_final_state(0))
-        fprintf(outstream_, " (final)");
+        hfst_fprintf(outstream_, " (final)");
       
-      fprintf(outstream_, "\n");
+      hfst_fprintf(outstream_, "\n");
 
       // transitions of current state
       HfstBasicTransducer::HfstTransitions transitions = net[0];
@@ -3400,7 +3469,7 @@ namespace xfst {
               else if (! return_to_level(whole_path, shortest_path, 
                                          whole_path.size() - 1))
                 {
-                  fprintf(errorstream_, "FATAL ERROR: could not return to level '%i'\n", 
+                  hfst_fprintf(errorstream_, "FATAL ERROR: could not return to level '%i'\n", 
                           (int)(whole_path.size() - 1));
                   ignore_history_after_index(ind);
                   PROMPT_AND_RETURN_THIS;
@@ -3416,7 +3485,7 @@ namespace xfst {
                 }
               else if (! return_to_level(whole_path, shortest_path, level))
                 {
-                  fprintf(errorstream_, "FATAL ERROR: could not return to level '%i'\n", level);
+                  hfst_fprintf(errorstream_, "FATAL ERROR: could not return to level '%i'\n", level);
                   ignore_history_after_index(ind);
                   PROMPT_AND_RETURN_THIS;
                 }
@@ -3438,7 +3507,7 @@ namespace xfst {
               else
                 {
                   HfstBasicTransition tr = transitions[number - 1];
-                  fprintf(outstream_, "  %s:%s --> ", tr.get_input_symbol().c_str(), 
+                  hfst_fprintf(outstream_, "  %s:%s --> ", tr.get_input_symbol().c_str(), 
                           tr.get_output_symbol().c_str());
                   append_state_to_paths(whole_path, shortest_path, tr.get_target_state());
                 }
@@ -3449,9 +3518,9 @@ namespace xfst {
           print_level(whole_path, shortest_path);
           if (net.is_final_state(whole_path.back()))
             {
-              fprintf(outstream_, " (final)");
+              hfst_fprintf(outstream_, " (final)");
             }
-          fprintf(outstream_, "\n");
+          hfst_fprintf(outstream_, "\n");
           number_of_arcs = print_arcs(transitions);
 
           free(line);
@@ -3463,20 +3532,20 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::compile_replace_upper_net()
     {
-      fprintf(stderr, "missing compile_replace_upper net %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(stderr, "missing compile_replace_upper net %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
   XfstCompiler::compile_replace_lower_net()
     {
-      fprintf(stderr, "missing compile_replace_lower net %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(stderr, "missing compile_replace_lower net %s:%d\n", __FILE__, __LINE__);
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler&
   XfstCompiler::hfst(const char* text)
     {
-      fprintf(stderr, "HFST: %s\n", text);
+      hfst_fprintf(stderr, "HFST: %s\n", text);
       PROMPT_AND_RETURN_THIS;
     }
 
@@ -3486,7 +3555,7 @@ namespace xfst {
     if (variables_["use-native-lexc"] == "OFF" && 
         ! HfstTransducer::is_implementation_type_available(hfst::FOMA_TYPE))
       {
-        fprintf(errorstream_, 
+        hfst_fprintf(errorstream_, 
                 "cannot compile file in lexc format, foma back-end is not available\n"
                 "and variable 'use-native-lexc' is 'OFF'");
         xfst_fail();
@@ -3511,7 +3580,7 @@ namespace xfst {
     
     if (t == NULL)
       {
-        fprintf(errorstream_, "error compiling file in lexc format\n");
+        hfst_fprintf(errorstream_, "error compiling file in lexc format\n");
         xfst_fail();
         PROMPT_AND_RETURN_THIS;
       }
@@ -3534,7 +3603,7 @@ namespace xfst {
         }
       catch (const HfstException & e)
         {
-          fprintf(errorstream_, "error reading file in att format\n");
+          hfst_fprintf(errorstream_, "error reading file in att format\n");
           xfst_fail();
         }
       PROMPT_AND_RETURN_THIS;
@@ -3565,7 +3634,7 @@ namespace xfst {
       hxfstin = fopen(filename, "r");
       if (hxfstin == NULL)
         {
-          fprintf(stderr, "could not open %s for reading\n", filename);
+          hfst_fprintf(stderr, "could not open %s for reading\n", filename);
           return -1;
         }
       xfst_ = this;
@@ -3603,7 +3672,7 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::print_properties(FILE* outfile)
     {
-      fprintf(outfile, "missing print properties %s:%d\n", __FILE__, __LINE__);
+      hfst_fprintf(outfile, "missing print properties %s:%d\n", __FILE__, __LINE__);
       return *this;
     }
   XfstCompiler&
@@ -3618,6 +3687,12 @@ namespace xfst {
     read_interactive_text_from_stdin_ = value;
     return *this;
   }
+  XfstCompiler&
+  XfstCompiler::setOutputToConsole(bool value)
+  {
+    output_to_console_ = value;
+    return *this;
+  }
   bool
   XfstCompiler::getReadline()
   {
@@ -3627,6 +3702,11 @@ namespace xfst {
   XfstCompiler::getReadInteractiveTextFromStdin()
   {
     return read_interactive_text_from_stdin_;
+  }
+  bool
+  XfstCompiler::getOutputToConsole()
+  {
+    return output_to_console_;
   }
   XfstCompiler& 
   XfstCompiler::setVerbosity(bool verbosity)
@@ -3648,7 +3728,7 @@ namespace xfst {
     {
       if (verbose_prompt_ && verbose_)
         {
-          fprintf(outstream_, "hfst[" SIZE_T_SPECIFIER "]: ", stack_.size());
+          hfst_fprintf(outstream_, "hfst[" SIZE_T_SPECIFIER "]: ", stack_.size());
         }
       return *this;
     }
@@ -3667,7 +3747,7 @@ namespace xfst {
       if (verbose_ && !stack_.empty())
         {
           HfstTransducer* top = stack_.top();
-          fprintf(outstream_, "? bytes. %i states, %i arcs, ? paths\n",
+          hfst_fprintf(outstream_, "? bytes. %i states, %i arcs, ? paths\n",
                   top->number_of_states(), top->number_of_arcs());
           std::map<std::string,std::string>::const_iterator it = variables_.find("print-sigma");
           if (it != variables_.end() && it->second == "ON")
