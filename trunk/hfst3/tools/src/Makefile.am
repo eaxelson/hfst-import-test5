@@ -189,6 +189,7 @@ noinst_HEADERS= \
 	inc/getopt-cases-unary.h  inc/globals-binary.h      \
 	inc/globals-common.h      inc/globals-unary.h \
 	HfstStrings2FstTokenizer.h hfst-file-to-mem.h \
+	hfst-string-conversions.h \
 	hfst-tool-metadata.h hfst-optimized-lookup.h \
 	guessify_fst.h generate_model_forms.h
 # parsers/XreCompiler.h parsers/xre_utils.h

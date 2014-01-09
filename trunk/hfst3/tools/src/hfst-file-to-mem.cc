@@ -51,7 +51,7 @@ char * hfst_file_to_mem(const char *filename) {
   FILE   *infile;
   size_t  numbytes;
   char   *buffer;
-  infile = fopen(filename, "r");
+  infile = fopen(filename, "rb");
   if(infile == NULL)
     {
       error(EXIT_FAILURE, 0, "Error opening file '%s'\n", filename);

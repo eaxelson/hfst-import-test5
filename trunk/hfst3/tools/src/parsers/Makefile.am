@@ -46,7 +46,7 @@ endif
 
 noinst_HEADERS = XfstCompiler.h xfst-utils.h xfst-parser.hh
 
-HFST_COMMON_SRC=../hfst-program-options.cc ../hfst-commandline.cc ../hfst-tool-metadata.cc ../HfstStrings2FstTokenizer.cc ../hfst-file-to-mem.cc
+HFST_COMMON_SRC=../hfst-program-options.cc ../hfst-commandline.cc ../hfst-tool-metadata.cc ../HfstStrings2FstTokenizer.cc ../hfst-file-to-mem.cc ../hfst-string-conversions.cc
 
 bin_PROGRAMS=$(MAYBE_XFST)
 

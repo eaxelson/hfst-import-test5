@@ -260,7 +260,7 @@ LWSP [\t ]*
 }
 
 ^{LWSP}("ignore net"|"ignore") {
-    return IGNORE;
+    return XFST_IGNORE;
 }
 
 ^{LWSP}("intersect net"|"intersect"|"conjunct") {
@@ -796,12 +796,12 @@ LWSP [\t ]*
 
 [\x80-\xff] {
     hxfsterror("Illegal 8-bit sequence (cannot form valid UTF-8)");
-    return ERROR;
+    return XFST_ERROR;
 }
 
 . {
     hxfsterror("Syntax error in lexer (no valid token found at the point)");
-    return ERROR;
+    return XFST_ERROR;
 }
 
 
