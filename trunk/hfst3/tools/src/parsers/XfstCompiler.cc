@@ -2311,7 +2311,16 @@ namespace xfst {
     {
       GET_TOP(tmp);
       HfstBasicTransducer basic(*tmp);
-      basic.write_in_xfst_format(outfile, variables_["print-weight"] == "ON");
+      if (output_to_console_ && (outfile == stdout))
+        {
+          ostringstream ostr;
+          basic.write_in_xfst_format(ostr, variables_["print-weight"] == "ON");
+          hfst_fprintf(outfile, ostr.str().c_str());
+        }
+      else
+        {
+          basic.write_in_xfst_format(outfile, variables_["print-weight"] == "ON");
+        }
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 

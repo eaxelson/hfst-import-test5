@@ -371,7 +371,7 @@ int main(int argc, char** argv)
       DWORD numRead = 0;
       while (ReadConsoleW(stdIn, buffer, sizeof buffer, &numRead, NULL))
         {
-          std::wstring wstr(buffer);
+          std::wstring wstr(buffer, numRead);
           std::string linestr = hfst::wide_string_to_string(wstr);
           expression += linestr;
 #else
