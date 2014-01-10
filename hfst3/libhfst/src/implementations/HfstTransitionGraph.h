@@ -871,10 +871,10 @@
                            os << ", ";
                          }
                        C data = tr_it->get_transition_data();
-                       print_xfst_arc(data);
+                       print_xfst_arc(os, data);
 
                        os << " -> ";
-                       print_xfst_state(tr_it->get_target_state());
+                       print_xfst_state(os, tr_it->get_target_state());
                      }
                  }
                os << "." << std::endl;
