@@ -23,6 +23,11 @@ that should print
   b:a
 
 
+Note that if a tool outputs directly to Windows console (i.e. not to the next
+tool in a pipe or to a file), you need to use the switch --console or -k to 
+make it sure that all unicode symbols are correctly printed.
+
+
 For more information on HFST tools, see
 <http://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstCommandLineTools>
 
