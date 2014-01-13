@@ -9,7 +9,7 @@ section
 	## Tell the user what is going to be installed 
 	## -------------------------------------------
 	
-	messageBox MB_OK "This program will install HFST command line tools locally to a chosen directory. After installation, you can use the functionalities by opening Command Prompt and moving to that directory. There you will also find a README file that gives more information on the functionalities and some simple examples."
+	messageBox MB_OK "This program will install HFST command line tools locally to a chosen directory. After installation, you can use the functionalities by opening Command Prompt and moving to that directory. There you will also find a README.txt file that gives more information on the functionalities and some simple examples."
 
 
 	## Define the installation directory
@@ -57,7 +57,7 @@ section
 	## Install the README file
 	## -----------------------
 
-	File README
+	File README.txt
 
 
 	## Install tagger tools
