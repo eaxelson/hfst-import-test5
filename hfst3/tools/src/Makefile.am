@@ -95,11 +95,11 @@ endif
 if WANT_INVERT
 MAYBE_INVERT=hfst-invert$(EXEEXT)
 endif
+if WANT_LEXC_WRAPPER
+MAYBE_LEXC_WRAPPER=hfst-lexc-wrapper$(EXEEXT)
+endif
 if WANT_LEXC
 MAYBE_LEXC=hfst-lexc$(EXEEXT)
-endif
-if WANT_LEXC2FST
-MAYBE_LEXC2FST=hfst-lexc2fst$(EXEEXT)
 endif
 if WANT_LOOKUP
 MAYBE_LOOKUP=hfst-lookup$(EXEEXT)
@@ -219,7 +219,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_SPLIT) $(MAYBE_STRINGS2FST) $(MAYBE_STRIP_HEADER)  \
 			 $(MAYBE_SUBTRACT) $(MAYBE_SUMMARIZE) $(MAYBE_TAIL)         \
 			 $(MAYBE_TXT2FST) $(MAYBE_CALCULATE) $(MAYBE_SUBSTITUTE)    \
-			 $(MAYBE_LEXC2FST) $(MAYBE_LEXC)   \
+			 $(MAYBE_LEXC) $(MAYBE_LEXC_WRAPPER)   \
 			 $(MAYBE_FORMAT)                     \
 			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)\
 			 $(MAYBE_TRAVERSE) $(MAYBE_GUESSIFY) $(MAYBE_GUESS) \
@@ -254,8 +254,8 @@ $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_info_SOURCES=hfst-info.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
-hfst_lexc_SOURCES=hfst-lexc.cc lexc-readline-ui.cc $(HFST_COMMON_SRC)
-hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
+hfst_lexc_wrapper_SOURCES=hfst-lexc-wrapper.cc lexc-readline-ui.cc $(HFST_COMMON_SRC)
+hfst_lexc_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
 #					  parsers/LexcCompiler.cc parsers/lexc-parser.yy \
 #					  parsers/lexc-lexer.ll parsers/lexc-utils.cc \
 #					  parsers/XreCompiler.cc parsers/xre_parse.yy \
@@ -308,9 +308,9 @@ install-exec-hook:
 		$(LN_S) -f hfst-disjunct$(EXEEXT) hfst-union$(EXEEXT)
 #		$(LN_S) -f hfst-preprocess-for-optimized-lookup-format$(EXEEXT) hfst-preprocess-for-optimised-lookup-format$(EXEEXT) &&
 
-BUILT_SOURCES=$(hfst_lexc2fst_BUILT) 
+BUILT_SOURCES=$(hfst_lexc_BUILT) 
 
-CLEANFILES=hfst-compiler.hh hfst-compiler.cc $(hfst_lexc2fst_BUILT) 
+CLEANFILES=hfst-compiler.hh hfst-compiler.cc $(hfst_lexc_BUILT) 
 
 
 hfst_calculate_CXXFLAGS= -Wall -Wno-error -Wno-sign-compare -Wno-deprecated

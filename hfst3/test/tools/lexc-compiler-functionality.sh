@@ -38,8 +38,8 @@ if test "$srcdir" = ""; then
 fi
 
 
-if ! test -x $TOOLDIR/hfst-lexc2fst ; then
-    echo "missing hfst-lexc2fst, assuming configured off, skipping"
+if ! test -x $TOOLDIR/hfst-lexc ; then
+    echo "missing hfst-lexc, assuming configured off, skipping"
     exit 73
 fi
 
@@ -68,8 +68,8 @@ for i in .sfst .ofst .foma ; do
     fi
 
     if test -f cat$i ; then
-        if ! $TOOLDIR/hfst-lexc2fst $FFLAG $srcdir/cat.lexc -o test 2> /dev/null; then
-            echo lexc2fst $FFLAG cat.lexc failed with $?
+        if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/cat.lexc -o test 2> /dev/null; then
+            echo lexc $FFLAG cat.lexc failed with $?
             exit 1
         fi
         if ! $TOOLDIR/hfst-compare -e -s cat$i test ; then
@@ -81,8 +81,8 @@ for i in .sfst .ofst .foma ; do
     for f in $LEXCTESTS ; do
         
         #check non-flag result
-        if ! $TOOLDIR/hfst-lexc2fst $FFLAG $srcdir/$f -o test 2> /dev/null; then
-            echo lexc2fst $FFLAG $f failed with $?
+        if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/$f -o test 2> /dev/null; then
+            echo lexc $FFLAG $f failed with $?
             exit 1
         fi
         
@@ -112,7 +112,7 @@ for i in .sfst .ofst .foma ; do
         # check flag results
         RESULT="$f.flag.result"
      
-        if ! $TOOLDIR/hfst-lexc2fst -F $FFLAG $srcdir/$f -o test 2> /dev/null; then
+        if ! $TOOLDIR/hfst-lexc -F $FFLAG $srcdir/$f -o test 2> /dev/null; then
             echo lexc2fst -F $FFLAG $f failed with $?
             exit 1
         fi
@@ -130,7 +130,7 @@ for i in .sfst .ofst .foma ; do
         
         
     done
-    if ! $TOOLDIR/hfst-lexc2fst $FFLAG $srcdir/basic.multi-file-1.lexc \
+    if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/basic.multi-file-1.lexc \
         $srcdir/basic.multi-file-2.lexc \
         $srcdir/basic.multi-file-3.lexc -o test 2> /dev/null; then
         echo lexc2fst $FFLAG basic.multi-file-{1,2,3}.lexc failed with $?

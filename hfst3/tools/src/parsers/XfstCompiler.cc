@@ -111,7 +111,6 @@ namespace xfst {
     variable_explanations_["show-flags"] = "show flag diacritics when printing";
     variable_explanations_["sort-arcs"] = "<NOT IMPLEMENTED>";
     variable_explanations_["use-timer"] = "<NOT IMPLEMENTED>";
-    variable_explanations_["use-native-lexc"] = "use hfst's own lexc compiler instead of foma's";
     variable_explanations_["verbose"] = "print more information";
   }
 
@@ -156,7 +155,6 @@ namespace xfst {
         variables_["show-flags"] = "OFF";
         variables_["sort-arcs"] = "MAYBE";
         variables_["use-timer"] = "OFF";
-        variables_["use-native-lexc"] = "OFF";
         variables_["verbose"] = "OFF";
         initialize_variable_explanations();
         prompt();
@@ -198,7 +196,6 @@ namespace xfst {
         variables_["show-flags"] = "OFF";
         variables_["sort-arcs"] = "MAYBE";
         variables_["use-timer"] = "OFF";
-        variables_["use-native-lexc"] = "OFF";
         variables_["verbose"] = "OFF";
         initialize_variable_explanations();
         prompt();
@@ -3561,31 +3558,17 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::read_lexc_from_file(const char * filename)
   {
-    if (variables_["use-native-lexc"] == "OFF" && 
-        ! HfstTransducer::is_implementation_type_available(hfst::FOMA_TYPE))
-      {
-        hfst_fprintf(errorstream_, 
-                "cannot compile file in lexc format, foma back-end is not available\n"
-                "and variable 'use-native-lexc' is 'OFF'");
-        xfst_fail();
-        PROMPT_AND_RETURN_THIS;
-      }
-
     HfstTransducer * t = NULL;
 
-    if (variables_["use-native-lexc"] == "ON")
-      {
-        FILE * infile = hfst::xfst::xfst_fopen(filename, "r");        
-        lexc_.parse(infile);
-        t = lexc_.compileLexical();
-        hfst::xfst::xfst_fclose(infile, filename);
-      }
-    else
-      {
-        t = HfstTransducer::read_lexc_ptr(std::string(filename), hfst::FOMA_TYPE, verbose_);
-        if (t != NULL)
-          t->convert(format_);
-      }
+    FILE * infile = hfst::xfst::xfst_fopen(filename, "r");        
+    lexc_.parse(infile);
+    t = lexc_.compileLexical();
+    hfst::xfst::xfst_fclose(infile, filename);
+
+    // using foma's lexc implementation
+    //t = HfstTransducer::read_lexc_ptr(std::string(filename), hfst::FOMA_TYPE, verbose_);
+    //if (t != NULL)
+    //  t->convert(format_);
     
     if (t == NULL)
       {
