@@ -263,12 +263,12 @@ AC_ARG_ENABLE([invert],
 			  [enable_invert=$enableval],
 			  [enable_invert=yes])
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
-AC_ARG_ENABLE([lexc],
-              [AS_HELP_STRING([--enable-lexc],
-                              [build lexc cli and readline @<:@default=no@:>@])],
-              [enable_lexc=$enableval],
-              [enable_lexc=$enable_all_tools])
-AM_CONDITIONAL([WANT_LEXC], [test "x$enable_lexc" != xno])
+AC_ARG_ENABLE([lexc-wrapper],
+              [AS_HELP_STRING([--enable-lexc-wrapper],
+                              [build lexc-wrapper cli and readline @<:@default=no@:>@])],
+              [enable_lexc_wrapper=$enableval],
+              [enable_lexc_wrapper=$enable_all_tools])
+AM_CONDITIONAL([WANT_LEXC_WRAPPER], [test "x$enable_lexc_wrapper" != xno])
 AC_ARG_ENABLE([twolc],
               [AS_HELP_STRING([--enable-twolc],
                               [build twolc @<:@default=yes@:>@])],
@@ -281,12 +281,12 @@ AC_ARG_ENABLE([tagger],
               [enable_tagger=$enableval],
               [enable_tagger=$enable_all_tools])
 AM_CONDITIONAL([WANT_TAGGER], [test "x$enable_tagger" != xno])
-AC_ARG_ENABLE([lexc2fst],
-              [AS_HELP_STRING([--enable-lexc2fst],
-                              [build lexc2fst cli @<:@default=yes@:>@])],
-              [enable_lexc2fst=$enableval],
-              [enable_lexc2fst=yes])
-AM_CONDITIONAL([WANT_LEXC2FST], [test "x$enable_lexc2fst" != xno])
+AC_ARG_ENABLE([lexc],
+              [AS_HELP_STRING([--enable-lexc],
+                              [build lexc cli @<:@default=yes@:>@])],
+              [enable_lexc=$enableval],
+              [enable_lexc=yes])
+AM_CONDITIONAL([WANT_LEXC], [test "x$enable_lexc" != xno])
 AC_ARG_ENABLE([lookup],
 			  [AS_HELP_STRING([--enable-lookup],
 							  [build lookup tool @<:@default=yes@:>@])],
@@ -713,7 +713,7 @@ cat <<EOF
     *                 head: $enable_head
     *                 invert: $enable_invert
     *                 lexc: $enable_lexc
-    *                 lexc2fst: $enable_lexc_compiler
+    *                 lexc-wrapper: $enable_lexc_wrapper
     *                 lookup: $enable_lookup
     *                 minimize: $enable_minimize (minimise)
     *                 name: $enable_name
@@ -759,7 +759,7 @@ AS_IF([test "x$with_unicode_handler" = "xhfst"],
       [AC_MSG_WARN([HFST only supports basic unicode handling with limited case mapping tables etc.; for better support consider using glib or ICU --with-unicode-handler])])
 dnl warn about missing "important" tools
 AS_IF([test "x$enable_lexc" == "xno"],
-      [AC_MSG_WARN([hfst-lexc is not enabled; hfst-lexc2fst toy will only offer limited support to compile lexc lexicons; enable with --enable-lexc])])
+      [AC_MSG_WARN([hfst-lexc is not enabled; enable with --enable-lexc])])
 AS_IF([test "x$enable_twolc" == "xno"],
       [AC_MSG_WARN([hfst-twolc is not enabled; you will not be able to compile xerox twolc grammars; enable using --enable-twolc])])
 

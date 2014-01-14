@@ -31,8 +31,8 @@ if (uname | egrep "MINGW|mingw" > /dev/null); then
     WINDOWS=0;
 fi
 
-if ! test -x $TOOLDIR/hfst-lexc ; then
-    echo hfst-lexc not executable, assumed configured off and skipping
+if ! test -x $TOOLDIR/hfst-lexc-wrapper ; then
+    echo hfst-lexc-wrapper not executable, assumed configured off and skipping
     exit 77
 fi
 
@@ -59,7 +59,7 @@ for i in .sfst .ofst .foma ; do
     fi
 
     if test -f cat$i ; then
-        if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/cat.lexc > test 2> /dev/null; then
+        if ! $TOOLDIR/hfst-lexc-wrapper $FFLAG $srcdir/cat.lexc > test 2> /dev/null; then
             echo lexc2fst $FFLAG cat.lexc failed with $?
             exit 1
         fi
@@ -69,14 +69,14 @@ for i in .sfst .ofst .foma ; do
         rm test
     fi
     for f in $LEXCTESTS ; do
-        if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/$f > test 2> /dev/null; then
+        if ! $TOOLDIR/hfst-lexc-wrapper $FFLAG $srcdir/$f > test 2> /dev/null; then
             echo lexc2fst $FFLAG $f failed with $?
             exit 1
         fi
         rm test
     done
     if [ $WINDOWS -eq 1 ]; then
-	if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/basic.multi-file-1.lexc \
+	if ! $TOOLDIR/hfst-lexc-wrapper $FFLAG $srcdir/basic.multi-file-1.lexc \
             $srcdir/basic.multi-file-2.lexc \
             $srcdir/basic.multi-file-3.lexc > test 2> /dev/null; then
             echo lexc $FFLAG basic.multi-file-{1,2,3}.lexc failed with $?

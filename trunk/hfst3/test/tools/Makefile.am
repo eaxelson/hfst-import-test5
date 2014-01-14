@@ -141,10 +141,10 @@ if WANT_TXT2FST
 TESTS += txt2fst-functionality.sh
 endif
 
-if WANT_LEXC
-TESTS += lexc-functionality.sh
+if WANT_LEXC_WRAPPER
+TESTS += lexc-wrapper-functionality.sh
 endif
-if WANT_LEXC2FST
+if WANT_LEXC
 TESTS += lexc-compiler-functionality.sh
 endif
 if WANT_CALCULATE
@@ -338,8 +338,6 @@ EXTRA_FILES=cat2dog.substitute cat.strings cat.txt cats_and_dogs.xre utf-8.strin
 # files needed for test programs
 EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS) $(TESTS) $(EXTRA_FILES) $(LEXC_TXTS) $(PMATCH_TXTS) script.xfst lexc2fst-stress.sh lookup-stress.sh proc-stress.sh valgrind.sh \
 lexc-compiler-functionality.sh calculate-functionality.sh shuffle-functionality.sh
-
-# lexc-functionality.sh 
 
 
 valgrind: $(CHECK_DATA)

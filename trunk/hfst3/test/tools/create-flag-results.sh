@@ -42,8 +42,8 @@ for f in $LEXCTESTS ; do
      
      echo "result: $RESULT"
  
-    if ! $TOOLDIR/hfst-lexc2fst -F $FFLAG $f -o $RESULT 2> /dev/null; then
-        echo "$TOOLDIR/hfst-lexc2fst -F $FFLAG $f -o $RESULT failed with $?"
+    if ! $TOOLDIR/hfst-lexc -F $FFLAG $f -o $RESULT 2> /dev/null; then
+        echo "$TOOLDIR/hfst-lexc -F $FFLAG $f -o $RESULT failed with $?"
         exit 1
     fi
     
