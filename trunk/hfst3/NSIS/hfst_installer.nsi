@@ -2,7 +2,7 @@
 !include StrRep.nsh
 !include ReplaceInFile.nsh
 
-outfile "install-hfst-64-bit.exe"
+outfile "install-FOO-XX-bit.exe"
 
 section
 
@@ -21,43 +21,13 @@ section
 	setOutPath $0
 
 
-	## Check that kernel32 and msvcrt dlls are found
-	## ---------------------------------------------
-
-	SearchPath $R0 "kernel32.dll"
-	${If} $R0 == ""
-	      messageBox MB_OK "ERROR: kernel32.dll not found."
-	      return
-	${EndIf}
-
-	SearchPath $R0 "msvcrt.dll"
-	${If} $R0 == ""
-	      messageBox MB_OK "ERROR: msvcrt.dll not found."
-	      return
-	${EndIf}
-
-
-	## Check if libstdc++ and libgcc dlls are found and, if needed
-	## install them to the HFST directory
-	## -----------------------------------------------------------
-
-	SearchPath $R0 "libstdc++-6.dll"
-	${If} $R0 == ""
-	      File libstdc++-6.dll
-	${EndIf}
-
-	# SearchPath $R0 "libgcc_s_dw2-1.dll"
-	SearchPath $R0 "libgcc_s_seh-1.dll"
-	${If} $R0 == ""
-	      # File libgcc_s_dw2-1.dll
-	      File libgcc_s_seh-1.dll
-	${EndIf}
+!include CheckLibraries.nsi
 
 
 	## Install the README file
 	## -----------------------
 
-	File README.txt
+	File README.hfst.txt README.txt
 
 
 	## Install tagger tools
@@ -91,7 +61,7 @@ section
 	## Install libhfst dll and HFST command line tools
 	## -----------------------------------------------
 
-	File libhfst-31.dll
+!include AddHfstLibrary.nsi
 
         File hfst-affix-guessify.exe
         File hfst-calculate.exe
@@ -150,7 +120,10 @@ section
 
 	# Install hfst command line script
 
-	File hfst.bat
+	File hfst.bat hfst.bat
+
+        !insertmacro _ReplaceInFile hfst.bat HFST_INSTALLATION_DIRECTORY $0
+        !insertmacro _ReplaceInFile hfst.bat HFST_WELCOME_MESSAGE "Welcome to the HFST interface!"
 
 	messageBox MB_OK "Installation complete. HFST functionalities are in directory $0."
 
@@ -159,13 +132,4 @@ section
 		CreateDirectory "$SMPROGRAMS\HFST"
                 CreateShortCut "$SMPROGRAMS\HFST\hfst.lnk" "$0\hfst.bat";
 	
-
-
-	## Add HFST directory to the PATH environment variable
-	## ---------------------------------------------------
-
-	# ${EnvVarUpdate} $1 "PATH" "A" "HKCU" "$0"
-	#  messageBox MB_OK "Test: path is: $1."
-	
-
 sectionEnd
