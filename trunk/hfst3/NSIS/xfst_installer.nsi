@@ -1,6 +1,12 @@
 !include LogicLib.nsh
 !include StrRep.nsh
 !include ReplaceInFile.nsh
+!include 'FileFunc.nsh'
+!insertmacro Locate
+
+# Var /GLOBAL switch_overwrite
+# StrCpy $switch_overwrite 0
+!include 'MoveFileFolder.nsh'
 
 outfile "install-FOO-XX-bit.exe"
 
@@ -15,7 +21,7 @@ section
 	## Define the installation directory
 	## ---------------------------------
 
-	nsDialogs::SelectFolderDialog "Select a directory where hfst-xfst will be installed" "c:\HFST-XFST"
+	nsDialogs::SelectFolderDialog "Select a directory where hfst-xfst will be installed" "C:\HFST-XFST"
 	Pop $0
 	messageBox MB_OK "Installing hfst-xfst to directory: $0."
 	setOutPath $0
@@ -27,8 +33,8 @@ section
 	## Install the README file
 	## -----------------------
 
-	File README.xfst.txt README.txt
-
+	File README.xfst.txt
+        !insertmacro MoveFile README.xfst.txt README.txt
 
 	## Install libhfst dll and hfst-xfst
 	## ---------------------------------
@@ -39,10 +45,12 @@ section
 
 	# Install hfst command line script
 
-	File hfst.bat hfst-xfst.bat
+	File hfst.bat
 
-        !insertmacro _ReplaceInFile hfst-xfst.bat HFST_INSTALLATION_DIRECTORY $0
-        !insertmacro _ReplaceInFile hfst-xfst.bat HFST_WELCOME_MESSAGE "Welcome to the hfst-xfst directory!"
+        !insertmacro _ReplaceInFile hfst.bat HFST_INSTALLATION_DIRECTORY $0
+        !insertmacro _ReplaceInFile hfst.bat HFST_WELCOME_MESSAGE "Welcome to the hfst-xfst directory!"
+
+        !insertmacro MoveFile hfst.bat hfst-xfst.bat
 
 	messageBox MB_OK "Installation complete. The tool hfst-xfst is in directory $0."
 

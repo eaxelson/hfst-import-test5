@@ -1,6 +1,8 @@
 !include LogicLib.nsh
 !include StrRep.nsh
 !include ReplaceInFile.nsh
+!include 'FileFunc.nsh'
+!insertmacro Locate
 
 outfile "install-FOO-XX-bit.exe"
 
@@ -27,7 +29,8 @@ section
 	## Install the README file
 	## -----------------------
 
-	File README.hfst.txt README.txt
+	File README.hfst.txt 
+        !insertmacro MoveFile README.hfst.txt README.txt
 
 
 	## Install tagger tools
@@ -120,7 +123,7 @@ section
 
 	# Install hfst command line script
 
-	File hfst.bat hfst.bat
+	File hfst.bat
 
         !insertmacro _ReplaceInFile hfst.bat HFST_INSTALLATION_DIRECTORY $0
         !insertmacro _ReplaceInFile hfst.bat HFST_WELCOME_MESSAGE "Welcome to the HFST interface!"
