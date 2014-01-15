@@ -1,6 +1,13 @@
 !include LogicLib.nsh
 !include StrRep.nsh
 !include ReplaceInFile.nsh
+!include 'FileFunc.nsh'
+!insertmacro Locate
+
+# Var /GLOBAL switch_overwrite
+# StrCpy $switch_overwrite 0
+!include 'MoveFileFolder.nsh'
+
 
 outfile "install-FOO-XX-bit.exe"
 
@@ -15,7 +22,7 @@ section
 	## Define the installation directory
 	## ---------------------------------
 
-	nsDialogs::SelectFolderDialog "Select a directory where hfst-lexc will be installed" "c:\HFST-LEXC"
+	nsDialogs::SelectFolderDialog "Select a directory where hfst-lexc will be installed" "C:\HFST-LEXC"
 	Pop $0
 	messageBox MB_OK "Installing hfst-lexc to directory: $0."
 	setOutPath $0
@@ -27,8 +34,8 @@ section
 	## Install the README file
 	## -----------------------
 
-	File README.lexc.txt README.txt
-
+	File README.lexc.txt
+        !insertmacro MoveFile README.lexc.txt README.txt
 
 	## Install libhfst dll and hfst-lexc
 	## ---------------------------------
@@ -39,10 +46,12 @@ section
 
 	# Install hfst command line script
 
-	File hfst.bat hfst-lexc.bat
+	File hfst.bat
 
-        !insertmacro _ReplaceInFile hfst-lexc.bat HFST_INSTALLATION_DIRECTORY $0
-        !insertmacro _ReplaceInFile hfst-lexc.bat HFST_WELCOME_MESSAGE "Welcome to the hfst-lexc directory!"
+        !insertmacro _ReplaceInFile hfst.bat HFST_INSTALLATION_DIRECTORY $0
+        !insertmacro _ReplaceInFile hfst.bat HFST_WELCOME_MESSAGE "Welcome to the hfst-lexc directory!"
+
+        !insertmacro MoveFile hfst.bat hfst-lexc.bat
 
 	messageBox MB_OK "Installation complete. The tool hfst-lexc is in directory $0."
 
