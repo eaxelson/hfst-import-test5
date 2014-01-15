@@ -264,7 +264,8 @@ namespace SFST {
 
   {
     size_t N=0;
-    Label Num2Label[alphabet.size()];
+    //Label Num2Label[alphabet.size()];
+    Label * Num2Label = new Label [alphabet.size()]; // HFST modification
     for( Alphabet::const_iterator it=alphabet.begin();
          it != alphabet.end(); it++ )
       {
@@ -288,6 +289,8 @@ namespace SFST {
       }
       label[i] = Num2Label[l];
     }
+
+    delete [] Num2Label; // HFST addition
   }
 
 
