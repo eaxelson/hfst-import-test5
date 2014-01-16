@@ -26,7 +26,9 @@ namespace hfst
 
   namespace implementations {
 #if HAVE_OPENFST
+#if HAVE_OPENFST_LOG
     class LogWeightOutputStream;
+#endif
     class TropicalWeightOutputStream;
 #endif
 #if HAVE_SFST
@@ -68,7 +70,9 @@ For more information on HFST transducer structure, see
     union StreamImplementation
     {
 #if HAVE_OPENFST
+#if HAVE_OPENFST_LOG
       hfst::implementations::LogWeightOutputStream * log_ofst;
+#endif
       hfst::implementations::TropicalWeightOutputStream * tropical_ofst;
 #endif
 #if HAVE_SFST

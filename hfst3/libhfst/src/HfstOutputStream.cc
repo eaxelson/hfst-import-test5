@@ -41,10 +41,12 @@ namespace hfst
         implementation.tropical_ofst = 
           new hfst::implementations::TropicalWeightOutputStream(hfst_format);
         break;
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         implementation.log_ofst = 
           new hfst::implementations::LogWeightOutputStream();
         break;
+#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -101,10 +103,12 @@ namespace hfst
             new hfst::implementations::TropicalWeightOutputStream
             (filename, hfst_format);
         break;
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         implementation.log_ofst = 
           new hfst::implementations::LogWeightOutputStream(filename);
         break;
+#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -146,9 +150,11 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         delete implementation.tropical_ofst;
         break;
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         delete implementation.log_ofst;
         break;
+#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -201,9 +207,11 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         implementation.tropical_ofst->write(c);
         break;
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         implementation.log_ofst->write(c);
         break;
+#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -245,9 +253,11 @@ namespace hfst
       case TROPICAL_OPENFST_TYPE:
         type_value=std::string("TROPICAL_OPENFST");
         break;
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         type_value=std::string("LOG_OPENFST");
         break;
+#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -402,10 +412,12 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
         implementation.tropical_ofst->write_transducer
           (transducer.implementation.tropical_ofst);
         return *this;    
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         implementation.log_ofst->write_transducer
           (transducer.implementation.log_ofst);
         return *this;
+#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -441,9 +453,11 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
       case TROPICAL_OPENFST_TYPE:
         implementation.tropical_ofst->close();
         break;
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         implementation.log_ofst->close();
         break;
+#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:

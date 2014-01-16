@@ -28,7 +28,9 @@ namespace hfst
   namespace implementations {
 #if HAVE_OPENFST
     class LogWeightInputStream;
+#if HAVE_OPENFST_LOG
     class TropicalWeightInputStream;
+#endif
 #endif
 #if HAVE_SFST
     class SfstInputStream;
@@ -100,7 +102,9 @@ For documentation on the HFST binary transducer format, see
 #endif
 #if HAVE_OPENFST
       hfst::implementations::TropicalWeightInputStream * tropical_ofst;
+#if HAVE_OPENFST_LOG
       hfst::implementations::LogWeightInputStream * log_ofst;
+#endif
 #endif
 #if HAVE_FOMA
       hfst::implementations::FomaInputStream * foma;

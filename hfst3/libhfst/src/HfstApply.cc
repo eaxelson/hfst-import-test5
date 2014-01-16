@@ -65,8 +65,10 @@ namespace hfst
 #endif
 #if HAVE_OPENFST
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *),
+#if HAVE_OPENFST_LOG
  hfst::implementations::LogFst * 
  (*log_ofst_funct)(hfst::implementations::LogFst *),
+#endif
 #endif
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *),
@@ -99,6 +101,7 @@ namespace hfst
           implementation.tropical_ofst = tropical_ofst_temp;
           break;
         }
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         {
           hfst::implementations::LogFst * log_ofst_temp =
@@ -107,6 +110,7 @@ namespace hfst
           implementation.log_ofst = log_ofst_temp;
           break;
         }
+#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -144,8 +148,10 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 #if HAVE_OPENFST
    fst::StdVectorFst * (*tropical_ofst_funct)
 (fst::StdVectorFst *, unsigned int n),
+#if HAVE_OPENFST_LOG
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *, unsigned int n),
+#endif
 #endif
 #if HAVE_FOMA
    fsm * (*foma_funct)(fsm *, unsigned int n),
@@ -178,6 +184,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
           implementation.tropical_ofst = tropical_ofst_temp;
           break;
         }
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         {
           hfst::implementations::LogFst * log_ofst_temp =
@@ -186,6 +193,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
           implementation.log_ofst = log_ofst_temp;
           break;
         }
+#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -223,8 +231,10 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 #if HAVE_OPENFST
    fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,String, 
                                               String),
+#if HAVE_OPENFST_LOG
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *,String, String),
+#endif
 #endif
 #if HAVE_FOMA
    fsm * (*foma_funct)(fsm *, String, String),
@@ -257,6 +267,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
           implementation.tropical_ofst = tropical_ofst_temp;
           break;
         }
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         {
           hfst::implementations::LogFst * log_ofst_temp =
@@ -265,6 +276,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
           implementation.log_ofst = log_ofst_temp;
           break;
         }
+#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -304,8 +316,10 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 #if HAVE_OPENFST
    fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,
                                               fst::StdVectorFst *),
+#if HAVE_OPENFST_LOG
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *,hfst::implementations::LogFst *),
+#endif
 #endif
 #if HAVE_FOMA
    fsm * (*foma_funct)(fsm *,
@@ -362,6 +376,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
           implementation.tropical_ofst = tropical_ofst_temp;
           break;
         }
+#if HAVE_OPENFST_LOG
       case LOG_OPENFST_TYPE:
         {
           hfst::implementations::LogFst * log_ofst_temp =
@@ -371,6 +386,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
           implementation.log_ofst = log_ofst_temp;
           break;
         }
+#endif
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
