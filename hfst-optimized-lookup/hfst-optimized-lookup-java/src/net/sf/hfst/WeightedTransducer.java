@@ -49,7 +49,7 @@ public class WeightedTransducer implements Transducer
 	}
 
 	public float getFinalWeight()
-	{ return (float) firstTransitionIndex; }
+	{ return Float.intBitsToFloat((int)firstTransitionIndex); }
 	
 	    public long target()
 	{ return firstTransitionIndex; }
@@ -310,6 +310,7 @@ public class WeightedTransducer implements Transducer
 		tryEpsilonTransitions(pivot(index) + 1);
 		if (inputString.get(inputPointer) == HfstOptimizedLookup.NO_SYMBOL_NUMBER)
 		    { // end of input string
+			outputString[outputPointer] = HfstOptimizedLookup.NO_SYMBOL_NUMBER;
 			if (transitionTable.size() <= index)
 			    { return; }
 			if (transitionTable.at(index).isFinal())
@@ -318,7 +319,6 @@ public class WeightedTransducer implements Transducer
 				noteAnalysis();
 				current_weight -= transitionTable.at(index).getWeight();
 			    }
-			outputString[outputPointer] = HfstOptimizedLookup.NO_SYMBOL_NUMBER;
 			return;
 		    }
 		++inputPointer;
@@ -329,13 +329,13 @@ public class WeightedTransducer implements Transducer
 		tryEpsilonIndices(index + 1);
 		if (inputString.get(inputPointer) == HfstOptimizedLookup.NO_SYMBOL_NUMBER)
 		    { // end of input string
+			outputString[outputPointer] = HfstOptimizedLookup.NO_SYMBOL_NUMBER;
 			if (indexTable.isFinal(index))
 			    {
 				current_weight += indexTable.at(index).getFinalWeight();
 				noteAnalysis();
 				current_weight -= indexTable.at(index).getFinalWeight();
 			    }
-			outputString[outputPointer] = HfstOptimizedLookup.NO_SYMBOL_NUMBER;
 			return;
 		    }
 		++inputPointer;

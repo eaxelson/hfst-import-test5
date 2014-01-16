@@ -283,9 +283,9 @@ public class UnweightedTransducer implements Transducer
 		tryEpsilonTransitions(index + 1);
 		if (inputString.get(inputPointer) == HfstOptimizedLookup.NO_SYMBOL_NUMBER)
 		    { // end of input string
+			outputString[outputPointer] = HfstOptimizedLookup.NO_SYMBOL_NUMBER;
 			if (transitionTable.at(index).isFinal())
 			    { noteAnalysis(); }
-			outputString[outputPointer] = HfstOptimizedLookup.NO_SYMBOL_NUMBER;
 			return;
 		    }
 		++inputPointer;
@@ -296,9 +296,9 @@ public class UnweightedTransducer implements Transducer
 		tryEpsilonIndices(index + 1);
 		if (inputString.get(inputPointer) == HfstOptimizedLookup.NO_SYMBOL_NUMBER)
 		    { // end of input string
+			outputString[outputPointer] = HfstOptimizedLookup.NO_SYMBOL_NUMBER;
 			if (indexTable.isFinal(index))
 			    { noteAnalysis(); }
-			outputString[outputPointer] = HfstOptimizedLookup.NO_SYMBOL_NUMBER;
 			return;
 		    }
 		++inputPointer;
