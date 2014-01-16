@@ -80,6 +80,14 @@ AC_ARG_WITH([openfst],
 AS_IF([test "x$with_openfst" != xno], [AC_DEFINE([HAVE_OPENFST], [1],
                                               [Define to compile OpenFst support in HFST])])
 AM_CONDITIONAL([WANT_OPENFST], [test x$with_openfst != xno])
+AC_ARG_WITH([openfst-log],
+            [AS_HELP_STRING([--with-openfst-log],
+                            [enable logarithmic weights @<:@default=yes@:>@])],
+            [],
+            [with_openfst_log=yes])
+AS_IF([test "x$with_openfst_log" != xno], [AC_DEFINE([HAVE_OPENFST_LOG], [1],
+                                              [Define to compile OpenFst with log weight support in HFST])])
+AM_CONDITIONAL([WANT_OPENFST_LOG], [test x$with_openfst_log != xno])
 AC_ARG_WITH([foma],
             [AS_HELP_STRING([--with-foma],
                             [process unweighted fsts with foma @<:@default=yes@:>@])],
@@ -130,12 +138,19 @@ AC_ARG_ENABLE([all_tools],
 			  [enable_all_tools=$enableval],
 			  [enable_all_tools=no])
 
+AC_ARG_ENABLE([no_tools],
+			  [AS_HELP_STRING([--enable-no-tools],
+							  [build no tools @<:@default=no@:>@])],
+			  [enable_no_tools=$enableval],
+			  [enable_no_tools=no])
+
+
 # allow programs to be built separately (sort alphabetically)
 AC_ARG_ENABLE([affix_guessify],
 			  [AS_HELP_STRING([--enable-affix-guessify],
 							  [build affix-guessify tool @<:@default=yes@:>@])],
 			  [enable_affix_guessify=$enableval],
-			  [enable_affix_guessify=yes])
+			  [if test x$enable_no_tools != xno; then enable_affix_guessify=no; else enable_affix_guessify=yes; fi])
 AM_CONDITIONAL([WANT_AFFIX_GUESSIFY], [test x$enable_affix_guessify != xno])
 AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],
@@ -147,49 +162,49 @@ AC_ARG_ENABLE([compare],
 			  [AS_HELP_STRING([--enable-compare],
 							  [build compare tool @<:@default=yes@:>@])],
 			  [enable_compare=$enableval],
-			  [enable_compare=yes])
+			  [if test x$enable_no_tools != xno; then enable_compare=no; else enable_compare=yes; fi])
 AM_CONDITIONAL([WANT_COMPARE], [test x$enable_compare != xno])
 AC_ARG_ENABLE([compose],
 			  [AS_HELP_STRING([--enable-compose],
 							  [build compose tool @<:@default=yes@:>@])],
 			  [enable_compose=$enableval],
-			  [enable_compose=yes])
+			  [if test x$enable_no_tools != xno; then enable_compose=no; else enable_compose=yes; fi])
 AM_CONDITIONAL([WANT_COMPOSE], [test x$enable_compose != xno])
 AC_ARG_ENABLE([compose_intersect],
 			  [AS_HELP_STRING([--enable-compose-intersect],
 							  [build compose-intersect tool @<:@default=yes@:>@])],
 			  [enable_compose_intersect=$enableval],
-			  [enable_compose_intersect=yes])
+			  [if test x$enable_no_tools != xno; then enable_compose_intersect=no; else enable_compose_intersect=yes; fi])
 AM_CONDITIONAL([WANT_COMPOSE_INTERSECT], [test x$enable_compose_intersect != xno])
 AC_ARG_ENABLE([concatenate],
 			  [AS_HELP_STRING([--enable-concatenate],
 							  [build concatenate tool @<:@default=yes@:>@])],
 			  [enable_concatenate=$enableval],
-			  [enable_concatenate=yes])
+			  [if test x$enable_no_tools != xno; then enable_concatenate=no; else enable_concatenate=yes; fi])
 AM_CONDITIONAL([WANT_CONCATENATE], [test x$enable_concatenate != xno])
 AC_ARG_ENABLE([conjunct],
 			  [AS_HELP_STRING([--enable-conjunct],
 							  [build conjunct tool @<:@default=yes@:>@])],
 			  [enable_conjunct=$enableval],
-			  [enable_conjunct=yes])
+			  [if test x$enable_no_tools != xno; then enable_conjunct=no; else enable_conjunct=yes; fi])
 AM_CONDITIONAL([WANT_CONJUNCT], [test x$enable_conjunct != xno])
 AC_ARG_ENABLE([multiply],
 			  [AS_HELP_STRING([--enable-multiply],
 							  [build multiply tool @<:@default=yes@:>@])],
 			  [enable_multiply=$enableval],
-			  [enable_multiply=yes])
+			  [if test x$enable_no_tools != xno; then enable_multiply=no; else enable_multiply=yes; fi])
 AM_CONDITIONAL([WANT_MULTIPLY], [test x$enable_multiply != xno])
 AC_ARG_ENABLE([determinize],
 			  [AS_HELP_STRING([--enable-determinize],
 							  [build determinize tool @<:@default=yes@:>@])],
 			  [enable_determinize=$enableval],
-			  [enable_determinize=yes])
+			  [if test x$enable_no_tools != xno; then enable_determinize=no; else enable_determinize=yes; fi])
 AM_CONDITIONAL([WANT_DETERMINIZE], [test x$enable_determinize != xno])
 AC_ARG_ENABLE([disjunct],
 			  [AS_HELP_STRING([--enable-disjunct],
 							  [build disjunct tool @<:@default=yes@:>@])],
 			  [enable_disjunct=$enableval],
-			  [enable_disjunct=yes])
+			  [if test x$enable_no_tools != xno; then enable_disjunct=no; else enable_disjunct=yes; fi])
 AM_CONDITIONAL([WANT_DISJUNCT], [test x$enable_disjunct != xno])
 AC_ARG_ENABLE([expand_equivalences],
 			  [AS_HELP_STRING([--enable-edit-metadata],
@@ -201,67 +216,67 @@ AC_ARG_ENABLE([edit_metadata],
 			  [AS_HELP_STRING([--enable-edit-metadata],
 							  [build metadata tool @<:@default=yes@:>@])],
 			  [enable_edit_metadata=$enableval],
-			  [enable_edit_metadata=yes])
+			  [if test x$enable_no_tools != xno; then enable_edit_metadata=no; else enable_edit_metadata=yes; fi])
 AM_CONDITIONAL([WANT_EDIT_METADATA], [test x$enable_edit_metadata != xno])
 AC_ARG_ENABLE([format],
 			  [AS_HELP_STRING([--enable-format],
 							  [build format tool @<:@default=yes@:>@])],
 			  [enable_format=$enableval],
-			  [enable_format=yes])
+			  [if test x$enable_no_tools != xno; then enable_format=no; else enable_format=yes; fi])
 AM_CONDITIONAL([WANT_FORMAT], [test x$enable_format != xno])
 AC_ARG_ENABLE([fst2fst],
 			  [AS_HELP_STRING([--enable-fst2fst],
 							  [build fst2fst tool @<:@default=yes@:>@])],
 			  [enable_fst2fst=$enableval],
-			  [enable_fst2fst=yes])
+			  [if test x$enable_no_tools != xno; then enable_fst2fst=no; else enable_fst2fst=yes; fi])
 AM_CONDITIONAL([WANT_FST2FST], [test x$enable_fst2fst != xno])
 AC_ARG_ENABLE([fst2strings],
 			  [AS_HELP_STRING([--enable-fst2strings],
 							  [build fst2strings tool @<:@default=yes@:>@])],
 			  [enable_fst2strings=$enableval],
-			  [enable_fst2strings=yes])
+			  [if test x$enable_no_tools != xno; then enable_fst2strings=no; else enable_fst2strings=yes; fi])
 AM_CONDITIONAL([WANT_FST2STRINGS], [test x$enable_fst2strings != xno])
 AC_ARG_ENABLE([fst2txt],
 			  [AS_HELP_STRING([--enable-fst2txt],
 							  [build fst2txt tool @<:@default=yes@:>@])],
 			  [enable_fst2txt=$enableval],
-			  [enable_fst2txt=yes])
+			  [if test x$enable_no_tools != xno; then enable_fst2txt=no; else enable_fst2txt=yes; fi])
 AM_CONDITIONAL([WANT_FST2TXT], [test x$enable_fst2txt != xno])
 AC_ARG_ENABLE([grep],
 			  [AS_HELP_STRING([--enable-grep],
 							  [build grep tool @<:@default=yes@:>@])],
 			  [enable_grep=$enableval],
-			  [enable_grep=yes])
+			  [if test x$enable_no_tools != xno; then enable_grep=no; else enable_grep=yes; fi])
 AM_CONDITIONAL([WANT_GREP], [test x$enable_grep != xno])
 AC_ARG_ENABLE([guess],
 			  [AS_HELP_STRING([--enable-guess],
 							  [build guess tool @<:@default=yes@:>@])],
 			  [enable_guess=$enableval],
-			  [enable_guess=yes])
+			  [if test x$enable_no_tools != xno; then enable_guess=no; else enable_guess=yes; fi])
 AM_CONDITIONAL([WANT_GUESS], [test x$enable_guess != xno])
 AC_ARG_ENABLE([guessify],
 			  [AS_HELP_STRING([--enable-guessify],
 							  [build guessify tool @<:@default=yes@:>@])],
 			  [enable_guessify=$enableval],
-			  [enable_guessify=yes])
+			  [if test x$enable_no_tools != xno; then enable_guessify=no; else enable_guessify=yes; fi])
 AM_CONDITIONAL([WANT_GUESSIFY], [test x$enable_guessify != xno])
 AC_ARG_ENABLE([head],
 			  [AS_HELP_STRING([--enable-head],
 							  [build head tool @<:@default=yes@:>@])],
 			  [enable_head=$enableval],
-			  [enable_head=yes])
+			  [if test x$enable_no_tools != xno; then enable_head=no; else enable_head=yes; fi])
 AM_CONDITIONAL([WANT_HEAD], [test x$enable_head != xno])
 AC_ARG_ENABLE([info],
 			  [AS_HELP_STRING([--enable-info],
 							  [build info tool @<:@default=yes@:>@])],
 			  [enable_info=$enableval],
-			  [enable_info=yes])
+			  [if test x$enable_no_tools != xno; then enable_info=no; else enable_info=yes; fi])
 AM_CONDITIONAL([WANT_INFO], [test x$enable_info != xno])
 AC_ARG_ENABLE([invert],
 			  [AS_HELP_STRING([--enable-invert],
 							  [build invert tool @<:@default=yes@:>@])],
 			  [enable_invert=$enableval],
-			  [enable_invert=yes])
+			  [if test x$enable_no_tools != xno; then enable_invert=no; else enable_invert=yes; fi])
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
 AC_ARG_ENABLE([lexc-wrapper],
               [AS_HELP_STRING([--enable-lexc-wrapper],
@@ -273,7 +288,7 @@ AC_ARG_ENABLE([twolc],
               [AS_HELP_STRING([--enable-twolc],
                               [build twolc @<:@default=yes@:>@])],
               [enable_twolc=$enableval],
-              [enable_twolc=yes])
+              [if test x$enable_no_tools != xno; then enable_twolc=no; else enable_twolc=yes; fi])
 AM_CONDITIONAL([WANT_TWOLC], [test "x$enable_twolc" != xno])
 AC_ARG_ENABLE([tagger],
               [AS_HELP_STRING([--enable-tagger],
@@ -285,55 +300,55 @@ AC_ARG_ENABLE([lexc],
               [AS_HELP_STRING([--enable-lexc],
                               [build lexc cli @<:@default=yes@:>@])],
               [enable_lexc=$enableval],
-              [enable_lexc=yes])
+              [if test x$enable_no_tools != xno; then enable_lexc=no; else enable_lexc=yes; fi])
 AM_CONDITIONAL([WANT_LEXC], [test "x$enable_lexc" != xno])
 AC_ARG_ENABLE([lookup],
 			  [AS_HELP_STRING([--enable-lookup],
 							  [build lookup tool @<:@default=yes@:>@])],
 			  [enable_lookup=$enableval],
-			  [enable_lookup=yes])
+			  [if test x$enable_no_tools != xno; then enable_lookup=no; else enable_lookup=yes; fi])
 AM_CONDITIONAL([WANT_LOOKUP], [test x$enable_lookup != xno])
 AC_ARG_ENABLE([pair-test],
 			  [AS_HELP_STRING([--enable-pair-test],
 							  [build pair-test tool @<:@default=yes@:>@])],
 			  [enable_pair_test=$enableval],
-			  [enable_pair_test=yes])
+			  [if test x$enable_no_tools != xno; then enable_pair_test=no; else enable_pair_test=yes; fi])
 AM_CONDITIONAL([WANT_PAIR_TEST], [test x$enable_pair_test != xno])
 AC_ARG_ENABLE([minimize],
 			  [AS_HELP_STRING([--enable-minimize],
 							  [build minimize tool @<:@default=yes@:>@])],
 			  [enable_minimize=$enableval],
-			  [enable_minimize=yes])
+			  [if test x$enable_no_tools != xno; then enable_minimize=no; else enable_minimize=yes; fi])
 AM_CONDITIONAL([WANT_MINIMIZE], [test x$enable_minimize != xno])
 AC_ARG_ENABLE([name],
 			  [AS_HELP_STRING([--enable-name],
 							  [build name tool @<:@default=yes@:>@])],
 			  [enable_name=$enableval],
-			  [enable_name=yes])
+			  [if test x$enable_no_tools != xno; then enable_name=no; else enable_name=yes; fi])
 AM_CONDITIONAL([WANT_NAME], [test x$enable_name != xno])
 AC_ARG_ENABLE([optimized_lookup],
 			  [AS_HELP_STRING([--enable-optimized-lookup],
 							  [build optimized-lookup tool @<:@default=yes@:>@])],
 			  [enable_optimized_lookup=$enableval],
-			  [enable_optimized_lookup=yes])
+			  [if test x$enable_no_tools != xno; then enable_optimized_lookup=no; else enable_optimized_lookup=yes; fi])
 AM_CONDITIONAL([WANT_OPTIMIZED_LOOKUP], [test x$enable_optimized_lookup != xno])
 AC_ARG_ENABLE([pmatch],
 			  [AS_HELP_STRING([--enable-pmatch],
 							  [build pmatch tool @<:@default=yes@:>@])],
 			  [enable_pmatch=$enableval],
-			  [enable_pmatch=yes])
+			  [if test x$enable_no_tools != xno; then enable_pmatch=no; else enable_pmatch=yes; fi])
 AM_CONDITIONAL([WANT_PMATCH], [test x$enable_pmatch != xno])
 AC_ARG_ENABLE([project],
 			  [AS_HELP_STRING([--enable-project],
 							  [build project tool @<:@default=yes@:>@])],
 			  [enable_project=$enableval],
-			  [enable_project=yes])
+			  [if test x$enable_no_tools != xno; then enable_project=no; else enable_project=yes; fi])
 AM_CONDITIONAL([WANT_PROJECT], [test x$enable_project != xno])
 AC_ARG_ENABLE([prune_alphabet],
 			  [AS_HELP_STRING([--enable-prune-alphabet],
 							  [build prune-alphabet tool @<:@default=yes@:>@])],
 			  [enable_prune_alphabet=$enableval],
-			  [enable_prune_alphabet=yes])
+			  [if test x$enable_no_tools != xno; then enable_prune_alphabet=no; else enable_prune_alphabet=yes; fi])
 AM_CONDITIONAL([WANT_PRUNE_ALPHABET], [test x$enable_prune_alphabet != xno])
 AC_ARG_ENABLE([proc],
 			  [AS_HELP_STRING([--enable-proc],
@@ -345,13 +360,13 @@ AC_ARG_ENABLE([push_weights],
 			  [AS_HELP_STRING([--enable-push-weights],
 							  [build push-weights tool @<:@default=yes@:>@])],
 			  [enable_push_weights=$enableval],
-			  [enable_push_weights=yes])
+			  [if test x$enable_no_tools != xno; then enable_push_weights=no; else enable_push_weights=yes; fi])
 AM_CONDITIONAL([WANT_PUSH_WEIGHTS], [test x$enable_push_weights != xno])
 AC_ARG_ENABLE([regexp2fst],
 			  [AS_HELP_STRING([--enable-regexp2fst],
 							  [build regexp2fst tool @<:@default=yes@:>@])],
 			  [enable_regexp2fst=$enableval],
-			  [enable_regexp2fst=yes])
+			  [if test x$enable_no_tools != xno; then enable_regexp2fst=no; else enable_regexp2fst=yes; fi])
 AM_CONDITIONAL([WANT_REGEXP2FST], [test x$enable_regexp2fst != xno])
 AC_ARG_ENABLE([xfst],
 			  [AS_HELP_STRING([--enable-xfst],
@@ -363,37 +378,37 @@ AC_ARG_ENABLE([pmatch2fst],
 			  [AS_HELP_STRING([--enable-pmatch2fst],
 							  [build pmatch2fst tool @<:@default=yes@:>@])],
 			  [enable_pmatch2fst=$enableval],
-			  [enable_pmatch2fst=yes])
+			  [if test x$enable_no_tools != xno; then enable_pmatch2fst=no; else enable_pmatch2fst=yes; fi])
 AM_CONDITIONAL([WANT_PMATCH2FST], [test x$enable_pmatch2fst != xno])
 AC_ARG_ENABLE([remove_epsilons],
 			  [AS_HELP_STRING([--enable-remove-epsilons],
 							  [build remove-epsilons tool @<:@default=yes@:>@])],
 			  [enable_remove_epsilons=$enableval],
-			  [enable_remove_epsilons=yes])
+			  [if test x$enable_no_tools != xno; then enable_remove_epsilons=no; else enable_remove_epsilons=yes; fi])
 AM_CONDITIONAL([WANT_REMOVE_EPSILONS], [test x$enable_remove_epsilons != xno])
 AC_ARG_ENABLE([repeat],
 			  [AS_HELP_STRING([--enable-repeat],
 							  [build repeat tool @<:@default=yes@:>@])],
 			  [enable_repeat=$enableval],
-			  [enable_repeat=yes])
+			  [if test x$enable_no_tools != xno; then enable_repeat=no; else enable_repeat=yes; fi])
 AM_CONDITIONAL([WANT_REPEAT], [test x$enable_repeat != xno])
 AC_ARG_ENABLE([reverse],
 			  [AS_HELP_STRING([--enable-reverse],
 							  [build reverse tool @<:@default=yes@:>@])],
 			  [enable_reverse=$enableval],
-			  [enable_reverse=yes])
+			  [if test x$enable_no_tools != xno; then enable_reverse=no; else enable_reverse=yes; fi])
 AM_CONDITIONAL([WANT_REVERSE], [test x$enable_reverse != xno])
 AC_ARG_ENABLE([reweight],
 			  [AS_HELP_STRING([--enable-reweight],
 							  [build reweight tool @<:@default=yes@:>@])],
 			  [enable_reweight=$enableval],
-			  [enable_reweight=yes])
+			  [if test x$enable_no_tools != xno; then enable_reweight=no; else enable_reweight=yes; fi])
 AM_CONDITIONAL([WANT_REWEIGHT], [test x$enable_reweight != xno])
 AC_ARG_ENABLE([split],
 			  [AS_HELP_STRING([--enable-split],
 							  [build split tool @<:@default=yes@:>@])],
 			  [enable_split=$enableval],
-			  [enable_split=yes])
+			  [if test x$enable_no_tools != xno; then enable_split=no; else enable_split=yes; fi])
 AM_CONDITIONAL([WANT_SPLIT], [test x$enable_split != xno])
 AC_ARG_ENABLE([shuffle],
 			  [AS_HELP_STRING([--enable-shuffle],
@@ -405,7 +420,7 @@ AC_ARG_ENABLE([strings2fst],
 			  [AS_HELP_STRING([--enable-strings2fst],
 							  [build strings2fst tool @<:@default=yes@:>@])],
 			  [enable_strings2fst=$enableval],
-			  [enable_strings2fst=yes])
+			  [if test x$enable_no_tools != xno; then enable_strings2fst=no; else enable_strings2fst=yes; fi])
 AM_CONDITIONAL([WANT_STRINGS2FST], [test x$enable_strings2fst != xno])
 #AC_ARG_ENABLE([strip_header],
 #			  [AS_HELP_STRING([--enable-strip-header],
@@ -417,25 +432,25 @@ AC_ARG_ENABLE([substitute],
 			  [AS_HELP_STRING([--enable-substitute],
 							  [build substitution tool @<:@default=yes@:>@])],
 			  [enable_substitute=$enableval],
-			  [enable_substitute=yes])
+			  [if test x$enable_no_tools != xno; then enable_substitute=no; else enable_substitute=yes; fi])
 AM_CONDITIONAL([WANT_SUBSTITUTE], [test x$enable_substitute != xno])
 AC_ARG_ENABLE([subtract],
 			  [AS_HELP_STRING([--enable-subtract],
 							  [build subtract tool @<:@default=yes@:>@])],
 			  [enable_subtract=$enableval],
-			  [enable_subtract=yes])
+			  [if test x$enable_no_tools != xno; then enable_subtract=no; else enable_subtract=yes; fi])
 AM_CONDITIONAL([WANT_SUBTRACT], [test x$enable_subtract != xno])
 AC_ARG_ENABLE([summarize],
 			  [AS_HELP_STRING([--enable-summarize],
 							  [build summarize tool @<:@default=yes@:>@])],
 			  [enable_summarize=$enableval],
-			  [enable_summarize=yes])
+			  [if test x$enable_no_tools != xno; then enable_summarize=no; else enable_summarize=yes; fi])
 AM_CONDITIONAL([WANT_SUMMARIZE], [test x$enable_summarize != xno])
 AC_ARG_ENABLE([tail],
 			  [AS_HELP_STRING([--enable-tail],
 							  [build tail tool @<:@default=yes@:>@])],
 			  [enable_tail=$enableval],
-			  [enable_tail=yes])
+			  [if test x$enable_no_tools != xno; then enable_tail=no; else enable_tail=yes; fi])
 AM_CONDITIONAL([WANT_TAIL], [test x$enable_tail != xno])
 AC_ARG_ENABLE([traverse],
 			  [AS_HELP_STRING([--enable-traverse],
@@ -447,13 +462,13 @@ AC_ARG_ENABLE([test],
 			  [AS_HELP_STRING([--enable-test],
 							  [build test tool @<:@default=yes@:>@])],
 			  [enable_test=$enableval],
-			  [enable_test=yes])
+			  [if test x$enable_no_tools != xno; then enable_test=no; else enable_test=yes; fi])
 AM_CONDITIONAL([WANT_TEST], [test x$enable_test != xno])
 AC_ARG_ENABLE([txt2fst],
 			  [AS_HELP_STRING([--enable-txt2fst],
 							  [build txt2fst tool @<:@default=yes@:>@])],
 			  [enable_txt2fst=$enableval],
-			  [enable_txt2fst=yes])
+			  [if test x$enable_no_tools != xno; then enable_txt2fst=no; else enable_txt2fst=yes; fi])
 AM_CONDITIONAL([WANT_TXT2FST], [test x$enable_txt2fst != xno])
 AC_ARG_ENABLE([foma_wrapper],
 			  [AS_HELP_STRING([--enable-foma-wrapper],
@@ -692,6 +707,7 @@ cat <<EOF
 -- Building $PACKAGE_STRING:
     * libhfst with sfst: $with_sfst
     *         with openfst: $with_openfst
+    *         with openfst log weights: $with_openfst_log
     *         with foma: $with_foma
     *         with optimized lookup: $with_hfstol
     * tools including affix-guessify: $enable_affix_guessify

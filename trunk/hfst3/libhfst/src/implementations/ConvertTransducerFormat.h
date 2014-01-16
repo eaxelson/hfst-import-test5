@@ -70,8 +70,10 @@ namespace implementations {
   typedef fst::StdArc::StateId StateId;
   typedef fst::ArcIterator<fst::StdVectorFst> StdArcIterator;
 
+#if HAVE_OPENFST_LOG
   typedef fst::ArcTpl<fst::LogWeight> LogArc;
   typedef fst::VectorFst<LogArc> LogFst;
+#endif
 #endif
 
 
@@ -184,7 +186,7 @@ namespace implementations {
   static fst::StdVectorFst * hfst_constant_transducer_to_tropical_ofst
   (const HfstConstantTransducer * t); */
 
-
+#if HAVE_OPENFST_LOG
   static HfstBasicTransducer * log_ofst_to_hfst_basic_transducer
     (LogFst * t, bool had_hfst_header=true);
   
@@ -209,7 +211,7 @@ namespace implementations {
   static LogFst * hfst_constant_transducer_to_log_ofst
   (const HfstConstantTransducer * t); */
 
-
+#endif
 
 #endif // HAVE_OPENFST 
   

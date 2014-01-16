@@ -19,8 +19,10 @@ HfstTransducer &apply(
 #endif
 #if HAVE_OPENFST
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *),
+#if HAVE_OPENFST_LOG
  hfst::implementations::LogFst * (*log_ofst_funct)
  (hfst::implementations::LogFst *),
+#endif
 #endif
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *),
@@ -40,8 +42,10 @@ HfstTransducer &apply(
 #endif
 #if HAVE_OPENFST
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *, unsigned int),
+#if HAVE_OPENFST_LOG
  hfst::implementations::LogFst * (*log_ofst_funct)
  (hfst::implementations::LogFst *, unsigned int),
+#endif
 #endif
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *, unsigned int),
@@ -60,9 +64,11 @@ HfstTransducer &apply(
 #if HAVE_OPENFST
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,String, 
                                             String),
+#if HAVE_OPENFST_LOG
  hfst::implementations::LogFst * (*log_ofst_funct)
  (hfst::implementations::LogFst *,
   String,String),
+#endif
 #endif
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *, String, String),
@@ -82,9 +88,11 @@ HfstTransducer &apply(
 #if HAVE_OPENFST
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,
                                             fst::StdVectorFst *),
+#if HAVE_OPENFST_LOG
  hfst::implementations::LogFst * (*log_ofst_funct)
  (hfst::implementations::LogFst *,
   hfst::implementations::LogFst *),
+#endif
 #endif
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *,

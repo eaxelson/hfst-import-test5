@@ -47,7 +47,10 @@ if WANT_SFST
 MAYBE_SFST=SfstTransducer.cc
 endif
 if WANT_OPENFST
-MAYBE_OPENFST=TropicalWeightTransducer.cc LogWeightTransducer.cc
+MAYBE_OPENFST=TropicalWeightTransducer.cc
+if WANT_OPENFST_LOG
+MAYBE_OPENFST += LogWeightTransducer.cc
+endif
 endif
 if WANT_FOMA
 MAYBE_FOMA=FomaTransducer.cc
@@ -118,7 +121,10 @@ if WANT_HFSTOL
 HFSTOL_TSTS=HfstOlTransducer optimized-lookup/transducer optimized-lookup/convert
 endif
 if WANT_OPENFST
-OFST_TSTS=LogWeightTransducer TropicalWeightTransducer
+OFST_TSTS=TropicalWeightTransducer
+if WANT_OPENFST_LOG
+OFST_TSTS += LogWeightTransducer
+endif
 endif
 if WANT_SFST
 SFST_TSTS=SfstTransducer

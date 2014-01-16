@@ -91,7 +91,9 @@ namespace hfst
   using hfst::implementations::TropicalWeightTransducer;
   using hfst::implementations::TropicalWeightState;
   using hfst::implementations::TropicalWeightStateIterator;
+#if HAVE_OPENFST_LOG
   using hfst::implementations::LogWeightTransducer;
+#endif // #if HAVE_OPENFST_LOG
 #endif // #if HAVE_OPENFST
 
 #if HAVE_FOMA
@@ -241,7 +243,9 @@ An example:
 #endif
 #if HAVE_OPENFST
       hfst::implementations::StdVectorFst * tropical_ofst;
+#if HAVE_OPENFST_LOG
       hfst::implementations::LogFst * log_ofst;
+#endif
 #endif
 #if HAVE_FOMA
       fsm * foma;
@@ -269,7 +273,9 @@ An example:
 #if HAVE_OPENFST
     static hfst::implementations::TropicalWeightTransducer 
       tropical_ofst_interface;
+#if HAVE_OPENFST_LOG
     static hfst::implementations::LogWeightTransducer log_ofst_interface;
+#endif
 #endif
 #if HAVE_FOMA
     static hfst::implementations::FomaTransducer foma_interface;

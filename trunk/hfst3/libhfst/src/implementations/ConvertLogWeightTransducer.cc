@@ -23,6 +23,7 @@ namespace hfst { namespace implementations
 {
 
 #if HAVE_OPENFST
+#if HAVE_OPENFST_LOG
 
   /* --- Conversion between log OpenFst and HfstBasicTransducer --- */
   
@@ -279,7 +280,7 @@ namespace hfst { namespace implementations
     return t;  
   }
 
-
+#endif
 #endif // HAVE_OPENFST
 
 
