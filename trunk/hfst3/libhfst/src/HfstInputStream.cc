@@ -974,6 +974,9 @@ namespace hfst
     try { 
       if (strcmp("",filename.c_str()) != 0) {
         std::ifstream ifs(filename.c_str());
+        if (ifs.fail())
+          HFST_THROW_MESSAGE(NotTransducerStreamException, 
+                             "file could not be opened");
         input_stream = &ifs;
         if (stream_eof())
           HFST_THROW(EndOfStreamException);
