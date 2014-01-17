@@ -50,13 +50,13 @@ section
         !insertmacro _ReplaceInFile hfst.bat HFST_INSTALLATION_DIRECTORY $0
         !insertmacro _ReplaceInFile hfst.bat HFST_WELCOME_MESSAGE "Welcome to the hfst-xfst directory!"
 
-        !insertmacro MoveFile hfst.bat hfst-xfst.bat
+        !insertmacro MoveFile hfst.bat hfst-xfst-shell.bat
 
 	messageBox MB_OK "Installation complete. The tool hfst-xfst is in directory $0."
 
         messageBox MB_YESNO "Do you want to create a shortcut to hfst-xfst in Start Menu?" IDYES true
         true:
 		CreateDirectory "$SMPROGRAMS\HFST-XFST"
-                CreateShortCut "$SMPROGRAMS\HFST-XFST\hfst-xfst.lnk" "$0\hfst-xfst.bat";
+                CreateShortCut "$SMPROGRAMS\HFST-XFST\hfst-xfst.lnk" "$0\hfst-xfst-shell.bat";
 	
 sectionEnd
