@@ -878,11 +878,20 @@ REGEXP12: LABEL { }
         | LABEL WEIGHT { 
             $$ = & $1->set_final_weights($2, true);
         }
-        | READ_BIN { // todo: case that file does not exist
-            hfst::HfstInputStream instream($1);
-            $$ = new HfstTransducer(instream);
-            instream.close();
-            free($1);
+        | READ_BIN {
+            try {
+              hfst::HfstInputStream instream($1);
+              $$ = new HfstTransducer(instream);
+              instream.close();
+              free($1);
+            }
+            catch (const HfstException & e) {
+              (void) e; // todo handle the exception
+              char msg [256];
+              sprintf(msg, "Error reading transducer file '%s'.", $1);
+              xreerror(msg);
+              YYABORT;
+            }
         }
         | READ_TEXT {
             FILE * f = NULL;
