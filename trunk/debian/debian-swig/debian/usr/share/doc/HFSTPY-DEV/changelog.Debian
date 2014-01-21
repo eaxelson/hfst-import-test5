@@ -1,3 +1,9 @@
+HFSTPY (3.5.2-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Erik Axelson <hfst-info@sf.net>  Tue, 21 Jan 2013 19:41:23 +0200
+
 HFSTPY (3.5.1-1) unstable; urgency=low
 
   * Initial release
