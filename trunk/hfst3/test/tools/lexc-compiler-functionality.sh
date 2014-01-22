@@ -98,7 +98,7 @@ for i in .sfst .ofst .foma ; do
      #   mv test.foma $RESULT
      #   rm tmp-foma-script
      
-        hfst-fst2fst $FFLAG $RESULT -o $RESULT.tmp
+        $TOOLDIR/hfst-fst2fst $FFLAG $RESULT -o $RESULT.tmp
            
          #echo "comparing file: $f"
          if ! $TOOLDIR/hfst-compare -e -s $RESULT.tmp test ; then
@@ -117,7 +117,7 @@ for i in .sfst .ofst .foma ; do
             exit 1
         fi
         
-        hfst-fst2fst $FFLAG $RESULT -o $RESULT.tmp
+        $TOOLDIR/hfst-fst2fst $FFLAG $RESULT -o $RESULT.tmp
            
          #echo "comparing flag file: $f"
          if ! $TOOLDIR/hfst-compare -e -s $RESULT.tmp test ; then

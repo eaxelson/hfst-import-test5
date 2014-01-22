@@ -74,7 +74,7 @@ do
         if [ "$COMPILE_FROM_SCRATCH" = "true" ]; then
             if [ "$example" = "FinnishOTProsody" -o \
                 "$example" = "Lingala" -o \
-                "$example" = "DatParser" -o \
+                "$example" = "DateParser" -o \
                 "$example" = "YaleShooting" ]; then
                 if [ "$example" = "DateParser" ] ; then
                     echo "  compiling with foma (result from xfst will not be equivalent"
