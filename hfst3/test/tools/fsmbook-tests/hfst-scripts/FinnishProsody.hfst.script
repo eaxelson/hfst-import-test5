@@ -122,7 +122,8 @@ done
 cat FinnWords.hfst | $2/hfst-compose Rules > FinnProsody
 
 # Print the lexicon with prosody indicated.
-cat FinnProsody | $2/hfst-project -p output | $2/hfst-fst2strings | sort > result
+# cat FinnProsody | $2/hfst-project -p output | $2/hfst-fst2strings | sort > result
+cp FinnProsody Result
 
 rm -f OptFinalStress SS BF US TernaryFeet SV BinaryFeet MainStress
 rm -f SecondaryStress MidV HighV FinnProsody FinnWords.hfst B C E

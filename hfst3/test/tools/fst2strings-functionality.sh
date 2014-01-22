@@ -27,9 +27,9 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
                 fi
             # flags do not allow [A|B|C] with [a|b|c]
                 if (egrep "A|B|C" test.strings | egrep "a|b|c" > tmp); then
-                    echo "error in processing flags in "unification_flags$i": the following path is not valid:"
-                    cat tmp
-                    exit 1
+                        echo "error in processing flags in "unification_flags$i": the following path is not valid:"
+                        cat tmp
+                        exit 1
                 fi
             done
         done
@@ -44,7 +44,7 @@ if ((test -z "$i") || $TOOLDIR/hfst-format --list-formats | grep $i > /dev/null)
                 echo extracting random flags from unification_flags_fail$i failed
                 exit 1
             fi
-            if ! (wc -l test.strings | grep '^0 ' > /dev/null); then
+            if ! (wc -l test.strings | grep '^ *0 ' > /dev/null); then
                 echo "error in processing flags in "unification_flags$i": the following paths are not valid:"
                 cat test.strings
                 exit 1

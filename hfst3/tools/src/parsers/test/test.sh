@@ -146,7 +146,7 @@ do
 	    continue
 	fi
         # apply up/down leak to stdout with readline..
-	if ! (cat $testfile.xfst | ../hfst-xfst --pipe-mode -f $format -s > tmp); then
+	if ! (cat $testfile.xfst | ../hfst-xfst --pipe-mode -f $format -s | tr -d '\r' > tmp); then
 	    echo "ERROR: in compiling "$testfile.xfst
 	    exit 1;
 	fi
@@ -175,13 +175,13 @@ do
 	    continue
 	fi
         # apply up/down leak to stdout with readline..
-        for param in --pipe-mode --no-readline
+        for param in --pipe-mode # --no-readline
         do
             # 'inspect net' requires input from stdin
             if (test "$param" = "--pipe-mode" -a "$testfile" = "inspect_net"); then
                 continue
             fi
-	    if ! (cat $testfile.xfst | ../hfst-xfst $param -f $format -s > tmp); then
+	    if ! (cat $testfile.xfst | ../hfst-xfst $param -f $format -s | tr -d '\r' > tmp); then
 	    echo "ERROR: in compiling "$testfile.xfst" with parameters "$param
 	    exit 1;
 	    fi
@@ -227,7 +227,7 @@ do
 
     for file in quit-on-fail.xfst assert.xfst
     do
-        if (cat $file | ../hfst-xfst -s -f $format > tmp 2> /dev/null); then
+        if (cat $file | ../hfst-xfst --pipe-mode -s -f $format > tmp 2> /dev/null); then
             echo "ERROR: in compiling "$file
             exit 1;
         fi

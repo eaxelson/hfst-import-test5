@@ -335,9 +335,70 @@ ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
 
 EXTRA_FILES=cat2dog.substitute cat.strings cat.txt cats_and_dogs.xre utf-8.strings latin-1.strings c_a_t.strings dos.strings not-contains-a.xre not-contains-a-comment-emptyline.xre parallel-left-arrow-multicom-emptyline.xre  parallel-left-arrow.xre cat.prolog
 
+RESULT_FILES=basic.cat-dog-bird.lexc.flag.result \
+basic.cat-dog-bird.lexc.result \
+basic.colons.lexc.flag.result \
+basic.colons.lexc.result \
+basic.comments.lexc.flag.result \
+basic.comments.lexc.result \
+basic.empty-sides.lexc.flag.result \
+basic.empty-sides.lexc.result \
+basic.escapes.lexc.flag.result \
+basic.escapes.lexc.result \
+basic.infostrings.lexc.flag.result \
+basic.infostrings.lexc.result \
+basic.initial-lexicon-empty.lexc.flag.result \
+basic.initial-lexicon-empty.lexc.result \
+basic.lowercase-lexicon-end.lexc.flag.result \
+basic.lowercase-lexicon-end.lexc.result \
+basic.multichar-symbols.lexc.flag.result \
+basic.multichar-symbols.lexc.result \
+basic.multi-entry-lines.lexc.flag.result \
+basic.multi-entry-lines.lexc.result \
+basic.no-newline-at-end.lexc.flag.result \
+basic.no-newline-at-end.lexc.result \
+basic.no-Root.lexc.flag.result \
+basic.no-Root.lexc.result \
+basic.punctuation.lexc.flag.result \
+basic.punctuation.lexc.result \
+basic.root-loop.lexc.flag.result \
+basic.root-loop.lexc.result \
+basic.spurious-lexicon.lexc.flag.result \
+basic.spurious-lexicon.lexc.result \
+basic.string-pairs.lexc.flag.result \
+basic.string-pairs.lexc.result \
+basic.two-lexicons.lexc.flag.result \
+basic.two-lexicons.lexc.result \
+basic.UTF-8.lexc.flag.result \
+basic.UTF-8.lexc.result \
+basic.zeros-epsilons.lexc.flag.result \
+basic.zeros-epsilons.lexc.result \
+hfst.weights.lexc.flag.result \
+hfst.weights.lexc.result \
+xre.any-variations.lexc.flag.result \
+xre.any-variations.lexc.result \
+xre.automatic-multichar-symbols.lexc.flag.result \
+xre.automatic-multichar-symbols.lexc.result \
+xre.basic.lexc.flag.result \
+xre.basic.lexc.result \
+xre.definitions.lexc.flag.result \
+xre.definitions.lexc.result \
+xre.months.lexc.flag.result \
+xre.months.lexc.result \
+xre.nested-definitions.lexc.flag.result \
+xre.nested-definitions.lexc.result \
+xre.numeric-star.lexc.flag.result \
+xre.numeric-star.lexc.result \
+xre.quotations.lexc.flag.result \
+xre.quotations.lexc.result \
+xre.sharp.lexc.flag.result \
+xre.sharp.lexc.result \
+xre.star-plus-optional.lexc.flag.result \
+xre.star-plus-optional.lexc.result
+
 # files needed for test programs
 EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS) $(TESTS) $(EXTRA_FILES) $(LEXC_TXTS) $(PMATCH_TXTS) script.xfst lexc2fst-stress.sh lookup-stress.sh proc-stress.sh valgrind.sh \
-lexc-compiler-functionality.sh calculate-functionality.sh shuffle-functionality.sh
+lexc-compiler-functionality.sh calculate-functionality.sh shuffle-functionality.sh $(RESULT_FILES)
 
 
 valgrind: $(CHECK_DATA)
