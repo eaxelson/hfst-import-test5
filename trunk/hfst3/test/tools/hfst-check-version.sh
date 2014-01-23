@@ -17,6 +17,7 @@ hfst-txt2fst"
 TWOLC_TOOLS="hfst-twolc/src/hfst-twolc-loc"
 TAGGER_TOOLS="hfst-tagger/src/hfst-tag /hfst-tagger/src/hfst-train-tagger-loc"
 PROC_TOOLS="hfst-proc/hfst-apertium-proc"
+XFST_TOOLS="parsers/hfst-xfst"
 
 # Extension for executables
 EXT=
@@ -44,7 +45,7 @@ fi
 # when testing. They also print their help messages to standard error
 # to avoid giving the message to the next tool in the pipeline.
 #
-for prog in $HFST_TOOLS $PROC_TOOLS ; do
+for prog in $HFST_TOOLS $PROC_TOOLS $XFST_TOOLS; do
     f=$TOOLDIR/$prog
     if [ -e "$f" ] ; then
         if [ "$verbose" != "false" ]; then
