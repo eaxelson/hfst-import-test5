@@ -1,2 +1,2 @@
 
-        File libhfst-31.dll
+        File libhfst-32.dll

@@ -87,7 +87,6 @@ section
         File hfst-info.exe
         File hfst-invert.exe
         File hfst-lexc.exe
-        File hfst-lexc2fst.exe
         File hfst-lookup.exe
         File hfst-pair-test.exe
         File hfst-minimize.exe

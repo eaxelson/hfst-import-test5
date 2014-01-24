@@ -2,7 +2,7 @@
 The tool hfst-twolc is installed in this directory. To be able to use the tool
 in any location, execute
 
-  start hfst-twolc.bat
+  start hfst-twolc-window.bat
 
 which will open up a new command window and temporarily add this directory to
 the PATH environment variable so that you can freely move between directories.
@@ -25,8 +25,8 @@ that should print
 
 
 Note that if the tool outputs directly to Windows console (i.e. not to the next
-tool in a pipe or to a file), you need to use the switch --console or -k to 
-make it sure that all unicode symbols are correctly printed. [TODO check]
+tool in a pipe or to a file), you need to use the switch --output-to-console or
+-k to make it sure that all unicode symbols are correctly printed. [TODO check]
 
 
 For more information on hfst-twolc, see
