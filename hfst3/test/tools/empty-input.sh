@@ -14,7 +14,6 @@ hfst-remove-epsilons hfst-repeat hfst-reverse hfst-reweight \
 hfst-shuffle hfst-split hfst-strings2fst hfst-substitute \
 hfst-subtract hfst-summarize hfst-tail hfst-traverse \
 hfst-txt2fst"
-# todo: hfst-lexc
 
 for prog in $HFST_TOOLS ; do
     f=$TOOLDIR/$prog
