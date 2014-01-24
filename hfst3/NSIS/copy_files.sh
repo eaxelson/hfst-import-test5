@@ -6,18 +6,19 @@
 # (1) HFST dll file
 
 HFST_DLL_DIRECTORY=../libhfst/src/.libs
-HFST_DLL=libhfst-31.dll
+HFST_DLL=libhfst-32.dll
 cp $HFST_DLL_DIRECTORY/$HFST_DLL .
 strip $HFST_DLL
 
 # (2) dependency dll files
 
 DEPENDENCY_DLL_DIRECTORY=/mingw/bin/
-# DEPENDENCY_DLLS="libgcc_s_dw2-1.dll libstdc++-6.dll"
-DEPENDENCY_DLLS="libgcc_s_seh-1.dll libstdc++-6.dll"
+DEPENDENCY_DLLS="libgcc_s_dw2-1.dll libgcc_s_seh-1.dll libstdc++-6.dll"
 for dll in $DEPENDENCY_DLLS;
 do
-    cp $DEPENDENCY_DLL_DIRECTORY/$dll .;
+    if (test -e $DEPENDENCY_DLL_DIRECTORY/$dll); then
+        cp $DEPENDENCY_DLL_DIRECTORY/$dll .;
+    fi
 done
 
 # (3) Python bindings
@@ -95,7 +96,6 @@ hfst-head.exe \
 hfst-info.exe \
 hfst-invert.exe \
 hfst-lexc.exe \
-hfst-lexc2fst.exe \
 hfst-lookup.exe \
 hfst-pair-test.exe \
 hfst-minimize.exe \

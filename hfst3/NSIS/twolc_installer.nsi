@@ -60,13 +60,13 @@ section
         !insertmacro _ReplaceInFile hfst.bat HFST_INSTALLATION_DIRECTORY $0
         !insertmacro _ReplaceInFile hfst.bat HFST_WELCOME_MESSAGE "Welcome to the hfst-twolc directory!"
 
-        !insertmacro MoveFile hfst.bat hfst-twolc-shell.bat
+        !insertmacro MoveFile hfst.bat hfst-twolc-window.bat
 
 	messageBox MB_OK "Installation complete. The tool hfst-twolc is in directory $0."
 
         messageBox MB_YESNO "Do you want to create a shortcut to hfst-twolc in Start Menu?" IDYES true
         true:
 		CreateDirectory "$SMPROGRAMS\HFST-TWOLC"
-                CreateShortCut "$SMPROGRAMS\HFST-TWOLC\hfst-twolc.lnk" "$0\hfst-twolc-shell.bat";
+                CreateShortCut "$SMPROGRAMS\HFST-TWOLC\hfst-twolc.lnk" "$0\hfst-twolc-window.bat";
 	
 sectionEnd

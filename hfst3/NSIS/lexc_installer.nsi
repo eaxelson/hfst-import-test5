@@ -51,13 +51,13 @@ section
         !insertmacro _ReplaceInFile hfst.bat HFST_INSTALLATION_DIRECTORY $0
         !insertmacro _ReplaceInFile hfst.bat HFST_WELCOME_MESSAGE "Welcome to the hfst-lexc directory!"
 
-        !insertmacro MoveFile hfst.bat hfst-lexc-shell.bat
+        !insertmacro MoveFile hfst.bat hfst-lexc-window.bat
 
 	messageBox MB_OK "Installation complete. The tool hfst-lexc is in directory $0."
 
         messageBox MB_YESNO "Do you want to create a shortcut to hfst-lexc in Start Menu?" IDYES true
         true:
 		CreateDirectory "$SMPROGRAMS\HFST-LEXC"
-                CreateShortCut "$SMPROGRAMS\HFST-LEXC\hfst-lexc.lnk" "$0\hfst-lexc-shell.bat";
+                CreateShortCut "$SMPROGRAMS\HFST-LEXC\hfst-lexc.lnk" "$0\hfst-lexc-window.bat";
 	
 sectionEnd

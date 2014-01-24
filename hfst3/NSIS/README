@@ -1,0 +1,15 @@
+Files to update before creating the installer:
+
+ - copy_files.sh      (update library version number)
+ - AddHfstLibrary.nsi (update library version number)
+ - CheckLibraries.nsi (define which exception library is used)
+
+First, copy the relevant files:
+
+ ./copy_files.sh
+
+Create the installer(s):
+
+ /c/hyapp/NSIS/makensis.exe [hfst|xfst|lexc|twolc]_installer.exe
+ mv install-FOO-XX-bit.exe install-[hfst|xfst|lexc|twolc]-[32|64]-bit.exe
+

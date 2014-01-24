@@ -23,37 +23,7 @@ section
 	messageBox MB_OK "Installing HFST to directory: $0."
 	setOutPath $0
 
-
-	## Check that kernel32 and msvcrt dlls are found
-	## ---------------------------------------------
-
-	SearchPath $R0 "kernel32.dll"
-	${If} $R0 == ""
-	      messageBox MB_OK "ERROR: kernel32.dll not found."
-	      return
-	${EndIf}
-
-	SearchPath $R0 "msvcrt.dll"
-	${If} $R0 == ""
-	      messageBox MB_OK "ERROR: msvcrt.dll not found."
-	      return
-	${EndIf}
-
-
-	## Check if libstdc++ and libgcc dlls are found and, if needed
-	## install them to the HFST directory
-	## -----------------------------------------------------------
-
-	SearchPath $R0 "libstdc++-6.dll"
-	${If} $R0 == ""
-	      File libstdc++-6.dll
-	${EndIf}
-
-	SearchPath $R0 "libgcc_s_dw2-1.dll"
-	${If} $R0 == ""
-	      File libgcc_s_dw2-1.dll
-	${EndIf}
-
+!include CheckLibraries.nsi
 
 	## Install the README file
 	## -----------------------
@@ -124,7 +94,7 @@ section
 	## Install libhfst dll and HFST command line tools
 	## -----------------------------------------------
 
-	File libhfst-31.dll
+	File libhfst-32.dll
 
         File hfst-affix-guessify.exe
         File hfst-calculate.exe
@@ -147,7 +117,6 @@ section
         File hfst-info.exe
         File hfst-invert.exe
         File hfst-lexc.exe
-        File hfst-lexc2fst.exe
         File hfst-lookup.exe
         File hfst-pair-test.exe
         File hfst-minimize.exe

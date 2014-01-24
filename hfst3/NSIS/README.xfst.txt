@@ -2,7 +2,7 @@
 The tool hfst-xfst is installed in this directory. To be able to use the tool
 in any location, execute
 
-  start hfst-xfst.bat
+  start hfst-xfst-window.bat
 
 which will open up a new command window and temporarily add this directory to
 the PATH environment variable so that you can freely move between directories.
@@ -15,18 +15,36 @@ To get information on the purpose of the tool, run
 
   hfst-xfst --help
 
-which will print a help message. To test the tool, you can run for example
+which will print a help message. To test the tool, you can open it in
+interactive mode (just writing 'hfst-xfst') and write for example
 
-  echo regex Ä:Ö; | hfst-xfst --pipe-mode --console
+  regex Ä:é;
+  print net
 
-that should print
+which should output something like
 
-  Ä:Ö
+  Ss0:    <Ä:é> -> fs1.
+  fs1:    (no arcs).
 
+If the unicode characters are not shown correctly, try running
 
-Note that if the tool outputs directly to Windows console (i.e. not to the next
-tool in a pipe or to a file), you need to use the switch --console or -k to 
-make it sure that all unicode symbols are correctly printed.
+  hfst-xfst -k
+
+The option -k (or --output-to-console) tells hfst-xfst that the output is not
+going to be redirected to a file or given to next command in pipe but printed
+directly to the Windows console.
+
+You can also try non-interactive mode:
+
+  echo regex Ä:é; > tmp
+  echo print net >> tmp
+
+and then
+
+  type tmp | hfst-xfst --pipe-mode (-k)
+  hfst-xfst -F tmp (-k)  
+
+both of which should print the same thing as above.
 
 
 For more information on hfst-xfst, see

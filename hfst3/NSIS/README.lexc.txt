@@ -2,7 +2,7 @@
 The tool hfst-lexc is installed in this directory. To be able to use the tool
 in any location, execute
 
-  start hfst-lexc.bat
+  start hfst-lexc-window.bat
 
 which will open up a new command window and temporarily add this directory to
 the PATH environment variable so that you can freely move between directories.
@@ -17,17 +17,25 @@ To get information on the purpose of the tool, run
 
 which will print a help message. To test the tool, you can run for example
 
-  [TODO]
+  echo LEXICON Root > tmp.lexc
+  echo lexicon # ; >> tmp.lexc
+  echo léxico # ; >> tmp.lexc
+  echo лексикон # ; >> tmp.lexc
+  echo λεξικό # ; >> tmp.lexc  
 
-that should print
+and then 
 
-  [TODO]
+  hfst-lexc tmp.lexc -o tmp.hfst
+  type tmp.lexc | hfst-lexc > tmp.hfst
 
+both of which write an HFST transducer that contains the four words listed
+in file tmp.lexc.
 
-Note that if the tool outputs directly to Windows console (i.e. not to the next
-tool in a pipe or to a file), you need to use the switch --console or -k to 
-make it sure that all unicode symbols are correctly printed. [TODO check]
+Known bugs:
 
+ - the tool doesn't work in interactive mode, you must either give a
+   filename or catenate the file in standard input
+   
 
 For more information on hfst-lexc, see
 <http://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstLexc> [TODO check]
