@@ -214,7 +214,7 @@ do
 		echo "skipping missing test for "$testfile$testcase"..."
 		continue
 	    fi
-	    if ! (cat $testfile$testcase.xfst | ../hfst-xfst --pipe-mode -s -f $format > tmp); then
+	    if ! (cat $testfile$testcase.xfst | ../hfst-xfst --pipe-mode -s -f $format | tr -d '\r' > tmp); then
 		echo "ERROR: in compiling "$testfile$testcase.xfst
 		exit 1;
 	    fi

@@ -3,6 +3,7 @@ TOOLSDIR=$1
 for f in $TOOLSDIR/hfst-* ; do
     if ! (echo "$f" | grep "hfst-twolc-loc" > /dev/null); then 
 	if ! (echo "$f" | grep "tagger" > /dev/null); then
+	if ! (echo "$f" | grep "hfst-lexc-wrapper" > /dev/null); then
 	    if [ -x "$f" -a ! -d "$f" ] ; then
 		$f < empty-file > /dev/null 2>&1
 		rv=$?
@@ -14,6 +15,7 @@ for f in $TOOLSDIR/hfst-* ; do
 		    exit 1
 		fi
 	    fi
+        fi
 	fi
     fi
 done
