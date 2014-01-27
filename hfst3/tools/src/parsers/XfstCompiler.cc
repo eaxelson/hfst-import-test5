@@ -673,6 +673,32 @@ namespace xfst {
         PROMPT_AND_RETURN_THIS;
       }
 
+  XfstCompiler&
+  XfstCompiler::define(const char * name)
+  {
+    GET_TOP(top);
+    bool was_defined = xre_.is_definition(name);
+    //if (!was_defined) {
+      xre_.define(name, *top);
+      //}
+    HfstTransducer * nu = new HfstTransducer(*top); 
+    if (variables_["name-nets"] == "ON") {
+      nu->set_name(name);
+    }
+    definitions_[name] = nu;
+
+    if (verbose_) 
+      {
+        if (was_defined)
+          hfst_fprintf(outstream_, "Redefined");
+        else
+          hfst_fprintf(outstream_, "Defined");
+        hfst_fprintf(outstream_, " '%s'\n", name); 
+      }          
+    original_definitions_[name] = "<net taken from stack>";
+    PROMPT_AND_RETURN_THIS;
+  }
+
   XfstCompiler& 
   XfstCompiler::define(const char* name, const char* xre)
     {
@@ -688,7 +714,7 @@ namespace xfst {
       /*else*/ if (latest_regex_compiled != NULL)
         {
           bool was_defined = xre_.is_definition(name);
-          if (!was_defined)
+          //if (!was_defined)
             xre_.define(name, xre);
           HfstTransducer * nu = new HfstTransducer(*latest_regex_compiled); 
           if (variables_["name-nets"] == "ON")

@@ -198,6 +198,24 @@ void insert_zeroes(char * array, unsigned int number)
     }
 }
 
+static bool expression_continues(std::string & expr)
+{
+  size_t s = expr.size();
+  if (s > 0 && expr.at(s-1) == '\\')
+    {
+      expr.at(s-1) = '\n';
+      return true;
+    }
+  if (s > 1 && expr.at(s-1) == '\r' && expr.at(s-2) == '\\')
+    {
+      expr.at(s-1) = '\n';
+      expr.at(s-2) = '\r';
+      return true;
+    }
+  return false;
+}
+
+
 #ifdef HAVE_READLINE
 #include "cmd.h"
 #include "abbrcmd.h"
@@ -383,9 +401,8 @@ int main(int argc, char** argv)
           std::string linestr(line);
           expression += linestr;
 #endif
-          if (expression.size() > 0 && expression.at(expression.size()-1) == '\\')
+          if (expression_continues(expression))
             {
-              expression.at(expression.size()-1) = '\n';
               if (!silent)
                 comp.prompt();
               continue;
