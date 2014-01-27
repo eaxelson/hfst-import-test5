@@ -682,6 +682,7 @@ namespace xfst {
       xre_.define(name, *top);
       //}
     HfstTransducer * nu = new HfstTransducer(*top); 
+    stack_.pop(); // todo: delete?
     if (variables_["name-nets"] == "ON") {
       nu->set_name(name);
     }

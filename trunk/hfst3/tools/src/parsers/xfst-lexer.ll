@@ -193,6 +193,14 @@ LWSP [\t ]*
     return CROSSPRODUCT;
 }
 
+"define"{WSP}+{NAMETOKEN}{LWSP}";" {
+    char * dup = strdup(yytext);
+    dup[strlen(dup)-1] = ' '; // get rid of the ';'
+    hxfstlval.name = hfst::xfst::strstrip(dup+strlen("define "));
+    free(dup);
+    return DEFINE_NAME;
+}
+
 "define"{WSP}+{NAMETOKEN}{LWSP}(""|"\r")$ {
     hxfstlval.name = hfst::xfst::strstrip(yytext+strlen("define "));
     return DEFINE_NAME;

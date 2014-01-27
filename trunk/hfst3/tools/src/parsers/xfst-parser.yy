@@ -266,6 +266,10 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->load_stack($2);
             free($2);
        }
+       | LOADS NAMETOKEN END_COMMAND {
+            hfst::xfst::xfst_->load_stack($2);
+            free($2);
+       }
        // wrobble
        | COLLECT_EPSILON_LOOPS END_COMMAND {
             hfst::xfst::xfst_->collect_epsilon_loops();
