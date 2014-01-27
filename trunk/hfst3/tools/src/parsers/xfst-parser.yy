@@ -204,6 +204,10 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($3[1]);
             free($3);
        }
+       | DEFINE_NAME {
+            hfst::xfst::xfst_->define($1);
+            free($1);
+       }
        | DEFINE_NAME REGEX {
             hfst::xfst::xfst_->define($1, $2);
             free($1);

@@ -193,12 +193,16 @@ LWSP [\t ]*
     return CROSSPRODUCT;
 }
 
+"define"{WSP}+{NAMETOKEN}{LWSP}(""|"\r")$ {
+    hxfstlval.name = hfst::xfst::strstrip(yytext+strlen("define "));
+    return DEFINE_NAME;
+}
+
 "define"{WSP}+{NAMETOKEN}{PROTOTYPE} {
     BEGIN(REGEX_STATE);
     hxfstlval.name = hfst::xfst::strstrip(yytext+strlen("define "));
     return DEFINE_FUNCTION;
 }
-
 
 "define"{WSP}+{NAMETOKEN} {
     BEGIN(REGEX_STATE);

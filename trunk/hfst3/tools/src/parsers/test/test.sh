@@ -21,8 +21,7 @@ do
     ## Create a transducer [Foo Bar Baz] where Foo is [foo], Bar [bar] and Baz [Baz].
     ## Definition of Foo is given in startup file, and definitions of Bar and Baz
     ## on command line. Baz is later undefined in input.
-    echo "define Foo" > startup # continue regex on
-    echo "foo;" >> startup      # another line
+    echo "define Foo foo" > startup
     if ! ((echo "undefine Baz" && echo "regex Foo Bar Baz;" && echo "save stack tmp") | \
 	${XFST_TOOL} -f $format -l startup \
 	-e "define Bar bar;" -e "define Baz baz;" > /dev/null 2> /dev/null)

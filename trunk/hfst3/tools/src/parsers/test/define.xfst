@@ -5,3 +5,9 @@ define Foobar foo:bar;
 regex Foobar Foobar;
 echo --
 write att
+clear
+regex a:b;
+define Foo
+regex Foo Foo;
+echo --
+write att
