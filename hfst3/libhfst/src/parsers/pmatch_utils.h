@@ -16,15 +16,18 @@
 
 namespace hfst { namespace pmatch {
 
+class PmatchFunction;
+
 extern char* data;
 extern char* startptr;
 extern size_t len;
-extern std::map<std::string,hfst::HfstTransducer*> definitions;
-extern std::set<std::string> def_insed_transducers;
+extern std::map<std::string, HfstTransducer *> definitions;
+extern std::map<std::string, HfstTransducer *> def_insed_transducers;
 extern std::set<std::string> inserted_transducers;
 extern std::set<std::string> unsatisfied_insertions;
 extern std::set<std::string> used_definitions;
-extern HfstTransducer* last_compiled;
+extern std::map<std::string, PmatchFunction> functions;
+extern std::vector<std::string> tmp_collected_funargs;
 extern ImplementationType format;
 extern bool verbose;
 extern bool flatten;
@@ -80,6 +83,7 @@ HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex);
  * @brief concatenate with an appropriate end tag transducer
  */
 void add_end_tag(HfstTransducer * regex, std::string tag);
+HfstTransducer * make_end_tag(std::string tag);
 
 /**
  * @brief find first quoted segment from strign @a s.
@@ -111,6 +115,12 @@ void print_size_info(HfstTransducer * net);
  */
 HfstTransducer * read_text(char * filename,
                            ImplementationType type = TROPICAL_OPENFST_TYPE);
+
+/**
+ * @brief Given a text file, read it line by line and return a tokenized
+ * list of arguments for a function to be applied on
+ */
+std::vector<std::vector<std::string> > read_args(char * filename, unsigned int argcount);
 
 /** @brief Return a transducer that accepts a single string from an array of
  *  char *. 
@@ -246,6 +256,71 @@ struct PmatchUtilityTransducers
     HfstTransducer * toupper(HfstTransducer & t);
 };
 
+enum PmatchAstOperation {
+    AstAddDelimiters,
+    AstConcatenate,
+    AstCompose,
+    AstCrossProduct,
+    AstLenientCompose,
+    AstOptionalize,
+    AstDisjunct,
+    AstIntersect,
+    AstSubtract,
+    None
+};
+
+enum PmatchAstType { AstTransducer, AstSymbol, AstBinaryOp, AstUnaryOp };
+
+struct PmatchAstNode {
+
+
+    PmatchAstNode * left_child;
+    PmatchAstNode * right_child;
+    HfstTransducer * transducer;
+    PmatchAstOperation op;
+    std::string symbol;
+    PmatchAstType type;
+
+    PmatchAstNode(PmatchAstNode * l,
+                  PmatchAstNode * r,
+                  PmatchAstOperation o):
+    left_child(l), right_child(r), op(o), type(AstBinaryOp),
+        transducer(NULL) { }
+    
+    PmatchAstNode(PmatchAstNode * l,
+                  PmatchAstOperation o):
+    left_child(l), right_child(NULL), op(o), type(AstUnaryOp),
+        transducer(NULL) {}
+
+PmatchAstNode(std::string sym): symbol(sym), type(AstSymbol) {}
+    
+PmatchAstNode(HfstTransducer * t): transducer(t),
+    left_child(NULL), right_child(NULL), op(None), type(AstTransducer) {}
+    
+    ~PmatchAstNode(void) {
+        delete left_child;
+        delete right_child;
+        delete transducer;
+    }
+
+    HfstTransducer * evaluate(std::map<std::string,
+                              HfstTransducer *> & funargs);
+
+};
+
+struct PmatchFunction {
+    std::vector<std::string> args;
+    PmatchAstNode * root;
+    
+    PmatchFunction(std::vector<std::string> argument_vector,
+                   PmatchAstNode * function_root):
+    args(argument_vector), root(function_root) { }
+
+    PmatchFunction(void) {}
+
+    HfstTransducer * evaluate(std::map<std::string,
+                              HfstTransducer *> & funargs);
+};
 
 } } // namespaces
 #endif

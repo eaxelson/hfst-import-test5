@@ -45,13 +45,14 @@ namespace pmatch
 {
 
 char* data;
-std::map<std::string,hfst::HfstTransducer*> definitions;
-std::set<std::string> def_insed_transducers;
+std::map<std::string, hfst::HfstTransducer*> definitions;
+std::map<std::string, hfst::HfstTransducer*> def_insed_transducers;
 std::set<std::string> inserted_transducers;
 std::set<std::string> unsatisfied_insertions;
 std::set<std::string> used_definitions;
+std::map<std::string, PmatchFunction> functions;
+std::vector<std::string> tmp_collected_funargs;
 char* startptr;
-hfst::HfstTransducer* last_compiled;
 hfst::ImplementationType format;
 size_t len;
 bool verbose;
@@ -218,6 +219,15 @@ void add_end_tag(HfstTransducer * regex, std::string tag)
                            regex->get_type());
     special_pmatch_symbols.insert("@PMATCH_ENDTAG_" + tag + "@");
     regex->concatenate(end_tag);
+}
+
+HfstTransducer * make_end_tag(std::string tag)
+{
+    HfstTransducer * end_tag = new HfstTransducer(hfst::internal_epsilon,
+                                                  "@PMATCH_ENDTAG_" + tag + "@",
+                                                  format);
+    special_pmatch_symbols.insert("@PMATCH_ENDTAG_" + tag + "@");
+    return end_tag;
 }
 
 char *
@@ -413,6 +423,8 @@ void init_globals(void)
     inserted_transducers.clear();
     unsatisfied_insertions.clear();
     used_definitions.clear();
+    functions.clear();
+    tmp_collected_funargs.clear();
 
     special_pmatch_symbols.clear();
     special_pmatch_symbols.insert(RC_ENTRY_SYMBOL);
@@ -554,6 +566,43 @@ HfstTransducer * read_text(char * filename, ImplementationType type)
                 ++n;
                 StringPairVector spv = tok.tokenize(line);
                 retval->disjunct(spv);
+            }
+        }
+    }
+    infile.close();
+    return retval;
+}
+
+std::vector<std::vector<std::string> > read_args(char * filename, unsigned int argcount)
+{
+    std::ifstream infile;
+    std::string line;
+    infile.open(filename);
+    std::vector<std::vector <std::string> > retval;
+    std::vector<std::string> current_tokens;
+    if(!infile.good()) {
+        std::cerr << "Pmatch: could not open text file " << filename <<
+            " for reading\n";
+    } else {
+        size_t n = 0;
+        while(infile.good()) {
+            std::getline(infile, line);
+            if(!line.empty()) {
+                current_tokens.clear();
+                ++n;
+                int curpos;
+                int nextpos = -1;
+                do {
+                    curpos = nextpos + 1;
+                    nextpos = line.find_first_of(" ", curpos);
+                    current_tokens.push_back(line.substr(curpos, nextpos - curpos));
+                } while (nextpos != std::string::npos);
+                if (current_tokens.size() != argcount) {
+                    std::cerr << "Pmatch: line " << n << " in " << filename << " contained "
+                              << current_tokens.size() << " tokens, expected " << argcount << std::endl;
+                } else {
+                    retval.push_back(current_tokens);
+                }
             }
         }
     }
@@ -736,6 +785,62 @@ HfstTransducer * PmatchUtilityTransducers::toupper(HfstTransducer & t)
     retval->output_project();
     retval->minimize();
     return retval;
+}
+
+HfstTransducer * PmatchFunction::evaluate(
+    std::map<std::string,
+             HfstTransducer *> & funargs)
+{
+    return root->evaluate(funargs);
+}
+
+HfstTransducer * PmatchAstNode::evaluate(
+    std::map<std::string,
+             HfstTransducer *> & funargs)
+{
+    if (type == AstTransducer) {
+        return new HfstTransducer(*transducer);
+    } else if (type == AstUnaryOp) {
+        HfstTransducer * retval = left_child->evaluate(funargs);
+        if (op == AstAddDelimiters) {
+            return add_pmatch_delimiters(retval);
+        } else if (op == AstOptionalize) {
+            retval->optionalize();
+            return retval;
+        }
+    } else if (type == AstBinaryOp) {
+        HfstTransducer * retval = left_child->evaluate(funargs);
+        if (op == AstConcatenate) {
+            retval->concatenate(*right_child->evaluate(funargs));
+            return retval;
+        } else if (op == AstCompose) {
+            retval->compose(*right_child->evaluate(funargs));
+            return retval;
+        } else if (op == AstCrossProduct) {
+            retval->cross_product(*right_child->evaluate(funargs));
+            return retval;
+        } else if (op == AstLenientCompose) {
+            retval->lenient_composition(*right_child->evaluate(funargs));
+            return retval;
+        } else if (op == AstDisjunct) {
+            retval->disjunct(*right_child->evaluate(funargs));
+            return retval;
+        } else if (op == AstIntersect) {
+            retval->intersect(*right_child->evaluate(funargs));
+            return retval;
+        } else if (op == AstSubtract) {
+            retval->subtract(*right_child->evaluate(funargs));
+            return retval;
+        }
+
+    } else if (type == AstSymbol) {
+        if (funargs.count(symbol) == 1) {
+            return new HfstTransducer(*funargs[symbol]);
+        } else {
+            std::string errstring = "Symbol " + std::string(symbol) + " not found";
+            pmatcherror(errstring.c_str());
+        }
+    }
 }
 
 
