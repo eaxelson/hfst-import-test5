@@ -868,6 +868,11 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->read_text(f);
             hfst::xfst::xfst_fclose(f, $2);
        }
+       | READ_TEXT NAMETOKEN END_COMMAND {
+            FILE * f = hfst::xfst::xfst_fopen($2, "r");
+            hfst::xfst::xfst_->read_text(f);
+            hfst::xfst::xfst_fclose(f, $2);
+       }
        | READ_TEXT NAMETOKEN_LIST CTRLD {
             hfst::xfst::xfst_->read_text($2);
             free($2);

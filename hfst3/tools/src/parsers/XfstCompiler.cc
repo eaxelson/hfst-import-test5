@@ -293,6 +293,26 @@ namespace xfst {
     return symbol;
   }
 
+  static HfstOneLevelPaths extract_output_paths(const HfstTwoLevelPaths & paths)
+  {
+    HfstOneLevelPaths retval;
+    for (hfst::HfstTwoLevelPaths::const_iterator it = paths.begin();
+         it != paths.end(); it++)
+      {
+        hfst::StringVector new_path;
+        hfst::StringPairVector path = it->second;
+        for (hfst::StringPairVector::const_iterator p = path.begin();
+             p != path.end(); p++)
+          {
+            if (p->second != "@0@" &&
+                p->second != "@_EPSILON_SYMBOL_@" )
+            new_path.push_back(p->second);
+          }
+        retval.insert(std::pair<float, StringVector>(it->first, new_path));
+      }
+    return retval;
+  }
+
   XfstCompiler&
   XfstCompiler::print_paths
   (const hfst::HfstOneLevelPaths &paths, 
@@ -389,6 +409,33 @@ namespace xfst {
   }
 
     XfstCompiler&
+    XfstCompiler::apply_line(char* line, HfstBasicTransducer * t)
+      {
+        char* token = strstrip(line);
+        StringSet alpha = t->get_alphabet();
+        HfstTokenizer tok;
+        for (StringSet::const_iterator it = alpha.begin();
+             it != alpha.end(); it++)
+          {
+            tok.add_multichar_symbol(*it);
+          }
+        StringVector lookup_path = tok.tokenize_one_level(std::string(token));
+        HfstTwoLevelPaths results;
+
+        // todo: variables_["obey-flags"] == ["ON"|"OFF"]
+        t->lookup_fd(lookup_path, results, -1);
+
+        HfstOneLevelPaths paths = extract_output_paths(results);
+
+        this->print_paths(paths);
+        if (paths.empty()) {
+          hfst_fprintf(outstream_, "???\n");
+        }
+        return *this;
+      }
+
+
+    XfstCompiler&
     XfstCompiler::apply_line(char* line, const HfstTransducer * t)
       {
         char* token = strstrip(line);
@@ -466,7 +513,9 @@ namespace xfst {
         HfstTransducer * t = stack_.top();
         if (t->get_type() != hfst::HFST_OL_TYPE && t->get_type() != hfst::HFST_OLW_TYPE)
           {
-            hfst_fprintf(warnstream_, "lookup might be slow, consider 'convert net'\n");
+            //hfst_fprintf(warnstream_, "lookup might be slow, consider 'convert net'\n");
+            HfstBasicTransducer fsm(*t);
+            return this->apply_line(line, &fsm);
           }
 
         return this->apply_line(line, t);
@@ -486,9 +535,10 @@ namespace xfst {
         t = new HfstTransducer(*(stack_.top()));
         t->invert().minimize();
 
-        hfst_fprintf(warnstream_, "lookup might be slow, consider 'convert net'\n");
+        //hfst_fprintf(warnstream_, "lookup might be slow, consider 'convert net'\n");
 
-        this->apply_line(line, t);
+        HfstBasicTransducer fsm(*t);
+        this->apply_line(line, &fsm);
         delete t;
         return *this;
       }
@@ -591,6 +641,8 @@ namespace xfst {
           }
         HfstTransducer * t = stack_.top();
 
+        HfstBasicTransducer * fsm = NULL;
+
         if (direction == APPLY_DOWN_DIRECTION)
           {
             if (t->get_type() == hfst::HFST_OL_TYPE ||
@@ -614,7 +666,8 @@ namespace xfst {
 
         if (t->get_type() != hfst::HFST_OL_TYPE && t->get_type() != hfst::HFST_OLW_TYPE)
           {
-            hfst_fprintf(warnstream_, "lookup might be slow, consider 'convert net'\n");
+            //hfst_fprintf(warnstream_, "lookup might be slow, consider 'convert net'\n");
+            fsm = new HfstBasicTransducer(*t);
           }
 
         char * line = NULL;
@@ -644,7 +697,10 @@ namespace xfst {
               }
 
             // perform lookup/lookdown
-            apply_line(line, t);
+            if (fsm != NULL)
+              apply_line(line, fsm);
+            else
+              apply_line(line, t);
             free(line);
           }
 
@@ -653,6 +709,8 @@ namespace xfst {
 
         if (direction == APPLY_DOWN_DIRECTION)
           delete t;
+        if (fsm != NULL)
+          delete fsm;
 
         PROMPT_AND_RETURN_THIS;
       }
@@ -689,14 +747,6 @@ namespace xfst {
       {
         char* s = strdup(indata);
         char* line = strtok(s, "\n");
-
-        // lookdown not yet implemented in HFST
-        if (verbose_)
-          {
-            hfst_fprintf(warnstream_, 
-                         "warning: lookdown not implemented, inverting transducer and performing lookup\n"
-                         "for faster performance, invert and minimize top network and do lookup instead\n\n");
-          }
         
         while (line != NULL && (strcmp(line, APPLY_END_STRING) != 0))
           {

@@ -631,6 +631,7 @@ class XfstCompiler
   XfstCompiler& add_prop_line(char* line);
 
   XfstCompiler& apply_line(char* line, const HfstTransducer * t);
+  XfstCompiler& apply_line(char* line, HfstBasicTransducer * t);
 
   XfstCompiler& apply_up_line(char* line);
   XfstCompiler& apply_down_line(char* line);
