@@ -98,6 +98,8 @@ class XfstCompiler
   //! @todo lookmed is missing from HFST
   XfstCompiler& apply_med(const char* indata);
 
+  XfstCompiler& convert_net();
+
   //! @brief Define alias for command sequence
   XfstCompiler& define_alias(const char* name, const char* commands);
   //! @brief Define list by range
@@ -627,10 +629,13 @@ class XfstCompiler
   const XfstCompiler& error(const char* message) const;
   const XfstCompiler& print_transducer_info() const;
   XfstCompiler& add_prop_line(char* line);
-  XfstCompiler& apply_line(char* line, ApplyDirection direction);
+
+  XfstCompiler& apply_line(char* line, const HfstTransducer * t);
+
   XfstCompiler& apply_up_line(char* line);
   XfstCompiler& apply_down_line(char* line);
   XfstCompiler& apply_med_line(char* line);
+
   XfstCompiler& print_bool(bool value);
   XfstCompiler& read_prop_line(char* line);
 

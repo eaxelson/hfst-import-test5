@@ -18,6 +18,7 @@ char * abbrcmd [] =
 "com-rep upper",
 "concatenate",
 "conjunct",
+"convert",
 "crossproduct",
 "determinise",
 "determinise net",
