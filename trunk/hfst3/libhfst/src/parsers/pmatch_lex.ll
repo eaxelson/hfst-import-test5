@@ -9,8 +9,8 @@
 #include "HfstInputStream.h"
 #include "HfstXeroxRules.h"
 
-#include "pmatch_parse.hh"
 #include "pmatch_utils.h"
+#include "pmatch_parse.hh"
 
 
 #undef YY_INPUT
@@ -43,7 +43,7 @@ A7 [\x00-\x7e]
 /* special meaning in pmatch */
 A7RESTRICTED [- |<>%^:;@0~\\&?$+*/_(){}\]\[-]
 /* non-restricted ASCII */
-A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%^:;@~\\&?$+*/_(){}\]\[-]
+A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%^:;,@~\\&?$+*/_(){}\]\[-]
 
 WEIGHT [0-9]+(\.[0-9]+)?
 
@@ -61,6 +61,10 @@ LWSP [\t\r\n ]
 
 "DefIns" {
     return DEFINS;
+}
+
+"DefFun" {
+    return DEFFUN;
 }
 
 "Alpha" {
@@ -123,6 +127,10 @@ LWSP [\t\r\n ]
     return NRC_LEFT;
 }
 
+"Map(" {
+    return MAP_LEFT;
+}
+
 
 "~"   { return COMPLEMENT; }
 "\\"  { return TERM_COMPLEMENT; }
@@ -146,6 +154,7 @@ LWSP [\t\r\n ]
 ">"   { return AFTER; }
 
 ".o." { return COMPOSITION; }
+".O." { return LENIENT_COMPOSITION; }
 ".x." { return CROSS_PRODUCT; }
 ".P." { return UPPER_PRIORITY_UNION; }
 ".p." { return LOWER_PRIORITY_UNION; }
