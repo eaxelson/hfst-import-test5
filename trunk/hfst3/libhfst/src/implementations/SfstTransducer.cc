@@ -642,9 +642,6 @@ namespace hfst { namespace implementations {
 
     return retval; }
 
-  std::pair<Transducer*, Transducer*> SfstTransducer::harmonize 
-  (Transducer *t1, Transducer *t2, bool unknown_symbols_in_use) ;
-
   std::vector<Transducer*> SfstTransducer::extract_path_transducers
   (Transducer *t)
   { vector<Transducer*> paths;
