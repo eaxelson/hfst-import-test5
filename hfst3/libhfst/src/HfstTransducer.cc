@@ -578,8 +578,6 @@ HfstOneLevelPaths * HfstTransducer::lookup_fd(const std::string & s,
 {
     switch(this->type) {
 
-        /* TODO: Convert into HFST_OL(W)_TYPE, if needed? */
-
     case (HFST_OL_TYPE):
     case (HFST_OLW_TYPE):
       return this->implementation.hfst_ol->lookup_fd(s);
