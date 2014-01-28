@@ -189,6 +189,11 @@ LWSP [\t ]*
     return CONCATENATE;
 }
 
+^{LWSP}("convert net"|"convert") {
+    return CONVERT_NET;
+}
+
+
 ^{LWSP}("crossproduct net"|"crossproduct") {
     return CROSSPRODUCT;
 }

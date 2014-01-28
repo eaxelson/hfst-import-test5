@@ -389,23 +389,16 @@ namespace xfst {
   }
 
     XfstCompiler&
-    XfstCompiler::apply_line(char* line, ApplyDirection direction)
+    XfstCompiler::apply_line(char* line, const HfstTransducer * t)
       {
-        GET_TOP(tmp);
         char* token = strstrip(line);
-        if (direction == APPLY_DOWN_DIRECTION)
-          {
-            // lookdown not yet implemented in HFST
-            tmp = new HfstTransducer(*(stack_.top()));
-            tmp->invert().minimize();
-          }
         HfstOneLevelPaths * paths = NULL;
 
         if (variables_["obey-flags"] == "ON") {
-          paths = tmp->lookup_fd(std::string(token));
+          paths = t->lookup_fd(std::string(token));
         }
         else {
-          paths = tmp->lookup(std::string(token));
+          paths = t->lookup(std::string(token));
         }
 
         this->print_paths(*paths);
@@ -414,22 +407,90 @@ namespace xfst {
         }
 
         delete paths;
-        if (direction == APPLY_DOWN_DIRECTION) {
-          delete tmp;
-        }
         return *this;
       }
+
+  XfstCompiler&
+  XfstCompiler::convert_net()
+  {
+    if (stack_.size() < 1)
+      {
+        hfst_fprintf(stderr, "Empty stack.\n");
+        prompt();
+        return *this;
+      }
+    HfstTransducer * t = stack_.top();
+
+    hfst::ImplementationType to_format;
+    if (t->get_type() == hfst::HFST_OL_TYPE ||
+        t->get_type() == hfst::HFST_OLW_TYPE)
+      {
+        to_format = format_;
+      }
+    else if (t->get_type() == hfst::TROPICAL_OPENFST_TYPE ||
+             t->get_type() == hfst::LOG_OPENFST_TYPE)
+      {
+        to_format = hfst::HFST_OLW_TYPE;
+      }
+    else
+      {
+        to_format = hfst::HFST_OL_TYPE;
+      }
+
+    if (! hfst::HfstTransducer::is_safe_conversion(t->get_type(), to_format))
+      {
+        hfst_fprintf(warnstream_, "warning: loss of information during conversion is possible\n");
+      }
+
+    if (verbose_)
+      {
+        hfst_fprintf(warnstream_, "converting transducer type from %s to %s, this might take a while...\n",
+                     hfst::implementation_type_to_format(t->get_type()),
+                     hfst::implementation_type_to_format(format_));
+      }
+    t->convert(to_format);
+    prompt();
+    return *this;
+  }
+
 
     XfstCompiler&
     XfstCompiler::apply_up_line(char* line)
       {
-        return this->apply_line(line, APPLY_UP_DIRECTION);
+        if (stack_.size() < 1)
+          {
+            hfst_fprintf(stderr, "Empty stack.\n");
+            prompt();
+            return *this;
+          }
+        HfstTransducer * t = stack_.top();
+        if (t->get_type() != hfst::HFST_OL_TYPE && t->get_type() != hfst::HFST_OLW_TYPE)
+          {
+            hfst_fprintf(warnstream_, "lookup might be slow, consider 'convert net'\n");
+          }
+
+        return this->apply_line(line, t);
       }
 
     XfstCompiler&
     XfstCompiler::apply_down_line(char* line)
       {
-        return this->apply_line(line, APPLY_DOWN_DIRECTION);
+        GET_TOP(t);
+        // lookdown not yet implemented in HFST
+        if (verbose_)
+          {
+            hfst_fprintf(warnstream_, 
+                         "warning: lookdown not implemented, inverting transducer and performing lookup\n"
+                         "for faster performance, invert and minimize top network and do lookup instead\n\n");
+          }
+        t = new HfstTransducer(*(stack_.top()));
+        t->invert().minimize();
+
+        hfst_fprintf(warnstream_, "lookup might be slow, consider 'convert net'\n");
+
+        this->apply_line(line, t);
+        delete t;
+        return *this;
       }
 
     XfstCompiler&
@@ -522,6 +583,40 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::apply(FILE* infile, ApplyDirection direction)
       {
+        if (stack_.size() < 1)
+          {
+            hfst_fprintf(stderr, "Empty stack.\n");
+            prompt();
+            return *this;
+          }
+        HfstTransducer * t = stack_.top();
+
+        if (direction == APPLY_DOWN_DIRECTION)
+          {
+            if (t->get_type() == hfst::HFST_OL_TYPE ||
+                t->get_type() == hfst::HFST_OLW_TYPE)
+              {
+                hfst_fprintf(stderr, "Operation not supported for optimized lookup format.\n");
+                prompt();
+                return *this;
+              }
+
+            // lookdown not yet implemented in HFST
+            if (verbose_)
+              {
+                hfst_fprintf(warnstream_, 
+                             "warning: lookdown not implemented, inverting transducer and performing lookup\n"
+                             "for faster performance, invert and minimize top network and do lookup instead\n\n");
+              }
+            t = new HfstTransducer(*(stack_.top()));
+            t->invert().minimize();
+          }
+
+        if (t->get_type() != hfst::HFST_OL_TYPE && t->get_type() != hfst::HFST_OLW_TYPE)
+          {
+            hfst_fprintf(warnstream_, "lookup might be slow, consider 'convert net'\n");
+          }
+
         char * line = NULL;
         // prompt is printed only when reading from the user
         const char * promptstr 
@@ -548,18 +643,17 @@ namespace xfst {
                 break;
               }
 
-            // apply line
-            if (direction == APPLY_UP_DIRECTION) {
-              apply_up_line(line);
-            }
-            else if (direction == APPLY_DOWN_DIRECTION) {
-              apply_down_line(line);
-            }
+            // perform lookup/lookdown
+            apply_line(line, t);
             free(line);
           }
 
         // ignore all readline history given to the apply command
         ignore_history_after_index(ind);
+
+        if (direction == APPLY_DOWN_DIRECTION)
+          delete t;
+
         PROMPT_AND_RETURN_THIS;
       }
 
@@ -595,6 +689,15 @@ namespace xfst {
       {
         char* s = strdup(indata);
         char* line = strtok(s, "\n");
+
+        // lookdown not yet implemented in HFST
+        if (verbose_)
+          {
+            hfst_fprintf(warnstream_, 
+                         "warning: lookdown not implemented, inverting transducer and performing lookup\n"
+                         "for faster performance, invert and minimize top network and do lookup instead\n\n");
+          }
+        
         while (line != NULL && (strcmp(line, APPLY_END_STRING) != 0))
           {
             apply_down_line(line);
@@ -1179,6 +1282,13 @@ namespace xfst {
   {
     if (t->get_type() != format_)
       {
+        if (t->get_type() == hfst::HFST_OL_TYPE ||
+            t->get_type() == hfst::HFST_OLW_TYPE)
+          {
+            hfst_fprintf(warnstream_, "warning: transducer is in optimized lookup format, 'apply up' is the only operation it supports\n");
+            return;
+          }
+
         if (verbose_)
           {
             hfst_fprintf(warnstream_, "warning: converting transducer type from %s to %s",
@@ -1186,7 +1296,7 @@ namespace xfst {
                     hfst::implementation_type_to_format(format_));
             if (filename != NULL)
               {
-                hfst_fprintf(warnstream_, "when reading from file '%s'",
+                hfst_fprintf(warnstream_, " when reading from file '%s'",
                         to_filename(filename));
               }
             if (! hfst::HfstTransducer::is_safe_conversion(t->get_type(), format_))
@@ -1239,6 +1349,12 @@ namespace xfst {
         // Add transducer as definition..
         if (load_definitions)
           {
+            if (t->get_type() == hfst::HFST_OL_TYPE ||
+                t->get_type() == hfst::HFST_OLW_TYPE)
+              {
+                hfst_fprintf(errorstream_, "cannot load optimized lookup transducers as definitions\n");
+                break;
+              }
             add_loaded_definition(t);
           }
         // ..or push it to stack.
@@ -1427,7 +1543,15 @@ namespace xfst {
         prompt();
         return NULL;
       }
-    return stack_.top();
+    HfstTransducer * retval = stack_.top();
+    if (retval->get_type() == hfst::HFST_OL_TYPE ||
+        retval->get_type() == hfst::HFST_OLW_TYPE)
+      {
+        hfst_fprintf(stderr, "Operation not supported for optimized lookup format.\n");
+        prompt();
+        return NULL;
+      }
+    return retval;
   }  
 
   XfstCompiler& 
@@ -3766,6 +3890,10 @@ namespace xfst {
       if (verbose_ && !stack_.empty())
         {
           HfstTransducer* top = stack_.top();
+          if (top->get_type() != format_)
+            {
+              return *this;
+            }
           hfst_fprintf(outstream_, "? bytes. %i states, %i arcs, ? paths\n",
                   top->number_of_states(), top->number_of_arcs());
           std::map<std::string,std::string>::const_iterator it = variables_.find("print-sigma");

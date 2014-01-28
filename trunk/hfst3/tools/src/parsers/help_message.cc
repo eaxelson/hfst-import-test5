@@ -275,6 +275,7 @@ bool handle_case(const std::string & names, const std::string & arguments,
   COMMAND("complete net, complete", "", "completes the FSM");
   COMMAND("compose net, compose", "", "composes networks on stack");
   COMMAND("concatenate net, concatenate", "", "concatenates networks on stack");
+  COMMAND("convert net, convert", "", "converts between optimized lookup and standard formats");
   COMMAND("crossproduct net, crossproduct", "", "cross-product of top two FSMs on stack");
   CONT_COMMAND("define", "<name> <r.e.>", "define a network");
   COMMAND("define", "<fname>(<v1,..,vn>) <r.e.>", "define function");

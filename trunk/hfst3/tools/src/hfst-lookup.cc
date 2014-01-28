@@ -82,6 +82,7 @@ using std::vector;
 // add tools-specific variables here
 static char* lookup_file_name;
 static FILE* lookup_file;
+static bool pipe_mode = false;
 static size_t linen = 0;
 static bool lookup_given = false;
 static size_t infinite_cutoff = 5;
@@ -214,7 +215,8 @@ print_usage()
     fprintf(message_out, 
         "Input/Output options:\n"
         "  -i, --input=INFILE     Read input transducer from INFILE\n"
-        "  -o, --output=OUTFILE   Write output to OUTFILE\n");
+        "  -o, --output=OUTFILE   Write output to OUTFILE\n"
+        "  -p, --pipe-mode        Read lookup strings from standard input, do not prompt\n");
 
     fprintf(message_out, "Lookup options:\n"
             "  -I, --input-strings=SFILE        Read lookup strings from SFILE\n"
@@ -273,12 +275,13 @@ parse_options(int argc, char** argv)
             {"xfst", required_argument, 0, 'X'},
             {"epsilon-format", required_argument, 0, 'e'},
             {"epsilon-format2", required_argument, 0, 'E'},
+            {"pipe-mode", no_argument, 0, 'p'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:",
+                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:p",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -376,6 +379,9 @@ parse_options(int argc, char** argv)
         case 'c':
             infinite_cutoff = (size_t)atoi(hfst_strdup(optarg));
             break;
+        case 'p':
+            pipe_mode = true;
+            break;
 
 #include "inc/getopt-cases-error.h"
         }
@@ -441,6 +447,13 @@ parse_options(int argc, char** argv)
     return EXIT_CONTINUE;
 }
 
+static void print_prompt()
+{
+  if (!silent && !pipe_mode && !lookup_given)
+    {
+      fprintf(stderr, "> ");
+    }
+}
 
 static std::string get_print_format(const std::string &s) ;
 
@@ -1384,6 +1397,8 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     HfstStrings2FstTokenizer input_tokenizer(mc_symbols, 
                          std::string(epsilon_format));
 
+    print_prompt();
+
     while (hfst_getline(&line, &llen, lookup_file) != -1)
       {
         linen++;
@@ -1457,6 +1472,8 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         }
         delete kv;
         delete kvs;
+
+        print_prompt();
       } // while lines in input
     free(line);
     if (print_statistics)
