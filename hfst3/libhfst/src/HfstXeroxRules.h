@@ -146,6 +146,11 @@ namespace hfst
         // which is used in some constraints
         HfstTransducer constraintsRightPart( ImplementationType type );
 
+        // .#. ?* <:0 0:> ?* .#.
+        // filters out empty string
+        HfstTransducer oneBetterthanNoneConstraint( const HfstTransducer &uncondidtionalTr );
+
+
         // ?* <:0 [B:0]* [I-B] [ B:0 | 0:B | ?-B ]*
         HfstTransducer leftMostConstraint( const HfstTransducer &uncondidtionalTr );
 

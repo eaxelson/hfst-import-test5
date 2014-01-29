@@ -197,8 +197,13 @@ namespace hfst
           HfstTransducer tmp(retval);
 
           tmp.compose(Constraint).minimize();
-          tmp.compose(retval).minimize();
 
+       //  printf("tmp: \n");
+        // tmp.write_in_att_format(stdout, 1);
+
+          tmp.compose(retval).minimize();
+         //printf("tmp 2: \n");
+         //tmp.write_in_att_format(stdout, 1);
 
           tmp.output_project().minimize();
           retval.subtract(tmp).minimize();
@@ -953,14 +958,62 @@ namespace hfst
           return rightPart;
       }
 
+      // .#. ?* <:0 0:> ?* .#.
+      // filters out empty string
+        HfstTransducer oneBetterthanNoneConstraint( const HfstTransducer &uncondidtionalTr )
+        {
+            ImplementationType type = uncondidtionalTr.get_type();
+            HfstTokenizer TOK;
+            TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+            TOK.add_multichar_symbol(".#.");
+
+            String leftMarker("@LM@");
+            String rightMarker("@RM@");
+            TOK.add_multichar_symbol(leftMarker);
+            TOK.add_multichar_symbol(rightMarker);
+
+            // Identity (normal)
+            HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+            HfstTransducer identity (identityPair);
+            identity.repeat_star().minimize();
+
+            HfstTransducer leftBracketToZero(leftMarker, "@_EPSILON_SYMBOL_@", TOK, type);
+            HfstTransducer rightBracketToZero(rightMarker, "@_EPSILON_SYMBOL_@", TOK, type);
 
 
-      // ?* <:0 [B:0]* [I-B] [ B:0 | 0:B | ?-B ]*
+            HfstTransducer boundary(".#.", TOK, type);
+            HfstTransducer Constraint(boundary);
+            Constraint.concatenate(identity);
+            Constraint.concatenate(leftBracketToZero)
+               .concatenate(rightBracketToZero)
+               .concatenate(boundary)
+               .concatenate(identity)
+               .minimize();
+
+//            printf("Constraint: \n");
+//            Constraint.write_in_att_format(stdout, 1);
+
+            //// Compose with unconditional replace transducer
+            // tmp = t.1 .o. Constr .o. t.1
+            // (t.1 - tmp.2) .o. t
+
+
+            HfstTransducer retval(type);
+            retval = constraintComposition(uncondidtionalTr, Constraint);
+
+
+            return retval;
+        }
+
+
+
+      // .#. ?* <:0 [B:0]* [I-B] [ B:0 | 0:B | ?-B ]* .#.
       HfstTransducer leftMostConstraint( const HfstTransducer &uncondidtionalTr )
       {
           HfstTokenizer TOK;
           TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
           TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
+          TOK.add_multichar_symbol(".#.");
 
           String leftMarker("@LM@");
           String rightMarker("@RM@");
@@ -990,6 +1043,8 @@ namespace hfst
           HfstTransducer B(leftBracket);
           B.disjunct(rightBracket).minimize();
           // (B:0)*
+
+
           HfstTransducer bracketsToEpsilonStar(B);
           bracketsToEpsilonStar.cross_product(epsilon).minimize().repeat_star().minimize();
 
@@ -1000,10 +1055,19 @@ namespace hfst
           HfstTransducer identityPairMinusBracketsPlus(identityPairMinusBrackets);
           identityPairMinusBracketsPlus.repeat_plus().minimize();
 
-
+          /*
+          HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+          HfstTransducer identityPairMinusBracketsOrEpsilon(identityPairMinusBrackets);
+          identityPairMinusBracketsOrEpsilon.disjunct(epsilon).minimize();
+          */
           HfstTransducer LeftBracketToEpsilon(leftMarker, "@_EPSILON_SYMBOL_@", TOK, type);
 
-          HfstTransducer Constraint(identity);
+
+          HfstTransducer boundary(".#.", TOK, type);
+
+          HfstTransducer Constraint(boundary);
+          Constraint.concatenate(identity);
+          //HfstTransducer Constraint(identity);
 
           // ?* <:0 [B:0]* [I-B] [ B:0 | 0:B | ?-B ]*
           Constraint.concatenate(LeftBracketToEpsilon).
@@ -1012,7 +1076,10 @@ namespace hfst
                   concatenate(rightPart).
                   minimize();
 
+          Constraint.concatenate(boundary).minimize();
 
+        //  printf("Constraint: \n");
+         // Constraint.write_in_att_format(stdout, 1);
 
           //// Compose with unconditional replace transducer
           // tmp = t.1 .o. Constr .o. t.1
@@ -2207,20 +2274,24 @@ namespace hfst
           //printf("LM uncondidtionalTr: \n");
           //uncondidtionalTr.write_in_att_format(stdout, 1);
 
+          // for epenthesis rules
+          // it can't have more than one epsilon repetition in a row
+          // it should be before leftMostConstraint
+          uncondidtionalTr = noRepetitionConstraint( uncondidtionalTr );
+
           HfstTransducer retval (leftMostConstraint(uncondidtionalTr));
-          //retval = leftMostConstraint(uncondidtionalTr);
 
-          //printf("leftMostConstraint: \n");
-          //retval.write_in_att_format(stdout, 1);
+          //to remove empty strings
+          retval = oneBetterthanNoneConstraint(retval);
 
+
+          // printf("leftMostConstraint: \n");
+          // retval.write_in_att_format(stdout, 1);
           retval = longestMatchLeftMostConstraint( retval );
 
           //printf("longestMatchLeftMostConstraint: \n");
           //retval.write_in_att_format(stdout, 1);
 
-          // for epenthesis rules
-          // it can't have more than one epsilon repetition in a row
-          retval = noRepetitionConstraint( retval );
 
           retval = removeB2Constraint(retval);
           retval = removeMarkers( retval );
@@ -2244,38 +2315,31 @@ namespace hfst
             uncondidtionalTr = parallelBracketedReplace(ruleVector, true);
         }
 
-        //printf("retval unconditional 1 \n");
-        //uncondidtionalTr.write_in_att_format(stdout, 1);
-
-
-        HfstTransducer retval (leftMostConstraint(uncondidtionalTr));
-
-        //printf("retval leftMostConstraint \n");
-        //retval.write_in_att_format(stdout, 1);
-
-
-
-        retval = longestMatchLeftMostConstraint( retval );
+        // printf("retval unconditional 1 \n");
+        // uncondidtionalTr.write_in_att_format(stdout, 1);
 
         // for epenthesis rules
         // it can't have more than one epsilon repetition in a row
-        retval = noRepetitionConstraint( retval );
+        // it should be before leftMostConstraint
+        uncondidtionalTr = noRepetitionConstraint( uncondidtionalTr );
+        //printf("uncondidtionalTr epenthesis \n");
+        //uncondidtionalTr.write_in_att_format(stdout, 1);
+
+         HfstTransducer retval (leftMostConstraint(uncondidtionalTr));
 
 
-//        printf("retval epenthesis \n");
- //       retval.write_in_att_format(stdout, 1);
+        //to remove empty strings
+        retval = oneBetterthanNoneConstraint(retval);
 
-
-
+        retval = longestMatchLeftMostConstraint( retval );
+       //printf("retval longestMatchLeftMostConstraint \n");
+       //retval.write_in_att_format(stdout, 1);
 
         // remove LM2, RM2
         retval = removeB2Constraint(retval);
 
-//        printf("retval removeB2Constraint \n");
-//        retval.write_in_att_format(stdout, 1);
-
-
-
+        //printf("retval removeB2Constraint \n");
+        //retval.write_in_att_format(stdout, 1);
 
         retval = removeMarkers( retval );
 
@@ -2285,8 +2349,8 @@ namespace hfst
         // deals with boundary symbol
         retval = applyBoundaryMark( retval );
 
-//        printf("LM applyBoundaryMark: \n");
-//        retval.write_in_att_format(stdout, 1);
+     // printf("LM applyBoundaryMark: \n");
+     // retval.write_in_att_format(stdout, 1);
 
         return retval;
       }
@@ -2370,17 +2434,21 @@ namespace hfst
           HfstTransducer uncondidtionalTr(bracketedReplace(rule, true));
           //    uncondidtionalTr = bracketedReplace(rule, true);
 
+          // for epenthesis rules
+          // it can't have more than one epsilon repetition in a row
+          //has to be before leftMostConstraint
+          uncondidtionalTr = noRepetitionConstraint( uncondidtionalTr );
+
           HfstTransducer retval (leftMostConstraint(uncondidtionalTr));
-          //retval = leftMostConstraint(uncondidtionalTr);
+          //to remove empty strings
+          retval = oneBetterthanNoneConstraint(retval);
+
           retval = shortestMatchLeftMostConstraint( retval );
 
           //printf("sh tr: \n");
           //retval.write_in_att_format(stdout, 1);
 
 
-          // for epenthesis rules
-          // it can't have more than one epsilon repetition in a row
-          retval = noRepetitionConstraint( retval );
           // remove LM2, RM2
           retval = removeB2Constraint(retval);
 
@@ -2405,18 +2473,21 @@ namespace hfst
             uncondidtionalTr = parallelBracketedReplace(ruleVector, true);
         }
 
+        // for epenthesis rules
+        // it can't have more than one epsilon repetition in a row
+        uncondidtionalTr = noRepetitionConstraint( uncondidtionalTr );
+
 
         HfstTransducer retval (leftMostConstraint(uncondidtionalTr));
-        //retval = leftMostConstraint(uncondidtionalTr);
+
+        //to remove empty strings
+        retval = oneBetterthanNoneConstraint(retval);
+
         retval = shortestMatchLeftMostConstraint( retval );
 
         //printf("sh tr: \n");
         //retval.write_in_att_format(stdout, 1);
 
-
-        // for epenthesis rules
-        // it can't have more than one epsilon repetition in a row
-        retval = noRepetitionConstraint( retval );
         // remove LM2, RM2
         retval = removeB2Constraint(retval);
 
@@ -2766,6 +2837,8 @@ int main(int argc, char * argv[])
 
           // std::cout << "----- Type --------- " << i << std::endl;
 
+
+
             // a -> b || ? - a _
             //test8( types[i] );
 
@@ -2828,7 +2901,6 @@ int main(int argc, char * argv[])
             test7d( types[i] );
             // ? -> x , a -> b
             test7e( types[i] );
-
             // markup parallel rules
             //test7e( types[i] );
 
@@ -2837,6 +2909,8 @@ int main(int argc, char * argv[])
 
             // a -> b b , a -> b
             test7g( types[i] );
+            //[..] @-> a;
+            test7h( types[i] );
 
             test9a( types[i] );
             test9b( types[i] );
@@ -2864,9 +2938,6 @@ int main(int argc, char * argv[])
             restriction_test8( types[i] );
 
             before_test1( types[i] );
-
-
-
           }
 
           std::cout << "ok" << std::endl;
