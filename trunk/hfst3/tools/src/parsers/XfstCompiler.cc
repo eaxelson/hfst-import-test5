@@ -457,8 +457,10 @@ namespace xfst {
         return *this;
       }
 
+
+
   XfstCompiler&
-  XfstCompiler::convert_net()
+  XfstCompiler::lookup_optimize()
   {
     if (stack_.size() < 1)
       {
@@ -472,7 +474,9 @@ namespace xfst {
     if (t->get_type() == hfst::HFST_OL_TYPE ||
         t->get_type() == hfst::HFST_OLW_TYPE)
       {
-        to_format = format_;
+        hfst_fprintf(warnstream_, "Network is already optimized for lookup.\n");
+        prompt();
+        return *this;
       }
     else if (t->get_type() == hfst::TROPICAL_OPENFST_TYPE ||
              t->get_type() == hfst::LOG_OPENFST_TYPE)
@@ -484,9 +488,34 @@ namespace xfst {
         to_format = hfst::HFST_OL_TYPE;
       }
 
-    if (! hfst::HfstTransducer::is_safe_conversion(t->get_type(), to_format))
+    if (verbose_)
       {
-        hfst_fprintf(warnstream_, "warning: loss of information during conversion is possible\n");
+        hfst_fprintf(warnstream_, "converting transducer type from %s to %s, this might take a while...\n",
+                     hfst::implementation_type_to_format(t->get_type()),
+                     hfst::implementation_type_to_format(to_format));
+      }
+    t->convert(to_format);
+    prompt();
+    return *this;
+  }
+
+  XfstCompiler&
+  XfstCompiler::remove_optimization()
+  {
+    if (stack_.size() < 1)
+      {
+        hfst_fprintf(stderr, "Empty stack.\n");
+        prompt();
+        return *this;
+      }
+    HfstTransducer * t = stack_.top();
+
+    if (t->get_type() != hfst::HFST_OL_TYPE &&
+        t->get_type() != hfst::HFST_OLW_TYPE)
+      {
+        hfst_fprintf(warnstream_, "Network is already in ordinary format.\n");
+        prompt();
+        return *this;
       }
 
     if (verbose_)
@@ -494,8 +523,12 @@ namespace xfst {
         hfst_fprintf(warnstream_, "converting transducer type from %s to %s, this might take a while...\n",
                      hfst::implementation_type_to_format(t->get_type()),
                      hfst::implementation_type_to_format(format_));
+        if (! hfst::HfstTransducer::is_safe_conversion(t->get_type(), format_))
+          {
+            hfst_fprintf(warnstream_, "warning: converting from weighted to unweighted format, loss of information is possible\n");
+          }
       }
-    t->convert(to_format);
+    t->convert(format_);
     prompt();
     return *this;
   }
@@ -648,7 +681,8 @@ namespace xfst {
             if (t->get_type() == hfst::HFST_OL_TYPE ||
                 t->get_type() == hfst::HFST_OLW_TYPE)
               {
-                hfst_fprintf(stderr, "Operation not supported for optimized lookup format.\n");
+                hfst_fprintf(stderr, "Operation not supported for optimized lookup format. "
+                             "Consider 'remove-optimization' to convert into ordinary format.\n");
                 prompt();
                 return *this;
               }
@@ -1363,6 +1397,15 @@ namespace xfst {
   XfstCompiler::open_hfst_input_stream(const char * infilename)
   {
     assert(infilename != NULL);
+    
+    FILE * infile = hfst::xfst::xfst_fopen(infilename, "r");
+    if (infile == NULL)
+      {
+        xfst_fail();
+        return NULL;
+      }
+    hfst::xfst::xfst_fclose(infile, infilename);
+
     HfstInputStream* instream = 0;
     try 
       {
@@ -1597,7 +1640,8 @@ namespace xfst {
     if (retval->get_type() == hfst::HFST_OL_TYPE ||
         retval->get_type() == hfst::HFST_OLW_TYPE)
       {
-        hfst_fprintf(stderr, "Operation not supported for optimized lookup format.\n");
+        hfst_fprintf(stderr, "Operation not supported for optimized lookup format. "
+                     "Consider 'remove-optimization' to convert into ordinary format.\n");
         prompt();
         return NULL;
       }
@@ -2948,9 +2992,9 @@ namespace xfst {
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
-  XfstCompiler::read_spaced(FILE* infile)
+  XfstCompiler::read_spaced_from_file(const char * filename)
     {
-      return this->read_text_or_spaced(infile, true); // spaces are used
+      return this->read_text_or_spaced(filename, true); // spaces are used
     }
   XfstCompiler& 
   XfstCompiler::read_spaced(const char* /* indata */)
@@ -2959,8 +3003,16 @@ namespace xfst {
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
-  XfstCompiler::read_text_or_spaced(FILE* infile, bool spaces)
+  XfstCompiler::read_text_or_spaced(const char * filename, bool spaces)
   {
+    FILE * infile = hfst::xfst::xfst_fopen(filename, "r");
+    if (infile == NULL)
+      {
+        hfst_fprintf(errorstream_, "cannot read text file\n");
+        prompt();
+        return *this;
+      }
+
     HfstTransducer * tmp = new HfstTransducer(format_);
     StringVector mcs; // no multichar symbols
     HfstStrings2FstTokenizer tok(mcs, hfst::internal_epsilon);
@@ -2975,14 +3027,15 @@ namespace xfst {
         free(line);
       }
     
+    hfst::xfst::xfst_fclose(infile, filename);
     tmp->minimize();
     stack_.push(tmp);
     PRINT_INFO_PROMPT_AND_RETURN_THIS;
   }
   XfstCompiler& 
-  XfstCompiler::read_text(FILE* infile)
+  XfstCompiler::read_text_from_file(const char * filename)
     {
-      return this->read_text_or_spaced(infile, false); // spaces are not used
+      return this->read_text_or_spaced(filename, false); // spaces are not used
     }
   XfstCompiler& 
   XfstCompiler::read_text(const char* /* indata */)
@@ -3761,7 +3814,14 @@ namespace xfst {
   {
     HfstTransducer * t = NULL;
 
-    FILE * infile = hfst::xfst::xfst_fopen(filename, "r");        
+    FILE * infile = hfst::xfst::xfst_fopen(filename, "r");
+    if (infile == NULL)
+      {
+        hfst_fprintf(errorstream_, "could not read lexc file\n");
+        xfst_fail();
+        PROMPT_AND_RETURN_THIS;
+      }
+
     lexc_.parse(infile);
     t = lexc_.compileLexical();
     hfst::xfst::xfst_fclose(infile, filename);
@@ -3785,8 +3845,16 @@ namespace xfst {
   }
 
   XfstCompiler&
-  XfstCompiler::read_att(FILE* infile)
+  XfstCompiler::read_att_from_file(const char * filename)
     {
+      FILE * infile = hfst::xfst::xfst_fopen(filename, "r");
+      if (infile == NULL)
+        {
+          hfst_fprintf(errorstream_, "could not read att file\n");
+          xfst_fail();
+          PROMPT_AND_RETURN_THIS;
+        }
+
       try
         {
           HfstTransducer * tmp = new HfstTransducer(infile, format_);
@@ -3796,9 +3864,11 @@ namespace xfst {
         }
       catch (const HfstException & e)
         {
+          hfst::xfst::xfst_fclose(infile, filename);
           hfst_fprintf(errorstream_, "error reading file in att format\n");
           xfst_fail();
         }
+      hfst::xfst::xfst_fclose(infile, filename);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 

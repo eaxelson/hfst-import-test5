@@ -275,7 +275,6 @@ bool handle_case(const std::string & names, const std::string & arguments,
   COMMAND("complete net, complete", "", "completes the FSM");
   COMMAND("compose net, compose", "", "composes networks on stack");
   COMMAND("concatenate net, concatenate", "", "concatenates networks on stack");
-  COMMAND("convert net, convert", "", "converts between optimized lookup and standard formats");
   COMMAND("crossproduct net, crossproduct", "", "cross-product of top two FSMs on stack");
   CONT_COMMAND("define", "<name> <r.e.>", "define a network");
   COMMAND("define", "<fname>(<v1,..,vn>) <r.e.>", "define function");
@@ -304,6 +303,7 @@ bool handle_case(const std::string & names, const std::string & arguments,
   AMBIGUOUS_COMMAND("load", "load stack, load defined");
   COMMAND("load stack, load", "<filename>", "Loads networks and pushes them on the stack");
   COMMAND("load defined, loadd", "<filename>", "Restores defined networks from file");
+  COMMAND("lookup-optimize, lookup-optimise", "", "optimize top network for fast lookup");
   COMMAND("lower-side net, lower-side", "", "takes lower projection of top FSM");
   COMMAND("minimize net, minimize, minimise net, minimise", "", "minimizes top FSM");
   COMMAND("minus net, minus, subtract", "", "subtracts networks on stack");
@@ -361,6 +361,7 @@ bool handle_case(const std::string & names, const std::string & arguments,
   COMMAND("read spaced-text, rs", "(<filename>)", "compile space-separated words/word-pairs separated by newlines into a FST");
   COMMAND("read text, rt", "(<filename>)", "compile a list of words separated by newlines into an automaton");
   //"read cmatrix <filename>", "read a confusion matrix and associate it with the network on top of the stack"
+  COMMAND("remove-optimization, remove-optimisation", "", "convert top network (optimized for fast lookup) to ordinary format");
   COMMAND("reverse net, reverse", "", "reverses top FSM");
   COMMAND("rotate stack, rotate", "", "rotates stack");
   COMMAND("save defined, saved", "<filename>", "save all defined networks to binary file");
