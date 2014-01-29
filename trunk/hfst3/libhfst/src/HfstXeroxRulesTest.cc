@@ -3173,3 +3173,51 @@ void test7g( ImplementationType type )
     //tmp2.write_in_att_format(stdout, 1);
     assert(tmp2.compare(result1));
 }
+
+//[..] @-> a;
+void test7h( ImplementationType type )
+{
+    HfstTokenizer TOK;
+    TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+    TOK.add_multichar_symbol("@_IDENTITY_SYMBOL_@");
+
+    // Mapping
+
+    HfstTransducer leftMapping1("@_EPSILON_SYMBOL_@", TOK, type);
+    HfstTransducer rightMapping1("a", TOK, type);
+    HfstTransducerPair mappingPair1(leftMapping1, rightMapping1);
+
+    HfstTransducerPairVector mappingPairVector1;
+    mappingPairVector1.push_back(mappingPair1);
+
+    // without context
+    Rule rule(mappingPairVector1);
+
+    HfstTransducer replaceTr(type);
+    replaceTr = replace_leftmost_longest_match(rule);
+
+
+//    printf("replaceTr: \n");
+//    replaceTr.write_in_att_format(stdout, 1);
+
+    //result
+    /*
+    0 1     @0@     a       0.000000
+    1 0     @_IDENTITY_SYMBOL_@    @_IDENTITY_SYMBOL_@      0.000000
+    1 0     a       a       0.000000
+    0 0.000000
+     *
+     */
+
+    HfstBasicTransducer bt;
+    bt.add_transition(0, HfstBasicTransition(1, "@_EPSILON_SYMBOL_@", "a", 0) );
+    bt.add_transition(1, HfstBasicTransition(0, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
+    bt.add_transition(1, HfstBasicTransition(0, "a", "a", 0) );
+    bt.set_final_weight(1, 0);
+
+    HfstTransducer result1(bt, type);
+//    printf("result1: \n");
+//    result1.write_in_att_format(stdout, 1);
+    assert(replaceTr.compare(result1));
+
+}
