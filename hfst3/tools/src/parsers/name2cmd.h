@@ -102,7 +102,8 @@ namespace hfst {
     xfst_mapping(COMPLETE_CMD, "complete net, complete");
     xfst_mapping(COMPOSE_CMD, "compose net, compose");
     xfst_mapping(CONCATENATE_CMD, "concatenate net, concatenate");
-    xfst_mapping(CONVERT_CMD, "convert net, convert");
+    xfst_mapping(LOOKUP_OPTIMIZE_CMD, "lookup-optimize, lookup-optimise");
+    xfst_mapping(REMOVE_OPTIMIZATION_CMD, "remove-optimization, remove-optimisation");
     xfst_mapping(CROSSPRODUCT_CMD, "crossproduct net, crossproduct");
     xfst_mapping(DEFINE_CMD, "define");
     xfst_mapping(DETERMINIZE_CMD, "determinize net, determinize, determinize net, determinise");

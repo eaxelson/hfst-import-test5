@@ -98,7 +98,9 @@ class XfstCompiler
   //! @todo lookmed is missing from HFST
   XfstCompiler& apply_med(const char* indata);
 
-  XfstCompiler& convert_net();
+  XfstCompiler& lookup_optimize();
+
+  XfstCompiler& remove_optimization();
 
   //! @brief Define alias for command sequence
   XfstCompiler& define_alias(const char* name, const char* commands);
@@ -352,19 +354,19 @@ class XfstCompiler
   //! @brief Read prolog form transducer from @a indata
   XfstCompiler& read_prolog(const char* indata);
   //! @brief Read spaced form transducer from @a infile
-  XfstCompiler& read_spaced(FILE* infile);
+  XfstCompiler& read_spaced_from_file(const char * filename);
   //! @brief Read spaced form transducer from @a indata
   XfstCompiler& read_spaced(const char* indata);
   //! @brief Read text form transducer from @a infile
-  XfstCompiler& read_text(FILE* infile);
+  XfstCompiler& read_text_from_file(const char * filename);
   //! @brief Read text form transducer from @a indata
   XfstCompiler& read_text(const char* indata);
   //! @brief Read lexicons from @a infile
   XfstCompiler& read_lexc_from_file(const char * filename);
   //! @brief Read lexicons from @a indata
   XfstCompiler& read_lexc(const char* indata);
-  //! @brief Read a transducer in att format from @a infile
-  XfstCompiler& read_att(FILE* infile);
+  //! @brief Read a transducer in att format from file @a filename
+  XfstCompiler& read_att_from_file(const char * filename);
   //! @brief Write top transducer in att format to @a outfile
   XfstCompiler& write_att(FILE* outfile);
 
@@ -528,7 +530,7 @@ class XfstCompiler
   //! @brief Read strings (with or without spaces between the symbols,
   //! as defined by \a spaces) from \a infile, disjunct them into
   //! a single transducer and push it to the stack.
-  XfstCompiler& read_text_or_spaced(FILE *infile, bool spaces);
+  XfstCompiler& read_text_or_spaced(const char * filename, bool spaces);
 
   //! @brief Convert format of \a t read from file \a filename to common
   //! format used by this xfst compiler and print a warning message 

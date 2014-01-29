@@ -189,8 +189,12 @@ LWSP [\t ]*
     return CONCATENATE;
 }
 
-^{LWSP}("convert net"|"convert") {
-    return CONVERT_NET;
+^{LWSP}("lookup-optimize"|"lookup-optimise") {
+    return LOOKUP_OPTIMIZE;
+}
+
+^{LWSP}("remove-optimization"|"remove-optimisation") {
+    return REMOVE_OPTIMIZATION;
 }
 
 

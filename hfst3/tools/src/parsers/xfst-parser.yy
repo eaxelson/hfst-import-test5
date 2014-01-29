@@ -85,7 +85,8 @@ int hxfstlex(void);
        COMPILE_REPLACE_UPPER CLEANUP ADD_PROPS PRINT_SIGMA_WORD_COUNT SHUFFLE
        COLON SAVE_TEXT DETERMINIZE SIGMA COMPILE_REPLACE_LOWER UNION
        PRINT_DIR LIST LOWER_SIDE MINIMIZE MINUS PRINT_NAME PRUNE_NET
-       PUSH_DEFINED READ_LEXC READ_ATT TWOSIDED_FLAGS WRITE_ATT ASSERT LABEL_NET CONVERT_NET
+       PUSH_DEFINED READ_LEXC READ_ATT TWOSIDED_FLAGS WRITE_ATT ASSERT LABEL_NET
+       LOOKUP_OPTIMIZE REMOVE_OPTIMIZATION
        XFST_ERROR
        NEWLINE
 
@@ -168,8 +169,11 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->apply_med($3);
             free($3);
        }
-       | CONVERT_NET END_COMMAND {
-            hfst::xfst::xfst_->convert_net();
+       | LOOKUP_OPTIMIZE END_COMMAND {
+            hfst::xfst::xfst_->lookup_optimize();
+       }
+       | REMOVE_OPTIMIZATION END_COMMAND {
+            hfst::xfst::xfst_->remove_optimization();
        }
        // ambiguous
        | AMBIGUOUS END_COMMAND {
@@ -270,6 +274,10 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
        }
        | LOADS NAMETOKEN END_COMMAND {
+            hfst::xfst::xfst_->load_stack($2);
+            free($2);
+       }
+       | LOADS NAMETOKEN SEMICOLON END_COMMAND {
             hfst::xfst::xfst_->load_stack($2);
             free($2);
        }
@@ -855,39 +863,34 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
        }
        | READ_SPACED REDIRECT_IN END_COMMAND {
-            FILE * f = hfst::xfst::xfst_fopen($2, "r");
-            hfst::xfst::xfst_->read_spaced(f);
-            hfst::xfst::xfst_fclose(f, $2);
+            hfst::xfst::xfst_->read_spaced_from_file($2);
+            free($2);
+       }
+       | READ_SPACED NAMETOKEN END_COMMAND {
+            hfst::xfst::xfst_->read_spaced_from_file($2);
+            free($2);
        }
        | READ_SPACED NAMETOKEN_LIST CTRLD {
             hfst::xfst::xfst_->read_spaced($2);
             free($2);
        }
        | READ_TEXT REDIRECT_IN END_COMMAND {
-            FILE * f = hfst::xfst::xfst_fopen($2, "r");
-            hfst::xfst::xfst_->read_text(f);
-            hfst::xfst::xfst_fclose(f, $2);
+            hfst::xfst::xfst_->read_text_from_file($2);
+            free($2);
        }
        | READ_TEXT NAMETOKEN END_COMMAND {
-            FILE * f = hfst::xfst::xfst_fopen($2, "r");
-            hfst::xfst::xfst_->read_text(f);
-            hfst::xfst::xfst_fclose(f, $2);
+            hfst::xfst::xfst_->read_text_from_file($2);
+            free($2);
        }
        | READ_TEXT NAMETOKEN_LIST CTRLD {
             hfst::xfst::xfst_->read_text($2);
             free($2);
        }
        | READ_LEXC NAMETOKEN END_COMMAND {
-            //FILE * f = hfst::xfst::xfst_fopen($2, "r");
-            //hfst::xfst::xfst_->read_lexc(f);
-            //hfst::xfst::xfst_fclose(f, $2);
             hfst::xfst::xfst_->read_lexc_from_file($2);
             free($2);
        }
        | READ_LEXC NAMETOKEN SEMICOLON END_COMMAND {
-            //FILE * f = hfst::xfst::xfst_fopen($2, "r");
-            //hfst::xfst::xfst_->read_lexc(f);
-            //hfst::xfst::xfst_fclose(f, $2);
             hfst::xfst::xfst_->read_lexc_from_file($2);
             free($2);
        }
@@ -895,9 +898,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->read_lexc_from_file("");
        }
        | READ_ATT NAMETOKEN END_COMMAND {
-            FILE * f = hfst::xfst::xfst_fopen($2, "r");
-            hfst::xfst::xfst_->read_att(f);
-            hfst::xfst::xfst_fclose(f, $2);
+            hfst::xfst::xfst_->read_att_from_file($2);
             free($2);
        }
        | WRITE_ATT END_COMMAND {
