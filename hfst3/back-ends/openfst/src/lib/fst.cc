@@ -18,6 +18,7 @@
 // \file
 // FST definitions.
 
+#include "../../../../config.h"
 #include <fst/fst.h>
 
 // Include these so they are registered

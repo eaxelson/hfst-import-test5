@@ -19,6 +19,7 @@
 // \file
 // Classes to provide symbol-to-integer and integer-to-symbol mappings.
 
+#include "../../../../config.h" // HFST ADDITION
 #include <fst/symbol-table.h>
 #include <fst/util.h>
 

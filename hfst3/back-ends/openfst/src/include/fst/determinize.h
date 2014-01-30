@@ -24,9 +24,17 @@
 
 #include <algorithm>
 #include <climits>
+
+#ifdef HAVE_TR1_UNORDERED_MAP
 #include <tr1/unordered_map>
 using std::tr1::unordered_map;
 using std::tr1::unordered_multimap;
+#else
+#include <unordered_map>
+using std::unordered_map;
+using std::unordered_multimap;
+#endif
+
 #include <map>
 #include <fst/slist.h>
 #include <string>

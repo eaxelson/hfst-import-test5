@@ -22,9 +22,17 @@
 #define FST_LIB_FACTOR_WEIGHT_H__
 
 #include <algorithm>
+
+#ifdef HAVE_TR1_UNORDERED_MAP
 #include <tr1/unordered_map>
 using std::tr1::unordered_map;
 using std::tr1::unordered_multimap;
+#else
+#include <unordered_map>
+using std::unordered_map;
+using std::unordered_multimap;
+#endif
+
 #include <fst/slist.h>
 #include <string>
 #include <utility>

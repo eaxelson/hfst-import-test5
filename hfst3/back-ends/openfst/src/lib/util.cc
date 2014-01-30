@@ -20,6 +20,7 @@
 
 #include <cctype>
 #include <string>
+#include "../../../../config.h" // HFST ADDITION
 #include <fst/util.h>
 
 namespace fst {
