@@ -1,92 +1,90 @@
 Kaikki	
-Kaikki	Kaikki<Pron><sg><nom>
+Kaikki	Kaikki Pron Qnt Nom Sg
 
 ihmiset	
-ihmiset	ihminen<N><pl><nom>
+ihmiset	ihminen N Nom Pl
 
 syntyvät	
-syntyvät	syntyä<V><act><indv><pres><pl3>
-syntyvät	syntyä<act><pcpva><pl><nom>
+syntyvät	syntyä PrsPrc Act Pos Nom Pl
+syntyvät	syntyä V Prs Act Pl3
 
 vapaina	
-vapaina	vapaa<A><pl><ess>
-vapaina	vapaa<N><pl><ess>
+vapaina	vapaa A Pos Ess Pl
+vapaina	vapaa N Ess Pl
 
 ja	
-ja	ja<CC>
+ja	ja CC
 
 tasavertaisina	
-tasavertaisina	tasa#vertainen<A><pl><ess>
-tasavertaisina	tasa#vertainen<N><pl><ess>
-tasavertaisina	tasavertainen<A><pl><ess>
+tasavertaisina	tasa#vertainen A Pos Ess Pl
+tasavertaisina	tasa#vertainen N Ess Pl
 
 arvoltaan	
-arvoltaan	arvo<N><sg><abl><pxpl3>
-arvoltaan	arvo<N><sg><abl><pxsg3>
+arvoltaan	arvo N Abl Sg Px3
 
 ja	
-ja	ja<CC>
+ja	ja CC
 
 oikeuksiltaan	
-oikeuksiltaan	oikeus<N><pl><abl><pxpl3>
-oikeuksiltaan	oikeus<N><pl><abl><pxsg3>
+oikeuksiltaan	oikeus N Abl Pl Px3
 
 .	
-.	.<Punct><sent>
+.	. Punct
 
 Heille	
-Heille	He<Pron><pl><all>
+Heille	He Pron Pers All Pl
 
 on	
-on	olla<V><act><indv><pres><sg3>
+on	olla V Prs Act Sg3
 
 annettu	
-annettu	annettu<A><sg><nom>
-annettu	antaa<V><pss><indv><past><conneg>
-annettu	antaa<pss><pcpnut><sg><nom>
+annettu	annettu A Pos Nom Sg
+annettu	antaa PrfPrc Pass Pos Nom Sg
+annettu	antaa V Pst Pass ConNeg
 
 järki	
-järki	järki<N><sg><nom>
+järki	järki N Nom Sg
 
 ja	
-ja	ja<CC>
+ja	ja CC
 
 omatunto	
-omatunto	omatunto<N><sg><nom>
+omatunto	omatunto N Nom Sg
+omatunto	omatunto N Sg Nom
 
 ,	
-,	,<Punct>
+,	, Punct
 
 ja	
-ja	ja<CC>
+ja	ja CC
 
 heidän	
-heidän	he<Pron><pl><gen>
+heidän	he Pron Pers Gen Pl
 
 on	
-on	olla<V><act><indv><pres><sg3>
+on	olla V Prs Act Sg3
 
 toimittava	
-toimittava	toimia<pss><pcpva><sg><nom>
-toimittava	toimittaa<act><pcpva><sg><nom>
+toimittava	toimia PrsPrc Pass Pos Nom Sg
+toimittava	toimittaa PrsPrc Act Pos Nom Sg
 
 toisiaan	
-toisiaan	toinen<N><pl><par><pxpl3>
-toisiaan	toinen<N><pl><par><pxsg3>
-toisiaan	toinen<Num><pl><par><pxpl3>
-toisiaan	toinen<Num><pl><par><pxsg3>
+toisiaan	toinen N Par Pl Px3
+toisiaan	toinen Num Ord Par Pl Px3
+toisiaan	toinen Ord Par Px3#
+toisiaan	toinen Pron Par Pl Px3
 
 kohtaan	
-kohtaan	kohdata<V><act><indv><pres><sg1>
-kohtaan	kohta<N><sg><ill>
-kohtaan	kohtaan<Adv>
+kohtaan	kohdata V Prs Act Sg1
+kohtaan	kohta N Ill Sg
+kohtaan	kohtaan Adv
 
 veljeyden	
-veljeyden	veljeys<N><sg><gen>
+veljeyden	veljeys N Gen Sg
 
 hengessä	
-hengessä	henki<N><sg><ine>
+hengessä	henki N Ine Sg
 
 .	
-.	.<Punct><sent>
+.	. Punct
 
