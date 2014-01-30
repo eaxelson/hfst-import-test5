@@ -20,9 +20,12 @@
 #ifndef FST_LIB_SLIST_H__
 #define FST_LIB_SLIST_H__
 
-#include <fst/config.h>
+//#include <fst/config.h> -->
+#include <../../../../config.h>
 
-#ifdef HAVE___GNU_CXX__SLIST_INT_
+
+//#ifdef HAVE___GNU_CXX__SLIST_INT_ -->
+#ifdef HAVE_EXT_SLIST_H
 
 #include <ext/slist>
 
@@ -56,6 +59,6 @@ template <typename T> class slist : public list<T> {
 
 }  // namespace fst
 
-#endif  // HAVE___GNU_CXX__SLIST_INT_
+#endif  // HAVE___GNU_CXX__SLIST_INT_ --> HAVE_EXT_SLIST_H_
 
 #endif  // FST_LIB_SLIST_H__

@@ -19,6 +19,7 @@
 #ifdef WINDOWS
 #include "back-ends/openfstwin/src/include/fst/fstlib.h"
 #else
+#include "../../../config.h"
 #include "back-ends/openfst/src/include/fst/fstlib.h"
 #endif // WINDOWS
 

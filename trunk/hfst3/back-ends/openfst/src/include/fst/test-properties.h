@@ -21,9 +21,15 @@
 #ifndef FST_LIB_TEST_PROPERTIES_H__
 #define FST_LIB_TEST_PROPERTIES_H__
 
+#ifdef HAVE_TR1_UNORDERED_SET
 #include <tr1/unordered_set>
 using std::tr1::unordered_set;
 using std::tr1::unordered_multiset;
+#else
+#include <unordered_set>
+using std::unordered_set;
+using std::unordered_multiset;
+#endif
 
 #include <fst/dfs-visit.h>
 #include <fst/connect.h>

@@ -18,7 +18,7 @@
 // Google-style flag handling definitions
 
 #include <cstring>
-
+#include "../../../../config.h" // HFST ADDITION
 #include <fst/compat.h>
 #include <fst/flags.h>
 

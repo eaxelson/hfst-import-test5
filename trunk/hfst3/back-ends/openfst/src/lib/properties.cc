@@ -19,6 +19,7 @@
 // Functions for updating property bits for various FST operations and
 // string names of the properties.
 
+#include "../../../../config.h" // HFST ADDITION
 #include <fst/properties.h>
 
 #include <stddef.h>

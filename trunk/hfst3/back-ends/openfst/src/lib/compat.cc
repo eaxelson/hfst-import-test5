@@ -18,6 +18,7 @@
 // Google compatibility definitions.
 
 #include <cstring>
+#include "../../../../config.h" // HFST ADDITION
 #include <fst/compat.h>
 
 using namespace std;

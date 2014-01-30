@@ -14,6 +14,7 @@
 // Copyright 2005-2010 Google, Inc.
 // Author: sorenj@google.com (Jeffrey Sorensen)
 
+#include "../../../../config.h"
 #include <fst/symbol-table-ops.h>
 
 namespace fst {

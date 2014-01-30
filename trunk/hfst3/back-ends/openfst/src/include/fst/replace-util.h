@@ -25,12 +25,27 @@
 
 #include <vector>
 using std::vector;
+
+#ifdef HAVE_TR1_UNORDERED_MAP
 #include <tr1/unordered_map>
 using std::tr1::unordered_map;
 using std::tr1::unordered_multimap;
+#else
+#include <unordered_map>
+using std::unordered_map;
+using std::unordered_multimap;
+#endif
+
+#ifdef HAVE_TR1_UNORDERED_SET
 #include <tr1/unordered_set>
 using std::tr1::unordered_set;
 using std::tr1::unordered_multiset;
+#else
+#include <unordered_set>
+using std::unordered_set;
+using std::unordered_multiset;
+#endif
+
 #include <map>
 
 #include <fst/connect.h>

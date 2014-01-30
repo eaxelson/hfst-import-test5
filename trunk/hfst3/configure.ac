@@ -623,6 +623,35 @@ AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h]
 AC_CHECK_HEADERS([libxml/tree.h libxml/mem.h])
 AC_LANG_PUSH([C++])
 
+AC_CHECK_HEADERS([tr1/unordered_map], [], [],
+[#ifdef HAVE_TR1_UNORDERED_MAP
+#include <tr1/unordered_map>
+#endif
+])
+AC_CHECK_HEADERS([tr1/unordered_set], [], [],
+[#ifdef HAVE_TR1_UNORDERED_SET
+#include <tr1/unordered_set>
+#endif
+])
+
+AC_CHECK_HEADERS([unordered_map], [], [],
+[#ifdef HAVE_UNORDERED_MAP
+#include <unordered_map>
+#endif
+])
+AC_CHECK_HEADERS([unordered_set], [], [],
+[#ifdef HAVE_UNORDERED_SET
+#include <unordered_set>
+#endif
+])
+
+AS_IF([test "x$ac_cv_header_tr1_unordered_map" = "xno" -a "x$ac_cv_header_unordered_map" = "xno"],
+            [AC_MSG_ERROR(["unordered_map not found"])])
+AS_IF([test "x$ac_cv_header_tr1_unordered_set" = "xno" -a "x$ac_cv_header_unordered_set" = "xno"],
+            [AC_MSG_ERROR(["unordered_set not found"])])
+
+AC_CHECK_HEADERS([ext/slist])
+
 #AS_IF([test "x$with_sfst" != "xno" -a "x$enable_windows" == "xno"],
 #      [AC_CHECK_HEADERS([sfst/fst.h sfst1/fst.h])])
 AS_IF([test "x$with_sfst" != "xno"],

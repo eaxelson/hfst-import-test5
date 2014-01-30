@@ -135,7 +135,7 @@ bool LabelsToUTF8String(const std::vector<Label>&, string*) {
 
 
 // Define missing hash functions if needed
-#ifndef HAVE_STD__TR1__HASH_LONG_LONG_UNSIGNED_
+/*#ifndef HAVE_STD__TR1__HASH_LONG_LONG_UNSIGNED_
 namespace std {
 namespace tr1 {
 
@@ -147,6 +147,6 @@ template<> struct hash<uint64> {
 
 }
 }
-#endif  // HAVE_STD__TR1__HASH_LONG_LONG_UNSIGNED_
+#endif  // HAVE_STD__TR1__HASH_LONG_LONG_UNSIGNED_ */
 
 #endif  // FST_LIB_COMPAT_H__
