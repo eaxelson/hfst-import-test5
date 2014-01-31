@@ -1,3 +1,500 @@
+2014-01-30 13:22  eaxelson
+
+	* check_installation/morphology_tests/finnish-analyze.output,
+	  check_installation/morphology_tests/finnish-analyze.output.old:
+	  Edited morphology tests so that they agree with changes in
+	  finnish-analyze.sh.
+
+2014-01-30 12:36  eaxelson
+
+	* back-ends/openfst/src/include/fst/accumulator.h,
+	  back-ends/openfst/src/include/fst/arc-map.h,
+	  back-ends/openfst/src/include/fst/compat.h,
+	  back-ends/openfst/src/include/fst/config.h,
+	  back-ends/openfst/src/include/fst/determinize.h,
+	  back-ends/openfst/src/include/fst/encode.h,
+	  back-ends/openfst/src/include/fst/epsnormalize.h,
+	  back-ends/openfst/src/include/fst/equivalent.h,
+	  back-ends/openfst/src/include/fst/factor-weight.h,
+	  back-ends/openfst/src/include/fst/label-reachable.h,
+	  back-ends/openfst/src/include/fst/relabel.h,
+	  back-ends/openfst/src/include/fst/replace-util.h,
+	  back-ends/openfst/src/include/fst/replace.h,
+	  back-ends/openfst/src/include/fst/rmepsilon.h,
+	  back-ends/openfst/src/include/fst/rmfinalepsilon.h,
+	  back-ends/openfst/src/include/fst/slist.h,
+	  back-ends/openfst/src/include/fst/sparse-tuple-weight.h,
+	  back-ends/openfst/src/include/fst/state-map.h,
+	  back-ends/openfst/src/include/fst/symbol-table-ops.h,
+	  back-ends/openfst/src/include/fst/synchronize.h,
+	  back-ends/openfst/src/include/fst/test-properties.h,
+	  back-ends/openfst/src/include/fst/util.h,
+	  back-ends/openfst/src/lib/compat.cc,
+	  back-ends/openfst/src/lib/flags.cc,
+	  back-ends/openfst/src/lib/fst.cc,
+	  back-ends/openfst/src/lib/properties.cc,
+	  back-ends/openfst/src/lib/symbol-table-ops.cc,
+	  back-ends/openfst/src/lib/symbol-table.cc,
+	  back-ends/openfst/src/lib/util.cc, configure.ac,
+	  libhfst/src/implementations/LogWeightTransducer.h,
+	  libhfst/src/implementations/TropicalWeightTransducer.h: Now
+	  checking in configure if tr1::unordered:map/set or
+	  std::unordered_map/set is available.
+
+2014-01-29 12:19  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/HfstXeroxRulesTest.cc: Replace rule longest match bug
+	  fix
+
+2014-01-29 11:23  eaxelson
+
+	* tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/help_message.cc, tools/src/parsers/name2cmd.h,
+	  tools/src/parsers/xfst-lexer.ll,
+	  tools/src/parsers/xfst-parser.yy: Now hfst-xfst gives better
+	  error messages if a file cannot be opened. Removed h-files from
+	  SOURCES in tagger Makefile because they confuse some compilers on
+	  Mac.
+
+2014-01-28 17:30  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: A preliminary version of
+	  DefFun(args... and Map(fun, @txt...)
+
+2014-01-28 17:06  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/test/apply_up.output,
+	  tools/src/parsers/xfst-parser.yy: Now apply up/down are done
+	  using HfstBasicTransducer if the transducer is not in optimized
+	  lookup format, which is relatively fast.
+
+2014-01-28 17:04  eaxelson
+
+	* libhfst/src/HfstTransducer.cc: Removed unnecessary comments.
+
+2014-01-28 15:42  eaxelson
+
+	* tools/src/hfst-lookup.cc, tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h, tools/src/parsers/abbrcmd.h,
+	  tools/src/parsers/help_message.cc, tools/src/parsers/name2cmd.h,
+	  tools/src/parsers/xfst-lexer.ll,
+	  tools/src/parsers/xfst-parser.yy: Added prompt '>' to
+	  hfst-lookup, it can be disabled with option --pipe-mode. Added
+	  command 'convert net' to hfst-xfst to convert between optimized
+	  lookup and standard formats. Now also supporting 'apply up' for
+	  optimized lookup transducers.
+
+2014-01-28 10:10  eaxelson
+
+	* libhfst/src/implementations/SfstTransducer.cc: Removed redundant
+	  declaration of SfstTransducer::harmonize that caused an error on
+	  Mac OS.
+
+2014-01-27 13:39  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/test/define.xfst,
+	  tools/src/parsers/xfst-lexer.ll,
+	  tools/src/parsers/xfst-parser.yy: Added command 'load FILENAME'.
+	  Fixes bug #225. Also allowing a ';' after 'define VARNAME'.
+
+2014-01-27 11:01  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h, tools/src/parsers/hfst-xfst.cc,
+	  tools/src/parsers/test/define.att,
+	  tools/src/parsers/test/define.xfst,
+	  tools/src/parsers/test/test.sh, tools/src/parsers/xfst-lexer.ll,
+	  tools/src/parsers/xfst-parser.yy: Now command 'define foo' is
+	  recognized. Fixes bug #224.
+
+2014-01-24 14:49  eaxelson
+
+	* NSIS/AddHfstLibrary.nsi, NSIS/README, NSIS/README.lexc.txt,
+	  NSIS/README.twolc.txt, NSIS/README.xfst.txt, NSIS/copy_files.sh,
+	  NSIS/hfst.bat, NSIS/hfst_installer.nsi,
+	  NSIS/hfst_python_installer.nsi, NSIS/lexc_installer.nsi,
+	  NSIS/twolc_installer.nsi, NSIS/xfst_installer.nsi: Updated NSIS
+	  files.
+
+2014-01-24 08:54  eaxelson
+
+	* check_installation/test-empty-input.sh,
+	  libhfst/src/HfstFlagDiacritics.h,
+	  test/tools/check-flag-results.sh,
+	  test/tools/create-flag-results.sh, test/tools/empty-input.sh,
+	  tools/src/parsers/test/test.sh: Set permissions of flag check
+	  scripts. Fixed some typos in other tests and in flag diacritic
+	  handling (== instead of = in if condition).
+
+2014-01-23 08:19  eaxelson
+
+	* test/tools/hfst-check-environment.sh,
+	  test/tools/hfst-check-help.sh, test/tools/hfst-check-version.sh:
+	  Added hfst-xfst to the environment, help and version checks.
+
+2014-01-22 14:46  eaxelson
+
+	* test/tools/Makefile.am,
+	  test/tools/fsmbook-tests/hfst-scripts/FinnishProsody.hfst.script,
+	  test/tools/fsmbook-tests/test.sh,
+	  test/tools/fst2strings-functionality.sh,
+	  test/tools/lexc-compiler-functionality.sh,
+	  tools/src/parsers/test/test.sh: Made minor fixes to tests so that
+	  they work correctly on windows and mac too.
+
+2014-01-17 12:57  eaxelson
+
+	* libhfst/src/HfstInputStream.cc, libhfst/src/parsers/xre_parse.yy:
+	  Now HfstInputStream constructor throws an exception if file
+	  cannot be opened. This exception is also handled in the regexp
+	  parser.
+
+2014-01-17 10:06  eaxelson
+
+	* NSIS/lexc_installer.nsi, NSIS/xfst_installer.nsi: Fixed program
+	  naming in NSIS installer.
+
+2014-01-16 16:06  eaxelson
+
+	* configure.ac, libhfst/src/HfstApply.cc,
+	  libhfst/src/HfstInputStream.cc, libhfst/src/HfstInputStream.h,
+	  libhfst/src/HfstOutputStream.cc, libhfst/src/HfstOutputStream.h,
+	  libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/hfst_apply_schemas.h,
+	  libhfst/src/implementations/ConvertLogWeightTransducer.cc,
+	  libhfst/src/implementations/ConvertTransducerFormat.cc,
+	  libhfst/src/implementations/ConvertTransducerFormat.h,
+	  libhfst/src/implementations/Makefile.am: Added experimental
+	  options --enable-no-tools and --with-openfst-log to configure.
+
+2014-01-16 12:42  eaxelson
+
+	* tools/src/hfst-lexc-compiler.cc: Removed unnecessary warnings
+	  from hfst-lexc.
+
+2014-01-16 10:33  eaxelson
+
+	* configure.ac: Fixed a typo in configure file, extension should be
+	  1, not 0.
+
+2014-01-15 13:55  eaxelson
+
+	* NSIS/MoveFileFolder.nsh, NSIS/hfst_installer.nsi,
+	  NSIS/lexc_installer.nsi, NSIS/twolc_installer.nsi,
+	  NSIS/xfst_installer.nsi: Fixed a couple of bugs in NSIS
+	  installers.
+
+2014-01-15 11:14  eaxelson
+
+	* back-ends/sfst/compact.cc: Now creating a variable length array
+	  dynamically to avoid compilation errors.
+
+2014-01-14 14:34  eaxelson
+
+	* NSIS/AddHfstLibrary.nsi, NSIS/CheckLibraries.nsi,
+	  NSIS/README.hfst.txt, NSIS/README.lexc.txt,
+	  NSIS/README.twolc.txt, NSIS/README.txt, NSIS/README.xfst.txt,
+	  NSIS/hfst.bat, NSIS/hfst_installer.nsi,
+	  NSIS/hfst_python_installer.nsi, NSIS/lexc_installer.nsi,
+	  NSIS/twolc_installer.nsi, NSIS/xfst_installer.nsi: Added more
+	  NSIS files for xfst, lexc and twolc distributions.
+
+2014-01-14 11:53  eaxelson
+
+	* configure.ac, test/tools/Makefile.am,
+	  test/tools/create-flag-results.sh, test/tools/empty-input.sh,
+	  test/tools/hfst-check-help.sh, test/tools/hfst-check-version.sh,
+	  test/tools/lexc-compiler-functionality.sh,
+	  test/tools/lexc-functionality.sh,
+	  test/tools/lexc-wrapper-functionality.sh, tools/src/Makefile.am,
+	  tools/src/hfst-lexc-wrapper.cc, tools/src/hfst-lexc.cc,
+	  tools/src/parsers/XfstCompiler.cc: Renamed hfst-lexc2fst to
+	  hfst-lexc and hfst-lexc to hfst-lexc-wrapper.
+
+2014-01-13 14:30  eaxelson
+
+	* NSIS/README.txt, NSIS/ReplaceInFile.nsh, NSIS/hfst_installer.nsi:
+	  Updated a couple of NSIS files.
+
+2014-01-10 15:27  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/hfst-string-conversions.cc,
+	  tools/src/hfst-string-conversions.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/hfst-xfst.cc: Now att format is printed
+	  directly to the console in windows environment.
+
+2014-01-09 14:11  eaxelson
+
+	* tools/src/Makefile.am, tools/src/hfst-file-to-mem.cc,
+	  tools/src/hfst-string-conversions.cc,
+	  tools/src/hfst-string-conversions.h,
+	  tools/src/parsers/Makefile.am, tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h, tools/src/parsers/hfst-xfst.cc,
+	  tools/src/parsers/xfst-lexer.ll,
+	  tools/src/parsers/xfst-parser.yy: Updated reading and printing
+	  functionalities based on tests in MinGW environment.
+
+2014-01-08 14:17  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: A more reasonable parse
+	  order for weights and special functions;
+	  fixes various bugs concerning weight placement that should be
+	  legal
+
+2013-12-20 14:16  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h: Added missing
+	  <stack> include to HfstTransitionGrap.h.
+
+2013-12-18 13:45  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc,
+	  libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/Makefile.am,
+	  libhfst/src/parsers/lexc-lexer.ll,
+	  libhfst/src/parsers/lexc-utils.cc,
+	  libhfst/src/parsers/lexc-utils.h, test/tools/Makefile.am,
+	  test/tools/basic.UTF-8.lexc.flag.result,
+	  test/tools/basic.UTF-8.lexc.result,
+	  test/tools/basic.cat-dog-bird.lexc.flag.result,
+	  test/tools/basic.cat-dog-bird.lexc.result,
+	  test/tools/basic.colons.lexc.flag.result,
+	  test/tools/basic.colons.lexc.result,
+	  test/tools/basic.comments.lexc.flag.result,
+	  test/tools/basic.comments.lexc.result,
+	  test/tools/basic.empty-sides.lexc.flag.result,
+	  test/tools/basic.empty-sides.lexc.result,
+	  test/tools/basic.escapes.lexc.flag.result,
+	  test/tools/basic.escapes.lexc.result,
+	  test/tools/basic.infostrings.lexc.flag.result,
+	  test/tools/basic.infostrings.lexc.result,
+	  test/tools/basic.initial-lexicon-empty.lexc.flag.result,
+	  test/tools/basic.initial-lexicon-empty.lexc.result,
+	  test/tools/basic.lowercase-lexicon-end.lexc.flag.result,
+	  test/tools/basic.lowercase-lexicon-end.lexc.result,
+	  test/tools/basic.multi-entry-lines.lexc.flag.result,
+	  test/tools/basic.multi-entry-lines.lexc.result,
+	  test/tools/basic.multichar-symbols.lexc.flag.result,
+	  test/tools/basic.multichar-symbols.lexc.result,
+	  test/tools/basic.no-Root.lexc.flag.result,
+	  test/tools/basic.no-Root.lexc.result,
+	  test/tools/basic.no-newline-at-end.lexc.flag.result,
+	  test/tools/basic.no-newline-at-end.lexc.result,
+	  test/tools/basic.punctuation.lexc.flag.result,
+	  test/tools/basic.punctuation.lexc.result,
+	  test/tools/basic.root-loop.lexc.flag.result,
+	  test/tools/basic.root-loop.lexc.result,
+	  test/tools/basic.spurious-lexicon.lexc.flag.result,
+	  test/tools/basic.spurious-lexicon.lexc.result,
+	  test/tools/basic.string-pairs.lexc.flag.result,
+	  test/tools/basic.string-pairs.lexc.result,
+	  test/tools/basic.two-lexicons.lexc.flag.result,
+	  test/tools/basic.two-lexicons.lexc.result,
+	  test/tools/basic.zeros-epsilons.lexc.flag.result,
+	  test/tools/basic.zeros-epsilons.lexc.result,
+	  test/tools/check-flag-results.sh,
+	  test/tools/create-flag-results.sh,
+	  test/tools/hfst.weights.lexc.flag.result,
+	  test/tools/hfst.weights.lexc.result,
+	  test/tools/lexc-compiler-functionality.sh,
+	  test/tools/pmatch-functionality.sh,
+	  test/tools/xre.any-variations.lexc.flag.result,
+	  test/tools/xre.any-variations.lexc.result,
+	  test/tools/xre.automatic-multichar-symbols.lexc.flag.result,
+	  test/tools/xre.automatic-multichar-symbols.lexc.result,
+	  test/tools/xre.basic.lexc.flag.result,
+	  test/tools/xre.basic.lexc.result,
+	  test/tools/xre.definitions.lexc.flag.result,
+	  test/tools/xre.definitions.lexc.result,
+	  test/tools/xre.months.lexc.flag.result,
+	  test/tools/xre.months.lexc.result,
+	  test/tools/xre.nested-definitions.lexc.flag.result,
+	  test/tools/xre.nested-definitions.lexc.result,
+	  test/tools/xre.numeric-star.lexc.flag.result,
+	  test/tools/xre.numeric-star.lexc.result,
+	  test/tools/xre.quotations.lexc.flag.result,
+	  test/tools/xre.quotations.lexc.result,
+	  test/tools/xre.sharp.lexc.flag.result,
+	  test/tools/xre.sharp.lexc.result,
+	  test/tools/xre.star-plus-optional.lexc.flag.result,
+	  test/tools/xre.star-plus-optional.lexc.result: new lexc2fst, with
+	  tests
+
+2013-12-17 14:52  eaxelson
+
+	* libhfst/src/HarmonizeUnknownAndIdentitySymbols.cc: Fixed a bug in
+	  harmonization, now flag diacritics are not harmonized.
+
+2013-12-16 14:19  hardwick
+
+	* libhfst/src/implementations/ConvertOlTransducer.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h,
+	  libhfst/src/parsers/pmatch_lex.ll, tools/src/hfst-pmatch.cc,
+	  tools/src/hfst-pmatch2fst.cc: Transition to weighted,
+	  prioritizing pmatch; recompilation of rulesets
+	  required at least for now
+
+2013-12-16 13:16  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h: Removed a line
+	  from HfstTransitionGraph::substitute that printed debugging info
+	  to stderr..
+
+2013-12-13 17:19  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.cc,
+	  libhfst/src/implementations/HfstTransitionGraph.h: Added function
+	  HfstTransitionGraph & HfstTransitionGraph::(std::map<HfstSymbol,
+	  HfstTransitionGraph> &, bool harmonize)
+
+2013-12-09 11:56  eaxelson
+
+	* test/tools/empty-input.sh, tools/src/hfst-affix-guessify.cc,
+	  tools/src/hfst-compare.cc, tools/src/hfst-compiler.yy,
+	  tools/src/hfst-compose-intersect.cc, tools/src/hfst-compose.cc,
+	  tools/src/hfst-concatenate.cc, tools/src/hfst-conjunct.cc,
+	  tools/src/hfst-determinize.cc, tools/src/hfst-disjunct.cc,
+	  tools/src/hfst-edit-metadata.cc,
+	  tools/src/hfst-expand-equivalences.cc, tools/src/hfst-format.cc,
+	  tools/src/hfst-fst2fst.cc, tools/src/hfst-fst2strings.cc,
+	  tools/src/hfst-fst2txt.cc, tools/src/hfst-grep.cc,
+	  tools/src/hfst-guess.cc, tools/src/hfst-guessify.cc,
+	  tools/src/hfst-head.cc, tools/src/hfst-info.cc,
+	  tools/src/hfst-invert.cc, tools/src/hfst-lexc-compiler.cc,
+	  tools/src/hfst-lexc.cc, tools/src/hfst-lookup.cc,
+	  tools/src/hfst-minimize.cc, tools/src/hfst-multiply.cc,
+	  tools/src/hfst-name.cc, tools/src/hfst-pair-test.cc,
+	  tools/src/hfst-pmatch2fst.cc, tools/src/hfst-project.cc,
+	  tools/src/hfst-prune-alphabet.cc, tools/src/hfst-push-weights.cc,
+	  tools/src/hfst-regexp2fst.cc, tools/src/hfst-remove-epsilons.cc,
+	  tools/src/hfst-repeat.cc, tools/src/hfst-reverse.cc,
+	  tools/src/hfst-reweight.cc, tools/src/hfst-shuffle.cc,
+	  tools/src/hfst-split.cc, tools/src/hfst-strings2fst.cc,
+	  tools/src/hfst-substitute.cc, tools/src/hfst-subtract.cc,
+	  tools/src/hfst-summarize.cc,
+	  tools/src/hfst-tagger/src/hfst-build-tagger.cc,
+	  tools/src/hfst-tail.cc, tools/src/hfst-twolc/src/htwolcpre1.yy,
+	  tools/src/hfst-twolc/src/htwolcpre2.yy,
+	  tools/src/hfst-twolc/src/htwolcpre3.yy,
+	  tools/src/hfst-txt2fst.cc: Now standard streams are defined as
+	  binary in command line tools when compiling on windows.
+
+2013-12-04 13:13  eaxelson
+
+	* NSIS/README, NSIS/README.txt, NSIS/copy_files.sh,
+	  NSIS/hfst_installer.nsi, swig/README, swig/setup.py,
+	  tools/src/hfst-tagger/src/hfst-train-tagger.bat,
+	  tools/src/hfst-twolc/src/hfst-twolc.bat: Updated batch, NSIS and
+	  swig scripts for windows.
+
+2013-12-02 09:59  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.cc: Support \uXXXX with a
+	  codepoint -> utf-8 generator - this should
+	  probably be shared somewhere
+
+2013-12-02 09:58  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.h: Know about uppercase ẞ
+
+2013-11-27 09:01  eaxelson
+
+	* tools/src/hfst-lexc.cc: Do not warn user about using foma type in
+	  hfst-lexc if they have explicitely requested it with --format
+	  foma.
+
+2013-11-27 08:45  eaxelson
+
+	* NSIS/ReplaceInFile.nsh, NSIS/StrRep.nsh, NSIS/hfst_installer.nsi,
+	  test/tools/lexc-functionality.sh, tools/src/hfst-lexc.cc: Now
+	  hfst-lexc obeys argument --format. Fixes bug #213. Also updated
+	  NSIS scripts.
+
+2013-11-21 14:36  eaxelson
+
+	* NSIS/copy_files.sh, NSIS/hfst_installer.nsi,
+	  tools/src/hfst-tagger/src/Makefile.am,
+	  tools/src/hfst-tagger/src/hfst-train-tagger.bat,
+	  tools/src/hfst-twolc/src/Makefile.am,
+	  tools/src/hfst-twolc/src/hfst-twolc.bat: Updated NSIS script.
+	  Added hfst-twolc and hfst-train-tagger bat files for windows
+	  compilation.
+
+2013-11-20 12:53  eaxelson
+
+	* libhfst/src/parsers/Makefile.am, test/tools/Makefile.am,
+	  tools/src/Makefile.am, tools/src/hfst-twolc/src/Makefile.am,
+	  tools/src/parsers/Makefile.am: Distribution package includes
+	  flex/bison-generated cc and hh files. Make check runs tests only
+	  for those command line tools that are enabled.
+
+2013-11-18 13:52  eaxelson
+
+	* configure.ac: Allowing tagger tools in mingw.
+
+2013-11-18 12:29  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc: Fixed a bug in xfst_getline,
+	  also added freeing the result from it.
+
+2013-11-14 12:08  eaxelson
+
+	* libhfst/src/parsers/xre_utils.cc: Fixed a memory error in
+	  hfst::xre::parse_quoted noticed during make check on MinGW.
+
+2013-11-13 16:30  moshagen
+
+	* NSIS/copy_files.sh: Corrected something that looks like an
+	  accidental omission.
+
+2013-11-13 13:15  eaxelson
+
+	* NSIS/copy_files.sh, back-ends/foma/Makefile.am,
+	  back-ends/foma/lex.lexc.c, back-ends/foma/lex.yy.c,
+	  libhfst/src/parsers/LexcCompiler.cc: Fixed some bugs noticed
+	  during MinGW compilation: added typedef 'off_t' and compiler
+	  definition '__NO_MINGW_LFS' when mings compilation is enabled,
+	  and escaped percent sign in fprintf as double percent. Also added
+	  tagger tools and hfst-xfst to NSIS installer script.
+
+2013-11-11 13:50  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Allow plain input-output
+	  -replacement with tokenized quoted literals,
+	  like "this":"that"
+
+2013-11-11 13:38  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: Some refactoring & warn about
+	  unused definitions
+
+2013-11-11 13:00  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am, swig/libhfst.i: Ready for release 3.5.1.
+
+2013-11-11 09:26  eaxelson
+
+	* libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/Makefile.am,
+	  libhfst/src/parsers/lexc-lexer.ll, test/libhfst/test_lexc.lexc:
+	  Applied lexc patch (bug #208).
+
 2013-11-11 08:58  sdrobac
 
 	* libhfst/src/parsers/LexcCompiler.cc,

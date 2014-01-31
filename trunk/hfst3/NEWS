@@ -5,6 +5,20 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.6.0
+---------------------------
+
+* hfst-lexc uses native hfst functions
+
+* improvements to pmatch tool
+
+* limited support for optimized lookup transducers in hfst-xfst
+
+* better support for Mac and Windows
+
+* replace rule longest match bug fixed
+
+
 Noteworthy changes in 3.5.1
 ---------------------------
 
