@@ -1,3 +1,9 @@
+hfst (3.6.0-1) unstable; urgency=low
+
+  * First release of version 3.6.0
+
+ -- Erik Axelson <hfst-info@sf.net>  Tue, 4 Feb 2014 12:11:55 +0200
+
 hfst (3.5.2-1) unstable; urgency=low
 
   * First release of version 3.5.2
