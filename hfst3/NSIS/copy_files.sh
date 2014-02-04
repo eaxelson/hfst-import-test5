@@ -6,7 +6,7 @@
 # (1) HFST dll file
 
 HFST_DLL_DIRECTORY=../libhfst/src/.libs
-HFST_DLL=libhfst-32.dll
+HFST_DLL=libhfst-33.dll
 cp $HFST_DLL_DIRECTORY/$HFST_DLL .
 strip $HFST_DLL
 
