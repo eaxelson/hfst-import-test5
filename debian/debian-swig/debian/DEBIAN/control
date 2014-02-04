@@ -1,6 +1,6 @@
 Package: HFSTPY-DEV
 Source: HFSTPY
-Version: 5.2-1
+Version: 6.0-1
 Section: devel
 Priority: optional
 Architecture: amd64

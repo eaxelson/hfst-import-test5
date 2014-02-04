@@ -52,10 +52,11 @@ if test -e $HFST_PREFIX/bin/hfst-train-tagger-loc; then
     rm -f $HFST_PREFIX/bin/hfst-train-tagger-loc;
 fi
 
-# replace prefix /usr/local/bin/ with /usr/bin/ (is this needed?)
-for tool in hfst-twolc;
+# replace prefix $hfstdir/bin/ with /usr/bin/
+hfstdir=`echo $2 | sed 's/\//\\\\\//g'` # escape the '/' signs for sed
+for tool in hfst-twolc hfst-train-tagger;
 do
-    sed -i 's/usr\/local\/bin\//usr\/bin\//' $tool;
+    sed -i 's/'$hfstdir'\/bin\//usr\/bin\//' $tool;
 done
 
 # foma wrapper depends on zlib..
