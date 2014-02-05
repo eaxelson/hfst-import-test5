@@ -72,6 +72,8 @@ char* input_symbol = 0;
 char* output_symbol = 0;
 char* symbol = 0;
 bool ends_only = false;
+char* tsv_file_name = 0;
+FILE* tsv_file = 0;
 
 void
 print_usage()
@@ -94,6 +96,7 @@ print_usage()
             "  -O, --output-symbol=OSYM   match arcs with output symbol OSYM\n"
             "  -S, --symbol=SYM           match arcs havins symbol SYM\n"
             "  -e, --end-states-only      match end states only, no arcs\n"
+            "  -T, --tsv-file=TFILE       read reweighting rules from TFILE\n"
             "\n");
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
@@ -143,12 +146,13 @@ parse_options(int argc, char** argv)
             {"output-symbol", required_argument, 0, 'O'},
             {"symbol", required_argument, 0, 'S'},
             {"end-state-only", required_argument, 0, 'e'},
+            {"tsv", required_argument, 0, 'T'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "a:b:F:l:u:I:O:S:e",
+                             HFST_GETOPT_UNARY_SHORT "a:b:F:l:u:I:O:S:eT:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -252,6 +256,9 @@ parse_options(int argc, char** argv)
         case 'e':
           ends_only = true;
           break;
+        case 'T':
+          tsv_file_name = hfst_strdup(optarg);
+          break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -267,6 +274,10 @@ parse_options(int argc, char** argv)
         warning(0, 0, "Lower bound %f exceeds upper bound %f so reweight will"
                 " never apply", lower_bound, upper_bound);
       }
+    if (tsv_file_name != 0)
+      {
+        tsv_file = hfst_fopen(tsv_file_name, "r");
+      }
     return EXIT_CONTINUE;
 }
 
@@ -279,7 +290,14 @@ reweight(float w, const char* i, const char* o)
       // not within weight bounds, don't apply
       return w;
     }
-  if ((i != 0) && (o != 0))
+  if ((i == 0) && (o == 0))
+    {
+      if (!ends_only)
+        {
+          return w;
+        }
+    }
+  else if ((i != 0) && (o != 0))
     {
       if (ends_only)
         {
@@ -306,26 +324,10 @@ reweight(float w, const char* i, const char* o)
 
 }
 
-int
-process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
-{
-  //instream.open();
-  //outstream.open();
-    
-    size_t transducer_n=0;
-    while(instream.is_good())
-    {
-        transducer_n++;
-        HfstTransducer trans(instream);
-        char* inputname = hfst_get_name(trans, inputfilename);
-        if (transducer_n==1)
-        {
-          verbose_printf("Reweighting %s...\n", inputname); 
-        }
-        else
-        {
-          verbose_printf("Reweighting %s..." SIZE_T_SPECIFIER "\n", inputname, transducer_n); 
-        }
+static
+HfstTransducer&
+do_reweight(HfstTransducer& trans)
+  {
         HfstBasicTransducer original(trans);
         HfstBasicTransducer replication;
         HfstState state_count = 1;
@@ -374,15 +376,92 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         source_state++;
           }
         trans = HfstTransducer(replication, trans.get_type());
-        hfst_set_name(trans, trans, "reweight");
-        hfst_set_formula(trans, trans, "W");
+        return trans;
+  }
+
+
+int
+process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
+  {
+    size_t transducer_n=0;
+    while(instream.is_good())
+    {
+        transducer_n++;
+        HfstTransducer trans(instream);
+        char* inputname = hfst_get_name(trans, inputfilename);
+        if (transducer_n==1)
+        {
+          verbose_printf("Reweighting %s...\n", inputname); 
+        }
+        else
+        {
+          verbose_printf("Reweighting %s..." SIZE_T_SPECIFIER "\n", inputname, transducer_n); 
+        }
+        if (NULL == tsv_file)
+          {
+            trans = do_reweight(trans);
+            hfst_set_name(trans, trans, "reweight");
+            hfst_set_formula(trans, trans, "W");
+          }
+        else
+          {
+            rewind(tsv_file);
+            free(symbol);
+            addition = 0;
+            multiplier = 1;
+            char* line;
+            size_t len = 0;
+            size_t linen = 0;
+            verbose_printf("Reading reweights from %s\n", tsv_file_name);
+            while (hfst_getline(&line, &len, tsv_file) != -1)
+              {
+                linen++;
+                if (*line == '\n')
+                  {
+                    continue;
+                  }
+                const char* tab = strstr(line, "\t");
+                if (NULL == tab)
+                  {
+                    if (*line == '#')
+                      {
+                        continue;
+                      }
+                    else
+                      {
+                        error_at_line(EXIT_FAILURE, 0, tsv_file_name, linen,
+                                      "at least one tab required per line");
+                      }
+                  }
+                const char* endstr = tab + 1;
+                while ((*endstr != '\0') && (*endstr != '\n'))
+                  {
+                    endstr++;
+                  }
+                symbol = hfst_strndup(line, tab - line);
+                char* weightspec = hfst_strndup(tab + 1, endstr - tab - 1);
+                if (*weightspec == '+')
+                  {
+                    addition = hfst_strtoweight(weightspec + 1);
+                  }
+                else
+                  {
+                    multiplier = hfst_strtoweight(weightspec);
+                  }
+                free(weightspec);
+                trans = do_reweight(trans);
+              } // getline
+            hfst_set_name(trans, trans, "reweight");
+            hfst_set_formula(trans, trans, "W");
+          } // if tsv_file
         outstream << trans.remove_epsilons();
         free(inputname);
-    }
+      } // foreach transducer
     instream.close();
     outstream.close();
     return EXIT_SUCCESS;
-}
+  }
+
 
 
 int main( int argc, char **argv ) {
