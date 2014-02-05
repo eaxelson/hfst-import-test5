@@ -62,7 +62,8 @@ print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1...]]\n"
-             "Compile lexc files into transducer\n"
+             "Compile lexc files into transducer (experimental)\n"
+             "For full lexc support, use hfst-lexc-wrapper instead\n"
         "\n", program_name );
         print_common_program_options(message_out);
         fprintf(message_out, "Input/Output options:\n"
