@@ -4,6 +4,10 @@
 !include 'FileFunc.nsh'
 !insertmacro Locate
 
+# Var /GLOBAL switch_overwrite
+# StrCpy $switch_overwrite 0
+!include 'MoveFileFolder.nsh'
+
 outfile "install-FOO-XX-bit.exe"
 
 section
