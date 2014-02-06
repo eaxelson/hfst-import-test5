@@ -122,8 +122,6 @@ class LexcCompiler
   const LexcCompiler& printConnectedness() const;
 
 
-
-
   private:
   bool quiet_;
   bool verbose_;
@@ -136,6 +134,7 @@ class LexcCompiler
   std::map<std::string,hfst::HfstTransducer*> stringTries_;
   std::map<std::string,HfstBasicTransducer*> stringVectors_;
   HfstBasicTransducer stringsTrie_;
+
 
 
   std::map<std::string,hfst::HfstTransducer*> regexps_;

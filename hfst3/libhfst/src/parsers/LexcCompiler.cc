@@ -188,15 +188,19 @@ LexcCompiler::addNoFlag(const string& lexname)
 LexcCompiler&
 LexcCompiler::addAlphabet(const string& alpha)
 {
+    //printf("alpha: %s \n", alpha.c_str());
     tokenizer_.add_multichar_symbol(alpha);
     return *this;
 }
 
-// Construct vector nameJoiner upper:lower contJoiner and add to trie
+// Construct vector nameJoiner data contJoiner and add to trie
 LexcCompiler&
 LexcCompiler::addStringEntry(const string& data,
         const string& continuation, double weight)
 {
+    // printf("data: %s \n", data.c_str());
+    string str = replace_zero(data);
+
     currentEntries_++;
     totalEntries_++;
     continuations_.insert(continuation);
@@ -238,7 +242,7 @@ LexcCompiler::addStringEntry(const string& data,
         joinerEncode(joinerEnc);
     }
     tokenizer_.add_multichar_symbol(joinerEnc);
-    StringPairVector newVector(tokenizer_.tokenize(joinerEnc + data + encodedCont));
+    StringPairVector newVector(tokenizer_.tokenize(joinerEnc + str + encodedCont));
     stringsTrie_.disjunct(newVector, 0);
 
 
@@ -250,6 +254,9 @@ LexcCompiler&
 LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
         const string& continuation, double weight)
 {
+    string upper_string = replace_zero(upper);
+    string lower_string = replace_zero(lower);
+
     //printf("upper: %s lower: %s: continuation: %s \n", upper.c_str(), lower.c_str(), continuation.c_str());
            //identityWoJoin.write_in_att_format(stdout, 1);
     currentEntries_++;
@@ -294,10 +301,10 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
     tokenizer_.add_multichar_symbol(joinerEnc);
 
     StringPairVector upperV;
-    upperV = tokenizer_.tokenize(upper);
+    upperV = tokenizer_.tokenize(upper_string);
 
     StringPairVector lowerV;
-    lowerV = tokenizer_.tokenize(lower);
+    lowerV = tokenizer_.tokenize(lower_string);
 
     int upperSize = upperV.size();
     int lowerSize = lowerV.size();
@@ -317,8 +324,8 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
             epsilons = epsilons + string("@@ANOTHER_EPSILON@@");
 
         }
-        newVector = tokenizer_.tokenize(joinerEnc + upper + encodedCont,
-                            joinerEnc + lower + epsilons + encodedCont);
+        newVector = tokenizer_.tokenize(joinerEnc + upper_string + encodedCont,
+                            joinerEnc + lower_string + epsilons + encodedCont);
 
     }
     else if (upperSize < lowerSize)
@@ -330,13 +337,13 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
             epsilons = epsilons + string("@@ANOTHER_EPSILON@@");
 
         }
-        newVector = tokenizer_.tokenize(joinerEnc + upper + epsilons + encodedCont,
-                            joinerEnc + lower + encodedCont);
+        newVector = tokenizer_.tokenize(joinerEnc + upper_string + epsilons + encodedCont,
+                            joinerEnc + lower_string + encodedCont);
     }
     else
     {
-        newVector = tokenizer_.tokenize(joinerEnc + upper + encodedCont,
-                    joinerEnc + lower + encodedCont);
+        newVector = tokenizer_.tokenize(joinerEnc + upper_string + encodedCont,
+                    joinerEnc + lower_string + encodedCont);
     }
     stringsTrie_.disjunct(newVector, 0);
 
@@ -543,6 +550,13 @@ LexcCompiler::compileLexical()
     lexicons.repeat_star().minimize();
 
 
+
+    //printf("lexicons: \n");
+    //lexicons.write_in_att_format(stdout, 1);
+
+
+
+
     HfstSymbolSubstitutions smallSubstitutions;
     smallSubstitutions.insert(StringPair("@0@", "@_EPSILON_SYMBOL_@"));
     smallSubstitutions.insert(StringPair("@@ANOTHER_EPSILON@@", "@_EPSILON_SYMBOL_@"));
@@ -555,6 +569,11 @@ LexcCompiler::compileLexical()
     */
     lexicons.substitute(smallSubstitutions);
     lexicons.prune_alphabet();
+
+
+    //printf("lexicons: \n");
+    //lexicons.write_in_att_format(stdout, 1);
+
 
     HfstBasicTransducer joinersTrie_;
 
@@ -742,14 +761,14 @@ LexcCompiler::compileLexical()
         joinersAll.repeat_star();
         joinersAll.minimize();
 
+/*
+     printf("lexicons before compose: \n");
+     lexicons.write_in_att_format(stdout, 1);
 
-        // printf("lexicons before compose: \n");
-        // lexicons.write_in_att_format(stdout, 1);
-
-        // printf("joinersAll: \n");
-        //         joinersAll.write_in_att_format(stdout, 1);
-        //         printf("\n");
-
+      printf("joinersAll: \n");
+      joinersAll.write_in_att_format(stdout, 1);
+      printf("\n");
+*/
 
         lexicons.compose(joinersAll).minimize();
 
@@ -772,17 +791,14 @@ LexcCompiler::compileLexical()
             {
                 //printf("%s \n", s->c_str());
                 String alph = *s;
+
                 if ( alph[0] == '$' && *alph.rbegin() == '$' && alph.size() > 2)
                 {
-                    // TODO: do this only for strings that look like $.....$
                     replace(alph.begin(), alph.end(), '$', '@');
-
                     //std::cout << alph << '\n';
                     fakeFlagsToRealFlags.insert(StringPair(*s, alph));
-
                     //lexicons.substitute(*s, alph).minimize();
                 }
-
             }
             allSubstitutions.insert(fakeFlagsToRealFlags.begin(), fakeFlagsToRealFlags.end());
 

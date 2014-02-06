@@ -40,7 +40,13 @@ static
 void
 handle_multichar(const string& multichar)
 {
-    hfst::lexc::lexc_->addAlphabet(multichar);
+    //in multichars @ZERO@ should right away be replaced with "0"        
+    string str = multichar;
+    string zero = "@ZERO@";
+    size_t start_pos = str.find(zero);
+    if(start_pos != std::string::npos)
+        str.replace(start_pos, zero.length(), "0");
+    hfst::lexc::lexc_->addAlphabet(str);
 }
 
 static
