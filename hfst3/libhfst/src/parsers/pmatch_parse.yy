@@ -228,10 +228,8 @@ FUNCBODY1: FUNCBODY2 { }
         new hfst::pmatch::PmatchAstNode($1,
                                         new hfst::pmatch::PmatchAstNode(end_tag),
                                         hfst::pmatch::AstConcatenate);
-    hfst::pmatch::PmatchAstNode * endtagged =
-        new hfst::pmatch::PmatchAstNode(concatenation,
-                                        hfst::pmatch::AstAddDelimiters);
-    $$ = endtagged;
+    $$ = new hfst::pmatch::PmatchAstNode(concatenation,
+                                         hfst::pmatch::AstAddDelimiters);
  }
 | FUNCBODY1 COMPOSITION FUNCBODY2 {
     $$ = new hfst::pmatch::PmatchAstNode($1, $3, hfst::pmatch::AstCompose);
