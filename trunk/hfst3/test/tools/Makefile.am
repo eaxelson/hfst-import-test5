@@ -288,6 +288,7 @@ LEXC_TXTS=basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc \
 		  basic.multichar-symbols.lexc basic.multichar-symbol-with-0.lexc \
 		  basic.multi-entry-lines.lexc basic.multi-file-1.lexc \
 		  basic.multi-file-2.lexc basic.multi-file-3.lexc \
+		  basic.multichar-escaped-zero.lexc \
 		  basic.no-newline-at-end.lexc basic.no-Root.lexc \
 		  basic.punctuation.lexc basic.root-loop.lexc \
 		  basic.spurious-lexicon.lexc basic.string-pairs.lexc \
@@ -355,6 +356,8 @@ basic.multichar-symbols.lexc.flag.result \
 basic.multichar-symbols.lexc.result \
 basic.multi-entry-lines.lexc.flag.result \
 basic.multi-entry-lines.lexc.result \
+basic.multichar-escaped-zero.lexc.flag.result \
+basic.multichar-escaped-zero.lexc.result \
 basic.no-newline-at-end.lexc.flag.result \
 basic.no-newline-at-end.lexc.result \
 basic.no-Root.lexc.flag.result \
@@ -398,7 +401,7 @@ xre.star-plus-optional.lexc.result
 
 # files needed for test programs
 EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS) $(TESTS) $(EXTRA_FILES) $(LEXC_TXTS) $(PMATCH_TXTS) script.xfst lexc2fst-stress.sh lookup-stress.sh proc-stress.sh valgrind.sh \
-lexc-compiler-functionality.sh calculate-functionality.sh shuffle-functionality.sh $(RESULT_FILES)
+calculate-functionality.sh shuffle-functionality.sh $(RESULT_FILES)
 
 
 valgrind: $(CHECK_DATA)

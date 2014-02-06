@@ -198,7 +198,7 @@ LexcCompiler&
 LexcCompiler::addStringEntry(const string& data,
         const string& continuation, double weight)
 {
-    // printf("data: %s \n", data.c_str());
+    //printf("data: %s \n", data.c_str());
     string str = replace_zero(data);
 
     currentEntries_++;
@@ -308,6 +308,10 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 
     int upperSize = upperV.size();
     int lowerSize = lowerV.size();
+
+    //cout << "u: "  << upperSize << "\n";
+    //cout << "L: "  << lowerSize << "\n";
+
 
 
     StringVector upV;

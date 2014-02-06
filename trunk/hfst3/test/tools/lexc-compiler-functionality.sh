@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # skip tests until errors are fixed
-exit 77
+#exit 77
 
 TOOLDIR=../../tools/src
 LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc 
