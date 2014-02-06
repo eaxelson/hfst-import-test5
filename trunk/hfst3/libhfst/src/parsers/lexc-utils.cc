@@ -148,6 +148,20 @@ xreDefinitionEncode(string& s)
     return lxs;
 }
 
+
+//replaces @ZERO@ with "0" in a string
+string& replace_zero(const string& s) {
+string str = s;
+string zero = "@ZERO@";
+    size_t start_pos = str.find(zero);
+    if(start_pos != std::string::npos)
+    {
+    str.replace(start_pos, zero.length(), "0");
+    }
+    return str;
+}
+
+
 // FLEX stuff
 
 
