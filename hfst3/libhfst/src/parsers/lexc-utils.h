@@ -64,7 +64,7 @@ std::string& regExpresionEncode(std::string& s);
 std::string& regExpresionDecode(std::string& s);
 
 //! @brief Replaces @ZERO@ with "0" in a string
-std::string& replace_zero(const std::string& s);
+std::string replace_zero(const std::string s);
 
 // FLEX HANDLING
 
