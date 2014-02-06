@@ -266,6 +266,19 @@ enum PmatchAstOperation {
     AstDisjunct,
     AstIntersect,
     AstSubtract,
+    AstRepeatStar,
+    AstRepeatPlus,
+    AstReverse,
+    AstInvert,
+    AstInputProject,
+    AstOutputProject,
+    AstRepeatN,
+    AstRepeatNPlus,
+    AstRepeatNMinus,
+    AstRepeatNToK,
+    AstOptCap,
+    AstToLower,
+    AstToUpper,
     None
 };
 
@@ -280,11 +293,36 @@ struct PmatchAstNode {
     PmatchAstOperation op;
     std::string symbol;
     PmatchAstType type;
+    std::vector<int> numeric_args;
 
     PmatchAstNode(PmatchAstNode * l,
                   PmatchAstNode * r,
                   PmatchAstOperation o):
-    left_child(l), right_child(r), op(o), type(AstBinaryOp),
+        left_child(l), right_child(r), op(o), type(AstBinaryOp),
+        transducer(NULL) { }
+    
+    PmatchAstNode(HfstTransducer * l,
+                  HfstTransducer * r,
+                  PmatchAstOperation o):
+        left_child(new PmatchAstNode(l)),
+        right_child(new PmatchAstNode(r)),
+        op(o), type(AstBinaryOp),
+        transducer(NULL) { }
+    
+    PmatchAstNode(HfstTransducer * l,
+                  PmatchAstNode * r,
+                  PmatchAstOperation o):
+    left_child(new PmatchAstNode(l)),
+        right_child(r),
+        op(o), type(AstBinaryOp),
+        transducer(NULL) { }
+    
+    PmatchAstNode(PmatchAstNode * l,
+              HfstTransducer * r,
+              PmatchAstOperation o):
+    left_child(l),
+    right_child(new PmatchAstNode(r)),
+        op(o), type(AstBinaryOp),
         transducer(NULL) { }
     
     PmatchAstNode(PmatchAstNode * l,
@@ -292,9 +330,17 @@ struct PmatchAstNode {
     left_child(l), right_child(NULL), op(o), type(AstUnaryOp),
         transducer(NULL) {}
 
+    PmatchAstNode(HfstTransducer * l,
+                  PmatchAstOperation o):
+        left_child(new PmatchAstNode(l)), right_child(NULL), op(o), type(AstUnaryOp),
+        transducer(NULL) {}
+
 PmatchAstNode(std::string sym): symbol(sym), type(AstSymbol) {}
     
-PmatchAstNode(HfstTransducer * t): transducer(t),
+    PmatchAstNode(const HfstTransducer * t): transducer(new HfstTransducer(*t)),
+    left_child(NULL), right_child(NULL), op(None), type(AstTransducer) {}
+    
+    PmatchAstNode(HfstTransducer & t): transducer(new HfstTransducer(t)),
     left_child(NULL), right_child(NULL), op(None), type(AstTransducer) {}
     
     ~PmatchAstNode(void) {
@@ -305,6 +351,9 @@ PmatchAstNode(HfstTransducer * t): transducer(t),
 
     HfstTransducer * evaluate(std::map<std::string,
                               HfstTransducer *> & funargs);
+
+    void push_numeric_arg(int arg)
+        { numeric_args.push_back(arg); }
 
 };
 

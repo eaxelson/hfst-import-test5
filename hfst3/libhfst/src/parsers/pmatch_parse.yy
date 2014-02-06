@@ -74,7 +74,7 @@
 %type <transducer> REGEXP1 REGEXP2 REGEXP4 REGEXP5 REGEXP6 REGEXP7
 REGEXP8 REGEXP9 REGEXP10 REGEXP11 REGEXP12 LABEL
 REPLACE REGEXP3 FUNCALL MAP
-%type <ast_node> FUNCBODY1 FUNCBODY2 FUNCBODY3 FUNCBODY4 FUNCBODY5
+%type <ast_node> FUNCBODY1 FUNCBODY2 FUNCBODY3 FUNCBODY4 FUNCBODY5 FUNCBODY6
 %type <string_vector> ARGLIST
 
 %type <replaceRuleVectorWithArrow> PARALLEL_RULES
@@ -89,6 +89,8 @@ REPLACE REGEXP3 FUNCALL MAP
 
 %type <transducer> OPTCAP TOLOWER TOUPPER INSERT RIGHT_CONTEXT
 LEFT_CONTEXT NEGATIVE_RIGHT_CONTEXT NEGATIVE_LEFT_CONTEXT
+%type <ast_node> FUN_RIGHT_CONTEXT FUN_LEFT_CONTEXT FUN_NEGATIVE_RIGHT_CONTEXT FUN_NEGATIVE_LEFT_CONTEXT
+%type <ast_node> FUN_OPTCAP FUN_TOLOWER FUN_TOUPPER
 
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
 %nonassoc <label> QUOTED_LITERAL SYMBOL
@@ -240,22 +242,18 @@ FUNCBODY1: FUNCBODY2 { }
 | FUNCBODY1 LENIENT_COMPOSITION FUNCBODY2 {
     $$ = new hfst::pmatch::PmatchAstNode($1, $3, hfst::pmatch::AstLenientCompose);
  }
-// | FUNCBODY1 RIGHT_CONTEXT {
-//     $$ = & $1->concatenate(*$2);
-//     delete $2;
-//  }
-// | FUNCBODY1 LEFT_CONTEXT {
-//     $$ = & $2->concatenate(*$1);
-//     delete $1;
-//  }
-// | FUNCBODY1 NEGATIVE_RIGHT_CONTEXT {
-//     $$ = & $1->concatenate(*$2);
-//     delete $2;
-//  }
-// | FUNCBODY1 NEGATIVE_LEFT_CONTEXT {
-//     $$ = & $2->concatenate(*$1);
-//     delete $1;
-//  }
+| FUNCBODY1 FUN_RIGHT_CONTEXT {
+     $$ = new hfst::pmatch::PmatchAstNode($1, $2, hfst::pmatch::AstConcatenate);
+ }
+| FUNCBODY1 FUN_LEFT_CONTEXT {
+    $$ = new hfst::pmatch::PmatchAstNode($2, $1, hfst::pmatch::AstConcatenate);
+ }
+| FUNCBODY1 FUN_NEGATIVE_RIGHT_CONTEXT {
+    $$ = new hfst::pmatch::PmatchAstNode($1, $2, hfst::pmatch::AstConcatenate);
+ }
+| FUNCBODY1 FUN_NEGATIVE_LEFT_CONTEXT {
+    $$ = new hfst::pmatch::PmatchAstNode($2, $1, hfst::pmatch::AstConcatenate);
+ }
 // // Bodyless contexts
 
 // | LEFT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
@@ -338,9 +336,73 @@ FUNCBODY4: FUNCBODY5
 | LEFT_PARENTHESIS FUNCBODY1 RIGHT_PARENTHESIS {
     $$ = new hfst::pmatch::PmatchAstNode($2, hfst::pmatch::AstOptionalize);
  }
+| ALPHA {
+    $$ = new hfst::pmatch::PmatchAstNode(hfst::pmatch::get_utils()->latin1_alpha_acceptor);
+ }
+| LOWERALPHA {
+    $$ = new hfst::pmatch::PmatchAstNode(hfst::pmatch::get_utils()->latin1_lowercase_acceptor);
+ }
+| UPPERALPHA {
+    $$ = new hfst::pmatch::PmatchAstNode(hfst::pmatch::get_utils()->latin1_uppercase_acceptor);
+ }
+| NUM {
+    $$ = new hfst::pmatch::PmatchAstNode(hfst::pmatch::get_utils()->latin1_numeral_acceptor);
+ }
+| PUNCT {
+    $$ = new hfst::pmatch::PmatchAstNode(hfst::pmatch::get_utils()->latin1_punct_acceptor);
+ }
+| WHITESPACE {
+    $$ = new hfst::pmatch::PmatchAstNode(hfst::pmatch::get_utils()->latin1_whitespace_acceptor);
+ }
+| INSERT { $$ = new hfst::pmatch::PmatchAstNode($1); }
+| FUN_OPTCAP { }
+| FUN_TOUPPER { }
+| FUN_TOLOWER { }
+
+;
+
+FUNCBODY5: FUNCBODY6 { }
+| FUNCBODY5 STAR {
+    $$ = new hfst::pmatch::PmatchAstNode($1, hfst::pmatch::AstRepeatStar);
+ }
+| FUNCBODY5 PLUS {
+    $$ = new hfst::pmatch::PmatchAstNode($1, hfst::pmatch::AstRepeatPlus);
+ }
+| FUNCBODY5 REVERSE {
+    $$ = new hfst::pmatch::PmatchAstNode($1, hfst::pmatch::AstReverse);
+ }
+| FUNCBODY5 INVERT {
+    $$ = new hfst::pmatch::PmatchAstNode($1, hfst::pmatch::AstInvert);
+ }
+| FUNCBODY5 UPPER {
+    $$ = new hfst::pmatch::PmatchAstNode($1, hfst::pmatch::AstInputProject);
+  }
+| FUNCBODY5 LOWER {
+    $$ = new hfst::pmatch::PmatchAstNode($1, hfst::pmatch::AstOutputProject);
+ }
+| FUNCBODY5 CATENATE_N {
+    $$ = new hfst::pmatch::PmatchAstNode($1, hfst::pmatch::AstRepeatN);
+    $$->push_numeric_arg($2);
+ }
+| FUNCBODY5 CATENATE_N_PLUS {
+    $$ = new hfst::pmatch::PmatchAstNode($1, hfst::pmatch::AstRepeatNPlus);
+    $$->push_numeric_arg($2 + 1);
+ }
+| FUNCBODY5 CATENATE_N_MINUS {
+    $$ = new hfst::pmatch::PmatchAstNode($1, hfst::pmatch::AstRepeatNMinus);
+    $$->push_numeric_arg($2 - 1);
+ }
+| FUNCBODY5 CATENATE_N_TO_K {
+    $$ = new hfst::pmatch::PmatchAstNode($1, hfst::pmatch::AstRepeatNToK);
+    $$->push_numeric_arg($2[0]);
+    $$->push_numeric_arg($2[1]);
+    free($2);
+ }
+;
 
 
-FUNCBODY5: QUOTED_LITERAL {
+
+FUNCBODY6: QUOTED_LITERAL {
     HfstTokenizer tok;
     HfstTransducer * literal = new HfstTransducer($1, tok, hfst::pmatch::format);
     free($1);
@@ -350,7 +412,9 @@ FUNCBODY5: QUOTED_LITERAL {
     $$ = new hfst::pmatch::PmatchAstNode($1);
     free($1);
  }
-
+| BOUNDARY_MARKER {
+    $$ = new hfst::pmatch::PmatchAstNode(new HfstTransducer("@BOUNDARY@", "@BOUNDARY@", hfst::pmatch::format));
+  }
 ;
 
 
@@ -975,6 +1039,21 @@ TOUPPER: TOUPPER_LEFT REGEXP11 RIGHT_PARENTHESIS {
 }
 ;
 
+FUN_OPTCAP: OPTCAP_LEFT FUNCBODY4 RIGHT_PARENTHESIS {
+    $$ = new hfst::pmatch::PmatchAstNode($2, hfst::pmatch::AstOptCap);
+}
+;
+
+FUN_TOLOWER: TOLOWER_LEFT FUNCBODY4 RIGHT_PARENTHESIS {
+    $$ = new hfst::pmatch::PmatchAstNode($2, hfst::pmatch::AstToLower);
+}
+;
+
+FUN_TOUPPER: TOUPPER_LEFT FUNCBODY4 RIGHT_PARENTHESIS {
+    $$ = new hfst::pmatch::PmatchAstNode($2, hfst::pmatch::AstToUpper);
+}
+;
+
 REGEXP12: LABEL { }
 | READ_BIN {
     hfst::HfstInputStream instream($1);
@@ -1241,9 +1320,6 @@ LEFT_CONTEXT: LC_LEFT REPLACE RIGHT_PARENTHESIS {
         hfst::internal_epsilon, hfst::pmatch::LC_EXIT_SYMBOL, hfst::pmatch::format);
     lc_entry->concatenate($2->reverse());
     lc_entry->concatenate(*lc_exit);
-    lc_entry->substitute("@PMATCH_ENTRY@", "@PMATCH_TMP@");
-    lc_entry->substitute("@PMATCH_EXIT@", "@PMATCH_ENTRY@");
-    lc_entry->substitute("@PMATCH_TMP@", "@PMATCH_EXIT@");
     $$ = lc_entry;
     delete $2;
     delete lc_exit;
@@ -1257,15 +1333,87 @@ NEGATIVE_LEFT_CONTEXT: NLC_LEFT REPLACE RIGHT_PARENTHESIS {
         hfst::internal_epsilon, hfst::pmatch::NLC_EXIT_SYMBOL, hfst::pmatch::format);
     nlc_entry->concatenate($2->reverse());
     nlc_entry->concatenate(*nlc_exit);
-    nlc_entry->substitute("@PMATCH_ENTRY@", "@PMATCH_TMP@");
-    nlc_entry->substitute("@PMATCH_EXIT@", "@PMATCH_ENTRY@");
-    nlc_entry->substitute("@PMATCH_TMP@", "@PMATCH_EXIT@");
     nlc_entry->disjunct(HfstTransducer("@PMATCH_PASSTHROUGH@",
                                        hfst::internal_epsilon, hfst::pmatch::format));
     $$ = nlc_entry;
     delete $2;
     delete nlc_exit;
  }
+;
+
+FUN_RIGHT_CONTEXT: RC_LEFT FUNCBODY2 RIGHT_PARENTHESIS {
+    hfst::pmatch::PmatchAstNode * rc_entry =
+        new hfst::pmatch::PmatchAstNode(
+            new HfstTransducer(hfst::internal_epsilon,
+                               hfst::pmatch::RC_ENTRY_SYMBOL,
+                               hfst::pmatch::format),
+            $2, hfst::pmatch::AstConcatenate);
+    $$ = new hfst::pmatch::PmatchAstNode(rc_entry,
+                                         new HfstTransducer(
+                                             hfst::internal_epsilon,
+                                             hfst::pmatch::RC_EXIT_SYMBOL,
+                                             hfst::pmatch::format),
+                                         hfst::pmatch::AstConcatenate);
+ }
+;
+
+FUN_NEGATIVE_RIGHT_CONTEXT: NRC_LEFT FUNCBODY2 RIGHT_PARENTHESIS {
+    hfst::pmatch::PmatchAstNode * nrc_entry =
+        new hfst::pmatch::PmatchAstNode(
+            new HfstTransducer(hfst::internal_epsilon,
+                               hfst::pmatch::NRC_ENTRY_SYMBOL,
+                               hfst::pmatch::format),
+            $2, hfst::pmatch::AstConcatenate);
+    hfst::pmatch::PmatchAstNode * nrc_main_branch =
+        new hfst::pmatch::PmatchAstNode(nrc_entry,
+                                        new HfstTransducer(
+                                            hfst::internal_epsilon,
+                                            hfst::pmatch::NRC_EXIT_SYMBOL,
+                                            hfst::pmatch::format),
+                                        hfst::pmatch::AstConcatenate);
+    $$ = new hfst::pmatch::PmatchAstNode(
+        nrc_main_branch,
+        new HfstTransducer("@PMATCH_PASSTHROUGH@",
+                           hfst::internal_epsilon, hfst::pmatch::format),
+        hfst::pmatch::AstDisjunct);
+ }
+;
+
+FUN_LEFT_CONTEXT: LC_LEFT FUNCBODY2 RIGHT_PARENTHESIS {
+    hfst::pmatch::PmatchAstNode * reverse = new hfst::pmatch::PmatchAstNode(
+        $2, hfst::pmatch::AstReverse);
+    
+    HfstTransducer * lc_entry = new HfstTransducer(
+        hfst::internal_epsilon, hfst::pmatch::LC_ENTRY_SYMBOL, hfst::pmatch::format);
+    HfstTransducer * lc_exit = new HfstTransducer(
+        hfst::internal_epsilon, hfst::pmatch::LC_EXIT_SYMBOL, hfst::pmatch::format);
+
+    hfst::pmatch::PmatchAstNode * entry = new hfst::pmatch::PmatchAstNode(
+        lc_entry, reverse, hfst::pmatch::AstConcatenate);
+    $$ = new hfst::pmatch::PmatchAstNode(
+        entry, lc_exit, hfst::pmatch::AstConcatenate);
+ }
+;
+
+FUN_NEGATIVE_LEFT_CONTEXT: NLC_LEFT FUNCBODY2 RIGHT_PARENTHESIS {
+    hfst::pmatch::PmatchAstNode * reverse = new hfst::pmatch::PmatchAstNode(
+        $2, hfst::pmatch::AstReverse);
+
+    HfstTransducer * nlc_entry = new HfstTransducer(
+        hfst::internal_epsilon, hfst::pmatch::NLC_ENTRY_SYMBOL, hfst::pmatch::format);
+    HfstTransducer * nlc_exit = new HfstTransducer(
+        hfst::internal_epsilon, hfst::pmatch::NLC_EXIT_SYMBOL, hfst::pmatch::format);
+
+    hfst::pmatch::PmatchAstNode * entry = new hfst::pmatch::PmatchAstNode(
+        nlc_entry, reverse, hfst::pmatch::AstConcatenate);
+    hfst::pmatch::PmatchAstNode * main_branch = new hfst::pmatch::PmatchAstNode(
+        entry, nlc_exit, hfst::pmatch::AstConcatenate);
+
+    $$ = new hfst::pmatch::PmatchAstNode(main_branch,
+                                         new HfstTransducer("@PMATCH_PASSTHROUGH@",
+                                                            hfst::internal_epsilon, hfst::pmatch::format),
+                                         hfst::pmatch::AstDisjunct);
+}
 ;
 
 %%

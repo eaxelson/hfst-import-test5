@@ -807,6 +807,48 @@ HfstTransducer * PmatchAstNode::evaluate(
         } else if (op == AstOptionalize) {
             retval->optionalize();
             return retval;
+        } else if (op == AstRepeatStar) {
+            retval->repeat_star();
+            return retval;
+        } else if (op == AstRepeatPlus) {
+            retval->repeat_plus();
+            return retval;
+        } else if (op == AstReverse) {
+            retval->reverse();
+            return retval;
+        } else if (op == AstInvert) {
+            retval->invert();
+            return retval;
+        } else if (op == AstInputProject) {
+            retval->input_project();
+            return retval;
+        } else if (op == AstOutputProject) {
+            retval->output_project();
+            return retval;
+        } else if (op == AstRepeatN) {
+            retval->repeat_n(numeric_args[0]);
+            return retval;
+        } else if (op == AstRepeatNPlus) {
+            retval->repeat_n_plus(numeric_args[0]);
+            return retval;
+        } else if (op == AstRepeatNMinus) {
+            retval->repeat_n_minus(numeric_args[0]);
+            return retval;
+        } else if (op == AstRepeatNToK) {
+            retval->repeat_n_to_k(numeric_args[0], numeric_args[1]);
+            return retval;
+        } else if (op == AstOptCap) {
+            HfstTransducer * tmp = get_utils()->optcap(*retval);
+            delete retval;
+            return tmp;
+        } else if (op == AstToLower) {
+            HfstTransducer * tmp = get_utils()->tolower(*retval);
+            delete retval;
+            return tmp;
+        } else if (op == AstToUpper) {
+            HfstTransducer * tmp = get_utils()->toupper(*retval);
+            delete retval;
+            return tmp;
         }
     } else if (type == AstBinaryOp) {
         HfstTransducer * retval = left_child->evaluate(funargs);
