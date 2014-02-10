@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# skip tests until errors are fixed
-#exit 77
-
 TOOLDIR=../../tools/src
 LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc 
           basic.empty-sides.lexc basic.escapes.lexc 
@@ -14,7 +11,7 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
           basic.spurious-lexicon.lexc basic.string-pairs.lexc 
           basic.two-lexicons.lexc basic.UTF-8.lexc basic.zeros-epsilons.lexc
           basic.lowercase-lexicon-end.lexc
-          basic.multichar-escaped-zero.lexc 
+          basic.multichar-escaped-zero.lexc
           hfst.weights.lexc      
           xre.automatic-multichar-symbols.lexc xre.basic.lexc 
           xre.definitions.lexc xre.months.lexc xre.nested-definitions.lexc 
@@ -22,6 +19,7 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
           xre.star-plus-optional.lexc
           xre.any-variations.lexc"
           
+          # basic.reserved-words-lowercase.lexc - hfst interprets 'end', 'lexicon' etc as reserved words
           # basic.end.lexc -hfst doesn't parse till end
           # xre.any-variations.lexc -foma ?:? problem
           # basic.multichar-symbol-with-0.lexc  - hfst works fine, foma wrong
@@ -141,3 +139,5 @@ for i in .sfst .ofst .foma ; do
         exit 1
     fi
 done
+
+return 77
