@@ -223,8 +223,6 @@ LexcCompiler::addStringEntry(const string& data,
     tokenizer_.add_multichar_symbol(encodedCont);
 
     // build string pair vector map
-    //TODO: manage weights
-
     string joinerEnc = currentLexiconName_;
     if (with_flags_)
     {
@@ -243,9 +241,7 @@ LexcCompiler::addStringEntry(const string& data,
     }
     tokenizer_.add_multichar_symbol(joinerEnc);
     StringPairVector newVector(tokenizer_.tokenize(joinerEnc + str + encodedCont));
-    stringsTrie_.disjunct(newVector, 0);
-
-
+    stringsTrie_.disjunct(newVector, weight);
 
     return *this;
 }
@@ -280,7 +276,6 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
     tokenizer_.add_multichar_symbol(encodedCont);
 
     // build string pair vector map
-    //TODO: manage weights
 
     string joinerEnc = currentLexiconName_;
     if (with_flags_)
@@ -349,7 +344,7 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
         newVector = tokenizer_.tokenize(joinerEnc + upper_string + encodedCont,
                     joinerEnc + lower_string + encodedCont);
     }
-    stringsTrie_.disjunct(newVector, 0);
+    stringsTrie_.disjunct(newVector, weight);
 
     return *this;
 }
@@ -389,10 +384,10 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
     //HfstTransducer* newPaths = xre_.compile(regexp + " "  + string(xre_encoded));
     HfstTransducer* newPaths = xre_.compile(regexp);
 
-    if (weight != 0)
-      {
-        newPaths->set_final_weights(weight);
-      }
+//    if (weight != 0)
+//      {
+//        newPaths->set_final_weights(weight);
+//      }
     newPaths->minimize();
 
 
@@ -444,7 +439,7 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
       }
       tokenizer_.add_multichar_symbol(joinerEnc);
       StringPairVector newVector(tokenizer_.tokenize(joinerEnc + regex_key + encodedCont));
-      stringsTrie_.disjunct(newVector, 0);
+      stringsTrie_.disjunct(newVector, weight);
 
 
 
