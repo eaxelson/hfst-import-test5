@@ -93,7 +93,7 @@ LEFT_CONTEXT NEGATIVE_RIGHT_CONTEXT NEGATIVE_LEFT_CONTEXT
 %type <ast_node> FUN_OPTCAP FUN_TOLOWER FUN_TOUPPER
 
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
-%nonassoc <label> QUOTED_LITERAL SYMBOL
+%nonassoc <label> QUOTED_LITERAL SYMBOL SYMBOL_WITH_LEFT_PAREN
 
 %left  CROSS_PRODUCT COMPOSITION LENIENT_COMPOSITION INTERSECTION
 %left  CENTER_MARKER MARKUP_MARKER
@@ -190,8 +190,8 @@ BINDING: SYMBOL REGEXP1 {
     $$ = new std::pair<std::string, hfst::HfstTransducer*>($1, $2);
  };
 
-FUNCTION: SYMBOL ARGLIST FUNCBODY1 END_OF_EXPRESSION {
-    hfst::pmatch::PmatchFunction fun(* $2, $3);
+FUNCTION: SYMBOL_WITH_LEFT_PAREN ARGLIST RIGHT_PARENTHESIS FUNCBODY1 END_OF_EXPRESSION {
+    hfst::pmatch::PmatchFunction fun(* $2, $4);
 //    std::pair<std::string, PmatchFunction> name_fun_pair($1, fun);
     hfst::pmatch::functions[$1] = fun;
     // Pass a dummy transducer, since function registration is separate
@@ -200,7 +200,7 @@ FUNCTION: SYMBOL ARGLIST FUNCBODY1 END_OF_EXPRESSION {
     $$ = new std::pair<std::string, hfst::HfstTransducer*>("@_PMATCH_DUMMY_@", dummy);
  };
 
-ARGLIST: LEFT_PARENTHESIS ARGS RIGHT_PARENTHESIS {
+ARGLIST: ARGS {
     $$ = new std::vector<std::string>(hfst::pmatch::tmp_collected_funargs);
     hfst::pmatch::tmp_collected_funargs.clear();
  };
@@ -1197,7 +1197,7 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
 | MAP {  }
 ;
 
-FUNCALL: SYMBOL ARGLIST {
+FUNCALL: SYMBOL_WITH_LEFT_PAREN ARGLIST RIGHT_PARENTHESIS {
     if (hfst::pmatch::functions.count($1) == 0) {
         std::string errstring = "Function not defined: " + std::string($1);
         pmatcherror(errstring.c_str());
