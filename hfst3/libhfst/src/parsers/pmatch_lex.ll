@@ -286,7 +286,15 @@ LWSP [\t\r\n ]
 {NAME_CH}+ {
     pmatchlval.label = hfst::pmatch::strip_percents(pmatchtext);
     return SYMBOL;
-}  
+}
+
+{NAME_CH}+"(" {
+    char * label = (char *) malloc(strlen(pmatchtext));;
+    strncpy(label, pmatchtext, strlen(pmatchtext) - 1);
+    pmatchlval.label = hfst::pmatch::strip_percents(label);
+    free(label);
+    return SYMBOL_WITH_LEFT_PAREN;
+}
 
 ";"{WSP}*{WEIGHT} {
     pmatchlval.weight = hfst::pmatch::get_weight(pmatchtext + 2);
