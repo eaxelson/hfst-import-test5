@@ -184,6 +184,10 @@ namespace hfst
         return retval;
       }
 
+      float func(float f) {
+        return f/2;
+      }
+
       /*
        * Generalized Lenient Composition, described in Anssi Yli-Jyrä 2008b
        */
@@ -198,8 +202,8 @@ namespace hfst
 
           tmp.compose(Constraint).minimize();
 
-       //  printf("tmp: \n");
-        // tmp.write_in_att_format(stdout, 1);
+          //printf("tmp: \n");
+           //tmp.write_in_att_format(stdout, 1);
 
           tmp.compose(retval).minimize();
          //printf("tmp 2: \n");
@@ -209,6 +213,13 @@ namespace hfst
           retval.subtract(tmp).minimize();
 
           retval.compose(t).minimize();
+
+
+          //printf("tmp 2: \n");
+                  //tmp.write_in_att_format(stdout, 1);
+
+          //scales down the weights because they get doubled in this function
+          retval.transform_weights(&func);
 
           return retval;
       }
@@ -2195,10 +2206,12 @@ namespace hfst
 
             //printf("----after mostBracketsStarConstraint: ----\n");
             //retval.write_in_att_format(stdout, 1);
+
             retval = removeB2Constraint(retval);
 
             //printf("----after removeB2Constraint: ----\n");
             //retval.write_in_att_format(stdout, 1);
+
             retval = removeMarkers( retval );
 
             //printf("----after removeMarkers: ----\n");
