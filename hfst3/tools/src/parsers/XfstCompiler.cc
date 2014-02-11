@@ -347,6 +347,12 @@ namespace xfst {
             }
 
           } // path gone through
+        
+        // if needed, print the weight
+        if (variables_["print-weight"] == "ON")
+          {
+            hfst_fprintf(outfile, "\t%f", it->first);
+          }
 
         hfst_fprintf(outfile, "\n");
         --n;
@@ -3822,13 +3828,12 @@ namespace xfst {
         PROMPT_AND_RETURN_THIS;
       }
 
-    // cannot be used until bugs in hfst's lexc parser are fixed
-    //lexc_.parse(infile);
-    //t = lexc_.compileLexical();
-    //hfst::xfst::xfst_fclose(infile, filename);
+    lexc_.parse(infile);
+    t = lexc_.compileLexical();
+    hfst::xfst::xfst_fclose(infile, filename);
 
     // using foma's lexc implementation
-    if (! HfstTransducer::is_implementation_type_available(hfst::FOMA_TYPE))
+    /*if (! HfstTransducer::is_implementation_type_available(hfst::FOMA_TYPE))
       {
         hfst_fprintf(errorstream_, "foma back-end not enabled, cannot read lexc files\n");
         xfst_fail();
@@ -3838,6 +3843,7 @@ namespace xfst {
     t = HfstTransducer::read_lexc_ptr(std::string(filename), hfst::FOMA_TYPE, verbose_);
     if (t != NULL)
       t->convert(format_);
+    */
     
     if (t == NULL)
       {

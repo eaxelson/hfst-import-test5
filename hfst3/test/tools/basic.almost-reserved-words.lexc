@@ -1,7 +1,7 @@
 LEXICON Root
 end # ;
+End # ;
 lexicon # ;
-declarations # ;
-definitions # ;
-noflags # ;
 multichar_symbols # ;
+definitions # ;
+declarations # ;
