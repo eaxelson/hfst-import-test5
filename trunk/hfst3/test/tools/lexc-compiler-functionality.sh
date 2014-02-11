@@ -12,23 +12,21 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
           basic.two-lexicons.lexc basic.UTF-8.lexc basic.zeros-epsilons.lexc
           basic.lowercase-lexicon-end.lexc
           basic.multichar-escaped-zero.lexc
+          basic.almost-reserved-words.lexc
           hfst.weights.lexc      
           xre.automatic-multichar-symbols.lexc xre.basic.lexc 
           xre.definitions.lexc xre.months.lexc xre.nested-definitions.lexc 
           xre.numeric-star.lexc xre.sharp.lexc xre.quotations.lexc
           xre.star-plus-optional.lexc
           xre.any-variations.lexc"
-          
-          # basic.reserved-words-lowercase.lexc - hfst interprets 'end', 'lexicon' etc as reserved words
+
           # basic.end.lexc -hfst doesn't parse till end
           # xre.any-variations.lexc -foma ?:? problem
           # basic.multichar-symbol-with-0.lexc  - hfst works fine, foma wrong
           # basic.multichar-flag-with-zero.lexc - foma wrong
 
           
-          
-          
-          
+                    
           
 LEXCXFAIL="xfail.bogus.lexc xfail.ISO-8859-1.lexc xfail.lexicon-semicolon.lexc"
 

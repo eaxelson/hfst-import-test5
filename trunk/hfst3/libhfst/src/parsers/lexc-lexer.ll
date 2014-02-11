@@ -89,19 +89,19 @@ LWSP [\r\n\t ]
 %%
 
 
-<INITIAL>^{WSP}*("Multichar"|"multichar"|"MULTICHAR")("_"|" ")("symbols"|"Symbols"|"SYMBOLS"){LWSP}+ {
+<INITIAL>^{WSP}*("Multichar_Symbols"|"MULTICHAR_SYMBOLS"){LWSP}+ {
     BEGIN MULTICHARS;
     hfst::lexc::token_update_positions(hlexctext);
     return MULTICHARS_START;
 }
 
-<INITIAL,MULTICHARS>^{WSP}*("NOFLAGS"|"NoFlags"|"Noflags"|"noflags"){LWSP}+ {
+<INITIAL,MULTICHARS>^{WSP}*("NOFLAGS"|"NoFlags"){LWSP}+ {
     BEGIN NOFLAGS;
     hfst::lexc::token_update_positions(hlexctext);
     return NOFLAGS_START;
 }
 
-<INITIAL,MULTICHARS,NOFLAGS>^{WSP}*("Definitions"|"Declarations"|"definitions"|"declarations"|"DEFINITIONS"|"DECLARATIONS"){LWSP}+ {
+<INITIAL,MULTICHARS,NOFLAGS>^{WSP}*("Definitions"|"Declarations"|"DEFINITIONS"|"DECLARATIONS"){LWSP}+ {
     BEGIN DEFINITIONS;
     hfst::lexc::token_update_positions(hlexctext);
     return DEFINITIONS_START;
@@ -118,18 +118,6 @@ LWSP [\r\n\t ]
     return LEXICON_START;
 }
 
-<INITIAL,MULTICHARS,NOFLAGS,DEFINITIONS>^{WSP}*("lexicon"){WSP}+{LEXICONNAME} {
-    BEGIN LEXICONS;
-    hfst::lexc::token_update_positions(hlexctext);
-    char* lexicon_start;
-    lexicon_start = hfst::lexc::strstrip(hlexctext);
-    hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "lexicon",
-                                          NULL, true);
-    free(lexicon_start);
-    hlexcerror("Lowercase lexicon parsed as LEXICON");
-    return LEXICON_START_WRONG_CASE;
-}
-
 <INITIAL,MULTICHARS,NOFLAGS,DEFINITIONS>^{WSP}*("Lexicon"){WSP}+{LEXICONNAME} {
     BEGIN LEXICONS;
     hfst::lexc::token_update_positions(hlexctext);
@@ -142,7 +130,7 @@ LWSP [\r\n\t ]
     return LEXICON_START_WRONG_CASE;
 }
 
-<INITIAL,MULTICHARS,NOFLAGS,DEFINITIONS>^{WSP}*("END"|"End"|"end"){LWSP}+ {
+<INITIAL,MULTICHARS,NOFLAGS,DEFINITIONS>^{WSP}*("END"){LWSP}+ {
     hfst::lexc::token_update_positions(hlexctext);
     return END_START;
 }
@@ -209,16 +197,6 @@ LWSP [\r\n\t ]
     hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "Lexicon", 0, true);
     free(lexicon_start);
     hlexcerror("Titlecase Lexicon parsed as LEXICON");
-    return LEXICON_START_WRONG_CASE;
-}
-
-<LEXICONS>^{WSP}*"lexicon"{WSP}+{LEXICONNAME} {
-    hfst::lexc::token_update_positions(hlexctext);
-    char* lexicon_start;
-    lexicon_start = hfst::lexc::strstrip(hlexctext);
-    hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "lexicon", 0, true);
-    free(lexicon_start);
-    hlexcerror("Lowercase lexicon parsed as LEXICON");
     return LEXICON_START_WRONG_CASE;
 }
 
