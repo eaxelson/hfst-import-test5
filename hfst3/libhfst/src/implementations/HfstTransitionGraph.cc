@@ -25,6 +25,7 @@ int main(int argc, char * argv[])
     g1.add_transition(0, HfstBasicTransition(1, "b", "b", 0.1));
     //g1.add_transition(0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0.1));
     g1.add_transition(0, HfstBasicTransition(1, "c", "c", 0.1));
+    g1.add_transition(0, HfstBasicTransition(1, "d", "d", 0.1));
     g1.set_final_weight(1, 0.5);
 
     //g1.write_in_att_format(stderr);
@@ -46,6 +47,8 @@ int main(int argc, char * argv[])
     g1.substitute(subst_map, false);
     //std::pair<std::string, std::string> p = std::pair<std::string, std::string>("a", "a");
     //g1.substitute(p, subst);
+
+    g1.remove_transition(0, HfstBasicTransition(1, "d", "d", 0.1));
 
     g1.write_in_att_format(stdout);
     std::cout << std::endl << "ok" << std::endl;
