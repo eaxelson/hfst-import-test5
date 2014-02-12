@@ -557,11 +557,37 @@
      void remove_transition(HfstState s, const HfstTransition<C> & transition,
                             bool remove_symbols_from_alphabet=false)
      {
-       if (state_vector.size() > s)
-         state_vector[s].erase(transition);
-       else
-         return;
+       if (! (state_vector.size() > s))
+         {
+           return;
+         }
 
+       HfstTransitions & transitions = state_vector[s];
+       // iterators to transitions to be removed
+       // transitions must be removed in reverse order so that iterators
+       // are not invalidated
+       std::stack<typename HfstTransitions::iterator> elements_to_remove;
+
+       // find the transitions to be removed
+       for (typename HfstTransitions::iterator it = transitions.begin();
+            it != transitions.end(); it++)
+         {
+           // weight is ignored
+           if (it->get_input_symbol() == transition.get_input_symbol() &&
+               it->get_output_symbol() == transition.get_output_symbol() &&
+               it->get_target_state() == transition.get_target_state())
+             {
+               // schedule transition to be removed
+               elements_to_remove.push(it); 
+             }
+         }
+       // remove the transitions in reverse order
+       while (!elements_to_remove.empty())
+         {
+           state_vector[s].erase(elements_to_remove.top());
+           elements_to_remove.pop();
+         }           
+       
        if (remove_symbols_from_alphabet)
          {
            HfstTransitionGraphAlphabet alpha = this->symbols_used();
