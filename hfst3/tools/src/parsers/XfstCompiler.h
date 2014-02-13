@@ -274,20 +274,20 @@ class XfstCompiler
   //! @brief Print length of longest string
   XfstCompiler& print_longest_string_size(FILE* outfile);
   //! @brief Print strings of lower language
-  XfstCompiler& print_lower_words(unsigned int number,
+  XfstCompiler& print_lower_words(const char * name, unsigned int number,
                                   FILE* outfile);
   //! @brief Print random strings of lower language
-  XfstCompiler& print_random_lower(unsigned int number, FILE* outfile);
+  XfstCompiler& print_random_lower(const char * name, unsigned int number, FILE* outfile);
   //! @brief Print astrings of upper language
-  XfstCompiler& print_upper_words(unsigned int number,
+  XfstCompiler& print_upper_words(const char * name, unsigned int number,
                                   FILE* outfile);
   //! @brief Print random strings of upper language
-  XfstCompiler& print_random_upper(unsigned int number, FILE* outfile);
+  XfstCompiler& print_random_upper(const char * name, unsigned int number, FILE* outfile);
   //! @brief Print pair strings of language
-  XfstCompiler& print_words(unsigned int number,
+  XfstCompiler& print_words(const char * name, unsigned int number,
                             FILE* outfile);
   //! @brief Print random pair strings of language
-  XfstCompiler& print_random_words(unsigned int number, FILE* outfile);
+  XfstCompiler& print_random_words(const char * name, unsigned int number, FILE* outfile);
   //! @brief Print name of top network
   XfstCompiler& print_name(FILE* outfile);
   //! @brief Print network
@@ -525,7 +525,7 @@ class XfstCompiler
   //! @brief Try to extract a maximum of \a number paths from topmost
   //! transducer in the stack and print them to \a outfile. \a level
   //! defines whether the input or output level is printed or both are printed.
-  XfstCompiler& print_words(unsigned int number,
+  XfstCompiler& print_words(const char * name, unsigned int number,
                             FILE * outfile, Level level);
   //! @brief Read strings (with or without spaces between the symbols,
   //! as defined by \a spaces) from \a infile, disjunct them into

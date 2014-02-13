@@ -576,106 +576,207 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             hfst::xfst::xfst_->print_shortest_string_size(stdout);
        }
        | PRINT_LOWER_WORDS NAMETOKEN NAMETOKEN END_COMMAND {
-            hfst::xfst::xfst_->print_lower_words(hfst::xfst::nametoken_to_number($3), stdout);
+            hfst::xfst::xfst_->print_lower_words($2, hfst::xfst::nametoken_to_number($3), stdout);
             free($2);
+       }
+       | PRINT_LOWER_WORDS NAMETOKEN NAMETOKEN REDIRECT_OUT END_COMMAND {
+            FILE * f = hfst::xfst::xfst_fopen($4, "w");
+            hfst::xfst::xfst_->print_lower_words($2, hfst::xfst::nametoken_to_number($3), f);
+            free($2);
+            hfst::xfst::xfst_fclose(f, $4);
        }
        | PRINT_LOWER_WORDS NAMETOKEN END_COMMAND {
             int i = hfst::xfst::nametoken_to_number($2);
             if (i != -1)
-              hfst::xfst::xfst_->print_lower_words(i, stdout);
+              hfst::xfst::xfst_->print_lower_words(NULL, i, stdout);
             else
-              hfst::xfst::xfst_->print_lower_words(0, stdout); // TODO?
+              hfst::xfst::xfst_->print_lower_words($2, 0, stdout);
+       }
+       | PRINT_LOWER_WORDS END_COMMAND {
+            hfst::xfst::xfst_->print_lower_words(NULL, 0, stdout);
+       }
+       | PRINT_LOWER_WORDS NAMETOKEN REDIRECT_OUT END_COMMAND {
+            FILE * f = hfst::xfst::xfst_fopen($3, "w");
+            int i = hfst::xfst::nametoken_to_number($2);
+            if (i != -1)
+              hfst::xfst::xfst_->print_lower_words(NULL, i, f);
+            else
+              hfst::xfst::xfst_->print_lower_words($2, 0, f);
+            hfst::xfst::xfst_fclose(f, $3);
        }
        | PRINT_LOWER_WORDS REDIRECT_OUT END_COMMAND {
             FILE * f = hfst::xfst::xfst_fopen($2, "w");
-            hfst::xfst::xfst_->print_lower_words(0, f);
+            hfst::xfst::xfst_->print_lower_words(NULL, 0, f);
             hfst::xfst::xfst_fclose(f, $2);
+       }
+       | PRINT_RANDOM_LOWER NAMETOKEN NAMETOKEN END_COMMAND {
+            hfst::xfst::xfst_->print_random_lower($2, hfst::xfst::nametoken_to_number($3), stdout);
+            free($2);
+       }
+       | PRINT_RANDOM_LOWER NAMETOKEN NAMETOKEN REDIRECT_OUT END_COMMAND {
+            FILE * f = hfst::xfst::xfst_fopen($4, "w");
+            hfst::xfst::xfst_->print_random_lower($2, hfst::xfst::nametoken_to_number($3), f);
+            free($2);
+            hfst::xfst::xfst_fclose(f, $4);
        }
        | PRINT_RANDOM_LOWER NAMETOKEN END_COMMAND {
-            hfst::xfst::xfst_->print_random_lower(hfst::xfst::nametoken_to_number($2), stdout);
+            int i = hfst::xfst::nametoken_to_number($2);
+            if (i != -1)
+              hfst::xfst::xfst_->print_random_lower(NULL, i, stdout);
+            else
+              hfst::xfst::xfst_->print_random_lower($2, 15, stdout);
        }
        | PRINT_RANDOM_LOWER END_COMMAND {
-            hfst::xfst::xfst_->print_random_lower(15, stdout);
-       }
-       | PRINT_RANDOM_LOWER REDIRECT_OUT END_COMMAND {
-            FILE * f = hfst::xfst::xfst_fopen($2, "w");
-            hfst::xfst::xfst_->print_random_lower(15, f);
-            hfst::xfst::xfst_fclose(f, $2);
+            hfst::xfst::xfst_->print_random_lower(NULL, 15, stdout);
        }
        | PRINT_RANDOM_LOWER NAMETOKEN REDIRECT_OUT END_COMMAND {
             FILE * f = hfst::xfst::xfst_fopen($3, "w");
-            hfst::xfst::xfst_->print_random_lower(hfst::xfst::nametoken_to_number($2), f);
+            int i = hfst::xfst::nametoken_to_number($2);
+            if (i != -1)
+              hfst::xfst::xfst_->print_random_lower(NULL, i, f);
+            else
+              hfst::xfst::xfst_->print_random_lower($2, 15, f);
             hfst::xfst::xfst_fclose(f, $3);
        }
+       | PRINT_RANDOM_LOWER REDIRECT_OUT END_COMMAND {
+            FILE * f = hfst::xfst::xfst_fopen($2, "w");
+            hfst::xfst::xfst_->print_random_lower(NULL, 15, f);
+            hfst::xfst::xfst_fclose(f, $2);
+       }
        | PRINT_UPPER_WORDS NAMETOKEN NAMETOKEN END_COMMAND {
-            hfst::xfst::xfst_->print_upper_words(hfst::xfst::nametoken_to_number($3), stdout);
+            hfst::xfst::xfst_->print_upper_words($2, hfst::xfst::nametoken_to_number($3), stdout);
+            free($2);
+       }
+       | PRINT_UPPER_WORDS NAMETOKEN NAMETOKEN REDIRECT_OUT END_COMMAND {
+            FILE * f = hfst::xfst::xfst_fopen($4, "w");
+            hfst::xfst::xfst_->print_upper_words($2, hfst::xfst::nametoken_to_number($3), f);
+            free($2);
+            hfst::xfst::xfst_fclose(f, $4);
        }
        | PRINT_UPPER_WORDS NAMETOKEN END_COMMAND {
             int i = hfst::xfst::nametoken_to_number($2);
             if (i != -1)
-              hfst::xfst::xfst_->print_upper_words(i, stdout);
+              hfst::xfst::xfst_->print_upper_words(NULL, i, stdout);
             else
-              hfst::xfst::xfst_->print_upper_words(0, stdout); // TODO
+              hfst::xfst::xfst_->print_upper_words($2, 0, stdout);
+       }
+       | PRINT_UPPER_WORDS END_COMMAND {
+            hfst::xfst::xfst_->print_upper_words(NULL, 0, stdout);
+       }
+       | PRINT_UPPER_WORDS NAMETOKEN REDIRECT_OUT END_COMMAND {
+            FILE * f = hfst::xfst::xfst_fopen($3, "w");
+            int i = hfst::xfst::nametoken_to_number($2);
+            if (i != -1)
+              hfst::xfst::xfst_->print_upper_words(NULL, i, f);
+            else
+              hfst::xfst::xfst_->print_upper_words($2, 0, f);
+            hfst::xfst::xfst_fclose(f, $3);
        }
        | PRINT_UPPER_WORDS REDIRECT_OUT END_COMMAND {
             FILE * f = hfst::xfst::xfst_fopen($2, "w");
-            hfst::xfst::xfst_->print_upper_words(0, f);
+            hfst::xfst::xfst_->print_upper_words(NULL, 0, f);
             hfst::xfst::xfst_fclose(f, $2);
        }
+       | PRINT_RANDOM_UPPER NAMETOKEN NAMETOKEN END_COMMAND {
+            hfst::xfst::xfst_->print_random_upper($2, hfst::xfst::nametoken_to_number($3), stdout);
+            free($2);
+       }
+       | PRINT_RANDOM_UPPER NAMETOKEN NAMETOKEN REDIRECT_OUT END_COMMAND {
+            FILE * f = hfst::xfst::xfst_fopen($4, "w");
+            hfst::xfst::xfst_->print_random_upper($2, hfst::xfst::nametoken_to_number($3), f);
+            free($2);
+            hfst::xfst::xfst_fclose(f, $4);
+       }
        | PRINT_RANDOM_UPPER NAMETOKEN END_COMMAND {
-            hfst::xfst::xfst_->print_random_upper(hfst::xfst::nametoken_to_number($2), stdout);
+            int i = hfst::xfst::nametoken_to_number($2);
+            if (i != -1)
+              hfst::xfst::xfst_->print_random_upper(NULL, i, stdout);
+            else
+              hfst::xfst::xfst_->print_random_upper($2, 15, stdout);
        }
        | PRINT_RANDOM_UPPER END_COMMAND {
-            hfst::xfst::xfst_->print_random_upper(15, stdout);
+            hfst::xfst::xfst_->print_random_upper(NULL, 15, stdout);
        }
        | PRINT_RANDOM_UPPER NAMETOKEN REDIRECT_OUT END_COMMAND {
             FILE * f = hfst::xfst::xfst_fopen($3, "w");
-            hfst::xfst::xfst_->print_random_upper(hfst::xfst::nametoken_to_number($2), f);
+            int i = hfst::xfst::nametoken_to_number($2);
+            if (i != -1)
+              hfst::xfst::xfst_->print_random_upper(NULL, i, f);
+            else
+              hfst::xfst::xfst_->print_random_upper($2, 15, f);
             hfst::xfst::xfst_fclose(f, $3);
        }
        | PRINT_RANDOM_UPPER REDIRECT_OUT END_COMMAND {
             FILE * f = hfst::xfst::xfst_fopen($2, "w");
-            hfst::xfst::xfst_->print_random_upper(15, f);
+            hfst::xfst::xfst_->print_random_upper(NULL, 15, f);
             hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT_WORDS NAMETOKEN NAMETOKEN END_COMMAND {
-            hfst::xfst::xfst_->print_words(hfst::xfst::nametoken_to_number($3), stdout);
+            hfst::xfst::xfst_->print_words($2, hfst::xfst::nametoken_to_number($3), stdout);
             free($2);
+       }
+       | PRINT_WORDS NAMETOKEN NAMETOKEN REDIRECT_OUT END_COMMAND {
+            FILE * f = hfst::xfst::xfst_fopen($4, "w");
+            hfst::xfst::xfst_->print_words($2, hfst::xfst::nametoken_to_number($3), f);
+            free($2);
+            hfst::xfst::xfst_fclose(f, $4);
        }
        | PRINT_WORDS NAMETOKEN END_COMMAND {
             int i = hfst::xfst::nametoken_to_number($2);
             if (i != -1)
-              hfst::xfst::xfst_->print_words(i, stdout);
+              hfst::xfst::xfst_->print_words(NULL, i, stdout);
             else
-              hfst::xfst::xfst_->print_words(0, stdout); // TODO?
+              hfst::xfst::xfst_->print_words($2, 0, stdout);
        }
        | PRINT_WORDS END_COMMAND {
-            hfst::xfst::xfst_->print_words(0, stdout);
+            hfst::xfst::xfst_->print_words(NULL, 0, stdout);
        }
        | PRINT_WORDS NAMETOKEN REDIRECT_OUT END_COMMAND {
             FILE * f = hfst::xfst::xfst_fopen($3, "w");
-            hfst::xfst::xfst_->print_words(hfst::xfst::nametoken_to_number($2), f);
+            int i = hfst::xfst::nametoken_to_number($2);
+            if (i != -1)
+              hfst::xfst::xfst_->print_words(NULL, i, f);
+            else
+              hfst::xfst::xfst_->print_words($2, 0, f);
             hfst::xfst::xfst_fclose(f, $3);
        }
        | PRINT_WORDS REDIRECT_OUT END_COMMAND {
             FILE * f = hfst::xfst::xfst_fopen($2, "w");
-            hfst::xfst::xfst_->print_words(0, f);
+            hfst::xfst::xfst_->print_words(NULL, 0, f);
             hfst::xfst::xfst_fclose(f, $2);
        }
+       | PRINT_RANDOM_WORDS NAMETOKEN NAMETOKEN END_COMMAND {
+            hfst::xfst::xfst_->print_random_words($2, hfst::xfst::nametoken_to_number($3), stdout);
+            free($2);
+       }
+       | PRINT_RANDOM_WORDS NAMETOKEN NAMETOKEN REDIRECT_OUT END_COMMAND {
+            FILE * f = hfst::xfst::xfst_fopen($4, "w");
+            hfst::xfst::xfst_->print_random_words($2, hfst::xfst::nametoken_to_number($3), f);
+            free($2);
+            hfst::xfst::xfst_fclose(f, $4);
+       }
        | PRINT_RANDOM_WORDS NAMETOKEN END_COMMAND {
-            hfst::xfst::xfst_->print_random_words(hfst::xfst::nametoken_to_number($2), stdout);
+            int i = hfst::xfst::nametoken_to_number($2);
+            if (i != -1)
+              hfst::xfst::xfst_->print_random_words(NULL, i, stdout);
+            else
+              hfst::xfst::xfst_->print_random_words($2, 15, stdout);
        }
        | PRINT_RANDOM_WORDS END_COMMAND {
-            hfst::xfst::xfst_->print_random_words(15, stdout);
+            hfst::xfst::xfst_->print_random_words(NULL, 15, stdout);
        }
        | PRINT_RANDOM_WORDS NAMETOKEN REDIRECT_OUT END_COMMAND {
             FILE * f = hfst::xfst::xfst_fopen($3, "w");
-            hfst::xfst::xfst_->print_random_words(hfst::xfst::nametoken_to_number($2), f);
+            int i = hfst::xfst::nametoken_to_number($2);
+            if (i != -1)
+              hfst::xfst::xfst_->print_random_words(NULL, i, f);
+            else
+              hfst::xfst::xfst_->print_random_words($2, 15, f);
             hfst::xfst::xfst_fclose(f, $3);
        }
        | PRINT_RANDOM_WORDS REDIRECT_OUT END_COMMAND {
             FILE * f = hfst::xfst::xfst_fopen($2, "w");
-            hfst::xfst::xfst_->print_random_words(15, f);
+            hfst::xfst::xfst_->print_random_words(NULL, 15, f);
             hfst::xfst::xfst_fclose(f, $2);
        }
        | PRINT NAMETOKEN END_COMMAND {

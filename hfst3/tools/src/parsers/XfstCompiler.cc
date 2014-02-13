@@ -406,6 +406,12 @@ namespace xfst {
 
           } // path gone through
 
+        // if needed, print the weight
+        if (variables_["print-weight"] == "ON")
+          {
+            hfst_fprintf(outfile, "\t%f", it->first);
+          }
+
         hfst_fprintf(outfile, "\n");
         --n;
 
@@ -2440,32 +2446,80 @@ namespace xfst {
     }
 
   XfstCompiler& 
-  XfstCompiler::print_lower_words(unsigned int number,
+  XfstCompiler::print_lower_words(const char * name, unsigned int number,
                                   FILE* outfile)
     {
-      return print_words(number, outfile, LOWER_LEVEL);
+      return print_words(name, number, outfile, LOWER_LEVEL);
     }
   XfstCompiler& 
-  XfstCompiler::print_random_lower(unsigned int number, FILE* outfile)
+  XfstCompiler::print_random_lower(const char * name, unsigned int number, FILE* outfile)
     {
       hfst::HfstTwoLevelPaths paths;
-      HfstTransducer tmp = hfst::HfstTransducer(*(stack_.top()));
+
+      HfstTransducer tmp(format_);
+      if (name == NULL)
+        {
+          HfstTransducer * temp = this->top(); 
+          if (temp == NULL) 
+            { return *this; }
+          tmp = *temp;
+        }
+      else
+        {
+          std::map<std::string, HfstTransducer*>::const_iterator it 
+            = definitions_.find(name);
+          if (it == definitions_.end())
+            {
+              hfst_fprintf(outfile, "no such definition '%s'\n", name);
+              prompt();
+              return *this;
+            }
+          else
+            {
+              tmp = *(it->second);
+            }
+        }
+
       tmp.output_project();
       tmp.extract_random_paths(paths, number);
       print_paths(paths, outfile);
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
-  XfstCompiler::print_upper_words(unsigned int number,
+  XfstCompiler::print_upper_words(const char * name, unsigned int number,
                                   FILE* outfile)
     {
-      return print_words(number, outfile, UPPER_LEVEL);
+      return print_words(name, number, outfile, UPPER_LEVEL);
     }
   XfstCompiler&
-  XfstCompiler::print_random_upper(unsigned int number, FILE* outfile)
+  XfstCompiler::print_random_upper(const char * name, unsigned int number, FILE* outfile)
     {
       hfst::HfstTwoLevelPaths paths;
-      HfstTransducer tmp = hfst::HfstTransducer(*(stack_.top()));
+
+      HfstTransducer tmp(format_);
+      if (name == NULL)
+        {
+          HfstTransducer * temp = this->top(); 
+          if (temp == NULL) 
+            { return *this; }
+          tmp = *temp;
+        }
+      else
+        {
+          std::map<std::string, HfstTransducer*>::const_iterator it 
+            = definitions_.find(name);
+          if (it == definitions_.end())
+            {
+              hfst_fprintf(outfile, "no such definition '%s'\n", name);
+              prompt();
+              return *this;
+            }
+          else
+            {
+              tmp = *(it->second);
+            }
+        }
+
       tmp.input_project();
       tmp.extract_random_paths(paths, number);
       print_paths(paths, outfile);
@@ -2473,19 +2527,39 @@ namespace xfst {
     }
 
   XfstCompiler& 
-  XfstCompiler::print_words(unsigned int number,
+  XfstCompiler::print_words(const char * name, unsigned int number,
                             FILE* outfile)
   {
-    return print_words(number, outfile, BOTH_LEVELS);
+    return print_words(name, number, outfile, BOTH_LEVELS);
   }
 
   XfstCompiler& 
-  XfstCompiler::print_words(unsigned int number,
+  XfstCompiler::print_words(const char * name, unsigned int number,
                             FILE* outfile, Level level)
     {
-      GET_TOP(tmp);
-
-      HfstTransducer temp(*tmp);
+      HfstTransducer temp(format_);
+      if (name == NULL)
+        {
+          HfstTransducer * tmp = this->top(); 
+          if (tmp == NULL) 
+            { return *this; }
+          temp = *tmp;
+        }
+      else
+        {
+          std::map<std::string, HfstTransducer*>::const_iterator it 
+            = definitions_.find(name);
+          if (it == definitions_.end())
+            {
+              hfst_fprintf(outfile, "no such definition '%s'\n", name);
+              prompt();
+              return *this;
+            }
+          else
+            {
+              temp = *(it->second);
+            }
+        }
 
       switch (level)
         {
@@ -2527,9 +2601,30 @@ namespace xfst {
     }
 
   XfstCompiler& 
-  XfstCompiler::print_random_words(unsigned int number, FILE* outfile)
+  XfstCompiler::print_random_words(const char * name, unsigned int number, FILE* outfile)
     {
-      GET_TOP(tmp);
+      const HfstTransducer * tmp = NULL;
+      if (name == NULL)
+        {
+          tmp = this->top(); 
+          if (tmp == NULL) 
+            { return *this; }
+        }
+      else
+        {
+          std::map<std::string, HfstTransducer*>::const_iterator it 
+            = definitions_.find(name);
+          if (it == definitions_.end())
+            {
+              hfst_fprintf(outfile, "no such definition '%s'\n", name);
+              prompt();
+              return *this;
+            }
+          else
+            {
+              tmp = it->second;
+            }
+        }
 
       hfst::HfstTwoLevelPaths paths;
       tmp->extract_random_paths(paths, number);
