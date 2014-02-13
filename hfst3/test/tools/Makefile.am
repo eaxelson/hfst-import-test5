@@ -365,7 +365,7 @@ basic.no-Root.lexc.result \
 basic.punctuation.lexc.flag.result \
 basic.punctuation.lexc.result \
 basic.almost-reserved-words.lexc.flag.result \
-basic.ralmost-eserved-words.lexc.result \
+basic.almost-reserved-words.lexc.result \
 basic.root-loop.lexc.flag.result \
 basic.root-loop.lexc.result \
 basic.spurious-lexicon.lexc.flag.result \
