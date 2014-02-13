@@ -36,11 +36,11 @@ FNAME="openfst-tropical";
 FFLAG="-f openfst-tropical";
 
 for f in $LEXCTESTS ; do
-     echo "file: $f"
+     # echo "file: $f"
     
      RESULT="$f.flag.result"
      
-     echo "result: $RESULT"
+     # echo "result: $RESULT"
  
     if ! $TOOLDIR/hfst-lexc -F $FFLAG $f -o $RESULT 2> /dev/null; then
         echo "$TOOLDIR/hfst-lexc -F $FFLAG $f -o $RESULT failed with $?"

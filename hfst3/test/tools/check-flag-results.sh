@@ -47,7 +47,7 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
       
         hfst-fst2fst -t $ORIGINAL -o $ORIGINAL.tmp
         
-     echo "comparing eliminated file: $f"
+     # echo "comparing eliminated file: $f"
      if ! $TOOLDIR/hfst-compare -e -s $ORIGINAL.tmp $FLAGGED ; then
          echo "results differ: $f"
          exit 1
