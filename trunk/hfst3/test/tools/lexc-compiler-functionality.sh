@@ -138,4 +138,4 @@ for i in .sfst .ofst .foma ; do
     fi
 done
 
-return 77
+exit 77
