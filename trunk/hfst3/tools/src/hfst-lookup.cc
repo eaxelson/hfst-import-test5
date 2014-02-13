@@ -1004,23 +1004,6 @@ line_to_lookup_path(char** s, HfstStrings2FstTokenizer& tok,
     return rv;
 }
 
-template<class T> HfstOneLevelPaths*
-lookup_simple(const HfstOneLevelPath& s, T& t, bool* infinity)
-{
-  HfstOneLevelPaths* results = new HfstOneLevelPaths;
-
-  (void)s;
-  (void)t;
-  (void)infinity;
-  if (results->size() == 0)
-    {
-       // no results as empty result
-      verbose_printf("Got no results\n");
-    }
-  return results;
-}
-
-
 HfstOneLevelPaths*
 lookup_simple(const HfstOneLevelPath& s, HfstTransducer& t, bool* infinity)
 {
@@ -1205,44 +1188,64 @@ lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity)
 
 
 
-template<class T> HfstOneLevelPaths*
-lookup_cascading(const HfstOneLevelPath& s, vector<T> cascade,
+HfstOneLevelPaths*
+lookup_cascading(const HfstOneLevelPath& s, vector<HfstTransducer> cascade,
                  bool* infinity)
 {
-  HfstOneLevelPaths* kvs = new HfstOneLevelPaths;
-  kvs->insert(s);
+  HfstOneLevelPaths* results = new HfstOneLevelPaths;
+
+  // go through all transducers in the cascade
   for (unsigned int i = 0; i < cascade.size(); i++)
     {
-      // cascade here
-      HfstOneLevelPaths* newkvs = new HfstOneLevelPaths;
-      for (HfstOneLevelPaths::const_iterator ckv = kvs->begin();
-           ckv != kvs->end();
-           ++ckv)
+      HfstOneLevelPaths* result = lookup_simple(s, cascade[i], infinity);
+      if (infinity)
         {
-          HfstOneLevelPaths* xyzkvs = lookup_simple<T>(*ckv, cascade[i],
-                             infinity);
-          if (infinity)
-            {
-              verbose_printf("Inf results @ level %u, using " SIZE_T_SPECIFIER "\n",
-                             i, xyzkvs->size());
-            }
-          else
-            {
-              verbose_printf("" SIZE_T_SPECIFIER " results @ level %u\n", xyzkvs->size(), i);
-            }
-          for (HfstOneLevelPaths::const_iterator xyzkv = xyzkvs->begin();
-               xyzkv != xyzkvs->end();
-               ++xyzkv)
-            {
-              newkvs->insert(*xyzkv);
-            }
-          delete xyzkvs;
+          verbose_printf("Inf results @ level %u\n", i);
         }
-      delete kvs;
-      kvs = newkvs;
-   }
-  return kvs;
+      else
+        {
+          verbose_printf("" SIZE_T_SPECIFIER " results @ level %u\n", result->size(), i);
+        }
+      for (HfstOneLevelPaths::const_iterator it = result->begin();
+           it != result->end(); it++)
+        {
+          results->insert(*it);
+        }
+    }
+  // all transducers gone through
+
+  return results;
 }
+
+HfstOneLevelPaths*
+lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
+                 bool* infinity)
+{
+  HfstOneLevelPaths* results = new HfstOneLevelPaths;
+
+  // go through all transducers in the cascade
+  for (unsigned int i = 0; i < cascade.size(); i++)
+    {
+      HfstOneLevelPaths* result = lookup_simple(s, cascade[i], infinity);
+      if (infinity)
+        {
+          verbose_printf("Inf results @ level %u\n", i);
+        }
+      else
+        {
+          verbose_printf("" SIZE_T_SPECIFIER " results @ level %u\n", result->size(), i);
+        }
+      for (HfstOneLevelPaths::const_iterator it = result->begin();
+           it != result->end(); it++)
+        {
+          results->insert(*it);
+        }
+    }
+  // all transducers gone through
+
+  return results;
+}
+
 
 void
 print_lookups(const HfstOneLevelPaths& kvs,
@@ -1294,8 +1297,9 @@ print_lookups(const HfstOneLevelPaths& kvs,
       }
 }
 
-template<class T> HfstOneLevelPaths*
-perform_lookups(HfstOneLevelPath& origin, std::vector<T>& cascade, 
+
+HfstOneLevelPaths*
+perform_lookups(HfstOneLevelPath& origin, std::vector<HfstTransducer>& cascade, 
                 bool unknown, bool* infinite)
 {
   HfstOneLevelPaths* kvs;
@@ -1307,7 +1311,7 @@ perform_lookups(HfstOneLevelPath& origin, std::vector<T>& cascade,
           }
         else
          {
-       kvs = lookup_cascading<T>(origin, cascade, infinite);
+           kvs = lookup_cascading(origin, cascade, infinite);
          }
       }
     else
@@ -1317,13 +1321,36 @@ perform_lookups(HfstOneLevelPath& origin, std::vector<T>& cascade,
     return kvs;
 }
 
+HfstOneLevelPaths*
+perform_lookups(HfstOneLevelPath& origin, std::vector<HfstBasicTransducer>& cascade, 
+                bool unknown, bool* infinite)
+{
+  HfstOneLevelPaths* kvs;
+    if (!unknown)
+      {
+        if (cascade.size() == 1)
+          {
+            kvs = lookup_simple(origin, cascade[0], infinite);
+          }
+        else
+         {
+           kvs = lookup_cascading(origin, cascade, infinite);
+         }
+      }
+    else
+      {
+        kvs = new HfstOneLevelPaths;
+      }
+    return kvs;
+}
+
+
 int
 process_stream(HfstInputStream& inputstream, FILE* outstream)
 {
     std::vector<HfstTransducer> cascade;
     std::vector<HfstBasicTransducer> cascade_mut;
-    bool internal_transducers=false;
-    // set to false if non-ol trasnducer is pushed into the cascade
+    // set to false if non-ol transducer is pushed into the cascade
     bool only_optimized_lookup=true;
     
     size_t transducer_n=0;
@@ -1332,10 +1359,12 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     {
         transducer_n++;
         HfstTransducer trans(inputstream);
-        if (trans.get_type() != HFST_OL_TYPE and
-            trans.get_type() != HFST_OLW_TYPE) {
+        hfst::ImplementationType type = trans.get_type();
+
+        if (type != HFST_OL_TYPE && type != HFST_OLW_TYPE) 
+          {
             only_optimized_lookup = false;
-        }
+          }
         char* inputname = strdup(trans.get_name().c_str());
         if (strlen(inputname) <= 0)
           {
@@ -1352,7 +1381,6 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
           }
 
         // add multicharacter symbols to mc_symbols
-        hfst::ImplementationType type = trans.get_type();
         if (type == hfst::SFST_TYPE || 
             type == hfst::TROPICAL_OPENFST_TYPE ||
             type == hfst::LOG_OPENFST_TYPE ||
@@ -1363,8 +1391,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                  it != basic.end(); it++)
               {
                 for (HfstBasicTransducer::HfstTransitions::const_iterator 
-               tr_it = it->begin();
-                     tr_it != it->end(); tr_it++)
+                       tr_it = it->begin(); tr_it != it->end(); tr_it++)
                   {
                     std::string mcs = tr_it->get_input_symbol();
                     if (mcs.size() > 1) {
@@ -1374,15 +1401,13 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                     }
                   }
               }
+            cascade_mut.push_back(basic);
           }
 
         cascade.push_back(trans);
       }
 
     inputstream.close();
-
-    // if transducer type is other than optimized_lookup,
-    // convert to HfstBasicTransducer
 
     if (print_pairs && 
         (inputstream.get_type() == HFST_OL_TYPE || 
@@ -1391,12 +1416,29 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
               "optimized lookup transducers");
     }
 
+    // if transducer type is other than optimized_lookup,
+    // convert to HfstBasicTransducer
+
     char* line = 0;
     size_t llen = 0;
 
     HfstStrings2FstTokenizer input_tokenizer(mc_symbols, 
                          std::string(epsilon_format));
 
+    if (!only_optimized_lookup)
+      {
+        char* format_string = hfst_strformat(cascade[0].get_type());
+        if (!silent) {
+          warning(0, 0, 
+                  "It is not possible to perform fast lookups with %s "
+                  "format automata.\n"
+                  "Using HFST basic transducer format "
+                  "and performing slow lookups",
+                  format_string);
+        }
+        free(format_string);
+      }
+    
     print_prompt();
 
     while (hfst_getline(&line, &llen, lookup_file) != -1)
@@ -1433,39 +1475,17 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
               }
             verbose_printf("\n");
           }
-        try 
+        if (only_optimized_lookup)
           {
-            kvs = perform_lookups<HfstTransducer>(*kv, cascade, unknown,
-                                                  &infinite);
-            /* This does not throw an exception only if the type of the
-               transducer is HFST_OL or HFST_OLW. */
+            kvs = perform_lookups(*kv, cascade, unknown,
+                                  &infinite);
           }
-        // FunctionNotImplementedException
-        catch (const HfstException e)
+        else
           {
-            if (!internal_transducers)
-              {
-                char* format_string = hfst_strformat(cascade[0].get_type());
-                if (!silent) {
-                  warning(0, 0, 
-                          "It is not possible to perform fast lookups with %s "
-                          "format automata.\n"
-                          "Converting to HFST basic transducer format "
-                          "and performing slow lookups",
-                          format_string);
-                }
-                free(format_string);
-                for (unsigned int i=0; i<cascade.size(); i++) 
-                  {
-                    HfstBasicTransducer mut(cascade[i]);
-                    cascade_mut.push_back(mut);
-                  }
-                internal_transducers = true;
-              }
-            kvs = perform_lookups<HfstBasicTransducer>(*kv, cascade_mut,
-                                                         unknown,
-                                                         &infinite);
+            kvs = perform_lookups(*kv, cascade_mut,
+                                  unknown, &infinite);
           }
+
         if (not print_pairs) { 
           // printing was already done in function lookup_fd
           print_lookups(*kvs, *kv, markup, unknown, infinite, outstream);
