@@ -280,7 +280,7 @@ AC_ARG_ENABLE([invert],
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
 AC_ARG_ENABLE([lexc-wrapper],
               [AS_HELP_STRING([--enable-lexc-wrapper],
-                              [build lexc-wrapper cli and readline @<:@default=yes@:>@])],
+                              [build lexc-wrapper cli and readline @<:@default=no@:>@])],
               [enable_lexc_wrapper=$enableval],
               [enable_lexc_wrapper=$enable_all_tools])
 AM_CONDITIONAL([WANT_LEXC_WRAPPER], [test "x$enable_lexc_wrapper" != xno])
