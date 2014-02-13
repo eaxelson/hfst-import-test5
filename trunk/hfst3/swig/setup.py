@@ -23,10 +23,10 @@ libhfst_module = Extension('_libhfst',
                            extra_link_args = []
                            )
 # when making the windows package, replace data_files with
-# ["libhfst-31.dll", "libgcc_s_seh-1.dll"] or
-# ["libhfst-31.dll", "libgcc_s_dw2-1.dll"] or
+# ["libhfst-34.dll", "libgcc_s_seh-1.dll"] or
+# ["libhfst-34.dll", "libgcc_s_dw2-1.dll"] or
 setup(name = 'libhfst_swig',
-      version = '3.5.1_beta',
+      version = '3.6.1_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.sourceforge.net',
