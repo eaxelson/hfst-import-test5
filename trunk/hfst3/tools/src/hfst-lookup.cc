@@ -235,7 +235,9 @@ print_usage()
             "VARIABLEs relevant to lookup are {print-pairs,print-space,\n"
             "quote-special,show-flags,obey-flags}\n"
             "Input epsilon cycles are followed by default INT=5 times.\n"
-            "Epsilon is printed by default as empty string.\n");
+            "Epsilon is printed by default as empty string.\n"
+            "It input contains several transducers, an accumulative set of\n"
+            "results is printed for each input string.\n"
     fprintf(message_out, "\n");
 
     fprintf(message_out, 
