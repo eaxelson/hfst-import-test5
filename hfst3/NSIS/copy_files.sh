@@ -72,7 +72,15 @@ XFST_BINARY=hfst-xfst.exe
 cp $XFST_DIRECTORY/$XFST_BINARY .
 strip $XFST_BINARY
 
-# (7) other tools
+# (7) proc tool
+
+PROC_DIRECTORY=../tools/src/hfst-proc/.libs/
+PROC_BINARY=hfst-apertium-proc.exe
+PROC_NAME=hfst-proc.exe
+cp $PROC_DIRECTORY/$PROC_BINARY $PROC_NAME
+strip $PROC_NAME
+
+# (8) other tools
 
 TOOL_DIRECTORY=../tools/src/.libs/
 TOOLS="hfst-affix-guessify.exe \
