@@ -29,11 +29,15 @@ bootstrappable=hfst-compare.1 hfst-compose.1 \
 			   hfst-subtract.1 hfst-summarize.1 hfst-tail.1 hfst-txt2fst.1 \
 			   hfst-calculate.1 hfst-compose-intersect.1 \
 			   hfst-lookup.1 \
-			   hfst-substitute.1 hfst-format.1 hfst-name.1
-broken=hfst-xfst.1 hfst-foma-wrapper.1 hfst-apertium-proc.1 hfst-lexc.1
+			   hfst-substitute.1 hfst-format.1 hfst-name.1 hfst-lexc.1 \
+			   hfst-lexc-wrapper.1
+
+hfst_xfst=hfst-xfst.1 
+hfst_apertium_proc=hfst-apertium-proc.1 
+
 aliases= hfst-determinise.1 hfst-expand.1 hfst-intersect.1 hfst-minimise.1 \
-	 hfst-minus.1 hfst-sfstpl2fst.1 hfst-summarise.1 hfst-union.1
-dist_man1_MANS=$(bootstrappable) $(aliases) $(broken)
+	 hfst-minus.1 hfst-sfstpl2fst.1 hfst-summarise.1 hfst-union.1 hfst-proc.1
+dist_man1_MANS=$(bootstrappable) $(aliases)
 LN_S=ln -s -f
 
 hfst-determinise.1:
@@ -51,6 +55,9 @@ hfst-minimise.1:
 hfst-minus.1:
 	$(LN_S) hfst-subtract.1 hfst-minus.1 
 
+hfst-proc.1:
+	$(LN_S) hfst-apertium-proc.1 hfst-proc.1
+
 hfst-sfstpl2fst.1:
 	$(LN_S) hfst-calculate.1 hfst-sfstpl2fst.1 
 
@@ -64,13 +71,23 @@ man:
 	make bootstrap && make aliases
 
 bootstrap: 
-	for f in $(bootstrappable) ; do \
-	  if [ "$$f" != "hfst-lookup.1" ]; then \
+	for f in $(bootstrappable); do \
 		N=`echo $$f | sed 's/.1/ \-\-help/' | sed 's/hfst/..\/tools\/src\/hfst/' | sh | sed -n 2p`; \
 		help2man \
 		-n="$$N" \
 		-s 1 -o $$f -N -S HFST `echo $$f | sed 's/.1//' | sed 's/hfst/..\/tools\/src\/hfst/'`; \
-	  fi; \
+	done;
+	for f in $(hfst_xfst); do \
+		N=`echo $$f | sed 's/.1/ \-\-help/' | sed 's/hfst/..\/tools\/src\/parsers\/hfst/' | sh | sed -n 2p`; \
+		help2man \
+		-n="$$N" \
+		-s 1 -o $$f -N -S HFST `echo $$f | sed 's/.1//' | sed 's/hfst/..\/tools\/src\/parsers\/hfst/'`; \
+	done;
+	for f in $(hfst_apertium_proc); do \
+		N=`echo $$f | sed 's/.1/ \-\-help/' | sed 's/hfst/..\/tools\/src\/hfst-proc\/hfst/' | sh | sed -n 2p`; \
+		help2man \
+		-n="$$N" \
+		-s 1 -o $$f -N -S HFST `echo $$f | sed 's/.1//' | sed 's/hfst/..\/tools\/src\/hfst-proc\/hfst/'`; \
 	done;
 
 
