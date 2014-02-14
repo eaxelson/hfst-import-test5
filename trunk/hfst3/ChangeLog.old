@@ -1,3 +1,127 @@
+2014-02-13 10:08  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/xfst-parser.yy: Added more options to print
+	  (random-)(upper-|lower-)words commands in hfst-xfst.
+
+2014-02-12 09:29  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.cc,
+	  libhfst/src/implementations/HfstTransitionGraph.h: Fixed a bug in
+	  HfstTransitionGraph::remove_transition and added a test for it.
+
+2014-02-11 15:58  eaxelson
+
+	* libhfst/src/parsers/lexc-lexer.ll, test/tools/Makefile.am,
+	  test/tools/basic.almost-reserved-words.lexc,
+	  test/tools/basic.almost-reserved-words.lexc.flag.result,
+	  test/tools/basic.almost-reserved-words.lexc.result,
+	  test/tools/basic.reserved-words-lowercase.lexc,
+	  test/tools/basic.reserved-words-lowercase.lexc.result,
+	  test/tools/lexc-compiler-functionality.sh,
+	  tools/src/parsers/XfstCompiler.cc: Fixed some reserved words in
+	  lexc parser. Added weights for command 'look up' in hfst-xfst.
+
+2014-02-11 14:16  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h:
+	  Scaled down weights in replace rules.
+
+2014-02-10 11:58  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy: Lex the left paren in
+	  function calls along with the function name
+	  to make a distinction between a symbol followed by an
+	  optionalized
+	  transducer and a function call
+
+2014-02-10 10:42  eaxelson
+
+	* test/tools/Makefile.am,
+	  test/tools/basic.reserved-words-lowercase.lexc,
+	  test/tools/basic.reserved-words-lowercase.lexc.result,
+	  test/tools/lexc-compiler-functionality.sh: Added a lexc test that
+	  contains reserved words in lowercase. The test does not compile
+	  in the same way as in foma.
+
+2014-02-10 10:28  sdrobac
+
+	* libhfst/src/parsers/LexcCompiler.cc,
+	  test/tools/hfst.weights.lexc.flag.result,
+	  test/tools/hfst.weights.lexc.result: Lexc weights fixed
+
+2014-02-07 20:53  moshagen
+
+	* tools/src: Ignore generated tool.
+
+2014-02-06 19:05  sdrobac
+
+	* libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/lexc-utils.cc,
+	  libhfst/src/parsers/lexc-utils.h, test/tools/Makefile.am,
+	  test/tools/basic.multichar-escaped-zero.lexc.flag.result,
+	  test/tools/basic.multichar-escaped-zero.lexc.result,
+	  test/tools/lexc-compiler-flags-functionality.sh,
+	  test/tools/lexc-compiler-functionality.sh: small lexc bugfix,
+	  tests enabled
+
+2014-02-06 15:28  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy: Allow underscore in symbols
+	  (couldn't discover a malignant side effect)
+
+2014-02-06 15:03  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: A lot more expressiveness
+	  involving DefFun()
+
+2014-02-06 11:58  sdrobac
+
+	* libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/LexcCompiler.h,
+	  libhfst/src/parsers/lexc-parser.yy,
+	  libhfst/src/parsers/lexc-utils.cc,
+	  libhfst/src/parsers/lexc-utils.h,
+	  test/tools/basic.multichar-escaped-zero.lexc,
+	  test/tools/lexc-compiler-functionality.sh: Fixed #227 hfst-lexc
+	  and multichars with zeros
+
+2014-02-05 14:21  eaxelson
+
+	* configure.ac, test/tools/lexc-compiler-functionality.sh,
+	  tools/src/hfst-lexc-compiler.cc,
+	  tools/src/parsers/XfstCompiler.cc: Made hfst-xfst use foma's
+	  lexc. hfst-lexc-wrapper is enabled by default.
+
+2014-02-05 10:42  eaxelson
+
+	* NSIS/hfst_installer.nsi: Forgot a couple of includes in hfst
+	  installer.
+
+2014-02-05 02:12  mie
+
+	* tools/src/hfst-reweight.cc: Allow tsv input for reweights
+
+2014-02-04 15:11  eaxelson
+
+	* NSIS/AddHfstLibrary.nsi, NSIS/copy_files.sh: Updated NSIS scripts
+	  to revision 3.6.0.
+
+2014-02-04 10:08  eaxelson
+
+	* libhfst/src/Makefile.am: Forgot to update -version-info in
+	  Makefile.am.
+
+2014-01-31 09:32  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am: Ready for release 3.6.0.
+
 2014-01-30 13:22  eaxelson
 
 	* check_installation/morphology_tests/finnish-analyze.output,
