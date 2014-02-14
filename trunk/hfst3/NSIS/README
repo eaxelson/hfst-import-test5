@@ -10,6 +10,6 @@ First, copy the relevant files:
 
 Create the installer(s):
 
- /c/hyapp/NSIS/makensis.exe [hfst|xfst|lexc|twolc]_installer.exe
+ /c/hyapp/NSIS/makensis.exe [hfst|xfst|lexc|twolc]_installer.nso
  mv install-FOO-XX-bit.exe install-[hfst|xfst|lexc|twolc]-[32|64]-bit.exe
 
