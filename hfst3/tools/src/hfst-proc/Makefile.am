@@ -42,3 +42,6 @@ install-exec-hook:
 	cd $(DESTDIR)$(bindir) && \
 		$(LN_S) -f hfst-apertium-proc$(EXEEXT) hfst-proc$(EXEEXT)
 
+uninstall-local:
+	cd $(DESTDIR)$(bindir) && \
+		rm hfst-proc$(EXEEXT)
