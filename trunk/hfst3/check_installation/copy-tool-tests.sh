@@ -51,6 +51,7 @@ cp ../test-help.sh .
 rm incompatible-formats.sh
 rm latin-1-strings.sh
 rm lexc-compiler-functionality.sh
+rm lexc-compiler-flags-functionality.sh
 
 # These tests are not included in basic check
 cp ../test-hfst-xfst.sh .
