@@ -37,7 +37,8 @@ Noteworthy changes in 3.5.0
 ---------------------------
 
 * a new tool hfst-xfst for compiling xfst scripts and using xfst commands
-  in interactive mode
+  in interactive mode (NOTE: hfst-xfst was earlier a wrapper for foma, so this
+  change breaks backwards compatibility)
 
 * wrapper for foma command line tool is renamed to hfst-foma
 
