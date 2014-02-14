@@ -16,28 +16,30 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-bootstrappable=hfst-compare.1 hfst-compose.1 \
-			   hfst-concatenate.1 hfst-determinize.1 \
-			   hfst-disjunct.1 \
-			   hfst-fst2fst.1 hfst-fst2strings.1 \
-			   hfst-fst2txt.1 \
-			   hfst-head.1 hfst-conjunct.1 \
-			   hfst-invert.1 hfst-minimize.1 hfst-project.1 \
-			   hfst-push-weights.1 hfst-regexp2fst.1 \
-			   hfst-remove-epsilons.1 hfst-repeat.1 \
-			   hfst-reverse.1 hfst-split.1 hfst-strings2fst.1 \
-			   hfst-subtract.1 hfst-summarize.1 hfst-tail.1 hfst-txt2fst.1 \
-			   hfst-calculate.1 hfst-compose-intersect.1 \
-			   hfst-lookup.1 \
-			   hfst-substitute.1 hfst-format.1 hfst-name.1 hfst-lexc.1 \
-			   hfst-lexc-wrapper.1
-
+hfst_tools=hfst-compare.1 hfst-compose.1 \
+	hfst-concatenate.1 hfst-determinize.1 \
+	hfst-disjunct.1 \
+	hfst-fst2fst.1 hfst-fst2strings.1 \
+	hfst-fst2txt.1 \
+	hfst-head.1 hfst-conjunct.1 \
+	hfst-invert.1 hfst-minimize.1 hfst-project.1 \
+	hfst-push-weights.1 hfst-regexp2fst.1 \
+	hfst-remove-epsilons.1 hfst-repeat.1 \
+	hfst-reverse.1 hfst-split.1 hfst-strings2fst.1 \
+	hfst-subtract.1 hfst-summarize.1 hfst-tail.1 hfst-txt2fst.1 \
+	hfst-calculate.1 hfst-compose-intersect.1 \
+	hfst-lookup.1 \
+	hfst-substitute.1 hfst-format.1 hfst-name.1 hfst-lexc.1 \
+	hfst-lexc-wrapper.1
 hfst_xfst=hfst-xfst.1 
 hfst_apertium_proc=hfst-apertium-proc.1 
+hfst_foma=hfst-foma.1 # hand-written
 
 aliases= hfst-determinise.1 hfst-expand.1 hfst-intersect.1 hfst-minimise.1 \
 	 hfst-minus.1 hfst-sfstpl2fst.1 hfst-summarise.1 hfst-union.1 hfst-proc.1
-dist_man1_MANS=$(bootstrappable) $(aliases)
+
+dist_man1_MANS=$(hfst_tools) $(hfst_xfst) $(hfst_apertium_proc) $(hfst_foma) $(aliases)
+
 LN_S=ln -s -f
 
 hfst-determinise.1:
@@ -67,11 +69,14 @@ hfst-summarise.1:
 hfst-union.1:
 	$(LN_S) hfst-disjunct.1 hfst-union.1
 
+
+# Generate man pages for all tools and their aliases
 man:
 	make bootstrap && make aliases
 
+# Generate man pages from help messages
 bootstrap: 
-	for f in $(bootstrappable); do \
+	for f in $(hfst_tools); do \
 		N=`echo $$f | sed 's/.1/ \-\-help/' | sed 's/hfst/..\/tools\/src\/hfst/' | sh | sed -n 2p`; \
 		help2man \
 		-n="$$N" \
@@ -89,8 +94,9 @@ bootstrap:
 		-n="$$N" \
 		-s 1 -o $$f -N -S HFST `echo $$f | sed 's/.1//' | sed 's/hfst/..\/tools\/src\/hfst-proc\/hfst/'`; \
 	done;
+# hfst-foma man page is hand-written
 
-
+# Create symbolic links to aliases
 aliases:
 	for f in $(aliases) ; do \
 		make $$f; \
