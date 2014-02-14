@@ -62,13 +62,14 @@ print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1...]]\n"
-             "Compile lexc files into transducer (experimental)\n"
-             "For full lexc support, use hfst-lexc-wrapper instead\n"
+             "Compile lexc files into transducer\n"
         "\n", program_name );
         print_common_program_options(message_out);
         fprintf(message_out, "Input/Output options:\n"
                "  -f, --format=FORMAT     compile into FORMAT transducer\n"
                "  -o, --output=OUTFILE    write result into OUTFILE\n");
+        fprintf(message_out, "Lexc options:\n"
+               "  -F, --withFlags         use flags to hyperminimize result\n");
         fprintf(message_out, "\n");
         fprintf(message_out,
                 "If INFILE or OUTFILE are omitted or -, standard streams will "
@@ -83,6 +84,14 @@ print_usage()
             "lexicon\n"
             "  %s -o L.hfst Root.lexc 2.lexc 3.lexc  Compile multi-file "
             "lexicon\n"
+            "\n"
+            "Using weights:\n"
+            "  LEXICON Root\n"
+            "  cat # \"weight: 2\" ;    Define weight for a word\n"
+            "  <[dog::1]+> # ;        Use weights in regular expressions\n"
+            "\n"
+            "Using weights has an effect only if FORMAT is weighted, i.e.\n"
+            "{ openfst-tropical, openfst-log, optimized-lookup-weighted }.\n"    
             "\n",
             program_name, program_name );
         print_report_bugs();
@@ -213,7 +222,7 @@ int main( int argc, char **argv ) {
   _setmode(1, _O_BINARY);
 #endif
 
-    hfst_set_program_name(argv[0], "0.1", "HfstLexc2Fst");
+    hfst_set_program_name(argv[0], "0.1", "HfstLexc");
 
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)
