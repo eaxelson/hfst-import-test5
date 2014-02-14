@@ -236,8 +236,8 @@ print_usage()
             "quote-special,show-flags,obey-flags}\n"
             "Input epsilon cycles are followed by default INT=5 times.\n"
             "Epsilon is printed by default as an empty string.\n"
-            "If the input contains several transducers, an accumulative\n"
-            "set of results is printed for each input string.\n");
+            "If the input contains several transducers, a set containing\n"
+            "results from all transducers is printed for each input string.\n");
     fprintf(message_out, "\n");
 
     fprintf(message_out, 

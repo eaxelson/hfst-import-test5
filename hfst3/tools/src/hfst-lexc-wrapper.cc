@@ -66,6 +66,8 @@ print_usage()
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1...]]\n"
              "Compile lexc files into transducer or imitate Xerox lexc\n"
+             "This is a wrapper around foma lexc, and does not support weights\n"
+             "For a native hfst tool with weights, use hfst-lexc instead\n"
         "\n", program_name );
         print_common_program_options(message_out);
         fprintf(message_out, "Input/Output options:\n"
@@ -306,7 +308,7 @@ int main( int argc, char **argv ) {
   _setmode(1, _O_BINARY);
 #endif
 
-    hfst_set_program_name(argv[0], "0.1", "HfstLexc");
+    hfst_set_program_name(argv[0], "0.1", "HfstLexcWrapper");
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)
     {
