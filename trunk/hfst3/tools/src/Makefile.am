@@ -308,6 +308,18 @@ install-exec-hook:
 		$(LN_S) -f hfst-disjunct$(EXEEXT) hfst-union$(EXEEXT)
 #		$(LN_S) -f hfst-preprocess-for-optimized-lookup-format$(EXEEXT) hfst-preprocess-for-optimised-lookup-format$(EXEEXT) &&
 
+uninstall-local:
+	cd $(DESTDIR)$(bindir) && \
+		rm hfst-determinise && \
+		rm hfst-expand && \
+		rm hfst-intersect && \
+		rm hfst-minimise && \
+		rm hfst-optimised-lookup && \
+		rm hfst-minus && \
+		rm hfst-sfstpl2fst && \
+		rm hfst-summarise && \
+		rm hfst-union
+
 BUILT_SOURCES=$(hfst_lexc_BUILT) 
 
 CLEANFILES=hfst-compiler.hh hfst-compiler.cc $(hfst_lexc_BUILT) 
