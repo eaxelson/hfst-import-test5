@@ -52,7 +52,6 @@ namespace hfst_ol {
         bool is_verbose(void) { return verbose; }
     };
 
-
     class PmatchContainer
     {
     protected:
@@ -69,8 +68,11 @@ namespace hfst_ol {
         SymbolNumberVector output;
 
     public:
+
         PmatchContainer(std::istream & is);
         ~PmatchContainer(void);
+
+        long line_number;
 
         void initialize_input(const char * input);
         bool has_unsatisfied_rtns(void) const;
@@ -162,6 +164,7 @@ namespace hfst_ol {
 
         PmatchAlphabet & alphabet;
         SymbolNumber orig_symbol_count;
+        PmatchContainer * container;
     
         // The mutually recursive lookup-handling functions
 
@@ -197,7 +200,8 @@ namespace hfst_ol {
         PmatchTransducer(std::istream& is,
                          TransitionTableIndex index_table_size,
                          TransitionTableIndex transition_table_size,
-                         PmatchAlphabet & alphabet);
+                         PmatchAlphabet & alphabet,
+                         PmatchContainer * container);
 
         void display() const;
 

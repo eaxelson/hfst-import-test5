@@ -177,7 +177,6 @@ int parse_options(int argc, char** argv)
     return EXIT_FAILURE;
 }
 
-
 int main(int argc, char ** argv)
 {
     hfst_set_program_name(argv[0], "0.1", "HfstPmatch");
