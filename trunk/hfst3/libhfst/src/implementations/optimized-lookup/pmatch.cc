@@ -88,13 +88,15 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
                         (malloc(sizeof(SymbolNumber)*io_size)));
     input_tape = orig_input_tape;
     output_tape = orig_output_tape;
+    line_number = 0;
     
     encoder = new Encoder(alphabet.get_symbol_table(), header.input_symbol_count());
     toplevel = new hfst_ol::PmatchTransducer(
         inputstream,
         header.index_table_size(),
         header.target_table_size(),
-        alphabet);
+        alphabet,
+        this);
     while (inputstream.good()) {
         try {
             transducer_name = parse_name_from_hfst3_header(inputstream);
@@ -108,7 +110,8 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
             new hfst_ol::PmatchTransducer(inputstream,
                                           header.index_table_size(),
                                           header.target_table_size(),
-                                          alphabet);
+                                          alphabet,
+                                          this);
         if (!alphabet.has_rtn(transducer_name)) {
             alphabet.add_rtn(rtn, transducer_name);
         } else {
@@ -268,6 +271,7 @@ std::string PmatchContainer::match(std::string & input)
 {
     std::string ret;
     initialize_input(input.c_str());
+    ++line_number;
     output.clear();
     while (has_queued_input()) {
         SymbolNumber * input_entry = input_tape;
@@ -356,8 +360,10 @@ bool PmatchContainer::has_queued_input(void)
 PmatchTransducer::PmatchTransducer(std::istream & is,
                                    TransitionTableIndex index_table_size,
                                    TransitionTableIndex transition_table_size,
-                                   PmatchAlphabet & alpha):
-    alphabet(alpha)
+                                   PmatchAlphabet & alpha,
+                                   PmatchContainer * cont):
+    alphabet(alpha),
+    container(cont)
 {
     orig_symbol_count = alphabet.get_symbol_table().size();
     // initialize the stack for local variables
@@ -530,7 +536,9 @@ void PmatchTransducer::note_analysis(SymbolNumber * input_tape,
                rtn_stack.top().best_weight == local_stack.top().running_weight) {
         SymbolNumberVector discarded(rtn_stack.top().output_tape_head,
                                      output_tape);
-        std::cerr << "\n\tWarning: conflicting equally weighted matches found, discarding:\n\t"
+        std::cerr << "\n\tline " << container->line_number << ": conflicting equally weighted matches found, keeping:\n\t"
+                  << alphabet.stringify(rtn_stack.top().best_result) << std::endl
+                  << "\tdiscarding:\n\t"
                   << alphabet.stringify(discarded) << std::endl << std::endl; 
     }
 }
