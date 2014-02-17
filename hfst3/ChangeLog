@@ -1,3 +1,98 @@
+2014-02-17 12:52  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h,
+	  tools/src/hfst-pmatch.cc: Better conflict warnings
+
+2014-02-17 12:47  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc: Now it is possible to save and
+	  load a stack of transducers in hfst optimized lookup format.
+
+2014-02-17 11:09  eaxelson
+
+	* tools/src/hfst-proc/hfst-proc.cc: Give a more informative error
+	  message if tranducer is not in hfst optimized lookup format in
+	  hfst-proc.
+
+2014-02-14 16:43  eaxelson
+
+	* man/Makefile.am, man/hfst-foma.1: Added hand-written man page for
+	  hfst-foma.
+
+2014-02-14 16:12  eaxelson
+
+	* man/Makefile.am, man/hfst-apertium-proc.1, man/hfst-calculate.1,
+	  man/hfst-compare.1, man/hfst-compose-intersect.1,
+	  man/hfst-compose.1, man/hfst-concatenate.1, man/hfst-conjunct.1,
+	  man/hfst-determinize.1, man/hfst-disjunct.1,
+	  man/hfst-foma-wrapper.1, man/hfst-format.1, man/hfst-fst2fst.1,
+	  man/hfst-fst2strings.1, man/hfst-fst2txt.1, man/hfst-head.1,
+	  man/hfst-invert.1, man/hfst-lexc-wrapper.1, man/hfst-lexc.1,
+	  man/hfst-lookup.1, man/hfst-minimize.1, man/hfst-name.1,
+	  man/hfst-proc.1, man/hfst-project.1, man/hfst-push-weights.1,
+	  man/hfst-regexp2fst.1, man/hfst-remove-epsilons.1,
+	  man/hfst-repeat.1, man/hfst-reverse.1, man/hfst-split.1,
+	  man/hfst-strings2fst.1, man/hfst-substitute.1,
+	  man/hfst-subtract.1, man/hfst-summarize.1, man/hfst-tail.1,
+	  man/hfst-txt2fst.1, man/hfst-xfst-compiler.1, man/hfst-xfst.1:
+	  Updated man pages.
+
+2014-02-14 13:39  eaxelson
+
+	* tools/src/Makefile.am, tools/src/hfst-proc/Makefile.am: Now
+	  removing symbolic links to command line tools when performing
+	  'make uninstall'.
+
+2014-02-14 11:41  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS: A new candidate for release
+	  3.6.1.
+
+2014-02-14 11:31  eaxelson
+
+	* check_installation/copy-tool-tests.sh: Updated installation
+	  check.
+
+2014-02-14 11:30  eaxelson
+
+	* NSIS/README, NSIS/README.proc.txt, NSIS/copy_files.sh,
+	  NSIS/proc_installer.nsi: Added an installer file for hfst-proc.
+
+2014-02-14 11:26  eaxelson
+
+	* tools/src/hfst-lexc-compiler.cc, tools/src/hfst-lexc-wrapper.cc,
+	  tools/src/hfst-lookup.cc: Edited help messages of lexc and lookup
+	  tools.
+
+2014-02-13 14:47  eaxelson
+
+	* test/tools/basic.zeros-epsilons.lexc.flag.result,
+	  test/tools/check-flag-results.sh,
+	  test/tools/create-flag-results.sh: Made creating and checking
+	  flag results less verbose.
+
+2014-02-13 13:50  eaxelson
+
+	* test/tools/lexc-compiler-functionality.sh: Changed 'return' to
+	  'exit' in shell script.
+
+2014-02-13 13:07  moshagen
+
+	* libhfst/src/parsers, test/libhfst, test/tools,
+	  tools/src/hfst-tagger/src, tools/src/hfst-twolc/test,
+	  tools/src/parsers/test: Ignore generated files.
+
+2014-02-13 13:04  eaxelson
+
+	* NSIS/AddHfstLibrary.nsi, NSIS/copy_files.sh, configure.ac,
+	  swig/setup.py: Updated version numbers in NSIS and swig files.
+	  Also made lexc wrapper disabled by default.
+
+2014-02-13 12:40  eaxelson
+
+	* test/tools/Makefile.am: Fixed a typo.
+
 2014-02-13 12:37  moshagen
 
 	* tools/src/hfst-lookup.cc: Corrected syntax error, typos.
