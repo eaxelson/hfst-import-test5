@@ -480,6 +480,7 @@ namespace xfst {
         prompt();
         return *this;
       }
+
     HfstTransducer * t = stack_.top();
 
     hfst::ImplementationType to_format;
@@ -506,7 +507,20 @@ namespace xfst {
                      hfst::implementation_type_to_format(t->get_type()),
                      hfst::implementation_type_to_format(to_format));
       }
-    t->convert(to_format);
+
+    std::stack<HfstTransducer*> temp;
+    while(!stack_.empty())
+      {
+        stack_.top()->convert(to_format);
+        temp.push(stack_.top());
+        stack_.pop();
+      }
+    while(!temp.empty())
+      {
+        stack_.push(temp.top());
+        temp.pop();
+      }
+
     prompt();
     return *this;
   }
@@ -540,7 +554,20 @@ namespace xfst {
             hfst_fprintf(warnstream_, "warning: converting from weighted to unweighted format, loss of information is possible\n");
           }
       }
-    t->convert(format_);
+
+    std::stack<HfstTransducer*> temp;
+    while(!stack_.empty())
+      {
+        stack_.top()->convert(format_);
+        temp.push(stack_.top());
+        stack_.pop();
+      }
+    while(!temp.empty())
+      {
+        stack_.push(temp.top());
+        temp.pop();
+      }
+
     prompt();
     return *this;
   }
@@ -2957,11 +2984,15 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::write_stack(const char* filename)
     {
-      /*hfst_fprintf(stderr, "cannot save transducer names %s:%d\n", __FILE__,
-        __LINE__);*/
+    if (stack_.size() < 1)
+      {
+        hfst_fprintf(stderr, "Empty stack.\n");
+        return *this;
+      }
+
       HfstOutputStream* outstream = (filename != 0)?
-        new HfstOutputStream(filename, format_):
-        new HfstOutputStream(format_);
+        new HfstOutputStream(filename, stack_.top()->get_type()):
+        new HfstOutputStream(stack_.top()->get_type());
       stack<HfstTransducer*> tmp;
       while (!stack_.empty())
         {
@@ -2974,6 +3005,7 @@ namespace xfst {
           stack_.push(tmp.top());
           tmp.pop();
         }
+      outstream->close();
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler& 
