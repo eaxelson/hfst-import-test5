@@ -8,7 +8,7 @@ For full listing of changes see ChangeLog.
 Noteworthy changes in 3.6.1
 ---------------------------
 
-* improvements to xfst, lexc and pmatch tools
+* improvements to xfst, lexc, pmatch and lookup tools
 
 
 Noteworthy changes in 3.6.0

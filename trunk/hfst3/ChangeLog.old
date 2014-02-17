@@ -1,3 +1,21 @@
+2014-02-13 12:37  moshagen
+
+	* tools/src/hfst-lookup.cc: Corrected syntax error, typos.
+
+2014-02-13 12:20  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am: Ready for release 3.6.1.
+
+2014-02-13 10:59  eaxelson
+
+	* tools/src/hfst-lookup.cc: Edited help message of hfst-lookup.
+
+2014-02-13 10:32  eaxelson
+
+	* tools/src/hfst-lookup.cc: hfst-lookup now also handles a
+	  transducer archive.
+
 2014-02-13 10:08  eaxelson
 
 	* tools/src/parsers/XfstCompiler.cc,
