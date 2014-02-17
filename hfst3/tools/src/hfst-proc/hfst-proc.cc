@@ -98,6 +98,7 @@ bool print_usage(void)
     "[-a [-p|-C|-x] [-k]|-g|-n|-d|-t] [-W] [-n N] [-c|-w] [-z] [-v|-q|]\n" <<
     "    transducer_file [input_file [output_file]]\n" <<
     "Perform a transducer lookup on a text stream, tokenizing on the fly\n" <<
+    "Transducer must be in HFST optimized lookup format\n" <<
     "\n" <<
     "  -a, --analysis          Morphological analysis (default)\n" <<
     "  -g, --generation        Morphological generation\n" <<
@@ -375,7 +376,14 @@ int main(int argc, char **argv)
   }
   try
   {
-    handle_hfst3_header(in);
+    try {
+      handle_hfst3_header(in);
+    }
+    catch (TransducerHasWrongTypeException &ex)
+      {
+        std::cerr << "Transducer must be in HFST optimized lookup format." << std::endl;
+        return EXIT_FAILURE;        
+      }
     ProcTransducer t(in);
     if(verboseFlag)
       std::cout << "Transducer successfully loaded" << std::endl;
