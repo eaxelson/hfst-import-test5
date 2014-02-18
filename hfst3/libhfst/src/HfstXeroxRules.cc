@@ -185,7 +185,8 @@ namespace hfst
       }
 
       float func(float f) {
-        return f/2;
+        //return f/2;
+          return 0;
       }
 
       /*
@@ -195,32 +196,121 @@ namespace hfst
       // (t.1 - tmp.2) .o. t
       HfstTransducer constraintComposition( const HfstTransducer &t, const HfstTransducer &Constraint )
       {
+
+//          printf("---- \n");
+//          printf("orig: \n");
+//          t.write_in_att_format(stdout, 1);
+//          printf("---- \n");
+
           HfstTransducer retval(t);
           retval.input_project().minimize();
 
           HfstTransducer tmp(retval);
-
           tmp.compose(Constraint).minimize();
-
           //printf("tmp: \n");
            //tmp.write_in_att_format(stdout, 1);
 
           tmp.compose(retval).minimize();
          //printf("tmp 2: \n");
          //tmp.write_in_att_format(stdout, 1);
-
           tmp.output_project().minimize();
           retval.subtract(tmp).minimize();
 
+          //transform weights to zero
+          retval.transform_weights(&func);
           retval.compose(t).minimize();
 
 
-          //printf("tmp 2: \n");
-                  //tmp.write_in_att_format(stdout, 1);
 
-          //scales down the weights because they get doubled in this function
-          retval.transform_weights(&func);
+          // this part divides weight at LM with 2 and deletes weight at LM2
 
+           //scales down the weights because they get doubled in this function
+          //retval.transform_weights(&func);
+
+          /*
+           ///////////////////////////////////////////////////
+           /// adjust weights
+           HfstBasicTransducer fsm(retval);
+
+            // printf("BEFORE: \n");
+            // fsm.write_in_att_format(stdout, 1);
+
+
+           unsigned int stateNum= 0;
+           unsigned int removeState;
+           hfst::implementations::HfstBasicTransition removeTr;
+           hfst::implementations::HfstBasicTransition newTr;
+           hfst::implementations::HfstBasicTransition removeTr2;
+           hfst::implementations::HfstBasicTransition newTr2;
+           float weight = 0;
+           // Go through all states
+           for (HfstBasicTransducer::const_iterator it = fsm.begin();
+           it != fsm.end(); it++ )
+           {
+
+             //  printf("state: %d\n" , stateNum);
+
+
+               // Go through all transitions
+               for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
+                = it->begin(); tr_it != it->end(); tr_it++)
+               {
+                   std::string in = tr_it->get_input_symbol();
+                   std::string out = tr_it->get_output_symbol();
+                   weight = tr_it->get_weight();
+
+
+                 //  printf("in: %s\n" , in.c_str());
+
+
+
+                   if ( in == out &&  in == "@LM@" )
+                   {
+
+                      // printf("  in: %s\n" , in.c_str());
+
+                           removeState = stateNum;
+                           removeTr = *tr_it;
+
+                           newTr = HfstBasicTransition(tr_it->get_target_state(), "@LM@", "@LM@", weight/2);
+
+                   }
+                   if ( in == out &&  in == "@LM2@" )
+                   {
+                       //printf("  in: %s\n" , in.c_str());
+
+                      // if ( weight != 0 )
+
+                           removeState = stateNum;
+                           removeTr2 = *tr_it;
+
+                           // set zero weight
+                           newTr2 = HfstBasicTransition(tr_it->get_target_state(), "@LM2@", "@LM2@", 0);
+                   }
+
+
+               }
+               fsm.remove_transition(removeState, removeTr);
+               fsm.add_transition(removeState, newTr );
+
+
+               fsm.remove_transition(removeState, removeTr2);
+               fsm.add_transition(removeState, newTr2 );
+
+               stateNum++;
+           }
+
+
+           ImplementationType type = t.get_type();
+           retval = HfstTransducer(fsm, type);
+
+           */
+
+
+        // printf("retval weight: \n");
+        // retval.write_in_att_format(stdout, 1);
+        // printf("----------------- \n");
+          ///////////////////////////////////////////////////
           return retval;
       }
 
@@ -2180,15 +2270,15 @@ namespace hfst
                 retval = parallelBracketedReplace(ruleVector, optional);
             }
 
-            //printf("- bracketed replace -\n");
-            //retval.write_in_att_format(stdout, 1);
+//            printf("- bracketed replace -\n");
+//            retval.write_in_att_format(stdout, 1);
 
             // for epenthesis rules
             // it can't have more than one epsilon repetition in a row
             retval = noRepetitionConstraint( retval );
 
-            //printf("----after noRepetitionConstraint: ----\n");
-            //retval.write_in_att_format(stdout, 1);
+//            printf("----after noRepetitionConstraint: ----\n");
+//            retval.write_in_att_format(stdout, 1);
 
 
             // deals with boundary symbol
