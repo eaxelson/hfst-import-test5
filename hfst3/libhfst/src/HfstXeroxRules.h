@@ -94,8 +94,8 @@ namespace hfst
          *  */
         HfstTransducer removeMarkers( const HfstTransducer &tr );
 
-        //used in scaling down weights by 2 in  constraintComposition function
-        float func(float f);
+        //Used in changing weights to zero (in constraintComposition function)
+        float zero_weight(float f);
 
         /** \brief Generalized Lenient Composition (by Anssi Yli-Jyr�) of a \a t and a \a Constraint.
          * More about this composition can be found in:
