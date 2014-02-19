@@ -184,8 +184,7 @@ namespace hfst
         return retval;
       }
 
-      float func(float f) {
-        //return f/2;
+      float zero_weight(float f) {
           return 0;
       }
 
@@ -203,6 +202,8 @@ namespace hfst
 //          printf("---- \n");
 
           HfstTransducer retval(t);
+          retval.transform_weights(&zero_weight);
+
           retval.input_project().minimize();
 
           HfstTransducer tmp(retval);
@@ -217,100 +218,9 @@ namespace hfst
           retval.subtract(tmp).minimize();
 
           //transform weights to zero
-          retval.transform_weights(&func);
+          retval.transform_weights(&zero_weight);
           retval.compose(t).minimize();
 
-
-
-          // this part divides weight at LM with 2 and deletes weight at LM2
-
-           //scales down the weights because they get doubled in this function
-          //retval.transform_weights(&func);
-
-          /*
-           ///////////////////////////////////////////////////
-           /// adjust weights
-           HfstBasicTransducer fsm(retval);
-
-            // printf("BEFORE: \n");
-            // fsm.write_in_att_format(stdout, 1);
-
-
-           unsigned int stateNum= 0;
-           unsigned int removeState;
-           hfst::implementations::HfstBasicTransition removeTr;
-           hfst::implementations::HfstBasicTransition newTr;
-           hfst::implementations::HfstBasicTransition removeTr2;
-           hfst::implementations::HfstBasicTransition newTr2;
-           float weight = 0;
-           // Go through all states
-           for (HfstBasicTransducer::const_iterator it = fsm.begin();
-           it != fsm.end(); it++ )
-           {
-
-             //  printf("state: %d\n" , stateNum);
-
-
-               // Go through all transitions
-               for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it
-                = it->begin(); tr_it != it->end(); tr_it++)
-               {
-                   std::string in = tr_it->get_input_symbol();
-                   std::string out = tr_it->get_output_symbol();
-                   weight = tr_it->get_weight();
-
-
-                 //  printf("in: %s\n" , in.c_str());
-
-
-
-                   if ( in == out &&  in == "@LM@" )
-                   {
-
-                      // printf("  in: %s\n" , in.c_str());
-
-                           removeState = stateNum;
-                           removeTr = *tr_it;
-
-                           newTr = HfstBasicTransition(tr_it->get_target_state(), "@LM@", "@LM@", weight/2);
-
-                   }
-                   if ( in == out &&  in == "@LM2@" )
-                   {
-                       //printf("  in: %s\n" , in.c_str());
-
-                      // if ( weight != 0 )
-
-                           removeState = stateNum;
-                           removeTr2 = *tr_it;
-
-                           // set zero weight
-                           newTr2 = HfstBasicTransition(tr_it->get_target_state(), "@LM2@", "@LM2@", 0);
-                   }
-
-
-               }
-               fsm.remove_transition(removeState, removeTr);
-               fsm.add_transition(removeState, newTr );
-
-
-               fsm.remove_transition(removeState, removeTr2);
-               fsm.add_transition(removeState, newTr2 );
-
-               stateNum++;
-           }
-
-
-           ImplementationType type = t.get_type();
-           retval = HfstTransducer(fsm, type);
-
-           */
-
-
-        // printf("retval weight: \n");
-        // retval.write_in_att_format(stdout, 1);
-        // printf("----------------- \n");
-          ///////////////////////////////////////////////////
           return retval;
       }
 
@@ -397,14 +307,12 @@ namespace hfst
             // both contexts are in upper language
             if ( replType == REPL_UP)
             {
-
                 // compose them with [I:I | <a:b>]*
                 leftContextExpanded = firstContext;
                 rightContextExpanded = secondContext;
 
                 leftContextExpanded.compose(identityExpanded).minimize();
                 rightContextExpanded.compose(identityExpanded).minimize();
-
             }
             // left context is in lower language, right in upper ( // )
             if ( replType == REPL_RIGHT )
@@ -438,9 +346,14 @@ namespace hfst
                 rightContextExpanded.compose(secondContext).minimize();
             }
 
-            firstContext.disjunct(leftContextExpanded).minimize();
-            secondContext.disjunct(rightContextExpanded).minimize();
 
+            firstContext.disjunct(leftContextExpanded);
+          //  firstContext.transform_weights(&zero_weight);
+         //   firstContext.minimize();
+
+            secondContext.disjunct(rightContextExpanded);
+          //  secondContext.transform_weights(&zero_weight);
+          //  secondContext.minimize();
 
             // add boundary symbol before/after contexts
             String boundaryMarker(".#.");
@@ -499,7 +412,12 @@ namespace hfst
           oneContextReplace.concatenate(mappingWithBracketsAndTmpBoundary).
                       concatenate(secondContext);
 
-          unionContextReplace.disjunct(oneContextReplace).minimize();
+          unionContextReplace.disjunct(oneContextReplace);
+
+          //minimization fails when there are weights in rules
+          // ie a::1 -> b || c _ d ;
+
+         // unionContextReplace.minimize();
           }
           return unionContextReplace;
       }
@@ -792,7 +710,6 @@ namespace hfst
 
         //printf("bracketedReplace \n");
         //bracketedReplace.write_in_att_format(stdout, 1);
-
 
         // subtract all mappings in contexts from replace without contexts
         HfstTransducer replaceWithoutContexts(bracketedReplace);
@@ -2259,6 +2176,9 @@ namespace hfst
       // for parallel rules
       HfstTransducer replace( const std::vector<Rule> &ruleVector, bool optional)
       {
+
+         // std::cerr << "replace"<< std::endl;
+
           HfstTransducer retval;
           // If there is only one rule in the vector, it is not parallel
             if ( ruleVector.size() == 1 )
@@ -2270,8 +2190,9 @@ namespace hfst
                 retval = parallelBracketedReplace(ruleVector, optional);
             }
 
-//            printf("- bracketed replace -\n");
-//            retval.write_in_att_format(stdout, 1);
+          //  std::cerr << "after bracketed replace"<< std::endl;
+          //  printf("- bracketed replace -\n");
+          //  retval.write_in_att_format(stdout, 1);
 
             // for epenthesis rules
             // it can't have more than one epsilon repetition in a row
@@ -2408,6 +2329,7 @@ namespace hfst
     HfstTransducer replace_leftmost_longest_match( const std::vector<Rule> &ruleVector )
     {
         //printf("\n replace_leftmost_longest_match \n");
+
         HfstTransducer uncondidtionalTr;
         if ( ruleVector.size() == 1 )
         {
@@ -2418,7 +2340,7 @@ namespace hfst
             uncondidtionalTr = parallelBracketedReplace(ruleVector, true);
         }
 
-        // printf("retval unconditional 1 \n");
+        //printf("retval unconditional 1 \n");
         // uncondidtionalTr.write_in_att_format(stdout, 1);
 
         // for epenthesis rules
@@ -2429,7 +2351,6 @@ namespace hfst
         //uncondidtionalTr.write_in_att_format(stdout, 1);
 
          HfstTransducer retval (leftMostConstraint(uncondidtionalTr));
-
 
         //to remove empty strings
         retval = oneBetterthanNoneConstraint(retval);

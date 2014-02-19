@@ -363,7 +363,7 @@ RULE: MAPPINGPAIR_VECTOR
       }
       | MAPPINGPAIR_VECTOR CONTEXTS_WITH_MARK
       {
-        // std::cerr << "rule: mapping_vector contextsWM"<< std::endl;      
+       //  std::cerr << "rule: mapping_vector contextsWM"<< std::endl;      
      //   HfstTransducer allMappingsDisjuncted = disjunctVectorMembers($1->second);
         
         Rule rule( $1->second, $2->second, $2->first );
