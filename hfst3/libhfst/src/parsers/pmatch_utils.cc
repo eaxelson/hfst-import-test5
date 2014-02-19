@@ -185,6 +185,7 @@ get_RC_transition(const char *s)
     rv = strcpy(rv, "@RC.");
     rv = strcat(rv, s);
     rv = strcat(rv, "@");
+    special_pmatch_symbols.insert(rv);
     return rv;
 }
 
@@ -195,6 +196,7 @@ get_LC_transition(const char *s)
     rv = strcpy(rv, "@LC.");
     rv = strcat(rv, s);
     rv = strcat(rv, "@");
+    special_pmatch_symbols.insert(rv);
     return rv;
 }
 

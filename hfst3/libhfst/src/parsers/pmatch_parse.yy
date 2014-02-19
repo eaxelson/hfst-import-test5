@@ -1112,6 +1112,10 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
 | ANY_TOKEN PAIR_SEPARATOR ANY_TOKEN {
     $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
                             hfst::pmatch::format);
+    // Insert special symbols we don't want to have expanded when this
+    // interacts with anything else
+    $$->insert_to_alphabet(hfst::pmatch::special_pmatch_symbols);
+
  }
 | ANY_TOKEN PAIR_SEPARATOR SYMBOL {
     $$ = new HfstTransducer(hfst::internal_unknown, $3, hfst::pmatch::format);
@@ -1184,6 +1188,9 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
 | ANY_TOKEN {
     $$ = new HfstTransducer(hfst::internal_identity,
                             hfst::pmatch::format);
+    // Insert special symbols we don't want to have expanded when this
+    // interacts with anything else
+    $$->insert_to_alphabet(hfst::pmatch::special_pmatch_symbols);
   }
 | QUOTED_LITERAL {
     HfstTokenizer tok;
