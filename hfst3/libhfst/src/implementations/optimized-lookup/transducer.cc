@@ -411,29 +411,32 @@ void Transducer::get_analyses(unsigned int input_pos,
     --recursion_depth_left;
     if (indexes_transition_table(i))
     {
-        found_transition = false;
         i -= TRANSITION_TARGET_TABLE_START;
-        
-        try_epsilon_transitions(input_pos,
-                                output_pos,
-                                i+1);
-        
-        // input-string ended.
-        if (input_tape[input_pos] == NO_SYMBOL_NUMBER)
-        {
+        found_transition = false;
+
+        // First we check for finality and collect the result
+        if (input_tape[input_pos] == NO_SYMBOL_NUMBER) {
             if (max_lookups < 0 || lookup_paths->size() < max_lookups) {
                 output_tape.write(output_pos, NO_SYMBOL_NUMBER);
-                if (tables->get_transition_finality(i))
-                {
+                if (tables->get_transition_finality(i)) {
                     current_weight += tables->get_weight(i);
                     note_analysis();
                     current_weight -= tables->get_weight(i);
                 }
             }
+        }
+
+        // Then we check epsilons
+        try_epsilon_transitions(input_pos,
+                                output_pos,
+                                i+1);
+
+        if (input_tape[input_pos] == NO_SYMBOL_NUMBER) {
+            // No more input
             ++recursion_depth_left;
             return;
         }
-      
+        
         SymbolNumber input = input_tape[input_pos];
         ++input_pos;
 
@@ -450,21 +453,23 @@ void Transducer::get_analyses(unsigned int input_pos,
     else
     {
         found_transition = false;
-        try_epsilon_indices(input_pos,
-                            output_pos,
-                            i+1);
-      
-        if (input_tape[input_pos] == NO_SYMBOL_NUMBER)
-        { // input-string ended.
+                
+        if (input_tape[input_pos] == NO_SYMBOL_NUMBER) {
             if (max_lookups < 0 || lookup_paths->size() < max_lookups) {
                 output_tape.write(output_pos, NO_SYMBOL_NUMBER);
-                if (tables->get_index_finality(i))
-                {
+                if (tables->get_index_finality(i)) {
                     current_weight += tables->get_final_weight(i);
                     note_analysis();
                     current_weight -= tables->get_final_weight(i);
                 }
             }
+        }
+        
+        try_epsilon_indices(input_pos,
+                            output_pos,
+                            i+1);
+        
+        if (input_tape[input_pos] == NO_SYMBOL_NUMBER) {
             ++recursion_depth_left;
             return;
         }
