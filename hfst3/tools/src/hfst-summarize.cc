@@ -316,7 +316,7 @@ process_stream(HfstInputStream& instream)
             }
       source_state++;
       }
-      delete mutt;
+      //delete mutt;
       // traverse
       
       // count physical size
@@ -425,15 +425,17 @@ process_stream(HfstInputStream& instream)
                   "most ambiguous output: %s %u\n"
                   "average input ambiguity: %f\n"
                   "average output ambiguity: %f\n"
-                  "expected arcs per symbol: %f\n",
+                  "expected arcs per symbol: %f\n"
+                  "infinitely ambiguous: %s\n",
                   sparsest_arcs, densest_arcs,
                   average_arcs_per_state,
                   average_input_epsilons,
                   most_ambiguous_input.first.c_str(), most_ambiguous_input.second,
                   most_ambiguous_output.first.c_str(), most_ambiguous_output.second,
                   average_input_ambiguity, average_output_ambiguity,
-                  expected_arcs_per_symbol
+                  expected_arcs_per_symbol, mutt->is_infinitely_ambiguous()? "yes": "no"
               );
+          delete mutt;
           // alphabets
           fprintf(outfile,
                   "sigma set:\n");
