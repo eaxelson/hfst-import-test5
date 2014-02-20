@@ -1120,9 +1120,9 @@ ccc : ddd
     //! is infinitely ambiguous on any lookup path found in the transducer,
     //! i.e. the argument \a s is ignored.
     //!
-    //! @todo Do not ignore the argument s
     //! @see lookup(HfstOneLevelPaths&, const StringVector&, ssize_t) const
-    bool is_lookup_infinitely_ambiguous(const StringVector& s) const;
+    bool is_lookup_infinitely_ambiguous(const StringVector & s) const;
+    bool is_lookup_infinitely_ambiguous(const std::string & s) const;
 
     //! @brief (Not implemented) Whether lookdown of path \a s will have
     //! infinite results.
