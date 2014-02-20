@@ -123,6 +123,9 @@ void Transducer::find_loop(unsigned int input_pos,
                            PositionStates & position_states)
 {
     found_transition = false;
+    if (indexes_transition_table(i)) {
+        i -= TRANSITION_TARGET_TABLE_START;
+    }
     
     TraversalState this_position(i, flag_state.get_values());
     if (input_pos == position_states.size()) {
@@ -143,8 +146,6 @@ void Transducer::find_loop(unsigned int input_pos,
         
     if (indexes_transition_table(i))
     {
-        i -= TRANSITION_TARGET_TABLE_START;
-        
         find_loop_epsilon_transitions(input_pos,
                                       i+1,
                                       position_states);
