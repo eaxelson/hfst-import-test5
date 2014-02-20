@@ -641,7 +641,8 @@ bool HfstTransducer::is_lookup_infinitely_ambiguous(const StringVector& s)
     /* TODO: Convert into HFST_OL(W)_TYPE, if needed. */
     case (HFST_OL_TYPE):
     case (HFST_OLW_TYPE):
-    return this->implementation.hfst_ol->is_infinitely_ambiguous();
+    return this->implementation.hfst_ol->
+        is_lookup_infinitely_ambiguous(s);
     default:
     (void)s;
     HFST_THROW(FunctionNotImplementedException);      

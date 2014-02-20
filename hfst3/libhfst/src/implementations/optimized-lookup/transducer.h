@@ -62,6 +62,17 @@ typedef std::map<SymbolNumber, hfst::FdOperation> OperationMap;
 typedef std::map<std::string, SymbolNumber> StringSymbolMap;
 class STransition;
 
+// for epsilon loop checking
+struct TraversalState
+{
+    TransitionTableIndex index;
+    FlagDiacriticState flags;
+    TraversalState(TransitionTableIndex i, FlagDiacriticState f):
+        index(i), flags(f) {}
+    bool operator==(TraversalState & rhs);
+};
+typedef std::vector<std::vector<TraversalState> > PositionStates;
+
 const SymbolNumber NO_SYMBOL_NUMBER = std::numeric_limits<SymbolNumber>::max();
 const TransitionTableIndex NO_TABLE_INDEX =
     std::numeric_limits<TransitionTableIndex>::max();
@@ -247,6 +258,40 @@ public:
                 return has_unweighted_input_epsilon_cycles;
             }
             return false;
+        }
+  
+    void set_flag(HeaderFlag flag, bool value)
+        {
+            switch (flag) {
+            case Weighted:
+                weighted = true;
+                break;
+            case Deterministic:
+                deterministic = true;
+                break;
+            case Input_deterministic:
+                input_deterministic = true;
+                break;
+            case Minimized:
+                minimized = true;
+                break;
+            case Cyclic:
+                cyclic = true;
+                break;
+            case Has_epsilon_epsilon_transitions:
+                has_epsilon_epsilon_transitions = true;
+                break;
+            case Has_input_epsilon_transitions:
+                has_input_epsilon_transitions = true;
+                break;
+            case Has_input_epsilon_cycles:
+                has_input_epsilon_cycles = true;
+                break;
+            case Has_unweighted_input_epsilon_cycles:
+                has_unweighted_input_epsilon_cycles = true;
+            default:
+                return;
+            }
         }
   
     void display() const
@@ -847,6 +892,27 @@ public:
         {
             return header->probe_flag(Has_input_epsilon_cycles);
         }
+
+    bool is_lookup_infinitely_ambiguous(const StringVector & s);
+    bool is_lookup_infinitely_ambiguous(const std::string & input);
+    void find_loop_epsilon_transitions(unsigned int input_pos,
+                                       TransitionTableIndex i,
+                                       PositionStates & position_states);
+    void find_loop_epsilon_indices(unsigned int input_pos,
+                                   TransitionTableIndex i,
+                                   PositionStates & position_states);
+    void find_loop_transitions(SymbolNumber input,
+                               unsigned int input_pos,
+                               TransitionTableIndex i,
+                               PositionStates & position_states);
+    void find_loop_index(SymbolNumber input,
+                         unsigned int input_pos,
+                         TransitionTableIndex i,
+                         PositionStates & position_states);
+    void find_loop(unsigned int input_pos,
+                   TransitionTableIndex i,
+                   PositionStates & position_states);
+
     TransducerTable<TransitionWIndex> & copy_windex_table();
     TransducerTable<TransitionW> & copy_transitionw_table();
     TransducerTable<TransitionIndex> & copy_index_table();
