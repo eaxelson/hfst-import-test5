@@ -3287,8 +3287,8 @@
                      {
                        return true;
                      }
-                   if (is_lookup_infinitely_ambiguous
-                       (it->get_target_state(), epsilon_path_states))
+                   if (is_infinitely_ambiguous
+                       (it->get_target_state(), epsilon_path_states, states_handled))
                      {
                        return true;
                      }
