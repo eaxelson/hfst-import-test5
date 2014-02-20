@@ -83,6 +83,9 @@ using hfst::implementations::HfstBasicTransition;
 namespace hfst { 
 namespace xfst {
 
+  size_t LOOKUP_CUTOFF = 5;
+  int PRINT_WORDS_CUTOFF = 5;
+
   static std::map<std::string, std::string> variable_explanations_;
 
   static void initialize_variable_explanations()
@@ -97,6 +100,7 @@ namespace xfst {
     variable_explanations_["minimal"] = "minimize networks after operations";
     variable_explanations_["name-nets"] = "stores the name of the network when using 'define'";
     variable_explanations_["obey-flags"] = "obey flag diacritic constraints";
+    variable_explanations_["precision"] = "todo: precision to use when printing weights";
     variable_explanations_["print-foma-sigma"] = "print identities as '@'";
     variable_explanations_["print-pairs"] = "show both sides (upper and lower) of labels";
     variable_explanations_["print-sigma"] = "show sigma when printing a network";
@@ -141,6 +145,7 @@ namespace xfst {
         variables_["minimal"] = "ON";
         variables_["name-nets"] = "OFF";
         variables_["obey-flags"] = "ON";
+        variables_["precision"] = "5";
         variables_["print-foma-sigma"] = "OFF";
         variables_["print-pairs"] = "OFF";
         variables_["print-sigma"] = "OFF";
@@ -182,6 +187,7 @@ namespace xfst {
         variables_["minimal"] = "ON";
         variables_["name-nets"] = "OFF";
         variables_["obey-flags"] = "ON";
+        variables_["precision"] = "5";
         variables_["print-foma-sigma"] = "OFF";
         variables_["print-pairs"] = "OFF";
         variables_["print-sigma"] = "OFF";
@@ -200,6 +206,13 @@ namespace xfst {
         initialize_variable_explanations();
         prompt();
       }
+
+  int XfstCompiler::hfst_print_weight(FILE * stream, float weight)
+  {
+    std::string formatter("%.");
+    formatter = formatter + variables_["precision"] + std::string("f");
+    return hfst_fprintf(stream, formatter.c_str(), weight);
+  }
 
   int XfstCompiler::hfst_fprintf(FILE * stream, const char * format, ...) const
   {
@@ -351,7 +364,8 @@ namespace xfst {
         // if needed, print the weight
         if (variables_["print-weight"] == "ON")
           {
-            hfst_fprintf(outfile, "\t%f", it->first);
+            hfst_fprintf(outfile, "\t");
+            hfst_print_weight(outfile, it->first);
           }
 
         hfst_fprintf(outfile, "\n");
@@ -409,7 +423,8 @@ namespace xfst {
         // if needed, print the weight
         if (variables_["print-weight"] == "ON")
           {
-            hfst_fprintf(outfile, "\t%f", it->first);
+            hfst_fprintf(outfile, "\t");
+            hfst_print_weight(outfile, it->first);
           }
 
         hfst_fprintf(outfile, "\n");
@@ -432,10 +447,19 @@ namespace xfst {
             tok.add_multichar_symbol(*it);
           }
         StringVector lookup_path = tok.tokenize_one_level(std::string(token));
+
+        size_t cutoff = -1;
+        if (t->is_lookup_infinitely_ambiguous(lookup_path))
+          {
+            cutoff = LOOKUP_CUTOFF;
+            hfst_fprintf(warnstream_, 
+              "warning: lookup is infinitely ambiguous, limiting the number of cycles to "SIZE_T_SPECIFIER"\n", cutoff);
+          }
+
         HfstTwoLevelPaths results;
 
         // todo: variables_["obey-flags"] == ["ON"|"OFF"]
-        t->lookup_fd(lookup_path, results, -1);
+        t->lookup_fd(lookup_path, results, cutoff);
 
         HfstOneLevelPaths paths = extract_output_paths(results);
 
@@ -448,17 +472,21 @@ namespace xfst {
 
 
     XfstCompiler&
-    XfstCompiler::apply_line(char* line, const HfstTransducer * t)
+    XfstCompiler::apply_line(char* line, const HfstTransducer * t, size_t cutoff)
       {
         char* token = strstrip(line);
         HfstOneLevelPaths * paths = NULL;
 
+        std::cerr << "cutoff is " << cutoff << std::endl;
+
         if (variables_["obey-flags"] == "ON") {
-          paths = t->lookup_fd(std::string(token));
+          paths = t->lookup_fd(std::string(token), cutoff);
         }
         else {
-          paths = t->lookup(std::string(token));
+          paths = t->lookup(std::string(token), cutoff);
         }
+
+        std::cerr << "done" << std::endl;
 
         this->print_paths(*paths);
         if (paths->empty()) {
@@ -590,7 +618,16 @@ namespace xfst {
             return this->apply_line(line, &fsm);
           }
 
-        return this->apply_line(line, t);
+        size_t ol_cutoff = LOOKUP_CUTOFF; // -1; fix this
+        StringVector foo; // this gets ignored by ol transducer's is_lookup_infinitely_ambiguous
+        if (t->is_lookup_infinitely_ambiguous(foo))
+          {
+            ol_cutoff = LOOKUP_CUTOFF;
+            hfst_fprintf(warnstream_, 
+                         "warning: transducer is infinitely ambiguous, limiting number of cycles to "SIZE_T_SPECIFIER"\n", ol_cutoff);
+          }
+        
+        return this->apply_line(line, t, ol_cutoff);
       }
 
     XfstCompiler&
@@ -712,6 +749,8 @@ namespace xfst {
             return *this;
           }
         HfstTransducer * t = stack_.top();
+        size_t ol_cutoff = LOOKUP_CUTOFF; // -1; fix this // number of cycles needs to be limited for an infinitely ambiguous ol transducer
+                               // because it doesn't support is_lookup_infinitely_ambiguous(const string &)
 
         HfstBasicTransducer * fsm = NULL;
 
@@ -739,8 +778,17 @@ namespace xfst {
 
         if (t->get_type() != hfst::HFST_OL_TYPE && t->get_type() != hfst::HFST_OLW_TYPE)
           {
-            //hfst_fprintf(warnstream_, "lookup might be slow, consider 'convert net'\n");
             fsm = new HfstBasicTransducer(*t);
+          }
+        else
+          {
+            StringVector foo; // this gets ignored by ol transducer's is_lookup_infinitely_ambiguous
+            if (t->is_lookup_infinitely_ambiguous(foo))
+              {
+                ol_cutoff = LOOKUP_CUTOFF;
+                hfst_fprintf(warnstream_, 
+                  "warning: transducer is infinitely ambiguous, limiting number of cycles to "SIZE_T_SPECIFIER"\n", ol_cutoff);
+              }
           }
 
         char * line = NULL;
@@ -773,7 +821,7 @@ namespace xfst {
             if (fsm != NULL)
               apply_line(line, fsm);
             else
-              apply_line(line, t);
+              apply_line(line, t, ol_cutoff);
             free(line);
           }
 
@@ -2615,11 +2663,11 @@ namespace xfst {
         }
       catch (const TransducerIsCyclicException & e)
         {
-          hfst_fprintf(warnstream_, "warning: transducer is cyclic, limiting the number of cycles to 5\n");
+          hfst_fprintf(warnstream_, "warning: transducer is cyclic, limiting the number of cycles to %i\n", PRINT_WORDS_CUTOFF);
           if (variables_["obey-flags"] == "OFF")
-            temp.extract_paths(results, number, 5);
+            temp.extract_paths(results, number, PRINT_WORDS_CUTOFF);
           else
-            temp.extract_paths_fd(results, number, 5);
+            temp.extract_paths_fd(results, number, PRINT_WORDS_CUTOFF);
         }
 
       print_paths(results, outfile);

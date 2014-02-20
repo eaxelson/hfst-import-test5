@@ -122,6 +122,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        	    hfst::xfst::xfst_->apply_up(stdin);
        }
        | APPLY_UP APPLY_INPUT END_COMMAND {
+         // BUG: if -F is used, all of file until end is in APPLY_INPUT
        	    hfst::xfst::xfst_->apply_up($2);
        }
        | APPLY_UP NAMETOKEN END_COMMAND {

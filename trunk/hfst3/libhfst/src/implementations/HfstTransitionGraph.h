@@ -3334,6 +3334,17 @@
                                                  epsilon_path_states);
          }
 
+         bool is_lookup_infinitely_ambiguous(const StringVector & s)
+         {
+           std::set<HfstState> epsilon_path_states;
+           epsilon_path_states.insert(0);
+           unsigned int index=0;
+           HfstOneLevelPath path(0, s);
+
+           return is_lookup_infinitely_ambiguous(path, index, INITIAL_STATE,
+                                                 epsilon_path_states);
+         }
+
 
 
 
