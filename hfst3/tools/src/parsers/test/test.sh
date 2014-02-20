@@ -1,7 +1,5 @@
 #!/bin/sh
 
-#exit 77;
-
 XFST_TOOL="../hfst-xfst -s --pipe-mode"
 STRINGS2FST="../../hfst-strings2fst -S"
 TXT2FST="../../hfst-txt2fst"
@@ -239,6 +237,30 @@ do
             exit 1;
         fi
     done
+
+    if [ "$format" = "openfst-tropical" ]; 
+    then
+        for file in weighted_rules_1 weighted_rules_2 \
+        weighted_rules_3 weighted_rules_4 weighted_rules_5
+        do
+            if ! (cat $file.xfst | ../hfst-xfst --pipe-mode -s -f $format > tmp 2> /dev/null); then
+                echo "ERROR: in compiling "$file".xfst"
+                exit 1;
+            fi
+            if ! (cat tmp | ${STRINGS2FST} -j -f $format > tmp1 2> /dev/null); then
+                echo "ERROR: in compiling result file from "$file".xfst"
+                exit 1;
+            fi
+            if ! (cat $file.result | ${STRINGS2FST} -j -f $format > tmp2 2> /dev/null); then
+                echo "ERROR: in compiling file "$file".result"
+                exit 1;
+            fi
+	    if ! (${COMPARE} tmp1 tmp2); then
+	        echo "ERROR: "$file" test failed"
+	        exit 1;
+	    fi
+        done
+    fi
 
     rm -f result tmp1 tmp2 foo
 

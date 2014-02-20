@@ -1,0 +1,6 @@
+set print-weight ON
+set precision 1
+set lookup-cutoff 5
+
+regex a::1 -> [b::2]+ || c __ c ;
+apply up cac

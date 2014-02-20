@@ -99,7 +99,7 @@ LWSP [\t ]*
     return ADD_PROPS;
 }
 
-^{LWSP}("apply up"|"up") {
+^{LWSP}("apply up"|"up"){LWSP}(""|"\r")$ {
     if (hfst::xfst::xfst_->getReadInteractiveTextFromStdin()) 
     {
         // let XfstCompiler take care of the input to apply up command
@@ -113,7 +113,11 @@ LWSP [\t ]*
     }
 }
 
-^{LWSP}("apply down"|"down") {
+^{LWSP}("apply up"|"up") {
+    return APPLY_UP;
+}
+
+^{LWSP}("apply down"|"down"){LWSP}(""|"\r")$ {
     if (hfst::xfst::xfst_->getReadInteractiveTextFromStdin()) 
     {
         // let XfstCompiler take care of the input to apply down command
@@ -126,6 +130,11 @@ LWSP [\t ]*
         return APPLY_DOWN;
     }
 }
+
+^{LWSP}("apply down"|"down") {
+    return APPLY_DOWN;
+}
+
 
 ^{LWSP}("apply med"|"med") {
     return APPLY_MED;
