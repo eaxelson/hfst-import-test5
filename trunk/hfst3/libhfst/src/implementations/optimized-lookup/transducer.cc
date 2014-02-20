@@ -409,7 +409,6 @@ void Transducer::get_analyses(unsigned int input_pos,
     }
     if (max_lookups >= 0 && lookup_paths->size() >= max_lookups) {
         // Back out because we have enough results already
-        std::cerr << "Backing out due to many results\n";
         return;
     }
     --recursion_depth_left;
