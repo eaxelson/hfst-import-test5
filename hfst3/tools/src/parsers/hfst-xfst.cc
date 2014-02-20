@@ -50,6 +50,7 @@ static bool output_to_console = false;
 #else
   static bool use_readline = false;
 #endif
+static bool print_weight = false;
 
 void
 print_usage()
@@ -70,6 +71,7 @@ print_usage()
           "  -l, --startupfile=FILE   Read commands from FILE on startup\n"
           "  -p, --pipe-mode          Read commands from standard input (non-interactive)\n"
           "  -r, --no-readline        Do not use readline library for input\n"
+          "  -w, --print-weight       Print weights for each operation\n"
           "  -k, --output-to-console  Output directly to console (Windows-specific)\n"
           "\n"
           "Option --execute can be invoked many times.\n"
@@ -100,12 +102,13 @@ parse_options(int argc, char** argv)
             {"startupfile", required_argument, 0, 'l'},
             {"pipe-mode", no_argument, 0, 'p'},
             {"no-readline", no_argument, 0, 'r'},
+            {"print-weight", no_argument, 0, 'w'},
             {"output-to-console", no_argument, 0, 'k'},
             {0,0,0,0}
           };
         int option_index = 0;
         // add tool-specific options here
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "f:F:e:l:prk",
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "f:F:e:l:prwk",
                              long_options, &option_index);
         if (-1 == c)
           {
@@ -153,6 +156,9 @@ parse_options(int argc, char** argv)
             break;
           case 'r':
             use_readline = false;
+            break;
+          case 'w':
+            print_weight = true;
             break;
           case 'k':
             output_to_console = true;
@@ -326,6 +332,13 @@ int main(int argc, char** argv)
   comp.setReadline(false);
 #endif
   comp.setVerbosity(!silent);
+  
+  if (print_weight)
+    {
+      comp.setPromptVerbosity(false);
+      comp.set("print-weight", "ON");
+      comp.setPromptVerbosity(true);
+    }
 
   if (output_to_console)
     comp.setOutputToConsole(true);

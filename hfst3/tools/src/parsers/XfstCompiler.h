@@ -617,6 +617,9 @@ class XfstCompiler
   //! @brief Remove newline ('\n' and '\r') from the end of \a str. 
   char * remove_newline(char * str);
 
+  //! @brief Print weight.
+  int hfst_print_weight(FILE * stream, float weight);
+
   //! @brief Wrapper for fprintf.
   int hfst_fprintf(FILE * stream, const char * format, ...) const;
 
@@ -632,7 +635,7 @@ class XfstCompiler
   const XfstCompiler& print_transducer_info() const;
   XfstCompiler& add_prop_line(char* line);
 
-  XfstCompiler& apply_line(char* line, const HfstTransducer * t);
+  XfstCompiler& apply_line(char* line, const HfstTransducer * t, size_t cutoff);
   XfstCompiler& apply_line(char* line, HfstBasicTransducer * t);
 
   XfstCompiler& apply_up_line(char* line);
