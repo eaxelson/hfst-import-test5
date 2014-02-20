@@ -249,6 +249,30 @@ HfstOneLevelPaths * Transducer::lookup_fd(const std::string & s)
     return lookup_fd(s.c_str());
 }
 
+bool Transducer::is_lookup_infinitely_ambiguous(const std::string & s)
+{
+    if (!initialize_input(s.c_str())) {
+        return false;
+    }
+    PositionStates position_states;
+    try {
+        find_loop(0, 0, position_states);
+    } catch (bool e) {
+        return e;
+    }
+    return false;
+}
+
+bool Transducer::is_lookup_infinitely_ambiguous(const StringVector & s)
+{
+    std::string input_str;
+    for (StringVector::const_iterator it = s.begin(); it != s.end(); ++it) {
+        input_str.append(*it);
+    }
+    return is_lookup_infinitely_ambiguous(input_str);
+}
+
+
 HfstOneLevelPaths * Transducer::lookup_fd(const char * s)
 {
     HfstOneLevelPaths * results = new HfstOneLevelPaths;

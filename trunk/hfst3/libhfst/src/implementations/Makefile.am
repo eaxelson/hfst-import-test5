@@ -68,7 +68,8 @@ BRIDGE_SRCS=$(MAYBE_SFST) $(MAYBE_OPENFST) $(MAYBE_FOMA) $(MAYBE_HFSTOL) # $(MAY
 if WANT_HFSTOL
 HFST_OL_SRCS=\
 optimized-lookup/transducer.cc optimized-lookup/convert.cc \
-	optimized-lookup/ospell.cc optimized-lookup/pmatch.cc
+	optimized-lookup/ospell.cc optimized-lookup/pmatch.cc \
+	optimized-lookup/find_epsilon_loops.cc
 endif
 
 libhfstimplementations_la_SOURCES=$(IMPLEMENTATION_SRCS) $(BRIDGE_SRCS) \
@@ -179,7 +180,8 @@ ConvertFomaTransducer_LDADD=../libhfst.la
 ConvertOlTransducer_SOURCES=ConvertOlTransducer.cc
 ConvertOlTransducer_CXXFLAGS=-DMAIN_TEST
 ConvertOlTransducer_LDADD=../libhfst.la
-optimized_lookup_transducer_SOURCES=optimized-lookup/transducer.cc optimized-lookup/ospell.cc optimized-lookup/pmatch.cc
+optimized_lookup_transducer_SOURCES=optimized-lookup/transducer.cc \
+	optimized-lookup/ospell.cc optimized-lookup/pmatch.cc optimized-lookup/find_epsilon_loops.cc
 optimized_lookup_transducer_CXXFLAGS=-DMAIN_TEST
 optimized_lookup_transducer_LDADD=../libhfst.la
 optimized_lookup_convert_SOURCES=optimized-lookup/convert.cc
