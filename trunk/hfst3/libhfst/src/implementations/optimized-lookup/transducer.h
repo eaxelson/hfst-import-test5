@@ -816,9 +816,7 @@ protected:
     HfstOneLevelPaths * lookup_paths;
     Encoder * encoder;
     Tape input_tape;
-    unsigned int input_tape_pos;
     Tape output_tape;
-    unsigned int output_tape_pos;
     hfst::FdState<SymbolNumber> flag_state;
     // This is to keep track of whether we're going to take a default transition
     bool found_transition;

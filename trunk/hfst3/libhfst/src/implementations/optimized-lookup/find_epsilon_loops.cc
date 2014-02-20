@@ -122,11 +122,12 @@ void Transducer::find_loop(unsigned int input_pos,
                            TransitionTableIndex i,
                            PositionStates & position_states)
 {
+    found_transition = false;
+    
     TraversalState this_position(i, flag_state.get_values());
     if (input_pos == position_states.size()) {
         // first time at this input
         std::vector<TraversalState> v;
-        v.push_back(this_position);
         position_states.push_back(v);
     } else {
         // see if the same state has been visited already at this input
@@ -142,7 +143,6 @@ void Transducer::find_loop(unsigned int input_pos,
         
     if (indexes_transition_table(i))
     {
-        found_transition = false;
         i -= TRANSITION_TARGET_TABLE_START;
         
         find_loop_epsilon_transitions(input_pos,
@@ -171,7 +171,6 @@ void Transducer::find_loop(unsigned int input_pos,
     }
     else
     {
-        found_transition = false;
         find_loop_epsilon_indices(input_pos,
                                   i+1,
                                   position_states);

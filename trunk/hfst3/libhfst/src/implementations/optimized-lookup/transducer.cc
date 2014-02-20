@@ -235,7 +235,6 @@ bool Transducer::initialize_input(const char * input)
 }
 
 HfstOneLevelPaths * Transducer::lookup_fd(const StringVector & s, ssize_t limit)
-
 {
     std::string input_str;
     for (StringVector::const_iterator it = s.begin(); it != s.end(); ++it) {
@@ -258,6 +257,8 @@ bool Transducer::is_lookup_infinitely_ambiguous(const std::string & s)
     try {
         find_loop(0, 0, position_states);
     } catch (bool e) {
+        current_weight = 0.0;
+        flag_state = alphabet->get_fd_table();
         return e;
     }
     return false;
@@ -399,6 +400,8 @@ void Transducer::get_analyses(unsigned int input_pos,
                               unsigned int output_pos,
                               TransitionTableIndex i)
 {
+    found_transition = false;
+    
     if (recursion_depth_left == 0) {
         std::cerr << __FILE__ <<
             ": maximum recursion depth exceeded, discarding results\n";
@@ -406,13 +409,13 @@ void Transducer::get_analyses(unsigned int input_pos,
     }
     if (max_lookups >= 0 && lookup_paths->size() >= max_lookups) {
         // Back out because we have enough results already
+        std::cerr << "Backing out due to many results\n";
         return;
     }
     --recursion_depth_left;
     if (indexes_transition_table(i))
     {
         i -= TRANSITION_TARGET_TABLE_START;
-        found_transition = false;
 
         // First we check for finality and collect the result
         if (input_tape[input_pos] == NO_SYMBOL_NUMBER) {
@@ -452,7 +455,6 @@ void Transducer::get_analyses(unsigned int input_pos,
     }
     else
     {
-        found_transition = false;
                 
         if (input_tape[input_pos] == NO_SYMBOL_NUMBER) {
             if (max_lookups < 0 || lookup_paths->size() < max_lookups) {
@@ -508,7 +510,7 @@ void Transducer::note_analysis(void)
 Transducer::Transducer():
     header(NULL), alphabet(NULL), tables(NULL),
     current_weight(0.0), lookup_paths(NULL), encoder(NULL),
-    input_tape(), input_tape_pos(0), output_tape(), output_tape_pos(0),
+    input_tape(), output_tape(),
     flag_state(), found_transition(false), max_lookups(-1),
     recursion_depth_left(MAX_RECURSION_DEPTH){}
 
@@ -518,7 +520,7 @@ Transducer::Transducer(std::istream& is):
     tables(NULL), current_weight(0.0), lookup_paths(NULL),
     encoder(new Encoder(alphabet->get_symbol_table(),
                         header->input_symbol_count())),
-    input_tape(), input_tape_pos(0), output_tape(), output_tape_pos(0),
+    input_tape(), output_tape(),
     flag_state(alphabet->get_fd_table()), found_transition(false), max_lookups(-1),
     recursion_depth_left(MAX_RECURSION_DEPTH)
 {
@@ -533,7 +535,7 @@ Transducer::Transducer(bool weighted):
     lookup_paths(NULL),
     encoder(new Encoder(alphabet->get_symbol_table(),
                         header->input_symbol_count())),
-    input_tape(), input_tape_pos(0), output_tape(), output_tape_pos(0),
+    input_tape(), output_tape(),
     flag_state(alphabet->get_fd_table()), found_transition(false),
     max_lookups(-1), recursion_depth_left(MAX_RECURSION_DEPTH)
 {
@@ -555,7 +557,7 @@ Transducer::Transducer(const TransducerHeader& header,
     lookup_paths(NULL),
     encoder(new Encoder(alphabet.get_symbol_table(),
                         header.input_symbol_count())),
-    input_tape(), input_tape_pos(0), output_tape(), output_tape_pos(0),
+    input_tape(), output_tape(),
     flag_state(alphabet.get_fd_table()), found_transition(false), max_lookups(-1),
     recursion_depth_left(MAX_RECURSION_DEPTH)
 {}
@@ -572,7 +574,7 @@ Transducer::Transducer(const TransducerHeader& header,
     lookup_paths(NULL),
     encoder(new Encoder(alphabet.get_symbol_table(),
                         header.input_symbol_count())),
-    input_tape(), input_tape_pos(0), output_tape(), output_tape_pos(0),
+    input_tape(), output_tape(),
     flag_state(alphabet.get_fd_table()), found_transition(false), max_lookups(-1),
     recursion_depth_left(MAX_RECURSION_DEPTH)
 {}
