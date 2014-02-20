@@ -224,7 +224,7 @@ class XfstCompiler
   //! @brief Test top transducer in stack for unambiguity
   //! @todo tests are not implemented
   XfstCompiler& test_unambiguous(bool assertion=false);
-
+  XfstCompiler& test_infinitely_ambiguous(bool assertion=false);
 
   XfstCompiler& substitute_named(const char* variable, const char* label);
   //! @brief Substitute all labels @a list by @a target.

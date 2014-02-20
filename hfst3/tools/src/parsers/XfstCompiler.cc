@@ -1946,6 +1946,18 @@ namespace xfst {
       //MAYBE_ASSERT(assertion, result);
       PROMPT_AND_RETURN_THIS;
     }
+  XfstCompiler& 
+  XfstCompiler::test_infinitely_ambiguous(bool assertion)
+    {
+      HfstTransducer * tmp = this->top();
+      if (NULL == tmp) {
+        return *this;
+      }
+      bool value = tmp->is_infinitely_ambiguous();
+      this->print_bool(value);
+      MAYBE_ASSERT(assertion, value);
+      PROMPT_AND_RETURN_THIS;
+    }
 
   // Tokenize string \a s using \a c as separator.
   static StringVector tokenize_string(const char * s, char c)

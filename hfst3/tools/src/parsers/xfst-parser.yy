@@ -86,7 +86,7 @@ int hxfstlex(void);
        COLON SAVE_TEXT DETERMINIZE SIGMA COMPILE_REPLACE_LOWER UNION
        PRINT_DIR LIST LOWER_SIDE MINIMIZE MINUS PRINT_NAME PRUNE_NET
        PUSH_DEFINED READ_LEXC READ_ATT TWOSIDED_FLAGS WRITE_ATT ASSERT LABEL_NET
-       LOOKUP_OPTIMIZE REMOVE_OPTIMIZATION
+       LOOKUP_OPTIMIZE REMOVE_OPTIMIZATION TEST_INFINITELY_AMBIGUOUS
        XFST_ERROR
        NEWLINE
 
@@ -348,6 +348,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        }
        | TEST_ID END_COMMAND {
             hfst::xfst::xfst_->test_id();
+       }
+       | TEST_INFINITELY_AMBIGUOUS {
+            hfst::xfst::xfst_->test_infinitely_ambiguous();
        }
        | TEST_LOWER_BOUNDED END_COMMAND {
             hfst::xfst::xfst_->test_lower_bounded();

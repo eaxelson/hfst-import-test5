@@ -570,6 +570,9 @@ LWSP [\t ]*
 "test identity"|"identity"|"ti" {
     return TEST_ID;
 }
+"test infinitely ambiguous"|"infinitely ambiguous"|"test infinitely-ambiguous"|"infinitely-ambiguous"|"tia" {
+    return TEST_INFINITELY_AMBIGUOUS;
+}
 "test lower-bounded"|"lower-bounded"|"tlb" {
     return TEST_LOWER_BOUNDED;
 }
@@ -594,7 +597,7 @@ LWSP [\t ]*
 "test upper-universal"|"upper-universal"|"tuu" {
     return TEST_UPPER_UNI;
 }
-"test unambiguous" {
+"test unambiguous"|"tu" {
     return TEST_UNAMBIGUOUS;
 }
 
