@@ -669,6 +669,22 @@ bool HfstTransducer::is_lookdown_infinitely_ambiguous
     HFST_THROW(FunctionNotImplementedException);
 }
 
+bool HfstTransducer::is_infinitely_ambiguous()
+    const {
+    switch(this->type) {
+    case (HFST_OL_TYPE):
+    case (HFST_OLW_TYPE):
+      return this->implementation.hfst_ol->
+        is_infinitely_ambiguous();
+    case (ERROR_TYPE):
+      HFST_THROW(TransducerHasWrongTypeException);
+    default:
+      hfst::implementations::HfstBasicTransducer net(*this);
+      return net.is_infinitely_ambiguous();
+    }
+}
+
+
 
 // -----------------------------------------------------------------------
 //

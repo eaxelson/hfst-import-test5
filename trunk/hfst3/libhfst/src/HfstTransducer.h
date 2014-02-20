@@ -1129,6 +1129,7 @@ ccc : ddd
     //! @todo todo
     bool is_lookdown_infinitely_ambiguous(const StringVector& s) const;
 
+    bool is_infinitely_ambiguous() const ;
 
 
     // -------------------------------------------

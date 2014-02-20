@@ -385,11 +385,12 @@ bool handle_case(const std::string & names, const std::string & arguments,
   COMMAND("system", "<cmd>", "execute the system command <cmd>");
   AMBIGUOUS_COMMAND("test", "test unambiguous, test equivalent, test functional, test identity, test lower-universal, "
                     "test upper-universal, test non-null, test null, test lower-bounded, test overlap, test sequential, "
-                    "test star-free, test sublanguage, test upper-bounded");
+                    "test star-free, test sublanguage, test upper-bounded, test infinitely-ambiguous");
   COMMAND("test unambiguous", "", "test if top FST is unambiguous");
   COMMAND("test equivalent, equivalent, te", "", "test if the top two FSMs are equivalent");
   COMMAND("test functional, functional, tf", "", "test if the top FST is functional (single-valued)");
   COMMAND("test identity, identity, ti", "", "test if top FST represents identity relations only");
+  COMMAND("test infinitely-ambiguous", "", "test if top FST is infinitely ambiguous");
   COMMAND("test lower-universal. lower-universal, tlu", "", "test if lower side is ..");
   COMMAND("test upper-universal, upper-universal, tuu", "", "test if upper side is ..");
   COMMAND("test non-null, tnn", "", "test if top machine is not the empty language");
