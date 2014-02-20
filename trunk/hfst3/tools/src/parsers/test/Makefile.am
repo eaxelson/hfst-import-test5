@@ -68,5 +68,10 @@ EXTRA_DIST=test.sh \
 	at_txt.att at_stxt.att at_txt_and_stxt.att \
 	at_txt.xfst at_stxt.xfst at_txt_and_stxt.xfst \
 	words.txt words.stxt \
-	at_pl.xfst at_pl.att network.prolog
+	at_pl.xfst at_pl.att network.prolog \
+	weighted_rules_1.xfst weighted_rules_1.result \
+	weighted_rules_2.xfst weighted_rules_2.result \
+	weighted_rules_3.xfst weighted_rules_3.result \
+	weighted_rules_4.xfst weighted_rules_4.result \
+	weighted_rules_5.xfst weighted_rules_5.result
 check_DATA=test.sh

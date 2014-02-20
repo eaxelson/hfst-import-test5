@@ -78,13 +78,14 @@ using hfst::implementations::HfstBasicTransition;
 #define MAYBE_ASSERT(assertion, value) if (!value && ((variables_["assert"] == "ON" || assertion) && (variables_["quit-on-fail"] == "ON"))) { exit(EXIT_FAILURE); }
 #define MAYBE_QUIT if(variables_["quit-on-fail"] == "ON") { exit(EXIT_FAILURE); }
 
+#define WEIGHT_PRECISION "5"
+#define LOOKUP_CUTOFF "5"
+#define PRINT_WORDS_CUTOFF "5"
+
 #include "help_message.cc"
 
 namespace hfst { 
 namespace xfst {
-
-  size_t LOOKUP_CUTOFF = 5;
-  int PRINT_WORDS_CUTOFF = 5;
 
   static std::map<std::string, std::string> variable_explanations_;
 
@@ -142,15 +143,17 @@ namespace xfst {
         variables_["flag-is-epsilon"] = "OFF";
         variables_["harmonize-flags"] = "OFF";
         variables_["hopcroft-min"] = "ON";
+        variables_["lookup-cutoff"] = LOOKUP_CUTOFF;
         variables_["minimal"] = "ON";
         variables_["name-nets"] = "OFF";
         variables_["obey-flags"] = "ON";
-        variables_["precision"] = "5";
+        variables_["precision"] = WEIGHT_PRECISION;
         variables_["print-foma-sigma"] = "OFF";
         variables_["print-pairs"] = "OFF";
         variables_["print-sigma"] = "OFF";
         variables_["print-space"] = "OFF";
         variables_["print-weight"] = "OFF";
+        variables_["print-words-cutoff"] = PRINT_WORDS_CUTOFF;
         variables_["quit-on-fail"] = "OFF";
         variables_["quote-special"] = "OFF";
         variables_["random-seed"] = "ON";
@@ -184,15 +187,17 @@ namespace xfst {
         variables_["flag-is-epsilon"] = "OFF";
         variables_["harmonize-flags"] = "OFF";
         variables_["hopcroft-min"] = "ON";
+        variables_["lookup-cutoff"] = LOOKUP_CUTOFF;
         variables_["minimal"] = "ON";
         variables_["name-nets"] = "OFF";
         variables_["obey-flags"] = "ON";
-        variables_["precision"] = "5";
+        variables_["precision"] = WEIGHT_PRECISION;
         variables_["print-foma-sigma"] = "OFF";
         variables_["print-pairs"] = "OFF";
         variables_["print-sigma"] = "OFF";
         variables_["print-space"] = "OFF";
         variables_["print-weight"] = "OFF";
+        variables_["print-words-cutoff"] = PRINT_WORDS_CUTOFF;
         variables_["quit-on-fail"] = "OFF";
         variables_["quote-special"] = "OFF";
         variables_["random-seed"] = "ON";
@@ -435,6 +440,14 @@ namespace xfst {
     return *this;
   }
 
+  static size_t string_to_size_t(const std::string & str)
+  {
+    std::istringstream iss(str);
+    size_t size;
+    iss >> size;
+    return size;
+  }
+
     XfstCompiler&
     XfstCompiler::apply_line(char* line, HfstBasicTransducer * t)
       {
@@ -451,9 +464,12 @@ namespace xfst {
         size_t cutoff = -1;
         if (t->is_lookup_infinitely_ambiguous(lookup_path))
           {
-            cutoff = LOOKUP_CUTOFF;
-            hfst_fprintf(warnstream_, 
-              "warning: lookup is infinitely ambiguous, limiting the number of cycles to "SIZE_T_SPECIFIER"\n", cutoff);
+            cutoff = string_to_size_t(variables_["lookup-cutoff"]);
+            if (verbose_)
+              {
+                hfst_fprintf(warnstream_, 
+                             "warning: lookup is infinitely ambiguous, limiting the number of cycles to "SIZE_T_SPECIFIER"\n", cutoff);
+              }
           }
 
         HfstTwoLevelPaths results;
@@ -477,16 +493,12 @@ namespace xfst {
         char* token = strstrip(line);
         HfstOneLevelPaths * paths = NULL;
 
-        std::cerr << "cutoff is " << cutoff << std::endl;
-
         if (variables_["obey-flags"] == "ON") {
           paths = t->lookup_fd(std::string(token), cutoff);
         }
         else {
           paths = t->lookup(std::string(token), cutoff);
         }
-
-        std::cerr << "done" << std::endl;
 
         this->print_paths(*paths);
         if (paths->empty()) {
@@ -618,13 +630,16 @@ namespace xfst {
             return this->apply_line(line, &fsm);
           }
 
-        size_t ol_cutoff = LOOKUP_CUTOFF; // -1; fix this
+        size_t ol_cutoff = string_to_size_t(variables_["lookup-cutoff"]); // -1; fix this
         StringVector foo; // this gets ignored by ol transducer's is_lookup_infinitely_ambiguous
         if (t->is_lookup_infinitely_ambiguous(foo))
           {
-            ol_cutoff = LOOKUP_CUTOFF;
-            hfst_fprintf(warnstream_, 
-                         "warning: transducer is infinitely ambiguous, limiting number of cycles to "SIZE_T_SPECIFIER"\n", ol_cutoff);
+            ol_cutoff = string_to_size_t(variables_["lookup-cutoff"]);;
+            if (verbose_)
+              {
+                hfst_fprintf(warnstream_, 
+                             "warning: transducer is infinitely ambiguous, limiting number of cycles to "SIZE_T_SPECIFIER"\n", ol_cutoff);
+              }
           }
         
         return this->apply_line(line, t, ol_cutoff);
@@ -739,6 +754,7 @@ namespace xfst {
     return "";
   }
 
+  // HERE
   XfstCompiler&
   XfstCompiler::apply(FILE* infile, ApplyDirection direction)
       {
@@ -749,7 +765,7 @@ namespace xfst {
             return *this;
           }
         HfstTransducer * t = stack_.top();
-        size_t ol_cutoff = LOOKUP_CUTOFF; // -1; fix this // number of cycles needs to be limited for an infinitely ambiguous ol transducer
+        size_t ol_cutoff = string_to_size_t(variables_["lookup-cutoff"]); ; // -1; fix this // number of cycles needs to be limited for an infinitely ambiguous ol transducer
                                // because it doesn't support is_lookup_infinitely_ambiguous(const string &)
 
         HfstBasicTransducer * fsm = NULL;
@@ -785,16 +801,19 @@ namespace xfst {
             StringVector foo; // this gets ignored by ol transducer's is_lookup_infinitely_ambiguous
             if (t->is_lookup_infinitely_ambiguous(foo))
               {
-                ol_cutoff = LOOKUP_CUTOFF;
-                hfst_fprintf(warnstream_, 
-                  "warning: transducer is infinitely ambiguous, limiting number of cycles to "SIZE_T_SPECIFIER"\n", ol_cutoff);
+                ol_cutoff = string_to_size_t(variables_["lookup-cutoff"]);
+                if (verbose_)
+                  {
+                    hfst_fprintf(warnstream_, 
+                                 "warning: transducer is infinitely ambiguous, limiting number of cycles to "SIZE_T_SPECIFIER"\n", ol_cutoff);
+                  }
               }
           }
 
         char * line = NULL;
         // prompt is printed only when reading from the user
         const char * promptstr 
-          = (infile == stdin)? get_apply_prompt(direction) : "";
+          = ((infile == stdin) && verbose_)? get_apply_prompt(direction) : "";
 
         int ind = current_history_index();  // readline history to return to
 
@@ -1456,7 +1475,10 @@ namespace xfst {
         if (t->get_type() == hfst::HFST_OL_TYPE ||
             t->get_type() == hfst::HFST_OLW_TYPE)
           {
-            hfst_fprintf(warnstream_, "warning: transducer is in optimized lookup format, 'apply up' is the only operation it supports\n");
+            if (verbose_)
+              {
+                hfst_fprintf(warnstream_, "warning: transducer is in optimized lookup format, 'apply up' is the only operation it supports\n");
+              }
             return;
           }
 
@@ -2663,11 +2685,12 @@ namespace xfst {
         }
       catch (const TransducerIsCyclicException & e)
         {
-          hfst_fprintf(warnstream_, "warning: transducer is cyclic, limiting the number of cycles to %i\n", PRINT_WORDS_CUTOFF);
+          int cutoff = string_to_size_t(variables_["print-words-cutoff"]);
+          hfst_fprintf(warnstream_, "warning: transducer is cyclic, limiting the number of cycles to %i\n", cutoff);
           if (variables_["obey-flags"] == "OFF")
-            temp.extract_paths(results, number, PRINT_WORDS_CUTOFF);
+            temp.extract_paths(results, number, cutoff);
           else
-            temp.extract_paths_fd(results, number, PRINT_WORDS_CUTOFF);
+            temp.extract_paths_fd(results, number, cutoff);
         }
 
       print_paths(results, outfile);
@@ -3752,7 +3775,7 @@ namespace xfst {
   char * XfstCompiler::xfst_getline(FILE * file, const std::string & promptstr)
   {
 #ifdef HAVE_READLINE
-    if (use_readline_)
+    if (use_readline_ && file == stdin)
       {
         char *buf = NULL;               // result from readline
         rl_bind_key('\t',rl_abort);     // disable auto-complet

@@ -3260,6 +3260,60 @@
              return result;
            }
 
+         bool is_infinitely_ambiguous
+           (HfstState state, 
+            std::set<HfstState> &epsilon_path_states,
+            std::vector<unsigned int> &states_handled)
+         {
+           if (states_handled[state] != 0)
+             return false;
+
+           // Go through all transitions in this state                                 
+           const HfstBasicTransducer::HfstTransitions &transitions 
+             = this->operator[](state);
+           for (HfstBasicTransducer::HfstTransitions::const_iterator it
+                  = transitions.begin();
+                it != transitions.end(); it++)
+             {
+               // (Diacritics are also treated as epsilons, although it might cause false                                                   
+               //  positive results, because loops with diacritics can be invalidated by                                                    
+               //  other diacritics.)                                                  
+               if ( is_epsilon(it->get_input_symbol()) ||
+                    FdOperation::is_diacritic(it->get_input_symbol()) )
+                 {
+                   epsilon_path_states.insert(state);
+                   if (epsilon_path_states.find(it->get_target_state())
+                       != epsilon_path_states.end())
+                     {
+                       return true;
+                     }
+                   if (is_lookup_infinitely_ambiguous
+                       (it->get_target_state(), epsilon_path_states))
+                     {
+                       return true;
+                     }
+                   epsilon_path_states.erase(state);
+                 }               
+             }
+           // mark state as handled
+           states_handled[state] = 1;
+           return false;
+         }
+         
+         bool is_infinitely_ambiguous()
+         {
+           std::set<HfstState> epsilon_path_states;
+           HfstState max_state = this->get_max_state();
+           std::vector<unsigned int> states_handled(max_state+1, 0);
+
+           for (unsigned int state = INITIAL_STATE; state < (max_state+1); state++)
+             {
+               if (is_infinitely_ambiguous(state, epsilon_path_states, states_handled))
+                 return true;
+             }
+           return false;
+         }
+
          bool is_lookup_infinitely_ambiguous
            (const HfstOneLevelPath& s,
             unsigned int& index, HfstState state,
