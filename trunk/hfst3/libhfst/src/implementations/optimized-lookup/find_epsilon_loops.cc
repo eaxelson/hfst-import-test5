@@ -146,6 +146,7 @@ void Transducer::find_loop(unsigned int input_pos,
         
     if (indexes_transition_table(i))
     {
+        i -= TRANSITION_TARGET_TABLE_START;
         find_loop_epsilon_transitions(input_pos,
                                       i+1,
                                       position_states);
