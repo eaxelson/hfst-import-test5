@@ -12,8 +12,6 @@
 
 #include "./transducer.h"
 
-#ifndef MAIN_TEST
-
 namespace hfst_ol {
 
 // Define an operation for checking state equivalence for the
@@ -202,17 +200,3 @@ void Transducer::find_loop(unsigned int input_pos,
 
 
 }
-
-#else // MAIN_TEST was defined
-
-#include <iostream>
-
-int main(int argc, char * argv[])
-{
-    std::cout << "Unit tests for " __FILE__ ":" << std::endl;
-    
-    std::cout << "ok" << std::endl;
-    return 0;
-}
-
-#endif // MAIN_TEST
