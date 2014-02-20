@@ -87,6 +87,7 @@ enum HeaderFlag {Weighted, Deterministic, Input_deterministic, Minimized,
 // For some profound reason it can't be replaced with (UINT_MAX+1)/2.
 const TransitionTableIndex TRANSITION_TARGET_TABLE_START = 2147483648u;
 const unsigned int MAX_IO_LEN = 10000;
+const unsigned int MAX_RECURSION_DEPTH = 5000;
 
 // This function is queried to check whether we should do the
 // single-character ascii lookup tokenization or the regular
@@ -822,6 +823,9 @@ protected:
     // This is to keep track of whether we're going to take a default transition
     bool found_transition;
 
+    ssize_t max_lookups;
+    unsigned int recursion_depth_left;
+
     void try_epsilon_transitions(unsigned int input_tape_pos,
                                  unsigned int output_tape_pos,
                                  TransitionTableIndex i);
@@ -929,13 +933,13 @@ public:
 
 
     bool initialize_input(const char * input_str);
-    HfstOneLevelPaths * lookup_fd(const StringVector & s);
+    HfstOneLevelPaths * lookup_fd(const StringVector & s, ssize_t limit = -1);
     /* Tokenize and lookup, accounting for flag diacritics, the surface string
        \a s. The return value, a pointer to HfstOneLevelPaths
        (which is a set) of analyses, is newly allocated.
     */
-    HfstOneLevelPaths * lookup_fd(const std::string & s);
-    HfstOneLevelPaths * lookup_fd(const char * s);
+    HfstOneLevelPaths * lookup_fd(const std::string & s, ssize_t limit = -1);
+    HfstOneLevelPaths * lookup_fd(const char * s, ssize_t limit = -1);
     void note_analysis(void);
 
     // Methods for supporting ospell
