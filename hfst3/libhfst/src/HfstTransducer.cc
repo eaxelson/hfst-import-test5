@@ -649,6 +649,20 @@ bool HfstTransducer::is_lookup_infinitely_ambiguous(const StringVector& s)
     }
 }
 
+bool HfstTransducer::is_lookup_infinitely_ambiguous(const std::string & s)
+    const {
+    switch(this->type) {
+    /* TODO: Convert into HFST_OL(W)_TYPE, if needed. */
+    case (HFST_OL_TYPE):
+    case (HFST_OLW_TYPE):
+    return this->implementation.hfst_ol->
+        is_lookup_infinitely_ambiguous(s);
+    default:
+    (void)s;
+    HFST_THROW(FunctionNotImplementedException);      
+    }
+}
+
 bool HfstTransducer::is_lookdown_infinitely_ambiguous
 (const StringVector& s) const {
     (void)s;
