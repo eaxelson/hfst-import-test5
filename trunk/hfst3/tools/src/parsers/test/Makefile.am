@@ -73,5 +73,7 @@ EXTRA_DIST=test.sh \
 	weighted_rules_2.xfst weighted_rules_2.result \
 	weighted_rules_3.xfst weighted_rules_3.result \
 	weighted_rules_4.xfst weighted_rules_4.result \
-	weighted_rules_5.xfst weighted_rules_5.result
+	weighted_rules_5.xfst weighted_rules_5.result \
+	weighted_rules_6.xfst weighted_rules_6.result \
+	weighted_rules_7.xfst weighted_rules_7.result
 check_DATA=test.sh
