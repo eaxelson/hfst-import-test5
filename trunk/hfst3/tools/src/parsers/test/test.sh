@@ -242,8 +242,16 @@ do
     then
         for file in weighted_replace_right_1 weighted_replace_right_2 \
         weighted_replace_right_3 weighted_replace_right_4 weighted_replace_right_5 \
-        weighted_replace_right_6 weighted_replace_right_7
+        weighted_replace_right_6 weighted_replace_right_7 \
+        weighted_optional_replace_right_1 weighted_optional_replace_right_2 \
+        weighted_optional_replace_right_3 weighted_optional_replace_right_4 \
+        weighted_optional_replace_right_5 \
+        weighted_optional_replace_right_6 weighted_optional_replace_right_7
         do
+	    if ! (ls $file.xfst 2> /dev/null); then
+	        echo "skipping missing test for "$file"..."
+	        continue
+	    fi
             if ! (cat $file.xfst | ../hfst-xfst --pipe-mode -s -f $format > tmp 2> /dev/null); then
                 echo "ERROR: in compiling "$file".xfst"
                 exit 1;
