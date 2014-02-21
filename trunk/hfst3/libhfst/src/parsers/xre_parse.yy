@@ -23,6 +23,23 @@ namespace hfst {
     extern bool harmonize_;
     extern bool harmonize_flags_;
     extern bool allow_extra_text_at_end;
+
+    bool has_weight_been_zeroed = false; // to control how many times a warning is given
+    float zero_weights(float f)
+    {
+        if ((! has_weight_been_zeroed) && (f != 0))
+        {
+            hfst::xre::warn("warning: ignoring weights in rule context\n");
+            has_weight_been_zeroed = true;
+        }
+        return 0;
+    }
+
+    bool is_weighted()
+    {   
+        return (hfst::xre::format == hfst::TROPICAL_OPENFST_TYPE || 
+                hfst::xre::format == hfst::LOG_OPENFST_TYPE);
+    }
   }
 }
 
@@ -500,24 +517,50 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
          {
              HfstTransducer t1(*$1);
              HfstTransducer t2(*$3);
+
+             if (hfst::xre::is_weighted())
+             {
+               hfst::xre::has_weight_been_zeroed=false;
+               t1.transform_weights(&hfst::xre::zero_weights);
+             }
              t1.minimize().prune_alphabet(false);
+
+             if (hfst::xre::is_weighted())
+             {
+               t2.transform_weights(&hfst::xre::zero_weights);
+               hfst::xre::has_weight_been_zeroed=false;
+             }
              t2.minimize().prune_alphabet(false);
+
             $$ = new HfstTransducerPair(t1, t2);
             delete $1, $3; 
          }
       | REPLACE CENTER_MARKER
          {
             HfstTransducer t1(*$1);
+
+            if (hfst::xre::is_weighted())
+            {
+              hfst::xre::has_weight_been_zeroed=false;
+              t1.transform_weights(&hfst::xre::zero_weights);
+              hfst::xre::has_weight_been_zeroed=false;
+            }
             t1.minimize().prune_alphabet(false);
 
-            HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
-            
+            HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);            
             $$ = new HfstTransducerPair(t1, epsilon);
             delete $1; 
          }
       | CENTER_MARKER REPLACE
          {
             HfstTransducer t1(*$2);
+
+            if (hfst::xre::is_weighted())
+            {
+              hfst::xre::has_weight_been_zeroed=false;
+              t1.transform_weights(&hfst::xre::zero_weights);
+              hfst::xre::has_weight_been_zeroed=false;
+            }
             t1.minimize().prune_alphabet(false);
              
             HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
