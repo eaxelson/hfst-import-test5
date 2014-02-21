@@ -240,9 +240,9 @@ do
 
     if [ "$format" = "openfst-tropical" ]; 
     then
-        for file in weighted_rules_1 weighted_rules_2 \
-        weighted_rules_3 weighted_rules_4 weighted_rules_5 \
-        weighted_rules_6
+        for file in weighted_replace_right_1 weighted_replace_right_2 \
+        weighted_replace_right_3 weighted_replace_right_4 weighted_replace_right_5 \
+        weighted_replace_right_6 weighted_replace_right_7
         do
             if ! (cat $file.xfst | ../hfst-xfst --pipe-mode -s -f $format > tmp 2> /dev/null); then
                 echo "ERROR: in compiling "$file".xfst"
