@@ -76,11 +76,15 @@ EXTRA_DIST=test.sh \
 	weighted_replace_right_5.xfst weighted_replace_right_5.result \
 	weighted_replace_right_6.xfst weighted_replace_right_6.result \
 	weighted_replace_right_7.xfst weighted_replace_right_7.result \
+	weighted_replace_right_8.xfst weighted_replace_right_8.result \
+	weighted_replace_right_9.xfst weighted_replace_right_9.result \
 	weighted_optional_replace_right_1.xfst weighted_optional_replace_right_1.result \
 	weighted_optional_replace_right_2.xfst weighted_optional_replace_right_2.result \
 	weighted_optional_replace_right_3.xfst weighted_optional_replace_right_3.result \
 	weighted_optional_replace_right_4.xfst weighted_optional_replace_right_4.result \
 	weighted_optional_replace_right_5.xfst weighted_optional_replace_right_5.result \
 	weighted_optional_replace_right_6.xfst weighted_optional_replace_right_6.result \
-	weighted_optional_replace_right_7.xfst weighted_optional_replace_right_7.result
+	weighted_optional_replace_right_7.xfst weighted_optional_replace_right_7.result \
+	weighted_optional_replace_right_8.xfst weighted_optional_replace_right_8.result \
+	weighted_optional_replace_right_9.xfst weighted_optional_replace_right_9.result
 check_DATA=test.sh
