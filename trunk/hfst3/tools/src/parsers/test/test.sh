@@ -248,7 +248,9 @@ do
         weighted_optional_replace_right_3 weighted_optional_replace_right_4 \
         weighted_optional_replace_right_5 \
         weighted_optional_replace_right_6 weighted_optional_replace_right_7 \
-        weighted_optional_replace_right_8 weighted_optional_replace_right_9
+        weighted_optional_replace_right_8 weighted_optional_replace_right_9 \
+        weighted_ltr_longest_match_1 weighted_ltr_longest_match_2 weighted_ltr_longest_match_3 \
+        weighted_ltr_shortest_match_1 weighted_ltr_shortest_match_2 weighted_ltr_shortest_match_3
         do
 	    if ! (ls $file.xfst 2> /dev/null); then
 	        echo "skipping missing test for "$file"..."

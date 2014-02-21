@@ -86,5 +86,11 @@ EXTRA_DIST=test.sh \
 	weighted_optional_replace_right_6.xfst weighted_optional_replace_right_6.result \
 	weighted_optional_replace_right_7.xfst weighted_optional_replace_right_7.result \
 	weighted_optional_replace_right_8.xfst weighted_optional_replace_right_8.result \
-	weighted_optional_replace_right_9.xfst weighted_optional_replace_right_9.result
+	weighted_optional_replace_right_9.xfst weighted_optional_replace_right_9.result \
+	weighted_ltr_longest_match_1.xfst weighted_ltr_longest_match_1.result \
+	weighted_ltr_longest_match_2.xfst weighted_ltr_longest_match_2.result \
+	weighted_ltr_longest_match_3.xfst weighted_ltr_longest_match_3.result \
+	weighted_ltr_shortest_match_1.xfst weighted_ltr_shortest_match_1.result \
+	weighted_ltr_shortest_match_2.xfst weighted_ltr_shortest_match_2.result \
+	weighted_ltr_shortest_match_3.xfst weighted_ltr_shortest_match_3.result
 check_DATA=test.sh
