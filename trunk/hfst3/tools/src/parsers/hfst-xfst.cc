@@ -368,6 +368,7 @@ int main(int argc, char** argv)
     {
       verbose_printf("Reading from standard input...\n");
       comp.setReadInteractiveTextFromStdin(false);
+      comp.setPromptVerbosity(verbose);
       if (parse_file("<stdin>", comp) == EXIT_FAILURE)
         //if (0 != comp.parse(stdin)) segfaults with scriptfiles..
         {
