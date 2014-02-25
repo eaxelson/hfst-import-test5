@@ -232,20 +232,53 @@ HfstTransducer * make_end_tag(std::string tag)
     return end_tag;
 }
 
-char *
-get_quoted(const char *s)
+
+char * get_delimited(const char *s, char delim_left, char delim_right)
 {
-    const char *qstart = strchr((char*) s, '"') + 1;
-    const char *qend = strrchr((char*) s, '"');
+    const char *qstart = strchr((char*) s, delim_left) + 1;
+    const char *qend = strrchr((char*) s, delim_right);
     char* qpart = strdup(qstart);
     *(qpart+ (size_t) (qend - qstart)) = '\0';
     return qpart;
 }
 
+char * get_delimited(const char *s, char delim)
+{
+    get_delimited(s, delim, delim);
+}
+
+char * get_escaped_delimited(const char *s, char delim_left, char delim_right)
+{
+    return unescape_delimited(get_delimited(s, delim_left, delim_right), delim_right);
+}
+char * get_escaped_delimited(const char *s, char delim)
+{
+    return unescape_delimited(get_delimited(s, delim, delim), delim);
+}
+
+char * unescape_delimited(char *s, char delim)
+{
+    char * read = s;
+    char * write = s;
+    while (*read != '\0') {
+        if (*read == '\\' && *(read + 1) == delim) {
+            *write = delim;
+            read += 2;
+            write += 1;
+        } else {
+            *write = *read;
+            ++read;
+            ++write;
+        }
+    }
+    *write == '\0';
+    return s;
+}
+
 char*
 parse_quoted(const char *s)
 {
-    char* quoted = get_quoted(s);
+    char* quoted = get_delimited(s, '"');
     // Mysteriously, when the quoted string is 24 + n * 16 bytes in length, an
     // extra byte is needed for rv.
     char* rv = static_cast<char*>(malloc(sizeof(char)*(strlen(quoted) + 1)));
