@@ -86,9 +86,13 @@ void add_end_tag(HfstTransducer * regex, std::string tag);
 HfstTransducer * make_end_tag(std::string tag);
 
 /**
- * @brief find first quoted segment from strign @a s.
+ * @brief find first segment from strign @a s delimited by char delim.
  */
-char* get_quoted(const char *s);
+char* get_delimited(const char *s, char delim);
+char* get_delimited(const char *s, char delim_left, char delim_right);
+char* get_escaped_delimited(const char *s, char delim);
+char* get_escaped_delimited(const char *s, char delim_left, char delim_right);
+char* unescape_delimited(char *s, char delim);
 
 char* parse_quoted(const char *s);
 

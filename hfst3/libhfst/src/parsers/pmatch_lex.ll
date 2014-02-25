@@ -55,7 +55,7 @@ WSP [\t ]
 LWSP [\t\r\n ]
 %%
 
-"Define" {
+[Dd]"efine" {
     return DEFINE;
 }
 
@@ -130,7 +130,6 @@ LWSP [\t\r\n ]
 "Map(" {
     return MAP_LEFT;
 }
-
 
 "~"   { return COMPLEMENT; }
 "\\"  { return TERM_COMPLEMENT; }
@@ -220,32 +219,32 @@ LWSP [\t\r\n ]
 ".l" { return LOWER; }
 
 "@bin\""[^""]+"\""|"@\""[^""]+"\"" { 
-    pmatchlval.label = hfst::pmatch::get_quoted(pmatchtext);
+    pmatchlval.label = hfst::pmatch::get_escaped_delimited(pmatchtext, '"');
     return READ_BIN;
 }
 
 "@txt\""[^""]+"\"" {
-    pmatchlval.label = hfst::pmatch::get_quoted(pmatchtext);
+    pmatchlval.label = hfst::pmatch::get_escaped_delimited(pmatchtext, '"');
     return READ_TEXT;
 }
 
 "@stxt\""[^""]+"\"" {
-    pmatchlval.label = hfst::pmatch::get_quoted(pmatchtext);
+    pmatchlval.label = hfst::pmatch::get_escaped_delimited(pmatchtext, '"');
     return READ_SPACED;
 }
 
 "@pl\""[^""]+"\"" {
-    pmatchlval.label = hfst::pmatch::get_quoted(pmatchtext);
+    pmatchlval.label = hfst::pmatch::get_escaped_delimited(pmatchtext, '"');
     return READ_PROLOG;
 }
 
 "@re\""[^""]+"\"" {
-    pmatchlval.label = hfst::pmatch::get_quoted(pmatchtext);
+    pmatchlval.label = hfst::pmatch::get_escaped_delimited(pmatchtext, '"');
     return READ_RE;
 }
 
 "@lexc\""[^""]+"\"" {
-    pmatchlval.label = hfst::pmatch::get_quoted(pmatchtext);
+    pmatchlval.label = hfst::pmatch::get_escaped_delimited(pmatchtext, '"');
     return READ_LEXC;
 }
 
@@ -255,8 +254,6 @@ LWSP [\t\r\n ]
 "]" { return RIGHT_BRACKET; }
 "(" { return LEFT_PARENTHESIS; }
 ")" { return RIGHT_PARENTHESIS; }
-"{" { return LEFT_CURLY; }
-"}" { return RIGHT_CURLY; }
 
 {LWSP}":"{LWSP} { return PAIR_SEPARATOR_SOLE; }
 ^":"$ { return PAIR_SEPARATOR_SOLE; }
@@ -267,6 +264,10 @@ LWSP [\t\r\n ]
 "::"{WEIGHT} {
     pmatchlval.weight = hfst::pmatch::get_weight(pmatchtext + 2);
     return WEIGHT;
+}
+"{"([^"}"]|"\\}")+"}" {
+    pmatchlval.label = hfst::pmatch::get_escaped_delimited(pmatchtext, '{', '}');
+    return CURLY_LITERAL;
 }
 
 "\""([^"\""]|"\\\"")+"\"" {

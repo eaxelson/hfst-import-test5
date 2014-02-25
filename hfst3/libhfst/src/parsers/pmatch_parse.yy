@@ -93,7 +93,7 @@ LEFT_CONTEXT NEGATIVE_RIGHT_CONTEXT NEGATIVE_LEFT_CONTEXT
 %type <ast_node> FUN_OPTCAP FUN_TOLOWER FUN_TOUPPER
 
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
-%nonassoc <label> QUOTED_LITERAL SYMBOL SYMBOL_WITH_LEFT_PAREN
+%nonassoc <label> QUOTED_LITERAL CURLY_LITERAL SYMBOL SYMBOL_WITH_LEFT_PAREN
 
 %left  CROSS_PRODUCT COMPOSITION LENIENT_COMPOSITION INTERSECTION
 %left  CENTER_MARKER MARKUP_MARKER
@@ -131,7 +131,7 @@ LOWER_PRIORITY_UNION
 
 %nonassoc <label> READ_BIN READ_TEXT READ_SPACED READ_PROLOG READ_RE READ_LEXC
 %token LEFT_BRACKET RIGHT_BRACKET LEFT_PARENTHESIS RIGHT_PARENTHESIS
-LEFT_CURLY RIGHT_CURLY LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED
+LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED
 %token END_OF_EXPRESSION
 %token PAIR_SEPARATOR PAIR_SEPARATOR_SOLE 
 PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
@@ -140,7 +140,7 @@ PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 
 %nonassoc DEFINE DEFINS DEFFUN ALPHA LOWERALPHA UPPERALPHA NUM PUNCT WHITESPACE
 OPTCAP_LEFT TOLOWER_LEFT TOUPPER_LEFT INS_LEFT ENDTAG_LEFT LC_LEFT RC_LEFT
-NLC_LEFT NRC_LEFT MAP_LEFT
+NLC_LEFT NRC_LEFT MAP_LEFT SYM_LEFT
 %%
 
 
@@ -994,9 +994,10 @@ REGEXP11: REGEXP12 { }
 | LEFT_PARENTHESIS REGEXP2 RIGHT_PARENTHESIS {
     $$ = & $2->optionalize();
  }
-| LEFT_CURLY SYMBOL RIGHT_CURLY {
+| CURLY_LITERAL {
     HfstTokenizer tok;
-    $$ = new HfstTransducer($2, tok, hfst::pmatch::format);
+    $$ = new HfstTransducer($1, tok, hfst::pmatch::format);
+    free($1);
  }
 | ALPHA {
     $$ = new HfstTransducer(*hfst::pmatch::get_utils()->latin1_alpha_acceptor);
@@ -1084,8 +1085,7 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
     free($3);
  }
 | QUOTED_LITERAL PAIR_SEPARATOR QUOTED_LITERAL {
-    HfstTokenizer tok;
-    $$ = new HfstTransducer($1, $3, tok, hfst::pmatch::format);
+    $$ = new HfstTransducer($1, $3, hfst::pmatch::format);
     free($1);
     free($3);
 }
@@ -1193,8 +1193,7 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
     $$->insert_to_alphabet(hfst::pmatch::special_pmatch_symbols);
   }
 | QUOTED_LITERAL {
-    HfstTokenizer tok;
-    $$ = new HfstTransducer($1, tok, hfst::pmatch::format);
+    $$ = new HfstTransducer($1, hfst::pmatch::format);
     free($1);
   }
 | BOUNDARY_MARKER {
