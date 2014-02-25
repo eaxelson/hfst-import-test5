@@ -66,9 +66,9 @@ static bool disjunct_expressions=false;
 static bool line_separated = true;
 
 //static unsigned int sum_of_weights=0;
-static bool sum_weights=false;
-static bool normalize_weights=false;
-static bool logarithmic_weights=false;
+//static bool sum_weights=false;
+//static bool normalize_weights=false;
+//static bool logarithmic_weights=false;
 
 static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
 
@@ -80,7 +80,7 @@ print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-    "Compile regular expressions into transducer(s)\n (Experimental version)"
+    "Compile (weighted) regular expressions into transducer(s)"
         "\n", program_name); 
         print_common_program_options(message_out);
         print_common_unary_program_options(message_out); 
@@ -89,12 +89,12 @@ print_usage()
 "  -f, --format=FMT          Write result in FMT format\n"
 "  -j, --disjunct            Disjunct all regexps instead of transforming\n"
 "                            each regexp into a separate transducer\n"
-"      --sum (todo)          Sum weights of duplicate strings instead of \n"
-"                            taking minimum\n"
-"      --norm (todo)         Divide each weight by sum of all weights\n"
-"      --log (todo)          Take negative logarithm of each weight\n"
+                //"      --sum (todo)          Sum weights of duplicate strings instead of \n"
+                //"                            taking minimum\n"
+                //"      --norm (todo)         Divide each weight by sum of all weights\n"
+                //"      --log (todo)          Take negative logarithm of each weight\n"
 "  -l, --line                Input is line separated (default)\n"
-"  -S, --semicolon           Input is semicolon separated (weights not supported)\n"
+"  -S, --semicolon           Input is semicolon separated\n"
 "  -e, --epsilon=EPS         Map EPS as zero.\n"
 "Harmonization:\n"
 "  -H, --do-not-harmonize    Do not expand '?' symbols.\n"
@@ -106,16 +106,17 @@ print_usage()
             "FMT must be one of the following: "
             "{foma, sfst, openfst-tropical, openfst-log}.\n"
             "If EPS is not defined, the default representation of 0 is used\n"
-            "Weights are currently not implemented.\n"
             "\n"
             );
 
         fprintf(message_out, "Examples:\n"
-"  echo \" c:d a:o t:g \" | %s       create transducer {cat}:{dog}\n"
-"  echo \" c:d a:o t:g ; 3\" | %s    same but with weight 3\n"
+"  echo \" {cat}:{dog} \" | %s       create transducer {cat}:{dog}\n"
+"  echo \" {cat}:{dog}::3 \" | %s    same but with weight 3\n"
+"  echo \" c:d a:o::3 t:g \" | %s    same but with weight 3 in the middle\n"
+"  echo \" {cat}:{dog} ; 3 \" | %s   legacy way of defining weights\n"
 "  echo \" cat ; dog ; 3 \" | %s -S  create transducers\n"
 "                                               \"cat\" and \"dog\" and \"3\"\n"
-                "\n", program_name, program_name, program_name);
+                "\n", program_name, program_name, program_name, program_name, program_name);
         print_report_bugs();
         fprintf(message_out, "\n");
         print_more_info();
@@ -135,9 +136,9 @@ parse_options(int argc, char** argv)
         HFST_GETOPT_UNARY_LONG,
           {"disjunct", no_argument, 0, 'j'},
           {"epsilon", required_argument, 0, 'e'},
-          {"sum", no_argument, 0, '1'},
-          {"norm", no_argument, 0, '2'},
-          {"log", no_argument, 0, '3'},
+        //  {"sum", no_argument, 0, '1'},
+        //  {"norm", no_argument, 0, '2'},
+        //  {"log", no_argument, 0, '3'},
           {"line", no_argument, 0, 'l'},
           {"semicolon", no_argument, 0, 'S'},
           {"format", required_argument, 0, 'f'},
@@ -147,7 +148,7 @@ parse_options(int argc, char** argv)
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "je:123lSf:HF",
+                             HFST_GETOPT_UNARY_SHORT "je:lSf:HF"/*"123"*/,
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -161,7 +162,7 @@ parse_options(int argc, char** argv)
         case 'e':
             epsilonname = hfst_strdup(optarg);
             break;
-        case '1':
+            /*        case '1':
             sum_weights = true;
             break;
         case '2':
@@ -169,7 +170,7 @@ parse_options(int argc, char** argv)
             break;
         case '3':
             logarithmic_weights = true;
-            break;
+            break;*/
         case 'j':
             disjunct_expressions = true;
             break;
