@@ -780,33 +780,37 @@ REGEXP8: REGEXP9 { }
         }
        | CONTAINMENT REGEXP8 {
     // std::cerr << "Containment: \n" << std::endl;
-            HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
-                                    hfst::xre::format);
-            HfstTransducer* right = new HfstTransducer(hfst::internal_identity,
-                                    hfst::xre::format);
-            right->repeat_star();
-            left->repeat_star();
 
-            $$ = & right->concatenate(*$2).concatenate(*left).prune_alphabet(false);
+            HfstTransducer left(hfst::internal_identity, hfst::xre::format);
+            HfstTransducer * right = new HfstTransducer(hfst::internal_identity, hfst::xre::format);
+
+            right->repeat_star();
+            left.repeat_star();
+
+            $$ = & right->concatenate(*$2).concatenate(left).prune_alphabet(false);
             delete $2;
-            delete left;
         }
        | CONTAINMENT_ONCE REGEXP8 {
-                                  std::cerr << "Contain 1 \n"<< std::endl;
-            HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
-                                    hfst::internal_unknown,
-                                    hfst::xre::format);
-            HfstTransducer* right = new HfstTransducer(hfst::internal_unknown,
-                                    hfst::internal_unknown,
-                                    hfst::xre::format);
-            right->repeat_star();
-            left->repeat_star();
-            HfstTransducer* contain_once = 
-                & (right->concatenate(*$2).concatenate(*left).prune_alphabet(false));
-            $$ = contain_once;
-            delete $2;
-            delete left;
+            std::cerr << "Contain 1 \n"<< std::endl;
 
+            // any = [?]*
+            HfstTransducer any(hfst::internal_identity, hfst::xre::format);
+            any.repeat_star().minimize();
+
+            // contains = [any $2 any] # because of harmonization, this works without repeat_plus
+            HfstTransducer contains(any);
+            contains.concatenate(*$2).concatenate(any).minimize();
+
+            // complement = [any - contains]
+            HfstTransducer complement(any);
+            complement.subtract(contains).minimize();
+
+            // result = [complement $2 complement]
+            HfstTransducer *result = new HfstTransducer(complement);
+            result->concatenate(*$2).concatenate(complement).minimize();
+
+            delete $2;
+            $$ = result;
         }
        | CONTAINMENT_OPT REGEXP8 {
           
