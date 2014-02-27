@@ -350,22 +350,22 @@ REPLACE : REGEXP3 { }
          }
       ;
 
-PARALLEL_RULES: RULE
+PARALLEL_RULES: PARALLEL_RULES COMMACOMMA RULE
          {
-         //   std::cerr << "parallel_rules:rule"<< std::endl;        
+           //std::cerr << "parallel_rules: parallel_rules ,, rule"<< std::endl;      
+            Rule tmpRule($3->second);
+            $1->second.push_back(tmpRule);
+            $$ =  new std::pair< ReplaceArrow, std::vector<Rule> > ($3->first, $1->second);
+            delete $3;
+         }
+         | RULE
+         {
+         //std::cerr << "parallel_rules:rule"<< std::endl;        
             std::vector<Rule> * ruleVector = new std::vector<Rule>();
             ruleVector->push_back($1->second);
             
             $$ =  new std::pair< ReplaceArrow, std::vector<Rule> > ($1->first, *ruleVector);
             delete $1;
-         }
-         | PARALLEL_RULES COMMACOMMA RULE
-         {
-           // std::cerr << "parallel_rules: parallel_rules ,, rule"<< std::endl;      
-            Rule tmpRule($3->second);
-            $1->second.push_back(tmpRule);
-            $$ =  new std::pair< ReplaceArrow, std::vector<Rule> > ($3->first, $1->second);
-            delete $3;
          }
          ;
 
@@ -791,7 +791,7 @@ REGEXP8: REGEXP9 { }
             delete $2;
         }
        | CONTAINMENT_ONCE REGEXP8 {
-            std::cerr << "Contain 1 \n"<< std::endl;
+            //std::cerr << "Contain 1 \n"<< std::endl;
 
             // any = [?]*
             HfstTransducer any(hfst::internal_identity, hfst::xre::format);
@@ -813,20 +813,24 @@ REGEXP8: REGEXP9 { }
             $$ = result;
         }
        | CONTAINMENT_OPT REGEXP8 {
-          
-            HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
-                                    hfst::internal_unknown,
-                                    hfst::xre::format);
-            HfstTransducer* right = new HfstTransducer(hfst::internal_unknown,
-                                    hfst::internal_unknown,
-                                    hfst::xre::format);
-            right->repeat_star();
-            left->repeat_star();
-            HfstTransducer* contain_once = 
-                & ((right->concatenate(*$2).concatenate(*left)));
-            $$ = & (contain_once->optionalize().prune_alphabet(false));
+            // any = [?]*
+            HfstTransducer any(hfst::internal_identity, hfst::xre::format);
+            any.repeat_star().minimize();
+
+            // contains = [any $2 any] # because of harmonization, this works without repeat_plus
+            HfstTransducer contains(any);
+            contains.concatenate(*$2).concatenate(any).minimize();
+
+            // complement = [any - contains]
+            HfstTransducer complement(any);
+            complement.subtract(contains).minimize();
+
+            // result = [[complement $2 complement] | [complement]]
+            HfstTransducer *result = new HfstTransducer(complement);
+            result->concatenate(*$2).concatenate(complement).disjunct(complement).minimize();
+
             delete $2;
-            delete left;
+            $$ = result;
         }
        ;
 
