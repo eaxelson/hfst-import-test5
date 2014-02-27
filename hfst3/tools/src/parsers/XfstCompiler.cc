@@ -79,8 +79,8 @@ using hfst::implementations::HfstBasicTransition;
 #define MAYBE_QUIT if(variables_["quit-on-fail"] == "ON") { exit(EXIT_FAILURE); }
 
 #define WEIGHT_PRECISION "5"
-#define LOOKUP_CUTOFF "5"
-#define PRINT_WORDS_CUTOFF "5"
+#define LOOKUP_CYCLE_CUTOFF "5"
+#define PRINT_WORDS_CYCLE_CUTOFF "5"
 
 #include "help_message.cc"
 
@@ -143,7 +143,7 @@ namespace xfst {
         variables_["flag-is-epsilon"] = "OFF";
         variables_["harmonize-flags"] = "OFF";
         variables_["hopcroft-min"] = "ON";
-        variables_["lookup-cutoff"] = LOOKUP_CUTOFF;
+        variables_["lookup-cycle-cutoff"] = LOOKUP_CYCLE_CUTOFF;
         variables_["minimal"] = "ON";
         variables_["name-nets"] = "OFF";
         variables_["obey-flags"] = "ON";
@@ -153,7 +153,7 @@ namespace xfst {
         variables_["print-sigma"] = "OFF";
         variables_["print-space"] = "OFF";
         variables_["print-weight"] = "OFF";
-        variables_["print-words-cutoff"] = PRINT_WORDS_CUTOFF;
+        variables_["print-words-cycle-cutoff"] = PRINT_WORDS_CYCLE_CUTOFF;
         variables_["quit-on-fail"] = "OFF";
         variables_["quote-special"] = "OFF";
         variables_["random-seed"] = "ON";
@@ -187,7 +187,7 @@ namespace xfst {
         variables_["flag-is-epsilon"] = "OFF";
         variables_["harmonize-flags"] = "OFF";
         variables_["hopcroft-min"] = "ON";
-        variables_["lookup-cutoff"] = LOOKUP_CUTOFF;
+        variables_["lookup-cycle-cutoff"] = LOOKUP_CYCLE_CUTOFF;
         variables_["minimal"] = "ON";
         variables_["name-nets"] = "OFF";
         variables_["obey-flags"] = "ON";
@@ -197,7 +197,7 @@ namespace xfst {
         variables_["print-sigma"] = "OFF";
         variables_["print-space"] = "OFF";
         variables_["print-weight"] = "OFF";
-        variables_["print-words-cutoff"] = PRINT_WORDS_CUTOFF;
+        variables_["print-words-cycle-cutoff"] = PRINT_WORDS_CYCLE_CUTOFF;
         variables_["quit-on-fail"] = "OFF";
         variables_["quote-special"] = "OFF";
         variables_["random-seed"] = "ON";
@@ -464,7 +464,7 @@ namespace xfst {
         size_t cutoff = -1;
         if (t->is_lookup_infinitely_ambiguous(lookup_path))
           {
-            cutoff = string_to_size_t(variables_["lookup-cutoff"]);
+            cutoff = string_to_size_t(variables_["lookup-cycle-cutoff"]);
             if (verbose_)
               {
                 hfst_fprintf(warnstream_, 
@@ -630,11 +630,11 @@ namespace xfst {
             return this->apply_line(line, &fsm);
           }
 
-        size_t ol_cutoff = string_to_size_t(variables_["lookup-cutoff"]); // -1; fix this
+        size_t ol_cutoff = string_to_size_t(variables_["lookup-cycle-cutoff"]); // -1; fix this
         StringVector foo; // this gets ignored by ol transducer's is_lookup_infinitely_ambiguous
         if (t->is_lookup_infinitely_ambiguous(foo))
           {
-            ol_cutoff = string_to_size_t(variables_["lookup-cutoff"]);;
+            ol_cutoff = string_to_size_t(variables_["lookup-cycle-cutoff"]);;
             if (verbose_)
               {
                 hfst_fprintf(warnstream_, 
@@ -765,7 +765,7 @@ namespace xfst {
             return *this;
           }
         HfstTransducer * t = stack_.top();
-        size_t ol_cutoff = string_to_size_t(variables_["lookup-cutoff"]); ; // -1; fix this // number of cycles needs to be limited for an infinitely ambiguous ol transducer
+        size_t ol_cutoff = string_to_size_t(variables_["lookup-cycle-cutoff"]); ; // -1; fix this // number of cycles needs to be limited for an infinitely ambiguous ol transducer
                                // because it doesn't support is_lookup_infinitely_ambiguous(const string &)
 
         HfstBasicTransducer * fsm = NULL;
@@ -801,7 +801,7 @@ namespace xfst {
             StringVector foo; // this gets ignored by ol transducer's is_lookup_infinitely_ambiguous
             if (t->is_lookup_infinitely_ambiguous(foo))
               {
-                ol_cutoff = string_to_size_t(variables_["lookup-cutoff"]);
+                ol_cutoff = string_to_size_t(variables_["lookup-cycle-cutoff"]);
                 if (verbose_)
                   {
                     hfst_fprintf(warnstream_, 
@@ -2697,7 +2697,7 @@ namespace xfst {
         }
       catch (const TransducerIsCyclicException & e)
         {
-          int cutoff = string_to_size_t(variables_["print-words-cutoff"]);
+          int cutoff = string_to_size_t(variables_["print-words-cycle-cutoff"]);
           hfst_fprintf(warnstream_, "warning: transducer is cyclic, limiting the number of cycles to %i\n", cutoff);
           if (variables_["obey-flags"] == "OFF")
             temp.extract_paths(results, number, cutoff);
