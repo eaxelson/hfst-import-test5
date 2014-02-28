@@ -781,14 +781,24 @@ REGEXP8: REGEXP9 { }
        | CONTAINMENT REGEXP8 {
     // std::cerr << "Containment: \n" << std::endl;
 
-            HfstTransducer left(hfst::internal_identity, hfst::xre::format);
-            HfstTransducer * right = new HfstTransducer(hfst::internal_identity, hfst::xre::format);
+            // any = [?]*
+            HfstTransducer any(hfst::internal_identity, hfst::xre::format);
+            any.repeat_star().minimize();
 
-            right->repeat_star();
-            left.repeat_star();
+            // contains = [any $2 any] # because of harmonization, this works without repeat_plus
+            HfstTransducer contains(any);
+            contains.concatenate(*$2).concatenate(any).minimize();
 
-            $$ = & right->concatenate(*$2).concatenate(left).prune_alphabet(false);
+            // opt_complement = (any - contains)
+            HfstTransducer opt_complement(any);
+            opt_complement.subtract(contains).optionalize().minimize();
+
+            // result = [[opt_complement $2]+ opt_complement]
+            HfstTransducer * result = new HfstTransducer(opt_complement);
+            result->optionalize().concatenate(*$2).repeat_plus().concatenate(opt_complement).minimize();
+
             delete $2;
+            $$ = result;
         }
        | CONTAINMENT_ONCE REGEXP8 {
             //std::cerr << "Contain 1 \n"<< std::endl;
