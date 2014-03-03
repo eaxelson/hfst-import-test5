@@ -118,6 +118,9 @@ namespace hfst
   void set_minimization_algorithm(MinimizationAlgorithm);
   MinimizationAlgorithm get_minimization_algorithm(); 
 
+  void set_encode_weights(bool);
+  bool get_encode_weights();
+
   /* Whether in harmonization the smaller transducer is always harmonized
      according to the bigger transducer. */
   void set_harmonize_smaller(bool);

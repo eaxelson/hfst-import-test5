@@ -3423,10 +3423,23 @@
          static void add_to_results
            (HfstTwoLevelPaths &results,
             HfstTwoLevelPath &path_so_far,
-            const float &final_weight)
+            const float &final_weight,
+            float * max_weight)
          {
            path_so_far.first = path_so_far.first + final_weight;
-           results.insert(path_so_far);
+           
+           if (max_weight == NULL) // no weight limitation given
+             {
+               results.insert(path_so_far);
+             }
+           else if (!(path_so_far.first > *max_weight)) // weight limitation not exceeded
+             {
+               results.insert(path_so_far);
+             }
+           else // weight limitation exceeded
+             {
+               ;
+             }
            path_so_far.first = path_so_far.first - final_weight;
          }
 
@@ -3480,10 +3493,15 @@
             HfstTwoLevelPath &path_so_far,
             StringSet &alphabet,
             HfstEpsilonHandler Eh,
-            size_t infinite_cutoff)
+            size_t infinite_cutoff,
+            float * max_weight = NULL)
          {
            // Check whether the number of input epsilon cycles is exceeded
            if (not Eh.can_continue(state)) {
+             return;
+           }
+           // Check whether the maximum weight is exceeded
+           if (max_weight != NULL && path_so_far.first > *max_weight) {
              return;
            }
            
@@ -3493,9 +3511,9 @@
                // and if the current state is final, 
                if (this->is_final_state(state)) 
                  {
-                   // path_so_far is a valid result.
+                   // path_so_far is a valid result if max_weight is not exceeded
                    add_to_results
-                     (results, path_so_far, this->get_final_weight(state) );
+                     (results, path_so_far, this->get_final_weight(state), max_weight);
                  }
              }
            
@@ -3541,7 +3559,7 @@
                    
                    // call lookup for the target state of the transition
                    lookup_fd(lookup_path, results, it->get_target_state(),
-                             lookup_index, path_so_far, alphabet, *Ehp, infinite_cutoff);
+                             lookup_index, path_so_far, alphabet, *Ehp, infinite_cutoff, max_weight);
                    
                    // return to the original values of path_so_far 
                    // and lookup_index
@@ -3563,7 +3581,8 @@
          void lookup_fd
            (const StringVector &lookup_path,
             HfstTwoLevelPaths &results,
-            size_t infinite_cutoff)
+            size_t infinite_cutoff,
+            float * max_weight = NULL)
          {
            HfstState state = 0;
            unsigned int lookup_index = 0;
@@ -3571,7 +3590,7 @@
            StringSet alphabet = this->get_alphabet();
            HfstEpsilonHandler Eh(infinite_cutoff);
            lookup_fd(lookup_path, results, state, lookup_index, path_so_far, 
-                     alphabet, Eh, infinite_cutoff);
+                     alphabet, Eh, infinite_cutoff, max_weight);
          }
 
 
