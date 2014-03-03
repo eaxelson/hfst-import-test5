@@ -97,6 +97,8 @@ hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
 
 /* The default minimization algorithm if Hopcroft. */
 MinimizationAlgorithm minimization_algorithm=HOPCROFT;
+/* By default, weights are not encoded in minimization. */
+bool encode_weights=false;
 /* By default, harmonization is not optimized. */
 bool harmonize_smaller=true;
 /* By default, unknown symbols are used. */
@@ -107,6 +109,13 @@ void set_harmonize_smaller(bool value) {
 
 bool get_harmonize_smaller(void) {
     return harmonize_smaller; }
+
+void set_encode_weights(bool value) {
+  encode_weights=value; }
+
+  bool get_encode_weights(void) {
+    return encode_weights; }
+
 
 void set_minimization_algorithm(MinimizationAlgorithm a) {
     minimization_algorithm=a; 
@@ -1853,21 +1862,55 @@ HfstTransducer &HfstTransducer::determinize()
 
 HfstTransducer &HfstTransducer::minimize()
 { is_trie = false;
-    return apply( 
+
+  switch(this->type)
+    {
 #if HAVE_SFST
-    &hfst::implementations::SfstTransducer::minimize,
+    case SFST_TYPE:
+      {
+        SFST::Transducer * sfst_temp =
+          hfst::implementations::SfstTransducer::minimize(implementation.sfst);
+        delete implementation.sfst;
+        implementation.sfst = sfst_temp;
+        break;
+      }
 #endif
 #if HAVE_OPENFST
-    &hfst::implementations::TropicalWeightTransducer::minimize,
+    case TROPICAL_OPENFST_TYPE:
+      {
+        fst::StdVectorFst * tropical_ofst_temp =
+          hfst::implementations::TropicalWeightTransducer::minimize(implementation.tropical_ofst, encode_weights);
+        delete implementation.tropical_ofst;
+        implementation.tropical_ofst = tropical_ofst_temp;
+        break;
+      }
 #if HAVE_OPENFST_LOG
-    &hfst::implementations::LogWeightTransducer::minimize,
+    case LOG_OPENFST_TYPE:
+      {
+        hfst::implementations::LogFst * log_ofst_temp =
+          hfst::implementations::LogWeightTransducer::minimize(implementation.log_ofst);
+        delete implementation.log_ofst;
+        implementation.log_ofst = log_ofst_temp;
+        break;
+      }
 #endif
 #endif
 #if HAVE_FOMA
-    &hfst::implementations::FomaTransducer::minimize,
+    case FOMA_TYPE:
+      {
+      fsm * foma_temp =
+        hfst::implementations::FomaTransducer::minimize(implementation.foma);
+      this->foma_interface.delete_foma(implementation.foma);
+      implementation.foma = foma_temp;
+      break;
+      }
 #endif
-    /* Add here your implementation. */
-    false ); } 
+    case ERROR_TYPE:
+    default:
+      HFST_THROW(TransducerHasWrongTypeException);
+    }
+  return *this;
+}
 
 
 
