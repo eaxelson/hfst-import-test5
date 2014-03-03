@@ -95,9 +95,11 @@ namespace xfst {
     variable_explanations_["char-encoding"] = "character encoding used";
     variable_explanations_["copyright-owner"] = "";
     variable_explanations_["directory"] = "<NOT IMPLEMENTED>";
+    variable_explanations_["encode-weights"] = "encode weights when minimizing";
     variable_explanations_["flag-is-epsilon"] = "<NOT IMPLEMENTED>";
     variable_explanations_["harmonize-flags"] = "harmonize flag diacritics before composition";
     variable_explanations_["hopcroft-min"] = "use hopcroft's minimization algorithm";
+    variable_explanations_["maximum-weight"] = "maximum weight of paths printed in apply";
     variable_explanations_["minimal"] = "minimize networks after operations";
     variable_explanations_["name-nets"] = "stores the name of the network when using 'define'";
     variable_explanations_["obey-flags"] = "obey flag diacritic constraints";
@@ -140,10 +142,12 @@ namespace xfst {
         variables_["char-encoding"] = "UTF-8";
         variables_["copyright-owner"] = "Copyleft (c) University of Helsinki";
         variables_["directory"] = "OFF";
+        variables_["encode-weights"] = "OFF";
         variables_["flag-is-epsilon"] = "OFF";
         variables_["harmonize-flags"] = "OFF";
         variables_["hopcroft-min"] = "ON";
         variables_["lookup-cycle-cutoff"] = LOOKUP_CYCLE_CUTOFF;
+        variables_["maximum-weight"] = "OFF";
         variables_["minimal"] = "ON";
         variables_["name-nets"] = "OFF";
         variables_["obey-flags"] = "ON";
@@ -184,10 +188,12 @@ namespace xfst {
         variables_["char-encoding"] = "UTF-8";
         variables_["copyright-owner"] = "Copyleft (c) University of Helsinki";
         variables_["directory"] = "OFF";
+        variables_["encode-weights"] = "OFF";
         variables_["flag-is-epsilon"] = "OFF";
         variables_["harmonize-flags"] = "OFF";
         variables_["hopcroft-min"] = "ON";
         variables_["lookup-cycle-cutoff"] = LOOKUP_CYCLE_CUTOFF;
+        variables_["maximum-weight"] = "OFF";
         variables_["minimal"] = "ON";
         variables_["name-nets"] = "OFF";
         variables_["obey-flags"] = "ON";
@@ -440,6 +446,14 @@ namespace xfst {
     return *this;
   }
 
+  static float string_to_float(const std::string & str)
+  {
+    std::istringstream iss(str);
+    float f;
+    iss >> f;
+    return f;
+  }
+
   static size_t string_to_size_t(const std::string & str)
   {
     std::istringstream iss(str);
@@ -475,7 +489,14 @@ namespace xfst {
         HfstTwoLevelPaths results;
 
         // todo: variables_["obey-flags"] == ["ON"|"OFF"]
-        t->lookup_fd(lookup_path, results, cutoff);
+
+        if (variables_["maximum-weight"] == "OFF")
+          t->lookup_fd(lookup_path, results, cutoff, NULL);
+        else
+          {
+            float max_weight = string_to_float(variables_["maximum-weight"]);
+            t->lookup_fd(lookup_path, results, cutoff, &max_weight);
+          }
 
         HfstOneLevelPaths paths = extract_output_paths(results);
 
@@ -1660,6 +1681,13 @@ namespace xfst {
             hfst::set_minimization_algorithm(hfst::HOPCROFT);
           if (strcmp(text, "OFF") == 0)
             hfst::set_minimization_algorithm(hfst::BRZOZOWSKI);
+        }
+      if (strcmp(name, "encode-weights") == 0)
+        {
+          if (strcmp(text, "ON") == 0)
+            hfst::set_encode_weights(true);
+          if (strcmp(text, "OFF") == 0)
+            hfst::set_encode_weights(false);
         }
       PROMPT_AND_RETURN_THIS;
     }
