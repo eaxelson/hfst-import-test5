@@ -1463,14 +1463,9 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::minimize
   (StdVectorFst * t, bool encode_weights)
   {
-    (void)encode_weights;
     RmEpsilon<StdArc>(t);
-
-    //EncodeMapper<StdArc> encode_mapper
-    //  (encode_weights ? (kEncodeLabels|kEncodeWeights) : (kEncodeLabels), ENCODE);
-
-    EncodeMapper<StdArc> encode_mapper(kEncodeLabels, ENCODE);
-
+    EncodeMapper<StdArc> encode_mapper
+      (encode_weights ? (kEncodeLabels|kEncodeWeights) : (kEncodeLabels), ENCODE);
     Encode(t, &encode_mapper);
     StdVectorFst * det = new StdVectorFst();
     Determinize<StdArc>(*t, det);
