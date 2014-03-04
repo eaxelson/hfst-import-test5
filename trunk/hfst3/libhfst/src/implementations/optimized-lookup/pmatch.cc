@@ -653,6 +653,8 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
             SymbolNumber * original_output = output_tape;
             SymbolNumber * original_input = input_tape;
             Weight original_weight = local_stack.top().running_weight;
+            local_stack.top().running_weight += transition_table[i].get_weight();
+
             // Pass control
             PmatchTransducer * rtn_target =
                 alphabet.get_rtn(transition_table[i].get_input_symbol());
