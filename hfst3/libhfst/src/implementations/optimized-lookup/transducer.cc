@@ -90,7 +90,7 @@ StringSymbolMap TransducerAlphabet::build_string_symbol_map(void) const
 
 bool TransducerAlphabet::is_like_epsilon(SymbolNumber symbol) const
 {
-    if (symbol == 0 || fd_table.is_diacritic(symbol)) {
+    if (fd_table.is_diacritic(symbol)) {
         return true;
     }
     if (symbol >= symbol_table.size()) {
