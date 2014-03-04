@@ -417,7 +417,7 @@ FUNCBODY6: QUOTED_LITERAL {
 
 
 REGEXP2: REPLACE
-{ 
+{
 //          std::cerr << "regexp2:replace \n"<< std::endl; 
 }
 | REGEXP2 ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
@@ -1263,10 +1263,17 @@ INSERT: INS_LEFT SYMBOL RIGHT_PARENTHESIS {
         char * Ins_trans = hfst::pmatch::get_Ins_transition($2);
         $$ = new HfstTransducer(
             Ins_trans, Ins_trans, hfst::pmatch::format);
-        $$->set_name($2);
+        $$->set_name(Ins_trans);
         free(Ins_trans);
         hfst::pmatch::inserted_transducers.insert($2);
         if (hfst::pmatch::verbose) {
+            std::cerr << "inserting " << $2;
+            if (hfst::pmatch::definitions.count($2) != 0) {
+                std::cerr << " with ";
+                hfst::pmatch::print_size_info(hfst::pmatch::definitions[$2]);
+            } else {
+                std::cerr << std::endl;
+            }
             hfst::pmatch::used_definitions.insert($2);
         }
     } else if(hfst::pmatch::definitions.count($2) == 1) {
@@ -1278,6 +1285,7 @@ INSERT: INS_LEFT SYMBOL RIGHT_PARENTHESIS {
         }
         $$ = new HfstTransducer(* hfst::pmatch::definitions[$2]);
     } else {
+        // error?
         if (strlen($2) == 0) {
             $$ = new HfstTransducer(hfst::pmatch::format);
         } else {
