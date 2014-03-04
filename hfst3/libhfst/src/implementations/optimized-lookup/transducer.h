@@ -389,6 +389,7 @@ public:
         { return fd_table.num_features() > 0; }
     bool is_flag_diacritic(SymbolNumber symbol) const
         { return fd_table.is_diacritic(symbol); }
+    bool is_like_epsilon(SymbolNumber symbol) const;
     
     const SymbolTable& get_symbol_table() const
         { return symbol_table; }

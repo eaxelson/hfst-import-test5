@@ -88,6 +88,23 @@ StringSymbolMap TransducerAlphabet::build_string_symbol_map(void) const
     return ss_map;
 }
 
+bool TransducerAlphabet::is_like_epsilon(SymbolNumber symbol) const
+{
+    if (symbol == 0 || fd_table.is_diacritic(symbol)) {
+        return true;
+    }
+    if (symbol >= symbol_table.size()) {
+        return false;
+    }
+    std::string s = symbol_table[symbol];
+    // Check for Insert symbols like @I.something@ here
+    if (s.size() >= 5 && s[0] == '@' && s[1] == 'I' &&
+        s[2] == '.' && s[s.size() - 1] == '@') {
+        return true;
+    }
+    return false;
+}
+
 void TransducerAlphabet::display() const
 {
     std::cout << "Transducer alphabet:" << std::endl;
@@ -697,7 +714,7 @@ TransitionTableIndexSet Transducer::get_transitions_from_state(
         for(SymbolNumber symbol=0; symbol < header->symbol_count(); symbol++) {
             // There may be flags at index 0 even if there aren't
             // any epsilons, so those have to be checked for
-            if (alphabet->is_flag_diacritic(symbol)) {
+            if (alphabet->is_like_epsilon(symbol)) {
                 TransitionTableIndex transition_i =
                     get_index(state_index+1).get_target();
                 if (!get_index(state_index+1).matches(0)) {
@@ -709,7 +726,7 @@ TransitionTableIndexSet Transducer::get_transitions_from_state(
                     if (get_transition(transition_i).matches(symbol)) {
                         transitions.insert(transition_i);
                         // There could still be epsilons here, or other flags
-                    } else if (input != 0 && !alphabet->is_flag_diacritic(input)) {
+                    } else if (input != 0 && !alphabet->is_like_epsilon(input)) {
                         break;
                     }
                     ++transition_i;
