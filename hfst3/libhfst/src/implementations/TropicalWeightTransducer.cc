@@ -15,7 +15,11 @@
 #include "HfstLookupFlagDiacritics.h"
 
 #ifndef MAIN_TEST
-namespace hfst { namespace implementations
+namespace hfst { 
+
+  bool get_encode_weights();
+
+namespace implementations
 {
   void print_att_number(StdVectorFst *t, FILE * ofile);
 
@@ -1451,7 +1455,13 @@ namespace hfst { namespace implementations
   TropicalWeightTransducer::determinize(StdVectorFst * t)
   {
     RmEpsilon<StdArc>(t);
-    EncodeMapper<StdArc> encode_mapper(kEncodeLabels/*|kEncodeWeights*/,ENCODE);
+
+    //fst::StdVectorFst * pushed = new fst::StdVectorFst();
+    //fst::Push<StdArc, REWEIGHT_TO_FINAL>(*t, pushed, fst::kPushWeights);
+    //pushed->SetInputSymbols(t->InputSymbols());
+
+    EncodeMapper<StdArc> encode_mapper
+      (hfst::get_encode_weights() ? (kEncodeLabels|kEncodeWeights) : (kEncodeLabels), ENCODE);
     Encode(t, &encode_mapper);
     StdVectorFst * det = new StdVectorFst();
     Determinize<StdArc>(*t, det);
@@ -1460,15 +1470,21 @@ namespace hfst { namespace implementations
   }
 
 
-  StdVectorFst * TropicalWeightTransducer::minimize
-  (StdVectorFst * t, bool encode_weights)
+  StdVectorFst * TropicalWeightTransducer::minimize(StdVectorFst * t)
   {
     RmEpsilon<StdArc>(t);
+    
+    //fst::StdVectorFst * pushed = new fst::StdVectorFst();
+    //fst::Push<StdArc, REWEIGHT_TO_FINAL>(*t, pushed, fst::kPushWeights);
+    //pushed->SetInputSymbols(t->InputSymbols());
+
     EncodeMapper<StdArc> encode_mapper
-      (encode_weights ? (kEncodeLabels|kEncodeWeights) : (kEncodeLabels), ENCODE);
+      (hfst::get_encode_weights() ? (kEncodeLabels|kEncodeWeights) : (kEncodeLabels), ENCODE);
     Encode(t, &encode_mapper);
     StdVectorFst * det = new StdVectorFst();
+    //std::cerr << "determinizing for minimize..." << std::endl; // DEBUG
     Determinize<StdArc>(*t, det);
+    //std::cerr << "... determinizing for minimize done" << std::endl; // DEBUG
     Minimize<StdArc>(det);
     Decode(det, encode_mapper);
     return det;
@@ -2149,7 +2165,7 @@ namespace hfst { namespace implementations
   }
 
   StdVectorFst * TropicalWeightTransducer::intersect(StdVectorFst * t1,
-                           StdVectorFst * t2)
+                                                     StdVectorFst * t2)
   {
     if (t1->OutputSymbols() == NULL)
       t1->SetOutputSymbols(t1->InputSymbols());
@@ -2162,12 +2178,14 @@ namespace hfst { namespace implementations
     RmEpsilon(t1);
     RmEpsilon(t2);
 
+    // weights must not be encoded, else e.g. [a:b::1] & [a:b::2] will be empty
     EncodeMapper<StdArc> encoder(0x0001,ENCODE);
     EncodeFst<StdArc> enc1(*t1, &encoder);
     EncodeFst<StdArc> enc2(*t2, &encoder);
+    //std::cerr << "determinizing for intersect..." << std::endl; // DEBUG
     DeterminizeFst<StdArc> det1(enc1);
     DeterminizeFst<StdArc> det2(enc2);
-
+    //std::cerr << "... determinizing for intersect done" << std::endl; // DEBUG
     IntersectFst<StdArc> intersect(det1,det2);
     StdVectorFst *foo = new StdVectorFst(intersect);
     DecodeFst<StdArc> decode(*foo, encoder);
@@ -2182,7 +2200,7 @@ namespace hfst { namespace implementations
   }
 
   StdVectorFst * TropicalWeightTransducer::subtract(StdVectorFst * t1,
-                          StdVectorFst * t2)
+                                                    StdVectorFst * t2)
   {
     bool DEBUG=false;
 
@@ -2203,6 +2221,7 @@ namespace hfst { namespace implementations
 
     // Remove weights from t2, is this really needed?
     StdVectorFst *t2_ = copy(t2);
+
 #ifndef FOO
     for (fst::StateIterator<StdVectorFst> siter(*t2_); 
          not siter.Done(); siter.Next())
@@ -2224,12 +2243,15 @@ namespace hfst { namespace implementations
       }
 #endif
 
-    EncodeMapper<StdArc> encoder(0x0001,ENCODE);
+    //EncodeMapper<StdArc> encoder(0x0001,ENCODE);
+    EncodeMapper<StdArc> encoder(kEncodeLabels, ENCODE);
     EncodeFst<StdArc> enc1(*t1, &encoder);
     EncodeFst<StdArc> enc2(*t2_, &encoder);
     delete t2_;
+    //std::cerr << "determinizing for subtract..." << std::endl;
     DeterminizeFst<StdArc> det1(enc1);
     DeterminizeFst<StdArc> det2(enc2);
+    //std::cerr << "... determinizing for subtract done" << std::endl;
 
     if (DEBUG) printf("  ..determinized\n");
 

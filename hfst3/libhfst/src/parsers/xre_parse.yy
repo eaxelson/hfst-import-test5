@@ -567,6 +567,11 @@ CONTEXT: REPLACE CENTER_MARKER REPLACE
             $$ = new HfstTransducerPair(epsilon, t1);
             delete $2; 
          }
+       | CENTER_MARKER
+          {
+            HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+            $$ = new HfstTransducerPair(epsilon, epsilon);
+          }
       ;
  CONTEXT_MARK: REPLACE_CONTEXT_UU
          {

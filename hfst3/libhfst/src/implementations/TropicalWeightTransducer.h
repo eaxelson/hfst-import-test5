@@ -172,7 +172,7 @@ namespace implementations
 
       static StdVectorFst * copy(StdVectorFst * t);
       static StdVectorFst * determinize(StdVectorFst * t);
-      static StdVectorFst * minimize(StdVectorFst * t, bool encode_weghts=false);
+      static StdVectorFst * minimize(StdVectorFst * t);
       static StdVectorFst * remove_epsilons(StdVectorFst * t);
       static StdVectorFst * n_best(StdVectorFst * t, unsigned int n);
       static StdVectorFst * prune(StdVectorFst * t);
@@ -212,9 +212,9 @@ namespace implementations
                                               const StdVectorFst * t2);
 
       static StdVectorFst * intersect(StdVectorFst * t1,
-                             StdVectorFst * t2);
+                                      StdVectorFst * t2);
       static StdVectorFst * subtract(StdVectorFst * t1,
-                            StdVectorFst * t2);
+                                     StdVectorFst * t2);
       static StdVectorFst * set_weight(StdVectorFst * t,float f);
       static StdVectorFst * set_final_weights(StdVectorFst * t, float weight, bool increment=false);
       static StdVectorFst * transform_weights
