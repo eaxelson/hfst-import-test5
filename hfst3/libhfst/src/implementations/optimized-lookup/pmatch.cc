@@ -68,7 +68,17 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
         
 }
 
-
+SymbolNumberVector PmatchAlphabet::get_specials(void) const
+{
+    SymbolNumberVector v;
+    for (std::map<SpecialSymbol, SymbolNumber>::const_iterator it =
+             special_symbols.begin(); it != special_symbols.end(); ++it) {
+        if (it->second != NO_SYMBOL_NUMBER) {
+            v.push_back(it->second);
+        }
+    }
+    return v;
+}
 
 PmatchContainer::PmatchContainer(std::istream & inputstream)
 {
@@ -118,6 +128,58 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
             delete rtn;
         }
     }
+    toplevel->collect_possible_first_symbols();
+
+    // Finally fetch the first symbols from any
+    // first-position rtn arcs in TOP. If they are potential epsilon loops,
+    // clear out the set.
+    std::set<SymbolNumber> & possible_firsts = toplevel->possible_first_symbols;
+    for (std::set<SymbolNumber>::iterator it = possible_firsts.begin();
+         it != possible_firsts.end(); ++it) {
+        if (alphabet.has_rtn(*it)) {
+            if (alphabet.get_rtn(*it) == toplevel) {
+                possible_firsts.clear();
+                break;
+            }
+            alphabet.get_rtn(*it)->collect_possible_first_symbols();
+            std::set<SymbolNumber> rtn_firsts =
+                alphabet.get_rtn(*it)->possible_first_symbols;
+            for (RtnMap::iterator it = alphabet.rtns.begin();
+                 it != alphabet.rtns.end(); ++it) {
+                if (rtn_firsts.count(it->first) == 1) {
+                    // For now we are very conservative:
+                    // if we can go through two levels of rtns
+                    // without any input, we just assume the full
+                    // input set is possible
+                    possible_firsts.clear();
+                }
+            }
+            if (rtn_firsts.empty() || possible_firsts.empty()) {
+                possible_firsts.clear();
+                break;
+            } else {
+                for (std::set<SymbolNumber>::
+                         const_iterator rtn_it = rtn_firsts.begin();
+                     rtn_it != rtn_firsts.end(); ++rtn_it) {
+                    possible_firsts.insert(*rtn_it);
+                }
+            }
+        }
+    }
+    for (RtnMap::iterator it = alphabet.rtns.begin();
+         it != alphabet.rtns.end(); ++it) {
+        possible_firsts.erase(it->first);
+    }
+    if (!possible_firsts.empty() &&
+        alphabet.get_special(boundary) != NO_SYMBOL_NUMBER) {
+        possible_firsts.insert(alphabet.get_special(boundary));
+    }
+    possible_first_symbols = possible_firsts;
+    // std::cerr << "toplevel's first symbols:\n";
+    // for (std::set<SymbolNumber>::iterator it = possible_firsts.begin();
+    //      it != possible_firsts.end(); ++it) {
+    //     std::cerr << alphabet.string_from_symbol(*it) << std::endl;
+    // }
 }
 
 bool PmatchAlphabet::is_end_tag(const std::string & symbol)
@@ -275,6 +337,12 @@ std::string PmatchContainer::match(std::string & input)
     output.clear();
     while (has_queued_input()) {
         SymbolNumber * input_entry = input_tape;
+        if (!possible_first_symbols.empty()) {
+                while (possible_first_symbols.count(*input_tape) == 0) {
+                    std::cerr << "skipped " << alphabet.string_from_symbol(*input_tape) << std::endl;
+                    output.push_back(*input_tape++);
+                }
+            }
         toplevel->match(&input_tape, &output_tape);
         copy_to_output(toplevel->get_best_result());
         if (input_entry == input_tape) {
@@ -343,20 +411,6 @@ bool PmatchContainer::has_queued_input(void)
     return *input_tape != NO_SYMBOL_NUMBER;
 }
 
-// void PmatchContainer::tokenize_from_queue(void)
-// {
-//     if (input_queue == NULL || *input_queue == '\0') {
-//     return;
-//     }
-//     char * orig_input_queue = input_queue;
-//     tokenize(&input_queue);
-//     char * new_input_queue = (char*) malloc(strlen(input_queue));
-//     strcpy(new_input_queue, input_queue);
-//     input_queue = new_input_queue;
-//     free(orig_input_queue);
-//     return;
-// }
-
 PmatchTransducer::PmatchTransducer(std::istream & is,
                                    TransitionTableIndex index_table_size,
                                    TransitionTableIndex transition_table_size,
@@ -410,6 +464,161 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
     }
     free(orig_p);
 }
+
+// Precompute which symbols may be at the start of a match.
+// For now we ignore default arcs, as does the rest of pmatch.
+void PmatchTransducer::collect_possible_first_symbols(void)
+{
+    SymbolNumberVector input_symbols;
+    SymbolNumberVector special_symbol_v = alphabet.get_specials();
+    std::set<SymbolNumber> special_symbols(special_symbol_v.begin(),
+                                           special_symbol_v.end());
+    SymbolTable table = alphabet.get_symbol_table();
+    SymbolNumber symbol_count = table.size();
+    for (SymbolNumber i = 1; i < symbol_count; ++i) {
+        if (!alphabet.is_like_epsilon(i) &&
+            !alphabet.is_end_tag(i) &&
+            special_symbols.count(i) == 0 &&
+            i != alphabet.get_unknown_symbol() &&
+            i != alphabet.get_identity_symbol() &&
+            i != alphabet.get_default_symbol())
+        {
+            input_symbols.push_back(i);
+        }
+    }
+    // always include unknown and identity (once) but not default
+    if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER) {
+        input_symbols.push_back(alphabet.get_unknown_symbol());
+    }
+    if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER) {
+        input_symbols.push_back(alphabet.get_identity_symbol());
+    }
+    try {
+        collect_first(0, input_symbols);
+    } catch (bool e) {
+        // If the end state can be reached without any input
+        // or we have initial wildcards
+        if (e == true) {
+            possible_first_symbols.clear();
+        }
+    }
+
+}
+
+void PmatchTransducer::collect_first_epsilon(TransitionTableIndex i,
+                           SymbolNumberVector const& input_symbols)
+{
+    while(true) {
+        SymbolNumber output = transition_table[i].get_output_symbol();
+        if (transition_table[i].get_input_symbol() == 0) {
+            if (!checking_context()) {
+                if (!try_entering_context(output)) {
+                    collect_first(transition_table[i].get_target(), input_symbols);
+                    ++i;
+                } else {
+                    // We're going to fake through a context
+                    collect_first(transition_table[i].get_target(), input_symbols);
+                    local_stack.pop();
+                    ++i;
+                }
+            } else {
+                // We *are* checking context and may be done
+                if (try_exiting_context(output)) {
+                    collect_first(transition_table[i].get_target(), input_symbols);
+                    local_stack.pop();
+                    ++i;
+                } else {
+                    // Don't touch output when checking context
+                    collect_first(transition_table[i].get_target(), input_symbols);
+                    ++i;
+                }
+            }
+        } else if (alphabet.is_flag_diacritic(
+                       transition_table[i].get_input_symbol())) {
+            collect_first(transition_table[i].get_target(), input_symbols);
+            ++i;
+        } else if (alphabet.has_rtn(transition_table[i].get_input_symbol())) {
+            possible_first_symbols.insert(transition_table[i].get_input_symbol());
+            // collect the inputs from this later
+            ++i;
+        } else { // it's not epsilon and it's not a flag or Ins, so nothing to do
+            return;
+        }
+    }
+
+}
+
+void PmatchTransducer::collect_first_epsilon_index(TransitionTableIndex i,
+                                                   SymbolNumberVector const& input_symbols)
+{
+    if (index_table[i].get_input_symbol() == 0) {
+        collect_first_epsilon(
+            index_table[i].get_target() - TRANSITION_TARGET_TABLE_START,
+            input_symbols);                                
+    }
+}
+
+void PmatchTransducer::collect_first_transition(TransitionTableIndex i,
+                                                SymbolNumberVector const& input_symbols)
+{
+    for (SymbolNumberVector::const_iterator it = input_symbols.begin();
+         it != input_symbols.end(); ++it) {
+        if (transition_table[i].get_input_symbol() == *it) {
+            if (!checking_context()) {
+                // if this is unknown or identity, game over
+                if (*it == alphabet.get_identity_symbol() ||
+                    *it == alphabet.get_unknown_symbol()) {
+                    throw true;
+                }
+                possible_first_symbols.insert(*it);
+            } else {
+                // faking through a context check
+                collect_first(transition_table[i].get_target(),
+                              input_symbols);
+            }
+        }
+    }
+}
+
+void PmatchTransducer::collect_first_index(TransitionTableIndex i,
+                                           SymbolNumberVector const& input_symbols)
+{
+    for (SymbolNumberVector::const_iterator it = input_symbols.begin();
+         it != input_symbols.end(); ++it) {
+        if (index_table[i+*it].get_input_symbol() == *it) {
+            collect_first_transition(index_table[i+*it].get_target() -
+                                     TRANSITION_TARGET_TABLE_START,
+                                     input_symbols);
+        }
+    }
+}
+
+void PmatchTransducer::collect_first(TransitionTableIndex i,
+                                     SymbolNumberVector const& input_symbols)
+{
+    if (indexes_transition_table(i))
+    {
+        i -= TRANSITION_TARGET_TABLE_START;
+        
+        // If we can get to finality without any input,
+        // throw a bool indicating that the full input set is needed
+        if (transition_table[i].final()) {
+            throw true;
+        }
+
+        collect_first_epsilon(i+1, input_symbols);
+        collect_first_transition(i+1, input_symbols);
+        
+    } else {
+        if (index_table[i].final()) {
+            throw true;
+        }
+        collect_first_epsilon_index(i+1, input_symbols);
+        collect_first_index(i+1, input_symbols);
+    }
+}
+
+
 
 void PmatchContainer::initialize_input(const char * input)
 {
