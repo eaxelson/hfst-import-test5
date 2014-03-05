@@ -59,7 +59,7 @@ print_usage()
   // Usage line                                                                                                                                                                                                                            
   fprintf(message_out, "Usage: %s [OPTIONS...]\n"
           "Compile XFST scripts or execute XFST commands interactively\n"
-          "\n", program_name);
+          "\n", "hfst-xfst" /*program_name*/);
   
   print_common_program_options(message_out);
   fprintf(message_out, "\n");

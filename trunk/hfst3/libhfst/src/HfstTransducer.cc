@@ -1861,55 +1861,22 @@ HfstTransducer &HfstTransducer::determinize()
     false ); } 
 
 HfstTransducer &HfstTransducer::minimize()
-{ is_trie = false;
-
-  switch(this->type)
-    {
+{  is_trie = false;
+    return apply(
 #if HAVE_SFST
-    case SFST_TYPE:
-      {
-        SFST::Transducer * sfst_temp =
-          hfst::implementations::SfstTransducer::minimize(implementation.sfst);
-        delete implementation.sfst;
-        implementation.sfst = sfst_temp;
-        break;
-      }
+    &hfst::implementations::SfstTransducer::minimize,
 #endif
 #if HAVE_OPENFST
-    case TROPICAL_OPENFST_TYPE:
-      {
-        fst::StdVectorFst * tropical_ofst_temp =
-          hfst::implementations::TropicalWeightTransducer::minimize(implementation.tropical_ofst, encode_weights);
-        delete implementation.tropical_ofst;
-        implementation.tropical_ofst = tropical_ofst_temp;
-        break;
-      }
+    &hfst::implementations::TropicalWeightTransducer::minimize,
 #if HAVE_OPENFST_LOG
-    case LOG_OPENFST_TYPE:
-      {
-        hfst::implementations::LogFst * log_ofst_temp =
-          hfst::implementations::LogWeightTransducer::minimize(implementation.log_ofst);
-        delete implementation.log_ofst;
-        implementation.log_ofst = log_ofst_temp;
-        break;
-      }
+    &hfst::implementations::LogWeightTransducer::minimize,
 #endif
 #endif
 #if HAVE_FOMA
-    case FOMA_TYPE:
-      {
-      fsm * foma_temp =
-        hfst::implementations::FomaTransducer::minimize(implementation.foma);
-      this->foma_interface.delete_foma(implementation.foma);
-      implementation.foma = foma_temp;
-      break;
-      }
+    &hfst::implementations::FomaTransducer::minimize,
 #endif
-    case ERROR_TYPE:
-    default:
-      HFST_THROW(TransducerHasWrongTypeException);
-    }
-  return *this;
+    /* Add here your implementation. */
+    false );
 }
 
 
@@ -5694,8 +5661,14 @@ int main(int argc, char * argv[])
 
         a_paths.harmonize_flag_diacritics(b_paths);
 
-        a_paths.intersect(b_paths).minimize();
+        std::cerr << "intersection of a_paths and b_paths: " << std::endl;
+        std::cerr << a_paths << "--" << std::endl;
+        std::cerr << b_paths << "--" << std::endl;
+
+        a_paths.intersect(b_paths).minimize(); // FAIL: intersection is empty ?
         
+        std::cerr << a_paths << "----" << std::endl;
+
         a_paths.convert(HFST_OLW_TYPE);
         
         HfstOneLevelPaths * one_result = 
