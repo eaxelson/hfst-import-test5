@@ -136,7 +136,7 @@ do
     ## Test that the result of testfile.xfst (written to standard output)
     ## is the same as testfile.output
     for testfile in print_stack print_labels print_label_tally \
-	shortest_string set_variable info print_net eliminate_flag
+	shortest_string set_variable info print_net eliminate_flag empty_context
     do
 	if ! (ls $testfile.xfst 2> /dev/null); then
 	    echo "skipping missing test for "$testfile"..."

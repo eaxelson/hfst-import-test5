@@ -48,6 +48,7 @@ EXTRA_DIST=test.sh \
 	define_function.xfst define_function.att \
 	define_fail.xfst \
 	eliminate_flag.xfst eliminate_flag.output \
+	empty_context.xfst empty_context.output \
 	set_variable.xfst set_variable.output \
 	apply_up.xfst apply_up.output \
 	apply_down.xfst apply_down.output \
