@@ -8,6 +8,7 @@
 namespace hfst_ol {
 
     class PmatchTransducer;
+    class PmatchContainer;
     typedef std::map<SymbolNumber, PmatchTransducer *> RtnMap;
     enum SpecialSymbol{entry,
                        exit,
@@ -47,9 +48,13 @@ namespace hfst_ol {
         bool has_rtn(SymbolNumber symbol) const;
         PmatchTransducer * get_rtn(SymbolNumber symbol);
         SymbolNumber get_special(SpecialSymbol special) const;
+        SymbolNumberVector get_specials(void) const;
         std::string stringify(const SymbolNumberVector & str);
         void be_verbose(void) { verbose = true; }
         bool is_verbose(void) { return verbose; }
+
+        friend PmatchTransducer;
+        friend PmatchContainer;
     };
 
     class PmatchContainer
@@ -66,6 +71,7 @@ namespace hfst_ol {
         SymbolNumber * output_tape;
         SymbolNumber * orig_output_tape;
         SymbolNumberVector output;
+        std::set<SymbolNumber> possible_first_symbols;
 
     public:
 
@@ -195,6 +201,17 @@ namespace hfst_ol {
         bool try_exiting_context(SymbolNumber symbol);
         void exit_context(void);
 
+        void collect_first_epsilon(TransitionTableIndex i,
+                                   SymbolNumberVector const& input_symbols);
+        void collect_first_epsilon_index(TransitionTableIndex i,
+                                         SymbolNumberVector const& input_symbols);
+        void collect_first_transition(TransitionTableIndex i,
+                                      SymbolNumberVector const& input_symbols);
+        void collect_first_index(TransitionTableIndex i,
+                                 SymbolNumberVector const& input_symbols);
+        void collect_first(TransitionTableIndex i,
+                           SymbolNumberVector const& input_symbols);
+
 
     public:
         PmatchTransducer(std::istream& is,
@@ -203,7 +220,7 @@ namespace hfst_ol {
                          PmatchAlphabet & alphabet,
                          PmatchContainer * container);
 
-        void display() const;
+        std::set<SymbolNumber> possible_first_symbols;
 
         // const SimpleIndex& get_index(TransitionTableIndex i) const
         // { return index_table[i] }
@@ -230,7 +247,7 @@ namespace hfst_ol {
         void rtn_call(SymbolNumber * input_tape_entry, SymbolNumber * output_tape_entry);
         void rtn_exit(void);
         void note_analysis(SymbolNumber * input_tape, SymbolNumber * output_tape);
-//        std::set<SymbolNumber> get_initial_input_symbols();
+        void collect_possible_first_symbols(void);
 
     };
 
