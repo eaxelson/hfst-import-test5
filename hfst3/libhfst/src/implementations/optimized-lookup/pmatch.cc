@@ -339,7 +339,6 @@ std::string PmatchContainer::match(std::string & input)
         SymbolNumber * input_entry = input_tape;
         if (!possible_first_symbols.empty()) {
                 while (possible_first_symbols.count(*input_tape) == 0) {
-                    std::cerr << "skipped " << alphabet.string_from_symbol(*input_tape) << std::endl;
                     output.push_back(*input_tape++);
                 }
             }
