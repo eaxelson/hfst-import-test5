@@ -428,7 +428,8 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
                                    PmatchAlphabet & alpha,
                                    PmatchContainer * cont):
     alphabet(alpha),
-    container(cont)
+    container(cont),
+    recursion_depth_left(PMATCH_MAX_RECURSION_DEPTH)
 {
     orig_symbol_count = alphabet.get_symbol_table().size();
     // initialize the stack for local variables
@@ -579,6 +580,7 @@ void PmatchTransducer::collect_first_transition(TransitionTableIndex i,
                 // if this is unknown or identity, game over
                 if (*it == alphabet.get_identity_symbol() ||
                     *it == alphabet.get_unknown_symbol()) {
+                    recursion_depth_left = PMATCH_MAX_RECURSION_DEPTH;
                     throw true;
                 }
                 possible_first_symbols.insert(*it);
@@ -607,6 +609,12 @@ void PmatchTransducer::collect_first_index(TransitionTableIndex i,
 void PmatchTransducer::collect_first(TransitionTableIndex i,
                                      SymbolNumberVector const& input_symbols)
 {
+
+    if (recursion_depth_left == 0) {
+        return;
+    } else {
+        --recursion_depth_left;
+    }
     if (indexes_transition_table(i))
     {
         i -= TRANSITION_TARGET_TABLE_START;
@@ -614,6 +622,7 @@ void PmatchTransducer::collect_first(TransitionTableIndex i,
         // If we can get to finality without any input,
         // throw a bool indicating that the full input set is needed
         if (transition_table[i].final()) {
+            recursion_depth_left = PMATCH_MAX_RECURSION_DEPTH;
             throw true;
         }
 
@@ -622,11 +631,13 @@ void PmatchTransducer::collect_first(TransitionTableIndex i,
         
     } else {
         if (index_table[i].final()) {
+            recursion_depth_left = PMATCH_MAX_RECURSION_DEPTH;
             throw true;
         }
         collect_first_epsilon_index(i+1, input_symbols);
         collect_first_index(i+1, input_symbols);
     }
+    ++recursion_depth_left;
 }
 
 
