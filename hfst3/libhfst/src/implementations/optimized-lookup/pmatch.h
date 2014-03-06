@@ -53,8 +53,8 @@ namespace hfst_ol {
         void be_verbose(void) { verbose = true; }
         bool is_verbose(void) { return verbose; }
 
-        friend PmatchTransducer;
-        friend PmatchContainer;
+        friend class PmatchTransducer;
+        friend class PmatchContainer;
     };
 
     class PmatchContainer
