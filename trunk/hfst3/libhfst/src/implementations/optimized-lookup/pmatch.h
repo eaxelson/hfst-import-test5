@@ -71,7 +71,7 @@ namespace hfst_ol {
         SymbolNumber * output_tape;
         SymbolNumber * orig_output_tape;
         SymbolNumberVector output;
-        std::set<SymbolNumber> possible_first_symbols;
+        std::vector<char> possible_first_symbols;
 
     public:
 

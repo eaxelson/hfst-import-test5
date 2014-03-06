@@ -133,9 +133,11 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
     // Finally fetch the first symbols from any
     // first-position rtn arcs in TOP. If they are potential epsilon loops,
     // clear out the set.
+    SymbolNumber max_input_sym = 0;
     std::set<SymbolNumber> & possible_firsts = toplevel->possible_first_symbols;
     for (std::set<SymbolNumber>::iterator it = possible_firsts.begin();
          it != possible_firsts.end(); ++it) {
+        if (*it > max_input_sym) { max_input_sym = *it; }
         if (alphabet.has_rtn(*it)) {
             if (alphabet.get_rtn(*it) == toplevel) {
                 possible_firsts.clear();
@@ -161,6 +163,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
                 for (std::set<SymbolNumber>::
                          const_iterator rtn_it = rtn_firsts.begin();
                      rtn_it != rtn_firsts.end(); ++rtn_it) {
+                    if (*rtn_it > max_input_sym) { max_input_sym = *rtn_it ;}
                     possible_firsts.insert(*rtn_it);
                 }
             }
@@ -174,7 +177,14 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
         alphabet.get_special(boundary) != NO_SYMBOL_NUMBER) {
         possible_firsts.insert(alphabet.get_special(boundary));
     }
-    possible_first_symbols = possible_firsts;
+    for (int i = 0; i <= max_input_sym; ++i) {
+        if (possible_firsts.count(i) == 1) {
+            possible_first_symbols.push_back(1);
+        } else {
+            possible_first_symbols.push_back(0);
+        }
+    }
+//    possible_first_symbols = possible_firsts;
     // std::cerr << "toplevel's first symbols:\n";
     // for (std::set<SymbolNumber>::iterator it = possible_firsts.begin();
     //      it != possible_firsts.end(); ++it) {
@@ -338,10 +348,12 @@ std::string PmatchContainer::match(std::string & input)
     while (has_queued_input()) {
         SymbolNumber * input_entry = input_tape;
         if (!possible_first_symbols.empty()) {
-                while (possible_first_symbols.count(*input_tape) == 0) {
-                    output.push_back(*input_tape++);
-                }
+            while (*input_tape >= possible_first_symbols.size() ||
+                   possible_first_symbols[*input_tape] == 0) {
+//                std::cerr << "skipped " << alphabet.string_from_symbol(*input_tape) << std::endl;
+                output.push_back(*input_tape++);
             }
+        }
         toplevel->match(&input_tape, &output_tape);
         copy_to_output(toplevel->get_best_result());
         if (input_entry == input_tape) {
