@@ -9,6 +9,9 @@ namespace hfst_ol {
 
     class PmatchTransducer;
     class PmatchContainer;
+
+    const unsigned int PMATCH_MAX_RECURSION_DEPTH = 3000;
+    
     typedef std::map<SymbolNumber, PmatchTransducer *> RtnMap;
     enum SpecialSymbol{entry,
                        exit,
@@ -161,6 +164,8 @@ namespace hfst_ol {
             SymbolNumberVector best_result;
             Weight best_weight;
         };
+
+        unsigned int recursion_depth_left;
 
         std::stack<LocalVariables> local_stack;
         std::stack<RtnVariables> rtn_stack;
