@@ -5661,13 +5661,7 @@ int main(int argc, char * argv[])
 
         a_paths.harmonize_flag_diacritics(b_paths);
 
-        std::cerr << "intersection of a_paths and b_paths: " << std::endl;
-        std::cerr << a_paths << "--" << std::endl;
-        std::cerr << b_paths << "--" << std::endl;
-
-        a_paths.intersect(b_paths).minimize(); // FAIL: intersection is empty ?
-        
-        std::cerr << a_paths << "----" << std::endl;
+        a_paths.intersect(b_paths).minimize();
 
         a_paths.convert(HFST_OLW_TYPE);
         

@@ -2168,9 +2168,10 @@ namespace implementations
                                                      StdVectorFst * t2)
   {
     if (t1->OutputSymbols() == NULL)
-      t1->SetOutputSymbols(t1->InputSymbols());
+      t1->SetOutputSymbols(t1->InputSymbols()->Copy());
+    t2->SetInputSymbols(t1->OutputSymbols()->Copy());
     if (t2->OutputSymbols() == NULL)
-      t2->SetOutputSymbols(t2->InputSymbols());
+      t2->SetOutputSymbols(t2->InputSymbols()->Copy());
 
     ArcSort(t1, OLabelCompare<StdArc>());
     ArcSort(t2, ILabelCompare<StdArc>());
@@ -2182,11 +2183,16 @@ namespace implementations
     EncodeMapper<StdArc> encoder(0x0001,ENCODE);
     EncodeFst<StdArc> enc1(*t1, &encoder);
     EncodeFst<StdArc> enc2(*t2, &encoder);
+
     //std::cerr << "determinizing for intersect..." << std::endl; // DEBUG
     DeterminizeFst<StdArc> det1(enc1);
     DeterminizeFst<StdArc> det2(enc2);
     //std::cerr << "... determinizing for intersect done" << std::endl; // DEBUG
-    IntersectFst<StdArc> intersect(det1,det2);
+
+    //std::cerr << "     here" << std::endl;
+    IntersectFst<StdArc> intersect(det1, det2);
+    //std::cerr << "     done" << std::endl;
+
     StdVectorFst *foo = new StdVectorFst(intersect);
     DecodeFst<StdArc> decode(*foo, encoder);
     delete foo;
