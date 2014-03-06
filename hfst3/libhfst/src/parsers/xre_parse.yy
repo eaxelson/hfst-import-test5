@@ -808,24 +808,47 @@ REGEXP8: REGEXP9 { }
        | CONTAINMENT_ONCE REGEXP8 {
             //std::cerr << "Contain 1 \n"<< std::endl;
 
-            // any = [?]*
-            HfstTransducer any(hfst::internal_identity, hfst::xre::format);
-            any.repeat_star().minimize();
+            // [0 -> MARKER || _ $2] .o. $#[MARKER] .o. [MARKER -> 0]
+            // where $# is function 'contains once non-overlapping'
 
-            // contains = [any $2 any] # because of harmonization, this works without repeat_plus
-            HfstTransducer contains(any);
-            contains.concatenate(*$2).concatenate(any).minimize();
+            HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+            HfstTransducer marker("$_CONTAINMENT_MARKER_$", hfst::xre::format);
 
-            // complement = [any - contains]
-            HfstTransducer complement(any);
-            complement.subtract(contains).minimize();
+            HfstTransducerPair mappingPair1(epsilon, marker);
+            HfstTransducerPairVector mappingPairVector1;
+            mappingPairVector1.push_back(mappingPair1);
 
-            // result = [complement $2 complement]
-            HfstTransducer *result = new HfstTransducer(complement);
-            result->concatenate(*$2).concatenate(complement).minimize();
+            HfstTransducerPair contextPair1(epsilon, *$2);
+            HfstTransducerPairVector contextPairVector1;
+            contextPairVector1.push_back(contextPair1);
 
-            delete $2;
-            $$ = result;
+            Rule rule1(mappingPairVector1, contextPairVector1, hfst::xeroxRules::REPL_UP);
+            HfstTransducer epsilonToMarker(hfst::xre::format);
+            epsilonToMarker = replace(rule1, false);
+
+            HfstTransducerPair mappingPair2(marker, epsilon);
+            HfstTransducerPairVector mappingPairVector2;
+            mappingPairVector2.push_back(mappingPair2);
+
+            Rule rule2(mappingPairVector2);
+            HfstTransducer markerToEpsilon(hfst::xre::format);
+            markerToEpsilon = replace(rule2, false);
+
+            HfstTransducer * containsOnce = hfst::xre::contains_once_non_overlapping(&marker);
+
+            //std::cerr << *$2 << "--" << std::endl;
+            //std::cerr << epsilonToMarker << "--" << std::endl << *containsOnce << "--" << std::endl << markerToEpsilon << std::endl;
+
+            HfstTransducer comp(epsilonToMarker);
+            comp.compose(*containsOnce).compose(markerToEpsilon).minimize();
+            delete containsOnce;
+
+            // there are still "$_CONTAINMENT_MARKER_$":0 transitions
+            HfstBasicTransducer comp_basic(comp);
+            comp_basic.remove_transitions(std::pair<std::string, std::string>("$_CONTAINMENT_MARKER_$", "@_EPSILON_SYMBOL_@"));
+            comp_basic.remove_symbol_from_alphabet("$_CONTAINMENT_MARKER_$");
+
+            $$ = new HfstTransducer(comp_basic, hfst::xre::format);
         }
        | CONTAINMENT_OPT REGEXP8 {
             // any = [?]*

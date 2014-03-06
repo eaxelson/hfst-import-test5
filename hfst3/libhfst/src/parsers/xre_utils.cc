@@ -702,6 +702,28 @@ xfst_label_to_transducer(const char* input, const char* output)
   return retval;
 }
 
+  HfstTransducer * contains_once_non_overlapping(const HfstTransducer * t)
+  {
+    // any = [?]*
+    HfstTransducer any(hfst::internal_identity, hfst::xre::format);
+    any.repeat_star().minimize();
+
+    // contains = [any $2 any] # because of harmonization, this works without repeat_plus
+    HfstTransducer contains(any);
+    contains.concatenate(*t).concatenate(any).minimize();
+
+    // complement = [any - contains]
+    HfstTransducer complement(any);
+    complement.subtract(contains).minimize();
+
+    // result = [complement $2 complement]
+    HfstTransducer *result = new HfstTransducer(complement);
+    result->concatenate(*t).concatenate(complement).minimize();
+
+    return result;
+  }
+
+
   void warn(const char * msg)
   {
     if (!verbose_)

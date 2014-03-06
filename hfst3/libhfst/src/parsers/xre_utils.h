@@ -112,6 +112,8 @@ bool is_valid_function_call(const char * name, const std::vector<HfstTransducer>
 /** @brief Parse "input:output", ":output", "input:" or ":". */
  HfstTransducer* xfst_label_to_transducer(const char* input, const char* output);
 
+ HfstTransducer * contains_once_non_overlapping(const HfstTransducer * t);
+
  void warn(const char * msg);
  void warn_about_special_symbols_in_replace(HfstTransducer *t);
  /* Warn about \a symbol if it is of form "@_.*_@" and verbose mode is on. */

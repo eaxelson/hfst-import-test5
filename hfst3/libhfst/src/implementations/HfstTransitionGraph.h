@@ -2043,6 +2043,8 @@
            return;
          }
 
+       public:
+
          /* A function that performs in-place removal of all transitions
             equivalent to \a sp in the graph. */
          void remove_transitions(const HfstSymbolPair &sp)
@@ -2082,6 +2084,8 @@
            if (!out_match_used) {
              alphabet.erase(sp.second); }
          }
+
+       protected:
 
          /* A function that performs in-place-substitution in the graph. */
          void substitute_(const HfstSymbolPair &old_sp, 
