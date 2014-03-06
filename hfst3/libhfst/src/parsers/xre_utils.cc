@@ -10,6 +10,7 @@
 
 #include "xre_utils.h"
 #include "HfstTransducer.h"
+#include "HfstXeroxRules.h"
 
 using std::string;
 using std::map;
@@ -722,6 +723,54 @@ xfst_label_to_transducer(const char* input, const char* output)
 
     return result;
   }
+
+  HfstTransducer * contains_once(const HfstTransducer * t)
+  {
+    // [0 -> MARKER || _ t] .o. $#[MARKER] .o. [MARKER -> 0]
+    // where $# is function 'contains once non-overlapping'
+    
+    // [0 -> MARKER || _ t]
+    HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+    HfstTransducer marker("$_CONTAINMENT_MARKER_$", hfst::xre::format);
+    
+    HfstTransducerPair mappingPair1(epsilon, marker);
+    HfstTransducerPairVector mappingPairVector1;
+    mappingPairVector1.push_back(mappingPair1);
+    
+    HfstTransducerPair contextPair1(epsilon, *t);
+    HfstTransducerPairVector contextPairVector1;
+    contextPairVector1.push_back(contextPair1);
+    
+    hfst::xeroxRules::Rule rule1(mappingPairVector1, contextPairVector1, hfst::xeroxRules::REPL_UP);
+    HfstTransducer epsilonToMarker(hfst::xre::format);
+    epsilonToMarker = hfst::xeroxRules::replace(rule1, false);
+    
+    // [MARKER -> 0]
+    HfstTransducerPair mappingPair2(marker, epsilon);
+    HfstTransducerPairVector mappingPairVector2;
+    mappingPairVector2.push_back(mappingPair2);
+    
+    hfst::xeroxRules::Rule rule2(mappingPairVector2);
+    HfstTransducer markerToEpsilon(hfst::xre::format);
+    markerToEpsilon = hfst::xeroxRules::replace(rule2, false);
+    
+    // $#[MARKER]
+    HfstTransducer * containsOnce = hfst::xre::contains_once_non_overlapping(&marker);
+    
+    // [0 -> MARKER || _ t] .o. $#[MARKER] .o. [MARKER -> 0]
+    HfstTransducer comp(epsilonToMarker);
+    comp.compose(*containsOnce).compose(markerToEpsilon).minimize();
+    delete containsOnce;
+    
+    // there are still MARKER:0 transitions, so get rid of them
+    // as well as the the marker
+    HfstBasicTransducer comp_basic(comp);
+    comp_basic.remove_transitions(std::pair<std::string, std::string>("$_CONTAINMENT_MARKER_$", "@_EPSILON_SYMBOL_@"));
+    comp_basic.remove_symbol_from_alphabet("$_CONTAINMENT_MARKER_$");
+    
+    return new HfstTransducer(comp_basic, hfst::xre::format);
+  }
+
 
 
   void warn(const char * msg)

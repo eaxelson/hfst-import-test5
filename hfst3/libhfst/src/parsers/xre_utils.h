@@ -112,7 +112,10 @@ bool is_valid_function_call(const char * name, const std::vector<HfstTransducer>
 /** @brief Parse "input:output", ":output", "input:" or ":". */
  HfstTransducer* xfst_label_to_transducer(const char* input, const char* output);
 
+ // e.g. t = [a a]: accepts aa and aaa
  HfstTransducer * contains_once_non_overlapping(const HfstTransducer * t);
+ // e.g. t = [a a]: accepts aa but not aa
+ HfstTransducer * contains_once(const HfstTransducer * t);
 
  void warn(const char * msg);
  void warn_about_special_symbols_in_replace(HfstTransducer *t);
