@@ -854,6 +854,50 @@ namespace implementations
     return result;
   }
 
+
+  static StdVectorFst * copy_fst(const StdVectorFst * t)
+  {
+    StdVectorFst * result = new StdVectorFst();
+
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+         not siter.Done(); siter.Next())
+      result->AddState();
+    
+    // go through all states in this
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+         not siter.Done(); siter.Next())
+      {
+        // create new state in result, if needed
+        StateId s = siter.Value();
+        StateId result_s=s;
+
+        // make the new state initial, if needed
+        if (t->Start() == s)
+          result->SetStart(result_s);
+
+        // make the new state final, if needed
+        if (t->Final(s) != TropicalWeight::Zero())
+          result->SetFinal(result_s, t->Final(s).Value());
+        
+
+        // go through all the arcs in this
+        for (fst::ArcIterator<StdVectorFst> aiter(*t,s); 
+             !aiter.Done(); aiter.Next())
+          {
+            const StdArc &arc = aiter.Value();
+
+            // find the corresponding target state in result or, if not found,
+            // create a new state
+            StateId result_nextstate=arc.nextstate;
+            
+            // copy the transition
+            result->AddArc(result_s, StdArc(arc.ilabel, arc.olabel, 
+                                            arc.weight, result_nextstate));    
+          }
+      }
+    return result;
+  }
+
   unsigned int TropicalWeightTransducer::number_of_states(const StdVectorFst *t)
   {
     unsigned int retval=0;
@@ -2167,17 +2211,27 @@ namespace implementations
   StdVectorFst * TropicalWeightTransducer::intersect(StdVectorFst * t1,
                                                      StdVectorFst * t2)
   {
-    if (t1->OutputSymbols() == NULL)
+    
+    //StdVectorFst * t1 = copy_fst(t1_);
+    //StdVectorFst * t2 = copy_fst(t2_);
+
+    //std::cerr << "t1 and t2:" << std::endl;
+    //write_in_att_format_number(t1, std::cerr);
+    //std::cerr << "--" << std::endl;
+    //write_in_att_format_number(t2, std::cerr);
+    //std::cerr << "----" << std::endl;
+
+    /*if (t1->OutputSymbols() == NULL)
       t1->SetOutputSymbols(t1->InputSymbols()->Copy());
     t2->SetInputSymbols(t1->OutputSymbols()->Copy());
     if (t2->OutputSymbols() == NULL)
-      t2->SetOutputSymbols(t2->InputSymbols()->Copy());
-
-    ArcSort(t1, OLabelCompare<StdArc>());
-    ArcSort(t2, ILabelCompare<StdArc>());
+    t2->SetOutputSymbols(t2->InputSymbols()->Copy());*/
 
     RmEpsilon(t1);
     RmEpsilon(t2);
+
+    ArcSort(t1, OLabelCompare<StdArc>());
+    ArcSort(t2, ILabelCompare<StdArc>());
 
     // weights must not be encoded, else e.g. [a:b::1] & [a:b::2] will be empty
     EncodeMapper<StdArc> encoder(0x0001,ENCODE);
