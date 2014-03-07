@@ -785,25 +785,8 @@ REGEXP8: REGEXP9 { }
         }
        | CONTAINMENT REGEXP8 {
             // std::cerr << "Containment: \n" << std::endl;
-
-            // any = [?]*
-            HfstTransducer any(hfst::internal_identity, hfst::xre::format);
-            any.repeat_star().minimize();
-
-            // contains = [any $2 any] # because of harmonization, this works without repeat_plus
-            HfstTransducer contains(any);
-            contains.concatenate(*$2).concatenate(any).minimize();
-
-            // opt_complement = (any - contains)
-            HfstTransducer opt_complement(any);
-            opt_complement.subtract(contains).optionalize().minimize();
-
-            // result = [[opt_complement $2]+ opt_complement]
-            HfstTransducer * result = new HfstTransducer(opt_complement);
-            result->optionalize().concatenate(*$2).repeat_plus().concatenate(opt_complement).minimize();
-
+            $$ = hfst::xre::contains($2);
             delete $2;
-            $$ = result;
         }
        | CONTAINMENT_ONCE REGEXP8 {
             //std::cerr << "Contain 1 \n"<< std::endl;
@@ -812,21 +795,8 @@ REGEXP8: REGEXP9 { }
             delete $2;
         }
        | CONTAINMENT_OPT REGEXP8 {
-            // any = [?]*
-            HfstTransducer any(hfst::internal_identity, hfst::xre::format);
-            any.repeat_star().minimize();
-
-            // contains = [any $2 any] # because of harmonization, this works without repeat_plus
-            HfstTransducer contains(any);
-            contains.concatenate(*$2).concatenate(any).minimize();
-
-            // complement = (any - contains)
-            HfstTransducer complement(any);
-            complement.subtract(contains).minimize();
-            
-            HfstTransducer * result = hfst::xre::contains_once($2);
-            result->disjunct(complement).minimize();
-            $$ = result;
+            $$ = hfst::xre::contains_once_optional($2);
+            delete $2;
         }
        ;
 

@@ -703,75 +703,71 @@ xfst_label_to_transducer(const char* input, const char* output)
   return retval;
 }
 
-  HfstTransducer * contains_once_non_overlapping(const HfstTransducer * t)
+  HfstTransducer * contains(const HfstTransducer * t)
   {
-    // any = [?]*
     HfstTransducer any(hfst::internal_identity, hfst::xre::format);
     any.repeat_star().minimize();
-
-    // contains = [any $2 any] # because of harmonization, this works without repeat_plus
-    HfstTransducer contains(any);
-    contains.concatenate(*t).concatenate(any).minimize();
-
-    // complement = [any - contains]
-    HfstTransducer complement(any);
-    complement.subtract(contains).minimize();
-
-    // result = [complement $2 complement]
-    HfstTransducer *result = new HfstTransducer(complement);
-    result->concatenate(*t).concatenate(complement).minimize();
-
-    return result;
+    HfstTransducer * retval = new HfstTransducer(any);
+    retval->concatenate(*t).concatenate(any).minimize();
+    return retval;
   }
 
-  HfstTransducer * contains_once(const HfstTransducer * t)
+  // [$c - $[ [[?+ c ?*] & [c ?*]] | [[c ?+] & [c]]]]
+  HfstTransducer * contains_once(const HfstTransducer * c)
   {
-    // [0 -> MARKER || _ t] .o. $#[MARKER] .o. [MARKER -> 0]
-    // where $# is function 'contains once non-overlapping'
+    // any_star = [?*]
+    HfstTransducer any_star(hfst::internal_identity, hfst::xre::format);
+    any_star.repeat_star().minimize();
+
+    // any_plus = [?+]
+    HfstTransducer any_plus(hfst::internal_identity, hfst::xre::format);
+    any_plus.repeat_plus().minimize();
+
+    // t1 = [?+ c ?*]
+    HfstTransducer * t1 = new HfstTransducer(any_plus);
+    t1->concatenate(*c).minimize();
+    t1->concatenate(any_star).minimize();
+
+    // t2 = [c ?*]
+    HfstTransducer t2(*c);
+    t2.concatenate(any_star).minimize();
+
+    // t1 = [[?+ c ?*] & [c ?*]]
+    t1->intersect(t2).minimize();
+
+    // t3 = [[c ?+] & c]
+    HfstTransducer t3(*c);
+    t3.concatenate(any_plus).minimize();
+    t3.intersect(*c).minimize();
+
+    // t1 = [t1 | t3]
+    t1->disjunct(t3).minimize();
     
-    // [0 -> MARKER || _ t]
-    HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
-    HfstTransducer marker("$_CONTAINMENT_MARKER_$", hfst::xre::format);
-    
-    HfstTransducerPair mappingPair1(epsilon, marker);
-    HfstTransducerPairVector mappingPairVector1;
-    mappingPairVector1.push_back(mappingPair1);
-    
-    HfstTransducerPair contextPair1(epsilon, *t);
-    HfstTransducerPairVector contextPairVector1;
-    contextPairVector1.push_back(contextPair1);
-    
-    hfst::xeroxRules::Rule rule1(mappingPairVector1, contextPairVector1, hfst::xeroxRules::REPL_UP);
-    HfstTransducer epsilonToMarker(hfst::xre::format);
-    epsilonToMarker = hfst::xeroxRules::replace(rule1, false);
-    
-    // [MARKER -> 0]
-    HfstTransducerPair mappingPair2(marker, epsilon);
-    HfstTransducerPairVector mappingPairVector2;
-    mappingPairVector2.push_back(mappingPair2);
-    
-    hfst::xeroxRules::Rule rule2(mappingPairVector2);
-    HfstTransducer markerToEpsilon(hfst::xre::format);
-    markerToEpsilon = hfst::xeroxRules::replace(rule2, false);
-    
-    // $#[MARKER]
-    HfstTransducer * containsOnce = hfst::xre::contains_once_non_overlapping(&marker);
-    
-    // [0 -> MARKER || _ t] .o. $#[MARKER] .o. [MARKER -> 0]
-    HfstTransducer comp(epsilonToMarker);
-    comp.compose(*containsOnce).compose(markerToEpsilon).minimize();
-    delete containsOnce;
-    
-    // there are still MARKER:0 transitions, so get rid of them
-    // as well as the the marker
-    HfstBasicTransducer comp_basic(comp);
-    comp_basic.remove_transitions(std::pair<std::string, std::string>("$_CONTAINMENT_MARKER_$", "@_EPSILON_SYMBOL_@"));
-    comp_basic.remove_symbol_from_alphabet("$_CONTAINMENT_MARKER_$");
-    
-    return new HfstTransducer(comp_basic, hfst::xre::format);
+    // cont_t1 = $[t1]
+    HfstTransducer * cont_t1 = contains(t1);
+    delete t1;
+    // cont_c = $[c]
+    HfstTransducer * cont_c = contains(c);
+
+    // $[c] - $[t1]
+    cont_c->subtract(*cont_t1).minimize();
+    delete cont_t1;
+    return cont_c;
   }
 
-
+  HfstTransducer * contains_once_optional(const HfstTransducer * t)
+  {
+    // neg_t = ~$[t]
+    HfstTransducer * cont_t = contains(t);
+    HfstTransducer neg_t(hfst::internal_identity, hfst::xre::format);
+    neg_t.repeat_star().minimize();
+    neg_t.subtract(*cont_t).minimize();
+    delete cont_t;
+    
+    HfstTransducer * retval = contains_once(t);
+    retval->disjunct(neg_t).minimize();
+    return retval;
+  }
 
   void warn(const char * msg)
   {
