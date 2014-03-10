@@ -1,67 +1,18 @@
-\documentclass[10pt, a4paper]{article}
-\usepackage{authblk}
+\documentclass[10pt, a4paper]{article} 
 \usepackage{lrec2014}
-\usepackage{url}
-\usepackage{latexsym}
+
+
 
 \usepackage{fontspec}
 \usepackage{xunicode}
 \usepackage{xltxtra}
 
-
-\setmainfont[Mapping=tex-text]{Times New Roman}
-
 \title{Heuristic Hyper-minimization of Finite State Lexicons}
-
-% ----------------------------------------------------------------------
-% AUTHOR FORMATS
-% 
-% ------------
-% For several authors from the same institution:
-%
-% \name{Firstname1 Surname1, Firstname2 Surname2, ..., FirstnameN SurnameN}
-%
-% \address{Institution \\ Address \\ {mail1, mail2, ...,  mailN}@institution}
-%
-% If the names do not fit well on one line use
-%
-%         \name{Firstname1 Surname1 \\ {\bf \large Firstname2 Surname2} \\
-%         ... \\ {\bf \large FirstnameN SurnameN }}
-%
-% ------------
-%
-% For authors from different institutions:
-%
-% \name{Firstname1 Surname1$^{\ast}$, Firstname2 Surname2$^{\ast}$, Firstname3 Surname3$^{\dagger}$, Firstname4 Surname4$^{\ast}$}
-%
-% \address{$^{\ast}$Institution1 \\ Address1 \\ 
-%          {mail1, mail2, mail4}@Institution1} \\ \\
-%          $^{\dagger}$Institution2 \\ Address3 \\ 
-%          mail3@Institution2 }
-%
-% ------------
-
-
 
 \name{Senka Drobac$^{\ast}$, Krister Lind\'{e}n$^{\ast}$, Tommi A Pirinen$^{\dagger}$, Miikka Silfverberg$^{\ast}$}
 \address{$^{\ast}$University of Helsinki \\ Department of Modern Languages, PO Box 24 \\ 
 $^{\dagger}$University of Helsinki \\ Department of Speech Sciences, PO Box 9 \\
-{senka.drobac, kriste.linden, tommi.pirinen, miikka.silfverberg}@helsinki.fi\\}
-
-
-
-
-
-\iffalse
-\author[1]{Senka Drobac}
-\author[1]{Krister Lind\'{e}n}
-\author[2]{Tommi A Pirinen}
-\author[1]{Miikka Silfverberg}
-\affil[1]{Department of Modern Languages, PO Box 24, 00014 University of Helsinki}
-\affil[2]{Department of Speech Sciences, PO Box 9, 00014 University of Helsinki}
-
-\renewcommand\Authands{ and }
-\fi
+{senka.drobac, krister.linden, tommi.pirinen, miikka.silfverberg}@helsinki.fi\\}
 
 \abstract{Flag diacritics enable optimising finite-state networks by
     combining identical sub-graphs of its transition
@@ -72,13 +23,12 @@ $^{\dagger}$University of Helsinki \\ Department of Speech Sciences, PO Box 9 \\
     based on the morpheme structure implicit in the language
     description. With this approach, we have gained significant
     decrease in the size of finite-state networks while maintaining reasonable application 
-    speed. ... (150-200 words) \\ \newline \Keywords{hyper-minimization, lexicons, keyword C}}
+    speed. ... (150-200 words) \\ \newline \Keywords{hyper-minimization, lexicon, FST}}
 
 %TODO - write more in abstract, keywords!
 
-\date{\today}
-
 \begin{document}
+
 \maketitleabstract
 
 
@@ -380,7 +330,7 @@ The complete calculation for this small example lexicon is shown in table~\ref{t
     \begin{tabular}{|l|c|c|c|c|}
         \hline
         \bf Lexicon & \bf w & \bf c & \bf m & \bf P \\
-        \hline
+        \hline\hline
         \bf Root & 3 & 2 & 0 & 6  \\
         \bf A & 2 & 2 & 3 & 12 \\
         \bf B  & 1 & 1 & 2 & 2 \\
@@ -406,9 +356,9 @@ y-axis P-measures. The dotted line shows sizes of the lexicon transducer with fl
 a sub-lexicon at the time. Each new removal is done to the previous result transducer. Solid dot line shows sizes of the same lexicon transducers with the rules composed to them. 
 The dashed line shows P measure (with values on the right y-axis).  
   
-It is interesting to see that the relations of P measure and transducer sizes after flag removal somewhat proportional. 
+It is interesting to see that the relations of P measure and transducer sizes after flag removal are somewhat proportional. 
 Additionally, the point where the transducer size with the applied rules is the smallest is just after the place where 
-the P measure starts rapidly growing. 
+the P measure starts to grow rapidly. 
 
 
 
@@ -427,7 +377,7 @@ with new method that inserts flag diacritics composed with grammar rules and fin
     \begin{tabular}{|l|r|r|r|}
         \hline
         \bf Language & \bf Original & \bf With flags & \bf \% \\
-        \hline
+        \hline\hline
         \bf Greenlandic &   168   & 17 & 10,1\%  \\
         \bf North Saami &   12     & 5,7 & 47,5\%  \\
         \bf Finish &   17     & 16 & 94,1\%  \\
@@ -440,19 +390,19 @@ with new method that inserts flag diacritics composed with grammar rules and fin
 \end{table}
 
 
-\begin{table}
-    \centering
+\begin{table}[h]
+ \centering
     \begin{tabular}{|l|r|r|r|}
         \hline
         \bf Language & \bf Original & \bf With flags & \bf \% \\
-        \hline
+        \hline\hline
         \bf Greenlandic & 2 770 w/s & 2 507 w/s & 90,5\%  \\
-        \bf North Saami & 30 714 & 8 775 & 28,6\%  \\
-        \bf Finish  & 84 415 & 27 420 & 32,5\%  \\
+        \bf North Saami & 30 714 w/s & 8 775 w/s & 28,6\%  \\
+        \bf Finish  & 84 415 w/s & 27 420 w/s & 32,5\%  \\
 
         \hline
     \end{tabular}
-    \caption{Sizes of transducers without and with automatic flags (in megabytes); Percentage shows size of the flagged transducer in comparison to the original
+    \caption{Look-up speed of transducers without and with automatic flags; Percentage shows speed of the flagged transducer in comparison to the original
     \label{table:lookup}}
 \end{table}
 
@@ -516,7 +466,7 @@ to maintain linguistic descriptions.
 
 \section{Acknowledgements}
 The research leading to these results has received funding from FIN-CLARIN, Langnet and the
-European Commission's 7th Framework Program under grant agreement n� 238405 (CLARA).
+European Commission's 7th Framework Program under grant agreement n° 238405 (CLARA).
 
 \bibliographystyle{lrec2014}
 \bibliography{lrec2014.bib}
