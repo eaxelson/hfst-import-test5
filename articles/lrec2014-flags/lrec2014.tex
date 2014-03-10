@@ -1,6 +1,6 @@
-\documentclass[11pt]{article}
+\documentclass[10pt, a4paper]{article}
 \usepackage{authblk}
-\usepackage{eacl2014}
+\usepackage{lrec2014}
 \usepackage{url}
 \usepackage{latexsym}
 
@@ -9,26 +9,50 @@
 \usepackage{xltxtra}
 
 
-
 \setmainfont[Mapping=tex-text]{Times New Roman}
 
-%\setlength\titlebox{6.5cm}    % You can expand the title box if you
-% really have to
+\title{Heuristic Hyper-minimization of Finite State Lexicons}
 
-\title{Optimising Morphological Analyser Transducers Using Morphological Structure
-and Automatically Induced Flag Diacritics - Abstract}
+% ----------------------------------------------------------------------
+% AUTHOR FORMATS
+% 
+% ------------
+% For several authors from the same institution:
+%
+% \name{Firstname1 Surname1, Firstname2 Surname2, ..., FirstnameN SurnameN}
+%
+% \address{Institution \\ Address \\ {mail1, mail2, ...,  mailN}@institution}
+%
+% If the names do not fit well on one line use
+%
+%         \name{Firstname1 Surname1 \\ {\bf \large Firstname2 Surname2} \\
+%         ... \\ {\bf \large FirstnameN SurnameN }}
+%
+% ------------
+%
+% For authors from different institutions:
+%
+% \name{Firstname1 Surname1$^{\ast}$, Firstname2 Surname2$^{\ast}$, Firstname3 Surname3$^{\dagger}$, Firstname4 Surname4$^{\ast}$}
+%
+% \address{$^{\ast}$Institution1 \\ Address1 \\ 
+%          {mail1, mail2, mail4}@Institution1} \\ \\
+%          $^{\dagger}$Institution2 \\ Address3 \\ 
+%          mail3@Institution2 }
+%
+% ------------
+
+
+
+\name{Senka Drobac$^{\ast}$, Krister Lind\'{e}n$^{\ast}$, Tommi A Pirinen$^{\dagger}$, Miikka Silfverberg$^{\ast}$}
+\address{$^{\ast}$University of Helsinki \\ Department of Modern Languages, PO Box 24 \\ 
+$^{\dagger}$University of Helsinki \\ Department of Speech Sciences, PO Box 9 \\
+{senka.drobac, kriste.linden, tommi.pirinen, miikka.silfverberg}@helsinki.fi\\}
+
+
+
 
 
 \iffalse
-\author{Senka Drobac//affff \and Krister Lind\'{e}n/affff \and Tommi A Pirinen//bbbb \and Miikka Silfverberg/affff  \\
-Department of Modern Languages \\
-PO Box 24 \\
-00014 University of Helsinki \\
-{\tt \{senka.drobac, krister.linden, tommi.pirinen, miikka.silfverberg\}@helsinki.fi}}
-\institute{bla}
-\fi
-
-
 \author[1]{Senka Drobac}
 \author[1]{Krister Lind\'{e}n}
 \author[2]{Tommi A Pirinen}
@@ -36,21 +60,10 @@ PO Box 24 \\
 \affil[1]{Department of Modern Languages, PO Box 24, 00014 University of Helsinki}
 \affil[2]{Department of Speech Sciences, PO Box 9, 00014 University of Helsinki}
 
-
-
 \renewcommand\Authands{ and }
+\fi
 
-
-
-
-\date{\today}
-
-\begin{document}
-\maketitle
-
-\section{Rationale}
-
-    Flag diacritics enable optimising finite-state networks by
+\abstract{Flag diacritics enable optimising finite-state networks by
     combining identical sub-graphs of its transition
     graph. Traditionally, the feature has required linguists to devise
     the optimisations to the graph by hand alongside the morphological
@@ -58,7 +71,16 @@ PO Box 24 \\
     discovering flag positions in morphological lexicons automatically
     based on the morpheme structure implicit in the language
     description. With this approach, we have gained significant
-    decrease in the size of finite-state networks while maintaining reasonable application speed.
+    decrease in the size of finite-state networks while maintaining reasonable application 
+    speed. ... (150-200 words) \\ \newline \Keywords{hyper-minimization, lexicons, keyword C}}
+
+%TODO - write more in abstract, keywords!
+
+\date{\today}
+
+\begin{document}
+\maketitleabstract
+
 
 \section{Introduction}
 
@@ -66,10 +88,9 @@ Finite-state transducers are an established way of encoding
 morphological analysers for natural languages. Nevertheless,
 full-scale morphological analysers can often grow to be too large for
 use cases like spell checkers, speech processing and shallow parsing, which 
-should have moderate memory footprint. Large transducers can be optimised by recognising
-equivalent sub-graphs and combining them by using special symbols called
-flag diacritics, to couple entrance points of the sub-graphs with the
-correct exit points.
+should have moderate memory footprint. Large transducers can be optimised by preserving the sub-lexicon structure with special symbols called flag diacritics, which prevents combinatorial blow ups in determinization.
+
+%Large transducers can be optimised by recognising equivalent sub-graphs and combining them by using special symbols called flag diacritics, to couple entrance points of the sub-graphs with the correct exit points.
 
 Up to date, applying flag diacritics has required a linguist to provide
 the lexicon compiler with their positions. However, there are two
@@ -173,16 +194,18 @@ morphologies that show similar compression quality, so it can be
 considered towards the upper bounds of what such compression can
 achieve.
  
+\section{Flag diacritics}
+\label{sec:flags}
 
-\section{Methods}
-\label{sec:methods}
+Flag diacritics are special multi-character symbols which are interpreted during runtime. They can be used to optimize large transducers to couple entrance points of the sub-graphs with the correct exit points.
 
-Flag diacritics are special multi-character symbols which are interpreted during runtime. They have special syntax: \verb+@operator.feature.value@+, where
+Their special syntax is: \verb+@operator.feature.value@+, where
 \texttt{operator} is one of the available operators (P, U, R, D, N, C), \texttt{feature} is name of a feature provisionally set by user and \texttt{value} can be any value held in feature, also provisionally defined ~\cite{beesley2003finite}.
 
+
 In this paper, we will use only two types of flag diacritics: positive
-setting (\verb+@P.feature value@+) and require test
-(\verb+@R.feature value@+). While positive setting flag only sets the
+setting (\verb+@P.feature.value@+) and require test
+(\verb+@R.feature.value@+). While positive setting flag only sets the
 feature to its value, require test flag invokes testing whether the
 feature is set to the designated value.  For example,
 \verb+@P.LEXNAME.Root@+ will set feature \texttt{LEXNAME} to value
@@ -190,7 +213,12 @@ feature is set to the designated value.  For example,
 \verb+@R.LEXNAME.Root@+, the invoked test will succeed and that path
 will be considered valid.
 
-Our algorithm is based on the finding that adjacent morph combinatorics can be expressed with finite-state flags like this:
+
+
+\section{Methods}
+\label{sec:methods}
+
+Our algorithm is based on the idea that adjacent morph combinatorics can be expressed with finite-state flags like this:
 
 Every rightward continuation is replaced with a positive setting flag
 with feature called \texttt{LEXNAME} and value corresponding to the
@@ -211,15 +239,7 @@ represented using the pair of flags
 The transducer built from the morphological description in
 figure~\ref{fig:lexc-fin} is shown in figure~\ref{fig:lexc-fin-flag}.
 
-Since real-world morphological descriptions often contain empty, or nearly
-empty, continuation lexicons, inserting flags in those cases only
-increase size of the transducer, without gaining any
-benefits. Therefore, those continuation lexicons are recognized
-during compilation time and skipped when inserting corresponding flag
-diacritics.
-
-
-% Here should come part with automatically finding which flags not to insert (P1, P2, P3?)
+\subsection{Composition}
 
 Lexicons that contain flag diacritics can be composed with other
 transducers which also contain flag diacritics without worrying about
@@ -245,6 +265,159 @@ diacritics will accept exactly the same strings as the composition of
 the transducers that are obtained by compiling out flag diacritics
 from the original lexicon $L$ and the original rule $R$.
 
+
+
+\subsection{Pruning invalid paths}
+
+When lexicons are compiled into transducers, the flag-diacritic hubs happen to form. One of the hubs is shown in
+figure~\ref{fig:lexc-gr-flag} in state 4. Various \verb+P+flags are input symbols to the state and output symbols are matching \verb+R+ flags. 
+When transducers with those flag-diacritic hubs are composed with grammar rules transducers, unnecessary paths occur. 
+They are product of flag combinatoric of non-matching \verb+P+ and \verb+R+ flags. Since the \verb+R+ invokes the require test, 
+the path won't be valid unless the same flag feature was previously set, in this case with the matching \verb+P+ flag. 
+Therefore, those paths don't change the language, but increase the transducer size.
+
+In order to remove all those paths, path pruning needs to be done. It is checked that in every hub state for every outgoing 
+\verb+R+ flag there is the matching incoming \verb+P+ flag. In case the \verb+P+ flag isn't preceding the \verb+R+ flag, 
+the whole path is proclaimed invalid and is removed from the transducer.
+
+
+
+
+
+		
+
+% Here should come part with automatically finding which flags not to insert (P1, P2, P3?)
+\subsection{Removing flag diacritics}
+
+
+\begin{figure}
+\centering
+\begin{verbatim}
+Step 1:
+    P.LEXNAME.sublex_i -> JOIN_sublex_i
+    R.LEXNAME.sublex_i -> JOIN_sublex_i
+    
+Step 2:
+    transducer - filter
+        .o.
+    P.LEXNAME.Root ?*
+        .o.
+    ?* R.LEXNAME.#
+  
+Where filter is:
+?* [(I-JOIN_sublex_i) | ?:?]
+    JOIN_sublex_i 
+[(I-JOIN_sublex_i) | ?:?] ?*
+
+Step 3:
+    JOIN_sublex_i -> epsilon
+
+  
+    \end{verbatim}
+    \caption{Removal of flag diacritics
+    \label{fig:lexc-remov}}
+\end{figure}
+
+
+Since real-world morphological descriptions often contain empty, or nearly
+empty, continuation lexicons, inserting flags in those cases only
+increase size of the transducer, without gaining any
+benefits. Therefore, those continuation lexicons should be recognized and corresponding flag diacritics removed.
+Additionally, we have noticed that rules composition to a flagged lexicon always results in dramatical size
+increment. In order to reduce final transducer size, it is important to recognize which flag diacritics should be removed from the lexicon 
+before composing it with rules, although their removal usually will increase the lexical transducer size.  
+
+Removal of flag diacritics is usually done with command \verb+remove-flag-FEATURE+, which removes all flags with the given \verb+FEATURE+. However, 
+our flags all have the same feature, called \verb+LEXNAME+, and values corresponding to sub-lexicon names. Therefore, if we want to remove just flags 
+for a certain sub-lexicon \verb+SUBLEX+, we use algorithm shown in figure~\ref{fig:lexc-remov}:
+
+First, \verb+P.LEXNAME.SUBLEX+ and \verb+R.LEXNAME.SUBLEX+ transitions are substituted with arbitrary special symbol, ie. 
+\verb+$JOINER.SUBLEX$+ in the entire transducer. 
+Then, from the original transducer we subtract all the paths that have other than two same joiners next to each other. We filter all paths that 
+don't start with \verb+P.LEXNAME.Root+ and end with \verb+R.LEXNAME.#+ and finally substitute all \verb+$JOINER.SUBLEX$+ transitions with epsilon transition.
+
+\subsection{Choosing flag-diacritics for removal}
+
+We have experimented with removing different flags and flags combinations from the lexical transducer 
+to get optimal transducer size after the composition with rules, although the flag removal usually increases lexical transducer size. 
+For the Greenlandic lexicon, we have counted 
+for each sub-lexicon how many words there are (w), how many unique continuations come from it (c) and how many times it 
+was mentioned as a continuation in other sub-lexicons (m). In figure~\ref{fig:lexc-measures} is an example lexicon 
+with three sub-lexicons: \verb+Root+, \verb+A+ and \verb+B+. Sub-lexicon \verb+Root+ has three words \verb+r1+, \verb+r2+ and \verb+r3+. 
+From \verb+Root+ there are two unique continuations \verb+A+ and \verb+B+ and the sub-lexicon itself wasn't anywhere mentioned as a continuation in the entire lexicon.
+
+Similarly, sub-lexicon \verb+A+ has 2 words, two continuations and was mentioned totally 3 times in the lexicon - 
+two times as continuations from the \verb+Root+ sub-lexicon and once from itself. Bub-lexicon \verb+B+ has only one word, one continuation and was mentioned 3 times. 
+
+After that, we calculated measure P which is product of 
+those 3 measures.
+\verb+P = w * c * m+
+
+The complete calculation for this small example lexicon is shown in table~\ref{table:measureP}.
+
+\begin{figure}
+\centering
+\begin{verbatim}
+    LEXICON Root
+    r1 A;
+    r2 A;
+    r3 B;
+    
+    LEXICON A
+    a1  A;
+    a2  B;
+    
+    LEXICON B
+    b2 #;
+    \end{verbatim}
+  
+    \caption{Example of flag removal measurement P
+    \label{fig:lexc-measures}}
+\end{figure}
+
+\begin{table}
+    \centering
+    \begin{tabular}{|l|c|c|c|c|}
+        \hline
+        \bf Lexicon & \bf w & \bf c & \bf m & \bf P \\
+        \hline
+        \bf Root & 3 & 2 & 0 & 6  \\
+        \bf A & 2 & 2 & 3 & 12 \\
+        \bf B  & 1 & 1 & 2 & 2 \\
+        \hline
+    \end{tabular}
+    \caption{Counting number of words (w), continuations (c) and mentions (m) in each sub-lexicon
+    \label{table:measureP}}
+\end{table}
+
+
+
+\begin{figure*}
+    \includegraphics[width=\textwidth]{p-measure.png}
+     \caption{Connection between P measure and transducer sizes with flag-diacritics being removed one by one
+     \label{fig:p-measure-sizes}}
+\end{figure*}
+
+After calculating P for the all sub-lexicons in the Greenlandic lexicon and sorting values, we got data 
+that with could be extrapolated by an exponential function. We experimented removing one flag diacritic at a 
+time and the sizes we got for the lexicon transducer itself and the one with grammar rules composed is shown in 
+figure~\ref{fig:p-measure-sizes}. On the x-axis are sub-lexicons, left y-axis shows sizes in megabytes and the right 
+y-axis P-measures. The dotted line shows sizes of the lexicon transducer with flag diacritics removed for 
+a sub-lexicon at the time. Each new removal is done to the previous result transducer. Solid dot line shows sizes of the same lexicon transducers with the rules composed to them. 
+The dashed line shows P measure (with values on the right y-axis).  
+  
+It is interesting to see that the relations of P measure and transducer sizes after flag removal somewhat proportional. 
+Additionally, the point where the transducer size with the applied rules is the smallest is just after the place where 
+the P measure starts rapidly growing. 
+
+
+
+
+
+
+
+
+
 In table~\ref{table:sizes} there are shown sizes of the original
 transducers compiled with regular lexc compiler composed with grammar rules, transducers compiled
 with new method that inserts flag diacritics composed with grammar rules and finally their ratio.
@@ -257,6 +430,7 @@ with new method that inserts flag diacritics composed with grammar rules and fin
         \hline
         \bf Greenlandic &   168   & 17 & 10,1\%  \\
         \bf North Saami &   12     & 5,7 & 47,5\%  \\
+        \bf Finish &   17     & 16 & 94,1\%  \\
         \bf Lule Saami  &   5     & 3 & 60,0\%  \\
         \bf Erzya       &   3,7     & 5,3 & 143,2\%  \\
         \hline
@@ -265,7 +439,22 @@ with new method that inserts flag diacritics composed with grammar rules and fin
     \label{table:sizes}}
 \end{table}
 
-% Add pruning flags!!!
+
+\begin{table}
+    \centering
+    \begin{tabular}{|l|r|r|r|}
+        \hline
+        \bf Language & \bf Original & \bf With flags & \bf \% \\
+        \hline
+        \bf Greenlandic & 2 770 w/s & 2 507 w/s & 90,5\%  \\
+        \bf North Saami & 30 714 & 8 775 & 28,6\%  \\
+        \bf Finish  & 84 415 & 27 420 & 32,5\%  \\
+
+        \hline
+    \end{tabular}
+    \caption{Sizes of transducers without and with automatic flags (in megabytes); Percentage shows size of the flagged transducer in comparison to the original
+    \label{table:lookup}}
+\end{table}
 
 
 % Find out and discuss why tr with lots of flags get big after applying rules
@@ -278,7 +467,7 @@ language descriptions. For this purpose we have acquired freely
 available, open source language descriptions from University of
 Tromsa's language repository~\cite{moshagen2013building}.\footnote{https://victorio.uit.no/langtech, revision 73836} The
 languages selected are Greenlandic (kal), North Saami (sme), Erzya
-(myv), and Lule Sami (smj).
+(myv), Finish (fin) and Lule Sami (smj).
 
 All operations with transducers were performed using Helsinki Finite
 State Technology tools~\cite{linden2011}.
@@ -325,7 +514,11 @@ inserted flag diacritics would make manual optimization preformed by
 linguists unnecessary, which would result in more readable and easier
 to maintain linguistic descriptions.
 
-\bibliographystyle{acl}
+\section{Acknowledgements}
+The research leading to these results has received funding from FIN-CLARIN, Langnet and the
+European Commission's 7th Framework Program under grant agreement n� 238405 (CLARA).
+
+\bibliographystyle{lrec2014}
 \bibliography{lrec2014.bib}
 
 
