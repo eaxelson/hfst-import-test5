@@ -703,6 +703,48 @@ xfst_label_to_transducer(const char* input, const char* output)
   return retval;
 }
 
+  HfstTransducer * contains_new(const HfstTransducer * t)
+  {
+    /*HfstTransducer * retval = new HfstTransducer("@_EPSILON_SYMBOL_@", "$_MARKER_$", t->get_type());
+    HfstTransducer identity("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", t->get_type());
+    retval->concatenate(identity).repeat_star().minimize();
+
+    HfstTransducer right_context(*t);
+    right_context.insert_freely(StringPair("$_MARKER_$", "@_EPSILON_SYMBOL_@")).minimize();
+
+    HfstTransducer left_context("@_EPSILON_SYMBOL_@", t->get_type());
+
+    HfstTransducerPair context(left_context, right_context);
+
+    StringPairSet mappings;
+    mappings.insert(StringPair("$_MARKER_$", "$_MARKER_$"));
+
+    StringPairSet alphabet;
+    alphabet.insert(StringPair("$_MARKER_$", "@_EPSILON_SYMBOL_@"));
+
+    HfstTransducer rule = hfst::rules::two_level_if_and_only_if
+    (context, mappings, alphabet);*/
+
+    HfstTransducerPair context(HfstTransducer("a", t->get_type()),
+                               HfstTransducer("a", t->get_type()));
+
+    StringPairSet mappings;
+    mappings.insert(StringPair("M", "M"));
+
+    StringPairSet alphabet;
+    alphabet.insert(StringPair("a","a"));
+    alphabet.insert(StringPair("b","b"));
+    alphabet.insert(StringPair("M","M"));
+
+    HfstTransducer rule = hfst::rules::two_level_if_and_only_if
+      (context, mappings, alphabet);
+
+    return new HfstTransducer(rule);
+
+    //retval->compose(rule).minimize();
+    //return retval;
+  }
+
   HfstTransducer * contains(const HfstTransducer * t)
   {
     HfstTransducer any(hfst::internal_identity, hfst::xre::format);

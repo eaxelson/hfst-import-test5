@@ -128,7 +128,7 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 "||" { CR; return REPLACE_CONTEXT_UU; }
 "//" { CR; return REPLACE_CONTEXT_LU; }
 "\\\\" { CR; return REPLACE_CONTEXT_UL; }
-"\\//" { CR; return REPLACE_CONTEXT_LL; }
+"\\/" { CR; return REPLACE_CONTEXT_LL; }
 "_"+ { CR; return CENTER_MARKER; }
 "..."+ { CR; return MARKUP_MARKER; }
 
