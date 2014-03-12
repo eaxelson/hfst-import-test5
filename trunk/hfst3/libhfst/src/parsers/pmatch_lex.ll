@@ -265,7 +265,7 @@ LWSP [\t\r\n ]
     pmatchlval.weight = hfst::pmatch::get_weight(pmatchtext + 2);
     return WEIGHT;
 }
-"{"([^"}"]|"\\}")+"}" {
+"{"([^}]|"\\}")+"}" {
     pmatchlval.label = hfst::pmatch::get_escaped_delimited(pmatchtext, '{', '}');
     return CURLY_LITERAL;
 }
