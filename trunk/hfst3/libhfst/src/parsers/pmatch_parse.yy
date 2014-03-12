@@ -1089,6 +1089,14 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
     free($1);
     free($3);
 }
+| EPSILON_TOKEN PAIR_SEPARATOR QUOTED_LITERAL {
+    $$ = new HfstTransducer(hfst::internal_epsilon, $3, hfst::pmatch::format);
+    free($3);
+}
+| QUOTED_LITERAL PAIR_SEPARATOR EPSILON_TOKEN {
+    $$ = new HfstTransducer($1, hfst::internal_epsilon, hfst::pmatch::format);
+    free($1);
+}
 | SYMBOL PAIR_SEPARATOR EPSILON_TOKEN {
     $$ = new HfstTransducer($1, hfst::internal_epsilon, hfst::pmatch::format);
     free($1);
