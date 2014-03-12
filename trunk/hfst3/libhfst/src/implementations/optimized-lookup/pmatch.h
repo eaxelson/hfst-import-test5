@@ -35,7 +35,6 @@ namespace hfst_ol {
         bool is_end_tag(const SymbolNumber symbol) const;
         std::string end_tag(const SymbolNumber symbol);
         std::string start_tag(const SymbolNumber symbol);
-        bool verbose;
 
     public:
         PmatchAlphabet(std::istream& is, SymbolNumber symbol_count);
@@ -53,8 +52,6 @@ namespace hfst_ol {
         SymbolNumber get_special(SpecialSymbol special) const;
         SymbolNumberVector get_specials(void) const;
         std::string stringify(const SymbolNumberVector & str);
-        void be_verbose(void) { verbose = true; }
-        bool is_verbose(void) { return verbose; }
 
         friend class PmatchTransducer;
         friend class PmatchContainer;
@@ -75,10 +72,11 @@ namespace hfst_ol {
         SymbolNumber * orig_output_tape;
         SymbolNumberVector output;
         std::vector<char> possible_first_symbols;
+        bool verbose;
 
     public:
 
-        PmatchContainer(std::istream & is);
+        PmatchContainer(std::istream & is, bool verbose = false);
         ~PmatchContainer(void);
 
         long line_number;
@@ -91,7 +89,8 @@ namespace hfst_ol {
         void copy_to_output(const SymbolNumberVector & best_result);
         std::string stringify_output(void);
         static std::string parse_name_from_hfst3_header(std::istream & f);
-        void be_verbose(void) { alphabet.be_verbose(); }
+        void be_verbose(void) { verbose = true; }
+        bool is_verbose(void) { return verbose; }
 
     };
 
@@ -207,15 +206,20 @@ namespace hfst_ol {
         void exit_context(void);
 
         void collect_first_epsilon(TransitionTableIndex i,
-                                   SymbolNumberVector const& input_symbols);
+                                   SymbolNumberVector const& input_symbols,
+                                   std::set<TransitionTableIndex> & seen_indices);
         void collect_first_epsilon_index(TransitionTableIndex i,
-                                         SymbolNumberVector const& input_symbols);
+                                         SymbolNumberVector const& input_symbols,
+                                         std::set<TransitionTableIndex> & seen_indices);
         void collect_first_transition(TransitionTableIndex i,
-                                      SymbolNumberVector const& input_symbols);
+                                      SymbolNumberVector const& input_symbols,
+                                      std::set<TransitionTableIndex> & seen_indices);
         void collect_first_index(TransitionTableIndex i,
-                                 SymbolNumberVector const& input_symbols);
+                                 SymbolNumberVector const& input_symbols,
+                                 std::set<TransitionTableIndex> & seen_indices);
         void collect_first(TransitionTableIndex i,
-                           SymbolNumberVector const& input_symbols);
+                           SymbolNumberVector const& input_symbols,
+                           std::set<TransitionTableIndex> & seen_indices);
 
 
     public:
