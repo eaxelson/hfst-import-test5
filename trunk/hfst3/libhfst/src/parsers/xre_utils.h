@@ -114,6 +114,8 @@ bool is_valid_function_call(const char * name, const std::vector<HfstTransducer>
 
  HfstTransducer * contains(const HfstTransducer * t);
 
+ HfstTransducer * contains_new(const HfstTransducer * t);
+
  HfstTransducer * contains_once(const HfstTransducer * t);
 
  HfstTransducer * contains_once_optional(const HfstTransducer * t);

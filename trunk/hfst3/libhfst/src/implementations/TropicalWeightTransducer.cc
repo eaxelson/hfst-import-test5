@@ -2212,14 +2212,11 @@ namespace implementations
                                                      StdVectorFst * t2)
   {
     
-    //StdVectorFst * t1 = copy_fst(t1_);
-    //StdVectorFst * t2 = copy_fst(t2_);
-
-    //std::cerr << "t1 and t2:" << std::endl;
-    //write_in_att_format_number(t1, std::cerr);
-    //std::cerr << "--" << std::endl;
-    //write_in_att_format_number(t2, std::cerr);
-    //std::cerr << "----" << std::endl;
+    /*std::cerr << "t1 and t2:" << std::endl;
+    write_in_att_format_number(t1, std::cerr);
+    std::cerr << "--" << std::endl;
+    write_in_att_format_number(t2, std::cerr);
+    std::cerr << "----" << std::endl;*/
 
     /*if (t1->OutputSymbols() == NULL)
       t1->SetOutputSymbols(t1->InputSymbols()->Copy());
@@ -2235,16 +2232,23 @@ namespace implementations
 
     // weights must not be encoded, else e.g. [a:b::1] & [a:b::2] will be empty
     EncodeMapper<StdArc> encoder(0x0001,ENCODE);
-    EncodeFst<StdArc> enc1(*t1, &encoder);
-    EncodeFst<StdArc> enc2(*t2, &encoder);
+    
+    //EncodeFst<StdArc> enc1(*t1, &encoder);
+    //EncodeFst<StdArc> enc2(*t2, &encoder);
+
+    Encode<StdArc>(t1, &encoder);
+    Encode<StdArc>(t2, &encoder);
+
+    ArcSort(t1, OLabelCompare<StdArc>());
+    ArcSort(t2, ILabelCompare<StdArc>());
 
     //std::cerr << "determinizing for intersect..." << std::endl; // DEBUG
-    DeterminizeFst<StdArc> det1(enc1);
-    DeterminizeFst<StdArc> det2(enc2);
+    //DeterminizeFst<StdArc> det1(enc1);
+    //DeterminizeFst<StdArc> det2(enc2);
     //std::cerr << "... determinizing for intersect done" << std::endl; // DEBUG
 
     //std::cerr << "     here" << std::endl;
-    IntersectFst<StdArc> intersect(det1, det2);
+    IntersectFst<StdArc> intersect(*t1, *t2);
     //std::cerr << "     done" << std::endl;
 
     StdVectorFst *foo = new StdVectorFst(intersect);
@@ -2255,7 +2259,10 @@ namespace implementations
     t1->SetOutputSymbols(NULL);
     t2->SetOutputSymbols(NULL);
 
-    result->SetInputSymbols(t1->InputSymbols());
+    /*std::cerr << "result:" << std::endl;
+    write_in_att_format_number(result, std::cerr);
+    std::cerr << "--------" << std::endl;*/
+
     return result;
   }
 
