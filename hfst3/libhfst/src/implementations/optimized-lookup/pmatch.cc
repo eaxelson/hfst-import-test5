@@ -5,8 +5,7 @@ namespace hfst_ol {
 
 PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
                                SymbolNumber symbol_count):
-    TransducerAlphabet(inputstream, symbol_count),
-    verbose(false)
+    TransducerAlphabet(inputstream, symbol_count)
 {
     special_symbols[entry] = NO_SYMBOL_NUMBER;
     special_symbols[exit] = NO_SYMBOL_NUMBER;
@@ -80,7 +79,9 @@ SymbolNumberVector PmatchAlphabet::get_specials(void) const
     return v;
 }
 
-PmatchContainer::PmatchContainer(std::istream & inputstream)
+PmatchContainer::PmatchContainer(std::istream & inputstream,
+                                 bool _verbose):
+    verbose(_verbose)
 {
     std::string transducer_name;
     transducer_name = parse_name_from_hfst3_header(inputstream);
@@ -128,6 +129,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
             delete rtn;
         }
     }
+    
     toplevel->collect_possible_first_symbols();
 
     // Finally fetch the first symbols from any
@@ -177,18 +179,20 @@ PmatchContainer::PmatchContainer(std::istream & inputstream)
         alphabet.get_special(boundary) != NO_SYMBOL_NUMBER) {
         possible_firsts.insert(alphabet.get_special(boundary));
     }
-    for (int i = 0; i <= max_input_sym; ++i) {
-        if (possible_firsts.count(i) == 1) {
-            possible_first_symbols.push_back(1);
-        } else {
-            possible_first_symbols.push_back(0);
+    if (!possible_firsts.empty()) {
+        for (int i = 0; i <= max_input_sym; ++i) {
+            if (possible_firsts.count(i) == 1) {
+                possible_first_symbols.push_back(1);
+            } else {
+                possible_first_symbols.push_back(0);
+            }
         }
     }
-//    possible_first_symbols = possible_firsts;
-    // std::cerr << "toplevel's first symbols:\n";
-    // for (std::set<SymbolNumber>::iterator it = possible_firsts.begin();
-    //      it != possible_firsts.end(); ++it) {
-    //     std::cerr << alphabet.string_from_symbol(*it) << std::endl;
+
+    // for(std::vector<char>::iterator it = possible_first_symbols.begin(); it != possible_first_symbols.end(); ++it) {
+    //     if (*it == 1) {
+    //         std::cerr << alphabet.string_from_symbol(it - possible_first_symbols.begin()) << std::endl;
+    //     }
     // }
 }
 
@@ -505,8 +509,9 @@ void PmatchTransducer::collect_possible_first_symbols(void)
     if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER) {
         input_symbols.push_back(alphabet.get_identity_symbol());
     }
+    std::set<TransitionTableIndex> seen_indices;
     try {
-        collect_first(0, input_symbols);
+        collect_first(0, input_symbols, seen_indices);
     } catch (bool e) {
         // If the end state can be reached without any input
         // or we have initial wildcards
@@ -518,36 +523,37 @@ void PmatchTransducer::collect_possible_first_symbols(void)
 }
 
 void PmatchTransducer::collect_first_epsilon(TransitionTableIndex i,
-                           SymbolNumberVector const& input_symbols)
+                                             SymbolNumberVector const& input_symbols,
+                                             std::set<TransitionTableIndex> & seen_indices)
 {
     while(true) {
         SymbolNumber output = transition_table[i].get_output_symbol();
         if (transition_table[i].get_input_symbol() == 0) {
             if (!checking_context()) {
                 if (!try_entering_context(output)) {
-                    collect_first(transition_table[i].get_target(), input_symbols);
+                    collect_first(transition_table[i].get_target(), input_symbols, seen_indices);
                     ++i;
                 } else {
                     // We're going to fake through a context
-                    collect_first(transition_table[i].get_target(), input_symbols);
+                    collect_first(transition_table[i].get_target(), input_symbols, seen_indices);
                     local_stack.pop();
                     ++i;
                 }
             } else {
                 // We *are* checking context and may be done
                 if (try_exiting_context(output)) {
-                    collect_first(transition_table[i].get_target(), input_symbols);
+                    collect_first(transition_table[i].get_target(), input_symbols, seen_indices);
                     local_stack.pop();
                     ++i;
                 } else {
                     // Don't touch output when checking context
-                    collect_first(transition_table[i].get_target(), input_symbols);
+                    collect_first(transition_table[i].get_target(), input_symbols, seen_indices);
                     ++i;
                 }
             }
         } else if (alphabet.is_flag_diacritic(
                        transition_table[i].get_input_symbol())) {
-            collect_first(transition_table[i].get_target(), input_symbols);
+            collect_first(transition_table[i].get_target(), input_symbols, seen_indices);
             ++i;
         } else if (alphabet.has_rtn(transition_table[i].get_input_symbol())) {
             possible_first_symbols.insert(transition_table[i].get_input_symbol());
@@ -561,17 +567,19 @@ void PmatchTransducer::collect_first_epsilon(TransitionTableIndex i,
 }
 
 void PmatchTransducer::collect_first_epsilon_index(TransitionTableIndex i,
-                                                   SymbolNumberVector const& input_symbols)
+                                                   SymbolNumberVector const& input_symbols,
+                                                   std::set<TransitionTableIndex> & seen_indices)
 {
     if (index_table[i].get_input_symbol() == 0) {
         collect_first_epsilon(
             index_table[i].get_target() - TRANSITION_TARGET_TABLE_START,
-            input_symbols);                                
+            input_symbols, seen_indices);                                
     }
 }
 
 void PmatchTransducer::collect_first_transition(TransitionTableIndex i,
-                                                SymbolNumberVector const& input_symbols)
+                                                SymbolNumberVector const& input_symbols,
+                                                std::set<TransitionTableIndex> & seen_indices)
 {
     for (SymbolNumberVector::const_iterator it = input_symbols.begin();
          it != input_symbols.end(); ++it) {
@@ -587,33 +595,34 @@ void PmatchTransducer::collect_first_transition(TransitionTableIndex i,
             } else {
                 // faking through a context check
                 collect_first(transition_table[i].get_target(),
-                              input_symbols);
+                              input_symbols, seen_indices);
             }
         }
     }
 }
 
 void PmatchTransducer::collect_first_index(TransitionTableIndex i,
-                                           SymbolNumberVector const& input_symbols)
+                                           SymbolNumberVector const& input_symbols,
+                                           std::set<TransitionTableIndex> & seen_indices)
 {
     for (SymbolNumberVector::const_iterator it = input_symbols.begin();
          it != input_symbols.end(); ++it) {
         if (index_table[i+*it].get_input_symbol() == *it) {
             collect_first_transition(index_table[i+*it].get_target() -
                                      TRANSITION_TARGET_TABLE_START,
-                                     input_symbols);
+                                     input_symbols, seen_indices);
         }
     }
 }
 
 void PmatchTransducer::collect_first(TransitionTableIndex i,
-                                     SymbolNumberVector const& input_symbols)
+                                     SymbolNumberVector const& input_symbols,
+                                     std::set<TransitionTableIndex> & seen_indices)
 {
-
-    if (recursion_depth_left == 0) {
+    if (seen_indices.count(i) == 1) {
         return;
     } else {
-        --recursion_depth_left;
+        seen_indices.insert(i);
     }
     if (indexes_transition_table(i))
     {
@@ -626,18 +635,17 @@ void PmatchTransducer::collect_first(TransitionTableIndex i,
             throw true;
         }
 
-        collect_first_epsilon(i+1, input_symbols);
-        collect_first_transition(i+1, input_symbols);
+        collect_first_epsilon(i+1, input_symbols, seen_indices);
+        collect_first_transition(i+1, input_symbols, seen_indices);
         
     } else {
         if (index_table[i].final()) {
             recursion_depth_left = PMATCH_MAX_RECURSION_DEPTH;
             throw true;
         }
-        collect_first_epsilon_index(i+1, input_symbols);
-        collect_first_index(i+1, input_symbols);
+        collect_first_epsilon_index(i+1, input_symbols, seen_indices);
+        collect_first_index(i+1, input_symbols, seen_indices);
     }
-    ++recursion_depth_left;
 }
 
 
@@ -762,7 +770,7 @@ void PmatchTransducer::note_analysis(SymbolNumber * input_tape,
             rtn_stack.top().output_tape_head, output_tape);
         rtn_stack.top().candidate_input_pos = input_tape;
         rtn_stack.top().best_weight = local_stack.top().running_weight;
-    } else if (alphabet.is_verbose() &&
+    } else if (container->is_verbose() &&
                input_tape == rtn_stack.top().candidate_input_pos &&
                rtn_stack.top().best_weight == local_stack.top().running_weight) {
         SymbolNumberVector discarded(rtn_stack.top().output_tape_head,

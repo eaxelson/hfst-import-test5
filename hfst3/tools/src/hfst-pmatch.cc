@@ -191,7 +191,7 @@ int main(int argc, char ** argv)
         std::cerr << "Could not open file " << pmatch_filename << std::endl;
         return EXIT_FAILURE;
     }
-        hfst_ol::PmatchContainer container(instream);
+    hfst_ol::PmatchContainer container(instream, verbose);
 //     if (outfile != stdout) {
 //         std::filebuf fb;
 // fb.open(outfilename, std::ios::out);
@@ -199,8 +199,5 @@ int main(int argc, char ** argv)
 // return process_input(container, outstream);
 // fb.close();
 //     } else {
-    if (verbose) {
-        container.be_verbose();
-    }
     return process_input(container, std::cout);
 }
