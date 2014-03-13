@@ -112,7 +112,7 @@ int xrelex ( YYSTYPE * , yyscan_t );
 %type <transducerPairVector> CONTEXTS_VECTOR RESTR_CONTEXTS_VECTOR
 %type <transducerPair> CONTEXT RESTR_CONTEXT
 %type <replType>  CONTEXT_MARK
-%type <label>     HALFARC SUB2
+%type <label>     HALFARC SUB2     
 %type <label>     SYMBOL_OR_QUOTED
 
 %type <transducerVector> REGEXP_LIST   // function call
@@ -234,6 +234,10 @@ REGEXP2: REPLACE
             delete $3;
         }
         // substitute
+       | SUB1 HALFARC PAIR_SEPARATOR HALFARC COMMA HALFARC PAIR_SEPARATOR HALFARC RIGHT_BRACKET {
+            $1->substitute(StringPair($2,$4), StringPair($6,$8));
+            $$ = $1;
+       }
        | SUB1 SUB2 SUB3 {
 
             StringSet alpha = $1->get_alphabet();
@@ -785,8 +789,26 @@ REGEXP8: REGEXP9 { }
         }
        | CONTAINMENT REGEXP8 {
             // std::cerr << "Containment: \n" << std::endl;
-            $$ = hfst::xre::contains($2);
+            if (hfst::xre::has_non_identity_pairs($2)) // if non-identity symbols present..
+            {
+              hfst::xre::warn("warning: using transducer that is non an automaton in containment\n");
+              $$ = hfst::xre::contains($2); // ..resort to simple containment
+            }
+            else
+            {
+              $$ = hfst::xre::contains_with_weight($2, 0);
+            }
             delete $2;
+        }
+       | CONTAINMENT WEIGHT REGEXP8 {
+            // std::cerr << "Containment: \n" << std::endl;
+            if (hfst::xre::has_non_identity_pairs($3)) // if non-identity symbols present..
+            {
+              xreerror("Containment with weight only works with automata");
+              YYABORT;
+            }
+            $$ = hfst::xre::contains_with_weight($3, $2);
+            delete $3;
         }
        | CONTAINMENT_ONCE REGEXP8 {
             //std::cerr << "Contain 1 \n"<< std::endl;
