@@ -114,7 +114,10 @@ bool is_valid_function_call(const char * name, const std::vector<HfstTransducer>
 
  HfstTransducer * contains(const HfstTransducer * t);
 
- HfstTransducer * contains_new(const HfstTransducer * t);
+ HfstTransducer * contains_with_weight(const HfstTransducer * t, float weight);
+
+ // doesn't work at the moment
+ HfstTransducer * contains_twolc(const HfstTransducer * t);
 
  HfstTransducer * contains_once(const HfstTransducer * t);
 
@@ -126,6 +129,8 @@ bool is_valid_function_call(const char * name, const std::vector<HfstTransducer>
  void warn_about_hfst_special_symbol(const char * symbol);
  /* Warn about \a symbol if it is of form "<.*>" or "all" and verbose mode is on. */
  void warn_about_xfst_special_symbol(const char * symbol);
+
+ bool has_non_identity_pairs(const HfstTransducer * t);
 
 } } // namespaces
 #endif

@@ -703,7 +703,7 @@ xfst_label_to_transducer(const char* input, const char* output)
   return retval;
 }
 
-  HfstTransducer * contains_new(const HfstTransducer * t)
+  HfstTransducer * contains_twolc(const HfstTransducer * t)
   {
     // marker = [0:M ?]*
     HfstTransducer marker("@_EPSILON_SYMBOL_@", "M", t->get_type());
@@ -711,8 +711,9 @@ xfst_label_to_transducer(const char* input, const char* output)
     marker.concatenate(id).repeat_star().minimize();
 
     // the rule
-    HfstTransducer right_context(*t); 
+    HfstTransducer right_context(*t);
     right_context.insert_freely(StringPair("M", "@_EPSILON_SYMBOL_@")).minimize();
+    right_context.insert_freely(StringPair("M", "M")).minimize();
     HfstTransducer left_context("@_EPSILON_SYMBOL_@", t->get_type());
     HfstTransducerPair context(left_context, right_context);
 
@@ -731,7 +732,7 @@ xfst_label_to_transducer(const char* input, const char* output)
     for (StringPairSet::const_iterator it = symbol_pairs.begin();
          it != symbol_pairs.end(); it++)
       {
-        //alphabet.insert(*it);
+        alphabet.insert(*it);
         alphabet.insert(StringPair(it->first, it->first));
         alphabet.insert(StringPair(it->second, it->second));
       }
@@ -741,12 +742,9 @@ xfst_label_to_transducer(const char* input, const char* output)
 
     return new HfstTransducer(rule);
 
-    //marker.compose(rule).minimize();
+    marker.compose(rule).minimize();
 
-    //return new HfstTransducer(marker);
-
-    //retval->compose(rule).minimize();
-    //return retval;
+    return new HfstTransducer(marker);
   }
 
   HfstTransducer * contains(const HfstTransducer * t)
@@ -756,6 +754,45 @@ xfst_label_to_transducer(const char* input, const char* output)
     HfstTransducer * retval = new HfstTransducer(any);
     retval->concatenate(*t).concatenate(any).minimize();
     return retval;
+  }
+
+  // [ 0::weight -> 0 || _ [t] ] - [?* - $[t]]
+  HfstTransducer * contains_with_weight(const HfstTransducer * t, float weight)
+  {
+    HfstTransducer weighted_epsilon(hfst::internal_epsilon, hfst::xre::format);
+    weighted_epsilon.set_final_weights(weight);
+    HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+
+    // mapping: 0::weight -> 0
+    HfstTransducerPair mappingPair(weighted_epsilon, epsilon);
+    HfstTransducerPairVector mappingPairVector;
+    mappingPairVector.push_back(mappingPair);
+    
+    // context: 0 _ [t]
+    HfstTransducerPair contextPair(epsilon, *t);
+    HfstTransducerPairVector contextPairVector;
+    contextPairVector.push_back(contextPair);
+
+    // weighted_rule = [ 0::weight @-> 0 || _ [t] ]
+    // (add weight for each occurrence of t)
+    hfst::xeroxRules::Rule rule(mappingPairVector, contextPairVector, hfst::xeroxRules::REPL_UP);
+    HfstTransducer weighted_rule(hfst::xre::format);
+    weighted_rule = replace(rule, false);
+
+    // note that replace_leftmost_longest_match does not work correctly in the case of epsilons
+
+    // noT = ?* - $[t]
+    // (strings that do not contain t)
+    HfstTransducer noT(hfst::internal_identity, t->get_type());
+    noT.repeat_star().minimize();
+    HfstTransducer * oneOrMoreT = contains(t);
+    noT.subtract(*oneOrMoreT).minimize();
+    delete oneOrMoreT;
+
+    // return [weighted_rule - noT]
+    // (subtract strings that do not contain t from weighted rule)
+    weighted_rule.subtract(noT).minimize();
+    return new HfstTransducer(weighted_rule);
   }
 
   // [$c - $[ [[?+ c ?*] & [c ?*]] | [[c ?+] & [c]]]]
@@ -886,6 +923,20 @@ void warn_about_special_symbols_in_replace(HfstTransducer * t)
                   "use substitute instead\n", it->c_str());
         }
     }
+}
+
+bool has_non_identity_pairs(const HfstTransducer * t)
+{
+  hfst::implementations::HfstBasicTransducer basic(*t);
+  StringPairSet sps = basic.get_transition_pairs();
+  for (StringPairSet::const_iterator it = sps.begin(); it != sps.end(); it++)
+    {
+      if (it->first != it->second)
+        {
+          return true;
+        }
+    }
+  return false;
 }
 
 } }
