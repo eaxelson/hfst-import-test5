@@ -497,6 +497,23 @@
            return alphabet;
          }
 
+         StringPairSet get_transition_pairs() const {
+
+           StringPairSet retval;
+           for (const_iterator it = begin(); it != end(); it++)
+             {
+               for (typename HfstTransitions::const_iterator tr_it
+                      = it->begin();
+                    tr_it != it->end(); tr_it++)
+                 {
+                   C data = tr_it->get_transition_data();
+                   
+                   retval.insert(StringPair(data.get_input_symbol(),
+                                            data.get_output_symbol()));
+                 }
+             }
+           return retval;
+         }
 
 
      // ----------------------------------------------------------------

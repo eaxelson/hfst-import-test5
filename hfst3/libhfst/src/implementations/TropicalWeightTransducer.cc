@@ -2312,18 +2312,19 @@ namespace implementations
 
     //EncodeMapper<StdArc> encoder(0x0001,ENCODE);
     EncodeMapper<StdArc> encoder(kEncodeLabels, ENCODE);
-    EncodeFst<StdArc> enc1(*t1, &encoder);
-    EncodeFst<StdArc> enc2(*t2_, &encoder);
-    delete t2_;
+    Encode<StdArc> (t1, &encoder);
+    Encode<StdArc> (t2_, &encoder);
     //std::cerr << "determinizing for subtract..." << std::endl;
-    DeterminizeFst<StdArc> det1(enc1);
-    DeterminizeFst<StdArc> det2(enc2);
+    StdVectorFst * det2 = new StdVectorFst();
+    Determinize<StdArc>(*t2_, det2);
+    delete t2_;
     //std::cerr << "... determinizing for subtract done" << std::endl;
 
     if (DEBUG) printf("  ..determinized\n");
 
     StdVectorFst *difference = new StdVectorFst();
-    Difference(det1, det2, difference);
+    Difference(*t1, *det2, difference);
+    delete det2;
     DecodeFst<StdArc> subtract(*difference, encoder);
     delete difference;
 
@@ -2333,7 +2334,7 @@ namespace implementations
     t2->SetOutputSymbols(NULL);
 
     StdVectorFst *result = new StdVectorFst(subtract); 
-    result->SetInputSymbols(t1->InputSymbols());
+    //result->SetInputSymbols(t1->InputSymbols());
     return result;
   }
 
