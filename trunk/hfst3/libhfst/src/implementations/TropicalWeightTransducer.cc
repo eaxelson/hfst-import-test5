@@ -2278,11 +2278,11 @@ namespace implementations
     if (t2->OutputSymbols() == NULL)
       t2->SetOutputSymbols(t2->InputSymbols());
 
-    ArcSort(t1, OLabelCompare<StdArc>());
-    ArcSort(t2, ILabelCompare<StdArc>());
-
     RmEpsilon(t1);
     RmEpsilon(t2);
+
+    ArcSort(t1, OLabelCompare<StdArc>());
+    ArcSort(t2, ILabelCompare<StdArc>());
 
     if (DEBUG) printf("  ..epsilons removed\n");
 
@@ -2314,6 +2314,10 @@ namespace implementations
     EncodeMapper<StdArc> encoder(kEncodeLabels, ENCODE);
     Encode<StdArc> (t1, &encoder);
     Encode<StdArc> (t2_, &encoder);
+
+    ArcSort(t1, OLabelCompare<StdArc>());
+    ArcSort(t2_, ILabelCompare<StdArc>());
+
     //std::cerr << "determinizing for subtract..." << std::endl;
     StdVectorFst * det2 = new StdVectorFst();
     Determinize<StdArc>(*t2_, det2);
