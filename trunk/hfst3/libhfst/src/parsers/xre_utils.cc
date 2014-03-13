@@ -705,41 +705,45 @@ xfst_label_to_transducer(const char* input, const char* output)
 
   HfstTransducer * contains_new(const HfstTransducer * t)
   {
-    /*HfstTransducer * retval = new HfstTransducer("@_EPSILON_SYMBOL_@", "$_MARKER_$", t->get_type());
-    HfstTransducer identity("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", t->get_type());
-    retval->concatenate(identity).repeat_star().minimize();
+    // marker = [0:M ?]*
+    HfstTransducer marker("@_EPSILON_SYMBOL_@", "M", t->get_type());
+    HfstTransducer id("@_IDENTITY_SYMBOL_@", t->get_type());
+    marker.concatenate(id).repeat_star().minimize();
 
-    HfstTransducer right_context(*t);
-    right_context.insert_freely(StringPair("$_MARKER_$", "@_EPSILON_SYMBOL_@")).minimize();
-
+    // the rule
+    HfstTransducer right_context(*t); 
+    right_context.insert_freely(StringPair("M", "@_EPSILON_SYMBOL_@")).minimize();
     HfstTransducer left_context("@_EPSILON_SYMBOL_@", t->get_type());
-
     HfstTransducerPair context(left_context, right_context);
-
-    StringPairSet mappings;
-    mappings.insert(StringPair("$_MARKER_$", "$_MARKER_$"));
-
-    StringPairSet alphabet;
-    alphabet.insert(StringPair("$_MARKER_$", "@_EPSILON_SYMBOL_@"));
-
-    HfstTransducer rule = hfst::rules::two_level_if_and_only_if
-    (context, mappings, alphabet);*/
-
-    HfstTransducerPair context(HfstTransducer("a", t->get_type()),
-                               HfstTransducer("a", t->get_type()));
 
     StringPairSet mappings;
     mappings.insert(StringPair("M", "M"));
 
+    // alphabet list possible mappings: M:M, M:0,
     StringPairSet alphabet;
-    alphabet.insert(StringPair("a","a"));
-    alphabet.insert(StringPair("b","b"));
     alphabet.insert(StringPair("M","M"));
+    alphabet.insert(StringPair("M","@_EPSILON_SYMBOL_@"));
+    alphabet.insert(StringPair("@_IDENTITY_SYMBOL_@","@_IDENTITY_SYMBOL_@"));
+
+    // and identity pairs of symbols that occur in t
+    HfstBasicTransducer basic(*t);
+    StringPairSet symbol_pairs = basic.get_transition_pairs();
+    for (StringPairSet::const_iterator it = symbol_pairs.begin();
+         it != symbol_pairs.end(); it++)
+      {
+        //alphabet.insert(*it);
+        alphabet.insert(StringPair(it->first, it->first));
+        alphabet.insert(StringPair(it->second, it->second));
+      }
 
     HfstTransducer rule = hfst::rules::two_level_if_and_only_if
       (context, mappings, alphabet);
 
     return new HfstTransducer(rule);
+
+    //marker.compose(rule).minimize();
+
+    //return new HfstTransducer(marker);
 
     //retval->compose(rule).minimize();
     //return retval;
