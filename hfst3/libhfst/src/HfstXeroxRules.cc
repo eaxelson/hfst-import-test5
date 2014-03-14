@@ -1951,6 +1951,8 @@ namespace hfst
 
             HfstTransducer epsilonToLeftMark("@_EPSILON_SYMBOL_@", TOK, type);
             epsilonToLeftMark.cross_product(leftMark).minimize();
+            //printf("epsilonToLeftMark: \n");
+            //epsilonToLeftMark.write_in_att_format(stdout, 1);
 
             HfstTransducer epsilonToRightMark("@_EPSILON_SYMBOL_@", TOK, type);
             epsilonToRightMark.cross_product(rightMark).minimize();
@@ -1972,6 +1974,7 @@ namespace hfst
 
             HfstTransducer in(mappingCrossProduct);
             in.input_project();
+            in.transform_weights(&zero_weight);
             //printf("in: \n");
             //in.write_in_att_format(stdout, 1);
 
@@ -2037,6 +2040,7 @@ namespace hfst
 
                 HfstTransducer in(mappingCrossProduct);
                 in.input_project();
+                in.transform_weights(&zero_weight);
                 //printf("in: \n");
                 //in.write_in_att_format(stdout, 1);
 
@@ -2101,6 +2105,7 @@ namespace hfst
 
                 HfstTransducer in(mappingCrossProduct);
                 in.input_project();
+                in.transform_weights(&zero_weight);
                 //printf("in: \n");
                 //in.write_in_att_format(stdout, 1);
 
