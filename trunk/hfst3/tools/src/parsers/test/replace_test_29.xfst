@@ -1,0 +1,6 @@
+set print-weight ON
+
+
+regex a+ @-> x || c _ ;
+replace_leftmost_longest_match UP: caav -> cx0v
+

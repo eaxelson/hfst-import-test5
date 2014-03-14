@@ -1,0 +1,9 @@
+set print-weight ON
+
+
+regex a -> b || .#. _ c ;
+apply up .#.ac
+# .#.ac
+apply up ac
+# ab
+

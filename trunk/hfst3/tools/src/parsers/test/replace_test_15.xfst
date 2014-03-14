@@ -1,0 +1,11 @@
+set print-weight ON
+
+
+regex a+ (->) x // a _ a ;
+apply up aaaa
+# aaaa
+# ax0a
+# axaa
+# aaxa
+# axxa
+

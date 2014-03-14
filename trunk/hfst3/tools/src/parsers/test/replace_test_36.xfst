@@ -1,0 +1,9 @@
+set print-weight ON
+
+
+regex b -> a  || a _ (r: aabb) ;
+regex b -> a  \\ a _ (r: aabb) ;
+regex b -> a  a _ (r: aaaa) ;
+regex b -> a  \/ a _ (r: aaaa) ;
+input: abbb
+

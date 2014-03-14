@@ -1,0 +1,6 @@
+set print-weight ON
+
+
+regex [ a+ b+ | b+ a+ ] @-> x \/ _ x ;
+replace_leftmost_longest_match DOWN: aabbaax -> x00x00x
+

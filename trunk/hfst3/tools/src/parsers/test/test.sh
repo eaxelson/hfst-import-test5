@@ -273,7 +273,9 @@ do
 	        exit 1;
 	    fi
         done
-        for file in contains contains_with_weight contains_once contains_once_optional
+        for file in contains contains_with_weight contains_once contains_once_optional \
+            replace_test_1 replace_test_2 replace_test_3 replace_test_4 replace_test_5 \
+            replace_test_6 replace_test_7 replace_test_8 replace_test_9
         do
             if ! (ls $file.xfst 2> /dev/null); then
 	        echo "skipping missing test for "$file"..."

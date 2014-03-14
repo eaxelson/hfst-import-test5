@@ -1,0 +1,5 @@
+set print-weight ON
+
+
+regex [ a+ b+ | b+ a+ ] -> x ;
+

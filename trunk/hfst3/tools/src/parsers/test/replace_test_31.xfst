@@ -1,0 +1,6 @@
+set print-weight ON
+
+
+regex a (->) b ||  x _ x ;
+xaxax:{xaxax,xbxax,xaxbx,xbxb}
+

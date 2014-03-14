@@ -1,0 +1,5 @@
+set print-weight ON
+
+
+0 .o. [ [. 0 .] -> a \/ _ b a , a b _ ,, [. 0 .] -> b \/ a _ a ]
+

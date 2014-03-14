@@ -1,0 +1,6 @@
+set print-weight ON
+
+
+regex ? @-> a ... b ;
+result: bb -> 0b00b0:abbabb 
+
