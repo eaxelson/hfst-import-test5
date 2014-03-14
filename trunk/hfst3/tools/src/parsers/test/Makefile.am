@@ -70,6 +70,10 @@ EXTRA_DIST=test.sh \
 	at_txt.xfst at_stxt.xfst at_txt_and_stxt.xfst \
 	words.txt words.stxt \
 	at_pl.xfst at_pl.att network.prolog \
+	contains.xfst contains.output \
+	contains_once.xfst contains_once.output \
+	contains_once_optional.xfst contains_once_optional.output \
+	contains_with_weight.xfst contains_with_weight.output \
 	weighted_replace_right_1.xfst weighted_replace_right_1.result \
 	weighted_replace_right_2.xfst weighted_replace_right_2.result \
 	weighted_replace_right_3.xfst weighted_replace_right_3.result \

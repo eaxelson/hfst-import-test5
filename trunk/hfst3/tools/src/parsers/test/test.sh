@@ -273,6 +273,21 @@ do
 	        exit 1;
 	    fi
         done
+        for file in contains contains_with_weight contains_once contains_once_optional
+        do
+            if ! (ls $file.xfst 2> /dev/null); then
+	        echo "skipping missing test for "$file"..."
+	        continue
+	    fi
+            if ! (cat $file.xfst | ../hfst-xfst --pipe-mode -s -f $format > tmp 2> /dev/null); then
+                echo "ERROR: in compiling "$file".xfst"
+                exit 1;
+            fi
+            if ! (diff $file.output tmp); then
+	        echo "ERROR: "$file" test failed"
+	        exit 1;
+	    fi
+        done
     fi
 
     rm -f result tmp1 tmp2 foo
