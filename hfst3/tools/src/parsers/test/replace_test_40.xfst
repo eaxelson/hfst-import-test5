@@ -1,5 +1,7 @@
 set print-weight ON
 
-
-a* -> p ;
-
+regex a* -> p::1 ;
+apply up alava
+echo ---
+regex [. a* .] -> p::1 ;
+apply up alava

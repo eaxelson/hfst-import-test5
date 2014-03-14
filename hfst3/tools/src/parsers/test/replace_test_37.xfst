@@ -1,17 +1,32 @@
 set print-weight ON
 
+regex a b -> x::1 || a b _ a ;
+apply up abababa
+echo --
 
-regex ab -> x || ab _ a (r: result4)
-regex ab -> x \\ ab _ a (r: result2)
-regex ab -> x ab _ a (r: result3)
-regex ab -> x \/ ab _ a (r: result4)
-regex ab (->) x || ab _ a (r: result3)
-regex ab (->) x \\ ab _ a (r: result2)
-regex ab (->) x ab _ a (r: result2)
-regex ab (->) x \/ ab _ a (r: result2)
-input: abababa
-result1 = abababa
-result2 = abababa,ababx0a,abx0aba
-result3 = abababa,ababx0a,abx0aba,abx0x0a
-result4 = ababx0a,abx0aba
+regex a b -> x::1 \\ a b _ a ;
+apply up abababa
+echo --
 
+regex a b -> x::1 // a b _ a ;
+apply up abababa
+echo --
+
+regex a b -> x::1 \/ a b _ a ;
+apply up abababa
+echo --
+
+regex a b (->) x::1 || a b _ a ;
+apply up abababa
+echo --
+
+regex a b (->) x::1 \\ a b _ a ;
+apply up abababa
+echo --
+
+regex a b (->) x::1 // a b _ a ;
+apply up abababa
+echo --
+
+regex a b (->) x::1 \/ a b _ a ;
+apply up abababa

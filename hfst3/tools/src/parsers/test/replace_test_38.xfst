@@ -1,6 +1,5 @@
 set print-weight ON
 
-
-regex [a|b] -> "[" ... "]" ;
-mba -> m[b][a]
+regex [a|b] -> "["::1 ... "]"::1 ;
+apply up mba
 
