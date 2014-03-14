@@ -1,0 +1,7 @@
+set print-weight ON
+
+
+regex ? -> x ;
+apply up s
+# x
+

@@ -1,0 +1,5 @@
+set print-weight ON
+
+
+a -> x \/ m _ ,, b -> y || x _ ;
+

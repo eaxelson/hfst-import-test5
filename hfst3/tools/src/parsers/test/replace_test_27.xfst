@@ -1,0 +1,14 @@
+set print-weight ON
+
+
+input1 = aabbaa
+result1 = x000aa
+result2 = aax000
+result3 = x00x0a
+result4 = ac0x00
+
+replace_leftmost_longest_match UP: input1 -> result1
+replace_rightmost_longest_match UP: input1 -> result2
+replce_leftmost_shortest_match UP: input1 -> result3
+replace_rightmost_shortest_match UP: input1 -> result4
+

@@ -1,0 +1,7 @@
+set print-weight ON
+
+# empty language replacement
+regex a -> ~[?*] ;
+regex [? - a]* ;
+test equivalent
+

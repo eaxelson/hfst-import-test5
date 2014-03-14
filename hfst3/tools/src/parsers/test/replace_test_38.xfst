@@ -1,0 +1,6 @@
+set print-weight ON
+
+
+regex [a|b] -> "[" ... "]" ;
+mba -> m[b][a]
+

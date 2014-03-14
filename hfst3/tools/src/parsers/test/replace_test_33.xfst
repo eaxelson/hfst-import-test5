@@ -1,0 +1,6 @@
+set print-weight ON
+
+
+regex a+ (->) x  || x x _ y y, y _ x ;
+axxayyaax:{axxayyax,axxayyxx,axxxyyax,axxxyyxx}
+

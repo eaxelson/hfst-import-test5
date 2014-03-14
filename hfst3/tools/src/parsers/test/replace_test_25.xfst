@@ -1,0 +1,7 @@
+set print-weight ON
+
+
+longest & shortest, left & right
+regex a+ b+ | b+ a+ @-> x ;
+input aabbaa
+

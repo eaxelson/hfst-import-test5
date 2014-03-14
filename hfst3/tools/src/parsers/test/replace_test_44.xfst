@@ -1,0 +1,5 @@
+set print-weight ON
+
+
+a+ @-> x , b+ @-> y
+
