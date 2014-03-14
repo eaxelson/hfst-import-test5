@@ -1,7 +1,4 @@
 set print-weight ON
 
-
-regex a @> x ;
+regex a::1 @> x::2 ;
 apply up aaana
-# xxxnx
-
