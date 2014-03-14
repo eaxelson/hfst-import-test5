@@ -1,9 +1,17 @@
 set print-weight ON
 
+regex b -> a::1  || _a ;
+apply up bbba
+echo --
 
-regex b -> a  || _a (r: bbaa) ;
-regex b -> a  \\ _a (r:aaaa) ;
-regex b -> a  _a (r:bbaa) ;
-regex b -> a  \/ _a (r:aaaa) ;
-input: bbba
+regex b -> a::1  \\ _a ;
+apply up bbba
+echo --
+
+regex b -> a::1  // _a ;
+apply up bbba
+echo --
+
+regex b -> a::1  \/ _a ;
+apply up bbba
 

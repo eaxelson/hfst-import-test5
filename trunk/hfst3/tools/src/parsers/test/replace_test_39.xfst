@@ -1,5 +1,4 @@
 set print-weight ON
 
-
-0 -> m ;
-
+regex 0 -> m::1 ;
+apply up foobar

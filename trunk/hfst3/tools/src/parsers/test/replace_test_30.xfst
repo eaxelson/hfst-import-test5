@@ -1,6 +1,4 @@
 set print-weight ON
 
-
-regex ? @-> a ... b ;
-result: bb -> 0b00b0:abbabb 
-
+regex ? @-> a::1 ... b::2 ;
+apply up bb

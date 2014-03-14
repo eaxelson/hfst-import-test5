@@ -1,6 +1,4 @@
 set print-weight ON
 
-
-regex [ a+ b+ | b+ a+ ] @-> x \/ _ x ;
-replace_leftmost_longest_match DOWN: aabbaax -> x00x00x
-
+regex [ [a::1]+ [b::2]+ | [b::2]+ [a::1]+ ] @-> x \/ _ x ;
+apply up aabbaax

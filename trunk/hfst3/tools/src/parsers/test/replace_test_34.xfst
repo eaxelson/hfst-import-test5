@@ -1,6 +1,4 @@
 set print-weight ON
 
-
-regex a (->) b ;
-xaxax:{xaxax,xbxax,xaxbx,xbxbx}
-
+regex a (->) b::1 ;
+apply up xaxax

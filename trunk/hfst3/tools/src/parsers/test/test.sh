@@ -279,7 +279,9 @@ do
             replace_test_11 replace_test_12 replace_test_13 replace_test_14 replace_test_15 \
             replace_test_16 replace_test_17 replace_test_18 replace_test_19 replace_test_20 \
             replace_test_21 replace_test_22 replace_test_23 replace_test_24 replace_test_25 \
-            replace_test_26
+            replace_test_26 replace_test_27 replace_test_28 replace_test_29 replace_test_30 \
+            replace_test_31 replace_test_32 replace_test_33 replace_test_34 replace_test_35 \
+            replace_test_36 replace_test_37 replace_test_38 replace_test_39 replace_test_40
         do
             if ! (ls $file.xfst 2> /dev/null); then
 	        echo "skipping missing test for "$file"..."
