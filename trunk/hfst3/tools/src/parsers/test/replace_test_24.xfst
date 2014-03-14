@@ -1,22 +1,21 @@
 set print-weight ON
 
+regex [a::1]+ @-> x::1 || a _ a ;
 
-input1 = "aaaa"
-input2 = "aaaaabaaaa"
-input3 = "aaaaabaaaacaaaa"
+apply up aaaa
+# axa
+apply up aaaaabaaaa
+# axabaxa
+apply up aaaaabaaaacaaaa
+# axabaxacaxa
 
-result1 = aaaa:{aaaa,ax0a,axaa,aaxa,axxa}
-result2 = aaaa:{ax0a,axxa}
-result3 = aaaa:{ax0a}
-result4 = aaaaabaaaa:ax00abax0a
-result5 = aaaaabaaaa:axxxabaxxa
-result6 = aaaaabaaaacaaaa:ax00abax0acax0a
-result7 = aaaaabaaaacaaaa:axxxabaxxacaxxa
-result8 = aaaa:{aaaa,ax0a,axaa,aaxa}
-result9 = aaaa:{ax0a,axaa}
-result10 = aaaa:{ax0a,aaxa}
-result11 = aaaa:{ax0a,axaa,aaxa}
+echo --
 
-replace_leftmost_longest_match UP: input1 -> result3, input2 -> result4, input3 -> result6
-replace_leftmost_shortest_match UP: input1 -> result4, input2 -> result5, input3 -> result7
+regex [a::1]+ @> x::1 || a _ a ;
 
+apply up aaaa
+# axabaxa
+apply up aaaaabaaaa
+# axxxabaxxa
+apply up aaaaabaaaacaaaa
+# axxxabaxxacaxxa

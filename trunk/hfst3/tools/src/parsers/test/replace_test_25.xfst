@@ -1,7 +1,20 @@
 set print-weight ON
 
+regex [[a::1]+ [b::2]+] | [[b::2]+ [a::1]+] @-> x ;
+apply up aabbaa
+# xaa
+echo --
 
-longest & shortest, left & right
-regex a+ b+ | b+ a+ @-> x ;
-input aabbaa
+regex [[a::1]+ [b::2]+] | [[b::2]+ [a::1]+] @> x ;
+apply up aabbaa
+# xxa
+echo --
 
+regex [[a::1]+ [b::2]+] | [[b::2]+ [a::1]+] ->@ x ;
+apply up aabbaa
+# aax
+echo --
+
+regex [[a::1]+ [b::2]+] | [[b::2]+ [a::1]+] >@ x ;
+apply up aabbaa
+# axx

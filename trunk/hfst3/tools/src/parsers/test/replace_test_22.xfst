@@ -1,5 +1,5 @@
 set print-weight ON
 
+regex [a::1]+ @-> x || a _ a ;
 
-regex a+ @-> || a _ a ;
-
+apply up aaaa

@@ -116,5 +116,12 @@ EXTRA_DIST=test.sh \
 	replace_test_16.xfst replace_test_16.result \
 	replace_test_17.xfst replace_test_17.result \
 	replace_test_18.xfst replace_test_18.result \
-	replace_test_19.xfst replace_test_19.result
+	replace_test_19.xfst replace_test_19.result \
+	replace_test_20.xfst replace_test_20.result \
+	replace_test_21.xfst replace_test_21.result \
+	replace_test_22.xfst replace_test_22.result \
+	replace_test_23.xfst replace_test_23.result \
+	replace_test_24.xfst replace_test_24.result \
+	replace_test_25.xfst replace_test_25.result \
+	replace_test_26.xfst replace_test_26.result
 check_DATA=test.sh
