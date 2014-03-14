@@ -1,8 +1,6 @@
 set print-weight ON
 
-
-regex a+ -> x // a _ a ;
+regex [a::1]+ -> x // a _ a ;
 apply up aaaa
-# ax0a
-# axaa
+
 

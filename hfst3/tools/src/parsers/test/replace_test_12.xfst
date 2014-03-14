@@ -1,7 +1,5 @@
 set print-weight ON
 
-
-regex ? -> x ;
+# this doesn't work in foma or xfst either
+regex ?::1 -> x ;
 apply up s
-# x
-
