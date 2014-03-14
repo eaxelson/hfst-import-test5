@@ -1,5 +1,4 @@
 set print-weight ON
 
-
-a+ @> x , b+ @> y
-
+regex a+ @> x::1 , b+ @> y::2 ;
+apply up abba

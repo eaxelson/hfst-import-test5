@@ -1,5 +1,5 @@
 set print-weight ON
 
-
-a+ -> x \/ m _ ,, b+ -> y || x _
+regex a+ -> x \/ m _ ,, b+ -> y || x _ ;
+apply up 
 
