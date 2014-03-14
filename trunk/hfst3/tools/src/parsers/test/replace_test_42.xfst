@@ -1,5 +1,4 @@
 set print-weight ON
 
-
-a -> b , b -> c
-
+regex a::1 -> b::1 , b::2 -> c::2 ;
+apply up abcabc

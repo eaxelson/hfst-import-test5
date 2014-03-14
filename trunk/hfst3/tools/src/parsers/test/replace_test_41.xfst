@@ -1,5 +1,8 @@
 set print-weight ON
 
-
-0 -> b || _ a a
-
+regex 0::1 -> b::2 || _ a a ;
+apply up
+aa
+aaa
+aaaa
+<ctrl-d>
