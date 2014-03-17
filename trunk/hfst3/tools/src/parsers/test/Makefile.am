@@ -150,5 +150,10 @@ EXTRA_DIST=test.sh \
 	replace_test_50.xfst replace_test_50.result \
 	replace_test_51.xfst replace_test_51.result \
 	replace_test_52.xfst replace_test_52.result \
-	replace_test_53.xfst replace_test_53.result
+	replace_test_53.xfst replace_test_53.result \
+	weighted_parallel_rules_1.xfst weighted_parallel_rules_1.output \
+	weighted_parallel_rules_2.xfst weighted_parallel_rules_2.output \
+	weighted_parallel_rules_3.xfst weighted_parallel_rules_3.output \
+	weighted_parallel_rules_4.xfst weighted_parallel_rules_4.output \
+	weighted_parallel_rules_5.xfst weighted_parallel_rules_5.output
 check_DATA=test.sh
