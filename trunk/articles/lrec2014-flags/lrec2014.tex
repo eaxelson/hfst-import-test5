@@ -2,7 +2,7 @@
 \usepackage{lrec2014}
 
 
-
+\usepackage{alltt}
 \usepackage{fontspec}
 \usepackage{xunicode}
 \usepackage{xltxtra}
@@ -14,16 +14,18 @@
 $^{\dagger}$University of Helsinki \\ Department of Speech Sciences, PO Box 9 \\
 {senka.drobac, krister.linden, tommi.pirinen, miikka.silfverberg}@helsinki.fi\\}
 
-\abstract{Flag diacritics enable optimising finite-state networks by
+\abstract{Flag diacritics, which are special multi-charachter symbols executed at runtime, enable optimising finite-state networks by
     combining identical sub-graphs of its transition
     graph. Traditionally, the feature has required linguists to devise
     the optimisations to the graph by hand alongside the morphological
     description. In this paper, we present a novel method of
-    discovering flag positions in morphological lexicons automatically
+    discovering flag positions in morphological lexicons automatically,
     based on the morpheme structure implicit in the language
     description. With this approach, we have gained significant
     decrease in the size of finite-state networks while maintaining reasonable application 
-    speed. ... (150-200 words) \\ \newline \Keywords{hyper-minimization, lexicon, FST}}
+    speed. The algorithm can be applied to any language description, where the biggest achievements are expected in large and complex morphologies. The most noticeable reduction in size we got with Greenlandic transducer, whose original transducer size is on average about 15 times larger than other morphologies. With presented hyper-minimization method, the transducer is reduced to 10,1\% of the original transducer size, with lookup speed decreased only by 9,5\%. 
+%    ... (150-200 words)
+    \\ \newline \Keywords{hyper-minimization, lexicon, FST}}
 
 %TODO - write more in abstract, keywords!
 
@@ -248,30 +250,33 @@ the whole path is proclaimed invalid and removed from the transducer.
 
 \begin{figure}
 \centering
-\begin{verbatim}
+
+\begin{alltt}
 Step 1:
-    P.LEXNAME.sublex_i -> JOINER.sublex_i
-    R.LEXNAME.sublex_i -> JOINER.sublex_i
-    
+
+P.LEXNAME.sublex_i -> JOINER.sublex_i
+R.LEXNAME.sublex_i -> JOINER.sublex_i
+
 Step 2:
     transducer - filter
         .o.
-    P.LEXNAME.Root ?*
+    P.LEXNAME.Root \(\Sigma\sp{*}\)
         .o.
-    ?* R.LEXNAME.#
-  
+   \(\Sigma\sp{*}\) R.LEXNAME.#
+
 Where transducer is the lexicon composed with
-rules and (with I as the identity relation)
-filter is:
-?* [(I-JOINER.sublex_i) | ?:?]
+rules (with ? as any symbol and \(\Sigma\sp{*}\) as
+universal language) and filter is:
+
+\(\Sigma\sp{*}\) [(?-JOINER.sublex_i) | ?:?]
     JOINER.sublex_i 
-[(I-JOINER.sublex_i) | ?:?] ?*
+[(?-JOINER.sublex_i) | ?:?] \(\Sigma\sp{*}\)
 
 Step 3:
     JOINER.sublex_i -> epsilon
-
   
-    \end{verbatim}
+\end{alltt}
+
     \caption{Removal of flag diacritics
     \label{fig:lexc-remov}}
 \end{figure}
@@ -287,7 +292,29 @@ before composing it with rules.
 
 Removal of flag diacritics is usually done with the command \verb+remove-flag-FEATURE+, which removes all flags with the given \verb+FEATURE+. However, 
 our flags all have the same feature, called \verb+LEXNAME+, and values corresponding to sub-lexicon names. Therefore, if we want to remove just flags 
-for a certain sub-lexicon \verb+SUBLEX+, we use the algorithm shown in Figure~\ref{fig:lexc-remov}:
+for a certain sub-lexicon \verb+SUBLEX+, we use the algorithm shown in Figure~\ref{fig:lexc-remov}, with operators explained in Table~\ref{table:operators}:
+
+
+
+\begin{table}
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        \bf Operation & \bf Name \\
+        \hline\hline
+        \bf a b & concatenation  \\
+        \bf a | b & disjunction  \\
+        \bf a : b & cross product  \\
+        \bf a .o. b & composition  \\
+        \bf * & Kleene star  \\
+        
+
+        \hline
+    \end{tabular}
+    \caption{List of operators
+    \label{table:operators}}
+\end{table}
+
 
 First, \verb+P.LEXNAME.SUBLEX+ and \verb+R.LEXNAME.SUBLEX+ transitions are substituted with an arbitrary special symbol, ie. 
 \verb+$JOINER.SUBLEX$+ in the entire transducer. 
@@ -308,8 +335,13 @@ Similarly, sub-lexicon \verb+A+ has 2 morphs, two continuations and was mentione
 two times as continuations from the \verb+Root+ sub-lexicon and once from itself. Sub-lexicon \verb+B+ has only one word, one continuation and was mentioned 2 times. 
 
 After that, we calculated T which is product of 
-those 3 counts.
-\verb+T = w * c * m+
+those 3 counts:
+
+\begin{equation}\label{first}
+T = w * c * m
+\end{equation}
+
+%\verb+T = w * c * m+
 
 The complete calculation for this small example lexicon is shown in Table~\ref{table:measureP}.
 
