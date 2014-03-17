@@ -252,40 +252,6 @@ FUNCBODY1: FUNCBODY2 { }
 | FUNCBODY1 FUN_NEGATIVE_LEFT_CONTEXT {
     $$ = new hfst::pmatch::PmatchAstNode($2, $1, hfst::pmatch::AstConcatenate);
  }
-// // Bodyless contexts
-
-// | LEFT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
-//     hfst::pmatch::add_end_tag($1, $3);
-//     $$ = $1;
-// }
-// | LEFT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
-//     hfst::pmatch::add_end_tag($1, $3);
-//     $$ = $1;
-// }
-// | RIGHT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
-//     hfst::pmatch::add_end_tag($1, $3);
-//     $$ = $1;
-// }
-// | RIGHT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
-//     hfst::pmatch::add_end_tag($1, $3);
-//     $$ = $1;
-// }
-// | NEGATIVE_LEFT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
-//     hfst::pmatch::add_end_tag($1, $3);
-//     $$ = $1;
-// }
-// | NEGATIVE_LEFT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
-//     hfst::pmatch::add_end_tag($1, $3);
-//     $$ = $1;
-// }
-// | NEGATIVE_RIGHT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
-//     hfst::pmatch::add_end_tag($1, $3);
-//     $$ = $1;
-// }
-// | NEGATIVE_RIGHT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
-//     hfst::pmatch::add_end_tag($1, $3);
-//     $$ = $1;
-// }
 ;
 
 FUNCBODY2: FUNCBODY3 { }
@@ -443,56 +409,6 @@ REGEXP2: REPLACE
     $$ = $1;
     delete $3;
  }
-| REGEXP2 RIGHT_CONTEXT {
-    $$ = & $1->concatenate(*$2);
-    delete $2;
- }
-| REGEXP2 LEFT_CONTEXT {
-    $$ = & $2->concatenate(*$1);
-    delete $1;
- }
-| REGEXP2 NEGATIVE_RIGHT_CONTEXT {
-    $$ = & $1->concatenate(*$2);
-    delete $2;
- }
-| REGEXP2 NEGATIVE_LEFT_CONTEXT {
-    $$ = & $2->concatenate(*$1);
-    delete $1;
- }
-// Bodyless contexts
-
-| LEFT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
-    hfst::pmatch::add_end_tag($1, $3);
-    $$ = $1;
-}
-| LEFT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
-    hfst::pmatch::add_end_tag($1, $3);
-    $$ = $1;
-}
-| RIGHT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
-    hfst::pmatch::add_end_tag($1, $3);
-    $$ = $1;
-}
-| RIGHT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
-    hfst::pmatch::add_end_tag($1, $3);
-    $$ = $1;
-}
-| NEGATIVE_LEFT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
-    hfst::pmatch::add_end_tag($1, $3);
-    $$ = $1;
-}
-| NEGATIVE_LEFT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
-    hfst::pmatch::add_end_tag($1, $3);
-    $$ = $1;
-}
-| NEGATIVE_RIGHT_CONTEXT ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
-    hfst::pmatch::add_end_tag($1, $3);
-    $$ = $1;
-}
-| NEGATIVE_RIGHT_CONTEXT ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
-    hfst::pmatch::add_end_tag($1, $3);
-    $$ = $1;
-}
 ;
 
 ////////////////////////////
@@ -1207,8 +1123,12 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
 | BOUNDARY_MARKER {
     $$ = new HfstTransducer("@BOUNDARY@", "@BOUNDARY@", hfst::pmatch::format);
   }
-| FUNCALL {  }
-| MAP {  }
+| FUNCALL { }
+| MAP { }
+| RIGHT_CONTEXT { }
+| NEGATIVE_RIGHT_CONTEXT { }
+| LEFT_CONTEXT { }
+| NEGATIVE_LEFT_CONTEXT { }
 ;
 
 FUNCALL: SYMBOL_WITH_LEFT_PAREN ARGLIST RIGHT_PARENTHESIS {
