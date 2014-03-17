@@ -330,7 +330,12 @@ namespace xfst {
           {
             if (p->second != "@0@" &&
                 p->second != "@_EPSILON_SYMBOL_@" )
-            new_path.push_back(p->second);
+              {
+                if (p->second == "@_UNKNOWN_SYMBOL_@")
+                  new_path.push_back("?");
+                else
+                  new_path.push_back(p->second);
+              }
           }
         retval.insert(std::pair<float, StringVector>(it->first, new_path));
       }
