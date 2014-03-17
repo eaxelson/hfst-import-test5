@@ -284,7 +284,9 @@ do
             replace_test_36 replace_test_37 replace_test_38 replace_test_39 replace_test_40 \
             replace_test_41 replace_test_42 replace_test_43 replace_test_44 replace_test_45 \
             replace_test_46 replace_test_47 replace_test_48 replace_test_49 replace_test_50 \
-            replace_test_51 replace_test_52 replace_test_53
+            replace_test_51 replace_test_52 replace_test_53 \
+            weighted_parallel_rules_1 weighted_parallel_rules_2 weighted_parallel_rules_3 \
+            weighted_parallel_rules_4 weighted_parallel_rules_5
         do
             if ! (ls $file.xfst 2> /dev/null); then
 	        echo "skipping missing test for "$file"..."
