@@ -3338,7 +3338,8 @@
          bool is_lookup_infinitely_ambiguous
            (const HfstOneLevelPath& s,
             unsigned int& index, HfstState state,
-            std::set<HfstState> &epsilon_path_states)
+            std::set<HfstState> &epsilon_path_states
+            )
          {
            // Whether the end of the lookup path s has been reached                    
            bool only_epsilons=false;
@@ -3381,7 +3382,18 @@
                   been reached. */
                else if (not only_epsilons)
                  {
-                   if ( it->get_input_symbol().compare(s.second.at(index)) == 0 )
+                   bool continu = false;
+                   if (it->get_input_symbol().compare(s.second.at(index)) == 0)
+                     continu = true;
+                   else if ((it->get_input_symbol().compare("@_UNKNOWN_SYMBOL_@") || 
+                             it->get_input_symbol().compare("@_IDENTITY_SYMBOL_@"))
+                            &&
+                            (alphabet.find(s.second.at(index)) == alphabet.end()))
+                     {
+                       continu = true;
+                     }
+
+                   if (continu)
                      {
                        index++; // consume an input symbol in the lookup path s            
                        std::set<HfstState> empty_set;
@@ -3396,8 +3408,6 @@
              }
            return false;
          }
-
-
 
          bool is_lookup_infinitely_ambiguous(const HfstOneLevelPath & s)
          {
@@ -3419,8 +3429,6 @@
            return is_lookup_infinitely_ambiguous(path, index, INITIAL_STATE,
                                                  epsilon_path_states);
          }
-
-
 
 
 
@@ -3480,10 +3488,10 @@
                // matches to the input symbol of the transition, i.e
                // either the input symbol is the same as the current symbol
                if ( isymbol.compare(lookup_path.at(lookup_index)) == 0 ||
-                    // or the input symbol is the identity symbol and
+                    // or the input symbol is the identity or unknown symbol and
                     // the current symbol is not found in the alphabet
                     // of the transducer.
-                    ( is_identity(isymbol) &&
+                    ( (is_identity(isymbol) || is_unknown(isymbol)) &&
                       (alphabet.find(lookup_path.at(lookup_index)) 
                        == alphabet.end()) ) 
                     )
@@ -3552,22 +3560,33 @@
                      input_symbol_consumed) )
                  {
                    // update path_so_far and lookup_index
-                   
-                   if (not (is_identity(it->get_input_symbol()))) {
-                     push_back_to_two_level_path
-                       (path_so_far, 
-                        StringPair(it->get_input_symbol(), 
-                                   it->get_output_symbol()),
-                        it->get_weight());
-                   }
-                   else { // identity symbol is replaced with the lookup symbol
-                     push_back_to_two_level_path
-                       (path_so_far, 
-                        StringPair(lookup_path.at(lookup_index), 
-                                   lookup_path.at(lookup_index)),
-                        it->get_weight());
-                   }
-                   
+                   std::string istr;
+                   std::string ostr;
+
+                   // identity symbol is replaced with the lookup symbol
+                   if (is_identity(it->get_input_symbol())) 
+                     {
+                       istr = lookup_path.at(lookup_index); 
+                       ostr = istr;
+                     }
+                   else
+                     {
+                       if (is_unknown(it->get_input_symbol()))
+                         istr = lookup_path.at(lookup_index);
+                       else
+                         istr = it->get_input_symbol();
+
+                       /*if (is_unknown(it->get_output_symbol()))
+                         ostr = std::string("?");
+                         else*/
+                       ostr = it->get_output_symbol();
+                     } 
+
+                   push_back_to_two_level_path
+                     (path_so_far,
+                      StringPair(istr, ostr),
+                      it->get_weight());
+                                      
                    HfstEpsilonHandler * Ehp = NULL;
                    if (input_symbol_consumed) {
                      lookup_index++;
