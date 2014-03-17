@@ -1,5 +1,5 @@
 set print-weight ON
 
-
-0 .o. [ [. 0 .] -> a \/ _ b a , a b _ ,, [. 0 .] -> b \/ a _ a ]
-
+set encode-weights ON
+regex [ [. 0 .] -> a::1 \/ _ b a , a b _ ,, [. 0 .] -> b::2 \/ a _ a ];
+apply up abba

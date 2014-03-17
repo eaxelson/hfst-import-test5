@@ -1,4 +1,4 @@
 set print-weight ON
 
-
-[..] @-> a
+regex [..] @-> a::1 ;
+apply up abba

@@ -1,5 +1,5 @@
 set print-weight ON
 
-
-a -> x \/ m _ ,, b -> y || x _ ;
-
+set encode-weights ON
+regex a::1 -> x \/ m _ ,, b::1 -> y || x _ ;
+apply up maab
