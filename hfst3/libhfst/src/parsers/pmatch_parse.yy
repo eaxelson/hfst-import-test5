@@ -995,43 +995,15 @@ REGEXP12: LABEL { }
   }
 ;
 
-LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
-    $$ = new HfstTransducer($1, $3, hfst::pmatch::format);
-    free($1);
-    free($3);
- }
-| QUOTED_LITERAL PAIR_SEPARATOR QUOTED_LITERAL {
+// There follows a cartesian product of {quoted_literal, epsilon_token and any_token}
+LABEL: QUOTED_LITERAL PAIR_SEPARATOR QUOTED_LITERAL {
     $$ = new HfstTransducer($1, $3, hfst::pmatch::format);
     free($1);
     free($3);
 }
-| EPSILON_TOKEN PAIR_SEPARATOR QUOTED_LITERAL {
-    $$ = new HfstTransducer(hfst::internal_epsilon, $3, hfst::pmatch::format);
-    free($3);
-}
-| QUOTED_LITERAL PAIR_SEPARATOR EPSILON_TOKEN {
-    $$ = new HfstTransducer($1, hfst::internal_epsilon, hfst::pmatch::format);
-    free($1);
-}
-| SYMBOL PAIR_SEPARATOR EPSILON_TOKEN {
-    $$ = new HfstTransducer($1, hfst::internal_epsilon, hfst::pmatch::format);
-    free($1);
- }
-| SYMBOL PAIR_SEPARATOR ANY_TOKEN {
-    $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::pmatch::format);
-    free($1);
- }
 | EPSILON_TOKEN PAIR_SEPARATOR EPSILON_TOKEN {
     $$ = new HfstTransducer(hfst::internal_epsilon, 
                             hfst::internal_epsilon, hfst::pmatch::format);
- }
-| EPSILON_TOKEN PAIR_SEPARATOR SYMBOL {
-    $$ = new HfstTransducer(hfst::internal_epsilon, $3, hfst::pmatch::format);
-    free($3);
- }
-| EPSILON_TOKEN PAIR_SEPARATOR ANY_TOKEN {
-    $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_unknown,
-                            hfst::pmatch::format);
  }
 | ANY_TOKEN PAIR_SEPARATOR ANY_TOKEN {
     $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
@@ -1041,15 +1013,30 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
     $$->insert_to_alphabet(hfst::pmatch::special_pmatch_symbols);
 
  }
-| ANY_TOKEN PAIR_SEPARATOR SYMBOL {
-    $$ = new HfstTransducer(hfst::internal_unknown, $3, hfst::pmatch::format);
-    free($3);
+| QUOTED_LITERAL PAIR_SEPARATOR EPSILON_TOKEN {
+    $$ = new HfstTransducer($1, hfst::internal_epsilon, hfst::pmatch::format);
+    free($1);
+}
+| QUOTED_LITERAL PAIR_SEPARATOR ANY_TOKEN {
+    $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::pmatch::format);
+    free($1);
  }
+| EPSILON_TOKEN PAIR_SEPARATOR QUOTED_LITERAL {
+    $$ = new HfstTransducer(hfst::internal_epsilon, $3, hfst::pmatch::format);
+    free($3);
+}
+| EPSILON_TOKEN PAIR_SEPARATOR ANY_TOKEN {
+    $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_unknown,
+                            hfst::pmatch::format);
+ }
+| ANY_TOKEN PAIR_SEPARATOR QUOTED_LITERAL {
+    $$ = new HfstTransducer(hfst::internal_unknown, $3, hfst::pmatch::format);
+}
 | ANY_TOKEN PAIR_SEPARATOR EPSILON_TOKEN {
     $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_epsilon,
                             hfst::pmatch::format);
  }
-| SYMBOL PAIR_SEPARATOR_WO_RIGHT {
+| QUOTED_LITERAL PAIR_SEPARATOR_WO_RIGHT {
     $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::pmatch::format);
     free($1);
  }
@@ -1061,7 +1048,7 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
     $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
                             hfst::pmatch::format);
  }
-| PAIR_SEPARATOR_WO_LEFT SYMBOL {
+| PAIR_SEPARATOR_WO_LEFT QUOTED_LITERAL {
     $$ = new HfstTransducer(hfst::internal_unknown, $2, hfst::pmatch::format);
     free($2);
  }
