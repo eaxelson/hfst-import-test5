@@ -5,6 +5,15 @@
 \usepackage{latexsym}
 
 
+
+\usepackage{fontspec}
+\usepackage{xunicode}
+\usepackage{xltxtra}
+
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+
 \title{Hyper-minimization of Finite state Lexicions Using Flag Diacritics}
 
 
@@ -68,7 +77,6 @@
 }
 
 \section{Background}
-
 \label{sec:background}
 
  
@@ -92,41 +100,144 @@ feature is set to the designated value. For example,
 will be considered valid.
 
 
+\section{Notation}
+\label{sec:notation}
 
 \section{Methods}
 \label{sec:methods}
 
-Our algorithm is based on lexc (cite: Tommi) algorithm ...
+
+\begin{figure}[htbp]
+    \centering
+
+\begin{subfigure}[t]{0.3\textwidth}
+\begin{verbatim}
+LEXICON Root
+A ;
+B ;
+C ;
+
+LEXICON A
+aaa A ;
+# ;
+
+LEXICON B
+aaaa B ;
+# ;
+
+LEXICON C
+aaaaa C;
+#;
+\end{verbatim}
+\caption{Lexc grammar description
+\label{fig:lexc-a2}}
+\end{subfigure}
+ ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+\begin{subfigure}[t]{0.3\textwidth}
+\begin{verbatim}
+ORIGINAL:
+no. of states: 60
+no. of arcs: 60
+no. of final states: 36
+\end{verbatim}
+\caption{Summary of the transducer without flag diacritics
+\label{fig:sizes-orig}}
+\end{subfigure}%
+ ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+\begin{subfigure}[t]{0.3\textwidth}
+\begin{verbatim}
+HYPER-MINIMAL:
+no. of states: 23
+no. of arcs: 27
+no. of final states: 1
+\end{verbatim}
+\caption{Summary of the hyper-minimal transducer
+\label{fig:sizes-flags}}
+ \end{subfigure}
+
+ \caption{Simple example lexicon with transducer sizes}
+ \label{fig:simple-ex}
+\end{figure}
 
 
-\subsection{Lexc}
+This algorithm is an improvement of hyper-minimization algorithm introduced in~\newcite{drobac2014}. The main idea of the algorithm is to replicate structure of a morphological lexicon into a finite state transducer with use of flag diacritics. Every sub-lexicon should start with require flag \verb+R.LEXNAME.sub-lex+ and every continuations should be expressed with positive setting flag \verb+P.LEXNAME.sub-lex+...
 
-Previous version of lexc took to long to compile because each sub-lexicon was build separately and then disjunct with the rest. Compilation time of large morphologies would take  up to 2 hours. In order to improve compilation speed and incorporate hyper-minimization part, we needed to change the lexc algorithm.
+One of the examples why preserving the structure with flag diacritics is useful is shown on a small scale artificial example shown in Figure~\ref{fig:simple-ex}.
+ 
+The Figure~\ref{fig:lexc-a2} shows language description of the following language: $(aaa)^*|(aaaa)^*|(aaaaa)^*$, written in the \texttt{lexc} format. In case this language is compiled into a normal, minimal transducer, it will consist of 60 states and 60 arcs, 
+but with the hyper-minimal method, the transducer size will be less then half of it: 23 states and 27 arcs, as shown in 
+Figure~\ref{fig:sizes-orig} and Figure~\ref{fig:sizes-flags} respectively.
 
-We build a trie, every sublexicon starts from the same start state with the sublexicon name, then morph follows and it ends with the continuation.
-In case the morph is a pair of two strings, epsilon padding is added to the end of the shorter string.
+TODO: This happens because the non-flagged transducer will try t combine and keep all possible options of strings in the same path, which will result in ... It could have to do with path depths, where depth is the length of the longest path from any state to another state that doesn't go through the same state twice. The non-flagged version has maximal depth 59 - all transitions are on the same path, while the hyper-minimal one has maximal depth of 9. Keeping the transducer shallow, reduces the necessary number of states and paths, which results in smaller final size.
 
-Lexc can also contain regular expressions. In that case, the regular expression is parsed and processed into a transducer and saved into a table of regular expression keys and matching transducers. The key is added to the trie same way the strings are - trie entry will start with the encoded sub-lexicon name, followed by regex key and finished with a continuation. LAter in the process, the regex keys are substituted with matching transducers from the hash table.
-
-
-When the entire lexical file is read into a trie, the trie is transformed into a transducer and over-generated with Kleene star.
-
-$trie -> transducer, overgenerate with repeat\_star()$
-
-Then, to the beginning and end of the transducer are concatenated starting and ending encoded joiners. In case of non-flagged version, the starting joiner is initial lexicon name, usually \texttt{Root} and ending joiner is encoded final lexicon, \texttt{\#}.
-
-In case of the hyper-minimized transducer, the starting joiner is encoded R flag of the initial sub-lexicon, usually \texttt{P.LEXNAME.Root} and the ending one is R flag of the final lexicon, \texttt{R.LEXNAME.\#}.
-
-
-To filter out invalid flag diacritic paths, tothe transducer is composed this filter:
+The similar combinatorial phenomena occur in large lexicons, like in Greenlandic, but it is difficult to find illuminating and small real world examples.
 
 
 
 
-\begin{equation}\label{filter}
-(\verb+P.FLAG R.FLAG+ \cup \Sigma^*)^* 
+
+\begin{figure*}
+    \includegraphics[width=\textwidth]{trie.png}
+     \caption{First step is to build a lexical trie
+     \label{fig:trie}}
+\end{figure*}
+
+
+\begin{figure*}
+    \includegraphics[width=\textwidth]{after_comp.png}
+     \caption{Transducer after composition with filter
+     \label{fig:after}}
+\end{figure*}
+
+
+
+\subsection{Lexical compilation}
+
+Previous version of lexc took to long to compile because each sub-lexicon was build separately and then disjunct with others. Compilation time of large morphologies would take up to several hours. In order to improve compilation speed and incorporate hyper-minimization part, we needed to change the lexc algorithm.
+
+We build a trie (TODO: what is trie) in which every sub-lexicon starts from the same start state with a require flag containing sub-lexicon name as a value. From that state, continues the morph, followed by a positive setting flag containing continuation value. In a case where the morph is a pair of two strings, epsilon padding is added to the end of the shorter string.
+
+\texttt{Lexc} can also contain regular expressions. In that case, the regular expression is parsed and processed into a transducer and saved into a table of regular expression keys and matching transducers. The key is added to the trie same way the strings are - trie entry will start with the encoded sub-lexicon name, followed by regex key and finished with a continuation. Later in the process, the regex keys are substituted with matching transducers from the hash table. Example of a trie built from lexical description in Figure~\ref{fig:lexc-a2} is shown in Figure~\ref{fig:trie}.
+
+
+When the entire lexical file is read into a trie, the trie is transformed into a transducer and over-generated with Kleene star:
+
+\begin{equation}\label{trie_star}
+tr = f(trie)^* 
 \end{equation}
 
+Then, to the beginning and end of the transducer are concatenated starting and ending encoded joiners. (In case of non-flagged version, the starting joiner is initial lexicon name, usually \texttt{Root} and ending joiner is encoded final lexicon, \texttt{\#}.) In case of the hyper-minimized transducer, the starting joiner is encoded P flag of the initial sub-lexicon, usually \texttt{P.LEXNAME.Root} and the ending one is R flag of the final lexicon, \texttt{R.LEXNAME.\#}.
+
+\begin{equation}\label{trie_star}
+tr' = \verb+P.LEXNAME.Root + tr \verb+ R.LEXNAME.#+
+\end{equation}
+
+To filter out invalid flag diacritic paths, to the transducer is composed this filter:
+
+\begin{equation}\label{filter}
+filter = \left( \left(\bigcup_{i} \verb+P.LEXNAME+_i \verb+ R.LEXNAME+_i \right) \cup (\Sigma \setminus F) ^*\right)^* 
+\end{equation}
+
+
+
+Transducer is composed to filter:
+\begin{equation}\label{composition}
+tr'' = tr' .o. filter
+\end{equation}
+
+In case some flag pairs should be left out from the transducer, at this point the flag pair could be replaced with epsilon.
+
+
+Then we need to insert regular expressions from the hash table.
+\begin{equation}\label{composition}
+regex\_key -> regex\_transducer
+\end{equation}
+
+
+
+
+
+\iffalse
 without flags:
 lexicons = start.concatenate(lexicons).concatenate(end).minimize();
             initialLexName lex \#
@@ -147,8 +258,6 @@ $ StringPairVector newVector(tokenizer_.tokenize(flagPstring + flagRstring));
             
             
 ------
-
-\begin{verbatim}
 StringPairVector newVector(tokenizer_.tokenize(alph)); <--- all right symbols, a da nije jedan od
                                 String prefix1("@@ANOTHER_EPSILON@@");
                                 String prefix2("$_LEXC_JOINER.");
@@ -166,56 +275,53 @@ joinersAll.minimize();
 
 lexicons.compose(joinersAll).minimize();
 \end{verbatim}
-
-----
+---
 Joniers -> epsilon
 ----
 Insert regular expressions
 ----
 $lexicons_basic.substitute(regMarkToTr, true);$
 
-
-
-
-\subsection{Adding flag automatic flag diacritics to the lexc compilation}
-Similarly as explained in paper ~\cite{drobac2014}. 
+\fi
 
 
 
 
 
-In Table~\ref{table:sizes} we show sizes of the original
-transducers compiled with the regular lexc compiler composed with grammar rules, transducers compiled
-with our new method that inserts flag diacritics composed with grammar rules and finally their ratio.
 
+\subsection{Results}
+
+
+
+In Table~\ref{table:sizes} we show sizes of the morphological analyser built with different approaches. The first column shows analyser size without any flag diacritics, it is followed by sizes achieved with the the previous method and finally there are shown sizes when compiled with the method proposed in this paper.
 \begin{table}
     \centering
-    \begin{tabular}{|l|r|r|r|}
+    \begin{tabular}{|l|r|r|r|r|r|}
         \hline
-        \bf Language & \bf Original & \bf With flags & \bf \% \\
+        \bf Language & \bf Original & \bf Old flags  & \bf \% & \bf New flags  & \bf \% \\
         \hline\hline
-        \bf Greenlandic &   168   & 17 & 10,1\%  \\
-        \bf North Saami &   12     & 5,7 & 47,5\%  \\
-        \bf Finnish &   17     & 16 & 94,1\%  \\
-        \bf Lule Saami  &   5     & 3 & 60,0\%  \\
-        \bf Erzya       &   3,7     & 5,3 & 143,2\%  \\
+        \bf Greenlandic &   168 M  & 17 M & 10,1\% &  14 M & 8,3\% \\
+        \bf North Saami &   12 M    & 5,7 M & 47,5\% & 10 M & 83,3\% \\
+        \bf Finnish &   17 M    & 16 M & 94,1\% & 16 M & 94,1\% \\
+        \bf Lule Saami  &   5 M    & 3 M & 60,0\% & 5 M & 100\% \\
+        \bf Erzya       &   3,7 M    & 5,3 M & 143,2\% &  5 & 135,13\% \\
         \hline
     \end{tabular}
-    \caption{Sizes of transducers without and with automatic flags (in megabytes); Percentage shows size of the flagged transducer in comparison with the original
+    \caption{analyzer size - Sizes of transducers without and with automatic flags (in megabytes); Percentage shows size of the flagged transducer in comparison with the original
     \label{table:sizes}}
 \end{table}
 
+In Table~\ref{table:lookup} we show lookup speed of the morphological analysers expressed in words per second...
 
 \begin{table}[h]
  \centering
-    \begin{tabular}{|l|r|r|r|}
+    \begin{tabular}{|l|r|r|r|r|r|}
         \hline
-        \bf Language & \bf Original & \bf With flags & \bf \% \\
+        \bf Language & \bf Original & \bf Old version & \bf \% & \bf New version & \bf \% \\
         \hline\hline
-        \bf Greenlandic & 2 770 w/s & 2 507 w/s & 90,5\%  \\
-        \bf North Saami & 30 714 w/s & 8 775 w/s & 28,6\%  \\
-        \bf Finnish  & 84 415 w/s & 27 420 w/s & 32,5\%  \\
-
+        \bf Greenlandic & 2 770 w/s & 2 507 w/s & 90,5\% & 2072 w/s & 74,8\%  \\
+        \bf North Saami & 30 714 w/s & 8 775 w/s & 28,6\% & 11 168 w/s & 36,4\%  \\
+        \bf Finnish  & 84 415 w/s & 27 420 w/s & 32,5\%  & 28 615 w/s & 33,9\%  \\
         \hline
     \end{tabular}
     \caption{Look-up speed of transducers without and with automatic flags; Percentage shows speed of the flagged transducer in comparison with the original
@@ -231,12 +337,12 @@ with our new method that inserts flag diacritics composed with grammar rules and
 We measure the success of our algorithm using real-world, large-scale
 language descriptions. For this purpose we have acquired freely
 available, open source language descriptions from the language repository of the University of 
-Tromsa~\cite{moshagen2013building}.\footnote{https://victorio.uit.no/langtech, revision 73836} The
+Tromsa~\cite{moshagen2013building}.\footnote{https://victorio.uit.no/langtech, revision 90691} The
 languages selected are Greenlandic (kal), North Saami (sme), Erzya
 (myv), Finnish (fin) and Lule Sami (smj).
 
 All operations with transducers were performed using Helsinki Finite
-State Technology tools~\cite{linden2011}.
+State Technology tools~\cite{linden2011}.\footnote{svn.code.sf.net/p/hfst/code, revision 3813}
 
 
 
