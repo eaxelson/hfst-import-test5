@@ -66,6 +66,12 @@ do
 	exit 1;
     fi
 
+    ## Test that using incompatible replace types in parallel rules yields an error message
+    if (!(echo 'regex a -> b ,, c (->) d ;' | ../hfst-xfst --pipe-mode -f $format > /dev/null 2> tmp) && grep "failed" tmp > /dev/null); then
+        echo "fail #6.5";
+        exit 1;
+    fi
+
     ## Test that the transducer info is correct
     if ! (echo 'regex [a|b|c|d|e] ([d|e|f|g]);' | ../hfst-xfst --pipe-mode -f $format > tmp 2> /dev/null); then
         echo "fail #7";
