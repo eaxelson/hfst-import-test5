@@ -312,7 +312,12 @@ namespace xfst {
       }
     if (strcmp(hfst::internal_epsilon.c_str(), symbol) == 0)
       {
-        return "@0@";
+        return "";
+      }
+    if (strcmp(hfst::internal_unknown.c_str(), symbol) == 0 || 
+        strcmp(hfst::internal_identity.c_str(), symbol) == 0)
+      {
+        return "?";
       }
     return symbol;
   }
