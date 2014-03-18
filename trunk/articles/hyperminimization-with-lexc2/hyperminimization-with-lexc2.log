@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.1415926-2.2-0.9995.2 (TeX Live 2009/Debian) (format=xelatex 2012.5.31)  27 JAN 2014 12:21
+This is XeTeX, Version 3.1415926-2.2-0.9995.2 (TeX Live 2009/Debian) (format=xelatex 2012.5.31)  17 MAR 2014 20:54
 entering extended mode
  %&-line parsing enabled.
 **hyperminimization-with-lexc2.tex
@@ -22,18 +22,13 @@ File: size11.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 \abovecaptionskip=\skip41
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
+) (./coling2014.sty
+Conference Style for COLING 2014 -- prepared 29th January 2014
+\titlebox=\skip43
+) (/usr/share/texmf-texlive/tex/latex/psnfss/times.sty
+Package: times 2005/04/12 PSNFSS-v9.2a (SPQR) 
 )
-(/usr/share/texmf-texlive/tex/latex/preprint/authblk.sty
-Package: authblk 2001/02/27 1.3 (PWD)
-\affilsep=\skip43
-\@affilsep=\skip44
-\c@Maxaffil=\count88
-\c@authors=\count89
-\c@affil=\count90
-) (./eacl2014.sty
-Conference Style for EACL 2014 -- released March 18, 2013
-\titlebox=\skip45
-) (/usr/share/texmf-texlive/tex/latex/ltxmisc/url.sty
+(/usr/share/texmf-texlive/tex/latex/ltxmisc/url.sty
 \Urlmuskip=\muskip10
 Package: url 2006/04/12  ver 3.3  Verb mode for urls, etc.
 )
@@ -43,394 +38,111 @@ Package: latexsym 1998/08/17 v2.2e Standard LaTeX package (lasy symbols)
 LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
 (Font)                  U/lasy/m/n --> U/lasy/b/n on input line 47.
 )
-(/usr/share/texmf-texlive/tex/xelatex/fontspec/fontspec.sty
-Package: fontspec 2008/08/09 v1.18 Advanced font selection for XeLaTeX
-
-(/usr/share/texmf-texlive/tex/generic/ifxetex/ifxetex.sty
-Package: ifxetex 2009/01/23 v0.5 Provides ifxetex conditional
-)
-\c@zf@newff=\count91
-\c@zf@index=\count92
-\c@zf@script=\count93
-\c@zf@language=\count94
-
-(/usr/share/texmf-texlive/tex/latex/tools/calc.sty
-Package: calc 2007/08/22 v4.3 Infix arithmetic (KKT,FJ)
-\calc@Acount=\count95
-\calc@Bcount=\count96
-\calc@Adimen=\dimen103
-\calc@Bdimen=\dimen104
-\calc@Askip=\skip46
-\calc@Bskip=\skip47
-LaTeX Info: Redefining \setlength on input line 76.
-LaTeX Info: Redefining \addtolength on input line 77.
-\calc@Ccount=\count97
-\calc@Cskip=\skip48
-)
-(/usr/share/texmf-texlive/tex/latex/xkeyval/xkeyval.sty
-Package: xkeyval 2008/08/13 v2.6a package option processing (HA)
-
-(/usr/share/texmf-texlive/tex/generic/xkeyval/xkeyval.tex
-\XKV@toks=\toks14
-\XKV@tempa@toks=\toks15
-\XKV@depth=\count98
-File: xkeyval.tex 2008/08/13 v2.6a key=value parser (HA)
-
-(/usr/share/texmf-texlive/tex/generic/xkeyval/keyval.tex)))
-(/usr/share/texmf-texlive/tex/latex/base/fontenc.sty
-Package: fontenc 2005/09/27 v1.99g Standard LaTeX package
-
-(/usr/share/texmf-texlive/tex/xelatex/euenc/eu1enc.def
-File: eu1enc.def 2008/03/08 v0.1d Experimental unicode font encoding
-)
-LaTeX Font Info:    Try loading font information for EU1+lmr on input line 100.
-
-
-(/usr/share/texmf-texlive/tex/xelatex/euenc/eu1lmr.fd
-File: eu1lmr.fd 2007/01/14 v1.3 Font defs for Latin Modern
-))
-LaTeX Info: Redefining \itshape on input line 1163.
-LaTeX Info: Redefining \slshape on input line 1166.
-LaTeX Info: Redefining \scshape on input line 1169.
-LaTeX Info: Redefining \upshape on input line 1172.
-
-fontspec.cfg loaded.
-(/usr/share/texmf-texlive/tex/xelatex/fontspec/fontspec.cfg))
-(/usr/share/texmf-texlive/tex/xelatex/xunicode/xunicode.sty
-File: xunicode.sty 2008/02/08 v0.91 provides access to latin accents and many o
-ther characters in Unicode lower plane
-)
-(/usr/share/texmf-texlive/tex/xelatex/xltxtra/xltxtra.sty
-Package: xltxtra 2009/09/02 v0.5 Improvements for the "XeLaTeX" format
-
-(/usr/share/texmf-texlive/tex/latex/metalogo/metalogo.sty
-Package: metalogo 2009/09/04 v0.11 Extended TeX logo macros
-
-(/usr/share/texmf-texlive/tex/latex/graphics/graphicx.sty
-Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
-
-(/usr/share/texmf-texlive/tex/latex/graphics/graphics.sty
-Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
-
-(/usr/share/texmf-texlive/tex/latex/graphics/trig.sty
-Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
-)
-(/etc/texmf/tex/latex/config/graphics.cfg
-File: graphics.cfg 2009/08/28 v1.8 graphics configuration of TeX Live
-)
-Package graphics Info: Driver file: xetex.def on input line 91.
-
-(/usr/share/texmf-texlive/tex/xelatex/xetex-def/xetex.def
-File: xetex.def 2009/11/22 v0.94 LaTeX color/graphics driver for XeTeX (RRM/JK)
-
-))
-\Gin@req@height=\dimen105
-\Gin@req@width=\dimen106
-)
-\xl@everylogo=\toks16
-\xl@@everylogo=\toks17
-LaTeX Info: Redefining \TeX on input line 193.
-LaTeX Info: Redefining \LaTeX on input line 202.
-LaTeX Info: Redefining \LaTeXe on input line 219.
-)
-(/usr/share/texmf-texlive/tex/latex/etex-pkg/etex.sty
-Package: etex 1998/03/26 v2.0 eTeX basic definition package (PEB)
-\et@xins=\count99
-)
-(/usr/share/texmf-texlive/tex/latex/base/fixltx2e.sty
-Package: fixltx2e 2006/09/13 v1.1m fixes to LaTeX
-LaTeX Info: Redefining \em on input line 420.
-)
-LaTeX Info: Redefining \em on input line 72.
-LaTeX Info: Redefining \emph on input line 81.
-LaTeX Info: Redefining \- on input line 86.
-LaTeX Info: Redefining \textsubscript on input line 105.
-LaTeX Info: Redefining \textsuperscript on input line 107.
-\xxt@tempbox=\box26
-)
-\c@zf@famc@Times New Roman=\count100
-Package fontspec Info: Defining font family for 'Times New Roman' with options 
-[Mapping=tex-text] on input line 13.
-
 (./hyperminimization-with-lexc2.aux)
 \openout1 = `hyperminimization-with-lexc2.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for EU1/lmr/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-Package fontspec Info: Adjusting the maths setup (use [no-math] to avoid this).
- on input line 48.
-\symlegacymaths=\mathgroup5
-LaTeX Font Info:    Overwriting symbol font `legacymaths' in version `bold'
-(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 48.
-LaTeX Font Info:    Redeclaring math accent \acute on input line 48.
-LaTeX Font Info:    Redeclaring math accent \grave on input line 48.
-LaTeX Font Info:    Redeclaring math accent \ddot on input line 48.
-LaTeX Font Info:    Redeclaring math accent \tilde on input line 48.
-LaTeX Font Info:    Redeclaring math accent \bar on input line 48.
-LaTeX Font Info:    Redeclaring math accent \breve on input line 48.
-LaTeX Font Info:    Redeclaring math accent \check on input line 48.
-LaTeX Font Info:    Redeclaring math accent \hat on input line 48.
-LaTeX Font Info:    Redeclaring math accent \dot on input line 48.
-LaTeX Font Info:    Redeclaring math accent \mathring on input line 48.
-LaTeX Font Info:    Redeclaring math symbol \colon on input line 48.
-LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 48.
-LaTeX Font Info:    Redeclaring math symbol \Delta on input line 48.
-LaTeX Font Info:    Redeclaring math symbol \Theta on input line 48.
-LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 48.
-LaTeX Font Info:    Redeclaring math symbol \Xi on input line 48.
-LaTeX Font Info:    Redeclaring math symbol \Pi on input line 48.
-LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 48.
-LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 48.
-LaTeX Font Info:    Redeclaring math symbol \Phi on input line 48.
-LaTeX Font Info:    Redeclaring math symbol \Psi on input line 48.
-LaTeX Font Info:    Redeclaring math symbol \Omega on input line 48.
-LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 48.
-LaTeX Font Info:    Redeclaring symbol font `operators' on input line 48.
-LaTeX Font Info:    Encoding `OT1' has changed to `EU1' for symbol font
-(Font)              `operators' in the math version `normal' on input line 48.
-LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  OT1/cmr/m/n --> EU1/TimesNewRoman(0)/m/n on input line 
-48.
-LaTeX Font Info:    Encoding `OT1' has changed to `EU1' for symbol font
-(Font)              `operators' in the math version `bold' on input line 48.
-LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  OT1/cmr/bx/n --> EU1/TimesNewRoman(0)/m/n on input line
- 48.
-LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  EU1/TimesNewRoman(0)/m/n --> EU1/TimesNewRoman(0)/m/n o
-n input line 48.
-LaTeX Font Info:    Overwriting math alphabet `\mathrm' in version `normal'
-(Font)                  EU1/TimesNewRoman(0)/m/n --> EU1/TimesNewRoman(0)/m/n o
-n input line 48.
-LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
-(Font)                  OT1/cmr/m/it --> EU1/TimesNewRoman(0)/m/it on input lin
-e 48.
-LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
-(Font)                  OT1/cmr/bx/n --> EU1/TimesNewRoman(0)/bx/n on input lin
-e 48.
-LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
-(Font)                  OT1/cmss/m/n --> EU1/lmss/m/n on input line 48.
-LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
-(Font)                  OT1/cmtt/m/n --> EU1/lmtt/m/n on input line 48.
-LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  EU1/TimesNewRoman(0)/m/n --> EU1/TimesNewRoman(0)/bx/n 
-on input line 48.
-LaTeX Font Info:    Overwriting math alphabet `\mathrm' in version `bold'
-(Font)                  EU1/TimesNewRoman(0)/m/n --> EU1/TimesNewRoman(0)/bx/n 
-on input line 48.
-LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
-(Font)                  OT1/cmr/bx/it --> EU1/TimesNewRoman(0)/bx/it on input l
-ine 48.
-LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
-(Font)                  OT1/cmss/bx/n --> EU1/lmss/bx/n on input line 48.
-LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
-(Font)                  OT1/cmtt/m/n --> EU1/lmtt/bx/n on input line 48.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 24.
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
+File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
+)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 25.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 49.
+(Font)              <12> on input line 25.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 49.
+(Font)              <8> on input line 25.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 49.
-LaTeX Font Info:    Try loading font information for U+lasy on input line 49.
+(Font)              <6> on input line 25.
+LaTeX Font Info:    Try loading font information for U+lasy on input line 25.
 
 (/usr/share/texmf-texlive/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
-Underfull \hbox (badness 1199) in paragraph at lines 65--73
-\EU1/TimesNewRoman(0)/m/n/10.95 Finite-state transducers are an established way
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 25.
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 25.
 
- []
-
-
-Underfull \hbox (badness 2012) in paragraph at lines 83--93
-\EU1/TimesNewRoman(0)/m/n/10.95 contiguous morphological constraints (Beesley,
- []
-
-
-Underfull \hbox (badness 1005) in paragraph at lines 83--93
-\EU1/TimesNewRoman(0)/m/n/10.95 fect on optimisation is at best haphazard, and
- []
-
-File: transducer.png Graphic file (type QTm)
-<use  "transducer.png" >
-File: gr.png Graphic file (type QTm)
- <use  "gr.png" >
-LaTeX Font Info:    Try loading font information for EU1+lmtt on input line 137
-.
-
-(/usr/share/texmf-texlive/tex/xelatex/euenc/eu1lmtt.fd
-File: eu1lmtt.fd 2007/01/14 v1.3 Font defs for Latin Modern
+(/usr/share/texmf-texlive/tex/latex/psnfss/ot1pcr.fd
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
-Underfull \hbox (badness 4416) in paragraph at lines 131--141
-[]\EU1/TimesNewRoman(0)/m/n/10.95 Consider for example Finnish morphology.
- []
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 68.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 68.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <9> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 68.
 
+
+LaTeX Warning: Reference `licence' on page 1 undefined on input line 68.
+
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10.95> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 102.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <10.95> on input line 114.
 [1
 
-
-
 ]
-Underfull \vbox (badness 5847) has occurred while \output is active []
+Overfull \hbox (17.79535pt too wide) in paragraph at lines 168--168
+[] \OT1/pcr/m/n/10.95 StringPairVector newVector(tokenizer_.tokenize(joinerEnc 
++ joinerEnc));[] 
+ []
 
 
-Underfull \hbox (badness 1424) in paragraph at lines 180--182
-\EU1/TimesNewRoman(0)/m/n/10.95 special syntax: []\EU1/lmtt/m/n/10.95 @operator
-.feature.value@\EU1/TimesNewRoman(0)/m/n/10.95 ,
+Overfull \hbox (50.64531pt too wide) in paragraph at lines 168--168
+[]\OT1/pcr/m/n/10.95 $ StringPairVector newVector(tokenizer_.tokenize(flagPstri
+ng + flagRstring));[] 
+ []
+
+
+Overfull \hbox (182.04515pt too wide) in paragraph at lines 168--168
+[]\OT1/pcr/m/n/10.95 StringPairVector newVector(tokenizer_.tokenize(alph)); <--
+- all right symbols, a da nije jedan od[] 
+ []
+
+
+Overfull \hbox (4.65536pt too wide) in paragraph at lines 168--168
+[]                                \OT1/pcr/m/n/10.95 String prefix1("@@ANOTHER_
+EPSILON@@");[] 
+ []
+
+
+Overfull \hbox (18.92465pt too wide) in paragraph at lines 170--176
+[]\OT1/ptm/m/n/10.95 ---- Joniers -> ep-silon ---- In-sert reg-u-lar ex-pres-si
+ons ---- $\OML/cmm/m/it/10.95 lexicons[]asic:substitute\OT1/cmr/m/n/10.95 (\OML
+/cmm/m/it/10.95 regMarkToTr; true\OT1/cmr/m/n/10.95 );$ 
  []
 
 [2]
-Underfull \hbox (badness 10000) in paragraph at lines 195--210
-[]\EU1/TimesNewRoman(0)/m/n/10.95 Every rightward continuation is replaced
- []
+Missing character: There is no é in font ptmr7t!
+ (./hyperminimization-with-lexc2.bbl
+Missing character: There is no é in font ptmr7t!
+Missing character: There is no — in font ptmr7t!
+) [3]
+(./hyperminimization-with-lexc2.aux)
 
+LaTeX Warning: There were undefined references.
 
-Underfull \hbox (badness 1215) in paragraph at lines 195--210
-\EU1/lmtt/m/n/10.95 LEXNAME \EU1/TimesNewRoman(0)/m/n/10.95 and value correspon
-ding to the con-
- []
-
-
-Underfull \hbox (badness 2744) in paragraph at lines 195--210
-\EU1/TimesNewRoman(0)/m/n/10.95 tinuation lexicon. For example, the lexicon
- []
-
-
-Underfull \hbox (badness 3503) in paragraph at lines 195--210
-\EU1/TimesNewRoman(0)/m/n/10.95 in figure 3[] has two rightward continuations:
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 195--210
-\EU1/lmtt/m/n/10.95 NOUNCASES \EU1/TimesNewRoman(0)/m/n/10.95 and \EU1/lmtt/m/n
-/10.95 #\EU1/TimesNewRoman(0)/m/n/10.95 , which are represented
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 195--210
-\EU1/TimesNewRoman(0)/m/n/10.95 using flags []\EU1/lmtt/m/n/10.95 @P.LEXNAME.NO
-UNCASES@ \EU1/TimesNewRoman(0)/m/n/10.95 and
- []
-
-
-Underfull \hbox (badness 6493) in paragraph at lines 195--210
-[]\EU1/lmtt/m/n/10.95 @P.LEXNAME.#@\EU1/TimesNewRoman(0)/m/n/10.95 . Similarly,
- every leftward
- []
-
-
-Underfull \hbox (badness 1490) in paragraph at lines 195--210
-\EU1/TimesNewRoman(0)/m/n/10.95 continuation is replaced with request test flag
-
- []
-
-
-Underfull \hbox (badness 1509) in paragraph at lines 195--210
-\EU1/TimesNewRoman(0)/m/n/10.95 which also has feature \EU1/lmtt/m/n/10.95 LEXN
-AME \EU1/TimesNewRoman(0)/m/n/10.95 and the cor-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 195--210
-\EU1/TimesNewRoman(0)/m/n/10.95 responding value. Therefore, the lexicon
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 195--210
-\EU1/TimesNewRoman(0)/m/n/10.95 and []\EU1/lmtt/m/n/10.95 @R.LEXNAME.#@\EU1/Tim
-esNewRoman(0)/m/n/10.95 . Additionally, every
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 195--210
-\EU1/TimesNewRoman(0)/m/n/10.95 morphological description starts with \EU1/lmtt
-/m/n/10.95 Root\EU1/TimesNewRoman(0)/m/n/10.95 ,
- []
-
-
-Underfull \hbox (badness 3333) in paragraph at lines 195--210
-\EU1/TimesNewRoman(0)/m/n/10.95 which is represented using the pair of flags
- []
-
-
-Underfull \hbox (badness 1210) in paragraph at lines 214--220
-\EU1/TimesNewRoman(0)/m/n/10.95 ten contain empty, or nearly empty, continua-
- []
-
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 231.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <9> on input line 236.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 236.
-
-Overfull \hbox (10.30536pt too wide) in paragraph at lines 254--265
- [][] 
- []
-
-
-Underfull \hbox (badness 6016) in paragraph at lines 283--285
-[]\EU1/TimesNewRoman(0)/m/n/10.95 All operations with transducers were per-
- []
-
-
-Underfull \hbox (badness 2617) in paragraph at lines 291--299
-\EU1/TimesNewRoman(0)/m/n/10.95 transducers using automatically inserted flags.
-
- []
-
-[3]
-Underfull \hbox (badness 1509) in paragraph at lines 300--310
-\EU1/TimesNewRoman(0)/m/n/10.95 icon, the results have shown that, for certain
- []
-
-
-Underfull \hbox (badness 1147) in paragraph at lines 300--310
-\EU1/TimesNewRoman(0)/m/n/10.95 dreds of times. This will happen every time
- []
-
-(./hyperminimization-with-lexc2.bbl
-Underfull \hbox (badness 10000) in paragraph at lines 25--33
-[]\EU1/TimesNewRoman(0)/m/n/10 Krister Lindén, Erik Axelson, Sam Hardwick,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 25--33
-\EU1/TimesNewRoman(0)/m/n/10 Hfst—framework for compiling and applying
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 36--42
-[]\EU1/TimesNewRoman(0)/m/n/10 Sjur Moshagen, Tommi A Pirinen, and Trond
- []
-
-
-Underfull \hbox (badness 4886) in paragraph at lines 36--42
-\EU1/TimesNewRoman(0)/m/n/10 projects.  In \EU1/TimesNewRoman(0)/m/it/10 Procee
-dings of Nodalida 2013\EU1/TimesNewRoman(0)/m/n/10 .
- []
-
-) [4
-
-] (./hyperminimization-with-lexc2.aux) ) 
+ ) 
 Here is how much of TeX's memory you used:
- 5346 strings out of 495694
- 87096 string characters out of 1188240
- 165032 words of memory out of 3000000
- 8429 multiletter control sequences out of 15000+50000
- 9024 words of font info for 58 fonts, out of 3000000 for 9000
+ 476 strings out of 495694
+ 6010 string characters out of 1188240
+ 55347 words of memory out of 3000000
+ 3660 multiletter control sequences out of 15000+50000
+ 15445 words of font info for 49 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
- 40i,13n,43p,475b,258s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 23i,8n,19p,501b,228s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on hyperminimization-with-lexc2.pdf (4 pages).
+Output written on hyperminimization-with-lexc2.pdf (3 pages).
