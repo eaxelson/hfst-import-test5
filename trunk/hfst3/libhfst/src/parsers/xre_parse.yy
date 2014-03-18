@@ -357,6 +357,11 @@ REPLACE : REGEXP3 { }
 PARALLEL_RULES: PARALLEL_RULES COMMACOMMA RULE
          {
            //std::cerr << "parallel_rules: parallel_rules ,, rule"<< std::endl;      
+           if ($3->first != $1->first)
+           {
+             xreerror("Replace type mismatch in parallel rules");
+             YYABORT;
+           }
             Rule tmpRule($3->second);
             $1->second.push_back(tmpRule);
             $$ =  new std::pair< ReplaceArrow, std::vector<Rule> > ($3->first, $1->second);
