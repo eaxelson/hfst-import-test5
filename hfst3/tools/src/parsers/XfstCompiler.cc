@@ -92,6 +92,7 @@ namespace xfst {
   static void initialize_variable_explanations()
   {
     variable_explanations_["assert"] = "quit the application if test result is 0 and quit-on-fail is ON";
+    variable_explanations_["att-epsilon"] = "epsilon symbol used when reading from att files";
     variable_explanations_["char-encoding"] = "character encoding used";
     variable_explanations_["copyright-owner"] = "";
     variable_explanations_["directory"] = "<NOT IMPLEMENTED>";
@@ -139,6 +140,7 @@ namespace xfst {
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
         variables_["assert"] = "OFF";
+        variables_["att-epsilon"] = "@0@ | @_EPSILON_SYMBOL_@";
         variables_["char-encoding"] = "UTF-8";
         variables_["copyright-owner"] = "Copyleft (c) University of Helsinki";
         variables_["directory"] = "OFF";
@@ -185,6 +187,7 @@ namespace xfst {
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
         variables_["assert"] = "OFF";
+        variables_["att-epsilon"] = "@0@ | @_EPSILON_SYMBOL_@";
         variables_["char-encoding"] = "UTF-8";
         variables_["copyright-owner"] = "Copyleft (c) University of Helsinki";
         variables_["directory"] = "OFF";
@@ -4119,7 +4122,11 @@ namespace xfst {
 
       try
         {
-          HfstTransducer * tmp = new HfstTransducer(infile, format_);
+          HfstTransducer * tmp = NULL;
+          if (variables_["att-epsilon"].compare("@0@ | @_EPSILON_SYMBOL_@") == 0) 
+            tmp = new HfstTransducer(infile, format_);
+          else
+            tmp = new HfstTransducer(infile, format_, variables_["att-epsilon"]);
           MAYBE_MINIMIZE(tmp);
           stack_.push(tmp);
           print_transducer_info();
