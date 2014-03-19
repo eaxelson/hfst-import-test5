@@ -112,6 +112,8 @@ bool is_valid_function_call(const char * name, const std::vector<HfstTransducer>
 /** @brief Parse "input:output", ":output", "input:" or ":". */
  HfstTransducer* xfst_label_to_transducer(const char* input, const char* output);
 
+ HfstTransducer* xfst_curly_label_to_transducer(const char* input, const char* output);
+
  HfstTransducer * contains(const HfstTransducer * t);
 
  HfstTransducer * contains_with_weight(const HfstTransducer * t, float weight);
