@@ -91,7 +91,7 @@ Their special syntax is: \verb+@operator.feature.value@+, where
 
 In this paper, we will use only two types of flag diacritics: positive
 setting (\verb+@P.feature.value@+) and require test
-(\verb+@R.feature.value@+). While positive setting flag only sets the
+(\verb+@R.feature.value@+). While a positive setting flag only sets the
 feature to its value, the require test flag invokes testing whether the
 feature is set to the designated value. For example,
 \verb+@P.LEXNAME.Root@+ will set feature \texttt{LEXNAME} to value
@@ -184,10 +184,10 @@ no. of final states: 1
 \end{figure}
 
 
-This algorithm is an improvement of hyper-minimization algorithm introduced in~\newcite{drobac2014}. The main idea of the algorithm is to 
-replicate structure of a morphological lexicon into a finite state transducer with use of flag diacritics. Every sub-lexicon should start 
-with require flag \verb+R.LEXNAME.sub-lex+, where \verb+LEXNAME+ is feature name that we use for this special purpose
-and \verb+sub-lex+ is name of the current sub-lexicon. Accordingly, every continuation should be expressed with positive setting flag 
+This algorithm is an improvement of the hyper-minimization algorithm introduced in~\newcite{drobac2014}. The main idea of the algorithm is to 
+replicate the structure of a morphological lexicon into a finite state transducer with the use of flag diacritics. Every sub-lexicon should start 
+with a require flag \verb+R.LEXNAME.sub-lex+, where \verb+LEXNAME+ is the feature name that we use for this special purpose
+and \verb+sub-lex+ is the name of the current sub-lexicon. Accordingly, every continuation should be expressed with positive setting flag 
 \verb+P.LEXNAME.sub-lex+, which sets feature \verb+LEXNAME+ to a \verb+sub-lex+ value, which corresponds to the continuation lexicon.
 TODO - example?
 
@@ -210,9 +210,7 @@ TODO - example?
 \end{figure}
 
 
-While in the previous version flags were concentrated in flag diacritic hubs, single states from where all continuation lexicons begin with a 
-require test 
-and end with positive settings, new method distributes flag diacritic states. For example, if one hub state would have incoming transitions 
+While in the previous version flags were concentrated in flag diacritic hubs, single states in which all continuation lexicons end with positive settings and from which they continue with a require test, in the new method, flag diacritic states are distributed. For example, if one hub state would have incoming transitions 
 $P_1$, $P_2$, $P_3$ and outgoing transitions $R_1$, $R_2$, $R_3$, the distributed version would be divided into three states, each with one 
 $P_i$ $R_i$ pair, as shown in 
 Figure~\ref{fig:hub_distr}. Therefore, we can say:
@@ -225,27 +223,27 @@ Figure~\ref{fig:hub_distr}. Therefore, we can say:
 
 This distributiveness is necessary because it allows 
 composition of lexicon with grammar rules without creating extra invalid flag diacritic paths, which means that, 
-unlike in the previous version, there is no need for pruning after the composition.
+unlike in the previous version, there is no need for pruning paths with invalid flag combinations after the composition.
 
 
-One of the examples why preserving the lexical structure with flag diacritics is useful is explained on a small scale artificial example shown in 
+One of the examples why preserving the lexical structure with flag diacritics is useful is explained on a small-scale artificial example shown in 
 Figure~\ref{fig:simple-ex}.
  
-The Figure~\ref{fig:lexc-a2} shows language description of the following language: $(aaa)^*|(aaaa)^*|(aaaaa)^*$, written in 
+The Figure~\ref{fig:lexc-a2} shows the language description of the following language: $(aaa)^*|(aaaa)^*|(aaaaa)^*$, written in 
 the \texttt{lexc} format. In case this language is compiled into a normal, minimal transducer, it will consist of 60 states and 60 arcs, 
 but with the hyper-minimal method, the transducer size will be less then half of it: 23 states and 27 arcs, as shown in 
 Figure~\ref{fig:sizes-orig} and Figure~\ref{fig:sizes-flags} respectively.
 
 This happens because the non-flagged transducer will try to combine and keep all possible options of strings in the same path, until it gets 
 the least common multiple of strings $aaa$, $aaaa$ and $aaaaa$. On the other hand, the flagged version will be able to distribute those three 
-strings to different paths, avoiding duplication as much as possible.
+strings into different paths, avoiding duplication as much as possible.
 
-If we define transducer depths as the length of the longest path from any state to another state that doesn't go through the same state twice, 
-the non-flagged version has maximal depth of 59 after which it returns to the starting state to complete the cycle, while the hyper-minimal 
-one has maximal depth of 9. Keeping the transducer shallow will reduce the necessary number of states and paths, which results in smaller final size.
+If we define transducer depth as the length of the longest path from any state to another state that does not go through the same state twice, 
+the non-flagged version has a maximal depth of 59 after which it returns to the starting state to complete the cycle, while the hyper-minimal 
+one has the maximal depth of 9. Keeping the transducer shallow will reduce the necessary number of states and paths, which results in a smaller final size.
 
-The similar combinatorial phenomena occur in large lexicons, like in Greenlandic, but it is difficult to find illuminating and small real 
-world examples that could be presented in a paper.
+Similar combinatorial phenomena occur in large lexicons, like in Greenlandic, but it is difficult to find illuminating and small real 
+world examples that can be presented in a paper.
 
 
 \begin{figure*}
@@ -265,59 +263,76 @@ world examples that could be presented in a paper.
 
 \subsection{Lexical compilation}
 
-Previous version of \texttt{lexc} took to long to compile because each sub-lexicon was build separately and then disjunct with others. Compilation time of large morphologies would take up to several hours. In order to improve compilation speed and incorporate hyper-minimization part, we needed to change the \texttt{lexc} algorithm.
+Previous version of \texttt{lexc} took too long to compile because each sub-lexicon was built separately and then disjuncted with others. The compilation time of large morphologies would take up to several hours. In order to improve compilation speed and incorporate hyper-minimization, we needed to change the \texttt{lexc} algorithm.
 
-First, from a lexical description we build a transducer trie, an ordered, acyclic finite state transducer. In the trie, every sub-lexicon 
-starts from the same start state with a require flag with a sub-lexicon name as a value. After the require flag, continues the morph, followed 
-by a positive setting flag with continuation value. In a case where the morph is a pair of two strings, epsilon padding is added to the end of 
+First, from a lexical description, we build a transducer trie, an ordered, acyclic finite-state transducer. In the trie, every sub-lexicon 
+starts from the same start state with a require flag with a sub-lexicon name as a value. After the require flag, the morph continues, followed 
+by a positive setting flag with a continuation value. In the case where the morph is a pair of two strings, epsilon padding is added to the end of 
 the shorter string.
 
 \texttt{Lexc} can also contain regular expressions. In that case, the regular expression is parsed and processed into a transducer which is saved into 
-a map of regular expression keys and matching transducers. The key is added to the trie the same way the strings are - trie entry will start with 
-the encoded sub-lexicon name, followed by regular expression key and finish with the continuation. Later in the process, the regular expression 
+a map of regular expression keys and matching transducers. The key is added to the trie in the same way as the strings are, i.e. the trie entry will start with 
+the encoded sub-lexicon name, followed by the regular expression key and finish with the continuation. Later in the process, the regular expression 
 keys are substituted with matching transducers from the map. 
-Example of a trie built from lexical description in Figure~\ref{fig:lexc-a2} is shown in Figure~\ref{fig:trie}.
+Example of a trie built from the lexical description in Figure~\ref{fig:lexc-a2} is shown in Figure~\ref{fig:trie}.
 
 When the entire lexical file is read into a trie, the trie is transformed into a transducer and over-generated with Kleene star:
 \begin{equation}\label{eq:trie_star}
 tr = \left[f(trie)\right]^* 
 \end{equation}
-Transformation of the trie to a transducer is fast operation, even for large data structures, which results in fast and efficient \texttt{lexc}.
+Transformation of the trie to a transducer is a fast operation, even for large data structures, which also gives us a fast and efficient version of \texttt{lexc}.
 
-The next step is concatenation of starting and ending encoded joiners to the beginning and the end of the transducer. 
+The next step is concatenation of start and end encoded joiners with the beginning and the end of the transducer. 
 %(In case of non-flagged version, the starting joiner is initial lexicon name, usually \texttt{Root} and ending joiner is encoded final lexicon, \texttt{\#}.)
-In case of the hyper-minimized transducer, the starting joiner is encoded P flag of the initial sub-lexicon, usually \texttt{P.LEXNAME.Root} and the ending one is R flag of the final lexicon, \texttt{R.LEXNAME.\#}.
+For the hyper-minimized transducer, the starting joiner is the \verb+P+ flag of the initial sub-lexicon, usually \texttt{P.LEXNAME.Root} and the ending joiner is the \verb+R+ flag of the final lexicon, \texttt{R.LEXNAME.\#}.
 
 \begin{equation}\label{eq:joiners}
 tr' = \verb+P.LEXNAME.Root + tr \verb+ R.LEXNAME.#+
 \end{equation}
-This way, the transducer will always start and end with the same flag pair.
+This ensures that the transducer always starts and ends with the same flag pair.
 
-To filter out invalid flag diacritic paths, caused by trie over-generation from equation~\ref{eq:trie_star}, the transducer is composed to filter:
+To filter out invalid flag diacritic paths, caused by trie over-generation from equation~\ref{eq:trie_star}, the transducer is composed with a filter:
 \begin{equation}\label{eq:composition}
 tr'' = tr' .o. filter
 \end{equation}
-where filter is:
+where the filter is:
 \begin{equation}\label{eq:filter}
 filter = \left[ \left(\bigcup_{i} \verb+P.LEXNAME+_i \verb+ R.LEXNAME+_i \right) \cup (\Sigma \setminus F) ^*\right]^* 
 \end{equation}
 
-In a case some flag pairs are wished to be left out from the transducer, at this point the flag pairs could be replaced with epsilon.
+and $(\Sigma \setminus F)^*$ denotes universal language without the hyper-minimization \verb+P+ and \verb+R+ flags.
 
 
-The final step is to replace regular expression keys with actual regular expression transducers
+In case the user wishes to remove some flag pairs from the transducer, they can be replaced with epsilon at this point.
+
+
+The final step when constructing the lexc transducer is to replace regular expression keys with actual regular expression transducers
 \begin{equation}\label{eq:regex}
 regular\_expession\_key \rightarrow regular\_expression\_transducer
 \end{equation}
 
-In Figure~\ref{fig:after} is shown the final hyper-minimal transducer built from lexical description from Figure~\ref{fig:lexc-a2}. 
+In Figure~\ref{fig:after}, we show the final hyper-minimal transducer built from the lexical description in Figure~\ref{fig:lexc-a2}. 
 
+
+
+\section{Data}
+\label{sec:data}
+
+We measure the success of our algorithm using real-world, large-scale
+language descriptions. For this purpose we have acquired freely
+available, open source language descriptions from the language repository of the University of 
+Tromssa~\cite{moshagen2013building}.\footnote{https://victorio.uit.no/langtech, revision 90691} The
+languages selected are Greenlandic (kal), North Saami (sme), Erzya
+(myv), Finnish (fin) and Lule Sami (smj).
+
+All operations with transducers were performed using Helsinki Finite
+State Technology tools~\cite{linden2011}.\footnote{svn.code.sf.net/p/hfst/code, revision 3813}
 
 
 
 \section{Results}
-In Table~\ref{table:sizes} we show sizes of the morphological analyzer built with different approaches. The first column shows analyzer 
-size without any flag diacritics, it is followed by sizes achieved with the previous method and finally there are shown sizes when 
+In Table~\ref{table:sizes}, we show the sizes of the morphological analyzers built with different approaches. The first column shows analyzer 
+size without any flag diacritics, it is followed by the sizes achieved with the previous method and finally there are sizes when 
 compiled with the method proposed in this paper.
 \begin{table}
     \centering
@@ -355,19 +370,6 @@ In Table~\ref{table:lookup} we show lookup speed of the morphological analysers 
 
 
 % Find out and discuss why tr with lots of flags get big after applying rules
-
-\section{Data}
-\label{sec:data}
-
-We measure the success of our algorithm using real-world, large-scale
-language descriptions. For this purpose we have acquired freely
-available, open source language descriptions from the language repository of the University of 
-Tromsa~\cite{moshagen2013building}.\footnote{https://victorio.uit.no/langtech, revision 90691} The
-languages selected are Greenlandic (kal), North Saami (sme), Erzya
-(myv), Finnish (fin) and Lule Sami (smj).
-
-All operations with transducers were performed using Helsinki Finite
-State Technology tools~\cite{linden2011}.\footnote{svn.code.sf.net/p/hfst/code, revision 3813}
 
 
 
