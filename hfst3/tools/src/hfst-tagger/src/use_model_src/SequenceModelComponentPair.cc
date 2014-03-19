@@ -19,8 +19,8 @@ SequenceModelComponentPair::StatePair2StateMap::operator[](const StatePair &p)
   while (static_cast<int>(state_pair_to_state_map_.size()) <= p.first)
     { 
       state_pair_to_state_map_.insert(state_pair_to_state_map_.end(),
-				      state_pair_to_state_map_.size() + 1,
-				      StateVector()); 
+                                      state_pair_to_state_map_.size() + 1,
+                                      StateVector()); 
     }
 
   StateVector &state_vector = state_pair_to_state_map_[p.first];
@@ -123,6 +123,9 @@ using hfst::TROPICAL_OPENFST_TYPE;
 
 int main(void)
 {
+  bool enc = hfst::get_encode_weights();
+  hfst::set_encode_weights(false); // TEST
+
   HfstTransducer a("a",TROPICAL_OPENFST_TYPE);
   HfstTransducer def(DEFAULT_SYMBOL,TROPICAL_OPENFST_TYPE);
   HfstTransducer b("b",TROPICAL_OPENFST_TYPE);
@@ -145,23 +148,23 @@ int main(void)
   assert(mp.get_final_weight(0) == infinity);
 
   assert(mp.get_transition
-	 (0,
-	  SequenceModelComponent::get_symbol("a")).target == 1);
+         (0,
+          SequenceModelComponent::get_symbol("a")).target == 1);
 
   assert(mp.get_transition
-	 (0,
-	  SequenceModelComponent::get_symbol("a")).weight +
-	 mp.get_final_weight(1) == static_cast<float>(11.0));
+         (0,
+          SequenceModelComponent::get_symbol("a")).weight +
+         mp.get_final_weight(1) == static_cast<float>(11.0));
 
   assert(mp.get_transition
-	 (0,
-	  SequenceModelComponent::get_symbol("b")).weight +
-	 mp.get_final_weight(1) == static_cast<float>(12.0));
+         (0,
+          SequenceModelComponent::get_symbol("b")).weight +
+         mp.get_final_weight(1) == static_cast<float>(12.0));
   
   assert(mp.get_transition
-	 (0,
-	  SequenceModelComponent::get_symbol("c")).weight +
-	 mp.get_final_weight(1) == static_cast<float>(20.0));
+         (0,
+          SequenceModelComponent::get_symbol("c")).weight +
+         mp.get_final_weight(1) == static_cast<float>(20.0));
 
   HfstTransducer c("c",TROPICAL_OPENFST_TYPE);
   c.set_final_weights(3.0).minimize();
@@ -169,9 +172,10 @@ int main(void)
   SequenceModelComponentPair mpp(m3,mp);
 
   assert(mpp.get_transition
-	 (0,
-	  SequenceModelComponent::get_symbol("c")).weight +
-	 mpp.get_final_weight(1) == static_cast<float>(23.0));
+         (0,
+          SequenceModelComponent::get_symbol("c")).weight +
+         mpp.get_final_weight(1) == static_cast<float>(23.0));
 
+  hfst::set_encode_weights(enc); // TEST
 }
 #endif // MAIN_TEST
