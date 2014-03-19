@@ -659,6 +659,66 @@ static const char * get_print_format(const char * symbol)
 }
 
 HfstTransducer*
+xfst_curly_label_to_transducer(const char* input, const char* output)
+{
+  HfstTransducer * retval = NULL;
+
+  if (strcmp(input, hfst::internal_unknown.c_str()) == 0)
+    {
+      HfstTokenizer tok;
+      StringVector sv = tok.tokenize_one_level(output);
+      std::string first_token(sv.at(0));
+      retval = new HfstTransducer
+        (hfst::internal_unknown, first_token, hfst::xre::format);
+
+      for (StringVector::const_iterator it = sv.begin();
+           it != sv.end(); it++)
+        {
+          HfstTransducer tmp(*it, first_token, hfst::xre::format);
+          retval->disjunct(tmp, false);
+        }
+      for (StringVector::const_iterator it = ++(sv.begin());
+           it != sv.end(); it++)
+        {
+          HfstTransducer tmp(hfst::internal_epsilon, *it, hfst::xre::format);
+          retval->concatenate(tmp, false);
+        }      
+    }
+  else if (strcmp(output, hfst::internal_unknown.c_str()) == 0)
+    {
+      HfstTokenizer tok;
+      StringVector sv = tok.tokenize_one_level(input);
+      std::string first_token(sv.at(0));
+      retval = new HfstTransducer
+        (first_token, hfst::internal_unknown, hfst::xre::format);
+
+      for (StringVector::const_iterator it = sv.begin();
+           it != sv.end(); it++)
+        {
+          HfstTransducer tmp(first_token, *it, hfst::xre::format);
+          retval->disjunct(tmp, false);
+        }
+      for (StringVector::const_iterator it = ++(sv.begin());
+           it != sv.end(); it++)
+        {
+          HfstTransducer tmp(*it, hfst::internal_epsilon, hfst::xre::format);
+          retval->concatenate(tmp, false);
+        }      
+    }
+  else
+    {
+      std::string istr(input);
+      std::string ostr(output);
+      HfstTokenizer tok;
+      tok.add_multichar_symbol(hfst::internal_epsilon);
+      retval = new HfstTransducer(istr, ostr, tok, hfst::xre::format);
+    }
+
+  retval->minimize();
+  return retval;
+}
+
+HfstTransducer*
 xfst_label_to_transducer(const char* input, const char* output)
 {
   HfstTransducer * retval = NULL;

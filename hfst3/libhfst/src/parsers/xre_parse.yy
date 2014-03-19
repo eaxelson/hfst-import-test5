@@ -1085,27 +1085,21 @@ LABEL: HALFARC {
 	$$ = hfst::xre::xfst_label_to_transducer(hfst::internal_unknown.c_str(), hfst::internal_unknown.c_str());
      }
      | HALFARC PAIR_SEPARATOR CURLY_BRACKETS {
-        HfstTokenizer TOK;
-        TOK.add_multichar_symbol($1);
-        $$ = new HfstTransducer($1, $3, TOK, hfst::xre::format);
+     	$$ = hfst::xre::xfst_curly_label_to_transducer($1,$3);
         free($1);
         free($3);
      }
      | CURLY_BRACKETS PAIR_SEPARATOR HALFARC {
-        HfstTokenizer TOK;
-        TOK.add_multichar_symbol($3);
-        $$ = new HfstTransducer($1, $3, TOK, hfst::xre::format);
+     	$$ = hfst::xre::xfst_curly_label_to_transducer($1,$3);
         free($1);
         free($3);
      }
      | CURLY_BRACKETS {
-        HfstTokenizer TOK;
-        $$ = new HfstTransducer($1, TOK, hfst::xre::format);
+     	$$ = hfst::xre::xfst_curly_label_to_transducer($1,$1);
         free($1);
      }
      | CURLY_BRACKETS PAIR_SEPARATOR CURLY_BRACKETS {
-        HfstTokenizer TOK;
-        $$ = new HfstTransducer($1, $3, TOK, hfst::xre::format);
+     	$$ = hfst::xre::xfst_curly_label_to_transducer($1,$3);
         free($1);
 	free($3);
      }
