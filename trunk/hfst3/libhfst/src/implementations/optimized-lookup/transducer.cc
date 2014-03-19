@@ -203,21 +203,22 @@ void Encoder::read_input_symbols(const SymbolTable & kt)
 
 void Encoder::read_input_symbol(const char * s, const int s_num)
 {
-    if ((strlen(s) == 1) && should_ascii_tokenize((unsigned char)(*s))) {
-        ascii_symbols[(unsigned char)(*s)] = s_num;
-    }
+//    if ((strlen(s) == 1) && should_ascii_tokenize((unsigned char)(*s))) {
+//        ascii_symbols[(unsigned char)(*s)] = s_num;
+//    }
     letters.add_string(s, s_num);
 }
 
 SymbolNumber Encoder::find_key(char ** p)
 {
-    if (ascii_symbols[(unsigned char)(**p)] == NO_SYMBOL_NUMBER)
-    {
-        return letters.find_key(p);
-    }
-    SymbolNumber s = ascii_symbols[(unsigned char)(**p)];
-    ++(*p);
-    return s;
+    return letters.find_key(p);
+//    if (ascii_symbols[(unsigned char)(**p)] == NO_SYMBOL_NUMBER)
+//    {
+//        return letters.find_key(p);
+//    }
+//    SymbolNumber s = ascii_symbols[(unsigned char)(**p)];
+//    ++(*p);
+//    return s;
 }
 
 bool Transducer::initialize_input(const char * input)
@@ -311,7 +312,6 @@ void Transducer::try_epsilon_transitions(unsigned int input_pos,
                                          unsigned int output_pos,
                                          TransitionTableIndex i)
 {
-//        std::cerr << "try_epsilon_transitions, index " << i << std::endl;
     while (true)
     {
         if (tables->get_transition_input(i) == 0) // epsilon
@@ -351,7 +351,6 @@ void Transducer::try_epsilon_indices(unsigned int input_pos,
                                      unsigned int output_pos,
                                      TransitionTableIndex i)
 {
-//    std::cerr << "try_epsilon_indices, index " << i << std::endl;
     if (tables->get_index_input(i) == 0)
     {
         try_epsilon_transitions(input_pos,
@@ -432,7 +431,6 @@ void Transducer::get_analyses(unsigned int input_pos,
     if (indexes_transition_table(i))
     {
         i -= TRANSITION_TARGET_TABLE_START;
-
         // First we check for finality and collect the result
         if (input_tape[input_pos] == NO_SYMBOL_NUMBER) {
             if (max_lookups < 0 || lookup_paths->size() < max_lookups) {
@@ -471,7 +469,6 @@ void Transducer::get_analyses(unsigned int input_pos,
     }
     else
     {
-                
         if (input_tape[input_pos] == NO_SYMBOL_NUMBER) {
             if (max_lookups < 0 || lookup_paths->size() < max_lookups) {
                 output_tape.write(output_pos, NO_SYMBOL_NUMBER);
