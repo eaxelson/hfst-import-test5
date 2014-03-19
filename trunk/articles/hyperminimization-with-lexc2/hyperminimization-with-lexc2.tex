@@ -3,7 +3,7 @@
 \usepackage{times}
 \usepackage{url}
 \usepackage{latexsym}
-
+\usepackage{graphicx}
 
 
 \usepackage{fontspec}
@@ -76,10 +76,179 @@
      \url{http://creativecommons.org/licenses/by/4.0/}
 }
 
+Finite-state transducers are an established way of encoding
+morphological analysers for natural languages. Nevertheless,
+full-scale morphological analysers can often grow to be too large for
+use cases like spell checkers, speech processing and shallow parsing
+which should have moderate memory footprint.
+
+The size of large finite-state machines, both automata and
+transducers, can be reduced by applying a minimization algorithm which
+combines states that are
+suffix-equivalent~\cite{Aho1986}. Minimization can have a substantial
+impact on the size of the machine, but as it is only able to combine
+suffix-equivalent states, there may still be residual redundancy in
+state space of the finite-state machine.
+
+Further size reduction can be accomplished by introducing a limited
+form of context-free structure into the finite-state graph using
+special symbols called flag
+diacritics~\cite{beesley1998constraining}. Using flag diacritics, it
+is possible to combine sub-graphs which are equivalent, i.e. accept
+the same strings, but which are not necessarily
+suffix-equivalent. Flag diacritics are used to couple the entrance
+points of the sub-graphs with the correct exit points. During lookup,
+paths whose flag diacritics do not match are filtered out. Thus the
+original language of the machine is preserved.
+
+Traditionally, applying flag diacritics has required a linguist to
+provide the lexicon compiler with their positions. There are two major
+problems with this kind of approach: Firstly, linguists often do not
+have a very good understanding of the structure of the finite-state
+networks built from lexicographical-morphological descriptions;
+Secondly, the addition of flag diacritics to these descriptions makes
+them unreadable and unmanageable since the amount of non-linguistic
+data in the linguistic description increases.
+
+In order to facilitate the construction of small finite-state
+morphologies, Drobac et al. \shortcite{drobac2014} present an approach
+to automatically introduce flag diacritics into a finite-state
+lexicon. In this paper, we refine the approach by Drobac et
+al. \shortcite{drobac2014}. We show that our approach achieves further
+size reduction in some cases. Moreover, the approach presented in this
+paper is conceptually simpler, because we do not need to apply path
+filtering after applying phonological rules.
+
+We apply our approach to morphological analyzers for five
+morphologically complex languages, namely Greenlandic, North Saami,
+Finnish, Lule Saami and Erzya. Our approach results in larger size
+reduction for Greenlandic than the approach presented by Drobac et
+al. \shortcite{drobac2014}. Furthermore, compilation time is reduced
+for all languaes [?] and lookup time is reduced for Finnish and North
+Saami.
+
+\begin{figure*}[!htb]
+    \includegraphics[width=\textwidth]{transducer.png}
+     \caption{Simplified part of Finnish lexc grammar description with automatic flags
+     \label{fig:lexc-fin-flag}}
+\end{figure*}
+
+\begin{figure*}[!htb]
+    \includegraphics[width=\textwidth]{gr.png}
+     \caption{Simplified part of Greenlandic lexc grammar description with automatic flags
+     \label{fig:lexc-gr-flag}}
+\end{figure*}
+
 \section{Background}
 \label{sec:background}
 
- 
+Finite state morphology~\cite{beesley2003finite} is the
+state-of-the-art in writing morphological analysers for natural
+languages of the whole range of typologically varying morphological
+features. The finite-state approach is built around two practical
+concepts: constructing lexicographical descriptions of the language
+using a syntax called lexc and expressing morphophonological
+variations as regular expression rules. In this paper we study lossless
+hyper-minimization of finite-state machines derived from lexicographic
+descriptions in the lexc formalism \cite{beesley1998constraining}.
+
+Hyper-minimization of minimal deterministic finite-state machines
+refers to procedures which produce an even smaller finite-state
+machine which preserves some of the qualities of the original
+deterministic minimal machine. Hyper-minimization comes in two flavors
+lossy and lossless.
+
+Lossy hyper-minimization algorithms~\cite{maletti2011} introduce a
+limited amount of changes to the language accepted by the original
+machine. This makes the machine susceptible to further size reduction
+using conventional minimization algorithms. Lossy hyper-minimization results in a deterministic machine which allows fast lookup.
+
+In contrast to lossy hyper-minimization, the approach presented in
+this paper is lossless. We introduce a limited amount of
+non-determinism into the finite-state machine using flag
+diacritics. Thus we achieve size reduction, while at the same time
+preserving the original language accepted by the finite-state
+machine. The non-determinism introduced by the algorithm results in
+some reduction in run-time during lookup. Nevertheless, our
+experiments show that this reduction is not prohibitive in practice
+(see Section \ref{results}).
+
+Finding the smallest non-deterministic finite-state machine equivalent
+to a given machine is PSPACE complete \cite{jiang1993} and thus
+intractable. Nevertheless, using a linguistic description, rather than
+a compiled finite-state machine, as starting point it is possible to
+achieve substantial reduction in the size of the machine without
+penalties in compilation time (see Section \ref{results}).
+
+Our approach is applied to lexicogrphical descriptions in lexc. Lexc
+is a simple right-linear phrase structure grammar formalism. In
+linguistic terms this means approximately the following: we have
+collections of lexicons, which are lists of morphemes. Each morpheme
+in a lexicon defines a continuation lexicon, which in turn determines
+the set of morphemes that can succeed the original morpheme and their
+possible continuations.
+
+Consider for example Finnish morphology. Nominal inflection can be
+constructed neatly from left to right. In figure~\ref{fig:lexc-fin},
+there is a lexc representation of the Finnish words \emph{talo} `house',
+\emph{asu} `clothing' and \emph{kärry} `cart', and nominal suffixes
+\emph{n} (singular genitive), \emph{lle} (singular allative) and
+\emph{ksi} (singular translative). Derivation of word-forms starts
+from the \texttt{Root} lexicon. Each of the nouns in root set of morphemes
+continues rightwards to \texttt{NOUNCASES} set of morphemes, and each
+case morpheme continues towards the special \texttt{\#} lexicon
+signifying the end of a word-form.
+
+\begin{figure}
+    \centering
+    \begin{verbatim}
+    LEXICON Root
+    talo NOUNCASES ;
+    asu NOUNCASES ;
+    kärry NOUNCASES ;
+
+    LEXICON NOUNCASES
+    n # ;
+    lle # ;
+    ksi # ;
+    \end{verbatim}
+    \caption{Simplified part of Finnish lexc grammar description
+    \label{fig:lexc-fin}}
+\end{figure}
+
+Finnish was used as an example in Karttunen's paper on flag diacritics
+in optimisation~\shortcite{karttunen2006numbers}. In that paper, he
+showed that the optimisation quality of wisely selected flag
+diacritics can be substantial; from a 20,498 state automaton to an
+1,946 state one. The article describes Finnish numerals, which have
+the feature of requiring agreeing inflection in free compounding. This
+can be achieved by allowing all compounds and restricting the
+combinations by flags, instead by lexicon structure. Unfortunately,
+the article does not show examples or re-producible description of the
+lexicographical data, but to our experience there are no available
+morphologies that show similar compression quality, so it can be
+considered towards the upper bounds of what such compression can
+achieve.
+
+One of the reasons why flag diacritics have been so cumbersome from
+the linguists point of view, is their two-fold nature. On one hand,
+they are there to optimise the finite-state automaton structure,
+e.g. in~\cite{karttunen2006numbers}. On the other hand, they are the
+primary method of describing non-contiguous morphological
+constraints~\cite{beesley1998constraining}. If they are applied on the
+constriction of separated morphotactic dependencies, the effect on
+optimisation is at best haphazard, and the resulting description is
+neither linguistically motivated nor maintainable from a computational
+view-point.
+
+In order to circumvent problems associated with manually applied flag
+diacritics, Drobac et al. \shortcite{drobac2014} present an approach
+to inducing flag diacritics into lexc lexicons. This work can be seen
+as a refinement of that approach.
+
+The approach by Drobac et al. \shortcite{drobac2014} has some
+problems. What?
+
 \section{Flag diacritics}
 \label{sec:flags}
 
