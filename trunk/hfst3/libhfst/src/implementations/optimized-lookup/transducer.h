@@ -752,6 +752,7 @@ public:
         {}
     
     void add_string(const char * p,SymbolNumber symbol_key);
+    bool has_key_starting_with(const char c) const;
     
     SymbolNumber find_key(char ** p);
     
@@ -770,7 +771,7 @@ protected:
 public:
     Encoder(const SymbolTable & st, SymbolNumber input_symbol_count):
         number_of_input_symbols(input_symbol_count),
-        ascii_symbols(UCHAR_MAX,NO_SYMBOL_NUMBER)
+        ascii_symbols(128, NO_SYMBOL_NUMBER)
         {
             read_input_symbols(st);
         }
