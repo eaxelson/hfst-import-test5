@@ -13,6 +13,7 @@
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{array}
 
 \title{Hyper-minimization of Finite state Lexicions Using Flag Diacritics}
 
@@ -33,7 +34,7 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-  max 200 words
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam lectus metus, ultrices at arcu et, blandit hendrerit nunc. Etiam imperdiet porttitor tellus non dapibus. Cras vulputate viverra rutrum. Nam tristique dui sem, eget mattis eros pulvinar non. Integer consectetur luctus porttitor. Nunc in purus cursus arcu sollicitudin consequat ac sed nisi. In pharetra nec leo a congue. Donec non sapien sapien. Etiam at dictum mauris, eget sodales tellus. Ut bibendum augue bibendum, porta lorem eu, placerat magna. Duis tristique iaculis lorem, vel rhoncus magna bibendum et. Pellentesque et magna et odio suscipit fermentum. Phasellus id molestie est, et vulputate leo. Integer venenatis at massa ullamcorper aliquet. Aenean egestas fringilla massa, a bibendum dolor. Pellentesque sapien lectus, malesuada ut iaculis eu, tempus et tellus. - max 200 words
 \end{abstract}
 
 
@@ -79,7 +80,7 @@
 Finite-state transducers are an established way of encoding
 morphological analysers for natural languages. Nevertheless,
 full-scale morphological analysers can often grow to be too large for
-use cases like spell checkers, speech processing and shallow parsing
+use cases like spell checkers, speech processing and shallow parsing,
 which should have moderate memory footprint.
 
 The size of large finite-state machines, both automata and
@@ -98,7 +99,7 @@ is possible to combine sub-graphs which are equivalent, i.e. accept
 the same strings, but which are not necessarily
 suffix-equivalent. Flag diacritics are used to couple the entrance
 points of the sub-graphs with the correct exit points. During lookup,
-paths whose flag diacritics do not match are filtered out. Thus the
+paths whose flag diacritics do not match are filtered out. Thus, the
 original language of the machine is preserved.
 
 Traditionally, applying flag diacritics has required a linguist to
@@ -112,32 +113,28 @@ data in the linguistic description increases.
 
 In order to facilitate the construction of small finite-state
 morphologies, Drobac et al. \shortcite{drobac2014} present an approach
-to automatically introduce flag diacritics into a finite-state
+to semi-automatically introduce flag diacritics into a finite-state
 lexicon. In this paper, we refine the approach by Drobac et
-al. \shortcite{drobac2014}. We show that our approach achieves further
-size reduction in some cases. Moreover, the approach presented in this
-paper is conceptually simpler, because we do not need to apply path
-filtering after applying phonological rules.
+al. \shortcite{drobac2014}. We show that our approach achieves similar optimal hyper-minimal sizes, 
+but with fully automated process. Moreover, the approach presented in this
+paper is conceptually simpler and faster, because we do not need to apply path
+pruning after applying phonological rules.
 
 We apply our approach to morphological analyzers for five
 morphologically complex languages, namely Greenlandic, North Saami,
 Finnish, Lule Saami and Erzya. Our approach results in larger size
 reduction for Greenlandic than the approach presented by Drobac et
-al. \shortcite{drobac2014}. Furthermore, compilation time is reduced
-for all languages [?] and lookup time is reduced for Finnish and North
+al. \shortcite{drobac2014}. Furthermore, because of the new \texttt{lexc} approach, compilation time is reduced
+for all languages and lookup time is reduced for Finnish and North
 Saami.
 
+\iffalse
 \begin{figure*}[!htb]
     \includegraphics[width=\textwidth]{transducer.png}
-     \caption{Simplified part of Finnish lexc grammar description with automatic flags
+     \caption{Simplified part of Finnish \texttt{lexc} grammar description with automatic flags
      \label{fig:lexc-fin-flag}}
 \end{figure*}
-
-\begin{figure*}[!htb]
-    \includegraphics[width=\textwidth]{gr.png}
-     \caption{Simplified part of Greenlandic lexc grammar description with automatic flags
-     \label{fig:lexc-gr-flag}}
-\end{figure*}
+\fi
 
 \section{Background}
 \label{sec:background}
@@ -147,15 +144,15 @@ state-of-the-art in writing morphological analysers for natural
 languages of the whole range of typologically varying morphological
 features. The finite-state approach is built around two practical
 concepts: constructing lexicographical descriptions of the language
-using a syntax called lexc and expressing morphophonological
+using a syntax called \texttt{lexc} and expressing morphophonological
 variations as regular expression rules. In this paper we study lossless
 hyper-minimization of finite-state machines derived from lexicographic
-descriptions in the lexc formalism \cite{beesley1998constraining}.
+descriptions in the \texttt{lexc} formalism \cite{beesley1998constraining}.
 
 Hyper-minimization of minimal deterministic finite-state machines
 refers to procedures which produce an even smaller finite-state
 machine which preserves some of the qualities of the original
-deterministic minimal machine. Hyper-minimization comes in two flavors
+deterministic minimal machine. Hyper-minimization comes in two flavors:
 lossy and lossless.
 
 Lossy hyper-minimization algorithms~\cite{maletti2011} introduce a
@@ -169,30 +166,28 @@ non-determinism into the finite-state machine using flag
 diacritics. Thus we achieve size reduction, while at the same time
 preserving the original language accepted by the finite-state
 machine. The non-determinism introduced by the algorithm results in
-some reduction in run-time during lookup. Nevertheless, our
-experiments show that this reduction is not prohibitive in practice
-(see Section \ref{results}).
+some reduction in run-time during lookup, which is not prohibitive in practice.
 
 Finding the smallest non-deterministic finite-state machine equivalent
 to a given machine is PSPACE complete \cite{jiang1993} for general
-finite-state machines and thus intractable. Nevertheless, using a
-linguistic description, rather than a compiled finite-state machine,
-as starting point it is possible to achieve substantial reduction in
+finite-state machines and therefore intractable. Nevertheless, using a
+linguistic description rather than a compiled finite-state machine
+as starting point, it is possible to achieve substantial reduction in
 the size of the machine without penalties in compilation time (see
-Section \ref{results}).
+Section \ref{sec:results}).
 
-Our approach is applied to lexicogrphical descriptions in lexc. Lexc
+Our approach is applied to lexicogrphical descriptions in \texttt{lexc}. \texttt{Lexc}
 is a simple right-linear phrase structure grammar formalism. In
-linguistic terms this means approximately the following: we have
+linguistic terms, this means approximately the following: we have
 collections of lexicons, which are lists of morphemes. Each morpheme
 in a lexicon defines a continuation lexicon, which in turn determines
 the set of morphemes that can succeed the original morpheme and their
 possible continuations.
 
 Consider for example Finnish morphology. Nominal inflection can be
-constructed neatly from left to right. In figure~\ref{fig:lexc-fin},
-there is a lexc representation of the Finnish words \emph{talo} `house',
-\emph{asu} `clothing' and \emph{k√§rry} `cart', and nominal suffixes
+constructed neatly from left to right. In Figure~\ref{fig:lexc-fin},
+there is a \texttt{lexc} representation of the Finnish words \emph{talo} `house',
+\emph{asu} `clothing' and \emph{k‰rry} `cart', and nominal suffixes
 \emph{n} (singular genitive), \emph{lle} (singular allative) and
 \emph{ksi} (singular translative). Derivation of word-forms starts
 from the \texttt{Root} lexicon. Each of the nouns in root set of morphemes
@@ -206,14 +201,14 @@ signifying the end of a word-form.
     LEXICON Root
     talo NOUNCASES ;
     asu NOUNCASES ;
-    k√§rry NOUNCASES ;
+    k‰rry NOUNCASES ;
 
     LEXICON NOUNCASES
     n # ;
     lle # ;
     ksi # ;
     \end{verbatim}
-    \caption{Simplified part of Finnish lexc grammar description
+    \caption{Simplified part of Finnish \texttt{lexc} grammar description
     \label{fig:lexc-fin}}
 \end{figure}
 
@@ -244,7 +239,7 @@ view-point.
 
 In order to circumvent problems associated with manually applied flag
 diacritics, Drobac et al. \shortcite{drobac2014} present an approach
-to inducing flag diacritics into lexc lexicons. Our work can be seen
+of inducing flag diacritics into \texttt{lexc} lexicons. Our work can be seen
 as a refinement of their approach.
 
 We attempt to compare our approach to Drobac et
@@ -256,12 +251,11 @@ the size of the final machine. We do not remove flags, since it is
 time consuming and our approach yields small binaries even without
 flag removal. Prior to removing flags, the binary sizes reported by
 Drobac et al. \shortcite{drobac2014} are much larger than the sizes we
-achieve. We could probably achieve even further size reductions by
-removing some of the flags.
+achieve.
 
 The approach taken by Drobac et al. \shortcite{drobac2014} also
-requires path filtering if phonological rules are applied to the
-lexicon. This is explained in section \ref{methods}. In contrast, our
+requires path pruning if phonological rules are applied to the
+lexicon. In contrast, our
 approach requires no path filtering, which shortens compile time.
 
 \section{Flag diacritics}
@@ -270,7 +264,7 @@ approach requires no path filtering, which shortens compile time.
 Flag diacritics are special multi-character symbols which are interpreted during runtime. They can be used to optimize large transducers to couple entrance points of the sub-graphs with the correct exit points.
 
 Their special syntax is: \verb+@operator.feature.value@+, where
-\texttt{operator} is one of the available operators (P, U, R, D, N, C), \texttt{feature} is the name of a feature set by the user and \texttt{value} can be any value held in a feature, also provisionally defined. For additional information on the semantics of flag diacritic operators, see~\newcite{beesley2003finite}.
+\texttt{operator} is one of the available operators (\verb+P+, \verb+U+, \verb+R+, \verb+D+, \verb+N+, \verb+C+), \texttt{feature} is the name of a feature set by the user and \texttt{value} can be any value held in a feature, also provisionally defined. For additional information on the semantics of flag diacritic operators, see~\newcite{beesley2003finite}.
 
 
 In this paper, we will use only two types of flag diacritics: positive
@@ -279,14 +273,15 @@ setting (\verb+@P.feature.value@+) and require test
 feature to its value, the require test flag invokes testing whether the
 feature is set to the designated value. For example,
 \verb+@P.LEXNAME.Root@+ will set feature \texttt{LEXNAME} to value
-\texttt{Root}. If later in the path there is an R flag that requires test
+\texttt{Root}. If later in the path there is an \verb+R+ flag that requires test
 \verb+@R.LEXNAME.Root@+, the invoked test will succeed and that path
 will be considered valid.
 
 
 \section{Notation}
 \label{sec:notation}
-TODO ...
+Besides standard set operators, in this paper we use operators which are listed in Table~\ref{table:operators}. Additionally, 
+we use $\Sigma^*$ to define universal language and $F$ to define set of all hyper-minimization \verb+P+ and \verb+R+ flags.
 
 
 \begin{table}[h]
@@ -300,8 +295,7 @@ TODO ...
         \bf a : b & cross product  \\
         \bf a .o. b & composition  \\
         \bf * & Kleene star  \\
-        
-
+        \bf $\rightarrow$ & replacement \\
         \hline
     \end{tabular}
     \caption{List of operators
@@ -314,10 +308,45 @@ TODO ...
 \section{Methods}
 \label{sec:methods}
 
+This algorithm is an improvement of the hyper-minimization algorithm introduced in~\newcite{drobac2014}. The main idea of the algorithm is to 
+replicate the structure of a morphological lexicon into a finite state transducer with the use of flag diacritics. Every sub-lexicon should start 
+with a require flag \verb+R.LEXNAME.sub-lex+, where \verb+LEXNAME+ is the feature name that we use for this special purpose
+and \verb+sub-lex+ is the name of the current sub-lexicon. Accordingly, every continuation should be expressed with positive setting flag 
+\verb+P.LEXNAME.sub-lex+, which sets feature \verb+LEXNAME+ to a \verb+sub-lex+ value, which corresponds to the continuation lexicon.
+
+\begin{figure}[h]
+\centering
+\begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{hub.png}
+        \caption{A hub state}
+        \label{fig:hub}
+\end{subfigure}%
+\quad %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+  %(or a blank line to force the subfigure onto a new line)
+\begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{distr.png}
+        \caption{Distributed hub}
+        \label{fig:distr}
+\end{subfigure}
+\caption{Hub state before and after distribution}
+\label{fig:hub_distr}
+\end{figure}
+
+While in the previous version flags were concentrated in flag diacritic hubs, single states in which all continuation lexicons end with positive settings and from which they continue with a require test, in the new method, flag diacritic states are distributed. For example, if one hub state would have incoming transitions 
+$P_1$, $P_2$, $P_3$ and outgoing transitions $R_1$, $R_2$, $R_3$, the distributed version would be divided into three states, each with one 
+$P_i$ $R_i$ pair, as shown in 
+Figure~\ref{fig:hub_distr}. Therefore, we can say:
+
+\begin{equation}\label{hub_replacement}
+[P_1 | P_2 | P_3] [R_1 | R_2 | R_3] \rightarrow [P_1 R_1] | [P_2 R_2] | [P_3 R_3]
+\end{equation}
+
+This distributiveness is necessary because it allows 
+composition of lexicon with grammar rules without creating extra invalid flag diacritic paths, which means that, 
+unlike in the previous version, there is no need for pruning paths with invalid flag combinations after the composition.
 
 \begin{figure}[htbp]
     \centering
-
 \begin{subfigure}[t]{0.3\textwidth}
 \begin{verbatim}
 LEXICON Root
@@ -362,52 +391,9 @@ no. of final states: 1
 \caption{Summary of the hyper-minimal transducer
 \label{fig:sizes-flags}}
  \end{subfigure}
-
  \caption{Simple example lexicon with transducer sizes}
  \label{fig:simple-ex}
 \end{figure}
-
-
-This algorithm is an improvement of the hyper-minimization algorithm introduced in~\newcite{drobac2014}. The main idea of the algorithm is to 
-replicate the structure of a morphological lexicon into a finite state transducer with the use of flag diacritics. Every sub-lexicon should start 
-with a require flag \verb+R.LEXNAME.sub-lex+, where \verb+LEXNAME+ is the feature name that we use for this special purpose
-and \verb+sub-lex+ is the name of the current sub-lexicon. Accordingly, every continuation should be expressed with positive setting flag 
-\verb+P.LEXNAME.sub-lex+, which sets feature \verb+LEXNAME+ to a \verb+sub-lex+ value, which corresponds to the continuation lexicon.
-TODO - example?
-
-\begin{figure}
-\centering
-\begin{subfigure}[b]{0.4\textwidth}
-        \includegraphics[width=\textwidth]{hub.png}
-        \caption{A hub state}
-        \label{fig:hub}
-\end{subfigure}%
-\quad %add desired spacing between images, e. g. ~, \quad, \qquad etc.
-  %(or a blank line to force the subfigure onto a new line)
-\begin{subfigure}[b]{0.4\textwidth}
-        \includegraphics[width=\textwidth]{distr.png}
-        \caption{Distributed hub}
-        \label{fig:distr}
-\end{subfigure}
-\caption{Hub state before and after distribution}
-\label{fig:hub_distr}
-\end{figure}
-
-
-While in the previous version flags were concentrated in flag diacritic hubs, single states in which all continuation lexicons end with positive settings and from which they continue with a require test, in the new method, flag diacritic states are distributed. For example, if one hub state would have incoming transitions 
-$P_1$, $P_2$, $P_3$ and outgoing transitions $R_1$, $R_2$, $R_3$, the distributed version would be divided into three states, each with one 
-$P_i$ $R_i$ pair, as shown in 
-Figure~\ref{fig:hub_distr}. Therefore, we can say:
-
-\begin{equation}\label{hub_replacement}
-[P_1 | P_2 | P_3] [R_1 | R_2 | R_3] \rightarrow [P_1 R_1] | [P_2 R_2] | [P_3 R_3]
-\end{equation}
-
-
-
-This distributiveness is necessary because it allows 
-composition of lexicon with grammar rules without creating extra invalid flag diacritic paths, which means that, 
-unlike in the previous version, there is no need for pruning paths with invalid flag combinations after the composition.
 
 
 One of the examples why preserving the lexical structure with flag diacritics is useful is explained on a small-scale artificial example shown in 
@@ -422,6 +408,7 @@ This happens because the non-flagged transducer will try to combine and keep all
 the least common multiple of strings $aaa$, $aaaa$ and $aaaaa$. On the other hand, the flagged version will be able to distribute those three 
 strings into different paths, avoiding duplication as much as possible.
 
+
 If we define transducer depth as the length of the longest path from any state to another state that does not go through the same state twice, 
 the non-flagged version has a maximal depth of 59 after which it returns to the starting state to complete the cycle, while the hyper-minimal 
 one has the maximal depth of 9. Keeping the transducer shallow will reduce the necessary number of states and paths, which results in a smaller final size.
@@ -430,32 +417,23 @@ Similar combinatorial phenomena occur in large lexicons, like in Greenlandic, bu
 world examples that can be presented in a paper.
 
 
-\begin{figure*}
-    \includegraphics[width=\textwidth]{trie.png}
-     \caption{First step is to build a lexical trie
-     \label{fig:trie}}
-\end{figure*}
-
-
-\begin{figure*}
-    \includegraphics[width=\textwidth]{after_comp.png}
-     \caption{Transducer after composition with filter
-     \label{fig:after}}
-\end{figure*}
-
-
-
 \subsection{Lexical compilation}
 
 Previous version of \texttt{lexc} took too long to compile because each sub-lexicon was built separately and then disjuncted with others. The compilation time of large morphologies would take up to several hours. In order to improve compilation speed and incorporate hyper-minimization, we needed to change the \texttt{lexc} algorithm.
 
 First, from a lexical description, we build a transducer trie, an ordered, acyclic finite-state transducer. In the trie, every sub-lexicon 
-starts from the same start state with a require flag with a sub-lexicon name as a value. After the require flag, the morph continues, followed 
+starts from the same start state with a require flag having a sub-lexicon name as a value. After the require flag, the morph continues, followed 
 by a positive setting flag with a continuation value. In the case where the morph is a pair of two strings, epsilon padding is added to the end of 
 the shorter string.
 
+\begin{figure*}[h]
+    \includegraphics[width=\textwidth]{trie.png}
+     \caption{First step is to build a lexical trie
+     \label{fig:trie}}
+\end{figure*}
+
 \texttt{Lexc} can also contain regular expressions. In that case, the regular expression is parsed and processed into a transducer which is saved into 
-a map of regular expression keys and matching transducers. The key is added to the trie in the same way as the strings are, i.e. the trie entry will start with 
+the map of regular expression keys and matching transducers. The key is added to the trie in the same way as the strings are, i.e. the trie entry will start with 
 the encoded sub-lexicon name, followed by the regular expression key and finish with the continuation. Later in the process, the regular expression 
 keys are substituted with matching transducers from the map. 
 Example of a trie built from the lexical description in Figure~\ref{fig:lexc-a2} is shown in Figure~\ref{fig:trie}.
@@ -464,7 +442,9 @@ When the entire lexical file is read into a trie, the trie is transformed into a
 \begin{equation}\label{eq:trie_star}
 tr = \left[f(trie)\right]^* 
 \end{equation}
-Transformation of the trie to a transducer is a fast operation, even for large data structures, which also gives us a fast and efficient version of \texttt{lexc}.
+
+where $f$ is function that transforms trie into a finite state transducer. Transformation of the trie to a transducer is a fast operation, 
+even for large data structures, which enables a fast and efficient version of \texttt{lexc}.
 
 The next step is concatenation of start and end encoded joiners with the beginning and the end of the transducer. 
 %(In case of non-flagged version, the starting joiner is initial lexicon name, usually \texttt{Root} and ending joiner is encoded final lexicon, \texttt{\#}.)
@@ -490,10 +470,16 @@ and $(\Sigma \setminus F)^*$ denotes universal language without the hyper-minimi
 In case the user wishes to remove some flag pairs from the transducer, they can be replaced with epsilon at this point.
 
 
-The final step when constructing the lexc transducer is to replace regular expression keys with actual regular expression transducers
+The final step when constructing the \texttt{lexc} transducer is to replace regular expression keys with actual regular expression transducers
 \begin{equation}\label{eq:regex}
 regular\_expession\_key \rightarrow regular\_expression\_transducer
 \end{equation}
+
+\begin{figure*}[h]
+    \includegraphics[width=\textwidth]{after_comp.png}
+     \caption{Transducer after composition with filter
+     \label{fig:after}}
+\end{figure*}
 
 In Figure~\ref{fig:after}, we show the final hyper-minimal transducer built from the lexical description in Figure~\ref{fig:lexc-a2}. 
 
@@ -515,33 +501,57 @@ State Technology tools~\cite{linden2011}.\footnote{svn.code.sf.net/p/hfst/code, 
 
 
 \section{Results}
-In Table~\ref{table:sizes}, we show the sizes of the morphological analyzers built with different approaches. The first column shows analyzer 
-size without any flag diacritics, it is followed by the sizes achieved with the previous method and finally there are sizes when 
+\label{sec:results}
+In Table~\ref{table:sizes}, we compare the sizes of morphological analyzers built with different approaches. The first column shows analyzer 
+size without any flag diacritics. It is followed by sizes reported in~\newcite{drobac2014} for both automatically inserted flag diacritics 
+and manually optimized result. Finally there are sizes when 
 compiled with the method proposed in this paper.
-\begin{table}
+\iffalse
+\begin{table}[h]
     \centering
-    \begin{tabular}{|l|r|r|r|r|r|}
+    \begin{tabular}{|l|r|p{2.5cm}|p{2.5cm}|r|r|r|}
         \hline
-        \bf Language & \bf Original & \bf Old flags  & \bf \% & \bf New flags  & \bf \% \\
+        \bf Language & \bf Original & \bf~\newcite{drobac2014} with all flags & \bf~\newcite{drobac2014} after manual optimization  & \bf \% & \bf Our method  & \bf \% \\
         \hline\hline
-        \bf Greenlandic &   168 M  & 17 M & 10,1\% &  14 M & 8,3\% \\
-        \bf North Saami &   12 M    & 5,7 M & 47,5\% & 10 M & 83,3\% \\
-        \bf Finnish &   17 M    & 16 M & 94,1\% & 16 M & 94,1\% \\
-        \bf Lule Saami  &   5 M    & 3 M & 60,0\% & 5 M & 100\% \\
-        \bf Erzya       &   3,7 M    & 5,3 M & 143,2\% &  5 M & 135,13\% \\
+        \bf Greenlandic &   168 M & 185M & 17 M & 10,1\% &  14 M & 8,3\% \\
+        \bf North Saami &   12 M   & 14M & 5,7 M & 47,5\% & 10 M & 83,3\% \\
+        \bf Finnish &   17 M   & 17M & 16 M & 94,1\% & 16 M & 94,1\% \\
+        \bf Lule Saami  &   5 M  & 19M  & 3 M & 60,0\% & 5 M & 100\% \\
+        \bf Erzya       &   3,7 M  & 16M  & 5,3 M & 143,2\% &  5 M & 135,13\% \\
         \hline
     \end{tabular}
-    \caption{Analyzer size - Sizes of transducers without and with automatic flags (in megabytes); Percentage shows size of the flagged transducer in comparison with the original
+    \caption{Analyzer size - Sizes of transducers without and with flags (in megabytes); Percentage shows size of the flagged transducer in comparison with the original
+    \label{table:sizes}}
+\end{table}
+\fi
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|l|m{3cm}|m{3cm}|l |}
+        \hline
+        \bf Language & \bf Original & \bf ~\newcite{drobac2014} with all flags & \bf ~\newcite{drobac2014} after manual optimization  & \bf Our method \\
+        \hline\hline
+        \bf Greenlandic &   168 M & 185M & 17 M  &  14 M  \\
+        \bf North Saami &   12 M   & 14M & 5,7 M  & 10 M  \\
+        \bf Finnish &   17 M   & 17M & 16 M  & 16 M  \\
+        \bf Lule Saami  &   5 M  & 19M  & 3 M  & 5 M  \\
+        \bf Erzya       &   3,7 M  & 18M  & 5,3 M  &  5 M \\
+        \hline
+    \end{tabular}
+    \caption{Analyzer size - Sizes of transducers without and with flags (in megabytes)
     \label{table:sizes}}
 \end{table}
 
-In Table~\ref{table:lookup} we show lookup speed of the morphological analysers expressed in words per second...
+
+In Table~\ref{table:lookup} we show lookup speed of the morphological analyzers. First, there is the speed of original analyzer, 
+followed by the reported speed of the optimal flagged analyzer in ~\newcite{drobac2014} and finally the speed of the analyzer build with our method.
+The lookup speed is expressed in words per second.
 
 \begin{table}[h]
  \centering
-    \begin{tabular}{|l|r|r|r|r|r|}
+    \begin{tabular}{|l|l|m{3cm}|l|l|l|}
         \hline
-        \bf Language & \bf Original & \bf Old version & \bf \% & \bf New version & \bf \% \\
+        \bf Language & \bf Original & \bf ~\newcite{drobac2014} & \bf \% & \bf Our method & \bf \% \\
         \hline\hline
         \bf Greenlandic & 2 770 w/s & 2 507 w/s & 90,5\% & 2072 w/s & 74,8\%  \\
         \bf North Saami & 30 714 w/s & 8 775 w/s & 28,6\% & 11 168 w/s & 36,4\%  \\
@@ -559,19 +569,25 @@ In Table~\ref{table:lookup} we show lookup speed of the morphological analysers 
 
 \section{Discussion}
 \label{sec:discussion}
+The results show that with fully automatic insertion of flag diacritics we achieved similar morphologic analyzer sizes and lookup speeds as 
+presented in~\newcite{drobac2014} after their manual optimization with flag removal.
+Additionally, the filter that we apply to the flagged transducer during \texttt{lexc} (equation~\ref{eq:composition}) distributes hyper-minimizing flag diacritics, 
+allowing users to compose lexical transducer to phonological rules without path pruning afterwards, which makes the whole 
+compilation process easier and faster.
+In future work, it would be interesting to further optimize our method by automatically recognizing redundant flag diacritics 
+and immediately removing them during \texttt{lexc} compilation. It is possible that the smaller number of flag diacritics would 
+further reduce transducer sizes and improve lookup speed. Additionally, the lookup algorithm could be optimized with special 
+handling of the hyper-minimizing flags, which would result with faster applications.
 
 
-
-%\subsection{Future Directions}
-%\label{subsec:future-directions}
-
-%This is an optimistic thing so we thought that automatic induction of flags
-%shoulda work nicely for other neat things too. Hyper-minimization based on
-%morphophonology would be cool. Also, graph-structure. And other things.
 
 \section{Conclusion}
 \label{sec:conclusion}
-
+In this paper, we show that we can fully automatically produce hyper-minimal morphological transducers from their language descriptions. 
+This method is especially valuable in language infrastructures, where the same compilation method is applied to all languages, like in 
+the language repository of the University of Tromssa~\cite{moshagen2013building}. The fully automatic approach makes the usage of the 
+method simple and applicable in real world applications.
+ 
 
 
 \iffalse
