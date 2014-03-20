@@ -18,7 +18,8 @@ namespace hfst_ol {
 
 bool should_ascii_tokenize(unsigned char c)
 {
-    return ((c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z'));
+    return c <= 127;
+//    return ((c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z'));
 }
 
 TransducerAlphabet::TransducerAlphabet(std::istream& is,
@@ -177,6 +178,11 @@ void OlLetterTrie::add_string(const char * p, SymbolNumber symbol_key)
     letters[(unsigned char)(*p)]->add_string(p+1,symbol_key);
 }
 
+bool OlLetterTrie::has_key_starting_with(const char c) const
+{
+    return letters[(unsigned char) c] == NULL;
+}
+
 SymbolNumber OlLetterTrie::find_key(char ** p)
 {
     const char * old_p = *p;
@@ -203,22 +209,27 @@ void Encoder::read_input_symbols(const SymbolTable & kt)
 
 void Encoder::read_input_symbol(const char * s, const int s_num)
 {
-//    if ((strlen(s) == 1) && should_ascii_tokenize((unsigned char)(*s))) {
-//        ascii_symbols[(unsigned char)(*s)] = s_num;
-//    }
+    if ((strlen(s) == 1) && should_ascii_tokenize((unsigned char)(*s))
+        && !letters.has_key_starting_with(*s)) {
+        ascii_symbols[(unsigned char)(*s)] = s_num;
+    }
+    // If there's an ascii tokenized symbol shadowing this, remove it
+    if (strlen(s) > 1 &&
+        ascii_symbols[(unsigned char)(*s)] != NO_SYMBOL_NUMBER) {
+        ascii_symbols[(unsigned char)(*s)] = NO_SYMBOL_NUMBER;
+    }
     letters.add_string(s, s_num);
 }
 
 SymbolNumber Encoder::find_key(char ** p)
 {
-    return letters.find_key(p);
-//    if (ascii_symbols[(unsigned char)(**p)] == NO_SYMBOL_NUMBER)
-//    {
-//        return letters.find_key(p);
-//    }
-//    SymbolNumber s = ascii_symbols[(unsigned char)(**p)];
-//    ++(*p);
-//    return s;
+    if (ascii_symbols[(unsigned char)(**p)] == NO_SYMBOL_NUMBER)
+    {
+        return letters.find_key(p);
+    }
+    SymbolNumber s = ascii_symbols[(unsigned char)(**p)];
+    ++(*p);
+    return s;
 }
 
 bool Transducer::initialize_input(const char * input)
