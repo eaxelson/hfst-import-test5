@@ -124,7 +124,7 @@ morphologically complex languages, namely Greenlandic, North Saami,
 Finnish, Lule Saami and Erzya. Our approach results in larger size
 reduction for Greenlandic than the approach presented by Drobac et
 al. \shortcite{drobac2014}. Furthermore, compilation time is reduced
-for all languaes [?] and lookup time is reduced for Finnish and North
+for all languages [?] and lookup time is reduced for Finnish and North
 Saami.
 
 \begin{figure*}[!htb]
@@ -174,11 +174,12 @@ experiments show that this reduction is not prohibitive in practice
 (see Section \ref{results}).
 
 Finding the smallest non-deterministic finite-state machine equivalent
-to a given machine is PSPACE complete \cite{jiang1993} and thus
-intractable. Nevertheless, using a linguistic description, rather than
-a compiled finite-state machine, as starting point it is possible to
-achieve substantial reduction in the size of the machine without
-penalties in compilation time (see Section \ref{results}).
+to a given machine is PSPACE complete \cite{jiang1993} for general
+finite-state machines and thus intractable. Nevertheless, using a
+linguistic description, rather than a compiled finite-state machine,
+as starting point it is possible to achieve substantial reduction in
+the size of the machine without penalties in compilation time (see
+Section \ref{results}).
 
 Our approach is applied to lexicogrphical descriptions in lexc. Lexc
 is a simple right-linear phrase structure grammar formalism. In
@@ -243,11 +244,25 @@ view-point.
 
 In order to circumvent problems associated with manually applied flag
 diacritics, Drobac et al. \shortcite{drobac2014} present an approach
-to inducing flag diacritics into lexc lexicons. This work can be seen
-as a refinement of that approach.
+to inducing flag diacritics into lexc lexicons. Our work can be seen
+as a refinement of their approach.
 
-The approach by Drobac et al. \shortcite{drobac2014} has some
-problems. What?
+We attempt to compare our approach to Drobac et
+al. \shortcite{drobac2014}, but direct comparison is difficult for
+several reasons. The sizes of the transducer binaries reported by
+Drobac et al. \shortcite{drobac2014} are the result of first inducing
+flags automatically and then removing some of them in order to reduce
+the size of the final machine. We do not remove flags, since it is
+time consuming and our approach yields small binaries even without
+flag removal. Prior to removing flags, the binary sizes reported by
+Drobac et al. \shortcite{drobac2014} are much larger than the sizes we
+achieve. We could probably achieve even further size reductions by
+removing some of the flags.
+
+The approach taken by Drobac et al. \shortcite{drobac2014} also
+requires path filtering if phonological rules are applied to the
+lexicon. This is explained in section \ref{methods}. In contrast, our
+approach requires no path filtering, which shortens compile time.
 
 \section{Flag diacritics}
 \label{sec:flags}
