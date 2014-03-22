@@ -6,6 +6,7 @@
 \usepackage{fontspec}
 \usepackage{xunicode}
 \usepackage{xltxtra}
+\usepackage{array}
 
 \title{Heuristic Hyper-minimization of Finite State Lexicons}
 
@@ -14,20 +15,17 @@
 $^{\dagger}$University of Helsinki \\ Department of Speech Sciences, PO Box 9 \\
 {senka.drobac, krister.linden, tommi.pirinen, miikka.silfverberg}@helsinki.fi\\}
 
-\abstract{Flag diacritics, which are special multi-charachter symbols executed at runtime, enable optimising finite-state networks by
+\abstract{Flag diacritics, which are special multi-character symbols executed at runtime, enable optimising finite-state networks by
     combining identical sub-graphs of its transition
     graph. Traditionally, the feature has required linguists to devise
     the optimisations to the graph by hand alongside the morphological
-    description. In this paper, we present a novel method of
+    description. In this paper, we present a novel method for
     discovering flag positions in morphological lexicons automatically,
     based on the morpheme structure implicit in the language
     description. With this approach, we have gained significant
     decrease in the size of finite-state networks while maintaining reasonable application 
-    speed. The algorithm can be applied to any language description, where the biggest achievements are expected in large and complex morphologies. The most noticeable reduction in size we got with Greenlandic transducer, whose original transducer size is on average about 15 times larger than other morphologies. With presented hyper-minimization method, the transducer is reduced to 10,1\% of the original transducer size, with lookup speed decreased only by 9,5\%. 
-%    ... (150-200 words)
-    \\ \newline \Keywords{hyper-minimization, lexicon, FST}}
-
-%TODO - write more in abstract, keywords!
+    speed. The algorithm can be applied to any language description, where the biggest achievements are expected in large and complex morphologies. The most noticeable reduction in size we got with a morphological transducer for Greenlandic, whose original size is on average about 15 times larger than other morphologies. With the presented hyper-minimization method, the transducer is reduced to 10,1\% of the original size, with lookup speed decreased only by 9,5\%. 
+\\ \newline \Keywords{hyper-minimization, lexicon, FST}}
 
 \begin{document}
 
@@ -40,7 +38,7 @@ Finite-state transducers are an established way of encoding
 morphological analysers for natural languages. Nevertheless,
 full-scale morphological analysers can often grow to be too large for
 use cases like spell checkers, speech processing and shallow parsing, which 
-should have moderate memory footprint. Large transducers can be optimised by preserving the sub-lexicon structure with special symbols called flag diacritics, which prevents combinatorial blow ups in determinization.
+should have a moderate memory footprint. Large transducers can be optimised by preserving the sub-lexicon structure with special symbols called flag diacritics, which prevents combinatorial blow ups in determinization.
 
 %Large transducers can be optimised by recognising equivalent sub-graphs and combining them by using special symbols called flag diacritics, to couple entrance points of the sub-graphs with the correct exit points.
 
@@ -91,11 +89,11 @@ languages of a whole range of typologically varying morphological
 features. The finite-state approach is built around two practical
 concepts: constructing lexicographical descriptions of the language
 using a tool called lexc and expressing morphophonological
-variations as regular expression rules. In this paper we study the use
+variations as regular expression rules. In this paper, we study the use
 of the lexicographical structure as framed by lexc. 
 
 Lexc supports a simple right-linear morphosyntactic grammar formalism. In
-linguistic terms this means approximately the following: we have
+linguistic terms, this means approximately the following: we have
 collections of lexicons, which are lists of morphemes. Each morpheme
 in a lexicon has continuation lexicons, which in turn determine
 the set of morphemes that can succeed the morpheme.
@@ -134,7 +132,7 @@ signifying the end of a word-form.
 Finnish was used as an example in Karttunen's paper on flag diacritics
 on optimisation~\shortcite{karttunen2006numbers}. In that paper, he
 showed that the optimisation quality of wisely selected flag
-diacritics can be substantial; from a 20,498 state automaton to an
+diacritics can be substantial; from a 20,498 state automaton to a
 1,946 state one. The article describes Finnish numerals, which have
 the feature of requiring agreeing inflection in free compounding. This
 can be achieved by allowing all compounds and restricting the
@@ -208,7 +206,7 @@ other.
 
 Consider for example the composition of a lexicon $L$ with a rule $R$. If
 both transducers contain flag diacritics for feature {\tt FEATURE},
-then $all features F$ are renamed {\tt F1} in $L$ and {\tt F2} in
+then $all features\:F$ are renamed {\tt F1} in $L$ and {\tt F2} in
 $R$.~\footnote{It is not sufficient to rename only flag diacritics
   with common features, because that might clash with existing feature
   names.} All flag diacritics (like {\tt @P.F.True@}) are renamed
@@ -246,7 +244,7 @@ the whole path is proclaimed invalid and removed from the transducer.
 
 % Here should come part with automatically finding which flags not to insert (P1, P2, P3?)
 \subsection{Removing flag diacritics}
-
+\label{removing}
 
 \begin{figure}
 \centering
@@ -322,6 +320,7 @@ Then, from the original transducer we subtract all the paths that do not have tw
 do not start with \verb+P.LEXNAME.Root+ and end with \verb+R.LEXNAME.#+ and finally substitute all \verb+$JOINER.SUBLEX$+ transitions with epsilon transition.
 
 \subsection{Choosing flag-diacritics for removal}
+\label{optimisation}
 
 We have experimented with removing different flags and flags combinations from the lexical transducer 
 to get an optimal transducer size after the composition with rules, although the flag removal usually increases lexical transducer size. 
@@ -388,47 +387,39 @@ The complete calculation for this small example lexicon is shown in Table~\ref{t
      \label{fig:p-measure-sizes}}
 \end{figure*}
 
-After calculating T for the all sub-lexicons in the Greenlandic lexicon and sorting values, we got data 
+After calculating T for all the sub-lexicons in the Greenlandic lexicon and sorting values, we got data 
 that seems to fit an exponential function. We experimented removing one flag diacritic at a 
 time and the sizes we got for the lexicon transducer itself and the one with grammar rules composed is shown in 
 Figure~\ref{fig:p-measure-sizes}. On the x-axis are sub-lexicons, while the y-axis shows sizes in megabytes and the right 
 y-axis the T-measure. The dotted line shows sizes of the lexicon transducer with flag diacritics removed for 
-a sub-lexicon at the time. Each new removal is done to the previous result transducer. 
-Solid dot line shows sizes of the same lexicon transducers with the rules composed to them. 
-The dashed line shows T measure (with values on the right y-axis).  
+one sub-lexicon at a time. Each new removal is done to the previous result transducer. 
+The solid dot line shows sizes of the same lexicon transducers with the rules composed to them. 
+The dashed line shows the T measure (with values on the right y-axis).  
   
-It is interesting to see that the relations of T measure and transducer sizes after flag removal are somewhat proportional. 
+It is interesting to see that the relations of the T measure and transducer sizes after flag removal are somewhat proportional. 
 Additionally, the point where the transducer size with the applied rules is the smallest is just after the place where 
 the T measure starts to grow rapidly. 
 
-
-
-
-
-
-
-
-
-In Table~\ref{table:sizes} we show sizes of the original
-transducers compiled with the regular lexc compiler composed with grammar rules, transducers compiled
-with our new method that inserts flag diacritics composed with grammar rules and finally their ratio.
-
-\begin{table}
+\begin{table*}[!h]
     \centering
-    \begin{tabular}{|l|r|r|r|}
+    \begin{tabular}{|l|r|r|r|r|}
         \hline
-        \bf Language & \bf Original & \bf With flags & \bf \% \\
+        \bf Language & \bf Original & \bf With all flags & \bf After optimization & \bf \% \\
         \hline\hline
-        \bf Greenlandic &   168   & 17 & 10,1\%  \\
-        \bf North Saami &   12     & 5,7 & 47,5\%  \\
-        \bf Finnish &   17     & 16 & 94,1\%  \\
-        \bf Lule Saami  &   5     & 3 & 60,0\%  \\
-        \bf Erzya       &   3,7     & 5,3 & 143,2\%  \\
+        \bf Greenlandic &   168 M  & 	185	M& 17 M & 10,1\%  \\
+        \bf North Saami &   12 M   &  14 M	& 5,7 M & 47,5\%  \\
+        \bf Finnish &   17 M     	 &	17 M 	& 16 M & 94,1\%  \\
+        \bf Lule Saami  &   5 M    & 	19 M 	& 3 M & 60,0\%  \\
+        \bf Erzya       &   3,7 M  &  16 M 	& 5,3 M& 143,2\%  \\
         \hline
     \end{tabular}
-    \caption{Sizes of transducers without and with automatic flags (in megabytes); Percentage shows size of the flagged transducer in comparison with the original
+    \caption{Sizes of transducers without and with automatic flags (in megabytes); Percentage shows size of the flagged transducer after optimization, in comparison with the original
     \label{table:sizes}}
-\end{table}
+\end{table*}
+
+In Table~\ref{table:sizes}, we show sizes of language transducers composed with grammar rules. First, there are sizes of original
+transducers, then transducers compiled
+with our new method that inserts all flag diacritics and finally flagged transducers after removing some of the flags, as described in Section~\ref{removing}
 
 
 \begin{table}[h]
@@ -481,8 +472,7 @@ While requiring {\tt R} flag diacritics will always occur only once
 for every continuation lexicon, the data shows that, for
 certain right continuations, P flag diacritics occur hundreds of
 times. This happens every time when in the same sublexicon
-there are words which have the same beginning. For example, in
-Figure~\ref{fig:lexc-gr-flag} shows how two morphemes \texttt{maagar}
+there are words which have the same beginning. For example, Figure~\ref{fig:lexc-gr-flag} shows how two morphemes \texttt{maagar}
 and \texttt{maagarnar} have the same continuation flag
 \verb+@P.LEXNAME.IV@+, but they cannot collapse into one path. In future
 work, it should be checked if removing flags for those paths would
