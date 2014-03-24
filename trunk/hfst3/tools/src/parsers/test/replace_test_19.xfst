@@ -1,3 +1,4 @@
+set precision 1
 set print-weight ON
 
 regex [a::1]+ -> x // a _ a ;
