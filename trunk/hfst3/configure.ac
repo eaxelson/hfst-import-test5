@@ -337,14 +337,6 @@ AC_ARG_ENABLE([pmatch],
 							  [build pmatch tool @<:@default=yes@:>@])],
 			  [enable_pmatch=$enableval],
 			  [if test x$enable_no_tools != xno; then enable_pmatch=no; else enable_pmatch=yes; fi])
-AM_CONDITIONAL([WANT_OSPELL], [test x$enable_ospell != xno])
-AC_ARG_ENABLE([ospell],
-			  [AS_HELP_STRING([--enable-ospell],
-							  [build ospell tool @<:@default=no@:>@])],
-			  [enable_ospell=$enableval]
-,                         [enable_ospell=no]
-# ,			  [enable_ospell=$enable_all_tools]  USE THIS LINE FOR RELEASE
-)
 AM_CONDITIONAL([WANT_PMATCH], [test x$enable_pmatch != xno])
 AC_ARG_ENABLE([project],
 			  [AS_HELP_STRING([--enable-project],
@@ -715,8 +707,6 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 tools/src/hfst-tagger/test/Makefile
                  tools/src/parsers/Makefile
                  tools/src/parsers/test/Makefile
-                 tools/src/hfst-ospell/Makefile
-                 tools/src/hfst-ospell/src/Makefile
 		 back-ends/Makefile
 		 back-ends/dlfcn/Makefile
 		 back-ends/openfstwin/Makefile
@@ -773,7 +763,6 @@ cat <<EOF
     *                 minimize: $enable_minimize (minimise)
     *                 name: $enable_name
     *                 optimized-lookup: $enable_optimized_lookup
-    *                 ospell: $enable_ospell
     *                 pmatch: $enable_pmatch
     *                 proc: $enable_proc
     *                 project: $enable_project
@@ -826,12 +815,6 @@ AS_IF([test "x$enable_calculate" == "xno"],
       [AC_MSG_WARN([hfst-calculate is not enabled; you will not be able to compile SFST-PL scripts; enable using --enable-calculate])])
 AS_IF([test "x$enable_xfst" == "xno"],
       [AC_MSG_WARN([hfst-xfst is not enabled; you will not be able to compile XFST scripts; enable using --enable-xfst])])
-
-# ADD THESE LINES FOR RELEASE
-#AS_IF([test "x$enable_ospell" == "xno"],
-#      [AC_MSG_WARN([hfst-ospell is not enabled; enable using --enable-ospell])])
-
-
 #AS_IF([test "x$warn_about_missing_zlib" != "xno"],
 #      [AC_MSG_WARN([hfst-foma was disabled because zlib was not found; you will not be able to compile XFST scripts with foma wrapper])])
 #AS_IF([test "x$generate_foma_wrapper" == "xno" -a "x$warn_about_missing_zlib" == "xno"], 
