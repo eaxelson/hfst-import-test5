@@ -1291,8 +1291,42 @@ namespace implementations
   }
 
   bool TropicalWeightTransducer::are_equivalent
-  (StdVectorFst *a, StdVectorFst *b) 
+  (StdVectorFst *a_, StdVectorFst *b_) 
   {
+    StdVectorFst * a = copy(a_);
+    StdVectorFst * b = copy(b_);
+
+    RmEpsilon<StdArc>(a);
+    RmEpsilon<StdArc>(b);
+
+    EncodeMapper<StdArc> encode_mapper
+      (hfst::get_encode_weights() ? (kEncodeLabels|kEncodeWeights) : (kEncodeLabels), ENCODE);
+
+    Encode(a, &encode_mapper);
+    Encode(b, &encode_mapper);
+
+    StdVectorFst * deta = new StdVectorFst();
+    StdVectorFst * detb = new StdVectorFst();
+
+    Determinize<StdArc>(*a, deta);
+    Determinize<StdArc>(*b, detb);
+
+    delete a;
+    delete b;
+
+    bool retval = Equivalent(*deta, *detb);
+
+    delete deta;
+    delete detb;
+
+    return retval;
+
+    //Decode(det, encode_mapper);
+    //return det;
+  }
+
+
+#ifdef FOO
     StdVectorFst * ac = copy(a);
     StdVectorFst * ab = copy(b);
     push_weights(ac, false);
@@ -1302,7 +1336,12 @@ namespace implementations
     delete ac;
     delete ab;
 
-    EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
+    
+    //EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
+
+    EncodeMapper<StdArc> encode_mapper
+      (hfst::get_encode_weights() ? (kEncodeLabels|kEncodeWeights) : (kEncodeLabels), ENCODE);
+
     EncodeFst<StdArc> enca(*mina, &encode_mapper);
     EncodeFst<StdArc> encb(*minb, &encode_mapper);
 
@@ -1313,7 +1352,7 @@ namespace implementations
     StdVectorFst B(encb);
 
     return Equivalent(A, B);
-  }
+#endif
   
   bool TropicalWeightTransducer::is_automaton(StdVectorFst * t)
   {
