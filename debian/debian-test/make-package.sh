@@ -8,13 +8,24 @@
 
 if [ "$1" != "--hfst-dir" -o "$2" = "" ]; then
     echo $0": error: directory where hfst is installed must be given"
-    echo $0" --hfst-dir DIRNAME"
+    echo $0" --hfst-dir DIRNAME [--ospell-dir DIRNAME]"
     exit 1
 fi
 HFST_PREFIX=$2
 
+OSPELL_PREFIX=""
+if [ "$3" = "--with-ospell" -a "$4" != "" ]; then
+    OSPELL_PREFIX=$4
+fi
+
 HFST_LIBNUMBER=`ls $HFST_PREFIX/lib/ | egrep 'libhfst\.so\.[0-9]+$' \
     | perl -pe 's/libhfst\.so\.([0-9]+)$/\1/'`
+
+OSPELL_LIBNUMBER=""
+if [ "$OSPELL_PREFIX" != "" ]; then
+OSPELL_LIBNUMBER=`ls $OSPELL_PREFIX/lib/ | egrep 'libhfst\.so\.[0-9]+$' \
+    | perl -pe 's/libhfst\.so\.([0-9]+)$/\1/'`
+fi
 
 # -------------------
 # Copy the HFST tools
@@ -37,6 +48,11 @@ done
 
 #copy hfst-train-tagger script
 cp -P $HFST_PREFIX/bin/hfst-train-tagger .
+
+# copy hfst-ospell, if needed 
+if [ "$OSPELL_PREFIX" != "" ]; then
+    cp -P $OSPELL_PREFIX/.libs/hfst-ospell .
+fi
 
 # copy hfst-twolc scripts and executables that it needs
 for tool in hfst-twolc htwolcpre1 htwolcpre2 htwolcpre3;
@@ -84,6 +100,14 @@ cp $HFST_PREFIX/lib/libhfst.so."$HFST_LIBNUMBER".0.0 .
 chrpath -d libhfst.so."$HFST_LIBNUMBER".0.0
 ln -s -T libhfst.so."$HFST_LIBNUMBER".0.0 libhfst.so."$HFST_LIBNUMBER"
 ln -s -T libhfst.so."$HFST_LIBNUMBER" libhfst.so
+
+# copy ospell library, if needed 
+if [ "$OSPELL_PREFIX" != "" ]; then
+    cp -P $OSPELL_PREFIX/.libs/libhfstospell.so."$OSPELL_LIBNUMBER".0.0 .
+    chrpath -d libhfstospell.so."$OSPELL_LIBNUMBER".0.0
+    ln -s -T libhfstospell.so."$OSPELL_LIBNUMBER".0.0 libhfstospell.so."$OSPELL_LIBNUMBER"
+    ln -s -T libhfstospell.so."$OSPELL_LIBNUMBER" libhfstospell.so
+fi
 
 strip *.so
 chmod 0644 *
