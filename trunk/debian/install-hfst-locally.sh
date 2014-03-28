@@ -39,9 +39,8 @@ cd $HFST_SRCDIR
 autoreconf -i && \
 ./configure --with-foma --prefix=$HFST_INSTDIR_FULL_PATH \
 --with-sfst=no LDFLAGS="-L/usr/lib/ -Wl,-rpath=/usr/lib/" \
---enable-calculate --enable-edit-metadata --enable-lexc \
---enable-tagger --enable-proc --enable-shuffle \
---enable-xfst --enable-foma-wrapper --with-readline && \
+--enable-all-tools --disable-foma-wrapper --disable-lexc-wrapper \
+--enable-fsmbook-tests --with-readline=no && \
 ./scripts/generate-cc-files.sh && make && make install
 
 # Make swig bindings
