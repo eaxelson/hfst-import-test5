@@ -14,7 +14,7 @@ fi
 HFST_PREFIX=$2
 
 OSPELL_PREFIX=""
-if [ "$3" = "--with-ospell" -a "$4" != "" ]; then
+if [ "$3" = "--ospell-dir" -a "$4" != "" ]; then
     OSPELL_PREFIX=$4
 fi
 
@@ -23,8 +23,8 @@ HFST_LIBNUMBER=`ls $HFST_PREFIX/lib/ | egrep 'libhfst\.so\.[0-9]+$' \
 
 OSPELL_LIBNUMBER=""
 if [ "$OSPELL_PREFIX" != "" ]; then
-OSPELL_LIBNUMBER=`ls $OSPELL_PREFIX/lib/ | egrep 'libhfst\.so\.[0-9]+$' \
-    | perl -pe 's/libhfst\.so\.([0-9]+)$/\1/'`
+OSPELL_LIBNUMBER=`ls $OSPELL_PREFIX/lib/ | egrep 'libhfstospell\.so\.[0-9]+$' \
+    | perl -pe 's/libhfstospell\.so\.([0-9]+)$/\1/'`
 fi
 
 # -------------------
@@ -51,7 +51,7 @@ cp -P $HFST_PREFIX/bin/hfst-train-tagger .
 
 # copy hfst-ospell, if needed 
 if [ "$OSPELL_PREFIX" != "" ]; then
-    cp -P $OSPELL_PREFIX/.libs/hfst-ospell .
+    cp -P $OSPELL_PREFIX/bin/hfst-ospell .
 fi
 
 # copy hfst-twolc scripts and executables that it needs
@@ -103,7 +103,7 @@ ln -s -T libhfst.so."$HFST_LIBNUMBER" libhfst.so
 
 # copy ospell library, if needed 
 if [ "$OSPELL_PREFIX" != "" ]; then
-    cp -P $OSPELL_PREFIX/.libs/libhfstospell.so."$OSPELL_LIBNUMBER".0.0 .
+    cp -P $OSPELL_PREFIX/lib/libhfstospell.so."$OSPELL_LIBNUMBER".0.0 .
     chrpath -d libhfstospell.so."$OSPELL_LIBNUMBER".0.0
     ln -s -T libhfstospell.so."$OSPELL_LIBNUMBER".0.0 libhfstospell.so."$OSPELL_LIBNUMBER"
     ln -s -T libhfstospell.so."$OSPELL_LIBNUMBER" libhfstospell.so

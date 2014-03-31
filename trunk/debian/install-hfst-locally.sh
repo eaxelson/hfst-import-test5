@@ -37,7 +37,7 @@ cd $HFST_SRCDIR
 # so that /usr/local/lib/libhfst.so will not be used
 #
 autoreconf -i && \
-./configure --with-foma --prefix=$HFST_INSTDIR_FULL_PATH \
+./configure --with-foma --with-sfst=no --prefix=$HFST_INSTDIR_FULL_PATH \
 --with-sfst=no LDFLAGS="-L/usr/lib/ -Wl,-rpath=/usr/lib/" \
 --enable-all-tools --disable-foma-wrapper --disable-lexc-wrapper \
 --enable-fsmbook-tests --with-readline=no && \
