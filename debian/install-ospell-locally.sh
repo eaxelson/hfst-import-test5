@@ -37,7 +37,7 @@ cd $OSPELL_SRCDIR
 # so that /usr/local/lib/libospell.so will not be used
 #
 autoreconf -i && \
-./configure --prefix=$OSPELL_INSTDIR_FULL_PATH \
+./configure --prefix=$OSPELL_INSTDIR_FULL_PATH --enable-xml=tinyxml \
 && make LDFLAGS="-L/usr/lib/ -Wl,-rpath=/usr/lib/" && make install
 
 cd $ORIG_DIR
