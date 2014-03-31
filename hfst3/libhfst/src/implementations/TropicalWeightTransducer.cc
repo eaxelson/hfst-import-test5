@@ -543,9 +543,6 @@ namespace implementations
   void TropicalWeightTransducer::write_in_att_format_number
     (StdVectorFst *t, std::ostream &os)
   {
-
-    //const SymbolTable* sym = t->InputSymbols();
-
     // this takes care that initial state is always printed as number zero
     // and state number zero (if it is not initial) is printed as another number
     // (basically as the number of the initial state in that case, i.e.
@@ -674,7 +671,7 @@ namespace implementations
       {
         if (*line == '-') // transducer separator
           return t;
-        //printf("read line: %s", line);
+
         char a1 [100]; char a2 [100]; char a3 [100]; 
         char a4 [100]; char a5 [100];
         int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
@@ -1320,39 +1317,7 @@ namespace implementations
     delete detb;
 
     return retval;
-
-    //Decode(det, encode_mapper);
-    //return det;
   }
-
-
-#ifdef FOO
-    StdVectorFst * ac = copy(a);
-    StdVectorFst * ab = copy(b);
-    push_weights(ac, false);
-    push_weights(ab, false);
-    StdVectorFst * mina = determinize(ac);
-    StdVectorFst * minb = determinize(ab);
-    delete ac;
-    delete ab;
-
-    
-    //EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
-
-    EncodeMapper<StdArc> encode_mapper
-      (hfst::get_encode_weights() ? (kEncodeLabels|kEncodeWeights) : (kEncodeLabels), ENCODE);
-
-    EncodeFst<StdArc> enca(*mina, &encode_mapper);
-    EncodeFst<StdArc> encb(*minb, &encode_mapper);
-
-    delete mina;
-    delete minb;
-
-    StdVectorFst A(enca);
-    StdVectorFst B(encb);
-
-    return Equivalent(A, B);
-#endif
   
   bool TropicalWeightTransducer::is_automaton(StdVectorFst * t)
   {
@@ -1539,10 +1504,6 @@ namespace implementations
   {
     RmEpsilon<StdArc>(t);
 
-    //fst::StdVectorFst * pushed = new fst::StdVectorFst();
-    //fst::Push<StdArc, REWEIGHT_TO_FINAL>(*t, pushed, fst::kPushWeights);
-    //pushed->SetInputSymbols(t->InputSymbols());
-
     EncodeMapper<StdArc> encode_mapper
       (hfst::get_encode_weights() ? (kEncodeLabels|kEncodeWeights) : (kEncodeLabels), ENCODE);
     Encode(t, &encode_mapper);
@@ -1556,18 +1517,13 @@ namespace implementations
   StdVectorFst * TropicalWeightTransducer::minimize(StdVectorFst * t)
   {
     RmEpsilon<StdArc>(t);
-    
-    //fst::StdVectorFst * pushed = new fst::StdVectorFst();
-    //fst::Push<StdArc, REWEIGHT_TO_FINAL>(*t, pushed, fst::kPushWeights);
-    //pushed->SetInputSymbols(t->InputSymbols());
 
     EncodeMapper<StdArc> encode_mapper
       (hfst::get_encode_weights() ? (kEncodeLabels|kEncodeWeights) : (kEncodeLabels), ENCODE);
     Encode(t, &encode_mapper);
     StdVectorFst * det = new StdVectorFst();
-    //std::cerr << "determinizing for minimize..." << std::endl; // DEBUG
+
     Determinize<StdArc>(*t, det);
-    //std::cerr << "... determinizing for minimize done" << std::endl; // DEBUG
     Minimize<StdArc>(det);
     Decode(det, encode_mapper);
     return det;
@@ -1638,8 +1594,6 @@ namespace implementations
     // print t after minimize
     print_att_number(&t_det_std, stderr);
 
-    // decoding
-    //Decode<StdArc>(&t_det, encode_mapper);  COMMENTED
   }
 
   /* For HfstMutableTransducer */
@@ -2250,19 +2204,6 @@ namespace implementations
   StdVectorFst * TropicalWeightTransducer::intersect(StdVectorFst * t1,
                                                      StdVectorFst * t2)
   {
-    
-    /*std::cerr << "t1 and t2:" << std::endl;
-    write_in_att_format_number(t1, std::cerr);
-    std::cerr << "--" << std::endl;
-    write_in_att_format_number(t2, std::cerr);
-    std::cerr << "----" << std::endl;*/
-
-    /*if (t1->OutputSymbols() == NULL)
-      t1->SetOutputSymbols(t1->InputSymbols()->Copy());
-    t2->SetInputSymbols(t1->OutputSymbols()->Copy());
-    if (t2->OutputSymbols() == NULL)
-    t2->SetOutputSymbols(t2->InputSymbols()->Copy());*/
-
     RmEpsilon(t1);
     RmEpsilon(t2);
 
@@ -2271,9 +2212,6 @@ namespace implementations
 
     // weights must not be encoded, else e.g. [a:b::1] & [a:b::2] will be empty
     EncodeMapper<StdArc> encoder(0x0001,ENCODE);
-    
-    //EncodeFst<StdArc> enc1(*t1, &encoder);
-    //EncodeFst<StdArc> enc2(*t2, &encoder);
 
     Encode<StdArc>(t1, &encoder);
     Encode<StdArc>(t2, &encoder);
@@ -2281,14 +2219,7 @@ namespace implementations
     ArcSort(t1, OLabelCompare<StdArc>());
     ArcSort(t2, ILabelCompare<StdArc>());
 
-    //std::cerr << "determinizing for intersect..." << std::endl; // DEBUG
-    //DeterminizeFst<StdArc> det1(enc1);
-    //DeterminizeFst<StdArc> det2(enc2);
-    //std::cerr << "... determinizing for intersect done" << std::endl; // DEBUG
-
-    //std::cerr << "     here" << std::endl;
     IntersectFst<StdArc> intersect(*t1, *t2);
-    //std::cerr << "     done" << std::endl;
 
     StdVectorFst *foo = new StdVectorFst(intersect);
     DecodeFst<StdArc> decode(*foo, encoder);
@@ -2297,10 +2228,6 @@ namespace implementations
 
     t1->SetOutputSymbols(NULL);
     t2->SetOutputSymbols(NULL);
-
-    /*std::cerr << "result:" << std::endl;
-    write_in_att_format_number(result, std::cerr);
-    std::cerr << "--------" << std::endl;*/
 
     return result;
   }
@@ -2328,7 +2255,6 @@ namespace implementations
     // Remove weights from t2, is this really needed?
     StdVectorFst *t2_ = copy(t2);
 
-#ifndef FOO
     for (fst::StateIterator<StdVectorFst> siter(*t2_); 
          not siter.Done(); siter.Next())
       {
@@ -2347,9 +2273,7 @@ namespace implementations
     if (t2_->Final(s) != fst::TropicalWeight::Zero())
           { t2_->SetFinal(s,0); }
       }
-#endif
 
-    //EncodeMapper<StdArc> encoder(0x0001,ENCODE);
     EncodeMapper<StdArc> encoder(kEncodeLabels, ENCODE);
     Encode<StdArc> (t1, &encoder);
     Encode<StdArc> (t2_, &encoder);
@@ -2357,11 +2281,9 @@ namespace implementations
     ArcSort(t1, OLabelCompare<StdArc>());
     ArcSort(t2_, ILabelCompare<StdArc>());
 
-    //std::cerr << "determinizing for subtract..." << std::endl;
     StdVectorFst * det2 = new StdVectorFst();
     Determinize<StdArc>(*t2_, det2);
     delete t2_;
-    //std::cerr << "... determinizing for subtract done" << std::endl;
 
     if (DEBUG) printf("  ..determinized\n");
 
@@ -2377,7 +2299,7 @@ namespace implementations
     t2->SetOutputSymbols(NULL);
 
     StdVectorFst *result = new StdVectorFst(subtract); 
-    //result->SetInputSymbols(t1->InputSymbols());
+
     return result;
   }
 
