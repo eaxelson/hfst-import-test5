@@ -89,7 +89,7 @@ Flag diacritics, which are special multi-character symbols executed at runtime, 
 Our algorithm is based on the idea that adjacent morph combinatorics can be expressed with finite-state flags like this:
 
 Every rightward continuation is replaced with a positive setting flag
-with feature called \texttt{LEXNAME} and a value corresponding to the
+with a feature called \texttt{LEXNAME} and a value corresponding to the
 continuation lexicon. For example, the lexicon in
 Figure~\ref{fig:lexc-fin} has one continuation lexicon: \texttt{NOUNCASES}, which is represented using the positive setting \verb+@P.LEXNAME.NOUNCASES@+@. Correspondingly, a require test \verb+@R.LEXNAME.NOUNCASES@+ is inserted in the beginning of the \texttt{NOUNCASES} continuation lexicon.
 
@@ -148,12 +148,12 @@ Since real-world morphological descriptions may contain empty, or nearly
 empty, continuation lexicons, inserting flags in those cases only
 increase the size of the transducer, without gaining any
 benefits. Therefore, those continuation lexicons need to be recognized and corresponding flag diacritics removed.
-Additionally, rule composition with a flagged lexicon usually results in dramatical size
+Additionally, rule composition with a flagged lexicon usually results in a dramatical size
 increase. In order to reduce the final transducer size, it is important to recognize which flag diacritics should be removed from the lexicon 
 before composing it with rules.  
 
-We have experimented with removing different flags and flags combinations from the lexical transducer 
-to get an optimal transducer size after the composition with rules, the optimal results are shown in Table~\ref{table:sizes}. 
+We have experimented with removing different flags and flag combinations from the lexical transducer 
+to get an optimal transducer size after the composition with rules. The optimal results are shown in Table~\ref{table:sizes}. 
 
 
 \section{Results}
@@ -176,8 +176,8 @@ to get an optimal transducer size after the composition with rules, the optimal 
 \end{table}
 
 \justifying
-In Table~\ref{table:sizes}, we show sizes of language transducers composed with grammar rules. First, there are sizes of original
-transducers, then transducers compiled
+In Table~\ref{table:sizes}, we show the sizes of language transducers composed with grammar rules. First, there are the sizes of the original
+transducers, then the transducers compiled
 with our new method that inserts all flag diacritics and finally flagged transducers after removing some of the flags. Look-up speeds, expressed in words per second, are shown in Table~\ref{table:lookup}.
 
 \begin{table}[h]
