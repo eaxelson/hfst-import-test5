@@ -13,7 +13,8 @@ strip $HFST_DLL
 # (2) dependency dll files
 
 DEPENDENCY_DLL_DIRECTORY=/mingw/bin/
-DEPENDENCY_DLLS="libgcc_s_dw2-1.dll libgcc_s_seh-1.dll libstdc++-6.dll"
+DEPENDENCY_DLLS="libgcc_s_dw2-1.dll libgcc_s_seh-1.dll libstdc++-6.dll \
+libbz2-2.dll libiconv-2.dll liblzma-5.dll zlib1.dll"
 for dll in $DEPENDENCY_DLLS;
 do
     if (test -e $DEPENDENCY_DLL_DIRECTORY/$dll); then
