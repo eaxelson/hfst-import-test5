@@ -267,8 +267,8 @@ namespace hfst
           HfstTransducer unionContextReplace(type);
 
           HfstTokenizer TOK;
-          TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-          HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+         // TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+         // HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
 
 
           for ( unsigned int i = 0; i < ContextVector.size(); i++ )
@@ -761,6 +761,7 @@ namespace hfst
         TOK.add_multichar_symbol(leftMarker2);
         TOK.add_multichar_symbol(rightMarker2);
         TOK.add_multichar_symbol(tmpMarker);
+        TOK.add_multichar_symbol( ".#.");
 
         ImplementationType type = ruleVector[0].get_mapping()[0].first.get_type();
 
@@ -773,6 +774,8 @@ namespace hfst
 
         // Identity pair
         HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+        HfstTransducer identity (identityPair);
+        identity.repeat_star().minimize();
 
         HfstTransducer identityExpanded(identityPair);
         identityExpanded.insert_to_alphabet(leftMarker);
@@ -782,6 +785,14 @@ namespace hfst
         identityExpanded.insert_to_alphabet(tmpMarker);
         // will be expanded with mappings
 
+         // for removing .#. from the center
+        HfstTransducer identityWithoutBoundary(identity);
+        identityWithoutBoundary.insert_to_alphabet(".#.");
+        HfstTransducer removeHash(identityWithoutBoundary);
+        HfstTransducer boundary(".#.", TOK, type);
+        removeHash.concatenate(boundary).concatenate(identityWithoutBoundary).minimize();
+        //printf("removeHash \n");
+        //removeHash.write_in_att_format(stdout, 1);
 
         HfstTransducerVector mappingWithBracketsVector;
         bool noContexts  = true;
@@ -794,13 +805,22 @@ namespace hfst
             {
                 HfstTransducer oneMappingPair(mappingPairVector[j].first);
                 oneMappingPair.cross_product(mappingPairVector[j].second);
+
+                //printf("oneMappingPair \n");
+                //oneMappingPair.write_in_att_format(stdout, 1);
+
+
                 if ( j == 0 )
                 {
-                  mapping = oneMappingPair;
+                    // remove .#. from the center
+                    // center - (?* .#. ?*)
+                    oneMappingPair.subtract(removeHash, false).minimize();
+                    mapping = oneMappingPair;
                 }
                 else
                 {
-                  mapping.disjunct(oneMappingPair).minimize();
+                    oneMappingPair.subtract(removeHash, false).minimize();
+                    mapping.disjunct(oneMappingPair).minimize();
                 }
             }
 
@@ -938,6 +958,10 @@ namespace hfst
            */
         }
 
+        //printf("unionContextReplace_labels: \n");
+        //unionContextReplace.write_in_att_format(stdout, 1);
+
+
 
         /*
         //THIS part is for disjuncting labels first, and then substitute them with transducers
@@ -985,8 +1009,8 @@ namespace hfst
           HfstTransducer uncondidtionalTr(identityExpanded);
           uncondidtionalTr.subtract(replaceWithoutContexts).minimize();
 
-        //printf("uncondidtionalTr: \n");
-        //uncondidtionalTr.write_in_att_format(stdout, 1);
+          //printf("uncondidtionalTr: \n");
+          //uncondidtionalTr.write_in_att_format(stdout, 1);
 
           return uncondidtionalTr;
 
@@ -1968,24 +1992,27 @@ namespace hfst
             // this is necessary because of first composition
             tr.substitute("@_UNKNOWN_SYMBOL_@", "@TMP_UNKNOWN@");
 
+            //printf("----first: ----\n");
+            //tr.write_in_att_format(stdout, 1);
+
             retval.compose(tr).minimize();
 
 
-            //printf("first composition: \n");
-            //retval.write_in_att_format(stdout, 1);
+//            printf("first composition: \n");
+//            retval.write_in_att_format(stdout, 1);
 
             // compose with .#. (? - .#.)* .#.
             retval.compose(boundaryAnythingBoundary)
                   .minimize();
 
-            //printf("2. composition: \n");
-            //retval.write_in_att_format(stdout, 1);
+//            printf("2. composition: \n");
+//            retval.write_in_att_format(stdout, 1);
 
             // compose with [.#.:0 | ? - .#.]*
             retval.compose(removeBoundary).minimize();
 
-            //printf("3. composition: \n");
-            //retval.write_in_att_format(stdout, 1);
+//            printf("3. composition: \n");
+//            retval.write_in_att_format(stdout, 1);
 
             // bring back unknown symbols
             retval.substitute("@TMP_UNKNOWN@", "@_UNKNOWN_SYMBOL_@");
@@ -2259,16 +2286,17 @@ namespace hfst
                 retval = parallelBracketedReplace(ruleVector, optional);
             }
 
-          //  std::cerr << "after bracketed replace"<< std::endl;
-          //  printf("- bracketed replace -\n");
-          //  retval.write_in_att_format(stdout, 1);
+            //std::cerr << "after bracketed replace"<< std::endl;
+            //printf("- bracketed replace -\n");
+            //retval.write_in_att_format(stdout, 1);
 
             // for epenthesis rules
             // it can't have more than one epsilon repetition in a row
             retval = noRepetitionConstraint( retval );
 
-//            printf("----after noRepetitionConstraint: ----\n");
-//            retval.write_in_att_format(stdout, 1);
+
+         //   printf("----after noRepetitionConstraint: ----\n");
+         //   retval.write_in_att_format(stdout, 1);
 
 
             // deals with boundary symbol
@@ -2284,13 +2312,13 @@ namespace hfst
                 retval = mostBracketsStarConstraint(retval);
             }
 
-            //printf("----after mostBracketsStarConstraint: ----\n");
-            //retval.write_in_att_format(stdout, 1);
+         // printf("----after mostBracketsStarConstraint: ----\n");
+         //  retval.write_in_att_format(stdout, 1);
 
             retval = removeB2Constraint(retval);
 
-            //printf("----after removeB2Constraint: ----\n");
-            //retval.write_in_att_format(stdout, 1);
+         //printf("----after removeB2Constraint: ----\n");
+         // retval.write_in_att_format(stdout, 1);
 
             retval = removeMarkers( retval );
 
