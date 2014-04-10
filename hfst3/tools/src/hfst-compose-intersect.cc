@@ -58,6 +58,8 @@ using hfst::HfstTransducerVector;
 // intersection of the rules.
 static bool invert=false;
 
+static bool encode_weights=false;
+
 void
 print_usage()
 {
@@ -72,6 +74,8 @@ print_usage()
             "                               rules with the lexicon instead\n"
             "                               of composing the lexicon with\n"
             "                               the intersection of the rules.\n"
+            "  -e, --encode-weights         Encode weights when minimizing\n"
+            "                               (default is false).\n"
            );
         //print_common_binary_program_parameter_instructions(message_out);
         fprintf(message_out,
@@ -105,11 +109,12 @@ parse_options(int argc, char** argv)
           HFST_GETOPT_COMMON_LONG,
           HFST_GETOPT_BINARY_LONG,
           {"invert", no_argument, 0, 'I'},
+          {"encode-weights", no_argument, 0, 'e'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_BINARY_SHORT "FI",
+                             HFST_GETOPT_BINARY_SHORT "FIe",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -122,6 +127,9 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-error.h"
         case 'I':
           invert = true;
+          break;
+        case 'e':
+          encode_weights = true;
           break;
         }
     }
@@ -259,7 +267,17 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
           verbose_printf("Reading and minimizing rule " SIZE_T_SPECIFIER "...\n",
                          rule_n);
         }
+      bool enc = hfst::get_encode_weights();
+      if (encode_weights)
+        {
+          hfst::set_encode_weights(true);
+        }
       rule.minimize();
+      if (encode_weights)
+        {
+          hfst::set_encode_weights(enc);
+        }
+
       rules.push_back(rule);      
       rule_n++;
     }
