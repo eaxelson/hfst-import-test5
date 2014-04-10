@@ -1,11 +1,11 @@
 Package: hfst-dev
 Source: hfst
-Version: 6.1-1
+Version: 7.0-1
 Section: devel
 Priority: optional
 Architecture: amd64
 Installed-size: 12 000
-Depends: libc6 (>= 2.14), libstdc++6 (>= 4.4.3), python (>= 2.6)
+Depends: libc6 (>= 2.14), libstdc++6 (>= 4.4.3), python (>= 2.6), tinyxml, libarchive
 Maintainer: HFST team <hfst-info@sf.net>
 Description: HFST library and commandline tools
  The backend formats included are OpenFst and foma.

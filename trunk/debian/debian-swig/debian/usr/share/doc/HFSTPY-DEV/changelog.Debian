@@ -1,3 +1,9 @@
+HFSTPY (3.7.0-1) unstable; urgency=low
+
+  * First release of 3.7.0
+
+ -- Erik Axelson <hfst-info@sf.net>  Thu, 10 Apr 2014 16:04:44 +0200
+
 HFSTPY (3.6.1-1) unstable; urgency=low
 
   * First release of 3.6.1
