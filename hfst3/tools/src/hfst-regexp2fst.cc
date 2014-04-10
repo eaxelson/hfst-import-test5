@@ -65,6 +65,8 @@ static char *epsilonname=NULL;
 static bool disjunct_expressions=false;
 static bool line_separated = true;
 
+static bool encode_weights=false;
+
 //static unsigned int sum_of_weights=0;
 //static bool sum_weights=false;
 //static bool normalize_weights=false;
@@ -98,7 +100,10 @@ print_usage()
 "  -e, --epsilon=EPS         Map EPS as zero.\n"
 "Harmonization:\n"
 "  -H, --do-not-harmonize    Do not expand '?' symbols.\n"
-"  -F, --harmonize-flags  Harmonize flag diacritics.\n");
+"  -F, --harmonize-flags  Harmonize flag diacritics.\n"
+"  -E, --encode-weights         Encode weights when minimizing\n"
+"                               (default is false).\n"
+                );
         fprintf(message_out, "\n");
 
         fprintf(message_out, 
@@ -144,11 +149,12 @@ parse_options(int argc, char** argv)
           {"format", required_argument, 0, 'f'},
           {"do-not-harmonize", no_argument, 0, 'H'},
           {"harmonize-flags", no_argument, 0, 'F'},
+          {"encode-weights", no_argument, 0, 'E'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "je:lSf:HF"/*"123"*/,
+                             HFST_GETOPT_UNARY_SHORT "je:lSf:HFE"/*"123"*/,
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -188,6 +194,9 @@ parse_options(int argc, char** argv)
             break;
         case 'F':
           harmonize_flags=true;
+          break;
+        case 'E':
+          encode_weights=true;
           break;
 #include "inc/getopt-cases-error.h"
         }
@@ -384,6 +393,12 @@ int main( int argc, char **argv )
         //xredebug = 1;
       }
 
+    bool enc = hfst::get_encode_weights();
+    if (encode_weights)
+      {
+        hfst::set_encode_weights(true);
+      }
+
   // close buffers, we use streams
   if (outfile != stdout)
     {
@@ -396,6 +411,13 @@ int main( int argc, char **argv )
         new HfstOutputStream(outfilename, output_format) :
         new HfstOutputStream(output_format);
   process_stream(*outstream);
+
+    if (encode_weights)
+      {
+        hfst::set_encode_weights(enc);
+      }
+
+
   free(inputfilename);
   free(outfilename);
   return EXIT_SUCCESS;
