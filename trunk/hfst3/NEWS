@@ -5,6 +5,25 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.7.0
+---------------------------
+
+* better support for weighted parallel replace rules
+
+* allowing empty contexts in replace rules
+
+* bugfixes and improvements to xfst and pmatch tools
+
+* bugfixes to handling of optimized lookup transducers
+
+* support for weighted containment operator 
+
+* tentatively added option and variable 'encode-weights' to regexp
+  and xfst parsers to control determinization of weighted transducers,
+  the default value being false (encoding weights prevents non-ending
+  determinization in some cases)
+
+
 Noteworthy changes in 3.6.1
 ---------------------------
 
@@ -513,5 +532,4 @@ Noteworthy changes in release 2.1
 ---------------------------------
 
 * hfst-twolc and hfst-compose-intersect understand # like xerox originals
-
 
