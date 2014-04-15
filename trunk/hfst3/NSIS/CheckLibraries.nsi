@@ -24,10 +24,10 @@
               File libstdc++-6.dll
         ${EndIf}
 
-        # SearchPath $R0 "libgcc_s_dw2-1.dll"
-        SearchPath $R0 "libgcc_s_seh-1.dll"
+        SearchPath $R0 "libgcc_s_dw2-1.dll"
+        # SearchPath $R0 "libgcc_s_seh-1.dll"
         ${If} $R0 == ""
-              # File libgcc_s_dw2-1.dll
-              File libgcc_s_seh-1.dll
+              File libgcc_s_dw2-1.dll
+              # File libgcc_s_seh-1.dll
         ${EndIf}
 

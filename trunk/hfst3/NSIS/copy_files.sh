@@ -6,7 +6,7 @@
 # (1) HFST dll file
 
 HFST_DLL_DIRECTORY=../libhfst/src/.libs
-HFST_DLL=libhfst-34.dll
+HFST_DLL=libhfst-35.dll
 cp $HFST_DLL_DIRECTORY/$HFST_DLL .
 strip $HFST_DLL
 
@@ -34,23 +34,23 @@ done
 
 # (4) tagger tools
 
-TAGGER_SCRIPT_DIRECTORY=../tools/src/hfst-tagger/src/
-TAGGER_SCRIPT="hfst-train-tagger.bat"
-TAGGER_BINARY_DIRECTORY=../tools/src/hfst-tagger/src/.libs/
-TAGGER_BINARIES="hfst-open-input-file-for-tagger.exe hfst-build-tagger.exe hfst-tag.exe"
-TAGGER_PYTHON_FILES="../tools/src/hfst-tagger/src/hfst_tagger_compute_data_statistics.py  \
-../tools/src/hfst-tagger/src/build_model_src/tagger_aux.py"
+#TAGGER_SCRIPT_DIRECTORY=../tools/src/hfst-tagger/src/
+#TAGGER_SCRIPT="hfst-train-tagger.bat"
+#TAGGER_BINARY_DIRECTORY=../tools/src/hfst-tagger/src/.libs/
+#TAGGER_BINARIES="hfst-open-input-file-for-tagger.exe hfst-build-tagger.exe hfst-tag.exe"
+#TAGGER_PYTHON_FILES="../tools/src/hfst-tagger/src/hfst_tagger_compute_data_statistics.py  \
+#../tools/src/hfst-tagger/src/build_model_src/tagger_aux.py"
 
-cp $TAGGER_SCRIPT_DIRECTORY/$TAGGER_SCRIPT .
-for binary in $TAGGER_BINARIES;
-do
-    cp $TAGGER_BINARY_DIRECTORY/$binary .
-    strip $binary;
-done
-for pyfile in $TAGGER_PYTHON_FILES;
-do
-    cp $pyfile .;
-done
+#cp $TAGGER_SCRIPT_DIRECTORY/$TAGGER_SCRIPT .
+#for binary in $TAGGER_BINARIES;
+#do
+#    cp $TAGGER_BINARY_DIRECTORY/$binary .
+#    strip $binary;
+#done
+#for pyfile in $TAGGER_PYTHON_FILES;
+#do
+#    cp $pyfile .;
+#done
 
 # (5) twolc tools
 
