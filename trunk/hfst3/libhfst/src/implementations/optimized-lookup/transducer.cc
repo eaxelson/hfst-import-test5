@@ -12,6 +12,8 @@
 
 #include "./transducer.h"
 
+#include <cstdio> // testing
+
 #ifndef MAIN_TEST
 
 namespace hfst_ol {
@@ -214,9 +216,10 @@ void Encoder::read_input_symbol(const char * s, const int s_num)
         ascii_symbols[(unsigned char)(*s)] = s_num;
     }
     // If there's an ascii tokenized symbol shadowing this, remove it
-    if (strlen(s) > 1 &&
+    if (strlen(s) > 1 && 
+        ((unsigned char)(ascii_symbols.size()) > ((unsigned char)(*s))) && 
         ascii_symbols[(unsigned char)(*s)] != NO_SYMBOL_NUMBER) {
-        ascii_symbols[(unsigned char)(*s)] = NO_SYMBOL_NUMBER;
+      ascii_symbols[(unsigned char)(*s)] = NO_SYMBOL_NUMBER;
     }
     letters.add_string(s, s_num);
 }
