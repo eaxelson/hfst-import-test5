@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS=std-options
 
-AM_CPPFLAGS= -Wno-deprecated -std=c99
+AM_CPPFLAGS= -Wno-deprecated -std=c99 -D_XOPEN_SOURCE=500
 
 if WANT_MINGW
 AM_CPPFLAGS += -DWINDOWS -D__NO_MINGW_LFS
