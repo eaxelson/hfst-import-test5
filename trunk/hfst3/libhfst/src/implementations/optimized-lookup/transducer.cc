@@ -217,7 +217,7 @@ void Encoder::read_input_symbol(const char * s, const int s_num)
     }
     // If there's an ascii tokenized symbol shadowing this, remove it
     if (strlen(s) > 1 && 
-        ((unsigned char)(ascii_symbols.size()) > ((unsigned char)(*s))) && 
+        should_ascii_tokenize((unsigned char)(*s)) && 
         ascii_symbols[(unsigned char)(*s)] != NO_SYMBOL_NUMBER) {
       ascii_symbols[(unsigned char)(*s)] = NO_SYMBOL_NUMBER;
     }
