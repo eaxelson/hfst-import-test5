@@ -226,7 +226,8 @@ void Encoder::read_input_symbol(const char * s, const int s_num)
 
 SymbolNumber Encoder::find_key(char ** p)
 {
-    if (ascii_symbols[(unsigned char)(**p)] == NO_SYMBOL_NUMBER)
+    if (!should_ascii_tokenize((unsigned char) **p) ||
+        ascii_symbols[(unsigned char)(**p)] == NO_SYMBOL_NUMBER)
     {
         return letters.find_key(p);
     }
