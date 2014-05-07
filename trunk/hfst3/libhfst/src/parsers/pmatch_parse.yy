@@ -401,8 +401,6 @@ REGEXP2: REPLACE
  }
 | REGEXP2 CROSS_PRODUCT REPLACE {
     $$ = & $1->cross_product(*$3);
-    // pmatcherror("No crossproduct");
-    // $$ = $1;
     delete $3;
  }
 | REGEXP2 LENIENT_COMPOSITION REPLACE {
