@@ -1,0 +1,154 @@
+\documentclass[11pt]{article}
+\usepackage{coling2014}
+\usepackage{times}
+\usepackage{url}
+\usepackage{latexsym}
+
+\newif\ifcameraready
+\camerareadyfalse
+
+
+%\setlength\titlebox{5cm}
+
+% You can expand the titlebox if you need extra space
+% to show all the authors. Please do not make the titlebox
+% smaller than 5cm (the original size); we will check this
+% in the camera-ready version and ask you to change it back.
+
+
+\title{Classification and Organisation of Lexical Data for Large Coverage of Applications}
+
+\ifcameraready
+\author{First author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  {\tt email@domain} \\\And
+  Second Author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  {\tt email@domain} \\}
+\fi
+
+\date{\today}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+    [[From high lexical coverage to high coverage of linguistic applications
+    through linguist classification of lexical data and all problems and
+    solutions therein. This is a case study about transforming Finnish
+    large coverage morphological analyser to a linguistics database for
+    large variety of computational linguistics software, such as
+    spell-checker, named entity recogniser, dependency parser, indexing tool
+    etc.]]
+\end{abstract}
+
+
+\section{Introduction}
+\label{sec:intro}
+
+% The following footnote without marker is needed for the camera-ready
+% version of the paper.
+% Comment out the instructions (first text) and uncomment the 8 lines
+% under "final paper" for your variant of English.
+% 
+\blfootnote{
+    %
+    % for review submission
+    %
+    \hspace{-0.65cm}  % space normally used by the marker
+    Place licence statement here for the camera-ready version, see
+    Section~\ref{licence} of the instructions for preparing a
+    manuscript.
+    %
+    % % final paper: en-uk version (to license, a licence)
+    %
+    % \hspace{-0.65cm}  % space normally used by the marker
+    % This work is licensed under a Creative Commons 
+    % Attribution 4.0 International Licence.
+    % Page numbers and proceedings footer are added by
+    % the organisers.
+    % Licence details:
+    % \url{http://creativecommons.org/licenses/by/4.0/}
+    % 
+    % % final paper: en-us version (to licence, a license)
+    %
+    % \hspace{-0.65cm}  % space normally used by the marker
+    % This work is licenced under a Creative Commons 
+    % Attribution 4.0 International License.
+    % Page numbers and proceedings footer are added by
+    % the organizers.
+    % License details:
+    % \url{http://creativecommons.org/licenses/by/4.0/}
+}
+
+\section{Some Tables}
+
+\begin{table}[h]
+    \begin{center}
+        \begin{tabular}{|l|rr|}
+            \hline
+            \bf Part-of-Speech & \bf 2011 & \bf 2014 \\
+            \hline
+            \sc Noun           & 78,994   & 374,574 \\
+            \sc Adj            & 10,689   & 18,765 \\
+            \sc Verb           & 10,219   & 10,889 \\
+            \sc Adv            & 5,332    & 5,666 \\
+            \sc Prt            & 442      & 7,287 \\
+            \sc Num            & 193      & 857 \\
+            \sc Adp            & 1,450    & 475 \\
+            \sc Conj           & 119      & 84 \\
+            \sc Pron           & 78       & 78 \\
+            \sc .              & 41       & 34 \\
+            \sc X              & 154      & 341 \\
+            \hline
+            \bf Total          & 110,346  & 411,868 \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Lexical data size organised by Google universal
+    POS tags~\cite{petrov2011universal} (by number of lexical items)}
+\end{table}
+
+\begin{table}[h]
+    \begin{center}
+        \begin{tabular}{|l|rr|}
+            \hline
+            \bf Part-of-Speech & \bf 2011 & \bf 2014 \\
+            \hline
+            \sc Noun           & 166      & 609 \\
+            \sc Adj            & 0        & 127 \\
+            \sc Verb           & 37       & 220 \\
+            \sc Adv            & 37       & 23* \\
+            \sc Prt            & 0        & 23* \\
+            \sc Num            & 46       & 25 \\
+            \sc Adp            & 0        & 23* \\
+            \sc Conj           & 0        & 0 \\
+            \sc Pron           & 0        & 51 \\
+            \sc .              & 0        & 1  \\
+            \sc X              & 0        & 0 \\
+            \hline
+            \bf Total          & 286      & 1,055 \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Paradigm count by parts-of-speech (by number of differing
+    stem variations or allomorph matches). *Adverbs, adpositions and particles
+    share same "inflectional" classes which are used to select possessive and
+    clitic combinations.}
+\end{table}
+
+\ifcameraready
+\section*{Acknowledgements}
+
+
+\fi
+
+% include your own bib file like this:
+\bibliographystyle{acl}
+\bibliography{lglp2014omorfi}
+
+
+\end{document}
