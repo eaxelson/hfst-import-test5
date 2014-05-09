@@ -2657,6 +2657,102 @@
            return *this;
          }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+         std::string weight_to_marker(float weight)
+           {
+             std::ostringstream o;
+             o << weight;
+             return std::string("@") + o.str() + std::string("@");
+           }
+
+         // HERE
+         HfstTransitionGraph & substitute_weights_with_markers() {
+           
+           // Go through all current states (we are going to add them)
+           HfstState limit = state_vector.size();
+           for (HfstState state = 0; state < limit; state++)
+             {
+               // The transitions that are substituted
+               std::vector<typename HfstTransitions::iterator> 
+                 old_transitions;
+               // The transitions that will substitute
+               std::vector<HfstTransition <C> > new_transitions;
+
+               // Go through all transitions
+               for (typename HfstTransitions::iterator tr_it
+                      = state_vector[state].begin();
+                    tr_it != state_vector[state].end(); tr_it++)
+                 {
+                   C data = tr_it->get_transition_data();
+
+                   // Whether there is anything to substitute 
+                   // in this transition
+                   if (data.get_weight() != 0 )
+                     {
+                       // schedule a substitution
+                       new_transitions.push_back
+                         (HfstTransition <C> (data.get_target_state(), 
+                                         data.get_input_symbol(), 
+                                         data.get_output_symbol(), 
+                                         data.get_weight()));
+                       // schedule the old transition to be deleted
+                       old_transitions.push_back(tr_it);
+                     }
+                   // (one transition gone through)
+                 } 
+               // (all transitions in a state gone through)
+
+               // Remove the substituted transitions
+               for (typename std::vector<typename 
+                      HfstTransitions::iterator>::iterator IT =
+                      old_transitions.begin(); 
+                    IT != old_transitions.end(); IT++) {
+                 state_vector[state].erase(*IT);
+               }
+               
+               // Add the substituting transitions
+               for (typename std::vector<HfstTransition <C> >::iterator IT 
+                      = new_transitions.begin();
+                    IT != new_transitions.end(); IT++)
+                 {
+                   HfstState new_state = add_state();
+                   std::string marker = weight2marker(IT->get_weight());
+                   HfstTransition <C> marker_transition(IT->get_target_state(),
+                                                        marker,
+                                                        marker,
+                                                        0);
+                   HfstTransition <C> new_transition(new_state,
+                                                     IT->get_input_symbol(),
+                                                     IT->get_output_symbol(),
+                                                     0);
+                   add_transition(state, new_transition);
+                   add_transition(new_state, marker_transition);
+                 }
+
+             }
+           // (all states gone trough)
+           return *this;
+         }
+
+
+
+
+
+
+
+
          // ####
          // another version of substitute for internal use..
          // ####
