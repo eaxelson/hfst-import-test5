@@ -1,8 +1,13 @@
 \documentclass[11pt]{article}
+
 \usepackage{coling2014}
 \usepackage{times}
 \usepackage{url}
 \usepackage{latexsym}
+
+% XeLaTeX
+\usepackage{fontspec}
+\usepackage{gb4e}
 
 \newif\ifcameraready
 \camerareadyfalse
@@ -16,7 +21,8 @@
 % in the camera-ready version and ask you to change it back.
 
 
-\title{Classification and Organisation of Lexical Data for Large Coverage of Applications}
+\title{From High Lexical Coverage to Wide Application Coverage---Evolving
+Language Resources for Larger User-Base}
 
 \ifcameraready
 \author{First author \\
@@ -35,14 +41,20 @@
 
 \begin{document}
 \maketitle
+
 \begin{abstract}
-    [[From high lexical coverage to high coverage of linguistic applications
-    through linguist classification of lexical data and all problems and
-    solutions therein. This is a case study about transforming Finnish
-    large coverage morphological analyser to a linguistics database for
-    large variety of computational linguistics software, such as
-    spell-checker, named entity recogniser, dependency parser, indexing tool
-    etc.]]
+    Evolving lexical resources from high coverage single-purpose morphological
+    analyser to wide coverage of linguistic applications and end-user products
+    is a difficult task. The lexical data coverage needs to be widened to cover
+    needs of various applications yet remain consistent and stable for the
+    previous applications. In this paper we present a case study on Finnish
+    lexical data developed in past years, but the insights gained should be
+    generally useful to everyone developing lexical data. The development has
+    been made by extending a database, and the work was done by linguists and
+    language technologists reviewing the classifications and new words, using
+    some supervised data collecting methods and written grammars.  The lexical
+    data has been successfully used in large variety of applications from
+    dependency parsing to spell-checking and rule-based machine translation. 
 \end{abstract}
 
 
@@ -84,7 +96,89 @@
     % \url{http://creativecommons.org/licenses/by/4.0/}
 }
 
-\section{Some Tables}
+For most moderately resourced languages, there exists at least one lexical
+resource, such as morphological analyser, that has reached a level of high
+lexical coverage, e.g., over 95̃~\% of running texts of generic domain.
+At that level the resource will be valuable enough
+for other researchers as well as software developers to start using it as a
+basis of a language model for large variety of software. In this article we
+present a case study of lexical resources of Finnish over three years of
+development from such basic, single-project resource into generally accepted
+state-of-the-art language model for a large variety of language technology
+production chains, such as: spell-checker~\cite{pirinen2014weighted},
+named entity recogniser~\cite{}, dependency parser~\cite{bohnet2013joint}, indexing tool,
+machine translation~\footnote{\url{LG-LP disallows repo URLs}}. \ldots
+
+The following aspects of language resource handling will be discussed:
+\begin{itemize}
+    \item gathering new rare lexical items: proper nouns, ...
+    \item linguistic classification and verification
+    \item automatically verification and consistency checks
+    \item requirements of different applications
+\end{itemize}
+
+A central requirement for scaling lexical resource to a multitude of
+applications is classification of lexical items. In a morphological analyser
+it is sufficient that each lexical item belongs to one or more part-of-speech
+class, which is just a coarse generalisation of its morphological, syntactic and
+semantic features. In most end applications, a number of different bits of
+information per lexical entry (including per morph) needs to be supported,
+and e.g., the information for named entity recognition must not interfere
+with the analysis quality of the morphological analyser. To implement this
+a separation of data and the grammar description was needed, and our solution
+explores a light-weight ad hoc database structure.
+
+The verifiability and stability of lexical resources can be ensured in two
+ways: deploying automatic test suites that ensure consistency of the data and
+integrity of resulting tools and parsers, and linguistically motivated, written
+annotation manuals. In this article we focus on the latter, although the system
+has plenty of automatic tests as well.
+
+The resulting database and buzzword is provided as free/open source
+product in public repository for anyone to download and use for other
+products. We believe that this aspect is other central concept for
+sustainable and reproducible NLP research, and is one that has in the
+past been omitted especially in case of Finnish resources but in general
+in a large variety of moderately-resourced languages.
+
+\textbf{[[[The cfp for reference:]]]}
+\begin{quote}
+The workshop encourages researchers to exchange about how they manage to face several challenges:
+\begin{itemize}
+\item the context of this production chain requires that they not be content with understanding phenomena, but also achieve actual production of formalized results;
+\item resulting resources should reach a reasonable level of verifiability, e.g. by finding formal or syntactic bases as a support to semantic description;
+\item methods which are able to cover the most diverse languages are to be preferred;
+\item the format of manual construction of complex LRs must be highly readable, so that errors can be easily detected and corrected.
+\end{itemize}
+
+These four challenges are intellectually stimulating and the first two are related to the scientificity of linguistic description. Others affect both producers and users of LRs:
+\begin{itemize}
+\item conceptual models are not easy to assign to large amounts of language data; due to idiosyncratic behaviour of lexical entries, it is often required to manually examine them individually as regards syntax or semantics;
+\item many multiword expressions, including support-verb constructions, are somewhere halfway between compositional and non-compositional constructs;
+\item actual implementation of NLP systems and real-world applications may provide feedback on complex lexical and grammatical LRs used in them, but experimentation is required to accurately relate features of the LRs with features of results obtained in NLP.
+\end{itemize}
+
+Centres of excellence on these topics exist, but are isolated from one another due to domain and language barriers.
+
+The activities of the Special Interest Group in the Lexicon (SIGLEX), under ACL, are a sign  that the scientific community is growingly interested in these issues. In recent years, several international conferences and journals have promoted them, although either in a more general NLP context (e.g. LREC), or in a more general linguistic context (e.g. the Lexis and Grammar Conferences), which diluted the focus.
+
+Therefore, we will ask for original research related (but not limited to) the following fields:
+\begin{itemize}
+\item Lexicography for NLP;
+\item Lexicon/Grammar interface;
+\item Dictionaries and grammars for translation technologies;
+\item Grammars: design, formal specification and quality;
+\item Local grammars;
+\item Ontologies and knowledge representation;
+\item Design and implementation of domain-specific and terminological LRs;
+\item Environments for construction of LRs;
+\item Statistical NLP coupled with existing LRs.
+\end{itemize}
+\end{quote}
+
+\section{Lexical Data}
+
+Lexical data is managed in an ad hoc database \ldots
 
 \begin{table}[h]
     \begin{center}
@@ -92,19 +186,19 @@
             \hline
             \bf Part-of-Speech & \bf 2011 & \bf 2014 \\
             \hline
-            \sc Noun           & 78,994   & 374,574 \\
-            \sc Adj            & 10,689   & 18,765 \\
+            \sc Noun           & 77,284   & 374,790 \\
+            \sc Adj            & 10,689   & 18,781 \\
             \sc Verb           & 10,219   & 10,889 \\
             \sc Adv            & 5,332    & 5,666 \\
-            \sc Prt            & 442      & 7,287 \\
-            \sc Num            & 193      & 857 \\
-            \sc Adp            & 1,450    & 475 \\
-            \sc Conj           & 119      & 84 \\
-            \sc Pron           & 78       & 78 \\
-            \sc .              & 41       & 34 \\
+            \sc Prt            & 480      & 948 \\
+            \sc Num            & 52       & 900 \\
+            \sc Adp            & 354      & 475 \\
+            \sc Conj           & 45       & 84 \\
+            \sc Pron           & 76       & 78 \\
+            \sc .              & 29       & 42 \\
             \sc X              & 154      & 341 \\
             \hline
-            \bf Total          & 110,346  & 411,868 \\
+            \bf Total          & 104,714  & 412,994 \\
             \hline
         \end{tabular}
     \end{center}
@@ -140,15 +234,67 @@
     clitic combinations.}
 \end{table}
 
+About collecting lexical data.
+
+\section{Development Motivated by Linguistics}
+
+FTB-work?
+
+\section{Development Motivated by Applications}
+
+NER extensions?
+
+For example for morphological analysis of Finnish, it is sufficient to treat
+so-called past-participle form as a single thing~(\ref{gloss:pcp}),
+however, in applications that need to parse some semantics or syntax it easily
+becomes apparent that at least three uses of the participle are separate enough
+to warrant different analyses to facilitate correct use: a past negative
+construction~(\ref{gloss:pcp-conneg}), a perfect or pluperfect
+construction~(\ref{gloss:pcp-past}) or a derivation yielding
+common adjective~(\ref{gloss:pcp-drv}). The separation is the
+most important for syntactic disambiguation, which in turn is used by e.g.,
+machine translation to avoid such translations as \emph{I (did) not looked} or
+\emph{presentation's looked}, which can be understandable as machine
+translations but are not the ideal solutions.
+
+\begin{exe}
+    \ex \label{gloss:pcp}
+    \gll \bf katso-nut \\
+    \small look-\textsc{Pst.Ptcp.Sg} \\
+\glt `looked'
+\end{exe}
+
+\begin{exe}
+    \ex \label{gloss:pcp-conneg}
+    \gll \bf en \bf katso-nut \\
+    \small \textsc{Neg.V.1sg} \small look-\textsc{Past.ConNeg.Sg} \\
+    \glt `I didn't look'
+    \ex \label{gloss:pcp-past}
+    \gll \bf ole-n \bf katso-nut \\
+    \small be-\textsc{pres.1sg} \small look-\textsc{Past.Ptcp.Sg} \\
+    \glt `I have looked' \\
+    \ex \label{gloss:pcp-drv}
+    \gll \bf esitelmä-n \bf katsonut \\
+    \small presentation-\textsc{Sg.Gen} \small look[\textsc{Sg.Nom}] \\
+    \glt `who has seen the presentation'
+\end{exe}
+
+\section{Conclusion}
+
+We have developed Finnish lexical database from single-use morphological
+analyser to generic, linguistically coherent lexical resource providing
+large number of production chains.
+
+
 \ifcameraready
 \section*{Acknowledgements}
 
 
 \fi
 
-% include your own bib file like this:
 \bibliographystyle{acl}
 \bibliography{lglp2014omorfi}
 
 
 \end{document}
+% vim: set spell:
