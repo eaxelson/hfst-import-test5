@@ -225,6 +225,17 @@ void HfstTransducer::remove_from_alphabet(const std::string &symbol)
     convert_to_hfst_transducer(net);
 }
 
+
+void HfstTransducer::remove_from_alphabet(const std::set<std::string> &symbols) 
+{
+  for (std::set<std::string>::const_iterator it = symbols.begin();
+       it != symbols.end(); it++)
+    {
+      this->remove_from_alphabet(*it);
+    }
+}
+
+
 HfstTransducer &HfstTransducer::prune_alphabet(bool force)
 {
   hfst::implementations::HfstBasicTransducer * net 

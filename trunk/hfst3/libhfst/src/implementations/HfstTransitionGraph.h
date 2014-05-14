@@ -2670,7 +2670,7 @@
 
 
 
-         std::string weight_to_marker(float weight)
+         std::string weight2marker(float weight)
            {
              std::ostringstream o;
              o << weight;
@@ -2685,7 +2685,7 @@
            for (HfstState state = 0; state < limit; state++)
              {
                // The transitions that are substituted
-               std::vector<typename HfstTransitions::iterator> 
+               std::stack<typename HfstTransitions::iterator> 
                  old_transitions;
                // The transitions that will substitute
                std::vector<HfstTransition <C> > new_transitions;
@@ -2703,23 +2703,21 @@
                      {
                        // schedule a substitution
                        new_transitions.push_back
-                         (HfstTransition <C> (data.get_target_state(), 
+                         (HfstTransition <C> (tr_it->get_target_state(), 
                                          data.get_input_symbol(), 
                                          data.get_output_symbol(), 
                                          data.get_weight()));
                        // schedule the old transition to be deleted
-                       old_transitions.push_back(tr_it);
+                       old_transitions.push(tr_it);
                      }
                    // (one transition gone through)
                  } 
                // (all transitions in a state gone through)
 
                // Remove the substituted transitions
-               for (typename std::vector<typename 
-                      HfstTransitions::iterator>::iterator IT =
-                      old_transitions.begin(); 
-                    IT != old_transitions.end(); IT++) {
-                 state_vector[state].erase(*IT);
+               while (! old_transitions.empty()) {
+                 state_vector[state].erase(old_transitions.top());
+                 old_transitions.pop();
                }
                
                // Add the substituting transitions
@@ -2729,6 +2727,7 @@
                  {
                    HfstState new_state = add_state();
                    std::string marker = weight2marker(IT->get_weight());
+                   std::cerr << "got marker '" << marker << "'" << std::endl;
                    HfstTransition <C> marker_transition(IT->get_target_state(),
                                                         marker,
                                                         marker,
@@ -2743,15 +2742,34 @@
 
              }
            // (all states gone trough)
+
+           // Go through the final states
+           std::set<HfstState> final_states_to_remove;
+
+           for (typename FinalWeightMap::iterator fin_it = final_weight_map.begin();
+                fin_it != final_weight_map.end(); fin_it++)
+             {
+               if (fin_it->second != 0)
+                 {
+                   HfstState new_state = add_state();
+                   set_final_weight(new_state, 0);
+                   std::string marker = weight2marker(fin_it->second);
+                   HfstTransition <C> epsilon_transition(new_state,
+                                                         marker,
+                                                         marker,
+                                                         0);
+                   add_transition(fin_it->first, epsilon_transition);
+                   final_states_to_remove.insert(fin_it->first);
+                 }
+             }
+           for (std::set<HfstState>::iterator it = final_states_to_remove.begin();
+                it != final_states_to_remove.end(); it++)
+             {
+               final_weight_map.erase(*it);
+             }
+
            return *this;
          }
-
-
-
-
-
-
-
 
          // ####
          // another version of substitute for internal use..
@@ -2881,6 +2899,112 @@
 
            return *this;
          }
+
+
+
+         bool marker2weight(const std::string & str, float & weight) 
+         {
+           if (str.size() < 3)
+             return false;
+           if (str.at(0) != '@' || str.at(str.size()-1) != '@')
+             return false;
+
+           std::string weight_string = str.substr(1, str.size()-2);
+           std::stringstream sstream(weight_string);
+           sstream >> weight;
+           if (sstream.fail()) {
+             return false;
+           }           
+           return true;
+         }         
+
+         // HERE
+         HfstTransitionGraph & substitute_markers_with_weights() {
+
+           // Go through all states
+           HfstState limit = state_vector.size();
+           for (HfstState state = 0; state < limit; state++)
+             {
+               // The transitions that are substituted
+               std::stack<typename HfstTransitions::iterator> 
+                 old_transitions;
+               // The transitions that will substitute
+               std::vector<HfstTransition <C> > new_transitions;
+
+               // Go through all transitions
+               for (typename HfstTransitions::iterator tr_it
+                      = state_vector[state].begin();
+                    tr_it != state_vector[state].end(); tr_it++)
+                 {
+                   C data = tr_it->get_transition_data();
+
+                   float weight = 0;
+                   // Whether there is anything to substitute 
+                   // in this transition
+                   if ( (!marker2weight(data.get_input_symbol(), weight)) && 
+                        marker2weight(data.get_output_symbol(), weight) )
+                     {
+                       std::cerr << "got weight '" << weight << "'" << std::endl;
+                       // schedule a substitution
+                       new_transitions.push_back
+                         (HfstTransition <C> (tr_it->get_target_state(), 
+                                              data.get_input_symbol(), 
+                                              hfst::internal_epsilon, 
+                                              weight));
+                       // schedule the old transition to be deleted
+                       old_transitions.push(tr_it);
+                     }
+                   // or the transition must be deleted
+                   else if (marker2weight(data.get_input_symbol(), weight) &&
+                            marker2weight(data.get_output_symbol(), weight) )
+                     {
+                       std::cerr << "got weight '" << weight << "'" << std::endl;
+                       // schedule the old transition to be deleted
+                       old_transitions.push(tr_it);
+                     }
+                   else {}
+                   // (one transition gone through)
+                 } 
+               // (all transitions in a state gone through)
+
+               // Remove the substituted transitions
+               while (! old_transitions.empty()) {
+                 state_vector[state].erase(old_transitions.top());
+                 old_transitions.pop();
+               }
+               
+               // Add the substituting transitions
+               for (typename std::vector<HfstTransition <C> >::iterator IT 
+                      = new_transitions.begin();
+                    IT != new_transitions.end(); IT++)
+                 {
+                   state_vector[state].push_back(*IT);
+                 }
+
+             }
+           // (all states gone trough)
+
+           std::stack<StringSet::iterator> weight_markers;
+           for (StringSet::iterator it = alphabet.begin();
+                it != alphabet.end(); it++)
+             {
+               float foo;
+               if (marker2weight(*it, foo))
+                 {
+                   weight_markers.push(it);
+                 }
+             }
+           while (! weight_markers.empty())
+             {
+               alphabet.erase(weight_markers.top());
+               weight_markers.pop();
+             }
+
+           return *this;           
+         }
+
+
+
 
          /* ----------------------------
                Insert freely functions
