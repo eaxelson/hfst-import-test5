@@ -724,6 +724,7 @@ namespace hfst
   }
 
 
+    // Return the string "@N@" where N is the string representation of i.
     static std::string getMarkerString(unsigned int i)
     {
       std::ostringstream oss;
@@ -731,11 +732,34 @@ namespace hfst
       return std::string("@") + oss.str() + std::string("@");
     }
 
-      // bracketed replace for parallel rules
-    HfstTransducer parallelBracketedReplace( const std::vector<Rule> &ruleVector, bool optional)
+    // Return the number representation of N in string "@N@".
+    static unsigned int getMarkerNumber(const std::string & str)
     {
-      StringSet marker_symbols; 
-      HfstSymbolSubstitutions marker_substitutions;
+      std::string number_str = str.substr(1, str.size()-2);
+      std::istringstream iss;
+      unsigned int retval;
+      iss >> retval;
+      return retval;
+    }
+
+    // Bracketed replace for parallel rules.
+    HfstTransducer parallelBracketedReplace
+    (const std::vector<Rule> &ruleVector, bool optional)
+    {
+      // For each parallel rule, we need to concatenate a special marker symbol
+      // to its output side. This is needed so that overlapping mappings with
+      // different weights and contexts are kept separate. If we have N rules,
+      // we need marker symbols "@1@", "@2@", ... , "@N@" ("@0@" is reserved
+      // for epsilon symbol). At the end, we must substitute any marker symbols
+      // with epsilons.
+      // For an example, consider the following case:
+      //   a -> b::1 || c _ c ,, a -> b::2 || d _ d
+      // If no markers are added, input 'dad' will yield 'dbd' with weight 1
+      // because the transition <a:b::2> will be eliminated by the transition
+      // <a:b::1> as it has a lower weight.
+
+      StringSet marker_symbols; // "@1@", "@2@", ... , "@N@"
+      HfstSymbolSubstitutions marker_substitutions; // any-marker-to-epsilon
       for (unsigned int i=0; i < ruleVector.size(); i++)
         {
           std::string marker_string = getMarkerString(i+1);
@@ -759,7 +783,8 @@ namespace hfst
         TOK.add_multichar_symbol(tmpMarker);
         TOK.add_multichar_symbol( ".#.");
 
-        ImplementationType type = ruleVector[0].get_mapping()[0].first.get_type();
+        ImplementationType type 
+          = ruleVector[0].get_mapping()[0].first.get_type();
 
         HfstTransducer leftBracket(leftMarker, TOK, type);
         HfstTransducer rightBracket(rightMarker, TOK, type);
@@ -768,11 +793,13 @@ namespace hfst
         HfstTransducer tmpBracket(tmpMarker, TOK, type);
 
 
-        // Identity pair
+        // Identity pair (unknowns/identities must not be expanded to marker
+        // symbols)
         HfstTransducer identityPair = HfstTransducer::identity_pair( type );
         identityPair.insert_to_alphabet(marker_symbols);
 
         HfstTransducer identity (identityPair);
+        // unknowns/identities must not be expanded to marker symbols
         identity.insert_to_alphabet(marker_symbols);
         identity.repeat_star().minimize();
 
@@ -785,13 +812,15 @@ namespace hfst
         identityExpanded.insert_to_alphabet(marker_symbols);
         // will be expanded with mappings
 
-         // for removing .#. from the center
+        // for removing .#. from the center
         HfstTransducer identityWithoutBoundary(identity);
         identityWithoutBoundary.insert_to_alphabet(".#.");
+        // (must not be expanded to marker symbols)
         identityWithoutBoundary.insert_to_alphabet(marker_symbols);
         HfstTransducer removeHash(identityWithoutBoundary);
         HfstTransducer boundary(".#.", TOK, type);
-        removeHash.concatenate(boundary).concatenate(identityWithoutBoundary).minimize();
+        removeHash.concatenate(boundary)
+          .concatenate(identityWithoutBoundary).minimize();
         //printf("removeHash \n");
         //removeHash.write_in_att_format(stdout, 1);
 
@@ -801,276 +830,312 @@ namespace hfst
         // go through vector and do everything for each rule
         for ( unsigned int i = 0; i < ruleVector.size(); i++ )
         {
-          HfstTransducerPairVector mappingPairVector = ruleVector[i].get_mapping();
-            HfstTransducer mapping(type);
-            for ( unsigned int j = 0; j < mappingPairVector.size(); j++ )
+          HfstTransducerPairVector mappingPairVector 
+            = ruleVector[i].get_mapping();
+          HfstTransducer mapping(type);
+          for ( unsigned int j = 0; j < mappingPairVector.size(); j++ )
             {
-              std::string marker_string = getMarkerString(i+1); // i+1 because @0@ is epsilon..
+              // i+1 because @0@ is epsilon..
+              std::string marker_string = getMarkerString(i+1); 
               HfstTransducer marker(marker_string, type); 
               HfstTransducer oneMappingPair(mappingPairVector[j].first);
+              // unknowns/identities must not be expanded to marker symbols
               oneMappingPair.insert_to_alphabet(marker_symbols);
-              mappingPairVector[j].second.insert_to_alphabet(marker_symbols);
-              oneMappingPair.cross_product(mappingPairVector[j].second.concatenate(marker));
+              HfstTransducer foo(mappingPairVector[j].second);
+              foo.insert_to_alphabet(marker_symbols);
+              oneMappingPair.cross_product
+                (foo.concatenate(marker));
               //oneMappingPair.cross_product(mappingPairVector[j].second);
+              
+              //printf("oneMappingPair \n");
+              //oneMappingPair.write_in_att_format(stdout, 1);
 
-                //printf("oneMappingPair \n");
-                //oneMappingPair.write_in_att_format(stdout, 1);
 
-
-                if ( j == 0 )
+              if ( j == 0 )
                 {
-                    // remove .#. from the center
-                    // center - (?* .#. ?*)
-                    oneMappingPair.subtract(removeHash, false).minimize();
-                    oneMappingPair.remove_from_alphabet(".#.");
-                    mapping = oneMappingPair;
+                  // remove .#. from the center
+                  // center - (?* .#. ?*)
+                  oneMappingPair.subtract(removeHash, false).minimize();
+                  oneMappingPair.remove_from_alphabet(".#.");
+                  mapping = oneMappingPair;
                 }
-                else
+              else
                 {
-                    oneMappingPair.subtract(removeHash, false).minimize();
-                    oneMappingPair.remove_from_alphabet(".#.");
-                    mapping.disjunct(oneMappingPair).minimize();
+                  oneMappingPair.subtract(removeHash, false).minimize();
+                  oneMappingPair.remove_from_alphabet(".#.");
+                  mapping.disjunct(oneMappingPair).minimize();
                 }
             }
+          
+          
+          HfstTransducerPairVector contextVector = ruleVector[i].get_context();
+          //ReplaceType replaceType = ruleVector[i].get_replType();
 
-
-            HfstTransducerPairVector contextVector = ruleVector[i].get_context();
-            //ReplaceType replaceType = ruleVector[i].get_replType();
-
-            // when there aren't any contexts, result is identityExpanded
-            if ( contextVector.size() == 1 )
+          // when there aren't any contexts, result is identityExpanded
+          if ( contextVector.size() == 1 )
             {
-                HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
-                if ( !(contextVector[0].first.compare(epsilon) && contextVector[0].second.compare(epsilon)) )
+              HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, type);
+              if ( !(contextVector[0].first.compare(epsilon) && 
+                     contextVector[0].second.compare(epsilon)) )
                 {
                   noContexts = false;
                 }
             }
 
-    //////////////////////////////////////////////////////////////////////////////
-            // In case of ? -> x replacement
-           // If left side is empty, return identity transducer
-           // If right side is empty, return identity transducer
-           //    with alphabet from the left side
-           HfstTransducer empty(type);
-
-           if ( mapping.compare(empty) )
-           {
-               mapping = identity;
-               if (mappingPairVector[0].second.compare(empty))
-               {
-                   //printf("alphabet: \n");
-                 StringSet transducerAlphabet = mappingPairVector[0].first.get_alphabet();
-                   for (StringSet::const_iterator s = transducerAlphabet.begin();
-                                  s != transducerAlphabet.end();
-                                  ++s)
-                       {
-                           //printf("%s \n", s->c_str());
-                           mapping.insert_to_alphabet(s->c_str());
-                       }
-                   //printf("------------------ \n");
-               }
-           }
-    //////////////////////////////////////////////////////////////////////////////
-
-
-            mapping.insert_to_alphabet(leftMarker);
-            mapping.insert_to_alphabet(rightMarker);
-            mapping.insert_to_alphabet(tmpMarker);
-
-            // Surround mapping with brackets
-            HfstTransducer mappingWithBrackets(leftBracket);
-            mappingWithBrackets.concatenate(mapping).concatenate(rightBracket).minimize();
-
-
-            // non - optional
-            // mapping = <a:b> u <2a:a>2
-            if ( optional != true )
+          //////////////////////////////////////////////////////////////////
+          // In case of ? -> x replacement
+          // If left side is empty, return identity transducer
+          // If right side is empty, return identity transducer
+          //    with alphabet from the left side
+          HfstTransducer empty(type);
+          
+          if ( mapping.compare(empty) )
             {
-                // needed in case of ? -> x replacement
-                mapping.insert_to_alphabet(leftMarker2);
-                mapping.insert_to_alphabet(rightMarker2);
-                mappingWithBrackets.insert_to_alphabet(leftMarker2);
-                mappingWithBrackets.insert_to_alphabet(rightMarker2);
+              mapping = identity;
+              if (mappingPairVector[0].second.compare(empty))
+                {
+                  //printf("alphabet: \n");
+                  StringSet transducerAlphabet 
+                    = mappingPairVector[0].first.get_alphabet();
+                  for (StringSet::const_iterator s 
+                         = transducerAlphabet.begin();
+                       s != transducerAlphabet.end();
+                       ++s)
+                    {
+                      //printf("%s \n", s->c_str());
+                      mapping.insert_to_alphabet(s->c_str());
+                    }
+                  //printf("------------------ \n");
+                }
+            }
+          //////////////////////////////////////////////////////////////////
+          
+          
+          mapping.insert_to_alphabet(leftMarker);
+          mapping.insert_to_alphabet(rightMarker);
+          mapping.insert_to_alphabet(tmpMarker);
+          
+          // Surround mapping with brackets
+          HfstTransducer mappingWithBrackets(leftBracket);
+          mappingWithBrackets.concatenate(mapping)
+            .concatenate(rightBracket).minimize();
+          
+          
+          // non - optional
+          // mapping = <a:b> u <2a:a>2
+          if ( optional != true )
+            {
+              // needed in case of ? -> x replacement
+              mapping.insert_to_alphabet(leftMarker2);
+              mapping.insert_to_alphabet(rightMarker2);
+              mappingWithBrackets.insert_to_alphabet(leftMarker2);
+              mappingWithBrackets.insert_to_alphabet(rightMarker2);
+              
+              
+              HfstTransducer mappingProject(mapping);
+              mappingProject.input_project().minimize();
+              
+              HfstTransducer mappingWithBracketsNonOptional(leftBracket2);
+              // needed in case of ? -> x replacement
+              //mappingWithBracketsNonOptional.insert_to_alphabet(leftMarker2);
+              //mappingWithBracketsNonOptional.
+              //insert_to_alphabet(rightMarker2);
 
-
-                HfstTransducer mappingProject(mapping);
-                mappingProject.input_project().minimize();
-
-                HfstTransducer mappingWithBracketsNonOptional(leftBracket2);
-                // needed in case of ? -> x replacement
-                //    mappingWithBracketsNonOptional.insert_to_alphabet(leftMarker2);
-                //    mappingWithBracketsNonOptional.insert_to_alphabet(rightMarker2);
-
-                mappingWithBracketsNonOptional.concatenate(mappingProject).
-                                              concatenate(rightBracket2).
-                                              minimize();
-                // mappingWithBrackets...... expanded
-                mappingWithBrackets.disjunct(mappingWithBracketsNonOptional).minimize();
+              mappingWithBracketsNonOptional.concatenate(mappingProject).
+                concatenate(rightBracket2).
+                minimize();
+              // mappingWithBrackets...... expanded
+              mappingWithBrackets.disjunct(mappingWithBracketsNonOptional)
+                .minimize();
 
             }
 
-            identityExpanded.disjunct(mappingWithBrackets).minimize();
-            mappingWithBracketsVector.push_back(mappingWithBrackets);
+          identityExpanded.disjunct(mappingWithBrackets).minimize();
+          mappingWithBracketsVector.push_back(mappingWithBrackets);
         }
-
+        
         identityExpanded.repeat_star().minimize();
-
+        
         // if none of the rules have contexts, return identityExpanded
         if ( noContexts )
-        {
-          identityExpanded.remove_from_alphabet(tmpMarker);
-          identityExpanded.substitute(marker_substitutions);
-          identityExpanded.remove_from_alphabet(marker_symbols);
-          return identityExpanded;
-        }
-
+          {
+            identityExpanded.remove_from_alphabet(tmpMarker);
+            // substitute markers with epsilons
+            identityExpanded.substitute(marker_substitutions);
+            identityExpanded.remove_from_alphabet(marker_symbols);
+            return identityExpanded;
+          }
+        
         // if they have contexts, process them
-
-
-
+        
 
 
         if ( ruleVector.size() != mappingWithBracketsVector.size() )
-        {
-          HFST_THROW_MESSAGE(TransducerTypeMismatchException, "Vector sizes don't match");
-        }
-
+          {
+            HFST_THROW_MESSAGE(TransducerTypeMismatchException, 
+                               "Vector sizes don't match");
+          }
+        
         std::map<std::string,hfst::HfstBasicTransducer> contextReplaceMap;
-
-
+        
+        
         HfstTransducer unionContextReplace(type);
         HfstTransducer bracketedReplace(type);
-        //THIS is for disjuncting labels first, and then substitute them with transducers
+        //THIS is for disjuncting labels first, and then substitute them with
+        // transducers
         //HfstTransducer unionContextReplace_labels(type);
         for ( unsigned int i = 0; i < ruleVector.size(); i++ )
-        {
-
+          {
+            
             // Surround mapping with brackets with tmp boudaries
             HfstTransducer mappingWithBracketsAndTmpBoundary(tmpBracket);
-            mappingWithBracketsAndTmpBoundary.concatenate(mappingWithBracketsVector[i])
-                                          .concatenate(tmpBracket)
-                                          .minimize();
+            mappingWithBracketsAndTmpBoundary
+              .concatenate(mappingWithBracketsVector[i])
+              .concatenate(tmpBracket)
+              .minimize();
             // .* |<a:b>| :*
             HfstTransducer bracketedReplaceTmp(identityExpanded);
             bracketedReplaceTmp.concatenate(mappingWithBracketsAndTmpBoundary)
-                              .concatenate(identityExpanded)
-                              .minimize();
-
+              .concatenate(identityExpanded)
+              .minimize();
+            
             bracketedReplaceTmp.transform_weights(&zero_weight);
             bracketedReplace.disjunct(bracketedReplaceTmp).minimize();
-
+            
             //Create context part
             HfstTransducer unionContextReplaceTmp(type);
-
-            // TESTING...
+            
+            // For each context that uses the output side (REPL_DOWN,
+            // REPL_LEFT, REPL_RIGHT) we must freely allow all markers that can
+            // be generated by other rules. Consider e.g. the following case:
+            //
+            //   C -> d::1 || \/ b _ b ,, a::1 -> b || c _ C , C _ c
+            //
+            // where the second rule yields caCac -> cbCbc and the first one
+            // again cbCbc -> cbdbc.
             HfstTransducerPairVector cont = ruleVector[i].get_context();
-            for (HfstTransducerPairVector::iterator cont_it = cont.begin();
-                 cont_it != cont.end(); cont_it++)
+
+            if (ruleVector[i].get_replType() != REPL_UP)
               {
-                for (StringSet::const_iterator sit = marker_symbols.begin();
-                     sit != marker_symbols.end(); sit++)
+                for (HfstTransducerPairVector::iterator cont_it = cont.begin();
+                     cont_it != cont.end(); cont_it++)
                   {
-                    StringPair marker_pair(*sit, *sit);
-                    cont_it->first.insert_freely(marker_pair, false);
-                    cont_it->second.insert_freely(marker_pair, false);
+                    for (StringSet::const_iterator sit 
+                           = marker_symbols.begin();
+                         sit != marker_symbols.end(); sit++)
+                      {
+                        if (getMarkerNumber(*sit) != i)
+                          {
+                            StringPair marker_pair(*sit, *sit);
+                            // 'false' makes sure harmonization is not done
+                            cont_it->first.insert_freely(marker_pair, false);
+                            cont_it->second.insert_freely(marker_pair, false);
+                          }
+                      }
                   }
               }
 
-            unionContextReplaceTmp = expandContextsWithMapping ( cont,
-                                               mappingWithBracketsAndTmpBoundary,
-                                               identityExpanded,
-                                               ruleVector[i].get_replType(),
-                                               optional);
-
+            unionContextReplaceTmp 
+              = expandContextsWithMapping ( cont,
+                                            mappingWithBracketsAndTmpBoundary,
+                                            identityExpanded,
+                                            ruleVector[i].get_replType(),
+                                            optional);
+            
             unionContextReplaceTmp.transform_weights(&zero_weight);
-
+            
             unionContextReplace.disjunct(unionContextReplaceTmp).minimize();
            /*
-            //THIS part is for disjuncting labels first, and then substitute them with transducers
-            //create map with context keys and basic transducers
-            stringstream tmpString;
-            tmpString << "$_contextRepl." << i << "_$";
-            string contx_key =  tmpString.str();
-            TOK.add_multichar_symbol(contx_key);
+           //THIS part is for disjuncting labels first, and then substitute
+           // them with transducers
+           //create map with context keys and basic transducers
+           stringstream tmpString;
+           tmpString << "$_contextRepl." << i << "_$";
+           string contx_key =  tmpString.str();
+           TOK.add_multichar_symbol(contx_key);
            // cout << "lexicon " << regex_key << "\n";
-
-            if (contextReplaceMap.find(contx_key) == contextReplaceMap.end())
-              {
-                contextReplaceMap.insert(pair<string,HfstBasicTransducer>(contx_key,
-                        HfstBasicTransducer(unionContextReplaceTmp)));
-              }
-
-            //disjunct all keys
-            unionContextReplace_labels.disjunct(HfstTransducer(contx_key, TOK, type)).minimize();
-
-         //   printf("unionContextReplace_labels: \n");
-         //   unionContextReplace_labels.write_in_att_format(stdout, 1);
-
+           
+           if (contextReplaceMap.find(contx_key) == contextReplaceMap.end())
+           {
+           contextReplaceMap.insert(pair<string,HfstBasicTransducer>(contx_key,
+           HfstBasicTransducer(unionContextReplaceTmp)));
+           }
+           
+           //disjunct all keys
+           unionContextReplace_labels.disjunct(HfstTransducer(contx_key,
+           TOK, type)).minimize();
+           
+           //   printf("unionContextReplace_labels: \n");
+           //   unionContextReplace_labels.write_in_att_format(stdout, 1);
+           
            */
-        }
+          }
 
         //printf("unionContextReplace_labels: \n");
         //unionContextReplace.write_in_att_format(stdout, 1);
-
-
-
+        
+        
+        
         /*
-        //THIS part is for disjuncting labels first, and then substitute them with transducers
+        //THIS part is for disjuncting labels first, and then substitute them
+        with transducers
         printf("substitute labels with real tr: \n");
-                //substitute labels with real tr
-                HfstBasicTransducer btr(unionContextReplace_labels);
-                btr.substitute(contextReplaceMap, true);
-                btr.prune_alphabet();
-
+        //substitute labels with real tr
+        HfstBasicTransducer btr(unionContextReplace_labels);
+        btr.substitute(contextReplaceMap, true);
+        btr.prune_alphabet();
+        
         printf("Substitute done. \n");
-                HfstTransducer unionContextReplace(btr, type);
-            printf("Created tr \n");
-
-
+        HfstTransducer unionContextReplace(btr, type);
+        printf("Created tr \n");
+        
+        
         //weight can be zero, because it will be subtracted
         bracketedReplace.transform_weights(&zero_weight);
         unionContextReplace.transform_weights(&zero_weight);
-
+        
         printf("min \n");
         unionContextReplace.minimize();
         printf("min done. \n");
-
+        
         */
-
+        
         /////////////////////}
-        //printf("subtract all mappings in contexts from replace without contexts: \n");
+        //printf("subtract all mappings in contexts from replace without
+        //contexts: \n");
         // subtract all mappings in contexts from replace without contexts
         HfstTransducer replaceWithoutContexts(bracketedReplace);
         replaceWithoutContexts.subtract(unionContextReplace).minimize();
-
+        
         //printf("remove bla bla: \n");
         // remove tmpMaprker
-        replaceWithoutContexts.substitute(StringPair(tmpMarker, tmpMarker),
-                StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@")).minimize();
+        replaceWithoutContexts.substitute
+          (StringPair(tmpMarker, tmpMarker),
+           StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@")).minimize();
         replaceWithoutContexts.remove_from_alphabet(tmpMarker);
         replaceWithoutContexts.minimize();
 
         identityExpanded.remove_from_alphabet(tmpMarker);
-
+        
         //printf("before final negation: \n");
         //replaceWithoutContexts.write_in_att_format(stdout, 1);
-
+        
         //printf("final subtract: \n");
-          // final negation
-          HfstTransducer uncondidtionalTr(identityExpanded);
-          uncondidtionalTr.subtract(replaceWithoutContexts).minimize();
-
-          //printf("uncondidtionalTr: \n");
-          //uncondidtionalTr.write_in_att_format(stdout, 1);
-
-          uncondidtionalTr.substitute(marker_substitutions);
-          uncondidtionalTr.remove_from_alphabet(marker_symbols);
-
-          return uncondidtionalTr;
-
+        // final negation
+        HfstTransducer uncondidtionalTr(identityExpanded);
+        uncondidtionalTr.subtract(replaceWithoutContexts).minimize();
+        
+        //printf("uncondidtionalTr: \n");
+        //uncondidtionalTr.write_in_att_format(stdout, 1);
+        
+        // substitute markers with epsilons
+        uncondidtionalTr.substitute(marker_substitutions);
+        uncondidtionalTr.remove_from_alphabet(marker_symbols);
+        
+        return uncondidtionalTr;
+        
     } 
-
+    
 
       //---------------------------------
       //    CONSTRAINTS
