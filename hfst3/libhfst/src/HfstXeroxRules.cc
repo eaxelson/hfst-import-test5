@@ -724,10 +724,24 @@ namespace hfst
   }
 
 
+    static std::string getMarkerString(unsigned int i)
+    {
+      std::ostringstream oss;
+      oss << i;
+      return std::string("@") + oss.str() + std::string("@");
+    }
 
       // bracketed replace for parallel rules
     HfstTransducer parallelBracketedReplace( const std::vector<Rule> &ruleVector, bool optional)
     {
+      StringSet marker_symbols; 
+      HfstSymbolSubstitutions marker_substitutions;
+      for (unsigned int i=0; i < ruleVector.size(); i++)
+        {
+          std::string marker_string = getMarkerString(i+1);
+          marker_symbols.insert(marker_string);
+          marker_substitutions[marker_string] = hfst::internal_epsilon;
+        }
 
         HfstTokenizer TOK;
         TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
@@ -756,7 +770,10 @@ namespace hfst
 
         // Identity pair
         HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+        identityPair.insert_to_alphabet(marker_symbols);
+
         HfstTransducer identity (identityPair);
+        identity.insert_to_alphabet(marker_symbols);
         identity.repeat_star().minimize();
 
         HfstTransducer identityExpanded(identityPair);
@@ -765,11 +782,13 @@ namespace hfst
         identityExpanded.insert_to_alphabet(leftMarker2);
         identityExpanded.insert_to_alphabet(rightMarker2);
         identityExpanded.insert_to_alphabet(tmpMarker);
+        identityExpanded.insert_to_alphabet(marker_symbols);
         // will be expanded with mappings
 
          // for removing .#. from the center
         HfstTransducer identityWithoutBoundary(identity);
         identityWithoutBoundary.insert_to_alphabet(".#.");
+        identityWithoutBoundary.insert_to_alphabet(marker_symbols);
         HfstTransducer removeHash(identityWithoutBoundary);
         HfstTransducer boundary(".#.", TOK, type);
         removeHash.concatenate(boundary).concatenate(identityWithoutBoundary).minimize();
@@ -778,15 +797,21 @@ namespace hfst
 
         HfstTransducerVector mappingWithBracketsVector;
         bool noContexts  = true;
+
         // go through vector and do everything for each rule
         for ( unsigned int i = 0; i < ruleVector.size(); i++ )
         {
-            HfstTransducerPairVector mappingPairVector = ruleVector[i].get_mapping();
+          HfstTransducerPairVector mappingPairVector = ruleVector[i].get_mapping();
             HfstTransducer mapping(type);
             for ( unsigned int j = 0; j < mappingPairVector.size(); j++ )
             {
-                HfstTransducer oneMappingPair(mappingPairVector[j].first);
-                oneMappingPair.cross_product(mappingPairVector[j].second);
+              std::string marker_string = getMarkerString(i+1); // i+1 because @0@ is epsilon..
+              HfstTransducer marker(marker_string, type); 
+              HfstTransducer oneMappingPair(mappingPairVector[j].first);
+              oneMappingPair.insert_to_alphabet(marker_symbols);
+              mappingPairVector[j].second.insert_to_alphabet(marker_symbols);
+              oneMappingPair.cross_product(mappingPairVector[j].second.concatenate(marker));
+              //oneMappingPair.cross_product(mappingPairVector[j].second);
 
                 //printf("oneMappingPair \n");
                 //oneMappingPair.write_in_att_format(stdout, 1);
@@ -828,13 +853,14 @@ namespace hfst
            // If right side is empty, return identity transducer
            //    with alphabet from the left side
            HfstTransducer empty(type);
+
            if ( mapping.compare(empty) )
            {
                mapping = identity;
                if (mappingPairVector[0].second.compare(empty))
                {
                    //printf("alphabet: \n");
-                   StringSet transducerAlphabet = mappingPairVector[0].first.get_alphabet();
+                 StringSet transducerAlphabet = mappingPairVector[0].first.get_alphabet();
                    for (StringSet::const_iterator s = transducerAlphabet.begin();
                                   s != transducerAlphabet.end();
                                   ++s)
@@ -894,6 +920,8 @@ namespace hfst
         if ( noContexts )
         {
           identityExpanded.remove_from_alphabet(tmpMarker);
+          identityExpanded.substitute(marker_substitutions);
+          identityExpanded.remove_from_alphabet(marker_symbols);
           return identityExpanded;
         }
 
@@ -934,7 +962,22 @@ namespace hfst
 
             //Create context part
             HfstTransducer unionContextReplaceTmp(type);
-            unionContextReplaceTmp = expandContextsWithMapping ( ruleVector[i].get_context(),
+
+            // TESTING...
+            HfstTransducerPairVector cont = ruleVector[i].get_context();
+            for (HfstTransducerPairVector::iterator cont_it = cont.begin();
+                 cont_it != cont.end(); cont_it++)
+              {
+                for (StringSet::const_iterator sit = marker_symbols.begin();
+                     sit != marker_symbols.end(); sit++)
+                  {
+                    StringPair marker_pair(*sit, *sit);
+                    cont_it->first.insert_freely(marker_pair, false);
+                    cont_it->second.insert_freely(marker_pair, false);
+                  }
+              }
+
+            unionContextReplaceTmp = expandContextsWithMapping ( cont,
                                                mappingWithBracketsAndTmpBoundary,
                                                identityExpanded,
                                                ruleVector[i].get_replType(),
@@ -1021,9 +1064,12 @@ namespace hfst
           //printf("uncondidtionalTr: \n");
           //uncondidtionalTr.write_in_att_format(stdout, 1);
 
+          uncondidtionalTr.substitute(marker_substitutions);
+          uncondidtionalTr.remove_from_alphabet(marker_symbols);
+
           return uncondidtionalTr;
 
-      }
+    } 
 
 
       //---------------------------------

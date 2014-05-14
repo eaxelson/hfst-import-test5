@@ -704,6 +704,7 @@ in \a ifile.
     @note Use with care, removing a symbol that occurs in a transition
     of the transducer can have unexpected results. */
     void remove_from_alphabet(const std::string &symbol);
+    void remove_from_alphabet(const std::set<std::string> &symbols);
 
     /** @brief Remove all symbols that do not occur in transitions of
         the transducer from its alphabet.

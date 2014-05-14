@@ -40,29 +40,29 @@ section
 	## Install tagger tools
 	## --------------------
 
-	${If} ${FileExists} "C:\Python27\Lib\site-packages"
-	      setOutPath "C:\Python27\Lib\site-packages\"
-	${Else}
-              ${If} ${FileExists} "C:\Python26\Lib\site-packages"
-	                      setOutPath "C:\Python26\Lib\site-packages\"
-              ${Else}
-	                      messageBox MB_OK "Did not find Python, so omitting hfst-train-tagger tool"
-              ${EndIf}
-	${EndIf}
+#	${If} ${FileExists} "C:\Python27\Lib\site-packages"
+#	      setOutPath "C:\Python27\Lib\site-packages\"
+#	${Else}
+#              ${If} ${FileExists} "C:\Python26\Lib\site-packages"
+#	                      setOutPath "C:\Python26\Lib\site-packages\"
+#              ${Else}
+#	                      messageBox MB_OK "Did not find Python, so omitting hfst-train-tagger tool"
+#              ${EndIf}
+#	${EndIf}
 
-        ${If} $OUTDIR == $0
-              File hfst-tag.exe
-        ${Else}
-              File tagger_aux.py
-              setOutPath $0
-              File hfst-tag.exe
-              # Use installation directory in scripts
-              !insertmacro _ReplaceInFile hfst-train-tagger.bat HFST_INSTALLATION_DIRECTORY $0
-	      File hfst-open-input-file-for-tagger.exe
-	      File hfst_tagger_compute_data_statistics.py
-	      File hfst-build-tagger.exe
-	      File hfst-train-tagger.bat              
-        ${EndIf}
+#        ${If} $OUTDIR == $0
+#              File hfst-tag.exe
+#        ${Else}
+#              File tagger_aux.py
+#              setOutPath $0
+#              File hfst-tag.exe
+#              # Use installation directory in scripts
+#              !insertmacro _ReplaceInFile hfst-train-tagger.bat HFST_INSTALLATION_DIRECTORY $0
+#	      File hfst-open-input-file-for-tagger.exe
+#	      File hfst_tagger_compute_data_statistics.py
+#	      File hfst-build-tagger.exe
+#	      File hfst-train-tagger.bat              
+#        ${EndIf}
 
 
 	## Install libhfst dll and HFST command line tools
