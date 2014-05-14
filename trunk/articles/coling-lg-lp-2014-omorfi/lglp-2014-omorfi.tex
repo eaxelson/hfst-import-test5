@@ -106,9 +106,9 @@ lexical resource of Finnish over three years of development from such a basic,
 single-project resource into a generally accepted state-of-the-art language
 model for a large variety of language technology production chains, such as:
 spell-checker~\cite{pirinen2014weighted}, named entity
-recognizer~\cite{huovelinsoftware}, dependency parser~\cite{bohnet2013joint}, indexing
-tool, machine translation system~\footnote{\url{LG-LP disallows repo URLs}}.
-\ldots
+recognizer~\cite{linden2013hfst}, dependency parser~\cite{bohnet2013joint},
+indexing tool, machine translation system~\footnote{\url{LG-LP disallows repo
+URLs}}.  \ldots
 
 The following aspects of language resource handling will be discussed:
 \begin{itemize}
@@ -209,7 +209,7 @@ lexical clusters are a relevant challenge for machine-learning.  From this
 design it follows that, all other context-conditions being equal, a bigger
 cluster is more likely to be a good candidate for a new token.  This idea is
 capitalized in the category guesser which can be derived from any finite-state
-lexicon with the use of \emph{hfst-guessify}~\cite{linden2008assigning}. The
+lexicon with the use of \emph{hfst-guessify}~\cite{linden2009entry}. The
 guesser takes the words in the lexicon into consideration.  More advanced
 machine-learning techniques are needed to benefit from the surrounding context
 in corpora.
@@ -434,7 +434,7 @@ To test the impact of the modifications, we use the following test data sets:
 \item FinnTreeBank1: morphologically disambiguated and dependency annotated selection of linguistically motivated sample sentences: 
          162,029 tokens, 
 \item FinnTreeBank2: morphologically disambiguated and dependency annotated selection of unrestricted text: 
-         4.000 tokens, \cite{voutilainen2011finntreebank}
+         4.000 tokens, \cite{voutilainen2012specifying}
 \item Gutenberg subsection: 100.000 tokens of unrestricted text from 18xx-18xx
 \end{itemize}
 
@@ -479,7 +479,10 @@ test data sets:
 
 To verify that the finite-state technology behaves as expected, i.e. no speed
 increase is incurred by the lexicon extension.  We compare the OMorFi 2011 and
-2014 versions of the finite-state implementations of the lexicons. 
+2014 versions of the finite-state implementations of the lexicons. The
+measurements were made using \texttt{hfst-optimized-lookup} tool on Centre of
+Scientific Computing Finland's interactive
+server.\footnote{\url{http://www.csc.fi/english/research/Computing_services/computing/servers/hippu}}
 
 \begin{table}[h]
     \begin{center}
@@ -487,7 +490,7 @@ increase is incurred by the lexicon extension.  We compare the OMorFi 2011 and
             \hline
             \bf Comparison       & \bf 2011 & \bf 2014 \\
             \hline
-            \sc Words per second           & 8,500           & 22,000\\
+            \sc Words per second           & 15,625           & 31,250\\
             \sc Disk size in MB                 & 31           & 69 \\
             \sc Number of states           & 551,845          & 522,184 \\
             \sc Number of arcs              & 1,140,661           & 2,298,083\\
