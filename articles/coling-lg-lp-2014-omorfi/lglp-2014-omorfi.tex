@@ -21,8 +21,8 @@
 % in the camera-ready version and ask you to change it back.
 
 
-\title{From High Lexical Coverage to Wide Application Coverage---Evolving
-Language Resources for Larger User-Base}
+\title{From High Lexical Coverage to Wide Application Coverage---Developing
+Language Resources for a Larger User-Base}
 
 \ifcameraready
 \author{First author \\
@@ -43,18 +43,18 @@ Language Resources for Larger User-Base}
 \maketitle
 
 \begin{abstract}
-    Evolving lexical resources from high coverage single-purpose morphological
-    analyser to wide coverage of linguistic applications and end-user products
+    Developing a lexical resource from a high coverage single-purpose morphological
+    analyzer to a wide coverage of linguistic applications and end-user products
     is a difficult task. The lexical data coverage needs to be widened to cover
     needs of various applications yet remain consistent and stable for the
-    previous applications. In this paper we present a case study on Finnish
-    lexical data developed in past years, but the insights gained should be
-    generally useful to everyone developing lexical data. The development has
+    previous applications. In this paper, we present a case study on Finnish
+    lexical data developed in recent years, but the insights gained should be
+    generally useful for everyone developing lexical data. The development has
     been made by extending a database, and the work was done by linguists and
     language technologists reviewing the classifications and new words, using
-    some supervised data collecting methods and written grammars.  The lexical
+    supervised data gathering methods and written grammars.  The lexical
     data has been successfully used in large variety of applications from
-    dependency parsing to spell-checking and rule-based machine translation. 
+    spell-checking and dependency parsing to rule-based machine translation. 
 \end{abstract}
 
 
@@ -97,88 +97,133 @@ Language Resources for Larger User-Base}
 }
 
 For most moderately resourced languages, there exists at least one lexical
-resource, such as morphological analyser, that has reached a level of high
-lexical coverage, e.g., over 95̃~\% of running texts of generic domain.
-At that level the resource will be valuable enough
-for other researchers as well as software developers to start using it as a
-basis of a language model for large variety of software. In this article we
-present a case study of lexical resources of Finnish over three years of
-development from such basic, single-project resource into generally accepted
-state-of-the-art language model for a large variety of language technology
-production chains, such as: spell-checker~\cite{pirinen2014weighted},
-named entity recogniser~\cite{}, dependency parser~\cite{bohnet2013joint}, indexing tool,
-machine translation~\footnote{\url{LG-LP disallows repo URLs}}. \ldots
+resource, such as a morphological analyzer, that has reached a level of high
+lexical coverage, e.g., over 95̃~\% of unrestricted text of any domain.  At that
+level the resource will be valuable enough for other researchers as well as
+software developers to start using it as a basis for language models for a
+large variety of software. In this article, we present a case study of a
+lexical resource of Finnish over three years of development from such a basic,
+single-project resource into a generally accepted state-of-the-art language
+model for a large variety of language technology production chains, such as:
+spell-checker~\cite{pirinen2014weighted}, named entity
+recognizer~\cite{huovelinsoftware}, dependency parser~\cite{bohnet2013joint}, indexing
+tool, machine translation system~\footnote{\url{LG-LP disallows repo URLs}}.
+\ldots
 
 The following aspects of language resource handling will be discussed:
 \begin{itemize}
-    \item gathering new rare lexical items: proper nouns, ...
+    \item gathering new lexical items
     \item linguistic classification and verification
-    \item automatically verification and consistency checks
+    \item automatic verification and consistency checks
     \item requirements of different applications
 \end{itemize}
 
-A central requirement for scaling lexical resource to a multitude of
-applications is classification of lexical items. In a morphological analyser
-it is sufficient that each lexical item belongs to one or more part-of-speech
-class, which is just a coarse generalisation of its morphological, syntactic and
-semantic features. In most end applications, a number of different bits of
-information per lexical entry (including per morph) needs to be supported,
-and e.g., the information for named entity recognition must not interfere
-with the analysis quality of the morphological analyser. To implement this
-a separation of data and the grammar description was needed, and our solution
-explores a light-weight ad hoc database structure.
+A central requirement for scaling up a lexical resource to a multitude of
+applications is the classification of lexical items. In a part-of-speech
+tagger, it may be sufficient that each lexical item belongs to one or more
+part-of-speech classes, which are a coarse generalization of the morphological,
+syntactic and semantic features. In most end-user applications, a number of
+different additional bits of information per lexical entry (including per
+morph) needs to be supported, and e.g., the information for named entity
+recognition must not interfere with the analysis quality of the morphological
+analyzer. To implement this, a separation of the data and the grammar
+description was needed in the morphological resource, and our solution explores
+a light-weight database structure.
 
 The verifiability and stability of lexical resources can be ensured in two
-ways: deploying automatic test suites that ensure consistency of the data and
-integrity of resulting tools and parsers, and linguistically motivated, written
-annotation manuals. In this article we focus on the latter, although the system
-has plenty of automatic tests as well.
+ways: deploying automatic test suites that ensure the consistency of the data
+and the integrity of resulting tools and parsers, and linguistically motivated,
+written annotation manuals. In this article, we focus on the latter, although
+the system has plenty of automatic tests as well.
 
-The resulting database and buzzword is provided as free/open source
-product in public repository for anyone to download and use for other
-products. We believe that this aspect is other central concept for
-sustainable and reproducible NLP research, and is one that has in the
-past been omitted especially in case of Finnish resources but in general
-in a large variety of moderately-resourced languages.
+The resulting database is provided as a free/open source product in a public
+repository for anyone to download and use for other products. We believe that
+this aspect is another central concept for sustainable and reproducible NLP
+research, and is one that has in the past been omitted especially in case of
+Finnish resources but also in general in a large variety of
+moderately-resourced languages.
 
-\textbf{[[[The cfp for reference:]]]}
-\begin{quote}
-The workshop encourages researchers to exchange about how they manage to face several challenges:
-\begin{itemize}
-\item the context of this production chain requires that they not be content with understanding phenomena, but also achieve actual production of formalized results;
-\item resulting resources should reach a reasonable level of verifiability, e.g. by finding formal or syntactic bases as a support to semantic description;
-\item methods which are able to cover the most diverse languages are to be preferred;
-\item the format of manual construction of complex LRs must be highly readable, so that errors can be easily detected and corrected.
-\end{itemize}
+In our work, we faced the fact that conceptual models are not easy to assign
+automatically to large amounts of language data, and due to the idiosyncratic
+behavior of lexical entries, it is still necessary to examine each entry
+suggestion individually to verify that it belongs to the intended category.
 
-These four challenges are intellectually stimulating and the first two are related to the scientificity of linguistic description. Others affect both producers and users of LRs:
-\begin{itemize}
-\item conceptual models are not easy to assign to large amounts of language data; due to idiosyncratic behaviour of lexical entries, it is often required to manually examine them individually as regards syntax or semantics;
-\item many multiword expressions, including support-verb constructions, are somewhere halfway between compositional and non-compositional constructs;
-\item actual implementation of NLP systems and real-world applications may provide feedback on complex lexical and grammatical LRs used in them, but experimentation is required to accurately relate features of the LRs with features of results obtained in NLP.
-\end{itemize}
+In addition, many multi-word expressions are somewhere halfway between
+compositional and non-compositional constructs.  While it may sometimes be
+beneficial to record frequent compositional constructs, it is often crucial to
+record the non-compositional constructs, as non-compositional constructs behave
+as individual words. 
 
-Centres of excellence on these topics exist, but are isolated from one another due to domain and language barriers.
+Actual implementations of NLP systems and real-world applications provide clues
+to what complex lexical and grammatical language-resources they need, but
+experiments are required to accurately relate the impact of the features of a
+language-resource on the results obtained in an NLP application.  In this
+paper, we use a manually annotated and verified gold-standard to represent the
+granularity and level of analysis we wish to achieve and evaluate our lexical
+analyzer with this gold standard. 
 
-The activities of the Special Interest Group in the Lexicon (SIGLEX), under ACL, are a sign  that the scientific community is growingly interested in these issues. In recent years, several international conferences and journals have promoted them, although either in a more general NLP context (e.g. LREC), or in a more general linguistic context (e.g. the Lexis and Grammar Conferences), which diluted the focus.
+By using manual encoding of information and not only machine-learning on the
+gold-standard training data, a high coverage of the training data is to be
+expected in the most recent version of our lexical resource. However, we
+extended the lessons learned from the training data to new unseen similar cases
+while building the lexical resource.  This is expected to show up as general
+domain-independent applicability of our resource in future applications.
 
-Therefore, we will ask for original research related (but not limited to) the following fields:
-\begin{itemize}
-\item Lexicography for NLP;
-\item Lexicon/Grammar interface;
-\item Dictionaries and grammars for translation technologies;
-\item Grammars: design, formal specification and quality;
-\item Local grammars;
-\item Ontologies and knowledge representation;
-\item Design and implementation of domain-specific and terminological LRs;
-\item Environments for construction of LRs;
-\item Statistical NLP coupled with existing LRs.
-\end{itemize}
-\end{quote}
+% Therefore, we will ask for original research related (but not limited to) the following fields:
+% \begin{itemize}
+% \item Lexicography for NLP;
+% \item Lexicon/Grammar interface;
+% \item Dictionaries and grammars for translation technologies;
+% \item Grammars: design, formal specification and quality;
+% \item Local grammars;
+% \item Ontologies and knowledge representation;
+% \item Design and implementation of domain-specific and terminological LRs;
+% \item Environments for construction of LRs;
+% \item Statistical NLP coupled with existing LRs.
+% \end{itemize}
 
 \section{Lexical Data}
 
-Lexical data is managed in an ad hoc database \ldots
+Lexical data is managed in a database format using the lemma and sense number
+as the primary keys to which we attach all the other information of a lexeme,
+such as inflectional paradigm,  part-of-speech as well as syntactic and
+semantic subcategories.  This compartmentalization of data allows us to treat
+different levels of descriptions separately.  On each level we use model words
+to represent the behavior we wish to model, e.g., we say that the name
+\emph{Merja} inflects as \emph{kirja}, has the same part-of-speech as
+\emph{sarja}, and have syntactic and semantic subcategories in common with
+other model words.  In essence, this does not differ from having numbers or
+other indexes on paradigms but it makes it easier for someone maintaining the
+database to memorize the distinctions. 
+
+The model words represent named clusters to which lexemes belong.  This ties in
+with the idea of verifiability and extendibility which we wish to achieve. It
+should be possible to infer which of the existing classes a new token most
+likely belongs to based on the contexts it appears in.  Listing exceptional
+tokens as clusters with only one member, or at most a few members, simplifies
+the description of the remaining tokens by making the description of their
+behavior more regular.  From a machine-learning perspective, fine-grained
+distinctions complicate the  objective function to be learned, but as long as
+the distinctions are practically useful and linguistically well-motivated our
+lexical clusters are a relevant challenge for machine-learning.  From this
+design it follows that, all other context-conditions being equal, a bigger
+cluster is more likely to be a good candidate for a new token.  This idea is
+capitalized in the category guesser which can be derived from any finite-state
+lexicon with the use of \emph{hfst-guessify}~\cite{linden2008assigning}. The
+guesser takes the words in the lexicon into consideration.  More advanced
+machine-learning techniques are needed to benefit from the surrounding context
+in corpora.
+
+In Tables 1, 2 and 3, we characterize the granularity of the lexical database
+and the work that has gone into developing it during three years between 2011
+and 2014 in terms of lexical items and paradigms of different parts-of-speech.
+From an internal Finnish morphological point of view, adjectives, nouns,
+pronouns and numerals behave in a similar fashion as nominals taking many of
+the same inflections and inflectional paradigms.  Also in Finnish, adverbs,
+particles and adpositions either do not inflect or take the same possessives
+and clitics.  However, for easier comparison with other languages, we compare
+numbers in terms of the Google universal POS tags defined
+in~\cite{petrov2011universal}. 
 
 \begin{table}[h]
     \begin{center}
@@ -202,15 +247,75 @@ Lexical data is managed in an ad hoc database \ldots
             \hline
         \end{tabular}
     \end{center}
-    \caption{Lexical data size organised by Google universal
-    POS tags~\cite{petrov2011universal} (by number of lexical items)}
+    \caption{Lexical data size organized by Google universal part-of-speech tags (by number of lexical items)}
 \end{table}
+
+In Table 1, we see that the majority of the added lexemes can be found among
+the nouns.  A more thorough analysis of the added nouns reveals that a majority
+is in the proper noun section.  This is motivated by the named-entity
+recognition (NER) application of OMorFi.  In many other languages, it is
+possible to add separate gazetteers, i.e. lists of names, to the NER
+application itself, but Finnish as a highly inflecting language needs to
+analyze the base forms of names as well, so the names need to be included in
+the morphological analyzer.  In Table 2, we compare the numbers of nouns in the
+two analyzer versions.
 
 \begin{table}[h]
     \begin{center}
         \begin{tabular}{|l|rr|}
             \hline
-            \bf Part-of-Speech & \bf 2011 & \bf 2014 \\
+            \bf Nouns             & \bf 2011 & \bf 2014 \\
+            \hline
+            \sc Geo Locations    & 1,710     & 244,648 \\
+            \sc Last Names        & 2,037     & 14,433 \\
+            \sc First names        & 1,277     & 5,153 \\
+            \sc Organizations   &               & 8,536 \\
+            \sc Miscellaneous   & 1,321     & 865 \\
+            \hline
+            \sc Proper Nouns    & 6,345      & 273,635 \\
+            \sc Common Nouns & 70,939    & 100,939 \\
+            \hline
+            \bf Nouns Total      & 77,284    & 374,574 \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Number of nouns according to subcategory with a subdivision of the proper noun category}
+\end{table}
+
+A quick look at the added adjectives, reveals that they are to a large part a)
+of foreign origin, b) lexicalized participles (aistittu [sensed], aistiva
+[sensing], aistittava [to be sensed]) , c) compound adjectives (aivokuollut
+[brain dead], epäsiisti [unclean]), d) related to place names (ahlaislainen
+[of/from Ahlainen]) and e) derivations with -inen [-ful] and -ton [-less]. 
+
+A majority of the added verbs are of foreign origin (hydroloida [hydrolate]), compound verbs (ilmajäähdyttää [air-condition]) or term-like neologisms (hamontaa [render]), but also some added verbs are transformational derivatives (grillailla [to be grilling]) as well as some of more colloquial style (häippäistä [leave without trace or explanation]).
+
+Adverbs have both increased and decreased. Previously 111 words classified as
+adverbs are now only adpositions or particles, whereas approximately 400 new
+adverbs are lexicalized forms of nouns.  In addition, there are approx. 50
+lexicalized comparative or superlative forms of adverbs.
+
+The majority of additional numbers are compound numbers that have been
+explicitly included in the lexicon.
+
+In addition, the inflection information of the words in OMorFi has also been
+made more fine-grained to serve e.g. spelling correction purposes.  As can be
+seen in Table 3, the number of noun paradigms has increased dramatically as
+words appearing only in singular or only in plural had their own paradigms.
+This warranted a shift from explicitly numbered paradigms to a more intuitive
+way of naming the paradigms according to one representative of the paradigm.
+There were previously three different systems for classifying Finnish
+inflectional paradigms with slightly different granularity intended mostly for
+human consumption in dictionaries which made it possible to hide some details
+that were subsequently listed as exceptional behavior for individual lexemes.
+The current approach is to have as many paradigms as needed which allows an
+exact description giving rise to some singletons.  
+
+\begin{table}[h]
+    \begin{center}
+        \begin{tabular}{|l|rr|}
+            \hline
+            \bf Paradigms  & \bf 2011 & \bf 2014 \\
             \hline
             \sc Noun           & 166      & 609 \\
             \sc Adj            & 0        & 127 \\
@@ -228,40 +333,78 @@ Lexical data is managed in an ad hoc database \ldots
             \hline
         \end{tabular}
     \end{center}
-    \caption{Paradigm count by parts-of-speech (by number of differing
-    stem variations or allomorph matches). *Adverbs, adpositions and particles
-    share same "inflectional" classes which are used to select possessive and
-    clitic combinations.}
+    \caption{Paradigm count by part-of-speech (by number of differing stem variations or allomorph matches). 
+   *Adverbs, adpositions and particles share paradigms for selecting possessive and clitic combinations.}
 \end{table}
-
-About collecting lexical data.
 
 \section{Development Motivated by Linguistics}
 
-FTB-work?
+Finnish TreeBank for annotating a corpus of linguistically interesting examples
+representing the whole spectrum of linguistic phenomena in Finnish.  Some
+linguistic phenomena may be rare which means that annotating unrestricted text
+may require a substantial amount of data to cover all the phenomena.  Using a
+corpus of examples from a the large Finnish grammar \cite{visk}, we are
+able to cover the whole spectrum in a limited space.  In addition, various
+aspects of the same phenomena are listed next to each other, which means that
+designing a gold standard is less time consuming.
+
+The gold standard for dependency syntax analysis was developed already in 2011,
+but checking the part-of-speech tagging and the morphological analysis was left
+out from the final stage.  Not only until the 2014 version of OMorFi have we
+finally got morphologically verified versions of the Finnish Treebank1 and 2
+corpora with a version of OMorFi that is fully compatible with the corpora.
+While including missing lexical items in OMorFi making sure that the correct
+base form and analysis is delivered by OMorFi, the corpora were corrected to
+make sure that the gold standard words are correctly analyzed in context.
+Currently the dependency tagging is reverified against the final version of the
+dependency tagging manual. 
 
 \section{Development Motivated by Applications}
 
-NER extensions?
+Below we describe the development that was needed to accommodate OMorFi for some of its current applications.
+
+\subsection{Spell Checking}
+
+More precise paradigm and inflectional descriptions.
+
+\subsection{Part-Of-Speech Tagging}
+
+Systematic ambiguities encapsulated in certain cases: ...
+
+\subsection{Named-Entity Recognition}
+
+Names of persons, locations and organizations have been compiled from various
+publicly available Finnish name sources on the internet.  Finnish named entity
+recognition based on OMorFi was tested on large corpora of news paper text and
+some frequent but unknown words were added.  Finnish NER was tested in an
+application called the software news room \cite{huovelinsoftware} developed in
+cooperation with Finnish media houses. 
+
+\subsection{Dependency Parsing}
+
+Clearer distinctions between approx. 100 high-frequent adverbs and particles
+have been made using corpus data and collocations as well as the large Finnish
+grammar \cite{visk}.
+
+\subsection{Machine Translation}
 
 For example for morphological analysis of Finnish, it is sufficient to treat
-so-called past-participle form as a single thing~(\ref{gloss:pcp}),
-however, in applications that need to parse some semantics or syntax it easily
-becomes apparent that at least three uses of the participle are separate enough
-to warrant different analyses to facilitate correct use: a past negative
-construction~(\ref{gloss:pcp-conneg}), a perfect or pluperfect
-construction~(\ref{gloss:pcp-past}) or a derivation yielding
-common adjective~(\ref{gloss:pcp-drv}). The separation is the
-most important for syntactic disambiguation, which in turn is used by e.g.,
-machine translation to avoid such translations as \emph{I (did) not looked} or
-\emph{presentation's looked}, which can be understandable as machine
-translations but are not the ideal solutions.
+the so-called past-participle form as a single entity~(\ref{gloss:pcp}).
+However, in applications that need to do syntactic parsing or semantic
+annotation, it becomes apparent that at least three uses of the participle are
+separate enough to warrant different analyses to facilitate correct use: a past
+negative construction~(\ref{gloss:pcp-conneg}), a perfect or pluperfect
+construction~(\ref{gloss:pcp-past}) or a derivation yielding a common
+adjective~(\ref{gloss:pcp-drv}). This separation is most important during
+syntactic disambiguation, which in turn is used by e.g., machine translation to
+avoid such translations as \emph{I (did) not looked} or \emph{presentation's
+looked}.
 
 \begin{exe}
     \ex \label{gloss:pcp}
     \gll \bf katso-nut \\
     \small look-\textsc{Pst.Ptcp.Sg} \\
-\glt `looked'
+    \glt `looked'
 \end{exe}
 
 \begin{exe}
@@ -279,22 +422,94 @@ translations but are not the ideal solutions.
     \glt `who has seen the presentation'
 \end{exe}
 
+\section{Test Data}
+
+To test the impact of the modifications, we use the following test data sets:
+
+\begin{itemize}
+\item Finnish Europarl Corpus published in 20xx: modern legal text, 37,616,194 tokens \cite{koehn2005europarl}
+\item Finnish JRC-Aquis Corpus published in 20xx: modern legal text, 47,711,286 tokens \cite{steinberger2006jrc}
+\item Gutenberg Corpus: older literary texts from 18xx-18xx, 35,839,524 tokens,\footnote{\url{http://project-gutenberg.com}}
+\item Finnish Wikipedia accessd in 20xx: modern scholarly prose, 55,231,863 tokens,\footnote{\url{http://fi.wikipedia.org}}
+\item FinnTreeBank1: morphologically disambiguated and dependency annotated selection of linguistically motivated sample sentences: 
+         162,029 tokens, 
+\item FinnTreeBank2: morphologically disambiguated and dependency annotated selection of unrestricted text: 
+         4.000 tokens, \cite{voutilainen2011finntreebank}
+\item Gutenberg subsection: 100.000 tokens of unrestricted text from 18xx-18xx
+\end{itemize}
+
+\section{Tests}
+
+\subsection{Coverage}
+
+To test the impact of the modifications, we do the following tests using the
+test data sets:
+
+\begin{itemize}
+\item Token coverage: word form is found in OMorFi
+\item Lemma coverage: lemma is found in OMorFi
+\item Analysis coverage: correct analysis is found in OMorFi
+\end{itemize}
+
+\begin{table}[h]
+    \begin{center}
+        \begin{tabular}{|ll|rr|}
+            \hline
+            \bf Coverage            &                & \bf 2011 & \bf 2014 \\
+            \hline
+            \sc Gutenberg           & Token     & 93.40           & 95.91 \\
+            \sc Finnish Wikipedia & Token     & 88.21           & 91.77 \\
+            \sc Europarl               & Token     & 97.79          & 98.85 \\
+            \sc JRC-Aquis            & Token     & 86.54          & 93.45 \\
+            \hline
+             \sc FinnTreeBank1    & Token     & xx          & 99.14 \\
+            \sc                             & Lemma   & xx          & 98.59 \\
+            \sc                             & Analysis & xx          & 98.16 \\
+            \hline
+             \sc FinnTreeBank2     & Token     & xx          & xx \\
+            \sc                              & Lemma   & xx          & xx \\
+            \sc                               & Analysis & xx          & xx \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Development of token, lemma and analysis coverage percent of various corpora for OMorFi from 2011 to 2014}
+\end{table}
+
+\subsection{Implementation Characteristics}
+
+To verify that the finite-state technology behaves as expected, i.e. no speed
+increase is incurred by the lexicon extension.  We compare the OMorFi 2011 and
+2014 versions of the finite-state implementations of the lexicons. 
+
+\begin{table}[h]
+    \begin{center}
+        \begin{tabular}{|l|rr|}
+            \hline
+            \bf Comparison       & \bf 2011 & \bf 2014 \\
+            \hline
+            \sc Words per second           & 8,500           & 22,000\\
+            \sc Disk size in MB                 & 31           & 69 \\
+            \sc Number of states           & 551,845          & 522,184 \\
+            \sc Number of arcs              & 1,140,661           & 2,298,083\\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Number of tokens analyzed per second using OMorFi 2011 and 2014}
+\end{table}
+
 \section{Conclusion}
 
-We have developed Finnish lexical database from single-use morphological
-analyser to generic, linguistically coherent lexical resource providing
+We have developed a Finnish lexical database from a single-use morphological
+analyzer to a generic, linguistically coherent lexical resource providing a
 large number of production chains.
-
 
 \ifcameraready
 \section*{Acknowledgements}
-
 
 \fi
 
 \bibliographystyle{acl}
 \bibliography{lglp2014omorfi}
-
 
 \end{document}
 % vim: set spell:
