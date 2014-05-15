@@ -47,6 +47,7 @@ using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 
+static bool encode_weights=false;
 
 // add tools-specific variables here
 
@@ -61,7 +62,9 @@ print_usage()
 
     print_common_program_options(message_out);
     print_common_unary_program_options(message_out);
-    fprintf(message_out, "\n");
+    fprintf(message_out, "Command-specific options:\n");
+    fprintf(message_out, "  -E, --encode-weights         Encode weights when minimizing\n"
+            "                               (default is false).\n\n");
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out, "\n");
     print_report_bugs();
@@ -82,12 +85,13 @@ parse_options(int argc, char** argv)
           HFST_GETOPT_COMMON_LONG,
           HFST_GETOPT_UNARY_LONG,
           // add tool-specific options here 
-            {0,0,0,0}
+          {"encode-weights", no_argument, 0, 'E'},
+          {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT,
+                             HFST_GETOPT_UNARY_SHORT "E",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -99,6 +103,10 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
 #include "inc/getopt-cases-error.h"
+        case 'E':
+          encode_weights=true;
+          break;
+
         }
     }
 
@@ -160,6 +168,14 @@ int main( int argc, char **argv ) {
     {
         fclose(outfile);
     }
+
+
+    bool enc = hfst::get_encode_weights();
+    if (encode_weights)
+      {
+        hfst::set_encode_weights(true);
+      }
+
     verbose_printf("Reading from %s, writing to %s\n", 
         inputfilename, outfilename);
     // here starts the buffer handling part
@@ -177,6 +193,13 @@ int main( int argc, char **argv ) {
         new HfstOutputStream(instream->get_type());
     
     retval = process_stream(*instream, *outstream);
+
+    if (encode_weights)
+      {
+        hfst::set_encode_weights(enc);
+      }
+
+
     delete instream;
     delete outstream;
     free(inputfilename);
