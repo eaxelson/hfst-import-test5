@@ -1,4 +1,5 @@
 
+
 /*******************************************************************/
 /*                                                                 */
 /*  FILE     alphabet.C                                            */
@@ -652,6 +653,11 @@ namespace SFST {
       if (!read_string(buffer, BUFFER_SIZE, file) || 
           feof(file) || ferror(file))
         throw "Error1 occurred while reading alphabet!\n";
+
+      // added for HFST compatibility
+      if (strcmp(buffer, "") == 0) {
+        throw "Empty string cannot be a symbol in HFST!\n";
+      }
       add_symbol(buffer, c);
     }
 
