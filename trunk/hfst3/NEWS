@@ -5,6 +5,15 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.7.1
+---------------------------
+
+* same mappings with different weights are now handled right in 
+  parallel replace rules.
+
+* improvements to optimized lookup format
+
+
 Noteworthy changes in 3.7.0
 ---------------------------
 
@@ -532,4 +541,5 @@ Noteworthy changes in release 2.1
 ---------------------------------
 
 * hfst-twolc and hfst-compose-intersect understand # like xerox originals
+
 
