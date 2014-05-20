@@ -262,7 +262,7 @@ do
 	        echo "skipping missing test for "$file"..."
 	        continue
 	    fi
-            if ! (cat $file.xfst | ../hfst-xfst --pipe-mode -s -f $format > tmp 2> /dev/null); then
+            if ! (cat $file.xfst | ../hfst-xfst --pipe-mode -s -f $format | tr -d '\r' > tmp 2> /dev/null); then
                 echo "ERROR: in compiling "$file".xfst"
                 exit 1;
             fi
@@ -300,7 +300,7 @@ do
 	        echo "skipping missing test for "$file"..."
 	        continue
 	    fi
-            if ! (cat $file.xfst | ../hfst-xfst --pipe-mode -s -f $format > tmp 2> /dev/null); then
+            if ! (cat $file.xfst | ../hfst-xfst --pipe-mode -s -f $format | tr -d '\r' > tmp 2> /dev/null); then
                 echo "ERROR: in compiling "$file".xfst"
                 exit 1;
             fi
