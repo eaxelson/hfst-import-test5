@@ -1,3 +1,938 @@
+2014-03-28 07:18  eaxelson
+
+	* libhfst/src/implementations/TropicalWeightTransducer.cc: Modified
+	  TropicalWeightTransducer::are_equivalent so that determinization
+	  is carried out in a way similar to 'intersect' and 'subtract'.
+
+2014-03-25 10:01  eaxelson
+
+	* configure.ac: Updated configure.ac
+
+2014-03-25 10:00  eaxelson
+
+	* tools/src/hfst-ospell: Deleted hfst-ospell file.
+
+2014-03-25 09:58  eaxelson
+
+	* tools/src/Makefile.am, tools/src/hfst-ospell/Makefile.am,
+	  tools/src/hfst-ospell/get-ospell.sh, tools/src/hfst-ospell/src,
+	  tools/src/hfst-ospell/src_Makefile.am: Reverted hfst-ospell
+	  changes.
+
+2014-03-25 09:43  eaxelson
+
+	* configure.ac, tools/src/Makefile.am, tools/src/hfst-ospell,
+	  tools/src/hfst-ospell/Makefile.am,
+	  tools/src/hfst-ospell/get-ospell.sh, tools/src/hfst-ospell/src,
+	  tools/src/hfst-ospell/src/Makefile.am,
+	  tools/src/hfst-ospell/src_Makefile.am: Tentatively added
+	  hfst-ospell under tools/src, it is only enabled if
+	  --enable-ospell is requested.
+
+2014-03-24 13:41  eaxelson
+
+	* tools/src/parsers/test/contains.output,
+	  tools/src/parsers/test/contains.xfst,
+	  tools/src/parsers/test/contains_once.output,
+	  tools/src/parsers/test/contains_once.xfst,
+	  tools/src/parsers/test/contains_once_optional.output,
+	  tools/src/parsers/test/contains_once_optional.xfst,
+	  tools/src/parsers/test/contains_with_weight.output,
+	  tools/src/parsers/test/contains_with_weight.xfst,
+	  tools/src/parsers/test/replace_test_.xfst,
+	  tools/src/parsers/test/replace_test_1.output,
+	  tools/src/parsers/test/replace_test_1.xfst,
+	  tools/src/parsers/test/replace_test_10.output,
+	  tools/src/parsers/test/replace_test_10.xfst,
+	  tools/src/parsers/test/replace_test_11.output,
+	  tools/src/parsers/test/replace_test_11.xfst,
+	  tools/src/parsers/test/replace_test_12.output,
+	  tools/src/parsers/test/replace_test_12.xfst,
+	  tools/src/parsers/test/replace_test_13.output,
+	  tools/src/parsers/test/replace_test_13.xfst,
+	  tools/src/parsers/test/replace_test_14.output,
+	  tools/src/parsers/test/replace_test_14.xfst,
+	  tools/src/parsers/test/replace_test_15.output,
+	  tools/src/parsers/test/replace_test_15.xfst,
+	  tools/src/parsers/test/replace_test_16.output,
+	  tools/src/parsers/test/replace_test_16.xfst,
+	  tools/src/parsers/test/replace_test_17.output,
+	  tools/src/parsers/test/replace_test_17.xfst,
+	  tools/src/parsers/test/replace_test_18.output,
+	  tools/src/parsers/test/replace_test_18.xfst,
+	  tools/src/parsers/test/replace_test_19.output,
+	  tools/src/parsers/test/replace_test_19.xfst,
+	  tools/src/parsers/test/replace_test_2.xfst,
+	  tools/src/parsers/test/replace_test_20.output,
+	  tools/src/parsers/test/replace_test_20.xfst,
+	  tools/src/parsers/test/replace_test_21.output,
+	  tools/src/parsers/test/replace_test_21.xfst,
+	  tools/src/parsers/test/replace_test_22.output,
+	  tools/src/parsers/test/replace_test_22.xfst,
+	  tools/src/parsers/test/replace_test_23.output,
+	  tools/src/parsers/test/replace_test_23.xfst,
+	  tools/src/parsers/test/replace_test_24.output,
+	  tools/src/parsers/test/replace_test_24.xfst,
+	  tools/src/parsers/test/replace_test_25.output,
+	  tools/src/parsers/test/replace_test_25.xfst,
+	  tools/src/parsers/test/replace_test_26.output,
+	  tools/src/parsers/test/replace_test_26.xfst,
+	  tools/src/parsers/test/replace_test_27.output,
+	  tools/src/parsers/test/replace_test_27.xfst,
+	  tools/src/parsers/test/replace_test_28.output,
+	  tools/src/parsers/test/replace_test_28.xfst,
+	  tools/src/parsers/test/replace_test_29.output,
+	  tools/src/parsers/test/replace_test_29.xfst,
+	  tools/src/parsers/test/replace_test_3.xfst,
+	  tools/src/parsers/test/replace_test_30.output,
+	  tools/src/parsers/test/replace_test_30.xfst,
+	  tools/src/parsers/test/replace_test_31.output,
+	  tools/src/parsers/test/replace_test_31.xfst,
+	  tools/src/parsers/test/replace_test_32.output,
+	  tools/src/parsers/test/replace_test_32.xfst,
+	  tools/src/parsers/test/replace_test_33.output,
+	  tools/src/parsers/test/replace_test_33.xfst,
+	  tools/src/parsers/test/replace_test_34.output,
+	  tools/src/parsers/test/replace_test_34.xfst,
+	  tools/src/parsers/test/replace_test_35.output,
+	  tools/src/parsers/test/replace_test_35.xfst,
+	  tools/src/parsers/test/replace_test_36.output,
+	  tools/src/parsers/test/replace_test_36.xfst,
+	  tools/src/parsers/test/replace_test_37.output,
+	  tools/src/parsers/test/replace_test_37.xfst,
+	  tools/src/parsers/test/replace_test_38.output,
+	  tools/src/parsers/test/replace_test_38.xfst,
+	  tools/src/parsers/test/replace_test_39.output,
+	  tools/src/parsers/test/replace_test_39.xfst,
+	  tools/src/parsers/test/replace_test_4.output,
+	  tools/src/parsers/test/replace_test_4.xfst,
+	  tools/src/parsers/test/replace_test_40.output,
+	  tools/src/parsers/test/replace_test_40.xfst,
+	  tools/src/parsers/test/replace_test_41.output,
+	  tools/src/parsers/test/replace_test_41.xfst,
+	  tools/src/parsers/test/replace_test_42.output,
+	  tools/src/parsers/test/replace_test_42.xfst,
+	  tools/src/parsers/test/replace_test_43.output,
+	  tools/src/parsers/test/replace_test_43.xfst,
+	  tools/src/parsers/test/replace_test_44.output,
+	  tools/src/parsers/test/replace_test_44.xfst,
+	  tools/src/parsers/test/replace_test_45.output,
+	  tools/src/parsers/test/replace_test_45.xfst,
+	  tools/src/parsers/test/replace_test_46.output,
+	  tools/src/parsers/test/replace_test_46.xfst,
+	  tools/src/parsers/test/replace_test_47.output,
+	  tools/src/parsers/test/replace_test_47.xfst,
+	  tools/src/parsers/test/replace_test_48.output,
+	  tools/src/parsers/test/replace_test_48.xfst,
+	  tools/src/parsers/test/replace_test_49.output,
+	  tools/src/parsers/test/replace_test_49.xfst,
+	  tools/src/parsers/test/replace_test_5.output,
+	  tools/src/parsers/test/replace_test_5.xfst,
+	  tools/src/parsers/test/replace_test_50.output,
+	  tools/src/parsers/test/replace_test_50.xfst,
+	  tools/src/parsers/test/replace_test_51.output,
+	  tools/src/parsers/test/replace_test_51.xfst,
+	  tools/src/parsers/test/replace_test_52.output,
+	  tools/src/parsers/test/replace_test_52.xfst,
+	  tools/src/parsers/test/replace_test_53.output,
+	  tools/src/parsers/test/replace_test_53.xfst,
+	  tools/src/parsers/test/replace_test_6.output,
+	  tools/src/parsers/test/replace_test_6.xfst,
+	  tools/src/parsers/test/replace_test_7.output,
+	  tools/src/parsers/test/replace_test_7.xfst,
+	  tools/src/parsers/test/replace_test_8.output,
+	  tools/src/parsers/test/replace_test_8.xfst,
+	  tools/src/parsers/test/replace_test_9.output,
+	  tools/src/parsers/test/replace_test_9.xfst: Use precision 1 in
+	  weighted tests.
+
+2014-03-20 07:16  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h:
+	  Reinstate special ascii tokenization while avoiding shadowing
+	  longer symbols
+
+2014-03-19 16:42  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc:
+	  Disable ascii-lookup when tokenizing
+
+2014-03-19 12:38  eaxelson
+
+	* tools/src/hfst-tagger/src/use_model_src/SequenceModelComponentPair.cc,
+	  tools/src/parsers/test/weighted_optional_replace_right_3.xfst,
+	  tools/src/parsers/test/weighted_replace_right_3.xfst: Set
+	  encode_weights off in tests to make sure that they work also if
+	  it is on.
+
+2014-03-19 10:18  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h: Fixed a bug in parsing regexps
+	  such as '?:{foo}'.
+
+2014-03-18 18:01  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy: Make pair notations a bit
+	  more consistent; enable RIGHT_ARROW
+
+2014-03-18 12:20  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy, tools/src/parsers/test/test.sh:
+	  Now incompatible replace types in parallel rules yield an error.
+
+2014-03-18 11:51  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/test.sh,
+	  tools/src/parsers/test/weighted_parallel_rules_10.output,
+	  tools/src/parsers/test/weighted_parallel_rules_10.xfst,
+	  tools/src/parsers/test/weighted_parallel_rules_6.output,
+	  tools/src/parsers/test/weighted_parallel_rules_6.xfst,
+	  tools/src/parsers/test/weighted_parallel_rules_7.output,
+	  tools/src/parsers/test/weighted_parallel_rules_7.xfst,
+	  tools/src/parsers/test/weighted_parallel_rules_8.output,
+	  tools/src/parsers/test/weighted_parallel_rules_8.xfst,
+	  tools/src/parsers/test/weighted_parallel_rules_9.output,
+	  tools/src/parsers/test/weighted_parallel_rules_9.xfst: Added
+	  variable 'att-epsilon' to hfst-xfst. Also added more weighted
+	  parallel replace tests.
+
+2014-03-18 06:01  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc: Now epsilons, identities and
+	  unknowns are printed correctly.
+
+2014-03-17 14:38  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/test/replace_test_12.output: Fixed a bug in
+	  handling unknowns in hfst-xfst's 'look up'.
+
+2014-03-17 12:29  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/test.sh,
+	  tools/src/parsers/test/weighted_parallel_rules_1.output,
+	  tools/src/parsers/test/weighted_parallel_rules_1.xfst,
+	  tools/src/parsers/test/weighted_parallel_rules_2.output,
+	  tools/src/parsers/test/weighted_parallel_rules_2.xfst,
+	  tools/src/parsers/test/weighted_parallel_rules_3.output,
+	  tools/src/parsers/test/weighted_parallel_rules_3.xfst,
+	  tools/src/parsers/test/weighted_parallel_rules_4.output,
+	  tools/src/parsers/test/weighted_parallel_rules_4.xfst,
+	  tools/src/parsers/test/weighted_parallel_rules_5.output,
+	  tools/src/parsers/test/weighted_parallel_rules_5.xfst: Added more
+	  weighted parallel replace tests.
+
+2014-03-17 12:20  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Allow runtime contexts
+	  anywhere to facilitate some efficiency strategies
+
+2014-03-17 08:07  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/replace_test_46.output,
+	  tools/src/parsers/test/replace_test_46.xfst,
+	  tools/src/parsers/test/replace_test_47.output,
+	  tools/src/parsers/test/replace_test_47.xfst,
+	  tools/src/parsers/test/replace_test_48.output,
+	  tools/src/parsers/test/replace_test_48.xfst,
+	  tools/src/parsers/test/replace_test_49.output,
+	  tools/src/parsers/test/replace_test_49.xfst,
+	  tools/src/parsers/test/replace_test_50.output,
+	  tools/src/parsers/test/replace_test_50.xfst,
+	  tools/src/parsers/test/replace_test_51.output,
+	  tools/src/parsers/test/replace_test_51.xfst,
+	  tools/src/parsers/test/replace_test_52.output,
+	  tools/src/parsers/test/replace_test_52.xfst,
+	  tools/src/parsers/test/replace_test_53.output,
+	  tools/src/parsers/test/replace_test_53.xfst,
+	  tools/src/parsers/test/test.sh: Added rest of the replace tests.
+
+2014-03-14 15:35  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/replace_test_41.output,
+	  tools/src/parsers/test/replace_test_41.xfst,
+	  tools/src/parsers/test/replace_test_42.output,
+	  tools/src/parsers/test/replace_test_42.xfst,
+	  tools/src/parsers/test/replace_test_43.output,
+	  tools/src/parsers/test/replace_test_43.xfst,
+	  tools/src/parsers/test/replace_test_44.output,
+	  tools/src/parsers/test/replace_test_44.xfst,
+	  tools/src/parsers/test/replace_test_45.output,
+	  tools/src/parsers/test/replace_test_45.xfst,
+	  tools/src/parsers/test/replace_test_46.xfst,
+	  tools/src/parsers/test/test.sh: More tests...
+
+2014-03-14 15:19  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/replace_test_27.output,
+	  tools/src/parsers/test/replace_test_27.xfst,
+	  tools/src/parsers/test/replace_test_28.output,
+	  tools/src/parsers/test/replace_test_28.xfst,
+	  tools/src/parsers/test/replace_test_29.output,
+	  tools/src/parsers/test/replace_test_29.xfst,
+	  tools/src/parsers/test/replace_test_30.output,
+	  tools/src/parsers/test/replace_test_30.xfst,
+	  tools/src/parsers/test/replace_test_31.output,
+	  tools/src/parsers/test/replace_test_31.xfst,
+	  tools/src/parsers/test/replace_test_32.output,
+	  tools/src/parsers/test/replace_test_32.xfst,
+	  tools/src/parsers/test/replace_test_33.output,
+	  tools/src/parsers/test/replace_test_33.xfst,
+	  tools/src/parsers/test/replace_test_34.output,
+	  tools/src/parsers/test/replace_test_34.xfst,
+	  tools/src/parsers/test/replace_test_35.output,
+	  tools/src/parsers/test/replace_test_35.xfst,
+	  tools/src/parsers/test/replace_test_36.output,
+	  tools/src/parsers/test/replace_test_36.xfst,
+	  tools/src/parsers/test/replace_test_37.output,
+	  tools/src/parsers/test/replace_test_37.xfst,
+	  tools/src/parsers/test/replace_test_38.output,
+	  tools/src/parsers/test/replace_test_38.xfst,
+	  tools/src/parsers/test/replace_test_39.output,
+	  tools/src/parsers/test/replace_test_39.xfst,
+	  tools/src/parsers/test/replace_test_40.output,
+	  tools/src/parsers/test/replace_test_40.xfst,
+	  tools/src/parsers/test/test.sh: Added more hfst-xfst replace rule
+	  tests.
+
+2014-03-14 13:41  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc: Fixed weights in markup rules
+
+2014-03-14 12:04  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/replace_test_20.output,
+	  tools/src/parsers/test/replace_test_20.xfst,
+	  tools/src/parsers/test/replace_test_21.output,
+	  tools/src/parsers/test/replace_test_21.xfst,
+	  tools/src/parsers/test/replace_test_22.output,
+	  tools/src/parsers/test/replace_test_22.xfst,
+	  tools/src/parsers/test/replace_test_23.output,
+	  tools/src/parsers/test/replace_test_23.xfst,
+	  tools/src/parsers/test/replace_test_24.output,
+	  tools/src/parsers/test/replace_test_24.xfst,
+	  tools/src/parsers/test/replace_test_25.output,
+	  tools/src/parsers/test/replace_test_25.xfst,
+	  tools/src/parsers/test/replace_test_26.output,
+	  tools/src/parsers/test/replace_test_26.xfst,
+	  tools/src/parsers/test/test.sh: Added more tests.
+
+2014-03-14 09:44  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/replace_test_10.output,
+	  tools/src/parsers/test/replace_test_10.xfst,
+	  tools/src/parsers/test/replace_test_11.output,
+	  tools/src/parsers/test/replace_test_11.xfst,
+	  tools/src/parsers/test/replace_test_12.output,
+	  tools/src/parsers/test/replace_test_12.xfst,
+	  tools/src/parsers/test/replace_test_13.output,
+	  tools/src/parsers/test/replace_test_13.xfst,
+	  tools/src/parsers/test/replace_test_14.output,
+	  tools/src/parsers/test/replace_test_14.xfst,
+	  tools/src/parsers/test/replace_test_15.output,
+	  tools/src/parsers/test/replace_test_15.xfst,
+	  tools/src/parsers/test/replace_test_16.output,
+	  tools/src/parsers/test/replace_test_16.xfst,
+	  tools/src/parsers/test/replace_test_17.output,
+	  tools/src/parsers/test/replace_test_17.xfst,
+	  tools/src/parsers/test/replace_test_18.output,
+	  tools/src/parsers/test/replace_test_18.xfst,
+	  tools/src/parsers/test/replace_test_19.output,
+	  tools/src/parsers/test/replace_test_19.xfst,
+	  tools/src/parsers/test/test.sh: Added more replace tests.
+
+2014-03-14 09:18  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/replace_test_.xfst,
+	  tools/src/parsers/test/replace_test_1.output,
+	  tools/src/parsers/test/replace_test_1.xfst,
+	  tools/src/parsers/test/replace_test_10.xfst,
+	  tools/src/parsers/test/replace_test_11.xfst,
+	  tools/src/parsers/test/replace_test_12.xfst,
+	  tools/src/parsers/test/replace_test_13.xfst,
+	  tools/src/parsers/test/replace_test_14.xfst,
+	  tools/src/parsers/test/replace_test_15.xfst,
+	  tools/src/parsers/test/replace_test_16.xfst,
+	  tools/src/parsers/test/replace_test_17.xfst,
+	  tools/src/parsers/test/replace_test_18.xfst,
+	  tools/src/parsers/test/replace_test_19.xfst,
+	  tools/src/parsers/test/replace_test_2.output,
+	  tools/src/parsers/test/replace_test_2.xfst,
+	  tools/src/parsers/test/replace_test_20.xfst,
+	  tools/src/parsers/test/replace_test_21.xfst,
+	  tools/src/parsers/test/replace_test_22.xfst,
+	  tools/src/parsers/test/replace_test_23.xfst,
+	  tools/src/parsers/test/replace_test_24.xfst,
+	  tools/src/parsers/test/replace_test_25.xfst,
+	  tools/src/parsers/test/replace_test_26.xfst,
+	  tools/src/parsers/test/replace_test_27.xfst,
+	  tools/src/parsers/test/replace_test_28.xfst,
+	  tools/src/parsers/test/replace_test_29.xfst,
+	  tools/src/parsers/test/replace_test_3.output,
+	  tools/src/parsers/test/replace_test_3.xfst,
+	  tools/src/parsers/test/replace_test_30.xfst,
+	  tools/src/parsers/test/replace_test_31.xfst,
+	  tools/src/parsers/test/replace_test_32.xfst,
+	  tools/src/parsers/test/replace_test_33.xfst,
+	  tools/src/parsers/test/replace_test_34.xfst,
+	  tools/src/parsers/test/replace_test_35.xfst,
+	  tools/src/parsers/test/replace_test_36.xfst,
+	  tools/src/parsers/test/replace_test_37.xfst,
+	  tools/src/parsers/test/replace_test_38.xfst,
+	  tools/src/parsers/test/replace_test_39.xfst,
+	  tools/src/parsers/test/replace_test_4.output,
+	  tools/src/parsers/test/replace_test_4.xfst,
+	  tools/src/parsers/test/replace_test_40.xfst,
+	  tools/src/parsers/test/replace_test_41.xfst,
+	  tools/src/parsers/test/replace_test_42.xfst,
+	  tools/src/parsers/test/replace_test_43.xfst,
+	  tools/src/parsers/test/replace_test_44.xfst,
+	  tools/src/parsers/test/replace_test_45.xfst,
+	  tools/src/parsers/test/replace_test_46.xfst,
+	  tools/src/parsers/test/replace_test_47.xfst,
+	  tools/src/parsers/test/replace_test_48.xfst,
+	  tools/src/parsers/test/replace_test_49.xfst,
+	  tools/src/parsers/test/replace_test_5.output,
+	  tools/src/parsers/test/replace_test_5.xfst,
+	  tools/src/parsers/test/replace_test_50.xfst,
+	  tools/src/parsers/test/replace_test_51.xfst,
+	  tools/src/parsers/test/replace_test_52.xfst,
+	  tools/src/parsers/test/replace_test_53.xfst,
+	  tools/src/parsers/test/replace_test_6.output,
+	  tools/src/parsers/test/replace_test_6.xfst,
+	  tools/src/parsers/test/replace_test_7.output,
+	  tools/src/parsers/test/replace_test_7.xfst,
+	  tools/src/parsers/test/replace_test_8.output,
+	  tools/src/parsers/test/replace_test_8.xfst,
+	  tools/src/parsers/test/replace_test_9.output,
+	  tools/src/parsers/test/replace_test_9.xfst,
+	  tools/src/parsers/test/replace_tests,
+	  tools/src/parsers/test/test.sh: Added replace tests, not all of
+	  them are yet performed.
+
+2014-03-14 07:50  eaxelson
+
+	* tools/src/parsers/test/replace_tests: Add tentatively new replace
+	  tests.
+
+2014-03-14 07:26  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/contains.output,
+	  tools/src/parsers/test/contains.xfst,
+	  tools/src/parsers/test/contains_once.output,
+	  tools/src/parsers/test/contains_once.xfst,
+	  tools/src/parsers/test/contains_once_optional.output,
+	  tools/src/parsers/test/contains_once_optional.xfst,
+	  tools/src/parsers/test/contains_with_weight.output,
+	  tools/src/parsers/test/contains_with_weight.xfst,
+	  tools/src/parsers/test/test.sh: Added tests for containment
+	  operators.
+
+2014-03-13 14:51  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h: A couple of small fixes to
+	  containment operator.
+
+2014-03-13 08:42  eaxelson
+
+	* libhfst/src/implementations/TropicalWeightTransducer.cc: Sorting
+	  arcs before subtraction in TropicalWeightTransducer::subtract.
+
+2014-03-13 08:08  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  libhfst/src/parsers/xre_utils.cc: Removed unnecessary
+	  determinization from TropicalWeightTransducer's intersection
+	  function. Added function
+	  HfstTransitionGraph::get_transition_pairs. Made some small
+	  modifications to xre parsers's containment operator.
+
+2014-03-12 15:01  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll: Fix definition of curly
+	  literals
+
+2014-03-12 11:35  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: More PAIR_SEPARATOR fluff
+	  (which should be completely refactored)
+
+2014-03-12 11:24  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h,
+	  tools/src/hfst-pmatch.cc: Build input scanner without using a
+	  stack guard;
+	  also refactor where runtime behaviour is stored
+
+2014-03-12 10:39  eaxelson
+
+	* libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  libhfst/src/parsers/xre_lex.ll, libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h: Added tentatively new functions
+	  for implementing containment in xre parser. Removed
+	  determinization from intersection.
+
+2014-03-07 13:14  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h: Changed containment operators so
+	  that they also work with transducers that are not automata, i.e.
+	  '$.[a:b]'.
+
+2014-03-07 09:38  eaxelson
+
+	* libhfst/src/implementations/TropicalWeightTransducer.cc: Added
+	  documentation to TropicalWeightTransducer::intersect.
+
+2014-03-06 14:18  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h: A simple
+	  stack guard for first-input -collection (only, for now)
+
+2014-03-06 13:08  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h: Now all containment operators
+	  work, at least with unweighted containment transducers.
+
+2014-03-06 12:26  eaxelson
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h: Fixed a bug in '$.' operator in
+	  xre parser.
+
+2014-03-06 11:19  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h: Use a
+	  vector in the prescanner to make it slightly faster
+
+2014-03-06 10:05  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.h: Add
+	  class-identifier to friend declarations; required by some
+	  compilers
+
+2014-03-05 14:35  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc: Remove
+	  extraneous debugging message
+
+2014-03-05 14:23  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h: A very
+	  conservative and (for now) computed-at-runtime input prescanner
+
+2014-03-05 13:30  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/empty_context.output,
+	  tools/src/parsers/test/empty_context.xfst,
+	  tools/src/parsers/test/test.sh: Added a test for empty context in
+	  replace rule.
+
+2014-03-05 13:11  eaxelson
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  libhfst/src/implementations/TropicalWeightTransducer.h,
+	  libhfst/src/parsers/xre_parse.yy, tools/src/parsers/hfst-xfst.cc:
+	  Resorting to global variable 'encode_weights' instead of passing
+	  it around as a variable. Allowing empty contexts in replace
+	  rules, i.e. 'a -> b || _ '. Fixed a minor printing issue in
+	  hfst-xfst.
+
+2014-03-04 18:15  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc: It's
+	  perhaps a little clearer if is_like_epsilon(epsilon) is false
+
+2014-03-04 16:15  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Fix
+	  bug where conversion from ol to basic transducers was missing
+	  @I.foo@ arcs in some situations
+
+2014-03-04 16:13  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc: Fix bug
+	  where weights on the insertion arc were being ignored
+
+2014-03-04 16:13  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Log insertions when verbose
+
+2014-03-03 19:50  eaxelson
+
+	* libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  tools/src/parsers/XfstCompiler.cc: Added variables 'max-weight'
+	  and 'encode-labels' to hfst-xfst.
+
+2014-03-03 18:18  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  libhfst/src/implementations/TropicalWeightTransducer.h:
+	  Tentatively added functions to control label and weight encoding
+	  in weighted minimization. Also added max_weight parameter to
+	  lookup_fd of HfstBasicTransducer.
+
+2014-02-28 09:13  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy: Fixed weighting in containment
+	  operators.
+
+2014-02-27 13:42  eaxelson
+
+	* tools/src/parsers/test/weighted_ltr_longest_match_1.xfst,
+	  tools/src/parsers/test/weighted_ltr_longest_match_2.xfst,
+	  tools/src/parsers/test/weighted_ltr_longest_match_3.xfst,
+	  tools/src/parsers/test/weighted_ltr_shortest_match_1.xfst,
+	  tools/src/parsers/test/weighted_ltr_shortest_match_2.xfst,
+	  tools/src/parsers/test/weighted_ltr_shortest_match_3.xfst,
+	  tools/src/parsers/test/weighted_optional_replace_right_1.xfst,
+	  tools/src/parsers/test/weighted_optional_replace_right_2.xfst,
+	  tools/src/parsers/test/weighted_optional_replace_right_3.xfst,
+	  tools/src/parsers/test/weighted_optional_replace_right_4.xfst,
+	  tools/src/parsers/test/weighted_optional_replace_right_5.xfst,
+	  tools/src/parsers/test/weighted_optional_replace_right_6.xfst,
+	  tools/src/parsers/test/weighted_optional_replace_right_7.xfst,
+	  tools/src/parsers/test/weighted_optional_replace_right_8.xfst,
+	  tools/src/parsers/test/weighted_optional_replace_right_9.xfst,
+	  tools/src/parsers/test/weighted_replace_right_1.xfst,
+	  tools/src/parsers/test/weighted_replace_right_2.xfst,
+	  tools/src/parsers/test/weighted_replace_right_3.xfst,
+	  tools/src/parsers/test/weighted_replace_right_4.xfst,
+	  tools/src/parsers/test/weighted_replace_right_5.xfst,
+	  tools/src/parsers/test/weighted_replace_right_6.xfst,
+	  tools/src/parsers/test/weighted_replace_right_7.xfst,
+	  tools/src/parsers/test/weighted_replace_right_8.xfst,
+	  tools/src/parsers/test/weighted_replace_right_9.xfst: Edited xfst
+	  tests.
+
+2014-02-27 13:19  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy: Fixed a bug in parsing multiple
+	  parallel replace rules.
+
+2014-02-27 09:34  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy,
+	  tools/src/parsers/XfstCompiler.cc: Fixed a bug in the contains
+	  one '$.' operator. Improvements to the xfst parser.
+
+2014-02-25 15:10  eaxelson
+
+	* tools/src/hfst-regexp2fst.cc: Updated regexp2fst help message.
+
+2014-02-25 13:49  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: Use "" for special parsing
+	  and symbols, {} for tokenizable strings;
+	  also allow "define" alongside "Define"
+	  Future note: consider adding another syntax for "totally bare"
+	  symbols
+	  with no special parsing
+
+2014-02-25 11:49  eaxelson
+
+	* tools/src/parsers/hfst-xfst.cc: Only print prompt in pipe mode if
+	  --verbose is used.
+
+2014-02-21 11:08  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/test.sh,
+	  tools/src/parsers/test/weighted_ltr_longest_match_1.result,
+	  tools/src/parsers/test/weighted_ltr_longest_match_1.xfst,
+	  tools/src/parsers/test/weighted_ltr_longest_match_2.result,
+	  tools/src/parsers/test/weighted_ltr_longest_match_2.xfst,
+	  tools/src/parsers/test/weighted_ltr_longest_match_3.result,
+	  tools/src/parsers/test/weighted_ltr_longest_match_3.xfst,
+	  tools/src/parsers/test/weighted_ltr_shortest_match_1.result,
+	  tools/src/parsers/test/weighted_ltr_shortest_match_1.xfst,
+	  tools/src/parsers/test/weighted_ltr_shortest_match_2.result,
+	  tools/src/parsers/test/weighted_ltr_shortest_match_2.xfst,
+	  tools/src/parsers/test/weighted_ltr_shortest_match_3.result,
+	  tools/src/parsers/test/weighted_ltr_shortest_match_3.xfst: Added
+	  yet more tests for weighted rules.
+
+2014-02-21 10:52  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy: Made xre parser ignore weights
+	  in rule contexts. A warning is given in non-silent mode.
+
+2014-02-21 09:45  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/test.sh,
+	  tools/src/parsers/test/weighted_optional_replace_right_8.result,
+	  tools/src/parsers/test/weighted_optional_replace_right_8.xfst,
+	  tools/src/parsers/test/weighted_optional_replace_right_9.result,
+	  tools/src/parsers/test/weighted_optional_replace_right_9.xfst,
+	  tools/src/parsers/test/weighted_replace_right_8.result,
+	  tools/src/parsers/test/weighted_replace_right_8.xfst,
+	  tools/src/parsers/test/weighted_replace_right_9.result,
+	  tools/src/parsers/test/weighted_replace_right_9.xfst: Added more
+	  tests for weighted replace rules.
+
+2014-02-21 08:38  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/test.sh,
+	  tools/src/parsers/test/weighted_optional_replace_right_1.result,
+	  tools/src/parsers/test/weighted_optional_replace_right_1.xfst,
+	  tools/src/parsers/test/weighted_optional_replace_right_2.result,
+	  tools/src/parsers/test/weighted_optional_replace_right_2.xfst,
+	  tools/src/parsers/test/weighted_optional_replace_right_3.result,
+	  tools/src/parsers/test/weighted_optional_replace_right_3.xfst,
+	  tools/src/parsers/test/weighted_optional_replace_right_4.result,
+	  tools/src/parsers/test/weighted_optional_replace_right_4.xfst,
+	  tools/src/parsers/test/weighted_optional_replace_right_5.result,
+	  tools/src/parsers/test/weighted_optional_replace_right_5.xfst,
+	  tools/src/parsers/test/weighted_optional_replace_right_6.result,
+	  tools/src/parsers/test/weighted_optional_replace_right_6.xfst,
+	  tools/src/parsers/test/weighted_optional_replace_right_7.result,
+	  tools/src/parsers/test/weighted_optional_replace_right_7.xfst:
+	  Added optional variants of replace right tests.
+
+2014-02-21 08:15  eaxelson
+
+	* tools/src/parsers/test/test.sh: Forgot to apply weighted_rules ->
+	  weighted_replace_right renaming scheme to test.sh.
+
+2014-02-21 08:14  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/weighted_replace_right_1.result,
+	  tools/src/parsers/test/weighted_replace_right_1.xfst,
+	  tools/src/parsers/test/weighted_replace_right_2.result,
+	  tools/src/parsers/test/weighted_replace_right_2.xfst,
+	  tools/src/parsers/test/weighted_replace_right_3.result,
+	  tools/src/parsers/test/weighted_replace_right_3.xfst,
+	  tools/src/parsers/test/weighted_replace_right_4.result,
+	  tools/src/parsers/test/weighted_replace_right_4.xfst,
+	  tools/src/parsers/test/weighted_replace_right_5.result,
+	  tools/src/parsers/test/weighted_replace_right_5.xfst,
+	  tools/src/parsers/test/weighted_replace_right_6.result,
+	  tools/src/parsers/test/weighted_replace_right_6.xfst,
+	  tools/src/parsers/test/weighted_replace_right_7.result,
+	  tools/src/parsers/test/weighted_replace_right_7.xfst,
+	  tools/src/parsers/test/weighted_rules_1.result,
+	  tools/src/parsers/test/weighted_rules_1.xfst,
+	  tools/src/parsers/test/weighted_rules_2.result,
+	  tools/src/parsers/test/weighted_rules_2.xfst,
+	  tools/src/parsers/test/weighted_rules_3.result,
+	  tools/src/parsers/test/weighted_rules_3.xfst,
+	  tools/src/parsers/test/weighted_rules_4.result,
+	  tools/src/parsers/test/weighted_rules_4.xfst,
+	  tools/src/parsers/test/weighted_rules_5.result,
+	  tools/src/parsers/test/weighted_rules_5.xfst,
+	  tools/src/parsers/test/weighted_rules_6.result,
+	  tools/src/parsers/test/weighted_rules_6.xfst,
+	  tools/src/parsers/test/weighted_rules_7.result,
+	  tools/src/parsers/test/weighted_rules_7.xfst: Renamed
+	  weighted_rules_* to weighted_replace_right_*.
+
+2014-02-21 08:09  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/test.sh,
+	  tools/src/parsers/test/weighted_rules_6.result,
+	  tools/src/parsers/test/weighted_rules_6.xfst,
+	  tools/src/parsers/test/weighted_rules_7.result,
+	  tools/src/parsers/test/weighted_rules_7.xfst: Addded more
+	  weighted rules tests.
+
+2014-02-20 16:47  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h,
+	  tools/src/parsers/help_message.cc,
+	  tools/src/parsers/xfst-lexer.ll,
+	  tools/src/parsers/xfst-parser.yy: Added function
+	  HfstTransducer::is_infinitely_ambiguous() and command 'test
+	  infinitely-ambiguous' in hfst-xfst.
+
+2014-02-20 15:50  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/find_epsilon_loops.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h,
+	  test/libhfst/test_transducer_functions.cc: Copy the before-seen
+	  states so different paths to the same state don't conflict
+	  Reinstates a skipped test
+
+2014-02-20 15:23  eaxelson
+
+	* tools/src/hfst-summarize.cc: Made hfst-summarize print whether
+	  transducer is infinitely ambiguous in verbose mode.
+
+2014-02-20 14:55  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h: Fixed a couple
+	  of typos causing errors when calling is_infinitely_ambiguous..
+
+2014-02-20 14:36  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  test/libhfst/test_transducer_functions.cc,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/test.sh,
+	  tools/src/parsers/test/weighted_rules_1.result,
+	  tools/src/parsers/test/weighted_rules_1.xfst,
+	  tools/src/parsers/test/weighted_rules_2.result,
+	  tools/src/parsers/test/weighted_rules_2.xfst,
+	  tools/src/parsers/test/weighted_rules_3.result,
+	  tools/src/parsers/test/weighted_rules_3.xfst,
+	  tools/src/parsers/test/weighted_rules_4.result,
+	  tools/src/parsers/test/weighted_rules_4.xfst,
+	  tools/src/parsers/test/weighted_rules_5.result,
+	  tools/src/parsers/test/weighted_rules_5.xfst,
+	  tools/src/parsers/xfst-lexer.ll,
+	  tools/src/parsers/xfst-parser.yy: Tentatively added function
+	  is_infinitely_ambiguous() to HfstTransitionGraph. Added variables
+	  'lookup-cutoff', 'print-words-cutoff' and 'precision' to
+	  hfst-xfst. Added test cases for weighted rules.
+	  test_transducer_functions now returns a skip value until hfst
+	  optimized lookup transducer's function is_infinitely_ambiguous is
+	  fixed.
+
+2014-02-20 13:42  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/find_epsilon_loops.cc:
+	  A slight followup to the previous commit
+
+2014-02-20 13:06  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/find_epsilon_loops.cc:
+	  Fix stupid bug in tricky control flow part of loop checking
+
+2014-02-20 12:49  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/find_epsilon_loops.cc:
+	  Bugfix: distinguish between transitions and transition indexes
+	  when determining
+	  state equivalence when looking for epsilon loops for a given
+	  input.
+
+2014-02-20 12:30  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc:
+	  Remove extraneous debugging message
+
+2014-02-20 12:22  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/find_epsilon_loops.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Fix
+	  bug where infinite ambiguity checking was polluting the flag
+	  diacritic state
+
+2014-02-20 11:28  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc:
+	  Reorder things so that we should usually run into max_results
+	  before
+	  running into the stack depth
+
+2014-02-20 11:02  hardwick
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h:
+	  Respect result limits and implement a recursion depth guard
+	  so instead of blowing out the stack we discard overlong results
+	  and give a warning message
+
+2014-02-20 10:10  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/find_epsilon_loops.cc:
+	  Rip out empty main test function so there's only one in the ol
+	  compilation unit
+
+2014-02-20 09:42  hardwick
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h: Add
+	  string version of is_lookup_infinitely_ambiguous() to
+	  HfstTransducer api too
+
+2014-02-20 09:34  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h, tools/src/parsers/hfst-xfst.cc,
+	  tools/src/parsers/xfst-parser.yy: Added variant
+	  is_lookup_infinitely_ambiguous(const std::string &) in
+	  HfstTransitionGraph which is used in hfst-xfst to check
+	  infinitely ambiguous cases in lookup. Also added a variable
+	  precision in hfst-xfst to control the number of decimals shown.
+
+2014-02-20 09:34  hardwick
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/implementations/Makefile.am,
+	  libhfst/src/implementations/optimized-lookup/find_epsilon_loops.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Add a
+	  facility for determining whether a given input produces an
+	  infinitely ambiguous lookup
+
+2014-02-19 10:09  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/parsers/xre_parse.yy: Replace rules - weight now
+	  works on both sides, with context.
+
+2014-02-19 07:22  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc: Insert special symbols into
+	  ?-containing transducers' alphabets right away,
+	  fixing some incorrect harmonization behaviour
+
+2014-02-18 11:53  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc: Updated weight management in
+	  replace rules
+
+2014-02-17 16:42  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS: Finally ready for release 3.6.1.
+
 2014-02-17 12:52  hardwick
 
 	* libhfst/src/implementations/optimized-lookup/pmatch.cc,

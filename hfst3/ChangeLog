@@ -1,3 +1,118 @@
+2014-05-16 11:14  eaxelson
+
+	* back-ends/sfst/alphabet.cc: Now an error message is thrown in
+	  HFST when reading a native SFST transducer that uses the empty
+	  symbol.
+
+2014-05-15 13:11  eaxelson
+
+	* tools/src/hfst-minimize.cc: Added option --encode-weights (-E) to
+	  hfst-minimize.
+
+2014-05-14 12:51  eaxelson
+
+	* libhfst/src/HfstXeroxRules.cc: Added documentation to parallel
+	  replace and removed unnecessary marker insertions.
+
+2014-05-14 11:07  eaxelson
+
+	* NSIS/hfst_installer.nsi, libhfst/src/HfstTransducer.cc,
+	  libhfst/src/HfstTransducer.h, libhfst/src/HfstXeroxRules.cc,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/test.sh,
+	  tools/src/parsers/test/weighted_parallel_rules_11.output,
+	  tools/src/parsers/test/weighted_parallel_rules_11.xfst: Modified
+	  conpilation of weighted parallel rules by inserting markers to
+	  keep same mappings with different weights separate. Also added a
+	  StringPair variant of insert_symbols_to_alphabet to
+	  HfstTransducer and HfstTransitionGraph. Added a test case for
+	  hfst-xfst. Updated NSIS installer.
+
+2014-05-09 10:30  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h: Tentatively
+	  added a function for substituting weights with markers.
+
+2014-05-07 12:36  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Remove spurious obsolete
+	  comment
+
+2014-04-28 10:40  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc:
+	  Bounds check accesses to ascii_symbols when reading input too
+	  (ascii_symbols used to have a NO_SYMBOL entry for any char, but
+	  now without
+	  a check some accesses were resulting in bogus keys)
+
+2014-04-26 11:32  hardwick
+
+	* back-ends/foma/Makefile.am: Add -D_XOPEN_SOURCE=500
+	  in order to prevent -std=c99 from preventing strdup() prototype
+	  being visible
+
+2014-04-26 10:31  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc:
+	  Correct bounds check for ascii_symbols alterations
+
+2014-04-23 09:12  eaxelson
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc: Now
+	  checking that ascii_symbols vector index is not out of bounds
+	  when removing shadowing symbols. Should fix bug #235.
+
+2014-04-15 12:03  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc: Replace rules bug fix
+
+2014-04-15 07:11  eaxelson
+
+	* NSIS/AddHfstLibrary.nsi, NSIS/CheckLibraries.nsi,
+	  NSIS/copy_files.sh: Updated NSIS files for current release.
+
+2014-04-10 14:41  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc: Parallel rules bug solved
+
+2014-04-10 12:58  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am: Ready for release 3.7.0.
+
+2014-04-10 10:17  eaxelson
+
+	* tools/src/parsers/test/Makefile.am: Added missing files to
+	  Makefile.
+
+2014-04-10 09:48  eaxelson
+
+	* tools/src/hfst-regexp2fst.cc: Added option --encode-weights also
+	  to hfst-regexp2fst.
+
+2014-04-10 09:30  eaxelson
+
+	* tools/src/hfst-compose-intersect.cc: Added option
+	  --encode-weights (default false) to hfst-compose-intersect.
+
+2014-04-09 11:12  eaxelson
+
+	* NSIS/README.ospell.txt, NSIS/copy_files.sh,
+	  NSIS/ospell_installer.nsi: Tentatively added NSIS installer for
+	  hfst-ospell.
+
+2014-03-31 12:59  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc: replace rules - weights are
+	  removed from calculating contexts (they were unnecessary there)
+
+2014-03-31 10:31  eaxelson
+
+	* libhfst/src/implementations/TropicalWeightTransducer.cc: Removed
+	  commented code.
+
 2014-03-28 07:18  eaxelson
 
 	* libhfst/src/implementations/TropicalWeightTransducer.cc: Modified
