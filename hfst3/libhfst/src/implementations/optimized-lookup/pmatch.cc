@@ -345,15 +345,15 @@ SymbolNumber PmatchAlphabet::get_special(SpecialSymbol special) const
 
 std::string PmatchContainer::match(std::string & input)
 {
-    std::string ret;
     initialize_input(input.c_str());
     ++line_number;
     output.clear();
     while (has_queued_input()) {
         SymbolNumber * input_entry = input_tape;
         if (!possible_first_symbols.empty()) {
-            while (*input_tape >= possible_first_symbols.size() ||
-                   possible_first_symbols[*input_tape] == 0) {
+            while (*input_tape != NO_SYMBOL_NUMBER &&
+                   (*input_tape >= possible_first_symbols.size() ||
+                    possible_first_symbols[*input_tape] == 0)) {
 //                std::cerr << "skipped " << alphabet.string_from_symbol(*input_tape) << std::endl;
                 output.push_back(*input_tape++);
             }
