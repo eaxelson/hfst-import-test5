@@ -246,7 +246,8 @@ namespace implementations
     return t;
   }
 
-  StdVectorFst * TropicalWeightTransducer::push_weights
+  // Moved to TropicalWeightTransducerPushWeights.cc
+  /*  StdVectorFst * TropicalWeightTransducer::push_weights
     (StdVectorFst * t, bool to_initial_state)
   {
     assert (t->InputSymbols() != NULL);
@@ -257,7 +258,7 @@ namespace implementations
       fst::Push<StdArc, REWEIGHT_TO_FINAL>(*t, retval, fst::kPushWeights);
     retval->SetInputSymbols(t->InputSymbols());
     return retval;
-  }
+    }*/
 
   StdVectorFst * TropicalWeightTransducer::transform_weights
     (StdVectorFst * t,float (*func)(float f))
@@ -1514,7 +1515,8 @@ namespace implementations
   }
 
 
-  StdVectorFst * TropicalWeightTransducer::minimize(StdVectorFst * t)
+  // Moved to TropicalWeightTransducerMinimize.cc
+  /*  StdVectorFst * TropicalWeightTransducer::minimize(StdVectorFst * t)
   {
     RmEpsilon<StdArc>(t);
 
@@ -1527,7 +1529,7 @@ namespace implementations
     Minimize<StdArc>(det);
     Decode(det, encode_mapper);
     return det;
-  }
+    }*/
 
 
   void TropicalWeightTransducer::print_alphabet(const StdVectorFst *t)
@@ -1560,7 +1562,7 @@ namespace implementations
       }
   }
 
-  void TropicalWeightTransducer::test_minimize(void)
+  /*  void TropicalWeightTransducer::test_minimize(void)
   {
     StdVectorFst * t = new StdVectorFst();
     StateId initial = t->AddState();
@@ -1594,7 +1596,7 @@ namespace implementations
     // print t after minimize
     print_att_number(&t_det_std, stderr);
 
-  }
+    }*/
 
   /* For HfstMutableTransducer */
 

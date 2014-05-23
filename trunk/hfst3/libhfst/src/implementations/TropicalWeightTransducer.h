@@ -228,7 +228,7 @@ namespace implementations
       static void write_in_att_format(StdVectorFst * t, FILE *ofile);
       static void write_in_att_format_number(StdVectorFst * t, FILE *ofile);
       
-      static void test_minimize(void);
+      //static void test_minimize(void);
 
       static void write_in_att_format(StdVectorFst * t, std::ostream &os);
       static void write_in_att_format_number
