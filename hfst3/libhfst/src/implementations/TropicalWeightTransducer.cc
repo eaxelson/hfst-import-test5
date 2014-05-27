@@ -16,12 +16,43 @@
 
 #ifndef MAIN_TEST
 namespace hfst { 
-
   bool get_encode_weights();
 
-namespace implementations
-{
-  void print_att_number(StdVectorFst *t, FILE * ofile);
+  namespace implementations {
+    
+    // This function can be moved to its own file if TropicalWeightTransducer.o
+    // yields a 'File too big' error.
+    StdVectorFst * TropicalWeightTransducer::push_weights
+    (StdVectorFst * t, bool to_initial_state)
+    {
+      assert (t->InputSymbols() != NULL);
+      fst::StdVectorFst * retval = new fst::StdVectorFst();
+      if (to_initial_state)
+        fst::Push<StdArc, REWEIGHT_TO_INITIAL>(*t, retval, fst::kPushWeights);
+      else
+        fst::Push<StdArc, REWEIGHT_TO_FINAL>(*t, retval, fst::kPushWeights);
+      retval->SetInputSymbols(t->InputSymbols());
+      return retval;
+    }
+
+    // This function can be moved to its own file if TropicalWeightTransducer.o
+    // yields a 'File too big' error.
+    StdVectorFst * TropicalWeightTransducer::minimize(StdVectorFst * t)
+    {
+      RmEpsilon<StdArc>(t);
+
+      EncodeMapper<StdArc> encode_mapper
+        (hfst::get_encode_weights() ? (kEncodeLabels|kEncodeWeights) : (kEncodeLabels), ENCODE);
+      Encode(t, &encode_mapper);
+      StdVectorFst * det = new StdVectorFst();
+
+      Determinize<StdArc>(*t, det);
+      Minimize<StdArc>(det);
+      Decode(det, encode_mapper);
+      return det;
+    }
+
+    void print_att_number(StdVectorFst *t, FILE * ofile);
 
   float tropical_seconds_in_harmonize=0;
   float TropicalWeightTransducer::get_profile_seconds() {

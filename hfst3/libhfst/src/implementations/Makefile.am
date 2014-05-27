@@ -47,7 +47,7 @@ if WANT_SFST
 MAYBE_SFST=SfstTransducer.cc
 endif
 if WANT_OPENFST
-MAYBE_OPENFST=TropicalWeightTransducer.cc TropicalWeightTransducerMinimize.cc TropicalWeightTransducerPushWeights.cc
+MAYBE_OPENFST=TropicalWeightTransducer.cc
 if WANT_OPENFST_LOG
 MAYBE_OPENFST += LogWeightTransducer.cc
 endif
