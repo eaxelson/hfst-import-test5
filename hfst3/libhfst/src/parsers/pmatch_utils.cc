@@ -32,8 +32,11 @@ pmatcherror(const char *msg)
     }
     else
     {
-        fprintf(stderr, "***    parsing %60s [line %d, near %s]...\n", 
-                hfst::pmatch::data, pmatchlineno, pmatchtext);
+        char buf[200];
+        memcpy(buf, hfst::pmatch::data, 200);
+        buf[200] = '\0';
+        fprintf(stderr, "***    parsing %s [line %d, near %s]...\n", 
+                buf, pmatchlineno, pmatchtext);
     }
 #endif
     return 0;
