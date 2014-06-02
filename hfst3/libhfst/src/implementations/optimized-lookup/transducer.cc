@@ -182,7 +182,7 @@ void OlLetterTrie::add_string(const char * p, SymbolNumber symbol_key)
 
 bool OlLetterTrie::has_key_starting_with(const char c) const
 {
-    return letters[(unsigned char) c] == NULL;
+    return letters[(unsigned char) c] != NULL;
 }
 
 SymbolNumber OlLetterTrie::find_key(char ** p)
