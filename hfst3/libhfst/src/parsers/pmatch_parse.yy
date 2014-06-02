@@ -1058,6 +1058,12 @@ LABEL: QUOTED_LITERAL PAIR_SEPARATOR QUOTED_LITERAL {
     $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_epsilon,
                             hfst::pmatch::format);
  }
+| EPSILON_TOKEN PAIR_SEPARATOR SYMBOL {
+    $$ = new HfstTransducer(hfst::internal_epsilon, $3, hfst::pmatch::format);
+}
+| SYMBOL PAIR_SEPARATOR EPSILON_TOKEN {
+    $$ = new HfstTransducer($1, hfst::internal_epsilon, hfst::pmatch::format);
+}
 | SYMBOL {
     if (hfst::pmatch::definitions.count($1) != 0) {
         if (!hfst::pmatch::flatten &&
