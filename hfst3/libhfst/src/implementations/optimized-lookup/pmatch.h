@@ -35,6 +35,7 @@ namespace hfst_ol {
         bool is_end_tag(const SymbolNumber symbol) const;
         std::string end_tag(const SymbolNumber symbol);
         std::string start_tag(const SymbolNumber symbol);
+        bool extract_tags;
 
     public:
         PmatchAlphabet(std::istream& is, SymbolNumber symbol_count);
@@ -76,8 +77,10 @@ namespace hfst_ol {
 
     public:
 
-        PmatchContainer(std::istream & is, bool verbose = false);
+        PmatchContainer(std::istream & is, bool _verbose = false,
+                        bool extract_tags = false);
         ~PmatchContainer(void);
+        unsigned int input_histogram_buffer[80];
 
         long line_number;
 
@@ -89,6 +92,7 @@ namespace hfst_ol {
         void copy_to_output(const SymbolNumberVector & best_result);
         std::string stringify_output(void);
         static std::string parse_name_from_hfst3_header(std::istream & f);
+        unsigned int input_pos(SymbolNumber * tape_pos) { return tape_pos - orig_input_tape; }
         void be_verbose(void) { verbose = true; }
         bool is_verbose(void) { return verbose; }
 

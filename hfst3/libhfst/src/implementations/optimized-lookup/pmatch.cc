@@ -80,7 +80,7 @@ SymbolNumberVector PmatchAlphabet::get_specials(void) const
 }
 
 PmatchContainer::PmatchContainer(std::istream & inputstream,
-                                 bool _verbose):
+                                 bool _verbose, bool _extract_tags):
     verbose(_verbose)
 {
     std::string transducer_name;
@@ -91,6 +91,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream,
     TransducerHeader header(inputstream);
     orig_symbol_count = symbol_count = header.symbol_count();
     alphabet = PmatchAlphabet(inputstream, header.symbol_count());
+    alphabet.extract_tags = _extract_tags;
 
     io_size = MAX_IO_LEN;
     orig_input_tape = ((SymbolNumber*)
@@ -346,6 +347,7 @@ SymbolNumber PmatchAlphabet::get_special(SpecialSymbol special) const
 std::string PmatchContainer::match(std::string & input)
 {
     initialize_input(input.c_str());
+    memset(input_histogram_buffer, 0, sizeof(unsigned int) * 80);
     ++line_number;
     output.clear();
     while (has_queued_input()) {
@@ -364,6 +366,26 @@ std::string PmatchContainer::match(std::string & input)
             output.push_back(*input_tape++);
         }
     }
+
+    // For drawing a histogram if input activity
+    // int max = 0;
+    // for (int i = 0; i < 80; ++i) {
+    //     if (input_histogram_buffer[i] > max) {
+    //         max = input_histogram_buffer[i];
+    //     }
+    // }
+    // for (int i = 0; i < 10; ++i) {
+    //     for (int j = 0; j < 80; ++j) {
+    //         if (((input_histogram_buffer[j] * 10) / max) > 9 - i) {
+    //             std::cerr << "#";
+    //         } else {
+    //             std::cerr << " ";
+    //         }
+    //     }
+    //     std::cerr << std::endl;
+    // }
+    // std::cerr << std::endl;
+    
     return stringify_output();
 }
 
@@ -405,7 +427,9 @@ std::string PmatchAlphabet::stringify(const SymbolNumberVector & str)
         } else if (*it == special_symbols[boundary]) {
             continue;
         } else {
-            retval.append(string_from_symbol(*it));
+            if (!extract_tags || start_tag_pos.size() != 0) {
+                retval.append(string_from_symbol(*it));
+            }
         }
     }
     return retval;
@@ -999,6 +1023,9 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
                                     SymbolNumber * output_tape,
                                     TransitionTableIndex i)
 {
+    // if (container->input_pos(input_tape) < 200) {
+    //     container->input_histogram_buffer[container->input_pos(input_tape)] += 1;
+    // }
     if (indexes_transition_table(i))
     {
         local_stack.top().default_symbol_trap = true;
