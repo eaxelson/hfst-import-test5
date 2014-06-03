@@ -10,7 +10,7 @@ namespace hfst_ol {
     class PmatchTransducer;
     class PmatchContainer;
 
-    const unsigned int PMATCH_MAX_RECURSION_DEPTH = 3000;
+    const unsigned int PMATCH_MAX_RECURSION_DEPTH = 5000;
     
     typedef std::map<SymbolNumber, PmatchTransducer *> RtnMap;
     enum SpecialSymbol{entry,
@@ -74,6 +74,7 @@ namespace hfst_ol {
         SymbolNumberVector output;
         std::vector<char> possible_first_symbols;
         bool verbose;
+        unsigned int recursion_depth_left;
 
     public:
 
@@ -95,7 +96,17 @@ namespace hfst_ol {
         unsigned int input_pos(SymbolNumber * tape_pos) { return tape_pos - orig_input_tape; }
         void be_verbose(void) { verbose = true; }
         bool is_verbose(void) { return verbose; }
-
+        bool try_recurse(void)
+        {
+            if (recursion_depth_left > 0) {
+                --recursion_depth_left;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        void unrecurse(void) { ++recursion_depth_left; }
+        void reset_recursion(void) { recursion_depth_left = PMATCH_MAX_RECURSION_DEPTH; }
     };
 
     struct SimpleTransition
@@ -167,8 +178,6 @@ namespace hfst_ol {
             SymbolNumberVector best_result;
             Weight best_weight;
         };
-
-        unsigned int recursion_depth_left;
 
         std::stack<LocalVariables> local_stack;
         std::stack<RtnVariables> rtn_stack;
