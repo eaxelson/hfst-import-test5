@@ -180,6 +180,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
       HfstBasicTransducer* mutt = 0;
       set<HfstState> replayed;
       HfstBasicTransducer::const_iterator i;
+      StringSet alpha = trans->get_alphabet();
       switch (direction)
         {
         case GUESS_SUFFIX:
@@ -193,6 +194,16 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                                         hfst::internal_identity,
                                         weight);
           repl->add_transition(guess_state, guess_arc);
+          for (StringSet::const_iterator x = alpha.begin();
+               x != alpha.end();
+               ++x)
+            {
+              HfstBasicTransition x_arc(guess_state,
+                                        *x,
+                                        *x,
+                                        weight);
+              repl->add_transition(guess_state, x_arc);
+            }
           verbose_printf("Rebuilding suffix...\n");
           i = mutt->begin();
           for (HfstState s = 0; s <= mutt->get_max_state(); s++)
@@ -208,6 +219,16 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                                             hfst::internal_identity,
                                             weight);
               repl->add_transition(guess_state, guess_arc);
+              for (StringSet::const_iterator x = alpha.begin();
+                   x != alpha.end();
+                   ++x)
+                {
+                  HfstBasicTransition x_arc(d,
+                                            *x,
+                                            *x,
+                                            weight);
+                  repl->add_transition(guess_state, x_arc);
+                }
               for (HfstBasicTransducer::HfstTransitions::const_iterator arc =
                    i->begin();
                    arc != i->end();
