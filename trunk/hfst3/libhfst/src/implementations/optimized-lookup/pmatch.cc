@@ -81,7 +81,8 @@ SymbolNumberVector PmatchAlphabet::get_specials(void) const
 
 PmatchContainer::PmatchContainer(std::istream & inputstream,
                                  bool _verbose, bool _extract_tags):
-    verbose(_verbose)
+    verbose(_verbose),
+    recursion_depth_left(PMATCH_MAX_RECURSION_DEPTH)
 {
     std::string transducer_name;
     transducer_name = parse_name_from_hfst3_header(inputstream);
@@ -456,8 +457,7 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
                                    PmatchAlphabet & alpha,
                                    PmatchContainer * cont):
     alphabet(alpha),
-    container(cont),
-    recursion_depth_left(PMATCH_MAX_RECURSION_DEPTH)
+    container(cont)
 {
     orig_symbol_count = alphabet.get_symbol_table().size();
     // initialize the stack for local variables
@@ -612,7 +612,7 @@ void PmatchTransducer::collect_first_transition(TransitionTableIndex i,
                 // if this is unknown or identity, game over
                 if (*it == alphabet.get_identity_symbol() ||
                     *it == alphabet.get_unknown_symbol()) {
-                    recursion_depth_left = PMATCH_MAX_RECURSION_DEPTH;
+                    container->reset_recursion();
                     throw true;
                 }
                 possible_first_symbols.insert(*it);
@@ -643,7 +643,12 @@ void PmatchTransducer::collect_first(TransitionTableIndex i,
                                      SymbolNumberVector const& input_symbols,
                                      std::set<TransitionTableIndex> & seen_indices)
 {
+    if (!container->try_recurse()) {
+        container->reset_recursion();
+        throw true;
+    }
     if (seen_indices.count(i) == 1) {
+        container->unrecurse();
         return;
     } else {
         seen_indices.insert(i);
@@ -655,7 +660,7 @@ void PmatchTransducer::collect_first(TransitionTableIndex i,
         // If we can get to finality without any input,
         // throw a bool indicating that the full input set is needed
         if (transition_table[i].final()) {
-            recursion_depth_left = PMATCH_MAX_RECURSION_DEPTH;
+            container->reset_recursion();
             throw true;
         }
 
@@ -664,7 +669,7 @@ void PmatchTransducer::collect_first(TransitionTableIndex i,
         
     } else {
         if (index_table[i].final()) {
-            recursion_depth_left = PMATCH_MAX_RECURSION_DEPTH;
+            container->reset_recursion();
             throw true;
         }
         collect_first_epsilon_index(i+1, input_symbols, seen_indices);
@@ -1026,6 +1031,12 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
     // if (container->input_pos(input_tape) < 200) {
     //     container->input_histogram_buffer[container->input_pos(input_tape)] += 1;
     // }
+    if (!container->try_recurse()) {
+        if (container->is_verbose()) {
+            std::cerr << "pmatch: out of stack space, truncating result\n";
+        }
+        return;
+    }
     if (indexes_transition_table(i))
     {
         local_stack.top().default_symbol_trap = true;
@@ -1050,6 +1061,7 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
         }
 
         if (*input_tape == NO_SYMBOL_NUMBER) {
+            container->unrecurse();
             return;
         }
 
@@ -1099,6 +1111,7 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
         }
         
         if (*input_tape == NO_SYMBOL_NUMBER) {
+            container->unrecurse();
             return;
         }
 
@@ -1130,6 +1143,7 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
         // }
 
     }
+    container->unrecurse();
 }
 
 bool PmatchTransducer::checking_context(void) const
