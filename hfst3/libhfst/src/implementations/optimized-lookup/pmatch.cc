@@ -390,6 +390,30 @@ std::string PmatchContainer::match(std::string & input)
     return stringify_output();
 }
 
+std::string PmatchContainer::locate(std::string & input)
+{
+    initialize_input(input.c_str());
+    ++line_number;
+    output.clear();
+    while (has_queued_input()) {
+        SymbolNumber * input_entry = input_tape;
+        if (!possible_first_symbols.empty()) {
+            while (*input_tape != NO_SYMBOL_NUMBER &&
+                   (*input_tape >= possible_first_symbols.size() ||
+                    possible_first_symbols[*input_tape] == 0)) {
+//                std::cerr << "skipped " << alphabet.string_from_symbol(*input_tape) << std::endl;
+                output.push_back(*input_tape++);
+            }
+        }
+        toplevel->match(&input_tape, &output_tape);
+        copy_to_output(toplevel->get_best_result());
+        if (input_entry == input_tape) {
+            output.push_back(*input_tape++);
+        }
+    }
+    return locatefy_output();
+}
+
 void PmatchContainer::copy_to_output(const SymbolNumberVector & best_result)
 {
     for (SymbolNumberVector::const_iterator it = best_result.begin();
@@ -401,6 +425,11 @@ void PmatchContainer::copy_to_output(const SymbolNumberVector & best_result)
 std::string PmatchContainer::stringify_output(void)
 {
     return alphabet.stringify(output);
+}
+
+std::string PmatchContainer::locatefy_output(void)
+{
+    return alphabet.locatefy(output);
 }
 
 std::string PmatchAlphabet::stringify(const SymbolNumberVector & str)
@@ -430,6 +459,48 @@ std::string PmatchAlphabet::stringify(const SymbolNumberVector & str)
         } else {
             if (!extract_tags || start_tag_pos.size() != 0) {
                 retval.append(string_from_symbol(*it));
+            }
+        }
+    }
+    return retval;
+}
+
+std::string PmatchAlphabet::locatefy(const SymbolNumberVector & str)
+{
+    std::string retval;
+    std::stack<unsigned int> start_tag_pos;
+    std::stack<std::string> patterns;
+    patterns.push("");
+    unsigned int tape_pos = 0;
+    for (SymbolNumberVector::const_iterator it = str.begin();
+         it != str.end(); ++it) {
+        if (*it == special_symbols[entry]) {
+            start_tag_pos.push(tape_pos);
+            patterns.push("");
+        } else if (*it == special_symbols[exit]) {
+            if (start_tag_pos.size() != 0) {
+                start_tag_pos.pop();
+            }
+            std::string pat = patterns.top();
+            patterns.pop();
+            patterns.top().append(pat);
+        } else if (is_end_tag(*it)) {
+            if (start_tag_pos.size() == 0) {
+                std::cerr << "Warning: end tag without start tag\n";
+            }
+            unsigned int pat_pos = start_tag_pos.top();
+            unsigned int len = tape_pos - pat_pos;
+            std::string pat = patterns.top();
+            std::string tag = start_tag(*it);
+            std::stringstream ss;
+            ss << pat_pos << "|" << len << "|" << pat << "|" << tag << "\n";
+            retval.append(ss.str());
+        } else if (*it == special_symbols[boundary]) {
+            continue;
+        } else {
+            ++tape_pos;
+            if (start_tag_pos.size() != 0) {
+                patterns.top().append(string_from_symbol(*it));
             }
         }
     }

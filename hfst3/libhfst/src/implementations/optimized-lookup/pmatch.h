@@ -3,6 +3,7 @@
 
 #include <map>
 #include <stack>
+#include <sstream>
 #include "transducer.h"
 
 namespace hfst_ol {
@@ -53,6 +54,7 @@ namespace hfst_ol {
         SymbolNumber get_special(SpecialSymbol special) const;
         SymbolNumberVector get_specials(void) const;
         std::string stringify(const SymbolNumberVector & str);
+        std::string locatefy(const SymbolNumberVector & str);
 
         friend class PmatchTransducer;
         friend class PmatchContainer;
@@ -89,9 +91,11 @@ namespace hfst_ol {
         bool has_unsatisfied_rtns(void) const;
         std::string get_unsatisfied_rtn_name(void) const;
         std::string match(std::string & input);
+        std::string locate(std::string & input);
         bool has_queued_input(void);
         void copy_to_output(const SymbolNumberVector & best_result);
         std::string stringify_output(void);
+        std::string locatefy_output(void);
         static std::string parse_name_from_hfst3_header(std::istream & f);
         unsigned int input_pos(SymbolNumber * tape_pos) { return tape_pos - orig_input_tape; }
         void be_verbose(void) { verbose = true; }
