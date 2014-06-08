@@ -1,0 +1,28 @@
+.. -*- mode: rst -*-
+================================================
+ Hfst-ataq tokeniser and analyser
+================================================
+
+This is a minimal hfst optimized lookup format based corpus analyser.
+
+Dependencies
+============
+
+ - ICU
+
+Usage
+=====
+
+Run::
+
+    apertium-destxt < input | hfst-ataq > output
+
+and compile your project with::
+
+    $(pkg-config --cflags hfstospell)
+
+and link with::
+
+    $(pkg-config --libs hfstospell)
+
+.. vim: set ft=rst:
