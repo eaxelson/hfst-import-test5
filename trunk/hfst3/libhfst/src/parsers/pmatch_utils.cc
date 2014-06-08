@@ -39,7 +39,8 @@ pmatcherror(const char *msg)
                 buf, pmatchlineno, pmatchtext);
     }
 #endif
-    return 0;
+    exit(0);
+
 }
 
 namespace hfst 
