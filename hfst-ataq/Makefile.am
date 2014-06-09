@@ -37,11 +37,12 @@ hfst_ataq_LDADD=libhfstataq.la
 hfst_ataq_CXXFLAGS=$(AM_CXXFLAGS) $(CXXFLAGS) $(PKG_CXXFLAGS)
 
 # install headers for library in hfst's includedir
-include_HEADERS=hfst-ataq.h
+include_HEADERS=hfst-ataq.hh
 
 # pkgconfig
 pkgconfigdir=$(libdir)/pkgconfig
 pkgconfig_DATA=hfstataq.pc
 
 # tests
+TESTS=requirements-specification-tests.sh
 
