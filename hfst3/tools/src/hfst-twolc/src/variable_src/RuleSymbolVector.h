@@ -25,7 +25,10 @@
 
 #include <vector>
 #include <string>
+#include <utility>
 #include "VariableDefs.h"
+
+typedef std::pair<std::string, std::string> RuleCenter;
 
 class RuleSymbolVector : public std::vector<std::string>
 {
@@ -39,6 +42,10 @@ class RuleSymbolVector : public std::vector<std::string>
   //! @brief Replace variables with their values given by 
   //! @a vvm and return a string representation of the result.
   std::string replace_variables(void);
+
+  //! @brief Replace variables with their values given by 
+  //! @a vvm and return a string representation of the result.
+  std::string replace_variables(const RuleCenter &center);
 
   //! @brief Regular @a push_back of std::vector<std::string>.
   RuleSymbolVector &push_back(const std::string &s);

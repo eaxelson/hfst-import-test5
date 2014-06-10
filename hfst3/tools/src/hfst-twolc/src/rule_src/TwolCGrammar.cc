@@ -120,43 +120,57 @@ void TwolCGrammar::add_rule(const std::string &name,
 }
 
 void TwolCGrammar::add_rule(const std::string &name,
-                const SymbolPairVector &center,
-                op::OPERATOR oper,
-                const OtherSymbolTransducerVector contexts)
+                            const SymbolPairVector &center,
+                            op::OPERATOR oper,
+                            const OtherSymbolTransducerVector contexts)
 {
+  /*
   OtherSymbolTransducer center_fst = Rule::get_center(center);
+  */
 
-  Rule * rule;
-  switch (oper)
+  for (SymbolPairVector::const_iterator it = center.begin();
+       it != center.end();
+       ++it)
     {
-    case op::RIGHT:
-      rule = new RightArrowRule(name,center_fst,contexts);
-      other_rule_container.add_rule
-    (static_cast<RightArrowRule*>(rule));
-      break;
-    case op::LEFT:
-      rule = new LeftArrowRule(name,center_fst,contexts);
-      other_rule_container.add_rule
-    (static_cast<LeftArrowRule*>(rule));
-      break;
-    case op::LEFT_RIGHT:
-      rule = new RightArrowRule(name,center_fst,contexts);
-      other_rule_container.add_rule
-    (static_cast<RightArrowRule*>(rule));
-      name_to_rule_subcases[get_original_name(name)].insert(rule);
-      rule = new LeftArrowRule(name,center_fst,contexts);
-      other_rule_container.add_rule
-    (static_cast<LeftArrowRule*>(rule));
-      break;
-    case op::NOT_LEFT:
-      rule = new LeftRestrictionArrowRule(name,center_fst,contexts);
-      other_rule_container.add_rule
-    (static_cast<LeftRestrictionArrowRule*>(rule));
-      break;
-    default:
-      assert(false);
+      Rule * rule;
+
+      std::string center_name = 
+        name + " CENTER=" + it->first + ":" + it->second;
+      
+      switch (oper)
+        {
+        case op::RIGHT:
+          rule = new ConflictResolvingRightArrowRule(center_name,*it,contexts);
+          right_arrow_rule_container.add_rule_and_display_and_resolve_conflicts
+            (static_cast<ConflictResolvingRightArrowRule*>(rule),std::cerr);
+          break;
+        case op::LEFT:
+          rule = new ConflictResolvingLeftArrowRule(center_name,*it,contexts);
+          left_arrow_rule_container.add_rule_and_display_and_resolve_conflicts
+            (static_cast<ConflictResolvingLeftArrowRule*>(rule),std::cerr); 
+          break;
+        case op::LEFT_RIGHT:
+          rule = new ConflictResolvingRightArrowRule(center_name,*it,contexts);
+          right_arrow_rule_container.add_rule_and_display_and_resolve_conflicts
+            (static_cast<ConflictResolvingRightArrowRule*>(rule),std::cerr); 
+          name_to_rule_subcases[get_original_name(center_name)].insert(rule);
+
+          rule = new ConflictResolvingLeftArrowRule(center_name,*it,contexts);
+          left_arrow_rule_container.add_rule_and_display_and_resolve_conflicts
+            (static_cast<ConflictResolvingLeftArrowRule*>(rule),std::cerr); 
+          break;
+        case op::NOT_LEFT:
+          rule = new LeftRestrictionArrowRule(center_name,*it,contexts);
+          other_rule_container.add_rule
+            (static_cast<LeftRestrictionArrowRule*>(rule)); 
+          break;
+        default:
+          assert(false);
+        }
+      
+      name_to_rule_subcases[get_original_name(center_name)].insert(rule);
     }
-  name_to_rule_subcases[get_original_name(name)].insert(rule);
+
 }
 
 void TwolCGrammar::compile_and_store(HfstOutputStream &out)
