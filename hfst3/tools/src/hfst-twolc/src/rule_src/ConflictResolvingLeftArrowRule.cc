@@ -26,13 +26,45 @@ ConflictResolvingLeftArrowRule::ConflictResolvingLeftArrowRule
   input_symbol(center.first)
 {}
 
+OtherSymbolTransducer get_wb_fst(void)
+{
+  OtherSymbolTransducer wb("__HFST_TWOLC_.#.",
+                           "__HFST_TWOLC_.#.");
+
+  OtherSymbolTransducer no_wb(TWOLC_UNKNOWN,
+                              TWOLC_UNKNOWN);
+  
+  OtherSymbolTransducer diamond(TWOLC_DIAMOND,
+                                TWOLC_DIAMOND);
+
+  no_wb.apply(&HfstTransducer::subtract, wb);
+  no_wb.apply(&HfstTransducer::disjunct, diamond);
+  no_wb.apply(&HfstTransducer::repeat_star);
+
+  OtherSymbolTransducer result(wb);
+  result.apply(&HfstTransducer::concatenate, no_wb);
+  result.apply(&HfstTransducer::concatenate, wb);
+
+  return result;
+}
+
+OtherSymbolTransducer wbize(const OtherSymbolTransducer &t)
+{
+  OtherSymbolTransducer t_copy(t);
+  OtherSymbolTransducer wb_fst = get_wb_fst();
+  t_copy.apply(&HfstTransducer::intersect,wb_fst);
+  return t_copy;
+}
+
 bool ConflictResolvingLeftArrowRule::conflicts_this
 (const ConflictResolvingLeftArrowRule &another,StringVector &v)
-{ return not context.is_empty_intersection(another.context,v); }
+{ 
+  return not context.is_empty_intersection(wbize(another.context),v); 
+}
 
 bool ConflictResolvingLeftArrowRule::resolvable_conflict
 (const ConflictResolvingLeftArrowRule &another)
-{ return context.is_subset(another.context); }
+{ return context.is_subset(wbize(another.context)); }
 
 void ConflictResolvingLeftArrowRule::resolve_conflict
 (const ConflictResolvingLeftArrowRule &another)
