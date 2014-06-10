@@ -72,7 +72,7 @@
   unsigned int get_number(const std::string &);
   unsigned int get_second_number(const std::string &s);
   std::string get_name(const std::string &s);
-               
+
 %}
 
 
