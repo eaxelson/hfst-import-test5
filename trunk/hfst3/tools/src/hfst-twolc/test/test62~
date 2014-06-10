@@ -1,8 +1,0 @@
-Alphabet 
-;
-
-Rules
-"R"
-[a:b | b:c] => a _ ;
-
-a:c => a _ ;
