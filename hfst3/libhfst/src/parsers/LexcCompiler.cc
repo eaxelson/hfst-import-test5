@@ -397,8 +397,9 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
     //std::map<std::string,hfst::HfstTransducer*> regexps_;
 
     // encode key
+    // keep regexps with different continuations separate
+    string regex_key =  currentLexiconName_ + "_" + continuation;
 
-    string regex_key =  currentLexiconName_;
     regExpresionEncode(regex_key);
     tokenizer_.add_multichar_symbol(regex_key);
    // cout << "lexicon " << regex_key << "\n";
@@ -537,6 +538,8 @@ LexcCompiler::compileLexical()
 */
 
     HfstTransducer lexicons(stringsTrie_, format_);
+
+
     lexicons.minimize();
 
 
