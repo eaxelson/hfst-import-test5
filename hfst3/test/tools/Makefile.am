@@ -300,7 +300,8 @@ LEXC_TXTS=basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc \
 		  xre.definitions.lexc xre.months.lexc xre.nested-definitions.lexc \
 		  xre.numeric-star.lexc xre.sharp.lexc xre.quotations.lexc \
 		  xre.star-plus-optional.lexc basic.lowercase-lexicon-end.lexc \
-		  basic.multichar-flag-with-zero.lexc basic.almost-reserved-words.lexc
+		  basic.multichar-flag-with-zero.lexc basic.almost-reserved-words.lexc \
+		  basic.regexps.lexc
 #XFST_TXTS=cat-regex.xfst
 ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
 		$(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TEXTS) \
@@ -366,6 +367,8 @@ basic.punctuation.lexc.flag.result \
 basic.punctuation.lexc.result \
 basic.almost-reserved-words.lexc.flag.result \
 basic.almost-reserved-words.lexc.result \
+basic.regexps.lexc.flag.result \
+basic.regexps.lexc.result \
 basic.root-loop.lexc.flag.result \
 basic.root-loop.lexc.result \
 basic.spurious-lexicon.lexc.flag.result \
