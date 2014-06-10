@@ -13,7 +13,8 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
           basic.lowercase-lexicon-end.lexc
           basic.multichar-escaped-zero.lexc
           basic.almost-reserved-words.lexc
-          hfst.weights.lexc      
+          basic.regexps.lexc
+          hfst.weights.lexc
           xre.automatic-multichar-symbols.lexc xre.basic.lexc 
           xre.definitions.lexc xre.months.lexc xre.nested-definitions.lexc 
           xre.numeric-star.lexc xre.sharp.lexc xre.quotations.lexc
@@ -108,7 +109,8 @@ for i in .sfst .ofst .foma ; do
         
         # check flag results
         RESULT="$f.flag.result"
-     
+ 
+
         if ! $TOOLDIR/hfst-lexc -F $FFLAG $srcdir/$f -o test 2> /dev/null; then
             echo lexc2fst -F $FFLAG $f failed with $?
             exit 1
