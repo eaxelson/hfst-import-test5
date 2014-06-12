@@ -3456,6 +3456,45 @@ namespace xfst {
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
   }
 
+  static bool substitute_input_flag_with_epsilon(const StringPair &sp, StringPairSet &sps)
+  {
+    if (FdOperation::is_diacritic(sp.first))
+      {
+        StringPair new_pair(hfst::internal_epsilon, sp.second);
+        sps.insert(new_pair);
+        return true;
+      }
+    return false;
+  }
+
+  static bool substitute_output_flag_with_epsilon(const StringPair &sp, StringPairSet &sps)
+  {
+    if (FdOperation::is_diacritic(sp.second))
+      {
+        StringPair new_pair(sp.first, hfst::internal_epsilon);
+        sps.insert(new_pair);
+        return true;
+      }
+    return false;
+  }
+
+  static bool substitute_one_sided_flags(const StringPair &sp, StringPairSet &sps)
+  {
+    if (FdOperation::is_diacritic(sp.first))
+      {
+        StringPair new_pair(sp.first, sp.first);
+        sps.insert(new_pair);
+        return true;
+      }
+    if (FdOperation::is_diacritic(sp.second))
+      {
+        StringPair new_pair(sp.second, sp.second);
+        sps.insert(new_pair);
+        return true;
+      }
+    return false;
+  }
+
   XfstCompiler&
   XfstCompiler::apply_binary_operation_iteratively(BinaryOperation operation)
   {
@@ -3494,7 +3533,17 @@ namespace xfst {
                       result->harmonize_flag_diacritics(*t);
                     }
                 }
+              if (variables_["flag-is-epsilon"] == "ON")
+                {
+                  result->substitute(&substitute_output_flag_with_epsilon);
+                  t->substitute(&substitute_input_flag_with_epsilon);
+                }
               result->compose(*t);
+              if (variables_["flag-is-epsilon"] == "ON")
+                {
+                  result->substitute(&substitute_one_sided_flags);
+                  // t will be deleted later
+                }
               break;
             }
           case CONCATENATE_NET:
