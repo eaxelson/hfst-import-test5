@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 TESTS=test
-EXTRA_DIST=test1 test1.txt_fst test10 test10.txt_fst test11 test11.txt_fst test12\
+EXTRA_DIST=test test1 test1.txt_fst test10 test10.txt_fst test11 test11.txt_fst test12\
 test12.txt_fst test13 test13.txt_fst test14 test14.txt_fst test15\
 test15.txt_fst test16 test16.txt_fst test17 test17.txt_fst test18\
 test18.txt_fst test19 test19.txt_fst test2 test2.txt_fst test20\
