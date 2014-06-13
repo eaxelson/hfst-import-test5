@@ -252,6 +252,7 @@ ImplementationType transducer_type
   OtherSymbolTransducerVector contexts(1,context);
   g.add_rule("\"test1\"",SymbolPair("a","b"),
          op::LEFT_RIGHT,contexts);
+  /*
   g.add_rule("\"test2\"",SymbolPair("a","b"),
          op::LEFT_RIGHT,contexts);
 
@@ -266,6 +267,6 @@ ImplementationType transducer_type
     apply(&HfstTransducer::concatenate,unknown);
   OtherSymbolTransducerVector contexts1(1,context1);
   g.add_rule("\"test3\"",SymbolPair("a","b"),
-         op::LEFT_RIGHT,contexts1);
+  op::LEFT_RIGHT,contexts1);*/
 }
 #endif // TEST_TWOL_C_GRAMMAR
