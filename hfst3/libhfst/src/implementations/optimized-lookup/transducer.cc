@@ -25,7 +25,8 @@ bool should_ascii_tokenize(unsigned char c)
 }
 
 TransducerAlphabet::TransducerAlphabet(std::istream& is,
-                                       SymbolNumber symbol_count)
+                                       SymbolNumber symbol_count,
+                                       bool preserve_diacritic_strings)
 {
     unknown_symbol = NO_SYMBOL_NUMBER;
     default_symbol = NO_SYMBOL_NUMBER;
@@ -33,9 +34,11 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
     {
         std::string str;
         std::getline(is, str, '\0');
-        symbol_table.push_back(str.c_str());
         if(hfst::FdOperation::is_diacritic(str)) {
             fd_table.define_diacritic(i, str);
+            if (!preserve_diacritic_strings) {
+                str = "";
+            }
         } else if (hfst::is_unknown(str)) {
             unknown_symbol = i;
         } else if (hfst::is_default(str)) {
@@ -46,6 +49,7 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
         if(!is) {
             HFST_THROW(TransducerHasWrongTypeException);
         }
+        symbol_table.push_back(str.c_str());
     }
 }
 

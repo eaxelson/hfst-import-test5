@@ -370,7 +370,9 @@ public:
             default_symbol = NO_SYMBOL_NUMBER;
             identity_symbol = NO_SYMBOL_NUMBER;
         }
-    TransducerAlphabet(std::istream& is, SymbolNumber symbol_count);
+    TransducerAlphabet(std::istream& is,
+                       SymbolNumber symbol_count,
+                       bool preserve_diacritic_strings = true);
     TransducerAlphabet(const SymbolTable& st);
   
     void display() const;
