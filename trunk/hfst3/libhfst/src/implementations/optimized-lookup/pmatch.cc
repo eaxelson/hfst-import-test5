@@ -5,7 +5,7 @@ namespace hfst_ol {
 
 PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
                                SymbolNumber symbol_count):
-    TransducerAlphabet(inputstream, symbol_count)
+    TransducerAlphabet(inputstream, symbol_count, false)
 {
     special_symbols[entry] = NO_SYMBOL_NUMBER;
     special_symbols[exit] = NO_SYMBOL_NUMBER;
