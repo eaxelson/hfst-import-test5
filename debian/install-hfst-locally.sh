@@ -41,7 +41,7 @@ autoreconf -i && \
 --with-sfst=no LDFLAGS="-L/usr/lib/ -Wl,-rpath=/usr/lib/" \
 --enable-all-tools --disable-foma-wrapper --disable-lexc-wrapper \
 --enable-fsmbook-tests --with-readline=no && \
-./scripts/generate-cc-files.sh && make && make install
+make && make install
 
 # Make swig bindings
 #
@@ -63,6 +63,9 @@ if (which python3 1> /dev/null 2> /dev/null); then
     fi
     if [ -e _libhfst.cpython-32mu.so ]; then
         mv _libhfst.cpython-32mu.so python3-_libhfst.so
+    fi
+    if [ -e _libhfst.cpython-32m.so ]; then
+        mv _libhfst.cpython-32m.so python3-_libhfst.so
     fi
 fi
 
