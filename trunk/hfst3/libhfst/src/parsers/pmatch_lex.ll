@@ -167,7 +167,6 @@ LWSP [\t\r\n ]
 "<=" { return LEFT_ARROW; }
 "=>" { return RIGHT_ARROW; }
 "->" { return REPLACE_RIGHT; }
-"->" { return LTR_LONGEST_MATCH; }
 "(->)" { return OPTIONAL_REPLACE_RIGHT; }
 "<-" { return REPLACE_LEFT; }
 "(<-)" { return OPTIONAL_REPLACE_LEFT; }
