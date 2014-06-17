@@ -14,7 +14,7 @@ if [ "$1" = "--help" -o "$1" = "-h" ]; then
     echo "Usage: make-debian-package.sh --python[2|3] --hfst-dir PATH"
     echo ""
     echo "[2|3] is python version,"
-    echo "PATH is full path to the directory where hfst is installed"
+    echo "PATH is full path to the hfst swig directory"
     exit
 fi
 
@@ -24,7 +24,7 @@ if ! [[ ( "$1" = "--python2" || "$1" = "--python3" ) && "$2" = "--hfst-dir" && "
     echo "Usage: make-debian-package.sh --python[2|3] --hfst-dir PATH"
     echo ""
     echo "[2|3] is python version,"
-    echo "PATH is full path to the directory where hfst is installed"
+    echo "PATH is full path to the hfst swig directory"
     exit
 fi
 

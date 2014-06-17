@@ -29,10 +29,10 @@ without the .svn files.
 
 Continue by running
 
-  ./make-debian-package --version X.Y.Z --python2 && 
-  ./make-debian-package --version X.Y.Z --python3
+  ./make-debian-package --python2 --hfst-dir /full/path/to/swig/dir/ && 
+  ./make-debian-package --python3 --hfst-dir /full/path/to/swig/dir/
 
-where X.Y.Z is the version number of newest HFST release.
+where /full/path/to/swig/dir is the swig dir of hfst-X.Y.Z.
 
 At the end, you will have files
 
