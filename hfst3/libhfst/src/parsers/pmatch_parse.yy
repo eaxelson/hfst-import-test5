@@ -217,6 +217,12 @@ REGEXP1: REGEXP2 END_OF_EXPRESSION { }
     $1->set_final_weights($2);
     $$ = $1;
  }
+// | REGEXP2 error {
+//     $$ = $1;
+//     std::cerr << "pmatch: skipping\n";
+//     yyerrok;
+//     yyclearin;
+//  }
 ;
 
 FUNCBODY1: FUNCBODY2 { }
@@ -972,6 +978,9 @@ REGEXP12: LABEL { }
     hfst::HfstInputStream instream($1);
     $$ = new HfstTransducer(instream);
     instream.close();
+    if ($$->get_type() != hfst::pmatch::format) {
+        $$->convert(hfst::pmatch::format);
+    }
     free($1);
   }
 | READ_TEXT {
