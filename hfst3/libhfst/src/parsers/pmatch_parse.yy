@@ -975,9 +975,17 @@ FUN_TOUPPER: TOUPPER_LEFT FUNCBODY4 RIGHT_PARENTHESIS {
 
 REGEXP12: LABEL { }
 | READ_BIN {
-    hfst::HfstInputStream instream($1);
-    $$ = new HfstTransducer(instream);
-    instream.close();
+    try {
+        hfst::HfstInputStream instream($1);
+        $$ = new HfstTransducer(instream);
+        instream.close();
+    } catch(NotTransducerStreamException) {
+        std::string ermsg =
+            std::string("Couldn't read transducer from ") +
+            std::string($1);
+        free($1);
+        pmatcherror(ermsg.c_str());
+    }
     if ($$->get_type() != hfst::pmatch::format) {
         $$->convert(hfst::pmatch::format);
     }
