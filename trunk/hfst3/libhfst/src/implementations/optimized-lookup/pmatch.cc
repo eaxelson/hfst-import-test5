@@ -495,7 +495,8 @@ std::string PmatchAlphabet::locatefy(const SymbolNumberVector & str)
             std::stringstream ss;
             ss << pat_pos << "|" << len << "|" << pat << "|" << tag << "\n";
             retval.append(ss.str());
-        } else if (*it == special_symbols[boundary]) {
+        } else if (*it == special_symbols[boundary]
+                   || is_flag_diacritic(*it)) {
             continue;
         } else {
             ++tape_pos;
