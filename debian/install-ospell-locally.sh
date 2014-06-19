@@ -38,7 +38,7 @@ cd $OSPELL_SRCDIR
 #
 autoreconf -i && \
 ./configure --prefix=$OSPELL_INSTDIR_FULL_PATH \
---enable-xml=tinyxml --enable-zhfst \
+--enable-xml --enable-zhfst \
 && make LDFLAGS="-L/usr/lib/ -Wl,-rpath=/usr/lib/" && make install
 
 cd $ORIG_DIR
