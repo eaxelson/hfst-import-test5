@@ -6,6 +6,7 @@
 #  -------------------------------------------------
 #
 
+
 if [ "$1" != "--hfst-dir" -o "$2" = "" ]; then
     echo $0": error: directory where ospell is installed must be given"
     echo $0" --ospell-dir DIRNAME"
@@ -47,6 +48,9 @@ chrpath -d libhfstospell.so."$OSPELL_LIBNUMBER".0.0
 ln -s -T libhfstospell.so."$OSPELL_LIBNUMBER".0.0 libhfstospell.so."$OSPELL_LIBNUMBER"
 ln -s -T libhfstospell.so."$OSPELL_LIBNUMBER" libhfstospell.so
 
+cp -P $OSPELL_PREFIX/lib/libhfstospell.a .
+cp -P $OSPELL_PREFIX/lib/libhfstospell.la .
+
 strip *.so
 chmod 0644 *
 
@@ -68,6 +72,12 @@ do
     cp -P $manpage debian/usr/share/man/man1;    
 done
 
+# -----------------------
+# Copy the pkgconfig file
+# -----------------------
+
+cp $OSPELL_PREFIX/lib/pkgconfig/hfstospell.pc debian/usr/lib/pkgconfig/
+chmod 0644 debian/usr/lib/pkgconfig/*
 
 # ---------------------------
 # Remove the rpaths from tool

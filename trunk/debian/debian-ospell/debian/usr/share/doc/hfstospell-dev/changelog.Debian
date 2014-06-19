@@ -1,5 +1,5 @@
-hfst (V.V.V-1) unstable; urgency=low
+hfst (0.3.0-1) unstable; urgency=low
 
   * Initial release
 
- -- Erik Axelson <hfst-info@sf.net>  Day, NN Mon 2014 TT:TT:TT +0200
+ -- Erik Axelson <hfst-info@sf.net>  Thu, 19 Jun 2014 12:14:58 +0200

@@ -1,10 +1,10 @@
 Package: hfstospell-dev
 Source: hfstospell
-Version: V.V-1
+Version: 3.0-1
 Section: devel
 Priority: optional
 Architecture: amd64
-Installed-size: XX XXX
+Installed-size: 7 400
 Depends: libc6 (>= 2.14), libstdc++6 (>= 4.4.3), libarchive-dev (>= 3), libxml++2-dev
 Maintainer: HFST team <hfst-info@sf.net>
 Description: HFST ospell library and commandline tool
