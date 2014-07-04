@@ -28,16 +28,6 @@ namespace hfst_ol {
                        Pmatch_passthrough,
                        boundary};
 
-        struct StringLocation
-    {
-        unsigned int start;
-        unsigned int len;
-        std::string tag;
-    StringLocation(void): start(0), len(0), tag("") {}
-    StringLocation(unsigned int s, unsigned int l, std::string t):
-        start(s), len(l), tag(t) {}
-    };
-
     struct SymbolPair
     {
         SymbolNumber input;
@@ -49,21 +39,6 @@ namespace hfst_ol {
     class DoubleTape: public std::vector<SymbolPair>
     {
     public:
-        /* void write_output(unsigned int pos, SymbolNumber sym) */
-        /* { */
-        /*     while (pos >= this->size()) { */
-        /*         this->push_back(SymbolPair()); */
-        /*     } */
-        /*     this->operator[](pos).output = sym; */
-        /* } */
-
-        /* void write_input(unsigned int pos, SymbolNumber sym) */
-        /* { */
-        /*     while (pos >= this->size()) { */
-        /*         this->push_back(SymbolPair()); */
-        /*     } */
-        /*     this->operator[](pos).input = sym; */
-        /* } */
 
         void write(unsigned int pos, SymbolNumber in, SymbolNumber out)
         {
