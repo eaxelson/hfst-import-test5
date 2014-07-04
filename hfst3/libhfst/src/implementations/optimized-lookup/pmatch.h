@@ -14,6 +14,7 @@ namespace hfst_ol {
     const unsigned int PMATCH_MAX_RECURSION_DEPTH = 5000;
     
     typedef std::map<SymbolNumber, PmatchTransducer *> RtnMap;
+    
     enum SpecialSymbol{entry,
                        exit,
                        LC_entry,
@@ -26,6 +27,78 @@ namespace hfst_ol {
                        NRC_exit,
                        Pmatch_passthrough,
                        boundary};
+
+        struct StringLocation
+    {
+        unsigned int start;
+        unsigned int len;
+        std::string tag;
+    StringLocation(void): start(0), len(0), tag("") {}
+    StringLocation(unsigned int s, unsigned int l, std::string t):
+        start(s), len(l), tag(t) {}
+    };
+
+    struct SymbolPair
+    {
+        SymbolNumber input;
+        SymbolNumber output;
+    SymbolPair(void): input(0), output(0) {}
+    SymbolPair(SymbolNumber i, SymbolNumber o): input(i), output(o) {}
+    };
+
+    class DoubleTape: public std::vector<SymbolPair>
+    {
+    public:
+        /* void write_output(unsigned int pos, SymbolNumber sym) */
+        /* { */
+        /*     while (pos >= this->size()) { */
+        /*         this->push_back(SymbolPair()); */
+        /*     } */
+        /*     this->operator[](pos).output = sym; */
+        /* } */
+
+        /* void write_input(unsigned int pos, SymbolNumber sym) */
+        /* { */
+        /*     while (pos >= this->size()) { */
+        /*         this->push_back(SymbolPair()); */
+        /*     } */
+        /*     this->operator[](pos).input = sym; */
+        /* } */
+
+        void write(unsigned int pos, SymbolNumber in, SymbolNumber out)
+        {
+            while (pos >= this->size()) {
+                this->push_back(SymbolPair());
+            }
+            this->operator[](pos) = SymbolPair(in, out);
+        }
+
+        using std::vector<SymbolPair>::insert;
+        void insert(unsigned int pos, SymbolNumber input, SymbolNumber output)
+        {
+            SymbolPair val(input, output);
+            DoubleTape::iterator it = this->begin();
+            this->insert(it + pos, val);
+        }
+
+        using std::vector<SymbolPair>::erase;
+        void erase(unsigned int pos)
+        {
+            DoubleTape::iterator it = this->begin();
+            this->erase(it + pos);
+        }
+
+        DoubleTape extract_slice(unsigned int start, unsigned int stop)
+        {
+            DoubleTape retval;
+            while(start < stop) {
+                retval.push_back(this->at(start));
+                ++start;
+            }
+            return retval;
+        }
+        
+    };
 
     class PmatchAlphabet: public TransducerAlphabet {
     protected:
@@ -53,13 +126,13 @@ namespace hfst_ol {
         PmatchTransducer * get_rtn(SymbolNumber symbol);
         SymbolNumber get_special(SpecialSymbol special) const;
         SymbolNumberVector get_specials(void) const;
-        std::string stringify(const SymbolNumberVector & str);
-        std::string locatefy(const SymbolNumberVector & str);
+        std::string stringify(const DoubleTape & str);
+        std::string locatefy(const DoubleTape & str);
 
         friend class PmatchTransducer;
         friend class PmatchContainer;
     };
-
+    
     class PmatchContainer
     {
     protected:
@@ -69,11 +142,9 @@ namespace hfst_ol {
         SymbolNumber symbol_count;
         PmatchTransducer * toplevel;
         size_t io_size;
-        SymbolNumber * input_tape;
-        SymbolNumber * orig_input_tape;
-        SymbolNumber * output_tape;
-        SymbolNumber * orig_output_tape;
-        SymbolNumberVector output;
+        SymbolNumberVector input;
+        DoubleTape tape;
+        DoubleTape output;
         std::vector<char> possible_first_symbols;
         bool verbose;
         unsigned int recursion_depth_left;
@@ -90,14 +161,23 @@ namespace hfst_ol {
         void initialize_input(const char * input);
         bool has_unsatisfied_rtns(void) const;
         std::string get_unsatisfied_rtn_name(void) const;
+        void process(std::string & input);
         std::string match(std::string & input);
         std::string locate(std::string & input);
-        bool has_queued_input(void);
-        void copy_to_output(const SymbolNumberVector & best_result);
+        bool has_queued_input(unsigned int input_pos);
+        bool not_possible_first_symbol(SymbolNumber sym)
+        {
+            if (possible_first_symbols.size() == 0) {
+                return false;
+            }
+            return sym >= possible_first_symbols.size() ||
+                possible_first_symbols[sym] == 0;
+        }
+        void copy_to_output(const DoubleTape & best_result);
+        void copy_to_output(SymbolNumber input, SymbolNumber output);
         std::string stringify_output(void);
         std::string locatefy_output(void);
         static std::string parse_name_from_hfst3_header(std::istream & f);
-        unsigned int input_pos(SymbolNumber * tape_pos) { return tape_pos - orig_input_tape; }
         void be_verbose(void) { verbose = true; }
         bool is_verbose(void) { return verbose; }
         bool try_recurse(void)
@@ -111,41 +191,8 @@ namespace hfst_ol {
         }
         void unrecurse(void) { ++recursion_depth_left; }
         void reset_recursion(void) { recursion_depth_left = PMATCH_MAX_RECURSION_DEPTH; }
-    };
 
-    struct SimpleTransition
-    {
-        SymbolNumber input;
-        SymbolNumber output;
-        TransitionTableIndex target;
-        static const size_t SIZE = 
-            sizeof(SymbolNumber) + 
-            sizeof(SymbolNumber) + 
-            sizeof(TransitionTableIndex);
-    SimpleTransition(
-        SymbolNumber i, SymbolNumber o, TransitionTableIndex t):
-        input(i), output(o), target(t) {}
-        bool final(void) const {
-            return input == NO_SYMBOL_NUMBER &&
-                output == NO_SYMBOL_NUMBER &&
-                target == 1;
-        }
-    };
-
-    struct SimpleIndex
-    {
-        SymbolNumber input;
-        TransitionTableIndex target;
-        static const size_t SIZE = 
-            sizeof(SymbolNumber) + 
-            sizeof(TransitionTableIndex);
-    SimpleIndex(
-        SymbolNumber i, TransitionTableIndex t):
-        input(i), target(t) {}
-        bool final(void) const {
-            return input == NO_SYMBOL_NUMBER &&
-                target != NO_TABLE_INDEX;
-        }
+        friend class PmatchTransducer;
     };
 
     struct ContextMatchedTrap
@@ -167,7 +214,7 @@ namespace hfst_ol {
         {
             hfst::FdState<SymbolNumber> flag_state;
             char tape_step;
-            SymbolNumber * context_placeholder;
+            unsigned int context_placeholder;
             ContextChecking context;
             bool default_symbol_trap;
             bool negative_context_success;
@@ -177,9 +224,10 @@ namespace hfst_ol {
 
         struct RtnVariables
         {
-            SymbolNumber * candidate_input_pos;
-            SymbolNumber * output_tape_head;
-            SymbolNumberVector best_result;
+            unsigned int candidate_input_pos;
+            unsigned int candidate_tape_pos;
+            unsigned int tape_entry;
+            DoubleTape best_result;
             Weight best_weight;
         };
 
@@ -192,29 +240,51 @@ namespace hfst_ol {
         PmatchAlphabet & alphabet;
         SymbolNumber orig_symbol_count;
         PmatchContainer * container;
-    
+
+        bool is_final(TransitionTableIndex i)
+        {
+            if (indexes_transition_table(i)) {
+                return transition_table[i - TRANSITION_TARGET_TABLE_START].final();
+            } else {
+                return index_table[i].final();
+            }
+        }
+
+        bool get_weight(TransitionTableIndex i)
+        {
+            if (indexes_transition_table(i)) {
+                return transition_table[i - TRANSITION_TARGET_TABLE_START].get_weight();
+            } else {
+                return index_table[i].final_weight();
+            }
+        }
+
+        TransitionTableIndex make_transition_table_index(
+            TransitionTableIndex i, SymbolNumber input) {
+            if (indexes_transition_table(i)) {
+                return i - TRANSITION_TARGET_TABLE_START;
+            } else {
+                if (index_table[i + input].get_input_symbol() == input) {
+                    return index_table[i + input].get_target() - TRANSITION_TARGET_TABLE_START;
+                } else {
+                    return TRANSITION_TARGET_TABLE_START;
+                }
+            }
+        }
+
         // The mutually recursive lookup-handling functions
 
-        void try_epsilon_transitions(SymbolNumber * input_tape,
-                                     SymbolNumber * output_tape,
-                                     TransitionTableIndex i);
+        void take_epsilons(unsigned int input_pos,
+                           unsigned int tape_pos,
+                           TransitionTableIndex i);
   
-        void try_epsilon_indices(SymbolNumber * input_tape,
-                                 SymbolNumber * output_tape,
-                                 TransitionTableIndex i);
-
-        void find_transitions(SymbolNumber input,
-                              SymbolNumber * input_tape,
-                              SymbolNumber * output_tape,
+        void take_transitions(SymbolNumber input,
+                              unsigned int input_pos,
+                              unsigned int tape_pos,
                               TransitionTableIndex i);
 
-        void find_index(SymbolNumber input,
-                        SymbolNumber * input_tape,
-                        SymbolNumber * output_tape,
-                        TransitionTableIndex i);
-
-        void get_analyses(SymbolNumber * input_tape,
-                          SymbolNumber * output_tape,
+        void get_analyses(unsigned int input_pos,
+                          unsigned int tape_pos,
                           TransitionTableIndex index);
 
         bool checking_context(void) const;
@@ -248,10 +318,6 @@ namespace hfst_ol {
 
         std::set<SymbolNumber> possible_first_symbols;
 
-        // const SimpleIndex& get_index(TransitionTableIndex i) const
-        // { return index_table[i] }
-        // const Transition& get_transition(TransitionTableIndex i) const
-        // { return tables->get_transition(i); }
         bool final_index(TransitionTableIndex i) const
         {
             if (indexes_transition_table(i)) {
@@ -264,15 +330,20 @@ namespace hfst_ol {
         static bool indexes_transition_table(TransitionTableIndex i)
         { return  i >= TRANSITION_TARGET_TABLE_START; }
 
-        const SymbolNumberVector & get_best_result(void) const
+        static bool is_good(TransitionTableIndex i)
+        { return  i < TRANSITION_TARGET_TABLE_START; }
+
+        const DoubleTape & get_best_result(void) const
         { return rtn_stack.top().best_result; }
-        SymbolNumber * get_candidate_input_pos(void) const
+        unsigned int get_candidate_input_pos(void) const
         { return rtn_stack.top().candidate_input_pos; }
+        Weight get_best_weight(void) const
+        { return rtn_stack.top().best_weight; }
     
-        void match(SymbolNumber ** input_tape_entry, SymbolNumber ** output_tape_entry);
-        void rtn_call(SymbolNumber * input_tape_entry, SymbolNumber * output_tape_entry);
+        void match(unsigned int & input_pos, unsigned int & tape_pos);
+        void rtn_call(unsigned int & input_pos, unsigned int & tape_pos);
         void rtn_exit(void);
-        void note_analysis(SymbolNumber * input_tape, SymbolNumber * output_tape);
+        void note_analysis(unsigned int input_pos, unsigned int tape_pos);
         void collect_possible_first_symbols(void);
 
     };

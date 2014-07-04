@@ -93,16 +93,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream,
     orig_symbol_count = symbol_count = header.symbol_count();
     alphabet = PmatchAlphabet(inputstream, header.symbol_count());
     alphabet.extract_tags = _extract_tags;
-
-    io_size = MAX_IO_LEN;
-    orig_input_tape = ((SymbolNumber*)
-                       (malloc(sizeof(SymbolNumber)*io_size)));
-    orig_output_tape = ((SymbolNumber*)
-                        (malloc(sizeof(SymbolNumber)*io_size)));
-    input_tape = orig_input_tape;
-    output_tape = orig_output_tape;
     line_number = 0;
-    
     encoder = new Encoder(alphabet.get_symbol_table(), header.input_symbol_count());
     toplevel = new hfst_ol::PmatchTransducer(
         inputstream,
@@ -240,8 +231,6 @@ std::string PmatchAlphabet::start_tag(const SymbolNumber symbol)
 
 PmatchContainer::~PmatchContainer(void)
 {
-    free(orig_input_tape);
-    free(orig_output_tape);
     delete encoder;
     delete toplevel;
 }
@@ -345,81 +334,57 @@ SymbolNumber PmatchAlphabet::get_special(SpecialSymbol special) const
     return special_symbols.at(special);
 }
 
-std::string PmatchContainer::match(std::string & input)
+void PmatchContainer::process(std::string & input_str)
 {
-    initialize_input(input.c_str());
-    memset(input_histogram_buffer, 0, sizeof(unsigned int) * 80);
+    initialize_input(input_str.c_str());
+    unsigned int input_pos = 0;
+
     ++line_number;
     output.clear();
-    while (has_queued_input()) {
-        SymbolNumber * input_entry = input_tape;
-        if (!possible_first_symbols.empty()) {
-            while (*input_tape != NO_SYMBOL_NUMBER &&
-                   (*input_tape >= possible_first_symbols.size() ||
-                    possible_first_symbols[*input_tape] == 0)) {
+    while (has_queued_input(input_pos)) {
+        SymbolNumber current_input = input[input_pos];
+        if (not_possible_first_symbol(current_input)) {
 //                std::cerr << "skipped " << alphabet.string_from_symbol(*input_tape) << std::endl;
-                output.push_back(*input_tape++);
-            }
+            copy_to_output(current_input, current_input);
+            ++input_pos;
+            continue;
         }
-        toplevel->match(&input_tape, &output_tape);
-        copy_to_output(toplevel->get_best_result());
-        if (input_entry == input_tape) {
-            output.push_back(*input_tape++);
+        tape.clear();
+        unsigned int tape_pos = 0;
+        toplevel->match(input_pos, tape_pos);
+        if (tape_pos > 0) {
+            // Tape moved
+            copy_to_output(toplevel->get_best_result());
+        } else {
+            copy_to_output(current_input, current_input);
+            ++input_pos;
         }
     }
+}
 
-    // For drawing a histogram if input activity
-    // int max = 0;
-    // for (int i = 0; i < 80; ++i) {
-    //     if (input_histogram_buffer[i] > max) {
-    //         max = input_histogram_buffer[i];
-    //     }
-    // }
-    // for (int i = 0; i < 10; ++i) {
-    //     for (int j = 0; j < 80; ++j) {
-    //         if (((input_histogram_buffer[j] * 10) / max) > 9 - i) {
-    //             std::cerr << "#";
-    //         } else {
-    //             std::cerr << " ";
-    //         }
-    //     }
-    //     std::cerr << std::endl;
-    // }
-    // std::cerr << std::endl;
-    
+std::string PmatchContainer::match(std::string & input)
+{
+    process(input);
     return stringify_output();
 }
 
 std::string PmatchContainer::locate(std::string & input)
 {
-    initialize_input(input.c_str());
-    ++line_number;
-    output.clear();
-    while (has_queued_input()) {
-        SymbolNumber * input_entry = input_tape;
-        if (!possible_first_symbols.empty()) {
-            while (*input_tape != NO_SYMBOL_NUMBER &&
-                   (*input_tape >= possible_first_symbols.size() ||
-                    possible_first_symbols[*input_tape] == 0)) {
-//                std::cerr << "skipped " << alphabet.string_from_symbol(*input_tape) << std::endl;
-                output.push_back(*input_tape++);
-            }
-        }
-        toplevel->match(&input_tape, &output_tape);
-        copy_to_output(toplevel->get_best_result());
-        if (input_entry == input_tape) {
-            output.push_back(*input_tape++);
-        }
-    }
+    process(input);
     return locatefy_output();
 }
 
-void PmatchContainer::copy_to_output(const SymbolNumberVector & best_result)
+void PmatchContainer::copy_to_output(const DoubleTape & best_result)
 {
-    for (SymbolNumberVector::const_iterator it = best_result.begin();
+    for (DoubleTape::const_iterator it = best_result.begin();
          it != best_result.end(); ++it) {
         output.push_back(*it);
     }
+}
+
+void PmatchContainer::copy_to_output(SymbolNumber input_sym, SymbolNumber output_sym)
+{
+    output.push_back(SymbolPair(input_sym, output_sym));
 }
 
 std::string PmatchContainer::stringify_output(void)
@@ -432,19 +397,20 @@ std::string PmatchContainer::locatefy_output(void)
     return alphabet.locatefy(output);
 }
 
-std::string PmatchAlphabet::stringify(const SymbolNumberVector & str)
+std::string PmatchAlphabet::stringify(const DoubleTape & str)
 {
     std::string retval;
     std::stack<unsigned int> start_tag_pos;
-    for (SymbolNumberVector::const_iterator it = str.begin();
+    for (DoubleTape::const_iterator it = str.begin();
          it != str.end(); ++it) {
-        if (*it == special_symbols[entry]) {
+        SymbolNumber output = it->output;
+        if (output == special_symbols[entry]) {
             start_tag_pos.push(retval.size());
-        } else if (*it == special_symbols[exit]) {
+        } else if (output == special_symbols[exit]) {
             if (start_tag_pos.size() != 0) {
                 start_tag_pos.pop();
             }
-        } else if (is_end_tag(*it)) {
+        } else if (is_end_tag(output)) {
             unsigned int pos;
             if (start_tag_pos.size() == 0) {
                 std::cerr << "Warning: end tag without start tag\n";
@@ -452,56 +418,64 @@ std::string PmatchAlphabet::stringify(const SymbolNumberVector & str)
             } else {
                 pos = start_tag_pos.top();
             }
-            retval.insert(pos, start_tag(*it));
-            retval.append(end_tag(*it));
-        } else if (*it == special_symbols[boundary]) {
+            retval.insert(pos, start_tag(output));
+            retval.append(end_tag(output));
+        } else if (output == special_symbols[boundary]) {
             continue;
         } else {
             if (!extract_tags || start_tag_pos.size() != 0) {
-                retval.append(string_from_symbol(*it));
+                retval.append(string_from_symbol(output));
             }
         }
     }
     return retval;
 }
 
-std::string PmatchAlphabet::locatefy(const SymbolNumberVector & str)
+std::string PmatchAlphabet::locatefy(const DoubleTape & str)
 {
     std::string retval;
     std::stack<unsigned int> start_tag_pos;
     std::stack<std::string> patterns;
     patterns.push("");
     unsigned int tape_pos = 0;
-    for (SymbolNumberVector::const_iterator it = str.begin();
+    for (DoubleTape::const_iterator it = str.begin();
          it != str.end(); ++it) {
-        if (*it == special_symbols[entry]) {
+        SymbolNumber input = it->input;
+        SymbolNumber output = it->output;
+        if (output == special_symbols[entry]) {
             start_tag_pos.push(tape_pos);
             patterns.push("");
-        } else if (*it == special_symbols[exit]) {
+        } else if (output == special_symbols[exit]) {
             if (start_tag_pos.size() != 0) {
                 start_tag_pos.pop();
             }
             std::string pat = patterns.top();
             patterns.pop();
             patterns.top().append(pat);
-        } else if (is_end_tag(*it)) {
+        } else if (is_end_tag(output)) {
             if (start_tag_pos.size() == 0) {
                 std::cerr << "Warning: end tag without start tag\n";
             }
             unsigned int pat_pos = start_tag_pos.top();
             unsigned int len = tape_pos - pat_pos;
             std::string pat = patterns.top();
-            std::string tag = start_tag(*it);
+            std::string tag = start_tag(output);
             std::stringstream ss;
             ss << pat_pos << "|" << len << "|" << pat << "|" << tag << "\n";
             retval.append(ss.str());
-        } else if (*it == special_symbols[boundary]
-                   || is_flag_diacritic(*it)) {
-            continue;
         } else {
-            ++tape_pos;
+            if (output == special_symbols[boundary]
+                || is_flag_diacritic(output)) {
+                output = 0;
+            }
+            if (input == special_symbols[boundary]) {
+                input = 0;
+            }
+            if (input != 0) {
+                ++tape_pos;
+            }
             if (start_tag_pos.size() != 0) {
-                patterns.top().append(string_from_symbol(*it));
+                patterns.top().append(string_from_symbol(output));
             }
         }
     }
@@ -518,9 +492,9 @@ std::string PmatchContainer::get_unsatisfied_rtn_name(void) const
     return "";
 }
 
-bool PmatchContainer::has_queued_input(void)
+bool PmatchContainer::has_queued_input(unsigned int input_pos)
 {
-    return *input_tape != NO_SYMBOL_NUMBER;
+    return input_pos < input.size();
 }
 
 PmatchTransducer::PmatchTransducer(std::istream & is,
@@ -537,15 +511,16 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
     locals_front.flag_state = alphabet.get_fd_table();
     locals_front.tape_step = 1;
     locals_front.context = none;
-    locals_front.context_placeholder = NULL;
+    locals_front.context_placeholder = 0;
     locals_front.default_symbol_trap = false;
     locals_front.negative_context_success = false;
     locals_front.pending_passthrough = false;
     locals_front.running_weight = 0.0;
     local_stack.push(locals_front);
     RtnVariables rtn_front;
-    rtn_front.candidate_input_pos = NULL;
-    rtn_front.output_tape_head = NULL;
+    rtn_front.tape_entry = 0;
+    rtn_front.candidate_input_pos = 0;
+    rtn_front.candidate_tape_pos = 0;
     rtn_stack.push(rtn_front);
 
 
@@ -751,32 +726,17 @@ void PmatchTransducer::collect_first(TransitionTableIndex i,
 
 
 
-void PmatchContainer::initialize_input(const char * input)
+void PmatchContainer::initialize_input(const char * input_s)
 {
-    if (strlen(input) > io_size - 4) {
-        free(orig_input_tape);
-        free(orig_output_tape);
-        orig_input_tape = ((SymbolNumber*)(malloc(10*sizeof(SymbolNumber)*strlen(input))));
-        orig_output_tape = ((SymbolNumber*)(malloc(10*sizeof(SymbolNumber)*strlen(input))));
-        if (orig_input_tape == NULL || orig_output_tape == NULL) {
-            std::cerr << "Failed to allocate input buffer of length " << strlen(input) << std::endl;
-            free(orig_input_tape);
-            free(orig_output_tape);
-            orig_input_tape = ((SymbolNumber*)(malloc(sizeof(SymbolNumber)*io_size)));
-            orig_output_tape = ((SymbolNumber*)(malloc(sizeof(SymbolNumber)*io_size)));
-        } else {
-            io_size = 10*strlen(input);
-        }
-        output_tape = orig_output_tape;
-    }
-    input_tape = orig_input_tape;
-    char * input_str = const_cast<char *>(input);
+    char * input_str = const_cast<char *>(input_s);
     char ** input_str_ptr = &input_str;
     SymbolNumber k = NO_SYMBOL_NUMBER;
-    input_tape[0] = NO_SYMBOL_NUMBER;
-    input_tape[1] = alphabet.get_special(boundary);
-    int i = 2;
-    while (**input_str_ptr != 0 && i < io_size - 4 ) {
+    SymbolNumber boundary_sym = alphabet.get_special(boundary);
+    input.clear();
+    if (boundary_sym != NO_SYMBOL_NUMBER) {
+        input.push_back(boundary_sym);
+    }
+    while (**input_str_ptr != 0) {
         char * original_input_loc = *input_str_ptr;
         k = encoder->find_key(input_str_ptr);
         if (k == NO_SYMBOL_NUMBER) {
@@ -798,51 +758,50 @@ void PmatchContainer::initialize_input(const char * input)
             k = symbol_count;
             ++symbol_count;
         }
-        input_tape[i] = k;
-        ++i;
+        input.push_back(k);
     }
-    input_tape[i] = alphabet.get_special(boundary);
-    input_tape[i+1] = NO_SYMBOL_NUMBER;
-    // Place input_tape beyond the opening NO_SYMBOL
-    ++input_tape;
-    // If the boundary marker is NO_SYMBOL (unused), skip it too
-    if (*input_tape == NO_SYMBOL_NUMBER) {
-        ++input_tape;
+    if (boundary_sym != NO_SYMBOL_NUMBER) {
+        input.push_back(boundary_sym);
     }
     return;
 }
 
-void PmatchTransducer::match(SymbolNumber ** input_tape_entry,
-                             SymbolNumber ** output_tape_entry)
+void PmatchTransducer::match(unsigned int & input_tape_pos,
+                             unsigned int & tape_pos)
 {
     rtn_stack.top().best_result.clear();
-    rtn_stack.top().candidate_input_pos = *input_tape_entry;
-    rtn_stack.top().output_tape_head = *output_tape_entry;
+    rtn_stack.top().candidate_input_pos = input_tape_pos;
+    rtn_stack.top().tape_entry = tape_pos;
+    rtn_stack.top().candidate_tape_pos = tape_pos;
     rtn_stack.top().best_weight = 0.0;
     local_stack.top().context = none;
     local_stack.top().tape_step = 1;
-    local_stack.top().context_placeholder = NULL;
+    local_stack.top().context_placeholder = 0;
     local_stack.top().default_symbol_trap = false;
     local_stack.top().running_weight = 0.0;
-    get_analyses(*input_tape_entry, *output_tape_entry, 0);
-    *input_tape_entry = rtn_stack.top().candidate_input_pos;
+    get_analyses(input_tape_pos, tape_pos, 0);
+    tape_pos = rtn_stack.top().candidate_tape_pos;
+    input_tape_pos = rtn_stack.top().candidate_input_pos;
 }
 
-void PmatchTransducer::rtn_call(SymbolNumber * input_tape_entry,
-                                SymbolNumber * output_tape_entry)
+void PmatchTransducer::rtn_call(unsigned int & input_tape_pos,
+                                unsigned int & tape_pos)
 {
     rtn_stack.push(rtn_stack.top());
-    rtn_stack.top().candidate_input_pos = input_tape_entry;
-    rtn_stack.top().output_tape_head = output_tape_entry;
+    rtn_stack.top().candidate_input_pos = input_tape_pos;
+    rtn_stack.top().tape_entry = tape_pos;
+    rtn_stack.top().candidate_tape_pos = tape_pos;
     rtn_stack.top().best_weight = 0.0;
     local_stack.push(local_stack.top());
     local_stack.top().flag_state = alphabet.get_fd_table();
     local_stack.top().tape_step = 1;
     local_stack.top().context = none;
-    local_stack.top().context_placeholder = NULL;
+    local_stack.top().context_placeholder = 0;
     local_stack.top().default_symbol_trap = false;
     local_stack.top().running_weight = 0.0;
-    get_analyses(input_tape_entry, output_tape_entry, 0);
+    get_analyses(input_tape_pos, tape_pos, 0);
+    tape_pos = rtn_stack.top().candidate_tape_pos;
+    input_tape_pos = rtn_stack.top().candidate_input_pos;
 }
 
 void PmatchTransducer::rtn_exit(void)
@@ -861,21 +820,22 @@ void PmatchTransducer::rtn_exit(void)
 //     }
 // }
 
-void PmatchTransducer::note_analysis(SymbolNumber * input_tape,
-                                     SymbolNumber * output_tape)
+void PmatchTransducer::note_analysis(unsigned int input_pos,
+                                     unsigned int tape_pos)
 {
-    if ((input_tape > rtn_stack.top().candidate_input_pos) ||
-        (input_tape == rtn_stack.top().candidate_input_pos &&
+    if ((input_pos > rtn_stack.top().candidate_input_pos) ||
+        (input_pos == rtn_stack.top().candidate_input_pos &&
          rtn_stack.top().best_weight > local_stack.top().running_weight)) {
-        rtn_stack.top().best_result.assign(
-            rtn_stack.top().output_tape_head, output_tape);
-        rtn_stack.top().candidate_input_pos = input_tape;
+        rtn_stack.top().best_result = container->tape.extract_slice(
+            rtn_stack.top().tape_entry, tape_pos);
+        rtn_stack.top().candidate_tape_pos = tape_pos;
+        rtn_stack.top().candidate_input_pos = input_pos;
         rtn_stack.top().best_weight = local_stack.top().running_weight;
     } else if (container->is_verbose() &&
-               input_tape == rtn_stack.top().candidate_input_pos &&
-               rtn_stack.top().best_weight == local_stack.top().running_weight) {
-        SymbolNumberVector discarded(rtn_stack.top().output_tape_head,
-                                     output_tape);
+                 input_pos == rtn_stack.top().candidate_input_pos &&
+                 rtn_stack.top().best_weight == local_stack.top().running_weight) {
+        DoubleTape discarded(container->tape.extract_slice(
+                                 rtn_stack.top().tape_entry, tape_pos));
         std::cerr << "\n\tline " << container->line_number << ": conflicting equally weighted matches found, keeping:\n\t"
                   << alphabet.stringify(rtn_stack.top().best_result) << std::endl
                   << "\tdiscarding:\n\t"
@@ -883,58 +843,53 @@ void PmatchTransducer::note_analysis(SymbolNumber * input_tape,
     }
 }
 
-// void PmatchTransducer::get_initial_input_symbols(
-//     std::set<SymbolNumber> & initials,
-//     TransitionTableIndex i)
-// {
-    
-    
-// }
-
-void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
-                                               SymbolNumber * output_tape,
-                                               TransitionTableIndex i)
+void PmatchTransducer::take_epsilons(unsigned int input_pos,
+                                     unsigned int tape_pos,
+                                     TransitionTableIndex i)
 {
-    while (true) {
+    i = make_transition_table_index(i, 0);
+    
+    while (is_good(i)) {
+        SymbolNumber input = transition_table[i].get_input_symbol();
+        SymbolNumber output = transition_table[i].get_output_symbol();
+        TransitionTableIndex target = transition_table[i].get_target();
+        Weight weight = transition_table[i].get_weight();
         // First we handle actual input epsilons.
-        // There is a special case when the output side
-        // is a context-checking marker.
-        if (transition_table[i].get_input_symbol() == 0) {
-            SymbolNumber output = transition_table[i].get_output_symbol();
-            if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER &&
-                output == alphabet.get_unknown_symbol()) {
-                output = *(input_tape - 1);
-            }
+        if (input == 0) {
+            // If output is "unknown"
+//            if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER &&
+//                output == alphabet.get_unknown_symbol()) {
+//                output = container->input[input_pos];
+//            }
             if (!checking_context()) {
                 if (!try_entering_context(output)) {
-                    *output_tape = output;
+                    // regular input epsilon
+                    container->tape.write(tape_pos, 0, output);
                     Weight tmp = local_stack.top().running_weight;
-                    local_stack.top().running_weight +=
-                        transition_table[i].get_weight();
-                    get_analyses(input_tape,
-                                 output_tape + 1,
-                                 transition_table[i].get_target());
+                    local_stack.top().running_weight += weight;
+                    get_analyses(input_pos, tape_pos + 1, target);
                     local_stack.top().running_weight = tmp;
                     ++i;
                 } else {
                     // We're going to do some context checking
 //                    std::cerr << "Entered context, stack is " << local_stack.size() << std::endl;
-                    local_stack.top().context_placeholder = input_tape;
-                    if (local_stack.top().context == LC ||
-                        local_stack.top().context == NLC) {
-                        // When entering a left context,
-                        // we begin checking not at the current symbol
-                        // but the previous one. This should be safe
-                        // because the tape is NO_SYMBOL padded.
-                        input_tape -= 1;
-                    }
-                    get_analyses(input_tape,
-                                 output_tape,
-                                 transition_table[i].get_target());
-                    if (local_stack.top().context == LC ||
-                        local_stack.top().context == NLC) {
-                        input_tape += 1; // Undo what we did - this is very inelegant
-                    }
+                    local_stack.top().context_placeholder = tape_pos;
+                     if (local_stack.top().context == LC ||
+                         local_stack.top().context == NLC) {
+                         // When entering a left context,
+                         // we begin checking not at the current symbol
+                         // but the previous one. This should be safe
+                         // because the tape is NO_SYMBOL padded.
+                         input_pos -= 1;
+                     }
+                     if (input_pos + 1 != 0) {
+                         // make sure we didn't go beyond the beginning of the tape
+                         get_analyses(input_pos, tape_pos, transition_table[i].get_target());
+                     }
+                     if (local_stack.top().context == LC ||
+                         local_stack.top().context == NLC) {
+                         input_pos += 1; // Undo what we did - this is very inelegant
+                     }
                     // In case we have a negative context, we check to see if the context matched.
                     // If it did, we schedule a passthrough arc after we've processed epsilons.
                     bool schedule_passthrough = false;
@@ -951,13 +906,9 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
             } else {
                 // We *are* checking context and may be done
                 if (try_exiting_context(output)) {
-//                    std::cerr << "Exited context, stack is " << local_stack.size() << std::endl;
                     // We've successfully completed a context check
-                    input_tape = local_stack.top().context_placeholder;
-//                    std::cerr << "input tape restored to " << *input_tape << std::endl;
-                    get_analyses(input_tape,
-                                 output_tape,
-                                 transition_table[i].get_target());
+                    input_pos = local_stack.top().context_placeholder;
+                    get_analyses(input_pos, tape_pos, target);
                     local_stack.pop();
                     ++i;
                 } else {
@@ -965,114 +916,96 @@ void PmatchTransducer::try_epsilon_transitions(SymbolNumber * input_tape,
                         ++i;
                         continue;
                     }
-                    // Don't touch output when checking context
-                    get_analyses(input_tape,
-                                 output_tape,
-                                 transition_table[i].get_target());
-                    ++i;
+                    // Don't alter tapes when checking context
+                    if (input_pos + 1 + local_stack.top().tape_step > 0) {
+                        get_analyses(input_pos + local_stack.top().tape_step, tape_pos, target);
+                        ++i;
+                    }
                 }
             }
-        } else if (alphabet.is_flag_diacritic(
-                       transition_table[i].get_input_symbol())) {
+        } else if (alphabet.is_flag_diacritic(input)) {
             std::vector<short> old_values(local_stack.top().flag_state.get_values());
             if (local_stack.top().flag_state.apply_operation(
-                    *(alphabet.get_operation(
-                          transition_table[i].get_input_symbol())))) {
+                    *(alphabet.get_operation(input)))) {
                 // flag diacritic allowed
-                *output_tape = transition_table[i].get_output_symbol();
-                get_analyses(input_tape,
-                             output_tape + 1,
-                             transition_table[i].get_target());
+                // generally we shouldn't care to write flags
+//                container->tape.write(tape_pos, input, output);
+                Weight tmp = local_stack.top().running_weight;
+                local_stack.top().running_weight += weight;
+                get_analyses(input_pos, tape_pos, target);
+                local_stack.top().running_weight = tmp;
             }
             local_stack.top().flag_state.assign_values(old_values);
             ++i;
             // It could be an insert statement... (gee, this function should
             // probably be refactored
-        }
-        else if (alphabet.has_rtn(transition_table[i].get_input_symbol())) {
-            SymbolNumber * original_output = output_tape;
-            SymbolNumber * original_input = input_tape;
+        } else if (alphabet.has_rtn(input)) {
+            unsigned int original_tape_pos = tape_pos;
+            unsigned int original_input_pos = input_pos;
             Weight original_weight = local_stack.top().running_weight;
-            local_stack.top().running_weight += transition_table[i].get_weight();
+            local_stack.top().running_weight += weight;
 
             // Pass control
             PmatchTransducer * rtn_target =
-                alphabet.get_rtn(transition_table[i].get_input_symbol());
-            rtn_target->rtn_call(input_tape, output_tape);
-            // Fetch result
-            for(SymbolNumberVector::const_iterator it =
-                    rtn_target->rtn_stack.top().best_result.begin();
-                it != rtn_target->rtn_stack.top().best_result.end();
-                ++it) {
-                *output_tape = *it;
-                ++output_tape;
+                alphabet.get_rtn(input);
+            rtn_target->rtn_call(input_pos, tape_pos);
+
+            if (tape_pos != original_tape_pos) {
+                // Tape moved, fetch result
+                tape_pos = original_tape_pos;
+                for(DoubleTape::const_iterator it =
+                        rtn_target->get_best_result().begin();
+                    it != rtn_target->get_best_result().end();
+                    ++it) {
+                    container->tape.write(tape_pos++, it->input, it->output);
+                }
+                local_stack.top().running_weight += rtn_target->get_best_weight();
+                rtn_target->rtn_exit();
+                // We're back in this transducer and continue where we left off
+                get_analyses(input_pos, tape_pos, target);
+                // Finally we go back to where we were so the
+                // other possible paths get a shot
+                tape_pos = original_tape_pos;
+                input_pos = original_input_pos;
+                local_stack.top().running_weight = original_weight;
             }
-            local_stack.top().running_weight += rtn_target->rtn_stack.top().best_weight;
-            input_tape = rtn_target->rtn_stack.top().candidate_input_pos;
-            rtn_target->rtn_exit();
-            // We're back in this transducer and continue where we left off
-            if (input_tape != original_input) {
-                // the rtn advanced the tape
-            get_analyses(input_tape,
-                         output_tape,
-                         transition_table[i].get_target());
-            // Finally we go back to where we were so the
-            // other possible paths get a shot
-            input_tape = original_input;
-            output_tape = original_output;
-            }
-            local_stack.top().running_weight = original_weight;
             ++i;
         } else { // it's not epsilon and it's not a flag or Ins, so nothing to do
             return;
         }
     }
-
 }
 
-void PmatchTransducer::try_epsilon_indices(SymbolNumber * input_tape,
-                                           SymbolNumber * output_tape,
-                                           TransitionTableIndex i)
-{
-    if (index_table[i].get_input_symbol() == 0) {
-        try_epsilon_transitions(input_tape,
-                                output_tape,
-                                index_table[i].get_target() -
-                                TRANSITION_TARGET_TABLE_START);
-    }
-
-}
-
-void PmatchTransducer::find_transitions(SymbolNumber input,
-                                        SymbolNumber * input_tape,
-                                        SymbolNumber * output_tape,
+void PmatchTransducer::take_transitions(SymbolNumber input,
+                                        unsigned int input_pos,
+                                        unsigned int tape_pos,
                                         TransitionTableIndex i)
 {
-    while (transition_table[i].get_input_symbol() != NO_SYMBOL_NUMBER) {
-        if (transition_table[i].get_input_symbol() == input) {
+    i = make_transition_table_index(i, input);
+    
+    while (is_good(i)) {
+        SymbolNumber this_input = transition_table[i].get_input_symbol();
+        SymbolNumber this_output = transition_table[i].get_output_symbol();
+        TransitionTableIndex target = transition_table[i].get_target();
+        if (this_input == NO_SYMBOL_NUMBER) {
+            return;
+        } else if (this_input == input) {
             if (!checking_context()) {
-                SymbolNumber output = transition_table[i].get_output_symbol();
-                if (input == alphabet.get_identity_symbol()) {
-                // we got here via identity, so look back in the
+                if (this_output == alphabet.get_identity_symbol() ||
+                    (this_output == alphabet.get_unknown_symbol())) {
+                // we got here via identity or unknown, so look back in the
                 // input tape to find the symbol we want to write
-                    output = *(input_tape - 1);
-                } else if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER &&
-                           output == alphabet.get_unknown_symbol()) {
-                    output = *(input_tape - 1);
+                    this_output = container->input[input_pos];
                 }
-                *output_tape = output;
+                container->tape.write(tape_pos, input, this_output);
                 Weight tmp = local_stack.top().running_weight;
                 local_stack.top().running_weight +=
                     transition_table[i].get_weight();
-                get_analyses(input_tape,
-                             output_tape + 1,
-                             transition_table[i].get_target());
+                get_analyses(input_pos + 1, tape_pos + 1, target);
                 local_stack.top().running_weight = tmp;
-            } else {
+            } else if (input_pos + 1 + local_stack.top().tape_step > 0) {
                 // Checking context so don't touch output
-                get_analyses(input_tape,
-                             output_tape,
-                             transition_table[i].get_target());
+                get_analyses(input_pos + local_stack.top().tape_step, tape_pos, target);
             }
             local_stack.top().default_symbol_trap = false;
         } else {
@@ -1082,26 +1015,12 @@ void PmatchTransducer::find_transitions(SymbolNumber input,
     }
 }
 
-void PmatchTransducer::find_index(SymbolNumber input,
-                                  SymbolNumber * input_tape,
-                                  SymbolNumber * output_tape,
-                                  TransitionTableIndex i)
-{
-    if (index_table[i+input].get_input_symbol() == input) {
-        find_transitions(input,
-                         input_tape,
-                         output_tape,
-                         index_table[i+input].get_target() - TRANSITION_TARGET_TABLE_START);
-        local_stack.top().default_symbol_trap = false;
-    }
-}
-
-void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
-                                    SymbolNumber * output_tape,
+void PmatchTransducer::get_analyses(unsigned int input_pos,
+                                    unsigned int tape_pos,
                                     TransitionTableIndex i)
 {
-    // if (container->input_pos(input_tape) < 200) {
-    //     container->input_histogram_buffer[container->input_pos(input_tape)] += 1;
+    // if (container->input_pos(tape_pos) < 200) {
+    //     container->input_histogram_buffer[container->input_pos(tape_pos)] += 1;
     // }
     if (!container->try_recurse()) {
         if (container->is_verbose()) {
@@ -1109,111 +1028,41 @@ void PmatchTransducer::get_analyses(SymbolNumber * input_tape,
         }
         return;
     }
-    if (indexes_transition_table(i))
-    {
-        local_stack.top().default_symbol_trap = true;
-        i -= TRANSITION_TARGET_TABLE_START;
-        
-        try_epsilon_transitions(input_tape,
-                                output_tape,
-                                i+1);
 
-        if (local_stack.top().pending_passthrough) {
-            find_transitions(alphabet.get_special(Pmatch_passthrough),
-                             input_tape, output_tape, i+1);
-            local_stack.top().pending_passthrough = false;
-        }
-        
-        // Check for finality even if the input string hasn't ended
-        if (transition_table[i].final()) {
-            Weight tmp = local_stack.top().running_weight;
-            local_stack.top().running_weight += transition_table[i].get_weight();
-            note_analysis(input_tape, output_tape);
-            local_stack.top().running_weight = tmp;
-        }
+//    std::cerr << alphabet.stringify(container->tape) << std::endl;
+    local_stack.top().default_symbol_trap = true;
+    take_epsilons(input_pos, tape_pos, i + 1);
+    if (local_stack.top().pending_passthrough) {
+        // A negative context failed
+        take_transitions(alphabet.get_special(Pmatch_passthrough),
+                         input_pos, tape_pos, i+1);
+        local_stack.top().pending_passthrough = false;
+    }
+    // Check for finality even if the input string hasn't ended
+    if (is_final(i)) {
+        Weight tmp = local_stack.top().running_weight;
+        local_stack.top().running_weight += get_weight(i);
+        note_analysis(input_pos, tape_pos);
+        local_stack.top().running_weight = tmp;
+    }
 
-        if (*input_tape == NO_SYMBOL_NUMBER) {
-            container->unrecurse();
-            return;
-        }
-
-        SymbolNumber input = *input_tape;
-        input_tape += local_stack.top().tape_step;
-
-        if (input < orig_symbol_count) {
-            find_transitions(input,
-                             input_tape,
-                             output_tape,
-                             i+1);
-        } else if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER) {
-            find_transitions(alphabet.get_identity_symbol(),
-                             input_tape,
-                             output_tape,
-                             i+1);
-        }
-        if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER) {
-            find_transitions(alphabet.get_unknown_symbol(),
-                             input_tape,
-                             output_tape,
-                             i+1);
-        }
-            
-        // if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER &&
-        //     local_stack.top().default_symbol_trap == true) {
-        //     find_transitions(alphabet.get_identity_symbol(),
-        //                      input_tape, output_tape, i+1);
-        // }
+    SymbolNumber input;
+    if (!container->has_queued_input(input_pos)) {
+        container->unrecurse();
+        return;
     } else {
-        local_stack.top().default_symbol_trap = true;
-        try_epsilon_indices(input_tape,
-                            output_tape,
-                            i+1);
+        input = container->input[input_pos];
+    }
 
-        if (local_stack.top().pending_passthrough) {
-            find_index(alphabet.get_special(Pmatch_passthrough),
-                       input_tape, output_tape, i+1);
-            local_stack.top().pending_passthrough = false;
-        }
-        
-        if (index_table[i].final()) {
-            Weight tmp = local_stack.top().running_weight;
-            local_stack.top().running_weight += index_table[i].final_weight();
-            note_analysis(input_tape, output_tape);
-            local_stack.top().running_weight = tmp;
-        }
-        
-        if (*input_tape == NO_SYMBOL_NUMBER) {
-            container->unrecurse();
-            return;
-        }
-
-
-        SymbolNumber input = *input_tape;
-        input_tape += local_stack.top().tape_step;
-
-        if (input < orig_symbol_count) {
-            find_index(input,
-                       input_tape,
-                       output_tape,
-                       i+1);
-        } else if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER) {
-            find_index(alphabet.get_identity_symbol(),
-                       input_tape,
-                       output_tape,
-                       i+1);
+    if (input < orig_symbol_count) {
+        take_transitions(input, input_pos, tape_pos, i+1);
+    } else {
+        if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER) {
+            take_transitions(alphabet.get_identity_symbol(), input_pos, tape_pos, i+1);
         }
         if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER) {
-            find_index(alphabet.get_unknown_symbol(),
-                       input_tape,
-                       output_tape,
-                       i+1);
+            take_transitions(alphabet.get_unknown_symbol(), input_pos, tape_pos, i+1);
         }
-        // if (alphabet.get_identity_symbol() != NO_SYMBOL_NUMBER &&
-        //     local_stack.top().default_symbol_trap == true) {
-        //     find_index(alphabet.get_identity_symbol(),
-        //                input_tape, output_tape, i+1);
-        // }
-
     }
     container->unrecurse();
 }
