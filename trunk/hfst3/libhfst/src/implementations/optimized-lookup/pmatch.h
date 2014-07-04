@@ -48,21 +48,6 @@ namespace hfst_ol {
             this->operator[](pos) = SymbolPair(in, out);
         }
 
-        using std::vector<SymbolPair>::insert;
-        void insert(unsigned int pos, SymbolNumber input, SymbolNumber output)
-        {
-            SymbolPair val(input, output);
-            DoubleTape::iterator it = this->begin();
-            this->insert(it + pos, val);
-        }
-
-        using std::vector<SymbolPair>::erase;
-        void erase(unsigned int pos)
-        {
-            DoubleTape::iterator it = this->begin();
-            this->erase(it + pos);
-        }
-
         DoubleTape extract_slice(unsigned int start, unsigned int stop)
         {
             DoubleTape retval;
