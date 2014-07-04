@@ -438,8 +438,8 @@ void Transducer::get_analyses(unsigned int input_pos,
     found_transition = false;
     
     if (recursion_depth_left == 0) {
-        std::cerr << __FILE__ <<
-            ": maximum recursion depth exceeded, discarding results\n";
+//        std::cerr << __FILE__ <<
+//            ": maximum recursion depth exceeded, discarding results\n";
         return;
     }
     if (max_lookups >= 0 && lookup_paths->size() >= max_lookups) {
