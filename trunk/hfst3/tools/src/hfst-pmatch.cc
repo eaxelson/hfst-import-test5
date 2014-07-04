@@ -50,6 +50,7 @@ using std::pair;
 
 bool blankline_separated = true;
 bool extract_tags = false;
+bool locate_mode = false;
 std::string pmatch_filename;
 
 void
@@ -62,7 +63,8 @@ print_usage()
     print_common_program_options(message_out);
     fprintf(message_out,
             "  -n  --newline          Newline as input separator (default is blank line)\n"
-            "  -x  --extract-tags     Only print tagged parts in output\n");
+            "  -x  --extract-tags     Only print tagged parts in output\n"
+            "  -l  --locate           Only print locations of matches\n");
     fprintf(message_out, 
             "Use standard streams for input and output.\n"
             "\n"
@@ -82,7 +84,11 @@ void match_and_print(hfst_ol::PmatchContainer & container,
         // Remove final newline
         input_text.erase(input_text.size() -1, 1);
     }
-    outstream << container.match(input_text);
+    if (!locate_mode) {
+        outstream << container.match(input_text);
+    } else {
+        outstream << container.locate(input_text);
+    }
     outstream << std::endl;
 }
 
@@ -125,10 +131,11 @@ int parse_options(int argc, char** argv)
                 HFST_GETOPT_COMMON_LONG,
                 {"newline", no_argument, 0, 'n'},
                 {"extract-tags", no_argument, 0, 'x'},
+                {"locate", no_argument, 0, 'l'},
                 {0,0,0,0}
             };
         int option_index = 0;
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nx",
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nxl",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -144,6 +151,9 @@ int parse_options(int argc, char** argv)
             break;
         case 'x':
             extract_tags = true;
+            break;
+        case 'l':
+            locate_mode = true;
             break;
 #include "inc/getopt-cases-error.h"
         }
