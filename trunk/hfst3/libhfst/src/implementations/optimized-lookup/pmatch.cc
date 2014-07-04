@@ -182,11 +182,6 @@ PmatchContainer::PmatchContainer(std::istream & inputstream,
         }
     }
 
-    // for(std::vector<char>::iterator it = possible_first_symbols.begin(); it != possible_first_symbols.end(); ++it) {
-    //     if (*it == 1) {
-    //         std::cerr << alphabet.string_from_symbol(it - possible_first_symbols.begin()) << std::endl;
-    //     }
-    // }
 }
 
 bool PmatchAlphabet::is_end_tag(const std::string & symbol)
@@ -344,7 +339,6 @@ void PmatchContainer::process(std::string & input_str)
     while (has_queued_input(input_pos)) {
         SymbolNumber current_input = input[input_pos];
         if (not_possible_first_symbol(current_input)) {
-//                std::cerr << "skipped " << alphabet.string_from_symbol(*input_tape) << std::endl;
             copy_to_output(current_input, current_input);
             ++input_pos;
             continue;
@@ -810,16 +804,6 @@ void PmatchTransducer::rtn_exit(void)
     local_stack.pop();
 }
 
-// void PmatchTransducer::take_best_path(void)
-// {
-//     if(candidate_path.size() == 0) {
-//         jump_queued_token();
-//     } else {
-//         output.insert(output.end(), candidate_path.begin(), candidate_path.end());
-//         input_tape = candidate_input_pos;
-//     }
-// }
-
 void PmatchTransducer::note_analysis(unsigned int input_pos,
                                      unsigned int tape_pos)
 {
@@ -872,14 +856,11 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
                     ++i;
                 } else {
                     // We're going to do some context checking
-//                    std::cerr << "Entered context, stack is " << local_stack.size() << std::endl;
                     local_stack.top().context_placeholder = tape_pos;
                      if (local_stack.top().context == LC ||
                          local_stack.top().context == NLC) {
-                         // When entering a left context,
-                         // we begin checking not at the current symbol
-                         // but the previous one. This should be safe
-                         // because the tape is NO_SYMBOL padded.
+                         // When entering a left context we begin checking not
+                         // at the current symbol but the previous one.
                          input_pos -= 1;
                      }
                      if (input_pos + 1 != 0) {
@@ -1019,9 +1000,6 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
                                     unsigned int tape_pos,
                                     TransitionTableIndex i)
 {
-    // if (container->input_pos(tape_pos) < 200) {
-    //     container->input_histogram_buffer[container->input_pos(tape_pos)] += 1;
-    // }
     if (!container->try_recurse()) {
         if (container->is_verbose()) {
             std::cerr << "pmatch: out of stack space, truncating result\n";

@@ -114,7 +114,6 @@ namespace hfst_ol {
         PmatchContainer(std::istream & is, bool _verbose = false,
                         bool extract_tags = false);
         ~PmatchContainer(void);
-        unsigned int input_histogram_buffer[80];
 
         long line_number;
 
