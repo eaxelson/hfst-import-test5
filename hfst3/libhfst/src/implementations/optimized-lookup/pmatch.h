@@ -236,6 +236,20 @@ namespace hfst_ol {
         void take_epsilons(unsigned int input_pos,
                            unsigned int tape_pos,
                            TransitionTableIndex i);
+
+        void check_context(unsigned int input_pos,
+                           unsigned int tape_pos,
+                           TransitionTableIndex i);
+  
+        void take_rtn(SymbolNumber input,
+                      unsigned int input_pos,
+                      unsigned int tape_pos,
+                      TransitionTableIndex i);
+  
+        void take_flag(SymbolNumber input,
+                       unsigned int input_pos,
+                       unsigned int tape_pos,
+                       TransitionTableIndex i);
   
         void take_transitions(SymbolNumber input,
                               unsigned int input_pos,
