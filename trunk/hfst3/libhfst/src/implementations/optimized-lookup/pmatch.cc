@@ -838,51 +838,18 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
         SymbolNumber output = transition_table[i].get_output_symbol();
         TransitionTableIndex target = transition_table[i].get_target();
         Weight weight = transition_table[i].get_weight();
-        // First we handle actual input epsilons.
+        // We handle paths where we're checking contexts here
         if (input == 0) {
-            // If output is "unknown"
-//            if (alphabet.get_unknown_symbol() != NO_SYMBOL_NUMBER &&
-//                output == alphabet.get_unknown_symbol()) {
-//                output = container->input[input_pos];
-//            }
             if (!checking_context()) {
                 if (!try_entering_context(output)) {
-                    // regular input epsilon
+                    // no context to enter, regular input epsilon
                     container->tape.write(tape_pos, 0, output);
-                    Weight tmp = local_stack.top().running_weight;
+                    Weight old_weight = local_stack.top().running_weight;
                     local_stack.top().running_weight += weight;
                     get_analyses(input_pos, tape_pos + 1, target);
-                    local_stack.top().running_weight = tmp;
-                    ++i;
+                    local_stack.top().running_weight = old_weight;
                 } else {
-                    // We're going to do some context checking
-                    local_stack.top().context_placeholder = tape_pos;
-                     if (local_stack.top().context == LC ||
-                         local_stack.top().context == NLC) {
-                         // When entering a left context we begin checking not
-                         // at the current symbol but the previous one.
-                         input_pos -= 1;
-                     }
-                     if (input_pos + 1 != 0) {
-                         // make sure we didn't go beyond the beginning of the tape
-                         get_analyses(input_pos, tape_pos, transition_table[i].get_target());
-                     }
-                     if (local_stack.top().context == LC ||
-                         local_stack.top().context == NLC) {
-                         input_pos += 1; // Undo what we did - this is very inelegant
-                     }
-                    // In case we have a negative context, we check to see if the context matched.
-                    // If it did, we schedule a passthrough arc after we've processed epsilons.
-                    bool schedule_passthrough = false;
-                    if((local_stack.top().context == NLC || local_stack.top().context == NRC)
-                       && !local_stack.top().negative_context_success) {
-                        schedule_passthrough = true;
-                    }
-                    local_stack.pop();
-                    if (schedule_passthrough) {
-                        local_stack.top().pending_passthrough = true;
-                    }
-                    ++i;
+                    check_context(input_pos, tape_pos, i);
                 }
             } else {
                 // We *are* checking context and may be done
@@ -891,70 +858,101 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
                     input_pos = local_stack.top().context_placeholder;
                     get_analyses(input_pos, tape_pos, target);
                     local_stack.pop();
-                    ++i;
                 } else {
                     if (local_stack.top().negative_context_success == true) {
-                        ++i;
-                        continue;
-                    }
-                    // Don't alter tapes when checking context
-                    if (input_pos + 1 + local_stack.top().tape_step > 0) {
+                        // We've succeeded in a negative context, just back out
+                        return;
+                    } else if (input_pos + 1 + local_stack.top().tape_step > 0) {
+                        // Don't alter tapes when checking context
                         get_analyses(input_pos + local_stack.top().tape_step, tape_pos, target);
-                        ++i;
                     }
                 }
             }
         } else if (alphabet.is_flag_diacritic(input)) {
-            std::vector<short> old_values(local_stack.top().flag_state.get_values());
-            if (local_stack.top().flag_state.apply_operation(
-                    *(alphabet.get_operation(input)))) {
-                // flag diacritic allowed
-                // generally we shouldn't care to write flags
-//                container->tape.write(tape_pos, input, output);
-                Weight tmp = local_stack.top().running_weight;
-                local_stack.top().running_weight += weight;
-                get_analyses(input_pos, tape_pos, target);
-                local_stack.top().running_weight = tmp;
-            }
-            local_stack.top().flag_state.assign_values(old_values);
-            ++i;
-            // It could be an insert statement... (gee, this function should
-            // probably be refactored
+            take_flag(input, input_pos, tape_pos, i);
         } else if (alphabet.has_rtn(input)) {
-            unsigned int original_tape_pos = tape_pos;
-            unsigned int original_input_pos = input_pos;
-            Weight original_weight = local_stack.top().running_weight;
-            local_stack.top().running_weight += weight;
-
-            // Pass control
-            PmatchTransducer * rtn_target =
-                alphabet.get_rtn(input);
-            rtn_target->rtn_call(input_pos, tape_pos);
-
-            if (tape_pos != original_tape_pos) {
-                // Tape moved, fetch result
-                tape_pos = original_tape_pos;
-                for(DoubleTape::const_iterator it =
-                        rtn_target->get_best_result().begin();
-                    it != rtn_target->get_best_result().end();
-                    ++it) {
-                    container->tape.write(tape_pos++, it->input, it->output);
-                }
-                local_stack.top().running_weight += rtn_target->get_best_weight();
-                rtn_target->rtn_exit();
-                // We're back in this transducer and continue where we left off
-                get_analyses(input_pos, tape_pos, target);
-                // Finally we go back to where we were so the
-                // other possible paths get a shot
-                tape_pos = original_tape_pos;
-                input_pos = original_input_pos;
-                local_stack.top().running_weight = original_weight;
-            }
-            ++i;
+            take_rtn(input, input_pos, tape_pos, i);
         } else { // it's not epsilon and it's not a flag or Ins, so nothing to do
             return;
         }
+        ++i;
     }
+}
+
+void PmatchTransducer::check_context(unsigned int input_pos,
+                                     unsigned int tape_pos,
+                                     TransitionTableIndex i)
+{
+    local_stack.top().context_placeholder = tape_pos;
+    if (local_stack.top().context == LC ||
+        local_stack.top().context == NLC) {
+        // When entering a left context we begin checking not
+        // at the current symbol but the previous one.
+        input_pos -= 1;
+    }
+    if (input_pos + 1 != 0) {
+        // make sure we didn't go beyond the beginning of the tape
+        get_analyses(input_pos, tape_pos, transition_table[i].get_target());
+    }
+    // In case we have a negative context, we check to see if the context matched.
+    // If it did, we schedule a passthrough arc after we've processed epsilons.
+    bool schedule_passthrough = false;
+    if((local_stack.top().context == NLC || local_stack.top().context == NRC)
+       && !local_stack.top().negative_context_success) {
+        schedule_passthrough = true;
+    }
+    local_stack.pop();
+    if (schedule_passthrough) {
+        local_stack.top().pending_passthrough = true;
+    }
+}
+
+void PmatchTransducer::take_rtn(SymbolNumber input,
+                                unsigned int input_pos,
+                                unsigned int tape_pos,
+                                TransitionTableIndex i)
+{
+    unsigned int original_tape_pos = tape_pos;
+    Weight original_weight = local_stack.top().running_weight;
+    local_stack.top().running_weight += transition_table[i].get_weight();
+    // Pass control
+    PmatchTransducer * rtn_target =
+        alphabet.get_rtn(input);
+    rtn_target->rtn_call(input_pos, tape_pos);
+    if (tape_pos != original_tape_pos) {
+        // Tape moved, fetch result
+        tape_pos = original_tape_pos;
+        for(DoubleTape::const_iterator it =
+                rtn_target->get_best_result().begin();
+            it != rtn_target->get_best_result().end();
+            ++it) {
+            container->tape.write(tape_pos++, it->input, it->output);
+        }
+        local_stack.top().running_weight += rtn_target->get_best_weight();
+        rtn_target->rtn_exit();
+        // We're back in this transducer and continue where we left off
+        get_analyses(input_pos, tape_pos, transition_table[i].get_target());
+    }
+    local_stack.top().running_weight = original_weight;
+}
+
+void PmatchTransducer::take_flag(SymbolNumber input,
+                                 unsigned int input_pos,
+                                 unsigned int tape_pos,
+                                 TransitionTableIndex i)
+{
+    std::vector<short> old_values(local_stack.top().flag_state.get_values());
+    if (local_stack.top().flag_state.apply_operation(
+            *(alphabet.get_operation(input)))) {
+        // flag diacritic allowed
+        // generally we shouldn't care to write flags
+//                container->tape.write(tape_pos, input, output);
+        Weight old_weight = local_stack.top().running_weight;
+        local_stack.top().running_weight += transition_table[i].get_weight();
+        get_analyses(input_pos, tape_pos, transition_table[i].get_target());
+        local_stack.top().running_weight = old_weight;
+    }
+    local_stack.top().flag_state.assign_values(old_values);
 }
 
 void PmatchTransducer::take_transitions(SymbolNumber input,
