@@ -807,6 +807,11 @@ void PmatchTransducer::rtn_exit(void)
 void PmatchTransducer::note_analysis(unsigned int input_pos,
                                      unsigned int tape_pos)
 {
+    if (input_pos + 1 == 0) {
+        // Sanity check for tape beyond its limits, this can happen
+        // with left contexts and should be dealt with a bit more nicely
+        return;
+    }
     if ((input_pos > rtn_stack.top().candidate_input_pos) ||
         (input_pos == rtn_stack.top().candidate_input_pos &&
          rtn_stack.top().best_weight > local_stack.top().running_weight)) {
@@ -883,17 +888,14 @@ void PmatchTransducer::check_context(unsigned int input_pos,
                                      unsigned int tape_pos,
                                      TransitionTableIndex i)
 {
-    local_stack.top().context_placeholder = tape_pos;
+    local_stack.top().context_placeholder = input_pos;
     if (local_stack.top().context == LC ||
         local_stack.top().context == NLC) {
         // When entering a left context we begin checking not
         // at the current symbol but the previous one.
         input_pos -= 1;
     }
-    if (input_pos + 1 != 0) {
-        // make sure we didn't go beyond the beginning of the tape
-        get_analyses(input_pos, tape_pos, transition_table[i].get_target());
-    }
+    get_analyses(input_pos, tape_pos, transition_table[i].get_target());
     // In case we have a negative context, we check to see if the context matched.
     // If it did, we schedule a passthrough arc after we've processed epsilons.
     bool schedule_passthrough = false;
@@ -982,7 +984,7 @@ void PmatchTransducer::take_transitions(SymbolNumber input,
                     transition_table[i].get_weight();
                 get_analyses(input_pos + 1, tape_pos + 1, target);
                 local_stack.top().running_weight = tmp;
-            } else if (input_pos + 1 + local_stack.top().tape_step > 0) {
+            } else {
                 // Checking context so don't touch output
                 get_analyses(input_pos + local_stack.top().tape_step, tape_pos, target);
             }
@@ -1005,7 +1007,6 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
         return;
     }
 
-//    std::cerr << alphabet.stringify(container->tape) << std::endl;
     local_stack.top().default_symbol_trap = true;
     take_epsilons(input_pos, tape_pos, i + 1);
     if (local_stack.top().pending_passthrough) {
