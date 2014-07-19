@@ -136,6 +136,8 @@ static char* infinite_end_setf = 0; // print in end of infinite results
 
 static bool print_statistics = false;
 
+static bool show_progress_bar = false;
+
 // predefined formats
 // Xerox:
 // word     word N SG
@@ -225,7 +227,8 @@ print_usage()
             "  -F, --input-format=IFORMAT       Use IFORMAT parsing input\n"
             "  -x, --statistics                 Print statistics\n"
             "  -X, --xfst=VARIABLE              Toggle xfst VARIABLE\n"
-            "  -c, --cycles=INT                 How many times to follow input epsilon cycles\n");
+            "  -c, --cycles=INT                 How many times to follow input epsilon cycles\n"
+            "  -P, --progress                   Show neat progress bar if possible\n");
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out, 
@@ -278,12 +281,13 @@ parse_options(int argc, char** argv)
             {"epsilon-format", required_argument, 0, 'e'},
             {"epsilon-format2", required_argument, 0, 'E'},
             {"pipe-mode", no_argument, 0, 'p'},
+            {"progress", no_argument, 0, 'P'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:p",
+                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:pP",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -384,7 +388,9 @@ parse_options(int argc, char** argv)
         case 'p':
             pipe_mode = true;
             break;
-
+        case 'P':
+            show_progress_bar = true;
+            break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -1440,9 +1446,17 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         }
         free(format_string);
       }
-    
+    long filesize = -1;
+    if (show_progress_bar)
+      {
+        fprintf(stderr, "Counting file size...\n");
+        fseek(lookup_file, 0L, SEEK_END);
+        filesize = ftell(lookup_file);
+        fprintf(stderr, "%ld... rewinding\n", filesize);
+        rewind(lookup_file);
+      }
     print_prompt();
-
+    long filepos = ftell(lookup_file);
     while (hfst_getline(&line, &llen, lookup_file) != -1)
       {
         linen++;
@@ -1457,6 +1471,19 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
             p++;
           }
         verbose_printf("Looking up %s...\n", line);
+        filepos = ftell(lookup_file);
+        if (show_progress_bar)
+          {
+            if (filesize != -1)
+              {
+                fprintf(stderr, "%ld / %ld...\r", filepos, filesize);
+              }
+            else
+              {
+                fprintf(stderr, "%ld / ?...\r", filepos);
+              }
+          }
+
         char* markup = 0;
         bool unknown = false;
         bool infinite = false;
@@ -1497,6 +1524,10 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
 
         print_prompt();
       } // while lines in input
+    if (show_progress_bar) 
+      {
+        fprintf(stderr, "%ld/%ld... Done\n", filepos, filesize);
+      }
     free(line);
     if (print_statistics)
       {
