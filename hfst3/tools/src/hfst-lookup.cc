@@ -1480,7 +1480,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
               }
             else
               {
-                fprintf(stderr, "%ld / ?...\r", filepos);
+                fprintf(stderr, "%ld / ?...\r", linen);
               }
           }
 
