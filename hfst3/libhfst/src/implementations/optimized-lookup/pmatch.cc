@@ -860,16 +860,15 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
                 // We *are* checking context and may be done
                 if (try_exiting_context(output)) {
                     // We've successfully completed a context check
-                    input_pos = local_stack.top().context_placeholder;
-                    get_analyses(input_pos, tape_pos, target);
+                    get_analyses(local_stack.top().context_placeholder, tape_pos, target);
                     local_stack.pop();
                 } else {
                     if (local_stack.top().negative_context_success == true) {
                         // We've succeeded in a negative context, just back out
                         return;
-                    } else if (input_pos + 1 + local_stack.top().tape_step > 0) {
+                    } else {
                         // Don't alter tapes when checking context
-                        get_analyses(input_pos + local_stack.top().tape_step, tape_pos, target);
+                        get_analyses(input_pos, tape_pos, target);
                     }
                 }
             }
