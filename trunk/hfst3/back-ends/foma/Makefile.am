@@ -1,5 +1,7 @@
 AUTOMAKE_OPTIONS=std-options
 
+.NOTPARALLEL:
+
 AM_CPPFLAGS= -Wno-deprecated -std=c99 -D_XOPEN_SOURCE=500
 
 if WANT_MINGW
