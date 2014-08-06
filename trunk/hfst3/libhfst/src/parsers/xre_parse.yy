@@ -881,6 +881,39 @@ REGEXP11: REGEXP12 { }
         | LEFT_BRACKET REGEXP2 RIGHT_BRACKET {
             $$ = & $2->minimize();
         }
+        // [foo]:[bar]
+        | LEFT_BRACKET REGEXP2 RIGHT_BRACKET PAIR_SEPARATOR LEFT_BRACKET REGEXP2 RIGHT_BRACKET {
+            $$ = & $2->cross_product(*$6);
+            delete $6;
+        }
+        // [foo]:{bar}
+        | LEFT_BRACKET REGEXP2 RIGHT_BRACKET PAIR_SEPARATOR CURLY_BRACKETS {
+     	    HfstTransducer * tmp = hfst::xre::xfst_curly_label_to_transducer($5,$5);
+            free($5);
+            $$ = & $2->cross_product(*tmp);
+            delete tmp;
+        }
+        // {foo}:[bar]
+        | CURLY_BRACKETS PAIR_SEPARATOR LEFT_BRACKET REGEXP2 RIGHT_BRACKET {
+     	    HfstTransducer * tmp = hfst::xre::xfst_curly_label_to_transducer($1,$1);
+            free($1);
+            $$ = & $4->cross_product(*tmp);
+            delete tmp;
+        }
+        // [foo]:bar
+        | LEFT_BRACKET REGEXP2 RIGHT_BRACKET PAIR_SEPARATOR HALFARC {
+            HfstTransducer * tmp = hfst::xre::expand_definition($5);
+            free($5);
+            $$ = & $2->cross_product(*tmp);
+            delete tmp;
+        }
+        // foo:[bar]
+        | HALFARC PAIR_SEPARATOR LEFT_BRACKET REGEXP2 RIGHT_BRACKET {
+            $$ = hfst::xre::expand_definition($1);
+            free($1);
+            $$ = & $$->cross_product(*$4);
+            delete $4;
+        }
         | LEFT_BRACKET REGEXP2 RIGHT_BRACKET WEIGHT {
             $$ = & $2->set_final_weights($4, true).minimize();
         }
@@ -1085,14 +1118,20 @@ LABEL: HALFARC {
 	$$ = hfst::xre::xfst_label_to_transducer(hfst::internal_unknown.c_str(), hfst::internal_unknown.c_str());
      }
      | HALFARC PAIR_SEPARATOR CURLY_BRACKETS {
-     	$$ = hfst::xre::xfst_curly_label_to_transducer($1,$3);
+        $$ = hfst::xre::xfst_label_to_transducer($1,$1);
         free($1);
+        HfstTransducer * tmp = hfst::xre::xfst_curly_label_to_transducer($3,$3);
         free($3);
+        $$ = & $$->cross_product(*tmp);
+        delete tmp;
      }
      | CURLY_BRACKETS PAIR_SEPARATOR HALFARC {
-     	$$ = hfst::xre::xfst_curly_label_to_transducer($1,$3);
-        free($1);
+        HfstTransducer * tmp = hfst::xre::xfst_label_to_transducer($3,$3);
         free($3);
+        $$ = hfst::xre::xfst_curly_label_to_transducer($1,$1);
+        free($1);
+        $$ = & $$->cross_product(*tmp);
+        delete tmp;
      }
      | CURLY_BRACKETS {
      	$$ = hfst::xre::xfst_curly_label_to_transducer($1,$1);
