@@ -3561,7 +3561,8 @@ HfstTransducer &HfstTransducer::lenient_composition( const HfstTransducer &anoth
     }
 
     HfstTransducer retval(*this);
-    retval.compose(another).minimize().priority_union(*this).minimize();
+    // true is a dummy variable, false means do not encode epsilons
+    retval.compose(another).minimize().priority_union(*this, true, false).minimize();
 
     *this = retval;
     return *this;
@@ -3794,7 +3795,7 @@ HfstTransducer &HfstTransducer::shuffle(const HfstTransducer &another, bool)
 
 
 
-HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another, bool)
+HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another, bool, bool encode_epsilons)
 {
     if ( this->type != another.type )
     {
@@ -3810,7 +3811,20 @@ HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another, b
     tmp.invert().compose(t1).invert().minimize();
     //  Compose t1 with the result to get the pairs which need to be filtered from t2.
     HfstTransducer filter(t1);
+
+    // handle epsilons
+    if (encode_epsilons)
+      {
+        filter.substitute("@_EPSILON_SYMBOL_@", "@EPS@");
+        tmp.substitute("@_EPSILON_SYMBOL_@", "@EPS@");
+      }
+
     filter.compose(tmp).minimize();
+
+    if (encode_epsilons)
+      {
+        filter.substitute("@EPS@", "@_EPSILON_SYMBOL_@");
+      }
 
     // Subtract filter from t2
     retval.subtract(filter).minimize();

@@ -1283,7 +1283,7 @@ ccc : ddd
      *
      * For more information, read: www.fsmbook.com
      *  */
-    HfstTransducer &priority_union(const HfstTransducer &another, bool harmonize=true);
+    HfstTransducer &priority_union(const HfstTransducer &another, bool harmonize=true, bool encode_epsilons=true);
 
 
     /**  \brief Make lenient composition of this transducer with \a.
