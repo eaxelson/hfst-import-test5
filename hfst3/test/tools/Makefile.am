@@ -301,7 +301,9 @@ LEXC_TXTS=basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc \
 		  xre.numeric-star.lexc xre.sharp.lexc xre.quotations.lexc \
 		  xre.star-plus-optional.lexc basic.lowercase-lexicon-end.lexc \
 		  basic.multichar-flag-with-zero.lexc basic.almost-reserved-words.lexc \
-		  basic.regexps.lexc no-newline-before-sublexicon.lexc
+		  basic.regexps.lexc no-newline-before-sublexicon.lexc \
+		  warn.sublexicon-mentioned-but-not-defined.lexc
+
 #XFST_TXTS=cat-regex.xfst
 ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
 		$(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TEXTS) \
@@ -404,7 +406,9 @@ xre.sharp.lexc.result \
 xre.star-plus-optional.lexc.flag.result \
 xre.star-plus-optional.lexc.result \
 no-newline-before-sublexicon.lexc.flag.result \
-no-newline-before-sublexicon.lexc.result
+no-newline-before-sublexicon.lexc.result \
+warn.sublexicon-mentioned-but-not-defined.flag.result \
+warn.sublexicon-mentioned-but-not-defined.result
 
 # files needed for test programs
 EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS) $(TESTS) $(EXTRA_FILES) $(LEXC_TXTS) $(PMATCH_TXTS) script.xfst lexc2fst-stress.sh lookup-stress.sh proc-stress.sh valgrind.sh \

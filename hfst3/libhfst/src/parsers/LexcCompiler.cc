@@ -76,6 +76,7 @@ LexcCompiler* lexc_ = 0;
 LexcCompiler::LexcCompiler() :
     quiet_(false),
     verbose_(false),
+    treat_warnings_as_errors_(false),
     format_(TROPICAL_OPENFST_TYPE),
     xre_(TROPICAL_OPENFST_TYPE),
     initialLexiconName_("Root"),
@@ -90,6 +91,7 @@ LexcCompiler::LexcCompiler() :
 LexcCompiler::LexcCompiler(ImplementationType impl) :
     quiet_(false),
     verbose_(false),
+    treat_warnings_as_errors_(false),
     format_(impl),
     xre_(impl),
     initialLexiconName_("Root"),
@@ -111,6 +113,7 @@ LexcCompiler::LexcCompiler(ImplementationType impl) :
 LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags) :
     quiet_(false),
     verbose_(false),
+    treat_warnings_as_errors_(false),
     format_(impl),
     xre_(impl),
     initialLexiconName_("Root"),
@@ -178,6 +181,14 @@ LexcCompiler::setVerbosity(bool verbose)
     verbose_ = verbose;
     return *this;
 }
+
+LexcCompiler&
+LexcCompiler::setTreatWarningsAsErrors(bool value)
+{
+    treat_warnings_as_errors_ = value;
+    return *this;
+}
+
 
 LexcCompiler&
 LexcCompiler::addNoFlag(const string& lexname)
@@ -529,7 +540,14 @@ LexcCompiler::compileLexical()
       {
         return 0;
       }
-    printConnectedness();
+
+    bool warnings_generated = false;
+    printConnectedness(warnings_generated);
+    if (warnings_generated && treat_warnings_as_errors_)
+      {
+        if (!quiet_) fprintf(stderr, "*** ERROR: could not parse lexc file: treating warnings as errors [--Werror] ***\n");
+        return 0;
+      }
 /*
     if( with_flags_)
         fprintf(stderr, "With Flags \n \n");
@@ -900,9 +918,9 @@ LexcCompiler::compileLexical()
 
 
 const LexcCompiler&
-LexcCompiler::printConnectedness() const
+LexcCompiler::printConnectedness(bool & warnings_generated) const
 {
-    if (!quiet_ && (lexiconNames_ != continuations_))
+  if (/* !quiet_ && */ (lexiconNames_ != continuations_))
     {
         vector<string> lexMinusCont = vector<string>(lexiconNames_.size());
         vector<string> contMinusLex = vector<string>(continuations_.size());
@@ -919,20 +937,28 @@ LexcCompiler::printConnectedness() const
             for (vector<string>::iterator s = contMinusLex.begin();
                     s != contMinusLexEnd; ++s)
             {
-                fprintf(stderr,
-                    "*** ERROR: Sublexicon is mentioned but not defined."
-                    " (%s) ***\n\n", s->c_str());
+              if (!quiet_)
+                {
+                  fprintf(stderr,
+                          "Warning: Sublexicon is mentioned but not defined."
+                          " (%s) \n", s->c_str());
+                }
+              warnings_generated = true;
             }
         }
         if (lexMinusContEnd - lexMinusCont.begin() > 0)
         {
-            fprintf(stderr, "Sublexicons defined but not used\n");
-            for (vector<string>::iterator s = lexMinusCont.begin();
-                    s != lexMinusContEnd; ++s)
+          warnings_generated = true;
+          if (!quiet_)
             {
-                fprintf(stderr, "%s ", s->c_str());
+              fprintf(stderr, "Warning: Sublexicons defined but not used\n");
+              for (vector<string>::iterator s = lexMinusCont.begin();
+                   s != lexMinusContEnd; ++s)
+                {
+                  fprintf(stderr, "%s ", s->c_str());
+                }
+              fprintf(stderr, "\n");
             }
-            fprintf(stderr, "\n");
         }
     }
     return *this;
