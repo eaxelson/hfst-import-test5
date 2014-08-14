@@ -19,7 +19,8 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
           xre.definitions.lexc xre.months.lexc xre.nested-definitions.lexc 
           xre.numeric-star.lexc xre.sharp.lexc xre.quotations.lexc
           xre.star-plus-optional.lexc
-          xre.any-variations.lexc"
+          xre.any-variations.lexc
+          no-newline-before-sublexicon.lexc"
 
           # basic.end.lexc -hfst doesn't parse till end
           # xre.any-variations.lexc -foma ?:? problem
