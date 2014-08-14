@@ -107,7 +107,7 @@ LWSP [\r\n\t ]
     return DEFINITIONS_START;
 }
 
-<INITIAL,MULTICHARS,NOFLAGS,DEFINITIONS>^{WSP}*("LEXICON"){WSP}+{LEXICONNAME} {
+<INITIAL,MULTICHARS,NOFLAGS,DEFINITIONS>{WSP}*("LEXICON"){WSP}+{LEXICONNAME} {
     BEGIN LEXICONS;
     hfst::lexc::token_update_positions(hlexctext);
     char* lexicon_start;
@@ -118,7 +118,7 @@ LWSP [\r\n\t ]
     return LEXICON_START;
 }
 
-<INITIAL,MULTICHARS,NOFLAGS,DEFINITIONS>^{WSP}*("Lexicon"){WSP}+{LEXICONNAME} {
+<INITIAL,MULTICHARS,NOFLAGS,DEFINITIONS>{WSP}*("Lexicon"){WSP}+{LEXICONNAME} {
     BEGIN LEXICONS;
     hfst::lexc::token_update_positions(hlexctext);
     char* lexicon_start;
@@ -181,7 +181,7 @@ LWSP [\r\n\t ]
 
 <DEFINITIONS>{LWSP} { hfst::lexc::token_update_positions(hlexctext); }
 
-<LEXICONS>^{WSP}*"LEXICON"{WSP}+{LEXICONNAME} {
+<LEXICONS>{WSP}*"LEXICON"{WSP}+{LEXICONNAME} {
     hfst::lexc::token_update_positions(hlexctext);
     char* lexicon_start;
     lexicon_start = hfst::lexc::strstrip(hlexctext);
