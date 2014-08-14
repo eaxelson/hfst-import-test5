@@ -69,6 +69,8 @@ class LexcCompiler
   //! lexc compiler does.
   LexcCompiler& setVerbosity(bool verbose);
 
+  LexcCompiler& setTreatWarningsAsErrors(bool value);
+
   //! @brief add @a alphabet to multicharacter symbol set.
   //! These symbolse may be used for regular expression ? for backends that do
   //! not support open alphabets.
@@ -119,13 +121,14 @@ class LexcCompiler
 
   //! @brief check that current morphotax is connected and print anomalies.
   //! Works like xerox lexc, for compatibility.
-  const LexcCompiler& printConnectedness() const;
+  const LexcCompiler& printConnectedness(bool & warnings_printed) const;
 
 
   private:
   bool quiet_;
   bool verbose_;
   bool with_flags_;
+  bool treat_warnings_as_errors_;
 
   hfst::ImplementationType format_;
   hfst::HfstTokenizer tokenizer_;

@@ -32,6 +32,8 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
           
 LEXCXFAIL="xfail.bogus.lexc xfail.ISO-8859-1.lexc xfail.lexicon-semicolon.lexc"
 
+LEXCWARN="warn.sublexicon-mentioned-but-not-defined.lexc"
+
 if test "$srcdir" = ""; then
     srcdir="./"
 fi
@@ -77,7 +79,7 @@ for i in .sfst .ofst .foma ; do
         fi
         rm test
     fi
-    for f in $LEXCTESTS ; do
+    for f in $LEXCTESTS $LEXCWARN ; do
         
         #check non-flag result
         if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/$f -o test 2> /dev/null; then
@@ -130,6 +132,14 @@ for i in .sfst .ofst .foma ; do
         
         
     done
+
+    for f in $LEXCWARN ; do
+        if $TOOLDIR/hfst-lexc --Werror $FFLAG $srcdir/$f -o test 2> /dev/null; then
+            echo lexc $FFLAG $f passed although --Werror was used
+            exit 1
+        fi        
+    done
+
     if ! $TOOLDIR/hfst-lexc $FFLAG $srcdir/basic.multi-file-1.lexc \
         $srcdir/basic.multi-file-2.lexc \
         $srcdir/basic.multi-file-3.lexc -o test 2> /dev/null; then
