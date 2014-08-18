@@ -561,9 +561,9 @@ LexcCompiler::compileLexical()
     lexicons.minimize();
 
 
-
-  // printf("lexicons: \n");
-  // lexicons.write_in_att_format(stdout, 1);
+    // DEBUG
+    //fprintf(stderr, "lexicons: \n");
+    //lexicons.write_in_att_format(stderr, 1);
 
 
     // repeat star to overgenerate
@@ -731,7 +731,7 @@ LexcCompiler::compileLexical()
             StringPairVector newVector(tokenizer_.tokenize(flagPstring + flagRstring));
             joinersTrie_.disjunct(newVector, 0);
         }
-      }
+    }
 
 
         /// get right side of every pair
@@ -832,6 +832,50 @@ LexcCompiler::compileLexical()
             //lexicons.prune_alphabet();
         }
 
+        // Tentative: CONSECUTIVE FLAG FILTER
+        /*
+        if (with_flags_)
+          {
+            std::string flag_remover_regexp("[ ");
+            for (std::map<std::string, std::string>::const_iterator it 
+                   = allSubstitutions.begin(); it != allSubstitutions.end(); it++)
+              {
+                //fprintf(stderr, "%s   ->   %s\n", it->first.c_str(), it->second.c_str());
+                if (it != allSubstitutions.begin())
+                  {
+                    flag_remover_regexp.append("| ");
+                  }
+                flag_remover_regexp.append("\"").append(it->first).append("\" ");
+              }
+            flag_remover_regexp.append("]");
+            std::string context_regexp(flag_remover_regexp);
+            flag_remover_regexp.append(" -> 0 || _ ").append(context_regexp);
+            
+            // DEBUG
+            //fprintf(stderr, "flag_remover_regexp: %s\n", flag_remover_regexp.c_str());
+            
+            hfst::xre::XreCompiler xre_comp(format_);
+            HfstTransducer * flag_filter = xre_comp.compile(flag_remover_regexp);
+            HfstTransducer * inverted_flag_filter = new HfstTransducer(*flag_filter);
+            inverted_flag_filter->invert();
+            
+            //fprintf(stderr, "flag_filter:\n");
+            //flag_filter->write_in_att_format(stderr, 1);
+            
+            //fprintf(stderr, "inverted flag_filter:\n");
+            //inverted_flag_filter->write_in_att_format(stderr, 1);
+            
+            HfstTransducer filtered_lexicons(*inverted_flag_filter);
+            filtered_lexicons.harmonize_flag_diacritics(lexicons);
+            filtered_lexicons.compose(lexicons, true);
+            filtered_lexicons.harmonize_flag_diacritics(*flag_filter);
+            filtered_lexicons.compose(*flag_filter, true).minimize();
+            
+            //fprintf(stderr, "filtered_lexicons:\n");
+            //filtered_lexicons.write_in_att_format(stderr, 1);
+            
+            lexicons = filtered_lexicons;
+            }*/
 
         lexicons.substitute(allSubstitutions).minimize();
         lexicons.prune_alphabet();
@@ -892,6 +936,7 @@ LexcCompiler::compileLexical()
             regMarkToTr[alph] = btr;
             //lexicons.substitute(StringPair(alph, alph), *it->second, true).minimize();
         }
+      
 
         HfstBasicTransducer lexicons_basic(lexicons);
         lexicons_basic.substitute(regMarkToTr, true);
