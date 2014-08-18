@@ -480,7 +480,7 @@ class PmatchContainer {
     std::string locate(std::string input);
 
     // From hfst_swig_extensions
-//    hfst_ol::PmatchContainer load_pmatch(std::string filename);
+    hfst_ol::PmatchContainer load_pmatch(std::string filename);
 };
 }
 
