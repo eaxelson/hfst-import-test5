@@ -19,6 +19,7 @@
 #include "parsers/XreCompiler.h"
 #include "hfst_swig_extensions.h"
 #include "HfstExceptionDefs.h"
+#include "implementations/optimized-lookup/pmatch.h"
 %}
 
 
@@ -242,6 +243,7 @@ public:
 
 }
 
+// From hfst_swig_extensions.h
 std::vector<std::pair <float, std::vector<std::string> > > vectorize(hfst::HfstOneLevelPaths * olps);
 std::vector<std::pair <float, std::vector<std::pair<std::string, std::string> > > > vectorize(hfst::HfstTwoLevelPaths tlps);
 std::vector<std::pair <float, std::vector<std::string> > > purge_flags(std::vector<std::pair<float, std::vector<std::string> > > olpv);
@@ -251,7 +253,6 @@ std::vector<HfstPath> detokenize_and_purge_paths(hfst::HfstOneLevelPaths * olps)
 std::vector<HfstPath> detokenize_vector(TwoLevelPathVector tlpv);
 std::vector<HfstPath> detokenize_paths(hfst::HfstTwoLevelPaths tlps);
 std::vector<HfstPath> detokenize_and_purge_paths(hfst::HfstTwoLevelPaths tlps);
-
 
 class HfstInputStream{
 public:
@@ -416,7 +417,7 @@ public:
     hfst::HfstTransducer * compileLexical();
     //const std::map<std::string,hfst::HfstTransducer>& getStringTries() const;
     //const std::map<std::string,hfst::HfstTransducer>& getRegexpUnions() const;
-    const LexcCompiler& printConnectedness() const;
+    const LexcCompiler& printConnectedness(bool & warnings) const;
   };
   };
 
@@ -469,6 +470,18 @@ public:
     static bool is_diacritic(const std::string& diacritic_str);
 };
 
+}
+
+namespace hfst_ol
+{
+class PmatchContainer {
+    PmatchContainer(std::ifstream filename, bool verbose=false, bool extract_tags=false);
+    std::string match(std::string input);
+    std::string locate(std::string input);
+
+    // From hfst_swig_extensions
+//    hfst_ol::PmatchContainer load_pmatch(std::string filename);
+};
 }
 
 
