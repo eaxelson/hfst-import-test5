@@ -1,9 +1,12 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <iostream>
+#include <fstream>
 #include "HfstDataTypes.h"
 #include "HfstTransducer.h"
 #include "HfstFlagDiacritics.h"
+#include "implementations/optimized-lookup/pmatch.h"
 
 // NO EFFECT in Swig...
 // Make sure that all standard streams are in binary mode.
@@ -176,5 +179,11 @@ namespace hfst {
   {
     return detokenize_vector(purge_flags(vectorize(htlps)));
   }
-  
+
+}
+
+hfst_ol::PmatchContainer load_pmatch(std::string filename)
+{
+    std::ifstream instream(filename.c_str());
+    return hfst_ol::PmatchContainer(instream);
 }
