@@ -116,6 +116,7 @@ namespace hfst_ol {
 
         PmatchContainer(std::istream & is, bool _verbose = false,
                         bool extract_tags = false);
+        PmatchContainer(void);
         ~PmatchContainer(void);
 
         long line_number;

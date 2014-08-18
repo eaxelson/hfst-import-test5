@@ -182,8 +182,8 @@ namespace hfst {
 
 }
 
-hfst_ol::PmatchContainer load_pmatch(std::string filename)
+hfst_ol::PmatchContainer & load_pmatch(std::string filename)
 {
     std::ifstream instream(filename.c_str());
-    return hfst_ol::PmatchContainer(instream);
+    return * (new hfst_ol::PmatchContainer(instream));
 }

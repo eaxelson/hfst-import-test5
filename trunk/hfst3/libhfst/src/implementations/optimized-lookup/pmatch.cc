@@ -184,6 +184,11 @@ PmatchContainer::PmatchContainer(std::istream & inputstream,
 
 }
 
+PmatchContainer::PmatchContainer(void)
+{
+    // Not used, but apparently needed by swig to construct these
+}
+
 bool PmatchAlphabet::is_end_tag(const std::string & symbol)
 {
     return symbol.find("@PMATCH_ENDTAG_") == 0 &&
@@ -428,6 +433,9 @@ std::string PmatchAlphabet::stringify(const DoubleTape & str)
 LocationVector PmatchAlphabet::locatefy(const DoubleTape & str)
 {
     LocationVector retval;
+    // We rebuild the original input without special
+    // symbols but with IDENTITIES etc. replaced
+    SymbolNumberVector orig_input;
     std::stack<unsigned int> start_tag_pos;
     std::stack<std::string> patterns;
     patterns.push("");
@@ -457,9 +465,9 @@ LocationVector PmatchAlphabet::locatefy(const DoubleTape & str)
             location.start = pat_pos;
             location.length = tape_pos - pat_pos;
             location.input = "";
-            for(DoubleTape::const_iterator input_it = str.begin() + pat_pos;
-                input_it != str.begin() + tape_pos; ++input_it) {
-                location.input.append(string_from_symbol(input_it->input));
+            for(SymbolNumberVector::const_iterator input_it = orig_input.begin() + pat_pos;
+                input_it != orig_input.begin() + tape_pos; ++input_it) {
+                location.input.append(string_from_symbol(*input_it));
             }
             location.output = pat;
             location.tag = tag;
@@ -476,6 +484,7 @@ LocationVector PmatchAlphabet::locatefy(const DoubleTape & str)
                 input = 0;
             }
             if (input != 0) {
+                orig_input.push_back(input);
                 ++tape_pos;
             }
             if (start_tag_pos.size() != 0) {
