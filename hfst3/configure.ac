@@ -338,6 +338,12 @@ AC_ARG_ENABLE([pmatch],
 			  [enable_pmatch=$enableval],
 			  [if test x$enable_no_tools != xno; then enable_pmatch=no; else enable_pmatch=yes; fi])
 AM_CONDITIONAL([WANT_PMATCH], [test x$enable_pmatch != xno])
+AC_ARG_ENABLE([proc2],
+			  [AS_HELP_STRING([--enable-proc2],
+							  [build proc2 tokenizing tool @<:@default=yes@:>@])],
+			  [enable_proc2=$enableval],
+			  [if test x$enable_no_tools != xno; then enable_proc2=no; else enable_proc2=yes; fi])
+AM_CONDITIONAL([WANT_PROC2], [test x$enable_proc2 != xno])
 AC_ARG_ENABLE([project],
 			  [AS_HELP_STRING([--enable-project],
 							  [build project tool @<:@default=yes@:>@])],
@@ -764,6 +770,7 @@ cat <<EOF
     *                 name: $enable_name
     *                 optimized-lookup: $enable_optimized_lookup
     *                 pmatch: $enable_pmatch
+    *                 proc2: $enable_proc2
     *                 proc: $enable_proc
     *                 project: $enable_project
     *                 prune-alphabet: $enable_prune_alphabet
