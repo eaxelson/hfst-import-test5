@@ -472,18 +472,17 @@ public:
 
 }
 
-namespace hfst_ol
-{
+namespace hfst_ol{
 class PmatchContainer {
-    PmatchContainer(std::ifstream filename, bool verbose=false, bool extract_tags=false);
+public:
+//    PmatchContainer(std::ifstream filename, bool verbose=false, bool extract_tags=false);
     std::string match(std::string input);
-    std::string locate(std::string input);
+//    std::string locate(std::string input);
 
     // From hfst_swig_extensions
-    hfst_ol::PmatchContainer load_pmatch(std::string filename);
 };
 }
-
+hfst_ol::PmatchContainer & load_pmatch(std::string filename);
 
 %pythoncode %{
 def lookup_clean(transducer, string):
