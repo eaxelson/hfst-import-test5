@@ -10,10 +10,13 @@ namespace hfst_ol {
 
     class PmatchTransducer;
     class PmatchContainer;
+    class Location;
 
     const unsigned int PMATCH_MAX_RECURSION_DEPTH = 5000;
     
     typedef std::map<SymbolNumber, PmatchTransducer *> RtnMap;
+    typedef std::vector<Location> LocationVector;
+            
     
     enum SpecialSymbol{entry,
                        exit,
@@ -87,7 +90,7 @@ namespace hfst_ol {
         SymbolNumber get_special(SpecialSymbol special) const;
         SymbolNumberVector get_specials(void) const;
         std::string stringify(const DoubleTape & str);
-        std::string locatefy(const DoubleTape & str);
+        LocationVector locatefy(const DoubleTape & str);
 
         friend class PmatchTransducer;
         friend class PmatchContainer;
@@ -122,7 +125,7 @@ namespace hfst_ol {
         std::string get_unsatisfied_rtn_name(void) const;
         void process(std::string & input);
         std::string match(std::string & input);
-        std::string locate(std::string & input);
+        LocationVector locate(std::string & input);
         bool has_queued_input(unsigned int input_pos);
         bool not_possible_first_symbol(SymbolNumber sym)
         {
@@ -135,7 +138,7 @@ namespace hfst_ol {
         void copy_to_output(const DoubleTape & best_result);
         void copy_to_output(SymbolNumber input, SymbolNumber output);
         std::string stringify_output(void);
-        std::string locatefy_output(void);
+        LocationVector locatefy_output(void);
         static std::string parse_name_from_hfst3_header(std::istream & f);
         void be_verbose(void) { verbose = true; }
         bool is_verbose(void) { return verbose; }
@@ -152,6 +155,15 @@ namespace hfst_ol {
         void reset_recursion(void) { recursion_depth_left = PMATCH_MAX_RECURSION_DEPTH; }
 
         friend class PmatchTransducer;
+    };
+
+    struct Location
+    {
+        unsigned int start;
+        unsigned int length;
+        std::string input;
+        std::string output;
+        std::string tag;
     };
 
     struct ContextMatchedTrap

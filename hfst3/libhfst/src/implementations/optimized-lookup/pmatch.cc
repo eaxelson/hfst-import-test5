@@ -362,7 +362,7 @@ std::string PmatchContainer::match(std::string & input)
     return stringify_output();
 }
 
-std::string PmatchContainer::locate(std::string & input)
+LocationVector PmatchContainer::locate(std::string & input)
 {
     process(input);
     return locatefy_output();
@@ -386,7 +386,7 @@ std::string PmatchContainer::stringify_output(void)
     return alphabet.stringify(output);
 }
 
-std::string PmatchContainer::locatefy_output(void)
+LocationVector PmatchContainer::locatefy_output(void)
 {
     return alphabet.locatefy(output);
 }
@@ -425,9 +425,9 @@ std::string PmatchAlphabet::stringify(const DoubleTape & str)
     return retval;
 }
 
-std::string PmatchAlphabet::locatefy(const DoubleTape & str)
+LocationVector PmatchAlphabet::locatefy(const DoubleTape & str)
 {
-    std::string retval;
+    LocationVector retval;
     std::stack<unsigned int> start_tag_pos;
     std::stack<std::string> patterns;
     patterns.push("");
@@ -451,12 +451,22 @@ std::string PmatchAlphabet::locatefy(const DoubleTape & str)
                 std::cerr << "Warning: end tag without start tag\n";
             }
             unsigned int pat_pos = start_tag_pos.top();
-            unsigned int len = tape_pos - pat_pos;
             std::string pat = patterns.top();
             std::string tag = start_tag(output);
-            std::stringstream ss;
-            ss << pat_pos << "|" << len << "|" << pat << "|" << tag << "\n";
-            retval.append(ss.str());
+            Location location;
+            location.start = pat_pos;
+            location.length = tape_pos - pat_pos;
+            location.input = "";
+            for(DoubleTape::const_iterator input_it = str.begin() + pat_pos;
+                input_it != str.begin() + tape_pos; ++input_it) {
+                location.input.append(string_from_symbol(input_it->input));
+            }
+            location.output = pat;
+            location.tag = tag;
+            retval.push_back(location);
+//            std::stringstream ss;
+//            ss << pat_pos << "|" << len << "|" << pat << "|" << tag << "\n";
+//            retval.append(ss.str());
         } else {
             if (output == special_symbols[boundary]
                 || is_flag_diacritic(output)) {

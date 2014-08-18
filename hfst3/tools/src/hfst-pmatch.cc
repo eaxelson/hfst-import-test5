@@ -87,7 +87,12 @@ void match_and_print(hfst_ol::PmatchContainer & container,
     if (!locate_mode) {
         outstream << container.match(input_text);
     } else {
-        outstream << container.locate(input_text);
+        hfst_ol::LocationVector locations = container.locate(input_text);
+        for(hfst_ol::LocationVector::const_iterator it = locations.begin();
+            it != locations.end(); ++it) {
+            outstream << it->start << "|" << it->length << "|" << it->output
+                      << "|" << it->tag << std::endl;
+        }
     }
     outstream << std::endl;
 }
