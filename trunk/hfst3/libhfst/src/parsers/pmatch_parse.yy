@@ -979,7 +979,7 @@ REGEXP12: LABEL { }
         hfst::HfstInputStream instream($1);
         $$ = new HfstTransducer(instream);
         instream.close();
-    } catch(NotTransducerStreamException) {
+    } catch(HfstException) {
         std::string ermsg =
             std::string("Couldn't read transducer from ") +
             std::string($1);
