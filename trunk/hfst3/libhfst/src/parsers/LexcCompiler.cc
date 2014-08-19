@@ -832,51 +832,6 @@ LexcCompiler::compileLexical()
             //lexicons.prune_alphabet();
         }
 
-        // Tentative: CONSECUTIVE FLAG FILTER
-        /*
-        if (with_flags_)
-          {
-            std::string flag_remover_regexp("[ ");
-            for (std::map<std::string, std::string>::const_iterator it 
-                   = allSubstitutions.begin(); it != allSubstitutions.end(); it++)
-              {
-                //fprintf(stderr, "%s   ->   %s\n", it->first.c_str(), it->second.c_str());
-                if (it != allSubstitutions.begin())
-                  {
-                    flag_remover_regexp.append("| ");
-                  }
-                flag_remover_regexp.append("\"").append(it->first).append("\" ");
-              }
-            flag_remover_regexp.append("]");
-            std::string context_regexp(flag_remover_regexp);
-            flag_remover_regexp.append(" -> 0 || _ ").append(context_regexp);
-            
-            // DEBUG
-            //fprintf(stderr, "flag_remover_regexp: %s\n", flag_remover_regexp.c_str());
-            
-            hfst::xre::XreCompiler xre_comp(format_);
-            HfstTransducer * flag_filter = xre_comp.compile(flag_remover_regexp);
-            HfstTransducer * inverted_flag_filter = new HfstTransducer(*flag_filter);
-            inverted_flag_filter->invert();
-            
-            //fprintf(stderr, "flag_filter:\n");
-            //flag_filter->write_in_att_format(stderr, 1);
-            
-            //fprintf(stderr, "inverted flag_filter:\n");
-            //inverted_flag_filter->write_in_att_format(stderr, 1);
-            
-            HfstTransducer filtered_lexicons(*inverted_flag_filter);
-            filtered_lexicons.harmonize_flag_diacritics(lexicons);
-            filtered_lexicons.compose(lexicons, true);
-            filtered_lexicons.harmonize_flag_diacritics(*flag_filter);
-            filtered_lexicons.compose(*flag_filter, true).minimize();
-            
-            //fprintf(stderr, "filtered_lexicons:\n");
-            //filtered_lexicons.write_in_att_format(stderr, 1);
-            
-            lexicons = filtered_lexicons;
-            }*/
-
         lexicons.substitute(allSubstitutions).minimize();
         lexicons.prune_alphabet();
 
@@ -945,8 +900,6 @@ LexcCompiler::compileLexical()
 
         lexicons_basic.prune_alphabet();
 
-
-
 /*
         printf("lexicons after substitute: \n");
         lexicons_basic.write_in_att_format(stdout, 1);
@@ -956,6 +909,107 @@ LexcCompiler::compileLexical()
 
 
     HfstTransducer* rv = new HfstTransducer(lexicons_basic, format_);
+
+    // Preserve only first flag of consecutive P and R lexname flag series, 
+    // e.g. change P.LEXNAME.1 R.LEXNAME.1 P.LEXNAME.2 R.LEXNAME.2 into P.LEXNAME.1 
+
+    // TODO:
+    // This piece of code should work, but it is commented out until expected results 
+    // from all lexc tests have been changed so that they do not contain flag series.
+        
+    if (/*with_flags_*/ false)
+          {
+
+            // To substitute "@[P|R].LEXNAME...@" with "$[P|R].LEXNAME...$" and vice versa. 
+            std::map<String, String> flag_substitutions;             // @ -> $
+            std::map<String, String> reverse_flag_substitutions;     // $ -> @
+
+            StringSet transducerAlphabet = rv->get_alphabet();
+            for (StringSet::const_iterator s = transducerAlphabet.begin();
+                 s != transducerAlphabet.end();
+                 ++s)
+            {
+              String alph = *s;
+              String alph10 = alph.substr(0,10);
+              if ( alph10 == "@P.LEXNAME" || alph10 == "@R.LEXNAME" )  
+                {
+                  replace(alph.begin(), alph.end(), '@', '$');
+                  //fprintf(stderr, "flag found:\t\t%s\t->\t%s\n", s->c_str(), alph.c_str());
+                  flag_substitutions[*s] = alph;
+                  reverse_flag_substitutions[alph] = *s;
+                }
+              else
+                {
+                  //fprintf(stderr, "other found:\t\t%s\n", alph.c_str());
+                }
+            }
+
+            // Substitute "@[P|R].LEXNAME...@" with "$[P|R].LEXNAME...$"
+            rv->substitute(flag_substitutions);
+
+            //fprintf(stderr, "rv:\n");
+            //rv->write_in_att_format(stderr, 1);
+            //fprintf(stderr, "--\n");
+
+            
+            // Construct a rule for consecutive flag removal: 
+            // [FLAG1 | FLAG2 ... FLAGN] -> 0 || [FLAG1 | FLAG2 ... FLAGN] _
+            // and also an inverted rule
+            std::string flag_remover_regexp("[ ");
+            bool first_flag = true;
+            for (std::map<String, String>::const_iterator it 
+                   = flag_substitutions.begin(); it != flag_substitutions.end(); it++)
+              {
+                //fprintf(stderr, "adding flag to rule:\t%s\n", it->second.c_str());
+                if (!first_flag)
+                      {
+                        flag_remover_regexp.append("| ");
+                      }
+                flag_remover_regexp.append("\"").append(it->second).append("\" ");
+                first_flag = false;
+              }
+            flag_remover_regexp.append("]");
+            std::string context_regexp(flag_remover_regexp);
+            flag_remover_regexp.append(" -> 0 || ").append(context_regexp).append(" _ ");
+            
+            // DEBUG
+            //fprintf(stderr, "flag_remover_regexp: %s\n", flag_remover_regexp.c_str());
+            
+            hfst::xre::XreCompiler xre_comp(format_);
+            HfstTransducer * flag_filter = xre_comp.compile(flag_remover_regexp);
+            flag_filter->minimize();
+            HfstTransducer * inverted_flag_filter = new HfstTransducer(*flag_filter);
+            inverted_flag_filter->invert().minimize();
+            
+            //fprintf(stderr, "flag_filter:\n");
+            //flag_filter->write_in_att_format(stderr, 1);
+            //fprintf(stderr, "--\n");            
+
+            //fprintf(stderr, "inverted flag_filter:\n");
+            //inverted_flag_filter->write_in_att_format(stderr, 1);
+            //fprintf(stderr, "--\n");            
+            
+
+            // [ [FLAG1 | FLAG2 ... FLAGN] -> 0 || [FLAG1 | FLAG2 ... FLAGN] _ ].inv
+            //                        .o.
+            //                       RESULT
+            //                        .o. 
+            // [FLAG1 | FLAG2 ... FLAGN] -> 0 || [FLAG1 | FLAG2 ... FLAGN] _
+            HfstTransducer filtered_lexicons(*inverted_flag_filter);
+            filtered_lexicons.harmonize_flag_diacritics(*rv);
+            filtered_lexicons.compose(*rv, true);
+            filtered_lexicons.harmonize_flag_diacritics(*flag_filter);
+            filtered_lexicons.compose(*flag_filter, true).minimize();
+
+            //fprintf(stderr, "filtered_lexicons:\n");
+            //filtered_lexicons.write_in_att_format(stderr, 1);
+            //fprintf(stderr, "--\n");                        
+
+            // Convert symbols "$[P|R].LEXNAME...$" back to "@[P|R].LEXNAME...@"            
+            filtered_lexicons.substitute(reverse_flag_substitutions);
+
+            rv->assign(filtered_lexicons);
+          }
 
     rv->minimize();
     return rv;
