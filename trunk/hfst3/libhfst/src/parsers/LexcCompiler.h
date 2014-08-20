@@ -71,6 +71,10 @@ class LexcCompiler
 
   LexcCompiler& setTreatWarningsAsErrors(bool value);
 
+  LexcCompiler& setWithFlags(bool value);
+
+  LexcCompiler& setMinimizeFlags(bool value);
+
   //! @brief add @a alphabet to multicharacter symbol set.
   //! These symbolse may be used for regular expression ? for backends that do
   //! not support open alphabets.
@@ -128,6 +132,7 @@ class LexcCompiler
   bool quiet_;
   bool verbose_;
   bool with_flags_;
+  bool minimize_flags_;
   bool treat_warnings_as_errors_;
 
   hfst::ImplementationType format_;
