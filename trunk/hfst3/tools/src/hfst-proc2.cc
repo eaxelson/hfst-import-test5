@@ -90,7 +90,7 @@ void match_and_print(hfst_ol::PmatchContainer & container,
     if (output_format == xerox) {
         for(hfst_ol::LocationVector::const_iterator it = locations.begin();
             it != locations.end(); ++it) {
-            outstream << it->input << "\t" << it->output << std::endl;
+            outstream << it->input << "\t" << it->output << std::endl << std::endl;
         }
     } else {
         // More formatting options
