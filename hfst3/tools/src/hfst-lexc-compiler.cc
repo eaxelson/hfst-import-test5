@@ -56,6 +56,7 @@ static unsigned int lexccount = 0;
 static bool is_input_stdin = true;
 static ImplementationType format = hfst::UNSPECIFIED_TYPE;
 static bool with_flags = false;
+static bool minimize_flags = false;
 static bool treat_warnings_as_errors = false;
 
 void
@@ -71,6 +72,7 @@ print_usage()
                "  -o, --output=OUTFILE    write result into OUTFILE\n");
         fprintf(message_out, "Lexc options:\n"
                "  -F, --withFlags         use flags to hyperminimize result\n"
+               "  -M, --minimizeFlags     if --withFlags is used, minimize the number of flags\n"
                "  -W, --Werror            treat warnings as errors\n");
         fprintf(message_out, "\n");
         fprintf(message_out,
@@ -114,12 +116,13 @@ parse_options(int argc, char** argv)
           {"format", required_argument, 0, 'f'},
           {"output", required_argument, 0, 'o'},
           {"withFlags", no_argument,    0, 'F'},
+          {"minimizeFlags", no_argument,    0, 'M'},
           {"Werror", no_argument,    0, 'W'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             "f:o:FW",
+                             "f:o:FMW",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -133,6 +136,9 @@ parse_options(int argc, char** argv)
           break;
         case 'F':
           with_flags = true;
+          break;
+        case 'M':
+          minimize_flags = true;
           break;
         case 'W':
           treat_warnings_as_errors = true;
@@ -258,6 +264,7 @@ int main( int argc, char **argv ) {
         new HfstOutputStream(outfilename, format) :
         new HfstOutputStream(format);
     LexcCompiler lexc(format, with_flags);
+    lexc.setMinimizeFlags(minimize_flags);
    // lexc.with_flags_ = with_flags;
     if (silent)
       {

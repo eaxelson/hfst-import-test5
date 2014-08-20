@@ -83,7 +83,8 @@ LexcCompiler::LexcCompiler() :
     totalEntries_(0),
     currentEntries_(0),
     parseErrors_(false),
-    with_flags_(false)
+    with_flags_(false),
+    minimize_flags_(false)
 {
     xre_.set_expand_definitions(true);
 }
@@ -98,7 +99,8 @@ LexcCompiler::LexcCompiler(ImplementationType impl) :
     totalEntries_(0),
     currentEntries_(0),
     parseErrors_(false),
-    with_flags_(false)
+    with_flags_(false),
+    minimize_flags_(false)
 {
     tokenizer_.add_multichar_symbol("@_EPSILON_SYMBOL_@");
     tokenizer_.add_multichar_symbol("@0@");
@@ -120,7 +122,8 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags) :
     totalEntries_(0),
     currentEntries_(0),
     parseErrors_(false),
-    with_flags_(withFlags)
+    with_flags_(withFlags),
+    minimize_flags_(false)
 {
     tokenizer_.add_multichar_symbol("@_EPSILON_SYMBOL_@");
     tokenizer_.add_multichar_symbol("@0@");
@@ -189,6 +192,19 @@ LexcCompiler::setTreatWarningsAsErrors(bool value)
     return *this;
 }
 
+LexcCompiler&
+LexcCompiler::setWithFlags(bool value)
+{
+    with_flags_ = value;
+    return *this;
+}
+
+LexcCompiler&
+LexcCompiler::setMinimizeFlags(bool value)
+{
+    minimize_flags_ = value;
+    return *this;
+}
 
 LexcCompiler&
 LexcCompiler::addNoFlag(const string& lexname)
@@ -917,7 +933,7 @@ LexcCompiler::compileLexical()
     // This piece of code should work, but it is commented out until expected results 
     // from all lexc tests have been changed so that they do not contain flag series.
         
-    if (/*with_flags_*/ false)
+    if (with_flags_ && minimize_flags_)
           {
 
             // To substitute "@[P|R].LEXNAME...@" with "$[P|R].LEXNAME...$" and vice versa. 
