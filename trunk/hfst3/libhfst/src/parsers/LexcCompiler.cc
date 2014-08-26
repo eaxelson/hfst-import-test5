@@ -84,7 +84,8 @@ LexcCompiler::LexcCompiler() :
     currentEntries_(0),
     parseErrors_(false),
     with_flags_(false),
-    minimize_flags_(false)
+    minimize_flags_(false),
+    rename_flags_(false)
 {
     xre_.set_expand_definitions(true);
 }
@@ -100,7 +101,8 @@ LexcCompiler::LexcCompiler(ImplementationType impl) :
     currentEntries_(0),
     parseErrors_(false),
     with_flags_(false),
-    minimize_flags_(false)
+    minimize_flags_(false),
+    rename_flags_(false)
 {
     tokenizer_.add_multichar_symbol("@_EPSILON_SYMBOL_@");
     tokenizer_.add_multichar_symbol("@0@");
@@ -123,7 +125,8 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags) :
     currentEntries_(0),
     parseErrors_(false),
     with_flags_(withFlags),
-    minimize_flags_(false)
+    minimize_flags_(false),
+    rename_flags_(false)
 {
     tokenizer_.add_multichar_symbol("@_EPSILON_SYMBOL_@");
     tokenizer_.add_multichar_symbol("@0@");
@@ -205,6 +208,14 @@ LexcCompiler::setMinimizeFlags(bool value)
     minimize_flags_ = value;
     return *this;
 }
+
+LexcCompiler&
+LexcCompiler::setRenameFlags(bool value)
+{
+    rename_flags_ = value;
+    return *this;
+}
+
 
 LexcCompiler&
 LexcCompiler::addNoFlag(const string& lexname)
@@ -928,10 +939,6 @@ LexcCompiler::compileLexical()
 
     // Preserve only first flag of consecutive P and R lexname flag series, 
     // e.g. change P.LEXNAME.1 R.LEXNAME.1 P.LEXNAME.2 R.LEXNAME.2 into P.LEXNAME.1 
-
-    // TODO:
-    // This piece of code should work, but it is commented out until expected results 
-    // from all lexc tests have been changed so that they do not contain flag series.
         
     if (with_flags_ && minimize_flags_)
           {
@@ -939,6 +946,9 @@ LexcCompiler::compileLexical()
             // To substitute "@[P|R].LEXNAME...@" with "$[P|R].LEXNAME...$" and vice versa. 
             std::map<String, String> flag_substitutions;             // @ -> $
             std::map<String, String> reverse_flag_substitutions;     // $ -> @
+
+            // TEST: rename all $P$ and $R$ flags so that they have the same name
+            std::map<String, String> dollar_to_foo_substitutions;
 
             StringSet transducerAlphabet = rv->get_alphabet();
             for (StringSet::const_iterator s = transducerAlphabet.begin();
@@ -953,6 +963,9 @@ LexcCompiler::compileLexical()
                   //fprintf(stderr, "flag found:\t\t%s\t->\t%s\n", s->c_str(), alph.c_str());
                   flag_substitutions[*s] = alph;
                   reverse_flag_substitutions[alph] = *s;
+                  // insert mapping: $[P|R].LEXNAME.SOMETHING$  <->  $[P|R]$.FOO.BAR$
+                  dollar_to_foo_substitutions[alph] = alph.substr(0, 2).append(".FOO.BAR$");
+                  //fprintf(stderr, "dollar_to_foo_substitutions[%s] = %s\n", alph.c_str(), (dollar_to_foo_substitutions[alph]).c_str());
                 }
               else
                 {
@@ -1021,8 +1034,18 @@ LexcCompiler::compileLexical()
             //filtered_lexicons.write_in_att_format(stderr, 1);
             //fprintf(stderr, "--\n");                        
 
-            // Convert symbols "$[P|R].LEXNAME...$" back to "@[P|R].LEXNAME...@"            
-            filtered_lexicons.substitute(reverse_flag_substitutions);
+            // TEST: Rename all $P$ and $R$ flags so that they have the same name
+            if (rename_flags_)
+              {
+                filtered_lexicons.substitute(dollar_to_foo_substitutions);
+                filtered_lexicons.substitute("$P.FOO.BAR$", "@P.FOO.BAR@");
+                filtered_lexicons.substitute("$R.FOO.BAR$", "@R.FOO.BAR@");
+              }
+            else
+              {
+                // Convert symbols "$[P|R].LEXNAME...$" back to "@[P|R].LEXNAME...@"            
+                filtered_lexicons.substitute(reverse_flag_substitutions);
+              }
 
             rv->assign(filtered_lexicons);
           }
