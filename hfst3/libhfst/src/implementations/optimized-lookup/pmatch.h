@@ -4,18 +4,22 @@
 #include <map>
 #include <stack>
 #include <sstream>
+#include <algorithm>
 #include "transducer.h"
 
 namespace hfst_ol {
 
     class PmatchTransducer;
     class PmatchContainer;
-    class Location;
+    struct Location;
+    class WeightedDoubleTape;
 
     const unsigned int PMATCH_MAX_RECURSION_DEPTH = 5000;
     
     typedef std::map<SymbolNumber, PmatchTransducer *> RtnMap;
     typedef std::vector<Location> LocationVector;
+    typedef std::vector<LocationVector> LocationVectorVector;
+    typedef std::vector<WeightedDoubleTape> WeightedDoubleTapeVector;
             
     
     enum SpecialSymbol{entry,
@@ -60,7 +64,14 @@ namespace hfst_ol {
             }
             return retval;
         }
-        
+
+    };
+
+    class WeightedDoubleTape: public DoubleTape
+    {
+    public:
+        Weight weight;
+    WeightedDoubleTape(DoubleTape dt, Weight w): DoubleTape(dt), weight(w) {}
     };
 
     class PmatchAlphabet: public TransducerAlphabet {
@@ -82,6 +93,7 @@ namespace hfst_ol {
         static bool is_insertion(const std::string & symbol);
         static std::string name_from_insertion(
             const std::string & symbol);
+        bool is_printable(SymbolNumber symbol);
         void add_special_symbol(const std::string & str, SymbolNumber symbol_number);
         void add_rtn(PmatchTransducer * rtn, std::string const & name);
         bool has_rtn(std::string const & name) const;
@@ -90,12 +102,13 @@ namespace hfst_ol {
         SymbolNumber get_special(SpecialSymbol special) const;
         SymbolNumberVector get_specials(void) const;
         std::string stringify(const DoubleTape & str);
-        LocationVector locatefy(const DoubleTape & str);
+        Location locatefy(unsigned int input_offset,
+                          const WeightedDoubleTape & str);
 
         friend class PmatchTransducer;
         friend class PmatchContainer;
     };
-    
+
     class PmatchContainer
     {
     protected:
@@ -108,13 +121,15 @@ namespace hfst_ol {
         SymbolNumberVector input;
         DoubleTape tape;
         DoubleTape output;
+        LocationVectorVector locations;
         std::vector<char> possible_first_symbols;
         bool verbose;
+        bool locate_mode;
         unsigned int recursion_depth_left;
 
     public:
 
-        PmatchContainer(std::istream & is, bool _verbose = false,
+        PmatchContainer(std::istream & is, bool verbose = false,
                         bool extract_tags = false);
         PmatchContainer(void);
         ~PmatchContainer(void);
@@ -126,7 +141,7 @@ namespace hfst_ol {
         std::string get_unsatisfied_rtn_name(void) const;
         void process(std::string & input);
         std::string match(std::string & input);
-        LocationVector locate(std::string & input);
+        LocationVectorVector locate(std::string & input);
         bool has_queued_input(unsigned int input_pos);
         bool not_possible_first_symbol(SymbolNumber sym)
         {
@@ -139,7 +154,7 @@ namespace hfst_ol {
         void copy_to_output(const DoubleTape & best_result);
         void copy_to_output(SymbolNumber input, SymbolNumber output);
         std::string stringify_output(void);
-        LocationVector locatefy_output(void);
+//        LocationVector locatefy_output(void);
         static std::string parse_name_from_hfst3_header(std::istream & f);
         void be_verbose(void) { verbose = true; }
         bool is_verbose(void) { return verbose; }
@@ -165,6 +180,10 @@ namespace hfst_ol {
         std::string input;
         std::string output;
         std::string tag;
+        Weight weight;
+
+        bool operator<(Location & rhs)
+            { return this->weight < rhs.weight; }
     };
 
     struct ContextMatchedTrap
@@ -212,6 +231,7 @@ namespace hfst_ol {
         PmatchAlphabet & alphabet;
         SymbolNumber orig_symbol_count;
         PmatchContainer * container;
+        WeightedDoubleTapeVector * locations;
 
         bool is_final(TransitionTableIndex i)
         {
@@ -330,8 +350,10 @@ namespace hfst_ol {
         void rtn_call(unsigned int & input_pos, unsigned int & tape_pos);
         void rtn_exit(void);
         void note_analysis(unsigned int input_pos, unsigned int tape_pos);
+        void grab_location(unsigned int input_pos, unsigned int tape_pos);
         void collect_possible_first_symbols(void);
 
+        friend class PmatchContainer;
     };
 
 }

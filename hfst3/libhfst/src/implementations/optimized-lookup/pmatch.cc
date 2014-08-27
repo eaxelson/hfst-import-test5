@@ -29,6 +29,21 @@ PmatchAlphabet::PmatchAlphabet(void):
     TransducerAlphabet()
 {}
 
+bool PmatchAlphabet::is_printable(SymbolNumber symbol)
+{
+    if (symbol == 0 || symbol == NO_SYMBOL_NUMBER ||
+        is_flag_diacritic(symbol) || is_end_tag(symbol)) {
+        return false;
+    }
+    for (std::map<SpecialSymbol, SymbolNumber>::const_iterator it = special_symbols.begin();
+         it != special_symbols.end(); ++it) {
+        if (it->second == symbol) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void PmatchAlphabet::add_special_symbol(const std::string & str,
                                          SymbolNumber symbol_number)
 {
@@ -82,6 +97,7 @@ SymbolNumberVector PmatchAlphabet::get_specials(void) const
 PmatchContainer::PmatchContainer(std::istream & inputstream,
                                  bool _verbose, bool _extract_tags):
     verbose(_verbose),
+    locate_mode(false),
     recursion_depth_left(PMATCH_MAX_RECURSION_DEPTH)
 {
     std::string transducer_name;
@@ -338,14 +354,19 @@ void PmatchContainer::process(std::string & input_str)
 {
     initialize_input(input_str.c_str());
     unsigned int input_pos = 0;
+    unsigned int printable_input_pos = 0;
 
     ++line_number;
     output.clear();
+    locations.clear();
     while (has_queued_input(input_pos)) {
         SymbolNumber current_input = input[input_pos];
         if (not_possible_first_symbol(current_input)) {
             copy_to_output(current_input, current_input);
             ++input_pos;
+            if (locate_mode && alphabet.is_printable(current_input)) {
+                ++printable_input_pos;
+            }
             continue;
         }
         tape.clear();
@@ -353,24 +374,40 @@ void PmatchContainer::process(std::string & input_str)
         toplevel->match(input_pos, tape_pos);
         if (tape_pos > 0) {
             // Tape moved
-            copy_to_output(toplevel->get_best_result());
+            if (locate_mode) {
+                LocationVector ls;
+                for (WeightedDoubleTapeVector::iterator it = (toplevel->locations)->begin();
+                     it != (toplevel->locations)->end(); ++it) {
+                    ls.push_back(alphabet.locatefy(printable_input_pos,
+                                                          *it));
+                }
+                sort(ls.begin(), ls.end());
+                locations.push_back(ls);
+            } else {
+                copy_to_output(toplevel->get_best_result());
+            }
         } else {
             copy_to_output(current_input, current_input);
             ++input_pos;
+            if (locate_mode && alphabet.is_printable(current_input)) {
+                ++printable_input_pos;
+            }
         }
     }
 }
 
 std::string PmatchContainer::match(std::string & input)
 {
+    locate_mode = false;
     process(input);
     return stringify_output();
 }
 
-LocationVector PmatchContainer::locate(std::string & input)
+LocationVectorVector PmatchContainer::locate(std::string & input)
 {
+    locate_mode = true;
     process(input);
-    return locatefy_output();
+    return locations;
 }
 
 void PmatchContainer::copy_to_output(const DoubleTape & best_result)
@@ -391,10 +428,10 @@ std::string PmatchContainer::stringify_output(void)
     return alphabet.stringify(output);
 }
 
-LocationVector PmatchContainer::locatefy_output(void)
-{
-    return alphabet.locatefy(output);
-}
+//LocationVector PmatchContainer::locatefy_output(void)
+//{
+//    return alphabet.locatefy(output);
+//}
 
 std::string PmatchAlphabet::stringify(const DoubleTape & str)
 {
@@ -430,67 +467,36 @@ std::string PmatchAlphabet::stringify(const DoubleTape & str)
     return retval;
 }
 
-LocationVector PmatchAlphabet::locatefy(const DoubleTape & str)
+Location PmatchAlphabet::locatefy(unsigned int input_offset,
+                                  const WeightedDoubleTape & str)
 {
-    LocationVector retval;
+    Location retval;
+    retval.start = input_offset;
+    retval.weight = str.weight;
+
     // We rebuild the original input without special
     // symbols but with IDENTITIES etc. replaced
     SymbolNumberVector orig_input;
-    std::stack<unsigned int> start_tag_pos;
-    std::stack<std::string> patterns;
-    patterns.push("");
-    unsigned int tape_pos = 0;
     for (DoubleTape::const_iterator it = str.begin();
          it != str.end(); ++it) {
         SymbolNumber input = it->input;
         SymbolNumber output = it->output;
-        if (output == special_symbols[entry]) {
-            start_tag_pos.push(tape_pos);
-            patterns.push("");
-        } else if (output == special_symbols[exit]) {
-            if (start_tag_pos.size() != 0) {
-                start_tag_pos.pop();
-            }
-            std::string pat = patterns.top();
-            patterns.pop();
-            patterns.top().append(pat);
-        } else if (is_end_tag(output)) {
-            if (start_tag_pos.size() == 0) {
-                std::cerr << "Warning: end tag without start tag\n";
-            }
-            unsigned int pat_pos = start_tag_pos.top();
-            std::string pat = patterns.top();
-            std::string tag = start_tag(output);
-            Location location;
-            location.start = pat_pos;
-            location.length = tape_pos - pat_pos;
-            location.input = "";
-            for(SymbolNumberVector::const_iterator input_it = orig_input.begin() + pat_pos;
-                input_it != orig_input.begin() + tape_pos; ++input_it) {
-                location.input.append(string_from_symbol(*input_it));
-            }
-            location.output = pat;
-            location.tag = tag;
-            retval.push_back(location);
-//            std::stringstream ss;
-//            ss << pat_pos << "|" << len << "|" << pat << "|" << tag << "\n";
-//            retval.append(ss.str());
-        } else {
-            if (output == special_symbols[boundary]
-                || is_flag_diacritic(output)) {
-                output = 0;
-            }
-            if (input == special_symbols[boundary]) {
-                input = 0;
-            }
-            if (input != 0) {
-                orig_input.push_back(input);
-                ++tape_pos;
-            }
-            if (start_tag_pos.size() != 0) {
-                patterns.top().append(string_from_symbol(output));
-            }
+        if (is_end_tag(output)) {
+            retval.tag = start_tag(output);
+            continue;
         }
+        if (is_printable(output)) {
+            retval.output.append(string_from_symbol(output));
+        }
+        if (is_printable(input)) {
+            orig_input.push_back(input);
+            ++input_offset;
+        }
+    }
+    retval.length = input_offset - retval.start;
+    for(SymbolNumberVector::const_iterator input_it = orig_input.begin();
+        input_it != orig_input.end(); ++input_it) {
+        retval.input.append(string_from_symbol(*input_it));
     }
     return retval;
 }
@@ -516,7 +522,8 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
                                    PmatchAlphabet & alpha,
                                    PmatchContainer * cont):
     alphabet(alpha),
-    container(cont)
+    container(cont),
+    locations(NULL)
 {
     orig_symbol_count = alphabet.get_symbol_table().size();
     // initialize the stack for local variables
@@ -783,7 +790,7 @@ void PmatchTransducer::match(unsigned int & input_tape_pos,
                              unsigned int & tape_pos)
 {
     rtn_stack.top().best_result.clear();
-    rtn_stack.top().candidate_input_pos = input_tape_pos;
+    rtn_stack.top().candidate_input_pos = input_tape_pos; 
     rtn_stack.top().tape_entry = tape_pos;
     rtn_stack.top().candidate_tape_pos = tape_pos;
     rtn_stack.top().best_weight = 0.0;
@@ -792,6 +799,13 @@ void PmatchTransducer::match(unsigned int & input_tape_pos,
     local_stack.top().context_placeholder = 0;
     local_stack.top().default_symbol_trap = false;
     local_stack.top().running_weight = 0.0;
+    if (locations != NULL) {
+        delete locations;
+        locations = NULL;
+    }
+    if (container->locate_mode) {
+        locations = new WeightedDoubleTapeVector();
+    }
     get_analyses(input_tape_pos, tape_pos, 0);
     tape_pos = rtn_stack.top().candidate_tape_pos;
     input_tape_pos = rtn_stack.top().candidate_input_pos;
@@ -831,6 +845,12 @@ void PmatchTransducer::note_analysis(unsigned int input_pos,
         // with left contexts and should be dealt with a bit more nicely
         return;
     }
+
+    if (locations != NULL) {
+        grab_location(input_pos, tape_pos);
+        return;
+    }
+    
     if ((input_pos > rtn_stack.top().candidate_input_pos) ||
         (input_pos == rtn_stack.top().candidate_input_pos &&
          rtn_stack.top().best_weight > local_stack.top().running_weight)) {
@@ -849,6 +869,25 @@ void PmatchTransducer::note_analysis(unsigned int input_pos,
                   << "\tdiscarding:\n\t"
                   << alphabet.stringify(discarded) << std::endl << std::endl; 
     }
+}
+
+void PmatchTransducer::grab_location(unsigned int input_pos, unsigned int tape_pos)
+{
+    if (locations->size() != 0) {
+        if (locations->at(0).size() > tape_pos - rtn_stack.top().tape_entry) {
+            // We already have better matches
+            return;
+        } else if (locations->at(0).size() < tape_pos - rtn_stack.top().tape_entry) {
+            // The old locations are worse
+            locations->clear();
+        }
+    }
+    rtn_stack.top().candidate_tape_pos = tape_pos;
+    rtn_stack.top().candidate_input_pos = input_pos;
+    WeightedDoubleTape rv(container->tape.extract_slice(
+                              rtn_stack.top().tape_entry, tape_pos),
+                          local_stack.top().running_weight);
+    locations->push_back(rv);
 }
 
 void PmatchTransducer::take_epsilons(unsigned int input_pos,
