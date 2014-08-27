@@ -194,6 +194,11 @@ int main( int argc, char **argv ) {
         new HfstOutputStream(outfilename, instream->get_type()) :
         new HfstOutputStream(instream->get_type());
     
+    if ( is_input_stream_in_ol_format(instream, "hfst-determinize"))
+      {
+        return EXIT_FAILURE;
+      }
+
     retval = process_stream(*instream, *outstream);
 
     if (encode_weights)

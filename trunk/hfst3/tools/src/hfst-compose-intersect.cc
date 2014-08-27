@@ -251,6 +251,13 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 hfst_strformat(secondstream.get_type()));
       }
 
+    if ( is_input_stream_in_ol_format(&firststream, "hfst-compose-intersect") ||
+         is_input_stream_in_ol_format(&secondstream, "hfst-compose-intersect") )
+      {
+        return EXIT_FAILURE;
+      }
+
+
     HfstTransducerVector rules;
     size_t rule_n = 1;  
 

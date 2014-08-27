@@ -50,6 +50,7 @@
 #include "hfst-commandline.h"
 #include "HfstOutputStream.h"
 #include "HfstTransducer.h"
+#include "HfstInputStream.h"
 
 #ifndef HAVE_ERROR_AT_LINE
 void error_at_line(int status, int errnum, const char* filename, 
@@ -167,6 +168,18 @@ verbose_printf(const char* fmt, ...)
       vfprintf(message_out, fmt, ap);
       va_end(ap);
     }
+}
+
+bool
+is_input_stream_in_ol_format(const hfst::HfstInputStream * is, const char * program)
+{
+  if ( is->get_type() == hfst::HFST_OL_TYPE || 
+       is->get_type() == hfst::HFST_OLW_TYPE )
+    {
+      fprintf(stderr, "Error: %s cannot process transducers that are in optimized lookup format.\n", program);
+      return true;
+    }
+  return false;
 }
 
 // string functions

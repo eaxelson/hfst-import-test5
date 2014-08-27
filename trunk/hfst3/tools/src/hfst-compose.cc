@@ -280,6 +280,12 @@ int main( int argc, char **argv ) {
         new HfstOutputStream(outfilename, firststream->get_type()) :
         new HfstOutputStream(firststream->get_type());
 
+    if ( is_input_stream_in_ol_format(firststream, "hfst-compose") || 
+         is_input_stream_in_ol_format(secondstream, "hfst-compose") )
+      {
+        return EXIT_FAILURE;
+      }
+
     retval = compose_streams(*firststream, *secondstream, *outstream);
     delete firststream;
     delete secondstream;

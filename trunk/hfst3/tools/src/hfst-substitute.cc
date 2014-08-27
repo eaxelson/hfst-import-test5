@@ -872,6 +872,12 @@ int main( int argc, char **argv )
     HfstOutputStream* outstream = (outfile != stdout) ?
             new HfstOutputStream(outfilename, instream->get_type()) :
             new HfstOutputStream(instream->get_type());
+
+    if ( is_input_stream_in_ol_format(instream, "hfst-substitute"))
+      {
+        return EXIT_FAILURE;
+      }
+
     process_stream(*instream, *outstream);
     free(inputfilename);
     free(outfilename);
