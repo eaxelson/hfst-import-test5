@@ -94,7 +94,7 @@ section
 	## Install libhfst dll and HFST command line tools
 	## -----------------------------------------------
 
-	File libhfst-32.dll
+	File libhfst-36.dll
 
         File hfst-affix-guessify.exe
         File hfst-calculate.exe
