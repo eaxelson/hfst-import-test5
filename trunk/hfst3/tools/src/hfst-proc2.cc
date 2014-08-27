@@ -84,13 +84,17 @@ void match_and_print(hfst_ol::PmatchContainer & container,
         // Remove final newline
         input_text.erase(input_text.size() -1, 1);
     }
-    hfst_ol::LocationVector locations = container.locate(input_text);
+    hfst_ol::LocationVectorVector locations = container.locate(input_text);
 
     // Output formatting
     if (output_format == xerox) {
-        for(hfst_ol::LocationVector::const_iterator it = locations.begin();
+        for(hfst_ol::LocationVectorVector::const_iterator it = locations.begin();
             it != locations.end(); ++it) {
-            outstream << it->input << "\t" << it->output << std::endl << std::endl;
+            for (hfst_ol::LocationVector::const_iterator loc_it = it->begin();
+                 loc_it != it->end(); ++loc_it) {
+                outstream << loc_it->input << "\t" << loc_it->output << std::endl;
+            }
+            std::cerr << endl;
         }
     } else {
         // More formatting options
