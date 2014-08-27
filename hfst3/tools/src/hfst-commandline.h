@@ -36,7 +36,7 @@
 #endif
 
 #include "HfstDataTypes.h"
-
+namespace hfst { class HfstInputStream; } ;
 
 /* These variables should be used in all command line programs.
  * In some cases they may be nonsensical; just define something then.
@@ -88,6 +88,8 @@ void verbose_printf(const char* format, ...);
 void hfst_set_program_name(const char* argv0, const char* version,
                            const char* wikipage);
 
+
+bool is_input_stream_in_ol_format(const hfst::HfstInputStream * is, const char * program);
 
 /** 
  * @brief set @c program_name to program's executable name for error messages.

@@ -180,6 +180,11 @@ int main( int argc, char **argv ) {
         new HfstOutputStream(outfilename, instream->get_type()) :
         new HfstOutputStream(instream->get_type());
     
+    if ( is_input_stream_in_ol_format(instream, "hfst-remove-epsilons"))
+      {
+        return EXIT_FAILURE;
+      }
+
     retval = process_stream(*instream, *outstream);
     delete instream;
     delete outstream;

@@ -295,6 +295,12 @@ int main( int argc, char **argv ) {
               secondfilename);
     }
 
+    if ( is_input_stream_in_ol_format(firststream, "hfst-compare") ||
+         is_input_stream_in_ol_format(secondstream, "hfst-compare") )
+      {
+        return EXIT_FAILURE;
+      }
+
     retval = compare_streams(*firststream, *secondstream);
     if (outfile != stdout)
     {
