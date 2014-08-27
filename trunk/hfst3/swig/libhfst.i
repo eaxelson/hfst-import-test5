@@ -429,6 +429,7 @@ public:
       XreCompiler();
       XreCompiler(hfst::ImplementationType impl);
       void define(const std::string& name, const std::string& xre);
+      void set_expand_definitions(bool);
       HfstTransducer* compile(const std::string& xre); // TODO: Warning 321: 'compile' conflicts with a built-in name in python
     };
 
