@@ -172,6 +172,14 @@ int main( int argc, char **argv ) {
               inputfilename);
         return EXIT_FAILURE;
     }
+
+    if ( instream->get_type() == hfst::HFST_OL_TYPE || 
+         instream->get_type() == hfst::HFST_OLW_TYPE )
+      {
+        fprintf(stderr, "Error: hfst-invert cannot process transducers that are in optimized lookup format.\n", argv[0]);
+        return EXIT_FAILURE;
+      }
+
     HfstOutputStream* outstream = (outfile != stdout) ?
         new HfstOutputStream(outfilename, instream->get_type()) :
         new HfstOutputStream(instream->get_type());
