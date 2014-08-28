@@ -573,8 +573,9 @@ void define_function_args(const char * name, const std::vector<HfstTransducer> *
   for (std::vector<HfstTransducer>::const_iterator it = args->begin();
        it != args->end(); it++)
     {
-      std::string function_arg = "@" + std::string(name) +
-        (static_cast<ostringstream*>( &(ostringstream() << arg_number) )->str()) + "@";
+      ostringstream os;
+      os << arg_number;
+      std::string function_arg = "@" + std::string(name) + os.str() + "@";
       definitions[function_arg] = new HfstTransducer(*it);
       //fprintf(stderr, "defined function arg: '%s', %i:\n", name, arg_number); // DEBUG
       //std::cerr << *it << std::endl;
@@ -591,8 +592,9 @@ void undefine_function_args(const char * name)
     }
   for (unsigned int arg_number = 1; arg_number <= it->second; arg_number++)
     {
-      std::string function_arg = "@" + std::string(name) +
-        (static_cast<ostringstream*>( &(ostringstream() << arg_number) )->str()) + "@";
+      ostringstream os;
+      os << arg_number;
+      std::string function_arg = "@" + std::string(name) + os.str() + "@";
       definitions.erase(function_arg);
       //fprintf(stderr, "undefined function arg: '%s', %i:\n", name, arg_number); // DEBUG
     }

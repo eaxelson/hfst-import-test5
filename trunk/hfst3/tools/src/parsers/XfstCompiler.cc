@@ -30,8 +30,6 @@ using std::map;
 using std::queue;
 using std::stack;
 
-using std::ostringstream;
-
 #include <cstdio>
 #include <cstdlib>
 
@@ -501,7 +499,7 @@ namespace xfst {
             if (verbose_)
               {
                 hfst_fprintf(warnstream_, 
-                             "warning: lookup is infinitely ambiguous, limiting the number of cycles to "SIZE_T_SPECIFIER"\n", cutoff);
+                             "warning: lookup is infinitely ambiguous, limiting the number of cycles to " SIZE_T_SPECIFIER "\n", cutoff);
               }
           }
 
@@ -678,7 +676,7 @@ namespace xfst {
             if (verbose_)
               {
                 hfst_fprintf(warnstream_, 
-                             "warning: transducer is infinitely ambiguous, limiting number of cycles to "SIZE_T_SPECIFIER"\n", ol_cutoff);
+                             "warning: transducer is infinitely ambiguous, limiting number of cycles to " SIZE_T_SPECIFIER "\n", ol_cutoff);
               }
           }
         
@@ -845,7 +843,7 @@ namespace xfst {
                 if (verbose_)
                   {
                     hfst_fprintf(warnstream_, 
-                                 "warning: transducer is infinitely ambiguous, limiting number of cycles to "SIZE_T_SPECIFIER"\n", ol_cutoff);
+                                 "warning: transducer is infinitely ambiguous, limiting number of cycles to " SIZE_T_SPECIFIER "\n", ol_cutoff);
                   }
               }
           }
@@ -1159,17 +1157,21 @@ namespace xfst {
 
         std::string new_retval = std::string("");
         std::string substituting_argument;
+        std::ostringstream os;
+
         if (user_friendly_argument_names)
           {
-            substituting_argument = "ARGUMENT" +
-              (static_cast<ostringstream*>
-               ( &(ostringstream() << arg_number) )->str());
+            os << arg_number;
+            substituting_argument = "ARGUMENT" + os.str();
+            /*(static_cast<ostringstream*>
+              ( &(ostringstream() << arg_number) )->str());*/
           }
         else
           {
-            substituting_argument = "\"@" + function_name + 
-              (static_cast<ostringstream*>
-               ( &(ostringstream() << arg_number) )->str()) + "@\"";
+            os << arg_number;
+            substituting_argument = "\"@" + function_name + os.str() + "@\"";
+              /*              (static_cast<ostringstream*>
+                              ( &(ostringstream() << arg_number) )->str()) + "@\"";*/
           }
      
         // go through retval
@@ -2813,7 +2815,7 @@ namespace xfst {
       HfstBasicTransducer basic(*tmp);
       if (output_to_console_ && (outfile == stdout))
         {
-          ostringstream ostr;
+          std::ostringstream ostr;
           basic.write_in_xfst_format(ostr, variables_["print-weight"] == "ON");
           hfst_fprintf(outfile, ostr.str().c_str());
         }
