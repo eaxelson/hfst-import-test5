@@ -478,6 +478,19 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
         {
           t.n_best(nbest_strings);
         }
+      catch (const FunctionNotImplementedException & e)
+        {
+          if (instream.get_type() == hfst::HFST_OL_TYPE || 
+              instream.get_type() == hfst::HFST_OLW_TYPE)
+            {
+              error(EXIT_FAILURE, 0, "option --nbest not implemented for optimized lookup format");
+            }
+          else
+            {
+              error(EXIT_FAILURE, 0, "option --nbest not implemented");
+            }
+          return EXIT_FAILURE;
+        }
       catch(const HfstFatalException & e)
         {
           error(EXIT_FAILURE, 0, "n_best runs out of memory");
@@ -527,8 +540,16 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
         t.extract_random_paths(results, max_random_strings);
       }
     }
-    catch (const HfstException e) {
-      fprintf(stderr, "option --random not implemented\n");
+    catch (const FunctionNotImplementedException & e) {
+      if (instream.get_type() == hfst::HFST_OL_TYPE || 
+          instream.get_type() == hfst::HFST_OLW_TYPE)
+        {
+          error(EXIT_FAILURE, 0, "option --random not implemented for optimized lookup format");
+        }
+      else
+        {
+          error(EXIT_FAILURE, 0, "option --random not implemented");
+        }
       return EXIT_FAILURE;
     }
       
