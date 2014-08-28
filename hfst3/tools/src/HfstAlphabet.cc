@@ -2,6 +2,7 @@
 #include "HfstBasic.h"
 #include "HfstUtf8.h"
 #include "HfstSymbolDefs.h"
+#include <cstdlib>
 
 #ifndef DEBUG_MAIN
 
@@ -74,7 +75,7 @@ namespace hfst {
     int HfstAlphabet::symbol2code( const char * s ) const {
       SymbolMap::const_iterator p = sm.find(s);
       if (p != sm.end()) return p->second;
-      return EOF;	
+      return EOF;       
     }
     
     const char *HfstAlphabet::code2symbol( unsigned int c ) const {

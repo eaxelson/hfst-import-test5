@@ -93,7 +93,7 @@ print_usage()
     fprintf(message_out,
        "All analyses in the morphological analyzer should have the form:\n"
        "w o r d f o r m POS " CATEGORY_SYMBOL_PREFIX "CLASS] X Y Z ...\n"
-       "where POS is the part-of-speech tag, "CATEGORY_SYMBOL_PREFIX "CLASS]\n"
+       "where POS is the part-of-speech tag, " CATEGORY_SYMBOL_PREFIX "CLASS]\n"
        "is an inflectional category marker and X, Y and Z are inflectional\n"
        "markers. The form of the inflectional category marker is fixed.\n"
        "CLASS can be any string, which doesn't contain \"]\".\n");
