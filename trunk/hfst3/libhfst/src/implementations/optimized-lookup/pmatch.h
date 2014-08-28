@@ -182,7 +182,7 @@ namespace hfst_ol {
         std::string tag;
         Weight weight;
 
-        bool operator<(Location & rhs)
+        bool operator<(Location rhs) const
             { return this->weight < rhs.weight; }
     };
 
