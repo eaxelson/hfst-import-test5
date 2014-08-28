@@ -139,6 +139,7 @@ namespace xfst {
     {       
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
+        xre_.set_flag_harmonization(true);
         variables_["assert"] = "OFF";
         variables_["att-epsilon"] = "@0@ | @_EPSILON_SYMBOL_@";
         variables_["char-encoding"] = "UTF-8";
@@ -146,7 +147,7 @@ namespace xfst {
         variables_["directory"] = "OFF";
         variables_["encode-weights"] = "OFF";
         variables_["flag-is-epsilon"] = "OFF";
-        variables_["harmonize-flags"] = "OFF";
+        variables_["harmonize-flags"] = "ON";
         variables_["hopcroft-min"] = "ON";
         variables_["lexc-minimize-flags"] = "OFF"; 
         variables_["lexc-with-flags"] = "OFF";
@@ -188,6 +189,7 @@ namespace xfst {
     {       
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
+        xre_.set_flag_harmonization(true);
         variables_["assert"] = "OFF";
         variables_["att-epsilon"] = "@0@ | @_EPSILON_SYMBOL_@";
         variables_["char-encoding"] = "UTF-8";
@@ -195,7 +197,7 @@ namespace xfst {
         variables_["directory"] = "OFF";
         variables_["encode-weights"] = "OFF";
         variables_["flag-is-epsilon"] = "OFF";
-        variables_["harmonize-flags"] = "OFF";
+        variables_["harmonize-flags"] = "ON";
         variables_["hopcroft-min"] = "ON";
         variables_["lexc-minimize-flags"] = "OFF"; 
         variables_["lexc-with-flags"] = "OFF";
@@ -1710,6 +1712,14 @@ namespace xfst {
           if (strcmp(text, "OFF") == 0)
             hfst::set_encode_weights(false);
         }
+      if (strcmp(name, "harmonize-flags") == 0)
+        {
+          if (strcmp(text, "ON") == 0)
+            xre_.set_flag_harmonization(true);
+          if (strcmp(text, "OFF") == 0)
+            xre_.set_flag_harmonization(false);
+        }
+
       PROMPT_AND_RETURN_THIS;
     }
 
