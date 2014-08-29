@@ -874,10 +874,10 @@ void PmatchTransducer::note_analysis(unsigned int input_pos,
 void PmatchTransducer::grab_location(unsigned int input_pos, unsigned int tape_pos)
 {
     if (locations->size() != 0) {
-        if (locations->at(0).size() > tape_pos - rtn_stack.top().tape_entry) {
+        if (input_pos < rtn_stack.top().candidate_input_pos) {
             // We already have better matches
             return;
-        } else if (locations->at(0).size() < tape_pos - rtn_stack.top().tape_entry) {
+        } else if (input_pos > rtn_stack.top().candidate_input_pos) {
             // The old locations are worse
             locations->clear();
         }
