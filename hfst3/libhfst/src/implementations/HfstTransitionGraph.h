@@ -3269,6 +3269,7 @@
                    }
                  current_state++;
                }
+             return *this;
            }
 
          StringSet get_flags() const
