@@ -33,8 +33,8 @@ pmatcherror(const char *msg)
     else
     {
         char buf[200];
-        memcpy(buf, hfst::pmatch::data, 200);
-        buf[200] = '\0';
+        memcpy(buf, hfst::pmatch::data, 200 - 1);
+        buf[200 - 1] = '\0';
         fprintf(stderr, "***    parsing %s [line %d, near %s]...\n", 
                 buf, pmatchlineno, pmatchtext);
     }
@@ -248,7 +248,7 @@ char * get_delimited(const char *s, char delim_left, char delim_right)
 
 char * get_delimited(const char *s, char delim)
 {
-    get_delimited(s, delim, delim);
+    return get_delimited(s, delim, delim);
 }
 
 char * get_escaped_delimited(const char *s, char delim_left, char delim_right)
@@ -920,6 +920,7 @@ HfstTransducer * PmatchAstNode::evaluate(
         } else {
             std::string errstring = "Symbol " + std::string(symbol) + " not found";
             pmatcherror(errstring.c_str());
+            return new HfstTransducer(); // For some compilers and linters
         }
     }
 }
