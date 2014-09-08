@@ -103,6 +103,8 @@ bool encode_weights=false;
 bool harmonize_smaller=true;
 /* By default, unknown symbols are used. */
 bool unknown_symbols_in_use=true;
+/* By default, unknowns and identities do not match flag diacritics. */
+bool match_unknowns_and_identities_with_flags=false;
 
 void set_harmonize_smaller(bool value) {
     harmonize_smaller=value; }
@@ -371,11 +373,11 @@ HfstTransducer * HfstTransducer::harmonize_symbol_encodings(const HfstTransducer
    another is not modifed, but a modified copy of it is returned. 
    Flag diacritics from the alphabet of this transducer are inserted
    to the alphabet of the copy of another, so that they are excluded
-   from harmonization.
+   from harmonization, if harmonize_flags is false (the default).
    If foma is used as implementation type, no harmonization is carried out,
    as foma's functions take care of harmonization. Then NULL is returned.
 */
-HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
+HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another, bool harmonize_flags)
 {
   using namespace implementations;
     if (this->type != another.type) {
@@ -389,29 +391,31 @@ HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
 
     // Prevent flag diacritics from being harmonized by inserting them to
     // the alphabet. FIX?: remove them at the end?
+    if (!harmonize_flags) {
     StringSet this_alphabet    = this->get_alphabet();
     StringSet another_alphabet = another_copy.get_alphabet();
-
+    
     for (StringSet::const_iterator it = another_alphabet.begin();
-     it != another_alphabet.end();
-     ++it)
+         it != another_alphabet.end();
+         ++it)
       {
-    if (FdOperation::is_diacritic(*it) && this_alphabet.count(*it) == 0)
-      {
-        this->insert_to_alphabet(*it);
+        if (FdOperation::is_diacritic(*it) && this_alphabet.count(*it) == 0)
+          {
+            this->insert_to_alphabet(*it);
+          }
       }
-      }
-
+    
     for (StringSet::const_iterator it = this_alphabet.begin();
-     it != this_alphabet.end();
-     ++it)
+         it != this_alphabet.end();
+         ++it)
       {
-    if (FdOperation::is_diacritic(*it) && another_alphabet.count(*it) == 0)
-      {
-        another_copy.insert_to_alphabet(*it);
+        if (FdOperation::is_diacritic(*it) && another_alphabet.count(*it) == 0)
+          {
+            another_copy.insert_to_alphabet(*it);
+          }
       }
-      }
-
+    }
+    
     switch(this->type)
     {
 #if HAVE_FOMA
@@ -430,7 +434,7 @@ HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
     HfstBasicTransducer * another_basic = another_copy.get_basic_transducer();
     HfstBasicTransducer * this_basic = this->convert_to_basic_transducer();
 
-    this_basic->harmonize(*another_basic);
+    this_basic->harmonize(*another_basic, harmonize_flags);
 
     this->convert_to_hfst_transducer(this_basic);
     HfstTransducer * another_harmonized 
@@ -454,7 +458,7 @@ HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
     In the case of foma transducers, does nothing because foma's own functions
     take care of harmonizing. If harmonization is needed, 
     FomaTransducer::harmonize can be used instead. */
-void HfstTransducer::harmonize(HfstTransducer &another)
+void HfstTransducer::harmonize(HfstTransducer &another, bool harmonize_flags)
 {
   using namespace implementations;
     if (this->type != another.type) {
@@ -465,6 +469,7 @@ void HfstTransducer::harmonize(HfstTransducer &another)
 
     // Prevent flag diacritics from being harmonized by inserting them to
     // the alphabet.
+    if (!harmonize_flags) {
     StringSet this_alphabet    = this->get_alphabet();
     StringSet another_alphabet = another.get_alphabet();
 
@@ -487,6 +492,7 @@ void HfstTransducer::harmonize(HfstTransducer &another)
         another.insert_to_alphabet(*it);
       }
       }
+    }
 
     switch(this->type)
     {
@@ -506,7 +512,7 @@ void HfstTransducer::harmonize(HfstTransducer &another)
     HfstBasicTransducer * another_basic = 
       another.convert_to_basic_transducer();
 
-    this_basic->harmonize(*another_basic);
+    this_basic->harmonize(*another_basic, harmonize_flags);
 
     this->convert_to_hfst_transducer(this_basic);
     another.convert_to_hfst_transducer(another_basic);
@@ -3287,7 +3293,7 @@ bool substitute_unknown_identity_pairs
 
 HfstTransducer &HfstTransducer::compose
 (const HfstTransducer &another, 
- bool harmonize)
+ bool harmonize, bool harmonize_flags)
 { is_trie = false;
 
     HfstTransducer * another_copy = new HfstTransducer(another);
@@ -3310,7 +3316,7 @@ HfstTransducer &HfstTransducer::compose
     if (this->type != FOMA_TYPE)
       {
         HfstTransducer * tmp =
-          this->harmonize_(const_cast<HfstTransducer&>(*another_copy));
+          this->harmonize_(const_cast<HfstTransducer&>(*another_copy), harmonize_flags);
         delete another_copy;
         another_copy = tmp;
       }

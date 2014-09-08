@@ -450,6 +450,7 @@ A EncodeMapper<A>::operator()(const A &arc) {
   } else {
     LOG(FATAL) << "EncodeMapper: Unknown operation";
   }
+  return arc; // HFST addition
 }
 
 
