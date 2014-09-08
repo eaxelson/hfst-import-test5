@@ -295,7 +295,7 @@ An example:
     /* The same as harmonize but does not change \a another but
        returns a harmonized version of that. If this and \a another 
        have type FOMA_TYPE, NULL is returned. */
-    HfstTransducer * harmonize_(const HfstTransducer &another);
+    HfstTransducer * harmonize_(const HfstTransducer &another, bool harmonize_flags=false);
 
     HfstTransducer * harmonize_symbol_encodings(const HfstTransducer &another);
 
@@ -686,8 +686,11 @@ in \a ifile.
        so that they are equivalent to the ones used in transducer another.
        Then the unknown and identity symbols are expanded
        in both transducers. If this and \a another have type FOMA_TYPE, 
-       nothing is done, since foma takes care of harmonization. */
-    void harmonize(HfstTransducer &another);
+       nothing is done, since foma takes care of harmonization. 
+
+       \a harmonize_flags defines whether flags are harmonized.
+    */
+    void harmonize(HfstTransducer &another, bool harmonize_flags=false);
 
     /** \brief Explicitly insert \a symbol to the alphabet 
     of the transducer. 
@@ -1239,7 +1242,7 @@ ccc : ddd
 
     /** \brief Compose this transducer with \a another. */
     HfstTransducer &compose(const HfstTransducer &another, 
-                            bool harmonize=true);
+                            bool harmonize=true, bool harmonize_flags=false);
 
     /** \brief Compose this transducer with the intersection of
         transducers in \a v. If \a invert is true, then compose the

@@ -83,6 +83,7 @@ size_t len;
   bool expand_definitions=false;
   bool harmonize_=true;
   bool harmonize_flags_=false;
+  bool match_flags_=false;
   bool verbose_=false;
   FILE * warning_stream=NULL;
 
