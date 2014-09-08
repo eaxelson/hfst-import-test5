@@ -134,31 +134,31 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 
 "\\\\\\" { CR; return LEFT_QUOTIENT; }
 
-"^"{UINTEGER}","{UINTEGER} { 
+"^"({UINTEGER}|"0")","({UINTEGER}|"0") { 
     CR;
     yylval->values = hfst::xre::get_n_to_k(yytext);
     return CATENATE_N_TO_K;
 }
 
-"^{"{UINTEGER}","{UINTEGER}"}" {
+"^{"({UINTEGER}|"0")","({UINTEGER}|"0")"}" {
     CR;
     yylval->values = hfst::xre::get_n_to_k(yytext);
     return CATENATE_N_TO_K;
 }
 
-"^>"{UINTEGER} { 
+"^>"({UINTEGER}|"0") { 
     CR;
     yylval->value = strtol(yytext + 2, 0, 10);
     return CATENATE_N_PLUS; 
 }
 
-"^<"{UINTEGER} { 
+"^<"({UINTEGER}|"0") { 
     CR;
     yylval->value = strtol(yytext + 2, 0, 10);
     return CATENATE_N_MINUS;
 }
 
-"^"{UINTEGER}                  { 
+"^"({UINTEGER}|"0")                  { 
     CR;
     yylval->value = strtol(yytext + 1, 0, 10);
     return CATENATE_N;
