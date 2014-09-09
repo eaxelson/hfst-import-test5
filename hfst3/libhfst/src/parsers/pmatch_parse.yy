@@ -1130,13 +1130,9 @@ LABEL: QUOTED_LITERAL PAIR_SEPARATOR QUOTED_LITERAL {
 | CONTEXT_CONDITION { }
 | ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
     $$ = hfst::pmatch::make_end_tag($2);
-//    hfst::pmatch::add_end_tag(new HfstTransducer(hfst::pmatch::format), $2);
-//    $$ = hfst::pmatch::add_pmatch_delimiters($1);
  }
 | ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
     $$ = hfst::pmatch::make_end_tag($2);
-//  hfst::pmatch::add_end_tag(new HfstTransducer(hfst::pmatch::format), $2);
-//    $$ = hfst::pmatch::add_pmatch_delimiters($1);
  }
 
 ;
