@@ -46,6 +46,7 @@
          hfst::HfstTransducer* transducer;
          hfst::HfstTransducerPair* transducerPair;
          hfst::HfstTransducerPairVector* transducerPairVector;
+         hfst::HfstTransducerVector* transducerVector;
          std::pair<std::string, hfst::HfstTransducer*>* transducerDefinition;
          std::map<std::string, hfst::HfstTransducer>* transducerDefinitions;
          hfst::pmatch::PmatchAstNode* ast_node;
@@ -88,7 +89,8 @@ REPLACE REGEXP3 FUNCALL MAP
 %type <replType>  CONTEXT_MARK
 
 %type <transducer> OPTCAP TOLOWER TOUPPER INSERT RIGHT_CONTEXT
-LEFT_CONTEXT NEGATIVE_RIGHT_CONTEXT NEGATIVE_LEFT_CONTEXT
+LEFT_CONTEXT NEGATIVE_RIGHT_CONTEXT NEGATIVE_LEFT_CONTEXT P_CONTEXT CONTEXT_CONDITION OR_CONTEXT AND_CONTEXT
+%type <transducerVector> CONTEXTS
 %type <ast_node> FUN_RIGHT_CONTEXT FUN_LEFT_CONTEXT FUN_NEGATIVE_RIGHT_CONTEXT FUN_NEGATIVE_LEFT_CONTEXT
 %type <ast_node> FUN_OPTCAP FUN_TOLOWER FUN_TOUPPER
 
@@ -140,7 +142,7 @@ PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 
 %nonassoc DEFINE DEFINS DEFFUN ALPHA LOWERALPHA UPPERALPHA NUM PUNCT WHITESPACE
 OPTCAP_LEFT TOLOWER_LEFT TOUPPER_LEFT INS_LEFT ENDTAG_LEFT LC_LEFT RC_LEFT
-NLC_LEFT NRC_LEFT MAP_LEFT SYM_LEFT
+NLC_LEFT NRC_LEFT MAP_LEFT SYM_LEFT OR_LEFT AND_LEFT
 %%
 
 
@@ -392,14 +394,6 @@ REGEXP2: REPLACE
 {
 //          std::cerr << "regexp2:replace \n"<< std::endl; 
 }
-| REGEXP2 ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
-    hfst::pmatch::add_end_tag($1, $3);
-    $$ = hfst::pmatch::add_pmatch_delimiters($1);
- }
-| REGEXP2 ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
-    hfst::pmatch::add_end_tag($1, $3);
-    $$ = hfst::pmatch::add_pmatch_delimiters($1);
- }
 | REGEXP2 COMPOSITION REPLACE {
        
     $$ = & $1->compose(*$3);
@@ -1133,11 +1127,61 @@ LABEL: QUOTED_LITERAL PAIR_SEPARATOR QUOTED_LITERAL {
   }
 | FUNCALL { }
 | MAP { }
-| RIGHT_CONTEXT { }
+| CONTEXT_CONDITION { }
+| ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
+    $$ = hfst::pmatch::make_end_tag($2);
+//    hfst::pmatch::add_end_tag(new HfstTransducer(hfst::pmatch::format), $2);
+//    $$ = hfst::pmatch::add_pmatch_delimiters($1);
+ }
+| ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
+    $$ = hfst::pmatch::make_end_tag($2);
+//  hfst::pmatch::add_end_tag(new HfstTransducer(hfst::pmatch::format), $2);
+//    $$ = hfst::pmatch::add_pmatch_delimiters($1);
+ }
+
+;
+
+CONTEXT_CONDITION:
+P_CONTEXT { }
+| OR_CONTEXT { }
+| AND_CONTEXT { };
+
+P_CONTEXT:
+RIGHT_CONTEXT { }
 | NEGATIVE_RIGHT_CONTEXT { }
 | LEFT_CONTEXT { }
-| NEGATIVE_LEFT_CONTEXT { }
-;
+| NEGATIVE_LEFT_CONTEXT { };
+
+OR_CONTEXT: OR_LEFT CONTEXTS RIGHT_PARENTHESIS
+{
+    $$ = new HfstTransducer(hfst::pmatch::format);
+    for(hfst::HfstTransducerVector::reverse_iterator it = $2->rbegin();
+        it != $2->rend(); ++it) {
+        $$->disjunct(*it);
+    }
+    delete $2;
+};
+
+AND_CONTEXT: AND_LEFT CONTEXTS RIGHT_PARENTHESIS
+{
+    $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_epsilon, hfst::pmatch::format);
+    for(hfst::HfstTransducerVector::reverse_iterator it = $2->rbegin();
+        it != $2->rend(); ++it) {
+        $$->concatenate(*it);
+    }
+    delete $2;
+};
+
+CONTEXTS:
+P_CONTEXT {
+    $$ = new hfst::HfstTransducerVector(1, *$1);
+    delete $1;
+}
+| P_CONTEXT COMMA CONTEXTS {
+    $3->push_back(*$1);
+    delete $1;
+    $$ = $3;
+};
 
 FUNCALL: SYMBOL_WITH_LEFT_PAREN ARGLIST RIGHT_PARENTHESIS {
     if (hfst::pmatch::functions.count($1) == 0) {

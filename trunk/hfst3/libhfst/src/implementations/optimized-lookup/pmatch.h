@@ -217,6 +217,7 @@ namespace hfst_ol {
         {
             unsigned int candidate_input_pos;
             unsigned int candidate_tape_pos;
+            unsigned int input_tape_entry;
             unsigned int tape_entry;
             DoubleTape best_result;
             Weight best_weight;
