@@ -43,7 +43,7 @@ class HarmonizeUnknownAndIdentitySymbols
   // Constructor whose side effect it is to harmonize the identity and unknown
   // symbols of its arguments.
   HarmonizeUnknownAndIdentitySymbols
-    (HfstBasicTransducer &,HfstBasicTransducer &, bool harmonize_flags=false);  
+    (HfstBasicTransducer &,HfstBasicTransducer &);  
  protected:
 
   HfstBasicTransducer &t1;

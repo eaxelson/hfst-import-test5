@@ -3127,9 +3127,9 @@
              that take two or more graphs as their arguments, unless otherwise
              said.
          */
-         HfstTransitionGraph &harmonize(HfstTransitionGraph &another, bool harmonize_flags=false) 
+         HfstTransitionGraph &harmonize(HfstTransitionGraph &another) 
        {
-         HarmonizeUnknownAndIdentitySymbols foo(*this, another, harmonize_flags);
+         HarmonizeUnknownAndIdentitySymbols foo(*this, another);
          return *this;
        }
 
