@@ -118,10 +118,6 @@ class XreCompiler
   //!        Default is false.
   void set_flag_harmonization(bool harmonize_flags);
 
-  //! @brief Whether composition operator matches unknowns and identities with flags.
-  //         Default is false.
-  void set_flag_matching(bool match_flags);
-
   //! @brief Whether warning messages are printed to \a file.
   //!        Default is false, If verbose==false, \a file is ignored.
   void set_verbosity(bool verbose, FILE * file);

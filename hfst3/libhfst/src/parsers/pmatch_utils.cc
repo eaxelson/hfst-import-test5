@@ -923,7 +923,6 @@ HfstTransducer * PmatchAstNode::evaluate(
             return new HfstTransducer(); // For some compilers and linters
         }
     }
-    return new HfstTransducer(); // this should not happen
 }
 
 

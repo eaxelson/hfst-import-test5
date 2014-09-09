@@ -22,7 +22,6 @@ namespace hfst {
     extern unsigned int cr;
     extern bool harmonize_;
     extern bool harmonize_flags_;
-    extern bool match_flags_;
     extern bool allow_extra_text_at_end;
 
     bool has_weight_been_zeroed = false; // to control how many times a warning is given
@@ -46,7 +45,6 @@ namespace hfst {
 
 using hfst::xre::harmonize_;
 using hfst::xre::harmonize_flags_;
-using hfst::xre::match_flags_;
 
 union YYSTYPE;
 class yy_buffer_state;
@@ -214,17 +212,17 @@ REGEXP2: REPLACE
          }
        | REGEXP2 COMPOSITION REPLACE 
        {
-        if ($1->has_flag_diacritics() && $3->has_flag_diacritics())
+        if ($1->has_flag_diacritics() || $3->has_flag_diacritics())
           {
             if (! harmonize_flags_) {
-                 hfst::xre::warn("warning: both composition arguments contain flag diacritics that are not harmonized\n");
+                 hfst::xre::warn("warning: at least one of the composition arguments contains flag diacritics that are not harmonized\n");
             }
             else {
                 $1->harmonize_flag_diacritics(*$3);
             }
           }
 
-            $$ = & $1->compose(*$3, harmonize_, match_flags_).minimize();
+            $$ = & $1->compose(*$3, harmonize_).minimize();
             delete $3;
         }
        | REGEXP2 CROSS_PRODUCT REPLACE {

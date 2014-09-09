@@ -46,20 +46,12 @@ static StringSet remove_flags(const StringSet & alpha)
 }
 
 HarmonizeUnknownAndIdentitySymbols::HarmonizeUnknownAndIdentitySymbols
-(HfstBasicTransducer &t1,HfstBasicTransducer &t2, bool harmonize_flags/*=false*/) :
+(HfstBasicTransducer &t1,HfstBasicTransducer &t2) :
   t1(t1),
   t2(t2)
 {
-  if (!harmonize_flags)
-    {
-      t1_symbol_set = remove_flags(t1.get_alphabet());
-      t2_symbol_set = remove_flags(t2.get_alphabet());
-    }
-  else
-    {
-      t1_symbol_set = t1.get_alphabet();
-      t2_symbol_set = t2.get_alphabet();
-    }
+  t1_symbol_set = remove_flags(t1.get_alphabet());
+  t2_symbol_set = remove_flags(t2.get_alphabet());
  
   if (debug_harmonize) // --- good
     {
