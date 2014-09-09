@@ -539,6 +539,7 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
     local_stack.push(locals_front);
     RtnVariables rtn_front;
     rtn_front.tape_entry = 0;
+    rtn_front.input_tape_entry = 0;
     rtn_front.candidate_input_pos = 0;
     rtn_front.candidate_tape_pos = 0;
     rtn_stack.push(rtn_front);
@@ -790,7 +791,8 @@ void PmatchTransducer::match(unsigned int & input_tape_pos,
                              unsigned int & tape_pos)
 {
     rtn_stack.top().best_result.clear();
-    rtn_stack.top().candidate_input_pos = input_tape_pos; 
+    rtn_stack.top().candidate_input_pos = input_tape_pos;
+    rtn_stack.top().input_tape_entry = input_tape_pos;
     rtn_stack.top().tape_entry = tape_pos;
     rtn_stack.top().candidate_tape_pos = tape_pos;
     rtn_stack.top().best_weight = 0.0;
@@ -816,6 +818,7 @@ void PmatchTransducer::rtn_call(unsigned int & input_tape_pos,
 {
     rtn_stack.push(rtn_stack.top());
     rtn_stack.top().candidate_input_pos = input_tape_pos;
+    rtn_stack.top().input_tape_entry = input_tape_pos;
     rtn_stack.top().tape_entry = tape_pos;
     rtn_stack.top().candidate_tape_pos = tape_pos;
     rtn_stack.top().best_weight = 0.0;
@@ -948,9 +951,8 @@ void PmatchTransducer::check_context(unsigned int input_pos,
     local_stack.top().context_placeholder = input_pos;
     if (local_stack.top().context == LC ||
         local_stack.top().context == NLC) {
-        // When entering a left context we begin checking not
-        // at the current symbol but the previous one.
-        input_pos -= 1;
+        // Jump to the left-hand side of the input
+        input_pos = rtn_stack.top().input_tape_entry - 1;
     }
     get_analyses(input_pos, tape_pos, transition_table[i].get_target());
     // In case we have a negative context, we check to see if the context matched.
@@ -1035,11 +1037,15 @@ void PmatchTransducer::take_transitions(SymbolNumber input,
                 // input tape to find the symbol we want to write
                     this_output = container->input[input_pos];
                 }
-                container->tape.write(tape_pos, input, this_output);
                 Weight tmp = local_stack.top().running_weight;
                 local_stack.top().running_weight +=
                     transition_table[i].get_weight();
-                get_analyses(input_pos + 1, tape_pos + 1, target);
+                if (this_input == alphabet.get_special(Pmatch_passthrough)) {
+                    get_analyses(input_pos, tape_pos, target); // FIXME
+                } else {
+                    container->tape.write(tape_pos, input, this_output);
+                    get_analyses(input_pos + 1, tape_pos + 1, target);
+                }
                 local_stack.top().running_weight = tmp;
             } else {
                 // Checking context so don't touch output

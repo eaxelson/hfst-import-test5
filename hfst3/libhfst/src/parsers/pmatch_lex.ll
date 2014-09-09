@@ -127,6 +127,14 @@ LWSP [\t\r\n ]
     return NRC_LEFT;
 }
 
+"OR(" {
+    return OR_LEFT;
+}
+
+"AND(" {
+    return AND_LEFT;
+}
+
 "Map(" {
     return MAP_LEFT;
 }
