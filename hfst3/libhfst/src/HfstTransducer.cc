@@ -2725,6 +2725,71 @@ void rename_flag_diacritics(HfstTransducer &fst,const std::string &suffix)
   fst = HfstTransducer(basic_fst_copy,fst.get_type());
 }
 
+void HfstTransducer::twosided_flag_diacritics()
+{
+  HfstBasicTransducer basic_fst(*this);
+  HfstBasicTransducer basic_fst_copy;
+  (void)basic_fst_copy.add_state(basic_fst.get_max_state());
+
+  hfst::implementations::HfstState s = 0;
+
+  for (HfstBasicTransducer::const_iterator it = basic_fst.begin();
+       it != basic_fst.end();
+       ++it)
+    {
+      for (HfstBasicTransducer::HfstTransitions::const_iterator jt = 
+             it->begin();
+           jt != it->end();
+           ++jt)
+        {
+          std::string istr = jt->get_input_symbol();
+          std::string ostr = jt->get_output_symbol();
+          bool istr_is_flag = FdOperation::is_diacritic(istr);
+          bool ostr_is_flag = FdOperation::is_diacritic(ostr);
+
+          bool extra_transition_needed 
+            = (istr_is_flag || ostr_is_flag) && (istr != ostr);            
+
+          if (extra_transition_needed)
+            {
+              hfst::implementations::HfstState new_state = basic_fst_copy.add_state();
+
+              // flag:foo -> flag:flag 0:foo, foo:flag -> foo:0 flag:flag
+              // flag1:flag2 -> flag1:flag1 flag2:flag2
+
+              std::string in = istr;
+              std::string out = (istr_is_flag)? istr : hfst::internal_epsilon;
+
+              basic_fst_copy.add_transition
+                (s,
+                 HfstBasicTransition
+                 (new_state, in, out, 0/*?*/));
+
+              in = (ostr_is_flag)? ostr : hfst::internal_epsilon;
+              out = ostr;
+
+              basic_fst_copy.add_transition
+                (new_state,
+                 HfstBasicTransition
+                 (jt->get_target_state(), in, out, jt->get_weight()/*?*/));
+            }
+          else
+            {
+              basic_fst_copy.add_transition
+                (s,
+                 HfstBasicTransition
+                 (jt->get_target_state(), istr, ostr, jt->get_weight()));
+            }
+        }
+
+      if (basic_fst.is_final_state(s))
+        { basic_fst_copy.set_final_weight(s,basic_fst.get_final_weight(s)); }
+
+      ++s;
+    }
+  *this = HfstTransducer(basic_fst_copy,this->get_type());
+}
+
 std::string encode_flag(const std::string &flag_diacritic)
 {
   std::string retval(flag_diacritic);

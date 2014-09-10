@@ -345,6 +345,8 @@ An example:
     unsigned int number_of_states() const;
     unsigned int number_of_arcs() const;
 
+    void twosided_flag_diacritics();
+
   protected:
     /* For internal use: Create a tokenizer that recognizes all symbols 
        that occur in the transducer. */

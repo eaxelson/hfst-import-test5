@@ -1660,8 +1660,8 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::twosided_flags()
   {
-    hfst_fprintf(stderr, "twosided flag diacritics not implemented %s:%d\n", __FILE__,
-                 __LINE__);
+      GET_TOP(tmp);
+      tmp->twosided_flag_diacritics();
       PROMPT_AND_RETURN_THIS;
   }
 
