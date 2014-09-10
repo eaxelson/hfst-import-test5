@@ -184,6 +184,8 @@ class XfstCompiler
   //! @brief Show all variables
   XfstCompiler& show();
 
+  XfstCompiler& twosided_flags();
+
   XfstCompiler& test_uni(Level level, bool assertion=false);
 
   //! @brief Test top transducer in stack for equivalence

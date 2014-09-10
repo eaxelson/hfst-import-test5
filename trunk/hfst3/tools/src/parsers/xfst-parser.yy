@@ -339,6 +339,9 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
        | SHOW_ALL END_COMMAND {
             hfst::xfst::xfst_->show();
        }
+       | TWOSIDED_FLAGS END_COMMAND {
+            hfst::xfst::xfst_->twosided_flags();
+       }
        // tests
        | TEST_EQ END_COMMAND {
             hfst::xfst::xfst_->test_eq();

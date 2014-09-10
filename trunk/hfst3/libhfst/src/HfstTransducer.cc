@@ -104,6 +104,28 @@ bool harmonize_smaller=true;
 /* By default, unknown symbols are used. */
 bool unknown_symbols_in_use=true;
 
+/* Xerox-style composition where flag diacritics match unknowns and identities. */
+bool xerox_composition=false;
+/* Xerox option where flag diacritic are treated as epsilons in composition. */
+bool flag_is_epsilon_in_composition=false;
+
+  void set_xerox_composition(bool value) {
+    xerox_composition=value;
+  }
+
+  bool get_xerox_composition() {
+    return xerox_composition;
+  }
+
+  void set_flag_is_epsilon_in_composition(bool value) {
+    flag_is_epsilon_in_composition=value;
+  }
+
+  bool get_flag_is_epsilon_in_composition() {
+    return flag_is_epsilon_in_composition;
+  }
+
+
 void set_harmonize_smaller(bool value) {
     harmonize_smaller=value; }
 
@@ -2703,6 +2725,110 @@ void rename_flag_diacritics(HfstTransducer &fst,const std::string &suffix)
   fst = HfstTransducer(basic_fst_copy,fst.get_type());
 }
 
+std::string encode_flag(const std::string &flag_diacritic)
+{
+  std::string retval(flag_diacritic);
+  retval[0] = '$';
+  retval[retval.size()-1] = '$';
+  return retval;
+}
+
+std::string decode_flag(const std::string &flag_diacritic)
+{
+  std::string retval(flag_diacritic);
+  retval[0] = '@';
+  retval[retval.size()-1] = '@';
+  return retval;
+}
+
+// todo: copy alphabet?
+void encode_flag_diacritics(HfstTransducer &fst)
+{
+  
+  HfstBasicTransducer basic_fst(fst);
+  HfstBasicTransducer basic_fst_copy;
+  (void)basic_fst_copy.add_state(basic_fst.get_max_state());
+
+  hfst::implementations::HfstState s = 0;
+
+  for (HfstBasicTransducer::const_iterator it = basic_fst.begin();
+       it != basic_fst.end();
+       it++)
+    {
+      for (HfstBasicTransducer::HfstTransitions::const_iterator jt = 
+             it->begin();
+           jt != it->end();
+           jt++)
+        {
+          basic_fst_copy.add_transition
+            (s,
+             HfstBasicTransition
+             (jt->get_target_state(),
+
+              FdOperation::is_diacritic(jt->get_input_symbol())  ?
+              encode_flag(jt->get_input_symbol()) :
+              jt->get_input_symbol(),
+
+              FdOperation::is_diacritic(jt->get_output_symbol())  ?
+              encode_flag(jt->get_output_symbol()) :
+              jt->get_output_symbol(),
+
+              jt->get_weight()));
+        }
+
+      if (basic_fst.is_final_state(s))
+        { basic_fst_copy.set_final_weight(s,basic_fst.get_final_weight(s)); }
+
+      s++;
+    }
+  fst = HfstTransducer(basic_fst_copy,fst.get_type());
+}
+
+// todo: copy alphabet
+void decode_flag_diacritics(HfstTransducer &fst)
+{
+  
+  HfstBasicTransducer basic_fst(fst);
+  HfstBasicTransducer basic_fst_copy;
+  (void)basic_fst_copy.add_state(basic_fst.get_max_state());
+
+  hfst::implementations::HfstState s = 0;
+
+  for (HfstBasicTransducer::const_iterator it = basic_fst.begin();
+       it != basic_fst.end();
+       it++)
+    {
+      for (HfstBasicTransducer::HfstTransitions::const_iterator jt = 
+             it->begin();
+           jt != it->end();
+           jt++)
+        {
+          std::string istr = decode_flag(jt->get_input_symbol());
+          if (!FdOperation::is_diacritic(istr))
+            istr = jt->get_input_symbol();
+          
+          std::string ostr = decode_flag(jt->get_output_symbol());
+          if (!FdOperation::is_diacritic(ostr))
+            ostr = jt->get_output_symbol();
+
+          basic_fst_copy.add_transition
+            (s,
+             HfstBasicTransition
+             (jt->get_target_state(),
+              istr,
+              ostr,
+              jt->get_weight()));
+        }
+
+      if (basic_fst.is_final_state(s))
+        { basic_fst_copy.set_final_weight(s,basic_fst.get_final_weight(s)); }
+
+      s++;
+    }
+  fst = HfstTransducer(basic_fst_copy,fst.get_type());
+}
+
+
 // Return true if the flag in flag_diacritic ends in suffix and false
 // otherwise. E.g. if flag_diacritic = "@D.NeedNoun_1.ON@ and suffix =
 // "_1", return true.
@@ -2755,6 +2881,48 @@ bool HfstTransducer::check_for_missing_flags_in
     return check_for_missing_flags_in(another, foo, 
                                       true /* return on first miss */);
 }
+
+
+static bool substitute_input_flag_with_epsilon(const StringPair &sp, StringPairSet &sps)
+{
+  if (FdOperation::is_diacritic(sp.first))
+    {
+      StringPair new_pair(hfst::internal_epsilon, sp.second);
+      sps.insert(new_pair);
+      return true;
+    }
+  return false;
+}
+
+static bool substitute_output_flag_with_epsilon(const StringPair &sp, StringPairSet &sps)
+{
+  if (FdOperation::is_diacritic(sp.second))
+    {
+      StringPair new_pair(sp.first, hfst::internal_epsilon);
+      sps.insert(new_pair);
+      return true;
+    }
+  return false;
+}
+
+static bool substitute_one_sided_flags(const StringPair &sp, StringPairSet &sps)
+{
+  if (FdOperation::is_diacritic(sp.first))
+    {
+      StringPair new_pair(sp.first, sp.first);
+      sps.insert(new_pair);
+      return true;
+    }
+  if (FdOperation::is_diacritic(sp.second))
+    {
+      StringPair new_pair(sp.second, sp.second);
+      sps.insert(new_pair);
+      return true;
+    }
+  return false;
+}
+
+
 
 // -----------------------------------------------------------------------
 //
@@ -3286,7 +3454,7 @@ bool substitute_unknown_identity_pairs
 
 
 HfstTransducer &HfstTransducer::compose
-(const HfstTransducer &another, 
+(const HfstTransducer &another,
  bool harmonize)
 { is_trie = false;
 
@@ -3295,6 +3463,18 @@ HfstTransducer &HfstTransducer::compose
     if (this->type != another_copy->type) {
         another_copy->convert(this->type);
     }
+
+    if (flag_is_epsilon_in_composition)
+      {
+        this->substitute(&substitute_output_flag_with_epsilon);
+        another_copy->substitute(&substitute_input_flag_with_epsilon);
+      }
+
+    if (xerox_composition)
+      {
+        encode_flag_diacritics(*this);
+        encode_flag_diacritics(*another_copy);
+      }
 
     /* prevent harmonization, if needed */
     if (! harmonize)
@@ -3316,7 +3496,7 @@ HfstTransducer &HfstTransducer::compose
       }
 
     // Handle special symbols here.
-    if ( (this->type != FOMA_TYPE) && unknown_symbols_in_use) 
+    if ( (this->type != FOMA_TYPE) && unknown_symbols_in_use)
     {
       // comment...
       this->substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",false,true);
@@ -3383,6 +3563,17 @@ HfstTransducer &HfstTransducer::compose
     default:
         HFST_THROW(FunctionNotImplementedException);
     }
+
+    if (xerox_composition)
+      {
+        decode_flag_diacritics(*this);
+        decode_flag_diacritics(*another_copy);
+      }
+
+    if (flag_is_epsilon_in_composition)
+      {
+        this->substitute(&substitute_one_sided_flags);
+      }
 
     if ( (this->type != FOMA_TYPE) && unknown_symbols_in_use) 
     {
