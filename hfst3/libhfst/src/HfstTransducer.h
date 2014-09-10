@@ -121,6 +121,12 @@ namespace hfst
   void set_encode_weights(bool);
   bool get_encode_weights();
 
+  void set_xerox_composition(bool);
+  bool get_xerox_composition();
+
+  void set_flag_is_epsilon_in_composition(bool);
+  bool get_flag_is_epsilon_in_composition();
+
   /* Whether in harmonization the smaller transducer is always harmonized
      according to the bigger transducer. */
   void set_harmonize_smaller(bool);

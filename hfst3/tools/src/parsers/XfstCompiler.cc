@@ -120,6 +120,7 @@ namespace xfst {
     variable_explanations_["sort-arcs"] = "<NOT IMPLEMENTED>";
     variable_explanations_["use-timer"] = "<NOT IMPLEMENTED>";
     variable_explanations_["verbose"] = "print more information";
+    variable_explanations_["xerox-composition"] = "treat flag diacritics as ordinary symbols in composition";
   }
 
   static const char * APPLY_END_STRING = "<ctrl-d>";
@@ -139,7 +140,7 @@ namespace xfst {
     {       
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
-        xre_.set_flag_harmonization(true);
+        xre_.set_flag_harmonization(false);
         variables_["assert"] = "OFF";
         variables_["att-epsilon"] = "@0@ | @_EPSILON_SYMBOL_@";
         variables_["char-encoding"] = "UTF-8";
@@ -147,7 +148,7 @@ namespace xfst {
         variables_["directory"] = "OFF";
         variables_["encode-weights"] = "OFF";
         variables_["flag-is-epsilon"] = "OFF";
-        variables_["harmonize-flags"] = "ON";
+        variables_["harmonize-flags"] = "OFF";
         variables_["hopcroft-min"] = "ON";
         variables_["lexc-minimize-flags"] = "OFF"; 
         variables_["lexc-with-flags"] = "OFF";
@@ -173,6 +174,7 @@ namespace xfst {
         variables_["sort-arcs"] = "MAYBE";
         variables_["use-timer"] = "OFF";
         variables_["verbose"] = "OFF";
+        variables_["xerox-composition"] = "OFF";
         initialize_variable_explanations();
         prompt();
       }
@@ -189,7 +191,7 @@ namespace xfst {
     {       
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
-        xre_.set_flag_harmonization(true);
+        xre_.set_flag_harmonization(false);
         variables_["assert"] = "OFF";
         variables_["att-epsilon"] = "@0@ | @_EPSILON_SYMBOL_@";
         variables_["char-encoding"] = "UTF-8";
@@ -197,7 +199,7 @@ namespace xfst {
         variables_["directory"] = "OFF";
         variables_["encode-weights"] = "OFF";
         variables_["flag-is-epsilon"] = "OFF";
-        variables_["harmonize-flags"] = "ON";
+        variables_["harmonize-flags"] = "OFF";
         variables_["hopcroft-min"] = "ON";
         variables_["lexc-minimize-flags"] = "OFF"; 
         variables_["lexc-with-flags"] = "OFF";
@@ -223,6 +225,7 @@ namespace xfst {
         variables_["sort-arcs"] = "MAYBE";
         variables_["use-timer"] = "OFF";
         variables_["verbose"] = "OFF";
+        variables_["xerox-composition"] = "OFF";
         initialize_variable_explanations();
         prompt();
       }
@@ -1654,6 +1657,14 @@ namespace xfst {
       PROMPT_AND_RETURN_THIS;
     }
 
+  XfstCompiler&
+  XfstCompiler::twosided_flags()
+  {
+    hfst_fprintf(stderr, "twosided flag diacritics not implemented %s:%d\n", __FILE__,
+                 __LINE__);
+      PROMPT_AND_RETURN_THIS;
+  }
+
   XfstCompiler& 
   XfstCompiler::echo(const char* text)
     {
@@ -1718,6 +1729,25 @@ namespace xfst {
             xre_.set_flag_harmonization(true);
           if (strcmp(text, "OFF") == 0)
             xre_.set_flag_harmonization(false);
+        }
+      if (strcmp(name, "xerox-composition") == 0)
+        {
+          if (strcmp(text, "ON") == 0)
+            hfst::set_xerox_composition(true);
+          if (strcmp(text, "OFF") == 0)
+            hfst::set_xerox_composition(false);
+        }
+      if (strcmp(name, "flag-is-epsilon") == 0)
+        {
+          if (strcmp(text, "ON") == 0)
+            hfst::set_flag_is_epsilon_in_composition(true);
+          if (strcmp(text, "OFF") == 0)
+            hfst::set_flag_is_epsilon_in_composition(false);
+        }
+
+      if (verbose_)
+        {
+          hfst_fprintf(outstream_, "variable %s = %s\n", name, text);
         }
 
       PROMPT_AND_RETURN_THIS;
@@ -3474,44 +3504,6 @@ namespace xfst {
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
   }
 
-  static bool substitute_input_flag_with_epsilon(const StringPair &sp, StringPairSet &sps)
-  {
-    if (FdOperation::is_diacritic(sp.first))
-      {
-        StringPair new_pair(hfst::internal_epsilon, sp.second);
-        sps.insert(new_pair);
-        return true;
-      }
-    return false;
-  }
-
-  static bool substitute_output_flag_with_epsilon(const StringPair &sp, StringPairSet &sps)
-  {
-    if (FdOperation::is_diacritic(sp.second))
-      {
-        StringPair new_pair(sp.first, hfst::internal_epsilon);
-        sps.insert(new_pair);
-        return true;
-      }
-    return false;
-  }
-
-  static bool substitute_one_sided_flags(const StringPair &sp, StringPairSet &sps)
-  {
-    if (FdOperation::is_diacritic(sp.first))
-      {
-        StringPair new_pair(sp.first, sp.first);
-        sps.insert(new_pair);
-        return true;
-      }
-    if (FdOperation::is_diacritic(sp.second))
-      {
-        StringPair new_pair(sp.second, sp.second);
-        sps.insert(new_pair);
-        return true;
-      }
-    return false;
-  }
 
   XfstCompiler&
   XfstCompiler::apply_binary_operation_iteratively(BinaryOperation operation)
@@ -3551,17 +3543,9 @@ namespace xfst {
                       result->harmonize_flag_diacritics(*t);
                     }
                 }
-              if (variables_["flag-is-epsilon"] == "ON")
-                {
-                  result->substitute(&substitute_output_flag_with_epsilon);
-                  t->substitute(&substitute_input_flag_with_epsilon);
-                }
+
               result->compose(*t);
-              if (variables_["flag-is-epsilon"] == "ON")
-                {
-                  result->substitute(&substitute_one_sided_flags);
-                  // t will be deleted later
-                }
+
               break;
             }
           case CONCATENATE_NET:
