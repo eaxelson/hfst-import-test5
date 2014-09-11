@@ -291,6 +291,7 @@ lexc_streams(HfstOutputStream& outstream)
               }
           }
       }
+    assert(trans != NULL);
     trans->convert(format);
     hfst_set_name(*trans, lexcfilenames[0], "lexc");
     hfst_set_formula(*trans, lexcfilenames[0], "L");

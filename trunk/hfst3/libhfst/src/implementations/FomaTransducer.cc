@@ -597,13 +597,17 @@ namespace hfst { namespace implementations {
           break; }
       }
 
-      if (!filter_fd || 
-          fd_state_stack->back().get_table().get_operation(arc->in)==NULL)
+      if (!filter_fd || ( fd_state_stack != NULL &&
+                          fd_state_stack->back().get_table().get_operation(arc->in)==NULL)) {
+        assert(c_in != NULL);
         istring = strdup(c_in);
+      }
 
       if (!filter_fd || 
-          fd_state_stack->back().get_table().get_operation(arc->out)==NULL)
+          fd_state_stack->back().get_table().get_operation(arc->out)==NULL) {
+        assert(c_out != NULL);
         ostring = strdup(c_out);
+      }
 
       spv.push_back(StringPair(istring, ostring));
 
@@ -804,7 +808,7 @@ namespace hfst { namespace implementations {
     msg + filename;
     HFST_THROW_MESSAGE(StreamNotReadableException, msg);
       }
-    delete filename_;
+    free(filename_);
     int verbose_int = 0;
     if (verbose)
       verbose_int = 1;

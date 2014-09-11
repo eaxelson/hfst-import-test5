@@ -286,6 +286,7 @@ process_stream(HfstInputStream* instream, HfstOutputStream* outstream)
                   }
                 char* to_char = 0;
                 const char* endstr = tab + 1;
+                assert(endstr != NULL);
                 tab = strstr(endstr, "\t");
                 while (tab != NULL)
                   {

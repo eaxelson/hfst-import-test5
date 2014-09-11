@@ -780,6 +780,9 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         }
       else if (to_transducer_filename)
         {
+          if (from_label == NULL) // make scan-build happy, this should not happen
+            throw "Error: from_label has a NULL value.";
+
             char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
                                          (strlen(from_label) +
                                           strlen(to_transducer_filename) +

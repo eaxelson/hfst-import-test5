@@ -340,6 +340,8 @@ int main( int argc, char **argv )
     
     if (generate_model_forms)
       {
+        if (generator == 0) // make scan-build happy, this should not happen
+          throw "Error: generator has a NULL value.";
         StringVectorVector paradigms = get_paradigms(line,
                                                      guesses,
                                                      *generator,
@@ -371,7 +373,7 @@ int main( int argc, char **argv )
     delete instream;
 
     if (outfile != stdout)
-      { delete out; }
+      { assert(out != std::cout); delete out; }
 
     free(inputfilename);
     free(outfilename);
