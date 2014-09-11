@@ -380,6 +380,13 @@ char*
 strstrip(const char* s)
 {
     char* rv = (char*)malloc(sizeof(char)*strlen(s)+1);
+
+    if (*s == '\0') // empty string is a special case
+    {
+      *rv = '\0';
+      return rv;
+    }
+
     char* p = rv;
     while (isspace(*s))
     {
@@ -420,8 +427,17 @@ strdup_nonconst_part(const char* token, const char* prefix,
     }
     varpart_len = strlen(token) - prefix_len - suffix_len;
     assert(varpart_len <= token_len);
-    assert(strncmp(token, prefix, prefix_len) == 0);
-    assert(strncmp(token + prefix_len + varpart_len, suffix, suffix_len) == 0);
+
+    if (prefix == NULL) 
+      { assert(strncmp(token, "", prefix_len) == 0); }
+    else 
+      { assert(strncmp(token, prefix, prefix_len) == 0); }
+
+    if (suffix == NULL) 
+      { assert(strncmp(token + prefix_len + varpart_len, "", suffix_len) == 0); }
+    else 
+      { assert(strncmp(token + prefix_len + varpart_len, suffix, suffix_len) == 0); }
+
     (void)memcpy(token_part, token + prefix_len, varpart_len);
     token_part[varpart_len] = '\0';
     if (strip)

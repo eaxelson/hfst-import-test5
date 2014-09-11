@@ -144,6 +144,8 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
           transducer_n_second++;
         }
         char* firstname = strdup(first->get_name().c_str());
+        if (second == NULL) // make scan-build happy, this should not happen
+          throw "Error: second stream has a NULL value.";
         char* secondname = strdup(second->get_name().c_str());
         if (strlen(firstname) == 0)
           {

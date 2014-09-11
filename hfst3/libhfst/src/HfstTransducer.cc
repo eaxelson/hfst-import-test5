@@ -1593,15 +1593,25 @@ static int flag_build
     if (strcmp(fname,ffname) != 0)
         return FLAG_NONE;
     
+    bool fvalue_allocated = false; // make scan-build happy..
+    bool ffvalue_allocated = false;
+
     if (fvalue == NULL) {
         fvalue = strdup("");
+        fvalue_allocated = true;
         selfnull = 1;
     }
     
-    if (ffvalue == NULL)
+    if (ffvalue == NULL) {
         ffvalue = strdup("");
+        ffvalue_allocated = true;
+    }
 
     eq = strcmp(fvalue, ffvalue);
+
+    if (fvalue_allocated) { free(fvalue); }  // make scan-build happy..
+    if (ffvalue_allocated) { free(ffvalue); }
+
     /* U flags */
     if (ftype == FLAG_UNIFY && fftype == FLAG_POSITIVE && eq == 0)
         return FLAG_SUCCEED;

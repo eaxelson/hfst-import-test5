@@ -147,6 +147,8 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
             transducer_n_second++;
           }
         char* firstname = hfst_get_name(*first, firstfilename);
+        if (second == 0) { // make scan-build happy, this should not happen
+          throw "Error: second stream has a NULL value."; }
         char* secondname = hfst_get_name(*second, secondfilename);
         if (transducer_n_first == 1)
         {

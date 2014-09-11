@@ -375,6 +375,7 @@ void HfstOlInputStream::ignore(unsigned int n)
       std::string istring("");
       std::string ostring("");
 
+      assert(fd_state_stack != NULL);
       if (!filter_fd || 
           fd_state_stack->back().get_table().
           get_operation(input)==NULL)
