@@ -98,7 +98,8 @@ PmatchContainer::PmatchContainer(std::istream & inputstream,
                                  bool _verbose, bool _extract_tags):
     verbose(_verbose),
     locate_mode(false),
-    recursion_depth_left(PMATCH_MAX_RECURSION_DEPTH)
+    recursion_depth_left(PMATCH_MAX_RECURSION_DEPTH),
+    entry_stack()
 {
     std::string transducer_name;
     transducer_name = parse_name_from_hfst3_header(inputstream);
@@ -912,7 +913,21 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
                     container->tape.write(tape_pos, 0, output);
                     Weight old_weight = local_stack.top().running_weight;
                     local_stack.top().running_weight += weight;
+
+                    // if it's an entry or exit arc, adjust entry stack
+                    if (output == alphabet.get_special(entry)) {
+                        container->entry_stack.push(input_pos);
+                    } else if (output == alphabet.get_special(exit)) {
+                        container->entry_stack.pop();
+                    }
+
+                    
                     get_analyses(input_pos, tape_pos + 1, target);
+
+                    if (output == alphabet.get_special(exit)) {
+                        container->entry_stack.unpop();
+                    }
+                    
                     local_stack.top().running_weight = old_weight;
                 } else {
                     check_context(input_pos, tape_pos, i);
@@ -952,7 +967,7 @@ void PmatchTransducer::check_context(unsigned int input_pos,
     if (local_stack.top().context == LC ||
         local_stack.top().context == NLC) {
         // Jump to the left-hand side of the input
-        input_pos = rtn_stack.top().input_tape_entry - 1;
+        input_pos = container->entry_stack.top() - 1;
     }
     get_analyses(input_pos, tape_pos, transition_table[i].get_target());
     // In case we have a negative context, we check to see if the context matched.
