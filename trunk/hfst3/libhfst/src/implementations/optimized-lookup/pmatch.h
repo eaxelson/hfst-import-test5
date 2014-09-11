@@ -67,6 +67,16 @@ namespace hfst_ol {
 
     };
 
+    class PositionStack: public std::vector<unsigned int>
+    {
+        unsigned int tmp;
+    public:
+        void push(unsigned int val) { push_back(val); }
+        void pop(void) { tmp = back(); pop_back(); }
+        void unpop(void) { push_back(tmp); }
+        unsigned int top(void) { return back(); }
+    };
+
     class WeightedDoubleTape: public DoubleTape
     {
     public:
@@ -119,6 +129,7 @@ namespace hfst_ol {
         PmatchTransducer * toplevel;
         size_t io_size;
         SymbolNumberVector input;
+        PositionStack entry_stack;
         DoubleTape tape;
         DoubleTape output;
         LocationVectorVector locations;
