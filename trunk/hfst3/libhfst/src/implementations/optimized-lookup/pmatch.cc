@@ -924,7 +924,9 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
                     
                     get_analyses(input_pos, tape_pos + 1, target);
 
-                    if (output == alphabet.get_special(exit)) {
+                    if (output == alphabet.get_special(entry)) {
+                        container->entry_stack.pop();
+                    } else if (output == alphabet.get_special(exit)) {
                         container->entry_stack.unpop();
                     }
                     
