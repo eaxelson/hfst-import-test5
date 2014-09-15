@@ -2816,7 +2816,6 @@ std::string decode_flag(const std::string &flag_diacritic)
   return retval;
 }
 
-// todo: copy alphabet?
 void encode_flag_diacritics(HfstTransducer &fst)
 {
   
@@ -2856,10 +2855,20 @@ void encode_flag_diacritics(HfstTransducer &fst)
 
       s++;
     }
+
+  // copy alphabet, encode all flags
+  StringSet alpha = basic_fst.get_alphabet();
+  for (StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
+    {
+      String symbol = *it;
+      if (FdOperation::is_diacritic(symbol))
+        symbol = encode_flag(symbol);
+      basic_fst_copy.add_symbol_to_alphabet(symbol);
+    }
+
   fst = HfstTransducer(basic_fst_copy,fst.get_type());
 }
 
-// todo: copy alphabet
 void decode_flag_diacritics(HfstTransducer &fst)
 {
   
@@ -2900,6 +2909,17 @@ void decode_flag_diacritics(HfstTransducer &fst)
 
       s++;
     }
+
+  // copy alphabet, decode all flags
+  StringSet alpha = basic_fst.get_alphabet();
+  for (StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
+    {
+      std::string symbol = decode_flag(*it);
+      if (!FdOperation::is_diacritic(symbol))
+        symbol = *it;
+      basic_fst_copy.add_symbol_to_alphabet(symbol);
+    }
+
   fst = HfstTransducer(basic_fst_copy,fst.get_type());
 }
 

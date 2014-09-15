@@ -161,5 +161,6 @@ EXTRA_DIST=test.sh \
 	weighted_parallel_rules_8.xfst weighted_parallel_rules_8.output \
 	weighted_parallel_rules_9.xfst weighted_parallel_rules_9.output \
 	weighted_parallel_rules_10.xfst weighted_parallel_rules_10.output \
-	weighted_parallel_rules_11.xfst weighted_parallel_rules_11.output
+	weighted_parallel_rules_11.xfst weighted_parallel_rules_11.output \
+	xerox_composition.xfst xerox_composition.output
 check_DATA=test.sh
