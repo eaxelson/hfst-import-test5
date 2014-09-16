@@ -407,8 +407,8 @@ xre.star-plus-optional.lexc.flag.result \
 xre.star-plus-optional.lexc.result \
 no-newline-before-sublexicon.lexc.flag.result \
 no-newline-before-sublexicon.lexc.result \
-warn.sublexicon-mentioned-but-not-defined.flag.result \
-warn.sublexicon-mentioned-but-not-defined.result
+warn.sublexicon-mentioned-but-not-defined.lexc.flag.result \
+warn.sublexicon-mentioned-but-not-defined.lexc.result
 
 # files needed for test programs
 EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS) $(TESTS) $(EXTRA_FILES) $(LEXC_TXTS) $(PMATCH_TXTS) script.xfst lexc2fst-stress.sh lookup-stress.sh proc-stress.sh valgrind.sh \
