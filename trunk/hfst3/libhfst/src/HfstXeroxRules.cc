@@ -87,6 +87,55 @@ namespace hfst
         return replType;
       }
 
+    std::ostream & operator<<(std::ostream &out, const Rule & r)
+    {
+      out << "hfst::xeroxRules::Rule:" << std::endl;
+      out << "replType: ";
+      switch(r.replType)
+        {
+        case REPL_UP:
+          out << "REPL_UP";
+          break;
+        case REPL_DOWN:
+          out << "REPL_DOWN";
+          break;
+        case REPL_RIGHT:
+          out << "REPL_RIGHT";
+          break;
+        case REPL_LEFT:
+          out << "REPL_LEFT";
+          break;
+        }
+      out << std::endl;
+
+      out << "mapping:" << std::endl;
+      unsigned int index = 1;
+      for (HfstTransducerPairVector::const_iterator it = r.mapping.begin();
+           it != r.mapping.end(); it++)
+        {
+          out << "#" << index << " (right side):" << std::endl;
+          out << it->first;
+          out << "#" << index << " (left side):" << std::endl;
+          out << it->second;
+          index++;
+        }
+
+      out << "context:" << std::endl;
+      index = 1;
+      for (HfstTransducerPairVector::const_iterator it = r.context.begin();
+           it != r.context.end(); it++)
+        {
+          out << "#" << index << " (right side):" << std::endl;
+          out << it->first;
+          out << "#" << index << " (left side):" << std::endl;
+          out << it->second;
+          index++;
+        }
+
+      return out;
+    }
+
+
       ///////
 
       MarkUpRule::MarkUpRule ( const HfstTransducerPairVector &a_mapping,
@@ -736,7 +785,7 @@ namespace hfst
     static unsigned int getMarkerNumber(const std::string & str)
     {
       std::string number_str = str.substr(1, str.size()-2);
-      std::istringstream iss;
+      std::istringstream iss(number_str);
       unsigned int retval;
       iss >> retval;
       return retval;

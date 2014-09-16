@@ -66,6 +66,7 @@ namespace hfst
             HfstTransducerPairVector get_mapping() const;
             HfstTransducerPairVector get_context() const;
             ReplaceType get_replType() const;
+            friend std::ostream& operator<<(std::ostream &out, const Rule &r);
         };
 
         /**
