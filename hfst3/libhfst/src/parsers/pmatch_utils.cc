@@ -921,8 +921,9 @@ HfstTransducer * PmatchAstNode::evaluate(
             std::string errstring = "Symbol " + std::string(symbol) + " not found";
             pmatcherror(errstring.c_str());
             return new HfstTransducer(); // For some compilers and linters
-        }
+        }        
     }
+    return new HfstTransducer(); // For some compilers and linters
 }
 
 
