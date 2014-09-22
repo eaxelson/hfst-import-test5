@@ -214,7 +214,6 @@ HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex)
                                                 EXIT_SYMBOL,
                                                 regex->get_type()));
     delete regex;
-    delimited_regex->minimize();
     return delimited_regex;
 }
 
@@ -556,7 +555,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
             dummy.harmonize(*defs_itr->second);
             retval.insert(std::pair<std::string, hfst::HfstTransducer*>(
                               defs_itr->first,
-                              add_pmatch_delimiters(defs_itr->second)));
+                              defs_itr->second));
         } else {
             delete defs_itr->second;
         }

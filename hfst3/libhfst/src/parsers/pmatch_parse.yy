@@ -189,7 +189,8 @@ BINDING: SYMBOL REGEXP1 {
         hfst::pmatch::print_size_info($2);
         std::cerr << std::endl;
     }
-    $$ = new std::pair<std::string, hfst::HfstTransducer*>($1, $2);
+    $$ = new std::pair<std::string, hfst::HfstTransducer*>
+        ($1, hfst::pmatch::add_pmatch_delimiters($2));
  };
 
 FUNCTION: SYMBOL_WITH_LEFT_PAREN ARGLIST RIGHT_PARENTHESIS FUNCBODY1 END_OF_EXPRESSION {
