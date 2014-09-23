@@ -48,7 +48,9 @@ const std::string BOUNDARY_SYMBOL = "@BOUNDARY@";
 const std::string ENTRY_SYMBOL = "@PMATCH_ENTRY@";
 const std::string EXIT_SYMBOL = "@PMATCH_EXIT@";
 
-extern std::set<std::string> special_pmatch_symbols;
+extern std::set<std::string> all_pmatch_symbols;
+
+void add_to_pmatch_symbols(StringSet symbols);
 
 PmatchUtilityTransducers* get_utils();
 
@@ -355,6 +357,8 @@ PmatchAstNode(std::string sym): symbol(sym), type(AstSymbol) {}
 
     HfstTransducer * evaluate(std::map<std::string,
                               HfstTransducer *> & funargs);
+
+    HfstTransducer * compile(void);
 
     void push_numeric_arg(int arg)
         { numeric_args.push_back(arg); }
