@@ -179,7 +179,6 @@ DEFINITION: DEFINE BINDING { $$ = $2; }
 
 BINDING: SYMBOL REGEXP1 {
     $2->set_name($1);
-    $2->minimize();
     if (hfst::pmatch::verbose) {
         std::cerr << std::setiosflags(std::ios::fixed) << std::setprecision(2);
         double duration = (clock() - hfst::pmatch::timer) /
@@ -189,8 +188,9 @@ BINDING: SYMBOL REGEXP1 {
         hfst::pmatch::print_size_info($2);
         std::cerr << std::endl;
     }
-    $$ = new std::pair<std::string, hfst::HfstTransducer*>
-        ($1, hfst::pmatch::add_pmatch_delimiters($2));
+    $2 = hfst::pmatch::add_pmatch_delimiters($2);
+    $2->minimize();
+    $$ = new std::pair<std::string, hfst::HfstTransducer*>($1, $2);
  };
 
 FUNCTION: SYMBOL_WITH_LEFT_PAREN ARGLIST RIGHT_PARENTHESIS FUNCBODY1 END_OF_EXPRESSION {
