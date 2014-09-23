@@ -904,7 +904,7 @@ REGEXP11: REGEXP12 { }
     $$ = & $1->set_final_weights($2);
  }
 | LEFT_BRACKET REGEXP2 RIGHT_BRACKET {
-    $$ = hfst::pmatch::add_pmatch_delimiters($2);
+    $$ = $2;
  }
 | LEFT_PARENTHESIS REGEXP2 RIGHT_PARENTHESIS {
     $$ = & $2->optionalize();
