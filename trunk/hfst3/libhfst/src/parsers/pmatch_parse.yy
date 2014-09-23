@@ -748,6 +748,8 @@ REGEXP5: REGEXP6 { }
     delete $3;
  }
 | REGEXP5 MINUS REGEXP6 {
+    hfst::pmatch::add_to_pmatch_symbols($3->get_alphabet());
+    $1->insert_to_alphabet(hfst::pmatch::all_pmatch_symbols);
     $$ = & $1->subtract(*$3);
     delete $3;
  }
@@ -1020,7 +1022,7 @@ LABEL: QUOTED_LITERAL PAIR_SEPARATOR QUOTED_LITERAL {
                             hfst::pmatch::format);
     // Insert special symbols we don't want to have expanded when this
     // interacts with anything else
-    $$->insert_to_alphabet(hfst::pmatch::special_pmatch_symbols);
+    $$->insert_to_alphabet(hfst::pmatch::all_pmatch_symbols);
 
  }
 | QUOTED_LITERAL PAIR_SEPARATOR EPSILON_TOKEN {
@@ -1093,6 +1095,7 @@ LABEL: QUOTED_LITERAL PAIR_SEPARATOR QUOTED_LITERAL {
                 hfst::pmatch::used_definitions.insert($1);
             }
             $$ = new HfstTransducer(*hfst::pmatch::definitions[$1]);
+            $$->insert_to_alphabet(hfst::pmatch::all_pmatch_symbols);
         }
     } else {
         if (strlen($1) == 0) {
@@ -1117,7 +1120,7 @@ LABEL: QUOTED_LITERAL PAIR_SEPARATOR QUOTED_LITERAL {
                             hfst::pmatch::format);
     // Insert special symbols we don't want to have expanded when this
     // interacts with anything else
-    $$->insert_to_alphabet(hfst::pmatch::special_pmatch_symbols);
+    $$->insert_to_alphabet(hfst::pmatch::all_pmatch_symbols);
   }
 | QUOTED_LITERAL {
     $$ = new HfstTransducer($1, hfst::pmatch::format);

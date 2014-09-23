@@ -65,7 +65,15 @@ clock_t timer;
 
 std::map<std::string, hfst::HfstTransducer> named_transducers;
 PmatchUtilityTransducers* utils=NULL;
-std::set<std::string> special_pmatch_symbols;
+std::set<std::string> all_pmatch_symbols;
+
+void add_to_pmatch_symbols(StringSet symbols)
+{
+    for(StringSet::const_iterator it = symbols.begin();
+        it != symbols.end(); ++it) {
+        all_pmatch_symbols.insert(*it);
+    }
+}
 
 PmatchUtilityTransducers*
 get_utils()
@@ -178,7 +186,7 @@ get_Ins_transition(const char *s)
     rv = strcpy(rv, "@I.");
     rv = strcat(rv, s);
     rv = strcat(rv, "@");
-    special_pmatch_symbols.insert(rv);
+    all_pmatch_symbols.insert(rv);
     return rv;
 }
 
@@ -189,7 +197,7 @@ get_RC_transition(const char *s)
     rv = strcpy(rv, "@RC.");
     rv = strcat(rv, s);
     rv = strcat(rv, "@");
-    special_pmatch_symbols.insert(rv);
+    all_pmatch_symbols.insert(rv);
     return rv;
 }
 
@@ -200,7 +208,7 @@ get_LC_transition(const char *s)
     rv = strcpy(rv, "@LC.");
     rv = strcat(rv, s);
     rv = strcat(rv, "@");
-    special_pmatch_symbols.insert(rv);
+    all_pmatch_symbols.insert(rv);
     return rv;
 }
 
@@ -222,7 +230,7 @@ void add_end_tag(HfstTransducer * regex, std::string tag)
     HfstTransducer end_tag(hfst::internal_epsilon,
                            "@PMATCH_ENDTAG_" + tag + "@",
                            regex->get_type());
-    special_pmatch_symbols.insert("@PMATCH_ENDTAG_" + tag + "@");
+    all_pmatch_symbols.insert("@PMATCH_ENDTAG_" + tag + "@");
     regex->concatenate(end_tag);
 }
 
@@ -231,7 +239,7 @@ HfstTransducer * make_end_tag(std::string tag)
     HfstTransducer * end_tag = new HfstTransducer(hfst::internal_epsilon,
                                                   "@PMATCH_ENDTAG_" + tag + "@",
                                                   format);
-    special_pmatch_symbols.insert("@PMATCH_ENDTAG_" + tag + "@");
+    all_pmatch_symbols.insert("@PMATCH_ENDTAG_" + tag + "@");
     return end_tag;
 }
 
@@ -464,19 +472,19 @@ void init_globals(void)
     functions.clear();
     tmp_collected_funargs.clear();
 
-    special_pmatch_symbols.clear();
-    special_pmatch_symbols.insert(RC_ENTRY_SYMBOL);
-    special_pmatch_symbols.insert(RC_EXIT_SYMBOL);
-    special_pmatch_symbols.insert(LC_ENTRY_SYMBOL);
-    special_pmatch_symbols.insert(LC_EXIT_SYMBOL);
-    special_pmatch_symbols.insert(NRC_ENTRY_SYMBOL);
-    special_pmatch_symbols.insert(NRC_EXIT_SYMBOL);
-    special_pmatch_symbols.insert(NLC_ENTRY_SYMBOL);
-    special_pmatch_symbols.insert(NLC_EXIT_SYMBOL);
-    special_pmatch_symbols.insert(PASSTHROUGH_SYMBOL);
-    special_pmatch_symbols.insert(BOUNDARY_SYMBOL);
-    special_pmatch_symbols.insert(ENTRY_SYMBOL);
-    special_pmatch_symbols.insert(EXIT_SYMBOL);
+    all_pmatch_symbols.clear();
+    all_pmatch_symbols.insert(RC_ENTRY_SYMBOL);
+    all_pmatch_symbols.insert(RC_EXIT_SYMBOL);
+    all_pmatch_symbols.insert(LC_ENTRY_SYMBOL);
+    all_pmatch_symbols.insert(LC_EXIT_SYMBOL);
+    all_pmatch_symbols.insert(NRC_ENTRY_SYMBOL);
+    all_pmatch_symbols.insert(NRC_EXIT_SYMBOL);
+    all_pmatch_symbols.insert(NLC_ENTRY_SYMBOL);
+    all_pmatch_symbols.insert(NLC_EXIT_SYMBOL);
+    all_pmatch_symbols.insert(PASSTHROUGH_SYMBOL);
+    all_pmatch_symbols.insert(BOUNDARY_SYMBOL);
+    all_pmatch_symbols.insert(ENTRY_SYMBOL);
+    all_pmatch_symbols.insert(EXIT_SYMBOL);
 
 }
 
@@ -532,7 +540,7 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     }
 
     HfstTransducer dummy(format);
-    dummy.insert_to_alphabet(special_pmatch_symbols);
+    dummy.insert_to_alphabet(all_pmatch_symbols);
     // We keep TOP and any inserted transducers
     std::map<std::string, hfst::HfstTransducer *>::iterator defs_itr;
     for (defs_itr = definitions.begin(); defs_itr != definitions.end();
@@ -541,7 +549,8 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
             inserted_transducers.count(defs_itr->first) != 0) {
             // In order to avoid expanding special pmatch markers, insert
             // them first
-            defs_itr->second->insert_to_alphabet(special_pmatch_symbols);
+            hfst::StringSet symbols_so_far = dummy.get_alphabet();
+            defs_itr->second->insert_to_alphabet(symbols_so_far);
             dummy.harmonize(*defs_itr->second);
         }
     }
@@ -552,6 +561,8 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         ++defs_itr) {
         if (defs_itr->first.compare("TOP") == 0 ||
             inserted_transducers.count(defs_itr->first) != 0) {
+            hfst::StringSet symbols_so_far = dummy.get_alphabet();
+            defs_itr->second->insert_to_alphabet(symbols_so_far);
             dummy.harmonize(*defs_itr->second);
             retval.insert(std::pair<std::string, hfst::HfstTransducer*>(
                               defs_itr->first,
