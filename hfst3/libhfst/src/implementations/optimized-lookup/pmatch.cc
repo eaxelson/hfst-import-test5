@@ -1010,6 +1010,8 @@ void PmatchTransducer::take_rtn(SymbolNumber input,
         rtn_target->rtn_exit();
         // We're back in this transducer and continue where we left off
         get_analyses(input_pos, tape_pos, transition_table[i].get_target());
+    } else {
+        rtn_target->rtn_exit();
     }
     local_stack.top().running_weight = original_weight;
 }
