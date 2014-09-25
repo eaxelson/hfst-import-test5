@@ -894,6 +894,7 @@ REGEXP10: REGEXP11 { }
                                              hfst::internal_identity,
                                              hfst::pmatch::format);
     $$ = & ( any->subtract(*$2));
+    $$->insert_to_alphabet(hfst::pmatch::all_pmatch_symbols);
     delete $2;
  }
 | SUBSTITUTE_LEFT REGEXP10 COMMA REGEXP10 COMMA REGEXP10 RIGHT_BRACKET {
