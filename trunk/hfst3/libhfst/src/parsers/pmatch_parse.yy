@@ -90,7 +90,7 @@ REPLACE REGEXP3 FUNCALL MAP
 
 %type <transducer> OPTCAP TOLOWER TOUPPER INSERT RIGHT_CONTEXT
 LEFT_CONTEXT NEGATIVE_RIGHT_CONTEXT NEGATIVE_LEFT_CONTEXT P_CONTEXT CONTEXT_CONDITION OR_CONTEXT AND_CONTEXT
-%type <transducerVector> CONTEXTS
+%type <transducerVector> CONTEXT_CONDITIONS
 %type <ast_node> FUN_RIGHT_CONTEXT FUN_LEFT_CONTEXT FUN_NEGATIVE_RIGHT_CONTEXT FUN_NEGATIVE_LEFT_CONTEXT
 %type <ast_node> FUN_OPTCAP FUN_TOLOWER FUN_TOUPPER
 
@@ -447,6 +447,7 @@ REPLACE : REGEXP3 {}
     }
        
     delete $1;
+    $$->insert_to_alphabet(hfst::pmatch::all_pmatch_symbols);
 }
 ;
 
@@ -523,7 +524,7 @@ MAPPINGPAIR_VECTOR: MAPPINGPAIR_VECTOR COMMA MAPPINGPAIR
 MAPPINGPAIR: REPLACE REPLACE_ARROW REPLACE
 {
         // std::cerr << "mapping : r2 arrow r2"<< std::endl;      
-  
+
           HfstTransducerPair mappingPair(*$1, *$3);
           $$ =  new std::pair< ReplaceArrow, HfstTransducerPair> ($2, mappingPair);
 
@@ -1152,7 +1153,7 @@ RIGHT_CONTEXT { }
 | LEFT_CONTEXT { }
 | NEGATIVE_LEFT_CONTEXT { };
 
-OR_CONTEXT: OR_LEFT CONTEXTS RIGHT_PARENTHESIS
+OR_CONTEXT: OR_LEFT CONTEXT_CONDITIONS RIGHT_PARENTHESIS
 {
     $$ = new HfstTransducer(hfst::pmatch::format);
     for(hfst::HfstTransducerVector::reverse_iterator it = $2->rbegin();
@@ -1162,7 +1163,7 @@ OR_CONTEXT: OR_LEFT CONTEXTS RIGHT_PARENTHESIS
     delete $2;
 };
 
-AND_CONTEXT: AND_LEFT CONTEXTS RIGHT_PARENTHESIS
+AND_CONTEXT: AND_LEFT CONTEXT_CONDITIONS RIGHT_PARENTHESIS
 {
     $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_epsilon, hfst::pmatch::format);
     for(hfst::HfstTransducerVector::reverse_iterator it = $2->rbegin();
@@ -1172,12 +1173,12 @@ AND_CONTEXT: AND_LEFT CONTEXTS RIGHT_PARENTHESIS
     delete $2;
 };
 
-CONTEXTS:
-P_CONTEXT {
+CONTEXT_CONDITIONS:
+CONTEXT_CONDITION {
     $$ = new hfst::HfstTransducerVector(1, *$1);
     delete $1;
 }
-| P_CONTEXT COMMA CONTEXTS {
+| CONTEXT_CONDITION COMMA CONTEXT_CONDITIONS {
     $3->push_back(*$1);
     delete $1;
     $$ = $3;
