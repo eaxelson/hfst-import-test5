@@ -63,7 +63,8 @@ using hfst::xre::XreCompiler;
 
 static char *epsilonname=NULL;
 static bool disjunct_expressions=false;
-static bool line_separated = true;
+static bool line_separated=true;
+static bool xfst_diacritics=false;
 
 static bool encode_weights=false;
 
@@ -97,12 +98,13 @@ print_usage()
                 //"      --log (todo)          Take negative logarithm of each weight\n"
 "  -l, --line                Input is line separated (default)\n"
 "  -S, --semicolon           Input is semicolon separated\n"
-"  -e, --epsilon=EPS         Map EPS as zero.\n"
+"  -e, --epsilon=EPS         Map EPS as zero, i.e. epsilon.\n"
+"  -x, --xfst-diacritics     Treat flag diacritics as normal symbols in composition.\n"
+"  -X, --xfst=VARIABLE       Toggle xfst compatibility option VARIABLE.\n"
 "Harmonization:\n"
 "  -H, --do-not-harmonize    Do not expand '?' symbols.\n"
-"  -F, --harmonize-flags  Harmonize flag diacritics.\n"
-"  -E, --encode-weights         Encode weights when minimizing\n"
-"                               (default is false).\n"
+"  -F, --harmonize-flags     Harmonize flag diacritics.\n"
+"  -E, --encode-weights      Encode weights when minimizing (default is false).\n"
                 );
         fprintf(message_out, "\n");
 
@@ -111,6 +113,7 @@ print_usage()
             "FMT must be one of the following: "
             "{foma, sfst, openfst-tropical, openfst-log}.\n"
             "If EPS is not defined, the default representation of 0 is used\n"
+            "Xfst variables are {flag-is-epsilon (default OFF)}.\n"    
             "\n"
             );
 
@@ -150,11 +153,13 @@ parse_options(int argc, char** argv)
           {"do-not-harmonize", no_argument, 0, 'H'},
           {"harmonize-flags", no_argument, 0, 'F'},
           {"encode-weights", no_argument, 0, 'E'},
+          {"xfst-diacritics", no_argument, 0, 'x'},
+          {"xfst", required_argument, 0, 'X'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "je:lSf:HFE"/*"123"*/,
+                             HFST_GETOPT_UNARY_SHORT "je:lSf:HFExX:"/*"123"*/,
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -198,6 +203,22 @@ parse_options(int argc, char** argv)
         case 'E':
           encode_weights=true;
           break;
+        case 'x':
+          xfst_diacritics=true;
+          break;
+        case 'X':
+          {
+            const char * argument = hfst_strdup(optarg);
+            if (strcmp(argument, "flag-is-epsilon") == 0)
+              {
+                hfst::set_flag_is_epsilon_in_composition(true);
+              }
+            else
+              {
+                fprintf(stderr, "Error: unknown option to --xfst: '%s'\n", optarg);
+                return EXIT_FAILURE;
+              }
+          }
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -220,6 +241,7 @@ process_stream(HfstOutputStream& outstream)
   char* line = 0;
   size_t len = 0;
   unsigned int line_count = 0;
+  hfst::set_flag_is_epsilon_in_composition(xfst_diacritics);
   XreCompiler comp(output_format);
   comp.set_verbosity(verbose, stderr);
   comp.set_harmonization(harmonize);
