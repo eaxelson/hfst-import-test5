@@ -282,6 +282,7 @@ XRE_TXTS=cats_and_dogs.xre cats_and_dogs_semicolon.xre \
 	 left-arrow-with-semicolon-comment.xre \
 	 left-arrow-with-semicolon-many-comments.xre
 PMATCH_TXTS=pmatch_blanks.txt pmatch_endtag.txt
+PMATCHSCRIPTS=pmatch-tests.sh pmatch-tester.sh
 LEXC_TXTS=basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc \
 		  basic.empty-sides.lexc basic.end.lexc basic.escapes.lexc \
 		  basic.infostrings.lexc basic.initial-lexicon-empty.lexc \
@@ -411,7 +412,7 @@ warn.sublexicon-mentioned-but-not-defined.lexc.flag.result \
 warn.sublexicon-mentioned-but-not-defined.lexc.result
 
 # files needed for test programs
-EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS) $(TESTS) $(EXTRA_FILES) $(LEXC_TXTS) $(PMATCH_TXTS) script.xfst lexc2fst-stress.sh lookup-stress.sh proc-stress.sh valgrind.sh \
+EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS) $(TESTS) $(EXTRA_FILES) $(LEXC_TXTS) $(PMATCH_TXTS) $(PMATCHSCRIPTS) script.xfst lexc2fst-stress.sh lookup-stress.sh proc-stress.sh valgrind.sh \
 calculate-functionality.sh shuffle-functionality.sh $(RESULT_FILES)
 
 
