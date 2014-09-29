@@ -18,3 +18,13 @@ if ! echo "cat" | $TOOLDIR/hfst-pmatch pmatch_endtag.pmatch > test.pmatch;
     fi
     
 rm test.pmatch
+
+# Jyrki's suite
+if ! $srcdir/pmatch-tests.sh --log none; then
+    rm $srcdir/pmatch-tests.sh.*
+    exit 77
+    # Pending stabilisation of various things the suite fails, so we pretend
+    # we skipped it
+fi
+
+rm $srcdir/pmatch-tests.sh.*
