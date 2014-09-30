@@ -2982,14 +2982,14 @@ static bool substitute_input_flag_with_epsilon(const StringPair &sp, StringPairS
 {
   if (FdOperation::is_diacritic(sp.first))
     {
-      if (sp.second != sp.first)
-        throw "Error: flags must be identities";
+      //if (sp.second != sp.first)
+      //  throw "Error: flags must be identities";
       StringPair new_pair(hfst::internal_epsilon, sp.second);
       sps.insert(new_pair);
       return true;
     }
-  if (FdOperation::is_diacritic(sp.second))
-    throw "Error: flags must be identities";
+  //if (FdOperation::is_diacritic(sp.second))
+  //  throw "Error: flags must be identities";
   return false;
 }
 
@@ -2997,14 +2997,14 @@ static bool substitute_output_flag_with_epsilon(const StringPair &sp, StringPair
 {
   if (FdOperation::is_diacritic(sp.second))
     {
-      if (sp.first != sp.second)
-        throw "Error: flags must be identities";
+      //if (sp.first != sp.second)
+      //  throw "Error: flags must be identities";
       StringPair new_pair(sp.first, hfst::internal_epsilon);
       sps.insert(new_pair);
       return true;
     }
-  if (FdOperation::is_diacritic(sp.first))
-    throw "Error: flags must be identities";
+  //if (FdOperation::is_diacritic(sp.first))
+  //  throw "Error: flags must be identities";
   return false;
 }
 
