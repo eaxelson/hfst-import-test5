@@ -2982,10 +2982,14 @@ static bool substitute_input_flag_with_epsilon(const StringPair &sp, StringPairS
 {
   if (FdOperation::is_diacritic(sp.first))
     {
+      if (sp.second != sp.first)
+        throw "Error: flags must be identities";
       StringPair new_pair(hfst::internal_epsilon, sp.second);
       sps.insert(new_pair);
       return true;
     }
+  if (FdOperation::is_diacritic(sp.second))
+    throw "Error: flags must be identities";
   return false;
 }
 
@@ -2993,22 +2997,26 @@ static bool substitute_output_flag_with_epsilon(const StringPair &sp, StringPair
 {
   if (FdOperation::is_diacritic(sp.second))
     {
+      if (sp.first != sp.second)
+        throw "Error: flags must be identities";
       StringPair new_pair(sp.first, hfst::internal_epsilon);
       sps.insert(new_pair);
       return true;
     }
+  if (FdOperation::is_diacritic(sp.first))
+    throw "Error: flags must be identities";
   return false;
 }
 
 static bool substitute_one_sided_flags(const StringPair &sp, StringPairSet &sps)
 {
-  if (FdOperation::is_diacritic(sp.first))
+  if (FdOperation::is_diacritic(sp.first) && (sp.second == hfst::internal_epsilon))
     {
       StringPair new_pair(sp.first, sp.first);
       sps.insert(new_pair);
       return true;
     }
-  if (FdOperation::is_diacritic(sp.second))
+  if (FdOperation::is_diacritic(sp.second) && (sp.first == hfst::internal_epsilon))
     {
       StringPair new_pair(sp.second, sp.second);
       sps.insert(new_pair);
@@ -3561,8 +3569,15 @@ HfstTransducer &HfstTransducer::compose
 
     if (flag_is_epsilon_in_composition)
       {
-        this->substitute(&substitute_output_flag_with_epsilon);
-        another_copy->substitute(&substitute_input_flag_with_epsilon);
+        try 
+          {
+            this->substitute(&substitute_output_flag_with_epsilon);
+            another_copy->substitute(&substitute_input_flag_with_epsilon);
+          }
+        catch (const char * msg)
+          {
+            HFST_THROW(FlagDiacriticsAreNotIdentitiesException);
+          }
       }
 
     if (xerox_composition)

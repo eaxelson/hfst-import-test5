@@ -212,17 +212,26 @@ REGEXP2: REPLACE
          }
        | REGEXP2 COMPOSITION REPLACE 
        {
-        if ($1->has_flag_diacritics() || $3->has_flag_diacritics())
+        if ($1->has_flag_diacritics() && $3->has_flag_diacritics())
           {
             if (! harmonize_flags_) {
-                 hfst::xre::warn("warning: at least one of the composition arguments contains flag diacritics that are not harmonized\n");
+                 hfst::xre::warn("warning: both composition arguments contain flag diacritics that are not harmonized\n");
             }
             else {
                 $1->harmonize_flag_diacritics(*$3);
             }
           }
 
+         try {
             $$ = & $1->compose(*$3, harmonize_).minimize();
+         }
+         catch (const FlagDiacriticsAreNotIdentitiesException & e)
+             {
+               xreerror("Error: flag diacritics must be identities in composition if flag-is-epsilon is ON.\n"
+               "I.e. only FLAG:FLAG is allowed, not FLAG1:FLAG2, FLAG:bar or foo:FLAG\n"
+               "Apply twosided flag-diacritics (tfd) before composition.\n");
+               YYABORT;
+             }
             delete $3;
         }
        | REGEXP2 CROSS_PRODUCT REPLACE {
