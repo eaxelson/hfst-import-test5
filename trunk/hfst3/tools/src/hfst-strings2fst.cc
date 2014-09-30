@@ -74,7 +74,8 @@ static StringVector multichar_symbols;
 
 static float sum_of_weights=0;
 static bool normalize_weights=false;
-static bool logarithmic_weights=false;
+static bool logarithmic_weights_e=false;
+static bool logarithmic_weights_10=false;
 
 static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
 
@@ -83,7 +84,7 @@ float divide_by_sum_of_weights(float weight) {
     return 0;
   return weight/sum_of_weights;
 }
-float take_negative_logarithm(float weight) {
+float take_negative_logarithm_e(float weight) {
   float result;
   if (weight == 0)
     result = 0; // shoud be INFINITY, but doesn't work in transitions
@@ -91,6 +92,21 @@ float take_negative_logarithm(float weight) {
     {
       errno = 0;
       result = -log(weight);
+      if (errno != 0)
+        {
+          error(EXIT_FAILURE, errno, "unable to take negative logarithm");
+        }
+    }
+  return result;
+}
+float take_negative_logarithm_10(float weight) {
+  float result;
+  if (weight == 0)
+    result = 0; // shoud be INFINITY, but doesn't work in transitions
+  else
+    {
+      errno = 0;
+      result = -log10(weight);
       if (errno != 0)
         {
           error(EXIT_FAILURE, errno, "unable to take negative logarithm");
@@ -119,7 +135,8 @@ print_usage()
         "                            instead of taking minimum\n"*/
         "      --norm                Divide each weight by sum of all weights\n"
         "                            (with option -j)\n"
-        "      --log                 Take negative logarithm of each weight\n"
+        "      --log                 Take negative natural logarithm of each weight\n"
+        "      --log10               Take negative 10-based logarithm of each weight\n"
         "  -p, --pairstrings         Input is in pairstring format\n"
         "  -S, --has-spaces          Input has spaces between symbols/symbol pairs\n"
         "  -e, --epsilon=EPS         Interpret string EPS as epsilon.\n"
@@ -169,6 +186,7 @@ parse_options(int argc, char** argv)
           {"epsilon", required_argument, 0, 'e'},
           {"norm", no_argument, 0, '2'},
           {"log", no_argument, 0, '3'},
+          {"log10", no_argument, 0, '4'},
           {"pairstrings", no_argument, 0, 'p'},
           {"has-spaces", no_argument, 0, 'S'},
           {"multichar-symbols", required_argument, 0, 'm'},
@@ -177,7 +195,7 @@ parse_options(int argc, char** argv)
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "je:23pSm:f:",
+                             HFST_GETOPT_UNARY_SHORT "je:234pSm:f:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -195,7 +213,10 @@ parse_options(int argc, char** argv)
             normalize_weights = true;
             break;
         case '3':
-            logarithmic_weights = true;
+            logarithmic_weights_e = true;
+            break;
+        case '4':
+            logarithmic_weights_10 = true;
             break;
         case 'j':
             disjunct_strings = true;
@@ -330,10 +351,16 @@ process_stream(HfstOutputStream& outstream)
         {
           HfstBasicTransducer tr;
 
-      if (logarithmic_weights) 
+      if (logarithmic_weights_e) 
         {
-          path_weight = take_negative_logarithm(weight);
+          path_weight = take_negative_logarithm_e(weight);
         }
+      else if (logarithmic_weights_10) 
+        {
+          path_weight = take_negative_logarithm_10(weight);
+        }
+      else {}
+
           tr.disjunct(spv, path_weight);
           HfstTransducer res(tr, output_format);
           hfst_set_name(res, "", "string");
@@ -356,11 +383,17 @@ process_stream(HfstOutputStream& outstream)
           verbose_printf("Normalising weights...\n");
       res.transform_weights(&divide_by_sum_of_weights);
         }
-                              if (logarithmic_weights)
+                              if (logarithmic_weights_e)
                             {
                                   verbose_printf("Taking negative logarithm...\n");
-                                  res.transform_weights(&take_negative_logarithm);
+                                  res.transform_weights(&take_negative_logarithm_e);
                                 }
+                              else if (logarithmic_weights_10)
+                            {
+                                  verbose_printf("Taking negative logarithm...\n");
+                                  res.transform_weights(&take_negative_logarithm_10);
+                                }
+                              else {}
 
       hfst_set_name(res, "?", "strings");
       outstream << res;
