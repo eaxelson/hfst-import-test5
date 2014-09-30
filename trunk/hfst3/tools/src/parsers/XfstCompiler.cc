@@ -1705,8 +1705,21 @@ namespace xfst {
     {
       if (variables_.find(name) == variables_.end())
         {
-          hfst_fprintf(warnstream_, "no such variable: '%s'\n", name);
-          PROMPT_AND_RETURN_THIS;
+          if (strcmp(name, "compose-flag-as-special") == 0)
+            {
+              hfst_fprintf(warnstream_, "variable compose-flag-as-special not found, using flag-is-epsilon instead\n");
+              variables_["flag-is-epsilon"] = text;
+              if (verbose_)
+                {
+                  hfst_fprintf(outstream_, "variable %s = %s\n", "flag-is-epsilon", text);
+                }
+              PROMPT_AND_RETURN_THIS;
+            }              
+          else
+            {
+              hfst_fprintf(warnstream_, "no such variable: '%s'\n", name);
+              PROMPT_AND_RETURN_THIS;
+            }
         }
       variables_[name] = text;
       if (strcmp(name, "hopcroft-min") == 0)
@@ -3528,14 +3541,14 @@ namespace xfst {
             break;
           case COMPOSE_NET:
             {
-              if (result->has_flag_diacritics() || t->has_flag_diacritics())
+              if (result->has_flag_diacritics() && t->has_flag_diacritics())
                 {
                   if (variables_["harmonize-flags"] == "OFF")
                     {
                       if (verbose_)
                         {
-                          hfst_fprintf(warnstream_, "At least one of composition arguments contains "
-                                  "flag diacritics. Set harmonize-flags ON to harmonize them.\n");
+                          hfst_fprintf(warnstream_, "Both composition arguments contain flag diacritics. "
+                                       "Set harmonize-flags ON to harmonize them.\n");
                         }
                     }
                   else
@@ -3544,7 +3557,18 @@ namespace xfst {
                     }
                 }
 
-              result->compose(*t);
+              try 
+                {
+                  result->compose(*t);
+                }
+              catch (const FlagDiacriticsAreNotIdentitiesException & e)
+                {
+                  hfst_fprintf(outstream_, "Error: flag diacritics must be identities in composition if flag-is-epsilon is ON.\n"
+                               "I.e. only FLAG:FLAG is allowed, not FLAG1:FLAG2, FLAG:bar or foo:FLAG\n"
+                               "Apply twosided flag-diacritics (tfd) before composition.\n");
+                  prompt();
+                  return *this;
+                }
 
               break;
             }
