@@ -398,6 +398,8 @@ HFST_EXCEPTION_CHILD_DECLARATION(EmptyStringException);
 
 HFST_EXCEPTION_CHILD_DECLARATION(SymbolNotFoundException);
 
+HFST_EXCEPTION_CHILD_DECLARATION(FlagDiacriticsAreNotIdentitiesException);
+
 //HFST_EXCEPTION_CHILD_DECLARATION(SymbolRedefinedException); 
 //HFST_EXCEPTION_CHILD_DECLARATION(TransducerHasNoStartStateException);
 //HFST_EXCEPTION_CHILD_DECLARATION(TransducerHasMoreThanOneStartStateException);
