@@ -219,6 +219,7 @@ parse_options(int argc, char** argv)
                 return EXIT_FAILURE;
               }
           }
+          break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -241,7 +242,7 @@ process_stream(HfstOutputStream& outstream)
   char* line = 0;
   size_t len = 0;
   unsigned int line_count = 0;
-  hfst::set_flag_is_epsilon_in_composition(xfst_diacritics);
+  hfst::set_xerox_composition(xfst_diacritics);
   XreCompiler comp(output_format);
   comp.set_verbosity(verbose, stderr);
   comp.set_harmonization(harmonize);
