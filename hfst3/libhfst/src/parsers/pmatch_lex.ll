@@ -107,6 +107,10 @@ LWSP [\t\r\n ]
     return INS_LEFT;
 }
 
+"Define(" {
+    return DEFINE_LEFT;
+}
+
 "EndTag(" {
     return ENDTAG_LEFT;
 }
