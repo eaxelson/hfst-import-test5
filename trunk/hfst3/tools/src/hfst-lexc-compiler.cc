@@ -59,6 +59,7 @@ static bool with_flags = false;
 static bool minimize_flags = false;
 static bool rename_flags = false;
 static bool treat_warnings_as_errors = false;
+static bool xerox_composition = true;  // Compatibility with Xerox tools is the default
 
 void
 print_usage()
@@ -74,7 +75,11 @@ print_usage()
         fprintf(message_out, "Lexc options:\n"
                "  -F, --withFlags         use flags to hyperminimize result\n"
                "  -M, --minimizeFlags     if --withFlags is used, minimize the number of flags\n"
-               "  -R, --renameFlags     if --withFlags and --minimizeFlags are used, rename flags (for testing)\n"
+               "  -R, --renameFlags       if --withFlags and --minimizeFlags are used, rename\n"
+               "                          flags (for testing)\n"
+               "  -x, --xerox-composition=VALUE Whether flag diacritics are treated as ordinary\n"
+               "                                symbols in composition (default is true).\n"
+               "  -X, --xfst=VARIABLE     toggle xfst compatibility option VARIABLE.\n"
                "  -W, --Werror            treat warnings as errors\n");
         fprintf(message_out, "\n");
         fprintf(message_out,
@@ -82,7 +87,9 @@ print_usage()
                 "be used\n"
                 "The possible values for FORMAT are { sfst, openfst-tropical, "
                 "openfst-log,\n"
-               "foma, optimized-lookup-unweighted, optimized-lookup-weighted }.\n");
+               "foma, optimized-lookup-unweighted, optimized-lookup-weighted }.\n"
+                "VALUEs recognized are {true,ON,yes} and {false,OFF,no}.\n"
+                "Xfst variables are {flag-is-epsilon (default OFF)}.\n");
         fprintf(message_out,
             "\n"
             "Examples:\n"
@@ -120,12 +127,14 @@ parse_options(int argc, char** argv)
           {"withFlags", no_argument,    0, 'F'},
           {"minimizeFlags", no_argument,    0, 'M'},
           {"renameFlags", no_argument,    0, 'R'},
+          {"xerox-composition", required_argument,    0, 'x'},
+          {"xfst", required_argument, 0, 'X'},
           {"Werror", no_argument,    0, 'W'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             "f:o:FMRW",
+                             "f:o:FMRx:X:W",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -145,6 +154,42 @@ parse_options(int argc, char** argv)
           break;
         case 'R':
           rename_flags = true;
+          break;
+        case 'x':
+          {
+            const char * argument = hfst_strdup(optarg);
+            if (strcmp(argument, "yes") == 0 ||
+                strcmp(argument, "true") == 0 ||
+                strcmp(argument, "ON") == 0)
+              {
+                xerox_composition=true;
+              }
+            else if (strcmp(argument, "no") == 0 ||
+                     strcmp(argument, "false") == 0 ||
+                     strcmp(argument, "OFF") == 0)
+              {
+                xerox_composition=false;
+              }
+            else
+              {
+                fprintf(stderr, "Error: unknown option to --xerox-composition: '%s'\n", optarg);
+                return EXIT_FAILURE;
+              }
+          }
+            break;
+        case 'X':
+          {
+            const char * argument = hfst_strdup(optarg);
+            if (strcmp(argument, "flag-is-epsilon") == 0)
+              {
+                hfst::set_flag_is_epsilon_in_composition(true);
+              }
+            else
+              {
+                fprintf(stderr, "Error: unknown option to --xfst: '%s'\n", optarg);
+                return EXIT_FAILURE;
+              }
+          }
           break;
         case 'W':
           treat_warnings_as_errors = true;
@@ -269,6 +314,7 @@ int main( int argc, char **argv ) {
     HfstOutputStream* outstream = (outfile != stdout) ?
         new HfstOutputStream(outfilename, format) :
         new HfstOutputStream(format);
+    hfst::set_xerox_composition(xerox_composition);
     LexcCompiler lexc(format, with_flags);
     lexc.setMinimizeFlags(minimize_flags);
     lexc.setRenameFlags(rename_flags);

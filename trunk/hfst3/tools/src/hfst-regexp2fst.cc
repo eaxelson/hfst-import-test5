@@ -64,7 +64,6 @@ using hfst::xre::XreCompiler;
 static char *epsilonname=NULL;
 static bool disjunct_expressions=false;
 static bool line_separated=true;
-static bool xfst_diacritics=false;
 
 static bool encode_weights=false;
 
@@ -99,7 +98,8 @@ print_usage()
 "  -l, --line                Input is line separated (default)\n"
 "  -S, --semicolon           Input is semicolon separated\n"
 "  -e, --epsilon=EPS         Map EPS as zero, i.e. epsilon.\n"
-"  -x, --xfst-diacritics     Treat flag diacritics as normal symbols in composition.\n"
+"  -x, --xerox-composition=VALUE Whether flag diacritics are treated as ordinary\n"
+"                                symbols in composition (default is false).\n"
 "  -X, --xfst=VARIABLE       Toggle xfst compatibility option VARIABLE.\n"
 "Harmonization:\n"
 "  -H, --do-not-harmonize    Do not expand '?' symbols.\n"
@@ -113,6 +113,7 @@ print_usage()
             "FMT must be one of the following: "
             "{foma, sfst, openfst-tropical, openfst-log}.\n"
             "If EPS is not defined, the default representation of 0 is used\n"
+            "VALUEs recognized are {true,ON,yes} and {false,OFF,no}.\n"    
             "Xfst variables are {flag-is-epsilon (default OFF)}.\n"    
             "\n"
             );
@@ -120,7 +121,8 @@ print_usage()
         fprintf(message_out, "Examples:\n"
 "  echo \" {cat}:{dog} \" | %s       create transducer {cat}:{dog}\n"
 "  echo \" {cat}:{dog}::3 \" | %s    same but with weight 3\n"
-"  echo \" c:d a:o::3 t:g \" | %s    same but with weight 3 in the middle\n"
+"  echo \" c:d a:o::3 t:g \" | %s    same but with weight 3\n"
+"                                               in the middle\n"
 "  echo \" {cat}:{dog} ; 3 \" | %s   legacy way of defining weights\n"
 "  echo \" cat ; dog ; 3 \" | %s -S  create transducers\n"
 "                                               \"cat\" and \"dog\" and \"3\"\n"
@@ -153,13 +155,13 @@ parse_options(int argc, char** argv)
           {"do-not-harmonize", no_argument, 0, 'H'},
           {"harmonize-flags", no_argument, 0, 'F'},
           {"encode-weights", no_argument, 0, 'E'},
-          {"xfst-diacritics", no_argument, 0, 'x'},
+          {"xerox-composition", required_argument, 0, 'x'},
           {"xfst", required_argument, 0, 'X'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "je:lSf:HFExX:"/*"123"*/,
+                             HFST_GETOPT_UNARY_SHORT "je:lSf:HFEx:X:"/*"123"*/,
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -204,7 +206,26 @@ parse_options(int argc, char** argv)
           encode_weights=true;
           break;
         case 'x':
-          xfst_diacritics=true;
+          {
+            const char * argument = hfst_strdup(optarg);
+            if (strcmp(argument, "yes") == 0 ||
+                strcmp(argument, "true") == 0 ||
+                strcmp(argument, "ON") == 0)
+              {
+                hfst::set_xerox_composition(true);
+              }
+            else if (strcmp(argument, "no") == 0 ||
+                     strcmp(argument, "false") == 0 ||
+                     strcmp(argument, "OFF") == 0)
+              {
+                hfst::set_xerox_composition(false);
+              }
+            else
+              {
+                fprintf(stderr, "Error: unknown option to --xerox-composition: '%s'\n", optarg);
+                return EXIT_FAILURE;
+              }
+          }
           break;
         case 'X':
           {
@@ -242,7 +263,6 @@ process_stream(HfstOutputStream& outstream)
   char* line = 0;
   size_t len = 0;
   unsigned int line_count = 0;
-  hfst::set_xerox_composition(xfst_diacritics);
   XreCompiler comp(output_format);
   comp.set_verbosity(verbose, stderr);
   comp.set_harmonization(harmonize);

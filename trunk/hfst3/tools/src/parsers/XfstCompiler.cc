@@ -141,6 +141,7 @@ namespace xfst {
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
         xre_.set_flag_harmonization(false);
+        hfst::set_xerox_composition(true);
         variables_["assert"] = "OFF";
         variables_["att-epsilon"] = "@0@ | @_EPSILON_SYMBOL_@";
         variables_["char-encoding"] = "UTF-8";
@@ -174,7 +175,7 @@ namespace xfst {
         variables_["sort-arcs"] = "MAYBE";
         variables_["use-timer"] = "OFF";
         variables_["verbose"] = "OFF";
-        variables_["xerox-composition"] = "OFF";
+        variables_["xerox-composition"] = "ON";
         initialize_variable_explanations();
         prompt();
       }
@@ -192,6 +193,7 @@ namespace xfst {
         xre_.set_expand_definitions(true);
         xre_.set_verbosity(true, stderr);
         xre_.set_flag_harmonization(false);
+        hfst::set_xerox_composition(true);
         variables_["assert"] = "OFF";
         variables_["att-epsilon"] = "@0@ | @_EPSILON_SYMBOL_@";
         variables_["char-encoding"] = "UTF-8";
@@ -225,7 +227,7 @@ namespace xfst {
         variables_["sort-arcs"] = "MAYBE";
         variables_["use-timer"] = "OFF";
         variables_["verbose"] = "OFF";
-        variables_["xerox-composition"] = "OFF";
+        variables_["xerox-composition"] = "ON";
         initialize_variable_explanations();
         prompt();
       }
