@@ -5,6 +5,39 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.8.0
+---------------------------
+
+* changes to flag diacritic handling
+
+  * now hfst-lexc has options --withFlags, --minimizeFlags and --renameFlags to control
+    hyperminimization
+
+  * hfst-xfst has corresponding variables --lexc-with-flags, --lexc-minimize-flags and 
+    --lexc-rename-flags
+
+  * hfst-xfst has variable xerox-composition (default ON) and hfst-lexc option 
+    --xerox-composition (default ON) to control if flags are matched with unknowns and
+    identities in composition (as Xerox does)
+ 
+  * hfst-regexp2fst also has option --xerox-composition (default OFF)
+
+  * command twosided flag-diacritics (tfd) added to hfst-xfst
+
+* added	a (temporary) tool called hfst-proc2 for simple tokenization, to become part of
+  something else or be renamed in the future
+
+* fixes to pmatch and optimized-lookup functionalities
+
+* fixes to twolc functionalities
+
+* fixed some issues found by scan-build
+
+* improvements to xre parsing
+
+* added option --Werror to hfst-lexc that treats warnings as errors
+
+
 Noteworthy changes in 3.7.1
 ---------------------------
 
