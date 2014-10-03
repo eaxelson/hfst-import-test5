@@ -99,6 +99,7 @@ namespace xfst {
     variable_explanations_["harmonize-flags"] = "harmonize flag diacritics before composition";
     variable_explanations_["hopcroft-min"] = "use hopcroft's minimization algorithm";
     variable_explanations_["lexc-minimize-flags"] = "if 'lexc-with-flags' == ON, minimize number of flags";
+    variable_explanations_["lexc-rename-flags"] = "if 'lexc-minimize-flags' == ON, rename flags";
     variable_explanations_["lexc-with-flags"] = "use flags to hyperminimize result from lexc files";
     variable_explanations_["maximum-weight"] = "maximum weight of paths printed in apply";
     variable_explanations_["minimal"] = "minimize networks after operations";
@@ -152,6 +153,7 @@ namespace xfst {
         variables_["harmonize-flags"] = "OFF";
         variables_["hopcroft-min"] = "ON";
         variables_["lexc-minimize-flags"] = "OFF"; 
+        variables_["lexc-rename-flags"] = "OFF"; 
         variables_["lexc-with-flags"] = "OFF";
         variables_["lookup-cycle-cutoff"] = LOOKUP_CYCLE_CUTOFF;
         variables_["maximum-weight"] = "OFF";
@@ -204,6 +206,7 @@ namespace xfst {
         variables_["harmonize-flags"] = "OFF";
         variables_["hopcroft-min"] = "ON";
         variables_["lexc-minimize-flags"] = "OFF"; 
+        variables_["lexc-rename-flags"] = "OFF"; 
         variables_["lexc-with-flags"] = "OFF";
         variables_["lookup-cycle-cutoff"] = LOOKUP_CYCLE_CUTOFF;
         variables_["maximum-weight"] = "OFF";
@@ -4154,6 +4157,10 @@ namespace xfst {
         if (variables_["lexc-minimize-flags"] == "ON")
           {
             lexc_.setMinimizeFlags(true);
+            if (variables_["lexc-rename-flags"] == "ON")
+              {
+                lexc_.setRenameFlags(true);
+              }
           }
       }
 
