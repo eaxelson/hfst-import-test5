@@ -748,7 +748,6 @@ REGEXP5: REGEXP6 { }
     delete $3;
  }
 | REGEXP5 MINUS REGEXP6 {
-    hfst::pmatch::add_to_pmatch_symbols($3->get_alphabet());
     $1->insert_to_alphabet(hfst::pmatch::all_pmatch_symbols);
     $$ = & $1->subtract(*$3);
     delete $3;
