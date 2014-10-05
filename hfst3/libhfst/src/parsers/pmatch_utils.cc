@@ -282,7 +282,7 @@ char * unescape_delimited(char *s, char delim)
             ++write;
         }
     }
-    *write == '\0';
+    *write = '\0';
     return s;
 }
 
