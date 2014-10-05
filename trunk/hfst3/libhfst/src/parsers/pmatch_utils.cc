@@ -272,8 +272,8 @@ char * unescape_delimited(char *s, char delim)
     char * read = s;
     char * write = s;
     while (*read != '\0') {
-        if (*read == '\\' && *(read + 1) == delim) {
-            *write = delim;
+        if (*read == '\\' && (*(read + 1) == delim || *(read + 1) == '\\')) {
+            *write = *(read + 1);
             read += 2;
             write += 1;
         } else {
