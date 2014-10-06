@@ -359,7 +359,7 @@ int main( int argc, char **argv ) {
     free(outfilename);
     if (tempfilename != 0)
       {
-        verbose_printf("Deleting temporary files on succesful exit\n");
+        verbose_printf("Deleting temporary files on successful exit\n");
         hfst_remove(tempfilename);
       }
     return retval;
