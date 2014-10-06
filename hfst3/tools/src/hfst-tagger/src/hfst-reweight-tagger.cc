@@ -52,8 +52,8 @@ print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-	    "Reweight a tagger accoring to a configuration file\n"
-	    "hfst_tagger_config.\n"
+            "Reweight a tagger accoring to a configuration file\n"
+            "hfst_tagger_config.\n"
         "\n", program_name);
 
     print_common_program_options(message_out);
@@ -110,8 +110,8 @@ float reweight(float w)
 { return coeff*w; }
 
 void reweight_fst(HfstInputStream &in,
-		  HfstOutputStream &out,
-		  float coefficient)
+                  HfstOutputStream &out,
+                  float coefficient)
 {
   HfstTransducer fst(in);
   coeff = coefficient;
@@ -120,8 +120,8 @@ void reweight_fst(HfstInputStream &in,
 }
 
 int process_input_data(const std::string &tagger_file_name,
-		       const std::string &output_file_name,
-		       const FloatVector &coefficients)
+                       const std::string &output_file_name,
+                       const FloatVector &coefficients)
 {
   // Read sequence model fsts and reweight.
   verbose_printf("Reading models and rewighting.");
@@ -138,7 +138,7 @@ int process_input_data(const std::string &tagger_file_name,
        ++it)
     {
       if (not seq_in.is_good())
-	{ error(EXIT_FAILURE, 0, "Config file has too many patterns."); }
+        { error(EXIT_FAILURE, 0, "Config file has too many patterns."); }
 
       reweight_fst(seq_in, seq_out, *it);
     }
@@ -155,7 +155,7 @@ int process_input_data(const std::string &tagger_file_name,
   HfstTransducer lex(lex_in);
 
   HfstOutputStream lex_out(output_file_name + ".lex",
-			   HFST_OLW_TYPE);
+                           HFST_OLW_TYPE);
   lex_out << lex;
 
   return EXIT_SUCCESS;
@@ -196,12 +196,12 @@ FloatVector parse_coefficients(void)
       std::getline(coeff_in,line);
       
       if (line == "")
-	{ continue; }
+        { continue; }
 
       float coefficient = get_coefficient(line);
 
       if (coefficient == -1)
-	{ error(EXIT_FAILURE, 0, "Invalid configuration file."); }
+        { error(EXIT_FAILURE, 0, "Invalid configuration file."); }
 
       coefficients.push_back(coefficient);
     }
@@ -211,9 +211,14 @@ FloatVector parse_coefficients(void)
 
 int main(int argc, char * argv[])
 {
-
-  parse_options(argc, argv);
+  hfst_set_program_name(argv[0], "0.1", "HfstReweightTagger");
+  int retval = parse_options(argc, argv);
   
+  if (retval != EXIT_CONTINUE)
+    {
+      return retval;
+    }
+
   std::string tagger_file_name = inputfilename;
   std::string output_file_name = outfilename;
 
