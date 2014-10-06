@@ -32,6 +32,7 @@ extern ImplementationType format;
 extern bool verbose;
 extern bool flatten;
 extern clock_t timer;
+extern int minimization_guard_count;
 
 struct PmatchUtilityTransducers;
 //extern PmatchUtilityTransducers* utils;
@@ -53,6 +54,8 @@ extern std::set<std::string> all_pmatch_symbols;
 void add_to_pmatch_symbols(StringSet symbols);
 void warn(std::string warning);
 PmatchUtilityTransducers* get_utils();
+void zero_minimization_guard(void);
+HfstTransducer * get_minimization_guard(void);
 
 /**
  * @brief input handling function for flex that parses strings.

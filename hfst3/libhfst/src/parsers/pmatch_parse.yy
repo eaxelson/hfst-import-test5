@@ -1208,6 +1208,9 @@ OR_CONTEXT: OR_LEFT CONTEXT_CONDITIONS RIGHT_PARENTHESIS
         $$->disjunct(*it);
     }
     delete $2;
+    // Zero the counter for making minimization
+    // guards for disjuncted negative contexts
+    hfst::pmatch::zero_minimization_guard();
 };
 
 AND_CONTEXT: AND_LEFT CONTEXT_CONDITIONS RIGHT_PARENTHESIS
@@ -1344,6 +1347,7 @@ RIGHT_CONTEXT: RC_LEFT REPLACE RIGHT_PARENTHESIS {
 ;
 
 NEGATIVE_RIGHT_CONTEXT: NRC_LEFT REPLACE RIGHT_PARENTHESIS {
+    $$ = hfst::pmatch::get_minimization_guard();
     HfstTransducer * nrc_entry = new HfstTransducer(
         hfst::internal_epsilon, hfst::pmatch::NRC_ENTRY_SYMBOL, hfst::pmatch::format);
     HfstTransducer * nrc_exit = new HfstTransducer(
@@ -1352,9 +1356,8 @@ NEGATIVE_RIGHT_CONTEXT: NRC_LEFT REPLACE RIGHT_PARENTHESIS {
     nrc_entry->concatenate(*nrc_exit);
     nrc_entry->disjunct(HfstTransducer("@PMATCH_PASSTHROUGH@",
                                        hfst::internal_epsilon, hfst::pmatch::format));
-    $$ = nrc_entry;
-    delete $2;
-    delete nrc_exit;
+    $$->concatenate(*nrc_entry);
+    delete $2; delete nrc_entry; delete nrc_exit;
  }
 ;
 
@@ -1366,12 +1369,12 @@ LEFT_CONTEXT: LC_LEFT REPLACE RIGHT_PARENTHESIS {
     lc_entry->concatenate($2->reverse());
     lc_entry->concatenate(*lc_exit);
     $$ = lc_entry;
-    delete $2;
-    delete lc_exit;
+    delete $2; delete lc_exit;
  }
 ;
 
 NEGATIVE_LEFT_CONTEXT: NLC_LEFT REPLACE RIGHT_PARENTHESIS {
+    $$ = hfst::pmatch::get_minimization_guard();
     HfstTransducer * nlc_entry = new HfstTransducer(
         hfst::internal_epsilon, hfst::pmatch::NLC_ENTRY_SYMBOL, hfst::pmatch::format);
     HfstTransducer * nlc_exit = new HfstTransducer(
@@ -1380,9 +1383,8 @@ NEGATIVE_LEFT_CONTEXT: NLC_LEFT REPLACE RIGHT_PARENTHESIS {
     nlc_entry->concatenate(*nlc_exit);
     nlc_entry->disjunct(HfstTransducer("@PMATCH_PASSTHROUGH@",
                                        hfst::internal_epsilon, hfst::pmatch::format));
-    $$ = nlc_entry;
-    delete $2;
-    delete nlc_exit;
+    $$->concatenate(*nlc_entry);
+    delete $2; delete nlc_entry; delete nlc_exit;
  }
 ;
 
