@@ -43,7 +43,7 @@ A7 [\x00-\x7e]
 /* special meaning in pmatch */
 A7RESTRICTED [- |<>%^:;@0~\\&?$+*/_(){}\]\[-]
 /* non-restricted ASCII */
-A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%^:;,@~\\&?$+*/(){}\]\[-]
+A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%^:;,@~\\&?$+*/(){}\]\[]
 
 WEIGHT [0-9]+(\.[0-9]+)?
 
@@ -298,6 +298,11 @@ return REGEX;
 "0" { return EPSILON_TOKEN; }
 "?" { return ANY_TOKEN; }
 "#"|".#." { return BOUNDARY_MARKER; }
+
+{EC} {
+    pmatchlval.label = hfst::pmatch::strip_percents(pmatchtext);
+    return QUOTED_LITERAL;
+}
 
 {NAME_CH}+ {
     pmatchlval.label = hfst::pmatch::strip_percents(pmatchtext);
