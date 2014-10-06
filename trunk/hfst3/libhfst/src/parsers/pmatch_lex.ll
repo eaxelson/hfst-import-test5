@@ -59,6 +59,10 @@ LWSP [\t\r\n ]
     return DEFINE;
 }
 
+"regex" {
+return REGEX;
+}
+
 "DefIns" {
     return DEFINS;
 }
@@ -293,7 +297,7 @@ LWSP [\t\r\n ]
 "[]" { return EPSILON_TOKEN; }
 "0" { return EPSILON_TOKEN; }
 "?" { return ANY_TOKEN; }
-"#" { return BOUNDARY_MARKER; }
+"#"|".#." { return BOUNDARY_MARKER; }
 
 {NAME_CH}+ {
     pmatchlval.label = hfst::pmatch::strip_percents(pmatchtext);
