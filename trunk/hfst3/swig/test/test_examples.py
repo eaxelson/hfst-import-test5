@@ -376,7 +376,7 @@ while not instr.is_eof():
         print("ERROR: Stream cannot be read.")
         exit(1) 
     t = libhfst.HfstTransducer(instr)
-    print("One transducer succesfully read.")
+    print("One transducer successfully read.")
     transducers_read += 1
 
 print("Read {0} transducers in total".format(transducers_read))

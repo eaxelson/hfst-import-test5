@@ -1630,7 +1630,7 @@ def detokenize_and_purge_paths(tokenized_paths):
 #         print "ERROR: Stream cannot be read."
 #         exit(1) 
 #     t = libhfst.HfstTransducer(instr)
-#     print "One transducer succesfully read."
+#     print "One transducer successfully read."
 #     transducers_read++
 #
 # print "Read %i transducers in total" % transducers_read

@@ -1176,7 +1176,7 @@
 
          // Extract input and output symbols, if possible, from prolog arc 
          // \a str and store them to \a isymbol and \a osymbol. 
-         // Return whether symbols were succesfully extracted.
+         // Return whether symbols were successfully extracted.
          // \a str must be of format "foo":"bar" or "foo"
          static bool get_prolog_arc_symbols
            (const std::string & str, std::string & isymbol, std::string & osymbol)
@@ -1389,7 +1389,7 @@
          }
 
          // Try to get a line from \a is (if \a file == NULL)
-         // or from \a file. If succesfull, strip the line from newlines,
+         // or from \a file. If successfull, strip the line from newlines,
          // increment \a linecount by one and return the line.
          // Else, throw an EndOfStreamException.
          static std::string get_stripped_line

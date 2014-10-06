@@ -75,7 +75,7 @@ while (not in->is_eof())
   exit(1); 
   }
   HfstTransducer t(*in);
-  std::cerr << "One transducer succesfully read." << std::endl;
+  std::cerr << "One transducer successfully read." << std::endl;
   transducers_read++;
 }
 
