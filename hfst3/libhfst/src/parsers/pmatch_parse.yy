@@ -73,8 +73,9 @@
 %type <transducerDefinitions> PMATCH
 %type <transducerDefinition> DEFINITION BINDING FUNCTION
 %type <transducer> REGEXP1 REGEXP2 REGEXP4 REGEXP5 REGEXP6 REGEXP7
-REGEXP8 REGEXP9 REGEXP10 REGEXP11 REGEXP12 LABEL
+REGEXP8 REGEXP9 REGEXP10 REGEXP11 REGEXP12 LABEL_PAIR
 REPLACE REGEXP3 FUNCALL MAP
+%type <label> LABEL
 %type <ast_node> FUNCBODY1 FUNCBODY2 FUNCBODY3 FUNCBODY4 FUNCBODY5 FUNCBODY6
 %type <string_vector> ARGLIST
 
@@ -911,11 +912,6 @@ REGEXP11: REGEXP12 { }
 | LEFT_PARENTHESIS REGEXP2 RIGHT_PARENTHESIS {
     $$ = & $2->optionalize();
  }
-| CURLY_LITERAL {
-    HfstTokenizer tok;
-    $$ = new HfstTransducer($1, tok, hfst::pmatch::format);
-    free($1);
- }
 | ALPHA {
     $$ = new HfstTransducer(*hfst::pmatch::get_utils()->latin1_alpha_acceptor);
  }
@@ -971,7 +967,7 @@ FUN_TOUPPER: TOUPPER_LEFT FUNCBODY4 RIGHT_PARENTHESIS {
 }
 ;
 
-REGEXP12: LABEL { }
+REGEXP12: LABEL_PAIR { }
 | READ_BIN {
     try {
         hfst::HfstInputStream instream($1);
@@ -1008,60 +1004,35 @@ REGEXP12: LABEL { }
   }
 ;
 
-// There follows a cartesian product of {quoted_literal, epsilon_token and any_token}
-LABEL: QUOTED_LITERAL PAIR_SEPARATOR QUOTED_LITERAL {
+LABEL_PAIR: LABEL PAIR_SEPARATOR LABEL {
     $$ = new HfstTransducer($1, $3, hfst::pmatch::format);
-    free($1);
-    free($3);
+    free($1); free($3);
 }
-| EPSILON_TOKEN PAIR_SEPARATOR EPSILON_TOKEN {
-    $$ = new HfstTransducer(hfst::internal_epsilon, 
-                            hfst::internal_epsilon, hfst::pmatch::format);
- }
+
 | ANY_TOKEN PAIR_SEPARATOR ANY_TOKEN {
     $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
                             hfst::pmatch::format);
     // Insert special symbols we don't want to have expanded when this
     // interacts with anything else
     $$->insert_to_alphabet(hfst::pmatch::all_pmatch_symbols);
-
  }
-| QUOTED_LITERAL PAIR_SEPARATOR EPSILON_TOKEN {
-    $$ = new HfstTransducer($1, hfst::internal_epsilon, hfst::pmatch::format);
-    free($1);
-}
-| QUOTED_LITERAL PAIR_SEPARATOR ANY_TOKEN {
+| LABEL PAIR_SEPARATOR ANY_TOKEN {
     $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::pmatch::format);
     free($1);
  }
-| EPSILON_TOKEN PAIR_SEPARATOR QUOTED_LITERAL {
-    $$ = new HfstTransducer(hfst::internal_epsilon, $3, hfst::pmatch::format);
+| ANY_TOKEN PAIR_SEPARATOR LABEL {
+    $$ = new HfstTransducer(hfst::internal_unknown, $3, hfst::pmatch::format);
     free($3);
 }
-| EPSILON_TOKEN PAIR_SEPARATOR ANY_TOKEN {
-    $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_unknown,
-                            hfst::pmatch::format);
- }
-| ANY_TOKEN PAIR_SEPARATOR QUOTED_LITERAL {
-    $$ = new HfstTransducer(hfst::internal_unknown, $3, hfst::pmatch::format);
-}
-| ANY_TOKEN PAIR_SEPARATOR EPSILON_TOKEN {
-    $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_epsilon,
-                            hfst::pmatch::format);
- }
-| QUOTED_LITERAL PAIR_SEPARATOR_WO_RIGHT {
+| LABEL PAIR_SEPARATOR_WO_RIGHT {
     $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::pmatch::format);
     free($1);
- }
-| EPSILON_TOKEN PAIR_SEPARATOR_WO_RIGHT {
-    $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_unknown,
-                            hfst::pmatch::format);
  }
 | ANY_TOKEN PAIR_SEPARATOR_WO_RIGHT {
     $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
                             hfst::pmatch::format);
  }
-| PAIR_SEPARATOR_WO_LEFT QUOTED_LITERAL {
+| PAIR_SEPARATOR_WO_LEFT LABEL {
     $$ = new HfstTransducer(hfst::internal_unknown, $2, hfst::pmatch::format);
     free($2);
  }
@@ -1069,16 +1040,6 @@ LABEL: QUOTED_LITERAL PAIR_SEPARATOR QUOTED_LITERAL {
     $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
                             hfst::pmatch::format);
  }
-| PAIR_SEPARATOR_WO_LEFT EPSILON_TOKEN {
-    $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_epsilon,
-                            hfst::pmatch::format);
- }
-| EPSILON_TOKEN PAIR_SEPARATOR SYMBOL {
-    $$ = new HfstTransducer(hfst::internal_epsilon, $3, hfst::pmatch::format);
-}
-| SYMBOL PAIR_SEPARATOR EPSILON_TOKEN {
-    $$ = new HfstTransducer($1, hfst::internal_epsilon, hfst::pmatch::format);
-}
 | SYMBOL {
     if (hfst::pmatch::definitions.count($1) != 0) {
         if (!hfst::pmatch::flatten &&
@@ -1112,9 +1073,10 @@ LABEL: QUOTED_LITERAL PAIR_SEPARATOR QUOTED_LITERAL {
     $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
                             hfst::pmatch::format);
   }
-| EPSILON_TOKEN {
-    $$ = new HfstTransducer(hfst::internal_epsilon, hfst::internal_epsilon,
+| LABEL {
+    $$ = new HfstTransducer($1, $1,
                             hfst::pmatch::format);
+    free($1);
   }
 | ANY_TOKEN {
     $$ = new HfstTransducer(hfst::internal_identity,
@@ -1123,13 +1085,52 @@ LABEL: QUOTED_LITERAL PAIR_SEPARATOR QUOTED_LITERAL {
     // interacts with anything else
     $$->insert_to_alphabet(hfst::pmatch::all_pmatch_symbols);
   }
-| QUOTED_LITERAL {
-    $$ = new HfstTransducer($1, hfst::pmatch::format);
+| CURLY_LITERAL {
+    HfstTokenizer tok;
+    $$ = new HfstTransducer($1, tok, hfst::pmatch::format);
     free($1);
-  }
-| BOUNDARY_MARKER {
-    $$ = new HfstTransducer("@BOUNDARY@", "@BOUNDARY@", hfst::pmatch::format);
-  }
+ }
+| CURLY_LITERAL PAIR_SEPARATOR CURLY_LITERAL {
+    HfstTokenizer tok;
+    HfstTransducer * left = new HfstTransducer($1, tok, hfst::pmatch::format);
+    HfstTransducer * right = new HfstTransducer($3, tok, hfst::pmatch::format);
+    HfstTransducer * destroy = new HfstTransducer(
+        hfst::internal_unknown, hfst::internal_epsilon, hfst::pmatch::format);
+    HfstTransducer * construct = new HfstTransducer(
+        hfst::internal_epsilon, hfst::internal_unknown, hfst::pmatch::format);
+    left->compose(destroy->repeat_star());
+    left->compose(construct->repeat_star());
+    left->compose(*right);
+    $$ = left;
+    delete destroy; delete construct; delete right;
+    free($1); free($3);
+}
+| LABEL PAIR_SEPARATOR CURLY_LITERAL {
+    HfstTokenizer tok;
+    HfstTransducer * left = new HfstTransducer(
+        $1, hfst::internal_epsilon, hfst::pmatch::format);
+    HfstTransducer * right = new HfstTransducer($3, tok, hfst::pmatch::format);
+    HfstTransducer * construct = new HfstTransducer(
+        hfst::internal_epsilon, hfst::internal_unknown, hfst::pmatch::format);
+    left->compose(construct->repeat_star());
+    left->compose(*right);
+    $$ = left;
+    delete construct; delete right;
+    free($1); free($3);
+}
+| CURLY_LITERAL PAIR_SEPARATOR LABEL {
+    HfstTokenizer tok;
+    HfstTransducer * left = new HfstTransducer($1, tok, hfst::pmatch::format);
+    HfstTransducer * right = new HfstTransducer(
+        hfst::internal_epsilon, $3, hfst::pmatch::format);
+    HfstTransducer * destroy = new HfstTransducer(
+        hfst::internal_unknown, hfst::internal_epsilon, hfst::pmatch::format);
+    left->compose(destroy->repeat_star());
+    left->compose(*right);
+    $$ = left;
+    delete destroy; delete right;
+    free($1); free($3);
+}
 | FUNCALL { }
 | MAP { }
 | CONTEXT_CONDITION { }
@@ -1140,6 +1141,11 @@ LABEL: QUOTED_LITERAL PAIR_SEPARATOR QUOTED_LITERAL {
     $$ = hfst::pmatch::make_end_tag($2);
  }
 
+;
+
+LABEL: QUOTED_LITERAL { }
+| EPSILON_TOKEN { $$ = strdup(hfst::internal_epsilon.c_str()); }
+| BOUNDARY_MARKER { $$ = strdup("@BOUNDARY@"); }
 ;
 
 CONTEXT_CONDITION:
