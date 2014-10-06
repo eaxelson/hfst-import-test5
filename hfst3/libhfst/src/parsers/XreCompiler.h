@@ -89,7 +89,7 @@ class XreCompiler
 
   //! @brief Compile a transducer defined by @a xre and set the value of @a
   //!        as the number of characters read from @a xre. The characters after
-  //!        the regular expression that was succesfully parsed are ignored.
+  //!        the regular expression that was successfully parsed are ignored.
   //!        May return a pointer to @e empty transducer on non-fatal error.
   //!        A null pointer is returned on fatal error, if abort is not called.
   HfstTransducer* compile_first(const std::string& xre, unsigned int & chars_read);
