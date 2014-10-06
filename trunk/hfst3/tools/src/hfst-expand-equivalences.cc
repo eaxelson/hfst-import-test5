@@ -423,11 +423,12 @@ int main( int argc, char **argv )
 #endif
     hfst_set_program_name(argv[0], "0.1", "HfstExpandEquivalences");
     int retval = parse_options(argc, argv);
-    check_options(argc, argv);
     if (retval != EXIT_CONTINUE)
     {
         return retval;
     }
+    check_options(argc, argv);
+
     // close buffers, we use streams
     if (inputfile != stdin)
     {
