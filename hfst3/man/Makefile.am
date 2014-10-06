@@ -39,13 +39,22 @@ hfst_tools=hfst-compare.1 hfst-compose.1 \
 hfst_xfst=hfst-xfst.1 
 hfst_apertium_proc=hfst-apertium-proc.1 
 hfst_foma=hfst-foma.1 # hand-written
-hfst_tagger_tools=hfst-open-input-file-for-tagger.1 hfst-tag.1
+hfst_foma_wrapper=hfst-foma-wrapper.1 # hand-written
+hfst_tag_and_reweight=hfst-tag.1 hfst-reweight-tagger.1
+hfst_train_tagger=hfst-train-tagger.1
+hfst_train_tagger_subprograms=hfst-open-input-file-for-tagger.1 \
+	hfst_tagger_compute_data_statistics.py.1 hfst-build-tagger.1 # hand-written
+hfst_twolc=hfst-twolc.1
+hfst_twolc_subprograms= htwolcpre1.1 htwolcpre2.1 htwolcpre3.1 # hand-written
 
 aliases= hfst-determinise.1 hfst-expand.1 hfst-intersect.1 hfst-minimise.1 \
 	 hfst-minus.1 hfst-sfstpl2fst.1 hfst-summarise.1 hfst-union.1 hfst-proc.1 \
-	 hfst-optimised-lookup.1 hfst-train-tagger.1 hfst-train-tagger-loc.1 hfst-train-tagger-system.1
+	 hfst-optimised-lookup.1 hfst-train-tagger-loc.1 hfst-train-tagger-system.1 \
+	 hfst-twolc-loc.1 hfst-twolc-system.1
 
-dist_man1_MANS=$(hfst_tools) $(hfst_xfst) $(hfst_apertium_proc) $(hfst_foma) $(aliases)
+dist_man1_MANS=$(hfst_tools) $(hfst_xfst) $(hfst_apertium_proc) $(hfst_foma) $(hfst_foma_wrapper) \
+	$(hfst_tag_and_reweight) $(hfst_train_tagger) $(hfst_train_tagger_subprograms) $(hfst_twolc) \
+	$(hfst-twolc_subprograms) $(aliases)
 
 LN_S=ln -s -f
 
@@ -76,14 +85,17 @@ hfst-sfstpl2fst.1:
 hfst-summarise.1: 
 	$(LN_S) hfst-summarize.1 hfst-summarise.1 
 
-hfst-train-tagger.1:
-	$(LN_S) hfst-open-input-file-for-tagger.1 hfst-train-tagger.1
-
 hfst-train-tagger-loc.1:
-	$(LN_S) hfst-open-input-file-for-tagger.1 hfst-train-tagger-loc.1
+	$(LN_S) hfst-train-tagger.1 hfst-train-tagger-loc.1
 
 hfst-train-tagger-system.1:
-	$(LN_S) hfst-open-input-file-for-tagger.1 hfst-train-tagger-system.1
+	$(LN_S) hfst-train-tagger.1 hfst-train-tagger-system.1
+
+hfst-twolc-loc.1:
+	$(LN_S) hfst-twolc.1 hfst-twolc-loc.1
+
+hfst-twolc-system.1:
+	$(LN_S) hfst-twolc.1 hfst-twolc-system.1
 
 hfst-union.1:
 	$(LN_S) hfst-disjunct.1 hfst-union.1
@@ -113,11 +125,23 @@ bootstrap:
 		-n="$$N" \
 		-s 1 -o $$f -N -S HFST `echo $$f | sed 's/.1//' | sed 's/hfst/..\/tools\/src\/hfst-proc\/hfst/'`; \
 	done;
-	for f in $(hfst_tagger_tools); do \
+	for f in $(hfst_tag_and_reweight); do \
 		N=`echo $$f | sed 's/.1/ \-\-help/' | sed 's/hfst/..\/tools\/src\/hfst-tagger\/src\/hfst/' | sh | sed -n 2p`; \
 		help2man --no-discard-stderr \
 		-n="$$N" \
 		-s 1 -o $$f -N -S HFST `echo $$f | sed 's/.1//' | sed 's/hfst/..\/tools\/src\/hfst-tagger\/src\/hfst/'`; \
+	done;
+	for f in $(hfst_train_tagger); do \
+		N=`echo "../tools/src/hfst-tagger/src/hfst-open-input-file-for-tagger --help" | sh | sed -n 2p`; \
+		help2man --no-discard-stderr \
+		-n="$$N" \
+		-s 1 -o $$f -N -S HFST `echo "../tools/src/hfst-tagger/src/hfst-train-tagger"`; \
+	done;
+	for f in $(hfst_twolc); do \
+		N=`echo "../tools/src/hfst-twolc/src/hfst-twolc --help" | sh | sed -n 2p`; \
+		help2man --no-discard-stderr \
+		-n="$$N" \
+		-s 1 -o $$f -N -S HFST `echo "../tools/src/hfst-twolc/src/hfst-twolc"`; \
 	done;
 # hfst-foma man page is hand-written
 
