@@ -30,13 +30,20 @@ hfst_tools=hfst-compare.1 hfst-compose.1 \
 	hfst-calculate.1 hfst-compose-intersect.1 \
 	hfst-lookup.1 \
 	hfst-substitute.1 hfst-format.1 hfst-name.1 hfst-lexc.1 \
-	hfst-lexc-wrapper.1
+	hfst-lexc-wrapper.1 \
+	hfst-affix-guessify.1 hfst-edit-metadata.1 hfst-expand-equivalences.1 \
+	hfst-grep.1 hfst-guess.1 hfst-guessify.1 hfst-info.1 hfst-multiply.1 \
+	hfst-pair-test.1 hfst-prune-alphabet.1 hfst-reweight.1 hfst-shuffle.1 \
+	hfst-traverse.1 hfst-proc2.1 hfst-pmatch.1 hfst-pmatch2fst.1 \
+	hfst-optimized-lookup.1
 hfst_xfst=hfst-xfst.1 
 hfst_apertium_proc=hfst-apertium-proc.1 
 hfst_foma=hfst-foma.1 # hand-written
+hfst_tagger_tools=hfst-open-input-file-for-tagger.1 hfst-tag.1
 
 aliases= hfst-determinise.1 hfst-expand.1 hfst-intersect.1 hfst-minimise.1 \
-	 hfst-minus.1 hfst-sfstpl2fst.1 hfst-summarise.1 hfst-union.1 hfst-proc.1
+	 hfst-minus.1 hfst-sfstpl2fst.1 hfst-summarise.1 hfst-union.1 hfst-proc.1 \
+	 hfst-optimised-lookup.1 hfst-train-tagger.1 hfst-train-tagger-loc.1 hfst-train-tagger-system.1
 
 dist_man1_MANS=$(hfst_tools) $(hfst_xfst) $(hfst_apertium_proc) $(hfst_foma) $(aliases)
 
@@ -57,6 +64,9 @@ hfst-minimise.1:
 hfst-minus.1:
 	$(LN_S) hfst-subtract.1 hfst-minus.1 
 
+hfst-optimised-lookup.1:
+	$(LN_S) hfst-optimized-lookup.1 hfst-optimised-lookup.1
+
 hfst-proc.1:
 	$(LN_S) hfst-apertium-proc.1 hfst-proc.1
 
@@ -65,6 +75,15 @@ hfst-sfstpl2fst.1:
 
 hfst-summarise.1: 
 	$(LN_S) hfst-summarize.1 hfst-summarise.1 
+
+hfst-train-tagger.1:
+	$(LN_S) hfst-open-input-file-for-tagger.1 hfst-train-tagger.1
+
+hfst-train-tagger-loc.1:
+	$(LN_S) hfst-open-input-file-for-tagger.1 hfst-train-tagger-loc.1
+
+hfst-train-tagger-system.1:
+	$(LN_S) hfst-open-input-file-for-tagger.1 hfst-train-tagger-system.1
 
 hfst-union.1:
 	$(LN_S) hfst-disjunct.1 hfst-union.1
@@ -93,6 +112,12 @@ bootstrap:
 		help2man \
 		-n="$$N" \
 		-s 1 -o $$f -N -S HFST `echo $$f | sed 's/.1//' | sed 's/hfst/..\/tools\/src\/hfst-proc\/hfst/'`; \
+	done;
+	for f in $(hfst_tagger_tools); do \
+		N=`echo $$f | sed 's/.1/ \-\-help/' | sed 's/hfst/..\/tools\/src\/hfst-tagger\/src\/hfst/' | sh | sed -n 2p`; \
+		help2man --no-discard-stderr \
+		-n="$$N" \
+		-s 1 -o $$f -N -S HFST `echo $$f | sed 's/.1//' | sed 's/hfst/..\/tools\/src\/hfst-tagger\/src\/hfst/'`; \
 	done;
 # hfst-foma man page is hand-written
 
