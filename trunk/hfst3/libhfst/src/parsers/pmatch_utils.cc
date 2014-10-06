@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
+#include <sstream>
 
 #include "pmatch_utils.h"
 #include "HfstTransducer.h"
@@ -62,6 +63,7 @@ size_t len;
 bool verbose;
 bool flatten;
 clock_t timer;
+int minimization_guard_count;
 
 std::map<std::string, hfst::HfstTransducer> named_transducers;
 PmatchUtilityTransducers* utils=NULL;
@@ -88,6 +90,23 @@ get_utils()
       utils = new PmatchUtilityTransducers(); 
     }
   return utils;
+}
+
+void zero_minimization_guard(void)
+{
+    minimization_guard_count = 0;
+}
+
+HfstTransducer * get_minimization_guard(void)
+{
+    std::stringstream guard;
+    if(minimization_guard_count == 0) {
+        guard << hfst::internal_epsilon;
+    } else {
+        guard << "@PMATCH_GUARD_" << minimization_guard_count << "@";
+    }
+    ++minimization_guard_count;
+    return new HfstTransducer(hfst::internal_epsilon, guard.str(), format);
 }
 
 int*
@@ -489,7 +508,8 @@ void init_globals(void)
     all_pmatch_symbols.insert(BOUNDARY_SYMBOL);
     all_pmatch_symbols.insert(ENTRY_SYMBOL);
     all_pmatch_symbols.insert(EXIT_SYMBOL);
-
+    
+    zero_minimization_guard();
 }
 
 std::map<std::string, HfstTransducer*>

@@ -22,7 +22,6 @@ PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
     for (SymbolNumber i = 1; i < symbol_table.size(); ++i) {
         add_special_symbol(symbol_table[i], i);
     }
-    
 }
 
 PmatchAlphabet::PmatchAlphabet(void):
@@ -32,7 +31,7 @@ PmatchAlphabet::PmatchAlphabet(void):
 bool PmatchAlphabet::is_printable(SymbolNumber symbol)
 {
     if (symbol == 0 || symbol == NO_SYMBOL_NUMBER ||
-        is_flag_diacritic(symbol) || is_end_tag(symbol)) {
+        is_flag_diacritic(symbol) || is_end_tag(symbol) || is_guard(symbol)) {
         return false;
     }
     for (std::map<SpecialSymbol, SymbolNumber>::const_iterator it = special_symbols.begin();
@@ -78,8 +77,9 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
             str.size() - (sizeof("@PMATCH_ENDTAG_@") - 1));
     } else if (is_insertion(str)) {
         rtn_names[name_from_insertion(str)] = symbol_number;
+    } else if (is_guard(str)) {
+        guards.push_back(symbol_number);
     }
-        
 }
 
 SymbolNumberVector PmatchAlphabet::get_specials(void) const
@@ -220,6 +220,22 @@ bool PmatchAlphabet::is_end_tag(const SymbolNumber symbol) const
 bool PmatchAlphabet::is_insertion(const std::string & symbol)
 {
     return symbol.find("@I.") == 0 && symbol.rfind("@") == symbol.size() - 1;
+}
+
+bool PmatchAlphabet::is_guard(const std::string & symbol)
+{
+    return symbol.find("@PMATCH_GUARD_") == 0 && symbol.rfind("@") == symbol.size() - 1;
+}
+
+bool PmatchAlphabet::is_guard(const SymbolNumber symbol) const
+{
+    for(SymbolNumberVector::const_iterator it = guards.begin();
+        it != guards.end(); ++it) {
+        if(symbol == *it) {
+            return true;
+        }
+    }
+    return false;
 }
 
 std::string PmatchAlphabet::name_from_insertion(const std::string & symbol)
@@ -457,7 +473,8 @@ std::string PmatchAlphabet::stringify(const DoubleTape & str)
             }
             retval.insert(pos, start_tag(output));
             retval.append(end_tag(output));
-        } else if (output == special_symbols[boundary]) {
+        } else if (output == special_symbols[boundary]
+                   || is_guard(output)) {
             continue;
         } else {
             if (!extract_tags || start_tag_pos.size() != 0) {

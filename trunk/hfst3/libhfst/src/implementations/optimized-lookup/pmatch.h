@@ -90,7 +90,9 @@ namespace hfst_ol {
         std::map<SpecialSymbol, SymbolNumber> special_symbols;
         std::map<SymbolNumber, std::string> end_tag_map;
         std::map<std::string, SymbolNumber> rtn_names;
+        SymbolNumberVector guards;
         bool is_end_tag(const SymbolNumber symbol) const;
+        bool is_guard(const SymbolNumber symbol) const;
         std::string end_tag(const SymbolNumber symbol);
         std::string start_tag(const SymbolNumber symbol);
         bool extract_tags;
@@ -101,6 +103,7 @@ namespace hfst_ol {
         ~PmatchAlphabet(void);
         static bool is_end_tag(const std::string & symbol);
         static bool is_insertion(const std::string & symbol);
+        static bool is_guard(const std::string & symbol);
         static std::string name_from_insertion(
             const std::string & symbol);
         bool is_printable(SymbolNumber symbol);
