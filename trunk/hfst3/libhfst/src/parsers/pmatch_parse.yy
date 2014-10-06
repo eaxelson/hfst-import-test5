@@ -5,7 +5,8 @@
 #include <stdio.h>
 #include <assert.h>
 #include <iostream>
-
+#include <sstream>
+    
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstXeroxRules.h"
@@ -20,9 +21,7 @@
 
     extern void pmatcherror(const char * text);
     extern int pmatchlex();
-
-
-
+    extern int pmatchlineno;
 
     %}
 
@@ -150,6 +149,12 @@ RC_LEFT NLC_LEFT NRC_LEFT MAP_LEFT SYM_LEFT OR_LEFT AND_LEFT
 
 PMATCH: DEFINITION {
     if ($1->first.compare("@_PMATCH_DUMMY_@")) {
+        if(hfst::pmatch::definitions.count($1->first) != 0) {
+            std::stringstream warning;
+            warning << "definition of " << $1->first << " on line "
+                    << pmatchlineno << " shadowed by earlier definition\n";
+            hfst::pmatch::warn(warning.str());
+        }
          hfst::pmatch::definitions.insert(*$1);
          if (hfst::pmatch::verbose) {
              std::cerr << std::setiosflags(std::ios::fixed) << std::setprecision(2);
@@ -160,12 +165,17 @@ PMATCH: DEFINITION {
              hfst::pmatch::print_size_info($1->second);
              std::cerr << std::endl;
          }
-
     }
     delete $1;
  } |
  PMATCH DEFINITION {
      if ($2->first.compare("@_PMATCH_DUMMY_@")) {
+         if(hfst::pmatch::definitions.count($2->first) != 0) {
+             std::stringstream warning;
+             warning << "definition of " << $2->first << " on line "
+                     << pmatchlineno << " shadowed by earlier definition\n";
+             hfst::pmatch::warn(warning.str());
+         }
          hfst::pmatch::definitions.insert(*$2);
          if (hfst::pmatch::verbose) {
              std::cerr << std::setiosflags(std::ios::fixed) << std::setprecision(2);
@@ -215,7 +225,12 @@ BINDING: SYMBOL REGEXP1 {
 
 FUNCTION: SYMBOL_WITH_LEFT_PAREN ARGLIST RIGHT_PARENTHESIS FUNCBODY1 END_OF_EXPRESSION {
     hfst::pmatch::PmatchFunction fun(* $2, $4);
-//    std::pair<std::string, PmatchFunction> name_fun_pair($1, fun);
+    if(hfst::pmatch::functions.count($1) != 0) {
+        std::stringstream warning;
+        warning << "definition of function" << $1 << " on line "
+                << pmatchlineno << " shadowed by earlier definition\n";
+        hfst::pmatch::warn(warning.str());
+    }
     hfst::pmatch::functions[$1] = fun;
     // Pass a dummy transducer, since function registration is separate
     HfstTransducer * dummy = new HfstTransducer(hfst::pmatch::format);
