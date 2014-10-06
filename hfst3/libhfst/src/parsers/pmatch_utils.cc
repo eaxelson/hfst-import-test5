@@ -75,6 +75,11 @@ void add_to_pmatch_symbols(StringSet symbols)
     }
 }
 
+void warn(std::string warning)
+{
+    std::cerr << "pmatch: warning: " << warning;
+}
+
 PmatchUtilityTransducers*
 get_utils()
 {
@@ -227,18 +232,17 @@ HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex)
 
 void add_end_tag(HfstTransducer * regex, std::string tag)
 {
-    HfstTransducer end_tag(hfst::internal_epsilon,
-                           "@PMATCH_ENDTAG_" + tag + "@",
-                           regex->get_type());
-    all_pmatch_symbols.insert("@PMATCH_ENDTAG_" + tag + "@");
-    regex->concatenate(end_tag);
+    HfstTransducer * end_tag = make_end_tag(tag);
+    regex->concatenate(*end_tag);
+    delete end_tag;
 }
 
 HfstTransducer * make_end_tag(std::string tag)
 {
-    HfstTransducer * end_tag = new HfstTransducer(hfst::internal_epsilon,
-                                                  "@PMATCH_ENDTAG_" + tag + "@",
-                                                  format);
+    HfstTransducer * end_tag = new HfstTransducer(
+        hfst::internal_epsilon,
+        "@PMATCH_ENDTAG_" + tag + "@",
+        format);
     all_pmatch_symbols.insert("@PMATCH_ENDTAG_" + tag + "@");
     return end_tag;
 }
