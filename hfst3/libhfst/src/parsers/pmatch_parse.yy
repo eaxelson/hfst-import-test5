@@ -140,7 +140,7 @@ PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
 
-%nonassoc DEFINE DEFINS DEFFUN ALPHA LOWERALPHA UPPERALPHA NUM PUNCT WHITESPACE
+%nonassoc DEFINE REGEX DEFINS DEFFUN ALPHA LOWERALPHA UPPERALPHA NUM PUNCT WHITESPACE
 OPTCAP_LEFT TOLOWER_LEFT TOUPPER_LEFT INS_LEFT DEFINE_LEFT ENDTAG_LEFT LC_LEFT
 RC_LEFT NLC_LEFT NRC_LEFT MAP_LEFT SYM_LEFT OR_LEFT AND_LEFT
 %%
@@ -151,15 +151,32 @@ RC_LEFT NLC_LEFT NRC_LEFT MAP_LEFT SYM_LEFT OR_LEFT AND_LEFT
 PMATCH: DEFINITION {
     if ($1->first.compare("@_PMATCH_DUMMY_@")) {
          hfst::pmatch::definitions.insert(*$1);
-     }
-//    $$ = &hfst::pmatch::definitions;
+         if (hfst::pmatch::verbose) {
+             std::cerr << std::setiosflags(std::ios::fixed) << std::setprecision(2);
+             double duration = (clock() - hfst::pmatch::timer) /
+                 (double) CLOCKS_PER_SEC;
+             hfst::pmatch::timer = clock();
+             std::cerr << "compiled " << $1->first << " in " << duration << " seconds\n";
+             hfst::pmatch::print_size_info($1->second);
+             std::cerr << std::endl;
+         }
+
+    }
     delete $1;
  } |
  PMATCH DEFINITION {
      if ($2->first.compare("@_PMATCH_DUMMY_@")) {
          hfst::pmatch::definitions.insert(*$2);
+         if (hfst::pmatch::verbose) {
+             std::cerr << std::setiosflags(std::ios::fixed) << std::setprecision(2);
+             double duration = (clock() - hfst::pmatch::timer) /
+                 (double) CLOCKS_PER_SEC;
+             hfst::pmatch::timer = clock();
+             std::cerr << "compiled " << $2->first << " in " << duration << " seconds\n";
+             hfst::pmatch::print_size_info($2->second);
+             std::cerr << std::endl;
+         }
      }
-//     $$ = &hfst::pmatch::definitions;
      delete $2;
  }
 ;
@@ -174,23 +191,26 @@ DEFINITION: DEFINE BINDING { $$ = $2; }
     hfst::pmatch::def_insed_transducers[$2->first] = ins_t;
     $$ = $2;
  }
+| REGEX REGEXP1 {
+    $2->set_name("TOP");
+    $2 = hfst::pmatch::add_pmatch_delimiters($2);
+    $2->minimize();
+    $$ = new std::pair<std::string, hfst::HfstTransducer*>("TOP", $2);
+ }
 | DEFFUN FUNCTION { $$ = $2; }
 ;
 
 BINDING: SYMBOL REGEXP1 {
     $2->set_name($1);
-    if (hfst::pmatch::verbose) {
-        std::cerr << std::setiosflags(std::ios::fixed) << std::setprecision(2);
-        double duration = (clock() - hfst::pmatch::timer) /
-            (double) CLOCKS_PER_SEC;
-        hfst::pmatch::timer = clock();
-        std::cerr << "compiled " << $1 << " in " << duration << " seconds\n";
-        hfst::pmatch::print_size_info($2);
-        std::cerr << std::endl;
-    }
     $2 = hfst::pmatch::add_pmatch_delimiters($2);
     $2->minimize();
     $$ = new std::pair<std::string, hfst::HfstTransducer*>($1, $2);
+ }
+| REGEX REGEXP1 {
+    $2->set_name("regex");
+    $2 = hfst::pmatch::add_pmatch_delimiters($2);
+    $2->minimize();
+    $$ = new std::pair<std::string, hfst::HfstTransducer*>("regex", $2);
  };
 
 FUNCTION: SYMBOL_WITH_LEFT_PAREN ARGLIST RIGHT_PARENTHESIS FUNCBODY1 END_OF_EXPRESSION {
@@ -201,6 +221,14 @@ FUNCTION: SYMBOL_WITH_LEFT_PAREN ARGLIST RIGHT_PARENTHESIS FUNCBODY1 END_OF_EXPR
     HfstTransducer * dummy = new HfstTransducer(hfst::pmatch::format);
     dummy->set_name("@_PMATCH_DUMMY_@");
     $$ = new std::pair<std::string, hfst::HfstTransducer*>("@_PMATCH_DUMMY_@", dummy);
+    if (hfst::pmatch::verbose) {
+        std::cerr << std::setiosflags(std::ios::fixed) << std::setprecision(2);
+        double duration = (clock() - hfst::pmatch::timer) /
+            (double) CLOCKS_PER_SEC;
+        hfst::pmatch::timer = clock();
+        std::cerr << "defined function" << $1 << " in " << duration << " seconds\n";
+        std::cerr << std::endl;
+    }
  };
 
 ARGLIST: ARGS {
@@ -392,9 +420,7 @@ FUNCBODY6: QUOTED_LITERAL {
 
 
 REGEXP2: REPLACE
-{
-//          std::cerr << "regexp2:replace \n"<< std::endl; 
-}
+{ }
 | REGEXP2 COMPOSITION REPLACE {
        
     $$ = & $1->compose(*$3);
