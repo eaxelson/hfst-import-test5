@@ -191,7 +191,7 @@ int CommandLine::parse_options(int argc, char** argv)
       else
         { 
           std::cerr << "Unknown format \"" << optarg << "\"."
-            << "Try runnning with option -h or --help."
+            << "Try running with option -h or --help."
             << std::endl;
           exit(1);
         }
