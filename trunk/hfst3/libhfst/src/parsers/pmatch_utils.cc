@@ -64,6 +64,7 @@ bool verbose;
 bool flatten;
 clock_t timer;
 int minimization_guard_count;
+bool need_delimiters;
 
 std::map<std::string, hfst::HfstTransducer> named_transducers;
 PmatchUtilityTransducers* utils=NULL;
@@ -494,6 +495,8 @@ void init_globals(void)
     used_definitions.clear();
     functions.clear();
     tmp_collected_funargs.clear();
+    zero_minimization_guard();
+    need_delimiters = false;
 
     all_pmatch_symbols.clear();
     all_pmatch_symbols.insert(RC_ENTRY_SYMBOL);
@@ -508,8 +511,6 @@ void init_globals(void)
     all_pmatch_symbols.insert(BOUNDARY_SYMBOL);
     all_pmatch_symbols.insert(ENTRY_SYMBOL);
     all_pmatch_symbols.insert(EXIT_SYMBOL);
-    
-    zero_minimization_guard();
 }
 
 std::map<std::string, HfstTransducer*>
@@ -571,10 +572,6 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
          ++defs_itr) {
         if (defs_itr->first.compare("TOP") == 0 ||
             inserted_transducers.count(defs_itr->first) != 0) {
-            // In order to avoid expanding special pmatch markers, insert
-            // them first
-            hfst::StringSet symbols_so_far = dummy.get_alphabet();
-            defs_itr->second->insert_to_alphabet(symbols_so_far);
             dummy.harmonize(*defs_itr->second);
         }
     }
@@ -585,8 +582,6 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         ++defs_itr) {
         if (defs_itr->first.compare("TOP") == 0 ||
             inserted_transducers.count(defs_itr->first) != 0) {
-            hfst::StringSet symbols_so_far = dummy.get_alphabet();
-            defs_itr->second->insert_to_alphabet(symbols_so_far);
             dummy.harmonize(*defs_itr->second);
             retval.insert(std::pair<std::string, hfst::HfstTransducer*>(
                               defs_itr->first,

@@ -104,6 +104,7 @@ namespace hfst_ol {
         static bool is_end_tag(const std::string & symbol);
         static bool is_insertion(const std::string & symbol);
         static bool is_guard(const std::string & symbol);
+        static bool is_special(const std::string & symbol);
         static std::string name_from_insertion(
             const std::string & symbol);
         bool is_printable(SymbolNumber symbol);

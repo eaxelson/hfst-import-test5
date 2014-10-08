@@ -227,6 +227,19 @@ bool PmatchAlphabet::is_guard(const std::string & symbol)
     return symbol.find("@PMATCH_GUARD_") == 0 && symbol.rfind("@") == symbol.size() - 1;
 }
 
+bool PmatchAlphabet::is_special(const std::string & symbol)
+{
+    if (symbol.size() == 0) {
+        return false;
+    }
+    if (is_insertion(symbol) || symbol == "@BOUNDARY@") {
+//        || symbol == "@_UNKNOWN_SYMBOL_@" || symbol == "@_IDENTITY_SYMBOL_@"
+        return true;
+    } else {
+        return symbol.find("@PMATCH") == 0 && symbol.at(symbol.size() - 1) == '@';
+    }
+}
+
 bool PmatchAlphabet::is_guard(const SymbolNumber symbol) const
 {
     for(SymbolNumberVector::const_iterator it = guards.begin();
