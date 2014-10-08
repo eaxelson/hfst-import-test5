@@ -211,17 +211,12 @@ DEFINITION: DEFINE BINDING { $$ = $2; }
 ;
 
 BINDING: SYMBOL REGEXP1 {
-    $2->set_name($1);
     $2 = hfst::pmatch::add_pmatch_delimiters($2);
+    $2->set_name($1);
     $2->minimize();
     $$ = new std::pair<std::string, hfst::HfstTransducer*>($1, $2);
  }
-| REGEX REGEXP1 {
-    $2->set_name("regex");
-    $2 = hfst::pmatch::add_pmatch_delimiters($2);
-    $2->minimize();
-    $$ = new std::pair<std::string, hfst::HfstTransducer*>("regex", $2);
- };
+;
 
 FUNCTION: SYMBOL_WITH_LEFT_PAREN ARGLIST RIGHT_PARENTHESIS FUNCBODY1 END_OF_EXPRESSION {
     hfst::pmatch::PmatchFunction fun(* $2, $4);
