@@ -203,7 +203,10 @@ DEFINITION: DEFINE BINDING { $$ = $2; }
  }
 | REGEX REGEXP1 {
     $2->set_name("TOP");
-    $2 = hfst::pmatch::add_pmatch_delimiters($2);
+    if (hfst::pmatch::need_delimiters) {
+        $2 = hfst::pmatch::add_pmatch_delimiters($2);
+    }
+    hfst::pmatch::need_delimiters = false;
     $2->minimize();
     $$ = new std::pair<std::string, hfst::HfstTransducer*>("TOP", $2);
  }
@@ -211,7 +214,10 @@ DEFINITION: DEFINE BINDING { $$ = $2; }
 ;
 
 BINDING: SYMBOL REGEXP1 {
-    $2 = hfst::pmatch::add_pmatch_delimiters($2);
+    if (hfst::pmatch::need_delimiters) {
+        $2 = hfst::pmatch::add_pmatch_delimiters($2);
+    }
+    hfst::pmatch::need_delimiters = false;
     $2->set_name($1);
     $2->minimize();
     $$ = new std::pair<std::string, hfst::HfstTransducer*>($1, $2);
@@ -1172,9 +1178,11 @@ LABEL_PAIR: LABEL PAIR_SEPARATOR LABEL {
 | CONTEXT_CONDITION { }
 | ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
     $$ = hfst::pmatch::make_end_tag($2);
+    hfst::pmatch::need_delimiters = true;
  }
 | ENDTAG_LEFT QUOTED_LITERAL RIGHT_PARENTHESIS {
     $$ = hfst::pmatch::make_end_tag($2);
+    hfst::pmatch::need_delimiters = true;
  }
 
 ;
@@ -1185,7 +1193,7 @@ LABEL: QUOTED_LITERAL { }
 ;
 
 CONTEXT_CONDITION:
-P_CONTEXT { }
+P_CONTEXT { $$ = $1; hfst::pmatch::need_delimiters = true; }
 | OR_CONTEXT { }
 | AND_CONTEXT { };
 

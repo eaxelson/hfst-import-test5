@@ -33,6 +33,7 @@ extern bool verbose;
 extern bool flatten;
 extern clock_t timer;
 extern int minimization_guard_count;
+extern bool need_delimiters;
 
 struct PmatchUtilityTransducers;
 //extern PmatchUtilityTransducers* utils;
