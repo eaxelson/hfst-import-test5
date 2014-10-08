@@ -3,6 +3,7 @@
 // --- HfstTransitionGraph.h is enough
 #include "implementations/HfstTransitionGraph.h" 
 #include "HfstFlagDiacritics.h"
+#include "implementations/optimized-lookup/pmatch.h"
 
 #ifndef MAIN_TEST
 
@@ -37,7 +38,7 @@ static StringSet remove_flags(const StringSet & alpha)
   for (StringSet::const_iterator it = alpha.begin();
       it != alpha.end(); it++)
     {
-      if (!FdOperation::is_diacritic(*it))
+        if (!FdOperation::is_diacritic(*it) && !hfst_ol::PmatchAlphabet::is_special(*it))
         {
           retval.insert(*it);
         }
@@ -118,9 +119,13 @@ HarmonizeUnknownAndIdentitySymbols::HarmonizeUnknownAndIdentitySymbols
   harmonize_unknown_symbols(t2,t1_symbols_minus_t2_symbols);
 
   // Add new symbols to the alphabets of the transducers.
-  
-  add_symbols_to_alphabet(t1,t2_symbols_minus_t1_symbols);
-  add_symbols_to_alphabet(t2,t1_symbols_minus_t2_symbols);
+  // We used to only add the difference of the alphabets,
+  // but that way we miss the things removed by remove_flags()
+  // which we do want. Since we'd be iterating over them again
+  // to collect them, might as well just add everything.
+  add_symbols_to_alphabet(t1,t2.get_alphabet());
+  add_symbols_to_alphabet(t2,t1.get_alphabet());
+
 
   if (debug_harmonize)
     {
