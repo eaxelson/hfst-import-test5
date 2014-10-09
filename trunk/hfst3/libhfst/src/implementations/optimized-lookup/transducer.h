@@ -360,7 +360,7 @@ protected:
     SymbolNumber unknown_symbol;
     SymbolNumber default_symbol;
     SymbolNumber identity_symbol;
-    
+    SymbolNumber orig_symbol_count;
   
 public:
     TransducerAlphabet()
@@ -369,6 +369,7 @@ public:
             unknown_symbol = NO_SYMBOL_NUMBER;
             default_symbol = NO_SYMBOL_NUMBER;
             identity_symbol = NO_SYMBOL_NUMBER;
+            orig_symbol_count = 1;
         }
     TransducerAlphabet(std::istream& is,
                        SymbolNumber symbol_count,
@@ -414,6 +415,8 @@ public:
         { return default_symbol; }
     SymbolNumber get_identity_symbol(void) const
         { return identity_symbol; }
+    SymbolNumber get_orig_symbol_count(void) const
+        { return orig_symbol_count; }
     void add_symbol(char * symbol);
     
 };
