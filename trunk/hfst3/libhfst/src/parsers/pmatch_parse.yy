@@ -489,7 +489,6 @@ REPLACE : REGEXP3 {}
     }
        
     delete $1;
-    $$->insert_to_alphabet(hfst::pmatch::all_pmatch_symbols);
 }
 ;
 
@@ -791,7 +790,6 @@ REGEXP5: REGEXP6 { }
     delete $3;
  }
 | REGEXP5 MINUS REGEXP6 {
-    $1->insert_to_alphabet(hfst::pmatch::all_pmatch_symbols);
     $$ = & $1->subtract(*$3);
     delete $3;
  }
@@ -935,7 +933,6 @@ REGEXP10: REGEXP11 { }
                                              hfst::internal_identity,
                                              hfst::pmatch::format);
     $$ = & ( any->subtract(*$2));
-    $$->insert_to_alphabet(hfst::pmatch::all_pmatch_symbols);
     delete $2;
  }
 | SUBSTITUTE_LEFT REGEXP10 COMMA REGEXP10 COMMA REGEXP10 RIGHT_BRACKET {
@@ -1054,9 +1051,6 @@ LABEL_PAIR: LABEL PAIR_SEPARATOR LABEL {
 | ANY_TOKEN PAIR_SEPARATOR ANY_TOKEN {
     $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
                             hfst::pmatch::format);
-    // Insert special symbols we don't want to have expanded when this
-    // interacts with anything else
-    $$->insert_to_alphabet(hfst::pmatch::all_pmatch_symbols);
  }
 | LABEL PAIR_SEPARATOR ANY_TOKEN {
     $$ = new HfstTransducer($1, hfst::internal_unknown, hfst::pmatch::format);
@@ -1099,7 +1093,6 @@ LABEL_PAIR: LABEL PAIR_SEPARATOR LABEL {
                 hfst::pmatch::used_definitions.insert($1);
             }
             $$ = new HfstTransducer(*hfst::pmatch::definitions[$1]);
-            $$->insert_to_alphabet(hfst::pmatch::all_pmatch_symbols);
         }
     } else {
         if (strlen($1) == 0) {
@@ -1123,9 +1116,6 @@ LABEL_PAIR: LABEL PAIR_SEPARATOR LABEL {
 | ANY_TOKEN {
     $$ = new HfstTransducer(hfst::internal_identity,
                             hfst::pmatch::format);
-    // Insert special symbols we don't want to have expanded when this
-    // interacts with anything else
-    $$->insert_to_alphabet(hfst::pmatch::all_pmatch_symbols);
   }
 | CURLY_LITERAL {
     HfstTokenizer tok;

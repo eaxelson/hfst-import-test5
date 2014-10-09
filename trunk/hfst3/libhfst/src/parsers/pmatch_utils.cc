@@ -68,15 +68,6 @@ bool need_delimiters;
 
 std::map<std::string, hfst::HfstTransducer> named_transducers;
 PmatchUtilityTransducers* utils=NULL;
-std::set<std::string> all_pmatch_symbols;
-
-void add_to_pmatch_symbols(StringSet symbols)
-{
-    for(StringSet::const_iterator it = symbols.begin();
-        it != symbols.end(); ++it) {
-        all_pmatch_symbols.insert(*it);
-    }
-}
 
 void warn(std::string warning)
 {
@@ -211,7 +202,6 @@ get_Ins_transition(const char *s)
     rv = strcpy(rv, "@I.");
     rv = strcat(rv, s);
     rv = strcat(rv, "@");
-    all_pmatch_symbols.insert(rv);
     return rv;
 }
 
@@ -222,7 +212,6 @@ get_RC_transition(const char *s)
     rv = strcpy(rv, "@RC.");
     rv = strcat(rv, s);
     rv = strcat(rv, "@");
-    all_pmatch_symbols.insert(rv);
     return rv;
 }
 
@@ -233,7 +222,6 @@ get_LC_transition(const char *s)
     rv = strcpy(rv, "@LC.");
     rv = strcat(rv, s);
     rv = strcat(rv, "@");
-    all_pmatch_symbols.insert(rv);
     return rv;
 }
 
@@ -263,7 +251,6 @@ HfstTransducer * make_end_tag(std::string tag)
         hfst::internal_epsilon,
         "@PMATCH_ENDTAG_" + tag + "@",
         format);
-    all_pmatch_symbols.insert("@PMATCH_ENDTAG_" + tag + "@");
     return end_tag;
 }
 
@@ -497,20 +484,6 @@ void init_globals(void)
     tmp_collected_funargs.clear();
     zero_minimization_guard();
     need_delimiters = false;
-
-    all_pmatch_symbols.clear();
-    all_pmatch_symbols.insert(RC_ENTRY_SYMBOL);
-    all_pmatch_symbols.insert(RC_EXIT_SYMBOL);
-    all_pmatch_symbols.insert(LC_ENTRY_SYMBOL);
-    all_pmatch_symbols.insert(LC_EXIT_SYMBOL);
-    all_pmatch_symbols.insert(NRC_ENTRY_SYMBOL);
-    all_pmatch_symbols.insert(NRC_EXIT_SYMBOL);
-    all_pmatch_symbols.insert(NLC_ENTRY_SYMBOL);
-    all_pmatch_symbols.insert(NLC_EXIT_SYMBOL);
-    all_pmatch_symbols.insert(PASSTHROUGH_SYMBOL);
-    all_pmatch_symbols.insert(BOUNDARY_SYMBOL);
-    all_pmatch_symbols.insert(ENTRY_SYMBOL);
-    all_pmatch_symbols.insert(EXIT_SYMBOL);
 }
 
 std::map<std::string, HfstTransducer*>
@@ -565,7 +538,6 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
     }
 
     HfstTransducer dummy(format);
-    dummy.insert_to_alphabet(all_pmatch_symbols);
     // We keep TOP and any inserted transducers
     std::map<std::string, hfst::HfstTransducer *>::iterator defs_itr;
     for (defs_itr = definitions.begin(); defs_itr != definitions.end();
