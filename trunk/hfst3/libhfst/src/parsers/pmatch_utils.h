@@ -50,8 +50,6 @@ const std::string BOUNDARY_SYMBOL = "@BOUNDARY@";
 const std::string ENTRY_SYMBOL = "@PMATCH_ENTRY@";
 const std::string EXIT_SYMBOL = "@PMATCH_EXIT@";
 
-extern std::set<std::string> all_pmatch_symbols;
-
 void add_to_pmatch_symbols(StringSet symbols);
 void warn(std::string warning);
 PmatchUtilityTransducers* get_utils();
