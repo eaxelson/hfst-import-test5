@@ -51,6 +51,7 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
         }
         symbol_table.push_back(str.c_str());
     }
+    orig_symbol_count = symbol_table.size();
 }
 
 void TransducerAlphabet::add_symbol(char * symbol)
@@ -73,6 +74,7 @@ TransducerAlphabet::TransducerAlphabet(const SymbolTable& st):
             default_symbol = i;
         }
     }
+    orig_symbol_count = symbol_table.size();
 }
 
 SymbolNumber TransducerAlphabet::symbol_from_string(
@@ -391,9 +393,11 @@ void Transducer::find_transitions(SymbolNumber input,
         if (tables->get_transition_input(i) == input)
         {
             SymbolNumber output = tables->get_transition_output(i);
-            if (input == alphabet->get_default_symbol()) {
-                // we got here via default, so look back in the
-                // input tape to find the symbol we want to write
+            if (output == alphabet->get_default_symbol()
+                || output == alphabet->get_identity_symbol()
+                || output == alphabet->get_default_symbol()) {
+                // we got here via default, identity or default, so look
+                // back in the input tape to find the symbol we want to write
                 output = input_tape[input_pos - 1];
             }
             output_tape.write(output_pos, output);
@@ -476,10 +480,22 @@ void Transducer::get_analyses(unsigned int input_pos,
         SymbolNumber input = input_tape[input_pos];
         ++input_pos;
 
-        find_transitions(input,
-                         input_pos,
-                         output_pos,
-                         i+1);
+        if (input < alphabet->get_orig_symbol_count()) {
+            // Input is in the alphabet
+            find_transitions(input,
+                             input_pos,
+                             output_pos,
+                             i+1);
+        } else {
+            if (alphabet->get_identity_symbol() != NO_SYMBOL_NUMBER) {
+                find_transitions(alphabet->get_identity_symbol(),
+                                 input_pos, output_pos, i+1);
+            }
+            if (alphabet->get_unknown_symbol() != NO_SYMBOL_NUMBER) {
+                find_transitions(alphabet->get_unknown_symbol(),
+                                 input_pos, output_pos, i+1);
+            }
+        }
         if (alphabet->get_default_symbol() != NO_SYMBOL_NUMBER &&
             !found_transition) {
             find_transitions(alphabet->get_default_symbol(),
@@ -511,10 +527,19 @@ void Transducer::get_analyses(unsigned int input_pos,
         SymbolNumber input = input_tape[input_pos];
         ++input_pos;
 
-        find_index(input,
-                   input_pos,
-                   output_pos,
-                   i+1);
+        if (input < alphabet->get_orig_symbol_count()) {
+            // Input is in the alphabet
+            find_index(input, input_pos, output_pos, i+1);
+        } else {
+            if (alphabet->get_identity_symbol() != NO_SYMBOL_NUMBER) {
+                find_index(alphabet->get_identity_symbol(),
+                           input_pos, output_pos, i+1);
+            }
+            if (alphabet->get_unknown_symbol() != NO_SYMBOL_NUMBER) {
+                find_index(alphabet->get_unknown_symbol(),
+                           input_pos, output_pos, i+1);
+            }
+        }
         // If we have a default symbol defined and we didn't find an index,
         // check for that
         if (alphabet->get_default_symbol() != NO_SYMBOL_NUMBER && !found_transition) {
