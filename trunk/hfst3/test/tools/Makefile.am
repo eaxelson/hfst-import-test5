@@ -68,6 +68,9 @@ endif
 if WANT_LOOKUP
 TESTS += lookup-functionality.sh
 endif
+if WANT_OPTIMIZED_LOOKUP
+TESTS += optimized-lookup-functionality.sh
+endif
 if WANT_MINIMIZE
 TESTS += minimize-functionality.sh
 endif
