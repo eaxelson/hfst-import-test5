@@ -385,7 +385,7 @@ void runTransducer (genericTransducer T)
   while(std::cin.getline(str,MAX_IO_STRING))
     {
       // Carriage returns in Windows..
-      unsigned int last_char_index = (unsigned int)(std::cin.gcount()) - 2;
+      unsigned int last_char_index = (unsigned int) (std::cin.gcount() > 2)? (std::cin.gcount()) - 2: 0;
       if (str[last_char_index] == '\r')
         str[last_char_index] = '\0';
 
