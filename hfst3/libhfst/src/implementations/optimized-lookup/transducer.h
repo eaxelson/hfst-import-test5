@@ -69,9 +69,11 @@ struct TraversalState
     FlagDiacriticState flags;
     TraversalState(TransitionTableIndex i, FlagDiacriticState f):
         index(i), flags(f) {}
-    bool operator==(TraversalState & rhs);
+    bool operator==(const TraversalState & rhs) const;
+    bool operator<(const TraversalState & rhs) const;
+
 };
-typedef std::vector<std::vector<TraversalState> > PositionStates;
+typedef std::vector<std::set<TraversalState> > PositionStates;
 
 const SymbolNumber NO_SYMBOL_NUMBER = std::numeric_limits<SymbolNumber>::max();
 const TransitionTableIndex NO_TABLE_INDEX =

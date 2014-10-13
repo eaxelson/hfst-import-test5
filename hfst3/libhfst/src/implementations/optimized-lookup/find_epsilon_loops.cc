@@ -16,7 +16,7 @@ namespace hfst_ol {
 
 // Define an operation for checking state equivalence for the
 // purpose of detecting the same situation happening twice
-bool TraversalState::operator==(TraversalState & rhs)
+bool TraversalState::operator==(const TraversalState & rhs) const
 {
     if (this->index != rhs.index) {
         return false;
@@ -30,6 +30,31 @@ bool TraversalState::operator==(TraversalState & rhs)
         }
     }
     return true;
+}
+
+bool TraversalState::operator<(const TraversalState & rhs) const
+{
+    if (this->index < rhs.index) {
+        return true;
+    }
+    if (this->index > rhs.index) {
+        return false;
+    }
+    if (this->flags.size() < rhs.flags.size()) {
+        return true;
+    }
+    if (this->flags.size() > rhs.flags.size()) {
+        return false;
+    }
+    for (size_t i = 0; i < this->flags.size(); ++i) {
+        if (this->flags[i] < rhs.flags[i]) {
+            return true;
+        }
+        if (this->flags[i] > rhs.flags[1]) {
+            return false;
+        }
+    }
+    return false;    
 }
 
 void Transducer::find_loop_epsilon_transitions(
@@ -130,19 +155,16 @@ void Transducer::find_loop(unsigned int input_pos,
     }
     if (input_pos == position_states.size()) {
         // first time at this input
-        std::vector<TraversalState> v;
+        std::set<TraversalState> v;
         position_states.push_back(v);
     } else {
         // see if the same state has been visited already at this input
-        for(std::vector<TraversalState>::iterator it = position_states[input_pos].begin();
-            it != position_states[input_pos].end(); ++it) {
-            if (this_position == *it) {
-                 throw true;
-            }
+        if (position_states[input_pos].count(this_position) == 1) {
+            throw true;
         }
     }
     // if we didn't throw a loop exception, record this state
-    position_states[input_pos].push_back(this_position);
+    position_states[input_pos].insert(this_position);
         
     if (indexes_transition_table(i))
     {
