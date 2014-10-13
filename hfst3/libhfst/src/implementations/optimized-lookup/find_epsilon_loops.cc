@@ -40,12 +40,6 @@ bool TraversalState::operator<(const TraversalState & rhs) const
     if (this->index > rhs.index) {
         return false;
     }
-    if (this->flags.size() < rhs.flags.size()) {
-        return true;
-    }
-    if (this->flags.size() > rhs.flags.size()) {
-        return false;
-    }
     for (size_t i = 0; i < this->flags.size(); ++i) {
         if (this->flags[i] < rhs.flags[i]) {
             return true;
@@ -54,6 +48,13 @@ bool TraversalState::operator<(const TraversalState & rhs) const
             return false;
         }
     }
+    if (this->flags.size() < rhs.flags.size()) {
+        return true;
+    }
+    if (this->flags.size() > rhs.flags.size()) {
+        return false;
+    }
+
     return false;    
 }
 
