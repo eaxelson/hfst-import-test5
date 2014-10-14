@@ -18,10 +18,7 @@ namespace hfst_ol {
 // purpose of detecting the same situation happening twice
 bool TraversalState::operator==(const TraversalState & rhs) const
 {
-    if (this->from_index != rhs.from_index) {
-        return false;
-    }
-    if (this->to_index != rhs.to_index) {
+    if (this->index != rhs.index) {
         return false;
     }
     for (size_t i = 0; i < this->flags.size(); ++i) {
@@ -34,16 +31,10 @@ bool TraversalState::operator==(const TraversalState & rhs) const
 
 bool TraversalState::operator<(const TraversalState & rhs) const
 {
-    if (this->from_index < rhs.from_index) {
+    if (this->index < rhs.index) {
         return true;
     }
-    if (this->from_index > rhs.from_index) {
-        return false;
-    }
-    if (this->to_index < rhs.to_index) {
-        return true;
-    }
-    if (this->to_index > rhs.to_index) {
+    if (this->index > rhs.index) {
         return false;
     }
     for (size_t i = 0; i < this->flags.size(); ++i) {
@@ -60,50 +51,43 @@ bool TraversalState::operator<(const TraversalState & rhs) const
 void Transducer::find_loop_epsilon_transitions(
     unsigned int input_pos,
     TransitionTableIndex i,
-    PositionStates position_states)
+    PositionStates & position_states)
 {
     FlagDiacriticState flags = flag_state.get_values();
-    while (input_pos >= position_states.size()) {
-        // first time at this input
-        std::set<TraversalState> v;
-        position_states.push_back(v);
-    }
-    TraversalState epsilon_reachable(i, tables->get_transition_target(i), flags);
-    if (position_states[input_pos].count(epsilon_reachable) == 1) {
-        // We've been here before
-        throw true;
-    }
-    bool added_this_state = false;
     while (true)
     {
         TransitionTableIndex target = tables->get_transition_target(i);
+        TraversalState epsilon_reachable(target, flags);
         if (tables->get_transition_input(i) == 0) // epsilon
         {
-            if (!added_this_state) {
-                // We try to trap non-progressing loops
-                position_states[input_pos].insert(epsilon_reachable);
-                added_this_state = true;
+            // We try to trap non-progressing loops
+            if (position_states.count(epsilon_reachable) == 1) {
+                // We've been here before
+                throw true;
             }
+            position_states.insert(epsilon_reachable);
             find_loop(input_pos,
                       target,
                       position_states);
+            position_states.erase(epsilon_reachable);
             found_transition = true;
             ++i;
         } else if (alphabet->is_flag_diacritic(
                        tables->get_transition_input(i))) {
             
+            if (position_states.count(epsilon_reachable) == 1) {
+                // We've been here before
+                throw true;
+            }
             if (flag_state.apply_operation(
                     *(alphabet->get_operation(
                           tables->get_transition_input(i))))) {
                 // flag diacritic allowed
-                if (!added_this_state) {
-                    position_states[input_pos].insert(epsilon_reachable);
-                    added_this_state = true;
-                }
+                position_states.insert(epsilon_reachable);
                 find_loop(input_pos,
                           target,
                           position_states);
-                found_transition = true;
+                position_states.erase(epsilon_reachable);
             }
             flag_state.assign_values(flags);
             ++i;
@@ -115,7 +99,7 @@ void Transducer::find_loop_epsilon_transitions(
 
 void Transducer::find_loop_epsilon_indices(unsigned int input_pos,
                                                 TransitionTableIndex i,
-                                                PositionStates position_states)
+                                                PositionStates & position_states)
 {
     if (tables->get_index_input(i) == 0)
     {
@@ -130,11 +114,13 @@ void Transducer::find_loop_epsilon_indices(unsigned int input_pos,
 void Transducer::find_loop_transitions(SymbolNumber input,
                                             unsigned int input_pos,
                                             TransitionTableIndex i,
-                                            PositionStates position_states)
+                                            PositionStates & position_states)
 {
 
     while (tables->get_transition_input(i) != NO_SYMBOL_NUMBER) {
         if (tables->get_transition_input(i) == input) {
+            // We're not going to find an epsilon / flag loop
+            position_states.clear();
             find_loop(input_pos,
                       tables->get_transition_target(i),
                       position_states);
@@ -149,7 +135,7 @@ void Transducer::find_loop_transitions(SymbolNumber input,
 void Transducer::find_loop_index(SymbolNumber input,
                                       unsigned int input_pos,
                                       TransitionTableIndex i,
-                                      PositionStates position_states)
+                                      PositionStates & position_states)
 {
     if (tables->get_index_input(i+input) == input)
     {
@@ -167,7 +153,7 @@ void Transducer::find_loop_index(SymbolNumber input,
 
 void Transducer::find_loop(unsigned int input_pos,
                            TransitionTableIndex i,
-                           PositionStates position_states)
+                           PositionStates & position_states)
 {
     found_transition = false;
     

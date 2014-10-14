@@ -65,17 +65,15 @@ class STransition;
 // for epsilon loop checking
 struct TraversalState
 {
-    TransitionTableIndex from_index;
-    TransitionTableIndex to_index;
+    TransitionTableIndex index;
     FlagDiacriticState flags;
-    TraversalState(TransitionTableIndex f_i, TransitionTableIndex t_i,
-                   FlagDiacriticState f):
-        from_index(f_i), to_index(t_i), flags(f) {}
+    TraversalState(TransitionTableIndex i, FlagDiacriticState f):
+        index(i), flags(f) {}
     bool operator==(const TraversalState & rhs) const;
     bool operator<(const TraversalState & rhs) const;
 
 };
-typedef std::vector<std::set<TraversalState> > PositionStates;
+typedef std::set<TraversalState> PositionStates;
 
 const SymbolNumber NO_SYMBOL_NUMBER = std::numeric_limits<SymbolNumber>::max();
 const TransitionTableIndex NO_TABLE_INDEX =
@@ -910,21 +908,21 @@ public:
     bool is_lookup_infinitely_ambiguous(const std::string & input);
     void find_loop_epsilon_transitions(unsigned int input_pos,
                                        TransitionTableIndex i,
-                                       PositionStates position_states);
+                                       PositionStates & position_states);
     void find_loop_epsilon_indices(unsigned int input_pos,
                                    TransitionTableIndex i,
-                                   PositionStates position_states);
+                                   PositionStates & position_states);
     void find_loop_transitions(SymbolNumber input,
                                unsigned int input_pos,
                                TransitionTableIndex i,
-                               PositionStates position_states);
+                               PositionStates & position_states);
     void find_loop_index(SymbolNumber input,
                          unsigned int input_pos,
                          TransitionTableIndex i,
-                         PositionStates position_states);
+                         PositionStates & position_states);
     void find_loop(unsigned int input_pos,
                    TransitionTableIndex i,
-                   PositionStates position_states);
+                   PositionStates & position_states);
 
     TransducerTable<TransitionWIndex> & copy_windex_table();
     TransducerTable<TransitionW> & copy_transitionw_table();
