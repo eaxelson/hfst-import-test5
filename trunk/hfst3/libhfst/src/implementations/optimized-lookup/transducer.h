@@ -65,10 +65,12 @@ class STransition;
 // for epsilon loop checking
 struct TraversalState
 {
-    TransitionTableIndex index;
+    TransitionTableIndex from_index;
+    TransitionTableIndex to_index;
     FlagDiacriticState flags;
-    TraversalState(TransitionTableIndex i, FlagDiacriticState f):
-        index(i), flags(f) {}
+    TraversalState(TransitionTableIndex f_i, TransitionTableIndex t_i,
+                   FlagDiacriticState f):
+        from_index(f_i), to_index(t_i), flags(f) {}
     bool operator==(const TraversalState & rhs) const;
     bool operator<(const TraversalState & rhs) const;
 
