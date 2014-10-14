@@ -71,7 +71,7 @@ void Transducer::find_loop_epsilon_transitions(
                 // We've been here before
                 throw true;
             }
-            
+            position_states[input_pos].insert(epsilon_reachable);
             find_loop(input_pos,
                       target,
                       position_states);
@@ -97,7 +97,7 @@ void Transducer::find_loop_epsilon_transitions(
                         throw true;
                     }
                 }
-                
+                position_states[input_pos].insert(epsilon_reachable);
                 find_loop(input_pos,
                           target,
                           position_states);
