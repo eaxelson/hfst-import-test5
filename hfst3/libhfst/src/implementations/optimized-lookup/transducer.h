@@ -910,21 +910,21 @@ public:
     bool is_lookup_infinitely_ambiguous(const std::string & input);
     void find_loop_epsilon_transitions(unsigned int input_pos,
                                        TransitionTableIndex i,
-                                       PositionStates & position_states);
+                                       PositionStates position_states);
     void find_loop_epsilon_indices(unsigned int input_pos,
                                    TransitionTableIndex i,
-                                   PositionStates & position_states);
+                                   PositionStates position_states);
     void find_loop_transitions(SymbolNumber input,
                                unsigned int input_pos,
                                TransitionTableIndex i,
-                               PositionStates & position_states);
+                               PositionStates position_states);
     void find_loop_index(SymbolNumber input,
                          unsigned int input_pos,
                          TransitionTableIndex i,
-                         PositionStates & position_states);
+                         PositionStates position_states);
     void find_loop(unsigned int input_pos,
                    TransitionTableIndex i,
-                   PositionStates & position_states);
+                   PositionStates position_states);
 
     TransducerTable<TransitionWIndex> & copy_windex_table();
     TransducerTable<TransitionW> & copy_transitionw_table();

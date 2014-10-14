@@ -60,7 +60,7 @@ bool TraversalState::operator<(const TraversalState & rhs) const
 void Transducer::find_loop_epsilon_transitions(
     unsigned int input_pos,
     TransitionTableIndex i,
-    PositionStates & position_states)
+    PositionStates position_states)
 {
     FlagDiacriticState flags = flag_state.get_values();
     while (input_pos >= position_states.size()) {
@@ -115,7 +115,7 @@ void Transducer::find_loop_epsilon_transitions(
 
 void Transducer::find_loop_epsilon_indices(unsigned int input_pos,
                                                 TransitionTableIndex i,
-                                                PositionStates & position_states)
+                                                PositionStates position_states)
 {
     if (tables->get_index_input(i) == 0)
     {
@@ -130,7 +130,7 @@ void Transducer::find_loop_epsilon_indices(unsigned int input_pos,
 void Transducer::find_loop_transitions(SymbolNumber input,
                                             unsigned int input_pos,
                                             TransitionTableIndex i,
-                                            PositionStates & position_states)
+                                            PositionStates position_states)
 {
 
     while (tables->get_transition_input(i) != NO_SYMBOL_NUMBER) {
@@ -149,7 +149,7 @@ void Transducer::find_loop_transitions(SymbolNumber input,
 void Transducer::find_loop_index(SymbolNumber input,
                                       unsigned int input_pos,
                                       TransitionTableIndex i,
-                                      PositionStates & position_states)
+                                      PositionStates position_states)
 {
     if (tables->get_index_input(i+input) == input)
     {
@@ -167,7 +167,7 @@ void Transducer::find_loop_index(SymbolNumber input,
 
 void Transducer::find_loop(unsigned int input_pos,
                            TransitionTableIndex i,
-                           PositionStates & position_states)
+                           PositionStates position_states)
 {
     found_transition = false;
     
