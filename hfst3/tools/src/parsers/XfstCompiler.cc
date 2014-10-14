@@ -1840,6 +1840,7 @@ namespace xfst {
         {
           hfst_fprintf(stderr, "Not enough networks on stack. "
                   "Operation requires at least 2.\n");
+          xfst_lesser_fail();
           return *this;
         }
       HfstTransducer* first = stack_.top();
@@ -2007,6 +2008,7 @@ namespace xfst {
       {
         hfst_fprintf(stderr, "Not enough networks on stack. "
                 "Operation requires at least 2.\n");
+        xfst_lesser_fail();
         PROMPT_AND_RETURN_THIS;
       }
       std::stack<HfstTransducer*> copied_stack(stack_); 
@@ -3501,6 +3503,7 @@ namespace xfst {
         {
           hfst_fprintf(stderr, "Not enough networks on stack. "
                   "Operation requires at least 2.\n");
+          xfst_lesser_fail();
           return *this;
         }
       HfstTransducer * result = stack_.top();
@@ -3548,9 +3551,9 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::apply_binary_operation_iteratively(BinaryOperation operation)
   {
-    if (stack_.size() < 1)
+    if (stack_.size() < 2)
       {
-        hfst_fprintf(stderr, "Empty stack.\n");
+        hfst_fprintf(stderr, "Not enough transducers on stack, operation requires at least 2.\n");
         xfst_lesser_fail();
         return *this;
       }
