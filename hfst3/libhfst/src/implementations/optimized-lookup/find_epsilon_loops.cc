@@ -18,7 +18,10 @@ namespace hfst_ol {
 // purpose of detecting the same situation happening twice
 bool TraversalState::operator==(const TraversalState & rhs) const
 {
-    if (this->index != rhs.index) {
+    if (this->from_index != rhs.from_index) {
+        return false;
+    }
+    if (this->to_index != rhs.to_index) {
         return false;
     }
     for (size_t i = 0; i < this->flags.size(); ++i) {
@@ -31,17 +34,23 @@ bool TraversalState::operator==(const TraversalState & rhs) const
 
 bool TraversalState::operator<(const TraversalState & rhs) const
 {
-    if (this->index < rhs.index) {
+    if (this->from_index < rhs.from_index) {
         return true;
     }
-    if (this->index > rhs.index) {
+    if (this->from_index > rhs.from_index) {
+        return false;
+    }
+    if (this->to_index < rhs.to_index) {
+        return true;
+    }
+    if (this->to_index > rhs.to_index) {
         return false;
     }
     for (size_t i = 0; i < this->flags.size(); ++i) {
         if (this->flags[i] < rhs.flags[i]) {
             return true;
         }
-        if (this->flags[i] > rhs.flags[1]) {
+        if (this->flags[i] > rhs.flags[i]) {
             return false;
         }
     }
@@ -54,24 +63,27 @@ void Transducer::find_loop_epsilon_transitions(
     PositionStates & position_states)
 {
     FlagDiacriticState flags = flag_state.get_values();
+    while (input_pos >= position_states.size()) {
+        // first time at this input
+        std::set<TraversalState> v;
+        position_states.push_back(v);
+    }
+    TraversalState epsilon_reachable(i, tables->get_transition_target(i), flags);
+    if (position_states[input_pos].count(epsilon_reachable) == 1) {
+        // We've been here before
+        throw true;
+    }
+    bool added_this_state = false;
     while (true)
     {
         TransitionTableIndex target = tables->get_transition_target(i);
-        TraversalState epsilon_reachable(target, flags);
         if (tables->get_transition_input(i) == 0) // epsilon
         {
-            // We try to trap non-progressing loops
-            if (input_pos >= position_states.size()) {
-                while (input_pos >= position_states.size()) {
-                    // first time at this input
-                    std::set<TraversalState> v;
-                    position_states.push_back(v);
-                }
-            } else if (position_states[input_pos].count(epsilon_reachable) == 1) {
-                // We've been here before
-                throw true;
+            if (!added_this_state) {
+                // We try to trap non-progressing loops
+                position_states[input_pos].insert(epsilon_reachable);
+                added_this_state = true;
             }
-            position_states[input_pos].insert(epsilon_reachable);
             find_loop(input_pos,
                       target,
                       position_states);
@@ -84,20 +96,10 @@ void Transducer::find_loop_epsilon_transitions(
                     *(alphabet->get_operation(
                           tables->get_transition_input(i))))) {
                 // flag diacritic allowed
-
-                TraversalState flag_reachable(target, flag_state.get_values());
-                if (input_pos >= position_states.size()) {
-                    while (input_pos >= position_states.size()) {
-                        std::set<TraversalState> v;
-                        position_states.push_back(v);
-                    }
-                } else {
-                    // see if the same state has been visited already at this input
-                    if (position_states[input_pos].count(flag_reachable) == 1) {
-                        throw true;
-                    }
+                if (!added_this_state) {
+                    position_states[input_pos].insert(epsilon_reachable);
+                    added_this_state = true;
                 }
-                position_states[input_pos].insert(epsilon_reachable);
                 find_loop(input_pos,
                           target,
                           position_states);
@@ -169,10 +171,6 @@ void Transducer::find_loop(unsigned int input_pos,
 {
     found_transition = false;
     
-    TraversalState this_position(i, flag_state.get_values());
-    if (indexes_transition_table(i)) {
-        this_position.index -= TRANSITION_TARGET_TABLE_START;
-    }
     if (indexes_transition_table(i))
     {
         i -= TRANSITION_TARGET_TABLE_START;
