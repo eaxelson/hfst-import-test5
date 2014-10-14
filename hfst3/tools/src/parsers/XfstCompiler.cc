@@ -68,10 +68,10 @@ extern void hxfst_delete_buffer(YY_BUFFER_STATE);
 using hfst::implementations::HfstBasicTransducer;
 using hfst::implementations::HfstBasicTransition;
 
-#define GET_TOP(x) HfstTransducer * x = this->top(); if ((x) == NULL) { return *this; }
+#define GET_TOP(x) HfstTransducer * x = this->top(); if ((x) == NULL) { xfst_lesser_fail(); return *this; }
 #define PROMPT_AND_RETURN_THIS prompt(); return *this;
 #define PRINT_INFO_PROMPT_AND_RETURN_THIS print_transducer_info(); prompt(); return *this;
-#define IF_NULL_PROMPT_AND_RETURN_THIS(x) if (x == NULL) { prompt(); return *this; }
+#define IF_NULL_PROMPT_AND_RETURN_THIS(x) if (x == NULL) { if(variables_["quit-on-fail"] == "ON") { exit(EXIT_FAILURE); } prompt(); return *this; }
 #define MAYBE_MINIMIZE(x) if (variables_["minimal"] == "ON") { x->minimize(); }
 #define MAYBE_ASSERT(assertion, value) if (!value && ((variables_["assert"] == "ON" || assertion) && (variables_["quit-on-fail"] == "ON"))) { exit(EXIT_FAILURE); }
 #define MAYBE_QUIT if(variables_["quit-on-fail"] == "ON") { exit(EXIT_FAILURE); }
@@ -290,6 +290,15 @@ namespace xfst {
         exit(EXIT_FAILURE); 
       }
   }
+
+  void XfstCompiler::xfst_lesser_fail()
+  {
+    if (variables_["quit-on-fail"] == "ON" && !read_interactive_text_from_stdin_) 
+      {
+        exit(EXIT_FAILURE); 
+      }
+  }
+
 
     XfstCompiler&
     XfstCompiler::add_prop_line(char* line)
@@ -565,6 +574,7 @@ namespace xfst {
     if (stack_.size() < 1)
       {
         hfst_fprintf(stderr, "Empty stack.\n");
+        xfst_lesser_fail();
         prompt();
         return *this;
       }
@@ -619,6 +629,7 @@ namespace xfst {
     if (stack_.size() < 1)
       {
         hfst_fprintf(stderr, "Empty stack.\n");
+        xfst_lesser_fail();
         prompt();
         return *this;
       }
@@ -667,6 +678,7 @@ namespace xfst {
         if (stack_.size() < 1)
           {
             hfst_fprintf(stderr, "Empty stack.\n");
+            xfst_lesser_fail();
             prompt();
             return *this;
           }
@@ -809,6 +821,7 @@ namespace xfst {
         if (stack_.size() < 1)
           {
             hfst_fprintf(stderr, "Empty stack.\n");
+            xfst_lesser_fail();
             prompt();
             return *this;
           }
@@ -1504,6 +1517,7 @@ namespace xfst {
       {
         hfst_fprintf(warnstream_, "warning: loaded transducer definition "
                 "has no name, skipping it\n");
+        // xfst_lesser_fail(); ???
         return *this;
       }
     std::map<std::string, HfstTransducer*>::const_iterator it 
@@ -1512,6 +1526,7 @@ namespace xfst {
       {
         hfst_fprintf(warnstream_, "warning: a definition named '%s' "
                 "already exists, overwriting it\n", def_name.c_str());
+        // xfst_lesser_fail(); ???
         definitions_.erase(def_name);
       }
     definitions_[def_name] = t;
@@ -1723,6 +1738,7 @@ namespace xfst {
           else
             {
               hfst_fprintf(warnstream_, "no such variable: '%s'\n", name);
+              // xfst_lesser_fail(); ???
               PROMPT_AND_RETURN_THIS;
             }
         }
@@ -1777,6 +1793,7 @@ namespace xfst {
       if (variables_.find(name) == variables_.end())
         {
           hfst_fprintf(warnstream_, "no such variable: '%s'\n", name);
+          // xfst_lesser_fail(); ???
           PROMPT_AND_RETURN_THIS;
         }
       char* num = static_cast<char*>(malloc(sizeof(char)*31));
@@ -1791,6 +1808,7 @@ namespace xfst {
       if (variables_.find(name) == variables_.end())
         {
           hfst_fprintf(warnstream_, "no such variable: '%s'\n", name);
+          // xfst_lesser_fail(); ???
           PROMPT_AND_RETURN_THIS;
         }        
       hfst_fprintf(outstream_, "variable %s = %s\n", name, variables_[name].c_str());
@@ -1849,6 +1867,7 @@ namespace xfst {
     if (stack_.size() < 1)
       {
         hfst_fprintf(stderr, "Empty stack.\n");
+        xfst_lesser_fail();
         prompt();
         return NULL;
       }
@@ -3081,6 +3100,7 @@ namespace xfst {
       if (stack_.size() < 1)
         {
           hfst_fprintf(stderr, "Empty stack.\n");
+          xfst_lesser_fail();
           PROMPT_AND_RETURN_THIS;
         }
       std::stack<hfst::HfstTransducer*> reverse_stack;
@@ -3177,6 +3197,7 @@ namespace xfst {
     if (stack_.size() < 1)
       {
         hfst_fprintf(stderr, "Empty stack.\n");
+        xfst_lesser_fail();
         return *this;
       }
 
@@ -3374,6 +3395,7 @@ namespace xfst {
       if (stack_.size() < 1)
         {
           hfst_fprintf(stderr, "Empty stack.\n");
+          xfst_lesser_fail();
           return *this;
         }
       PRINT_INFO_PROMPT_AND_RETURN_THIS;
@@ -3529,6 +3551,7 @@ namespace xfst {
     if (stack_.size() < 1)
       {
         hfst_fprintf(stderr, "Empty stack.\n");
+        xfst_lesser_fail();
         return *this;
       }
     HfstTransducer* result = stack_.top();
@@ -3554,6 +3577,7 @@ namespace xfst {
                         {
                           hfst_fprintf(warnstream_, "Both composition arguments contain flag diacritics. "
                                        "Set harmonize-flags ON to harmonize them.\n");
+                          // xfst_lesser_fail(); ???
                         }
                     }
                   else
@@ -3571,6 +3595,7 @@ namespace xfst {
                   hfst_fprintf(outstream_, "Error: flag diacritics must be identities in composition if flag-is-epsilon is ON.\n"
                                "I.e. only FLAG:FLAG is allowed, not FLAG1:FLAG2, FLAG:bar or foo:FLAG\n"
                                "Apply twosided flag-diacritics (tfd) before composition.\n");
+                  xfst_lesser_fail();
                   prompt();
                   return *this;
                 }
@@ -3686,6 +3711,7 @@ namespace xfst {
       if (stack_.size() < 1)
         {
           hfst_fprintf(stderr, "Empty stack.\n");
+          xfst_lesser_fail();
           return *this;
         }
       HfstTransducer* t = stack_.top();
@@ -3699,6 +3725,7 @@ namespace xfst {
       if (stack_.size() < 1)
         {
           hfst_fprintf(stderr, "Empty stack.\n");
+          xfst_lesser_fail();
           return *this;
         }
 
