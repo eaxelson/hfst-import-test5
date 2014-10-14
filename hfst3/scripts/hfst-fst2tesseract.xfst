@@ -1,0 +1,8 @@
+!!! hfst-xfst script for converting a morphological analyzer to a Tesseract !!!
+!!! OCR word model                                                          !!!
+
+set quit-on-fail ON
+upper-side
+eliminate flags
+lookup-optimize
+save LAN.word-hfst-fsm
