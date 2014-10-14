@@ -566,6 +566,10 @@ class XfstCompiler
   //! else do nothing.
   void xfst_fail();
 
+  //! @brief Exit with failure status if quit-on-fail is ON and hfst-xfst
+  //! is not used in interactive mode, else do nothing.
+  void xfst_lesser_fail();
+
   //! @brief Print alphabet \a alpha to \a outfile. \a unknown and \a identity
   //! define whether these symbols occur in the transitions of the transducer
   //! whose alphabet we are printing.
