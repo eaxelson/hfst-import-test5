@@ -73,7 +73,7 @@ struct TraversalState
     bool operator<(const TraversalState & rhs) const;
 
 };
-typedef std::set<TraversalState> PositionStates;
+typedef std::set<TraversalState> TraversalStates;
 
 const SymbolNumber NO_SYMBOL_NUMBER = std::numeric_limits<SymbolNumber>::max();
 const TransitionTableIndex NO_TABLE_INDEX =
@@ -814,10 +814,7 @@ class Transducer
 protected:
     TransducerHeader* header;
     TransducerAlphabet* alphabet;
-    
     TransducerTablesInterface* tables;
-    
- 
     void load_tables(std::istream& is);
 
     // for lookup
@@ -829,6 +826,9 @@ protected:
     hfst::FdState<SymbolNumber> flag_state;
     // This is to keep track of whether we're going to take a default transition
     bool found_transition;
+    // For keeping a tally of previously epsilon-visited states to control
+    // going into loops
+    TraversalStates traversal_states;
 
     ssize_t max_lookups;
     unsigned int recursion_depth_left;
@@ -855,6 +855,19 @@ protected:
                       unsigned int output_tape_pos,
                       TransitionTableIndex i);
     
+    void find_loop_epsilon_transitions(unsigned int input_pos,
+                                       TransitionTableIndex i);
+    void find_loop_epsilon_indices(unsigned int input_pos,
+                                   TransitionTableIndex i);
+    void find_loop_transitions(SymbolNumber input,
+                               unsigned int input_pos,
+                               TransitionTableIndex i);
+    void find_loop_index(SymbolNumber input,
+                         unsigned int input_pos,
+                         TransitionTableIndex i);
+    void find_loop(unsigned int input_pos,
+                   TransitionTableIndex i);
+
 
 public:
     Transducer(std::istream& is);
@@ -906,24 +919,7 @@ public:
 
     bool is_lookup_infinitely_ambiguous(const StringVector & s);
     bool is_lookup_infinitely_ambiguous(const std::string & input);
-    void find_loop_epsilon_transitions(unsigned int input_pos,
-                                       TransitionTableIndex i,
-                                       PositionStates & position_states);
-    void find_loop_epsilon_indices(unsigned int input_pos,
-                                   TransitionTableIndex i,
-                                   PositionStates & position_states);
-    void find_loop_transitions(SymbolNumber input,
-                               unsigned int input_pos,
-                               TransitionTableIndex i,
-                               PositionStates & position_states);
-    void find_loop_index(SymbolNumber input,
-                         unsigned int input_pos,
-                         TransitionTableIndex i,
-                         PositionStates & position_states);
-    void find_loop(unsigned int input_pos,
-                   TransitionTableIndex i,
-                   PositionStates & position_states);
-
+    
     TransducerTable<TransitionWIndex> & copy_windex_table();
     TransducerTable<TransitionW> & copy_transitionw_table();
     TransducerTable<TransitionIndex> & copy_index_table();

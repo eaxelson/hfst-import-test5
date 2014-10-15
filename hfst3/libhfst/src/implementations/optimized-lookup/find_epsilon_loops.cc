@@ -50,8 +50,7 @@ bool TraversalState::operator<(const TraversalState & rhs) const
 
 void Transducer::find_loop_epsilon_transitions(
     unsigned int input_pos,
-    TransitionTableIndex i,
-    PositionStates & position_states)
+    TransitionTableIndex i)
 {
     FlagDiacriticState flags = flag_state.get_values();
     while (true)
@@ -61,33 +60,29 @@ void Transducer::find_loop_epsilon_transitions(
         if (tables->get_transition_input(i) == 0) // epsilon
         {
             // We try to trap non-progressing loops
-            if (position_states.count(epsilon_reachable) == 1) {
+            if (traversal_states.count(epsilon_reachable) == 1) {
                 // We've been here before
                 throw true;
             }
-            position_states.insert(epsilon_reachable);
-            find_loop(input_pos,
-                      target,
-                      position_states);
-            position_states.erase(epsilon_reachable);
+            traversal_states.insert(epsilon_reachable);
+            find_loop(input_pos, target);
+            traversal_states.erase(epsilon_reachable);
             found_transition = true;
             ++i;
         } else if (alphabet->is_flag_diacritic(
                        tables->get_transition_input(i))) {
             
-            if (position_states.count(epsilon_reachable) == 1) {
-                // We've been here before
-                throw true;
-            }
             if (flag_state.apply_operation(
                     *(alphabet->get_operation(
                           tables->get_transition_input(i))))) {
                 // flag diacritic allowed
-                position_states.insert(epsilon_reachable);
-                find_loop(input_pos,
-                          target,
-                          position_states);
-                position_states.erase(epsilon_reachable);
+                if (traversal_states.count(epsilon_reachable) == 1) {
+                    // We've been here before
+                    throw true;
+                }
+                traversal_states.insert(epsilon_reachable);
+                find_loop(input_pos, target);
+                traversal_states.erase(epsilon_reachable);
             }
             flag_state.assign_values(flags);
             ++i;
@@ -98,32 +93,27 @@ void Transducer::find_loop_epsilon_transitions(
 }
 
 void Transducer::find_loop_epsilon_indices(unsigned int input_pos,
-                                                TransitionTableIndex i,
-                                                PositionStates & position_states)
+                                                TransitionTableIndex i)
 {
     if (tables->get_index_input(i) == 0)
     {
-        find_loop_epsilon_transitions(input_pos,
-                                      tables->get_index_target(i) - 
-                                      TRANSITION_TARGET_TABLE_START,
-                                      position_states);
+        find_loop_epsilon_transitions(
+            input_pos,
+            tables->get_index_target(i) - TRANSITION_TARGET_TABLE_START);
         found_transition = true;
     }
 }
 
 void Transducer::find_loop_transitions(SymbolNumber input,
                                             unsigned int input_pos,
-                                            TransitionTableIndex i,
-                                            PositionStates & position_states)
+                                            TransitionTableIndex i)
 {
 
     while (tables->get_transition_input(i) != NO_SYMBOL_NUMBER) {
         if (tables->get_transition_input(i) == input) {
             // We're not going to find an epsilon / flag loop
-            position_states.clear();
-            find_loop(input_pos,
-                      tables->get_transition_target(i),
-                      position_states);
+            traversal_states.clear();
+            find_loop(input_pos, tables->get_transition_target(i));
             found_transition = true;
         } else {
             return;
@@ -134,16 +124,14 @@ void Transducer::find_loop_transitions(SymbolNumber input,
 
 void Transducer::find_loop_index(SymbolNumber input,
                                       unsigned int input_pos,
-                                      TransitionTableIndex i,
-                                      PositionStates & position_states)
+                                      TransitionTableIndex i)
 {
     if (tables->get_index_input(i+input) == input)
     {
         find_loop_transitions(input,
                               input_pos,
                               tables->get_index_target(i+input) - 
-                              TRANSITION_TARGET_TABLE_START,
-                              position_states);
+                              TRANSITION_TARGET_TABLE_START);
         found_transition = true;
     }
 }
@@ -152,17 +140,14 @@ void Transducer::find_loop_index(SymbolNumber input,
 
 
 void Transducer::find_loop(unsigned int input_pos,
-                           TransitionTableIndex i,
-                           PositionStates & position_states)
+                           TransitionTableIndex i)
 {
     found_transition = false;
     
     if (indexes_transition_table(i))
     {
         i -= TRANSITION_TARGET_TABLE_START;
-        find_loop_epsilon_transitions(input_pos,
-                                      i+1,
-                                      position_states);
+        find_loop_epsilon_transitions(input_pos, i+1);
         
         // input-string ended.
         if (input_tape[input_pos] == NO_SYMBOL_NUMBER)
@@ -173,22 +158,16 @@ void Transducer::find_loop(unsigned int input_pos,
         SymbolNumber input = input_tape[input_pos];
         ++input_pos;
 
-        find_loop_transitions(input,
-                              input_pos,
-                              i+1,
-                              position_states);
+        find_loop_transitions(input, input_pos, i+1);
         if (alphabet->get_default_symbol() != NO_SYMBOL_NUMBER &&
             !found_transition) {
             find_loop_transitions(alphabet->get_default_symbol(),
-                                  input_pos, i+1,
-                                  position_states);
+                                  input_pos, i+1);
         }
     }
     else
     {
-        find_loop_epsilon_indices(input_pos,
-                                  i+1,
-                                  position_states);
+        find_loop_epsilon_indices(input_pos, i+1);
         
         if (input_tape[input_pos] == NO_SYMBOL_NUMBER)
         { // input-string ended.
@@ -198,16 +177,12 @@ void Transducer::find_loop(unsigned int input_pos,
         SymbolNumber input = input_tape[input_pos];
         ++input_pos;
 
-        find_loop_index(input,
-                        input_pos,
-                        i+1,
-                        position_states);
+        find_loop_index(input, input_pos, i+1);
         // If we have a default symbol defined and we didn't find an index,
         // check for that
         if (alphabet->get_default_symbol() != NO_SYMBOL_NUMBER && !found_transition) {
             find_loop_index(alphabet->get_default_symbol(),
-                            input_pos, i+1,
-                            position_states);
+                            input_pos, i+1);
         }
     }
 }
