@@ -3855,6 +3855,78 @@
          }
 
 
+         void check_regexp_state_for_cycle(HfstState s, const std::set<HfstState> & states_visited)
+         {
+           if (states_visited.find(s) != states_visited.end())
+             {
+               throw "error: loop detected inside compile-replace regular expression";
+             }
+         }
+
+         void check_regexp_state_for_final(HfstState s)
+         {
+           if (is_final_state(s))
+             {
+               throw "error: final state inside compile-replace regular expression";
+             }
+
+         }
+
+         void check_regexp_transition(const HfstBasicTransition & tr)
+         {
+           if (tr.get_input_symbol() != tr.get_output_symbol())
+             {
+               throw "error: input and output symbols differ in compile-replace regular expression";
+             } 
+           if (is_special_symbol(tr.get_input_symbol()) || is_special_symbol(tr.get_output_symbol()))
+             {
+               throw "error: special symbol detected in compile-replace regular expression";
+             } 
+           if ("^[" == tr.get_input_symbol() || "^[" == tr.get_output_symbol())
+             {
+               throw "error: ^[ detected inside compile-replace regular expression";
+             }
+           // weights?
+           // flag diacritics?
+         }
+
+         void find_regexp_paths
+           (HfstState s, 
+            std::set<HfstState> & states_visited, 
+            std::vector<std::string> & path, 
+            std::vector<std::pair<HfstState, std::vector<std::string> > > & full_paths)
+           {
+             check_regexp_state_for_cycle(s, states_visited);
+             check_regexp_state_for_final(s);
+             states_visited.insert(s);
+
+             const HfstBasicTransducer::HfstTransitions &transitions 
+               = this->operator[](s);
+             for (HfstBasicTransducer::HfstTransitions::const_iterator it 
+                    = transitions.begin();
+                  it != transitions.end(); it++)
+               {
+                 check_regexp_transition(*it);
+                 if ("^]" == it->get_input_symbol())
+                   {
+                     check_regexp_state_for_cycle(it->get_target_state(), states_visited);
+                     full_paths.push_back
+                       (std::pair<HfstState, std::vector<std::string> >(it->get_target_state(), path));
+                   }
+                 else
+                   {
+                     path.push_back(it->get_input_symbol());
+                     find_regexp_paths
+                       (it->get_target_state(),
+                        states_visited,
+                        path,
+                        full_paths);
+                     path.pop_back();
+                   }   
+               }
+           }
+
+
 /*      /\** @brief Determine whether this graph has input-epsilon cycles. */
 /*       *\/ */
 /*      bool has_input_epsilon_cycles(void) */
