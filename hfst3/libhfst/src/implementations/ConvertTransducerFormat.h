@@ -38,6 +38,7 @@
 #ifndef _FOMALIB_H_
 #define _FOMALIB_H_
 #include <stdbool.h>
+#define _Bool bool
 #include "back-ends/foma/fomalib.h"
 #endif // _FOMALIB_H_
 #endif // HAVE_FOMA
