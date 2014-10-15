@@ -29,6 +29,7 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
                                        bool preserve_diacritic_strings)
 {
     unknown_symbol = NO_SYMBOL_NUMBER;
+    identity_symbol = NO_SYMBOL_NUMBER;
     default_symbol = NO_SYMBOL_NUMBER;
     for(SymbolNumber i=0; i<symbol_count; i++)
     {
@@ -407,10 +408,11 @@ void Transducer::find_transitions(SymbolNumber input,
             SymbolNumber output = tables->get_transition_output(i);
             if (output == alphabet->get_default_symbol()
                 || output == alphabet->get_identity_symbol()
-                || output == alphabet->get_default_symbol()) {
-                // we got here via default, identity or default, so look
+                || output == alphabet->get_unknown_symbol()) {
+                // we got here via default, identity or unknown, so look
                 // back in the input tape to find the symbol we want to write
                 output = input_tape[input_pos - 1];
+
             }
             output_tape.write(output_pos, output);
             current_weight += tables->get_weight(i);
