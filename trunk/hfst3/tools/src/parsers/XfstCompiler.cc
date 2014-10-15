@@ -4156,16 +4156,52 @@ namespace xfst {
       ignore_history_after_index(ind);
       PROMPT_AND_RETURN_THIS;
     }
+
+  static bool is_well_formed_for_compile_replace(const HfstTransducer * t, hfst::xre::XreCompiler & xre_)
+  {
+
+    HfstTransducer * not_bracket_star = xre_.compile("[? - \"^[\" - \"^]\"]* ;");
+    xre_.define("TempNotBracketStar", *not_bracket_star);
+    // all paths that contain one or more well-formed ^[ ^] expressions
+    HfstTransducer * well_formed = xre_.compile("TempNotBracketStar \"^[\" TempNotBracketStar  [ \"^]\" TempNotBracketStar \"^[\"  TempNotBracketStar ]*  \"^]\" TempNotBracketStar ;");
+    xre_.undefine("TempNotBracketStar");
+    delete not_bracket_star;
+
+    // subtract those paths from copy of t
+    HfstTransducer tc(*t);
+    tc.subtract(*well_formed).minimize();
+    delete well_formed;
+    // all paths that contain one or more ^[ or ^]
+    HfstTransducer * brackets = xre_.compile("$[ \"^[\" | \"^]\" ] ;");
+
+    // test if the result is empty
+    tc.intersect(*brackets).minimize();
+    delete(brackets);
+    HfstTransducer empty(tc.get_type());
+    bool value = empty.compare(tc, false);
+    return value;
+  }
+
   XfstCompiler&
   XfstCompiler::compile_replace_upper_net()
     {
       hfst_fprintf(stderr, "missing compile_replace_upper net %s:%d\n", __FILE__, __LINE__);
+      GET_TOP(tmp);
+      if (is_well_formed_for_compile_replace(tmp, xre_))
+        fprintf(stderr, "Network is well-formed.\n");
+      else
+        fprintf(stderr, "Network is not well-formed.\n");
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
   XfstCompiler::compile_replace_lower_net()
     {
       hfst_fprintf(stderr, "missing compile_replace_lower net %s:%d\n", __FILE__, __LINE__);
+      GET_TOP(tmp);
+      if (is_well_formed_for_compile_replace(tmp, xre_))
+        fprintf(stderr, "Network is well-formed.\n");
+      else
+        fprintf(stderr, "Network is not well-formed.\n");
       PROMPT_AND_RETURN_THIS;
     }
 
