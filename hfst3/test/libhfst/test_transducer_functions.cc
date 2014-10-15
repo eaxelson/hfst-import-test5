@@ -84,7 +84,7 @@ bool compare_string_vectors(const StringVector &v1, const StringVector &v2,
       for (unsigned int i=0; i<v2.size(); i++) { 
     v2_string.append(v2[i]);
       }
-      fprintf(stderr, "####### comparing strings '%s' and '%s'...\n", v1_string.c_str(), v2_string.c_str() ); // debug
+      // fprintf(stderr, "####### comparing strings '%s' and '%s'...\n", v1_string.c_str(), v2_string.c_str() ); // debug
       return (v1_string.compare(v2_string) == 0);
     }
 
@@ -119,7 +119,7 @@ bool do_hfst_lookup_paths_contain(const HfstOneLevelPaths &results,
     }
     }
   if (found == false) {
-    fprintf(stderr, "######## returning false...\n"); // debug
+    // fprintf(stderr, "######## returning false...\n"); // debug
     return false;
   }
   if (not test_path_weight)
@@ -426,8 +426,8 @@ int main(int argc, char **argv)
     HfstTransducer animals_ol(animals);
 
     // debug
-    std::cerr << "####### animals_ol:" << std::endl;
-    std::cerr << animals_ol << std::endl;
+    // std::cerr << "####### animals_ol:" << std::endl;
+    // std::cerr << animals_ol << std::endl;
 
     if (types[i] == TROPICAL_OPENFST_TYPE ||
         types[i] == LOG_OPENFST_TYPE) {
