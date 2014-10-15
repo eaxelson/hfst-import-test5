@@ -22,6 +22,7 @@
 
 #ifndef _FOMALIB_H_
 #define _FOMALIB_H_
+#define _Bool bool
 #include "back-ends/foma/fomalib.h"
 #endif
 
