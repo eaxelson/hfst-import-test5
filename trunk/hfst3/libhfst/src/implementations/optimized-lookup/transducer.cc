@@ -292,9 +292,9 @@ bool Transducer::is_lookup_infinitely_ambiguous(const std::string & s)
     if (!initialize_input(s.c_str())) {
         return false;
     }
-    PositionStates position_states;
+    traversal_states.clear();
     try {
-        find_loop(0, 0, position_states);
+        find_loop(0, 0);
     } catch (bool e) {
         current_weight = 0.0;
         flag_state = alphabet->get_fd_table();
@@ -322,6 +322,7 @@ HfstOneLevelPaths * Transducer::lookup_fd(const char * s, ssize_t limit)
         lookup_paths = NULL;
         return results;
     }
+    traversal_states.clear();
     //current_weight += s.second;
     get_analyses(0, 0, 0);
     //current_weight -= s.second;
@@ -335,32 +336,41 @@ void Transducer::try_epsilon_transitions(unsigned int input_pos,
 {
     while (true)
     {
-        if (tables->get_transition_input(i) == 0) // epsilon
+        SymbolNumber input = tables->get_transition_input(i);
+        SymbolNumber output = tables->get_transition_output(i);
+        TransitionTableIndex target = tables->get_transition_target(i);
+        Weight weight = tables->get_weight(i);
+        if (input == 0) // epsilon
         {
-            output_tape.write(output_pos, tables->get_transition_output(i));
-            current_weight += tables->get_weight(i);
-            get_analyses(input_pos,
-                         output_pos + 1,
-                         tables->get_transition_target(i));
+            output_tape.write(output_pos, output);
+            current_weight += weight;
+            get_analyses(input_pos, output_pos + 1, target);
             found_transition = true;
-            current_weight -= tables->get_weight(i);
+            current_weight -= weight;
             ++i;
-        } else if (alphabet->is_flag_diacritic(
-                       tables->get_transition_input(i))) {
-            std::vector<short> old_values(flag_state.get_values());
+        } else if (alphabet->is_flag_diacritic(input)) {
+            FlagDiacriticState flags = flag_state.get_values();
             if (flag_state.apply_operation(
-                    *(alphabet->get_operation(
-                          tables->get_transition_input(i))))) {
+                    *(alphabet->get_operation(input)))) {
                 // flag diacritic allowed
-                output_tape.write(output_pos, tables->get_transition_output(i));
-                current_weight += tables->get_weight(i);
-                get_analyses(input_pos,
-                             output_pos + 1,
-                             tables->get_transition_target(i));
+
+                TraversalState flag_reachable(target, flags);
+                if (traversal_states.count(flag_reachable) == 1) {
+                    // We've been here before at this input, back out
+                    flag_state.assign_values(flags);
+                    ++i;
+                    continue;
+                }
+
+                traversal_states.insert(flag_reachable);
+                output_tape.write(output_pos, output);
+                current_weight += weight;
+                get_analyses(input_pos, output_pos + 1, target);
                 found_transition = true;
-                current_weight -= tables->get_weight(i);
+                current_weight -= weight;
+                traversal_states.erase(flag_reachable);
             }
-            flag_state.assign_values(old_values);
+            flag_state.assign_values(flags);
             ++i;
         } else { // it's not epsilon and it's not a flag, so nothing to do
             return;
@@ -392,6 +402,8 @@ void Transducer::find_transitions(SymbolNumber input,
     {
         if (tables->get_transition_input(i) == input)
         {
+            // We're not going to find an epsilon / flag loop
+            traversal_states.clear();
             SymbolNumber output = tables->get_transition_output(i);
             if (output == alphabet->get_default_symbol()
                 || output == alphabet->get_identity_symbol()
