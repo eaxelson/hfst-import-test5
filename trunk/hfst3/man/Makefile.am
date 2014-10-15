@@ -54,7 +54,7 @@ aliases= hfst-determinise.1 hfst-expand.1 hfst-intersect.1 hfst-minimise.1 \
 
 dist_man1_MANS=$(hfst_tools) $(hfst_xfst) $(hfst_apertium_proc) $(hfst_foma) $(hfst_foma_wrapper) \
 	$(hfst_tag_and_reweight) $(hfst_train_tagger) $(hfst_train_tagger_subprograms) $(hfst_twolc) \
-	$(hfst-twolc_subprograms) $(aliases)
+	$(hfst_twolc_subprograms) $(aliases)
 
 LN_S=ln -s -f
 
