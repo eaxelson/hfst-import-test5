@@ -4191,6 +4191,15 @@ namespace xfst {
         fprintf(stderr, "Network is well-formed.\n");
       else
         fprintf(stderr, "Network is not well-formed.\n");
+      HfstBasicTransducer fsm(*tmp);
+      try 
+        {
+          fprintf(stderr, "compile-replace found %u replacements\n", (unsigned int)fsm.find_replacements().size());
+        }
+      catch(const char * msg)
+        {
+          fprintf(stderr, "compile_replace threw an error: '%s'\n", msg);
+        }
       PROMPT_AND_RETURN_THIS;
     }
   XfstCompiler&
@@ -4202,6 +4211,15 @@ namespace xfst {
         fprintf(stderr, "Network is well-formed.\n");
       else
         fprintf(stderr, "Network is not well-formed.\n");
+      HfstBasicTransducer fsm(*tmp);
+      try 
+        {
+          fprintf(stderr, "compile-replace found %u replacements\n", (unsigned int)fsm.find_replacements().size());
+        }
+      catch(const char * msg)
+        {
+          fprintf(stderr, "compile_replace threw an error: '%s'\n", msg);
+        }
       PROMPT_AND_RETURN_THIS;
     }
 
