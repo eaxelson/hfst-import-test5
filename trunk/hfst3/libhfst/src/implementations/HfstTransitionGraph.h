@@ -51,6 +51,11 @@
      /** @brief The number of a state in an HfstTransitionGraph. */
      typedef unsigned int HfstState;
 
+     typedef std::pair<HfstState, std::vector<std::pair<std::string, std::string> > > HfstReplacement;
+     typedef std::vector<HfstReplacement> HfstReplacements;
+     typedef std::map<HfstState, HfstReplacements > HfstReplacementsMap;
+
+
      /** @brief A simple transition graph format that consists of
          states and transitions between those states.
 
@@ -3863,22 +3868,9 @@
              }
          }
 
-         /*void check_regexp_state_for_final(HfstState s)
-         {
-           if (is_final_state(s))
-             {
-               throw "error: final state inside compile-replace regular expression";
-             }
-
-             }*/
-
          // Returns whether tr is "^]":"^]". If tr is not allowed, throws an error message.
          bool check_regexp_transition_end(const HfstBasicTransition & tr)
          {
-           /*if (tr.get_input_symbol() != tr.get_output_symbol())
-             {
-               throw "error: input and output symbols differ in compile-replace regular expression";
-             }*/ 
            std::string istr = tr.get_input_symbol();
            std::string ostr = tr.get_output_symbol();
            if (is_special_symbol(istr) || is_special_symbol(ostr))
@@ -3905,18 +3897,17 @@
          // If there is a "^[":"^[" transition leading to state \a s from some state
          // S and state S is included in \a states_visited and \a path and \a full_paths
          // are empty, this function can be used to find all (sub-)paths of form
-         // ?* "^]" (? does not contain "^]" or "^[") starting from state \a s. The resulting
+         // [x:y]* "^]" (x and y cannot be "^]" or "^[") starting from state \a s. The resulting
          // paths are stored in \a full_paths. \a path is used to keep track of each path so
-         // far. 
+         // far. Weights are currently ignored.
          void find_regexp_paths
            (HfstState s, 
             std::set<HfstState> & states_visited, 
             std::vector<std::pair<std::string, std::string> > & path, 
-            std::vector<std::pair<HfstState, std::vector<std::pair<std::string, std::string> > > > & full_paths)
+            HfstReplacements & full_paths)
            {
-             // no cycles or final states allowed inside "^[" and "^]"
+             // no cycles allowed inside "^[" and "^]"
              check_regexp_state_for_cycle(s, states_visited);
-             //check_regexp_state_for_final(s); is this needed?
              states_visited.insert(s);
 
              // go through all transitions
@@ -3933,12 +3924,12 @@
                      check_regexp_state_for_cycle(it->get_target_state(), states_visited);
                      // ..but else we can add the expression that it ends to the results
                      full_paths.push_back
-                       (std::pair<HfstState, std::vector<std::pair<std::string, std::string > > >(it->get_target_state(), path));
+                       (HfstReplacement(it->get_target_state(), path));
                    }
                  // add transition to path and call function again for its target state
                  else
                    {
-                     path.push_back(std::pair<std::string, std::string>(it->get_input_symbol(), it->get_output_symbol()));
+                     path.push_back(StringPair(it->get_input_symbol(), it->get_output_symbol()));
                      find_regexp_paths
                        (it->get_target_state(),
                         states_visited,
@@ -3951,6 +3942,15 @@
              states_visited.erase(s);
            }
 
+         // For each "^[":"^[" transition in state \a s, find continuing paths of form [x:y]* "^]":"^]"
+         // (where x and y can freely be any symbols except "^]" or "^[") and store those paths in \a full_paths
+         // vector where the first member of each element is the state where the ending "^]":"^]" transition
+         // leads to and the second element is a vector of transitions (i.e. string pairs) without the ending
+         // "^]":"^]" transition.
+         // An error is thrown if mismatched "^[" or "^]" symbols, special symbols (epsilon, unknown, identity),
+         // or loops are encountered on a regexp path. Final states are allowed on regexp paths as they are also
+         // allowed by Xerox tools.
+         // Weights are currently ignored.
          void find_regexp_paths
            (HfstState s,
             std::vector<std::pair<HfstState, std::vector<std::pair<std::string, std::string> > > > & full_paths)
@@ -3979,14 +3979,17 @@
                }
          }
 
-         std::map<HfstState, std::vector<std::pair<HfstState, std::vector<std::pair<std::string, std::string> > > > > find_replacements()
+         // Find all subpaths of form "^[" [x:y]* "^]" (x and y cannot be "^[" or "^]") and return them.
+         // retval[start_state] == vector(pair(end_state, vector(pair(isymbol,osymbol) ) ) )
+         // Weights are currently ignored.
+         HfstReplacementsMap find_replacements()
          {
-           std::map<HfstState, std::vector<std::pair<HfstState, std::vector<std::pair<std::string, std::string> > > > > replacements;
+           HfstReplacementsMap replacements;
            unsigned int state = 0;
            for (iterator it = begin(); it != end(); it++)
              {
                fprintf(stderr, "state %u......\n", state);
-               std::vector<std::pair<HfstState, std::vector<std::pair<std::string, std::string> > > > full_paths;
+               HfstReplacements full_paths;
                find_regexp_paths(state, full_paths);
                if (full_paths.size() > 0)
                  {
@@ -3997,6 +4000,30 @@
            return replacements;
          }
 
+         void compile_replace()
+         {
+           HfstReplacementsMap replacement_map = find_replacements();
+           for (HfstReplacementsMap::const_iterator it = replacement_map.begin(); 
+                it != replacement_map.end(); it++)
+             {
+               HfstState start_state = it->first;
+               HfstReplacements replacements = it->second; 
+               for (HfstReplacements::const_iterator rit = replacements.begin();
+                    rit != replacements.end(); rit++)
+                 {
+                   /*
+                   HfstState end_state = rit->first;
+                   HfstTransducer * regex_tr = compile_path_as_regex(rit->second);
+                   HfstTransducer * string_tr = compile_path_as_string(rit->second);
+                   regex_tr->cross_product(*string_tr); // check this
+                   delete string_tr;
+                   HfstBasicTransducer replacement(*regex_tr);
+                   delete regex_tr;
+                   insert_replacement(start_state, end_state, replacement);
+                   */
+                 }
+             }
+         }
 
 /*      /\** @brief Determine whether this graph has input-epsilon cycles. */
 /*       *\/ */

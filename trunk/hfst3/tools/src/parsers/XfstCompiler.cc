@@ -4182,9 +4182,55 @@ namespace xfst {
     return value;
   }
 
+  static HfstTransducer * compile_path_as_string(const hfst::StringPairVector & path)
+  {
+    std::string pathstr("");
+    for (hfst::StringPairVector::const_iterator it = path.begin(); it != path.end(); it++)
+      {
+        pathstr.append("\"").append(it->first).append("\":\"").append(it->second).append("\" ");
+      }
+    pathstr.append(";");
+    char * pathstrptr = strdup(pathstr.c_str());
+    fprintf(stderr, "compiling path '%s' as string (regex)...\n", pathstrptr); // DEBUG
+    hfst::xre::XreCompiler xre_comp(hfst::TROPICAL_OPENFST_TYPE);
+    // unknowns and identities? definitions?
+    HfstTransducer * retval = xre_comp.compile(pathstrptr);
+    free(pathstrptr);
+    if (retval == NULL)
+      {
+        throw "error: compile_path_as_string failed";
+      }
+    return retval;
+  }
+
+  static HfstTransducer * compile_path_as_regex(const hfst::StringPairVector & path)
+  {
+    std::string pathstr("");
+    for (hfst::StringPairVector::const_iterator it = path.begin(); it != path.end(); it++)
+      {
+        pathstr.append(it->first).append(":").append(it->second).append(" ");
+      }
+    pathstr.append(";");
+    char * pathstrptr = strdup(pathstr.c_str());
+    fprintf(stderr, "compiling path '%s' as regex...\n", pathstrptr); // DEBUG
+    hfst::xre::XreCompiler xre_comp(hfst::TROPICAL_OPENFST_TYPE);
+    // unknowns and identities? definitions?
+    HfstTransducer * retval = xre_comp.compile(pathstrptr);
+    free(pathstrptr);
+    if (retval == NULL)
+      {
+        throw "error: compile_path_as_regex failed";
+      }
+    return retval;
+  }
+
   XfstCompiler&
   XfstCompiler::compile_replace_upper_net()
     {
+      using hfst::implementations::HfstState;
+      using hfst::implementations::HfstReplacements;
+      using hfst::implementations::HfstReplacementsMap;
+
       hfst_fprintf(stderr, "missing compile_replace_upper net %s:%d\n", __FILE__, __LINE__);
       GET_TOP(tmp);
       if (is_well_formed_for_compile_replace(tmp, xre_))
@@ -4194,7 +4240,26 @@ namespace xfst {
       HfstBasicTransducer fsm(*tmp);
       try 
         {
-          fprintf(stderr, "compile-replace found %u replacements\n", (unsigned int)fsm.find_replacements().size());
+          HfstReplacementsMap replacement_map = fsm.find_replacements();
+          
+            for (HfstReplacementsMap::const_iterator it = replacement_map.begin();
+                 it != replacement_map.end(); it++)
+              {
+                HfstState start_state = it->first;
+                HfstReplacements replacements = it->second;
+                for (HfstReplacements::const_iterator rit = replacements.begin();
+                     rit != replacements.end(); rit++)
+                  {
+                   HfstState end_state = rit->first;
+                   HfstTransducer * regex_tr = compile_path_as_regex(rit->second);
+                   HfstTransducer * string_tr = compile_path_as_string(rit->second);
+                   regex_tr->cross_product(*string_tr); // check this
+                   delete string_tr;
+                   HfstBasicTransducer replacement(*regex_tr);
+                   delete regex_tr;
+                   //fsm.insert_replacement(start_state, end_state, replacement);
+                  }
+              }
         }
       catch(const char * msg)
         {
