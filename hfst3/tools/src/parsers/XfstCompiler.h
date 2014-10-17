@@ -438,11 +438,12 @@ class XfstCompiler
   XfstCompiler& inspect_net();
   //! @brief Repeat 0..1 times
   XfstCompiler& optional_net();
+
+  // internal function
+  XfstCompiler& compile_replace_net(Level level);
   //! @brief Compile-replace lower
-  //! @todo missing from HFST
   XfstCompiler& compile_replace_lower_net();
   //! @brief Compile-replace upper
-  //! @todo missing from HFST
   XfstCompiler& compile_replace_upper_net();
 
 

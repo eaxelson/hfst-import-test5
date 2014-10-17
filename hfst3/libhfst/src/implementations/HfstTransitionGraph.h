@@ -4000,30 +4000,50 @@
            return replacements;
          }
 
-         void compile_replace()
+         // Copy \a graph
+         void insert_transducer(HfstState state1, HfstState state2, const HfstTransitionGraph & graph)
          {
-           HfstReplacementsMap replacement_map = find_replacements();
-           for (HfstReplacementsMap::const_iterator it = replacement_map.begin(); 
-                it != replacement_map.end(); it++)
+           HfstState offset = add_state(); 
+           HfstState source_state=0;
+           for (const_iterator it = graph.begin();
+                it != graph.end(); it++)
              {
-               HfstState start_state = it->first;
-               HfstReplacements replacements = it->second; 
-               for (HfstReplacements::const_iterator rit = replacements.begin();
-                    rit != replacements.end(); rit++)
-                 {
-                   /*
-                   HfstState end_state = rit->first;
-                   HfstTransducer * regex_tr = compile_path_as_regex(rit->second);
-                   HfstTransducer * string_tr = compile_path_as_string(rit->second);
-                   regex_tr->cross_product(*string_tr); // check this
-                   delete string_tr;
-                   HfstBasicTransducer replacement(*regex_tr);
-                   delete regex_tr;
-                   insert_replacement(start_state, end_state, replacement);
-                   */
-                 }
+               for (typename HfstTransitions::const_iterator tr_it
+                    = it->begin();
+                  tr_it != it->end(); tr_it++)
+               {
+                 C data = tr_it->get_transition_data();
+
+                   HfstTransition <C> transition
+                     (tr_it->get_target_state() + offset,
+                      data.get_input_symbol(),
+                      data.get_output_symbol(),
+                      data.get_weight());
+
+                   add_transition(source_state + offset, transition);
+               }
+             source_state++;
+           }
+
+           // Epsilon transitions
+           for (typename FinalWeightMap::const_iterator it
+                  = graph.final_weight_map.begin();
+                it != graph.final_weight_map.end(); it++)
+             {
+               HfstTransition <C> epsilon_transition
+                 (state2, C::get_epsilon(), C::get_epsilon(),
+                  it->second);
+               add_transition(it->first + offset, epsilon_transition);
              }
+
+           // Initial transition
+           HfstTransition <C> epsilon_transition
+             (offset, C::get_epsilon(), C::get_epsilon(), 0);
+           add_transition(state1, epsilon_transition);
          }
+       
+
+
 
 /*      /\** @brief Determine whether this graph has input-epsilon cycles. */
 /*       *\/ */
