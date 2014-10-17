@@ -4157,16 +4157,20 @@ namespace xfst {
       PROMPT_AND_RETURN_THIS;
     }
 
-  static bool is_well_formed_for_compile_replace(const HfstTransducer * t, hfst::xre::XreCompiler & xre_)
+  static HfstTransducer * contains_regexps(hfst::xre::XreCompiler & xre_)
   {
-
     HfstTransducer * not_bracket_star = xre_.compile("[? - \"^[\" - \"^]\"]* ;");
     xre_.define("TempNotBracketStar", *not_bracket_star);
     // all paths that contain one or more well-formed ^[ ^] expressions
     HfstTransducer * well_formed = xre_.compile("TempNotBracketStar \"^[\" TempNotBracketStar  [ \"^]\" TempNotBracketStar \"^[\"  TempNotBracketStar ]*  \"^]\" TempNotBracketStar ;");
     xre_.undefine("TempNotBracketStar");
     delete not_bracket_star;
+    return well_formed;
+  }
 
+  static bool is_well_formed_for_compile_replace(const HfstTransducer * t, hfst::xre::XreCompiler & xre_)
+  {
+    HfstTransducer * well_formed = contains_regexps(xre_);
     // subtract those paths from copy of t
     HfstTransducer tc(*t);
     tc.subtract(*well_formed).minimize();
@@ -4182,61 +4186,45 @@ namespace xfst {
     return value;
   }
 
-  static HfstTransducer * compile_path_as_string(const hfst::StringPairVector & path)
+  static std::string to_literal_regexp(const hfst::StringPairVector & path)
   {
-    std::string pathstr("");
+    std::string pathstr("[ ");
     for (hfst::StringPairVector::const_iterator it = path.begin(); it != path.end(); it++)
       {
-        pathstr.append("\"").append(it->first).append("\":\"").append(it->second).append("\" ");
+        pathstr.append("\"").append(it->first).append("\" ");
       }
-    pathstr.append(";");
-    char * pathstrptr = strdup(pathstr.c_str());
-    fprintf(stderr, "compiling path '%s' as string (regex)...\n", pathstrptr); // DEBUG
-    hfst::xre::XreCompiler xre_comp(hfst::TROPICAL_OPENFST_TYPE);
-    // unknowns and identities? definitions?
-    HfstTransducer * retval = xre_comp.compile(pathstrptr);
-    free(pathstrptr);
-    if (retval == NULL)
-      {
-        throw "error: compile_path_as_string failed";
-      }
-    return retval;
+    pathstr.append("]");
+    return pathstr;
   }
 
-  static HfstTransducer * compile_path_as_regex(const hfst::StringPairVector & path)
+  static std::string to_regexp(const hfst::StringPairVector & path)
   {
-    std::string pathstr("");
+    std::string pathstr("[ ");
     for (hfst::StringPairVector::const_iterator it = path.begin(); it != path.end(); it++)
       {
-        pathstr.append(it->first).append(":").append(it->second).append(" ");
+        pathstr.append(it->first).append(" ");
       }
-    pathstr.append(";");
-    char * pathstrptr = strdup(pathstr.c_str());
-    fprintf(stderr, "compiling path '%s' as regex...\n", pathstrptr); // DEBUG
-    hfst::xre::XreCompiler xre_comp(hfst::TROPICAL_OPENFST_TYPE);
-    // unknowns and identities? definitions?
-    HfstTransducer * retval = xre_comp.compile(pathstrptr);
-    free(pathstrptr);
-    if (retval == NULL)
-      {
-        throw "error: compile_path_as_regex failed";
-      }
-    return retval;
+    pathstr.append("]");
+    return pathstr;
   }
 
   XfstCompiler&
-  XfstCompiler::compile_replace_upper_net()
+  XfstCompiler::compile_replace_net(Level level)
     {
+      assert(level != BOTH_LEVELS);
       using hfst::implementations::HfstState;
       using hfst::implementations::HfstReplacements;
       using hfst::implementations::HfstReplacementsMap;
 
-      hfst_fprintf(stderr, "missing compile_replace_upper net %s:%d\n", __FILE__, __LINE__);
       GET_TOP(tmp);
       if (is_well_formed_for_compile_replace(tmp, xre_))
-        fprintf(stderr, "Network is well-formed.\n");
+        {
+          fprintf(stderr, "Network is well-formed.\n");
+        }
       else
-        fprintf(stderr, "Network is not well-formed.\n");
+        {
+          fprintf(stderr, "Network is not well-formed.\n");
+        }
       HfstBasicTransducer fsm(*tmp);
       try 
         {
@@ -4251,13 +4239,27 @@ namespace xfst {
                      rit != replacements.end(); rit++)
                   {
                    HfstState end_state = rit->first;
-                   HfstTransducer * regex_tr = compile_path_as_regex(rit->second);
-                   HfstTransducer * string_tr = compile_path_as_string(rit->second);
-                   regex_tr->cross_product(*string_tr); // check this
-                   delete string_tr;
-                   HfstBasicTransducer replacement(*regex_tr);
-                   delete regex_tr;
-                   //fsm.insert_replacement(start_state, end_state, replacement);
+                   std::string CPR(""); // Cross-Product Regexp
+                   if (level == LOWER_LEVEL)
+                     {
+                       CPR = to_literal_regexp(rit->second) + std::string(" .x. ") + to_regexp(rit->second);
+                       CPR = std::string("\"^[\":0") + std::string(" [") + CPR + std::string("] ") + std::string("\"^]\":0 ;");
+                     }
+                   else
+                     {
+                       CPR = to_regexp(rit->second) + std::string(" .x. ") + to_literal_regexp(rit->second);
+                       CPR = std::string("0:\"^[\"") + std::string(" [") + CPR + std::string("] ") + std::string("0:\"^]\" ;");
+                     }
+                   char * cpr = strdup(CPR.c_str());
+                   fprintf(stderr, "compiling replacement '%s'...\n", cpr);
+                   HfstTransducer * replacement = xre_.compile(cpr);
+                   assert(replacement != NULL); // todo
+                   replacement->minimize();
+                   HfstBasicTransducer repl(*replacement);
+                   // DEBUG
+                   std::cerr << "inserting transducer:" << std::endl << *replacement << std::endl << "between states " << start_state << " and " << end_state << "." << std::endl ;
+                   delete replacement;
+                   fsm.insert_transducer(start_state, end_state, repl);
                   }
               }
         }
@@ -4265,28 +4267,32 @@ namespace xfst {
         {
           fprintf(stderr, "compile_replace threw an error: '%s'\n", msg);
         }
+      HfstTransducer * result = new HfstTransducer(fsm, format_);
+
+      std::cerr << "result from compile-replace is:" << std::endl << *result << std::endl;
+
+      HfstTransducer * cr = contains_regexps(xre_);
+      result->subtract(*cr).minimize();
+      delete cr;
+      stack_.pop();
+      delete tmp;
+      stack_.push(result);
+
       PROMPT_AND_RETURN_THIS;
     }
+
   XfstCompiler&
   XfstCompiler::compile_replace_lower_net()
     {
-      hfst_fprintf(stderr, "missing compile_replace_lower net %s:%d\n", __FILE__, __LINE__);
-      GET_TOP(tmp);
-      if (is_well_formed_for_compile_replace(tmp, xre_))
-        fprintf(stderr, "Network is well-formed.\n");
-      else
-        fprintf(stderr, "Network is not well-formed.\n");
-      HfstBasicTransducer fsm(*tmp);
-      try 
-        {
-          fprintf(stderr, "compile-replace found %u replacements\n", (unsigned int)fsm.find_replacements().size());
-        }
-      catch(const char * msg)
-        {
-          fprintf(stderr, "compile_replace threw an error: '%s'\n", msg);
-        }
-      PROMPT_AND_RETURN_THIS;
+      return compile_replace_net(LOWER_LEVEL);
     }
+
+  XfstCompiler&
+  XfstCompiler::compile_replace_upper_net()
+    {
+      return compile_replace_net(UPPER_LEVEL);
+    }
+
 
   XfstCompiler&
   XfstCompiler::hfst(const char* text)
