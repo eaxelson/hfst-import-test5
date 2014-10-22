@@ -19,7 +19,7 @@ namespace hfst {
     
     /** @brief One implementation of template class C in 
         HfstTransition. 
-	
+        
         A HfstTropicalTransducerTransitionData has an input symbol and an 
         output symbol of type SymbolType (string) and a weight of type 
         WeightType (float).
@@ -29,7 +29,7 @@ namespace hfst {
         implementation is hidden from the user.
         The class has two static maps and functions that take care of conversion
         between strings and internal numbers.
-	
+        
         @see HfstTransition HfstBasicTransition */
     class HfstTropicalTransducerTransitionData {
     public:
@@ -47,17 +47,17 @@ namespace hfst {
 
       static SymbolType get_epsilon()
       {
-	return SymbolType("@_EPSILON_SYMBOL_@");
+        return SymbolType("@_EPSILON_SYMBOL_@");
       }
       
       static SymbolType get_unknown()
       {
-	return SymbolType("@_UNKNOWN_SYMBOL_@");
+        return SymbolType("@_UNKNOWN_SYMBOL_@");
       }
       
       static SymbolType get_identity()
       {
-	return SymbolType("@_IDENTITY_SYMBOL_@");
+        return SymbolType("@_IDENTITY_SYMBOL_@");
       }
       
     public: /* FIXME: Should be private. */
@@ -70,63 +70,63 @@ namespace hfst {
 
       /* Get the biggest number used to represent a symbol. */
       static unsigned int get_max_number() {
-	return max_number;
+        return max_number;
       }
 
       /* 
-	 Get a vector that defines how numbers of a transducer must
-	 be changed, i.e. harmonized, so that it follows the same 
-	 number-to-string encoding as all transducers that use the datatype
-	 HfstTropicalTransducerTransitionData.
+         Get a vector that defines how numbers of a transducer must
+         be changed, i.e. harmonized, so that it follows the same 
+         number-to-string encoding as all transducers that use the datatype
+         HfstTropicalTransducerTransitionData.
 
-	 \a symbols defines how numbers are mapped to strings in the
-	 original transducer so that each index in \a symbols 
-	 is the number that corresponds to the string at that index.
-	 An empty string at an index means that the index is not
-	 used in the original transducer.
+         \a symbols defines how numbers are mapped to strings in the
+         original transducer so that each index in \a symbols 
+         is the number that corresponds to the string at that index.
+         An empty string at an index means that the index is not
+         used in the original transducer.
 
-	 The result is a vector whose each index is the number that
-	 must be replaced by the number at that index when a
-	 transducer is harmonized. If an index is not used in the
-	 transducer, the result will contain a zero at that index.
+         The result is a vector whose each index is the number that
+         must be replaced by the number at that index when a
+         transducer is harmonized. If an index is not used in the
+         transducer, the result will contain a zero at that index.
       */
       static std::vector<unsigned int> get_harmonization_vector
-	(const std::vector<SymbolType> &symbols)
+        (const std::vector<SymbolType> &symbols)
       {
-	std::vector<unsigned int> harmv;
-	harmv.reserve(symbols.size());
-	harmv.resize(symbols.size(), 0);
-	for (unsigned int i=0; i<symbols.size(); i++)
-	  {
-	    if (symbols.at(i) != "")
-	      harmv.at(i) = get_number(symbols.at(i));
-	  }
-	return harmv;
+        std::vector<unsigned int> harmv;
+        harmv.reserve(symbols.size());
+        harmv.resize(symbols.size(), 0);
+        for (unsigned int i=0; i<symbols.size(); i++)
+          {
+            if (symbols.at(i) != "")
+              harmv.at(i) = get_number(symbols.at(i));
+          }
+        return harmv;
       }
 
       static std::vector<unsigned int> get_reverse_harmonization_vector
-	(const std::map<SymbolType, unsigned int> &symbols)
+        (const std::map<SymbolType, unsigned int> &symbols)
       {
-	std::vector<unsigned int> harmv;
-	harmv.reserve(max_number+1);
-	harmv.resize(max_number+1, 0);
-	for (unsigned int i=0; i<harmv.size(); i++)
-	  {
-	    std::map<SymbolType, unsigned int>::const_iterator it
-	      = symbols.find(get_symbol(i));
-	    if (it != symbols.end())
-	      harmv.at(i) = it->second;
-	  }
-	return harmv;
+        std::vector<unsigned int> harmv;
+        harmv.reserve(max_number+1);
+        harmv.resize(max_number+1, 0);
+        for (unsigned int i=0; i<harmv.size(); i++)
+          {
+            std::map<SymbolType, unsigned int>::const_iterator it
+              = symbols.find(get_symbol(i));
+            if (it != symbols.end())
+              harmv.at(i) = it->second;
+          }
+        return harmv;
       }
 
     protected:
       /* Get the symbol that is mapped as \a number */
       static const std::string &get_symbol(unsigned int number) 
-      {	
+      { 
         if (number >= number2symbol_map.size()) {
           std::string message("HfstTropicalTransducerTransitionData: "
-			      "number ");
+                              "number ");
           std::ostringstream oss;
           oss << number;
           message.append(oss.str());
@@ -140,27 +140,27 @@ namespace hfst {
       /* Get the number that is used to represent \a symbol */
       static unsigned int get_number(const std::string &symbol) 
       {
-	if(symbol == "") { // FAIL
-	  Symbol2NumberMap::iterator it = symbol2number_map.find(symbol);
-	  if (it == symbol2number_map.end()) {
-	    std::cerr << "ERROR: No number for the empty symbol\n" 
-		      << std::endl;
-	  }
-	  else {
-	    std::cerr << "ERROR: The empty symbol corresdponds to number " 
-		      << it->second << std::endl;
-	  }
-	  assert(false);
-	}
-	
+        if(symbol == "") { // FAIL
+          Symbol2NumberMap::iterator it = symbol2number_map.find(symbol);
+          if (it == symbol2number_map.end()) {
+            std::cerr << "ERROR: No number for the empty symbol\n" 
+                      << std::endl;
+          }
+          else {
+            std::cerr << "ERROR: The empty symbol corresdponds to number " 
+                      << it->second << std::endl;
+          }
+          assert(false);
+        }
+        
         Symbol2NumberMap::iterator it = symbol2number_map.find(symbol);
         if (it == symbol2number_map.end()) 
-	  {
-	    max_number++;
-	    symbol2number_map[symbol] = max_number;
-	    number2symbol_map.push_back(symbol);	    
-	    return max_number;
-	  }
+          {
+            max_number++;
+            symbol2number_map[symbol] = max_number;
+            number2symbol_map.push_back(symbol);            
+            return max_number;
+          }
         return it->second;
       }
 
@@ -212,12 +212,12 @@ namespace hfst {
       }
 
       HfstTropicalTransducerTransitionData
-	(unsigned int inumber,
-	 unsigned int onumber,
-	 WeightType weight) {
-	input_number = inumber;
-	output_number = onumber;
-	this->weight = weight;
+        (unsigned int inumber,
+         unsigned int onumber,
+         WeightType weight) {
+        input_number = inumber;
+        output_number = onumber;
+        this->weight = weight;
       }
 
       /** @brief Get the input symbol. */
@@ -231,11 +231,11 @@ namespace hfst {
       }
 
       unsigned int get_input_number() const {
-	return input_number;
+        return input_number;
       }
 
       unsigned int get_output_number() const {
-	return output_number;
+        return output_number;
       }
       
       /** @brief Get the weight. */
@@ -254,19 +254,19 @@ namespace hfst {
         return (symbol.compare("@_IDENTITY_SYMBOL_@") == 0);
       }
       static bool is_valid_symbol(const SymbolType &symbol) {
-	if (symbol == "")
-	  return false;
-	return true;
+        if (symbol == "")
+          return false;
+        return true;
       }
 
       static SymbolType get_marker(const SymbolTypeSet &sts) {
-	(void)sts;
-	return SymbolType("@_MARKER_SYMBOL_@");
+        (void)sts;
+        return SymbolType("@_MARKER_SYMBOL_@");
       }
 
       /** @brief Whether this transition is less than transition 
           \a another. 
-	  
+          
           /internal is it too slow if string comparison is used instead?
       */
       bool operator<(const HfstTropicalTransducerTransitionData &another) 
@@ -281,13 +281,27 @@ namespace hfst {
           return false;
         return (weight < another.weight);
       }
+
+      // same as operator< but weight is ignored
+      bool less_than(const HfstTropicalTransducerTransitionData &another) 
+        const {
+        if (input_number < another.input_number )
+          return true;
+        if (input_number > another.input_number)
+          return false;
+        if (output_number < another.output_number)
+          return true;
+        if (output_number > another.output_number)
+          return false;
+        return true;
+      }
       
       void operator=(const HfstTropicalTransducerTransitionData &another)
-	{
-	  input_number = another.input_number;
-	  output_number = another.output_number;
-	  weight = another.weight;
-	}
+        {
+          input_number = another.input_number;
+          output_number = another.output_number;
+          weight = another.weight;
+        }
       
       friend class Number2SymbolVectorInitializer;
       friend class Symbol2NumberMapInitializer;
