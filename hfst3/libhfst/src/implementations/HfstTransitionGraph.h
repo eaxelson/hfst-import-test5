@@ -4000,7 +4000,12 @@
            return replacements;
          }
 
-         // Copy \a graph
+         // Attach a copy of \a graph between states \a state1 and \a state2 with epsilon transitions.
+         // There will be an epsilon transition with weight zero from state \a state1 to the
+         // initial state of \a graph and one epsilon transition from each final state of
+         // \a graph to state \a state2 with a weight of that state's final weight. Final states of
+         // \a graph as well as its initial state are made normal non-final states when copying \a graph.
+         // Todo: copy alphabet? harmonize graphs?
          void insert_transducer(HfstState state1, HfstState state2, const HfstTransitionGraph & graph)
          {
            HfstState offset = add_state(); 
@@ -4041,9 +4046,89 @@
              (offset, C::get_epsilon(), C::get_epsilon(), 0);
            add_transition(state1, epsilon_transition);
          }
-       
 
+           typedef std::pair<HfstState, HfstState> StatePair;
+           typedef std::map<StatePair, HfstState> StateMap;
 
+         static HfstState find_target_state(HfstState target1, HfstState target2, StateMap & state_map, HfstTransitionGraph & intersection)
+         {
+           StatePair state_pair(target1, target2);
+           StateMap::const_iterator it = state_map.find(state_pair);
+           if (it != state_map.end())
+             {
+               return it->second;
+             }
+           HfstState retval = intersection.add_state();
+           state_map[state_pair] = retval;
+           return retval;
+         }
+
+         static void find_matches(HfstTransitions & tr1, HfstTransitions & tr2,
+                                  HfstTransitionGraph & intersection, HfstState state, StateMap & state_map)
+         {
+           if (tr1.size() == 0 || tr2.size() == 0)
+             {
+               return;
+             }
+           unsigned int start_search_from=0;
+           
+           for (unsigned int i=0; i < tr1.size(); i++)
+             {
+               HfstTransition <C> & transition1 = tr1[i];
+               for(unsigned int j=start_search_from; j < tr2.size(); j++)
+                 {
+                   HfstTransition <C> & transition2 = tr2[j];
+                   if (transition2 < transition1)
+                     {
+                       // continue
+                     }
+                   else if (transition2 > transition1)
+                     {
+                       start_search_from=j;
+                       break;
+                     }
+                   else // equal
+                     {
+                       HfstState target = find_target_state
+                         (transition1.get_target_state(), transition2.get_target_state(), state_map, intersection);
+                       
+                       start_search_from=j+1;
+                     }
+                 }
+               return;
+             }
+           return;
+         }
+
+         static void intersect(HfstTransitionGraph & graph1, HfstTransitionGraph & graph2, 
+                          HfstState state1, HfstState state2, 
+                          HfstTransitionGraph & retval, HfstState retval_state,
+                          StateMap & state_map, std::vector<bool> & state_agenda)
+         {
+           HfstTransitions & transitions1 = graph1.state_vector[state1];
+           HfstTransitions & transitions2 = graph2.state_vector[state2];
+           std::vector<std::pair<unsigned int, unsigned int> > matches 
+             = find_matches(transitions1, transitions2);
+
+           //for (unsigned )
+           //if state_map.find(matches[i]);
+         }
+
+         static HfstTransitionGraph intersect
+           (HfstTransitionGraph & graph1, HfstTransitionGraph & graph2)
+         {
+           HfstTransitionGraph retval;
+           retval.add_state();
+           StateMap state_map;
+           std::vector<bool> state_agenda;
+           graph1.sort_arcs();
+           graph2.sort_arcs();
+           state_map[StatePair(0, 0)] = 0; // initial states 
+           state_agenda.push_back(true);   // initial state is on the agenda
+
+           intersect(graph1, graph2, 0, 0, retval, 0, state_map, state_agenda);
+           return retval;
+         }
 
 /*      /\** @brief Determine whether this graph has input-epsilon cycles. */
 /*       *\/ */
