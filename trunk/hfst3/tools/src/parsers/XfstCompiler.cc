@@ -1014,6 +1014,14 @@ namespace xfst {
     XfstCompiler&
     XfstCompiler::define_list(const char* name, const char* values)
       {
+        if (definitions_.find(name) != definitions_.end())
+          {
+            fprintf(warnstream_, "Error: '%s' has already been defined as a transducer variable.\n"
+                    "It cannot have an incompatible definition as a list.\n"
+                    "Please undefine the definition first.\n", name);
+            MAYBE_QUIT;
+            PROMPT_AND_RETURN_THIS;
+          }
         list<string> l;
         char* p = strdup(values);
         char* token = strtok(p, " ");
@@ -1066,6 +1074,16 @@ namespace xfst {
       // When calling this function, the regex \a indata should already have
       // been compiled into a transducer which should have been stored to
       // the variable latest_regex_compiled.
+
+        if (lists_.find(name) != lists_.end())
+          {
+            fprintf(warnstream_, "Error: '%s' has already been defined as a list variable.\n"
+                    "It cannot have an incompatible definition as a transducer.\n"
+                    "Please undefine the variable first.\n", name);
+            MAYBE_QUIT;
+            PROMPT_AND_RETURN_THIS;
+          }
+
       /*else*/ if (latest_regex_compiled != NULL)
         {
           bool was_defined = xre_.is_definition(name);

@@ -199,12 +199,12 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
             free($4);
        }
-       | DEFINE_LIST NAMETOKEN NAMETOKEN_LIST END_COMMAND {
+       | LIST NAMETOKEN NAMETOKEN_LIST SEMICOLON END_COMMAND {
             hfst::xfst::xfst_->define_list($2, $3);
             free($2);
             free($3);
        }
-       | DEFINE_LIST NAMETOKEN RANGE END_COMMAND {
+       | LIST NAMETOKEN RANGE END_COMMAND {
             hfst::xfst::xfst_->define_list($2, $3[0], $3[1]);
             free($2);
             free($3[0]);
