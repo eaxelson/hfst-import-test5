@@ -283,7 +283,7 @@ namespace hfst {
       }
 
       // same as operator< but weight is ignored
-      bool less_than(const HfstTropicalTransducerTransitionData &another) 
+      bool less_than_ignore_weight(const HfstTropicalTransducerTransitionData &another) 
         const {
         if (input_number < another.input_number )
           return true;
@@ -293,7 +293,7 @@ namespace hfst {
           return true;
         if (output_number > another.output_number)
           return false;
-        return true;
+        return false;
       }
       
       void operator=(const HfstTropicalTransducerTransitionData &another)
