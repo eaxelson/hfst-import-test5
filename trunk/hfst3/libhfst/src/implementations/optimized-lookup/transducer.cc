@@ -65,6 +65,7 @@ TransducerAlphabet::TransducerAlphabet(const SymbolTable& st):
 {
     unknown_symbol = NO_SYMBOL_NUMBER;
     default_symbol = NO_SYMBOL_NUMBER;
+    identity_symbol = NO_SYMBOL_NUMBER;
     for(SymbolNumber i=0; i<symbol_table.size(); i++)
     {
         if(hfst::FdOperation::is_diacritic(symbol_table[i])) {
@@ -73,6 +74,8 @@ TransducerAlphabet::TransducerAlphabet(const SymbolTable& st):
             unknown_symbol = i;
         } else if (hfst::is_default(symbol_table[i])) {
             default_symbol = i;
+        } else if (hfst::is_identity(symbol_table[i])) {
+            identity_symbol = i;
         }
     }
     orig_symbol_count = symbol_table.size();
@@ -412,7 +415,6 @@ void Transducer::find_transitions(SymbolNumber input,
                 // we got here via default, identity or unknown, so look
                 // back in the input tape to find the symbol we want to write
                 output = input_tape[input_pos - 1];
-
             }
             output_tape.write(output_pos, output);
             current_weight += tables->get_weight(i);
