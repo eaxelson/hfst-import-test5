@@ -4050,12 +4050,18 @@
            typedef std::pair<HfstState, HfstState> StatePair;
            typedef std::map<StatePair, HfstState> StateMap;
 
-           static HfstState find_target_state(HfstState target1, HfstState target2, StateMap & state_map, HfstTransitionGraph & intersection, bool & was_new_state)
+           // Find target state corresponding to state pair \a target1, \a target2 in \a state_map and return that state.
+           // If not found, add a new state to \a intersection, add it to \a state_map and return it.
+           // \a was_new_state specifies whether a new state was added.
+           static HfstState find_target_state
+             (HfstState target1, HfstState target2, StateMap & state_map, 
+              HfstTransitionGraph & intersection, bool & was_new_state)
            {
              StatePair state_pair(target1, target2);
              StateMap::const_iterator it = state_map.find(state_pair);
              if (it != state_map.end())
                {
+                 was_new_state=false;
                  return it->second;
                }
              HfstState retval = intersection.add_state();
@@ -4064,63 +4070,108 @@
              return retval;
          }
 
+           // A function used by find_matches.
+           // Copy matching transition tr1/tr2 to state \a state in \a intersection and return
+           // the target state of that transition. Also make that state final, if needed.
+           static HfstState handle_match(const HfstTransitionGraph & graph1, const HfstTransition <C> & tr1,
+                                         const HfstTransitionGraph & graph2, const HfstTransition <C> & tr2,
+                                         HfstTransitionGraph & intersection, HfstState state, StateMap & state_map)
+                                    
+           {
+             HfstState target1 = tr1.get_target_state();
+             HfstState target2 = tr2.get_target_state();
+             bool was_new_state = false;
+             HfstState retval = find_target_state
+               (target1, target2, state_map, intersection, was_new_state);
+             // The sum of weight is copied to the resulting intersection.
+             float transition_weight = tr1.get_weight() + tr2.get_weight();
+             intersection.add_transition
+               (state, HfstTransition <C> 
+                (retval, tr1.get_input_symbol(), tr1.get_output_symbol(), transition_weight)); 
+             // For each new state added, check if the corresponding states in \a graph1 and \a graph2
+             // are final. If they are, make the new state final with the sum of final weights.
+             if (was_new_state && (graph1.is_final_state(target1) && graph2.is_final_state(target2)))
+               {
+                 float final_weight = graph1.get_final_weight(target1) + graph2.get_final_weight(target2);
+                 intersection.set_final_weight(retval, final_weight);
+               }
+             return retval;
+           }
+
+
+           // A recursive function used by function intersect.
+           //
+           // @param graph1        The first transducer argument of intersection.
+           // @param state1        The current state of \a graph1.
+           // @param graph2        The second transducer argument of intersection.
+           // @param state2        The current state of \a graph2.
+           // @param intersection  The intersection of \a graph1 and \a graph2.
+           // @param state         The current state of \a intersection.
+           // @param state_map     State pairs from \a graph1 and \a graph2 mapped to states in \a intersection.
+           // @param agenda        States in \a intersection already handled or scheduled to be handled.
+           //
+           // @pre \a graph1 and \a graph2 must be arc-sorted (via sort_arcs()) to make transition matching faster.
+           // @pre \a graph1 and \a graph2 must be deterministic. (todo: handle equivalent transitions, maybe even epsilons?)
            static void find_matches
              (HfstTransitionGraph & graph1, HfstState state1, HfstTransitionGraph & graph2, HfstState state2,
               HfstTransitionGraph & intersection, HfstState state, StateMap & state_map, std::set<HfstState> & agenda)
            {
-             agenda.insert(state);
-             HfstTransitions & tr1 = graph1.state_vector[state1];
-             HfstTransitions & tr2 = graph2.state_vector[state2];
+             agenda.insert(state);  // do not handle \a state twice
+             HfstTransitions & tr1 = graph1.state_vector[state1]; // transitions of graph1
+             HfstTransitions & tr2 = graph2.state_vector[state2]; // transitions of graph2
 
              if (tr1.size() == 0 || tr2.size() == 0)
                {
-                 return;
+                 return; // we cannot proceed as no matches are possible
                }
-             unsigned int start_search_from=0;
+             unsigned int start_search_from=0; // where to start search in tr2
              
+             // *** Go through all transitions of state \a state1 in \a graph1 and try to find a match in
+             // transitions of state \a state2 in \a graph2. As transitions are sorted, we know that
+             // if a match is found for tr1[i] in tr2[j], a match for tr1[i+1] can be searched starting from
+             // tr2[j+1]. If no match is found for tr1[i] in tr2 but tr2[j] is the first element that is bigger
+             // than tr1[i], a match for tr1[i+1] can be searched starting from tr2[j]. ***
              for (unsigned int i=0; i < tr1.size(); i++)
                {
                  HfstTransition <C> & transition1 = tr1[i];
-                 C & transition_data1 = transition1.get_transition_data();
+                 // Transition data (input and output symbols) to be compared.
+                 const C & transition_data1 = transition1.get_transition_data();
+
+                 // --- Go through tr2 starting from start_search_from. ---
                  for(unsigned int j=start_search_from; j < tr2.size(); j++)
                    {
                      HfstTransition <C> & transition2 = tr2[j];
-                     C & transition_data2 = transition2.get_transition_data();
-                     // Target state does not matter, that's why we use transition data instead
-                     // of transition. Wweight doesn't matter either, that's why we use less_than
-                     // instead of operator<.
-                     if (transition_data2.less_than(transition_data1))
+                     // Transition data (input and output symbols) to be compared.
+                     const C & transition_data2 = transition2.get_transition_data();
+                     // todo: input:output duplicates with different weights? (lower weight is chosen always?)
+                     if (transition_data2.less_than_ignore_weight(transition_data1))
                        {
-                         // continue
+                         // no match found, continue searching
                        }
-                     else if (transition_data1.less_than(transition_data2))
+                     else if (transition_data1.less_than_ignore_weight(transition_data2))
                        {
+                         // No match can be found, start searching for next item in tr1
+                         // starting from current item of tr2.
                          start_search_from=j;
                          break;
                        }
-                     else // equal
+                     else
                        {
-                         HfstState target1 = transition1.get_target_state();
-                         HfstState target2 = transition2.get_target_state();
-                         bool was_new_state = false;
-                         HfstState target = find_target_state
-                           (target1, target2, state_map, intersection, was_new_state);
-                         float transition_weight = std::min(transition1.get_weight(), transition2.get_weight());
-                         intersection.add_transition(state, HfstTransition <C> (target, transition1.get_input_symbol(), transition1.get_output_symbol(), transition_weight)); 
-                         if (was_new_state && (tr1.is_final_state(target1) && tr1.is_final_state(target2)))
-                           {
-                             float final_weight = std::min(tr1.get_final_weight(target1), tr2.get_final_weight(target2));
-                             intersection.set_final_weight(target, final_weight);
-                           }
+                         // Match found, copy transitions and define target state in intersection
+                         HfstState target = handle_match(graph1, transition1, graph2, transition2, intersection, state, state_map);
+                         // Recursive call for target state, if it is not already on the agenda.
                          if (agenda.find(target) == agenda.end())
                            {
-                             find_matches(graph1, target1, graph2, target2, intersection, target, state_map, agenda);
+                             find_matches(graph1, transition1.get_target_state(), graph2, transition2.get_target_state(), intersection, target, state_map, agenda);
                            }
+                         // Start searching for next item in tr1 starting from next item of tr2.
                          start_search_from=j+1;
+                         break;
                        }
                    }
-                 return;
+                 // --- A transition in tr1 compared for all possible transitions in tr2, compare next transition. ---
                }
+             // *** All transitions in tr1 gone through. ***
              return;
            }
 
@@ -4128,14 +4179,18 @@
            (HfstTransitionGraph & graph1, HfstTransitionGraph & graph2)
          {
            HfstTransitionGraph retval;
-           retval.add_state();
            StateMap state_map;
            std::set<HfstState> agenda;
            graph1.sort_arcs();
            graph2.sort_arcs();
            state_map[StatePair(0, 0)] = 0;   // initial states
-           agenda.insert(0);                 // initial state is on the agenda
 
+           if (graph1.is_final_state(0) && graph2.is_final_state(0))
+             {
+               float final_weight = std::min(graph1.get_final_weight(0), graph2.get_final_weight(0));
+               retval.set_final_weight(0, final_weight);
+             }
+           
            find_matches(graph1, 0, graph2, 0, retval, 0, state_map, agenda);
 
            return retval;
