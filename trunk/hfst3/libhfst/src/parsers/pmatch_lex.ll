@@ -311,7 +311,8 @@ return REGEX;
 
 {NAME_CH}+"(" {
     char * label = (char *) malloc(strlen(pmatchtext));;
-    strncpy(label, pmatchtext, strlen(pmatchtext) - 1);
+    strncpy(label, pmatchtext, strlen(pmatchtext));
+    label[strlen(pmatchtext) - 1] = '\0';
     pmatchlval.label = hfst::pmatch::strip_percents(label);
     free(label);
     return SYMBOL_WITH_LEFT_PAREN;
