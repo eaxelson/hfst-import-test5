@@ -4196,6 +4196,172 @@
            return retval;
          }
 
+
+
+           // A function used by find_matches_for_merge
+           // Copy matching transition graph_tr/merger_tr to state \a result_state in \a result and return
+           // the target state of that transition. Also make that state final, if needed.
+           static HfstState handle_non_list_match(const HfstTransitionGraph & graph, const HfstTransition <C> & graph_transition,
+                                                  const HfstTransitionGraph & merger, HfstState merger_target,
+                                                  HfstTransitionGraph & result, HfstState result_state, StateMap & state_map)
+                                    
+           {
+             HfstState graph_target = graph_transition.get_target_state();
+             bool was_new_state = false;
+             HfstState retval = find_target_state
+               (graph_target, merger_target, state_map, result, was_new_state);
+             result.add_transition
+               (result_state, HfstTransition <C> 
+                (retval, graph_transition.get_input_symbol(), graph_transition.get_output_symbol(), graph_transition.get_weight()));
+             // For each new state added, check if the corresponding states in \a graph and \a merger
+             // are final. If they are, make the new state final with the sum of final weights.
+             if (was_new_state && (graph.is_final_state(graph_target) && merger.is_final_state(merger_target)))
+               {
+                 float final_weight = graph.get_final_weight(graph_target) + merger.get_final_weight(merger_target);
+                 result.set_final_weight(retval, final_weight);
+               }
+             return retval;
+           }
+
+
+           // A function used by find_matches_for_merge
+           // Copy matching transition graph_tr/merger_tr to state \a result_state in \a result and return
+           // the target state of that transition. Also make that state final, if needed.
+           static HfstState handle_list_match(const HfstTransitionGraph & graph, const HfstTransition <C> & graph_transition,
+                                              const HfstTransitionGraph & merger, const HfstTransition <C> & merger_transition,
+                                              HfstTransitionGraph & result, HfstState result_state, StateMap & state_map)
+                                    
+           {
+             HfstState graph_target = graph_transition.get_target_state();
+             HfstState merger_target = merger_transition.get_target_state();
+             bool was_new_state = false;
+             HfstState retval = find_target_state
+               (graph_target, merger_target, state_map, result, was_new_state);
+             // The sum of weight is copied to the resulting intersection.
+             float transition_weight = graph_transition.get_weight() + merger_transition.get_weight();
+             result.add_transition
+               (result_state, HfstTransition <C> 
+                (retval, merger_transition.get_input_symbol(), merger_transition.get_output_symbol(), transition_weight)); 
+             // For each new state added, check if the corresponding states in \a graph1 and \a graph2
+             // are final. If they are, make the new state final with the sum of final weights.
+             if (was_new_state && (graph.is_final_state(graph_target) && merger.is_final_state(merger_target)))
+               {
+                 float final_weight = graph.get_final_weight(graph_target) + merger.get_final_weight(merger_target);
+                 result.set_final_weight(retval, final_weight);
+               }
+             return retval;
+           }
+
+
+           static bool is_list_symbol(const C & transition_data)
+           {
+             return false;
+           }
+
+           static bool is_list_match(const C & graph_transition_data, const C & merger_transition_data)
+           {
+             return false;
+           }
+
+           // A recursive function used by function intersect.
+           //
+           // @param graph          The first transducer argument of intersection.
+           // @param graph_state    The current state of \a graph1.
+           // @param merger         The second transducer argument of intersection.
+           // @param merger_state   The current state of \a graph2.
+           // @param result         The intersection of \a graph1 and \a graph2.
+           // @param result_state   The current state of \a intersection.
+           // @param state_map      State pairs from \a graph and \a merger mapped to states in \a result.
+           // @param agenda         States in \a result already handled or scheduled to be handled.
+           //
+           // @pre \a graph and \a merger must be arc-sorted (via sort_arcs()) to make transition matching faster.
+           // @pre \a graph and \a merger must be deterministic. (todo: handle equivalent transitions, maybe even epsilons?)
+           static void find_matches_for_merge
+             (HfstTransitionGraph & graph, HfstState graph_state, HfstTransitionGraph & merger, HfstState merger_state,
+              HfstTransitionGraph & result, HfstState result_state, StateMap & state_map, std::set<HfstState> & agenda)
+           {
+             agenda.insert(result_state);  // do not handle \a result_state twice
+             HfstTransitions & graph_transitions = graph.state_vector[graph_state]; // transitions of graph
+             HfstTransitions & merger_transitions = merger.state_vector[merger_state]; // transitions of merger
+
+             if (graph_transitions.size() == 0)
+               {
+                 return; // we cannot proceed as no matches are possible
+               }
+
+             // Go through all transitions in state \a graph_state of \a graph.
+             for (unsigned int i=0; i < graph_transitions.size(); i++)
+               {
+                 HfstTransition <C> & graph_transition = graph_transitions[i];
+                 const C & graph_transition_data = graph_transition.get_transition_data();
+
+                 // List symbols must be checked separately
+                 if (is_list_symbol(graph_transition_data))
+                   {
+                     bool list_match_found=false;
+                     // Find all matches
+                     for(unsigned int j=0; j < merger_transitions.size(); j++)
+                       {
+                         HfstTransition <C> & merger_transition = merger_transitions[j];
+                         const C & merger_transition_data = merger_transition.get_transition_data();
+
+                         if (is_list_match(graph_transition_data, merger_transition_data))
+                           {
+                             list_match_found=true;
+                             HfstState target = handle_list_match(graph, graph_transition, merger, merger_transition, result, result_state, state_map);
+                             if (agenda.find(target) == agenda.end())
+                               {
+                                 find_matches_for_merge(graph, graph_transition.get_target_state(), merger, merger_transition.get_target_state(), result, target, state_map, agenda);
+                               }
+                           }
+                       }
+                     if (list_match_found)
+                       {
+                         continue;
+                       }
+                   }
+                 // If symbol is not a list symbol or no match was found for it, copy symbol as such
+                 // We use merger_state as merger transition target state
+                 HfstState target = handle_non_list_match(graph, graph_transition, merger, merger_state, result, result_state, state_map);
+                 if (agenda.find(target) == agenda.end())
+                   {
+                     find_matches_for_merge(graph, graph_transition.get_target_state(), merger, /*merger_transition.get_target_state()*/ merger_state, result, target, state_map, agenda);
+                   }
+                 // --- A transition in graph compared for all corresponding transitions in merger, compare next transition. --- 
+               }
+             // *** All transitions in state gone through. ***
+             return;
+           }
+
+         static HfstTransitionGraph merge
+           (HfstTransitionGraph & graph, HfstTransitionGraph & merger)
+         {
+           HfstTransitionGraph result;
+           StateMap state_map;
+           std::set<HfstState> agenda;
+           graph.sort_arcs();
+           merger.sort_arcs();
+           state_map[StatePair(0, 0)] = 0;   // initial states
+
+           if (graph.is_final_state(0) && merger.is_final_state(0))
+             {
+               float final_weight = graph.get_final_weight(0) + merger.get_final_weight(0);
+               result.set_final_weight(0, final_weight);
+             }
+           
+           find_matches_for_merge(graph, 0, merger, 0, result, 0, state_map, agenda);
+
+           return result;
+         }
+
+
+
+
+
+
+
+
+
 /*      /\** @brief Determine whether this graph has input-epsilon cycles. */
 /*       *\/ */
 /*      bool has_input_epsilon_cycles(void) */

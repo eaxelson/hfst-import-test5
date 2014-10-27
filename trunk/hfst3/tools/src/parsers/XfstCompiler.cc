@@ -3576,6 +3576,8 @@ namespace xfst {
         return *this;
       }
     HfstTransducer* result = stack_.top();
+    //HfstBasicTransducer fsm(*result);
+
     stack_.pop();
     while (!stack_.empty())
       {
@@ -3583,6 +3585,12 @@ namespace xfst {
         switch (operation)
           {
           case INTERSECT_NET:
+            /*{
+              HfstBasicTransducer basic(*t);
+              HfstBasicTransducer merge_tr = HfstBasicTransducer::merge(fsm, basic);
+              fprintf(stderr, "result of merge is:\n");
+              merge_tr.write_in_att_format(stderr);
+              }*/
             result->intersect(*t);
             break;
           case IGNORE_NET:
