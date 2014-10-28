@@ -26,7 +26,7 @@ libhfst_module = Extension('_libhfst',
 # ["libhfst-NN.dll", "libgcc_s_seh-1.dll"] or
 # ["libhfst-NN.dll", "libgcc_s_dw2-1.dll"] or
 setup(name = 'libhfst_swig',
-      version = '3.7.1_beta',
+      version = '3.8.0_beta',
       author = 'HFST team',
       author_email = 'hfst-bugs@helsinki.fi',
       url = 'http://hfst.sourceforge.net',
