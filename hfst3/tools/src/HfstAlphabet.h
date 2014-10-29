@@ -1,7 +1,21 @@
 #ifndef _HFST_ALPHABET_H_
 #define _HFST_ALPHABET_H_
 
-#include <ext/hash_map>
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
+#if HAVE_BACKWARD_HASH_MAP
+#  include <backward/hash_map>
+#elif HAVE_EXT_HASH_MAP
+#  include <ext/hash_map>
+#elif HAVE_HASH_MAP
+#  include <hash_map>
+#else
+#  warning "unknown hash_map"
+#  include <hash_map>
+#endif
+
 #include <set>
 #include <vector>
 #include <string.h>
@@ -19,7 +33,11 @@ namespace hfst {
     public:
       typedef std::pair<unsigned int,unsigned int> NumberPair;
       // hash table used to map the codes back to the symbols
-      typedef __gnu_cxx::hash_map<unsigned int, char*> CharMap;      
+#ifdef __GNUC__
+      typedef __gnu_cxx::hash_map<unsigned int, char*> CharMap;
+#else
+      typedef std::hash_map<unsigned int, char*> CharMap;
+#endif
 
     private:
       // string comparison operators needed to stored strings in a hash table
@@ -30,7 +48,11 @@ namespace hfst {
       };
       
       // hash table used to map the symbols to their codes
+#ifdef __GNUC__
       typedef __gnu_cxx::hash_map<const char*, unsigned int, __gnu_cxx::hash<const char*>,eqstr> SymbolMap;
+#else
+      typedef std::hash_map<const char*, unsigned int, std::hash<const char*>,eqstr> SymbolMap;
+#endif
       // set of symbol pairs
       typedef std::set<NumberPair> NumberPairSet;
       
