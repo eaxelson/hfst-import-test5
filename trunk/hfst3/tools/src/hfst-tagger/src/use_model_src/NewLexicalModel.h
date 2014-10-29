@@ -5,9 +5,33 @@
 #  include <config.h>
 #endif
 
+
+#ifdef HAVE_TR1_UNORDERED_MAP
+#include <tr1/unordered_map>
+#else
+#include <unordered_map>
+#endif
+
+
+
+
+
+
+
 #include "HfstTransducer.h"
+
+#ifdef HAVE_TR1_UNORDERED_MAP
 #include <tr1/unordered_map> 
-#include <tr1/unordered_set> 
+#else
+#include <unordered_map>
+#endif
+
+#ifdef HAVE_TR1_UNORDERED_SET
+#include <tr1/unordered_set>
+#else
+#include <unordered_set>
+#endif
+
 #include <iostream>
 
 #include "DataTypes.h"
@@ -24,14 +48,19 @@ class NewLexicalModel
 {
  public:
   NewLexicalModel(const std::string &filename, 
-		  std::istream * paradigm_guess_stream = 0);
+                  std::istream * paradigm_guess_stream = 0);
   const WeightedStringVector &operator[] (const std::string &word);
   const WeightedStringVector &get_first_word_analysis(const std::string &word);
   bool is_oov(const std::string &word);
   bool is_lexicon_oov(const std::string &word);
  private:
+#ifdef HAVE_TR1_UNORDERED_MAP
   typedef std::tr1::unordered_map<std::string,WeightedStringVector> 
     AnalysisCache;
+#else
+  typedef std::unordered_map<std::string,WeightedStringVector> 
+    AnalysisCache;
+#endif
 
   AnalysisCache   analysis_cache;  
   AnalysisCache   upper_case_suffix_cache;  
@@ -55,15 +84,20 @@ class NewLexicalModel
   size_t id;
   bool lexical_model_is_broken;
   std::istream * paradigm_guess_stream;
+#ifdef HAVE_TR1_UNORDERED_SET
   std::tr1::unordered_set<std::string> o_o_v_words;
   std::tr1::unordered_set<std::string> lexicon_o_o_v_words;
+#else
+  std::tr1::unordered_set<std::string> o_o_v_words;
+  std::tr1::unordered_set<std::string> lexicon_o_o_v_words;
+#endif
 
   void initialize_tag_probabilities(void);
 
   const WeightedStringVector &cache_word_analyses(const std::string &word);
   const WeightedStringVector &guess(const std::string &word,
-				    bool upper_case,
-				    const StringVector &rev_tokenized_word);
+                                    bool upper_case,
+                                    const StringVector &rev_tokenized_word);
   const WeightedStringVector &cache_analyses
     (const std::string &word,
      HfstOneLevelPaths * paths,
@@ -77,14 +111,14 @@ class NewLexicalModel
      bool upper_case);
 
   void merge_analyses(const WeightedStringVector &suffix_analyses,
-		      WeightedStringVector &word_analyses,
-		      bool  upper_case);
+                      WeightedStringVector &word_analyses,
+                      bool  upper_case);
   
   void bayesian_invert(WeightedStringVector &word_analyses,
-		       const std::string &suffix,
-		       bool upper_case);
+                       const std::string &suffix,
+                       bool upper_case);
   size_t get_suffix_length(StringVector::const_iterator begin,
-			   StringVector::const_iterator end);
+                           StringVector::const_iterator end);
   const WeightedStringVector &cache_suffix_analyses
     (const std::string &word,
      const std::string &suffix,
@@ -95,13 +129,13 @@ class NewLexicalModel
   float get_tag_penalty(const std::string &tag, bool upper_case);
   
   std::string to_string(StringVector::const_iterator begin,
-			StringVector::const_iterator end);
+                        StringVector::const_iterator end);
   float get_prob(float weight);
   float get_penalty(float prob);
   std::string to_lower_case(const std::string &word) const;
 
   const WeightedStringVector &paradigm_guess(const std::string &word,
-					     const StringVector &guesses);
+                                             const StringVector &guesses);
   StringVector split(const std::string &guesses);
   float get_weight(const std::string &weight_string);
 };

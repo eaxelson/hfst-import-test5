@@ -629,9 +629,11 @@ AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h]
 AC_CHECK_HEADERS([libxml/tree.h libxml/mem.h])
 AC_LANG_PUSH([C++])
 
+AS_IF([echo "$CXXFLAGS" | grep '\-std=gnu++11' > /dev/null 2> /dev/null], [AC_DEFINE([STD_XX_11], [1], ["c++ standard 11 requested"]) [std_xx_11_requested=yes]])
+
 AC_CHECK_HEADERS([tr1/unordered_map], [], [],
 [#ifdef HAVE_TR1_UNORDERED_MAP
-#include <tr1/unordered_map>
+#include <tr2/unordered_map>
 #endif
 ])
 AC_CHECK_HEADERS([tr1/unordered_set], [], [],
@@ -655,6 +657,16 @@ AS_IF([test "x$ac_cv_header_tr1_unordered_map" = "xno" -a "x$ac_cv_header_unorde
             [AC_MSG_ERROR(["unordered_map not found"])])
 AS_IF([test "x$ac_cv_header_tr1_unordered_set" = "xno" -a "x$ac_cv_header_unordered_set" = "xno"],
             [AC_MSG_ERROR(["unordered_set not found"])])
+
+AS_IF([test "$std_xx_11_requested" = "yes" -a "x$ac_cv_header_unordered_map" = "xno"],
+            [AC_MSG_ERROR(["<unordered_map> not found, it is needed in c++ standard 11"])])
+AS_IF([test "$std_xx_11_requested" = "yes" -a "x$ac_cv_header_unordered_set" = "xno"],
+            [AC_MSG_ERROR(["<unordered_set> not found, it is needed in c++ standard 11"])])
+
+# if c++11 is requested, do not use tr1 unordered maps and sets
+AS_IF([test "$std_xx_11_requested" = "yes"], AC_DEFINE([HAVE_TR1_UNORDERED_MAP], [0]))
+AS_IF([test "$std_xx_11_requested" = "yes"], AC_DEFINE([HAVE_TR1_UNORDERED_SET], [0]))
+
 
 AC_CHECK_HEADERS([ext/slist])
 
@@ -693,6 +705,7 @@ AS_IF([test "x$with_unicode_handler" != "xglib"],
 AC_CHECK_DECLS([program_name, program_invocation_name, program_invocation_short_name])
 AC_CHECK_DECLS([rl_completion_suppress_append, rl_completion_matches])
 AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul error error_at_line strndup getline getdelim getopt_long strtod xstrdup set_program_name setprogname setlocale nl_langinfo])
+
 
 # Checks for system services
 
