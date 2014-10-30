@@ -629,11 +629,13 @@ AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h]
 AC_CHECK_HEADERS([libxml/tree.h libxml/mem.h])
 AC_LANG_PUSH([C++])
 
-AS_IF([echo "$CXXFLAGS" | grep '\-std=gnu++11' > /dev/null 2> /dev/null], [AC_DEFINE([STD_XX_11], [1], ["c++ standard 11 requested"]) [std_xx_11_requested=yes]])
+AS_IF([echo "$CXXFLAGS" | grep '\-std' | grep 'gnu++11' > /dev/null 2> /dev/null], [AC_DEFINE([STD_XX_11], [1], ["c++ standard 11 requested"]) [std_xx_11_requested=yes]])
+AS_IF([echo "$CXXFLAGS" | grep '\-std' | grep 'c++11' > /dev/null 2> /dev/null], [AC_DEFINE([STD_XX_11], [1], ["c++ standard 11 requested"]) [std_xx_11_requested=yes]])
+AS_IF([echo "$CXXFLAGS" | grep '\-std' | grep 'c++0x' > /dev/null 2> /dev/null], [AC_DEFINE([STD_XX_11], [1], ["c++ standard 11 requested"]) [std_xx_11_requested=yes]])
 
 AC_CHECK_HEADERS([tr1/unordered_map], [], [],
 [#ifdef HAVE_TR1_UNORDERED_MAP
-#include <tr2/unordered_map>
+#include <tr1/unordered_map>
 #endif
 ])
 AC_CHECK_HEADERS([tr1/unordered_set], [], [],
