@@ -373,7 +373,7 @@ int main( int argc, char **argv )
     delete instream;
 
     if (outfile != stdout)
-      { assert(out != std::cout); delete out; }
+      { assert(out != &std::cout); delete out; }
 
     free(inputfilename);
     free(outfilename);
