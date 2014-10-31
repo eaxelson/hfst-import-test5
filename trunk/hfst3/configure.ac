@@ -629,9 +629,8 @@ AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h]
 AC_CHECK_HEADERS([libxml/tree.h libxml/mem.h])
 AC_LANG_PUSH([C++])
 
-AS_IF([echo "$CXXFLAGS" | grep '\-std' | grep 'gnu++11' > /dev/null 2> /dev/null], [AC_DEFINE([STD_XX_11], [1], ["c++ standard 11 requested"]) [std_xx_11_requested=yes]])
-AS_IF([echo "$CXXFLAGS" | grep '\-std' | grep 'c++11' > /dev/null 2> /dev/null], [AC_DEFINE([STD_XX_11], [1], ["c++ standard 11 requested"]) [std_xx_11_requested=yes]])
-AS_IF([echo "$CXXFLAGS" | grep '\-std' | grep 'c++0x' > /dev/null 2> /dev/null], [AC_DEFINE([STD_XX_11], [1], ["c++ standard 11 requested"]) [std_xx_11_requested=yes]])
+# Whether std::unordered_map and std::unordered_set should be used
+AS_IF([echo "$CXXFLAGS" | grep '\-std' | grep -E '((gnu\+\+)|(c\+\+))((11)|(0x)|(14)|(1y)|(17)|(1z))' > /dev/null 2> /dev/null], [std_xx_11_requested=yes])
 
 AC_CHECK_HEADERS([tr1/unordered_map], [], [],
 [#ifdef HAVE_TR1_UNORDERED_MAP
@@ -655,19 +654,19 @@ AC_CHECK_HEADERS([unordered_set], [], [],
 #endif
 ])
 
-AS_IF([test "x$ac_cv_header_tr1_unordered_map" = "xno" -a "x$ac_cv_header_unordered_map" = "xno"],
-            [AC_MSG_ERROR(["unordered_map not found"])])
-AS_IF([test "x$ac_cv_header_tr1_unordered_set" = "xno" -a "x$ac_cv_header_unordered_set" = "xno"],
-            [AC_MSG_ERROR(["unordered_set not found"])])
-
 AS_IF([test "$std_xx_11_requested" = "yes" -a "x$ac_cv_header_unordered_map" = "xno"],
             [AC_MSG_ERROR(["<unordered_map> not found, it is needed in c++ standard 11"])])
 AS_IF([test "$std_xx_11_requested" = "yes" -a "x$ac_cv_header_unordered_set" = "xno"],
             [AC_MSG_ERROR(["<unordered_set> not found, it is needed in c++ standard 11"])])
 
-# if c++11 is requested, do not use tr1 unordered maps and sets
-AS_IF([test "$std_xx_11_requested" = "yes"], AC_DEFINE([HAVE_TR1_UNORDERED_MAP], [0]))
-AS_IF([test "$std_xx_11_requested" = "yes"], AC_DEFINE([HAVE_TR1_UNORDERED_SET], [0]))
+AS_IF([test "x$ac_cv_header_tr1_unordered_map" = "xno" -a "x$ac_cv_header_unordered_map" = "xno"],
+            [AC_MSG_ERROR(["unordered_map not found"])])
+AS_IF([test "x$ac_cv_header_tr1_unordered_set" = "xno" -a "x$ac_cv_header_unordered_set" = "xno"],
+            [AC_MSG_ERROR(["unordered_set not found"])])
+
+# Define if tr1/unordered_maps and _sets should be used
+AS_IF([test "$std_xx_11_requested" != "yes" -a "x$ac_cv_header_tr1_unordered_map" != "xno"], AC_DEFINE([USE_TR1_UNORDERED_MAP], [1], [Use tr1/unordered_map]))
+AS_IF([test "$std_xx_11_requested" != "yes" -a "x$ac_cv_header_tr1_unordered_set" != "xno"], AC_DEFINE([USE_TR1_UNORDERED_SET], [1], [Use tr1/unordered_set]))
 
 
 AC_CHECK_HEADERS([ext/slist])

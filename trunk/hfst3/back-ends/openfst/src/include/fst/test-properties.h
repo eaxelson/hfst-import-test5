@@ -21,7 +21,7 @@
 #ifndef FST_LIB_TEST_PROPERTIES_H__
 #define FST_LIB_TEST_PROPERTIES_H__
 
-#ifdef HAVE_TR1_UNORDERED_SET
+#ifdef USE_TR1_UNORDERED_SET
 #include <tr1/unordered_set>
 using std::tr1::unordered_set;
 using std::tr1::unordered_multiset;
