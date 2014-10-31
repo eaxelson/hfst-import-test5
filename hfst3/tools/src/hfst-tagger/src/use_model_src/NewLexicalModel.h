@@ -5,31 +5,18 @@
 #  include <config.h>
 #endif
 
-
-#ifdef HAVE_TR1_UNORDERED_MAP
-#include <tr1/unordered_map>
-#else
-#include <unordered_map>
-#endif
-
-
-
-
-
-
-
 #include "HfstTransducer.h"
 
-#ifdef HAVE_TR1_UNORDERED_MAP
-#include <tr1/unordered_map> 
+#ifdef USE_TR1_UNORDERED_MAP
+ #include <tr1/unordered_map> 
 #else
-#include <unordered_map>
+ #include <unordered_map>
 #endif
 
-#ifdef HAVE_TR1_UNORDERED_SET
-#include <tr1/unordered_set>
+#ifdef USE_TR1_UNORDERED_SET
+ #include <tr1/unordered_set>
 #else
-#include <unordered_set>
+ #include <unordered_set>
 #endif
 
 #include <iostream>
@@ -54,7 +41,7 @@ class NewLexicalModel
   bool is_oov(const std::string &word);
   bool is_lexicon_oov(const std::string &word);
  private:
-#ifdef HAVE_TR1_UNORDERED_MAP
+#ifdef USE_TR1_UNORDERED_MAP
   typedef std::tr1::unordered_map<std::string,WeightedStringVector> 
     AnalysisCache;
 #else
@@ -84,12 +71,12 @@ class NewLexicalModel
   size_t id;
   bool lexical_model_is_broken;
   std::istream * paradigm_guess_stream;
-#ifdef HAVE_TR1_UNORDERED_SET
+#ifdef USE_TR1_UNORDERED_SET
   std::tr1::unordered_set<std::string> o_o_v_words;
   std::tr1::unordered_set<std::string> lexicon_o_o_v_words;
 #else
-  std::tr1::unordered_set<std::string> o_o_v_words;
-  std::tr1::unordered_set<std::string> lexicon_o_o_v_words;
+  std::unordered_set<std::string> o_o_v_words;
+  std::unordered_set<std::string> lexicon_o_o_v_words;
 #endif
 
   void initialize_tag_probabilities(void);

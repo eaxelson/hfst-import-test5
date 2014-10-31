@@ -34,7 +34,7 @@
 #include<list>
 #include<stack>
 
-#ifdef HAVE_TR1_UNORDERED_MAP
+#ifdef USE_TR1_UNORDERED_MAP
 #include<tr1/unordered_map>
 using std::tr1::unordered_map;
 using std::tr1::unordered_multimap;
@@ -141,7 +141,7 @@ class SparseTupleWeight {
   // Assumes H() function exists for the hash of the key value
   size_t Hash() const {
     uint64 h = 0;
-#ifdef HAVE_TR1_UNORDERED_MAP
+#ifdef USE_TR1_UNORDERED_MAP
     std::tr1::hash<K> H;
 #else
     std::hash<K> H;
