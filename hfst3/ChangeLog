@@ -1,3 +1,538 @@
+2014-10-31 16:44  eaxelson
+
+	* tools/src/hfst-guess.cc: Fixed std::cout into &std::cout in
+	  stream pointer comparison.
+
+2014-10-31 14:36  eaxelson
+
+	* back-ends/openfst/src/include/fst/accumulator.h,
+	  back-ends/openfst/src/include/fst/arc-map.h,
+	  back-ends/openfst/src/include/fst/determinize.h,
+	  back-ends/openfst/src/include/fst/encode.h,
+	  back-ends/openfst/src/include/fst/epsnormalize.h,
+	  back-ends/openfst/src/include/fst/equivalent.h,
+	  back-ends/openfst/src/include/fst/factor-weight.h,
+	  back-ends/openfst/src/include/fst/label-reachable.h,
+	  back-ends/openfst/src/include/fst/relabel.h,
+	  back-ends/openfst/src/include/fst/replace-util.h,
+	  back-ends/openfst/src/include/fst/replace.h,
+	  back-ends/openfst/src/include/fst/rmepsilon.h,
+	  back-ends/openfst/src/include/fst/rmfinalepsilon.h,
+	  back-ends/openfst/src/include/fst/sparse-tuple-weight.h,
+	  back-ends/openfst/src/include/fst/state-map.h,
+	  back-ends/openfst/src/include/fst/symbol-table-ops.h,
+	  back-ends/openfst/src/include/fst/synchronize.h,
+	  back-ends/openfst/src/include/fst/test-properties.h,
+	  back-ends/openfst/src/include/fst/util.h, configure.ac,
+	  tools/src/hfst-tagger/src/use_model_src/DataTypes.h,
+	  tools/src/hfst-tagger/src/use_model_src/NewLexicalModel.h: Now
+	  using definitions USE_TR1_UNORDERED_(MAP|SET) when defining what
+	  unordered maps and sets to use.
+
+2014-10-30 15:29  eaxelson
+
+	* configure.ac: Fixed a typo tr2 -> tr1.
+
+2014-10-29 13:50  eaxelson
+
+	* configure.ac, tools/src/HfstAlphabet.h,
+	  tools/src/hfst-tagger/src/use_model_src/NewLexicalModel.h:
+	  Unordered maps and sets are used from std namespace if
+	  -std=gnu++11 is requested.
+
+2014-10-28 11:40  eaxelson
+
+	* swig/setup.py: Forgot to update version number in swig bindings.
+
+2014-10-27 16:40  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy: Various improvements and
+	  additions to function syntax,
+	  particularly empty args and string-args
+
+2014-10-27 14:48  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc: Added functions for merge
+	  operation in HfstTransitionGraph.
+
+2014-10-24 11:03  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/implementations/HfstTropicalTransducerTransitionData.h:
+	  Modified weight handling in HfstTransitionGraph::intersect.
+
+2014-10-24 08:38  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc: When
+	  the alphabet is constructed from a symbol table, set identity to
+	  NO_SYM
+	  this was supposed to always happen anyway but didn't matter until
+	  recently
+
+2014-10-22 13:16  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/implementations/HfstTropicalTransducerTransitionData.h:
+	  Modified intersection algorithms in HfstTransitionGraph.
+
+2014-10-22 10:21  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h: Added
+	  functions to be used in xerox's merge operation.
+
+2014-10-22 10:20  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/xfst-parser.yy: Small fixes to list definitions
+	  in hfst-xfst.
+
+2014-10-17 15:59  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h: Added an implementation for
+	  compile-replace in hfst-xfst, it still needs lot of testing.
+
+2014-10-16 14:36  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc: Yet some more functions added
+	  to compile-replace.
+
+2014-10-16 11:48  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc: Added more functions for
+	  compile-replace.
+
+2014-10-15 14:23  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h: Tentatively
+	  added functions in HfstTransitionGraph to be used in
+	  compile-replace.
+
+2014-10-15 13:26  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc: Added function
+	  is_well_formed_for_compile_replace to be used in compile-replace
+	  command.
+
+2014-10-15 11:30  eaxelson
+
+	* test/libhfst/test_transducer_functions.cc: Forgot to comment out
+	  debugging prints in tests.
+
+2014-10-15 11:28  eaxelson
+
+	* back-ends/openfst/src/include/fst/interval-set.h,
+	  test/libhfst/test_transducer_functions.cc: Added brackets around
+	  member calls 'Interval.end' and 'Interval.begin' to avoid them
+	  getting confused with std::end() and std::begin() templates in
+	  C++11.
+
+2014-10-15 10:21  eaxelson
+
+	* back-ends/openfst/src/include/fst/interval-set.h: Rolled back
+	  earlier revision in interval-set.h
+
+2014-10-15 09:56  eaxelson
+
+	* back-ends/openfst/src/include/fst/interval-set.h,
+	  libhfst/src/implementations/ConvertTransducerFormat.h,
+	  libhfst/src/implementations/FomaTransducer.h: Made small
+	  modifications for better c++11/c++0x support.
+
+2014-10-15 09:32  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc: Fix
+	  bug where identity wasn't being set to NO_SYMBOL when absent from
+	  alphabet
+
+2014-10-15 08:46  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/find_epsilon_loops.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Refuse
+	  to enter flag loops more than once
+	  fixes bug #250 bug - arguably this could be applied to epsilon
+	  loops too,
+	  pending discussion
+
+2014-10-15 08:09  eaxelson
+
+	* man/Makefile.am: Fixed a typo in Makefile.
+
+2014-10-14 15:01  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc: Now hfst-xfst gives a warning
+	  (or exits) if a binary command tries to access a stack with less
+	  than 2 transducers.
+
+2014-10-14 14:51  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h: Now hfst-xfst exits if a
+	  command tries to access an empty stack if quit-on-fail is ON and
+	  hfst-xfst is not in interactive mode.
+
+2014-10-14 13:44  mpsilfve
+
+	* scripts/hfst-fst2tesseract.xfst: Comment explaining usage of
+	  hfst-fst2tesseract.xfst.
+
+2014-10-14 13:40  mpsilfve
+
+	* scripts/hfst-fst2tesseract.xfst: Added script for converting
+	  morphological analyzers to Tesseract word models.
+
+2014-10-14 12:27  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/find_epsilon_loops.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h:
+	  Improvements to loop finding
+
+2014-10-14 12:08  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/find_epsilon_loops.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h:
+	  Further corrections to loop detection
+	  slowdown back to ~10x but may be improved from here
+
+2014-10-14 11:51  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/find_epsilon_loops.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Fix
+	  some cases of overdetecting infinite ambiguity, there's still
+	  some left
+
+2014-10-14 10:51  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/find_epsilon_loops.cc:
+	  Forgot to keep adding the repeated states in the loop detection
+	  phase
+
+2014-10-13 18:15  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/find_epsilon_loops.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Only
+	  try to catch infinite ambiguity at epsilon arcs
+	  This is the big speed win and presumably correct.
+
+2014-10-13 17:22  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/find_epsilon_loops.cc:
+	  This order of comparison is a bit faster since sizes never differ
+
+2014-10-13 16:34  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/find_epsilon_loops.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Speed
+	  up is_lookup_infinitely_ambiguous() somewhat
+
+2014-10-11 04:10  mie
+
+	* tools/src/hfst-optimized-lookup.cc: Try to avoid using negative
+	  indexes for arrays
+
+2014-10-11 03:59  mie
+
+	* test/tools/Makefile.am,
+	  test/tools/optimized-lookup-functionality.sh: Optimised lookup
+	  tests
+
+2014-10-09 17:22  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h:
+	  Runtime handling of identity and unknown
+
+2014-10-09 12:30  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.h: Forgot to remove one thing in
+	  the last commit
+
+2014-10-09 12:22  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc: Take out our own
+	  harmonization hacks now that they're unneeded
+
+2014-10-08 12:45  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: Don't use delimiters when
+	  they're not necessary,
+	  also don't insert everything to RTNs anymore and provide the
+	  is_special()
+	  function the previous commit required
+
+2014-10-08 12:29  hardwick
+
+	* libhfst/src/HarmonizeUnknownAndIdentitySymbols.cc: Treat special
+	  pmatch symbols like flag diacritics for harmonization,
+	  also after harmonization add all symbols, including flags, to the
+	  alphabets
+
+2014-10-08 11:51  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Fix bug where delimiters
+	  were shadowing the named transducers' names
+	  also remove extraenous parsing path
+
+2014-10-06 21:33  janiemi
+
+	* test/tools/pmatch-tester.sh, test/tools/pmatch-tests.sh: Updated
+	  pmatch functionality tests.
+	  
+	  Current pmatch syntax: string literals in {...}, symbols in
+	  double quotes.
+	  Added tests: Ins maximizing globally; Difference and character
+	  sets in
+	  named expressions; Named expressions in OptCap, ToUpper; Named
+	  expressions
+	  in replace; Long input lines; Ins should not throw
+	  std::out_of_range;
+	  Disjunction of two Ins expressions.
+	  Added options: --include-tests, --exclude-tests,
+	  --no-number-tests,
+	  --truncate-lines, --truncate-log-lines. Minor new features in
+	  test runner.
+
+2014-10-06 17:27  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll: Add string literal syntax for
+	  standalone %-escaped chars
+	  (they used to be considered symbols which now have to be
+	  defined or cause an error)
+
+2014-10-06 16:44  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: Use minimization guards to
+	  keep multiple negative contexts separate in disjunctions
+
+2014-10-06 15:36  eaxelson
+
+	* libhfst/src/HfstInputStream.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/parsers/XreCompiler.h, swig/doc/libhfst.py,
+	  swig/hfstBot.py, swig/test/test_examples.py: Fixed some more
+	  spelling errors noticed by lintian.
+
+2014-10-06 14:45  eaxelson
+
+	* tools/src/hfst-lexc-wrapper.cc,
+	  tools/src/hfst-twolc/src/commandline_src/CommandLine.cc: Fixed
+	  spelling errors found by lintian.
+
+2014-10-06 14:33  eaxelson
+
+	* man/hfst-train-tagger.1: Added again hfst-train-tagger man page
+	  which is no more a symlink.
+
+2014-10-06 14:31  eaxelson
+
+	* man/Makefile.am, man/hfst-build-tagger.1,
+	  man/hfst-foma-wrapper.1, man/hfst-open-input-file-for-tagger.1,
+	  man/hfst-reweight-tagger.1, man/hfst-train-tagger.1,
+	  man/hfst-twolc-loc.1, man/hfst-twolc-system.1, man/hfst-twolc.1,
+	  man/hfst_tagger_compute_data_statistics.py.1, man/htwolcpre1.1,
+	  man/htwolcpre2.1, man/htwolcpre3.1: Added missing man pages.
+
+2014-10-06 14:00  eaxelson
+
+	* tools/src/hfst-tagger/src/hfst-reweight-tagger.cc: Now
+	  hfst-reweight-tagger --help returns EXIT_SUCCESS before trying to
+	  access uninitialized values.
+
+2014-10-06 13:24  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: Warn about shadowing
+	  definitions
+
+2014-10-06 13:05  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy: Alternate syntaxes regex for
+	  Define TOP and .#. for #
+
+2014-10-06 12:47  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Revamp LABEL parsing and
+	  introduce curly literal pairs
+
+2014-10-06 11:08  eaxelson
+
+	* man/Makefile.am, man/hfst-affix-guessify.1,
+	  man/hfst-apertium-proc.1, man/hfst-calculate.1,
+	  man/hfst-compare.1, man/hfst-compose-intersect.1,
+	  man/hfst-compose.1, man/hfst-concatenate.1, man/hfst-conjunct.1,
+	  man/hfst-determinise.1, man/hfst-determinize.1,
+	  man/hfst-disjunct.1, man/hfst-edit-metadata.1,
+	  man/hfst-expand-equivalences.1, man/hfst-expand.1,
+	  man/hfst-format.1, man/hfst-fst2fst.1, man/hfst-fst2strings.1,
+	  man/hfst-fst2txt.1, man/hfst-grep.1, man/hfst-guess.1,
+	  man/hfst-guessify.1, man/hfst-head.1, man/hfst-info.1,
+	  man/hfst-intersect.1, man/hfst-invert.1, man/hfst-lexc-wrapper.1,
+	  man/hfst-lexc.1, man/hfst-lookup.1, man/hfst-minimise.1,
+	  man/hfst-minimize.1, man/hfst-minus.1, man/hfst-multiply.1,
+	  man/hfst-name.1, man/hfst-open-input-file-for-tagger.1,
+	  man/hfst-optimised-lookup.1, man/hfst-optimized-lookup.1,
+	  man/hfst-pair-test.1, man/hfst-pmatch.1, man/hfst-pmatch2fst.1,
+	  man/hfst-proc2.1, man/hfst-project.1, man/hfst-prune-alphabet.1,
+	  man/hfst-push-weights.1, man/hfst-regexp2fst.1,
+	  man/hfst-remove-epsilons.1, man/hfst-repeat.1,
+	  man/hfst-reverse.1, man/hfst-reweight.1, man/hfst-sfstpl2fst.1,
+	  man/hfst-shuffle.1, man/hfst-split.1, man/hfst-strings2fst.1,
+	  man/hfst-substitute.1, man/hfst-subtract.1, man/hfst-summarise.1,
+	  man/hfst-summarize.1, man/hfst-tag.1, man/hfst-tail.1,
+	  man/hfst-train-tagger-loc.1, man/hfst-train-tagger-system.1,
+	  man/hfst-train-tagger.1, man/hfst-traverse.1, man/hfst-txt2fst.1,
+	  man/hfst-union.1, man/hfst-xfst.1: Updated and added man pages.
+
+2014-10-06 11:06  eaxelson
+
+	* tools/src/hfst-expand-equivalences.cc: Moved option checking
+	  after possible returning from program so that option --help will
+	  not generate error messages.
+
+2014-10-05 11:06  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.cc: Require backslash character
+	  to be escaped as \\ in curly literals
+
+2014-10-05 10:53  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.cc: Fix bug in unescaping
+	  function
+
+2014-10-03 12:28  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am: Ready for release 3.8.0.
+
+2014-10-03 11:55  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc: Added variable
+	  'lexc-rename-flags' to hfst-xfst.
+
+2014-10-03 11:48  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Desperately fiddle with the
+	  way the minus operation expands things
+
+2014-10-01 16:29  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy: Add lambda-like anonymous
+	  definitions for controlling subexpression boundaries
+
+2014-10-01 12:46  eaxelson
+
+	* tools/src/hfst-lexc-compiler.cc, tools/src/hfst-regexp2fst.cc,
+	  tools/src/parsers/XfstCompiler.cc: Changed the flag handling
+	  behavior of hfst-xfst and hfst-lexc. Now both tools by default
+	  use Xerox's way when composing, i.e. flag diacritics match
+	  unknown and identity symbols. This can be controlled with
+	  variable 'xerox-composition' (the default is ON) in hfst-xfst and
+	  with option '--xerox-composition={ON,OFF}' (the default is also
+	  ON) in hfst-lexc. hfst-regexp2fst also has the option
+	  '--xerox-composition' which by default is OFF, as it was earlier.
+
+2014-10-01 11:28  eaxelson
+
+	* tools/src/hfst-regexp2fst.cc: Fixed a typo in hfst-regexp2fst
+	  option handling.
+
+2014-09-30 15:38  eaxelson
+
+	* libhfst/src/HfstTransducer.cc: Now one-sided flag diacritics are
+	  allowed in composition when flag-is-epsilon is used.
+
+2014-09-30 13:54  eaxelson
+
+	* tools/src/hfst-strings2fst.cc: Added option --log10 for 10-based
+	  logarithmic weights in hfst-strings2fst.
+
+2014-09-30 13:18  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/parsers/xre_parse.yy,
+	  tools/src/parsers/XfstCompiler.cc: Now an error is thrown if
+	  flags are not twosided in composition when xerox composition is
+	  used.
+
+2014-09-30 13:05  eaxelson
+
+	* libhfst/src/HfstExceptionDefs.cc,
+	  libhfst/src/HfstExceptionDefs.h: Added exception class
+	  FlagDiacriticsAreNotIdentitesException.
+
+2014-09-29 11:22  hardwick
+
+	* test/tools/Makefile.am, test/tools/pmatch-functionality.sh,
+	  test/tools/pmatch-tester.sh, test/tools/pmatch-tests.sh: Add
+	  pmatch functionality test suite
+
+2014-09-29 10:49  eaxelson
+
+	* tools/src/hfst-regexp2fst.cc: Added option -X flag-is-epsilon to
+	  hfst-regexp2fst.
+
+2014-09-25 10:38  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Fix another symbol-leaking
+	  issue
+
+2014-09-25 10:17  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Allow nested logical
+	  operations on contexts
+
+2014-09-23 07:15  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: We need to avoid symbol
+	  pollution for more than just special symbols
+	  (this doesn't completely resolve pollution issues, just some
+	  urgent ones)
+
+2014-09-23 06:47  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc: Don't
+	  forget to pop the rtn stack when there's nothing matched
+
+2014-09-23 06:36  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Minimize after adding
+	  delimiters, not before
+
+2014-09-23 05:14  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Revert bracket-bounding
+	  behaviour
+
+2014-09-22 15:47  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Use brackets for extra
+	  delimiters to control tag and context boundaries more
+
+2014-09-22 15:28  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc: add_delimiters was happening
+	  in the wrong place since recent syntax changes
+
 2014-09-22 12:57  eaxelson
 
 	* libhfst/src/implementations/HfstOlTransducer.cc: Fixed a too

@@ -5,8 +5,10 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
-Noteworthy changes in 3.8.0
+Noteworthy changes in 3.8.1
 ---------------------------
+
+* (the release of version 3.8.0 was delayed, its changes are also listed here)
 
 * changes to flag diacritic handling
 
@@ -28,6 +30,8 @@ Noteworthy changes in 3.8.0
   something else or be renamed in the future
 
 * fixes to pmatch and optimized-lookup functionalities
+
+* improvements to speed issues in optimized-lookup
 
 * fixes to twolc functionalities
 
