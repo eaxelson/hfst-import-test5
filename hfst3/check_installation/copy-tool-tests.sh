@@ -38,6 +38,8 @@ do
 	sed -i 's/-loc / /g' $file
     fi
 done
+# this file uses 'tooldir' instead of 'TOOLDIR'
+sed -i 's/$\tooldir\//$1/g' pmatch-tester.sh
 
 # These tests are rewritten in directory check_installation
 rm empty-input.sh
