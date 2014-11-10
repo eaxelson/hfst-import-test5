@@ -2732,7 +2732,7 @@
                  {
                    HfstState new_state = add_state();
                    std::string marker = weight2marker(IT->get_weight());
-                   std::cerr << "got marker '" << marker << "'" << std::endl;
+                   //std::cerr << "got marker '" << marker << "'" << std::endl;
                    HfstTransition <C> marker_transition(IT->get_target_state(),
                                                         marker,
                                                         marker,
@@ -2949,7 +2949,7 @@
                    if ( (!marker2weight(data.get_input_symbol(), weight)) && 
                         marker2weight(data.get_output_symbol(), weight) )
                      {
-                       std::cerr << "got weight '" << weight << "'" << std::endl;
+                       //std::cerr << "got weight '" << weight << "'" << std::endl;
                        // schedule a substitution
                        new_transitions.push_back
                          (HfstTransition <C> (tr_it->get_target_state(), 
@@ -2963,7 +2963,7 @@
                    else if (marker2weight(data.get_input_symbol(), weight) &&
                             marker2weight(data.get_output_symbol(), weight) )
                      {
-                       std::cerr << "got weight '" << weight << "'" << std::endl;
+                       //std::cerr << "got weight '" << weight << "'" << std::endl;
                        // schedule the old transition to be deleted
                        old_transitions.push(tr_it);
                      }
@@ -3974,7 +3974,7 @@
                      states_visited.insert(s);
                      std::vector<std::pair<std::string, std::string> > path; 
                      find_regexp_paths(it->get_target_state(), states_visited, path, full_paths);
-                     fprintf(stderr, "%u regexp paths found for state %u\n", (unsigned int)full_paths.size(), s);
+                     fprintf(stderr, "%u regexp paths found for state %u\n", (unsigned int)full_paths.size(), s); // debug
                    }
                }
          }
@@ -3988,7 +3988,7 @@
            unsigned int state = 0;
            for (iterator it = begin(); it != end(); it++)
              {
-               fprintf(stderr, "state %u......\n", state);
+               fprintf(stderr, "state %u......\n", state); // debug
                HfstReplacements full_paths;
                find_regexp_paths(state, full_paths);
                if (full_paths.size() > 0)
@@ -4255,12 +4255,48 @@
 
            static bool is_list_symbol(const C & transition_data)
            {
-             return false;
+             std::string isymbol = transition_data.get_input_symbol();
+             std::string osymbol = transition_data.get_output_symbol();
+
+             if (isymbol != osymbol)
+               {
+                 return false;
+               }
+             return (isymbol.compare(0, 6, "@LIST_") == 0);
            }
 
-           static bool is_list_match(const C & graph_transition_data, const C & merger_transition_data)
+           // @pre \a transition_data is a list symbol
+           // @pre list symbols cannot contain '_' or '@'
+           static std::set<std::string> get_list_symbols(const std::string & list_symbol)
            {
-             return false;
+             std::set<std::string> result;
+             unsigned int i = 6;
+
+             // skip list name
+             while(list_symbol[i] != '_')
+               {
+                 i++;
+               }
+             i++;
+
+             // extract symbols
+             std::string symbol("");
+             while (list_symbol[i] != '@')
+               {
+                 if (list_symbol[i] == '_')
+                   {
+                     result.insert(symbol);
+                     symbol = std::string("");
+                   }
+                 else
+                   {
+                     symbol.append(1, list_symbol[i]);
+                   }
+                 i++;
+               }
+             result.insert(symbol);
+
+             return result;
            }
 
            // A recursive function used by function intersect.
@@ -4298,14 +4334,16 @@
                  // List symbols must be checked separately
                  if (is_list_symbol(graph_transition_data))
                    {
+                     std::set<std::string> list_symbols = get_list_symbols(graph_transition_data.get_input_symbol());
                      bool list_match_found=false;
                      // Find all matches
                      for(unsigned int j=0; j < merger_transitions.size(); j++)
                        {
                          HfstTransition <C> & merger_transition = merger_transitions[j];
                          const C & merger_transition_data = merger_transition.get_transition_data();
+                         const std::string & isymbol = merger_transition_data.get_input_symbol();
 
-                         if (is_list_match(graph_transition_data, merger_transition_data))
+                         if (list_symbols.find(isymbol) != list_symbols.end())
                            {
                              list_match_found=true;
                              HfstState target = handle_list_match(graph, graph_transition, merger, merger_transition, result, result_state, state_map);
@@ -4400,8 +4438,8 @@
       HfstFastTransducer;
 
  
-       }
+   }
    
-}
+ }
 
 #endif // #ifndef _HFST_TRANSITION_GRAPH_H_

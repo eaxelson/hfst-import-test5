@@ -121,7 +121,7 @@ int xrelex ( YYSTYPE * , yyscan_t );
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
 %nonassoc <label> SYMBOL CURLY_BRACKETS
 
-%left  CROSS_PRODUCT COMPOSITION LENIENT_COMPOSITION INTERSECTION
+%left  CROSS_PRODUCT COMPOSITION LENIENT_COMPOSITION INTERSECTION MERGE_RIGHT_ARROW MERGE_LEFT_ARROW
 %left  CENTER_MARKER MARKUP_MARKER
 %left  SHUFFLE
 %right LEFT_RESTRICTION LEFT_ARROW RIGHT_ARROW LEFT_RIGHT_ARROW
@@ -242,6 +242,14 @@ REGEXP2: REPLACE
             $$ = & $1->lenient_composition(*$3).minimize();
             delete $3;
         }
+       | REGEXP2 MERGE_RIGHT_ARROW REPLACE {
+            $$ = & $3->merge(*$1).minimize();
+            delete $1;
+       }
+       | REGEXP2 MERGE_LEFT_ARROW REPLACE {
+            $$ = & $1->merge(*$3).minimize();
+            delete $3;
+       }
         // substitute
        | SUB1 HALFARC PAIR_SEPARATOR HALFARC COMMA HALFARC PAIR_SEPARATOR HALFARC RIGHT_BRACKET {
             $1->substitute(StringPair($2,$4), StringPair($6,$8));
