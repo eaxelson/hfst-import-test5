@@ -362,7 +362,6 @@ parse_quoted(const char *s)
                 p = p + 2;
                 break;
               case 'u':
-              case 'U':
                   if (strlen(p) < 6) {
                       // Can't be a valid escape sequence
                       *r++ = *p;
@@ -377,6 +376,23 @@ parse_quoted(const char *s)
                       strcpy(r, utf8_char.c_str());
                       r += utf8_char.size() + 1;
                       p += 6;
+                  }
+                  break;
+              case 'U':
+                  if (strlen(p) < 10) {
+                      // Can't be a valid escape sequence
+                      *r++ = *p;
+                      *r++ = *(p+1);
+                      p += 2;
+                  } else {
+                      char buf[9];
+                      memcpy(buf, p+2, 8);
+                      buf[8] = '\0';
+                      unsigned int codepoint = strtol(buf, NULL, 16);
+                      std::string utf8_char = codepoint_to_utf8(codepoint);
+                      strcpy(r, utf8_char.c_str());
+                      r += utf8_char.size() + 1;
+                      p += 10;
                   }
                   break;
               case 'v':
@@ -499,13 +515,20 @@ HfstTransducer * parse_range(const char * s)
     while (**c != '\0') {
         unsigned int codepoint1 = 0;
         unsigned int codepoint2 = 0;
-        if (strlen(*c) >= 6 && **c == '\\' && *(*c + 1) == 'u') {
+        if (strlen(*c) >= 6 && **c == '\\' &&
+            (*(*c + 1) == 'u' || *(*c + 1) == 'U')) {
             // an escape sequence
-            char buf[5];
-            memcpy(buf, *c+2, 4);
-            buf[4] = '\0';
+            char buf[9];
+            if (*(*c + 1) == 'u') {
+                memcpy(buf, *c+2, 4);
+                buf[4] = '\0';
+                *c += 6;
+            } else {
+                memcpy(buf, *c+2, 8);
+                buf[8] = '\0';
+                *c += 10;
+            }
             codepoint1 = strtol(buf, NULL, 16);
-            *c += 6;
         } else {
             codepoint1 = next_utf8_to_codepoint((unsigned char**) c);
         }
@@ -517,12 +540,17 @@ HfstTransducer * parse_range(const char * s)
         *c += 1;
         if (strlen(*c) >= 6 && **c == '\\' &&
             (*(*c + 1) == 'u' || *(*c + 1) == 'U')) {
-            // an escape sequence
-            char buf[5];
-            memcpy(buf, *c+2, 4);
-            buf[4] = '\0';
+            char buf[9];
+            if (*(*c + 1) == 'u') {
+                memcpy(buf, *c+2, 4);
+                buf[4] = '\0';
+                *c += 6;
+            } else {
+                memcpy(buf, *c+2, 8);
+                buf[8] = '\0';
+                *c += 10;
+            }
             codepoint2 = strtol(buf, NULL, 16);
-            *c += 6;
         } else {
             codepoint2 = next_utf8_to_codepoint((unsigned char**) c);
         }
