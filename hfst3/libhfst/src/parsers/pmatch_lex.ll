@@ -53,6 +53,9 @@ UINTEGER [1-9][0-9]*
 INTEGER -?[1-9][0-9]*
 WSP [\t ]
 LWSP [\t\r\n ]
+
+HEXCHAR [0-9]|[a-f]
+UNICODE_ESCAPE "\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR}
 %%
 
 [Dd]"efine" {
@@ -285,7 +288,7 @@ return REGEX;
     return CURLY_LITERAL;
 }
 
-"\""({U8C}"-"{U8C})+"\"" {
+"\""(({UNICODE_ESCAPE}|{U8C})"-"({UNICODE_ESCAPE}|{U8C}))+"\"" {
     pmatchlval.transducer = hfst::pmatch::parse_range(pmatchtext);
     return CHARACTER_RANGE;
 }
