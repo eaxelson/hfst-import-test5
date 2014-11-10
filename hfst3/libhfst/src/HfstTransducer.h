@@ -1249,6 +1249,8 @@ ccc : ddd
     HfstTransducer &compose(const HfstTransducer &another, 
                             bool harmonize=true);
 
+    HfstTransducer &merge(const HfstTransducer &another);
+
     /** \brief Compose this transducer with the intersection of
         transducers in \a v. If \a invert is true, then compose the
         intersection of the transducers in \a v with this transducer.

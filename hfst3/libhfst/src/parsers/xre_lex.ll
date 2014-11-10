@@ -102,6 +102,8 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 
 ".o." { CR; return COMPOSITION; }
 ".O." { CR; return LENIENT_COMPOSITION; }
+".m>." { CR; return MERGE_RIGHT_ARROW; }
+".<m." { CR; return MERGE_LEFT_ARROW; }
 ".x." { CR; return CROSS_PRODUCT; }
 ".P." { CR; return UPPER_PRIORITY_UNION; }
 ".p." { CR; return LOWER_PRIORITY_UNION; }

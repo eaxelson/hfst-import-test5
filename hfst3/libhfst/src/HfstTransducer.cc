@@ -3556,6 +3556,16 @@ bool substitute_unknown_identity_pairs
 }
 
 
+HfstTransducer &HfstTransducer::merge
+(const HfstTransducer &another)
+{
+  HfstBasicTransducer this_basic(*this);
+  HfstBasicTransducer another_basic(another);
+  HfstBasicTransducer result = hfst::implementations::HfstBasicTransducer::merge(this_basic, another_basic);
+  *this = HfstTransducer(result, this->get_type());
+  return *this;
+}
+
 HfstTransducer &HfstTransducer::compose
 (const HfstTransducer &another,
  bool harmonize)
