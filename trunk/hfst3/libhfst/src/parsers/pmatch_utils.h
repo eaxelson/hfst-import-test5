@@ -100,6 +100,10 @@ char* unescape_delimited(char *s, char delim);
 
 char* parse_quoted(const char *s);
 
+unsigned int next_utf8_to_codepoint(unsigned char **c);
+std::string codepoint_to_utf8(unsigned int codepoint);
+HfstTransducer * parse_range(const char *s);
+
 int* get_n_to_k(const char* s);
 
 double get_weight(const char* s);

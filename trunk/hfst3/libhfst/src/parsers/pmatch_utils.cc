@@ -372,44 +372,9 @@ parse_quoted(const char *s)
                       memcpy(buf, p+2, 4);
                       buf[4] = '\0';
                       unsigned int codepoint = strtol(buf, NULL, 16);
-                      bool u_parse_err = false;
-                      // The following is adapted from an answer at
-                      // http://stackoverflow.com/questions/4607413/c-library-to-convert-unicode-code-points-to-utf8
-                      // My understanding of the magic numbers:
-                      // 0x80 = 128 = 2^7
-                      // 64 = 2^6, 192 = 2^6 + 2^7
-                      // 0x800 = 2048 = 2^11
-                      // 0x1000 = 2^16 etc.
-                      if (codepoint < 0x80) {
-                          buf[0] = codepoint;
-                          buf[1] = '\0';
-                      } else if (codepoint < 0x800) {
-                          buf[0] = 192 + codepoint / 64;
-                          buf[1] = 128 + codepoint % 64;
-                          buf[2] = '\0';
-                      } else if (codepoint - 0xd800u < 0x800) {
-                          u_parse_err = true;
-                      } else if (codepoint < 0x10000) {
-                          buf[0] = 224 + codepoint / 4096;
-                          buf[1] = 128 + codepoint / 64 % 64;
-                          buf[2] = 128 + codepoint % 64;
-                          buf[3] = '\0';
-                      } else if (codepoint < 0x110000) {
-                          buf[0] = 240 + codepoint / 262144;
-                          buf[1] = 128 + codepoint / 4096 % 64;
-                          buf[2] = 128 + codepoint / 64 % 64;
-                          buf[3] = 128 + codepoint % 64;
-                          buf[4] = '\0';
-                      } else {
-                          u_parse_err = true;
-                      }
-                      if (u_parse_err) {
-                          fprintf(stderr, "PMATCH: Failed to parse unicode codepoint\n");
-                          *r++ = '\0';
-                      } else {
-                          strcpy(r, buf);
-                          r += strlen(buf) + 1;
-                      }
+                      std::string utf8_char = codepoint_to_utf8(codepoint);
+                      strcpy(r, utf8_char.c_str());
+                      r += utf8_char.size() + 1;
                       p += 6;
                   }
                   break;
@@ -454,6 +419,108 @@ parse_quoted(const char *s)
     *r = '\0';
     free(quoted);
     return rv;
+}
+
+unsigned int next_utf8_to_codepoint(unsigned char **c)
+{
+    unsigned int codepoint = 0;
+    char bytes_in_char = 0;
+    if (**c <= 127) {
+        bytes_in_char = 1;
+        codepoint = **c & 127;
+    } else if ( (**c & (128 + 64 + 32 + 16)) == (128 + 64 + 32 + 16) ) {
+        bytes_in_char = 4;
+        codepoint = **c & 128 + 64 + 32 + 16;
+    } else if ( (**c & (128 + 64 + 32 )) == (128 + 64 + 32) ) {
+        bytes_in_char = 3;
+        codepoint = **c & 128 + 64 + 32;
+    } else if ( (**c & (128 + 64 )) == (128 + 64)) {
+        bytes_in_char = 2;
+        codepoint = **c & 128 + 64;
+    } else {
+        return 0;
+    }
+    for (int i = 1; i < bytes_in_char; ++i) {
+        codepoint = ((codepoint << 6) | (unsigned long)(**(c + i) & 63));
+    }
+    *c += bytes_in_char;
+    return codepoint;
+}
+
+std::string codepoint_to_utf8(unsigned int codepoint)
+{
+    char buf[5];
+    bool u_parse_err = false;
+    // The following is adapted from an answer at
+    // http://stackoverflow.com/questions/4607413/c-library-to-convert-unicode-code-points-to-utf8
+    // My understanding of the magic numbers:
+    // 0x80 = 128 = 2^7
+    // 64 = 2^6, 192 = 2^6 + 2^7
+    // 0x800 = 2048 = 2^11
+    // 0x1000 = 2^16 etc.
+    if (codepoint < 0x80) {
+        buf[0] = codepoint;
+        buf[1] = '\0';
+    } else if (codepoint < 0x800) {
+        buf[0] = 192 + codepoint / 64;
+        buf[1] = 128 + codepoint % 64;
+        buf[2] = '\0';
+    } else if (codepoint - 0xd800u < 0x800) {
+        u_parse_err = true;
+    } else if (codepoint < 0x10000) {
+        buf[0] = 224 + codepoint / 4096;
+        buf[1] = 128 + codepoint / 64 % 64;
+        buf[2] = 128 + codepoint % 64;
+        buf[3] = '\0';
+    } else if (codepoint < 0x110000) {
+        buf[0] = 240 + codepoint / 262144;
+        buf[1] = 128 + codepoint / 4096 % 64;
+        buf[2] = 128 + codepoint / 64 % 64;
+        buf[3] = 128 + codepoint % 64;
+        buf[4] = '\0'; 
+    } else {
+        u_parse_err = true;
+    }
+    if (u_parse_err) {
+        return "";
+    } else {
+        return std::string(buf);;
+    }
+}
+
+HfstTransducer * parse_range(const char * s)
+{
+    char * quoted = get_delimited(s, '"');
+    char * orig_quoted = quoted;
+    char ** c = & quoted;
+    unsigned char bytes_in_char;
+    HfstTransducer * retval = new HfstTransducer(format);
+    while (**c != '\0') {
+        unsigned int codepoint1 = next_utf8_to_codepoint((unsigned char**) c);
+        if (**c != '-') {
+            std::string errstring("Could not parse range expression: ");
+            errstring.append(std::string(s));
+            pmatcherror(errstring.c_str());
+        }
+        *c += 1;
+        unsigned int codepoint2 = next_utf8_to_codepoint((unsigned char **) c);
+        if (codepoint1 == 0 || codepoint2 == 0) {
+            std::string errstring("Malformed character in range expression: ");
+            errstring.append(std::string(s));
+            pmatcherror(errstring.c_str());
+        }
+        if (codepoint2 < codepoint1) {
+            std::string errstring("Range expression goes from higher to lower: ");
+            errstring.append(std::string(s));
+            pmatcherror(errstring.c_str());
+        }
+        while (codepoint1 <= codepoint2) {
+            retval->disjunct(HfstTransducer(codepoint_to_utf8(codepoint1), format));
+            ++codepoint1;
+        }
+    }
+    free(orig_quoted);
+    return retval;
 }
 
 double

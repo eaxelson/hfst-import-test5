@@ -285,6 +285,11 @@ return REGEX;
     return CURLY_LITERAL;
 }
 
+"\""({U8C}"-"{U8C})+"\"" {
+    pmatchlval.transducer = hfst::pmatch::parse_range(pmatchtext);
+    return CHARACTER_RANGE;
+}
+
 "\""([^"\""]|"\\\"")+"\"" {
     pmatchlval.label = hfst::pmatch::parse_quoted(pmatchtext); 
     return QUOTED_LITERAL;
