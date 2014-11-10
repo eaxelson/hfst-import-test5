@@ -55,7 +55,7 @@ WSP [\t ]
 LWSP [\t\r\n ]
 
 HEXCHAR [0-9]|[a-f]
-UNICODE_ESCAPE "\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR}
+UNICODE_ESCAPE "\\"("u"|"U"){HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR}
 %%
 
 [Dd]"efine" {

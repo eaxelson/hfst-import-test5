@@ -362,10 +362,11 @@ parse_quoted(const char *s)
                 p = p + 2;
                 break;
               case 'u':
+              case 'U':
                   if (strlen(p) < 6) {
                       // Can't be a valid escape sequence
-                      *r++ = '\\';
-                      *r++ = 'u';
+                      *r++ = *p;
+                      *r++ = *(p+1);
                       p += 2;
                   } else {
                       char buf[5];
@@ -514,7 +515,8 @@ HfstTransducer * parse_range(const char * s)
             pmatcherror(errstring.c_str());
         }
         *c += 1;
-        if (strlen(*c) >= 6 && **c == '\\' && *(*c + 1) == 'u') {
+        if (strlen(*c) >= 6 && **c == '\\' &&
+            (*(*c + 1) == 'u' || *(*c + 1) == 'U')) {
             // an escape sequence
             char buf[5];
             memcpy(buf, *c+2, 4);
