@@ -918,6 +918,22 @@ HfstTransducer * PmatchAstNode::evaluate(
     } else if (type == AstSymbol) {
         if (funargs.count(symbol) == 1) {
             return new HfstTransducer(*funargs[symbol]);
+        } else if (definitions.count(symbol) == 1) {
+            if (!flatten && def_insed_transducers.count(symbol) == 1) {
+                inserted_transducers.insert(symbol);
+                if (verbose) {
+                    used_definitions.insert(symbol);
+                }
+                return new HfstTransducer(*def_insed_transducers[symbol]);
+            } else {
+                if (verbose) {
+                    std::cerr << "including " <<
+                        definitions[symbol]->get_name() << " with ";
+                    print_size_info(hfst::pmatch::definitions[symbol]);
+                    used_definitions.insert(symbol);
+                }
+                return new HfstTransducer(*hfst::pmatch::definitions[symbol]);
+            }
         } else {
             std::string errstring = "Symbol " + std::string(symbol) + " not found";
             pmatcherror(errstring.c_str());
