@@ -326,7 +326,7 @@ struct PmatchAstNode {
         transducer(NULL) { }
     
     PmatchAstNode(PmatchAstNode * l,
-              HfstTransducer * r,
+                  HfstTransducer * r,
               PmatchAstOperation o):
     left_child(l),
     right_child(new PmatchAstNode(r)),

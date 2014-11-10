@@ -49,6 +49,7 @@
          std::pair<std::string, hfst::HfstTransducer*>* transducerDefinition;
          std::map<std::string, hfst::HfstTransducer>* transducerDefinitions;
          hfst::pmatch::PmatchAstNode* ast_node;
+         std::vector<hfst::pmatch::PmatchAstNode *>* ast_node_vector;
          std::vector<std::string>* string_vector;
     
          std::pair<hfst::xeroxRules::ReplaceArrow, std::vector<hfst::xeroxRules::Rule> >* replaceRuleVectorWithArrow;
@@ -75,7 +76,8 @@
 REGEXP8 REGEXP9 REGEXP10 REGEXP11 REGEXP12 LABEL_PAIR
 REPLACE REGEXP3 FUNCALL MAP FUNCALL_ARG
 %type <label> LABEL
-%type <ast_node> FUNCBODY1 FUNCBODY2 FUNCBODY3 FUNCBODY4 FUNCBODY5 FUNCBODY6 FUNC_LABEL_PAIR
+%type <ast_node> FUNCBODY1 FUNCBODY2 FUNCBODY3 FUNCBODY4 FUNCBODY5 FUNCBODY6 FUNC_LABEL_PAIR FUN_OR_CONTEXT FUN_AND_CONTEXT FUN_CONTEXT_CONDITION FUN_CONTEXT
+%type <ast_node_vector> FUN_CONTEXT_CONDITIONS
 %type <string_vector> ARGLIST
 %type <transducerVector> FUNCALL_ARGLIST
 
@@ -297,18 +299,6 @@ FUNCBODY1: FUNCBODY2 { }
 | FUNCBODY1 LENIENT_COMPOSITION FUNCBODY2 {
     $$ = new PmatchAstNode($1, $3, hfst::pmatch::AstLenientCompose);
  }
-| FUNCBODY1 FUN_RIGHT_CONTEXT {
-     $$ = new PmatchAstNode($1, $2, hfst::pmatch::AstConcatenate);
- }
-| FUNCBODY1 FUN_LEFT_CONTEXT {
-    $$ = new PmatchAstNode($2, $1, hfst::pmatch::AstConcatenate);
- }
-| FUNCBODY1 FUN_NEGATIVE_RIGHT_CONTEXT {
-    $$ = new PmatchAstNode($1, $2, hfst::pmatch::AstConcatenate);
- }
-| FUNCBODY1 FUN_NEGATIVE_LEFT_CONTEXT {
-    $$ = new PmatchAstNode($2, $1, hfst::pmatch::AstConcatenate);
- }
 ;
 
 FUNCBODY2: FUNCBODY3 { }
@@ -376,6 +366,18 @@ FUNCBODY4: FUNCBODY5
     $$ = new PmatchAstNode(hfst::pmatch::get_utils()->latin1_whitespace_acceptor);
  }
 | INSERT { $$ = new PmatchAstNode($1); }
+| ANONYMOUS_DEFINITION {
+$$ = new PmatchAstNode($1, hfst::pmatch::AstAddDelimiters);
+// Fixme: no funargs inside this
+}
+| FUNCALL {
+    $$ = new PmatchAstNode($1);
+// Fixme: no funargs inside this
+  }
+| MAP {
+    $$ = new PmatchAstNode($1);
+// Fixme: no funargs inside this
+}
 | FUN_OPTCAP { }
 | FUN_TOUPPER { }
 | FUN_TOLOWER { }
@@ -428,9 +430,6 @@ FUNCBODY6: FUNC_LABEL_PAIR { }
     $$ = new PmatchAstNode($1);
     free($1);
  }
-| BOUNDARY_MARKER {
-    $$ = new PmatchAstNode(new HfstTransducer("@BOUNDARY@", "@BOUNDARY@", hfst::pmatch::format));
-  }
 | ENDTAG_LEFT SYMBOL RIGHT_PARENTHESIS {
     $$ = new PmatchAstNode(hfst::pmatch::make_end_tag($2));
     hfst::pmatch::need_delimiters = true;
@@ -468,20 +467,181 @@ FUNCBODY6: FUNC_LABEL_PAIR { }
     $$ = new PmatchAstNode(hfst::HfstTransducer::read_lexc_ptr($1, hfst::TROPICAL_OPENFST_TYPE, hfst::pmatch::verbose));
     free($1);
   }
+| FUN_CONTEXT_CONDITION { }
+
+
+
+
 ;
+
+FUN_CONTEXT_CONDITION:
+FUN_CONTEXT { $$ = $1; hfst::pmatch::need_delimiters = true; }
+| FUN_OR_CONTEXT { }
+| FUN_AND_CONTEXT { }
+;
+
+FUN_CONTEXT:
+FUN_RIGHT_CONTEXT { }
+| FUN_NEGATIVE_RIGHT_CONTEXT { }
+| FUN_LEFT_CONTEXT { }
+| FUN_NEGATIVE_LEFT_CONTEXT { };
+
+FUN_OR_CONTEXT: OR_LEFT FUN_CONTEXT_CONDITIONS RIGHT_PARENTHESIS
+{
+    $$ = NULL;
+    for (std::vector<PmatchAstNode *>::iterator it = $2->begin();
+         it != $2->end(); ++it) {
+        if ($$ == NULL) {
+            $$ = *it;
+        } else {
+            PmatchAstNode * tmp = $$;
+            $$ = new PmatchAstNode(tmp, *it, hfst::pmatch::AstDisjunct);
+        }
+    }
+    delete $2;
+    // Zero the counter for making minimization
+    // guards for disjuncted negative contexts
+    hfst::pmatch::zero_minimization_guard();
+};
+
+FUN_AND_CONTEXT: AND_LEFT FUN_CONTEXT_CONDITIONS RIGHT_PARENTHESIS
+{
+    $$ = NULL;
+    for (std::vector<PmatchAstNode *>::iterator it = $2->begin();
+         it != $2->end(); ++it) {
+        if ($$ = NULL) {
+            $$ = *it;
+        } else {
+            PmatchAstNode * tmp = $$;
+            $$ = new PmatchAstNode(tmp, *it, hfst::pmatch::AstConcatenate);
+        }
+    }
+    delete $2;
+};
+
+FUN_CONTEXT_CONDITIONS:
+FUN_CONTEXT_CONDITION {
+    $$ = new std::vector<PmatchAstNode *>(1, $1);
+ }
+| FUN_CONTEXT_CONDITION COMMA FUN_CONTEXT_CONDITIONS {
+    $3->push_back($1);
+    $$ = $3;
+ };
+
+
+
 
  FUNC_LABEL_PAIR:
 LABEL {
     $$ = new PmatchAstNode(new HfstTransducer($1, hfst::pmatch::format));
     free($1);
-} |
-CURLY_LITERAL {
+}
+| CURLY_LITERAL {
     HfstTokenizer tok;
     $$ = new PmatchAstNode(new HfstTransducer($1, tok, hfst::pmatch::format));
     free($1);
 }
+| LABEL PAIR_SEPARATOR LABEL {
+    $$ = new PmatchAstNode(new HfstTransducer($1, $3, hfst::pmatch::format));
+    free($1); free($3);
+}
+| ANY_TOKEN PAIR_SEPARATOR ANY_TOKEN {
+    $$ = new PmatchAstNode(new HfstTransducer(hfst::internal_unknown, hfst::pmatch::format));
+}
+| LABEL PAIR_SEPARATOR ANY_TOKEN {
+    $$ = new PmatchAstNode(new HfstTransducer($1, hfst::internal_unknown, hfst::pmatch::format));
+    free($1);
+}
+| ANY_TOKEN PAIR_SEPARATOR LABEL {
+    $$ = new PmatchAstNode(new HfstTransducer(hfst::internal_unknown, $3, hfst::pmatch::format));
+    free($3);
+}
+| LABEL PAIR_SEPARATOR_WO_RIGHT {
+    $$ = new PmatchAstNode(new HfstTransducer($1, hfst::internal_unknown, hfst::pmatch::format));
+    free($1);
+ }
+| ANY_TOKEN PAIR_SEPARATOR_WO_RIGHT {
+    $$ = new PmatchAstNode(new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
+                                          hfst::pmatch::format));
+}
+| PAIR_SEPARATOR_WO_LEFT LABEL {
+    $$ = new PmatchAstNode(new HfstTransducer(hfst::internal_unknown, $2, hfst::pmatch::format));
+    free($2);
+}
+| PAIR_SEPARATOR_WO_LEFT ANY_TOKEN {
+    $$ = new PmatchAstNode(new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
+                                              hfst::pmatch::format));
+}
+| PAIR_SEPARATOR_SOLE {
+    $$ = new PmatchAstNode(new HfstTransducer(hfst::internal_unknown,
+                                              hfst::pmatch::format));
+  }
+| ANY_TOKEN {
+    $$ = new PmatchAstNode(new HfstTransducer(hfst::internal_identity,
+                                              hfst::pmatch::format));
+  }
+| CURLY_LITERAL PAIR_SEPARATOR CURLY_LITERAL {
+    HfstTokenizer tok;
+    HfstTransducer * left = new HfstTransducer($1, tok, hfst::pmatch::format);
+    HfstTransducer right($3, tok, hfst::pmatch::format);
+    HfstTransducer destroy(hfst::internal_unknown, hfst::internal_epsilon, hfst::pmatch::format);
+    HfstTransducer construct(hfst::internal_epsilon, hfst::internal_unknown, hfst::pmatch::format);
+    left->compose(destroy.repeat_star());
+    left->compose(construct.repeat_star());
+    left->compose(right);
+    $$ = new PmatchAstNode(left);
+    free($1); free($3);
+}
+| LABEL PAIR_SEPARATOR CURLY_LITERAL {
+    HfstTokenizer tok;
+    HfstTransducer * left = new HfstTransducer(
+        $1, hfst::internal_epsilon, hfst::pmatch::format);
+    HfstTransducer right($3, tok, hfst::pmatch::format);
+    HfstTransducer construct(hfst::internal_epsilon, hfst::internal_unknown, hfst::pmatch::format);
+    left->compose(construct.repeat_star());
+    left->compose(right);
+    $$ = new PmatchAstNode(left);
+    free($1); free($3);
+}
+| CURLY_LITERAL PAIR_SEPARATOR LABEL {
+    HfstTokenizer tok;
+    HfstTransducer * left = new HfstTransducer($1, tok, hfst::pmatch::format);
+    HfstTransducer right(hfst::internal_epsilon, $3, hfst::pmatch::format);
+    HfstTransducer destroy(hfst::internal_unknown, hfst::internal_epsilon, hfst::pmatch::format);
+    left->compose(destroy.repeat_star());
+    left->compose(right);
+    $$ = new PmatchAstNode(left);
+    free($1); free($3);
+}
+
 ;
 
+// MAP: MAP_LEFT SYMBOL COMMA READ_TEXT RIGHT_PARENTHESIS {
+//     if (hfst::pmatch::functions.count($2) == 0) {
+//         std::string errstring = "Function not defined: " + std::string($2);
+//         pmatcherror(errstring.c_str());
+//     }
+//     std::vector<string> & callee_args = hfst::pmatch::functions[$2].args;
+//     std::vector<std::vector<std::string> > caller_strings =
+//         hfst::pmatch::read_args($4, callee_args.size());
+//     std::map<std::string, HfstTransducer*> caller_args;
+//     HfstTokenizer tok;
+//     $$ = new HfstTransducer(hfst::pmatch::format);
+//     for (std::vector<std::vector<std::string> >::iterator it =
+//              caller_strings.begin(); it != caller_strings.end(); ++it) {
+//         for (int i = 0; i < it->size(); ++i) {
+//             caller_args[callee_args[i]] = new HfstTransducer(it->at(i), tok, hfst::pmatch::format);
+//         }
+//         $$->disjunct(*hfst::pmatch::functions[$2].evaluate(caller_args));
+//         // Clean up the string transducers we allocated each time 
+//         for (std::map<std::string, HfstTransducer *>::iterator it = caller_args.begin();
+//              it != caller_args.end(); ++it) {
+//             delete it->second;
+//         }
+//         caller_args.clear();
+//     }
+//     $$->minimize();
+// };
 
 REGEXP2: REPLACE
 { }
@@ -1330,6 +1490,9 @@ SYMBOL {
     $$ = new HfstTransducer($1, hfst::pmatch::format);
     free($1);
   }
+| LEFT_BRACKET REGEXP2 RIGHT_BRACKET {
+    $$ = $2;
+}
 ;
 
 MAP: MAP_LEFT SYMBOL COMMA READ_TEXT RIGHT_PARENTHESIS {
@@ -1469,15 +1632,16 @@ FUN_RIGHT_CONTEXT: RC_LEFT FUNCBODY2 RIGHT_PARENTHESIS {
                                hfst::pmatch::format),
             $2, hfst::pmatch::AstConcatenate);
     $$ = new PmatchAstNode(rc_entry,
-                                         new HfstTransducer(
-                                             hfst::internal_epsilon,
-                                             hfst::pmatch::RC_EXIT_SYMBOL,
-                                             hfst::pmatch::format),
-                                         hfst::pmatch::AstConcatenate);
+                           new HfstTransducer(
+                               hfst::internal_epsilon,
+                               hfst::pmatch::RC_EXIT_SYMBOL,
+                               hfst::pmatch::format),
+                           hfst::pmatch::AstConcatenate);
  }
 ;
 
 FUN_NEGATIVE_RIGHT_CONTEXT: NRC_LEFT FUNCBODY2 RIGHT_PARENTHESIS {
+    HfstTransducer * guard = hfst::pmatch::get_minimization_guard();
     PmatchAstNode * nrc_entry =
         new PmatchAstNode(
             new HfstTransducer(hfst::internal_epsilon,
@@ -1491,11 +1655,12 @@ FUN_NEGATIVE_RIGHT_CONTEXT: NRC_LEFT FUNCBODY2 RIGHT_PARENTHESIS {
                                             hfst::pmatch::NRC_EXIT_SYMBOL,
                                             hfst::pmatch::format),
                                         hfst::pmatch::AstConcatenate);
-    $$ = new PmatchAstNode(
+    PmatchAstNode * context = new PmatchAstNode(
         nrc_main_branch,
         new HfstTransducer("@PMATCH_PASSTHROUGH@",
                            hfst::internal_epsilon, hfst::pmatch::format),
         hfst::pmatch::AstDisjunct);
+    $$ = new PmatchAstNode(guard, context, hfst::pmatch::AstConcatenate);
  }
 ;
 
@@ -1516,6 +1681,7 @@ FUN_LEFT_CONTEXT: LC_LEFT FUNCBODY2 RIGHT_PARENTHESIS {
 ;
 
 FUN_NEGATIVE_LEFT_CONTEXT: NLC_LEFT FUNCBODY2 RIGHT_PARENTHESIS {
+    HfstTransducer * guard = hfst::pmatch::get_minimization_guard();
     PmatchAstNode * reverse = new PmatchAstNode(
         $2, hfst::pmatch::AstReverse);
     
@@ -1529,10 +1695,12 @@ FUN_NEGATIVE_LEFT_CONTEXT: NLC_LEFT FUNCBODY2 RIGHT_PARENTHESIS {
     PmatchAstNode * main_branch = new PmatchAstNode(
         entry, nlc_exit, hfst::pmatch::AstConcatenate);
     
-    $$ = new PmatchAstNode(main_branch,
-                           new HfstTransducer("@PMATCH_PASSTHROUGH@",
-                                              hfst::internal_epsilon, hfst::pmatch::format),
-                           hfst::pmatch::AstDisjunct);
+    PmatchAstNode * context =
+        new PmatchAstNode(main_branch,
+                          new HfstTransducer("@PMATCH_PASSTHROUGH@",
+                                             hfst::internal_epsilon, hfst::pmatch::format),
+                          hfst::pmatch::AstDisjunct);
+    $$ = new PmatchAstNode(guard, context, hfst::pmatch::AstConcatenate);
 }
 ;
 
