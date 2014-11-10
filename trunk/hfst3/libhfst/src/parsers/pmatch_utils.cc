@@ -424,24 +424,24 @@ parse_quoted(const char *s)
 unsigned int next_utf8_to_codepoint(unsigned char **c)
 {
     unsigned int codepoint = 0;
-    char bytes_in_char = 0;
+    int bytes_in_char = 0;
     if (**c <= 127) {
         bytes_in_char = 1;
         codepoint = **c & 127;
-    } else if ( (**c & (128 + 64 + 32 + 16)) == (128 + 64 + 32 + 16) ) {
-        bytes_in_char = 4;
-        codepoint = **c & 128 + 64 + 32 + 16;
-    } else if ( (**c & (128 + 64 + 32 )) == (128 + 64 + 32) ) {
-        bytes_in_char = 3;
-        codepoint = **c & 128 + 64 + 32;
-    } else if ( (**c & (128 + 64 )) == (128 + 64)) {
+    } else if ( (**c & (128 + 64)) == (128 + 64) ) {
         bytes_in_char = 2;
-        codepoint = **c & 128 + 64;
+        codepoint = **c & 31;
+    } else if ( (**c & (128 + 64 + 32)) == (128 + 64 + 32) ) {
+        bytes_in_char = 3;
+        codepoint = **c & 15;
+    } else if ( (**c & (128 + 64 + 32 + 16)) == (128 + 64 + 32 + 16)) {
+        bytes_in_char = 4;
+        codepoint = **c & 7;
     } else {
         return 0;
     }
     for (int i = 1; i < bytes_in_char; ++i) {
-        codepoint = ((codepoint << 6) | (unsigned long)(**(c + i) & 63));
+        codepoint = ((codepoint << 6) | (unsigned long)(*(*c + i) & 63));
     }
     *c += bytes_in_char;
     return codepoint;
@@ -496,14 +496,34 @@ HfstTransducer * parse_range(const char * s)
     unsigned char bytes_in_char;
     HfstTransducer * retval = new HfstTransducer(format);
     while (**c != '\0') {
-        unsigned int codepoint1 = next_utf8_to_codepoint((unsigned char**) c);
+        unsigned int codepoint1 = 0;
+        unsigned int codepoint2 = 0;
+        if (strlen(*c) >= 6 && **c == '\\' && *(*c + 1) == 'u') {
+            // an escape sequence
+            char buf[5];
+            memcpy(buf, *c+2, 4);
+            buf[4] = '\0';
+            codepoint1 = strtol(buf, NULL, 16);
+            *c += 6;
+        } else {
+            codepoint1 = next_utf8_to_codepoint((unsigned char**) c);
+        }
         if (**c != '-') {
             std::string errstring("Could not parse range expression: ");
             errstring.append(std::string(s));
             pmatcherror(errstring.c_str());
         }
         *c += 1;
-        unsigned int codepoint2 = next_utf8_to_codepoint((unsigned char **) c);
+        if (strlen(*c) >= 6 && **c == '\\' && *(*c + 1) == 'u') {
+            // an escape sequence
+            char buf[5];
+            memcpy(buf, *c+2, 4);
+            buf[4] = '\0';
+            codepoint2 = strtol(buf, NULL, 16);
+            *c += 6;
+        } else {
+            codepoint2 = next_utf8_to_codepoint((unsigned char**) c);
+        }
         if (codepoint1 == 0 || codepoint2 == 0) {
             std::string errstring("Malformed character in range expression: ");
             errstring.append(std::string(s));
