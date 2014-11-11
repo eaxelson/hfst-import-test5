@@ -111,7 +111,9 @@ const
 
 void
 HfstTokenizer::add_multichar_symbol(const string& symbol)
-{  multi_char_symbols.add(symbol.c_str()); }
+{  if (symbol == "")
+    { return; }
+  multi_char_symbols.add(symbol.c_str()); }
 
 void
 HfstTokenizer::add_skip_symbol(const std::string &symbol)
