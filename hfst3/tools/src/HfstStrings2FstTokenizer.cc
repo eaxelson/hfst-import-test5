@@ -7,8 +7,10 @@ HfstStrings2FstTokenizer::HfstStrings2FstTokenizer
   eps(eps)
 {
   // \: \\ \<space> and eps are special cases.
-  add_multichar_symbol( eps );
-
+  if (!eps.empty())
+    {
+      add_multichar_symbol( eps );
+    }
 
   tokenizer.add_multichar_symbol( BACKSLASH COL );
   tokenizer.add_multichar_symbol( BACKSLASH SPACE );
@@ -122,10 +124,10 @@ StringPairVector HfstStrings2FstTokenizer::make_pair_vector
       std::string output_symbol = unescape(*output_it);
 
       spv.push_back
-	(StringPair(input_symbol.empty() or input_symbol == eps ? 
-		    EPSILON_SYMBOL : input_symbol,
-		    output_symbol.empty() or output_symbol == eps ? 
-		    EPSILON_SYMBOL : output_symbol)); 
+        (StringPair(input_symbol.empty() or input_symbol == eps ? 
+                    EPSILON_SYMBOL : input_symbol,
+                    output_symbol.empty() or output_symbol == eps ? 
+                    EPSILON_SYMBOL : output_symbol)); 
       ++input_it;
       ++output_it;
     }
@@ -173,7 +175,7 @@ std::string HfstStrings2FstTokenizer::unescape(std::string symbol)
 
   pos = 0;
   while ((pos = symbol.find(TAB_ESCAPE)) != std::string::npos)
-    { symbol.replace(pos,strlen(TAB_ESCAPE),"	"); }
+    { symbol.replace(pos,strlen(TAB_ESCAPE),"   "); }
   
   pos = 0;
   while ((pos = symbol.find(COL_ESCAPE)) != std::string::npos)
@@ -277,7 +279,7 @@ void test_ps
        it != spv.end();
        ++it)
     { 
-      if (it->first != it->second)	
+      if (it->first != it->second)      
     { std::cout << it->first << " : " << it->second << std::endl; }
       else
     { std::cout << it->first << std::endl; }
@@ -295,7 +297,7 @@ void test_sp
        it != spv.end();
        ++it)
     { 
-      if (it->first != it->second)	
+      if (it->first != it->second)      
     { std::cout << it->first << " : " << it->second << std::endl; }
       else
     { std::cout << it->first << std::endl; }
