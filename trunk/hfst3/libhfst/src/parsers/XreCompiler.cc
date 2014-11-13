@@ -42,6 +42,12 @@ XreCompiler::define(const std::string& name, const std::string& xre)
   definitions_[name] = compiled;
 }
 
+void 
+XreCompiler::define_list(const std::string& name, const std::list<std::string>& symbol_list)
+{
+  list_definitions_[name] = symbol_list;
+}
+
 void
 XreCompiler::define(const std::string& name, const HfstTransducer & transducer)
 {

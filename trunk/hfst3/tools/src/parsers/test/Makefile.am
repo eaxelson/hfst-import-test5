@@ -21,6 +21,7 @@ EXTRA_DIST=test.sh \
 	reverse_net.xfst reverse_net.att \
 	upper_side_net.xfst upper_side_net.att \
 	lower_side_net.xfst lower_side_net.att \
+	one_transition_regex.xfst one_transition_regex.att \
 	substitute_defined.xfst substitute_defined.att \
 	substitute_symbol_1.xfst substitute_symbol_1.att \
 	substitute_symbol_2.xfst substitute_symbol_2.att \

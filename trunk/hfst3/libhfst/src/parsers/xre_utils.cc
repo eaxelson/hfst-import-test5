@@ -74,6 +74,7 @@ char* data;
 std::map<std::string,hfst::HfstTransducer*> definitions;
   std::map<std::string,std::string>  function_definitions;
   std::map<std::string,unsigned int> function_arguments;
+  std::map<std::string,std::list<string> > lists;
 char* startptr;
 hfst::HfstTransducer* last_compiled;
 bool contains_only_comments = false;
@@ -725,30 +726,49 @@ xfst_label_to_transducer(const char* input, const char* output)
 {
   HfstTransducer * retval = NULL;
 
-  // non-matching definitions
-  if ( (is_definition(input) || is_definition(output)) && 
-       strcmp(input, output) != 0 )
+  bool input_is_definition = is_definition(input);
+  bool output_is_definition = is_definition(output);
+  bool input_is_unknown = (strcmp(input, hfst::internal_unknown.c_str()) == 0);
+  bool output_is_unknown = (strcmp(output, hfst::internal_unknown.c_str()) == 0);
+
+  // definitions -> use cross-product
+  if (input_is_definition || output_is_definition)
     {
-      // TODO, FIX:
-      //char msg[256];
-      //sprintf(msg, "invalid use of definitions in label %s:%s", 
-      //        get_print_format(input), get_print_format(output));
-      //yyerror(msg);
+      HfstTransducer * tmp = NULL; // temporary transducer for cross-product calculation
+      if (input_is_unknown)
+        {
+          retval = new HfstTransducer(hfst::internal_identity, hfst::xre::format);
+          tmp = expand_definition(output);
+        }
+      else if (output_is_unknown)
+        {
+          tmp = new HfstTransducer(hfst::internal_identity, hfst::xre::format);
+          retval = expand_definition(input);
+        }
+      else // neither is unknown
+        {
+          retval = expand_definition(input);
+          tmp = expand_definition(output);
+        }
+      retval->cross_product(*tmp);
+      delete tmp;
+      return retval;
     }
-  if  (strcmp(input, hfst::internal_unknown.c_str()) == 0 && 
-       strcmp(output, hfst::internal_unknown.c_str()) == 0)
+
+  // no definitions
+  if  (input_is_unknown && output_is_unknown)
     {
       retval = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown, hfst::xre::format);
       HfstTransducer id(hfst::internal_identity, hfst::internal_identity, hfst::xre::format);
       retval->disjunct(id).minimize();
     }
-  else if (strcmp(input, hfst::internal_unknown.c_str()) == 0)
+  else if (input_is_unknown)
     {
       retval = new HfstTransducer(hfst::internal_unknown, output, hfst::xre::format);
       HfstTransducer output_tr(output, output, hfst::xre::format);
       retval->disjunct(output_tr).minimize();
     }
-  else if (strcmp(output, hfst::internal_unknown.c_str()) == 0)
+  else if (output_is_unknown)
     {
       retval = new HfstTransducer(input, hfst::internal_unknown, hfst::xre::format);
       HfstTransducer input_tr(input, input, hfst::xre::format);
@@ -758,10 +778,6 @@ xfst_label_to_transducer(const char* input, const char* output)
     {
       retval = new HfstTransducer(input, output, hfst::xre::format);
     }
-
-  if (is_definition(input))
-    retval = expand_definition(input); // changed
-
   return retval;
 }
 

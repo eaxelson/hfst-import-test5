@@ -243,11 +243,11 @@ REGEXP2: REPLACE
             delete $3;
         }
        | REGEXP2 MERGE_RIGHT_ARROW REPLACE {
-            $$ = & $3->merge(*$1).minimize();
+            $$ = & $3->merge(*$1, hfst::xre::lists).minimize();
             delete $1;
        }
        | REGEXP2 MERGE_LEFT_ARROW REPLACE {
-            $$ = & $1->merge(*$3).minimize();
+            $$ = & $1->merge(*$3, hfst::xre::lists).minimize();
             delete $3;
        }
         // substitute
