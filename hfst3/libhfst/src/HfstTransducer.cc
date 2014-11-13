@@ -3557,11 +3557,11 @@ bool substitute_unknown_identity_pairs
 
 
 HfstTransducer &HfstTransducer::merge
-(const HfstTransducer &another)
+(const HfstTransducer &another, const std::map<std::string, std::list<std::string> > & list_symbols)
 {
   HfstBasicTransducer this_basic(*this);
   HfstBasicTransducer another_basic(another);
-  HfstBasicTransducer result = hfst::implementations::HfstBasicTransducer::merge(this_basic, another_basic);
+  HfstBasicTransducer result = hfst::implementations::HfstBasicTransducer::merge(this_basic, another_basic, list_symbols);
   *this = HfstTransducer(result, this->get_type());
   return *this;
 }

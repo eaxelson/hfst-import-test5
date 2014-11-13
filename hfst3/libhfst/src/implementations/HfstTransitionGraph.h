@@ -11,6 +11,7 @@
  #include <iostream>
  #include <algorithm>
  #include <stack>
+ #include <list>
 
  #include "../HfstSymbolDefs.h"
  #include "../HfstExceptionDefs.h"
@@ -4253,7 +4254,8 @@
            }
 
 
-           static bool is_list_symbol(const C & transition_data)
+              
+           static bool is_list_symbol(const C & transition_data, const std::map<std::string, std::list<std::string> > & list_symbols)
            {
              std::string isymbol = transition_data.get_input_symbol();
              std::string osymbol = transition_data.get_output_symbol();
@@ -4262,9 +4264,10 @@
                {
                  return false;
                }
-             return (isymbol.compare(0, 6, "@LIST_") == 0);
+             return (list_symbols.find(isymbol) != list_symbols.end());
            }
 
+           /*
            // @pre \a transition_data is a list symbol
            // @pre list symbols cannot contain '_' or '@'
            static std::set<std::string> get_list_symbols(const std::string & list_symbol)
@@ -4297,7 +4300,7 @@
              result.insert(symbol);
 
              return result;
-           }
+             }*/
 
            // A recursive function used by function intersect.
            //
@@ -4314,7 +4317,8 @@
            // @pre \a graph and \a merger must be deterministic. (todo: handle equivalent transitions, maybe even epsilons?)
            static void find_matches_for_merge
              (HfstTransitionGraph & graph, HfstState graph_state, HfstTransitionGraph & merger, HfstState merger_state,
-              HfstTransitionGraph & result, HfstState result_state, StateMap & state_map, std::set<HfstState> & agenda)
+              HfstTransitionGraph & result, HfstState result_state, StateMap & state_map, std::set<HfstState> & agenda,
+              const std::map<std::string, std::list<std::string> > & list_symbols)
            {
              agenda.insert(result_state);  // do not handle \a result_state twice
              HfstTransitions & graph_transitions = graph.state_vector[graph_state]; // transitions of graph
@@ -4332,9 +4336,9 @@
                  const C & graph_transition_data = graph_transition.get_transition_data();
 
                  // List symbols must be checked separately
-                 if (is_list_symbol(graph_transition_data))
+                 if (is_list_symbol(graph_transition_data, list_symbols))
                    {
-                     std::set<std::string> list_symbols = get_list_symbols(graph_transition_data.get_input_symbol());
+                     const std::list<std::string> & symbol_list = list_symbols.find(graph_transition_data.get_input_symbol())->second;
                      bool list_match_found=false;
                      // Find all matches
                      for(unsigned int j=0; j < merger_transitions.size(); j++)
@@ -4349,7 +4353,7 @@
                              HfstState target = handle_list_match(graph, graph_transition, merger, merger_transition, result, result_state, state_map);
                              if (agenda.find(target) == agenda.end())
                                {
-                                 find_matches_for_merge(graph, graph_transition.get_target_state(), merger, merger_transition.get_target_state(), result, target, state_map, agenda);
+                                 find_matches_for_merge(graph, graph_transition.get_target_state(), merger, merger_transition.get_target_state(), result, target, state_map, agenda, list_symbols);
                                }
                            }
                        }
@@ -4363,7 +4367,7 @@
                  HfstState target = handle_non_list_match(graph, graph_transition, merger, merger_state, result, result_state, state_map);
                  if (agenda.find(target) == agenda.end())
                    {
-                     find_matches_for_merge(graph, graph_transition.get_target_state(), merger, /*merger_transition.get_target_state()*/ merger_state, result, target, state_map, agenda);
+                     find_matches_for_merge(graph, graph_transition.get_target_state(), merger, /*merger_transition.get_target_state()*/ merger_state, result, target, state_map, agenda, list_symbols);
                    }
                  // --- A transition in graph compared for all corresponding transitions in merger, compare next transition. --- 
                }
@@ -4372,7 +4376,7 @@
            }
 
          static HfstTransitionGraph merge
-           (HfstTransitionGraph & graph, HfstTransitionGraph & merger)
+           (HfstTransitionGraph & graph, HfstTransitionGraph & merger, const std::map<std::string, std::list<std::string> > & list_symbols)
          {
            HfstTransitionGraph result;
            StateMap state_map;
@@ -4387,7 +4391,7 @@
                result.set_final_weight(0, final_weight);
              }
            
-           find_matches_for_merge(graph, 0, merger, 0, result, 0, state_map, agenda);
+           find_matches_for_merge(graph, 0, merger, 0, result, 0, state_map, agenda, list_symbols);
 
            return result;
          }
