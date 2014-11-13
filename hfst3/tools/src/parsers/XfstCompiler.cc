@@ -1032,6 +1032,7 @@ namespace xfst {
           }
         free(p);
         lists_[name] = l;
+        xre_.define_list(name, l);
         PROMPT_AND_RETURN_THIS;
       }
 
@@ -2528,31 +2529,43 @@ namespace xfst {
   XfstCompiler&
   XfstCompiler::print_list(const char* name, FILE* outfile)
     {
+      if (lists_.find(name) == lists_.end())
+        {
+          hfst_fprintf(outfile, "No such list defined: %s\n", name);
+          PROMPT_AND_RETURN_THIS;
+        }
       list<string> l = lists_[name];
-      hfst_fprintf(outfile, "%10s:", name);
+      hfst_fprintf(outfile, "%10s: ", name);
       for (list<string>::const_iterator s = l.begin();
            s != l.end();
            ++s)
         {
           hfst_fprintf(outfile, "%s ", s->c_str());
         }
+      hfst_fprintf(outfile, "\n");
       PROMPT_AND_RETURN_THIS;
     }
 
   XfstCompiler& 
   XfstCompiler::print_list(FILE* outfile)
     {
+      if (lists_.size() == 0)
+        {
+          hfst_fprintf(outfile, "No lists defined.\n");
+          PROMPT_AND_RETURN_THIS;
+        }
       for (map<string,list<string> >::const_iterator l = lists_.begin();
            l != lists_.end();
            ++l)
         {
-          hfst_fprintf(outfile, "%10s:", l->first.c_str());
+          hfst_fprintf(outfile, "%10s: ", l->first.c_str());
           for (list<string>::const_iterator s = l->second.begin();
                s != l->second.end();
                ++s)
             {
               hfst_fprintf(outfile, "%s ", s->c_str());
             }
+          hfst_fprintf(outfile, "\n");
         }
       PROMPT_AND_RETURN_THIS;
     }
