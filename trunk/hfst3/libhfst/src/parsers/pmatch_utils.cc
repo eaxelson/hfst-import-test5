@@ -272,6 +272,22 @@ HfstTransducer * make_list(HfstTransducer * t)
     return new HfstTransducer(arc, format);
 }
 
+HfstTransducer * make_sigma(HfstTransducer * t)
+{
+    HfstTransducer * retval =
+        new HfstTransducer(hfst::internal_epsilon, format);
+    hfst::StringSet alphabet = t->get_alphabet();
+    for (hfst::StringSet::const_iterator it = alphabet.begin();
+         it != alphabet.end(); ++it) {
+        if (!hfst_ol::PmatchAlphabet::is_special(*it) &&
+            *it != hfst::internal_epsilon && *it != hfst::internal_unknown &&
+            *it != hfst::internal_identity && *it != hfst::internal_default) {
+            retval->disjunct(HfstTransducer(*it, format));
+        }
+    }
+    return retval;
+}
+
 char * get_delimited(const char *s, char delim_left, char delim_right)
 {
     const char *qstart = strchr((char*) s, delim_left) + 1;
