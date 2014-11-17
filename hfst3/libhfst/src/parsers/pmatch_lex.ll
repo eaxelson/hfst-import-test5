@@ -110,6 +110,14 @@ return REGEX;
     return TOUPPER_LEFT;
 }
 
+"UpCase(" {
+    return TOLOWER_LEFT;
+}
+
+"DownCase(" {
+    return TOUPPER_LEFT;
+}
+
 "Ins(" {
     return INS_LEFT;
 }
@@ -148,6 +156,10 @@ return REGEX;
 
 "Map(" {
     return MAP_LEFT;
+}
+
+"Lit(" {
+    return LIT_LEFT;
 }
 
 "~"   { return COMPLEMENT; }
