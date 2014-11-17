@@ -143,7 +143,7 @@ PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
 
-%nonassoc DEFINE REGEX DEFINS DEFFUN ALPHA LOWERALPHA UPPERALPHA NUM PUNCT WHITESPACE
+%nonassoc DEFINE REGEX DEFINED_LIST DEFINS DEFFUN ALPHA LOWERALPHA UPPERALPHA NUM PUNCT WHITESPACE
 OPTCAP_LEFT TOLOWER_LEFT TOUPPER_LEFT INS_LEFT DEFINE_LEFT ENDTAG_LEFT LC_LEFT
 RC_LEFT NLC_LEFT NRC_LEFT MAP_LEFT LIT_LEFT LST_LEFT SIGMA_LEFT OR_LEFT AND_LEFT
 %%
@@ -213,6 +213,12 @@ DEFINITION: DEFINE BINDING { $$ = $2; }
     hfst::pmatch::need_delimiters = false;
     $2->minimize();
     $$ = new std::pair<std::string, hfst::HfstTransducer*>("TOP", $2);
+ }
+| DEFINED_LIST BINDING {
+    $$ = new std::pair<std::string, hfst::HfstTransducer*>($2->first,
+                                                           hfst::pmatch::make_sigma($2->second));
+    delete $2->second;
+    delete $2;
  }
 | DEFFUN FUNCTION { $$ = $2; }
 ;
