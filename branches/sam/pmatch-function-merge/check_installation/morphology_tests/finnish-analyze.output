@@ -1,0 +1,90 @@
+Kaikki	
+Kaikki	Kaikki Pron Qnt Nom Sg
+
+ihmiset	
+ihmiset	ihminen N Nom Pl
+
+syntyvät	
+syntyvät	syntyä PrsPrc Act Pos Nom Pl
+syntyvät	syntyä V Prs Act Pl3
+
+vapaina	
+vapaina	vapaa A Pos Ess Pl
+vapaina	vapaa N Ess Pl
+
+ja	
+ja	ja CC
+
+tasavertaisina	
+tasavertaisina	tasa#vertainen A Pos Ess Pl
+tasavertaisina	tasa#vertainen N Ess Pl
+
+arvoltaan	
+arvoltaan	arvo N Abl Sg Px3
+
+ja	
+ja	ja CC
+
+oikeuksiltaan	
+oikeuksiltaan	oikeus N Abl Pl Px3
+
+.	
+.	. Punct
+
+Heille	
+Heille	He Pron Pers All Pl
+
+on	
+on	olla V Prs Act Sg3
+
+annettu	
+annettu	annettu A Pos Nom Sg
+annettu	antaa PrfPrc Pass Pos Nom Sg
+annettu	antaa V Pst Pass ConNeg
+
+järki	
+järki	järki N Nom Sg
+
+ja	
+ja	ja CC
+
+omatunto	
+omatunto	omatunto N Nom Sg
+omatunto	omatunto N Sg Nom
+
+,	
+,	, Punct
+
+ja	
+ja	ja CC
+
+heidän	
+heidän	he Pron Pers Gen Pl
+
+on	
+on	olla V Prs Act Sg3
+
+toimittava	
+toimittava	toimia PrsPrc Pass Pos Nom Sg
+toimittava	toimittaa PrsPrc Act Pos Nom Sg
+
+toisiaan	
+toisiaan	toinen N Par Pl Px3
+toisiaan	toinen Num Ord Par Pl Px3
+toisiaan	toinen Ord Par Px3#
+toisiaan	toinen Pron Par Pl Px3
+
+kohtaan	
+kohtaan	kohdata V Prs Act Sg1
+kohtaan	kohta N Ill Sg
+kohtaan	kohtaan Adv
+
+veljeyden	
+veljeyden	veljeys N Gen Sg
+
+hengessä	
+hengessä	henki N Ine Sg
+
+.	
+.	. Punct
+
