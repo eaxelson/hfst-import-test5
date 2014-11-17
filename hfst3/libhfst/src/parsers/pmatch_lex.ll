@@ -166,6 +166,10 @@ return REGEX;
     return LST_LEFT;
 }
 
+"Sigma(" {
+    return SIGMA_LEFT;
+}
+
 "~"   { return COMPLEMENT; }
 "\\"  { return TERM_COMPLEMENT; }
 "&"   { return INTERSECTION; }

@@ -90,6 +90,7 @@ void add_end_tag(HfstTransducer * regex, std::string tag);
 HfstTransducer * make_end_tag(std::string tag);
 
 HfstTransducer * make_list(HfstTransducer * t);
+HfstTransducer * make_sigma(HfstTransducer * t);
 
 /**
  * @brief find first segment from strign @a s delimited by char delim.
