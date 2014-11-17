@@ -1313,8 +1313,9 @@ LABEL_PAIR: LABEL PAIR_SEPARATOR LABEL {
         if (strlen($1) == 0) {
             $$ = new HfstTransducer(hfst::pmatch::format);
         } else {
-            std::string errstring = "Unknown symbol: " + std::string($1);
-            pmatcherror(errstring.c_str());
+            $$ = new HfstTransducer($1, hfst::pmatch::format);
+//            std::string errstring = "Unknown symbol: " + std::string($1);
+//            pmatcherror(errstring.c_str());
         }
     }
     free($1);
