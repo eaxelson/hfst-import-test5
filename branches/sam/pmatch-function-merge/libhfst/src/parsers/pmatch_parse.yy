@@ -257,6 +257,36 @@ FUNCTION: SYMBOL_WITH_LEFT_PAREN ARGLIST RIGHT_PARENTHESIS FUNCBODY1 END_OF_EXPR
         std::cerr << std::endl;
     }
  }
+| SYMBOL FUNCBODY1 END_OF_EXPRESSION {
+    PmatchAstNode * function_body;
+    if (hfst::pmatch::need_delimiters) {
+        function_body = new PmatchAstNode($2, hfst::pmatch::AstAddDelimiters);
+    } else {
+        function_body = $2;
+    }
+    hfst::pmatch::need_delimiters = false;
+    hfst::pmatch::PmatchFunction fun(std::vector<std::string>(), function_body);
+    if(hfst::pmatch::functions.count($1) != 0) {
+        std::stringstream warning;
+        warning << "definition of function" << $1 << " on line "
+                << pmatchlineno << " shadowed by earlier definition\n";
+        hfst::pmatch::warn(warning.str());
+    }
+    hfst::pmatch::functions[$1] = fun;
+    // Pass a dummy transducer, since function registration is separate
+    HfstTransducer * dummy = new HfstTransducer(hfst::pmatch::format);
+    dummy->set_name("@_PMATCH_DUMMY_@");
+    $$ = new std::pair<std::string, hfst::HfstTransducer*>("@_PMATCH_DUMMY_@", dummy);
+    if (hfst::pmatch::verbose) {
+        std::cerr << std::setiosflags(std::ios::fixed) << std::setprecision(2);
+        double duration = (clock() - hfst::pmatch::timer) /
+            (double) CLOCKS_PER_SEC;
+        hfst::pmatch::timer = clock();
+        std::cerr << "defined function" << $1 << " in " << duration << " seconds\n";
+        std::cerr << std::endl;
+    }
+
+ }
 ;
 
 ARGLIST: ARGS {
