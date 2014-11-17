@@ -162,6 +162,10 @@ return REGEX;
     return LIT_LEFT;
 }
 
+"Lst(" {
+    return LST_LEFT;
+}
+
 "~"   { return COMPLEMENT; }
 "\\"  { return TERM_COMPLEMENT; }
 "&"   { return INTERSECTION; }

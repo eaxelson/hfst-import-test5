@@ -90,6 +90,8 @@ namespace hfst_ol {
         std::map<SpecialSymbol, SymbolNumber> special_symbols;
         std::map<SymbolNumber, std::string> end_tag_map;
         std::map<std::string, SymbolNumber> rtn_names;
+        std::map<SymbolNumber, std::set<SymbolNumber> > symbol_lists;
+        std::map<SymbolNumber, std::set<SymbolNumber> > list_symbols;
         SymbolNumberVector guards;
         bool is_end_tag(const SymbolNumber symbol) const;
         bool is_guard(const SymbolNumber symbol) const;
@@ -104,11 +106,13 @@ namespace hfst_ol {
         static bool is_end_tag(const std::string & symbol);
         static bool is_insertion(const std::string & symbol);
         static bool is_guard(const std::string & symbol);
+        static bool is_list(const std::string & symbol);
         static bool is_special(const std::string & symbol);
         static std::string name_from_insertion(
             const std::string & symbol);
         bool is_printable(SymbolNumber symbol);
         void add_special_symbol(const std::string & str, SymbolNumber symbol_number);
+        void process_symbol_list(std::string str, SymbolNumber sym);
         void add_rtn(PmatchTransducer * rtn, std::string const & name);
         bool has_rtn(std::string const & name) const;
         bool has_rtn(SymbolNumber symbol) const;

@@ -12,6 +12,7 @@
 #include "pmatch_utils.h"
 #include "HfstTransducer.h"
 #include "tools/src/HfstUtf8.h"
+#include "implementations/optimized-lookup/pmatch.h"
 
 using std::string;
 using std::map;
@@ -254,6 +255,22 @@ HfstTransducer * make_end_tag(std::string tag)
     return end_tag;
 }
 
+HfstTransducer * make_list(HfstTransducer * t)
+{
+    std::string arc = "@PMATCH_LIST_";
+    hfst::StringSet alphabet = t->get_alphabet();
+    for (hfst::StringSet::const_iterator it = alphabet.begin();
+         it != alphabet.end(); ++it) {
+        if (!hfst_ol::PmatchAlphabet::is_special(*it) &&
+            *it != hfst::internal_epsilon && *it != hfst::internal_unknown &&
+            *it != hfst::internal_identity && *it != hfst::internal_default) {
+            arc.append(*it);
+            arc.append("_");
+        }
+    }
+    arc.append("@");
+    return new HfstTransducer(arc, format);
+}
 
 char * get_delimited(const char *s, char delim_left, char delim_right)
 {
