@@ -66,6 +66,10 @@ UNICODE_ESCAPE ("\\u"{HEXCHAR}{HEXCHAR}{HEXCHAR}{HEXCHAR})|("\\U00"{HEXCHAR}{HEX
 return REGEX;
 }
 
+"list" {
+    return DEFINED_LIST;
+}
+
 "DefIns" {
     return DEFINS;
 }

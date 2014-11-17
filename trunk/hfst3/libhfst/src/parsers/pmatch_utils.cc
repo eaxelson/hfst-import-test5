@@ -275,7 +275,7 @@ HfstTransducer * make_list(HfstTransducer * t)
 HfstTransducer * make_sigma(HfstTransducer * t)
 {
     HfstTransducer * retval =
-        new HfstTransducer(hfst::internal_epsilon, format);
+        new HfstTransducer(format);
     hfst::StringSet alphabet = t->get_alphabet();
     for (hfst::StringSet::const_iterator it = alphabet.begin();
          it != alphabet.end(); ++it) {
