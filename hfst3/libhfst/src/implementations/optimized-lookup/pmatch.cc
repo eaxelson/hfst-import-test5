@@ -79,6 +79,48 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
         rtn_names[name_from_insertion(str)] = symbol_number;
     } else if (is_guard(str)) {
         guards.push_back(symbol_number);
+    } else if (is_list(str)) {
+        process_symbol_list(str, symbol_number);
+    }
+}
+
+void PmatchAlphabet::process_symbol_list(std::string str, SymbolNumber sym)
+{
+    list_symbols[sym] = std::set<SymbolNumber>();
+    StringSymbolMap ss = build_string_symbol_map();
+    size_t begin = strlen("@PMATCH_LIST_");
+    size_t stop;
+    std::vector<std::string> collected_symbols;
+    while ((stop = str.find('_', begin)) != std::string::npos) {
+// For each underscore after the prelude, grab the substring
+        std::string symbol = str.substr(begin, stop - begin);
+        if (symbol.size() == 0) {
+// If the symbol _is_ an underscore it looks like we got an empty string
+            symbol = "_";
+            begin = stop + 2;
+        } else {
+            begin = stop + 1;
+        }
+        collected_symbols.push_back(symbol);
+    }
+    // One at the end
+    collected_symbols.push_back(str.substr(begin, str.size() - begin - strlen("@")));
+    // Process the symbols we found
+    for (std::vector<std::string>::const_iterator it = collected_symbols.begin();
+         it != collected_symbols.end(); ++it) {
+        SymbolNumber str_sym;
+        if (ss.count(*it) == 0) {
+        symbol_table.push_back(*it);
+        str_sym = orig_symbol_count;
+        ++orig_symbol_count;
+        } else {
+            str_sym = ss[*it];
+        }
+        if (symbol_lists.count(str_sym) == 0) {
+            symbol_lists[str_sym] = std::set<SymbolNumber>();
+        }
+        symbol_lists[str_sym].insert(sym);
+        list_symbols[sym].insert(str_sym);
     }
 }
 
@@ -107,11 +149,11 @@ PmatchContainer::PmatchContainer(std::istream & inputstream,
     // for once more established
 
     TransducerHeader header(inputstream);
-    orig_symbol_count = symbol_count = header.symbol_count();
     alphabet = PmatchAlphabet(inputstream, header.symbol_count());
+    orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
     alphabet.extract_tags = _extract_tags;
     line_number = 0;
-    encoder = new Encoder(alphabet.get_symbol_table(), header.input_symbol_count());
+    encoder = new Encoder(alphabet.get_symbol_table(), orig_symbol_count);
     toplevel = new hfst_ol::PmatchTransducer(
         inputstream,
         header.index_table_size(),
@@ -225,6 +267,11 @@ bool PmatchAlphabet::is_insertion(const std::string & symbol)
 bool PmatchAlphabet::is_guard(const std::string & symbol)
 {
     return symbol.find("@PMATCH_GUARD_") == 0 && symbol.rfind("@") == symbol.size() - 1;
+}
+
+bool PmatchAlphabet::is_list(const std::string & symbol)
+{
+    return symbol.find("@PMATCH_LIST_") == 0 && symbol.rfind("@") == symbol.size() - 1;
 }
 
 bool PmatchAlphabet::is_special(const std::string & symbol)
@@ -714,7 +761,16 @@ void PmatchTransducer::collect_first_transition(TransitionTableIndex i,
                     container->reset_recursion();
                     throw true;
                 }
-                possible_first_symbols.insert(*it);
+                if (alphabet.list_symbols.count(*it) == 1) {
+// If this is a list, collect everything in the list
+                    for (std::set<SymbolNumber>::const_iterator sym_it =
+                             alphabet.list_symbols[*it].begin();
+                         sym_it != alphabet.list_symbols[*it].end(); ++sym_it) {
+                        possible_first_symbols.insert(*sym_it);
+                    }
+                } else {
+                    possible_first_symbols.insert(*it);
+                }
             } else {
                 // faking through a context check
                 collect_first(transition_table[i].get_target(),
@@ -1081,8 +1137,9 @@ void PmatchTransducer::take_transitions(SymbolNumber input,
         } else if (this_input == input) {
             if (!checking_context()) {
                 if (this_output == alphabet.get_identity_symbol() ||
-                    (this_output == alphabet.get_unknown_symbol())) {
-                // we got here via identity or unknown, so look back in the
+                    (this_output == alphabet.get_unknown_symbol()) ||
+                    (alphabet.list_symbols.count(this_output) == 1)) {
+                // we got here via a meta-arc, so look back in the
                 // input tape to find the symbol we want to write
                     this_output = container->input[input_pos];
                 }
@@ -1141,6 +1198,15 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
         return;
     } else {
         input = container->input[input_pos];
+    }
+    
+    if (alphabet.symbol_lists.count(input) == 1) {
+// At least one symbol list contains this symbol
+        for(std::set<SymbolNumber>::const_iterator it =
+                alphabet.symbol_lists[input].begin();
+            it != alphabet.symbol_lists[input].end(); ++it) {
+            take_transitions(*it, input_pos, tape_pos, i+1);
+        }
     }
 
     if (input < orig_symbol_count) {
