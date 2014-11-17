@@ -991,46 +991,47 @@ REGEXP4: REGEXP5 { }
 ;
 
 REGEXP5: REGEXP6 { }
-| REGEXP5 UNION REGEXP6 {
+| REGEXP5 REGEXP6 { 
+    $$ = & $1->concatenate(*$2);
+    delete $2;
+ }
+;
+
+REGEXP6: REGEXP7 { }
+| REGEXP6 UNION REGEXP7 {
     $$ = & $1->disjunct(*$3);
     delete $3;
  }
-| REGEXP5 INTERSECTION REGEXP6 {
+| REGEXP6 INTERSECTION REGEXP7 {
     $$ = & $1->intersect(*$3);
     delete $3;
  }
-| REGEXP5 MINUS REGEXP6 {
+| REGEXP6 MINUS REGEXP7 {
     $$ = & $1->subtract(*$3);
     delete $3;
  }
-| REGEXP5 UPPER_MINUS REGEXP6 {
+| REGEXP6 UPPER_MINUS REGEXP7 {
     pmatcherror("No upper minus");
     $$ = $1;
     delete $3;
  }
-| REGEXP5 LOWER_MINUS REGEXP6 {
+| REGEXP6 LOWER_MINUS REGEXP7 {
     pmatcherror("No lower minus");
     $$ = $1;
     delete $3;
  }
-| REGEXP5 UPPER_PRIORITY_UNION REGEXP6 {
+| REGEXP6 UPPER_PRIORITY_UNION REGEXP7 {
     pmatcherror("No upper priority union");
     $$ = $1;
     delete $3;
  }
-| REGEXP5 LOWER_PRIORITY_UNION REGEXP6 {
+| REGEXP6 LOWER_PRIORITY_UNION REGEXP7 {
     pmatcherror("No lower priority union");
     $$ = $1;
     delete $3;
  }
 ;
 
-REGEXP6: REGEXP7 { }
-| REGEXP6 REGEXP7 { 
-    $$ = & $1->concatenate(*$2);
-    delete $2;
- }
-;
 
 REGEXP7: REGEXP8 { }
 | REGEXP7 IGNORING REGEXP8 {
