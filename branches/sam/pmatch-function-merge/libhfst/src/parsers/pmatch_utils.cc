@@ -951,6 +951,12 @@ HfstTransducer * PmatchFunction::evaluate(
     return root->evaluate(funargs);
 }
 
+HfstTransducer * PmatchFunction::evaluate(void)
+{
+    std::map<std::string, HfstTransducer *> empty_funargs;
+    return root->evaluate(empty_funargs);
+}
+
 HfstTransducer * PmatchAstNode::evaluate(
     std::map<std::string,
              HfstTransducer *> & funargs)

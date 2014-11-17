@@ -363,7 +363,6 @@ PmatchAstNode(std::string sym): symbol(sym), type(AstSymbol) {}
 
     HfstTransducer * evaluate(std::map<std::string,
                               HfstTransducer *> & funargs);
-
     HfstTransducer * compile(void);
 
     void push_numeric_arg(int arg)
@@ -383,6 +382,7 @@ struct PmatchFunction {
 
     HfstTransducer * evaluate(std::map<std::string,
                               HfstTransducer *> & funargs);
+    HfstTransducer * evaluate(void);
 };
 
 } } // namespaces

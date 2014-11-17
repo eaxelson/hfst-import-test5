@@ -195,8 +195,8 @@ PMATCH: DEFINITION {
  }
 ;
 
-DEFINITION: DEFINE BINDING { $$ = $2; }
-| DEFINS BINDING {
+DEFINITION:
+DEFINS BINDING {
     char * Ins_trans = hfst::pmatch::get_Ins_transition($2->first.c_str());
     HfstTransducer * ins_t = new HfstTransducer(
         Ins_trans, Ins_trans, hfst::pmatch::format);
@@ -215,6 +215,7 @@ DEFINITION: DEFINE BINDING { $$ = $2; }
     $$ = new std::pair<std::string, hfst::HfstTransducer*>("TOP", $2);
  }
 | DEFFUN FUNCTION { $$ = $2; }
+| DEFINE FUNCTION { $$ = $2; }
 ;
 
 BINDING: SYMBOL REGEXP1 {
@@ -273,10 +274,9 @@ FUNCTION: SYMBOL_WITH_LEFT_PAREN ARGLIST RIGHT_PARENTHESIS FUNCBODY1 END_OF_EXPR
         hfst::pmatch::warn(warning.str());
     }
     hfst::pmatch::functions[$1] = fun;
-    // Pass a dummy transducer, since function registration is separate
-    HfstTransducer * dummy = new HfstTransducer(hfst::pmatch::format);
-    dummy->set_name("@_PMATCH_DUMMY_@");
-    $$ = new std::pair<std::string, hfst::HfstTransducer*>("@_PMATCH_DUMMY_@", dummy);
+    HfstTransducer * t = fun.evaluate();
+    t->set_name($1);
+    $$ = new std::pair<std::string, hfst::HfstTransducer*>($1, t);
     if (hfst::pmatch::verbose) {
         std::cerr << std::setiosflags(std::ios::fixed) << std::setprecision(2);
         double duration = (clock() - hfst::pmatch::timer) /
