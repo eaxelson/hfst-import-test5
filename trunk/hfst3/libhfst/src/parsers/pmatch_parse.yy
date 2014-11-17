@@ -303,43 +303,41 @@ FUNCBODY1: FUNCBODY2 { }
 ;
 
 FUNCBODY2: FUNCBODY3 { }
-| FUNCBODY2 UNION FUNCBODY3 {
+| FUNCBODY2 FUNCBODY3 {
+    $$ = new PmatchAstNode($1, $2, hfst::pmatch::AstConcatenate);
+ };
+
+FUNCBODY3: FUNCBODY4 { }
+| FUNCBODY3 UNION FUNCBODY4 {
     $$ = new PmatchAstNode($1, $3, hfst::pmatch::AstDisjunct);
  }
-| FUNCBODY2 INTERSECTION FUNCBODY3 {
+| FUNCBODY3 INTERSECTION FUNCBODY4 {
     $$ = new PmatchAstNode($1, $3, hfst::pmatch::AstIntersect);
  }
-| FUNCBODY2 MINUS FUNCBODY3 {
+| FUNCBODY3 MINUS FUNCBODY4 {
     $$ = new PmatchAstNode($1, $3, hfst::pmatch::AstSubtract);
  }
-// | REGEXP5 UPPER_MINUS REGEXP6 {
+// | REGEXP3 UPPER_MINUS REGEXP4 {
 //     pmatcherror("No upper minus");
 //     $$ = $1;
 //     delete $3;
 //  }
-// | REGEXP5 LOWER_MINUS REGEXP6 {
+// | REGEXP3 LOWER_MINUS REGEXP4 {
 //     pmatcherror("No lower minus");
 //     $$ = $1;
 //     delete $3;
 //  }
-// | REGEXP5 UPPER_PRIORITY_UNION REGEXP6 {
+// | REGEXP3 UPPER_PRIORITY_UNION REGEXP4 {
 //     pmatcherror("No upper priority union");
 //     $$ = $1;
 //     delete $3;
 //  }
-// | REGEXP5 LOWER_PRIORITY_UNION REGEXP6 {
+// | REGEXP3 LOWER_PRIORITY_UNION REGEXP3 {
 //     pmatcherror("No lower priority union");
 //     $$ = $1;
 //     delete $3;
 //  }
 ;
-
-
-
-FUNCBODY3: FUNCBODY4 { }
-| FUNCBODY3 FUNCBODY4 {
-    $$ = new PmatchAstNode($1, $2, hfst::pmatch::AstConcatenate);
- };
 
 FUNCBODY4: FUNCBODY5
 | LEFT_BRACKET FUNCBODY1 RIGHT_BRACKET {
