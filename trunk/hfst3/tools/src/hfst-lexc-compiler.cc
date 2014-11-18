@@ -60,6 +60,8 @@ static bool minimize_flags = false;
 static bool rename_flags = false;
 static bool treat_warnings_as_errors = false;
 static bool xerox_composition = true;  // Compatibility with Xerox tools is the default
+static bool encode_weights = false;
+static bool enc = false;
 
 void
 print_usage()
@@ -73,6 +75,7 @@ print_usage()
                "  -f, --format=FORMAT     compile into FORMAT transducer\n"
                "  -o, --output=OUTFILE    write result into OUTFILE\n");
         fprintf(message_out, "Lexc options:\n"
+               "  -E, --encode-weights    encode weights when minimizing (default is false)\n"
                "  -F, --withFlags         use flags to hyperminimize result\n"
                "  -M, --minimizeFlags     if --withFlags is used, minimize the number of flags\n"
                "  -R, --renameFlags       if --withFlags and --minimizeFlags are used, rename\n"
@@ -122,6 +125,7 @@ parse_options(int argc, char** argv)
         static const struct option long_options[] =
         {
           HFST_GETOPT_COMMON_LONG,
+          {"encode-weights", no_argument, 0, 'E'},
           {"format", required_argument, 0, 'f'},
           {"output", required_argument, 0, 'o'},
           {"withFlags", no_argument,    0, 'F'},
@@ -134,7 +138,7 @@ parse_options(int argc, char** argv)
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             "f:o:FMRx:X:W",
+                             "Ef:o:FMRx:X:W",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -143,6 +147,9 @@ parse_options(int argc, char** argv)
         switch (c)
         {
 #include "inc/getopt-cases-common.h"
+        case 'E':
+          encode_weights = true;
+          break;
         case 'f':
           format = hfst_parse_format_name(optarg);
           break;
@@ -276,6 +283,12 @@ lexc_streams(LexcCompiler& lexc, HfstOutputStream& outstream)
     verbose_printf("done\n");
     delete res;
     outstream.close();
+
+    if (encode_weights)
+      {
+        hfst::set_encode_weights(enc);
+      }
+
     return EXIT_SUCCESS;
 }
 
@@ -304,6 +317,13 @@ int main( int argc, char **argv ) {
     {
         fclose(outfile);
     }
+
+    enc = hfst::get_encode_weights();
+    if (encode_weights)
+      {
+        hfst::set_encode_weights(true);
+      }
+
     verbose_printf("Reading from ");
     for (unsigned int i = 0; i < lexccount; i++)
       {
