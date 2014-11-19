@@ -19,7 +19,7 @@ extern size_t len;
 extern std::map<std::string,hfst::HfstTransducer*> definitions;
 extern std::map<std::string,std::string> function_definitions;
 extern std::map<std::string,unsigned int> function_arguments;
- extern std::map<std::string, std::list<std::string> > lists;
+extern std::map<std::string, std::set<std::string> > symbol_lists;
 extern HfstTransducer* last_compiled;
 extern bool contains_only_comments;
 extern ImplementationType format;
@@ -80,6 +80,7 @@ HfstTransducer* compile(const std::string& xre,
                         std::map<std::string,hfst::HfstTransducer*>& defs,
                         std::map<std::string,std::string>& func_defs,
                         std::map<std::string,unsigned int> func_args,
+                        std::map<std::string, std::set<std::string> >& lists,
                         hfst::ImplementationType type);
 
 /**
@@ -89,6 +90,7 @@ HfstTransducer* compile_first(const std::string& xre,
                               std::map<std::string,hfst::HfstTransducer*>& defs,
                               std::map<std::string,std::string>& func_defs,
                               std::map<std::string,unsigned int> func_args,
+                              std::map<std::string, std::set<std::string> >& lists,
                               hfst::ImplementationType type,
                               unsigned int & chars_read);
 
@@ -125,6 +127,8 @@ bool is_valid_function_call(const char * name, const std::vector<HfstTransducer>
  HfstTransducer * contains_once(const HfstTransducer * t);
 
  HfstTransducer * contains_once_optional(const HfstTransducer * t);
+
+ HfstTransducer * merge_first_to_second(HfstTransducer * tr1, HfstTransducer * tr2);
 
  void warn(const char * msg);
  void warn_about_special_symbols_in_replace(HfstTransducer *t);

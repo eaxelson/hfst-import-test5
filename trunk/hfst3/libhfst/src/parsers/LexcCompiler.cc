@@ -504,6 +504,13 @@ LexcCompiler::setCurrentLexiconName(const string& lexiconName)
 {
     static bool firstLexicon = true;
     currentLexiconName_ = lexiconName;
+
+    // testing
+    //if (lexiconNames_.find(lexiconName) == lexiconNames_.end())
+    //  throw("Lexicon is defined more than once!");
+    //else
+    //  std::cerr << "Lexicon defined for the first time: " << lexiconName << std::endl; 
+
     lexiconNames_.insert(lexiconName);
     if (noFlags_.find(lexiconName) == noFlags_.end())
     {
@@ -575,52 +582,22 @@ LexcCompiler::compileLexical()
         if (!quiet_) fprintf(stderr, "*** ERROR: could not parse lexc file: treating warnings as errors [--Werror] ***\n");
         return 0;
       }
-/*
-    if( with_flags_)
-        fprintf(stderr, "With Flags \n \n");
-    else
-        fprintf(stderr, "no Flags \n \n");
-*/
 
     HfstTransducer lexicons(stringsTrie_, format_);
 
 
     lexicons.minimize();
 
-
-    // DEBUG
-    //fprintf(stderr, "lexicons: \n");
-    //lexicons.write_in_att_format(stderr, 1);
-
-
     // repeat star to overgenerate
     lexicons.repeat_star().minimize();
-
-
-
-    //printf("lexicons: \n");
-    //lexicons.write_in_att_format(stdout, 1);
-
-
-
 
     HfstSymbolSubstitutions smallSubstitutions;
     smallSubstitutions.insert(StringPair("@0@", "@_EPSILON_SYMBOL_@"));
     smallSubstitutions.insert(StringPair("@@ANOTHER_EPSILON@@", "@_EPSILON_SYMBOL_@"));
     smallSubstitutions.insert(StringPair("@ZERO@", "0"));
 
-    /*
-    lexicons.substitute("@0@", "@_EPSILON_SYMBOL_@");
-    lexicons.substitute("@@ANOTHER_EPSILON@@", "@_EPSILON_SYMBOL_@");
-    lexicons.substitute("@ZERO@", "0");
-    */
     lexicons.substitute(smallSubstitutions);
     lexicons.prune_alphabet();
-
-
-    //printf("lexicons: \n");
-    //lexicons.write_in_att_format(stdout, 1);
-
 
     HfstBasicTransducer joinersTrie_;
 

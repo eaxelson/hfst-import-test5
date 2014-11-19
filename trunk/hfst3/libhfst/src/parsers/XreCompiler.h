@@ -32,7 +32,6 @@
 
 #include <string>
 #include <cstdio>
-#include <list>
 #include "../HfstDataTypes.h"
 
 namespace hfst { 
@@ -53,7 +52,7 @@ class XreCompiler
   //!        defined by @a xre in later phases of compilation.
   void define(const std::string& name, const std::string& xre);
 
-  void define_list(const std::string& name, const std::list<std::string>& symbol_list);
+  void define_list(const std::string& name, const std::set<std::string>& symbol_list);
 
   //! @brief Add a function macro.
   //!        Compilers will replace call to function \a name with the transducer
@@ -129,7 +128,7 @@ class XreCompiler
   std::map<std::string,hfst::HfstTransducer*> definitions_;
   std::map<std::string, std::string> function_definitions_;
   std::map<std::string, unsigned int > function_arguments_;
-  std::map<std::string, std::list<std::string> > list_definitions_;
+  std::map<std::string, std::set<std::string> > list_definitions_;
   hfst::ImplementationType format_;
 
 }

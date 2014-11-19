@@ -19,6 +19,7 @@ XreCompiler::XreCompiler() :
     definitions_(),
     function_definitions_(),
     function_arguments_(),
+    list_definitions_(),
     format_(hfst::TROPICAL_OPENFST_TYPE)
 {}
 
@@ -26,6 +27,7 @@ XreCompiler::XreCompiler(hfst::ImplementationType impl) :
     definitions_(),
     function_definitions_(),
     function_arguments_(),
+    list_definitions_(),
     format_(impl)
 {}
 
@@ -43,7 +45,7 @@ XreCompiler::define(const std::string& name, const std::string& xre)
 }
 
 void 
-XreCompiler::define_list(const std::string& name, const std::list<std::string>& symbol_list)
+XreCompiler::define_list(const std::string& name, const std::set<std::string>& symbol_list)
 {
   list_definitions_[name] = symbol_list;
 }
@@ -135,13 +137,13 @@ XreCompiler::contained_only_comments()
 HfstTransducer*
 XreCompiler::compile(const std::string& xre)
 {
-  return hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, format_);
+  return hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, list_definitions_, format_);
 }
 
 HfstTransducer*
 XreCompiler::compile_first(const std::string& xre, unsigned int & chars_read)
 {
-  return hfst::xre::compile_first(xre, definitions_, function_definitions_, function_arguments_, format_, chars_read);
+  return hfst::xre::compile_first(xre, definitions_, function_definitions_, function_arguments_, list_definitions_, format_, chars_read);
 }
 
 bool XreCompiler::get_positions_of_symbol_in_xre
@@ -151,7 +153,7 @@ bool XreCompiler::get_positions_of_symbol_in_xre
   positions.clear();
   cr=0;
   HfstTransducer * compiled = 
-    hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, format_);
+    hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, list_definitions_, format_);
   free(position_symbol);
   position_symbol = NULL;
   if (compiled == NULL)

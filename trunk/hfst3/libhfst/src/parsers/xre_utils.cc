@@ -70,11 +70,11 @@ namespace hfst
 namespace xre 
 {
 
-char* data;
-std::map<std::string,hfst::HfstTransducer*> definitions;
+  char* data;
+  std::map<std::string,hfst::HfstTransducer*> definitions;
   std::map<std::string,std::string>  function_definitions;
   std::map<std::string,unsigned int> function_arguments;
-  std::map<std::string,std::list<string> > lists;
+  std::map<std::string,std::set<string> > symbol_lists;
 char* startptr;
 hfst::HfstTransducer* last_compiled;
 bool contains_only_comments = false;
@@ -439,6 +439,7 @@ HfstTransducer*
 compile(const string& xre, map<string,HfstTransducer*>& defs,
         map<string, string>& func_defs,
         map<string, unsigned int > func_args,
+        map<string, std::set<string> >& lists,
         ImplementationType impl)
 {
     // lock here?
@@ -448,6 +449,7 @@ compile(const string& xre, map<string,HfstTransducer*>& defs,
     definitions = defs;
     function_definitions = func_defs;
     function_arguments = func_args;
+    symbol_lists = lists;
     format = impl;
 
     contains_only_comments = false;
@@ -481,6 +483,7 @@ HfstTransducer*
 compile_first(const string& xre, map<string,HfstTransducer*>& defs,
               map<string, string>& func_defs,
               map<string, unsigned int > func_args,
+              map<string, std::set<string> >& lists,
               ImplementationType impl,
               unsigned int & chars_read)
 {
@@ -491,6 +494,7 @@ compile_first(const string& xre, map<string,HfstTransducer*>& defs,
     definitions = defs;
     function_definitions = func_defs;
     function_arguments = func_args;
+    symbol_lists = lists;
     format = impl;
 
     contains_only_comments = false;
@@ -928,6 +932,12 @@ xfst_label_to_transducer(const char* input, const char* output)
     HfstTransducer * retval = contains_once(t);
     retval->disjunct(neg_t).minimize();
     return retval;
+  }
+
+  HfstTransducer * merge_first_to_second(HfstTransducer * tr1, HfstTransducer * tr2)
+  {
+    tr2->merge(*tr1, hfst::xre::symbol_lists);
+    return tr2;
   }
 
   void warn(const char * msg)
