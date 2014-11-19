@@ -20,11 +20,9 @@
 
 #include <string>
 #include <map>
-#include <list>
 #include <queue>
 #include <stack>
 
-using std::list;
 using std::string;
 using std::map;
 using std::queue;
@@ -999,13 +997,13 @@ namespace xfst {
           {
             hfst_fprintf(errorstream_, "unsupported unicode range %s-%s\n", start, end);
           }
-        list<string> l;
+        std::set<string> l;
         for (char c = *start; c < *end; c++)
           {
             char *s = static_cast<char*>(malloc(sizeof(char)*2));
             *s = c;
             *(s+1) = '\0';
-            l.push_back(s);
+            l.insert(s);
           }
         lists_[name] = l;
         return *this;
@@ -1022,12 +1020,12 @@ namespace xfst {
             MAYBE_QUIT;
             PROMPT_AND_RETURN_THIS;
           }
-        list<string> l;
+        std::set<string> l;
         char* p = strdup(values);
         char* token = strtok(p, " ");
         while (token != NULL)
           {
-            l.push_back(token);
+            l.insert(token);
             token = strtok(NULL, " ");
           }
         free(p);
@@ -2534,9 +2532,9 @@ namespace xfst {
           hfst_fprintf(outfile, "No such list defined: %s\n", name);
           PROMPT_AND_RETURN_THIS;
         }
-      list<string> l = lists_[name];
+      std::set<string> l = lists_[name];
       hfst_fprintf(outfile, "%10s: ", name);
-      for (list<string>::const_iterator s = l.begin();
+      for (std::set<string>::const_iterator s = l.begin();
            s != l.end();
            ++s)
         {
@@ -2554,12 +2552,12 @@ namespace xfst {
           hfst_fprintf(outfile, "No lists defined.\n");
           PROMPT_AND_RETURN_THIS;
         }
-      for (map<string,list<string> >::const_iterator l = lists_.begin();
+      for (map<string,std::set<string> >::const_iterator l = lists_.begin();
            l != lists_.end();
            ++l)
         {
           hfst_fprintf(outfile, "%10s: ", l->first.c_str());
-          for (list<string>::const_iterator s = l->second.begin();
+          for (std::set<string>::const_iterator s = l->second.begin();
                s != l->second.end();
                ++s)
             {
@@ -3598,12 +3596,6 @@ namespace xfst {
         switch (operation)
           {
           case INTERSECT_NET:
-            /*{
-              HfstBasicTransducer basic(*t);
-              HfstBasicTransducer merge_tr = HfstBasicTransducer::merge(fsm, basic);
-              fprintf(stderr, "result of merge is:\n");
-              merge_tr.write_in_att_format(stderr);
-              }*/
             result->intersect(*t);
             break;
           case IGNORE_NET:

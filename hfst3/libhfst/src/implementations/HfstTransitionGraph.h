@@ -11,7 +11,6 @@
  #include <iostream>
  #include <algorithm>
  #include <stack>
- #include <list>
 
  #include "../HfstSymbolDefs.h"
  #include "../HfstExceptionDefs.h"
@@ -4185,7 +4184,7 @@
            graph1.sort_arcs();
            graph2.sort_arcs();
            state_map[StatePair(0, 0)] = 0;   // initial states
-
+           
            if (graph1.is_final_state(0) && graph2.is_final_state(0))
              {
                float final_weight = std::min(graph1.get_final_weight(0), graph2.get_final_weight(0));
@@ -4198,6 +4197,9 @@
          }
 
 
+
+
+         // HERE BEGINS
 
            // A function used by find_matches_for_merge
            // Copy matching transition graph_tr/merger_tr to state \a result_state in \a result and return
@@ -4231,7 +4233,6 @@
            static HfstState handle_list_match(const HfstTransitionGraph & graph, const HfstTransition <C> & graph_transition,
                                               const HfstTransitionGraph & merger, const HfstTransition <C> & merger_transition,
                                               HfstTransitionGraph & result, HfstState result_state, StateMap & state_map)
-                                    
            {
              HfstState graph_target = graph_transition.get_target_state();
              HfstState merger_target = merger_transition.get_target_state();
@@ -4252,17 +4253,17 @@
                }
              return retval;
            }
-
+           
 
               
-           static bool is_list_symbol(const C & transition_data, const std::map<std::string, std::list<std::string> > & list_symbols)
+           static bool is_list_symbol(const C & transition_data, const std::map<std::string, std::set<std::string> > & list_symbols)
            {
              std::string isymbol = transition_data.get_input_symbol();
              std::string osymbol = transition_data.get_output_symbol();
 
              if (isymbol != osymbol)
                {
-                 return false;
+                 throw "is_list_symbol: input and output symbols must be the same";
                }
              return (list_symbols.find(isymbol) != list_symbols.end());
            }
@@ -4318,7 +4319,7 @@
            static void find_matches_for_merge
              (HfstTransitionGraph & graph, HfstState graph_state, HfstTransitionGraph & merger, HfstState merger_state,
               HfstTransitionGraph & result, HfstState result_state, StateMap & state_map, std::set<HfstState> & agenda,
-              const std::map<std::string, std::list<std::string> > & list_symbols)
+              const std::map<std::string, std::set<std::string> > & list_symbols)
            {
              agenda.insert(result_state);  // do not handle \a result_state twice
              HfstTransitions & graph_transitions = graph.state_vector[graph_state]; // transitions of graph
@@ -4338,7 +4339,7 @@
                  // List symbols must be checked separately
                  if (is_list_symbol(graph_transition_data, list_symbols))
                    {
-                     const std::list<std::string> & symbol_list = list_symbols.find(graph_transition_data.get_input_symbol())->second;
+                     const std::set<std::string> & symbol_list = list_symbols.find(graph_transition_data.get_input_symbol())->second;
                      bool list_match_found=false;
                      // Find all matches
                      for(unsigned int j=0; j < merger_transitions.size(); j++)
@@ -4346,8 +4347,14 @@
                          HfstTransition <C> & merger_transition = merger_transitions[j];
                          const C & merger_transition_data = merger_transition.get_transition_data();
                          const std::string & isymbol = merger_transition_data.get_input_symbol();
+                         const std::string & osymbol = merger_transition_data.get_output_symbol();
 
-                         if (list_symbols.find(isymbol) != list_symbols.end())
+                         if (isymbol != osymbol)
+                           {
+                             throw "find_matches_for_merge: input and output symbols must be the same";
+                           }
+
+                         if (symbol_list.find(isymbol) != symbol_list.end())
                            {
                              list_match_found=true;
                              HfstState target = handle_list_match(graph, graph_transition, merger, merger_transition, result, result_state, state_map);
@@ -4376,7 +4383,7 @@
            }
 
          static HfstTransitionGraph merge
-           (HfstTransitionGraph & graph, HfstTransitionGraph & merger, const std::map<std::string, std::list<std::string> > & list_symbols)
+           (HfstTransitionGraph & graph, HfstTransitionGraph & merger, const std::map<std::string, std::set<std::string> > & list_symbols)
          {
            HfstTransitionGraph result;
            StateMap state_map;
@@ -4391,7 +4398,14 @@
                result.set_final_weight(0, final_weight);
              }
            
-           find_matches_for_merge(graph, 0, merger, 0, result, 0, state_map, agenda, list_symbols);
+           try 
+             {
+               find_matches_for_merge(graph, 0, merger, 0, result, 0, state_map, agenda, list_symbols);
+             }
+           catch (const char * msg)
+             {
+               HFST_THROW_MESSAGE(TransducersAreNotAutomataException, std::string(msg));
+             }
 
            return result;
          }

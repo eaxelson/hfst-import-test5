@@ -1249,7 +1249,7 @@ ccc : ddd
     HfstTransducer &compose(const HfstTransducer &another, 
                             bool harmonize=true);
 
-    HfstTransducer &merge(const HfstTransducer &another, const std::map<std::string, std::list<std::string> > & list_symbols);
+    HfstTransducer &merge(const HfstTransducer &another, const std::map<std::string, std::set<std::string> > & list_symbols);
 
     /** \brief Compose this transducer with the intersection of
         transducers in \a v. If \a invert is true, then compose the

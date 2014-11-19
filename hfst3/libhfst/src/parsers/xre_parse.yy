@@ -243,11 +243,20 @@ REGEXP2: REPLACE
             delete $3;
         }
        | REGEXP2 MERGE_RIGHT_ARROW REPLACE {
-            $$ = & $3->merge(*$1, hfst::xre::lists).minimize();
+          try {
+            $$ = hfst::xre::merge_first_to_second($1, $3);
+          }
+          catch (const TransducersAreNotAutomataException & e)
+          {
+            xreerror("Error: transducers must be automata in merge operation.");
             delete $1;
+            delete $3;
+            YYABORT;
+          }
+          delete $1;
        }
        | REGEXP2 MERGE_LEFT_ARROW REPLACE {
-            $$ = & $1->merge(*$3, hfst::xre::lists).minimize();
+            $$ = hfst::xre::merge_first_to_second($3, $1);
             delete $3;
        }
         // substitute
