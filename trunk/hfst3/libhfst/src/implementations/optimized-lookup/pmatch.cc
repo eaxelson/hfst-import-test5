@@ -19,6 +19,8 @@ PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
     special_symbols[NRC_exit] = NO_SYMBOL_NUMBER;
     special_symbols[Pmatch_passthrough] = NO_SYMBOL_NUMBER;
     special_symbols[boundary] = NO_SYMBOL_NUMBER;
+    symbol2lists = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
+    list2symbols = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
     for (SymbolNumber i = 1; i < symbol_table.size(); ++i) {
         add_special_symbol(symbol_table[i], i);
     }
@@ -27,6 +29,13 @@ PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
 PmatchAlphabet::PmatchAlphabet(void):
     TransducerAlphabet()
 {}
+
+void PmatchAlphabet::add_symbol(const std::string & symbol)
+{
+    TransducerAlphabet::add_symbol(symbol);
+    symbol2lists.push_back(NO_SYMBOL_NUMBER);
+    list2symbols.push_back(NO_SYMBOL_NUMBER);
+}
 
 bool PmatchAlphabet::is_printable(SymbolNumber symbol)
 {
@@ -86,7 +95,7 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
 
 void PmatchAlphabet::process_symbol_list(std::string str, SymbolNumber sym)
 {
-    list_symbols[sym] = std::set<SymbolNumber>();
+    SymbolNumberVector list_symbols;
     StringSymbolMap ss = build_string_symbol_map();
     size_t begin = strlen("@PMATCH_LIST_");
     size_t stop;
@@ -110,18 +119,23 @@ void PmatchAlphabet::process_symbol_list(std::string str, SymbolNumber sym)
          it != collected_symbols.end(); ++it) {
         SymbolNumber str_sym;
         if (ss.count(*it) == 0) {
-        symbol_table.push_back(*it);
-        str_sym = orig_symbol_count;
-        ++orig_symbol_count;
+// This symbol isn't mentioned elsewhere in the alphabet
+            add_symbol(*it);
+            str_sym = orig_symbol_count;
+            ++orig_symbol_count;
         } else {
             str_sym = ss[*it];
         }
-        if (symbol_lists.count(str_sym) == 0) {
-            symbol_lists[str_sym] = std::set<SymbolNumber>();
+        list_symbols.push_back(str_sym);
+        if (symbol2lists[str_sym] == NO_SYMBOL_NUMBER) {
+            symbol2lists[str_sym] = symbol_lists.size();
+            symbol_lists.push_back(SymbolNumberVector(1, sym));
+        } else {
+            symbol_lists[symbol2lists[str_sym]].push_back(sym);
         }
-        symbol_lists[str_sym].insert(sym);
-        list_symbols[sym].insert(str_sym);
     }
+    list2symbols[sym] = symbol_list_members.size();
+    symbol_list_members.push_back(list_symbols);
 }
 
 SymbolNumberVector PmatchAlphabet::get_specials(void) const
@@ -761,11 +775,11 @@ void PmatchTransducer::collect_first_transition(TransitionTableIndex i,
                     container->reset_recursion();
                     throw true;
                 }
-                if (alphabet.list_symbols.count(*it) == 1) {
+                if (alphabet.list2symbols[*it] != NO_SYMBOL_NUMBER) {
 // If this is a list, collect everything in the list
-                    for (std::set<SymbolNumber>::const_iterator sym_it =
-                             alphabet.list_symbols[*it].begin();
-                         sym_it != alphabet.list_symbols[*it].end(); ++sym_it) {
+                    for (SymbolNumberVector::const_iterator sym_it =
+                            alphabet.symbol_list_members[alphabet.list2symbols[*it]].begin();
+                        sym_it != alphabet.symbol_list_members[alphabet.list2symbols[*it]].end(); ++sym_it) {
                         possible_first_symbols.insert(*sym_it);
                     }
                 } else {
@@ -1138,7 +1152,7 @@ void PmatchTransducer::take_transitions(SymbolNumber input,
             if (!checking_context()) {
                 if (this_output == alphabet.get_identity_symbol() ||
                     (this_output == alphabet.get_unknown_symbol()) ||
-                    (alphabet.list_symbols.count(this_output) == 1)) {
+                    (alphabet.list2symbols[this_output] != NO_SYMBOL_NUMBER)) {
                 // we got here via a meta-arc, so look back in the
                 // input tape to find the symbol we want to write
                     this_output = container->input[input_pos];
@@ -1200,11 +1214,11 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
         input = container->input[input_pos];
     }
     
-    if (alphabet.symbol_lists.count(input) == 1) {
+    if (alphabet.symbol2lists[input] != NO_SYMBOL_NUMBER) {
 // At least one symbol list contains this symbol
-        for(std::set<SymbolNumber>::const_iterator it =
-                alphabet.symbol_lists[input].begin();
-            it != alphabet.symbol_lists[input].end(); ++it) {
+        for(SymbolNumberVector::const_iterator it =
+                alphabet.symbol_lists[alphabet.symbol2lists[input]].begin();
+            it != alphabet.symbol_lists[alphabet.symbol2lists[input]].end(); ++it) {
             take_transitions(*it, input_pos, tape_pos, i+1);
         }
     }

@@ -90,8 +90,12 @@ namespace hfst_ol {
         std::map<SpecialSymbol, SymbolNumber> special_symbols;
         std::map<SymbolNumber, std::string> end_tag_map;
         std::map<std::string, SymbolNumber> rtn_names;
-        std::map<SymbolNumber, std::set<SymbolNumber> > symbol_lists;
-        std::map<SymbolNumber, std::set<SymbolNumber> > list_symbols;
+// For each symbol, either NO_SYMBOL for "no corresponding list" or an index into symbol_lists
+        SymbolNumberVector symbol2lists;
+// For each a symbol, either NO_SYMBOL for "this is not a list" or an index into symbol_lists_members
+        SymbolNumberVector list2symbols;
+        std::vector<SymbolNumberVector> symbol_lists;
+        std::vector<SymbolNumberVector> symbol_list_members;
         SymbolNumberVector guards;
         bool is_end_tag(const SymbolNumber symbol) const;
         bool is_guard(const SymbolNumber symbol) const;
@@ -103,6 +107,7 @@ namespace hfst_ol {
         PmatchAlphabet(std::istream& is, SymbolNumber symbol_count);
         PmatchAlphabet(void);
         ~PmatchAlphabet(void);
+        virtual void add_symbol(const std::string & symbol);
         static bool is_end_tag(const std::string & symbol);
         static bool is_insertion(const std::string & symbol);
         static bool is_guard(const std::string & symbol);
