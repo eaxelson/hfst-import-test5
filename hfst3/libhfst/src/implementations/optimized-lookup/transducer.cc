@@ -60,6 +60,11 @@ void TransducerAlphabet::add_symbol(char * symbol)
     symbol_table.push_back(symbol);
 }
 
+void TransducerAlphabet::add_symbol(const std::string & symbol)
+{
+    symbol_table.push_back(symbol);
+}
+
 TransducerAlphabet::TransducerAlphabet(const SymbolTable& st):
     symbol_table(st)
 {

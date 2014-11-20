@@ -419,7 +419,9 @@ public:
         { return identity_symbol; }
     SymbolNumber get_orig_symbol_count(void) const
         { return orig_symbol_count; }
-    void add_symbol(char * symbol);
+    virtual void add_symbol(char * symbol);
+    virtual void add_symbol(const std::string & symbol);
+
     
 };
 
