@@ -65,10 +65,18 @@ handle_definition(const string& variable_name, const string& reg_exp)
 }
 
 static
-void
+bool
 handle_lexicon_name(const string& lexiconName)
 {
+  try 
+  {
     hfst::lexc::lexc_->setCurrentLexiconName(lexiconName);
+  }
+  catch(const char * msg)
+  {
+    return false;
+  }
+  return true;
 }
 
 static
@@ -256,12 +264,16 @@ LEXICONS: LEXICONS LEXICON2 LEXICON_LINES
           ;
 
 LEXICON2: LEXICON_START {
-            handle_lexicon_name($1);
+            bool retval = handle_lexicon_name($1);
             free($1);
+            if (!retval)
+              { hlexcerror("Sublexicon defined more than once."); YYABORT; }
           }
           | LEXICON_START_WRONG_CASE {
-            handle_lexicon_name($1);
+            bool retval = handle_lexicon_name($1);
             free($1);
+            if (!retval)
+              { hlexcerror("Sublexicon defined more than once."); YYABORT; }
           }
           ;
 

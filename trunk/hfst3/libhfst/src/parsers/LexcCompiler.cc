@@ -85,7 +85,8 @@ LexcCompiler::LexcCompiler() :
     parseErrors_(false),
     with_flags_(false),
     minimize_flags_(false),
-    rename_flags_(false)
+    rename_flags_(false),
+    allow_multiple_sublexicon_definitions_(false)
 {
     xre_.set_expand_definitions(true);
 }
@@ -102,7 +103,8 @@ LexcCompiler::LexcCompiler(ImplementationType impl) :
     parseErrors_(false),
     with_flags_(false),
     minimize_flags_(false),
-    rename_flags_(false)
+    rename_flags_(false),
+    allow_multiple_sublexicon_definitions_(false)
 {
     tokenizer_.add_multichar_symbol("@_EPSILON_SYMBOL_@");
     tokenizer_.add_multichar_symbol("@0@");
@@ -126,7 +128,8 @@ LexcCompiler::LexcCompiler(ImplementationType impl, bool withFlags) :
     parseErrors_(false),
     with_flags_(withFlags),
     minimize_flags_(false),
-    rename_flags_(false)
+    rename_flags_(false),
+    allow_multiple_sublexicon_definitions_(false)
 {
     tokenizer_.add_multichar_symbol("@_EPSILON_SYMBOL_@");
     tokenizer_.add_multichar_symbol("@0@");
@@ -194,6 +197,14 @@ LexcCompiler::setTreatWarningsAsErrors(bool value)
     treat_warnings_as_errors_ = value;
     return *this;
 }
+
+LexcCompiler&
+LexcCompiler::setAllowMultipleSublexiconDefinitions(bool value)
+{
+    allow_multiple_sublexicon_definitions_ = value;
+    return *this;
+}
+
 
 LexcCompiler&
 LexcCompiler::setWithFlags(bool value)
@@ -505,11 +516,11 @@ LexcCompiler::setCurrentLexiconName(const string& lexiconName)
     static bool firstLexicon = true;
     currentLexiconName_ = lexiconName;
 
-    // testing
-    //if (lexiconNames_.find(lexiconName) == lexiconNames_.end())
-    //  throw("Lexicon is defined more than once!");
-    //else
-    //  std::cerr << "Lexicon defined for the first time: " << lexiconName << std::endl; 
+    if (!allow_multiple_sublexicon_definitions_)
+      {
+        if (lexiconNames_.find(lexiconName) != lexiconNames_.end())
+          throw("Lexicon is defined more than once!");
+      }
 
     lexiconNames_.insert(lexiconName);
     if (noFlags_.find(lexiconName) == noFlags_.end())
@@ -1099,14 +1110,17 @@ main(int argc, char** argv)
 #if HAVE_SFST
     std::cout << " (SFST)...";
     LexcCompiler lexcSfst(SFST_TYPE);
+    lexcSfst.setAllowMultipleSublexiconDefinitions(true);
 #endif
 #if HAVE_OPENFST
     std::cout << " (OpenFST)...";
     LexcCompiler lexcOfst(TROPICAL_OPENFST_TYPE);
+    lexcOfst.setAllowMultipleSublexiconDefinitions(true);
 #endif
 #if HAVE_FOMA
     std::cout << " (foma)...";
     LexcCompiler lexcFoma(FOMA_TYPE);
+    lexcFoma.setAllowMultipleSublexiconDefinitions(true);
 #endif
     std::cout << std::endl << "set verbose:";
 #if HAVE_SFST

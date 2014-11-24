@@ -71,6 +71,8 @@ class LexcCompiler
 
   LexcCompiler& setTreatWarningsAsErrors(bool value);
 
+  LexcCompiler& setAllowMultipleSublexiconDefinitions(bool value);
+
   LexcCompiler& setWithFlags(bool value);
 
   LexcCompiler& setMinimizeFlags(bool value);
@@ -137,6 +139,7 @@ class LexcCompiler
   bool minimize_flags_;
   bool rename_flags_;
   bool treat_warnings_as_errors_;
+  bool allow_multiple_sublexicon_definitions_;
 
   hfst::ImplementationType format_;
   hfst::HfstTokenizer tokenizer_;
