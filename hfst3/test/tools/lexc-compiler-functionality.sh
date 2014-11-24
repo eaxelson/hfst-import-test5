@@ -30,7 +30,7 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
           
                     
           
-LEXCXFAIL="xfail.bogus.lexc xfail.ISO-8859-1.lexc xfail.lexicon-semicolon.lexc"
+LEXCXFAIL="xfail.bogus.lexc xfail.ISO-8859-1.lexc xfail.lexicon-semicolon.lexc xfail.sublexicon-defined-more-than-once.lexc"
 
 LEXCWARN="warn.sublexicon-mentioned-but-not-defined.lexc"
 

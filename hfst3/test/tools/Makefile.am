@@ -299,6 +299,7 @@ LEXC_TXTS=basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc \
 		  basic.two-lexicons.lexc basic.UTF-8.lexc basic.zeros-epsilons.lexc \
 		  cat.lexc hfst.weights.lexc stress.random-lexicons-100.lexc \
 		  xfail.bogus.lexc xfail.ISO-8859-1.lexc xfail.lexicon-semicolon.lexc \
+		  xfail.sublexicon-defined-more-than-once.lexc \
 		  xre.any-variations.lexc xre.at-file.lexc \
 		  xre.automatic-multichar-symbols.lexc xre.basic.lexc \
 		  xre.definitions.lexc xre.months.lexc xre.nested-definitions.lexc \
