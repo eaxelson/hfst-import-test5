@@ -234,6 +234,52 @@ StringPairVector HfstTokenizer::tokenize
     }
   return spv;
 }
+
+StringPairVector HfstTokenizer::tokenize
+(const string& input_string,const string& output_string,
+ void (*warn_about_pair)(const std::pair<std::string, std::string> &symbol_pair)) const
+{
+  check_utf8_correctness(input_string);
+  check_utf8_correctness(output_string);
+
+  StringPairVector spv;
+  
+  StringPairVector input_spv = tokenize(input_string.c_str());
+  StringPairVector output_spv = tokenize(output_string.c_str());
+
+  if (input_spv.size() < output_spv.size())
+    {
+      StringPairVector::iterator jt = output_spv.begin();
+      for (StringPairVector::iterator it = input_spv.begin();
+           it != input_spv.end();
+           ++it)
+        { StringPair sp(it->first, jt->first);
+          warn_about_pair(sp);
+          spv.push_back(sp);
+          ++jt; }
+      for ( ; jt != output_spv.end(); ++jt)
+        { StringPair sp(internal_epsilon,jt->first);
+          warn_about_pair(sp);
+          spv.push_back(sp); }
+    }
+  else
+    {
+      StringPairVector::iterator it = input_spv.begin();
+      for (StringPairVector::iterator jt = output_spv.begin();
+           jt != output_spv.end();
+           ++jt)
+        { StringPair sp(it->first, jt->first);
+          warn_about_pair(sp);
+          spv.push_back(sp);
+          ++it; }
+      for ( ; it != input_spv.end(); ++it)
+        { StringPair sp(it->first,internal_epsilon);
+          warn_about_pair(sp);
+          spv.push_back(sp); }
+    }
+  return spv;
+}
+
   
   void 
   HfstTokenizer::check_utf8_correctness(const std::string &input_string)
