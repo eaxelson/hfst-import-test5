@@ -29,7 +29,7 @@
 #include <assert.h>
 
 extern void hlexcerror(const char *text);
-
+extern void hlexcwarn(const char *text);
 %}
 
 /* c.f. Unicode Standard 5.1 D92 Table 3-7 */
@@ -126,7 +126,7 @@ LWSP [\r\n\t ]
     hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "Lexicon",
                                           NULL, true);
     free(lexicon_start);
-    hlexcerror("Titlecase Lexicon parsed as LEXICON");
+    hlexcwarn("Titlecase Lexicon parsed as LEXICON");
     return LEXICON_START_WRONG_CASE;
 }
 
@@ -196,7 +196,7 @@ LWSP [\r\n\t ]
     lexicon_start = hfst::lexc::strstrip(hlexctext);
     hlexclval.name = hfst::lexc::strdup_nonconst_part(lexicon_start, "Lexicon", 0, true);
     free(lexicon_start);
-    hlexcerror("Titlecase Lexicon parsed as LEXICON");
+    hlexcwarn("Titlecase Lexicon parsed as LEXICON");
     return LEXICON_START_WRONG_CASE;
 }
 
