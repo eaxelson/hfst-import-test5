@@ -33,6 +33,7 @@ using std::string;
 // obligatory yacc stuff
 extern int hlexclineno;
 void hlexcerror(const char *text);
+void hlexcwarn(const char *text);
 int hlexclex(void);
 
 // Actual functions to handle parsed stuff
@@ -361,6 +362,13 @@ int hlexcparse(void);
 // gah, bison/flex error mechanism here
 void
 hlexcerror(const char* text)
+{
+    hfst::lexc::error_at_current_token(0, 0, text);
+    hlexcnerrs++;
+}
+
+void
+hlexcwarn(const char* text)
 {
     hfst::lexc::error_at_current_token(0, 0, text);
 }
