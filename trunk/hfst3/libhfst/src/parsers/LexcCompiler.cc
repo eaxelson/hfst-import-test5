@@ -295,6 +295,48 @@ LexcCompiler::addStringEntry(const string& data,
     return *this;
 }
 
+// to handle information to warn_about_one_sided_flags_
+static bool treat_one_sided_flags_as_errors_ = false;
+static bool quiet_one_sided_flags_ = false;
+
+static void warn_about_one_sided_flags(const std::pair<std::string, std::string> & symbol_pair)
+{
+  if (FdOperation::is_diacritic(symbol_pair.first))
+    {
+      if (symbol_pair.first != symbol_pair.second)
+        {
+          if (treat_one_sided_flags_as_errors_)
+            {
+              if (!quiet_one_sided_flags_)
+                {
+                  std::cerr << "*** ERROR: one-sided flag diacritic: " << symbol_pair.first << ":" << symbol_pair.second << " [--Werror]" << std::endl;
+                }
+              throw "one-sided flag";
+            }
+          if (!quiet_one_sided_flags_)
+            {
+              std::cerr << "Warning: one-sided flag diacritic: " << symbol_pair.first << ":" << symbol_pair.second << std::endl;
+            }
+        }
+      return;
+    }
+  if (FdOperation::is_diacritic(symbol_pair.second))
+    {
+      if (treat_one_sided_flags_as_errors_)
+        {
+          if (!quiet_one_sided_flags_)
+            {
+              std::cerr << "*** ERROR: one-sided flag diacritic: " << symbol_pair.first << ":" << symbol_pair.second << " [--Werror]" << std::endl;
+            }
+          throw "one-sided flag";
+        }
+      if (!quiet_one_sided_flags_)
+        {
+          std::cerr << "Warning: one-sided flag diacritic: " << symbol_pair.first << ":" << symbol_pair.second << std::endl;
+        }
+    }
+}
+
 LexcCompiler&
 LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
         const string& continuation, double weight)
@@ -363,6 +405,9 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 
     StringPairVector newVector;
 
+    treat_one_sided_flags_as_errors_ = treat_warnings_as_errors_;
+    quiet_one_sided_flags_ = quiet_;
+
     if ( upperSize > lowerSize)
     {
         std::string epsilons = "";
@@ -373,7 +418,8 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 
         }
         newVector = tokenizer_.tokenize(joinerEnc + upper_string + encodedCont,
-                            joinerEnc + lower_string + epsilons + encodedCont);
+                                        joinerEnc + lower_string + epsilons + encodedCont,
+                                        &warn_about_one_sided_flags);
 
     }
     else if (upperSize < lowerSize)
@@ -386,12 +432,14 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 
         }
         newVector = tokenizer_.tokenize(joinerEnc + upper_string + epsilons + encodedCont,
-                            joinerEnc + lower_string + encodedCont);
+                                        joinerEnc + lower_string + encodedCont,
+                                        &warn_about_one_sided_flags);
     }
     else
     {
         newVector = tokenizer_.tokenize(joinerEnc + upper_string + encodedCont,
-                    joinerEnc + lower_string + encodedCont);
+                                        joinerEnc + lower_string + encodedCont,
+                                        &warn_about_one_sided_flags);
     }
     stringsTrie_.disjunct(newVector, weight);
 

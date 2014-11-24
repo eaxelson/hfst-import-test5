@@ -125,7 +125,7 @@ handle_string_entry(const string& data, const string& cont, const string& gloss)
 }
 
 static
-void
+bool
 handle_string_pair_entry(const string& upper, const string& lower,
                                 const string& cont, const string& gloss)
 {
@@ -136,7 +136,11 @@ handle_string_pair_entry(const string& upper, const string& lower,
     // handle epsilon "0"
     if (upper != "0" && lower != "0")
     {
-       hfst::lexc::lexc_->addStringPairEntry(upper, lower, cont, weight);
+       try {
+         hfst::lexc::lexc_->addStringPairEntry(upper, lower, cont, weight);
+       } catch(const char * msg) {
+         return false;
+       } 
     }
     else
     {
@@ -146,8 +150,13 @@ handle_string_pair_entry(const string& upper, const string& lower,
          upper_ = std::string("");
        if (lower == "0")
          lower_ = std::string("");
-       hfst::lexc::lexc_->addStringPairEntry(upper_, lower_, cont, weight);
+       try {
+         hfst::lexc::lexc_->addStringPairEntry(upper_, lower_, cont, weight);
+       } catch(const char * msg) {
+         return false;
+       }
     }
+    return true;
 }
 
 static
@@ -288,24 +297,30 @@ LEXICON_LINE: ULSTRING LEXICON_NAME ';' {
               }
               | ULSTRING ':' ULSTRING
                 LEXICON_NAME ';' {
-                handle_string_pair_entry($1, $3, $4, "");
+                bool retval = handle_string_pair_entry($1, $3, $4, "");
                 free( $1);
                 free( $3);
                 free( $4);
+                if (!retval)
+                  { hlexcerror("Erroneous string pair entry."); YYABORT; }
               }
               | LEXICON_NAME ';' {
                 handle_string_entry("", $1, "");
                 free( $1);
               }
               | ULSTRING ':' LEXICON_NAME ';' {
-                handle_string_pair_entry($1, "", $3, "");
+                bool retval = handle_string_pair_entry($1, "", $3, "");
                 free( $1);
                 free( $3);
+                if (!retval)
+                  { hlexcerror("Erroneous string pair entry."); YYABORT; }
               }
               | ':' ULSTRING LEXICON_NAME ';' {
-                handle_string_pair_entry("", $2, $3, "");
+                bool retval = handle_string_pair_entry("", $2, $3, "");
                 free( $2);
                 free( $3);
+                if (!retval)
+                  { hlexcerror("Erroneous string pair entry."); YYABORT; }
               }
               | ':' LEXICON_NAME ';' {
                 handle_string_entry("", $2, "");
@@ -319,11 +334,13 @@ LEXICON_LINE: ULSTRING LEXICON_NAME ';' {
               }
               | ULSTRING ':' ULSTRING
                 LEXICON_NAME ENTRY_GLOSS ';' {
-                handle_string_pair_entry($1, $3, $4, $5);
+                bool retval = handle_string_pair_entry($1, $3, $4, $5);
                 free( $1);
                 free( $3);
                 free( $4);
                 free( $5);
+                if (!retval)
+                  { hlexcerror("Erroneous string pair entry."); YYABORT; }
               }
               | LEXICON_NAME ENTRY_GLOSS ';' {
                 handle_string_entry("", $1, $2);
@@ -331,16 +348,20 @@ LEXICON_LINE: ULSTRING LEXICON_NAME ';' {
                 free( $2);
               }
               | ULSTRING ':' LEXICON_NAME ENTRY_GLOSS ';' {
-                handle_string_pair_entry($1, "", $3, $4);
+                bool retval = handle_string_pair_entry($1, "", $3, $4);
                 free( $1);
                 free( $3);
                 free( $4);
+                if (!retval)
+                  { hlexcerror("Erroneous string pair entry."); YYABORT; }
               }
               | ':' ULSTRING LEXICON_NAME ENTRY_GLOSS ';' {
-                handle_string_pair_entry("", $2, $3, $4);
+                bool retval = handle_string_pair_entry("", $2, $3, $4);
                 free( $2);
                 free( $3);
                 free( $4);
+                if (!retval)
+                  { hlexcerror("Erroneous string pair entry."); YYABORT; }
               }
               | ':' LEXICON_NAME ENTRY_GLOSS ';' {
                 handle_string_entry("", $2, $3);
