@@ -341,11 +341,11 @@ int main( int argc, char **argv ) {
    // lexc.with_flags_ = with_flags;
     if (silent)
       {
-        lexc.setVerbosity(false);
+        lexc.setVerbosity(0);
       }
     else
       {
-        lexc.setVerbosity(verbose);
+        lexc.setVerbosity(verbose ? 2 : 1);
       }
     if (treat_warnings_as_errors)
       {

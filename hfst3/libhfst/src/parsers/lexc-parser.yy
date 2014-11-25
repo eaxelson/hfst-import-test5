@@ -33,7 +33,6 @@ using std::string;
 // obligatory yacc stuff
 extern int hlexclineno;
 void hlexcerror(const char *text);
-void hlexcwarn(const char *text);
 int hlexclex(void);
 
 // Actual functions to handle parsed stuff
@@ -173,6 +172,15 @@ handle_regexp_entry(const string& reg_exp, const string& cont,
 
 static
 void
+hlexcwarn(const char* text)
+{
+  if (! hfst::lexc::lexc_->isQuiet())      
+    { hfst::lexc::error_at_current_token(0, 0, text); }
+}
+
+
+static
+void
 handle_eof()
 {
 }
@@ -279,6 +287,10 @@ LEXICON2: LEXICON_START {
               { hlexcerror("Sublexicon defined more than once."); YYABORT; }
           }
           | LEXICON_START_WRONG_CASE {
+            if (hfst::lexc::lexc_->areWarningsTreatedAsErrors()) 
+              { hlexcerror("Keyword 'Lexicon' used instead of 'LEXICON'. [--Werror]"); YYABORT; }
+            else
+              { hlexcwarn("Titlecase Lexicon parsed as LEXICON"); }
             bool retval = handle_lexicon_name($1);
             free($1);
             if (!retval)
@@ -399,12 +411,5 @@ hlexcerror(const char* text)
     hfst::lexc::error_at_current_token(0, 0, text);
     hlexcnerrs++;
 }
-
-void
-hlexcwarn(const char* text)
-{
-    hfst::lexc::error_at_current_token(0, 0, text);
-}
-
 
 // vim: set ft=yacc:
