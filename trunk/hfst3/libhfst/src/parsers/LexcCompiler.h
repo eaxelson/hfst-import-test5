@@ -65,11 +65,16 @@ class LexcCompiler
   LexcCompiler& parse(const char* filename);
 
   //! @brief set verbosity options.
-  //! When verbose is true, LexcCompiler will output the messages that Xerox
+  //! 0 means quiet, 1 the default and 2 (or bigger) the verbose mode.
+  //! When verbose is 2, LexcCompiler will output the messages that Xerox
   //! lexc compiler does.
-  LexcCompiler& setVerbosity(bool verbose);
+  LexcCompiler& setVerbosity(unsigned int verbose);
+
+  bool isQuiet();
 
   LexcCompiler& setTreatWarningsAsErrors(bool value);
+
+  bool areWarningsTreatedAsErrors();
 
   LexcCompiler& setAllowMultipleSublexiconDefinitions(bool value);
 

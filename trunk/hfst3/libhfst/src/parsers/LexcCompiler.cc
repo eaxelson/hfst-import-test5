@@ -183,12 +183,38 @@ LexcCompiler& LexcCompiler::parse(const char* filename)
     return *this;
 }
 
-LexcCompiler&
-LexcCompiler::setVerbosity(bool verbose)
+bool LexcCompiler::isQuiet()
 {
-    quiet_ = !verbose;
-    verbose_ = verbose;
-    return *this;
+  return quiet_;
+}
+
+LexcCompiler&
+LexcCompiler::setVerbosity(unsigned int verbose)
+{
+  //quiet_ = !verbose;
+  //verbose_ = verbose;
+  if (verbose == 0)
+    {
+      quiet_ = true;
+      verbose_ = false;
+    }
+  else if (verbose == 1)
+    {
+      quiet_ = false;
+      verbose_ = false;
+    }
+  else
+    {
+      quiet_ = false;
+      verbose_ = true;
+    }
+  return *this;
+}
+
+bool
+LexcCompiler::areWarningsTreatedAsErrors()
+{
+  return treat_warnings_as_errors_;
 }
 
 LexcCompiler&
@@ -307,15 +333,15 @@ static void warn_about_one_sided_flags(const std::pair<std::string, std::string>
         {
           if (treat_one_sided_flags_as_errors_)
             {
-              if (!quiet_one_sided_flags_)
+              if (true /*!quiet_one_sided_flags_*/) // error messages are always printed
                 {
-                  std::cerr << "*** ERROR: one-sided flag diacritic: " << symbol_pair.first << ":" << symbol_pair.second << " [--Werror]" << std::endl;
+                  std::cerr << std::endl << "*** ERROR: one-sided flag diacritic: " << symbol_pair.first << ":" << symbol_pair.second << " [--Werror]" << std::endl;
                 }
               throw "one-sided flag";
             }
           if (!quiet_one_sided_flags_)
             {
-              std::cerr << "Warning: one-sided flag diacritic: " << symbol_pair.first << ":" << symbol_pair.second << std::endl;
+              hfst::lexc::error_at_current_token(0, 0, "Warning: one-sided flag diacritic.");
             }
         }
       return;
@@ -324,15 +350,15 @@ static void warn_about_one_sided_flags(const std::pair<std::string, std::string>
     {
       if (treat_one_sided_flags_as_errors_)
         {
-          if (!quiet_one_sided_flags_)
+          if (true /*!quiet_one_sided_flags_*/) // error messages are always printed
             {
-              std::cerr << "*** ERROR: one-sided flag diacritic: " << symbol_pair.first << ":" << symbol_pair.second << " [--Werror]" << std::endl;
+              std::cerr << std::endl << "*** ERROR: one-sided flag diacritic: " << symbol_pair.first << ":" << symbol_pair.second << " [--Werror]" << std::endl;
             }
           throw "one-sided flag";
         }
       if (!quiet_one_sided_flags_)
         {
-          std::cerr << "Warning: one-sided flag diacritic: " << symbol_pair.first << ":" << symbol_pair.second << std::endl;
+          hfst::lexc::error_at_current_token(0, 0, "Warning: one-sided flag diacritic.");
         }
     }
 }
@@ -405,6 +431,7 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 
     StringPairVector newVector;
 
+    // information for function pointer &warn_about_one_sided_flags
     treat_one_sided_flags_as_errors_ = treat_warnings_as_errors_;
     quiet_one_sided_flags_ = quiet_;
 
@@ -1172,16 +1199,16 @@ main(int argc, char** argv)
 #endif
     std::cout << std::endl << "set verbose:";
 #if HAVE_SFST
-    lexcSfst.setVerbosity(true);
-    lexcSfst.setVerbosity(false);
+    lexcSfst.setVerbosity(1);
+    lexcSfst.setVerbosity(2);
 #endif
 #if HAVE_OFST
-    lexcOfst.setVerbosity(true);
-    lexcOfst.setVerbosity(false);
+    lexcOfst.setVerbosity(1);
+    lexcOfst.setVerbosity(2);
 #endif
 #if HAVE_FOMA
-    lexcFoma.setVerbosity(true);
-    lexcFoma.setVerbosity(false);
+    lexcFoma.setVerbosity(1);
+    lexcFoma.setVerbosity(2);
 #endif
     FILE* existence_check = fopen("LexcCompiler_test.lexc", "r");
     if (existence_check == NULL)
