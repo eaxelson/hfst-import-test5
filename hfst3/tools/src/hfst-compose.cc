@@ -139,8 +139,11 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     size_t transducer_n_first = 0; // transducers read from first stream
     size_t transducer_n_second = 0; // transducers read from second stream
     while (continueReading) {
-        first = new HfstTransducer(firststream);
-        transducer_n_first++;
+        if (firststream.is_good())
+          {
+            first = new HfstTransducer(firststream);
+            transducer_n_first++;
+          }
         if (secondstream.is_good())
           {
             second = new HfstTransducer(secondstream);
@@ -194,19 +197,42 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                   hfst_strformat(secondstream.get_type()));
           }
 
-        continueReading = firststream.is_good() && 
-          (secondstream.is_good() || transducer_n_second == 1);
+        continueReading = 
+          (firststream.is_good() && secondstream.is_good())  ||
+          (firststream.is_good() && (transducer_n_second == 1))  ||
+          ((transducer_n_first == 1) && secondstream.is_good());
 
-        delete first;
-        first=0;
+        if (!continueReading)
+          {
+            delete first;
+            delete second;
+          }
+        else
+          {
+            if (firststream.is_good())
+              {
+                delete first;
+              }
+            if (secondstream.is_good())
+              {
+                delete second;
+              }
+          }
+
+        //continueReading = firststream.is_good() && 
+        //  (secondstream.is_good() || transducer_n_second == 1);
+
+        //delete first;
+        //first=0;
         // delete the transducer of second stream, unless we continue reading
         // the first stream and there is only one transducer in the second 
         // stream
-        if ((continueReading && secondstream.is_good()) || not continueReading)
-          {
-            delete second;
-            second=0;
-          }
+        //if ((continueReading && secondstream.is_good()) || not continueReading)
+        //  {
+        //    delete second;
+        //    second=0;
+        //  }
+
         free(firstname);
         free(secondname);
     }
@@ -221,12 +247,14 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
       }
 
     if (secondstream.is_good())
-    {
-      error(EXIT_FAILURE, 0, 
-            "first input '%s' contains fewer transducers than second input"
-            " '%s'",
-            firstfilename, secondfilename);
-    }
+      {
+        error(EXIT_FAILURE, 0, 
+              "first input '%s' contains fewer transducers than second input"
+              " '%s'; this is only possible if the first input contains"
+              " exactly one transducer", 
+              firstfilename, secondfilename);
+      }
+
     firststream.close();
     secondstream.close();
     outstream.close();
