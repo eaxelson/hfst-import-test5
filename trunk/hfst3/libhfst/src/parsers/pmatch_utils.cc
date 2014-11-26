@@ -255,6 +255,15 @@ HfstTransducer * make_end_tag(std::string tag)
     return end_tag;
 }
 
+HfstTransducer * make_counter(std::string name)
+{
+    HfstTransducer * counter = new HfstTransducer(
+        hfst::internal_epsilon,
+        "@PMATCH_COUNTER_" + name + "@",
+        format);
+    return counter;
+}
+
 HfstTransducer * make_list(HfstTransducer * t)
 {
     std::string arc = "@PMATCH_LIST_";

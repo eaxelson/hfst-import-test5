@@ -96,9 +96,11 @@ namespace hfst_ol {
         SymbolNumberVector list2symbols;
         std::vector<SymbolNumberVector> symbol_lists;
         std::vector<SymbolNumberVector> symbol_list_members;
+        std::vector<unsigned long int> counters;
         SymbolNumberVector guards;
         bool is_end_tag(const SymbolNumber symbol) const;
         bool is_guard(const SymbolNumber symbol) const;
+        bool is_counter(const SymbolNumber symbol) const;
         std::string end_tag(const SymbolNumber symbol);
         std::string start_tag(const SymbolNumber symbol);
         bool extract_tags;
@@ -112,16 +114,20 @@ namespace hfst_ol {
         static bool is_insertion(const std::string & symbol);
         static bool is_guard(const std::string & symbol);
         static bool is_list(const std::string & symbol);
+        static bool is_counter(const std::string & symbol);
         static bool is_special(const std::string & symbol);
         static std::string name_from_insertion(
             const std::string & symbol);
         bool is_printable(SymbolNumber symbol);
         void add_special_symbol(const std::string & str, SymbolNumber symbol_number);
         void process_symbol_list(std::string str, SymbolNumber sym);
+        void process_counter(std::string str, SymbolNumber sym);
+        void count(SymbolNumber sym);
         void add_rtn(PmatchTransducer * rtn, std::string const & name);
         bool has_rtn(std::string const & name) const;
         bool has_rtn(SymbolNumber symbol) const;
         PmatchTransducer * get_rtn(SymbolNumber symbol);
+        std::string get_counter_name(SymbolNumber symbol);
         SymbolNumber get_special(SpecialSymbol special) const;
         SymbolNumberVector get_specials(void) const;
         std::string stringify(const DoubleTape & str);
@@ -149,16 +155,16 @@ namespace hfst_ol {
         std::vector<char> possible_first_symbols;
         bool verbose;
         bool locate_mode;
+        bool profile_mode;
         unsigned int recursion_depth_left;
 
     public:
 
-        PmatchContainer(std::istream & is, bool verbose = false,
-                        bool extract_tags = false);
+        PmatchContainer(std::istream & is);
         PmatchContainer(void);
         ~PmatchContainer(void);
 
-        long line_number;
+        unsigned long line_number;
 
         void initialize_input(const char * input);
         bool has_unsatisfied_rtns(void) const;
@@ -166,6 +172,7 @@ namespace hfst_ol {
         void process(std::string & input);
         std::string match(std::string & input);
         LocationVectorVector locate(std::string & input);
+        std::string get_profiling_info(void);
         bool has_queued_input(unsigned int input_pos);
         bool not_possible_first_symbol(SymbolNumber sym)
         {
@@ -180,8 +187,12 @@ namespace hfst_ol {
         std::string stringify_output(void);
 //        LocationVector locatefy_output(void);
         static std::string parse_name_from_hfst3_header(std::istream & f);
-        void be_verbose(void) { verbose = true; }
-        bool is_verbose(void) { return verbose; }
+        void set_verbose(bool b) { verbose = b; }
+        void set_locate_mode(bool b) {
+            locate_mode = b;
+            alphabet.extract_tags = b;
+        }
+        void set_profile(bool b) { profile_mode = b; }
         bool try_recurse(void)
         {
             if (recursion_depth_left > 0) {

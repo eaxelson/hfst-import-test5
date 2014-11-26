@@ -174,6 +174,10 @@ return REGEX;
     return SIGMA_LEFT;
 }
 
+"Counter(" {
+    return COUNTER_LEFT;
+}
+
 "~"   { return COMPLEMENT; }
 "\\"  { return TERM_COMPLEMENT; }
 "&"   { return INTERSECTION; }

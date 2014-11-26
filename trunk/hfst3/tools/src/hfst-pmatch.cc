@@ -51,6 +51,7 @@ using std::pair;
 bool blankline_separated = true;
 bool extract_tags = false;
 bool locate_mode = false;
+bool profile = false;
 std::string pmatch_filename;
 
 void
@@ -64,7 +65,8 @@ print_usage()
     fprintf(message_out,
             "  -n  --newline          Newline as input separator (default is blank line)\n"
             "  -x  --extract-tags     Only print tagged parts in output\n"
-            "  -l  --locate           Only print locations of matches\n");
+            "  -l  --locate           Only print locations of matches\n"
+            "  -p  --profile          Produce profiling data\n");
     fprintf(message_out, 
             "Use standard streams for input and output.\n"
             "\n"
@@ -121,6 +123,9 @@ int process_input(hfst_ol::PmatchContainer & container,
     if (blankline_separated && !input_text.empty()) {
         match_and_print(container, outstream, input_text);
     }
+    if (profile) {
+        outstream << "\n" << container.get_profiling_info() << "\n";
+    }
     return EXIT_SUCCESS;
 }
 
@@ -137,6 +142,7 @@ int parse_options(int argc, char** argv)
                 {"newline", no_argument, 0, 'n'},
                 {"extract-tags", no_argument, 0, 'x'},
                 {"locate", no_argument, 0, 'l'},
+                {"profile", no_argument, 0, 'p'},
                 {0,0,0,0}
             };
         int option_index = 0;
@@ -159,6 +165,9 @@ int parse_options(int argc, char** argv)
             break;
         case 'l':
             locate_mode = true;
+            break;
+        case 'p':
+            profile = true;
             break;
 #include "inc/getopt-cases-error.h"
         }
@@ -212,7 +221,11 @@ int main(int argc, char ** argv)
         std::cerr << "Could not open file " << pmatch_filename << std::endl;
         return EXIT_FAILURE;
     }
-    hfst_ol::PmatchContainer container(instream, verbose, extract_tags);
+    hfst_ol::PmatchContainer container(instream);
+    container.set_verbose(verbose);
+// the locate_mode bool in this tool only affects its own processing
+    container.set_locate_mode(extract_tags);
+    container.set_profile(profile);
 //     if (outfile != stdout) {
 //         std::filebuf fb;
 // fb.open(outfilename, std::ios::out);
