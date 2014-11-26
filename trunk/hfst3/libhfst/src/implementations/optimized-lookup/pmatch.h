@@ -87,7 +87,7 @@ namespace hfst_ol {
     class PmatchAlphabet: public TransducerAlphabet {
     protected:
         RtnMap rtns;
-        std::map<SpecialSymbol, SymbolNumber> special_symbols;
+        SymbolNumberVector special_symbols;
         std::map<SymbolNumber, std::string> end_tag_map;
         std::map<std::string, SymbolNumber> rtn_names;
 // For each symbol, either NO_SYMBOL for "no corresponding list" or an index into symbol_lists
