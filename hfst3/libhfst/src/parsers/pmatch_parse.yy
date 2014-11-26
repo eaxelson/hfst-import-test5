@@ -143,9 +143,10 @@ PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
 
-%nonassoc DEFINE REGEX DEFINED_LIST DEFINS DEFFUN ALPHA LOWERALPHA UPPERALPHA NUM PUNCT WHITESPACE
-OPTCAP_LEFT TOLOWER_LEFT TOUPPER_LEFT INS_LEFT DEFINE_LEFT ENDTAG_LEFT LC_LEFT
-RC_LEFT NLC_LEFT NRC_LEFT MAP_LEFT LIT_LEFT LST_LEFT SIGMA_LEFT OR_LEFT AND_LEFT
+%nonassoc DEFINE REGEX DEFINED_LIST DEFINS DEFFUN ALPHA LOWERALPHA UPPERALPHA
+NUM PUNCT WHITESPACE OPTCAP_LEFT TOLOWER_LEFT TOUPPER_LEFT INS_LEFT DEFINE_LEFT
+ENDTAG_LEFT LC_LEFT RC_LEFT NLC_LEFT NRC_LEFT MAP_LEFT LIT_LEFT LST_LEFT
+SIGMA_LEFT COUNTER_LEFT OR_LEFT AND_LEFT
 %%
 
 
@@ -1313,6 +1314,10 @@ LABEL_PAIR: LABEL PAIR_SEPARATOR LABEL {
         if (strlen($1) == 0) {
             $$ = new HfstTransducer(hfst::pmatch::format);
         } else {
+            if (hfst::pmatch::verbose) {
+                std::cerr << "Warning: interpreting undefined symbol \"" << $1
+                          << "\" as label on line " << pmatchlineno << "\n";
+            }
             $$ = new HfstTransducer($1, hfst::pmatch::format);
 //            std::string errstring = "Unknown symbol: " + std::string($1);
 //            pmatcherror(errstring.c_str());
@@ -1393,12 +1398,21 @@ LABEL_PAIR: LABEL PAIR_SEPARATOR LABEL {
 | CHARACTER_RANGE { $$ = $1; }
 | LST_LEFT REGEXP2 RIGHT_PARENTHESIS
 {
-    $$ = hfst::pmatch::make_list($2);
-    free($2);
+    if (!hfst::pmatch::flatten) {
+        $$ = hfst::pmatch::make_list($2);
+        free($2);
+    } else {
+        $$ = $2;
+    }
 }
 | SIGMA_LEFT REGEXP2 RIGHT_PARENTHESIS
 {
     $$ = hfst::pmatch::make_sigma($2);
+    free($2);
+}
+| COUNTER_LEFT SYMBOL RIGHT_PARENTHESIS
+{
+    $$ = hfst::pmatch::make_counter($2);
     free($2);
 }
 ;

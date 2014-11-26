@@ -39,8 +39,8 @@ void PmatchAlphabet::add_symbol(const std::string & symbol)
 
 bool PmatchAlphabet::is_printable(SymbolNumber symbol)
 {
-    if (symbol == 0 || symbol == NO_SYMBOL_NUMBER ||
-        is_flag_diacritic(symbol) || is_end_tag(symbol) || is_guard(symbol)) {
+    if (symbol == 0 || symbol == NO_SYMBOL_NUMBER || is_flag_diacritic(symbol)
+        || is_end_tag(symbol) || is_guard(symbol) || is_counter(symbol)) {
         return false;
     }
     for (std::map<SpecialSymbol, SymbolNumber>::const_iterator it = special_symbols.begin();
@@ -90,6 +90,8 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
         guards.push_back(symbol_number);
     } else if (is_list(str)) {
         process_symbol_list(str, symbol_number);
+    } else if (is_counter(str)) {
+        process_counter(str, symbol_number);
     }
 }
 
@@ -150,9 +152,24 @@ SymbolNumberVector PmatchAlphabet::get_specials(void) const
     return v;
 }
 
-PmatchContainer::PmatchContainer(std::istream & inputstream,
-                                 bool _verbose, bool _extract_tags):
-    verbose(_verbose),
+void PmatchAlphabet::process_counter(std::string str, SymbolNumber sym)
+{
+    // Fill up non-counter spots in the counter vector with blanks
+    while (counters.size() < sym) {
+        counters.push_back(NO_COUNTER);
+    }
+    counters.push_back(0);
+}
+
+void PmatchAlphabet::count(SymbolNumber sym)
+{
+    if (is_counter(sym)) {
+        counters[sym]++;
+    }
+}
+
+PmatchContainer::PmatchContainer(std::istream & inputstream):
+    verbose(false),
     locate_mode(false),
     recursion_depth_left(PMATCH_MAX_RECURSION_DEPTH),
     entry_stack()
@@ -165,7 +182,7 @@ PmatchContainer::PmatchContainer(std::istream & inputstream,
     TransducerHeader header(inputstream);
     alphabet = PmatchAlphabet(inputstream, header.symbol_count());
     orig_symbol_count = symbol_count = alphabet.get_orig_symbol_count();
-    alphabet.extract_tags = _extract_tags;
+    alphabet.extract_tags = locate_mode;
     line_number = 0;
     encoder = new Encoder(alphabet.get_symbol_table(), orig_symbol_count);
     toplevel = new hfst_ol::PmatchTransducer(
@@ -283,6 +300,11 @@ bool PmatchAlphabet::is_guard(const std::string & symbol)
     return symbol.find("@PMATCH_GUARD_") == 0 && symbol.rfind("@") == symbol.size() - 1;
 }
 
+bool PmatchAlphabet::is_counter(const std::string & symbol)
+{
+    return symbol.find("@PMATCH_COUNTER_") == 0 && symbol.rfind("@") == symbol.size() - 1;
+}
+
 bool PmatchAlphabet::is_list(const std::string & symbol)
 {
     return symbol.find("@PMATCH_LIST_") == 0 && symbol.rfind("@") == symbol.size() - 1;
@@ -310,6 +332,11 @@ bool PmatchAlphabet::is_guard(const SymbolNumber symbol) const
         }
     }
     return false;
+}
+
+bool PmatchAlphabet::is_counter(const SymbolNumber symbol) const
+{
+    return (symbol < counters.size() && counters[symbol] != NO_COUNTER);
 }
 
 std::string PmatchAlphabet::name_from_insertion(const std::string & symbol)
@@ -436,6 +463,19 @@ PmatchTransducer * PmatchAlphabet::get_rtn(SymbolNumber symbol)
     return rtns[symbol];
 }
 
+std::string PmatchAlphabet::get_counter_name(SymbolNumber symbol)
+{
+    if (symbol_table.size() <= symbol) {
+        return "INVALID_COUNTER";
+    }
+    std::string name = symbol_table[symbol];
+    if (!is_counter(name)) {
+        return "INVALID_COUNTER";
+    }
+    return name.substr(strlen("@PMATCH_COUNTER_"),
+                       name.size() - strlen("@PMATCH_COUNTER_") - 1);
+}
+
 SymbolNumber PmatchAlphabet::get_special(SpecialSymbol special) const
 {
     return special_symbols.at(special);
@@ -501,6 +541,47 @@ LocationVectorVector PmatchContainer::locate(std::string & input)
     return locations;
 }
 
+// A utility comparing function for get_profiling_info
+bool counter_comp(std::pair<std::string, unsigned long> l,
+                  std::pair<std::string, unsigned long> r)
+{
+    // Descending order
+    return l.second > r.second;
+}
+
+std::string PmatchContainer::get_profiling_info(void)
+{
+    std::stringstream retval;
+    size_t max_name_len = 0;
+    retval << "Profiling information:\n";
+    retval << "  Traversals of Counter() positions:\n";
+    std::vector<std::pair<std::string, unsigned long> > counter_name_val_pairs;
+    for(SymbolNumber i = 0; i < alphabet.counters.size(); ++i) {
+        if (alphabet.counters[i] != NO_COUNTER) {
+            std::string counter_name = alphabet.get_counter_name(i);
+            if (counter_name.size() > max_name_len) {
+                max_name_len = counter_name.size();
+            }
+            counter_name_val_pairs.push_back(
+                std::pair<std::string, unsigned long>(counter_name,
+                                                      alphabet.counters[i]));
+        }
+    }
+    std::sort(counter_name_val_pairs.begin(), counter_name_val_pairs.end(),
+              counter_comp);
+    for(std::vector<std::pair<std::string, unsigned long> >::const_iterator it =
+            counter_name_val_pairs.begin(); it != counter_name_val_pairs.end(); ++it) {
+        retval << "    " << it->first;
+        size_t spacing_counter = max_name_len + 8 - it->first.size();
+        while (spacing_counter) {
+            retval << " ";
+            --spacing_counter;
+        }
+        retval << it->second << "\n";
+    }
+    return retval.str();
+}
+
 void PmatchContainer::copy_to_output(const DoubleTape & best_result)
 {
     for (DoubleTape::const_iterator it = best_result.begin();
@@ -551,7 +632,8 @@ std::string PmatchAlphabet::stringify(const DoubleTape & str)
                    || is_guard(output)) {
             continue;
         } else {
-            if (!extract_tags || start_tag_pos.size() != 0) {
+            if ((!extract_tags || start_tag_pos.size() != 0)
+                && is_printable(output)) {
                 retval.append(string_from_symbol(output));
             }
         }
@@ -963,9 +1045,9 @@ void PmatchTransducer::note_analysis(unsigned int input_pos,
         rtn_stack.top().candidate_tape_pos = tape_pos;
         rtn_stack.top().candidate_input_pos = input_pos;
         rtn_stack.top().best_weight = local_stack.top().running_weight;
-    } else if (container->is_verbose() &&
-                 input_pos == rtn_stack.top().candidate_input_pos &&
-                 rtn_stack.top().best_weight == local_stack.top().running_weight) {
+    } else if (container->verbose &&
+               input_pos == rtn_stack.top().candidate_input_pos &&
+               rtn_stack.top().best_weight == local_stack.top().running_weight) {
         DoubleTape discarded(container->tape.extract_slice(
                                  rtn_stack.top().tape_entry, tape_pos));
         std::cerr << "\n\tline " << container->line_number << ": conflicting equally weighted matches found, keeping:\n\t"
@@ -1007,6 +1089,9 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
         Weight weight = transition_table[i].get_weight();
         // We handle paths where we're checking contexts here
         if (input == 0) {
+            if (container->profile_mode) {
+                alphabet.count(output);
+            }
             if (!checking_context()) {
                 if (!try_entering_context(output)) {
                     // no context to enter, regular input epsilon
@@ -1020,7 +1105,6 @@ void PmatchTransducer::take_epsilons(unsigned int input_pos,
                     } else if (output == alphabet.get_special(exit)) {
                         container->entry_stack.pop();
                     }
-
                     
                     get_analyses(input_pos, tape_pos + 1, target);
 
@@ -1184,7 +1268,7 @@ void PmatchTransducer::get_analyses(unsigned int input_pos,
                                     TransitionTableIndex i)
 {
     if (!container->try_recurse()) {
-        if (container->is_verbose()) {
+        if (container->verbose) {
             std::cerr << "pmatch: out of stack space, truncating result\n";
         }
         return;

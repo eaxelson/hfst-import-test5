@@ -88,7 +88,7 @@ HfstTransducer * add_pmatch_delimiters(HfstTransducer * regex);
  */
 void add_end_tag(HfstTransducer * regex, std::string tag);
 HfstTransducer * make_end_tag(std::string tag);
-
+HfstTransducer * make_counter(std::string name);
 HfstTransducer * make_list(HfstTransducer * t);
 HfstTransducer * make_sigma(HfstTransducer * t);
 
