@@ -5,20 +5,9 @@ namespace hfst_ol {
 
 PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
                                SymbolNumber symbol_count):
-    TransducerAlphabet(inputstream, symbol_count, false)
+    TransducerAlphabet(inputstream, symbol_count, false),
+    special_symbols(12, NO_SYMBOL_NUMBER) // SpecialSymbols enum
 {
-    special_symbols[entry] = NO_SYMBOL_NUMBER;
-    special_symbols[exit] = NO_SYMBOL_NUMBER;
-    special_symbols[LC_entry] = NO_SYMBOL_NUMBER;
-    special_symbols[LC_exit] = NO_SYMBOL_NUMBER;
-    special_symbols[RC_entry] = NO_SYMBOL_NUMBER;
-    special_symbols[RC_exit] = NO_SYMBOL_NUMBER;
-    special_symbols[NLC_entry] = NO_SYMBOL_NUMBER;
-    special_symbols[NLC_exit] = NO_SYMBOL_NUMBER;
-    special_symbols[NRC_entry] = NO_SYMBOL_NUMBER;
-    special_symbols[NRC_exit] = NO_SYMBOL_NUMBER;
-    special_symbols[Pmatch_passthrough] = NO_SYMBOL_NUMBER;
-    special_symbols[boundary] = NO_SYMBOL_NUMBER;
     symbol2lists = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
     list2symbols = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
     for (SymbolNumber i = 1; i < symbol_table.size(); ++i) {
@@ -43,9 +32,9 @@ bool PmatchAlphabet::is_printable(SymbolNumber symbol)
         || is_end_tag(symbol) || is_guard(symbol) || is_counter(symbol)) {
         return false;
     }
-    for (std::map<SpecialSymbol, SymbolNumber>::const_iterator it = special_symbols.begin();
+    for (SymbolNumberVector::const_iterator it = special_symbols.begin();
          it != special_symbols.end(); ++it) {
-        if (it->second == symbol) {
+        if (*it == symbol) {
             return false;
         }
     }
@@ -143,10 +132,10 @@ void PmatchAlphabet::process_symbol_list(std::string str, SymbolNumber sym)
 SymbolNumberVector PmatchAlphabet::get_specials(void) const
 {
     SymbolNumberVector v;
-    for (std::map<SpecialSymbol, SymbolNumber>::const_iterator it =
+    for (SymbolNumberVector::const_iterator it =
              special_symbols.begin(); it != special_symbols.end(); ++it) {
-        if (it->second != NO_SYMBOL_NUMBER) {
-            v.push_back(it->second);
+        if (*it != NO_SYMBOL_NUMBER) {
+            v.push_back(*it);
         }
     }
     return v;
@@ -725,6 +714,7 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
     is.read(indextab, TransitionWIndex::size * index_table_size);
     is.read(transitiontab, TransitionW::size * transition_table_size);
     char * orig_p = indextab;
+    index_table.reserve(index_table_size);
     while(index_table_size) {
         // index_table.push_back(
         //     SimpleIndex(*(SymbolNumber *) indextab,
@@ -736,6 +726,7 @@ PmatchTransducer::PmatchTransducer(std::istream & is,
     }
     free(orig_p);
     orig_p = transitiontab;
+    transition_table.reserve(transition_table_size);
     while(transition_table_size) {
         transition_table.push_back(TransitionW(transitiontab));
             // SimpleTransition(*(SymbolNumber *) transitiontab,
