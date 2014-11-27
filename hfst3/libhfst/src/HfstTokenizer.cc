@@ -11,7 +11,9 @@
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "HfstTokenizer.h"
+#include "HfstFlagDiacritics.h"
 #include <string>
+#include <cassert>
 
 #ifndef MAIN_TEST
 
@@ -253,7 +255,8 @@ StringPairVector HfstTokenizer::tokenize
       for (StringPairVector::iterator it = input_spv.begin();
            it != input_spv.end();
            ++it)
-        { StringPair sp(it->first, jt->first);
+        { 
+          StringPair sp(it->first, jt->first);
           warn_about_pair(sp);
           spv.push_back(sp);
           ++jt; }
@@ -277,6 +280,83 @@ StringPairVector HfstTokenizer::tokenize
           warn_about_pair(sp);
           spv.push_back(sp); }
     }
+  return spv;
+}
+
+StringPairVector HfstTokenizer::tokenize_and_align_flag_diacritics
+(const string& input_string,const string& output_string,
+ void (*warn_about_pair)(const std::pair<std::string, std::string> &symbol_pair)) const
+{
+  check_utf8_correctness(input_string);
+  check_utf8_correctness(output_string);
+
+  StringPairVector spv;
+  
+  StringPairVector input_spv = tokenize(input_string.c_str());
+  StringPairVector output_spv = tokenize(output_string.c_str());
+  
+  assert(input_spv.size() > 0 && output_spv.size() > 0);
+  StringPairVector::const_iterator it = input_spv.begin();
+  StringPairVector::const_iterator jt = output_spv.begin();
+
+  // proceed until both token vectors are exhausted
+  while(it != input_spv.end() || jt != output_spv.end())
+    {
+      StringPair sp("", "");  // string pair to push back to the result
+      StringPair sp_cont("", "");  // possible continuation in case of missaligned flags
+
+      if (it == input_spv.end()) 
+        {
+          if (FdOperation::is_diacritic(jt->first)) // copy diacritic to other side
+            {
+              sp = StringPair(jt->first, jt->first);
+            }
+          else // pad input with epsilons
+            {
+              sp = StringPair(internal_epsilon, jt->first);
+            }
+          jt++;
+        }
+      else if (jt == output_spv.end()) 
+        {
+          if (FdOperation::is_diacritic(it->first)) // copy diacritic to other side
+            {
+              sp = StringPair(it->first, it->first);
+            }
+          else // pad output with epsilons
+            {
+              sp = StringPair(it->first, internal_epsilon);
+            }
+          it++;
+        }
+      else
+        {
+          // take from both vectors (cases foo:bar, foo:foo, flag1:flag1)
+          if ((!FdOperation::is_diacritic(it->first) && !FdOperation::is_diacritic(jt->first)) || 
+              *it == *jt)
+            {
+              sp = StringPair(it->first, jt->first);
+            }
+          // take first from first vector and then from second
+          // (cases flag1:flag2, flag1::bar, foo:flag2)
+          else
+            {
+              StringPair wrong_pair(it->first, jt->first);
+              warn_about_pair(wrong_pair);
+              sp = StringPair(it->first, it->first);
+              sp_cont = StringPair(jt->first, jt->first);
+            }
+          it++;
+          jt++;
+        }
+      
+      spv.push_back(sp);      
+      if (sp_cont.first.size() != 0 && sp_cont.second.size() != 0)
+        {
+          spv.push_back(sp_cont);
+        }      
+    }
+
   return spv;
 }
 

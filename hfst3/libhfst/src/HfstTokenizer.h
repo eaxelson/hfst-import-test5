@@ -132,6 +132,11 @@ namespace hfst
                               const std::string &output_string,
                               void (*warn_about_pair)(const std::pair<std::string, std::string> &symbol_pair)) const;
 
+    StringPairVector tokenize_and_align_flag_diacritics
+      (const std::string &input_string,
+       const std::string &output_string,
+       void (*warn_about_pair)(const std::pair<std::string, std::string> &symbol_pair)) const;
+
     //! \brief If @a input_String is not valid utf-8, throw an
     //! @a IncorrectUtf8CodingException.
     //!
