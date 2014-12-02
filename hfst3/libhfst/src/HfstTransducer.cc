@@ -3561,8 +3561,47 @@ HfstTransducer &HfstTransducer::merge
 {
   HfstBasicTransducer this_basic(*this);
   HfstBasicTransducer another_basic(another);
-  HfstBasicTransducer result = hfst::implementations::HfstBasicTransducer::merge(this_basic, another_basic, list_symbols);
-  *this = HfstTransducer(result, this->get_type());
+  std::set<std::string> markers_added;
+  HfstBasicTransducer result = hfst::implementations::HfstBasicTransducer::merge(this_basic, another_basic, list_symbols, markers_added);
+  HfstTransducer initial_merge(result, this->get_type());
+  initial_merge.minimize();
+
+  // filter non-optimal paths
+  // [ ? | #V ?:? ]* %#V:V ?:0 [ ? | #V ?:? | %#V:V ?:0 ]*
+  hfst::xre::XreCompiler xre_(this->get_type());
+  xre_.set_verbosity(false, NULL);
+
+  for (std::set<std::string>::const_iterator it = markers_added.begin(); it != markers_added.end(); it++)
+    {
+      std::string marker = *it;
+      std::string symbol(1, it->at(1)); // @X@ -> X
+      std::string worsener_string("[ ? | \"" + marker +  "\" ?:? ]* \"" + marker + "\":" + symbol + " ?:0 [ ? | \"" + marker + "\" ?:? | \"" + marker + "\":" + symbol + " ?:0 ]* ;");
+      //std::cerr << "worsener_string: '" << worsener_string << "'" << std::endl;
+
+      HfstTransducer * worsener = xre_.compile(worsener_string);
+      assert(worsener != NULL);
+      worsener->minimize();
+      HfstTransducer cp(initial_merge);
+      cp.compose(*worsener).output_project().minimize();
+      delete worsener;
+
+      initial_merge.subtract(cp).minimize();
+      initial_merge.substitute(marker, internal_epsilon);
+
+      HfstBasicTransducer fsm(initial_merge);
+      StringSet symbols = fsm.symbols_used();
+      if (symbols.find(symbol) == symbols.end())
+        {
+          //std::cerr << "removing symbol '" << symbol << "' from alphabet.." << std::endl; 
+          initial_merge.remove_from_alphabet(symbol);
+          }
+
+      // DEBUG
+      //std::cerr << "initial_merge:" << std::endl << initial_merge << std::endl;
+    }
+
+  *this = initial_merge;
+
   return *this;
 }
 
