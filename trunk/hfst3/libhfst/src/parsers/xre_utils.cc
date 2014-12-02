@@ -939,7 +939,10 @@ xfst_label_to_transducer(const char* input, const char* output)
 
   HfstTransducer * merge_first_to_second(HfstTransducer * tr1, HfstTransducer * tr2)
   {
-    tr2->merge(*tr1, hfst::xre::symbol_lists);
+    // Merge operation creates an XreCompiler that needs this information below. Otherwise, it will overwrite all this.
+    struct XreConstructorArguments args(hfst::xre::definitions, hfst::xre::function_definitions, hfst::xre::function_arguments, hfst::xre::symbol_lists, hfst::xre::format);
+
+    tr2->merge(*tr1, args);
     return tr2;
   }
 
