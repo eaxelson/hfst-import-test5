@@ -276,7 +276,7 @@
 
      /* Check that all symbols that occur in the transitions of the graph
         are also in the alphabet. */
-     bool check_alphabet() 
+     bool check_alphabet()
      {
            for (iterator it = begin(); it != end(); it++)
              {
@@ -4232,7 +4232,7 @@
            // the target state of that transition. Also make that state final, if needed.
            static HfstState handle_list_match(const HfstTransitionGraph & graph, const HfstTransition <C> & graph_transition,
                                               const HfstTransitionGraph & merger, const HfstTransition <C> & merger_transition,
-                                              HfstTransitionGraph & result, HfstState result_state, StateMap & state_map)
+                                              HfstTransitionGraph & result, HfstState result_state, StateMap & state_map, std::set<std::string> & markers_added)
            {
              HfstState graph_target = graph_transition.get_target_state();
              HfstState merger_target = merger_transition.get_target_state();
@@ -4241,8 +4241,16 @@
                (graph_target, merger_target, state_map, result, was_new_state);
              // The sum of weight is copied to the resulting intersection.
              float transition_weight = graph_transition.get_weight() + merger_transition.get_weight();
+             
+             // testing: add a marker
+             HfstState extra_state = result.add_state();
              result.add_transition
                (result_state, HfstTransition <C> 
+                (extra_state, "@" + graph_transition.get_input_symbol() + "@", "@" + graph_transition.get_output_symbol() + "@", 0));
+             markers_added.insert("@" + graph_transition.get_input_symbol() + "@");
+
+             result.add_transition
+               (extra_state /*result_state*/, HfstTransition <C> 
                 (retval, merger_transition.get_input_symbol(), merger_transition.get_output_symbol(), transition_weight)); 
              // For each new state added, check if the corresponding states in \a graph1 and \a graph2
              // are final. If they are, make the new state final with the sum of final weights.
@@ -4319,7 +4327,7 @@
            static void find_matches_for_merge
              (HfstTransitionGraph & graph, HfstState graph_state, HfstTransitionGraph & merger, HfstState merger_state,
               HfstTransitionGraph & result, HfstState result_state, StateMap & state_map, std::set<HfstState> & agenda,
-              const std::map<std::string, std::set<std::string> > & list_symbols)
+              const std::map<std::string, std::set<std::string> > & list_symbols, std::set<std::string> & markers_added)
            {
              agenda.insert(result_state);  // do not handle \a result_state twice
              HfstTransitions & graph_transitions = graph.state_vector[graph_state]; // transitions of graph
@@ -4357,10 +4365,10 @@
                          if (symbol_list.find(isymbol) != symbol_list.end())
                            {
                              list_match_found=true;
-                             HfstState target = handle_list_match(graph, graph_transition, merger, merger_transition, result, result_state, state_map);
+                             HfstState target = handle_list_match(graph, graph_transition, merger, merger_transition, result, result_state, state_map, markers_added);
                              if (agenda.find(target) == agenda.end())
                                {
-                                 find_matches_for_merge(graph, graph_transition.get_target_state(), merger, merger_transition.get_target_state(), result, target, state_map, agenda, list_symbols);
+                                 find_matches_for_merge(graph, graph_transition.get_target_state(), merger, merger_transition.get_target_state(), result, target, state_map, agenda, list_symbols, markers_added);
                                }
                            }
                        }
@@ -4374,7 +4382,7 @@
                  HfstState target = handle_non_list_match(graph, graph_transition, merger, merger_state, result, result_state, state_map);
                  if (agenda.find(target) == agenda.end())
                    {
-                     find_matches_for_merge(graph, graph_transition.get_target_state(), merger, /*merger_transition.get_target_state()*/ merger_state, result, target, state_map, agenda, list_symbols);
+                     find_matches_for_merge(graph, graph_transition.get_target_state(), merger, /*merger_transition.get_target_state()*/ merger_state, result, target, state_map, agenda, list_symbols, markers_added);
                    }
                  // --- A transition in graph compared for all corresponding transitions in merger, compare next transition. --- 
                }
@@ -4383,7 +4391,7 @@
            }
 
          static HfstTransitionGraph merge
-           (HfstTransitionGraph & graph, HfstTransitionGraph & merger, const std::map<std::string, std::set<std::string> > & list_symbols)
+           (HfstTransitionGraph & graph, HfstTransitionGraph & merger, const std::map<std::string, std::set<std::string> > & list_symbols, std::set<std::string> & markers_added)
          {
            HfstTransitionGraph result;
            StateMap state_map;
@@ -4400,7 +4408,7 @@
            
            try 
              {
-               find_matches_for_merge(graph, 0, merger, 0, result, 0, state_map, agenda, list_symbols);
+               find_matches_for_merge(graph, 0, merger, 0, result, 0, state_map, agenda, list_symbols, markers_added);
              }
            catch (const char * msg)
              {
