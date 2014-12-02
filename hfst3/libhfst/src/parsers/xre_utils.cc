@@ -75,7 +75,7 @@ namespace xre
   std::map<std::string,std::string>  function_definitions;
   std::map<std::string,unsigned int> function_arguments;
   std::map<std::string,std::set<string> > symbol_lists;
-char* startptr;
+  char* startptr; // changed this to an internal variable in compile functions
 hfst::HfstTransducer* last_compiled;
 bool contains_only_comments = false;
 hfst::ImplementationType format;
@@ -444,7 +444,8 @@ compile(const string& xre, map<string,HfstTransducer*>& defs,
 {
     // lock here?
     data = strdup(xre.c_str());
-    startptr = data;
+    // use an internal variable startptr_ instead of global startptr
+    char * startptr_ = data;
     len = strlen(data);
     definitions = defs;
     function_definitions = func_defs;
@@ -456,14 +457,14 @@ compile(const string& xre, map<string,HfstTransducer*>& defs,
 
     yyscan_t scanner;
     xrelex_init(&scanner);
-    YY_BUFFER_STATE bs = xre_scan_string(startptr,scanner);
+    YY_BUFFER_STATE bs = xre_scan_string(startptr_,scanner);
     
     int parse_retval = xreparse(scanner);
 
     xre_delete_buffer(bs,scanner);
     xrelex_destroy(scanner);
 
-    free(startptr);
+    free(startptr_);
     data = 0;
     len = 0;
     if (parse_retval == 0 && !contains_only_comments) // if (yynerrs == 0)
@@ -489,7 +490,8 @@ compile_first(const string& xre, map<string,HfstTransducer*>& defs,
 {
     // lock here?
     data = strdup(xre.c_str());
-    startptr = data;
+    // use an internal variable startptr_ instead of global startptr
+    char * startptr_ = data;
     len = strlen(data);
     definitions = defs;
     function_definitions = func_defs;
@@ -501,7 +503,7 @@ compile_first(const string& xre, map<string,HfstTransducer*>& defs,
 
     yyscan_t scanner;
     xrelex_init(&scanner);
-    YY_BUFFER_STATE bs = xre_scan_string(startptr,scanner);
+    YY_BUFFER_STATE bs = xre_scan_string(startptr_,scanner);
 
     bool tmp = hfst::xre::allow_extra_text_at_end;
     hfst::xre::allow_extra_text_at_end = true;
@@ -514,7 +516,8 @@ compile_first(const string& xre, map<string,HfstTransducer*>& defs,
     xre_delete_buffer(bs,scanner);
     xrelex_destroy(scanner);
 
-    free(startptr);
+    free(startptr_);
+
     data = 0;
     len = 0;
     if (parse_retval == 0 && !contains_only_comments) // if (yynerrs == 0)
