@@ -1251,6 +1251,8 @@ ccc : ddd
 
     HfstTransducer &merge(const HfstTransducer &another, const std::map<std::string, std::set<std::string> > & list_symbols);
 
+    HfstTransducer &merge(const HfstTransducer &another, const struct hfst::xre::XreConstructorArguments & args);
+
     /** \brief Compose this transducer with the intersection of
         transducers in \a v. If \a invert is true, then compose the
         intersection of the transducers in \a v with this transducer.

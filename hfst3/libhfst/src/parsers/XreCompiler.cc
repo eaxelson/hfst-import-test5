@@ -31,6 +31,14 @@ XreCompiler::XreCompiler(hfst::ImplementationType impl) :
     format_(impl)
 {}
 
+    XreCompiler::XreCompiler(const struct XreConstructorArguments & args) :
+    definitions_(args.definitions),
+    function_definitions_(args.function_definitions),
+    function_arguments_(args.function_arguments),
+    list_definitions_(args.list_definitions),
+    format_(args.format)
+{}
+
 void
 XreCompiler::define(const std::string& name, const std::string& xre)
 {

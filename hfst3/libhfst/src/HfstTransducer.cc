@@ -3557,18 +3557,18 @@ bool substitute_unknown_identity_pairs
 
 
 HfstTransducer &HfstTransducer::merge
-(const HfstTransducer &another, const std::map<std::string, std::set<std::string> > & list_symbols)
+(const HfstTransducer &another, const struct hfst::xre::XreConstructorArguments & args)
 {
   HfstBasicTransducer this_basic(*this);
   HfstBasicTransducer another_basic(another);
   std::set<std::string> markers_added;
-  HfstBasicTransducer result = hfst::implementations::HfstBasicTransducer::merge(this_basic, another_basic, list_symbols, markers_added);
+  HfstBasicTransducer result = hfst::implementations::HfstBasicTransducer::merge(this_basic, another_basic, args.list_definitions, markers_added);
   HfstTransducer initial_merge(result, this->get_type());
   initial_merge.minimize();
 
   // filter non-optimal paths
   // [ ? | #V ?:? ]* %#V:V ?:0 [ ? | #V ?:? | %#V:V ?:0 ]*
-  hfst::xre::XreCompiler xre_(this->get_type());
+  hfst::xre::XreCompiler xre_(args);
   xre_.set_verbosity(false, NULL);
 
   for (std::set<std::string>::const_iterator it = markers_added.begin(); it != markers_added.end(); it++)
@@ -3576,7 +3576,6 @@ HfstTransducer &HfstTransducer::merge
       std::string marker = *it;
       std::string symbol(1, it->at(1)); // @X@ -> X
       std::string worsener_string("[ ? | \"" + marker +  "\" ?:? ]* \"" + marker + "\":" + symbol + " ?:0 [ ? | \"" + marker + "\" ?:? | \"" + marker + "\":" + symbol + " ?:0 ]* ;");
-      //std::cerr << "worsener_string: '" << worsener_string << "'" << std::endl;
 
       HfstTransducer * worsener = xre_.compile(worsener_string);
       assert(worsener != NULL);
@@ -3592,16 +3591,11 @@ HfstTransducer &HfstTransducer::merge
       StringSet symbols = fsm.symbols_used();
       if (symbols.find(symbol) == symbols.end())
         {
-          //std::cerr << "removing symbol '" << symbol << "' from alphabet.." << std::endl; 
           initial_merge.remove_from_alphabet(symbol);
-          }
-
-      // DEBUG
-      //std::cerr << "initial_merge:" << std::endl << initial_merge << std::endl;
+        }
     }
 
   *this = initial_merge;
-
   return *this;
 }
 

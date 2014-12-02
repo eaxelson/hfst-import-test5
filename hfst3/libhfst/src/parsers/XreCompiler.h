@@ -38,6 +38,31 @@ namespace hfst {
 //! @brief hfst::xre namespace is used for all functions related to Xerox 
 //! Regular Expresisions (XRE) parsing.
 namespace xre {
+
+  // needed for merge operation
+struct XreConstructorArguments
+{
+  std::map<std::string,hfst::HfstTransducer*> definitions;
+  std::map<std::string, std::string> function_definitions;
+  std::map<std::string, unsigned int > function_arguments;
+  std::map<std::string, std::set<std::string> > list_definitions;
+  hfst::ImplementationType format;
+
+  XreConstructorArguments
+  (std::map<std::string,hfst::HfstTransducer*> definitions_,
+   std::map<std::string, std::string> function_definitions_,
+   std::map<std::string, unsigned int > function_arguments_,
+   std::map<std::string, std::set<std::string> > list_definitions_,
+   hfst::ImplementationType format_)
+  {
+    definitions = definitions_;
+    function_definitions = function_definitions_;
+    function_arguments = function_arguments_;
+    list_definitions = list_definitions_;
+    format = format_;
+  }
+};
+
 //! @brief A compiler holding information needed to compile XREs.
 class XreCompiler
 {
@@ -46,6 +71,8 @@ class XreCompiler
   XreCompiler();
   //! @brief Create compiler for @a impl format transducers
   XreCompiler(hfst::ImplementationType impl);
+  // ...
+  XreCompiler(const struct XreConstructorArguments & args);
 
   //! @brief Add a definition macro.
   //!        Compilers will replace arcs labeled @a name, with the transducer
