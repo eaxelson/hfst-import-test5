@@ -39,6 +39,8 @@ namespace hfst {
 //! Regular Expresisions (XRE) parsing.
 namespace xre {
 
+void setCharCounter(bool value);
+
   // needed for merge operation
 struct XreConstructorArguments
 {

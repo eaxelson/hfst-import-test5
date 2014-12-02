@@ -187,6 +187,7 @@ int parse_file(const char* filename, hfst::xfst::XfstCompiler &comp)
       error(EXIT_FAILURE, 0, "error when reading file %s\n", filename);
       return EXIT_FAILURE;
     }
+
   if (0 != comp.parse_line(line))
     {
       error(EXIT_FAILURE, 0, "error when parsing file %s\n", filename);

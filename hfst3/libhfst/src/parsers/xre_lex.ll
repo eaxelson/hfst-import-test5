@@ -20,12 +20,13 @@
 namespace hfst { 
   namespace xre {
     extern unsigned int cr; // number of characters read
+    extern bool count_chars_read; // whether the char counter is on
     extern std::set<unsigned int> positions; // positions of a given SYMBOL
     extern char * position_symbol;  // the given SYMBOL
 } }
 
 // a macro that increments the number of characters read
-#define CR hfst::xre::cr += (unsigned int)strlen(yytext);
+#define CR if (hfst::xre::count_chars_read) { hfst::xre::cr += (unsigned int)strlen(yytext); }
 
 extern int xrelex ( YYSTYPE * lvalp, yyscan_t scanner );
 

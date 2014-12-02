@@ -3568,6 +3568,7 @@ HfstTransducer &HfstTransducer::merge
 
   // filter non-optimal paths
   // [ ? | #V ?:? ]* %#V:V ?:0 [ ? | #V ?:? | %#V:V ?:0 ]*
+  hfst::xre::setCharCounter(false);  // we don't want to confuse the xre compiler inside which we create xre_
   hfst::xre::XreCompiler xre_(args);
   xre_.set_verbosity(false, NULL);
 
@@ -3596,6 +3597,7 @@ HfstTransducer &HfstTransducer::merge
     }
 
   *this = initial_merge;
+  hfst::xre::setCharCounter(true); // the xre compiler that called merge can count chars again
   return *this;
 }
 
