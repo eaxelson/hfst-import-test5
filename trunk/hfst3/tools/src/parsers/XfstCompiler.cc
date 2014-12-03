@@ -4188,6 +4188,7 @@ namespace xfst {
       PROMPT_AND_RETURN_THIS;
     }
 
+  // Returns an automaton that contains one ore more "^[" "^]" expressions.
   static HfstTransducer * contains_regexps(hfst::xre::XreCompiler & xre_)
   {
     HfstTransducer * not_bracket_star = xre_.compile("[? - \"^[\" - \"^]\"]* ;");
@@ -4199,6 +4200,34 @@ namespace xfst {
     return well_formed;
   }
 
+  static HfstTransducer * contains_regexps_on_one_side(hfst::xre::XreCompiler & xre_, bool input_side)
+  {
+    HfstTransducer * not_bracket_star;
+    if (input_side)
+      {
+        not_bracket_star = xre_.compile("[?:? - \"^[\":? - \"^]\":?]* ;");
+      }
+    else
+      {
+        not_bracket_star = xre_.compile("[?:? - ?:\"^[\" - ?:\"^]\"]* ;");
+      }
+    xre_.define("TempNotBracketStar", *not_bracket_star);
+    // all paths that contain one or more well-formed ^[ ^] expressions
+    HfstTransducer * well_formed;
+    if (input_side)
+      {
+        well_formed = xre_.compile("TempNotBracketStar \"^[\":? TempNotBracketStar  [ \"^]\":? TempNotBracketStar \"^[\":?  TempNotBracketStar ]*  \"^]\":? TempNotBracketStar ;");
+      }
+    else
+      {
+        well_formed = xre_.compile("TempNotBracketStar ?:\"^[\" TempNotBracketStar  [ ?:\"^]\" TempNotBracketStar ?:\"^[\"  TempNotBracketStar ]*  ?:\"^]\" TempNotBracketStar ;");
+      }
+    xre_.undefine("TempNotBracketStar");
+    delete not_bracket_star;
+    return well_formed;
+  }
+
+  // @pre \a t must be an automaton
   static bool is_well_formed_for_compile_replace(const HfstTransducer * t, hfst::xre::XreCompiler & xre_)
   {
     HfstTransducer * well_formed = contains_regexps(xre_);
@@ -4217,23 +4246,45 @@ namespace xfst {
     return value;
   }
 
-  static std::string to_literal_regexp(const hfst::StringPairVector & path)
+  static std::string to_literal_regexp(const hfst::StringPairVector & path, bool input_side)
   {
     std::string pathstr("[ ");
     for (hfst::StringPairVector::const_iterator it = path.begin(); it != path.end(); it++)
       {
-        pathstr.append("\"").append(it->first).append("\" ");
+        std::string symbol = (input_side) ? it->first : it->second ;
+        pathstr.append("\"").append(symbol).append("\" ");
       }
     pathstr.append("]");
     return pathstr;
   }
 
-  static std::string to_regexp(const hfst::StringPairVector & path)
+  static HfstTransducer * to_literal_transducer(const hfst::StringPairVector & path, hfst::xre::XreCompiler & xre_)
   {
     std::string pathstr("[ ");
     for (hfst::StringPairVector::const_iterator it = path.begin(); it != path.end(); it++)
       {
-        pathstr.append(it->first).append(" ");
+        pathstr.append("\"").append(it->first).append("\":\"").append(it->second).append("\" ");
+      }
+    pathstr.append("];");
+    // debug
+    //std::cerr << "to_literal_transducer: compiling expression: " << pathstr << std::endl;
+    char * p = strdup(pathstr.c_str());
+    HfstTransducer * retval = xre_.compile(p);
+    free(p);
+    return retval;
+  }
+
+  static std::string to_regexp(const hfst::StringPairVector & path, bool input_side)
+  {
+    std::string pathstr("[ ");
+    for (hfst::StringPairVector::const_iterator it = path.begin(); it != path.end(); it++)
+      {
+        std::string symbol = (input_side) ? it->first : it->second ;
+        // ignore "^[" and "^]"
+        if (symbol != "^]" && symbol != "^[")
+          {
+            pathstr.append(symbol).append(" ");
+          }
       }
     pathstr.append("]");
     return pathstr;
@@ -4248,18 +4299,33 @@ namespace xfst {
       using hfst::implementations::HfstReplacementsMap;
 
       GET_TOP(tmp);
-      if (is_well_formed_for_compile_replace(tmp, xre_))
+      HfstTransducer tmp_cp(*tmp);
+
+      if (level == UPPER_LEVEL)
+        {
+          tmp_cp.input_project();
+        }
+      else // LOWER_LEVEL
+        {
+          tmp_cp.output_project();
+        }
+
+      if (is_well_formed_for_compile_replace(&tmp_cp, xre_))
         {
           fprintf(stderr, "Network is well-formed.\n");
         }
       else
         {
           fprintf(stderr, "Network is not well-formed.\n");
+          xfst_lesser_fail();
+          prompt();
+          return *this;
         }
+
       HfstBasicTransducer fsm(*tmp);
       try 
         {
-          HfstReplacementsMap replacement_map = fsm.find_replacements();
+          HfstReplacementsMap replacement_map = fsm.find_replacements((level == UPPER_LEVEL)); // input_side
           
             for (HfstReplacementsMap::const_iterator it = replacement_map.begin();
                  it != replacement_map.end(); it++)
@@ -4273,22 +4339,50 @@ namespace xfst {
                    std::string CPR(""); // Cross-Product Regexp
                    if (level == LOWER_LEVEL)
                      {
-                       CPR = to_literal_regexp(rit->second) + std::string(" .x. ") + to_regexp(rit->second);
-                       CPR = std::string("\"^[\":0") + std::string(" [") + CPR + std::string("] ") + std::string("\"^]\":0 ;");
+                       CPR = to_literal_regexp(rit->second, false /*output side*/) + std::string(" .x. ") + to_regexp(rit->second, false /*output side*/);
+                       //CPR = std::string("\"^[\":0") + std::string(" [") + CPR + std::string("] ") + std::string("\"^]\":0 ;");
+                       CPR = std::string("[") + CPR + std::string("] ;");
                      }
-                   else
+                   else // UPPER_LEVEL
                      {
-                       CPR = to_regexp(rit->second) + std::string(" .x. ") + to_literal_regexp(rit->second);
-                       CPR = std::string("0:\"^[\"") + std::string(" [") + CPR + std::string("] ") + std::string("0:\"^]\" ;");
+                       CPR = to_regexp(rit->second, true /*input side*/) + std::string(" .x. ") + to_literal_regexp(rit->second, true /*input side*/);
+                       //CPR = std::string("0:\"^[\"") + std::string(" [") + CPR + std::string("] ") + std::string("0:\"^]\" ;");
+                       CPR = std::string("[") + CPR + std::string("] ;");
                      }
                    char * cpr = strdup(CPR.c_str());
-                   fprintf(stderr, "compiling replacement '%s'...\n", cpr);
+                   //fprintf(stderr, "compiling replacement '%s'...\n", cpr);
                    HfstTransducer * replacement = xre_.compile(cpr);
-                   assert(replacement != NULL); // todo
+                   if (replacement == NULL)
+                     {
+                       fprintf(stderr, "Could not compile regular expression in compile-replace: %s.\n", cpr);
+                       xfst_lesser_fail();
+                       prompt();
+                       return *this;
+                     }
                    replacement->minimize();
+
+                   // compose with opposite level
+                   if (level == UPPER_LEVEL)
+                     {
+                       HfstTransducer * original_path = to_literal_transducer(rit->second, xre_);
+                       original_path->minimize();
+                       replacement->compose(*original_path);
+                       delete original_path;
+                       replacement->minimize();
+                     }
+                   else // LOWER_LEVEL
+                     {
+                       HfstTransducer * original_path = to_literal_transducer(rit->second, xre_);
+                       original_path->minimize();
+                       original_path->compose(*replacement);
+                       original_path->minimize();
+                       delete replacement;
+                       replacement = original_path; 
+                     }
+
                    HfstBasicTransducer repl(*replacement);
                    // DEBUG
-                   std::cerr << "inserting transducer:" << std::endl << *replacement << std::endl << "between states " << start_state << " and " << end_state << "." << std::endl ;
+                   //std::cerr << "inserting transducer:" << std::endl << *replacement << std::endl << "between states " << start_state << " and " << end_state << "." << std::endl ;
                    delete replacement;
                    fsm.insert_transducer(start_state, end_state, repl);
                   }
@@ -4300,9 +4394,11 @@ namespace xfst {
         }
       HfstTransducer * result = new HfstTransducer(fsm, format_);
 
-      std::cerr << "result from compile-replace is:" << std::endl << *result << std::endl;
+      // debug
+      //std::cerr << "result from compile-replace is:" << std::endl << *result << std::endl;
 
-      HfstTransducer * cr = contains_regexps(xre_);
+      // filter out regexps (todo: possible that there are regexps on opposite side)
+      HfstTransducer * cr = contains_regexps_on_one_side(xre_, (level == UPPER_LEVEL) /*input side*/);
       result->subtract(*cr).minimize();
       delete cr;
       stack_.pop();
