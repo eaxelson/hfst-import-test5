@@ -3869,24 +3869,24 @@
          }
 
          // Returns whether tr is "^]":"^]". If tr is not allowed, throws an error message.
-         bool check_regexp_transition_end(const HfstBasicTransition & tr)
+         bool check_regexp_transition_end(const HfstBasicTransition & tr, bool input_side)
          {
            std::string istr = tr.get_input_symbol();
            std::string ostr = tr.get_output_symbol();
-           if (is_special_symbol(istr) || is_special_symbol(ostr))
+           if ((input_side && is_special_symbol(istr)) || (!input_side && is_special_symbol(ostr)))
              {
                throw "error: special symbol detected in compile-replace regular expression";
              } 
-           if (("^[" == istr) || ("^[" == ostr))
+           if ((input_side && ("^[" == istr)) || (!input_side && ("^[" == ostr)))
              {
                throw "error: ^[ detected inside compile-replace regular expression";
              }
-           if (("^]" == istr) || ("^]" == ostr))
+           if ((input_side && ("^]" == istr)) || (!input_side && ("^]" == ostr)))
              {
-               if (istr != ostr)
+               /*if (istr != ostr)
                  {
                    throw "error: ^] detected on only one side of transition inside compile-replace regular expression";
-                 }
+                   }*/
                return true;
              }
            return false;
@@ -3904,7 +3904,7 @@
            (HfstState s, 
             std::set<HfstState> & states_visited, 
             std::vector<std::pair<std::string, std::string> > & path, 
-            HfstReplacements & full_paths)
+            HfstReplacements & full_paths, bool input_side)
            {
              // no cycles allowed inside "^[" and "^]"
              check_regexp_state_for_cycle(s, states_visited);
@@ -3918,11 +3918,12 @@
                   it != transitions.end(); it++)
                {
                  // closing bracket..
-                 if (check_regexp_transition_end(*it)) // throws error message if *it is not a valid transition
+                 if (check_regexp_transition_end(*it, input_side)) // throws error message if *it is not a valid transition
                    {
                      // ..cannot lead to a state already visited..
                      check_regexp_state_for_cycle(it->get_target_state(), states_visited);
                      // ..but else we can add the expression that it ends to the results
+                     path.push_back(std::pair<std::string, std::string>(it->get_input_symbol(), it->get_output_symbol()));
                      full_paths.push_back
                        (HfstReplacement(it->get_target_state(), path));
                    }
@@ -3934,7 +3935,7 @@
                        (it->get_target_state(),
                         states_visited,
                         path,
-                        full_paths);
+                        full_paths, input_side);
                      path.pop_back();
                    }   
                }
@@ -3953,7 +3954,8 @@
          // Weights are currently ignored.
          void find_regexp_paths
            (HfstState s,
-            std::vector<std::pair<HfstState, std::vector<std::pair<std::string, std::string> > > > & full_paths)
+            std::vector<std::pair<HfstState, std::vector<std::pair<std::string, std::string> > > > & full_paths, 
+            bool input_side)
          {
            // go through all transitions
            const HfstBasicTransducer::HfstTransitions &transitions 
@@ -3964,17 +3966,18 @@
                {
                  std::string istr = it->get_input_symbol();
                  std::string ostr = it->get_output_symbol();
-                 if ("^[" == istr || "^[" == ostr)
+                 if ((input_side && ("^[" == istr)) || (!input_side && ("^[" == ostr)))
                    {
-                     if (istr != ostr)
+                     /*if (istr != ostr)
                        {
                          throw "error: ^[ detected on only one side of transition";
-                       }
+                         }*/
                      std::set<HfstState> states_visited;
                      states_visited.insert(s);
                      std::vector<std::pair<std::string, std::string> > path; 
-                     find_regexp_paths(it->get_target_state(), states_visited, path, full_paths);
-                     fprintf(stderr, "%u regexp paths found for state %u\n", (unsigned int)full_paths.size(), s); // debug
+                     path.push_back(std::pair<std::string, std::string>(istr, ostr));
+                     find_regexp_paths(it->get_target_state(), states_visited, path, full_paths, input_side);
+                     //fprintf(stderr, "%u regexp paths found for state %u\n", (unsigned int)full_paths.size(), s); // debug
                    }
                }
          }
@@ -3982,15 +3985,15 @@
          // Find all subpaths of form "^[" [x:y]* "^]" (x and y cannot be "^[" or "^]") and return them.
          // retval[start_state] == vector(pair(end_state, vector(pair(isymbol,osymbol) ) ) )
          // Weights are currently ignored.
-         HfstReplacementsMap find_replacements()
+         HfstReplacementsMap find_replacements(bool input_side)
          {
            HfstReplacementsMap replacements;
            unsigned int state = 0;
            for (iterator it = begin(); it != end(); it++)
              {
-               fprintf(stderr, "state %u......\n", state); // debug
+               //fprintf(stderr, "state %u......\n", state); // debug
                HfstReplacements full_paths;
-               find_regexp_paths(state, full_paths);
+               find_regexp_paths(state, full_paths, input_side);
                if (full_paths.size() > 0)
                  {
                    replacements[state] = full_paths;
