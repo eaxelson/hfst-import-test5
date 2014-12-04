@@ -942,6 +942,7 @@ xfst_label_to_transducer(const char* input, const char* output)
     // Merge operation creates an XreCompiler that needs this information below. Otherwise, it will overwrite all this.
     struct XreConstructorArguments args(hfst::xre::definitions, hfst::xre::function_definitions, hfst::xre::function_arguments, hfst::xre::symbol_lists, hfst::xre::format);
 
+    tr1->minimize();
     tr2->merge(*tr1, args);
     return tr2;
   }

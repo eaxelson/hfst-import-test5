@@ -4200,31 +4200,19 @@ namespace xfst {
     return well_formed;
   }
 
-  static HfstTransducer * contains_regexps_on_one_side(hfst::xre::XreCompiler & xre_, bool input_side)
+  static HfstTransducer * contains_regexp_markers_on_one_side(hfst::xre::XreCompiler & xre_, bool input_side)
   {
-    HfstTransducer * not_bracket_star;
+    HfstTransducer * retval = NULL;
     if (input_side)
       {
-        not_bracket_star = xre_.compile("[?:? - \"^[\":? - \"^]\":?]* ;");
+        retval = xre_.compile("[?:?|0:?|?:0]* [\"^[\":? | \"^]\":? | \"^[\":0 | \"^]\":0] [?:?|0:?|?:0]*");
       }
-    else
+    else // output side
       {
-        not_bracket_star = xre_.compile("[?:? - ?:\"^[\" - ?:\"^]\"]* ;");
+        retval = xre_.compile("[?:?|0:?|?:0]* [?:\"^[\" | ?:\"^]\" | 0:\"^[\" | 0:\"^]\"] [?:?|0:?|?:0]*");
       }
-    xre_.define("TempNotBracketStar", *not_bracket_star);
-    // all paths that contain one or more well-formed ^[ ^] expressions
-    HfstTransducer * well_formed;
-    if (input_side)
-      {
-        well_formed = xre_.compile("TempNotBracketStar \"^[\":? TempNotBracketStar  [ \"^]\":? TempNotBracketStar \"^[\":?  TempNotBracketStar ]*  \"^]\":? TempNotBracketStar ;");
-      }
-    else
-      {
-        well_formed = xre_.compile("TempNotBracketStar ?:\"^[\" TempNotBracketStar  [ ?:\"^]\" TempNotBracketStar ?:\"^[\"  TempNotBracketStar ]*  ?:\"^]\" TempNotBracketStar ;");
-      }
-    xre_.undefine("TempNotBracketStar");
-    delete not_bracket_star;
-    return well_formed;
+    assert(retval != NULL);
+    return retval;
   }
 
   // @pre \a t must be an automaton
@@ -4350,6 +4338,7 @@ namespace xfst {
                        CPR = std::string("[") + CPR + std::string("] ;");
                      }
                    char * cpr = strdup(CPR.c_str());
+                   // debug
                    //fprintf(stderr, "compiling replacement '%s'...\n", cpr);
                    HfstTransducer * replacement = xre_.compile(cpr);
                    if (replacement == NULL)
@@ -4360,6 +4349,9 @@ namespace xfst {
                        return *this;
                      }
                    replacement->minimize();
+
+                   // debug
+                   //std::cerr << "replacement is:" << std::endl << *replacement << std::endl;
 
                    // compose with opposite level
                    if (level == UPPER_LEVEL)
@@ -4395,10 +4387,15 @@ namespace xfst {
       HfstTransducer * result = new HfstTransducer(fsm, format_);
 
       // debug
-      //std::cerr << "result from compile-replace is:" << std::endl << *result << std::endl;
+      //std::cerr << "result from compile-replace before filtering is:" << std::endl << *result << std::endl;
 
       // filter out regexps (todo: possible that there are regexps on opposite side)
-      HfstTransducer * cr = contains_regexps_on_one_side(xre_, (level == UPPER_LEVEL) /*input side*/);
+      HfstTransducer * cr = contains_regexp_markers_on_one_side(xre_, (level == UPPER_LEVEL) /*input side*/);
+      cr->minimize();
+
+      // debug
+      //std::cerr << "filter is:" << std::endl << *cr << std::endl;
+
       result->subtract(*cr).minimize();
       delete cr;
       stack_.pop();
