@@ -165,5 +165,8 @@ EXTRA_DIST=test.sh \
 	weighted_parallel_rules_9.xfst weighted_parallel_rules_9.output \
 	weighted_parallel_rules_10.xfst weighted_parallel_rules_10.output \
 	weighted_parallel_rules_11.xfst weighted_parallel_rules_11.output \
-	xerox_composition.xfst xerox_composition.output
+	xerox_composition.xfst xerox_composition.output \
+	compile_replace_1.xfst compile_replace_1.output \
+	compile_replace_2.xfst compile_replace_2.output \
+	compile_replace_3.xfst compile_replace_3.output
 check_DATA=test.sh
