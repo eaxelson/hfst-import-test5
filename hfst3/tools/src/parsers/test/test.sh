@@ -99,7 +99,7 @@ do
         substitute_defined_1 substitute_defined_2 substitute_defined_3 \
         substitute_defined_4 substitute_defined_5 substitute_defined_6 \
         at_re_1 at_re_2 at_re_3 at_txt at_stxt at_txt_and_stxt at_pl \
-        quoted_literals replace_identity one_transition_regex
+        quoted_literals replace_identity one_transition_regex merge
         # substitute_symbol_6 fails on sfst
         # angle_brackets omitted, since xfst and foma handle them differently
     do
@@ -121,6 +121,31 @@ do
 	    exit 1;
 	fi
     done
+
+    ## The same as above but only for openfst format
+    if [ "$format" = "openfst-tropical" ]; then
+        for testfile in merge_weighted
+        do
+	    rm -f result result1 result2
+	    if ! (ls $testfile.xfst 2> /dev/null); then
+	        echo "skipping missing test for "$testfile"..."
+	        continue
+	    fi
+	    if ! (cat $testfile.xfst | ../hfst-xfst --pipe-mode -q -f $format > result 2> /dev/null); then
+	        echo "ERROR: in compiling "$testfile".xfst"
+	        exit 1;
+	    fi
+	    if ! (cat result | ${TXT2FST} > tmp1; cat $testfile.att | ${TXT2FST} > tmp2; ); then
+	        echo "ERROR: in compiling "$testfile".att"
+	        exit 1;
+	    fi
+	    if ! (${COMPARE} tmp1 tmp2); then
+	        echo "ERROR: "$testfile" test failed"
+	        exit 1;
+	    fi
+        done
+    fi
+
 
     ## Test that testfile_fail fails.
     #for testfile in define_fail
