@@ -563,8 +563,8 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     verbose_printf("Printed %i random string(s)\n", cb.count);
       }
 
-    if (print_separator_after_each_transducer)
-      outstream << "--" << std::endl;
+    //if (print_separator_after_each_transducer)
+    //  outstream << "--" << std::endl;
   }
     
   instream.close();
