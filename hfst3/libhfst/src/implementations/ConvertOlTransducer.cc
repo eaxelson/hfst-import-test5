@@ -171,23 +171,17 @@ void get_states_and_symbols(
     StringSet * flag_diacritics = new StringSet();
     StringSet * other_symbols = new StringSet();
     
-    std::map<unsigned int, unsigned int> * relabeled_states =
-        new std::map<unsigned int, unsigned int>();
     unsigned int first_transition = 0;
-    unsigned int source_state=0;
+    unsigned int state_number = 0;
     for (HfstBasicTransducer::const_iterator it = t->begin(); 
          it != t->end(); ++it) {
-        unsigned int state_number = state_placeholders.size();
-        if (state_number != source_state) {
-            relabeled_states->operator[](source_state) = state_number;
-        }
         hfst_ol::Weight final_w = 0.0;
-        if (t->is_final_state(source_state)) {
-            final_w = t->get_final_weight(source_state);    
+        if (t->is_final_state(state_number)) {
+            final_w = t->get_final_weight(state_number);    
         }
         state_placeholders.push_back(hfst_ol::StatePlaceholder(
                                          state_number,
-                                         t->is_final_state(source_state),
+                                         t->is_final_state(state_number),
                                          first_transition,
                                          final_w));
         ++first_transition; // there's a padding entry between states
@@ -207,7 +201,7 @@ void get_states_and_symbols(
                 other_symbols->insert(tr_it->get_output_symbol());
             }
         }
-        source_state++;
+        ++state_number;
     }
 
     std::map<std::string, SymbolNumber> string_symbol_map;
@@ -269,24 +263,17 @@ void get_states_and_symbols(
     // Do a second pass over the transitions, figuring out everything
     // about the states except starting indices
 
-    source_state=0;
+    state_number = 0;
     for (HfstBasicTransducer::const_iterator it = t->begin(); 
          it != t->end(); ++it) {
         for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
                = it->begin();
              tr_it != it->end(); ++tr_it) {
-            unsigned int state_number = source_state;
-            if (relabeled_states->count(source_state) != 0) {
-                state_number = relabeled_states->operator[](source_state);
-            }
             // add input in case we're seeing it the first time
             state_placeholders[state_number].add_input(
                 string_symbol_map[tr_it->get_input_symbol()],
                 flag_symbols);
             unsigned int target = tr_it->get_target_state();
-            if (relabeled_states->count(target) != 0) {
-                target = relabeled_states->operator[](target);
-            }
             hfst_ol::TransitionPlaceholder trans(
                 target,
                 string_symbol_map[tr_it->get_input_symbol()],
@@ -295,9 +282,8 @@ void get_states_and_symbols(
             SymbolNumber input_sym = string_symbol_map[tr_it->get_input_symbol()];
             state_placeholders[state_number].add_transition(trans);
         }
-        source_state++;
+        ++state_number;
     }
-    delete relabeled_states;
 }
 
   /* Create an hfst_ol::Transducer equivalent to HfstBasicTransducer \a t.
@@ -364,52 +350,42 @@ void get_states_and_symbols(
         unsigned int i = first_available_index;
 
         // While this index is not suitable for a starting index, keep looking
-    if (!quick) {
         while (!used_indices->fits(*it, flag_symbols, i)) {
-        ++i;
+            ++i;
         }
-    }
         it->start_index = i;
-    previous_successful_index = i;
+        previous_successful_index = i;
         // Once we've found a starting index, insert a finality marker and
-    // mark all the used indices
-    used_indices->assign(i, it->state_number, NO_SYMBOL_NUMBER);
-    for (std::vector<std::vector<hfst_ol::TransitionPlaceholder> >
-             ::const_iterator tr_it = it->transition_placeholders.begin();
+        // mark all the used indices
+        used_indices->assign(i, it->state_number, NO_SYMBOL_NUMBER);
+        for (std::vector<std::vector<hfst_ol::TransitionPlaceholder> >
+                 ::const_iterator tr_it = it->transition_placeholders.begin();
              tr_it != it->transition_placeholders.end(); ++tr_it) {
-        SymbolNumber index_offset = tr_it->at(0).input;
-        if (flag_symbols.count(index_offset) != 0) {
-            index_offset = 0;
-        }
-        used_indices->assign(i + index_offset + 1, it->state_number, index_offset);
-    }
-    while (used_indices->unsuitable(
-           first_available_index, seen_input_symbols,
-           packing_aggression)) {
-        ++first_available_index;
-    }
-    if (first_available_index == previous_first_index) {
-        if (floor_stuck_counter > floor_jump_threshold) {
-            SymbolNumber index_offset = it->get_largest_index();
+            SymbolNumber index_offset = tr_it->at(0).input;
             if (flag_symbols.count(index_offset) != 0) {
                 index_offset = 0;
             }
-            first_available_index =
-                previous_successful_index + 1 + index_offset;
-            while (used_indices->unsuitable(
-                       first_available_index,
-                       seen_input_symbols, packing_aggression)) {
-                ++first_available_index;
-            }
-            floor_stuck_counter = 0;
-            previous_first_index = first_available_index;
-        } else {
-            ++floor_stuck_counter;
+            used_indices->assign(i + index_offset + 1, it->state_number, index_offset);
         }
-    } else {
-        previous_first_index = first_available_index;
-        floor_stuck_counter = 0;
-    }
+
+        while (used_indices->unsuitable(first_available_index, seen_input_symbols, packing_aggression)) {
+            ++first_available_index;
+        }
+        if (first_available_index == previous_first_index) {
+            if (floor_stuck_counter > floor_jump_threshold) {
+                first_available_index = previous_successful_index + 1;
+                while (used_indices->used(first_available_index)) {
+                    ++first_available_index;
+                }
+                floor_stuck_counter = 0;
+                previous_first_index = first_available_index;
+            } else {
+                ++floor_stuck_counter;
+            }
+        } else {
+            previous_first_index = first_available_index;
+            floor_stuck_counter = 0;
+        }
     }
 
     // Now resort by state number for the rest
