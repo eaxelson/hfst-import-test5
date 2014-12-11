@@ -374,9 +374,6 @@ void get_states_and_symbols(
         if (first_available_index == previous_first_index) {
             if (floor_stuck_counter > floor_jump_threshold) {
                 first_available_index = previous_successful_index + 1;
-//                while (used_indices->used(first_available_index)) {
-//                    ++first_available_index;
-//                }
                 floor_stuck_counter = 0;
                 previous_first_index = first_available_index;
             } else {
