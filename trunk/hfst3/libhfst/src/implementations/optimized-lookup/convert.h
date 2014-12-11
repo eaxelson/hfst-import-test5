@@ -264,7 +264,7 @@ struct IndexPlaceholders
     for (unsigned int i = 0; i < symbols; ++i) {
         filled += used(index + i + 1);
         if (filled >= (packing_aggression*symbols)) {
-        return true; // too full
+            return true; // too full
         }
     }
     return false;
