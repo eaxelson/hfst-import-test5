@@ -619,9 +619,6 @@ std::string PmatchAlphabet::stringify(const DoubleTape & str)
             }
             retval.insert(pos, start_tag(output));
             retval.append(end_tag(output));
-        } else if (output == special_symbols[boundary]
-                   || is_guard(output)) {
-            continue;
         } else {
             if ((!extract_tags || start_tag_pos.size() != 0)
                 && is_printable(output)) {
