@@ -99,6 +99,7 @@ namespace hfst_ol {
         std::vector<SymbolNumberVector> symbol_list_members;
         std::vector<unsigned long int> counters;
         SymbolNumberVector guards;
+        std::vector<bool> printable_vector;
         bool is_end_tag(const SymbolNumber symbol) const;
         bool is_guard(const SymbolNumber symbol) const;
         bool is_counter(const SymbolNumber symbol) const;
