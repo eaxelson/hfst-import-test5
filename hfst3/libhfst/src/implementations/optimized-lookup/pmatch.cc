@@ -11,8 +11,14 @@ PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
     symbol2lists = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
     list2symbols = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
     rtns = RtnVector(orig_symbol_count, NULL);
+    // We initialize the vector of which symbols have a printable representation
+    // with false, then flip those that actually do to true
+    printable_vector = std::vector<bool>(orig_symbol_count, false);
     for (SymbolNumber i = 1; i < symbol_table.size(); ++i) {
         add_special_symbol(symbol_table[i], i);
+        if (is_flag_diacritic(i)) {
+            printable_vector[i] = false;
+        }
     }
 }
 
@@ -26,21 +32,12 @@ void PmatchAlphabet::add_symbol(const std::string & symbol)
     symbol2lists.push_back(NO_SYMBOL_NUMBER);
     list2symbols.push_back(NO_SYMBOL_NUMBER);
     rtns.push_back(NULL);
+    printable_vector.push_back(true);
 }
 
 bool PmatchAlphabet::is_printable(SymbolNumber symbol)
 {
-    if (symbol == 0 || symbol == NO_SYMBOL_NUMBER || is_flag_diacritic(symbol)
-        || is_end_tag(symbol) || is_guard(symbol) || is_counter(symbol)) {
-        return false;
-    }
-    for (SymbolNumberVector::const_iterator it = special_symbols.begin();
-         it != special_symbols.end(); ++it) {
-        if (*it == symbol) {
-            return false;
-        }
-    }
-    return true;
+    return symbol < printable_vector.size() && printable_vector[symbol];
 }
 
 void PmatchAlphabet::add_special_symbol(const std::string & str,
@@ -83,6 +80,8 @@ void PmatchAlphabet::add_special_symbol(const std::string & str,
         process_symbol_list(str, symbol_number);
     } else if (is_counter(str)) {
         process_counter(str, symbol_number);
+    } else {
+        printable_vector[symbol_number] = true;
     }
 }
 
