@@ -10,6 +10,7 @@ PmatchAlphabet::PmatchAlphabet(std::istream & inputstream,
 {
     symbol2lists = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
     list2symbols = SymbolNumberVector(orig_symbol_count, NO_SYMBOL_NUMBER);
+    rtns = RtnVector(orig_symbol_count, NULL);
     for (SymbolNumber i = 1; i < symbol_table.size(); ++i) {
         add_special_symbol(symbol_table[i], i);
     }
@@ -24,6 +25,7 @@ void PmatchAlphabet::add_symbol(const std::string & symbol)
     TransducerAlphabet::add_symbol(symbol);
     symbol2lists.push_back(NO_SYMBOL_NUMBER);
     list2symbols.push_back(NO_SYMBOL_NUMBER);
+    rtns.push_back(NULL);
 }
 
 bool PmatchAlphabet::is_printable(SymbolNumber symbol)
@@ -220,9 +222,9 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
             alphabet.get_rtn(*it)->collect_possible_first_symbols();
             std::set<SymbolNumber> rtn_firsts =
                 alphabet.get_rtn(*it)->possible_first_symbols;
-            for (RtnMap::iterator it = alphabet.rtns.begin();
-                 it != alphabet.rtns.end(); ++it) {
-                if (rtn_firsts.count(it->first) == 1) {
+            for (RtnNameMap::const_iterator it = alphabet.rtn_names.begin();
+                 it != alphabet.rtn_names.end(); ++it) {
+                if (rtn_firsts.count(it->second) == 1) {
                     // For now we are very conservative:
                     // if we can go through two levels of rtns
                     // without any input, we just assume the full
@@ -243,9 +245,9 @@ PmatchContainer::PmatchContainer(std::istream & inputstream):
             }
         }
     }
-    for (RtnMap::iterator it = alphabet.rtns.begin();
-         it != alphabet.rtns.end(); ++it) {
-        possible_firsts.erase(it->first);
+    for (RtnNameMap::const_iterator it = alphabet.rtn_names.begin();
+         it != alphabet.rtn_names.end(); ++it) {
+        possible_firsts.erase(it->second);
     }
     if (!possible_firsts.empty() &&
         alphabet.get_special(boundary) != NO_SYMBOL_NUMBER) {
@@ -360,9 +362,9 @@ PmatchContainer::~PmatchContainer(void)
 
 PmatchAlphabet::~PmatchAlphabet(void)
 {
-    for (RtnMap::iterator it = rtns.begin();
+    for (RtnVector::iterator it = rtns.begin();
          it != rtns.end(); ++it) {
-        delete it->second;
+        delete *it;
     }
 
 }
@@ -434,17 +436,17 @@ std::string PmatchContainer::parse_name_from_hfst3_header(std::istream & f)
 void PmatchAlphabet::add_rtn(PmatchTransducer * rtn, std::string const & name)
 {
     SymbolNumber symbol = rtn_names[name];
-    rtns.insert(std::pair<SymbolNumber, PmatchTransducer *>(symbol, rtn));
+    rtns[symbol] = rtn;
 }
 
 bool PmatchAlphabet::has_rtn(std::string const & name) const
 {
-    return rtns.count(rtn_names.at(name)) != 0;
+    return rtn_names.at(name) < rtns.size() && rtns[rtn_names.at(name)] != NULL;
 }
 
 bool PmatchAlphabet::has_rtn(SymbolNumber symbol) const
 {
-    return rtns.count(symbol) != 0;
+    return symbol < rtns.size() && rtns[symbol] != NULL;
 }
 
 PmatchTransducer * PmatchAlphabet::get_rtn(SymbolNumber symbol)

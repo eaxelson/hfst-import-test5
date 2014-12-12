@@ -16,7 +16,8 @@ namespace hfst_ol {
 
     const unsigned int PMATCH_MAX_RECURSION_DEPTH = 5000;
     
-    typedef std::map<SymbolNumber, PmatchTransducer *> RtnMap;
+    typedef std::vector<PmatchTransducer *> RtnVector;
+    typedef std::map<std::string, SymbolNumber> RtnNameMap;
     typedef std::vector<Location> LocationVector;
     typedef std::vector<LocationVector> LocationVectorVector;
     typedef std::vector<WeightedDoubleTape> WeightedDoubleTapeVector;
@@ -86,10 +87,10 @@ namespace hfst_ol {
 
     class PmatchAlphabet: public TransducerAlphabet {
     protected:
-        RtnMap rtns;
+        RtnVector rtns;
         SymbolNumberVector special_symbols;
         std::map<SymbolNumber, std::string> end_tag_map;
-        std::map<std::string, SymbolNumber> rtn_names;
+        RtnNameMap rtn_names;
 // For each symbol, either NO_SYMBOL for "no corresponding list" or an index into symbol_lists
         SymbolNumberVector symbol2lists;
 // For each a symbol, either NO_SYMBOL for "this is not a list" or an index into symbol_lists_members
