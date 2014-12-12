@@ -365,6 +365,7 @@ PmatchAlphabet::~PmatchAlphabet(void)
     for (RtnVector::iterator it = rtns.begin();
          it != rtns.end(); ++it) {
         delete *it;
+        *it = NULL;
     }
 
 }
