@@ -4251,7 +4251,27 @@ namespace xfst {
     std::string pathstr("[ ");
     for (hfst::StringPairVector::const_iterator it = path.begin(); it != path.end(); it++)
       {
-        pathstr.append("\"").append(it->first).append("\":\"").append(it->second).append("\" ");
+        std::string isymbol = it->first;
+        if (isymbol == hfst::internal_epsilon)
+          {
+            pathstr.append("0");
+          }
+        else
+          {
+            pathstr.append("\"").append(isymbol).append("\"");
+          }
+        
+        pathstr.append(":");
+
+        std::string osymbol = it->second;
+        if (osymbol == hfst::internal_epsilon)
+          {
+            pathstr.append("0 ");
+          }
+        else
+          {
+            pathstr.append("\"").append(osymbol).append("\" ");
+          }
       }
     pathstr.append("];");
     // debug
@@ -4300,11 +4320,13 @@ namespace xfst {
 
       if (is_well_formed_for_compile_replace(&tmp_cp, xre_))
         {
-          fprintf(stderr, "Network is well-formed.\n");
+          if (verbose_)
+            fprintf(stderr, "Network is well-formed.\n");
         }
       else
         {
-          fprintf(stderr, "Network is not well-formed.\n");
+          if (verbose_)
+            fprintf(stderr, "Network is not well-formed.\n");
           xfst_lesser_fail();
           prompt();
           return *this;
