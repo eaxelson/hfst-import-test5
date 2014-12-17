@@ -11,8 +11,6 @@
 namespace hfst { namespace xre {
 
     unsigned int cr=0; // chars read from xre input
-    bool count_chars_read = true;  // whether counter cr is on
-    void setCharCounter(bool value) { count_chars_read = value; }
     std::set<unsigned int> positions;
     char * position_symbol = NULL;
     std::string error_message;
@@ -149,7 +147,11 @@ XreCompiler::compile(const std::string& xre)
 {
   // debug
   //std::cerr << "XreCompiler: " << this << " : compile(\"" << xre << "\")" << std::endl;
-  return hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, list_definitions_, format_);
+  unsigned int cr_before = cr;
+  cr = 0;
+  HfstTransducer * retval = hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, list_definitions_, format_);
+  cr = cr_before;
+  return retval;
 }
 
 HfstTransducer*
@@ -157,8 +159,11 @@ XreCompiler::compile_first(const std::string& xre, unsigned int & chars_read)
 {
   // debug
   //std::cerr << "XreCompiler: " << this << " : compile_first(\"" << xre << "\"";
+  unsigned int cr_before = cr;
+  cr = 0;
   HfstTransducer * retval = hfst::xre::compile_first(xre, definitions_, function_definitions_, function_arguments_, list_definitions_, format_, chars_read);
   //std::cerr << ", " << chars_read << ")" << std::endl;
+  cr = cr_before;
   return retval;
 }
 
@@ -167,7 +172,8 @@ bool XreCompiler::get_positions_of_symbol_in_xre
 {
   position_symbol = strdup(symbol.c_str());
   positions.clear();
-  cr=0;
+  unsigned int cr_before = cr;
+  cr = 0;
   HfstTransducer * compiled = 
     hfst::xre::compile(xre, definitions_, function_definitions_, function_arguments_, list_definitions_, format_);
   free(position_symbol);
@@ -180,6 +186,7 @@ bool XreCompiler::get_positions_of_symbol_in_xre
       return false;
     }
   positions_ = positions;
+  cr = cr_before;
   return true;
 }
 

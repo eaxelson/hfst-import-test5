@@ -570,7 +570,7 @@ AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
 
 # Checks for libraries
 
-AC_CHECK_LIB([xml2], [main])
+#AC_CHECK_LIB([xml2], [main])
 AC_LANG_PUSH([C++])
 AS_IF([test "x$with_openfst" != "xno" -a "x$enable_mingw" == "xno"], 
       [AC_CHECK_LIB([dl], [main])])
