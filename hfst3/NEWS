@@ -5,6 +5,18 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.8.2
+---------------------------
+
+* Runtime speed improvements in pmatch
+
+* Speedup in conversion to optimized lookup format
+
+* Merge and compile-replace operations supported in hfst-xfst
+
+* Added option --print-symbol-pair-statistis(=N) to hfst-summarize
+
+
 Noteworthy changes in 3.8.1
 ---------------------------
 
