@@ -69,7 +69,7 @@ print_usage()
     print_common_unary_program_options(message_out);
     // fprintf(message_out, (tool-specific options and short descriptions)
     fprintf(message_out, "Summarize options:\n");
-    fprintf(message_out, "  -p, --print-symbol-pair-statistics=N  Print info about symbol pairs that occur\n");
+    fprintf(message_out, "  -S, --print-symbol-pair-statistics=N  Print info about symbol pairs that occur\n");
     fprintf(message_out, "                                        at most N times (default is infinity)\n");
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
@@ -555,6 +555,9 @@ process_stream(HfstInputStream& instream)
                 }
               fprintf(outfile, "\n");
             }
+
+        } // if verbose
+
           // ADDED
           if (print_symbol_pair_statistics) 
             {
@@ -575,9 +578,7 @@ process_stream(HfstInputStream& instream)
                 }
               fprintf(outfile, "\n");
             }
-
           delete trans;
-        }
     }
 
     fprintf(outfile, "\nRead " SIZE_T_SPECIFIER " transducers in total.\n", transducer_n);
