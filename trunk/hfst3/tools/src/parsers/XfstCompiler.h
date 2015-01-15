@@ -511,11 +511,11 @@ class XfstCompiler
   const char* get_print_symbol(const char* symbol);
   //! @brief Print \a n first paths (or all, if n is negative) 
   //! from \a paths to \a outfile.
-  XfstCompiler& print_paths(const hfst::HfstTwoLevelPaths &paths, 
+  bool print_paths(const hfst::HfstTwoLevelPaths &paths, 
                             FILE* outfile=stdout, int n=-1);
   //! @brief Print \a n first paths (or all, if n is negative) 
   //! from \a paths to \a outfile.
-  XfstCompiler& print_paths(const hfst::HfstOneLevelPaths &paths, 
+  bool print_paths(const hfst::HfstOneLevelPaths &paths, 
                             FILE* outfile=stdout, int n=-1);
   // A method used by function print_longest_string_or_its_size.
   XfstCompiler& print_one_string_or_its_size

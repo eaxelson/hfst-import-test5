@@ -118,6 +118,19 @@ bool is_default(const char * str)
       return result;
     }
 
+    StringVector to_string_vector(const StringPairVector & spv, bool input_side)
+    {
+      StringVector result;
+      for (StringPairVector::const_iterator it = spv.begin(); it != spv.end(); it++)
+        {
+          if (input_side)
+            result.push_back(it->first);
+          else
+            result.push_back(it->second);
+        }
+      return result;
+    }
+
     StringVector to_string_vector(const HfstTwoLevelPath & path)
     {
       StringVector result;
