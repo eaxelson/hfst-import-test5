@@ -128,6 +128,7 @@ namespace hfst
     StringVector to_string_vector(const hfst::HfstTwoLevelPath & path);
     std::string to_string(const StringVector & sv, bool spaces=false);
     std::string to_string(const StringPairVector & sv, bool spaces=false);
+    StringVector to_string_vector(const StringPairVector & spv, bool input_side);
     hfst::HfstTwoLevelPaths remove_flags(const hfst::HfstTwoLevelPaths & paths);
     hfst::HfstTwoLevelPath remove_flags(const hfst::HfstTwoLevelPath & path);
     StringPairSet to_string_pair_set(const StringSet & ss);
