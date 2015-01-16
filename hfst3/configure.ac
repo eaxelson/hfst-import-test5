@@ -626,7 +626,7 @@ AS_IF([test "x$with_readline" = "xyes"],
 
 # Checks for header files
 AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h])
-AC_CHECK_HEADERS([libxml/tree.h libxml/mem.h])
+#AC_CHECK_HEADERS([libxml/tree.h libxml/mem.h])
 AC_LANG_PUSH([C++])
 
 # Whether std::unordered_map and std::unordered_set should be used
