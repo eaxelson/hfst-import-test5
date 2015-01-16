@@ -405,10 +405,16 @@ namespace xfst {
                 if (is_negatively_set || (values[feat] != val)) { return false; }
               break;
             case 'D': // disallow
-              if (val == "") // empty disallow
-                if (values[feat] != "") { return false; }
-              else // nonempty disallow
-                if ((!is_negatively_set) && (values[feat] == val)) { return false; }
+              if (val == "") { // empty disallow
+                if (values[feat] != "") {  
+                  return false;
+                }
+              }
+              else { 
+                if ((!is_negatively_set) && (values[feat] == val)) { // nonempty disallow
+                  return false;
+                }
+              }
               break;
             case 'C': // clear
               values[feat] = "";
