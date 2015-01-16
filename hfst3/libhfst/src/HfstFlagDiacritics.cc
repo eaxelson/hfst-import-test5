@@ -57,13 +57,25 @@ bool FdOperation::is_diacritic(const std::string& diacritic_string)
     // The feature name ends at the '.' char after the feature name star pos.
     size_t feature_past  = diacritic.find('.',3);
 
+    // If there is no value given (e.g. "@D.FOO@"),
+    if (feature_past == std::string::npos)
+      feature_past = diacritic.size() - 1; // point to the last '@' char.
+    
     return diacritic.substr(feature_start, feature_past - feature_start);
   }
 
   std::string FdOperation::get_value(const std::string& diacritic)
   {
+    // First locate the second '.' char.
+    size_t second_comma = diacritic.find('.',diacritic.find('.') + 1);
+
+    // If there is no second '.' char (diacritics is e.g. of form "@D.FOO@"),
+    // return an empty string.
+    if (second_comma == std::string::npos)
+      return "";
+
     // The value starts after the second '.' char.
-    size_t value_start = diacritic.find('.',diacritic.find('.') + 1) + 1;
+    size_t value_start = second_comma + 1;
 
     // The value ends at the last char.
     size_t value_past  = diacritic.size() - 1;
