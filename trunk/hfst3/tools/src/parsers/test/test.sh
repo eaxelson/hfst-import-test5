@@ -100,7 +100,7 @@ do
         substitute_defined_4 substitute_defined_5 substitute_defined_6 \
         at_re_1 at_re_2 at_re_3 at_txt at_stxt at_txt_and_stxt at_pl \
         quoted_literals replace_identity one_transition_regex merge
-        # substitute_symbol_6 fails on sfst
+        # substitute_symbol_6 fails on sfst,  substitute_symbol_7 substitute_symbol_8 should be added
         # angle_brackets omitted, since xfst and foma handle them differently
     do
 	rm -f result result1 result2

@@ -29,6 +29,8 @@ EXTRA_DIST=test.sh \
 	substitute_symbol_4.xfst substitute_symbol_4.att \
 	substitute_symbol_5.xfst substitute_symbol_5.att \
 	substitute_symbol_6.xfst substitute_symbol_6.att \
+	substitute_symbol_7.xfst substitute_symbol_7.att \
+	substitute_symbol_8.xfst substitute_symbol_8.att \
 	substitute_label_1.xfst substitute_label_1.att \
 	substitute_label_2.xfst substitute_label_2.att \
 	substitute_label_3.xfst substitute_label_3.att \
