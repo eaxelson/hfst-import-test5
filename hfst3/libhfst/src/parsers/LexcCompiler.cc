@@ -71,6 +71,8 @@ extern void hlexclex_destroy();
 
 namespace hfst { namespace lexc {
 
+    bool debug = false;
+
 LexcCompiler* lexc_ = 0;
 
 LexcCompiler::LexcCompiler() :
@@ -871,17 +873,23 @@ LexcCompiler::compileLexical()
         joinersAll.repeat_star();
         joinersAll.minimize();
 
-/*
-     printf("lexicons before compose: \n");
-     lexicons.write_in_att_format(stdout, 1);
-
-      printf("joinersAll: \n");
-      joinersAll.write_in_att_format(stdout, 1);
-      printf("\n");
-*/
+        if (debug) 
+          {
+            fprintf(stderr, "lexicons before compose: \n");
+            lexicons.write_in_att_format(stderr, 1);
+            
+            fprintf(stderr, "joinersAll: \n");
+            joinersAll.write_in_att_format(stderr, 1);
+            fprintf(stderr, "\n");
+          }
 
         lexicons.compose(joinersAll).minimize();
 
+        if (debug) 
+          {
+            std::cerr << "lexicons after composition: " << std::endl;
+            std::cerr << lexicons << std::endl; 
+          }
 
         HfstSymbolSubstitutions allSubstitutions;
         if(with_flags_)
@@ -899,7 +907,10 @@ LexcCompiler::compileLexical()
                            s != transducerAlphabet.end();
                            ++s)
             {
-                //printf("%s \n", s->c_str());
+              if (debug) 
+                { 
+                  fprintf(stderr, "handling alpha: '%s'...\n", s->c_str()); 
+                }
                 String alph = *s;
 
                 if ( alph[0] == '$' && *alph.rbegin() == '$' && alph.size() > 2)
@@ -907,6 +918,10 @@ LexcCompiler::compileLexical()
                     replace(alph.begin(), alph.end(), '$', '@');
                     //std::cout << alph << '\n';
                     fakeFlagsToRealFlags.insert(StringPair(*s, alph));
+                    if (debug) 
+                      { 
+                        std::cerr << "debug: inserting fakeFlagsToRealFlags replacement: " << *s << " -> " << alph << std::endl; 
+                      }
                     //lexicons.substitute(*s, alph).minimize();
                 }
             }
@@ -925,8 +940,12 @@ LexcCompiler::compileLexical()
         lexicons.substitute(allSubstitutions).minimize();
         lexicons.prune_alphabet();
 
-
-
+        if (debug) 
+          {
+            std::cerr << "lexicons after substitution: " << std::endl;
+            std::cerr << lexicons << std::endl; 
+          }
+        
         //replace reg exp key with transducers
         if (verbose_)
         {
@@ -948,6 +967,10 @@ LexcCompiler::compileLexical()
 
                 //std::cout << alph << '\n';
                 fakeRegexprToReal.insert(StringPair(it->first, alph));
+                if (debug) 
+                  { 
+                    std::cerr << "debug: inserting fakeRegexprToReal replacement: " << it->first << " -> " << alph << std::endl; 
+                  }
 
             //    lexicons.substitute(it->first, alph).minimize();
             }
@@ -979,16 +1002,25 @@ LexcCompiler::compileLexical()
             }
             HfstBasicTransducer btr(*(it->second));
             regMarkToTr[alph] = btr;
+            if (debug) 
+              { 
+                std::cerr << "debug: regMarkToTr[" << alph << "] = " << std::endl;
+                btr.write_in_att_format(stderr); 
+              }
             //lexicons.substitute(StringPair(alph, alph), *it->second, true).minimize();
         }
       
-
         HfstBasicTransducer lexicons_basic(lexicons);
         lexicons_basic.substitute(regMarkToTr, true);
 
-
-
         lexicons_basic.prune_alphabet();
+
+        if (debug) 
+          {
+            std::cerr << "lexicons_basic after regexp substitution: " << std::endl;
+            lexicons_basic.write_in_att_format(stderr); 
+          }
+
 
 /*
         printf("lexicons after substitute: \n");
@@ -1002,10 +1034,9 @@ LexcCompiler::compileLexical()
 
     // Preserve only first flag of consecutive P and R lexname flag series, 
     // e.g. change P.LEXNAME.1 R.LEXNAME.1 P.LEXNAME.2 R.LEXNAME.2 into P.LEXNAME.1 
-        
+    
     if (with_flags_ && minimize_flags_)
           {
-
             // To substitute "@[P|R].LEXNAME...@" with "$[P|R].LEXNAME...$" and vice versa. 
             std::map<String, String> flag_substitutions;             // @ -> $
             std::map<String, String> reverse_flag_substitutions;     // $ -> @
@@ -1064,8 +1095,10 @@ LexcCompiler::compileLexical()
             std::string context_regexp(flag_remover_regexp);
             flag_remover_regexp.append(" -> 0 || ").append(context_regexp).append(" _ ");
             
-            // DEBUG
-            //fprintf(stderr, "flag_remover_regexp: %s\n", flag_remover_regexp.c_str());
+            if (debug) 
+              { 
+                fprintf(stderr, "flag_remover_regexp: %s\n", flag_remover_regexp.c_str()); 
+              }
             
             hfst::xre::XreCompiler xre_comp(format_);
             HfstTransducer * flag_filter = xre_comp.compile(flag_remover_regexp);
@@ -1106,7 +1139,7 @@ LexcCompiler::compileLexical()
               }
             else
               {
-                // Convert symbols "$[P|R].LEXNAME...$" back to "@[P|R].LEXNAME...@"            
+                // Convert symbols "$[P|R].LEXNAME...$" back to "@[P|R].LEXNAME...@"                    
                 filtered_lexicons.substitute(reverse_flag_substitutions);
               }
 
