@@ -2803,13 +2803,16 @@ void HfstTransducer::twosided_flag_diacritics()
 std::string encode_flag(const std::string &flag_diacritic)
 {
   std::string retval(flag_diacritic);
-  retval[0] = '$';
-  retval[retval.size()-1] = '$';
+  retval[0] = '%';
+  retval[retval.size()-1] = '%';
   return retval;
 }
 
 std::string decode_flag(const std::string &flag_diacritic)
 {
+  if (flag_diacritic[0] != '%' || flag_diacritic[flag_diacritic.size()-1] != '%')
+    return std::string(flag_diacritic);
+
   std::string retval(flag_diacritic);
   retval[0] = '@';
   retval[retval.size()-1] = '@';
@@ -3636,6 +3639,7 @@ HfstTransducer &HfstTransducer::compose
         another_copy->insert_missing_symbols_to_alphabet_from(*this);
       }
 
+    // hfst-lexc's @_REG.Root_#_@ ??
     /* special symbols are never harmonized */
     this->insert_missing_symbols_to_alphabet_from(*another_copy, true);
     another_copy->insert_missing_symbols_to_alphabet_from(*this, true);
