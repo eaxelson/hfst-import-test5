@@ -2410,13 +2410,13 @@ namespace xfst {
       stack_.pop();
 
       std::string liststr(list);
-      if (liststr == "NOTHING")
+      if (liststr == "\"NOTHING\"") // list is given in quoted format: "foo" "bar" ...
         liststr = "";
 
-      // use regex parser:  `[ [TR] , s , L ]
+      // use regex parser:  `[ [TR] , "s" , L ]
       xre_.define("TempXfstTransducerName", *top);
       std::string subst_regex("`[ [TempXfstTransducerName] , ");
-      subst_regex += std::string(target) + " , " + liststr + " ]";
+      subst_regex += "\"" + std::string(target) + "\" , " + liststr + " ]";
       HfstTransducer * substituted = xre_.compile(subst_regex);
       xre_.undefine("TempXfstTransducerName");
 

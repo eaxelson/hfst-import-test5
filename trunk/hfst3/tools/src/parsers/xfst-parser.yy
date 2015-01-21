@@ -93,7 +93,7 @@ int hxfstlex(void);
 %token <text> REGEX
 %token <text> APPLY_INPUT
     
-%type <text> COMMAND_SEQUENCE NAMETOKEN_LIST LABEL_LIST LABEL
+%type <text> COMMAND_SEQUENCE NAMETOKEN_LIST QUOTED_NAMETOKEN_LIST LABEL_LIST LABEL
 %%
 
 XFST_SCRIPT: COMMAND_LIST 
@@ -430,7 +430,7 @@ COMMAND: ADD_PROPS REDIRECT_IN END_COMMAND {
             free($2);
             free($4);
        }
-       | SUBSTITUTE_SYMBOL NAMETOKEN_LIST FOR NAMETOKEN END_COMMAND {
+       | SUBSTITUTE_SYMBOL QUOTED_NAMETOKEN_LIST FOR NAMETOKEN END_COMMAND {
             hfst::xfst::xfst_->substitute_symbol($2, $4);
             free($2);
             free($4);
@@ -1181,6 +1181,50 @@ NAMETOKEN_LIST: NAMETOKEN_LIST NAMETOKEN {
              }
              | NAMETOKEN {
                 $$ = $1;
+             }
+             ;
+
+QUOTED_NAMETOKEN_LIST: QUOTED_NAMETOKEN_LIST NAMETOKEN {
+                $$ = static_cast<char*>(malloc(sizeof(char)*strlen($1)+strlen($2)+4));
+                char* s = $1;
+                char* r = $$;
+                while (*s != '\0')
+                {
+                    *r = *s;
+                    r++;
+                    s++;
+                }
+                *r = ' ';
+                r++;
+                s = $2;
+                *r = '"';
+                r++;
+                while (*s != '\0')
+                {
+                    *r = *s;
+                    r++;
+                    s++;
+                }
+                *r = '"';
+                r++;
+                *r = '\0';
+             }
+             | NAMETOKEN {
+                $$ = static_cast<char*>(malloc(sizeof(char)*strlen($1)+3));
+                char* s = $1;
+                char* r = $$;
+                *r = '"';
+                r++;
+                while (*s != '\0')
+                {
+                    *r = *s;
+                    r++;
+                    s++;
+                }
+                *r = '"';
+                r++;
+                *r = '\0';
+                free($1);
              }
              ;
 
