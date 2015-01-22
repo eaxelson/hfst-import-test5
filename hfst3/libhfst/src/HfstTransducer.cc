@@ -2863,6 +2863,20 @@ void encode_flag_diacritics(HfstTransducer &fst)
   StringSet alpha = basic_fst.get_alphabet();
   for (StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
     {
+      if (it->size() > 4)
+        {
+          if ((it->at(0) == '%') && (it->at(it->size()-1) == '%'))
+            {
+              std::string str(*it);
+              str[0] = '@';
+              str[str.size()-1] = '@';
+              if (FdOperation::is_diacritic(str))
+                {
+                  std::string msg = "error: reserved symbol '" + str + "' detected";
+                  throw msg.c_str();
+                }
+            }
+        }
       String symbol = *it;
       if (FdOperation::is_diacritic(symbol))
         symbol = encode_flag(symbol);
