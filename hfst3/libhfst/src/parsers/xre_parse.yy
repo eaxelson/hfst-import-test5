@@ -315,6 +315,18 @@ REGEXP2: REPLACE
                         HfstTransducer replaceTr(hfst::xre::format);
                         replaceTr = replace(rule, false);
 
+                        // if we are replacing with flag diacritics, the rule must allow
+                        // flags to be replaced with themselves
+                        StringSet alpha = $3->get_alphabet();
+                        for (StringSet::const_iterator it = alpha.begin(); it != alpha.end(); it++)
+                        {
+                          if (FdOperation::is_diacritic(*it))
+                          {
+                            replaceTr.insert_freely(StringPair(*it, *it), false);
+                          }
+                        }
+                        replaceTr.minimize();
+
                         tmpTr->compose(replaceTr).minimize();
                         tmpTr->invert().compose(replaceTr).invert();
 	        }
