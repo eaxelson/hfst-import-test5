@@ -11,6 +11,7 @@ import net.sf.hfst.Transducer;
 import net.sf.hfst.UnweightedTransducer;
 import net.sf.hfst.WeightedTransducer;
 import net.sf.hfst.NoTokenizationException;
+import net.sf.hfst.FormatException;
 
 /**
  * HfstRuntimeReader takes a transducer (the name of which should
@@ -78,7 +79,12 @@ public class HfstOptimizedLookup {
 		System.exit(1);
 	    }
 	System.out.println("Reading header...");
-	TransducerHeader h = new TransducerHeader(transducerfile);
+        TransducerHeader h = null;
+        try { h = new TransducerHeader(transducerfile); }
+        catch (FormatException e) {
+            System.err.println("File must be in hfst optimized-lookup format");
+            System.exit(1);
+        }
 	DataInputStream charstream = new DataInputStream(transducerfile);
 	System.out.println("Reading alphabet...");
 	TransducerAlphabet a = new TransducerAlphabet(charstream, h.getSymbolCount());

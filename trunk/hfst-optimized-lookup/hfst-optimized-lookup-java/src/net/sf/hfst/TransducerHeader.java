@@ -2,6 +2,7 @@ package net.sf.hfst;
 
 //import java.io.DataInputStream;
 import java.io.FileInputStream;
+import net.sf.hfst.FormatException;
 
 /**
  * On instantiation reads the transducer's header and provides an interface
@@ -33,14 +34,14 @@ public class TransducerHeader
      * Read in the (56 bytes of) header information, which unfortunately
      * is mostly in little-endian unsigned form.
      */
-    public TransducerHeader(FileInputStream file) throws java.io.IOException
+    public TransducerHeader(FileInputStream file) throws java.io.IOException, FormatException
     {
 	hfst3 = false;
 	intact = true; // could add some checks to toggle this and check outside
 	ByteArray head = new ByteArray(5);
 	file.read(head.getBytes());
 	if (begins_hfst3_header(head)) {
-	    skip_hfst3_header(file);
+	    read_hfst3_header(file);
 	    file.read(head.getBytes());
 	    hfst3 = true;
 	}
@@ -76,11 +77,21 @@ public class TransducerHeader
 		bytes.getUByte() == 0);
     }
 
-    public void skip_hfst3_header(FileInputStream file) throws java.io.IOException
+    public void read_hfst3_header(FileInputStream file) throws java.io.IOException, FormatException
     {
+        // The only thing we really check is that the format begins with
+        // HFST_OL. First we read the two bytes giving the header size...
 	ByteArray len = new ByteArray(2);
 	file.read(len.getBytes());
-	file.skip(len.getUShort() + 1);
+        // Then we read the rest...
+        ByteArray header = new ByteArray(len.getUShort() + 1);
+        file.read(header.getBytes());
+        // And just convert it to a String and see if the type is set to what we want
+        String s = new String(header.getBytes(), "UTF-8");
+        if (s.indexOf("type\0HFST_OL") == -1) {
+            throw new FormatException();
+        }
+
     }
 
     public int getInputSymbolCount()
