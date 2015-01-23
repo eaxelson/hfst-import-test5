@@ -87,6 +87,10 @@ static size_t linen = 0;
 static bool lookup_given = false;
 static size_t infinite_cutoff = 5;
 
+// symbols actually seen in (non-ol) transducers
+static std::vector<std::set<std::string> > cascade_symbols_seen;
+static std::vector<bool> cascade_unknown_or_identity_seen;
+
 enum lookup_input_format
 {
   UTF8_TOKEN_INPUT,
@@ -936,6 +940,7 @@ line_to_lookup_path(char** s, HfstStrings2FstTokenizer& tok,
               for (StringPairVector::const_iterator it = spv.begin();
                    it != spv.end(); it++)
                 {
+                  // todo: check if symbol is known to transducer
                   rv->second.push_back(it->first);
                 }
             }
@@ -1083,6 +1088,25 @@ static void print_lookup_string(const StringVector &s) {
   }
 }
 
+bool is_possible_to_get_result(const HfstOneLevelPath & s,
+                               const StringSet & symbols_seen,
+                               bool unknown_or_identity_seen)
+{
+  if (unknown_or_identity_seen)
+    return true;
+  StringVector sv = s.second;
+  for (StringVector::const_iterator it = sv.begin(); it != sv.end(); it++)
+    {
+      if (symbols_seen.find(*it) == symbols_seen.end())
+        return false;
+    }
+  return true;
+}
+
+// which transducer in the cascade we are handling
+static unsigned int transducer_number=0;
+
+// HERE
 void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results, 
                          const HfstOneLevelPath& s, ssize_t limit = -1)
 {
@@ -1092,7 +1116,11 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
   HfstTwoLevelPaths results_spv;
   StringPairVector path_spv;
 
-  t.lookup_fd(s.second, results_spv, infinite_cutoff);
+  if (is_possible_to_get_result(s, cascade_symbols_seen[transducer_number], 
+                                cascade_unknown_or_identity_seen[transducer_number]))
+    {
+      t.lookup_fd(s.second, results_spv, infinite_cutoff);
+    }
 
   if (print_pairs) {
     
@@ -1166,12 +1194,17 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
   results = filtered;
 }
 
+
 HfstOneLevelPaths*
 lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity)
 {
   HfstOneLevelPaths* results = new HfstOneLevelPaths;
 
-  if (t.is_lookup_infinitely_ambiguous(s))
+  bool possible = is_possible_to_get_result
+    (s, cascade_symbols_seen[transducer_number], 
+     cascade_unknown_or_identity_seen[transducer_number]);
+
+  if (possible && t.is_lookup_infinitely_ambiguous(s))
     {
       if (!silent && infinite_cutoff > 0) {
     warning(0, 0, "Got infinite results, number of cycles limited to " SIZE_T_SPECIFIER "",
@@ -1225,6 +1258,7 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstTransducer> cascade,
   return results;
 }
 
+
 HfstOneLevelPaths*
 lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
                  bool* infinity)
@@ -1234,6 +1268,7 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
   // go through all transducers in the cascade
   for (unsigned int i = 0; i < cascade.size(); i++)
     {
+      transducer_number=i; // needed for lookup_simple
       HfstOneLevelPaths* result = lookup_simple(s, cascade[i], infinity);
       if (infinity)
         {
@@ -1352,7 +1387,6 @@ perform_lookups(HfstOneLevelPath& origin, std::vector<HfstBasicTransducer>& casc
     return kvs;
 }
 
-
 int
 process_stream(HfstInputStream& inputstream, FILE* outstream)
 {
@@ -1363,11 +1397,13 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     
     size_t transducer_n=0;
     StringVector mc_symbols;
+    bool id_or_unk_seen = false;
     while (inputstream.is_good())
     {
         transducer_n++;
         HfstTransducer trans(inputstream);
         hfst::ImplementationType type = trans.get_type();
+        std::set<std::string> symbols_seen;
 
         if (type != HFST_OL_TYPE && type != HFST_OLW_TYPE) 
           {
@@ -1402,6 +1438,9 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                        tr_it = it->begin(); tr_it != it->end(); tr_it++)
                   {
                     std::string mcs = tr_it->get_input_symbol();
+                    symbols_seen.insert(mcs);
+                    if (mcs == hfst::internal_unknown || mcs == hfst::internal_identity)
+                      id_or_unk_seen = true;
                     if (mcs.size() > 1) {
                       mc_symbols.push_back(mcs);
                       verbose_printf("multicharacter symbol: %s\n",
@@ -1410,9 +1449,15 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                   }
               }
             cascade_mut.push_back(basic);
-          }
+            cascade_symbols_seen.push_back(symbols_seen);
+            if (id_or_unk_seen)
+              cascade_unknown_or_identity_seen.push_back(true);
+            else
+              cascade_unknown_or_identity_seen.push_back(false);
+        }
 
         cascade.push_back(trans);
+        id_or_unk_seen = false;
       }
 
     inputstream.close();
