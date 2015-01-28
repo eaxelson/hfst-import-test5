@@ -493,6 +493,7 @@ void PmatchContainer::process(std::string & input_str)
         }
         tape.clear();
         unsigned int tape_pos = 0;
+        unsigned int old_input_pos = input_pos;
         toplevel->match(input_pos, tape_pos);
         if (tape_pos > 0) {
             // Tape moved
@@ -508,7 +509,9 @@ void PmatchContainer::process(std::string & input_str)
             } else {
                 copy_to_output(toplevel->get_best_result());
             }
-        } else {
+        }
+        if (tape_pos == 0 || input_pos == old_input_pos) {
+            // If nothing happened, we move one position up
             copy_to_output(current_input, current_input);
             ++input_pos;
             if (locate_mode && alphabet.is_printable(current_input)) {
