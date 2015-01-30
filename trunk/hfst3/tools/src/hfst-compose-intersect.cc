@@ -306,7 +306,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 warning(0, 0, 
                         "\nFound output symbols (e.g. \"%s\") in transducer in\n"
                         "file %s which will be filtered out because they are\n"
-                        "not found on the output tapes of transducers in file\n"
+                        "not found on the input tapes of transducers in file\n"
                         "%s.",
                         symbol.c_str(), firstfilename, secondfilename);
               }
@@ -315,7 +315,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 warning(0, 0, 
                         "\nFound output multi-char symbols (\"%s\") in \n"
                         "transducer in file %s which are not found on the\n"
-                        "output tape of transducers in file %s.",
+                        "input tapes of transducers in file %s.",
                         symbol.c_str(), firstfilename, secondfilename);
               }
           }
