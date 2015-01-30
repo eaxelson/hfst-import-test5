@@ -25,6 +25,8 @@
 
 #include "hfst-optimized-lookup.h"
 
+static float beam=-1;
+
 bool print_usage(void)
 {
   std::cout <<
@@ -43,11 +45,16 @@ bool print_usage(void)
     "  -u, --unique                Suppress duplicate analyses\n" <<
     "  -n N, --analyses=N          Output no more than N analyses\n" <<
     "                              (if the transducer is weighted, the N best analyses)\n" <<
+    "  -b, --beam=B                Output only analyses whose weight is within B from\n" <<
+    "                              the best analysis\n" <<
     "  -x, --xerox                 Xerox output format (default)\n" <<
     "  -f, --fast                  Be as fast as possible.\n" <<
     "                              (with this option enabled -u and -n don't work and\n" <<
     "                              output won't be ordered by weight).\n" <<
     "\n" <<
+    "N must be a positive integer. B must be a non-negative float.\n" <<
+    "Options -n and -b are combined with AND, i.e. they both restrict the output.\n" <<
+    "\n" << 
     "Note that " << PACKAGE_NAME << " is *not* guaranteed to behave identically to\n" <<
     "hfst-lookup (although it almost always does): input-side multicharacter symbols\n" <<
     "are not fully supported. If the first character of such a symbol is an ASCII\n" <<
@@ -91,6 +98,7 @@ int main(int argc, char **argv)
           // the hfst-optimized-lookup-specific options
           {"echo-inputs",  no_argument,       0, 'e'},
           {"show-weights", no_argument,       0, 'w'},
+          {"beam",         required_argument, 0, 'b'},
           {"unique",       no_argument,       0, 'u'},
           {"xerox",        no_argument,       0, 'x'},
           {"fast",         no_argument,       0, 'f'},
@@ -99,7 +107,7 @@ int main(int argc, char **argv)
         };
       
       int option_index = 0;
-      c = getopt_long(argc, argv, "hVvqsewuxfn:", long_options, &option_index);
+      c = getopt_long(argc, argv, "hVvqsewb:uxfn:", long_options, &option_index);
 
       if (c == -1) // no more options to look at
         break;
@@ -153,6 +161,15 @@ int main(int argc, char **argv)
           displayUniqueFlag = true;
           break;
           
+        case 'b':
+          beam = atof(optarg);
+          if (beam < 0)
+            {
+              std::cerr << "Invalid argument for --beam\n";
+              return EXIT_FAILURE;
+            }
+          break;
+
         case 'n':
           maxAnalyses = atoi(optarg);
           if (maxAnalyses < 1)
@@ -435,6 +452,7 @@ void runTransducer (genericTransducer T)
 
 int setup(FILE * f)
 {
+  try {
   TransducerHeader header(f);
   TransducerAlphabet alphabet(f, header.symbol_count());
 
@@ -499,6 +517,14 @@ int setup(FILE * f)
             }
         }
     }
+  }
+  catch (const HeaderParsingException & e)
+    {
+      std::cerr << "Invalid transducer header.\n";
+      std::cerr << "The transducer must be in optimized lookup format.\n";
+      return EXIT_FAILURE;
+    }
+
   return 0;
 }
 
@@ -1398,19 +1424,27 @@ void TransducerW::printAnalyses(std::string prepend)
       return;
     }
   int i = 0;
+  float lowest_weight = -1;
   DisplayMultiMap::iterator it = display_map.begin();
   while ( (it != display_map.end()) && (i < maxAnalyses))
     {
-      if (outputType == xerox)
-        {
-          std::cout << prepend << "\t";
-        }
-      std::cout << (*it).second;
-      if (displayWeightsFlag)
-        {
-          std::cout << '\t' << (*it).first;
-        }
-      std::cout << std::endl;
+      if (it == display_map.begin())
+        lowest_weight = it->first;
+      // if beam is not set, i.e. has a negative value (-1.0), the only constraint
+      // is maxAnalyses
+      if (beam < 0 || it->first <= (lowest_weight + beam))
+      {
+        if (outputType == xerox)
+          {
+            std::cout << prepend << "\t";
+          }
+        std::cout << (*it).second;
+        if (displayWeightsFlag)
+          {
+            std::cout << '\t' << (*it).first;
+          }
+        std::cout << std::endl;
+      }
       ++it;
       ++i;
     }
@@ -1427,11 +1461,15 @@ void TransducerWUniq::printAnalyses(std::string prepend)
       return;
     }
   int i = 0;
+  float lowest_weight = -1 ;
   std::multimap<Weight, std::string> weight_sorted_map;
   DisplayMap::iterator it = display_map.begin();
   while (it != display_map.end())
     {
-      weight_sorted_map.insert(std::pair<Weight, std::string>((*it).second, (*it).first));
+      if (it == display_map.begin())
+        lowest_weight = it->second;
+      if (beam < 0 || it->second <= (lowest_weight + beam))
+        weight_sorted_map.insert(std::pair<Weight, std::string>((*it).second, (*it).first));
       ++it;
     }
   std::multimap<Weight, std::string>::iterator display_it = weight_sorted_map.begin();
@@ -1463,11 +1501,15 @@ void TransducerWFdUniq::printAnalyses(std::string prepend)
       return;
     }
   int i = 0;
+  float lowest_weight = -1 ;
   std::multimap<Weight, std::string> weight_sorted_map;
   DisplayMap::iterator it;
   for (it = display_map.begin(); it != display_map.end(); it++)
     {
-      weight_sorted_map.insert(std::pair<Weight, std::string>((*it).second, (*it).first));
+      if (it == display_map.begin())
+        lowest_weight = it->second;
+      if (beam < 0 || it->second <= (lowest_weight + beam))
+        weight_sorted_map.insert(std::pair<Weight, std::string>((*it).second, (*it).first));
     }
   std::multimap<Weight, std::string>::iterator display_it;
   for (display_it = weight_sorted_map.begin();
