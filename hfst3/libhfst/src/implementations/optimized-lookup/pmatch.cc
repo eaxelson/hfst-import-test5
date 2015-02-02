@@ -1234,13 +1234,18 @@ void PmatchTransducer::take_transitions(SymbolNumber input,
                 // input tape to find the symbol we want to write
                     this_output = container->input[input_pos];
                 }
+                if (this_input == alphabet.get_identity_symbol() ||
+                    (this_input == alphabet.get_unknown_symbol()) ||
+                    (alphabet.list2symbols[this_input] != NO_SYMBOL_NUMBER)) {
+                    this_input = container->input[input_pos];
+                }
                 Weight tmp = local_stack.top().running_weight;
                 local_stack.top().running_weight +=
                     transition_table[i].get_weight();
                 if (this_input == alphabet.get_special(Pmatch_passthrough)) {
                     get_analyses(input_pos, tape_pos, target); // FIXME
                 } else {
-                    container->tape.write(tape_pos, input, this_output);
+                    container->tape.write(tape_pos, this_input, this_output);
                     get_analyses(input_pos + 1, tape_pos + 1, target);
                 }
                 local_stack.top().running_weight = tmp;
