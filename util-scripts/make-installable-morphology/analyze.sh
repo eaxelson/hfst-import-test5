@@ -27,6 +27,12 @@ if [ $? -eq 0 ] ; then
     java_optlookup_present=$?
 fi
 
+# Sometimes proc is very slow if the input contains several consecutive
+# capital letters. The command below will preprocess the input so that
+# five or more consecutive capital letters are downcased:
+#
+# sed -u -e 's/\([[:upper:]][[:upper:]][[:upper:]][[:upper:]][[:upper:]]\+\)/\L\1/g;' | hfst-proc
+
 if [ $proc_present -eq 0 ] ; then
     echo 1>&2 Using hfst-proc...
     if [ $# -lt 1 ] ; then
