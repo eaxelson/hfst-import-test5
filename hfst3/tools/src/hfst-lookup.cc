@@ -86,6 +86,7 @@ static bool pipe_mode = false;
 static size_t linen = 0;
 static bool lookup_given = false;
 static size_t infinite_cutoff = 5;
+static float beam=-1;
 
 // symbols actually seen in (non-ol) transducers
 static std::vector<std::set<std::string> > cascade_symbols_seen;
@@ -232,6 +233,8 @@ print_usage()
             "  -x, --statistics                 Print statistics\n"
             "  -X, --xfst=VARIABLE              Toggle xfst VARIABLE\n"
             "  -c, --cycles=INT                 How many times to follow input epsilon cycles\n"
+            "  -b, --beam=B                     Output only analyses whose weight is within B from\n"
+            "                                   the best analysis\n"
             "  -P, --progress                   Show neat progress bar if possible\n");
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
@@ -243,6 +246,7 @@ print_usage()
             "quote-special,show-flags,obey-flags}\n"
             "Input epsilon cycles are followed by default INT=5 times.\n"
             "Epsilon is printed by default as an empty string.\n"
+            "B must be a non-negative float.\n"
             "If the input contains several transducers, a set containing\n"
             "results from all transducers is printed for each input string.\n");
     fprintf(message_out, "\n");
@@ -284,6 +288,7 @@ parse_options(int argc, char** argv)
             {"xfst", required_argument, 0, 'X'},
             {"epsilon-format", required_argument, 0, 'e'},
             {"epsilon-format2", required_argument, 0, 'E'},
+            {"beam", required_argument, 0, 'b'},
             {"pipe-mode", no_argument, 0, 'p'},
             {"progress", no_argument, 0, 'P'},
             {0,0,0,0}
@@ -291,7 +296,7 @@ parse_options(int argc, char** argv)
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:pP",
+                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:b:pP",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -355,6 +360,14 @@ parse_options(int argc, char** argv)
         case 'E':
             epsilon_format = hfst_strdup(optarg);
             break;
+        case 'b':
+          beam = atof(optarg);
+          if (beam < 0)
+            {
+              std::cerr << "Invalid argument for --beam\n";
+              return EXIT_FAILURE;
+            }
+          break;
         case 'x':
             print_statistics = true;
             break;
@@ -1106,7 +1119,6 @@ bool is_possible_to_get_result(const HfstOneLevelPath & s,
 // which transducer in the cascade we are handling
 static unsigned int transducer_number=0;
 
-// HERE
 void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results, 
                          const HfstOneLevelPath& s, ssize_t limit = -1)
 {
@@ -1129,32 +1141,38 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
       print_lookup_string(s.second);
       fprintf(outfile, "\n");
     }
-    else {
+    else {  // HERE!!!
+      float lowest_weight = -1;
       /* For all result strings, */
       for (HfstTwoLevelPaths::const_iterator it
              = results_spv.begin(); it != results_spv.end(); it++) {
-        
-        /* print the lookup string */
-        print_lookup_string(s.second);
-        fprintf(outfile, "\t");
-        
-        /* and the path that yielded the result string */
-        bool first_pair=true;
-        for (StringPairVector::const_iterator IT = it->second.begin();
-             IT != it->second.end(); IT++) {
-          if (print_space && not first_pair) {
-            fprintf(outfile, " ");
+
+        if (it == results_spv.begin())
+          lowest_weight = it->first;
+        if (beam < 0 || it->first <= (lowest_weight + beam))
+          {        
+            /* print the lookup string */
+            print_lookup_string(s.second);
+            fprintf(outfile, "\t");
+            
+            /* and the path that yielded the result string */
+            bool first_pair=true;
+            for (StringPairVector::const_iterator IT = it->second.begin();
+                 IT != it->second.end(); IT++) {
+              if (print_space && not first_pair) {
+                fprintf(outfile, " ");
+              }
+              first_pair=false;
+              fprintf(outfile, "%s:%s", 
+                      get_print_format(IT->first).c_str(), 
+                      get_print_format(IT->second).c_str());
+            }
+            /* and the weight of that path. */
+            fprintf(outfile, "\t%f\n", it->first);
           }
-          first_pair=false;
-          fprintf(outfile, "%s:%s", 
-                  get_print_format(IT->first).c_str(), 
-                  get_print_format(IT->second).c_str());
-        }
-        /* and the weight of that path. */
-        fprintf(outfile, "\t%f\n", it->first);
       }
-    }
     fprintf(outfile, "\n");
+    }
   }
 
   // Convert HfstTwoLevelPaths into HfstOneLevelPaths
@@ -1290,11 +1308,14 @@ lookup_cascading(const HfstOneLevelPath& s, vector<HfstBasicTransducer> cascade,
 }
 
 
+// HERE!!! limits kvs with beam
 void
 print_lookups(const HfstOneLevelPaths& kvs,
               const HfstOneLevelPath& kv, char* markup,
               bool outside_sigma, bool inf, FILE * ofile)
 {
+  float lowest_weight = -1;
+
     if (outside_sigma)
       {
         lookup_printf(unknown_begin_setf, &kv, NULL, markup, ofile);
@@ -1318,8 +1339,13 @@ print_lookups(const HfstOneLevelPaths& kvs,
                 ++lkv)
           {
             HfstOneLevelPath lup = *lkv;
-            lookup_printf(infinite_lookupf, &kv, &lup, markup, ofile);
-            analyses++;
+            if (lkv == kvs.begin())
+              lowest_weight = lup.first;
+            if (beam < 0 || lup.first <= (lowest_weight + beam))
+              {
+                lookup_printf(infinite_lookupf, &kv, &lup, markup, ofile);
+                analyses++;
+              }
           }
         lookup_printf(infinite_end_setf, &kv, NULL, markup, ofile);
       }
@@ -1333,8 +1359,13 @@ print_lookups(const HfstOneLevelPaths& kvs,
                 ++lkv)
           {
             HfstOneLevelPath lup = *lkv;
-            lookup_printf(lookupf, &kv, &lup, markup, ofile);
-            analyses++;
+            if (lkv == kvs.begin())
+              lowest_weight = lup.first;
+            if (beam < 0 || lup.first <= (lowest_weight + beam))
+              {
+                lookup_printf(lookupf, &kv, &lup, markup, ofile);
+                analyses++;
+              }
         }
         lookup_printf(end_setf, &kv, NULL, markup, ofile);
       }
