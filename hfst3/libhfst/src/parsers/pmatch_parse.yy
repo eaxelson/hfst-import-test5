@@ -1274,6 +1274,7 @@ LABEL_PAIR: LABEL PAIR_SEPARATOR LABEL {
  }
 | ANY_TOKEN PAIR_SEPARATOR LABEL {
     $$ = new HfstTransducer(hfst::internal_unknown, $3, hfst::pmatch::format);
+    $$->disjunct(HfstTransducer($3, $3, hfst::pmatch::format));
     free($3);
 }
 | LABEL PAIR_SEPARATOR_WO_RIGHT {
@@ -1286,6 +1287,7 @@ LABEL_PAIR: LABEL PAIR_SEPARATOR LABEL {
  }
 | PAIR_SEPARATOR_WO_LEFT LABEL {
     $$ = new HfstTransducer(hfst::internal_unknown, $2, hfst::pmatch::format);
+    $$->disjunct(HfstTransducer($2, $2, hfst::pmatch::format));	
     free($2);
  }
 | PAIR_SEPARATOR_WO_LEFT ANY_TOKEN {
