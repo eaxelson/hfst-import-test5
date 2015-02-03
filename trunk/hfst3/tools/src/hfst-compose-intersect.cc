@@ -57,8 +57,8 @@ using hfst::HfstTransducerVector;
 // the lexicon. Otherwise the lexicon is composed with the
 // intersection of the rules.
 static bool invert=false;
-
 static bool encode_weights=false;
+static bool harmonize=true;
 
 void
 print_usage()
@@ -76,6 +76,7 @@ print_usage()
             "                               the intersection of the rules.\n"
             "  -e, --encode-weights         Encode weights when minimizing\n"
             "                               (default is false).\n"
+            "  -H, --do-not-harmonize       Do not harmonize symbols.\n"
            );
         //print_common_binary_program_parameter_instructions(message_out);
         fprintf(message_out,
@@ -114,7 +115,7 @@ parse_options(int argc, char** argv)
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_BINARY_SHORT "FIe",
+                             HFST_GETOPT_BINARY_SHORT "FIeH",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -130,6 +131,9 @@ parse_options(int argc, char** argv)
           break;
         case 'e':
           encode_weights = true;
+          break;
+        case 'H':
+          harmonize = false;
           break;
         }
     }
@@ -329,7 +333,10 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
               }
           }
         
-        harmonize_rules(lexicon, rules);
+        if (harmonize)
+          {
+            harmonize_rules(lexicon, rules);
+          }
 
         lexicon.compose_intersect(rules,invert);
         char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
