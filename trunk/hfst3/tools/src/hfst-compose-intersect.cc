@@ -234,6 +234,15 @@ std::string check_multi_char_symbols
   return "";
 }
 
+void harmonize_rules(HfstTransducer & lexicon, std::vector<HfstTransducer> & rules)
+{
+  for (std::vector<HfstTransducer>::iterator it = rules.begin(); it != rules.end(); it++)
+    {
+      it->harmonize(lexicon);
+    }
+  return;
+}
+
 int
 compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 HfstOutputStream& outstream)
@@ -320,6 +329,8 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
               }
           }
         
+        harmonize_rules(lexicon, rules);
+
         lexicon.compose_intersect(rules,invert);
         char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
                                                         (strlen(lexiconname) +
