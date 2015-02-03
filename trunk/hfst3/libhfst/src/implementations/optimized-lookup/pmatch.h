@@ -190,10 +190,8 @@ namespace hfst_ol {
 //        LocationVector locatefy_output(void);
         static std::string parse_name_from_hfst3_header(std::istream & f);
         void set_verbose(bool b) { verbose = b; }
-        void set_locate_mode(bool b) {
-            locate_mode = b;
-            alphabet.extract_tags = b;
-        }
+        void set_extract_tags_mode(bool b)
+            { alphabet.extract_tags = b; }
         void set_profile(bool b) { profile_mode = b; }
         bool try_recurse(void)
         {

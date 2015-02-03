@@ -223,8 +223,7 @@ int main(int argc, char ** argv)
     }
     hfst_ol::PmatchContainer container(instream);
     container.set_verbose(verbose);
-// the locate_mode bool in this tool only affects its own processing
-    container.set_locate_mode(extract_tags);
+    container.set_extract_tags_mode(extract_tags);
     container.set_profile(profile);
 //     if (outfile != stdout) {
 //         std::filebuf fb;
