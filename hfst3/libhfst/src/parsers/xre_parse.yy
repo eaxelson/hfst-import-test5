@@ -147,7 +147,7 @@ int xrelex ( YYSTYPE * , yyscan_t );
 
 %nonassoc SUBSTITUTE_LEFT TERM_COMPLEMENT
 %nonassoc COMPLEMENT CONTAINMENT CONTAINMENT_ONCE CONTAINMENT_OPT
-%nonassoc REVERSE INVERT UPPER LOWER STAR PLUS
+%nonassoc REVERSE INVERT XRE_UPPER XRE_LOWER STAR PLUS
 %nonassoc <values> CATENATE_N_TO_K
 %nonassoc <value> CATENATE_N CATENATE_N_PLUS CATENATE_N_MINUS
 
@@ -878,10 +878,10 @@ REGEXP9: REGEXP10 { }
        | REGEXP9 INVERT {
             $$ = & $1->invert();
         }
-       | REGEXP9 UPPER {
+       | REGEXP9 XRE_UPPER {
             $$ = & $1->input_project();
         }
-       | REGEXP9 LOWER {
+       | REGEXP9 XRE_LOWER {
             $$ = & $1->output_project();
         }
        | REGEXP9 CATENATE_N {

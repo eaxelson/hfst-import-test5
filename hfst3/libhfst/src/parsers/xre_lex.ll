@@ -1,3 +1,4 @@
+
 %option 8Bit batch noyylineno noyywrap reentrant bison-bridge prefix="xre"
 
 %{
@@ -168,8 +169,8 @@ BRACED      [{]([^}]|[\300-\337].|[\340-\357]..|[\360-\367]...)+[}]
 
 ".r" { CR; return REVERSE; }
 ".i" { CR; return INVERT; }
-".u" { CR; return UPPER; }
-".l" { CR; return LOWER; }
+".u" { CR; return XRE_UPPER; }
+".l" { CR; return XRE_LOWER; }
 
 "@bin\""[^""]+"\""|"@\""[^""]+"\"" { 
     CR;

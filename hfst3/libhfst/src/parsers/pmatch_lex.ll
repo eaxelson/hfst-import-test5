@@ -261,8 +261,8 @@ return REGEX;
 
 ".r" { return REVERSE; }
 ".i" { return INVERT; }
-".u" { return UPPER; }
-".l" { return LOWER; }
+".u" { return PMATCH_UPPER; }
+".l" { return PMATCH_LOWER; }
 
 "@bin\""[^""]+"\""|"@\""[^""]+"\"" { 
     pmatchlval.label = hfst::pmatch::get_escaped_delimited(pmatchtext, '"');
