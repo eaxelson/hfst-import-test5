@@ -1012,7 +1012,7 @@ void iface_save_stack(char *filename) {
         printf("Writing to file %s.\n", filename);
         for (stack_ptr = stack_find_bottom(); stack_ptr->next != NULL; stack_ptr = stack_ptr->next) {
 #ifdef ZLIB
-            foma_net_print(stack_ptr->fsm, outfile);
+          foma_net_print(stack_ptr->fsm, outfile);
 #endif
         }
         gzclose(outfile);
@@ -1271,7 +1271,7 @@ int iface_write_att(char *filename) {
 
 void iface_write_prolog(char *filename) {
   if (iface_stack_check(1))       
-    write_prolog(stack_find_top()->fsm, filename);
+    foma_write_prolog(stack_find_top()->fsm, filename);
 }
 
 void iface_zero_plus() {

@@ -98,7 +98,8 @@ int load_defined(char *filename) {
   io_error(); return 0; }
 int save_defined(char *filename) {
   io_error(); return 0; }
-int write_prolog (struct fsm *net, char *filename) {
+// write_prolog changed to foma_write_prolog because it conflicts with an xfsm function
+int foma_write_prolog(struct fsm *net, char *filename) {
   io_error(); return 0; }
 #else
 
@@ -124,7 +125,8 @@ void escape_print(FILE *stream, char* string) {
     }
 }
 
-int write_prolog (struct fsm *net, char *filename) {
+// write_prolog changed to foma_write_prolog because it conflicts with an xfsm function
+int foma_write_prolog(struct fsm *net, char *filename) {
   struct fsm_state *stateptr;
   int i, *finals, *used_symbols, maxsigma;
   FILE *out;

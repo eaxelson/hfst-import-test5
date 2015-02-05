@@ -302,7 +302,8 @@ FEXPORT int fsm_write_binary_file(struct fsm *net, char *filename);
 FEXPORT int load_defined(char *filename);
 FEXPORT int save_defined();
 FEXPORT int save_stack_att();
-FEXPORT int write_prolog(struct fsm *net, char *filename);
+  // write_prolog changed to foma_write_prolog because it conflicts with an xfsm function
+FEXPORT int foma_write_prolog(struct fsm *net, char *filename);
 #ifdef ZLIB // HFST addition
   FEXPORT int foma_net_print(struct fsm *net, gzFile *outfile);
 #endif
