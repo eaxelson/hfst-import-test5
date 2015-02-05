@@ -130,7 +130,7 @@ LOWER_PRIORITY_UNION
 
 %nonassoc SUBSTITUTE_LEFT TERM_COMPLEMENT
 %nonassoc COMPLEMENT CONTAINMENT CONTAINMENT_ONCE CONTAINMENT_OPT
-%nonassoc REVERSE INVERT UPPER LOWER STAR PLUS
+%nonassoc REVERSE INVERT PMATCH_UPPER PMATCH_LOWER STAR PLUS
 %nonassoc <values> CATENATE_N_TO_K
 %nonassoc <value> CATENATE_N CATENATE_N_PLUS CATENATE_N_MINUS
 
@@ -404,10 +404,10 @@ FUNCBODY5: FUNCBODY6 { }
 | FUNCBODY5 INVERT {
     $$ = new PmatchAstNode($1, hfst::pmatch::AstInvert);
  }
-| FUNCBODY5 UPPER {
+| FUNCBODY5 PMATCH_UPPER {
     $$ = new PmatchAstNode($1, hfst::pmatch::AstInputProject);
   }
-| FUNCBODY5 LOWER {
+| FUNCBODY5 PMATCH_LOWER {
     $$ = new PmatchAstNode($1, hfst::pmatch::AstOutputProject);
  }
 | FUNCBODY5 CATENATE_N {
@@ -1122,10 +1122,10 @@ REGEXP9: REGEXP10 { }
 | REGEXP9 INVERT {
     $$ = & $1->invert();
  }
-| REGEXP9 UPPER {
+| REGEXP9 PMATCH_UPPER {
     $$ = & $1->input_project();
  }
-| REGEXP9 LOWER {
+| REGEXP9 PMATCH_LOWER {
     $$ = & $1->output_project();
  }
 | REGEXP9 CATENATE_N {
