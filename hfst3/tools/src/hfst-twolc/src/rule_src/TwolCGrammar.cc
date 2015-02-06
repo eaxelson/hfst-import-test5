@@ -232,6 +232,10 @@ ImplementationType transducer_type
   symbols.insert(SymbolPair("b","c"));*/
   //g.set_alphabet(symbols);
 
+#ifdef HAVE_XFSM
+  #define Alphabet TwolCAlphabet
+#endif
+
   Alphabet alphabet;
   alphabet.define_alphabet_pair(SymbolPair("a","b"));
   alphabet.define_alphabet_pair(SymbolPair("a","d"));

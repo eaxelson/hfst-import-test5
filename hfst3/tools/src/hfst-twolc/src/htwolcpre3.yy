@@ -58,6 +58,10 @@
   size_t line_number = 1;
   InputReader input_reader(line_number);
 
+#ifdef HAVE_XFSM
+  #define Alphabet TwolCAlphabet
+#endif
+
   // The Alphabet of the grammar
   Alphabet alphabet;
 
