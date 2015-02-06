@@ -97,6 +97,21 @@ AS_IF([test "x$with_foma" != xno], [AC_DEFINE([HAVE_FOMA], [1],
                                               [Define to compile foma support in HFST])])
 AM_CONDITIONAL([WANT_FOMA], [test x$with_foma != xno])
 
+AC_ARG_WITH([xfsm],
+            [AS_HELP_STRING([--with-xfsm],
+                            [process unweighted fsts with xfsm @<:@default=no@:>@])],
+            [],
+            [with_xfsm=no])
+AS_IF([test "x$with_xfsm" != xno], [AC_DEFINE([HAVE_XFSM], [1],
+                                              [Define to compile xfsm support in HFST])])
+AM_CONDITIONAL([WANT_XFSM], [test x$with_xfsm != xno])
+
+AS_IF([test "x$with_xfsm" != "xno"], 
+[AC_CHECK_LIB([xfsm], [main], [], AC_MSG_ERROR([xfsm back-end requested but libxfsm not found]))])
+
+AS_IF([test "x$with_xfsm" != "xno"], 
+[AC_CHECK_HEADER([xfsm/xfsm_api.h], [xfsmheader_exists=yes], AC_MSG_ERROR([xfsm back-end requested but libxfsm header not found]))])
+
 ### Add here your library ###
 #AC_ARG_WITH([my_transducer_library],
 #            [AS_HELP_STRING([--with-my-transducer-library],
@@ -488,7 +503,6 @@ AC_ARG_ENABLE([xfst],
 			  [enable_xfst=$enableval],
 			  [enable_xfst=$enable_all_tools])
 AM_CONDITIONAL([WANT_XFST], [test x$enable_xfst != xno])
-
 
 # Check if zlib is available
 AC_CHECK_LIB([z], [main], [zlib_exists=yes], [zlib_exists=no])

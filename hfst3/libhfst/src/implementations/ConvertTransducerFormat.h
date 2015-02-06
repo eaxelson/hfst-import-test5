@@ -43,6 +43,10 @@
 #endif // _FOMALIB_H_
 #endif // HAVE_FOMA
 
+#if HAVE_XFSM
+#include "xfsm/xfsm_api.h"
+#endif
+
 /* Add here your transducer library header (and possibly a guard). */
 //#if HAVE_MY_TRANSDUCER_LIBRARY
 //#ifndef _MY_TRANSDUCER_LIBRARY_LIB_H_
@@ -160,6 +164,11 @@ namespace implementations {
   static struct fsm * hfst_constant_transducer_to_foma
   (const HfstConstantTransducer * t); */
 #endif // HAVE_FOMA
+
+#if HAVE_XFSM
+  static HfstBasicTransducer * xfsm_to_hfst_basic_transducer(NETptr t);
+  static NETptr hfst_basic_transducer_to_xfsm(const HfstBasicTransducer * t);
+#endif // HAVE_XFSM
 
 #if HAVE_OPENFST
   static HfstBasicTransducer * tropical_ofst_to_hfst_basic_transducer
