@@ -49,7 +49,7 @@ using hfst::implementations::HfstBasicTransducer;
 #include "inc/globals-unary.h"
 // add tools-specific variables here
 static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
-static bool read_prolog=false;
+static bool read_prolog_format=false;
 // whether numbers are used instead of symbol names
 static bool use_numbers=false; // not used
 // printname for epsilon
@@ -127,7 +127,7 @@ break;
             use_numbers = true;
             break;
         case 'p':
-            read_prolog = true;
+            read_prolog_format = true;
             break;
         case 'f':
             output_format = hfst_parse_format_name(optarg);
@@ -172,7 +172,7 @@ process_stream(HfstOutputStream& outstream)
         {
           verbose_printf("Reading transducer table " SIZE_T_SPECIFIER "...\n", transducer_n);
         }
-      if (read_prolog)
+      if (read_prolog_format)
         {
           try {
             HfstBasicTransducer fsm = 
