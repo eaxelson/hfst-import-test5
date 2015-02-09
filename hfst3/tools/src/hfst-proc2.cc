@@ -48,6 +48,7 @@ using std::pair;
 #include "inc/globals-unary.h"
 
 bool blankline_separated = true;
+bool print_all = false;
 std::string tokenizer_filename;
 enum OutputFormat {
     xerox
@@ -64,6 +65,7 @@ print_usage()
     print_common_program_options(message_out);
     fprintf(message_out,
             "  -n  --newline          Newline as input separator (default is blank line)\n"
+            "  -a  --print-all        Print nonmatching text\n"
             "  -x  --xerox            Xerox output (default)\n");
     fprintf(message_out, 
             "Use standard streams for input and output (for now).\n"
@@ -92,7 +94,11 @@ void match_and_print(hfst_ol::PmatchContainer & container,
             it != locations.end(); ++it) {
             for (hfst_ol::LocationVector::const_iterator loc_it = it->begin();
                  loc_it != it->end(); ++loc_it) {
-                outstream << loc_it->input << "\t" << loc_it->output << std::endl;
+                if (loc_it->output.compare("@_NONMATCHING_@") != 0) {
+                    outstream << loc_it->input << "\t" << loc_it->output << std::endl;
+                } else if (print_all) {
+                    outstream << loc_it->input << "\t" << loc_it->input << "+?" << std::endl;
+                }
             }
             std::cerr << endl;
         }
@@ -140,11 +146,12 @@ int parse_options(int argc, char** argv)
             {
                 HFST_GETOPT_COMMON_LONG,
                 {"newline", no_argument, 0, 'n'},
+                {"print-all", no_argument, 0, 'a'},
                 {"xerox", no_argument, 0, 'x'},
                 {0,0,0,0}
             };
         int option_index = 0;
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nxl",
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nax",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -157,6 +164,9 @@ int parse_options(int argc, char** argv)
 #include "inc/getopt-cases-common.h"
         case 'n':
             blankline_separated = false;
+            break;
+        case 'a':
+            print_all = true;
             break;
         case 'x':
             output_format = xerox;
