@@ -37,7 +37,6 @@
 namespace hfst {
   namespace implementations
 {
-  ;
-
+  class XfsmTransducer {} ;
 } }
 #endif

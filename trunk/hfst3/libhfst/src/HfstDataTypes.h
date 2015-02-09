@@ -46,6 +46,7 @@ namespace hfst
     TROPICAL_OPENFST_TYPE, /**< An OpenFst transducer with tropical weights. */
     LOG_OPENFST_TYPE, /**< An OpenFst transducer with logarithmic weights. */
     FOMA_TYPE, /**< A foma transducer, unweighted. */
+    XFSM_TYPE, /**< An xfsm transducer, unweighted (mostly for testing purposes). */
     /* Add an enumerator for your transducer type here. */
     //MY_TRANSDUCER_LIBRARY_TYPE, 
     HFST_OL_TYPE, /**< An HFST optimized lookup transducer, unweighted */

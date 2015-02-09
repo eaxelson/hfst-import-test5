@@ -24,7 +24,7 @@ IMPLEMENTATION_SRCS=HfstTransitionGraph.cc \
 		    HfstTropicalTransducerTransitionData.cc \
 		    ConvertSfstTransducer.cc ConvertTropicalWeightTransducer.cc \
 		    ConvertLogWeightTransducer.cc ConvertFomaTransducer.cc \
-	  	    ConvertOlTransducer.cc \
+	  	    ConvertOlTransducer.cc ConvertXfsmTransducer.cc \
                     compose_intersect/ComposeIntersectRulePair.cc \
                     compose_intersect/ComposeIntersectLexicon.cc \
                     compose_intersect/ComposeIntersectRule.cc \
