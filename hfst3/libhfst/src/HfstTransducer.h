@@ -36,6 +36,10 @@
 #include "implementations/FomaTransducer.h"
 #endif
 
+#if HAVE_XFSM
+#include "implementations/XfsmTransducer.h"
+#endif
+
 /* Include here the header file of the files that take care 
    of the interaction between HFST and your transducer library. */
 //#if HAVE_MY_TRANSDUCER_LIBRARY
@@ -99,6 +103,10 @@ namespace hfst
 #if HAVE_FOMA
   using hfst::implementations::FomaTransducer;
 #endif // #if HAVE_FOMA
+
+#if HAVE_XFSM
+  using hfst::implementations::XfsmTransducer;
+#endif // #if HAVE_XFSM
 
   /* Add here the transducer class of your transducer library. */
   //#if HAVE_MY_TRANSDUCER_LIBRARY
@@ -259,6 +267,9 @@ An example:
 #if HAVE_FOMA
       fsm * foma;
 #endif
+#if HAVE_XFSM
+      NETptr xfsm;
+#endif
 
       /* Add here your own transducer backend implementation. */
       //#if HAVE_MY_TRANSDUCER_LIBRARY
@@ -290,6 +301,9 @@ An example:
     static hfst::implementations::FomaTransducer foma_interface;
 #endif
     static hfst::implementations::HfstOlTransducer hfst_ol_interface;
+#if HAVE_XFSM
+    static hfst::implementations::XfsmTransducer xfsm_interface;
+#endif
 
     /* Add here the class that takes care of the interaction between
        HFST and your transducer library. */

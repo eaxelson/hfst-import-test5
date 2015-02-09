@@ -19,6 +19,9 @@ namespace hfst
       case FOMA_TYPE:
         return "FOMA_TYPE";
         break;
+      case XFSM_TYPE:
+        return "XFSM_TYPE";
+        break;
       case HFST_OL_TYPE:
         return "HFST_OL_TYPE";
         break;
@@ -55,6 +58,9 @@ namespace hfst
         break;
       case FOMA_TYPE:
         return "foma";
+        break;
+      case XFSM_TYPE:
+        return "xfsm";
         break;
       case HFST_OL_TYPE:
         return "hfst-optimized-lookup-unweighted";
