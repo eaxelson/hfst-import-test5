@@ -92,8 +92,10 @@ void match_and_print(hfst_ol::PmatchContainer & container,
         hfst_ol::LocationVectorVector locations = container.locate(input_text);
         for(hfst_ol::LocationVectorVector::const_iterator it = locations.begin();
             it != locations.end(); ++it) {
-            outstream << it->at(0).start << "|" << it->at(0).length << "|"
-                      << it->at(0).output << "|" << it->at(0).tag << std::endl;
+            if (it->at(0).output.compare("@_NONMATCHING_@") != 0) {
+                outstream << it->at(0).start << "|" << it->at(0).length << "|"
+                          << it->at(0).output << "|" << it->at(0).tag << std::endl;
+            }
         }
     }
     outstream << std::endl;
@@ -146,7 +148,7 @@ int parse_options(int argc, char** argv)
                 {0,0,0,0}
             };
         int option_index = 0;
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nxl",
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nxlp",
                              long_options, &option_index);
         if (-1 == c)
         {

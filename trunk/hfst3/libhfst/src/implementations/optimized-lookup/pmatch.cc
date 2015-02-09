@@ -481,6 +481,7 @@ void PmatchContainer::process(std::string & input_str)
     ++line_number;
     output.clear();
     locations.clear();
+    DoubleTape nonmatching_locations;
     while (has_queued_input(input_pos)) {
         SymbolNumber current_input = input[input_pos];
         if (not_possible_first_symbol(current_input)) {
@@ -488,6 +489,8 @@ void PmatchContainer::process(std::string & input_str)
             ++input_pos;
             if (locate_mode && alphabet.is_printable(current_input)) {
                 ++printable_input_pos;
+                nonmatching_locations.push_back(
+                    SymbolPair(current_input, current_input));
             }
             continue;
         }
@@ -498,6 +501,15 @@ void PmatchContainer::process(std::string & input_str)
         if (tape_pos > 0) {
             // Tape moved
             if (locate_mode) {
+                if (!nonmatching_locations.empty()) {
+                    LocationVector ls;
+                    Location nonmatching = alphabet.locatefy(printable_input_pos - nonmatching_locations.size(),
+                                                             WeightedDoubleTape(nonmatching_locations, 0.0));
+                    nonmatching.output = "@_NONMATCHING_@";
+                    ls.push_back(nonmatching);
+                    locations.push_back(ls);
+                    nonmatching_locations.clear();
+                }
                 LocationVector ls;
                 for (WeightedDoubleTapeVector::iterator it = (toplevel->locations)->begin();
                      it != (toplevel->locations)->end(); ++it) {
@@ -506,6 +518,7 @@ void PmatchContainer::process(std::string & input_str)
                 }
                 sort(ls.begin(), ls.end());
                 locations.push_back(ls);
+                printable_input_pos += (input_pos - old_input_pos);
             } else {
                 copy_to_output(toplevel->get_best_result());
             }
@@ -516,8 +529,14 @@ void PmatchContainer::process(std::string & input_str)
             ++input_pos;
             if (locate_mode && alphabet.is_printable(current_input)) {
                 ++printable_input_pos;
+                nonmatching_locations.push_back(SymbolPair(current_input, current_input));
             }
         }
+    }
+    if (locate_mode && !nonmatching_locations.empty()) {
+        LocationVector ls;
+        ls.push_back(alphabet.locatefy(printable_input_pos, WeightedDoubleTape(nonmatching_locations, 0.0)));
+        locations.push_back(ls);
     }
 }
 
