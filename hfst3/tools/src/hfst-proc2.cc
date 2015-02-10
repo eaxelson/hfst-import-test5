@@ -62,7 +62,7 @@ void
 print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-    fprintf(message_out, "Usage: %s [--segment | --xerox | --cg] [OPTIONS...] TOKENIZER\n"
+    fprintf(message_out, "Usage: %s [--segment | --xerox | --cg] [OPTIONS...] RULESET\n"
             "perform matching/lookup on text streams\n"
             "\n", program_name);
     print_common_program_options(message_out);
