@@ -39,6 +39,9 @@ namespace hfst
       if (converted == FOMA_TYPE) {
         return false;
       }
+      if (converted == XFSM_TYPE) {
+        return false;
+      }
     }
     /* Add here your library. */
     //#ifdef HAVE_MY_TRANSDUCER_LIBRARY
@@ -72,6 +75,9 @@ namespace hfst
 #endif
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *),
+#endif
+#if HAVE_XFSM
+ NETptr (*xfsm_funct)(NETptr),
 #endif
  /* Add your library. */
  //#if HAVE_MY_TRANSDUCER_LIBRARY
@@ -122,6 +128,15 @@ namespace hfst
           break;
         }
 #endif
+#if HAVE_XFSM
+      case XFSM_TYPE:
+        {
+          NETptr xfsm_temp = xfsm_funct(implementation.xfsm);
+          delete implementation.xfsm;
+          implementation.xfsm = xfsm_temp;
+          break;
+        }
+#endif
         /* Add your library here. */
         //#if HAVE_MY_TRANSDUCER_LIBRARY
         //case MY_TRANSDUCER_LIBRARY_TYPE:
@@ -155,6 +170,9 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 #endif
 #if HAVE_FOMA
    fsm * (*foma_funct)(fsm *, unsigned int n),
+#endif
+#if HAVE_XFSM
+NETptr (*xfsm_funct)(NETptr, unsigned int n),
 #endif
 /* Add your library here. */
 //#if HAVE_MY_TRANSDUCER_LIBRARY
@@ -205,6 +223,16 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
           break;
     }
 #endif
+#if HAVE_XFSM
+      case XFSM_TYPE:
+        {
+      NETptr xfsm_temp = 
+            xfsm_funct(implementation.xfsm,n);
+          delete implementation.xfsm;
+          implementation.xfsm = xfsm_temp;
+          break;
+    }
+#endif
         /* Add your library here. */
         //#if HAVE_MY_TRANSDUCER_LIBRARY
         //case MY_TRANSDUCER_LIBRARY_TYPE:
@@ -238,6 +266,9 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 #endif
 #if HAVE_FOMA
    fsm * (*foma_funct)(fsm *, String, String),
+#endif
+#if HAVE_XFSM
+   NETptr (*xfsm_funct)(NETptr, String, String),
 #endif
    /* Add your library here. */
    //#if HAVE_MY_TRANSDUCER_LIBRARY
@@ -288,6 +319,16 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
       break;
         }
 #endif
+#if HAVE_XFSM
+      case XFSM_TYPE:
+        {
+      NETptr xfsm_temp = 
+            xfsm_funct(implementation.xfsm,s1,s2);
+          delete implementation.xfsm;
+          implementation.xfsm = xfsm_temp;
+      break;
+        }
+#endif
         /* Add your library here. */
         //#if HAVE_MY_TRANSDUCER_LIBRARY
         //case MY_TRANSDUCER_LIBRARY_TYPE:
@@ -324,6 +365,9 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 #if HAVE_FOMA
    fsm * (*foma_funct)(fsm *,
                                     fsm *),
+#endif
+#if HAVE_XFSM
+   NETptr (*xfsm_funct)(NETptr, NETptr),
 #endif
    /* Add your library here. */
    //#if HAVE_MY_TRANSDUCER_LIBRARY
@@ -395,6 +439,16 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
             foma_funct(implementation.foma,another_->implementation.foma);
           delete implementation.foma;
           implementation.foma = foma_temp;
+          break;
+        }
+#endif
+#if XFSM_FOMA
+      case XFSM_TYPE:
+        {
+          NETptr * xfsm_temp = 
+            xfsm_funct(implementation.xfsm,another_->implementation.xfsm);
+          delete implementation.xfsm;
+          implementation.xfsm = xfsm_temp;
           break;
         }
 #endif
