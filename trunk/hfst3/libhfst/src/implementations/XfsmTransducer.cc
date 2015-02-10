@@ -15,7 +15,11 @@
 #ifndef MAIN_TEST
 namespace hfst { namespace implementations {
 
-    ;
+    void XfsmTransducer::initialize_xfsm()
+    {
+      FST_CNTXTptr cntxt = initialize_cfsm();
+      (void) set_char_encoding(cntxt, CHAR_ENC_UTF_8);
+    }
   } }
 
 #else // MAIN_TEST was defined

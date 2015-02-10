@@ -27,6 +27,9 @@ HfstTransducer &apply(
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *),
 #endif
+#if HAVE_XFSM
+ NETptr (*xfsm_funct)(NETptr),
+#endif
  /* Add your library here */
  //#if HAVE_MY_TRANSDUCER_LIBRARY
  //my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *),
@@ -50,6 +53,9 @@ HfstTransducer &apply(
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *, unsigned int),
 #endif
+#if HAVE_XFSM
+ NETptr (*xfsm_funct)(NETptr, unsigned int),
+#endif
  /* Add your library here */
  //#if HAVE_MY_TRANSDUCER_LIBRARY
  //my_namespace::MyFst * (*my_transducer_library_funct)
@@ -72,6 +78,9 @@ HfstTransducer &apply(
 #endif
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *, String, String),
+#endif
+#if HAVE_XFSM
+ NETptr (*xfsm_funct)(NETptr, String, String),
 #endif
  /* Add your library here */
  //#if HAVE_MY_TRANSDUCER_LIBRARY
@@ -97,6 +106,9 @@ HfstTransducer &apply(
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *,
                      fsm *),
+#endif
+#if HAVE_XFSM
+ NETptr (*xfsm_funct)(NETptr, NETptr),
 #endif
  /* Add your library here */
  //#if HAVE_MY_TRANSDUCER_LIBRARY

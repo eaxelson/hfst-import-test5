@@ -119,6 +119,8 @@ namespace hfst
 
   // *** TESTING AND OPTIMIZATION...
 
+  void initialize_xfsm();
+
   enum MinimizationAlgorithm { HOPCROFT, BRZOZOWSKI };
   /* Which minimization algorithm is used. 
      In foma, Hopcroft is always used. 

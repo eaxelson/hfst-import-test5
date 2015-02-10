@@ -37,6 +37,9 @@
 namespace hfst {
   namespace implementations
 {
-  class XfsmTransducer {} ;
+  class XfsmTransducer {
+  public:
+    static void initialize_xfsm();
+  } ;
 } }
 #endif

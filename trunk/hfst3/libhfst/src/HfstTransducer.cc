@@ -95,6 +95,13 @@ hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
 //
 // -----------------------------------------------------------------------
 
+#if HAVE_XFSM
+  void initialize_xfsm()
+  {
+    XfsmTransducer::initialize_xfsm();
+  }
+#endif
+
 /* The default minimization algorithm if Hopcroft. */
 MinimizationAlgorithm minimization_algorithm=HOPCROFT;
 /* By default, weights are not encoded in minimization. */
@@ -1866,6 +1873,9 @@ HfstTransducer &HfstTransducer::remove_epsilons()
 #if HAVE_FOMA
     &hfst::implementations::FomaTransducer::remove_epsilons,
 #endif
+#if HAVE_XFSM
+    NULL,
+#endif
     /* Add here your implementation. */
     //#if HAVE_MY_TRANSDUCER_LIBRARY
     //&hfst::implementations::MyTransducerLibraryTransducer::remove_epsilons,
@@ -1900,6 +1910,9 @@ HfstTransducer &HfstTransducer::determinize()
 #if HAVE_FOMA
     &hfst::implementations::FomaTransducer::determinize,
 #endif
+#if HAVE_XFSM
+    NULL,
+#endif
     /* Add here your implementation. */
     false ); } 
 
@@ -1917,6 +1930,9 @@ HfstTransducer &HfstTransducer::minimize()
 #endif
 #if HAVE_FOMA
     &hfst::implementations::FomaTransducer::minimize,
+#endif
+#if HAVE_XFSM
+    NULL,
 #endif
     /* Add here your implementation. */
     false );
@@ -1945,6 +1961,9 @@ HfstTransducer &HfstTransducer::repeat_star()
 #if HAVE_FOMA
     &hfst::implementations::FomaTransducer::repeat_star,
 #endif
+#if HAVE_XFSM
+    NULL,
+#endif
     /* Add here your implementation. */
     false ); }  
 
@@ -1963,6 +1982,9 @@ HfstTransducer &HfstTransducer::repeat_plus()
 #if HAVE_FOMA
     &hfst::implementations::FomaTransducer::repeat_plus,
 #endif
+#if HAVE_XFSM
+    NULL,
+#endif
     /* Add here your implementation. */
     false ); }  
 
@@ -1980,6 +2002,9 @@ HfstTransducer &HfstTransducer::repeat_n(unsigned int n)
 #endif
 #if HAVE_FOMA
     &hfst::implementations::FomaTransducer::repeat_n,
+#endif
+#if HAVE_XFSM
+    NULL,
 #endif
     /* Add here your implementation. */
     //#if HAVE_MY_TRANSDUCER_LIBRARY
@@ -2007,6 +2032,9 @@ HfstTransducer &HfstTransducer::repeat_n_minus(unsigned int n)
 #endif
 #if HAVE_FOMA
     &hfst::implementations::FomaTransducer::repeat_le_n,
+#endif
+#if HAVE_XFSM
+    NULL,
 #endif
     /* Add here your implementation. */
     n ); }   
@@ -2040,6 +2068,9 @@ HfstTransducer &HfstTransducer::optionalize()
 #if HAVE_FOMA
     &hfst::implementations::FomaTransducer::optionalize,
 #endif
+#if HAVE_XFSM
+    NULL,
+#endif
     /* Add here your implementation. */
     false ); }   
 
@@ -2057,6 +2088,9 @@ HfstTransducer &HfstTransducer::invert()
 #endif
 #if HAVE_FOMA
     &hfst::implementations::FomaTransducer::invert,
+#endif
+#if HAVE_XFSM
+    NULL,
 #endif
     /* Add here your implementation. */
     false ); }    
@@ -2076,6 +2110,9 @@ HfstTransducer &HfstTransducer::reverse()
 #if HAVE_FOMA
     &hfst::implementations::FomaTransducer::reverse,
 #endif
+#if HAVE_XFSM
+    NULL,
+#endif
     /* Add here your implementation. */
     false ); }    
 
@@ -2093,6 +2130,9 @@ HfstTransducer &HfstTransducer::input_project()
 #endif
 #if HAVE_FOMA
     &hfst::implementations::FomaTransducer::extract_input_language,
+#endif
+#if HAVE_XFSM
+    NULL,
 #endif
     /* Add here your implementation. */
     false ); }
@@ -2112,6 +2152,9 @@ HfstTransducer &HfstTransducer::output_project()
 #endif
 #if HAVE_FOMA
     &hfst::implementations::FomaTransducer::extract_output_language,
+#endif
+#if HAVE_XFSM
+    NULL,
 #endif
     /* Add here your implementation. */
     false ); }
@@ -4386,6 +4429,9 @@ HfstTransducer &HfstTransducer::concatenate
 #if HAVE_FOMA
         &hfst::implementations::FomaTransducer::concatenate,
 #endif
+#if HAVE_XFSM
+    NULL,
+#endif
         /* Add here your implementation. */
         //#if HAVE_MY_TRANSDUCER_LIBRARY
         //&hfst::implementations::MyTransducerLibraryTransducer::concatenate,
@@ -4473,6 +4519,9 @@ HfstTransducer &HfstTransducer::disjunct
 #if HAVE_FOMA
     &hfst::implementations::FomaTransducer::disjunct,
 #endif
+#if HAVE_XFSM
+    NULL,
+#endif
     /* Add here your implementation. */
     const_cast<HfstTransducer&>(another), harmonize); }
 
@@ -4492,6 +4541,9 @@ HfstTransducer &HfstTransducer::intersect
 #if HAVE_FOMA
     &hfst::implementations::FomaTransducer::intersect,
 #endif
+#if HAVE_XFSM
+    NULL,
+#endif
     /* Add here your implementation. */
     const_cast<HfstTransducer&>(another), harmonize); }
 
@@ -4510,6 +4562,9 @@ HfstTransducer &HfstTransducer::subtract
 #endif
 #if HAVE_FOMA
     &hfst::implementations::FomaTransducer::subtract,
+#endif
+#if HAVE_XFSM
+    NULL,
 #endif
     /* Add here your implementation. */
     const_cast<HfstTransducer&>(another), harmonize); }
@@ -4702,6 +4757,10 @@ bool HfstTransducer::is_implementation_type_available
     if (type == TROPICAL_OPENFST_TYPE || type == LOG_OPENFST_TYPE)
     return false;
 #endif
+#if !HAVE_XFSM
+    if (type == XFSM_TYPE)
+      return false;
+#endif
     /* Add here your implementation. */
     //#if !HAVE_MY_TRANSDUCER_LIBRARY
     //if (type == MY_TRANSDUCER_LIBRARY_TYPE)
@@ -4740,6 +4799,14 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
         ConversionFunctions::foma_to_hfst_basic_transducer
         (implementation.foma);
       foma_interface.delete_foma(implementation.foma);
+      break;
+#endif
+#if HAVE_XFSM
+    case XFSM_TYPE:
+      internal =
+        ConversionFunctions::xfsm_to_hfst_basic_transducer
+        (implementation.xfsm);
+      //delete implementation.xfsm;
       break;
 #endif
         /* Add here your implementation. */
@@ -4835,6 +4902,13 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
     case FOMA_TYPE:
       implementation.foma =
         ConversionFunctions::hfst_basic_transducer_to_foma(internal);
+      delete internal;
+      break;
+#endif
+#if HAVE_XFSM
+    case XFSM_TYPE:
+      implementation.xfsm =
+        ConversionFunctions::hfst_basic_transducer_to_xfsm(internal);
       delete internal;
       break;
 #endif
