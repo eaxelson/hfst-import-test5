@@ -49,24 +49,30 @@ using std::pair;
 
 bool blankline_separated = true;
 bool print_all = false;
+bool print_weights = false;
 std::string tokenizer_filename;
 enum OutputFormat {
-    xerox
+    tokenize,
+    xerox,
+    cg
 };
-OutputFormat output_format = xerox;
+OutputFormat output_format = tokenize;
 
 void
 print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-    fprintf(message_out, "Usage: %s [OPTIONS...] TOKENIZER\n"
+    fprintf(message_out, "Usage: %s [--segment | --xerox | --cg] [OPTIONS...] TOKENIZER\n"
             "perform matching/lookup on text streams\n"
             "\n", program_name);
     print_common_program_options(message_out);
     fprintf(message_out,
             "  -n  --newline          Newline as input separator (default is blank line)\n"
             "  -a  --print-all        Print nonmatching text\n"
-            "  -x  --xerox            Xerox output (default)\n");
+            "  -w  --print-weight     Print weights\n"
+            "  --segment              Segmenting / tokenization mode (default)\n"
+            "  --xerox                Xerox output\n"
+            "  --cg                   cg output\n");
     fprintf(message_out, 
             "Use standard streams for input and output (for now).\n"
             "\n"
@@ -87,26 +93,73 @@ void match_and_print(hfst_ol::PmatchContainer & container,
         input_text.erase(input_text.size() -1, 1);
     }
     hfst_ol::LocationVectorVector locations = container.locate(input_text);
-
-    // Output formatting
-    if (output_format == xerox) {
-        for(hfst_ol::LocationVectorVector::const_iterator it = locations.begin();
-            it != locations.end(); ++it) {
+    if (locations.size() == 0 && print_all) {
+        // If we got nothing at all
+        if (output_format == tokenize) {
+            outstream << input_text;
+        } else if (output_format == xerox) {
+            outstream << input_text << "\t" << input_text << "+?";
+        } else if (output_format == cg) {
+            outstream << "\"<>\"" << std::endl << input_text << "\t\"" << input_text << "\" ?";
+        }
+        outstream << "\n\n";
+    }
+    for(hfst_ol::LocationVectorVector::const_iterator it = locations.begin();
+        it != locations.end(); ++it) {
+        if ((it->size() == 1 && it->at(0).output.compare("@_NONMATCHING_@") == 0)) {
+            if (print_all) {
+                if (output_format == tokenize) {
+                    outstream << it->at(0).input;
+                } else if (output_format == xerox) {
+                    outstream << it->at(0).input << "\t" << it->at(0).input << "+?";
+                } else if (output_format == cg) {
+                    outstream << "\"<>\"" << std::endl << it->at(0).input << "\t\"" << it->at(0).input << "\" ?";
+                }
+                outstream << "\n\n";
+            }
+            continue;
+            // All nonmatching cases have been handled
+        }
+        if (output_format == tokenize && it->size() != 0) {
+            outstream << it->at(0).input;
+            if (print_weights) {
+                    outstream << "\t" << it->at(0).weight;
+                }
+                outstream << std::endl;
+                // All output_format == tokenize cases have been handled
+            } else if (output_format == cg && it->size() != 0) {
+                // Print the cg cohort header
+                outstream << "\"<" << it->at(0).input << ">\"" << std::endl;
+            }
             for (hfst_ol::LocationVector::const_iterator loc_it = it->begin();
                  loc_it != it->end(); ++loc_it) {
-                if (loc_it->output.compare("@_NONMATCHING_@") != 0) {
-                    outstream << loc_it->input << "\t" << loc_it->output << std::endl;
-                } else if (print_all) {
-                    outstream << loc_it->input << "\t" << loc_it->input << "+?" << std::endl;
+                if (output_format == xerox) {
+                    outstream << loc_it->input << "\t" << loc_it->output;
+                    if (print_weights) {
+                        outstream << "\t" << loc_it->weight;
+                    }
+                    outstream << std::endl;
+                } else if (output_format == cg) {
+                    // For the most common case, eg. analysis strings that begin with the original input,
+                    // we try to do what cg tools expect and surround the original input with double quotes.
+                    // Otherwise we omit the double quotes and assume the rule writer knows what he's doing.
+                    if (loc_it->output.compare(loc_it->input) == 0) {
+                        // The nice case obtains
+                        outstream << "\t\"" << loc_it->input << "\"" <<
+                            loc_it->output.substr(loc_it->input.size(), std::string::npos);
+                    } else {
+                        outstream << "\t" << loc_it->output;
+                    }
+                    if (print_weights) {
+                        outstream << "\t" << loc_it->weight;
+                    }
+                    outstream << std::endl;
                 }
             }
-            std::cerr << endl;
+            outstream << std::endl;
         }
-    } else {
-        // More formatting options
-    }
-    outstream << std::endl;
 }
+        
 
 int process_input(hfst_ol::PmatchContainer & container,
                   std::ostream & outstream)
@@ -147,11 +200,14 @@ int parse_options(int argc, char** argv)
                 HFST_GETOPT_COMMON_LONG,
                 {"newline", no_argument, 0, 'n'},
                 {"print-all", no_argument, 0, 'a'},
+                {"print-weights", no_argument, 0, 'w'},
+                {"segment", no_argument, 0, 't'},
                 {"xerox", no_argument, 0, 'x'},
+                {"cg", no_argument, 0, 'c'},
                 {0,0,0,0}
             };
         int option_index = 0;
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nax",
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "naw",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -168,8 +224,17 @@ int parse_options(int argc, char** argv)
         case 'a':
             print_all = true;
             break;
+        case 'w':
+            print_weights = true;
+            break;
+        case 't':
+            output_format = tokenize;
+            break;
         case 'x':
             output_format = xerox;
+            break;
+        case 'c':
+            output_format = cg;
             break;
 #include "inc/getopt-cases-error.h"
         }
