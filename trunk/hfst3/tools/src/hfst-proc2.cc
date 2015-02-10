@@ -143,7 +143,7 @@ void match_and_print(hfst_ol::PmatchContainer & container,
                     // For the most common case, eg. analysis strings that begin with the original input,
                     // we try to do what cg tools expect and surround the original input with double quotes.
                     // Otherwise we omit the double quotes and assume the rule writer knows what he's doing.
-                    if (loc_it->output.compare(loc_it->input) == 0) {
+                    if (loc_it->output.find(loc_it->input) == 0) {
                         // The nice case obtains
                         outstream << "\t\"" << loc_it->input << "\"" <<
                             loc_it->output.substr(loc_it->input.size(), std::string::npos);
