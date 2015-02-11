@@ -55,11 +55,6 @@ bool print_usage(void)
     "N must be a positive integer. B must be a non-negative float.\n" <<
     "Options -n and -b are combined with AND, i.e. they both restrict the output.\n" <<
     "\n" << 
-    "Note that " << PACKAGE_NAME << " is *not* guaranteed to behave identically to\n" <<
-    "hfst-lookup (although it almost always does): input-side multicharacter symbols\n" <<
-    "are not fully supported. If the first character of such a symbol is an ASCII\n" <<
-    "symbol also matching a single-character symbol, it will be tokenized as such.\n" <<
-    "\n" <<
     "Report bugs to " << PACKAGE_BUGREPORT << "\n" <<
     "\n";
   return true;
@@ -342,6 +337,11 @@ void LetterTrie::add_string(const char * p, SymbolNumber symbol_key)
   letters[(unsigned char)(*p)]->add_string(p+1,symbol_key);
 }
 
+bool LetterTrie::has_key_starting_with(const char c) const
+{
+    return letters[(unsigned char) c] != NULL;
+}
+
 SymbolNumber LetterTrie::find_key(char ** p)
 {
   const char * old_p = *p;
@@ -367,10 +367,18 @@ void Encoder::read_input_symbols(KeyTable * kt)
       assert(kt->find(k) != kt->end());
 #endif
       const char * p = kt->operator[](k);
-      if ((strlen(p) == 1) && (unsigned char)(*p) <= 127)
-        {
+      if ((strlen(p) == 1) && (unsigned char)(*p) <= 127
+          // we have a single char ascii symbol
+          && !letters.has_key_starting_with(*p)) {
+          // make sure there isn't a longer symbol we would be shadowing
           ascii_symbols[(unsigned char)(*p)] = k;
-        }
+      }
+      // If there's an ascii tokenized symbol shadowing this, remove it
+      if (strlen(p) > 1 && 
+          (unsigned char)(*p) <= 127 && 
+          ascii_symbols[(unsigned char)(*p)] != NO_SYMBOL_NUMBER) {
+          ascii_symbols[(unsigned char)(*p)] = NO_SYMBOL_NUMBER;
+      }
       letters.add_string(p,k);
     }
 }
