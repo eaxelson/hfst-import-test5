@@ -82,9 +82,9 @@ class Transition;
 enum FlagDiacriticOperator {P, N, R, D, C, U};
 
 enum HeaderFlag {Weighted, Deterministic, Input_deterministic, Minimized,
-		 Cyclic, Has_epsilon_epsilon_transitions,
-		 Has_input_epsilon_transitions, Has_input_epsilon_cycles,
-		 Has_unweighted_input_epsilon_cycles};
+         Cyclic, Has_epsilon_epsilon_transitions,
+         Has_input_epsilon_transitions, Has_input_epsilon_cycles,
+         Has_unweighted_input_epsilon_cycles};
 
 typedef std::vector<TransitionIndex*> TransitionIndexVector;
 typedef std::vector<Transition*> TransitionVector;
@@ -97,7 +97,7 @@ class HeaderParsingException: public std::exception
 {
 public:
     virtual const char* what() const throw()
-	{ return("Parsing error while reading header"); }
+    { return("Parsing error while reading header"); }
 };
 
 class TransducerHeader
@@ -129,13 +129,13 @@ class TransducerHeader
     (void)ret;
     if (prop == 0)
       {
-	property = false;
-	return;
+    property = false;
+    return;
       }
     else
       {
-	property = true;
-	return;
+    property = true;
+    return;
       }
     std::cerr << "Could not parse transducer; wrong or corrupt file?" << std::endl;
     exit(1);
@@ -144,8 +144,8 @@ class TransducerHeader
  public:
   TransducerHeader(FILE * f)
     {
-	skip_hfst3_header(f);
-	
+    skip_hfst3_header(f);
+    
       // The silly compiler complains about not catching the return value
       // of fread(). Hence this dummy variable is needed.
       size_t val;
@@ -256,16 +256,16 @@ class TransducerAlphabet
     operations(),
     line((char*)(malloc(1000)))
       {
-	feat_num = 0;
-	val_num = 1;
-	value_bucket[std::string()] = 0; // empty value = neutral
-	for (SymbolNumber k = 0; k < number_of_symbols; ++k)
-	  {
-	    get_next_symbol(f,k);
-	  }
-	// assume the first symbol is epsilon which we don't want to print
-	kt->operator[](0) = "";
-	free(line);
+    feat_num = 0;
+    val_num = 1;
+    value_bucket[std::string()] = 0; // empty value = neutral
+    for (SymbolNumber k = 0; k < number_of_symbols; ++k)
+      {
+        get_next_symbol(f,k);
+      }
+    // assume the first symbol is epsilon which we don't want to print
+    kt->operator[](0) = "";
+    free(line);
       }
   
   KeyTable * get_key_table(void)
@@ -295,6 +295,7 @@ class LetterTrie
       {}
 
   void add_string(const char * p,SymbolNumber symbol_key);
+  bool has_key_starting_with(const char c) const;
 
   SymbolNumber find_key(char ** p);
 
@@ -314,7 +315,7 @@ class Encoder {
   number_of_input_symbols(input_symbol_count),
     ascii_symbols(UCHAR_MAX,NO_SYMBOL_NUMBER)
       {
-	read_input_symbols(kt);
+    read_input_symbols(kt);
       }
   
   SymbolNumber find_key(char ** p);
@@ -346,7 +347,7 @@ class TransitionIndex
     sizeof(SymbolNumber) + sizeof(TransitionTableIndex);
 
  TransitionIndex(SymbolNumber input,
-		 TransitionTableIndex first_transition):
+         TransitionTableIndex first_transition):
     input_symbol(input),
     first_transition_index(first_transition)
     {}
@@ -385,8 +386,8 @@ class Transition
     2 * sizeof(SymbolNumber) + sizeof(TransitionTableIndex);
 
  Transition(SymbolNumber input,
-	    SymbolNumber output,
-	    TransitionTableIndex target):
+        SymbolNumber output,
+        TransitionTableIndex target):
     input_symbol(input),
     output_symbol(output),
     target_index(target)
@@ -426,7 +427,7 @@ class IndexTableReader
   void get_index_vector(void);
  public:
  IndexTableReader(FILE * f,
-			 TransitionTableIndex index_count): 
+             TransitionTableIndex index_count): 
   number_of_table_entries(index_count)
     {
       table_size = number_of_table_entries*TransitionIndex::SIZE;
@@ -469,16 +470,16 @@ class TransitionTableReader
   void get_transition_vector(void);
  public:
  TransitionTableReader(FILE * f,
-			      TransitionTableIndex transition_count):
+                  TransitionTableIndex transition_count):
   number_of_table_entries(transition_count),
     position(0)
       {
-	table_size = number_of_table_entries*Transition::SIZE;
-	TableTransitions = (char*)(malloc(table_size));
-	int bytes;
-	bytes = fread(TableTransitions,table_size,1,f);
-	(void)bytes;
-	get_transition_vector();
+    table_size = number_of_table_entries*Transition::SIZE;
+    TableTransitions = (char*)(malloc(table_size));
+    int bytes;
+    bytes = fread(TableTransitions,table_size,1,f);
+    (void)bytes;
+    get_transition_vector();
 
       }
   
@@ -555,31 +556,31 @@ class Transducer
   }
   
   void try_epsilon_indices(SymbolNumber * input_symbol,
-			   SymbolNumber * output_symbol,
-			   SymbolNumber * original_output_string,
-			   TransitionTableIndex i);
+               SymbolNumber * output_symbol,
+               SymbolNumber * original_output_string,
+               TransitionTableIndex i);
   
   virtual void try_epsilon_transitions(SymbolNumber * input_symbol,
-			       SymbolNumber * output_symbol,
-			       SymbolNumber * original_output_string,
-			       TransitionTableIndex i);
+                   SymbolNumber * output_symbol,
+                   SymbolNumber * original_output_string,
+                   TransitionTableIndex i);
   
   void find_index(SymbolNumber input,
-		  SymbolNumber * input_symbol,
-		  SymbolNumber * output_symbol,
-		  SymbolNumber * original_output_string,
-		  TransitionTableIndex i);
+          SymbolNumber * input_symbol,
+          SymbolNumber * output_symbol,
+          SymbolNumber * original_output_string,
+          TransitionTableIndex i);
   
   void find_transitions(SymbolNumber input,
-			SymbolNumber * input_symbol,
-			SymbolNumber * output_symbol,
-			SymbolNumber * original_output_string,
-			TransitionTableIndex i);
+            SymbolNumber * input_symbol,
+            SymbolNumber * output_symbol,
+            SymbolNumber * original_output_string,
+            TransitionTableIndex i);
   
   void get_analyses(SymbolNumber * input_symbol,
-			    SymbolNumber * output_symbol,
-			    SymbolNumber * original_output_string,
-			    TransitionTableIndex i);
+                SymbolNumber * output_symbol,
+                SymbolNumber * original_output_string,
+                TransitionTableIndex i);
 
 
  public:
@@ -595,11 +596,11 @@ class Transducer
     indices(index_reader()),
     transitions(transition_reader())
       {
-	for (int i = 0; i < 1000; ++i)
-	  {
-	    output_string[i] = NO_SYMBOL_NUMBER;
-	  }
-	set_symbol_table();
+    for (int i = 0; i < 1000; ++i)
+      {
+        output_string[i] = NO_SYMBOL_NUMBER;
+      }
+    set_symbol_table();
       }
 
     
@@ -641,9 +642,9 @@ class TransducerFd: public Transducer
   OperationVector operations;
 
   void try_epsilon_transitions(SymbolNumber * input_symbol,
-			       SymbolNumber * output_symbol,
-			       SymbolNumber * original_output_string,
-			       TransitionTableIndex i);
+                   SymbolNumber * output_symbol,
+                   SymbolNumber * original_output_string,
+                   TransitionTableIndex i);
   
   bool PushState(FlagDiacriticOperation op);
 
@@ -652,7 +653,7 @@ class TransducerFd: public Transducer
     Transducer(f, h, a),
       statestack(1, FlagDiacriticState (a.get_state_size(), 0)),
       operations(a.get_operation_vector())
-	{}
+    {}
 };
 
 class TransducerFdUniq: public TransducerFd
@@ -699,7 +700,7 @@ class TransitionWIndex
     sizeof(SymbolNumber) + sizeof(TransitionTableIndex);
 
  TransitionWIndex(SymbolNumber input,
-		  TransitionTableIndex first_transition):
+          TransitionTableIndex first_transition):
     input_symbol(input),
     first_transition_index(first_transition)
     {}
@@ -714,15 +715,15 @@ class TransitionWIndex
   bool final(void)
   {
       return input_symbol == NO_SYMBOL_NUMBER &&
-	  first_transition_index != NO_TABLE_INDEX;
+      first_transition_index != NO_TABLE_INDEX;
   }
   
   Weight final_weight(void)
   {
       union to_weight
       {
-	  TransitionTableIndex i;
-	  Weight w;
+      TransitionTableIndex i;
+      Weight w;
       } weight;
       weight.i = first_transition_index;
       return weight.w;
@@ -750,9 +751,9 @@ class TransitionW
     2 * sizeof(SymbolNumber) + sizeof(TransitionTableIndex) + sizeof(Weight);
 
  TransitionW(SymbolNumber input,
-	     SymbolNumber output,
-	     TransitionTableIndex target,
-	     Weight w):
+         SymbolNumber output,
+         TransitionTableIndex target,
+         Weight w):
     input_symbol(input),
     output_symbol(output),
     target_index(target),
@@ -791,8 +792,8 @@ class TransitionW
   bool final(void)
   {
       return input_symbol == NO_SYMBOL_NUMBER &&
-	  output_symbol == NO_SYMBOL_NUMBER &&
-	  target_index == 1;
+      output_symbol == NO_SYMBOL_NUMBER &&
+      target_index == 1;
   }
 };
 
@@ -807,7 +808,7 @@ class IndexTableReaderW
   void get_index_vector(void);
  public:
  IndexTableReaderW(FILE * f,
-			  TransitionTableIndex index_count): 
+              TransitionTableIndex index_count): 
   number_of_table_entries(index_count)
     {
       table_size = number_of_table_entries*TransitionWIndex::SIZE;
@@ -851,16 +852,16 @@ class TransitionTableReaderW
 
  public:
  TransitionTableReaderW(FILE * f,
-			       TransitionTableIndex transition_count):
+                   TransitionTableIndex transition_count):
   number_of_table_entries(transition_count),
     position(0)
       {
-	table_size = number_of_table_entries*TransitionW::SIZE;
-	TableTransitions = (char*)(malloc(table_size));
-	int bytes;
-	bytes = fread(TableTransitions,table_size,1,f);
-	(void)bytes;
-	get_transition_vector();
+    table_size = number_of_table_entries*TransitionW::SIZE;
+    TableTransitions = (char*)(malloc(table_size));
+    int bytes;
+    bytes = fread(TableTransitions,table_size,1,f);
+    (void)bytes;
+    get_transition_vector();
       }
   
   void Set(TransitionTableIndex pos);
@@ -927,26 +928,26 @@ class TransducerW
   void set_symbol_table(void);
 
   virtual void try_epsilon_transitions(SymbolNumber * input_symbol,
-				       SymbolNumber * output_symbol,
-				       SymbolNumber * original_output_string,
-				       TransitionTableIndex i);
+                       SymbolNumber * output_symbol,
+                       SymbolNumber * original_output_string,
+                       TransitionTableIndex i);
   
   void try_epsilon_indices(SymbolNumber * input_symbol,
-				   SymbolNumber * output_symbol,
-				   SymbolNumber * original_output_string,
-				   TransitionTableIndex i);
+                   SymbolNumber * output_symbol,
+                   SymbolNumber * original_output_string,
+                   TransitionTableIndex i);
 
   void find_transitions(SymbolNumber input,
-			SymbolNumber * input_symbol,
-			SymbolNumber * output_symbol,
-			SymbolNumber * original_output_string,
-			TransitionTableIndex i);
+            SymbolNumber * input_symbol,
+            SymbolNumber * output_symbol,
+            SymbolNumber * original_output_string,
+            TransitionTableIndex i);
 
   void find_index(SymbolNumber input,
-		  SymbolNumber * input_symbol,
-		  SymbolNumber * output_symbol,
-		  SymbolNumber * original_output_string,
-		  TransitionTableIndex i);
+          SymbolNumber * input_symbol,
+          SymbolNumber * output_symbol,
+          SymbolNumber * original_output_string,
+          TransitionTableIndex i);
 
   virtual void note_analysis(SymbolNumber * whole_output_string);
 
@@ -961,9 +962,9 @@ class TransducerW
   }
 
   void get_analyses(SymbolNumber * input_symbol,
-		    SymbolNumber * output_symbol,
-		    SymbolNumber * original_output_string,
-		    TransitionTableIndex i);
+            SymbolNumber * output_symbol,
+            SymbolNumber * original_output_string,
+            TransitionTableIndex i);
 
   Weight get_final_index_weight(TransitionTableIndex i) {
     return indices[i]->final_weight();
@@ -987,11 +988,11 @@ class TransducerW
     transitions(transition_reader()),
     current_weight(0.0)
       {
-	for (int i = 0; i < 1000; ++i)
-	  {
-	    output_string[i] = NO_SYMBOL_NUMBER;
-	  }
-	set_symbol_table();
+    for (int i = 0; i < 1000; ++i)
+      {
+        output_string[i] = NO_SYMBOL_NUMBER;
+      }
+    set_symbol_table();
       }
 
   KeyTable * get_key_table(void)
@@ -1033,9 +1034,9 @@ class TransducerWFd: public TransducerW
   OperationVector operations;
 
   void try_epsilon_transitions(SymbolNumber * input_symbol,
-			       SymbolNumber * output_symbol,
-			       SymbolNumber * original_output_string,
-			       TransitionTableIndex i);
+                   SymbolNumber * output_symbol,
+                   SymbolNumber * original_output_string,
+                   TransitionTableIndex i);
 
   bool PushState(FlagDiacriticOperation op);
 
