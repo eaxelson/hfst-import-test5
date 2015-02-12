@@ -45,44 +45,130 @@ namespace hfst { namespace implementations
   HfstBasicTransducer * ConversionFunctions::
   xfsm_to_hfst_basic_transducer(NETptr t) 
   {
-    std::cerr << "xfsm_to_hfst_basic_transducer..." << std::endl;
-    PAGEptr p = new_page();
-    p = network_to_page(t, p);
-    std::string page(p->string);
+    HfstBasicTransducer * result = new HfstBasicTransducer();
 
-    std::string start("s0:");
-    std::size_t found = page.find(start);
-    assert(found != std::string::npos);
+    //std::cerr << "xfsm_to_hfst_basic_transducer..." << std::endl;
+    //PAGEptr p = new_page();
+    //p = network_to_page(t, p);
+    //std::string page(p->string);
+
+    //std::string start("s0:");
+    //std::size_t found = page.find(start);
+    //assert(found != std::string::npos);
     // initial state is final
-    if (page.at(found-1) == 'f')
-      {
-        found = (found-1);
-      }
-    page = page.substr(found);
+    //if (page.at(found-1) == 'f')
+    //  {
+    //    found = (found-1);
+    //  }
+    //page = page.substr(found);
 
-    std::cerr << "page is: '" << page << "'" << std::endl;
+    //std::cerr << "page is: '" << page << "'" << std::endl;
+    //free_page(p);
+
+    std::map<STATEptr, HfstState> state_map;
 
     STATEptr state_pointer = t->body.states;
+    STATEptr start_pointer = t->start.state;
 
     while (state_pointer != NULL)
       {
-        std::cerr << "a state:" << std::endl;
+        HfstState s;
+        if (state_pointer == start_pointer) 
+          {
+            s = 0;
+            state_map[state_pointer] = s; // initial state exists already in result
+            //std::cerr << "state_map[" << state_pointer << "] = " << s << " (start)" << std::endl;
+          }            
+        else
+          {
+            s = result->add_state();
+            state_map[state_pointer] = s;
+            //std::cerr << "state_map[" << state_pointer << "] = " << s << std::endl;
+          }
+
+        if (state_pointer->final != 0)
+          {
+            result->set_final_weight(s, 0);
+            //std::cerr << "set_final_weight: " << s << std::endl;
+          }
+          
+        state_pointer = state_pointer->next;
+      }
+
+    state_pointer = t->body.states;
+
+    while (state_pointer != NULL)
+      {
+        /*std::cerr << "state " << state_pointer << " ";
+        if (state_pointer == start_pointer)
+          std::cerr << "(start)";
+        if (state_pointer->final != 0)
+          std::cerr << "(final)";
+          std::cerr << ":" << std::endl;*/
+
         ARCptr arc_pointer = state_pointer->arc.set;
         while (arc_pointer != NULL)
           {
-            std::cerr << "  an arc: ";
             id_type label = arc_pointer->label;
-            std::cerr << label << " ";
-            (void) print_label(label, stderr, ESCAPE);
-            std::cerr << std::endl;
+            id_type upper = upper_id(label);
+            id_type lower = lower_id(label);
+
+            std::string pstru, pstrl;
+
+            if (upper == 0)
+              pstru = hfst::internal_epsilon;
+            else if (upper == 1)
+              pstru = hfst::internal_unknown;
+            else {
+              PAGEptr pp = new_page();
+              label_to_page(upper, ESCAPE, DONT_WATCH_RM, pp);
+              pstru = std::string(pp->string);
+              free_page(pp);
+            }
+
+            if (lower == 0)
+              pstrl = hfst::internal_epsilon;
+            else if (lower == 1)
+              pstrl = hfst::internal_unknown;
+            else {
+              PAGEptr pp = new_page();
+              label_to_page(lower, ESCAPE, DONT_WATCH_RM, pp);
+              pstrl = std::string(pp->string);
+              free_page(pp);
+            }
+            
+            STATEptr dest_ptr = arc_pointer->destination;
+
+            //std::cerr << "'" << pstru << "':'" << pstrl << "' -> " << dest_ptr << std::endl;
+
+            // state_pointer pstru pstrl dest_ptr
+            HfstBasicTransition tr(state_map[dest_ptr], pstru, pstrl, 0);
+            result->add_transition(state_map[state_pointer], tr);
+
             arc_pointer = arc_pointer->next;
           }
         state_pointer = state_pointer->next;
       }
 
-    //HfstBasicTransducer * result = xfsm_page_string_to_hfst_basic_transducer(p->string());
-    // todo: delete page?
-    return NULL;
+    return result;
+  }
+
+  static void symbol_pair_to_id(const std::string & input, const std::string & output, 
+                                id_type & input_id, id_type & output_id)
+  {
+    if (input == hfst::internal_epsilon)
+      input_id = 0;
+    else if (input == hfst::internal_unknown)
+      input_id = 1;
+    else
+      input_id = single_to_id(input.c_str());
+    
+    if (output == hfst::internal_epsilon)
+      output_id = 0;
+    else if (output == hfst::internal_unknown)
+      output_id = 1;
+    else
+      output_id = single_to_id(output.c_str());
   }
 
 
@@ -95,7 +181,7 @@ namespace hfst { namespace implementations
   NETptr ConversionFunctions::
     hfst_basic_transducer_to_xfsm(const HfstBasicTransducer * hfst_fsm) 
   {
-    std::cerr << "hfst_basic_transducer_to_xfsm..." << std::endl;
+    //std::cerr << "hfst_basic_transducer_to_xfsm..." << std::endl;
     NETptr result = null_net();
 
     // Maps HfstBasicTransducer states (i.e. vector indices) into Xfsm transducer states
@@ -122,12 +208,12 @@ namespace hfst { namespace implementations
       }
 
     // DEBUG
-    fsm_state = 0;
-    for (std::vector<STATEptr>::const_iterator it = state_vector.begin(); it != state_vector.end(); it++)
+    //fsm_state = 0;
+    /*for (std::vector<STATEptr>::const_iterator it = state_vector.begin(); it != state_vector.end(); it++)
       {
         std::cerr << "state_vector[" << fsm_state << "] == " << *it << std::endl;
         fsm_state++;
-      }
+        }*/
 
     // ----- Go through all states -----
     unsigned int source_state=0;
@@ -147,15 +233,9 @@ namespace hfst { namespace implementations
 
             id_type input_id, output_id;
 
-            if (input == hfst::internal_epsilon)
-              input_id = 0;
-            else
-              input_id = single_to_id(input.c_str());
+            symbol_pair_to_id(input, output, input_id, output_id);
 
-            if (output == hfst::internal_epsilon)
-              output_id = 0;
-            else
-              output_id = single_to_id(output.c_str());
+            //std::cerr << "input_id: " << input_id << ", output id: " << output_id << std::endl;
 
             STATEptr xfsm_target_state = state_vector.at(target);
             // TODO: handle special symbols
@@ -165,7 +245,7 @@ namespace hfst { namespace implementations
               throw "add_arc_to_state failed";
 
             // DEBUG
-            std::cerr << "add_arc_to_state: " << xfsm_source_state << " <" << ti << "> " << xfsm_target_state << std::endl; 
+            //std::cerr << "add_arc_to_state: " << xfsm_source_state << " <" << ti << "> " << xfsm_target_state << std::endl; 
           }
         // ----- transitions gone through -----
         source_state++;
