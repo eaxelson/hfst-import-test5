@@ -40,6 +40,8 @@ namespace hfst {
   class XfsmTransducer {
   public:
     static void initialize_xfsm();
+    static NETptr create_xfsm_unknown_to_unknown_transducer();
+    static NETptr create_xfsm_identity_to_identity_transducer();
   } ;
 } }
 #endif

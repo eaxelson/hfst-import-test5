@@ -30,6 +30,68 @@ namespace hfst { namespace implementations
 
 
 #if HAVE_XFSM
+
+  // Convert between HfstBasicTransducer and xfsm transducer symbols.
+  // For identities, use FOOO.
+  static id_type hfst_symbol_to_xfsm_symbol(const std::string & symbol)
+  {
+    if (symbol == hfst::internal_epsilon)
+      return EPSILON;
+    else if (symbol == hfst::internal_unknown)
+      return OTHER;
+    else
+      return single_to_id(symbol.c_str());
+  }
+
+  // Convert between xfsm transducer and HfstBasicTransducer symbols.
+  // For identities, use FOOO.
+  static std::string xfsm_symbol_to_hfst_symbol(id_type id)
+  {
+    if (id == EPSILON)
+      return hfst::internal_epsilon;
+    else if (id == OTHER)
+      return hfst::internal_unknown;
+    else {
+      PAGEptr pp = new_page();
+      // ESCAPE and DONT_WATCH_RM are needed so that unicode symbols will work...
+      label_to_page(id, ESCAPE, DONT_WATCH_RM, pp);
+      std::string retval(pp->string);
+      free_page(pp);
+      return retval;
+    }
+  }
+
+  void label_id_to_symbol_pair(id_type label_id, std::string & isymbol, std::string & osymbol)
+  {
+    // atomic OTHER label -> identity pair
+    if (label_id == OTHER)
+      {
+        isymbol = hfst::internal_identity;
+        osymbol = hfst::internal_identity;
+      }
+    else
+      {
+        id_type upperid = upper_id(label_id);
+        id_type lowerid = lower_id(label_id);
+        isymbol = xfsm_symbol_to_hfst_symbol(upperid);
+        osymbol = xfsm_symbol_to_hfst_symbol(lowerid);
+      }
+  }
+
+  void copy_xfsm_alphabet_into_hfst_alphabet(NETptr t, HfstBasicTransducer * fsm)
+    {
+      ALPHABETptr alpha_ptr = net_sigma(t);
+      ALPH_ITptr alpha_it_ptr = start_alph_iterator(NULL, alpha_ptr);
+      id_type label_id = next_alph_id(alpha_it_ptr);
+      
+      while(label_id != ID_NO_SYMBOL)
+        {
+          std::string symbol = xfsm_symbol_to_hfst_symbol(label_id);
+          fsm->add_symbol_to_alphabet(symbol);
+          label_id = next_alph_id(alpha_it_ptr);
+        }
+    }
+
   
   /* ----------------------------------------------------------------------
 
@@ -37,140 +99,69 @@ namespace hfst { namespace implementations
      
      ---------------------------------------------------------------------- */
 
-  static HfstBasicTransducer * xfsm_page_string_to_hfst_basic_transducer(char * str)
-  {
-    return NULL;
-  }
-
   HfstBasicTransducer * ConversionFunctions::
   xfsm_to_hfst_basic_transducer(NETptr t) 
   {
     HfstBasicTransducer * result = new HfstBasicTransducer();
 
-    //std::cerr << "xfsm_to_hfst_basic_transducer..." << std::endl;
-    //PAGEptr p = new_page();
-    //p = network_to_page(t, p);
-    //std::string page(p->string);
+    // Map states of t into states in result
+    std::map<STATEptr, HfstState> xfsm_to_hfst_state;
 
-    //std::string start("s0:");
-    //std::size_t found = page.find(start);
-    //assert(found != std::string::npos);
-    // initial state is final
-    //if (page.at(found-1) == 'f')
-    //  {
-    //    found = (found-1);
-    //  }
-    //page = page.substr(found);
+    STATEptr state_ptr = t->body.states;
+    STATEptr start_ptr = t->start.state;
 
-    //std::cerr << "page is: '" << page << "'" << std::endl;
-    //free_page(p);
-
-    std::map<STATEptr, HfstState> state_map;
-
-    STATEptr state_pointer = t->body.states;
-    STATEptr start_pointer = t->start.state;
-
-    while (state_pointer != NULL)
+    // For each state in t, create an equivalent state in result and make it
+    // final, if needed.
+    while (state_ptr != NULL)
       {
-        HfstState s;
-        if (state_pointer == start_pointer) 
+        HfstState new_state;
+        if (state_ptr == start_ptr) 
           {
-            s = 0;
-            state_map[state_pointer] = s; // initial state exists already in result
-            //std::cerr << "state_map[" << state_pointer << "] = " << s << " (start)" << std::endl;
+            new_state = 0;
+            // initial state exists already in result
+            xfsm_to_hfst_state[state_ptr] = new_state; 
           }            
         else
           {
-            s = result->add_state();
-            state_map[state_pointer] = s;
-            //std::cerr << "state_map[" << state_pointer << "] = " << s << std::endl;
+            new_state = result->add_state();
+            xfsm_to_hfst_state[state_ptr] = new_state;
           }
 
-        if (state_pointer->final != 0)
+        if (state_ptr->final != 0)
           {
-            result->set_final_weight(s, 0);
-            //std::cerr << "set_final_weight: " << s << std::endl;
+            result->set_final_weight(new_state, 0);
           }
           
-        state_pointer = state_pointer->next;
+        state_ptr = state_ptr->next;
       }
 
-    state_pointer = t->body.states;
+    state_ptr = t->body.states;
 
-    while (state_pointer != NULL)
+    // For each state in t, go through its transitions and copy them into result.
+    while (state_ptr != NULL)
       {
-        /*std::cerr << "state " << state_pointer << " ";
-        if (state_pointer == start_pointer)
-          std::cerr << "(start)";
-        if (state_pointer->final != 0)
-          std::cerr << "(final)";
-          std::cerr << ":" << std::endl;*/
-
-        ARCptr arc_pointer = state_pointer->arc.set;
-        while (arc_pointer != NULL)
+        ARCptr arc_ptr = state_ptr->arc.set;
+        while (arc_ptr != NULL)
           {
-            id_type label = arc_pointer->label;
-            id_type upper = upper_id(label);
-            id_type lower = lower_id(label);
-
-            std::string pstru, pstrl;
-
-            if (upper == 0)
-              pstru = hfst::internal_epsilon;
-            else if (upper == 1)
-              pstru = hfst::internal_unknown;
-            else {
-              PAGEptr pp = new_page();
-              label_to_page(upper, ESCAPE, DONT_WATCH_RM, pp);
-              pstru = std::string(pp->string);
-              free_page(pp);
-            }
-
-            if (lower == 0)
-              pstrl = hfst::internal_epsilon;
-            else if (lower == 1)
-              pstrl = hfst::internal_unknown;
-            else {
-              PAGEptr pp = new_page();
-              label_to_page(lower, ESCAPE, DONT_WATCH_RM, pp);
-              pstrl = std::string(pp->string);
-              free_page(pp);
-            }
+            id_type label_id = arc_ptr->label;
+            std::string isymbol, osymbol;
+            label_id_to_symbol_pair(label_id, isymbol, osymbol);
             
-            STATEptr dest_ptr = arc_pointer->destination;
+            STATEptr target_state_ptr = arc_ptr->destination;
 
-            //std::cerr << "'" << pstru << "':'" << pstrl << "' -> " << dest_ptr << std::endl;
+            HfstBasicTransition tr(xfsm_to_hfst_state[target_state_ptr], isymbol, osymbol, 0);
+            result->add_transition(xfsm_to_hfst_state[state_ptr], tr);
 
-            // state_pointer pstru pstrl dest_ptr
-            HfstBasicTransition tr(state_map[dest_ptr], pstru, pstrl, 0);
-            result->add_transition(state_map[state_pointer], tr);
-
-            arc_pointer = arc_pointer->next;
+            arc_ptr = arc_ptr->next;
           }
-        state_pointer = state_pointer->next;
+        state_ptr = state_ptr->next;
       }
+
+    // Copy alphabet of t into result.
+    copy_xfsm_alphabet_into_hfst_alphabet(t, result);
 
     return result;
   }
-
-  static void symbol_pair_to_id(const std::string & input, const std::string & output, 
-                                id_type & input_id, id_type & output_id)
-  {
-    if (input == hfst::internal_epsilon)
-      input_id = 0;
-    else if (input == hfst::internal_unknown)
-      input_id = 1;
-    else
-      input_id = single_to_id(input.c_str());
-    
-    if (output == hfst::internal_epsilon)
-      output_id = 0;
-    else if (output == hfst::internal_unknown)
-      output_id = 1;
-    else
-      output_id = single_to_id(output.c_str());
-  }
-
 
   /* ------------------------------------------------------------------------
      
@@ -181,10 +172,9 @@ namespace hfst { namespace implementations
   NETptr ConversionFunctions::
     hfst_basic_transducer_to_xfsm(const HfstBasicTransducer * hfst_fsm) 
   {
-    //std::cerr << "hfst_basic_transducer_to_xfsm..." << std::endl;
     NETptr result = null_net();
 
-    // Maps HfstBasicTransducer states (i.e. vector indices) into Xfsm transducer states
+    // Maps HfstBasicTransducer states (i.e. vector indices) into xfsm transducer states.
     std::vector<STATEptr> state_vector;
 
     // ---- Copy states -----
@@ -207,14 +197,6 @@ namespace hfst { namespace implementations
         fsm_state++;
       }
 
-    // DEBUG
-    //fsm_state = 0;
-    /*for (std::vector<STATEptr>::const_iterator it = state_vector.begin(); it != state_vector.end(); it++)
-      {
-        std::cerr << "state_vector[" << fsm_state << "] == " << *it << std::endl;
-        fsm_state++;
-        }*/
-
     // ----- Go through all states -----
     unsigned int source_state=0;
     for (HfstBasicTransducer::const_iterator it = hfst_fsm->begin();
@@ -227,25 +209,33 @@ namespace hfst { namespace implementations
              tr_it != it->end(); tr_it++)
           {
             // Copy the transition
-            std::string input = tr_it->get_input_symbol();
-            std::string output = tr_it->get_output_symbol();
-            HfstState target =  tr_it->get_target_state();
+            std::string isymbol = tr_it->get_input_symbol();
+            std::string osymbol = tr_it->get_output_symbol();
+            HfstState target_state =  tr_it->get_target_state();
 
-            id_type input_id, output_id;
+            id_type ti;
 
-            symbol_pair_to_id(input, output, input_id, output_id);
+            if (isymbol == hfst::internal_identity)
+              {
+                if (osymbol != hfst::internal_identity)
+                  throw "identity symbol cannot be on one side only";
+                // atomic OTHER label
+                ti = OTHER;
+              }
+            else
+              {
+                id_type input_id = hfst_symbol_to_xfsm_symbol(isymbol);
+                id_type output_id = hfst_symbol_to_xfsm_symbol(osymbol);
+                ti = id_pair_to_id(input_id, output_id);
+              }
 
             //std::cerr << "input_id: " << input_id << ", output id: " << output_id << std::endl;
 
-            STATEptr xfsm_target_state = state_vector.at(target);
-            // TODO: handle special symbols
-            id_type ti = id_pair_to_id(input_id, output_id);
+            STATEptr xfsm_target_state = state_vector.at(target_state);
 
             if( add_arc_to_state(result, xfsm_source_state, ti, xfsm_target_state, NULL, 0) == NULL )
               throw "add_arc_to_state failed";
 
-            // DEBUG
-            //std::cerr << "add_arc_to_state: " << xfsm_source_state << " <" << ti << "> " << xfsm_target_state << std::endl; 
           }
         // ----- transitions gone through -----
         source_state++;
@@ -258,17 +248,21 @@ namespace hfst { namespace implementations
         result = optional_net(result, 0);
       }
 
-    // ----- Go through the final states -----
-    /*for (HfstBasicTransducer::FinalWeightMap::const_iterator it
-           = hfst_fsm->final_weight_map.begin();
-         it != hfst_fsm->final_weight_map.end(); it++)
+    // Copy alphabet
+    ALPHABETptr ap = net_sigma(result);
+    const HfstBasicTransducer::HfstTransitionGraphAlphabet & alpha
+      = hfst_fsm->get_alphabet();
+    for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it
+           = alpha.begin();
+         it != alpha.end(); it++)
       {
-        // Set the state as final, ignore the weight
-        HfstState final = it->first;
-        }*/
-    // ----- final states gone through -----
+        (void) alph_add_to(ap, hfst_symbol_to_xfsm_symbol(it->c_str()), DONT_KEEP);
+      }    
 
-    // TODO: copy alphabet
+    // TESTING...
+    NETptr unk2unk = XfsmTransducer::create_xfsm_unknown_to_unknown_transducer();
+    NETptr id2id = XfsmTransducer::create_xfsm_identity_to_identity_transducer();
+    //NETptr comp = compose_net(result, unk2unk, DONT_KEEP, DONT_KEEP);
 
     return result;
   }
