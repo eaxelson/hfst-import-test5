@@ -31,20 +31,22 @@ namespace hfst { namespace implementations
 
 #if HAVE_XFSM
 
-  // Convert between HfstBasicTransducer and xfsm transducer symbols.
-  // For identities, use FOOO.
+  // Convert between HfstBasicTransducer and xfsm transducer one-side symbols.
+  // The identity symbol must be handled separately.
   static id_type hfst_symbol_to_xfsm_symbol(const std::string & symbol)
   {
     if (symbol == hfst::internal_epsilon)
       return EPSILON;
     else if (symbol == hfst::internal_unknown)
       return OTHER;
+    else if (symbol == hfst::internal_identity)
+      throw "hfst_symbol_to_xfsm_symbol does not accept the identity symbol as its argument";
     else
       return single_to_id(symbol.c_str());
   }
 
-  // Convert between xfsm transducer and HfstBasicTransducer symbols.
-  // For identities, use FOOO.
+  // Convert between xfsm transducer and HfstBasicTransducer one-side symbols.
+  // The identity symbol must be handled separately.
   static std::string xfsm_symbol_to_hfst_symbol(id_type id)
   {
     if (id == EPSILON)
@@ -52,18 +54,22 @@ namespace hfst { namespace implementations
     else if (id == OTHER)
       return hfst::internal_unknown;
     else {
-      PAGEptr pp = new_page();
-      // ESCAPE and DONT_WATCH_RM are needed so that unicode symbols will work...
-      label_to_page(id, ESCAPE, DONT_WATCH_RM, pp);
-      std::string retval(pp->string);
-      free_page(pp);
+      std::string retval("");
+      LABELptr lptr = id_to_label(id);
+      FAT_STR fs = lptr->content.name;
+      while (*fs != '\0')
+        {
+          retval.append(1, *fs);
+          ++fs;
+        }
       return retval;
     }
   }
 
+  // Convert between an xfsm label (symbol pair) and hfst transition symbols.
   void label_id_to_symbol_pair(id_type label_id, std::string & isymbol, std::string & osymbol)
   {
-    // atomic OTHER label -> identity pair
+    // (1) atomic OTHER label -> identity pair
     if (label_id == OTHER)
       {
         isymbol = hfst::internal_identity;
@@ -71,6 +77,8 @@ namespace hfst { namespace implementations
       }
     else
       {
+        // (2) non-atomic OTHER label -> unknown pair
+        // (3) all other cases
         id_type upperid = upper_id(label_id);
         id_type lowerid = lower_id(label_id);
         isymbol = xfsm_symbol_to_hfst_symbol(upperid);
@@ -78,6 +86,8 @@ namespace hfst { namespace implementations
       }
   }
 
+  // Insert all symbols in an xfsm transducer alphabet (sigma) into
+  // the alphabet of an HfstBasicTransducer.
   void copy_xfsm_alphabet_into_hfst_alphabet(NETptr t, HfstBasicTransducer * fsm)
     {
       ALPHABETptr alpha_ptr = net_sigma(t);
@@ -117,8 +127,8 @@ namespace hfst { namespace implementations
         HfstState new_state;
         if (state_ptr == start_ptr) 
           {
-            new_state = 0;
             // initial state exists already in result
+            new_state = 0;
             xfsm_to_hfst_state[state_ptr] = new_state; 
           }            
         else
@@ -127,7 +137,7 @@ namespace hfst { namespace implementations
             xfsm_to_hfst_state[state_ptr] = new_state;
           }
 
-        if (state_ptr->final != 0)
+        if (state_ptr->final != 0) 
           {
             result->set_final_weight(new_state, 0);
           }
@@ -229,8 +239,6 @@ namespace hfst { namespace implementations
                 ti = id_pair_to_id(input_id, output_id);
               }
 
-            //std::cerr << "input_id: " << input_id << ", output id: " << output_id << std::endl;
-
             STATEptr xfsm_target_state = state_vector.at(target_state);
 
             if( add_arc_to_state(result, xfsm_source_state, ti, xfsm_target_state, NULL, 0) == NULL )
@@ -256,12 +264,14 @@ namespace hfst { namespace implementations
            = alpha.begin();
          it != alpha.end(); it++)
       {
+        if (hfst::is_epsilon(*it) || hfst::is_unknown(*it) || hfst::is_identity(*it))
+          continue;
         (void) alph_add_to(ap, hfst_symbol_to_xfsm_symbol(it->c_str()), DONT_KEEP);
       }    
 
     // TESTING...
-    NETptr unk2unk = XfsmTransducer::create_xfsm_unknown_to_unknown_transducer();
-    NETptr id2id = XfsmTransducer::create_xfsm_identity_to_identity_transducer();
+    //NETptr unk2unk = XfsmTransducer::create_xfsm_unknown_to_unknown_transducer();
+    //NETptr id2id = XfsmTransducer::create_xfsm_identity_to_identity_transducer();
     //NETptr comp = compose_net(result, unk2unk, DONT_KEEP, DONT_KEEP);
 
     return result;
