@@ -86,6 +86,24 @@ namespace hfst { namespace implementations
       }
   }
 
+  id_type symbol_pair_to_label_id(const std::string & isymbol, const std::string & osymbol)
+  {
+    if (isymbol == hfst::internal_identity)
+      {
+        if (osymbol != hfst::internal_identity)
+          throw "identity symbol cannot be on one side only";
+        // atomic OTHER label
+        return OTHER;
+      }
+    else
+      {
+        id_type input_id = hfst_symbol_to_xfsm_symbol(isymbol);
+        id_type output_id = hfst_symbol_to_xfsm_symbol(osymbol);
+        return id_pair_to_id(input_id, output_id);
+      }
+  }
+
+
   // Insert all symbols in an xfsm transducer alphabet (sigma) into
   // the alphabet of an HfstBasicTransducer.
   void copy_xfsm_alphabet_into_hfst_alphabet(NETptr t, HfstBasicTransducer * fsm)
@@ -120,28 +138,42 @@ namespace hfst { namespace implementations
     STATEptr state_ptr = t->body.states;
     STATEptr start_ptr = t->start.state;
 
-    // For each state in t, create an equivalent state in result and make it
-    // final, if needed.
+    // Create states in result
     while (state_ptr != NULL)
       {
-        HfstState new_state;
+        // initial state exists already
+        if (state_ptr != start_ptr) 
+          {
+            (void)result->add_state();
+          }
+        state_ptr = state_ptr->next;
+      }
+    state_ptr = t->body.states;
+
+    // For each state in t, map the state into a state in result and make it final,
+    // if needed. States of t are stored in a stack, so we start numbering states of
+    // result from the biggest state number.
+    HfstState result_state = result->get_max_state();
+    while (state_ptr != NULL)
+      {
         if (state_ptr == start_ptr) 
           {
             // initial state exists already in result
-            new_state = 0;
-            xfsm_to_hfst_state[state_ptr] = new_state; 
+            xfsm_to_hfst_state.insert(std::pair<STATEptr, HfstState>(state_ptr, 0));
+            if (state_ptr->final != 0) 
+              {
+                result->set_final_weight(0, 0);
+              }
           }            
         else
           {
-            new_state = result->add_state();
-            xfsm_to_hfst_state[state_ptr] = new_state;
-          }
-
-        if (state_ptr->final != 0) 
-          {
-            result->set_final_weight(new_state, 0);
-          }
-          
+            xfsm_to_hfst_state.insert(std::pair<STATEptr, HfstState>(state_ptr, result_state));
+            if (state_ptr->final != 0) 
+              {
+                result->set_final_weight(result_state, 0);
+              }
+            --result_state;
+          }          
         state_ptr = state_ptr->next;
       }
 
@@ -223,7 +255,7 @@ namespace hfst { namespace implementations
             std::string osymbol = tr_it->get_output_symbol();
             HfstState target_state =  tr_it->get_target_state();
 
-            id_type ti;
+            id_type ti = symbol_pair_to_label_id(isymbol, osymbol);
 
             if (isymbol == hfst::internal_identity)
               {
