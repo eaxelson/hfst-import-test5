@@ -4070,7 +4070,7 @@ namespace xfst {
     if (use_readline_ && file == stdin)
       {
         char *buf = NULL;               // result from readline
-        rl_bind_key('\t',rl_abort);     // disable auto-complet
+        rl_bind_key('\t',rl_insert);     // disable auto-complet
         
         if((buf = readline(promptstr.c_str())) != NULL)
           {
