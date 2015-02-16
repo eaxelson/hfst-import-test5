@@ -5,28 +5,37 @@
 # hfst-pmatch, hfst-pmatch2fst, hfst-twolc and hfst-proc.
 #
 
-ENVIRONMENT=
-SHOW_LINKS=
+# recognize whther we are on Linux or Mac
+ENVIRONMENT=      # linux/mac
+SHOW_LINKS=       # ldd/otool -L
 CONFIGURE_ARGS='--enable-xfst --with-readline --enable-foma-wrapper=no'
+DYLIB_EXTENSION=  # so/dylib
 if (uname -a | grep 'Linux'); then
     ENVIRONMENT='Linux';
     SHOW_LINKS='ldd';
-#   CONFIGURE_ARGS is ok as such 
+#   CONFIGURE_ARGS are ok as such 
+    DYLIB_EXTENSION='so';
+    echo "generating for Linux environment"
 elif (uname -a | grep 'Darwin'); then
     ENVIRONMENT='Mac';
     SHOW_LINKS='otool -L'
     CONFIGURE_ARGS=$CONFIGURE_ARGS' --disable-dependency-tracking CFLAGS="-arch i386 -arch x86_64" CXXFLAGS="-arch i386 -arch x86_64" LDFLAGS="-arch i386 -arch x86_64"'
+    DYLIB_EXTENSION='dylib'
+    echo "generating for Mac environment"
 else
-    echo "Unknown environment"
+    echo "Unknown environment, exiting program"
     exit 1
 fi
 
+# compile tool given as first argument and link it statically to libhfst
 compile_statically ()
 {
     echo "compiling "$1"..."
+    # compile tool normally but save the commands in log file
     make $1 > LOG
     echo "linking "$1" statically..."
-    grep 'libtool: link:' LOG | sed 's/libhfst.so/libhfst.a/; s/libtool: link: //' | sh
+    # tweak the link command to make libhfst linking static
+    grep 'libtool: link:' LOG | sed 's/libhfst.'$DYLIB_EXTENSION'/libhfst.a/; s/libtool: link: //' | sh
     if ($SHOW_LINKS .libs/$1 | grep 'libhfst'); then
         echo "static linking of libhfst failed foor tool "$1
         exit 1
@@ -36,8 +45,10 @@ compile_statically ()
 
 autoreconf -i && ./configure $CONFIGURE_ARGS
 
+# these are needed for compiling individual tools
 cd back-ends && make && cd ../libhfst/src && make
 
+# compile all eight tools
 cd ../../tools/src/parsers &&
 compile_statically hfst-xfst &&
 cd ../../../tools/src &&
@@ -52,11 +63,3 @@ cd ../../../tools/src/hfst-twolc/src &&
 compile_statically htwolcpre1 &&
 compile_statically htwolcpre2 &&
 compile_statically htwolcpre3
-
-
-# Mac: libhfst.dylib
-# tweak binary compilation by changing from dynamic libhfst linking to static one
-
-
-
-# make "-arch i386 -arch x86_64" for CFLAGS, CXXFLAGS and LDFLAGS and --disable-dependency-tracking. Mac's readline does not find 'rl_abort' in hfst-xfst, so it should be commented out.
