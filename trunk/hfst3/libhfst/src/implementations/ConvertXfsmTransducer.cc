@@ -31,82 +31,11 @@ namespace hfst { namespace implementations
 
 #if HAVE_XFSM
 
-  // Convert between HfstBasicTransducer and xfsm transducer one-side symbols.
-  // The identity symbol must be handled separately.
-  static id_type hfst_symbol_to_xfsm_symbol(const std::string & symbol)
-  {
-    if (symbol == hfst::internal_epsilon)
-      return EPSILON;
-    else if (symbol == hfst::internal_unknown)
-      return OTHER;
-    else if (symbol == hfst::internal_identity)
-      throw "hfst_symbol_to_xfsm_symbol does not accept the identity symbol as its argument";
-    else
-      return single_to_id(symbol.c_str());
-  }
-
-  // Convert between xfsm transducer and HfstBasicTransducer one-side symbols.
-  // The identity symbol must be handled separately.
-  static std::string xfsm_symbol_to_hfst_symbol(id_type id)
-  {
-    if (id == EPSILON)
-      return hfst::internal_epsilon;
-    else if (id == OTHER)
-      return hfst::internal_unknown;
-    else {
-      std::string retval("");
-      LABELptr lptr = id_to_label(id);
-      FAT_STR fs = lptr->content.name;
-      while (*fs != '\0')
-        {
-          retval.append(1, *fs);
-          ++fs;
-        }
-      return retval;
-    }
-  }
-
-  // Convert between an xfsm label (symbol pair) and hfst transition symbols.
-  void label_id_to_symbol_pair(id_type label_id, std::string & isymbol, std::string & osymbol)
-  {
-    // (1) atomic OTHER label -> identity pair
-    if (label_id == OTHER)
-      {
-        isymbol = hfst::internal_identity;
-        osymbol = hfst::internal_identity;
-      }
-    else
-      {
-        // (2) non-atomic OTHER label -> unknown pair
-        // (3) all other cases
-        id_type upperid = upper_id(label_id);
-        id_type lowerid = lower_id(label_id);
-        isymbol = xfsm_symbol_to_hfst_symbol(upperid);
-        osymbol = xfsm_symbol_to_hfst_symbol(lowerid);
-      }
-  }
-
-  id_type symbol_pair_to_label_id(const std::string & isymbol, const std::string & osymbol)
-  {
-    if (isymbol == hfst::internal_identity)
-      {
-        if (osymbol != hfst::internal_identity)
-          throw "identity symbol cannot be on one side only";
-        // atomic OTHER label
-        return OTHER;
-      }
-    else
-      {
-        id_type input_id = hfst_symbol_to_xfsm_symbol(isymbol);
-        id_type output_id = hfst_symbol_to_xfsm_symbol(osymbol);
-        return id_pair_to_id(input_id, output_id);
-      }
-  }
-
+#include "XfsmTransducer.h"
 
   // Insert all symbols in an xfsm transducer alphabet (sigma) into
   // the alphabet of an HfstBasicTransducer.
-  void copy_xfsm_alphabet_into_hfst_alphabet(NETptr t, HfstBasicTransducer * fsm)
+  static void copy_xfsm_alphabet_into_hfst_alphabet(NETptr t, HfstBasicTransducer * fsm)
     {
       ALPHABETptr alpha_ptr = net_sigma(t);
       ALPH_ITptr alpha_it_ptr = start_alph_iterator(NULL, alpha_ptr);
@@ -114,7 +43,7 @@ namespace hfst { namespace implementations
       
       while(label_id != ID_NO_SYMBOL)
         {
-          std::string symbol = xfsm_symbol_to_hfst_symbol(label_id);
+          std::string symbol = XfsmTransducer::xfsm_symbol_to_hfst_symbol(label_id);
           fsm->add_symbol_to_alphabet(symbol);
           label_id = next_alph_id(alpha_it_ptr);
         }
@@ -187,7 +116,7 @@ namespace hfst { namespace implementations
           {
             id_type label_id = arc_ptr->label;
             std::string isymbol, osymbol;
-            label_id_to_symbol_pair(label_id, isymbol, osymbol);
+            XfsmTransducer::label_id_to_symbol_pair(label_id, isymbol, osymbol);
             
             STATEptr target_state_ptr = arc_ptr->destination;
 
@@ -255,7 +184,7 @@ namespace hfst { namespace implementations
             std::string osymbol = tr_it->get_output_symbol();
             HfstState target_state =  tr_it->get_target_state();
 
-            id_type ti = symbol_pair_to_label_id(isymbol, osymbol);
+            id_type ti = XfsmTransducer::symbol_pair_to_label_id(isymbol, osymbol);
 
             if (isymbol == hfst::internal_identity)
               {
@@ -266,8 +195,8 @@ namespace hfst { namespace implementations
               }
             else
               {
-                id_type input_id = hfst_symbol_to_xfsm_symbol(isymbol);
-                id_type output_id = hfst_symbol_to_xfsm_symbol(osymbol);
+                id_type input_id = XfsmTransducer::hfst_symbol_to_xfsm_symbol(isymbol);
+                id_type output_id = XfsmTransducer::hfst_symbol_to_xfsm_symbol(osymbol);
                 ti = id_pair_to_id(input_id, output_id);
               }
 
@@ -298,13 +227,8 @@ namespace hfst { namespace implementations
       {
         if (hfst::is_epsilon(*it) || hfst::is_unknown(*it) || hfst::is_identity(*it))
           continue;
-        (void) alph_add_to(ap, hfst_symbol_to_xfsm_symbol(it->c_str()), DONT_KEEP);
+        (void) alph_add_to(ap, XfsmTransducer::hfst_symbol_to_xfsm_symbol(it->c_str()), DONT_KEEP);
       }    
-
-    // TESTING...
-    //NETptr unk2unk = XfsmTransducer::create_xfsm_unknown_to_unknown_transducer();
-    //NETptr id2id = XfsmTransducer::create_xfsm_identity_to_identity_transducer();
-    //NETptr comp = compose_net(result, unk2unk, DONT_KEEP, DONT_KEEP);
 
     return result;
   }

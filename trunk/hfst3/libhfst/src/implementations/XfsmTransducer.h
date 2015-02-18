@@ -42,6 +42,22 @@ namespace hfst {
     static void initialize_xfsm();
     static NETptr create_xfsm_unknown_to_unknown_transducer();
     static NETptr create_xfsm_identity_to_identity_transducer();
+    static id_type hfst_symbol_to_xfsm_symbol(const std::string & symbol);
+    static std::string xfsm_symbol_to_hfst_symbol(id_type id);
+    static void label_id_to_symbol_pair(id_type label_id, std::string & isymbol, std::string & osymbol);
+    static id_type symbol_pair_to_label_id(const std::string & isymbol, const std::string & osymbol);
+
+    static NETptr create_empty_transducer(void);
+    static NETptr create_epsilon_transducer(void);
+    static NETptr define_transducer(const hfst::StringPairVector &spv);
+    static NETptr define_transducer
+      (const hfst::StringPairSet &sps, bool cyclic=false);
+    static NETptr define_transducer(const std::vector<StringPairSet> &spsv);
+    static NETptr define_transducer
+      (const std::string &symbol);
+    static NETptr define_transducer
+      (const std::string &isymbol, const std::string &osymbol);
+    static NETptr copy(NETptr t);
   } ;
 } }
 #endif
