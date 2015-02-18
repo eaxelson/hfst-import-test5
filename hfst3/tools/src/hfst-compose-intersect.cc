@@ -337,8 +337,28 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
           {
             harmonize_rules(lexicon, rules);
           }
+       
+        // To hopefully speed up stuff: Compose intersect the output
+        // of the lexicon with the rules and then compose the original
+        // lexicon with the result.
 
-        lexicon.compose_intersect(rules,invert);
+        if (invert)
+          {
+            HfstTransducer lexicon_input(lexicon);
+            lexicon_input.input_project().minimize();
+            lexicon_input.compose_intersect(rules,true);
+
+            lexicon_input.compose(lexicon);
+            lexicon = lexicon_input;
+          }
+        else
+          {
+            HfstTransducer lexicon_output(lexicon);
+            lexicon_output.output_project().minimize();
+            lexicon_output.compose_intersect(rules,false);
+            lexicon.compose(lexicon_output);
+          }
+
         char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
                                                         (strlen(lexiconname) +
                                                          strlen(secondfilename) +
