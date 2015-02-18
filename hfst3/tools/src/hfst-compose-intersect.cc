@@ -58,6 +58,7 @@ using hfst::HfstTransducerVector;
 // intersection of the rules.
 static bool invert=false;
 static bool encode_weights=false;
+static bool fast_ci=false;
 static bool harmonize=true;
 
 void
@@ -74,6 +75,8 @@ print_usage()
             "                               rules with the lexicon instead\n"
             "                               of composing the lexicon with\n"
             "                               the intersection of the rules.\n"
+            "  -f, --fast                   Faster compose instersect using\n"
+            "                               more memory.\n"
             "  -e, --encode-weights         Encode weights when minimizing\n"
             "                               (default is false).\n"
             "  -H, --do-not-harmonize       Do not harmonize symbols.\n"
@@ -111,11 +114,12 @@ parse_options(int argc, char** argv)
           HFST_GETOPT_BINARY_LONG,
           {"invert", no_argument, 0, 'I'},
           {"encode-weights", no_argument, 0, 'e'},
+          {"fast", no_argument, 0, 'f'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_BINARY_SHORT "FIeH",
+                             HFST_GETOPT_BINARY_SHORT "FIeHf",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -131,6 +135,9 @@ parse_options(int argc, char** argv)
           break;
         case 'e':
           encode_weights = true;
+          break;
+        case 'f':
+          fast_ci = true;
           break;
         case 'H':
           harmonize = false;
@@ -337,26 +344,33 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
           {
             harmonize_rules(lexicon, rules);
           }
-       
-        // To hopefully speed up stuff: Compose intersect the output
-        // of the lexicon with the rules and then compose the original
-        // lexicon with the result.
 
-        if (invert)
+        if (fast_ci)
           {
-            HfstTransducer lexicon_input(lexicon);
-            lexicon_input.input_project().minimize();
-            lexicon_input.compose_intersect(rules,true);
-
-            lexicon_input.compose(lexicon);
-            lexicon = lexicon_input;
+            // To hopefully speed up stuff: Compose intersect the output
+            // of the lexicon with the rules and then compose the original
+            // lexicon with the result.
+            
+            if (invert)
+              {
+                HfstTransducer lexicon_input(lexicon);
+                lexicon_input.input_project().minimize();
+                lexicon_input.compose_intersect(rules,true);
+                
+                lexicon_input.compose(lexicon);
+                lexicon = lexicon_input;
+              }
+            else
+              {
+                HfstTransducer lexicon_output(lexicon);
+                lexicon_output.output_project().minimize();
+                lexicon_output.compose_intersect(rules,false);
+                lexicon.compose(lexicon_output);
+              }
           }
         else
           {
-            HfstTransducer lexicon_output(lexicon);
-            lexicon_output.output_project().minimize();
-            lexicon_output.compose_intersect(rules,false);
-            lexicon.compose(lexicon_output);
+            lexicon.compose_intersect(rules,invert);
           }
 
         char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
