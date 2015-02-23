@@ -38,6 +38,9 @@ namespace hfst
 #if HAVE_FOMA
     class FomaInputStream;
 #endif    
+#if HAVE_XFSM
+    class XfsmInputStream;
+#endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
     class MyTransducerLibraryInputStream;
 #endif
@@ -108,6 +111,9 @@ For documentation on the HFST binary transducer format, see
 #endif
 #if HAVE_FOMA
       hfst::implementations::FomaInputStream * foma;
+#endif
+#if HAVE_XFSM
+      hfst::implementations::XfsmInputStream * xfsm;
 #endif
 
 #if HAVE_MY_TRANSDUCER_LIBRARY
@@ -187,6 +193,8 @@ For documentation on the HFST binary transducer format, see
       SFST_, 
       /* A foma transducer. */ 
       FOMA_, 
+      /* An xfsm transducer. */
+      XFSM_,
       /* Your transducer type */
       //MY_TRANSDUCER_LIBRARY_,
       /* Transducer type not recognized. */ 
