@@ -37,6 +37,9 @@ namespace hfst
 #if HAVE_FOMA
     class FomaOutputStream;
 #endif    
+#if HAVE_XFSM
+    class XfsmOutputStream;
+#endif    
 #if HAVE_MY_TRANSDUCER_LIBRARY
     class MyTransducerLibraryOutputStream;
 #endif
@@ -80,6 +83,9 @@ For more information on HFST transducer structure, see
 #endif
 #if HAVE_FOMA
       hfst::implementations::FomaOutputStream * foma;
+#endif
+#if HAVE_XFSM
+      hfst::implementations::XfsmOutputStream * xfsm;
 #endif
 
 #if HAVE_MY_TRANSDUCER_LIBRARY

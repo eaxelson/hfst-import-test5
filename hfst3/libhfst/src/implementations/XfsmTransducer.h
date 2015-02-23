@@ -37,6 +37,47 @@
 namespace hfst {
   namespace implementations
 {
+
+  class XfsmInputStream
+  {
+  private:
+    std::string filename;
+    FILE * input_file;
+    void skip_identifier_version_3_0(void);
+    void skip_hfst_header(void);
+  public:
+    XfsmInputStream(void);
+    XfsmInputStream(const std::string &filename);
+    void close(void);
+    bool is_eof(void);
+    bool is_bad(void);
+    bool is_good(void);
+    bool is_fst(void);
+    void ignore(unsigned int);
+    NETptr read_transducer();
+
+    char stream_get();
+    short stream_get_short();
+    void stream_unget(char c);
+
+    static bool is_fst(FILE * f);
+    static bool is_fst(std::istream &s);
+  };
+
+  class XfsmOutputStream
+  {
+  private:
+    std::string filename;
+    FILE *ofile;
+    //void write_3_0_library_header(FILE *file);
+  public:
+    XfsmOutputStream(void);
+    XfsmOutputStream(const std::string &filename);
+    void close(void);
+    void write(const char &c);
+    void write_transducer(NETptr transducer);
+  };
+
   class XfsmTransducer {
   public:
     static void initialize_xfsm();
@@ -58,6 +99,7 @@ namespace hfst {
     static NETptr define_transducer
       (const std::string &isymbol, const std::string &osymbol);
     static NETptr copy(NETptr t);
+    static NETptr read_net(FILE * f);
   } ;
 } }
 #endif

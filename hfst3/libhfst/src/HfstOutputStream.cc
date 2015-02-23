@@ -54,6 +54,12 @@ namespace hfst
           new hfst::implementations::FomaOutputStream();
         break;
 #endif
+#if HAVE_XFSM
+      case XFSM_TYPE:
+        implementation.xfsm = 
+          new hfst::implementations::XfsmOutputStream(); // throws error, not implemented
+        break;
+#endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
       case MY_TRANSDUCER_LIBRARY_TYPE:
         implementation.my_transducer_library = 
@@ -116,6 +122,12 @@ namespace hfst
           new hfst::implementations::FomaOutputStream(filename);
         break;
 #endif
+#if HAVE_XFSM
+      case XFSM_TYPE:
+        implementation.xfsm = 
+          new hfst::implementations::XfsmOutputStream(filename);
+        break;
+#endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
       case MY_TRANSDUCER_LIBRARY_TYPE:
         implementation.my_transducer_library =
@@ -159,6 +171,11 @@ namespace hfst
 #if HAVE_FOMA
       case FOMA_TYPE:
         delete implementation.foma;
+        break;
+#endif
+#if HAVE_XFSM
+      case XFSM_TYPE:
+        delete implementation.xfsm;
         break;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
@@ -218,6 +235,11 @@ namespace hfst
         implementation.foma->write(c);
         break;
 #endif
+#if HAVE_XFSM
+      case XFSM_TYPE:
+        implementation.xfsm->write(c);
+        break;
+#endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
       case MY_TRANSDUCER_LIBRARY_TYPE:
         implementation.my_transducer_library->write(c);
@@ -262,6 +284,11 @@ namespace hfst
 #if HAVE_FOMA
       case FOMA_TYPE:
         type_value=std::string("FOMA");
+        break;
+#endif
+#if HAVE_XFSM
+      case XFSM_TYPE:
+        type_value=std::string("XFSM");
         break;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
@@ -425,6 +452,12 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
           (transducer.implementation.foma);
         return *this;
 #endif
+#if HAVE_XFSM
+      case XFSM_TYPE:
+        implementation.xfsm->write_transducer
+          (transducer.implementation.xfsm);
+        return *this;
+#endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
       case MY_TRANSDUCER_LIBRARY_TYPE:
         implementation.my_transducer_library->write_transducer
@@ -462,6 +495,11 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
 #if HAVE_FOMA
       case FOMA_TYPE:
         implementation.foma->close();
+        break;
+#endif
+#if HAVE_XFSM
+      case XFSM_TYPE:
+        implementation.xfsm->close();
         break;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY

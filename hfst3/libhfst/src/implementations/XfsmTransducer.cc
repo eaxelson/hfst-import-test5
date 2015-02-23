@@ -11,6 +11,7 @@
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "XfsmTransducer.h"
+#include <cstring>
 
 #ifndef MAIN_TEST
 namespace hfst { namespace implementations {
@@ -21,6 +22,174 @@ namespace hfst { namespace implementations {
       (void) set_char_encoding(cntxt, CHAR_ENC_UTF_8);
     }
 
+
+  // ---------- XfsmInputStream functions ----------
+
+    /** Create a XfsmInputStream that reads from stdin. */
+  XfsmInputStream::XfsmInputStream(void)
+  {
+    input_file = stdin;
+  }
+    /** Create a XfsmInputStream that reads from file \a filename. */
+    XfsmInputStream::XfsmInputStream(const std::string &filename_):
+      filename(std::string(filename_))
+  {
+    if (filename == std::string())
+      { input_file = stdin; }
+    else {
+      input_file = fopen(filename.c_str(),"r");
+      if (input_file == NULL)
+        { 
+          HFST_THROW(StreamNotReadableException); }
+    }
+  }
+
+    /** Close the stream. */
+  void XfsmInputStream::close(void)
+  {
+    if (input_file == NULL)
+      { return; }
+    if (filename.c_str()[0] != 0)
+      {
+    fclose(input_file);
+    input_file = NULL;
+      }
+  }
+  
+  char XfsmInputStream::stream_get() {
+    return (char) fgetc(input_file); }
+
+  short XfsmInputStream::stream_get_short() 
+  {
+    short i;
+    assert(1 == fread(&i,sizeof(i),1,input_file));
+    return i;
+  }
+
+  void XfsmInputStream::stream_unget(char c) {
+    ungetc ( (int)c, input_file ); }
+
+  bool XfsmInputStream::is_eof(void)
+  {
+    int c = getc(input_file);
+    bool retval = (feof(input_file) != 0);
+    ungetc(c, input_file);
+    return retval;
+  }
+  
+  bool XfsmInputStream::is_bad(void)
+  {
+    return is_eof();
+  }
+  
+  bool XfsmInputStream::is_good(void)
+  {
+    return not is_bad();
+  };
+  
+  bool XfsmInputStream::is_fst(void)
+  {
+    return is_fst(input_file);
+  }
+  
+  bool XfsmInputStream::is_fst(FILE * f)
+  {
+    if (f == NULL)
+      { return false; }
+    int c = getc(f);
+    ungetc(c, f);
+    return c == 31 || c == (int)'#';
+  }
+  
+  bool XfsmInputStream::is_fst(std::istream &s)
+  {
+    int c = s.peek();
+    return s.good() && (c == 31 || c == (int)'#');
+  }
+
+  /* Skip the identifier string "FOMA_TYPE" */
+  void XfsmInputStream::skip_identifier_version_3_0(void)
+  { 
+    char foma_identifier[10];
+    int foma_id_count = fread(foma_identifier,10,1,input_file);
+    if (foma_id_count != 1)
+      { 
+        HFST_THROW(NotTransducerStreamException); }
+    if (0 != strcmp(foma_identifier,"FOMA_TYPE"))
+      {
+        HFST_THROW(NotTransducerStreamException); }
+  }
+  
+  void XfsmInputStream::skip_hfst_header(void)
+  {
+    char hfst_header[6];
+    int header_count = fread(hfst_header,6,1,input_file);
+    if (header_count != 1)
+      {  
+        HFST_THROW(NotTransducerStreamException); }
+    try { skip_identifier_version_3_0(); }
+    catch (const HfstException e)
+      { throw e; }
+  }
+
+    void XfsmInputStream::ignore(unsigned int n)
+    { 
+      for (unsigned int i=0; i<n; i++)
+    fgetc(input_file);
+    }
+
+  NETptr XfsmInputStream::read_transducer()
+  {
+    if (is_eof())
+      return NULL;
+    NETptr t = XfsmTransducer::read_net(input_file);
+    if (t == NULL) {
+      HFST_THROW(NotTransducerStreamException);
+    }
+    return t;
+  };
+
+    XfsmOutputStream::XfsmOutputStream(void)
+    { /*ofile = stdout;*/ 
+      throw "XfsmOutputStream::XfsmOutputStream() not supported";
+    }
+
+    XfsmOutputStream::XfsmOutputStream(const std::string &str):
+      filename(std::string(str))
+    {
+      if (filename != std::string()) {
+        ofile = fopen(filename.c_str(), "wb");
+        if (ofile == NULL) {
+          HFST_THROW(StreamNotReadableException);
+        }
+      }
+      else {
+        throw "XfsmOutputStream::XfsmOutputStream(\"\") not supported";
+        /*ofile = stdout;*/
+      }
+    }
+
+    void XfsmOutputStream::close(void)
+    {
+      if (filename != std::string())
+        { fclose(ofile); }
+    }
+
+    void XfsmOutputStream::write(const char &c)
+    {
+      fputc(c,ofile);
+    }
+
+    void XfsmOutputStream::write_transducer(NETptr transducer) 
+    {
+      FST_CNTXTptr cptr = get_default_cfsm_context();
+      char * fn = strdup(filename.c_str());
+      if (save_net(transducer, fn, cptr) != 0)
+        HFST_THROW_MESSAGE
+          (HfstFatalException,
+           "an error happened when writing an xfsm transducer");
+      // free(fn) ?
+    }
 
     static id_type hfst_symbol_to_xfsm_symbol(const std::string & symbol);
     static std::string xfsm_symbol_to_hfst_symbol(id_type id);
@@ -142,6 +311,8 @@ namespace hfst { namespace implementations {
 
     NETptr XfsmTransducer::copy(NETptr t) { return NULL; }
 
+    NETptr XfsmTransducer::read_net(FILE * f)  { return NULL; }
+
   } }
 
 #else // MAIN_TEST was defined
@@ -157,4 +328,3 @@ int main(int argc, char * argv[])
     return EXIT_SUCCESS;
 }
 #endif // MAIN_TEST
-
