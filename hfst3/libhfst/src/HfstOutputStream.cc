@@ -342,10 +342,12 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
   {
     if (not this->is_open) {
       HFST_THROW(StreamIsClosedException); }
+#if HAVE_XFSM
     if (type == XFSM_TYPE)
       {
         implementation.xfsm->flush();
       }
+#endif
     return *this;
   }
 
