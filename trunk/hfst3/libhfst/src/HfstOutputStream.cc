@@ -80,11 +80,12 @@ namespace hfst
       }
     this->is_open=true;
   }
+
   // FIXME: HfstOutputStream takes a string parameter, 
   //        HfstInputStream a const char*
   HfstOutputStream::HfstOutputStream
-  (const std::string &filename,ImplementationType type, bool hfst_format):
-    type(type), hfst_format(hfst_format), is_open(false)
+  (const std::string &filename,ImplementationType type, bool hfst_format_):
+    type(type), hfst_format(hfst_format_), is_open(false)
   { 
     if (not HfstTransducer::is_implementation_type_available(type)) {
       HFST_THROW(ImplementationTypeNotAvailableException);
@@ -124,6 +125,9 @@ namespace hfst
 #endif
 #if HAVE_XFSM
       case XFSM_TYPE:
+        /* XFSM api only offers a function that reads transducers that takes a filename argument. 
+           That is why we don't write an HFST header. */
+        hfst_format = false; 
         implementation.xfsm = 
           new hfst::implementations::XfsmOutputStream(filename);
         break;
@@ -237,7 +241,7 @@ namespace hfst
 #endif
 #if HAVE_XFSM
       case XFSM_TYPE:
-        implementation.xfsm->write(c);
+        throw "operation XfsmOutputStream::write(const char &c) not supported";
         break;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
@@ -334,6 +338,17 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
       }
   }
 
+  HfstOutputStream &HfstOutputStream::flush()
+  {
+    if (not this->is_open) {
+      HFST_THROW(StreamIsClosedException); }
+    if (type == XFSM_TYPE)
+      {
+        implementation.xfsm->flush();
+      }
+    return *this;
+  }
+
   HfstOutputStream &HfstOutputStream::redirect (HfstTransducer &transducer)
   {
     return this->operator<<(transducer);
@@ -382,8 +397,12 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
        HFST version 3.0 header must contain at least the attributes 'version', 
        'type' and 'name' and their values. Implementation-specific attributes
        can follow after these obligatory attributes.
+
+       Note: in XFSM format, we never write the HFST header. hfst_format is always
+       false if the stream is of XFSM format.
      */
     if (hfst_format) {
+
       const int MAX_HEADER_LENGTH=65535;
 
       // collect the header data here
@@ -453,6 +472,7 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
         return *this;
 #endif
 #if HAVE_XFSM
+        /* This stores the transducer in a list that is written only when flush() is called. */
       case XFSM_TYPE:
         implementation.xfsm->write_transducer
           (transducer.implementation.xfsm);

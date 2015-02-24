@@ -140,11 +140,20 @@ For more information on HFST transducer structure, see
     /** \brief Destructor. */
     ~HfstOutputStream(void);  
 
+    /** \brief Flush the stream.
+
+     If the stream is of XFSM_TYPE, all transducers inserted with the operator<<
+     are actually written to the stream. Else, does nothing. */
+    HfstOutputStream &flush();
+
     /** \brief Write the transducer \a transducer in binary format 
         to the stream. 
 
         All transducers must have the same type as the stream, else a
         TransducerTypeMismatchException is thrown. 
+
+        If the stream is of XFSM_TYPE, \a transducer is stored to a list
+        and written when flush() is called for the stream.
 
         @throws TransducerTypeMismatchException
     */
