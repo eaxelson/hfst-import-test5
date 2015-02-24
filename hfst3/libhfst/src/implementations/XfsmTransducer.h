@@ -38,44 +38,58 @@ namespace hfst {
   namespace implementations
 {
 
+  /* A class for reading XFSM binary transducers from a file. */
   class XfsmInputStream
   {
   private:
+    /* The name of the file where transducers will be read from. */
     std::string filename;
-    FILE * input_file;
-    void skip_identifier_version_3_0(void);
-    void skip_hfst_header(void);
+    /* A list of transducers that will return transducers one by one when 
+       read_transducer() is called. */
+    NVptr net_list;
+    /* The size of net_list. */
+    int list_size;
+    /* The position of the transducer that read_transducer() will return. */
+    int list_pos;
   public:
+    /* Throws an error. */
     XfsmInputStream(void);
+    /* A stream that will read transducers from file \a filename. */
     XfsmInputStream(const std::string &filename);
+    /* Frees the memory allocated for this XfsmInputStream. */
     void close(void);
+    /* Whether there are any transducers left in net_list. */
     bool is_eof(void);
+    /* Whether the stream is bad for reading, always false. */
     bool is_bad(void);
+    /* Whether the stream is good for reading, always true. */
     bool is_good(void);
+    /* Whether the next item returned by read_transducer() is a valid
+       XFSM transducer. Basically always true, except if is_eof() is true. */
     bool is_fst(void);
-    void ignore(unsigned int);
+    /* Delayed read, returns a transducer from net_list. */
     NETptr read_transducer();
-
-    char stream_get();
-    short stream_get_short();
-    void stream_unget(char c);
-
-    static bool is_fst(FILE * f);
-    static bool is_fst(std::istream &s);
   };
 
+  /* A class for writing XFSM transducers in binary format to a file. */
   class XfsmOutputStream
   {
   private:
+    /* The name of the file where transducers will be written. */
     std::string filename;
-    FILE *ofile;
-    //void write_3_0_library_header(FILE *file);
+    /* A list of transducers to be written when flush() is called. */
+    NVptr net_list;
   public:
+    /* Throws an error. */
     XfsmOutputStream(void);
+    /* A stream that will write transducers into file \a filename. */
     XfsmOutputStream(const std::string &filename);
-    void close(void);
-    void write(const char &c);
-    void write_transducer(NETptr transducer);
+    /* Writes the contents of net_list into file filename. */
+    void flush();
+    /* Does nothing. */
+    void close();
+    /* Delayed write, stores a copy of \a transducer in net_list. */
+    void write_transducer(NETptr transducer); 
   };
 
   class XfsmTransducer {
@@ -99,7 +113,7 @@ namespace hfst {
     static NETptr define_transducer
       (const std::string &isymbol, const std::string &osymbol);
     static NETptr copy(NETptr t);
-    static NETptr read_net(FILE * f);
+
   } ;
 } }
 #endif
