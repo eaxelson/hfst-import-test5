@@ -20,6 +20,7 @@ namespace hfst { namespace implementations {
     {
       FST_CNTXTptr cntxt = initialize_cfsm();
       (void) set_char_encoding(cntxt, CHAR_ENC_UTF_8);
+      IY_VERBOSE = 0; // suppress messages
     }
 
 
@@ -51,7 +52,7 @@ namespace hfst { namespace implementations {
         fclose(input_file);
 
         char * fn = strdup(filename.c_str());
-        FST_CNTXTptr fst_cntxt = NULL; // ???
+        FST_CNTXTptr fst_cntxt = get_default_cfsm_context();
         net_list = load_nets(fn, fst_cntxt);
         free(fn);
         if (net_list == NULL)
