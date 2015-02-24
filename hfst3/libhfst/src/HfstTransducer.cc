@@ -1205,6 +1205,12 @@ HfstTransducer::~HfstTransducer(void)
         foma_interface.delete_foma(implementation.foma);
         break;
 #endif
+#if HAVE_XFSM
+    case XFSM_TYPE:
+      // FIX THIS: causes errors...
+      //delete implementation.xfsm;
+        break;
+#endif
     case HFST_OL_TYPE:
     case HFST_OLW_TYPE:
         delete implementation.hfst_ol;
