@@ -502,7 +502,7 @@ hfst_write(int fd, const void* buf, size_t count)
 int
 hfst_mkstemp(char* templ)
 {
-#ifdef WINDOWS
+#ifdef _WIN32
   error(EXIT_FAILURE, errno, 
         "'int hfst_mkstemp(char * temp1)' not implemented for windows");
 #else 
