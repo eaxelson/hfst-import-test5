@@ -56,9 +56,10 @@ else
   libhfst_la_LIBADD += $(top_builddir)/back-ends/openfst/src/lib/libfst.la
 endif
 
-#if WANT_XFSM
-#  libhfst_la_LIBADD += -lxfsm
-#endif
+if WINDOWS
+  libhfst_la_LIBADD += -ldl
+endif
+
 
 # we only have one library target but would like a particular includedir
 # structure for various headers, so we do this

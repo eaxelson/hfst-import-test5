@@ -33,7 +33,7 @@ using std::stack;
 
 #include <cstdarg>
 
-#ifndef WINDOWS
+#ifndef _WIN32
   #include <glob.h>
 #else
   #include <windows.h>
@@ -2493,7 +2493,7 @@ namespace xfst {
   XfstCompiler& 
   XfstCompiler::print_dir(const char* globdata, FILE* outfile)
     {
-#ifndef WINDOWS
+#ifndef _WIN32
       glob_t globbuf;
 
       int rv = glob(globdata, 0, NULL, &globbuf);
