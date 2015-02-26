@@ -70,6 +70,7 @@ print_usage()
     "  -b, --use-backend-format          Write result in implementation format, without any HFST wrappers\n"
     "  -S, --sfst                        Write output in (HFST's) SFST implementation\n"
     "  -F, --foma                        Write output in (HFST's) foma implementation\n"
+    "  -x, --xfsm                        Write output in native xfsm format\n"
     "  -t, --openfst-tropical            Write output in (HFST's) tropical weight (OpenFST) implementation\n"
     "  -l, --openfst-log                 Write output in (HFST's) log weight (OpenFST) implementation\n"
     "  -O, --optimized-lookup-unweighted Write output in the HFST optimized-lookup implementation\n"
@@ -79,8 +80,9 @@ print_usage()
     print_common_unary_program_parameter_instructions(message_out);
         fprintf(message_out, 
             "FMT must be name of a format usable by libhfst, i.e. one of the following:\n"
-        "{ foma, openfst-tropical, openfst-log, sfst,\n"
-        "  optimized-lookup-weighted, optimized-lookup-unweighted }.\n");
+        "{ foma, openfst-tropical, openfst-log, sfst, xfsm\n"
+        "  optimized-lookup-weighted, optimized-lookup-unweighted }.\n"
+        "Note that xfsm format is always written in native format without HFST wrappers.\n");
     fprintf(message_out, "\n");
     print_report_bugs();
     fprintf(message_out, "\n");
@@ -103,6 +105,7 @@ parse_options(int argc, char** argv)
           {"format",       required_argument, 0, 'f'},
           {"sfst",               no_argument, 0, 'S'},
           {"foma",               no_argument, 0, 'F'},
+          {"xfsm",               no_argument, 0, 'x'},
           {"openfst-tropical",    no_argument, 0, 't'},
           {"openfst-log",         no_argument, 0, 'l'},
           {"optimized-lookup-unweighted",   no_argument, 0, 'O'},
@@ -113,7 +116,7 @@ parse_options(int argc, char** argv)
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "SFtlOwQf:b",
+                             HFST_GETOPT_UNARY_SHORT "SFtlOwQf:bx",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -138,6 +141,9 @@ parse_options(int argc, char** argv)
         case 'F':
           output_type = hfst::FOMA_TYPE;
           break;
+        case 'x':
+          output_type = hfst::XFSM_TYPE;
+          break;
         case 't':
           output_type = hfst::TROPICAL_OPENFST_TYPE;
           break;
@@ -161,7 +167,7 @@ parse_options(int argc, char** argv)
     {
         error(EXIT_FAILURE, 0, 
               "You must specify an output type "
-              "(one of -S, -f, -t, -l, -O, or -w)");
+              "(one of -S, -F, -t, -x, -l, -O, or -w)");
     }
 
 #include "inc/check-params-common.h"
