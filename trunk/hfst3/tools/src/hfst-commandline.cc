@@ -295,6 +295,10 @@ hfst_parse_format_name(const char* s)
       {
         rv = hfst::FOMA_TYPE;
       }
+    else if (strcasecmp(s, "xfsm") == 0)
+      {
+        rv = hfst::XFSM_TYPE;
+      }
     else if ((strcasecmp(s, "optimized-lookup-unweighted") == 0) ||
              (strcasecmp(s, "olu") == 0))
       {

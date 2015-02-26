@@ -59,7 +59,7 @@ using hfst::HfstTransducerVector;
 static bool invert=false;
 static bool encode_weights=false;
 static bool fast_ci=false;
-static bool harmonize=true;
+static bool harmonize=false;
 
 void
 print_usage()
@@ -79,7 +79,7 @@ print_usage()
             "                               more memory.\n"
             "  -e, --encode-weights         Encode weights when minimizing\n"
             "                               (default is false).\n"
-            "  -H, --do-not-harmonize       Do not harmonize symbols.\n"
+            "  -a, --harmonize              Harmonize symbols.\n"
            );
         //print_common_binary_program_parameter_instructions(message_out);
         fprintf(message_out,
@@ -115,11 +115,12 @@ parse_options(int argc, char** argv)
           {"invert", no_argument, 0, 'I'},
           {"encode-weights", no_argument, 0, 'e'},
           {"fast", no_argument, 0, 'f'},
+          {"harmonize", no_argument, 0, 'a'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_BINARY_SHORT "FIeHf",
+                             HFST_GETOPT_BINARY_SHORT "FIeHfa",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -139,8 +140,8 @@ parse_options(int argc, char** argv)
         case 'f':
           fast_ci = true;
           break;
-        case 'H':
-          harmonize = false;
+        case 'a':
+          harmonize = true;
           break;
         }
     }
