@@ -100,6 +100,13 @@ hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
   {
     XfsmTransducer::initialize_xfsm();
   }
+
+  InitializeXfsm::InitializeXfsm()
+  {
+    initialize_xfsm();
+  }
+
+  InitializeXfsm dummy;
 #endif
 
 /* The default minimization algorithm if Hopcroft. */
@@ -1938,7 +1945,7 @@ HfstTransducer &HfstTransducer::minimize()
     &hfst::implementations::FomaTransducer::minimize,
 #endif
 #if HAVE_XFSM
-    NULL,
+    &hfst::implementations::XfsmTransducer::minimize,
 #endif
     /* Add here your implementation. */
     false );
