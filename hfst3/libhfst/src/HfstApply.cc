@@ -131,9 +131,9 @@ namespace hfst
 #if HAVE_XFSM
       case XFSM_TYPE:
         {
-          NETptr xfsm_temp = xfsm_funct(implementation.xfsm);
-          delete implementation.xfsm;
-          implementation.xfsm = xfsm_temp;
+          (void)xfsm_funct(implementation.xfsm);
+          //delete implementation.xfsm;
+          //implementation.xfsm = xfsm_temp;
           break;
         }
 #endif
