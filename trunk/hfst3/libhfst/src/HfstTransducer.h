@@ -119,7 +119,15 @@ namespace hfst
 
   // *** TESTING AND OPTIMIZATION...
 
+#if HAVE_XFSM
   void initialize_xfsm();
+
+  class InitializeXfsm
+  {
+  public:
+    InitializeXfsm();
+  };
+#endif
 
   enum MinimizationAlgorithm { HOPCROFT, BRZOZOWSKI };
   /* Which minimization algorithm is used. 
@@ -857,6 +865,7 @@ This will yield a file "testfile.att" that looks as follows:
         @see #write_in_att_format */
     void write_in_att_format(const std::string &filename, 
                              bool write_weights=true) const;
+
 
   public:
     /* \brief Call \a callback with some or all string pairs recognized 
