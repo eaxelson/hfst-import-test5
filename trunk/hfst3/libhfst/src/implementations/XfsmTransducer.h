@@ -113,6 +113,7 @@ namespace hfst {
     static NETptr define_transducer
       (const std::string &isymbol, const std::string &osymbol);
     static NETptr copy(NETptr t);
+    static NETptr minimize(NETptr t);
 
   } ;
 } }

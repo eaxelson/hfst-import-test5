@@ -276,6 +276,15 @@ namespace hfst { namespace implementations {
       return copy_net(t);
     }
 
+    NETptr XfsmTransducer::minimize(NETptr t) 
+    {
+      if (minimize_net(t) == 1)
+        {
+          HFST_THROW(HfstFatalException);
+        }
+      return t;
+    }
+
   } }
 
 #else // MAIN_TEST was defined
