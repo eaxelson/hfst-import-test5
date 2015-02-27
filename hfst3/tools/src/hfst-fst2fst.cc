@@ -203,6 +203,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         outstream << orig;
         free(inputname);
     }
+    outstream.flush(); // needed for xfsm transducers whose writing is delayed
     instream.close();
     outstream.close();
     return EXIT_SUCCESS;
@@ -232,7 +233,7 @@ int main( int argc, char **argv ) {
     verbose_printf("Reading from %s, writing to %s\n", 
         inputfilename, outfilename);
     char* format_description = hfst_strformat(output_type);
-    if (hfst_format) 
+    if (hfst_format && (output_type != hfst::XFSM_TYPE)) 
       {
         verbose_printf("Writing %s format transducers with HFST3 headers\n",
                        format_description);
@@ -243,6 +244,16 @@ int main( int argc, char **argv ) {
                        " headers\n", format_description);
       }
     free(format_description);
+
+    if (output_type == hfst::XFSM_TYPE)
+      {
+        if (strcmp(outfilename, "<stdout>") == 0) {
+          error(EXIT_FAILURE, 0, "Writing to standard output not supported for xfsm transducers,\n"
+                "use 'hfst-fst2fst [--output|-o] OUTFILE' instead");
+          return EXIT_FAILURE;
+        }
+      }
+
     // here starts the buffer handling part
     HfstInputStream* instream = NULL;
     try {
@@ -251,8 +262,15 @@ int main( int argc, char **argv ) {
     } catch(const HfstException e)  {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
+#if HAVE_XFSM
+        if (inputfile == stdin) {
+          error(EXIT_FAILURE, 0, "note that you cannot read xfsm transducers from standard input,\n"
+                "use hfst-fst2fst [--input|-i] INFILE instead");
+        }
+#endif
         return EXIT_FAILURE;
     }
+
     HfstOutputStream* outstream = (outfile != stdout) ?
       new HfstOutputStream(outfilename, output_type, hfst_format) :
       new HfstOutputStream(output_type, hfst_format);

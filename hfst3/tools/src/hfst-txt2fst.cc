@@ -174,6 +174,23 @@ process_stream(HfstOutputStream& outstream)
         }
       if (read_prolog_format)
         {
+
+          if (output_format == hfst::XFSM_TYPE)
+            {
+              try {
+                HfstTransducer * t = HfstTransducer::prolog_file_to_xfsm_transducer(inputfilename);
+                outstream << *t;
+                delete(t);
+                outstream.flush();
+                break;
+              }
+              catch (const HfstException & e) {
+                error(EXIT_FAILURE, 0, "Error when trying to convert text file (prolog) into xfsm format\n"
+                      "Note that the file may contain only one transducer in text format\n");
+                return EXIT_FAILURE;
+              }
+            }
+
           try {
             HfstBasicTransducer fsm = 
               HfstBasicTransducer::read_in_prolog_format(inputfile, linecount);
@@ -253,6 +270,28 @@ int main( int argc, char **argv )
         error(EXIT_FAILURE, 0, "Unknown format cannot be used as output\n");
         return EXIT_FAILURE;
       }
+
+    if (output_format == hfst::XFSM_TYPE)
+      {
+        if (strcmp(outfilename, "<stdout>") == 0) {
+          error(EXIT_FAILURE, 0, "Writing to standard output not supported for xfsm transducers,\n"
+                "use 'hfst-txt2fst [--output|-o] OUTFILE' instead");
+          return EXIT_FAILURE;
+        }
+        if (!read_prolog_format) {
+          error(EXIT_FAILURE, 0, "Writing in att format not supported for xfsm transducers,\n"
+                "use '--prolog' instead");
+          return EXIT_FAILURE;
+        }
+        if (strcmp(inputfilename, "<stdin>") == 0) {
+          error(EXIT_FAILURE, 0, "Reading prolog format from standard input not supported for xfsm transducers,\n"
+                "use 'hfst-txt2fst [--input|-i] INFILE' instead");
+          return EXIT_FAILURE;
+        }
+        else {}
+      }
+
+
     // here starts the buffer handling part
     HfstOutputStream* outstream = (outfile != stdout) ?
                 new HfstOutputStream(outfilename, output_format) :
