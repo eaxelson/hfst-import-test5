@@ -784,6 +784,11 @@ HfstTransducer::HfstTransducer(ImplementationType type):
         implementation.foma = foma_interface.create_empty_transducer();
         break;
 #endif
+#if HAVE_XFSM
+    case XFSM_TYPE:
+        implementation.xfsm = xfsm_interface.create_empty_transducer();
+        break;
+#endif
         /* Add here your implementation. */
         //#if HAVE_MY_TRANSDUCER_LIBRARY
     //case MY_TRANSDUCER_LIBRARY_TYPE:
@@ -4969,6 +4974,49 @@ void HfstTransducer::write_in_att_format
     // Implemented only for internal transducer format.
     hfst::implementations::HfstBasicTransducer net(*this);
     net.write_in_att_format(ofile, print_weights);
+}
+
+/* Implemented only for XFSM_TYPE. */
+void HfstTransducer::write_xfsm_transducer_in_att_format(const char * filename) const
+{
+  if (type != XFSM_TYPE)
+    HFST_THROW(FunctionNotImplementedException);
+#if HAVE_XFSM
+  hfst::implementations::XfsmTransducer::write_in_att_format
+    (const_cast<NETptr>(this->implementation.xfsm), filename);
+#endif
+}
+
+/* Implemented only for XFSM_TYPE. */
+void HfstTransducer::write_xfsm_transducer_in_prolog_format(const char * filename) const
+{
+  if (type != XFSM_TYPE)
+    HFST_THROW(FunctionNotImplementedException);
+#if HAVE_XFSM
+  hfst::implementations::XfsmTransducer::write_in_prolog_format
+    (const_cast<NETptr>(this->implementation.xfsm), filename);
+#endif
+}
+
+void HfstTransducer::write_in_prolog_format(FILE * file, const std::string & name,
+                                            bool write_weights)
+{
+  /* For big transducers, converting from xfsm is slow. */
+  if (type == XFSM_TYPE)
+    HFST_THROW(FunctionNotImplementedException);
+  HfstBasicTransducer fsm(*this);
+  fsm.write_in_prolog_format(file, name, write_weights);
+}
+
+HfstTransducer * HfstTransducer::prolog_file_to_xfsm_transducer(const char * filename)
+{
+#if HAVE_XFSM
+  HfstTransducer * retval = new HfstTransducer(hfst::XFSM_TYPE);
+  retval->implementation.xfsm = XfsmTransducer::prolog_file_to_xfsm_transducer(filename);
+  return retval;
+#else
+  HFST_THROW(FunctionNotImplementedException);
+#endif
 }
 
 HfstTransducer::HfstTransducer(FILE * ifile, 

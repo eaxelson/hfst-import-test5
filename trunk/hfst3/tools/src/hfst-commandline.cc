@@ -343,6 +343,9 @@ hfst_strformat(hfst::ImplementationType format)
     case hfst::FOMA_TYPE:
       return strdup("foma");
       break;
+    case hfst::XFSM_TYPE:
+      return strdup("xfsm");
+      break;
     case hfst::HFST_OL_TYPE:
       return strdup("Hfst's lookup optimized, unweighted");
       break;

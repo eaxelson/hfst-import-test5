@@ -285,6 +285,29 @@ namespace hfst { namespace implementations {
       return t;
     }
 
+    void XfsmTransducer::write_in_att_format(NETptr t, const char * filename)
+    {
+      HFST_THROW(HfstFatalException);
+    }
+
+    void XfsmTransducer::write_in_prolog_format(NETptr t, const char * filename)
+    {
+      char * f = strdup(filename);
+      if (write_prolog(t, f) != 0)
+        HFST_THROW(HfstFatalException);
+      free(f);
+    }
+
+    NETptr XfsmTransducer::prolog_file_to_xfsm_transducer(const char * filename)
+    {
+      char * f = strdup(filename);
+      NETptr retval = read_prolog(f);
+      if (retval == NULL)
+        HFST_THROW(HfstFatalException);
+      free(f);
+      return retval;
+    }
+
   } }
 
 #else // MAIN_TEST was defined

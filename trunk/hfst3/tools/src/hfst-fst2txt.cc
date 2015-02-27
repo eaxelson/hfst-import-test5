@@ -524,6 +524,11 @@ process_stream(HfstInputStream& instream, FILE* outf)
         }
         else
         { 
+          if (instream.get_type() == hfst::XFSM_TYPE) {
+            error(EXIT_FAILURE, 0, "Writing more than one transducer in text format to file not supported for xfsm transducers,\n"
+                  "use [hfst-head|hfst-tail|hfst-split] to extract individual transducers from input");
+            return EXIT_FAILURE;             
+          }
           verbose_printf("Converting %s..." SIZE_T_SPECIFIER "\n", inputname,
                          transducer_n); 
         }
@@ -538,7 +543,7 @@ process_stream(HfstInputStream& instream, FILE* outf)
           printw=true;
         else if (do_not_print_weights)
           printw=false;
-        else if ( (type == hfst::SFST_TYPE || type == hfst::FOMA_TYPE) )
+        else if ( (type == hfst::SFST_TYPE || type == hfst::FOMA_TYPE || type == hfst::XFSM_TYPE) )
           printw = false;
         else if ( (type == hfst::TROPICAL_OPENFST_TYPE || type == hfst::LOG_OPENFST_TYPE) )
           printw = true;
@@ -547,24 +552,41 @@ process_stream(HfstInputStream& instream, FILE* outf)
     switch (format)
       {
       case ATT_TEXT:
-        if (use_numbers)
+        if (use_numbers) // xfsm case checked earlier
           t->write_in_att_format_number(outf,printw);
-        else
+        else { // xfsm not yet supported
+          //if (type == hfst::XFSM_TYPE) // weights are never printed
+          //  t->write_xfsm_transducer_in_att_format(outfilename);
+          //else
           t->write_in_att_format(outf,printw);
+        }
         break;
-      case DOT_TEXT:
+      case DOT_TEXT: // xfsm case checked earlier
         print_dot(outf, *t);
         break;
-      case PCKIMMO_TEXT:
+      case PCKIMMO_TEXT: // xfsm case checked earlier
         print_pckimmo(outf, *t);
         break;
       case PROLOG_TEXT:
         {
-          HfstBasicTransducer fsm(*t);
-          std::string namestr = t->get_name();
-          if (namestr == "")
-            namestr = "NO_NAME";
-          fsm.write_in_prolog_format(outf,namestr,printw);
+          try 
+            {
+              if (type == hfst::XFSM_TYPE) {
+                t->write_xfsm_transducer_in_prolog_format(outfilename); // no name or weights printed
+              }
+              else {
+                std::string namestr = t->get_name();
+                if (namestr == "")
+                  namestr = "NO_NAME";
+                t->write_in_prolog_format(outf,namestr,printw);
+              }
+            }
+          catch (const HfstException & e)
+            {
+              std::string msg("");
+              msg = msg + "Error encountered when writing in prolog format: " + e.name;
+              error(EXIT_FAILURE, 0, msg.c_str());
+            }
           break;
         }
       default:
@@ -611,6 +633,36 @@ int main( int argc, char **argv )
               inputfilename);
         return EXIT_FAILURE;
     }
+
+    if (instream->get_type() == hfst::XFSM_TYPE)
+      {
+        if (format == DOT_TEXT) {
+          error(EXIT_FAILURE, 0, "Output format 'dot' not supported for xfsm transducers, use 'prolog'");
+          return EXIT_FAILURE; 
+        }
+        if (format == PCKIMMO_TEXT) {
+          error(EXIT_FAILURE, 0, "Output format 'pckimmo' not supported for xfsm transducers, use 'prolog'");
+          return EXIT_FAILURE; 
+        }
+        if (format == ATT_TEXT) {
+          error(EXIT_FAILURE, 0, "Output format 'att' not supported for xfsm transducers, use 'prolog'");
+          return EXIT_FAILURE; 
+        }
+        if (use_numbers) {
+          error(EXIT_FAILURE, 0, "Option '--use-numbers' not supported for xfsm transducers");
+          return EXIT_FAILURE; 
+        }
+        if (strcmp(inputfilename, "<stdin>") == 0) {
+          error(EXIT_FAILURE, 0, "Reading from standard input not supported for xfsm transducers,\n"
+                "use 'hfst-fst2txt [--input|-i] INFILE' instead");
+          return EXIT_FAILURE; 
+        }
+        if (strcmp(outfilename, "<stdout>") == 0) {
+          error(EXIT_FAILURE, 0, "Writing to standard output not supported for xfsm transducers,\n"
+                "use 'hfst-fst2txt [--output|-o] OUTFILE' instead");
+          return EXIT_FAILURE; 
+        }
+      }
     
     retval = process_stream(*instream, outfile);
 

@@ -115,6 +115,10 @@ namespace hfst {
     static NETptr copy(NETptr t);
     static NETptr minimize(NETptr t);
 
+    static void write_in_att_format(NETptr t, const char * filename);
+    static void write_in_prolog_format(NETptr t, const char * filename);
+    static NETptr prolog_file_to_xfsm_transducer(const char * filename);
+
   } ;
 } }
 #endif

@@ -428,6 +428,9 @@ An example:
       (const std::string &filename, ImplementationType type, 
        const std::string &epsilon_symbol);
 
+  public:
+    static HfstTransducer * prolog_file_to_xfsm_transducer(const char * filename);
+
 
     /* For debugging */
   public:
@@ -850,6 +853,14 @@ This will yield a file "testfile.att" that looks as follows:
     void write_in_att_format(HfstFile & ofile, bool write_weights=true) const;
 
     void write_in_att_format(char * buffer, bool write_weights=true) const;
+
+    /* For XFSM_TYPE. */
+    void write_xfsm_transducer_in_att_format(const char * filename) const;
+    void write_xfsm_transducer_in_prolog_format(const char * filename) const;
+
+    /* For other types. */
+    void write_in_prolog_format(FILE * file, const std::string & name,
+                                bool write_weights=true);
 
     void write_in_att_format_number
       (FILE * ofile, bool write_weights=true) const;
