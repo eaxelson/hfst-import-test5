@@ -260,6 +260,9 @@ int main( int argc, char **argv )
       case hfst::FOMA_TYPE:
         verbose_printf("Using foma as output handler\n");
         break;
+      case hfst::XFSM_TYPE:
+        verbose_printf("Using xfsm as output handler\n");
+        break;
       case hfst::HFST_OL_TYPE:
         verbose_printf("Using optimized lookup output\n");
         break;

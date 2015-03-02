@@ -132,8 +132,6 @@ namespace hfst
       case XFSM_TYPE:
         {
           (void)xfsm_funct(implementation.xfsm);
-          //delete implementation.xfsm;
-          //implementation.xfsm = xfsm_temp;
           break;
         }
 #endif

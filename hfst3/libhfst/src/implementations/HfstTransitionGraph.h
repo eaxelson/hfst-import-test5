@@ -943,8 +943,9 @@
              return "?";
            if(symbol == "@_IDENTITY_SYMBOL_@")
              return "?";
-           // prepend a backslash to a double quote
+           // prepend a backslash to a double quote and to a backslash
            std::string retval(symbol);
+           replace_all(retval, "\\", "\\\\");
            replace_all(retval, "\"", "\\\"");
            return retval;
          }
@@ -960,9 +961,11 @@
              return "@_EPSILON_SYMBOL_@";
            if (symbol == "?")
              return "@_UNKNOWN_SYMBOL_@";
-           // remove the escaping backslash in front of a double quote
+           // remove the escaping backslash in front of a double quote and
+           // a double quote
            std::string retval(symbol);
            replace_all(retval, "\\\"", "\"");
+           replace_all(retval, "\\\\", "\\");
            return retval;
          }
 
@@ -1017,7 +1020,7 @@
              {
                if (symbols_used_.find(*it) == symbols_used_.end())
                  {
-                   fprintf(file, "symbol(%s, \"%s\").\n", identifier, it->c_str());
+                   fprintf(file, "symbol(%s, \"%s\").\n", identifier, prologize_symbol(it->c_str()).c_str());
                  }
              }
 
@@ -1079,7 +1082,7 @@
              {
                if (symbols_used_.find(*it) == symbols_used_.end())
                  {
-                   os << "symbol(" << name << ", \"" << *it << "\")" << std::endl;
+                   os << "symbol(" << name << ", \"" << prologize_symbol(*it) << "\")" << std::endl;
                  }
              }
 
@@ -1376,7 +1379,7 @@
            if (! strip_quotes_from_both_sides(symbolstr))
              return false;
            
-           graph.add_symbol_to_alphabet(symbolstr);
+           graph.add_symbol_to_alphabet(deprologize_symbol(symbolstr));
            return true;
          }
 
