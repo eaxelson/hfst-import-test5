@@ -583,9 +583,7 @@ process_stream(HfstInputStream& instream, FILE* outf)
             }
           catch (const HfstException & e)
             {
-              std::string msg("");
-              msg = msg + "Error encountered when writing in prolog format: " + e.name;
-              error(EXIT_FAILURE, 0, msg.c_str());
+              error(EXIT_FAILURE, 0, "Error encountered when writing in prolog format: %s", e.name.c_str());
             }
           break;
         }
