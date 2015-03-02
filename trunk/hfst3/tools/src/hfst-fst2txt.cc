@@ -83,7 +83,7 @@ print_usage()
         "  -D, --do-not-print-weights   If weights are not printed in any "
         "case\n"
         "  -f, --format=TFMT            Print output in TFMT format "
-        "[default=att]\n");
+            "[default=att]\n");
     fprintf(message_out, "\n");
     fprintf(message_out,
           "If OUTFILE or INFILE is missing or -, "
@@ -576,8 +576,21 @@ process_stream(HfstInputStream& instream, FILE* outf)
               }
               else {
                 std::string namestr = t->get_name();
-                if (namestr == "")
-                  namestr = "NO_NAME";
+                std::ostringstream ostr;
+                ostr << transducer_n;
+                std::string alt_namestr = "NO_NAME_" + ostr.str();
+
+                if (namestr == "") {
+                  namestr = alt_namestr;
+                  if (!silent) {
+                    fprintf(stderr, "Transducer has no name, giving it a name '%s'...\n", namestr.c_str()); }
+                }
+                else {
+                  namestr = alt_namestr;
+                  if (!silent) {
+                    fprintf(stderr, "Renaming transducer into '%s'...\n", namestr.c_str()); }
+                }
+
                 t->write_in_prolog_format(outf,namestr,printw);
               }
             }

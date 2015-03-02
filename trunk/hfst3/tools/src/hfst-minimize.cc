@@ -141,6 +141,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         outstream << trans;
         free(inputname);
     }
+    outstream.flush();
     instream.close();
     outstream.close();
     return EXIT_SUCCESS;
