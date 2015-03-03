@@ -139,6 +139,9 @@ namespace hfst
   void set_encode_weights(bool);
   bool get_encode_weights();
 
+  void set_minimize_even_if_already_minimal(bool);
+  bool get_minimize_even_if_already_minimal();
+
   void set_xerox_composition(bool);
   bool get_xerox_composition();
 
