@@ -111,6 +111,9 @@ hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
 
 /* The default minimization algorithm if Hopcroft. */
 MinimizationAlgorithm minimization_algorithm=HOPCROFT;
+ /* By default, we do not minimize transducers that are already minimal. 
+    This variable is for debugging and profiling. */
+bool minimize_even_if_already_minimal=false;
 /* By default, weights are not encoded in minimization. */
 bool encode_weights=false;
 /* By default, harmonization is not optimized. */
@@ -129,6 +132,17 @@ bool flag_is_epsilon_in_composition=false;
 
   bool get_xerox_composition() {
     return xerox_composition;
+  }
+
+  void set_minimize_even_if_already_minimal(bool value) {
+    minimize_even_if_already_minimal=value;
+#if HAVE_XFSM
+    XfsmTransducer::set_minimize_even_if_already_minimal(value);
+#endif
+  }
+
+  bool get_minimize_even_if_already_minimal() {
+    return minimize_even_if_already_minimal;
   }
 
   void set_flag_is_epsilon_in_composition(bool value) {

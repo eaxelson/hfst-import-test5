@@ -276,8 +276,19 @@ namespace hfst { namespace implementations {
       return copy_net(t);
     }
 
-    NETptr XfsmTransducer::minimize(NETptr t) 
+    bool XfsmTransducer::minimize_even_if_already_minimal_ = false;
+
+    void XfsmTransducer::set_minimize_even_if_already_minimal(bool value)
     {
+      minimize_even_if_already_minimal_ = value;
+    }
+
+    NETptr XfsmTransducer::minimize(NETptr t)
+    {
+      if (minimize_even_if_already_minimal_) 
+        {
+          NET_minimized(t) = 0; 
+        }
       if (minimize_net(t) == 1)
         {
           HFST_THROW(HfstFatalException);

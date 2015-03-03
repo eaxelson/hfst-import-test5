@@ -93,6 +93,9 @@ namespace hfst {
   };
 
   class XfsmTransducer {
+  private:
+    static bool minimize_even_if_already_minimal_;
+
   public:
     static void initialize_xfsm();
     static NETptr create_xfsm_unknown_to_unknown_transducer();
@@ -114,6 +117,9 @@ namespace hfst {
       (const std::string &isymbol, const std::string &osymbol);
     static NETptr copy(NETptr t);
     static NETptr minimize(NETptr t);
+
+    // for debugging
+    static void set_minimize_even_if_already_minimal(bool value);
 
     static void write_in_att_format(NETptr t, const char * filename);
     static void write_in_prolog_format(NETptr t, const char * filename);
