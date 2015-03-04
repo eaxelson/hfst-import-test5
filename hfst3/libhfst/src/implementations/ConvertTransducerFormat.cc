@@ -92,6 +92,12 @@ namespace hfst { namespace implementations
     if (t.type == FOMA_TYPE)
       return foma_to_hfst_basic_transducer(t.implementation.foma); 
 #endif // HAVE_FOMA
+
+#if HAVE_XFSM
+    if (t.type == XFSM_TYPE)
+      return xfsm_to_hfst_basic_transducer(t.implementation.xfsm); 
+#endif // HAVE_FOMA
+
     
     /* Add here your implementation. */
     //#if HAVE_MY_TRANSDUCER_LIBRARY

@@ -744,6 +744,10 @@ in \a ifile.
     void remove_from_alphabet(const std::string &symbol);
     void remove_from_alphabet(const std::set<std::string> &symbols);
 
+    // For XFSM format
+    void remove_symbols_from_alphabet(const StringSet & symbols);
+
+
     /** @brief Remove all symbols that do not occur in transitions of
         the transducer from its alphabet.
 
@@ -1648,6 +1652,8 @@ transducer.transform_weights(&func);
                                    bool insert_renamed_flags=true);
     
     void insert_missing_symbols_to_alphabet_from(const HfstTransducer &another, bool only_special_symbols=false);
+
+    StringSet insert_missing_diacritics_to_alphabet_from(const HfstTransducer &another);
 
     static bool is_special_symbol(const std::string & symbol);
     

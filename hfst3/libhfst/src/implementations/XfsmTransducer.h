@@ -117,9 +117,16 @@ namespace hfst {
       (const std::string &isymbol, const std::string &osymbol);
     static NETptr copy(NETptr t);
     static NETptr minimize(NETptr t);
+    static NETptr compose(NETptr t1, const NETptr t2);
+
+    static StringSet get_alphabet(const NETptr t);
+    static void add_symbol_to_alphabet(NETptr t, const std::string & symbol);
+    static void add_symbols_to_alphabet(NETptr t, const StringSet & symbols);
+    static void remove_symbols_from_alphabet(NETptr t, const StringSet & symbols);
 
     // for debugging
     static void set_minimize_even_if_already_minimal(bool value);
+    static void set_compose_flag_as_special(bool value);
 
     static void write_in_att_format(NETptr t, const char * filename);
     static void write_in_prolog_format(NETptr t, const char * filename);

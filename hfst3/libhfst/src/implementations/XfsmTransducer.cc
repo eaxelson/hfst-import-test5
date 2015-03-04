@@ -261,19 +261,55 @@ namespace hfst { namespace implementations {
       return optional_net(result, DONT_KEEP);
     }
 
-    NETptr XfsmTransducer::define_transducer(const hfst::StringPairVector &spv) { return NULL; }
+    //NETptr read_regex(const char *regex_str);
 
-    NETptr XfsmTransducer::define_transducer(const hfst::StringPairSet &sps, bool cyclic/*=false*/) { return NULL; }
+    NETptr XfsmTransducer::define_transducer(const hfst::StringPairVector &spv)
+    {
+      std::string regex("");
+      for (hfst::StringPairVector::const_iterator it = spv.begin(); it != spv.end(); it++)
+        {
+          regex = regex + "\"" + it->first + "\":\"" + it->second + "\" ";
+        }
+      return read_regex(regex.c_str());
+    }
+
+    NETptr XfsmTransducer::define_transducer(const hfst::StringPairSet &sps, bool cyclic/*=false*/)
+    {
+      std::string regex("");
+      for (hfst::StringPairSet::const_iterator it = sps.begin(); it != sps.end(); it++)
+        {
+          if (it != sps.begin())
+            regex = regex + " | ";
+          regex = regex + "\"" + it->first + "\":\"" + it->second + "\"";
+        }
+      if (cyclic)
+        regex = "[" + regex + "]*";
+      return read_regex(regex.c_str());
+    }
 
     NETptr XfsmTransducer::define_transducer(const std::vector<StringPairSet> &spsv) { return NULL; }
 
-    NETptr XfsmTransducer::define_transducer(const std::string &symbol) { return NULL; }
+    NETptr XfsmTransducer::define_transducer(const std::string &symbol)
+    {
+      std::string regex = "\"" + symbol + "\"";
+      return read_regex(regex.c_str());
+    }
 
-    NETptr XfsmTransducer::define_transducer(const std::string &isymbol, const std::string &osymbol) { return NULL; }
+    NETptr XfsmTransducer::define_transducer(const std::string &isymbol, const std::string &osymbol)
+    {
+      std::string regex = "\"" + isymbol + "\":\"" + osymbol + "\"";
+      return read_regex(regex.c_str());
+    }
 
     NETptr XfsmTransducer::copy(NETptr t) 
     {
       return copy_net(t);
+    }
+
+    void XfsmTransducer::set_compose_flag_as_special(bool value)
+    {
+      FST_CNTXTptr fst_cntxt = get_default_cfsm_context();
+      fst_cntxt->interface->general.compose_flag_as_special = (value) ? 1 : 0 ;
     }
 
     bool XfsmTransducer::minimize_even_if_already_minimal_ = false;
@@ -294,6 +330,59 @@ namespace hfst { namespace implementations {
           HFST_THROW(HfstFatalException);
         }
       return t;
+    }
+
+    void XfsmTransducer::add_symbol_to_alphabet(NETptr t, const std::string & symbol)
+    {
+      ALPHABETptr ap = net_sigma(t);
+      if (hfst::is_epsilon(symbol) || hfst::is_unknown(symbol) || hfst::is_identity(symbol))
+        return;
+      (void) alph_add_to(ap, XfsmTransducer::hfst_symbol_to_xfsm_symbol(symbol.c_str()), DONT_KEEP);
+    }
+
+    void XfsmTransducer::add_symbols_to_alphabet(NETptr t, const StringSet & symbols)
+    {
+      ALPHABETptr ap = net_sigma(t);
+
+      for (StringSet::const_iterator it = symbols.begin(); it != symbols.end(); it++)
+        {
+          if (hfst::is_epsilon(*it) || hfst::is_unknown(*it) || hfst::is_identity(*it))
+            continue;
+          (void) alph_add_to(ap, XfsmTransducer::hfst_symbol_to_xfsm_symbol(it->c_str()), DONT_KEEP);
+        }
+    }
+
+    void XfsmTransducer::remove_symbols_from_alphabet(NETptr t, const StringSet & symbols)
+    {
+      ALPHABETptr ap = net_sigma(t);
+
+      for (StringSet::const_iterator it = symbols.begin(); it != symbols.end(); it++)
+        {
+          if (hfst::is_epsilon(*it) || hfst::is_unknown(*it) || hfst::is_identity(*it))
+            continue;
+          (void)alph_remove_from(ap, XfsmTransducer::hfst_symbol_to_xfsm_symbol(it->c_str()), DONT_KEEP);
+        }
+    }
+
+    StringSet XfsmTransducer::get_alphabet(const NETptr t)
+    {
+      StringSet retval;
+      ALPHABETptr alpha_ptr = net_sigma(const_cast<NETptr>(t));
+      ALPH_ITptr alpha_it_ptr = start_alph_iterator(NULL, alpha_ptr);
+      id_type label_id = next_alph_id(alpha_it_ptr);
+
+      while(label_id != ID_NO_SYMBOL)
+        {
+          std::string symbol = XfsmTransducer::xfsm_symbol_to_hfst_symbol(label_id);
+          retval.insert(symbol);
+          label_id = next_alph_id(alpha_it_ptr);
+        }
+      return retval;
+    }
+
+    NETptr XfsmTransducer::compose(NETptr t1, const NETptr t2)
+    {
+      return compose_net(t1, const_cast<NETptr>(t2), DONT_KEEP, KEEP);
     }
 
     void XfsmTransducer::write_in_att_format(NETptr t, const char * filename)
