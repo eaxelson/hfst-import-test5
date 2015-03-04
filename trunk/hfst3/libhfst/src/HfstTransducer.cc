@@ -147,6 +147,9 @@ bool flag_is_epsilon_in_composition=false;
 
   void set_flag_is_epsilon_in_composition(bool value) {
     flag_is_epsilon_in_composition=value;
+#if HAVE_XFSM
+    XfsmTransducer::set_compose_flag_as_special(value);
+#endif
   }
 
   bool get_flag_is_epsilon_in_composition() {
@@ -237,10 +240,21 @@ void HfstTransducer::insert_to_alphabet(const std::string &symbol)
     if (symbol == "")
       HFST_THROW_MESSAGE(EmptyStringException, "insert_to_alphabet");
 
-    hfst::implementations::HfstBasicTransducer * net 
-      = convert_to_basic_transducer();
-    net->add_symbol_to_alphabet(symbol);
-    convert_to_hfst_transducer(net);
+    if (this->type != XFSM_TYPE)
+      {
+        hfst::implementations::HfstBasicTransducer * net 
+          = convert_to_basic_transducer();
+        net->add_symbol_to_alphabet(symbol);
+        convert_to_hfst_transducer(net);
+      }
+    else
+      {
+#if HAVE_XFSM
+        this->xfsm_interface.add_symbol_to_alphabet(this->implementation.xfsm, symbol);
+#else
+        HFST_THROW(ImplementationTypeNotAvailableException);
+#endif
+      }
 }
 
 void HfstTransducer::insert_to_alphabet(const std::set<std::string> &symbols) 
@@ -253,10 +267,21 @@ void HfstTransducer::insert_to_alphabet(const std::set<std::string> &symbols)
           { HFST_THROW_MESSAGE(EmptyStringException, "insert_to_alphabet"); }
       }
 
-    hfst::implementations::HfstBasicTransducer * net 
-      = convert_to_basic_transducer();
-    net->add_symbols_to_alphabet(symbols);
-    convert_to_hfst_transducer(net);
+    if (this->type != XFSM_TYPE)
+      {
+        hfst::implementations::HfstBasicTransducer * net 
+          = convert_to_basic_transducer();
+        net->add_symbols_to_alphabet(symbols);
+        convert_to_hfst_transducer(net);
+      }
+    else
+      {
+#if HAVE_XFSM
+        this->xfsm_interface.add_symbols_to_alphabet(this->implementation.xfsm, symbols);
+#else
+        HFST_THROW(ImplementationTypeNotAvailableException);
+#endif
+      }
 }
 
 
@@ -283,6 +308,16 @@ void HfstTransducer::remove_from_alphabet(const std::set<std::string> &symbols)
     {
       this->remove_from_alphabet(*it);
     }
+}
+  
+/* Implemented for XFSM_TYPE, as conversion between HfstBasicFormat and XFSM_TYPE is slow. */
+void HfstTransducer::remove_symbols_from_alphabet(const StringSet & symbols)
+{
+  if (this->type != XFSM_TYPE)
+    HFST_THROW_MESSAGE(FunctionNotImplementedException, "remove_symbols_from_alphabet");
+#if HAVE_XFSM
+  this->xfsm_interface.remove_symbols_from_alphabet(this->implementation.xfsm, symbols);
+#endif
 }
 
 
@@ -343,6 +378,10 @@ StringSet HfstTransducer::get_alphabet() const
 #if HAVE_FOMA
     case FOMA_TYPE:
         return foma_interface.get_alphabet(implementation.foma);
+#endif
+#if HAVE_XFSM
+    case XFSM_TYPE:
+      return xfsm_interface.get_alphabet(implementation.xfsm);
 #endif
     case ERROR_TYPE:
         HFST_THROW(TransducerHasWrongTypeException);
@@ -1136,6 +1175,11 @@ HfstTransducer::HfstTransducer(const HfstTransducer &another):
 #if HAVE_FOMA
     case FOMA_TYPE:
         implementation.foma = foma_interface.copy(another.implementation.foma);
+        break;
+#endif
+#if HAVE_XFSM
+    case XFSM_TYPE:
+        implementation.xfsm = xfsm_interface.copy(another.implementation.xfsm);
         break;
 #endif
     case HFST_OL_TYPE:
@@ -2650,6 +2694,25 @@ bool HfstTransducer::is_special_symbol(const std::string &symbol)
   return false;
 }
 
+StringSet HfstTransducer::insert_missing_diacritics_to_alphabet_from(const HfstTransducer &another)
+{
+  StringSet this_alphabet = this->get_alphabet();
+  StringSet another_alphabet = another.get_alphabet();
+  StringSet missing_flags;
+
+  for (StringSet::const_iterator it = another_alphabet.begin();
+       it != another_alphabet.end(); it++)
+    {
+      if (this_alphabet.find(*it) == this_alphabet.end())
+        { 
+          if (FdOperation::is_diacritic(*it))
+            missing_flags.insert(*it);
+        }
+    }
+  this->insert_to_alphabet(missing_flags);
+  return missing_flags;
+}
+
 void HfstTransducer::insert_missing_symbols_to_alphabet_from(const HfstTransducer &another, bool only_special_symbols)
 {
   StringSet this_alphabet = this->get_alphabet();
@@ -3702,7 +3765,16 @@ HfstTransducer &HfstTransducer::compose
         another_copy->convert(this->type);
     }
 
-    if (flag_is_epsilon_in_composition)
+    /* If we want flag diacritcs to be handled in the same way as epsilons
+       in composition, we substitute output flags of first transducer with
+       epsilons and input flags of second transducer with epsilons. NOTE:
+       we assume that flag diacritics are always used as identities, i.e.
+       @FLAG1@:foo, foo:@FLAG2@ or @FLAG1@:@FLAG2@ are not allowed in
+       transitions.
+
+       In XFSM, this is controlled through a variable that has been set
+       already when set_flag_is_epsilon_in_composition() has been called */
+    if (flag_is_epsilon_in_composition && this->type != XFSM_TYPE)
       {
         try 
           {
@@ -3715,13 +3787,40 @@ HfstTransducer &HfstTransducer::compose
           }
       }
 
+    // Variables possibly needed next.
+    StringSet diacritics_added_from_another_to_this;
+    StringSet diacritics_added_from_this_to_another;
+
+    /* If we want flag diacritics to match with identities and unknowns (as
+       Xerox does), we encode flags as normal symbols before composition. We do
+       not need to do this for XFSM transducers, as this is already the default
+       behavior.
+
+       If we do not want flags to match with identities and unknowns (the default
+       for non-XFSM transducers) and the transducer is of XFSM_TYPE, we add flags
+       of first transducer to alphabet of second transducer if they are not yet
+       there and vice versa before composition. */
     if (xerox_composition)
       {
-        encode_flag_diacritics(*this);
-        encode_flag_diacritics(*another_copy);
+        if (this->type != XFSM_TYPE)
+          {
+            encode_flag_diacritics(*this);
+            encode_flag_diacritics(*another_copy);
+          }
+      }
+    else
+      {
+        if (this->type == XFSM_TYPE)
+          {
+            diacritics_added_from_another_to_this 
+              = this->insert_missing_diacritics_to_alphabet_from(*another_copy);
+            diacritics_added_from_this_to_another 
+              = another_copy->insert_missing_diacritics_to_alphabet_from(*this);
+          }
       }
 
-    /* prevent harmonization, if needed */
+
+    /* Prevent harmonization (i.e. matching unknown symbols), if requested. */
     if (! harmonize)
       {
         this->insert_missing_symbols_to_alphabet_from(*another_copy);
@@ -3729,11 +3828,14 @@ HfstTransducer &HfstTransducer::compose
       }
 
     // hfst-lexc's @_REG.Root_#_@ ??
-    /* special symbols are never harmonized */
+    /* Special symbols are never harmonized, add them to alphabets of
+       both transducers to prevent them from being matched with unknowns
+       and identities. */
     this->insert_missing_symbols_to_alphabet_from(*another_copy, true);
     another_copy->insert_missing_symbols_to_alphabet_from(*this, true);
 
-    if (this->type != FOMA_TYPE)
+    // Harmonize, FOMA and XFSM take care of this by default.
+    if (this->type != FOMA_TYPE && this->type != XFSM_TYPE)
       {
         HfstTransducer * tmp =
           this->harmonize_(const_cast<HfstTransducer&>(*another_copy));
@@ -3741,15 +3843,15 @@ HfstTransducer &HfstTransducer::compose
         another_copy = tmp;
       }
 
-    // Handle special symbols here.
-    if ( (this->type != FOMA_TYPE) && unknown_symbols_in_use)
-    {
-      // comment...
-      this->substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",false,true);
-      const_cast<HfstTransducer*>(another_copy)->substitute
-    ("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",true,false);
-    }
-    
+    /* Take care of unknown and identity symbols being handled right in
+       composition, FOMA and XFSM take care of this by default. */
+    if ( (this->type != FOMA_TYPE && this->type != XFSM_TYPE) && unknown_symbols_in_use)
+      {
+        this->substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",false,true);
+        const_cast<HfstTransducer*>(another_copy)->substitute
+          ("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",true,false);
+      }
+
     switch (this->type)
     {
 #if HAVE_SFST
@@ -3798,6 +3900,15 @@ HfstTransducer &HfstTransducer::compose
     break;
     }
 #endif
+#if HAVE_XFSM
+    case XFSM_TYPE:
+      {
+        this->implementation.xfsm = 
+          this->xfsm_interface.compose(this->implementation.xfsm, 
+                                       another_copy->implementation.xfsm);
+        break;
+      }
+#endif
     #if HAVE_HFSTOL
     case HFST_OL_TYPE:
     case HFST_OLW_TYPE:
@@ -3810,20 +3921,32 @@ HfstTransducer &HfstTransducer::compose
         HFST_THROW(FunctionNotImplementedException);
     }
 
+    // Revert changes made before composition
+
     if (xerox_composition)
       {
-        decode_flag_diacritics(*this);
-        decode_flag_diacritics(*another_copy);
+        if (this->type != XFSM_TYPE)
+          {
+            decode_flag_diacritics(*this);
+            decode_flag_diacritics(*another_copy);
+          }
+      }
+    else
+      {
+        if (this->type == XFSM_TYPE)
+          {
+            this->remove_symbols_from_alphabet(diacritics_added_from_another_to_this);
+            another_copy->remove_symbols_from_alphabet(diacritics_added_from_this_to_another);
+          }
       }
 
-    if (flag_is_epsilon_in_composition)
+    if (flag_is_epsilon_in_composition && this->type != XFSM_TYPE)
       {
         this->substitute(&substitute_one_sided_flags);
       }
 
-    if ( (this->type != FOMA_TYPE) && unknown_symbols_in_use) 
+    if ( (this->type != FOMA_TYPE && this->type != XFSM_TYPE) && unknown_symbols_in_use) 
     {
-        // comment...
         this->substitute(&substitute_single_identity_with_the_other_symbol);
         (const_cast<HfstTransducer*>(another_copy))->
        substitute(&substitute_unknown_identity_pairs);
