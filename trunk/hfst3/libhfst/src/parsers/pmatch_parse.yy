@@ -1041,8 +1041,7 @@ REGEXP6: REGEXP7 { }
 
 REGEXP7: REGEXP8 { }
 | REGEXP7 IGNORING REGEXP8 {
-    pmatcherror("No ignoring");
-    $$ = $1;
+    $$ = & $1->insert_freely(*$3, false);
     delete $3;
  }
 | REGEXP7 IGNORE_INTERNALLY REGEXP8 {
