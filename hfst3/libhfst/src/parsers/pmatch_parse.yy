@@ -708,23 +708,24 @@ REPLACE : REGEXP3 {}
 }
 ;
 
-PARALLEL_RULES: RULE
+PARALLEL_RULES:
+PARALLEL_RULES COMMACOMMA RULE
 {
-    //   std::cerr << "parallel_rules:rule"<< std::endl;        
+//  std::cerr << "parallel_rules: parallel_rules ,, rule"<< std::endl;      
+    Rule tmpRule($3->second);
+    $1->second.push_back(tmpRule);
+    $$ =  new std::pair< ReplaceArrow, std::vector<Rule> > ($3->first, $1->second);
+    delete $3;
+}
+| RULE {
+//  std::cerr << "parallel_rules:rule"<< std::endl;        
     std::vector<Rule> * ruleVector = new std::vector<Rule>();
     ruleVector->push_back($1->second);
             
     $$ =  new std::pair< ReplaceArrow, std::vector<Rule> > ($1->first, *ruleVector);
     delete $1;
 }
-| PARALLEL_RULES COMMACOMMA RULE
-{
-    // std::cerr << "parallel_rules: parallel_rules ,, rule"<< std::endl;      
-    Rule tmpRule($3->second);
-    $1->second.push_back(tmpRule);
-    $$ =  new std::pair< ReplaceArrow, std::vector<Rule> > ($3->first, $1->second);
-    delete $3;
-}
+
 ;
 
 RULE: MAPPINGPAIR_VECTOR
@@ -1169,6 +1170,7 @@ REGEXP11: REGEXP12 { }
  }
 | ALPHA {
     $$ = new HfstTransducer(*hfst::pmatch::get_utils()->latin1_alpha_acceptor);
+        $$->minimize();
  }
 | LOWERALPHA {
     $$ = new HfstTransducer(*hfst::pmatch::get_utils()->latin1_lowercase_acceptor);
