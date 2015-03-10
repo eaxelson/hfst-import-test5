@@ -119,6 +119,18 @@ namespace hfst {
     static NETptr minimize(NETptr t);
     static NETptr compose(NETptr t1, const NETptr t2);
 
+    static bool are_equivalent(NETptr t1, NETptr t2);
+    static bool is_cyclic(NETptr t);
+    static unsigned int number_of_states(NETptr t);
+    static unsigned int number_of_arcs(NETptr t);
+    static NETptr eliminate_flags_xfsm(NETptr t);
+    static NETptr eliminate_flag_xfsm(NETptr t, const std::string & flag);
+
+    static NETptr repeat_star(NETptr t);
+    static NETptr repeat_plus(NETptr t);
+    static NETptr repeat_n(NETptr t, unsigned int n);
+    static NETptr repeat_le_n(NETptr t, unsigned int n);
+
     static StringSet get_alphabet(const NETptr t);
     static void add_symbol_to_alphabet(NETptr t, const std::string & symbol);
     static void add_symbols_to_alphabet(NETptr t, const StringSet & symbols);
