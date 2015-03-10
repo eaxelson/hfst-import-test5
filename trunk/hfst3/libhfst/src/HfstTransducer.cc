@@ -2212,6 +2212,13 @@ HfstTransducer &HfstTransducer::repeat_n(unsigned int n)
 
 HfstTransducer &HfstTransducer::repeat_n_plus(unsigned int n)
 { is_trie = false; // This could be done so that is_trie is preserved
+#if HAVE_XFSM
+  if (this->type == XFSM_TYPE)
+    {
+      this->xfsm_interface.repeat_n_plus(this->implementation.xfsm, n);
+      return *this;
+    }
+#endif
     HfstTransducer a(*this);
     return (this->repeat_n(n).concatenate(a.repeat_star()));
 }
@@ -2239,6 +2246,13 @@ HfstTransducer &HfstTransducer::repeat_n_minus(unsigned int n)
 
 HfstTransducer &HfstTransducer::repeat_n_to_k(unsigned int n, unsigned int k)
 { is_trie = false; // This could be done so that is_trie is preserved
+#if HAVE_XFSM
+  if (this->type == XFSM_TYPE)
+    {
+      this->xfsm_interface.repeat_n_to_k(this->implementation.xfsm, n, k);
+      return *this;
+    }
+#endif
     HfstTransducer a(*this);
     return (this->repeat_n(n).concatenate(a.repeat_n_minus(k-n)));
 }
@@ -2267,7 +2281,7 @@ HfstTransducer &HfstTransducer::optionalize()
     &hfst::implementations::FomaTransducer::optionalize,
 #endif
 #if HAVE_XFSM
-    NULL,
+    &hfst::implementations::XfsmTransducer::optionalize,
 #endif
     /* Add here your implementation. */
     false ); }   
@@ -2288,7 +2302,7 @@ HfstTransducer &HfstTransducer::invert()
     &hfst::implementations::FomaTransducer::invert,
 #endif
 #if HAVE_XFSM
-    NULL,
+    &hfst::implementations::XfsmTransducer::invert,
 #endif
     /* Add here your implementation. */
     false ); }    
@@ -2309,7 +2323,7 @@ HfstTransducer &HfstTransducer::reverse()
     &hfst::implementations::FomaTransducer::reverse,
 #endif
 #if HAVE_XFSM
-    NULL,
+    &hfst::implementations::XfsmTransducer::reverse,
 #endif
     /* Add here your implementation. */
     false ); }    
@@ -2330,7 +2344,7 @@ HfstTransducer &HfstTransducer::input_project()
     &hfst::implementations::FomaTransducer::extract_input_language,
 #endif
 #if HAVE_XFSM
-    NULL,
+    &hfst::implementations::XfsmTransducer::extract_input_language,
 #endif
     /* Add here your implementation. */
     false ); }
@@ -2352,7 +2366,7 @@ HfstTransducer &HfstTransducer::output_project()
     &hfst::implementations::FomaTransducer::extract_output_language,
 #endif
 #if HAVE_XFSM
-    NULL,
+    &hfst::implementations::XfsmTransducer::extract_output_language,
 #endif
     /* Add here your implementation. */
     false ); }
