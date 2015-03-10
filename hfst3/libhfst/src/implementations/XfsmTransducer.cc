@@ -400,6 +400,26 @@ namespace hfst { namespace implementations {
       return compose_net(t1, const_cast<NETptr>(t2), DONT_KEEP, KEEP);
     }
 
+    NETptr XfsmTransducer::concatenate(NETptr t1, const NETptr t2)
+    {
+      return concat_net(t1, const_cast<NETptr>(t2), DONT_KEEP, KEEP);
+    }
+
+    NETptr XfsmTransducer::disjunct(NETptr t1, const NETptr t2)
+    {
+      return union_net(t1, const_cast<NETptr>(t2), DONT_KEEP, KEEP);
+    }
+
+    NETptr XfsmTransducer::intersect(NETptr t1, const NETptr t2)
+    {
+      return intersect_net(t1, const_cast<NETptr>(t2), DONT_KEEP, KEEP);
+    }
+    
+    NETptr XfsmTransducer::subtract(NETptr t1, const NETptr t2)
+    {
+      return minus_net(t1, const_cast<NETptr>(t2), DONT_KEEP, KEEP);
+    }
+
     bool XfsmTransducer::are_equivalent(NETptr t1, NETptr t2)
     {
       return (test_equivalent(t1, t2) == 1);
@@ -453,6 +473,41 @@ namespace hfst { namespace implementations {
     NETptr XfsmTransducer::repeat_le_n(NETptr t, unsigned int n) 
     {
       return repeat_net(t, 0, n, DONT_KEEP);
+    }
+
+    NETptr XfsmTransducer::repeat_n_plus(NETptr t, unsigned int n) 
+    {
+      return repeat_net(t, n, -1, DONT_KEEP);
+    }
+
+    NETptr XfsmTransducer::repeat_n_to_k(NETptr t, unsigned int n, unsigned int k) 
+    {
+      return repeat_net(t, n, k, DONT_KEEP);
+    }
+
+    NETptr XfsmTransducer::optionalize(NETptr t) 
+    {
+      return optional_net(t, DONT_KEEP);
+    }
+
+    NETptr XfsmTransducer::invert(NETptr t) 
+    {
+      return invert_net(t, DONT_KEEP);
+    }
+
+    NETptr XfsmTransducer::reverse(NETptr t) 
+    {
+      return reverse_net(t, DONT_KEEP);
+    }
+
+    NETptr XfsmTransducer::extract_input_language(NETptr t) 
+    {
+      return upper_side_net(t, DONT_KEEP);
+    }
+
+    NETptr XfsmTransducer::extract_output_language(NETptr t) 
+    {
+      return lower_side_net(t, DONT_KEEP);
     }
 
     void XfsmTransducer::write_in_att_format(NETptr t, const char * filename)

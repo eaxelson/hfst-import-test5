@@ -117,7 +117,12 @@ namespace hfst {
       (const std::string &isymbol, const std::string &osymbol);
     static NETptr copy(NETptr t);
     static NETptr minimize(NETptr t);
+
     static NETptr compose(NETptr t1, const NETptr t2);
+    static NETptr concatenate(NETptr t1, const NETptr t2);
+    static NETptr disjunct(NETptr t1, const NETptr t2);
+    static NETptr intersect(NETptr t1, const NETptr t2);
+    static NETptr subtract(NETptr t1, const NETptr t2);
 
     static bool are_equivalent(NETptr t1, NETptr t2);
     static bool is_cyclic(NETptr t);
@@ -130,6 +135,14 @@ namespace hfst {
     static NETptr repeat_plus(NETptr t);
     static NETptr repeat_n(NETptr t, unsigned int n);
     static NETptr repeat_le_n(NETptr t, unsigned int n);
+    static NETptr repeat_n_plus(NETptr t, unsigned int n);
+    static NETptr repeat_n_to_k(NETptr t, unsigned int n, unsigned int k);
+
+    static NETptr optionalize(NETptr t);
+    static NETptr invert(NETptr t);
+    static NETptr reverse(NETptr t);
+    static NETptr extract_input_language(NETptr t);
+    static NETptr extract_output_language(NETptr t);
 
     static StringSet get_alphabet(const NETptr t);
     static void add_symbol_to_alphabet(NETptr t, const std::string & symbol);
