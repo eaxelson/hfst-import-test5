@@ -287,7 +287,22 @@ namespace hfst { namespace implementations {
       return read_regex(regex.c_str());
     }
 
-    NETptr XfsmTransducer::define_transducer(const std::vector<StringPairSet> &spsv) { return NULL; }
+    NETptr XfsmTransducer::define_transducer(const std::vector<StringPairSet> &spsv)
+    {
+      std::string regex("");
+      for (std::vector<StringPairSet>::const_iterator it1 = spsv.begin(); it1 != spsv.end(); it1++)
+        {
+          regex = regex + "[";
+          for (hfst::StringPairSet::const_iterator it2 = it1->begin(); it2 != it1->end(); it2++)
+            {
+              if (it2 != it1->begin())
+                regex = regex + " | ";
+              regex = regex + "\"" + it2->first + "\":\"" + it2->second + "\"";
+            }
+          regex = regex + "] ";
+        }
+      return read_regex(regex.c_str());
+    }
 
     NETptr XfsmTransducer::define_transducer(const std::string &symbol)
     {
@@ -383,6 +398,61 @@ namespace hfst { namespace implementations {
     NETptr XfsmTransducer::compose(NETptr t1, const NETptr t2)
     {
       return compose_net(t1, const_cast<NETptr>(t2), DONT_KEEP, KEEP);
+    }
+
+    bool XfsmTransducer::are_equivalent(NETptr t1, NETptr t2)
+    {
+      return (test_equivalent(t1, t2) == 1);
+    }
+
+    bool XfsmTransducer::is_cyclic(NETptr t)
+    {
+      if (test_upper_bounded(t) != 1 || test_lower_bounded(t) != 1)
+        return true;
+      return false;
+    }
+    
+    unsigned int XfsmTransducer::number_of_states(NETptr t)
+    {
+      return (unsigned int) NET_num_states(t);
+    }
+
+    unsigned int XfsmTransducer::number_of_arcs(NETptr t)
+    {
+      return (unsigned int) NET_num_arcs(t);
+    }
+
+    NETptr XfsmTransducer::eliminate_flags_xfsm(NETptr t)
+    {
+      return eliminate_flag(t, NULL, DONT_KEEP);
+    }
+
+    NETptr XfsmTransducer::eliminate_flag_xfsm(NETptr t, const std::string & flag)
+    {
+      char * f = strdup(flag.c_str());
+      NETptr retval = eliminate_flag(t, f, DONT_KEEP);
+      free(f);
+      return retval;
+    }
+
+    NETptr XfsmTransducer::repeat_star(NETptr t) 
+    {
+      return repeat_net(t, 0, -1, DONT_KEEP);
+    }
+    
+    NETptr XfsmTransducer::repeat_plus(NETptr t) 
+    {
+      return repeat_net(t, 1, -1, DONT_KEEP);
+    }
+
+    NETptr XfsmTransducer::repeat_n(NETptr t, unsigned int n) 
+    {
+      return repeat_net(t, n, n, DONT_KEEP);
+    }
+    
+    NETptr XfsmTransducer::repeat_le_n(NETptr t, unsigned int n) 
+    {
+      return repeat_net(t, 0, n, DONT_KEEP);
     }
 
     void XfsmTransducer::write_in_att_format(NETptr t, const char * filename)
