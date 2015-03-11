@@ -186,6 +186,7 @@ disjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
             second=0;
           }
 
+        outstream.flush();
         free(firstname);
         free(secondname);
     }
