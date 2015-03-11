@@ -144,6 +144,8 @@ namespace hfst {
     static NETptr extract_input_language(NETptr t);
     static NETptr extract_output_language(NETptr t);
 
+    static NETptr insert_freely(NETptr t, const NETptr ins);
+
     static StringSet get_alphabet(const NETptr t);
     static void add_symbol_to_alphabet(NETptr t, const std::string & symbol);
     static void add_symbols_to_alphabet(NETptr t, const StringSet & symbols);
