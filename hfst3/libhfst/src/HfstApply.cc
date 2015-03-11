@@ -226,7 +226,7 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
         {
       NETptr xfsm_temp = 
             xfsm_funct(implementation.xfsm,n);
-          delete implementation.xfsm;
+      delete implementation.xfsm;
           implementation.xfsm = xfsm_temp;
           break;
     }
@@ -389,7 +389,6 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
     /* special symbols are never harmonized */
     this->insert_missing_symbols_to_alphabet_from(another, true);
     another.insert_missing_symbols_to_alphabet_from(*this, true);
-
     HfstTransducer * another_ =
       this->harmonize_(another);        
     if (another_ == NULL) // foma
@@ -440,12 +439,12 @@ NETptr (*xfsm_funct)(NETptr, unsigned int n),
           break;
         }
 #endif
-#if XFSM_FOMA
+#if HAVE_XFSM
       case XFSM_TYPE:
         {
-          NETptr * xfsm_temp = 
+          NETptr xfsm_temp = 
             xfsm_funct(implementation.xfsm,another_->implementation.xfsm);
-          delete implementation.xfsm;
+          //delete implementation.xfsm;
           implementation.xfsm = xfsm_temp;
           break;
         }
