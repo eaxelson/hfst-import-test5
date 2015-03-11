@@ -231,6 +231,7 @@ concatenate_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
 
     firststream.close();
     secondstream.close();
+    outstream.flush();
     outstream.close();
     return EXIT_SUCCESS;
 }

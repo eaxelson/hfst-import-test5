@@ -201,7 +201,13 @@ int main( int argc, char **argv ) {
     try {
       instream = (inputfile != stdin) ?
         new HfstInputStream(inputfilename) : new HfstInputStream();
-    } catch(const HfstException e)    {
+    }
+    catch(const ImplementationTypeNotAvailableException & e) {
+      error(EXIT_FAILURE, 0, "file %s is in %s format which is not available",
+            inputfilename, hfst::implementation_type_to_format(instream->get_type()));
+      return EXIT_FAILURE;
+      }
+    catch(const HfstException & e)    {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;
