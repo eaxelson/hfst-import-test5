@@ -4780,7 +4780,7 @@ HfstTransducer &HfstTransducer::concatenate
         &hfst::implementations::FomaTransducer::concatenate,
 #endif
 #if HAVE_XFSM
-    NULL,
+        &hfst::implementations::XfsmTransducer::concatenate,
 #endif
         /* Add here your implementation. */
         //#if HAVE_MY_TRANSDUCER_LIBRARY
@@ -4870,7 +4870,7 @@ HfstTransducer &HfstTransducer::disjunct
     &hfst::implementations::FomaTransducer::disjunct,
 #endif
 #if HAVE_XFSM
-    NULL,
+    &hfst::implementations::XfsmTransducer::disjunct,
 #endif
     /* Add here your implementation. */
     const_cast<HfstTransducer&>(another), harmonize); }
@@ -4892,7 +4892,7 @@ HfstTransducer &HfstTransducer::intersect
     &hfst::implementations::FomaTransducer::intersect,
 #endif
 #if HAVE_XFSM
-    NULL,
+    &hfst::implementations::XfsmTransducer::intersect,
 #endif
     /* Add here your implementation. */
     const_cast<HfstTransducer&>(another), harmonize); }
@@ -4914,7 +4914,7 @@ HfstTransducer &HfstTransducer::subtract
     &hfst::implementations::FomaTransducer::subtract,
 #endif
 #if HAVE_XFSM
-    NULL,
+    &hfst::implementations::XfsmTransducer::subtract,
 #endif
     /* Add here your implementation. */
     const_cast<HfstTransducer&>(another), harmonize); }
