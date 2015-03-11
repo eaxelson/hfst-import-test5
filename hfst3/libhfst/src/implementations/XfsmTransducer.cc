@@ -510,6 +510,11 @@ namespace hfst { namespace implementations {
       return lower_side_net(t, DONT_KEEP);
     }
 
+    NETptr XfsmTransducer::insert_freely(NETptr t, NETptr ins)
+    {
+      return ignore_net(t, const_cast<NETptr>(ins), DONT_KEEP, KEEP);
+    }
+
     void XfsmTransducer::write_in_att_format(NETptr t, const char * filename)
     {
       HFST_THROW(HfstFatalException);
