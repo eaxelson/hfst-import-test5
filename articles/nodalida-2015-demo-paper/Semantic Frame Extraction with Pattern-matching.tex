@@ -1,0 +1,182 @@
+\documentclass[11pt]{article}
+\usepackage{nodalida2015}
+\usepackage{times}
+\usepackage{mathptmx}
+%\usepackage{txfonts}
+\usepackage{url}
+\usepackage{latexsym}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\special{papersize=210mm,297mm} % to avoid having to use "-t a4" with dvips 
+%\setlength\titlebox{6.5cm}  % You can expand the title box if you really have to
+
+\title{Extracting Semantic Frames with Pattern-matching}
+
+\author{Sam Hardwick \\
+  University of Helsinki \\
+  {\tt sam.hardwick@iki.fi} \\\And
+  Miikka Silfverberg \\
+  University of Helsinki \\
+  {\tt miikka.silfverberg@iki.fi}\\\And
+  Krister Lind{é}n \\
+  University of Helsinki \\
+  {\tt krister.linden@helsinki.fi}}
+
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+  We demonstrate the use of \verb+hfst-pmatch+~\newcite{pmatch}, a development of Xerox
+  \verb+fst+~\newcite{xerox-pmatch}, for developing a semantic frame extractor. We
+  select a FrameNet~\newcite{framenet} frame and write shallowly syntactic pattern-matching rules
+  based on part-of-speech information and morphology from either a morphological automaton or
+  tagged text.
+\end{abstract}
+
+\section{Introduction}
+\verb+pmatch+ is a pattern-matching operation based on regular expressions. It
+allows embedded references to other expressions (recursive transition networks
+or RTNs), including circular or self-references, which allows matching
+context-free grammars. The matched patterns may be efficiently tagged, extracted
+and modified by the rules.
+
+Substantial named-entity recognisers (NERs) have been developed in
+\verb+pmatch+ for Swedish and Finnish. Here we demonstrate a bottom-up approach
+to using it to identify the frame ``Size'' in FrameNet.
+
+\section{A Semantic Frame}
+
+A semantic frame is a description of a \emph{type} of event, relation or entity
+and related participants~\newcite{semantic-frame}. For example, in Framenet,
+a database of semantic frames,
+the description of an \verb+Entity+ in terms of physical space occupied by it is
+an instance of the semantic frame \verb+Size+. The frame is characterised by
+a lexical unit (LU), which is a word (in this case an adjective)
+such as ``big'' or ``tiny'', descriptive of the size of the \verb+Entity+.
+Apart from \verb+Entity+, which is a core or compulsory element, the
+frame may identify a \verb+Degree+ to which the \verb+Entity+ deviates
+from the norm (``a \textbf{really} big dog'') and a \verb+Standard+ to
+which it is compared (``tall \textbf{for a jockey}'').
+
+\section{A Rule}
+
+A simple and common syntactic realisation of the \verb+Size+ frame is a single
+noun phrase containing one of the LUs, such as
+``the big dog that ran away''. Here we'd like to identify ``big'' as \verb+LU+,
+``dog'' as \verb+Entity+ and the combination as \verb+Size+.
+Our first rule for identifying this type of construction might be
+
+\begin{verbatim}
+Define Size1 LC(W) Define(LU EndTag(LU))
+  W Define(Noun EndTag(Entity)) RC(W);
+Define TOP Size1 EndTag(Size);  
+\end{verbatim}
+
+\verb+TOP+ is the root of the pattern matcher, and must be present.
+\verb+W+ is a word boundary, such as a space character or the beginning or end of
+input. \verb+LC+ and \verb+RC+ are special operations for checking that at both left and right
+sides of the rule there is a word boundary without including it in the match itself.
+The \verb+Define()+s inside other definitions are anonymous rules that delimit the effect of
+\verb+EndTag()+, which assigns a tag to a pattern.
+
+We can verify that this extracts instances of our desired pattern by compiling
+these rules with \verb+hfst-pmatch2fst+ and running the compiled result with
+\verb+hfst-pmatch --locate+, which gives the locations (which we omit here to save space) of matches and omits
+nonmatching text. Here we have inputted the text of the King James Bible from
+Project Gutenberg~\newcite{projectgutenberg} and added some extra characters on both sides for
+a concordance-like effect:
+
+\begin{verbatim}
+...
+let your little ones also go|<Size>
+all be a great cry througho|<Size>
+re was a great cry in Egypt|<Size>
+saw that great work which th|<Size>
+re lay a small round thing, a|<Size>
+...
+\end{verbatim}
+
+\subsection{Incorporating Semantic Information}
+Size is very metaphorical, so we can get a list of concrete nouns from WordNet
+or else laboriously iterate and collect metaphorically used nouns ourselves...
+
+\subsection{Incorporating Part-of-speech Information}
+
+We have hitherto used named rules for matching word classes, like \verb+Noun+,
+without specifying how they are written. Even our collection of LUs might need
+some closer attention -- for example ``little'' could be an adverb.
+
+Considering that in writing our
+rules we are effectively doing shallow syntactic parsing, even a very simple
+way to identify parts of speech may suffice: a morphological dictionary.
+For example, a finite-state transducer representing English morphology may be
+used to define the class of common nouns as follows:
+
+\begin{verbatim}
+! The file we want to read
+Define English @bin"english.hfst";
+! We compose it with a noun filter
+! and extract the input side
+Define Noun English .o.
+ [?+ "<NN1>" | "<NN2>"].u;
+! (NN1 is singular, NN2 plural)
+\end{verbatim}
+
+If we have the use of a part-of-speech tagger, we may write our rules to act
+on its output:
+
+\begin{verbatim}
+Define Noun LC(W) [\W]+
+ ["<NN1>"|"<NN2>"] RC(W);
+\end{verbatim}
+
+\section{Increasing Coverage}
+Identify common cases we missed by finding LUs that aren't matched by
+anything and write more rules...
+
+\section{Elaborations}
+
+More sophisticated parsing with embedded structures...
+
+% If you use BibTeX with a bib file named eacl2014.bib, 
+% you should add the following two lines:
+\bibliographystyle{acl}
+\bibliography{nodalida2015}
+
+% Otherwise you can include your references as follows:
+%% \begin{thebibliography}{}
+
+%% \bibitem[\protect\citename{Aho and Ullman}1972]{Aho:72}
+%% Alfred~V. Aho and Jeffrey~D. Ullman.
+%% \newblock 1972.
+%% \newblock {\em The Theory of Parsing, Translation and Compiling}, volume~1.
+%% \newblock Prentice-{Hall}, Englewood Cliffs, NJ.
+
+%% \bibitem[\protect\citename{{American Psychological Association}}1983]{APA:83}
+%% {American Psychological Association}.
+%% \newblock 1983.
+%% \newblock {\em Publications Manual}.
+%% \newblock American Psychological Association, Washington, DC.
+
+%% \bibitem[\protect\citename{{Association for Computing Machinery}}1983]{ACM:83}
+%% {Association for Computing Machinery}.
+%% \newblock 1983.
+%% \newblock {\em Computing Reviews}, 24(11):503--512.
+
+%% \bibitem[\protect\citename{Chandra \bgroup et al.\egroup }1981]{Chandra:81}
+%% Ashok~K. Chandra, Dexter~C. Kozen, and Larry~J. Stockmeyer.
+%% \newblock 1981.
+%% \newblock Alternation.
+%% \newblock {\em Journal of the Association for Computing Machinery},
+%%   28(1):114--133.
+
+%% \bibitem[\protect\citename{Gusfield}1997]{Gusfield:97}
+%% Dan Gusfield.
+%% \newblock 1997.
+%% \newblock {\em Algorithms on Strings, Trees and Sequences}.
+%% \newblock Cambridge University Press, Cambridge, UK.
+
+%% \end{thebibliography}
+
+\end{document}
