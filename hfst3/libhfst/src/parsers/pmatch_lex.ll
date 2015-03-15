@@ -49,8 +49,9 @@ WEIGHT [0-9]+(\.[0-9]+)?
 
 /* token character */
 NAME_CH {A7UNRESTRICTED}|{U8H}|{EC}
-UINTEGER [1-9][0-9]*
-INTEGER -?[1-9][0-9]*
+ZERO "0"
+UINTEGER ([1-9][0-9]*)|{ZERO}
+INTEGER (-?[1-9][0-9]*)|{ZERO}
 WSP [\t ]
 LWSP [\t\r\n ]
 
