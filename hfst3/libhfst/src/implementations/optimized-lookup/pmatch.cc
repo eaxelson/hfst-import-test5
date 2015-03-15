@@ -535,7 +535,10 @@ void PmatchContainer::process(std::string & input_str)
     }
     if (locate_mode && !nonmatching_locations.empty()) {
         LocationVector ls;
-        ls.push_back(alphabet.locatefy(printable_input_pos, WeightedDoubleTape(nonmatching_locations, 0.0)));
+        Location nonmatching = alphabet.locatefy(printable_input_pos - nonmatching_locations.size(),
+                                                 WeightedDoubleTape(nonmatching_locations, 0.0));
+        nonmatching.output = "@_NONMATCHING_@";
+        ls.push_back(nonmatching);
         locations.push_back(ls);
     }
 }
