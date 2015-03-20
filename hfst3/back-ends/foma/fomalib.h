@@ -26,7 +26,13 @@ extern "C" {
 #include <zlib.h>
 #endif
 
-#define FEXPORT __attribute__((visibility("default")))
+#ifdef _MSC_VER
+  #define FEXPORT __declspec(dllexport)
+  #define INLINE 
+#else
+  #define FEXPORT __attribute__((visibility("default")))
+  #define INLINE inline
+#endif
 
 /* Library version */
 #define MAJOR_VERSION 0
@@ -370,6 +376,12 @@ FEXPORT int fsm_construct_check_symbol(struct fsm_construct_handle *handle, char
 FEXPORT void fsm_construct_copy_sigma(struct fsm_construct_handle *handle, struct sigma *sigma);
 FEXPORT struct fsm *fsm_construct_done(struct fsm_construct_handle *handle);
 
+
+#ifndef bool
+  #define bool int
+  #define false((bool)0)
+  #define true((bool)1)
+#endif
 
 /******************/
 /* String hashing */

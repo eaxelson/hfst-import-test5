@@ -18,7 +18,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <sys/time.h>
+#ifndef _MSC_VER
+  #include <sys/time.h>
+#endif
 #include "foma.h"
 
 static struct defined_quantifiers *quantifiers;

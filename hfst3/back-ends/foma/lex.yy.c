@@ -60,6 +60,7 @@ typedef unsigned int flex_uint32_t;
 #endif /* ! C99 */
 
 /* Limits of integral types. */
+#ifndef _MSC_VER
 #ifndef INT8_MIN
 #define INT8_MIN               (-128)
 #endif
@@ -87,6 +88,7 @@ typedef unsigned int flex_uint32_t;
 #ifndef UINT32_MAX
 #define UINT32_MAX             (4294967295U)
 #endif
+#endif // _MSC_VER
 
 #endif /* ! FLEXINT_H */
 
@@ -1760,9 +1762,14 @@ void yyset_lineno (int line_number, yyscan_t yyscanner);
 int my_yyparse(char *my_string, int lineno) {
    int yyp;
    yyscan_t scanner;
-   
+#ifdef _MSC_VER
+   YY_BUFFER_STATE my_string_buffer = NULL; // initialization must be done here for cl.exe   
+#endif
+
    yylex_init(&scanner);
-   YY_BUFFER_STATE my_string_buffer;
+#ifndef _MSC_VER
+   YY_BUFFER_STATE my_string_buffer;  // see above ifdef
+#endif
    my_string_buffer = yy_scan_string(my_string,scanner);
    yyset_lineno(lineno,scanner);
    if (g_parse_depth > 0) {
@@ -1813,7 +1820,9 @@ int my_yyparse(char *my_string, int lineno) {
  * down here because we want the user's section 1 to have been scanned first.
  * The user has a chance to override it with an option.
  */
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif // _MSC_VER
 #endif
 
 #ifndef YY_EXTRA_TYPE

@@ -15,6 +15,14 @@
 /*     You should have received a copy of the GNU General Public License     */
 /*     along with foma.  If not, see <http://www.gnu.org/licenses/>.         */
 
+#ifndef bool
+  #define bool int
+  #define false ((bool)0)
+  #define true  ((bool)1)
+#endif
+
+#define _Bool bool
+
 struct state_array {
     struct fsm_state *transitions;
 };
