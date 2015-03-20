@@ -22,7 +22,8 @@ extract.c flags.c int_stack.c io.c \
 lex.cmatrix.c lex.yy.c mem.c minimize.c \
 regex.c reverse.c rewrite.c sigma.c \
 spelling.c stringhash.c structures.c \
-topsort.c trie.c utf8.c;
+topsort.c trie.c utf8.c foma.h fomalib.h \
+fomalibconf.h regex.h;
 do 
     cp back-ends/foma/$file $1/back-ends/foma/;
 done
@@ -80,28 +81,32 @@ done
 
 # parsers
 for file in \
-LexcCompiler.cc
-LexcCompiler.h
+LexcCompiler PmatchCompiler XreCompiler \
+lexc-utils pmatch_utils xre_utils;
+do
+    cp libhfst/src/parsers/$file.cc \
+        $1/libhfst/src/parsers/$file.cpp
+    cp libhfst/src/parsers/$file.h \
+        $1/libhfst/src/parsers/$file.h
+done
+for file in \
+lexc-lexer pmatch_lex xre_lex;
+do
+    cp libhfst/src/parsers/$file.cc \
+        $1/libhfst/src/parsers/$file.cpp
+done
+for file in \
+lexc-parser pmatch_parse xre_parse;
+do
+    cp libhfst/src/parsers/$file.cc \
+        $1/libhfst/src/parsers/$file.cpp
+    cp libhfst/src/parsers/$file.hh \
+        $1/libhfst/src/parsers/$file.hh
+done
 
-PmatchCompiler.cc
-PmatchCompiler.h
-XreCompiler.cc
-XreCompiler.h
-XreCompiler.reentrant.cc
-XreCompiler.reentrant.h
-lexc-lexer.ll
-lexc-parser.yy
-lexc-utils.cc
-lexc-utils.h
-pmatch_lex.ll
-pmatch_parse.yy
-pmatch_utils.cc
-pmatch_utils.h
-xre_lex.ll
-xre_lex.reentrant.ll
-xre_parse.reentrant.yy
-xre_parse.yy
-xre_utils.cc
-xre_utils.h
-xre_utils.reentrant.cc
-xre_utils.reentrant.h
+# make scripts and headers
+cp scripts/make-foma.bat $1/back-ends/foma/
+cp scripts/make-openfstwin.bat $1/back-ends/openfstwin/src/lib/
+# todo: make scripts for all directories
+cp scripts/stdint.h $1/back-ends/foma/
+cp scripts/inttypes.h $1/back-ends/foma/
