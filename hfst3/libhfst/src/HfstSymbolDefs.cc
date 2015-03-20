@@ -218,7 +218,7 @@ bool is_default(const char * str)
            it != v.end();
            ++it)
         {
-          if (not FdOperation::is_diacritic(*it))
+          if (! FdOperation::is_diacritic(*it))
             { v_wo_flags.push_back(*it); }
         }
       return v_wo_flags;
@@ -231,8 +231,8 @@ bool is_default(const char * str)
            it != v.end();
            ++it)
         {
-          if (not FdOperation::is_diacritic(it->first) &&
-              not FdOperation::is_diacritic(it->second))
+          if (! FdOperation::is_diacritic(it->first) &&
+              ! FdOperation::is_diacritic(it->second))
             { v_wo_flags.push_back(*it); }
         }
       return v_wo_flags;

@@ -111,7 +111,7 @@ namespace hfst {
     fst::SymbolTable st(t->InputSymbols()->Name());    
     for ( fst::SymbolTableIterator it 
             = fst::SymbolTableIterator(*(t->InputSymbols()));
-          not it.Done(); it.Next() ) {
+           !it.Done(); it.Next() ) {
       if (it.Symbol() != symbol) {
     st.AddSymbol(it.Symbol(), it.Value());
       }
@@ -158,7 +158,7 @@ namespace hfst {
     StringSet s;
     for ( fst::SymbolTableIterator it 
             = fst::SymbolTableIterator(*(t->InputSymbols()));
-          not it.Done(); it.Next() ) {
+          ! it.Done(); it.Next() ) {
       s.insert( std::string(it.Symbol()) );
     }
     return s;
@@ -181,7 +181,7 @@ namespace hfst {
     unsigned int biggest_number=0;
     for ( fst::SymbolTableIterator it 
             = fst::SymbolTableIterator(*(t->InputSymbols()));
-          not it.Done(); it.Next() ) {
+          ! it.Done(); it.Next() ) {
       if (it.Value() > biggest_number) 
         biggest_number = it.Value();
     }      
@@ -216,12 +216,12 @@ namespace hfst {
     // find the number-to-number mappings for transducer t1
     for ( fst::SymbolTableIterator it 
             = fst::SymbolTableIterator(*(t1->InputSymbols()));
-          not it.Done(); it.Next() ) {    
+          ! it.Done(); it.Next() ) {    
       km [ (unsigned int)it.Value() ] 
         = (unsigned int) t2->InputSymbols()->Find( it.Symbol() );
       
       assert(it.Value() >= 0);
-      assert(not (t2->InputSymbols()->Find( it.Symbol() ) < 0));
+      assert(! (t2->InputSymbols()->Find( it.Symbol() ) < 0));
     }
     
     return km;
@@ -232,7 +232,7 @@ namespace hfst {
     (StdVectorFst *t, NumberNumberMap &km) 
   {
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next())
+         ! siter.Done(); siter.Next())
       {
         StateId s = siter.Value();
         for (fst::MutableArcIterator<StdVectorFst> aiter(t,s); 
@@ -258,7 +258,7 @@ namespace hfst {
   (StdVectorFst * t, float weight, bool increment)
   {
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next())
+         ! siter.Done(); siter.Next())
       {
         StateId s = siter.Value();
         if ( t->Final(s) != TropicalWeight::Zero() )
@@ -295,7 +295,7 @@ namespace hfst {
     (StdVectorFst * t,float (*func)(float f))
   {
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next())
+         ! siter.Done(); siter.Next())
       {
         StateId s = siter.Value();
         if ( t->Final(s) != TropicalWeight::Zero() )
@@ -333,7 +333,7 @@ namespace hfst {
     }
       
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next()) 
+         ! siter.Done(); siter.Next()) 
       {
         StateId s = siter.Value();
         if (s == initial_state) {
@@ -367,7 +367,7 @@ namespace hfst {
       }
 
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next())
+         ! siter.Done(); siter.Next())
       {
         StateId s = siter.Value();
         if (s != initial_state) {
@@ -416,7 +416,7 @@ namespace hfst {
     }
       
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next()) 
+         ! siter.Done(); siter.Next()) 
       {
         StateId s = siter.Value();
         if (s == initial_state) {
@@ -449,7 +449,7 @@ namespace hfst {
       }
 
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next())
+         ! siter.Done(); siter.Next())
       {
         StateId s = siter.Value();
         if (s != initial_state) {
@@ -500,7 +500,7 @@ namespace hfst {
     }
       
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next()) 
+         ! siter.Done(); siter.Next()) 
       {
         StateId s = siter.Value();
         if (s == initial_state) {
@@ -536,7 +536,7 @@ namespace hfst {
       }
 
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next())
+         ! siter.Done(); siter.Next())
       {
         StateId s = siter.Value();
         if (s != initial_state) {
@@ -586,7 +586,7 @@ namespace hfst {
     }
       
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next()) 
+         ! siter.Done(); siter.Next()) 
       {
         StateId s = siter.Value();
         if (s == initial_state) {
@@ -622,7 +622,7 @@ namespace hfst {
       }
 
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next())
+         ! siter.Done(); siter.Next())
       {
         StateId s = siter.Value();
         if (s != initial_state) {
@@ -766,12 +766,12 @@ namespace hfst {
     StdVectorFst * result = new StdVectorFst();
 
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next())
+         ! siter.Done(); siter.Next())
       result->AddState();
 
     // go through all states in this
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next())
+         ! siter.Done(); siter.Next())
       {
         // create new state in result, if needed
         StateId s = siter.Value();
@@ -808,13 +808,13 @@ namespace hfst {
                 for (StringSet::iterator it1 = unknown.begin(); 
                      it1 != unknown.end(); it1++) 
                   {
-            if (not FdOperation::is_diacritic(*it1)) {
+            if (! FdOperation::is_diacritic(*it1)) {
               
               int64 inumber = is->Find(*it1);
               for (StringSet::iterator it2 = unknown.begin(); 
                it2 != unknown.end(); it2++) 
             {
-              if (not FdOperation::is_diacritic(*it2)) {
+              if (! FdOperation::is_diacritic(*it2)) {
                 int64 onumber = is->Find(*it2);
                 if (inumber != onumber)
                   result->AddArc(result_s, 
@@ -838,7 +838,7 @@ namespace hfst {
                 for (StringSet::iterator it = unknown.begin(); 
                      it != unknown.end(); it++) 
                   {
-            if (not FdOperation::is_diacritic(*it)) {
+            if (! FdOperation::is_diacritic(*it)) {
               int64 number = is->Find(*it);
               result->AddArc(result_s, 
                      StdArc(number, number, 
@@ -851,7 +851,7 @@ namespace hfst {
                 for (StringSet::iterator it = unknown.begin(); 
                      it != unknown.end(); it++) 
                   {
-            if (not FdOperation::is_diacritic(*it)) {
+            if (! FdOperation::is_diacritic(*it)) {
               int64 number = is->Find(*it);
               result->AddArc(result_s, 
                      StdArc(number, arc.olabel, 
@@ -864,7 +864,7 @@ namespace hfst {
                 for (StringSet::iterator it = unknown.begin(); 
                      it != unknown.end(); it++) 
                   {
-            if (not FdOperation::is_diacritic(*it)) {
+            if (! FdOperation::is_diacritic(*it)) {
               int64 number = is->Find(*it);
               result->AddArc(result_s, 
                      StdArc(arc.ilabel, number, 
@@ -889,12 +889,12 @@ namespace hfst {
     StdVectorFst * result = new StdVectorFst();
 
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next())
+         ! siter.Done(); siter.Next())
       result->AddState();
     
     // go through all states in this
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next())
+         ! siter.Done(); siter.Next())
       {
         // create new state in result, if needed
         StateId s = siter.Value();
@@ -931,7 +931,7 @@ namespace hfst {
   {
     unsigned int retval=0;
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next())
+         ! siter.Done(); siter.Next())
       retval++;
     return retval;
   }
@@ -940,7 +940,7 @@ namespace hfst {
   {
     unsigned int retval=0;
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next())
+         ! siter.Done(); siter.Next())
       {
         for (fst::ArcIterator<StdVectorFst> aiter(*t,siter.Value()); 
              !aiter.Done(); aiter.Next())
@@ -1013,14 +1013,14 @@ namespace hfst {
     fst::StdVectorFst *harmonized_t1;
     fst::StdVectorFst *harmonized_t2;
 
-    if (not unknown_symbols_in_use)
+    if (! unknown_symbols_in_use)
       harmonized_t1 = t1;
     else {
       harmonized_t1 = expand_arcs(t1, unknown_t1, unknown_symbols_in_use);
       harmonized_t1->SetInputSymbols(t1->InputSymbols());
     }
 
-    if (not unknown_symbols_in_use)
+    if (! unknown_symbols_in_use)
       harmonized_t2 = t2;
     else {
       harmonized_t2 = expand_arcs(t2, unknown_t2, unknown_symbols_in_use);
@@ -1284,7 +1284,7 @@ namespace hfst {
   (const std::string &symbol)
   {
 
-    assert(not (symbol == ""));
+    assert(! (symbol == ""));
 
     StdVectorFst * t = new StdVectorFst;
     SymbolTable st = create_symbol_table("");
@@ -1303,8 +1303,8 @@ namespace hfst {
     (const std::string &isymbol, const std::string &osymbol)
   {
 
-    assert(not (isymbol == ""));
-    assert(not (osymbol == ""));
+    assert(! (isymbol == ""));
+    assert(! (osymbol == ""));
 
     StdVectorFst * t = new StdVectorFst;
     SymbolTable st = create_symbol_table("");
@@ -1354,7 +1354,7 @@ namespace hfst {
   bool TropicalWeightTransducer::is_automaton(StdVectorFst * t)
   {
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next()) 
+         ! siter.Done(); siter.Next()) 
       {
         StateId s = siter.Value();
         for (fst::ArcIterator<StdVectorFst> aiter(*t,s); 
@@ -1390,8 +1390,8 @@ namespace hfst {
       {
         StateId s2 = t->AddState();
 
-    assert(not (it->first == ""));
-    assert(not (it->second == ""));
+    assert(! (it->first == ""));
+    assert(! (it->second == ""));
 
         t->AddArc(s1,StdArc(st.AddSymbol(it->first),
                             st.AddSymbol(it->second),0,s2));
@@ -1412,15 +1412,15 @@ namespace hfst {
     t->SetStart(s1);
     StateId s2=s1;               // final state
 
-    if (not sps.empty()) {
-      if (not cyclic)
+    if (! sps.empty()) {
+      if (! cyclic)
         s2 = t->AddState();
       for (StringPairSet::const_iterator it = sps.begin();
            it != sps.end();
            ++it)
         {
-      assert(not (it->first == ""));
-      assert(not (it->second == ""));
+      assert(! (it->first == ""));
+      assert(! (it->second == ""));
 
           t->AddArc(s1,StdArc(st.AddSymbol(it->first),
                               st.AddSymbol(it->second),0,s2));
@@ -1447,8 +1447,8 @@ namespace hfst {
         for (StringPairSet::const_iterator it2 = (*it).begin(); 
              it2 != (*it).end(); it2++ ) {
 
-      assert(not (it2->first == ""));
-      assert(not (it2->second == ""));
+      assert(! (it2->first == ""));
+      assert(! (it2->second == ""));
 
           t->AddArc(s1,StdArc(st.AddSymbol(it2->first),
                               st.AddSymbol(it2->second),0,s2));
@@ -1489,8 +1489,8 @@ namespace hfst {
     t->SetStart(s1);
     StateId s2=s1;               // final state
 
-    if (not nps.empty()) {
-      if (not cyclic)
+    if (! nps.empty()) {
+      if (! cyclic)
         s2 = t->AddState();
       for (NumberPairSet::const_iterator it = nps.begin();
            it != nps.end();
@@ -1577,7 +1577,7 @@ namespace hfst {
   void print_att_number(StdVectorFst *t, FILE * ofile) {
     fprintf(ofile, "initial state: %i\n", t->Start());
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next()) 
+         ! siter.Done(); siter.Next()) 
       {
         StateId s = siter.Value();
         if ( t->Final(s) != TropicalWeight::Zero() )
@@ -1878,7 +1878,7 @@ namespace hfst {
     fst::SymbolTable * st = tc->InputSymbols()->Copy();
     assert(st != NULL);
     for (fst::StateIterator<fst::StdVectorFst> siter(*tc); 
-         not siter.Done(); siter.Next()) 
+         ! siter.Done(); siter.Next()) 
       {
         StateId s = siter.Value();
         for (fst::MutableArcIterator<StdVectorFst> aiter(tc,s); 
@@ -1961,7 +1961,7 @@ namespace hfst {
     for( int i = 0; i < states; ++i ) {
 
       for (fst::MutableArcIterator<fst::StdVectorFst> it(t,i);
-           not it.Done();
+           ! it.Done();
            it.Next()) {
 
         fst::StdArc arc = it.Value();
@@ -2047,7 +2047,7 @@ namespace hfst {
     for( unsigned int i = 0; i < (unsigned int)states; ++i ) {
 
       for (fst::MutableArcIterator<fst::StdVectorFst> it(t,i);
-           not it.Done();
+           ! it.Done();
            it.Next()) {
 
         fst::StdArc arc = it.Value();
@@ -2188,7 +2188,7 @@ namespace hfst {
             }
           }
 
-        if (not transition_found) {
+        if (! transition_found) {
           StateId new_state = t->AddState();
           t->AddArc(s, StdArc(inumber,onumber,0,new_state));
           s = new_state;
@@ -2223,7 +2223,7 @@ namespace hfst {
             }
           }
 
-        if (not transition_found) {
+        if (! transition_found) {
           StateId new_state = t->AddState();
           t->AddArc(s, StdArc(inumber,onumber,0,new_state));
           s = new_state;
@@ -2289,7 +2289,7 @@ namespace hfst {
     StdVectorFst *t2_ = copy(t2);
 
     for (fst::StateIterator<StdVectorFst> siter(*t2_); 
-         not siter.Done(); siter.Next())
+         ! siter.Done(); siter.Next())
       {
         StateId s = siter.Value();
         for (fst::MutableArcIterator<StdVectorFst> aiter(t2_,s); 
@@ -2340,7 +2340,7 @@ namespace hfst {
   {
     StdVectorFst * t_copy = new StdVectorFst(*t);
     for (fst::StateIterator<StdVectorFst> iter(*t); 
-         not iter.Done(); iter.Next())
+         ! iter.Done(); iter.Next())
       {
         if (t_copy->Final(iter.Value()) != fst::TropicalWeight::Zero())
           { t_copy->SetFinal(iter.Value(),f); }
@@ -2360,7 +2360,7 @@ namespace hfst {
          !aiter.Done();
          aiter.Next())
       {
-        if ((aiter.Value().ilabel == ilabel) and 
+        if ((aiter.Value().ilabel == ilabel) && 
             (aiter.Value().olabel == olabel))
           { return aiter.Position(); }
       }
@@ -2637,7 +2637,7 @@ namespace hfst {
 
       /* Go through all transitions in a random order.
      (If \a t is pruned, only one transition is proceeded.) */
-      while ( not t_transitions.empty() ) {
+      while ( ! t_transitions.empty() ) {
     unsigned int index = rand() % t_transitions.size();
     fst::StdArc arc = t_transitions.at(index);
     t_transitions.erase(t_transitions.begin()+index);
@@ -2854,7 +2854,7 @@ namespace hfst {
     }
 
     fst::SymbolTable *output_st=NULL;
-    if (not hfst_format) {
+    if (! hfst_format) {
       output_st = new fst::SymbolTable(*(transducer->InputSymbols()));
       transducer->SetOutputSymbols(output_st);
     }

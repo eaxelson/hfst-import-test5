@@ -16,12 +16,12 @@
 #include "HfstExceptionDefs.h"
 #include "HfstFlagDiacritics.h"
 
-#ifdef WINDOWS
+#ifdef _MSC_VER
 #include "back-ends/openfstwin/src/include/fst/fstlib.h"
 #else
 #include "../../../config.h"
 #include "back-ends/openfst/src/include/fst/fstlib.h"
-#endif // WINDOWS
+#endif // _MSC_VER
 
 #include "HfstExtractStrings.h"
 #include <cstdio>

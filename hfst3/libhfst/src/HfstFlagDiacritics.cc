@@ -35,8 +35,8 @@ bool FdOperation::is_diacritic(const std::string& diacritic_string)
     }
   if (diacritic_string.find_last_of('.') == 2)
     {
-      if ((diacritic_string.at(1) != 'R') and
-          (diacritic_string.at(1) != 'D') and
+      if ((diacritic_string.at(1) != 'R') &&
+          (diacritic_string.at(1) != 'D') &&
           (diacritic_string.at(1) != 'C'))
       { return false; }
     }
