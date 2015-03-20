@@ -76,6 +76,7 @@ typedef unsigned int flex_uint32_t;
 #endif /* ! C99 */
 
 /* Limits of integral types. */
+#ifndef _MSC_VER
 #ifndef INT8_MIN
 #define INT8_MIN               (-128)
 #endif
@@ -103,6 +104,7 @@ typedef unsigned int flex_uint32_t;
 #ifndef UINT32_MAX
 #define UINT32_MAX             (4294967295U)
 #endif
+#endif // _MSC_VER
 
 #endif /* ! FLEXINT_H */
 
@@ -739,7 +741,9 @@ void my_cmatrixparse(struct fsm *net, char *my_string) {
  * down here because we want the user's section 1 to have been scanned first.
  * The user has a chance to override it with an option.
  */
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif // _MSC_VER
 #endif
 
 #ifndef YY_EXTRA_TYPE

@@ -393,10 +393,9 @@ void apply_clear_index(struct apply_handle *h) {
 }
 
 void apply_index(struct apply_handle *h, int inout, int densitycutoff, int mem_limit, int flags_only) {
-    struct fsm_state *fsm;
+  struct fsm_state *fsm = h->gstates; // must be defined in the beginning for cl.exe compiler
     unsigned int cnt = 0;
     int i, j, maxtrans, numtrans, laststate, sym, stateno;
-    fsm = h->gstates;
 
     struct apply_state_index **indexptr, *iptr, *tempiptr;
 
