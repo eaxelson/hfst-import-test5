@@ -1,0 +1,20 @@
+#! /bin/bash
+
+LEXC=$1
+ID=$2
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+cat $DIR/inituppercase.regex | hfst-regexp2fst > $DIR/hfst_bin/inituppercase.hfst
+
+$LEXC $DIR/kal.lexc > $DIR/hfst_bin/kal.lexc.hfst
+
+cat $DIR/kal.xfst | sed "s|PATH_TO_BIN|$DIR/hfst_bin|" > $DIR/kal.xfst.tmp
+
+hfst-xfst -F $DIR/kal.xfst.tmp
+
+hfst-compose -F -1 $DIR/hfst_bin/kal.lexc.hfst -2 $DIR/hfst_bin/kal.xfst.hfst |\
+hfst-compose-intersect -2 $DIR/hfst_bin/inituppercase.hfst |\
+hfst-minimize |\
+hfst-invert |\
+hfst-fst2fst -w > $DIR/hfst_bin/kal.hfst.$ID
