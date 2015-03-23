@@ -44,7 +44,7 @@ done
 
 cp back-ends/openfstwin/src/include/fst/*.h $1/back-ends/openfstwin/src/include/fst/
 
-# libhfst/src
+# libhfst/src and subdirectories
 mkdir $1/libhfst
 mkdir $1/libhfst/src
 mkdir $1/libhfst/src/implementations
@@ -52,7 +52,48 @@ mkdir $1/libhfst/src/implementations/compose_intersect
 mkdir $1/libhfst/src/implementations/optimized-lookup
 mkdir $1/libhfst/src/parsers
 
-# compose_intersect
+# libhfst/src without subdirectories
+for file in \
+FormatSpecifiers.h HarmonizeUnknownAndIdentitySymbols.h \
+HfstDataTypes.h HfstEpsilonHandler.h HfstExceptionDefs.h \
+HfstExceptions.h HfstExtractStrings.h HfstFlagDiacritics.h \
+HfstInputStream.h HfstLookupFlagDiacritics.h HfstOutputStream.h \
+HfstSymbolDefs.h HfstTokenizer.h HfstTransducer.h HfstXeroxRules.h \
+hfst.h hfst.hpp.in hfst_apply_schemas.h;
+do
+    cp libhfst/src/$file $1/libhfst/src/
+done
+
+for file in \
+HarmonizeUnknownAndIdentitySymbols HfstApply HfstDataTypes \
+HfstEpsilonHandler HfstExceptionDefs HfstExceptions HfstFlagDiacritics \
+HfstInputStream HfstLookupFlagDiacritics HfstOutputStream HfstRules \
+HfstSymbolDefs HfstTokenizer HfstTransducer HfstXeroxRules \
+HfstXeroxRulesTest;
+do
+    cp libhfst/src/$file.cc $1/libhfst/src/$file.cpp
+done
+
+# libhfst/src/implementations without subdirectories
+for file in \
+ConvertTransducerFormat.h FomaTransducer.h HfstFastTransitionData.h \
+HfstOlTransducer.h HfstTransition.h HfstTransitionGraph.h \
+HfstTropicalTransducerTransitionData.h LogWeightTransducer.h \
+TropicalWeightTransducer.h;
+do
+    cp libhfst/src/implementations/$file $1/libhfst/src/implementations/
+done
+
+for file in \
+ConvertFomaTransducer ConvertLogWeightTransducer ConvertOlTransducer \
+ConvertTransducerFormat ConvertTropicalWeightTransducer FomaTransducer \
+HfstOlTransducer HfstTransitionGraph HfstTropicalTransducerTransitionData \
+LogWeightTransducer TropicalWeightTransducer;
+do
+    cp libhfst/src/implementations/$file.cc $1/libhfst/src/implementations/$file.cpp
+done
+
+# implementations/compose_intersect
 for file in \
 ComposeIntersectFst ComposeIntersectLexicon ComposeIntersectRule \
 ComposeIntersectRulePair ComposeIntersectUtilities;
@@ -63,7 +104,7 @@ do
         $1/libhfst/src/implementations/compose_intersect/$file.h
 done
 
-# optimized-lookup
+# implementations/optimized-lookup
 for file in \
 convert pmatch transducer;
 do
