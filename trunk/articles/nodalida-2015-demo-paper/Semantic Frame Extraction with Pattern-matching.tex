@@ -105,7 +105,6 @@ or is introduced with the directive \verb+regex+. For example:
 \begin{framed}
 \begin{verbatim}
 define my_colours {green} | {red};
-! Comment: what about eg. "triggered"?
 define TOP my_colours EndTag(colour);
 \end{verbatim}
 \end{framed}
@@ -127,7 +126,16 @@ trigge<colour>red</colour>.
 \end{framed}
   \normalsize
 %  \caption{Demonstrating \texttt{pmatch} output}
-%  \end{table}
+  %  \end{table}
+
+To avoid tagging the ``red'' at the end of ``triggered'', we need to add a word
+boundary to the rule. This could be accomplished by defining eg.\@ \verb+W+ to
+be whitespace (\verb+Whitespace+), punctuation (\verb+Punct+) or the limit of
+input (\verb+#+). \verb+W+ may then be interpolated
+in rules when we want to capture whitespace inside the pattern, or checked for
+with run-time context checking just to make sure there is a word boundary at the
+edge of our rule (\verb+LC()+ and \verb+RC()+ check left and right contexts
+respectively).
 
 A simple and common syntactic realisation of the \verb+Size+ frame is a single
 noun phrase containing one of the LUs, such as
@@ -151,12 +159,7 @@ define TOP Size1 EndTag(Size);
 \end{table}
 
 This ruleset has been simplified for brevity -- it has only a few of the
-permitted LUs, and word boundary issues have not been dealt with. In practice
-we would define a separate word boundary rule, eg.\@ \verb+W+, to allow
-whitespace or the beginning or end of input. This may be interpolated in the
-rules where we want to capture the whitespace, or checked for with run-time
-context checking just to make sure there is a word boundary at the edge of our
-rule (\verb+LC()+ and \verb+RC()+ check left and right contexts respectively).
+permitted LUs, and word boundary issues have not been addressed.
 
 The \verb+Define()+ inside the definition of \verb+TOP+ is an anonymous rule
 that delimits the effect of the \verb+EndTag+. The extra \verb+Adjective+ is
@@ -171,7 +174,7 @@ sides for
 a concordance-like effect:
 
 %\begin{table}[h]
-
+\hfill \break
   \small
   \begin{framed}
 \begin{verbatim}
@@ -192,7 +195,7 @@ saw that <Size><LU>great</LU>
 %  \label{bibletext}
 %\end{table}
 
-\verb+pmatch+ may be operated in verious modes. In \verb+locate+ mode the
+\verb+pmatch+ may be operated in various modes. In \verb+locate+ mode the
 position and length of each match is given, and only the outermost tag is
 supplied. \verb+match+ mode (which is the default) tags and outputs running
 text, and \verb+extract+ mode does the same but omits parts of the input that
@@ -200,7 +203,7 @@ aren't matched by a rule. Matches may also be extracted via an API call, for
 example in order to achieve the above-seen concordance effect.
 
 A natural next step is to add optional non-core elements, such as an adverb
-preceding the LU being tagged as \verb+Degree+ and a phrase beginning with
+preceding the LU being tagged as \verb+Degree+ and a noun phrase beginning with
 ``for a'' following it as \verb+Standard+.
 
 \begin{table}[h]
@@ -211,12 +214,11 @@ define Size1
   Define(Adverb EndTag(Degree))
   LU (Adjective)
   Define(Noun EndTag(Entity))
-  Define({for a} NounPhrase
-  EndTag(Standard));
+  Define({for a} NP EndTag(Standard));
 \end{verbatim}
 \end{framed}
 \normalsize
-\caption{Redefining \texttt{Size1} to tag optional elements}
+\caption{Extending the rule with optional elements}
 \end{table}
 
 Here are some examples this rule finds in the British National
