@@ -7,10 +7,12 @@
 \usepackage{latexsym}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{framed}
 \special{papersize=210mm,297mm} % to avoid having to use "-t a4" with dvips 
 %\setlength\titlebox{6.5cm}  % You can expand the title box if you really have to
 
-\title{Extracting Semantic Frames with Pattern-matching}
+\title{Extracting Semantic Frames using hfst-pmatch}
 
 \author{Sam Hardwick \\
   University of Helsinki \\
@@ -27,79 +29,259 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-  We demonstrate the use of \verb+hfst-pmatch+~\newcite{pmatch}, a development of Xerox
-  \verb+fst+~\newcite{xerox-pmatch}, for developing a semantic frame extractor. We
-  select a FrameNet~\newcite{framenet} frame and write shallowly syntactic pattern-matching rules
+  We use \verb+hfst-pmatch+~(\newcite{pmatch}), a
+  pattern-matching tool mimicking and extending Xerox
+  \verb+fst+~(\newcite{karttunen/2011}), for demonstrating how to develop a
+  semantic frame extractor. We
+  select a FrameNet~(\newcite{framenet}) frame and write shallowly syntactic pattern-matching rules
   based on part-of-speech information and morphology from either a morphological automaton or
   tagged text.
 \end{abstract}
 
 \section{Introduction}
-\verb+pmatch+ is a pattern-matching operation based on regular expressions. It
-allows embedded references to other expressions (recursive transition networks
-or RTNs), including circular or self-references, which allows matching
-context-free grammars. The matched patterns may be efficiently tagged, extracted
-and modified by the rules.
+\verb+pmatch+ is a pattern-matching operation for text based on regular
+expressions. It uses a context-free grammar on regular expression terminals,
+which allows for recursive, self-referencing rules which would not be possible
+in a fully regular formalism. The matched patterns may be efficiently tagged,
+extracted and modified by the rules.
 
-Substantial named-entity recognisers (NERs) have been developed in
+Large-scale named-entity recognisers (NERs) have been developed in
 \verb+pmatch+ for Swedish and Finnish. Here we demonstrate a bottom-up approach
 to using it to identify the frame ``Size'' in FrameNet.
 
 \section{A Semantic Frame}
 
-A semantic frame is a description of a \emph{type} of event, relation or entity
-and related participants~\newcite{semantic-frame}. For example, in Framenet,
+A semantic frame~(\newcite{semantic-frame}) is a description of a \emph{type} of event, relation or entity
+and related participants. For example, in Framenet,
 a database of semantic frames,
 the description of an \verb+Entity+ in terms of physical space occupied by it is
-an instance of the semantic frame \verb+Size+. The frame is characterised by
-a lexical unit (LU), which is a word (in this case an adjective)
+an instance of the semantic frame \verb+Size+. The frame is evoked by
+a lexical unit (LU), also known as a frame evoking element (FEE), which is a
+word (in this case an adjective)
 such as ``big'' or ``tiny'', descriptive of the size of the \verb+Entity+.
 Apart from \verb+Entity+, which is a core or compulsory element, the
 frame may identify a \verb+Degree+ to which the \verb+Entity+ deviates
 from the norm (``a \textbf{really} big dog'') and a \verb+Standard+ to
 which it is compared (``tall \textbf{for a jockey}'').
 
+
+  \begin{center}
+\begin{table}[h]
+  \begin{tabular}{ | l | p{4cm} |}
+\hline
+Lexical Unit (LU) & Adjective describing magnitude (large, tiny, ...) \\
+\hline
+Entity (E) & That which is being described (house, debt, ...) \\
+\hline
+Degree (D), optional & Intensity or extent of description
+(really, quite, ...) \\
+\hline
+Standard (S), optional & A point of comparison (for a jockey, ...) \\
+\hline
+    \end{tabular}
+    \caption{The semantic frame \emph{Size}.}
+\end{table}
+      \end{center}
+
+For example:
+
+\begin{table}[h]
+$$
+\Big[_\text{Size}\Big[_\text{E}\text{He} \Big]
+  \text{is} \Big[_\text{D} \text{quite} \Big] \Big[_\text{LU}\text{tall} \Big]
+  \Big[_\text{S} \text{for a jockey} \Big] \Big]
+$$
+\caption{A tagged example of \emph{Size}}
+\end{table}
+
 \section{A Rule}
+
+A \verb+pmatch+ ruleset consists of a number of named regular expressions and
+functions, exactly one of which is the top-level rule which is named \verb+TOP+
+or is introduced with the directive \verb+regex+. For example:
+
+\begin{table}[h]
+\small
+\begin{framed}
+\begin{verbatim}
+define my_colours {green} | {red};
+! Comment: what about eg. "triggered"?
+define TOP my_colours EndTag(colour);
+\end{verbatim}
+\end{framed}
+\normalsize
+\caption{Introducing \texttt{pmatch} syntax}
+\end{table}
+
+The effect of the directive \verb+EndTag()+ is to tag whatever is matched by its
+rule (here shown with an unintentional effect):
+
+%\begin{table}[h]
+  \small
+  \begin{framed}
+\begin{verbatim}
+The light went <colour>green</colour>
+and the mechanism was
+trigge<colour>red</colour>.
+\end{verbatim}
+\end{framed}
+  \normalsize
+%  \caption{Demonstrating \texttt{pmatch} output}
+%  \end{table}
 
 A simple and common syntactic realisation of the \verb+Size+ frame is a single
 noun phrase containing one of the LUs, such as
-``the big dog that ran away''. Here we'd like to identify ``big'' as \verb+LU+,
-``dog'' as \verb+Entity+ and the combination as \verb+Size+.
+``the big brown dog that ran away''. Here we'd like to identify ``big'' as \verb+LU+,
+``brown dog'' as \verb+Entity+ and the combination as \verb+Size+.
 Our first rule for identifying this type of construction might be
 
+\begin{table}[h]
+  \small
+  \begin{framed}
 \begin{verbatim}
-Define Size1 LC(W) Define(LU EndTag(LU))
-  W Define(Noun EndTag(Entity)) RC(W);
-Define TOP Size1 EndTag(Size);  
+define LU {small} | {large} |
+  {big} EndTag(LU);
+define Size1 LU (Adjective)
+  Define(Noun EndTag(Entity));
+define TOP Size1 EndTag(Size);  
 \end{verbatim}
+\end{framed}
+\normalsize
+\caption{A simplified first rule}
+\end{table}
 
-\verb+TOP+ is the root of the pattern matcher, and must be present.
-\verb+W+ is a word boundary, such as a space character or the beginning or end of
-input. \verb+LC+ and \verb+RC+ are special operations for checking that at both left and right
-sides of the rule there is a word boundary without including it in the match itself.
-The \verb+Define()+s inside other definitions are anonymous rules that delimit the effect of
-\verb+EndTag()+, which assigns a tag to a pattern.
+This ruleset has been simplified for brevity -- it has only a few of the
+permitted LUs, and word boundary issues have not been dealt with. In practice
+we would define a separate word boundary rule, eg.\@ \verb+W+, to allow
+whitespace or the beginning or end of input. This may be interpolated in the
+rules where we want to capture the whitespace, or checked for with run-time
+context checking just to make sure there is a word boundary at the edge of our
+rule (\verb+LC()+ and \verb+RC()+ check left and right contexts respectively).
 
-We can verify that this extracts instances of our desired pattern by compiling
-these rules with \verb+hfst-pmatch2fst+ and running the compiled result with
-\verb+hfst-pmatch --locate+, which gives the locations (which we omit here to save space) of matches and omits
-nonmatching text. Here we have inputted the text of the King James Bible from
-Project Gutenberg~\newcite{projectgutenberg} and added some extra characters on both sides for
+The \verb+Define()+s inside the definition of \verb+TOP+ is an anonymous rules
+that delimits the effect of the \verb+EndTag+. The extra \verb+Adjective+ is
+optional, which is conveyed by the surrounding parentheses.
+
+We can verify that our rules extract instances of our desired pattern by compiling
+them with \verb+hfst-pmatch2fst+ and running the compiled result with
+\verb+hfst-pmatch --extract-tags+. In the following we have
+inputted the text of the King James Bible from Project
+Gutenberg (\url{gutenberg.org}) and added some extra characters on both
+sides for
 a concordance-like effect:
 
+%\begin{table}[h]
+
+  \small
+  \begin{framed}
 \begin{verbatim}
 ...
-let your little ones also go|<Size>
-all be a great cry througho|<Size>
-re was a great cry in Egypt|<Size>
-saw that great work which th|<Size>
-re lay a small round thing, a|<Size>
+there lay a <Size><LU>small</LU>
+round <Entity>thing</Entity></Size>
+...
+there was a <Size><LU>great</LU>
+<Entity>cry</Entity></Size> in Egypt
+...
+saw that <Size><LU>great</LU>
+<Entity>work</Entity></Size> which
 ...
 \end{verbatim}
+\end{framed}
+\normalsize
+%\caption{Fragments of tagged running text}
+%  \label{bibletext}
+%\end{table}
+
+\verb+pmatch+ may be operated in verious modes. In \verb+locate+ mode the
+position and length of each match is given, and only the outermost tag is
+supplied. \verb+match+ mode (which is the default) tags and outputs running
+text, and \verb+extract+ mode does the same but omits parts of the input that
+aren't matched by a rule. Matches may also be extracted via an API call, for
+example in order to achieve the above-seen concordance effect.
+
+A natural next step is to add optional non-core elements, such as an adverb
+preceding the LU being tagged as \verb+Degree+ and a phrase beginning with
+``for a'' following it as \verb+Standard+.
+
+\begin{table}[h]
+  \small
+  \begin{framed}
+\begin{verbatim}
+define Size1
+  Define(Adverb EndTag(Degree))
+  LU (Adjective)
+  Define(Noun EndTag(Entity))
+  Define({for a} NounPhrase
+  EndTag(Standard));
+\end{verbatim}
+\end{framed}
+\normalsize
+\caption{Redefining \texttt{Size1} to tag optional elements}
+\end{table}
+
+Here are some examples this rule finds in the British National
+Corpus~(\newcite{bnc}).
+
+%\begin{table}[h]
+  \small
+  \begin{framed}
+\begin{verbatim}
+...
+presence of an <Size>
+  <Degree>arbitrarily</Degree>
+  <LU>small</LU> <Entity>
+  amount</Entity></Size> of dust
+...
+one <Size><LU>small</LU>
+  <Entity>step</Entity>
+  <Standard>for a man</Standard>
+  </Size>
+...
+\end{verbatim}
+  \end{framed}
+  \normalsize
+%  \caption{Tagged text with optional elements}
+%  \label{bnctext}
+%  \end{table}
+
+We can see that in ``small amount of dust'' we might want to
+tag not just the immediate noun as \verb+Entity+ but the entire noun phrase
+(which could be implemented up to a context-free definition of a noun phrase),
+and in ``one small step for a man'' a common indirect use of the \verb+Standard+
+construction.
+
+The FrameNet corpus itself is a
+good source for finding more cases.
+
+As well as correct matches, such as ``small round thing'' in the biblical
+example, we have metaphorical meanings of \verb+Size+, such as ``great cry''.
+This may or may not be desired -- perhaps we wish to do further processing to
+identify the target domains of such metaphors, or perhaps we wish to be able
+to annotate physical size and physical size only.
 
 \subsection{Incorporating Semantic Information}
-Size is very metaphorical, so we can get a list of concrete nouns from WordNet
-or else laboriously iterate and collect metaphorically used nouns ourselves...
+
+Size is a very metaphorical concept, and syntactic rules as above will produce a large amount of matches that relate to such uses, eg. ``a great cry'' or ``a big deal''. If we wish to refine our rules to detect such uses, there are a few avenues for refinement.
+
+First of all, some LUs are much more metaphorical than others. A ``great man'' is almost certainly a metaphorical use, whereas a ``large man'' is almost certainly concrete. Accuracy may be improved by requiring ``great'' to be used together with a common concrete complement, like ``great crowd''. This is a matter of running the rules on a corpus and doing some statistics on the result.
+
+There are also semantic classifications of words, such as WordNet(~\newcite{wordnet}). We may compile the set of hyponyms of \emph{physical entity} and require them to appear as the nouns in our rules.
+
+\begin{table}[h]
+\small
+\begin{framed}
+\begin{verbatim}
+define phys_entity
+  @txt"phys_entity.txt";
+! a list of singular baseforms
+! can be expanded to include
+! eg. plurals by suitably composing
+! it with a dictionary automaton
+\end{verbatim}
+\end{framed}
+\normalsize
+\caption{Reading an external linguistic resource}
+\end{table}
 
 \subsection{Incorporating Part-of-speech Information}
 
@@ -111,33 +293,68 @@ Considering that in writing our
 rules we are effectively doing shallow syntactic parsing, even a very simple
 way to identify parts of speech may suffice: a morphological dictionary.
 For example, a finite-state transducer representing English morphology may be
-used to define the class of common nouns as follows:
+used to define the class of common nouns as in table \ref{dictrules}.
 
+\begin{table}[h]
+\small
+  \begin{framed}
 \begin{verbatim}
 ! The file we want to read
-Define English @bin"english.hfst";
+define English @bin"english.hfst";
 ! We compose it with a noun filter
 ! and extract the input side
-Define Noun English .o.
+define Noun English .o.
  [?+ "<NN1>" | "<NN2>"].u;
 ! (NN1 is singular, NN2 plural)
 \end{verbatim}
+\end{framed}
+  \normalsize
+  \caption{Using a dictionary to write POS rules}
+  \label{dictrules}
+  \end{table}
 
 If we have the use of a part-of-speech tagger, we may write our rules to act
-on its output:
+on its output, as in table \ref{posrules}.
 
+\begin{table}[h]
+  \small
+  \begin{framed}
 \begin{verbatim}
-Define Noun LC(W) [\W]+
+define Noun LC(W) Wordchar+
  ["<NN1>"|"<NN2>"] RC(W);
 \end{verbatim}
+\end{framed}
+  \normalsize
+  \caption{Using tags in pre-tagged text}
+  \label{posrules}
+  \end{table}
 
 \section{Increasing Coverage}
-Identify common cases we missed by finding LUs that aren't matched by
-anything and write more rules...
+Having considered for each rule where \verb+Degree+ and \verb+Standard+ may occur, coverage may be evaluated by also finding those cases where a LU is used as an adjective but hasn't been tagged, eg.
 
-\section{Elaborations}
+\small
+\begin{verbatim}
+define TOP Size1 | Size2 | ...
+ Define(LU EndTag(NonmatchingLU));
+\end{verbatim}
+\normalsize
 
-More sophisticated parsing with embedded structures...
+The valid match is always the longest possible one, so \verb+NonmatchingLU+ will be the tag only if no subsuming \verb+SizeN+ rule applies.
+
+For example in
+
+\small
+\begin{verbatim}
+the moving human body is
+<NonmatchingLU>large</NonmatchingLU>
+obtrusive and highly visible
+\end{verbatim}
+\normalsize
+
+We see another realisation of the frame: the \verb+Entity+ being followed by a
+copula, and the \verb+LU+ appearing to the right. We could write the rule
+\verb+Size2+ to capture this, adding positions for non-core elements either by
+linguistic reasoning or by searching the corpus.
 
 % If you use BibTeX with a bib file named eacl2014.bib, 
 % you should add the following two lines:
