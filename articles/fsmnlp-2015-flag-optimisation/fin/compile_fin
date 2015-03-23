@@ -1,0 +1,18 @@
+#! /bin/bash
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+LEXC=$1
+ID=$2
+
+$LEXC $DIR/fin.lexc > $DIR/hfst_bin/fin.lexc.hfst
+hfst-twolc $DIR/fin.twolc > $DIR/hfst_bin/fin.twolc.hfst
+
+cat $DIR/inituppercase.regex | hfst-regexp2fst > $DIR/hfst_bin/inituppercase.hfst
+cat $DIR/remove_boundaries.regex | hfst-regexp2fst > $DIR/hfst_bin/remove_boundaries.hfst
+
+hfst-compose-intersect -1 $DIR/hfst_bin/fin.lexc.hfst -2 $DIR/hfst_bin/fin.twolc.hfst |\
+hfst-compose-intersect -2 $DIR/hfst_bin/inituppercase.hfst |\
+hfst-compose-intersect -2 $DIR/hfst_bin/remove_boundaries.hfst |\
+hfst-minimize |\
+hfst-invert |\
+hfst-fst2fst -w > $DIR/hfst_bin/fin.hfst.$ID

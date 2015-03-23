@@ -1,0 +1,5 @@
+#!
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+$DIR/hfst-lexc-transform-flag-paths -F -M $1
