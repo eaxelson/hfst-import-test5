@@ -1,0 +1,72 @@
+\documentclass{llncs}
+
+\usepackage{llncsdoc}
+
+%% PDFLaTeX
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{textcomp}      % for ° symbol
+
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage{url}
+\usepackage{tabularx}
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning}
+
+%% XeLaTeX
+% \usepackage{fontspec}
+% \usepackage{xunicode}
+% \usepackage{xltxtra}
+
+\usepackage{expex}
+
+%
+\begin{document}
+%
+\title{Semantic tagging using HFST}
+%
+\author{N.N. and N.N.}
+
+ \institute{xx\\
+ yy\\
+ zz\\
+ ww\\
+ \email{\{n.n., n.n.\}@xxx.yy}}
+
+\maketitle
+
+% Removed the manual bibstyle in favor of splncs03.bst,
+% if it's required fetch it from svn history
+
+\begin{abstract}
+%Krister
+\end{abstract}
+
+\section*{Introduction}
+% Krister (1 p.)
+
+\section{Tokenization using {\tt hfst-pmatch}}\label{sec:tokenization}
+% Sam (4 p.)
+
+\section{Morphological Tagging using {\tt hfst-finnpos}}\label{sec:morph-tagging}
+% Miikka (4 p.)
+
+\section{Semantic Tagging using {\tt hfst-pamtch}}\label{sec:sem-tagging}
+% Sam (4 p.)
+
+\section{Distortion Filtering with Weighted Regular Expressions}
+% Sam & Miikka (3 p.)
+
+\section{Background}\label{sec:background}
+% Erik (2 p.)
+
+\section{Discussion and Conclusion}\label{sec:discussion}
+% Krister (1 p.)
+
+\bibliographystyle{splncs03}
+\bibliography{sfcm-2015}
+
+\end{document}
+% vim: set spell:
