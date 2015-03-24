@@ -53,6 +53,26 @@
 \section{Morphological Tagging using {\tt hfst-finnpos}}\label{sec:morph-tagging}
 % Miikka (4 p.)
 
+Finnpos \cite{silfverberg2015} is a morphological tagger toolkit based
+on the Conditional Random Field framework. It is especially geared
+toward morphologically rich languages.  It utilizes several
+optimizations to ensure fast estimation and inference even with large
+label sets. Additionally, it uses sub label dependencies in
+unstructured and structured features for counteracting data sparsity
+and modeling grammatical phenomena such as case and number congruence.
+
+Besides optimizations and sub-label dependencies
+\cite{silfverberg2014}, Finnpos also provides a flexible way of
+integrating a morphological analyzer in the tagging
+process. Morphological analyses can be use both as features during
+estimation and inference and for constraining the set of possible
+morphological labels for word forms. Additionally, the analyzer is
+used in lemmatization.
+
+For words not recognized by the morphological analyzer, Finnpos
+includes a data driven lemmatizer which is based on the averaged
+perceptron classifier..
+
 \section{Semantic Tagging using {\tt hfst-pamtch}}\label{sec:sem-tagging}
 % Sam (4 p.)
 
