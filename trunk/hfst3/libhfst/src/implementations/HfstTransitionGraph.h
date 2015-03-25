@@ -1406,7 +1406,7 @@
            char line [255];
 
            if (file == NULL) { /* we use streams */
-             if (not is.getline(line,255).eof())
+             if (! is.getline(line,255).eof())
                HFST_THROW(EndOfStreamException);
            }
            else { /* we use FILEs */            
@@ -1778,7 +1778,7 @@
            while(true) {
 
              if (file == NULL) { /* we use streams */
-               if (not is.getline(line,255).eof())
+               if (! is.getline(line,255).eof())
                  break;
              }
              else { /* we use FILEs */            
@@ -2247,8 +2247,8 @@
                typename HfstSymbolPairSet::const_iterator IT 
                  = substituting_transitions.begin();
 
-               if (not C::is_valid_symbol(IT->first) ||
-               not C::is_valid_symbol(IT->second) )
+               if (! C::is_valid_symbol(IT->first) ||
+               ! C::is_valid_symbol(IT->second) )
              HFST_THROW_MESSAGE
                (EmptyStringException,
                 "HfstTransitionGraph::substitute");
@@ -2269,8 +2269,8 @@
                while (IT != substituting_transitions.end())
              {
 
-               if (not C::is_valid_symbol(IT->first) ||
-                   not C::is_valid_symbol(IT->second) )
+               if (! C::is_valid_symbol(IT->first) ||
+                   ! C::is_valid_symbol(IT->second) )
                  HFST_THROW_MESSAGE
                    (EmptyStringException,
                     "HfstTransitionGraph::substitute");
@@ -2321,8 +2321,8 @@
                       bool input_side=true, 
                       bool output_side=true) {
 
-       if (not C::is_valid_symbol(old_symbol) || 
-           not C::is_valid_symbol(new_symbol) ) {
+       if (! C::is_valid_symbol(old_symbol) || 
+           ! C::is_valid_symbol(new_symbol) ) {
          HFST_THROW_MESSAGE
            (EmptyStringException,
             "HfstTransitionGraph::substitute"); }
@@ -2338,9 +2338,9 @@
            // if the substitution is made on both sides.
            if (input_side && output_side) {
              /* Special symbols are always included in the alphabet */
-             if (not is_epsilon(old_symbol) && 
-                 not is_unknown(old_symbol) &&
-                 not is_identity(old_symbol)) {
+             if (! is_epsilon(old_symbol) && 
+                 ! is_unknown(old_symbol) &&
+                 ! is_identity(old_symbol)) {
                alphabet.erase(old_symbol); }
            }
            // Insert the substituting symbol to the alphabet.
@@ -2428,8 +2428,8 @@
          HfstTransitionGraph &substitute
            (const HfstSymbolPair &sp, const HfstSymbolPairSet &sps) 
        {
-         if (not C::is_valid_symbol(sp.first) || 
-         not C::is_valid_symbol(sp.second) ) {
+         if (! C::is_valid_symbol(sp.first) || 
+         ! C::is_valid_symbol(sp.second) ) {
            HFST_THROW_MESSAGE
          (EmptyStringException,
           "HfstTransitionGraph::substitute"); }
@@ -2437,8 +2437,8 @@
          for (typename HfstSymbolPairSet::const_iterator it = sps.begin();
           it != sps.end(); it++)
            {
-         if (not C::is_valid_symbol(it->first) || 
-             not C::is_valid_symbol(it->second) ) {
+         if (! C::is_valid_symbol(it->first) || 
+             ! C::is_valid_symbol(it->second) ) {
            HFST_THROW_MESSAGE
              (EmptyStringException,
               "HfstTransitionGraph::substitute"); }
@@ -2455,10 +2455,10 @@
            (const HfstSymbolPair &old_pair, 
             const HfstSymbolPair &new_pair) 
          {
-       if (not C::is_valid_symbol(old_pair.first) || 
-           not C::is_valid_symbol(new_pair.first) ||
-           not C::is_valid_symbol(old_pair.second) || 
-           not C::is_valid_symbol(new_pair.second) ) {
+       if (! C::is_valid_symbol(old_pair.first) || 
+           ! C::is_valid_symbol(new_pair.first) ||
+           ! C::is_valid_symbol(old_pair.second) || 
+           ! C::is_valid_symbol(new_pair.second) ) {
          HFST_THROW_MESSAGE
            (EmptyStringException,
             "HfstTransitionGraph::substitute"); }
@@ -2590,7 +2590,7 @@
            substitute(const HfstSymbolPair &sp, 
               const HfstTransitionGraph &graph) {
 
-           if ( not ( C::is_valid_symbol(sp.first) &&              
+           if ( ! ( C::is_valid_symbol(sp.first) &&              
                       C::is_valid_symbol(sp.second) ) ) {
              HFST_THROW_MESSAGE
                (EmptyStringException, 
@@ -2792,7 +2792,7 @@
            for (typename SubstMap::const_iterator it = substitution_map.begin();
                 it != substitution_map.end(); it++)
              {
-               if ( not ( C::is_valid_symbol(it->first) ))
+               if ( ! ( C::is_valid_symbol(it->first) ))
                  {
                    HFST_THROW_MESSAGE(EmptyStringException, 
                     "HfstTransitionGraph::substitute "
@@ -3024,7 +3024,7 @@
          HfstTransitionGraph &insert_freely
            (const HfstSymbolPair &symbol_pair, typename C::WeightType weight) 
            {    
-         if ( not ( C::is_valid_symbol(symbol_pair.first) &&           
+         if ( ! ( C::is_valid_symbol(symbol_pair.first) &&           
                 C::is_valid_symbol(symbol_pair.second) ) ) {
            HFST_THROW_MESSAGE
          (EmptyStringException, 
@@ -3056,7 +3056,7 @@
                     = symbol_pairs.begin();
                   symbols_it != symbol_pairs.end(); symbols_it++)
                {
-                 if ( not ( C::is_valid_symbol(symbols_it->first) &&           
+                 if ( ! ( C::is_valid_symbol(symbols_it->first) &&           
                             C::is_valid_symbol(symbols_it->second) ) ) {
                    HFST_THROW_MESSAGE
                      (EmptyStringException, 
@@ -3182,7 +3182,7 @@
              }
 
            // If not found, create the transition
-           if (not transition_found)
+           if (! transition_found)
              {
                next_state = add_state();
                HfstTransition <C> transition(next_state, it->first,
@@ -3609,7 +3609,7 @@
                /* CASE 2: Other input symbols consume a symbol in the lookup path s,   
                   so they can be added only if the end of the lookup path s has not    
                   been reached. */
-               else if (not only_epsilons)
+               else if (! only_epsilons)
                  {
                    bool continu = false;
                    if (it->get_input_symbol().compare(s.second.at(index)) == 0)
@@ -3711,7 +3711,7 @@
            std::string isymbol = transition.get_input_symbol();
            
            // If we are not at the end of lookup_path,
-           if (not (lookup_index == (unsigned int)lookup_path.size()))
+           if (! (lookup_index == (unsigned int)lookup_path.size()))
              {
                // we can go further if the current symbol in lookup_path
                // matches to the input symbol of the transition, i.e
@@ -3755,7 +3755,7 @@
             float * max_weight = NULL)
          {
            // Check whether the number of input epsilon cycles is exceeded
-           if (not Eh.can_continue(state)) {
+           if (! Eh.can_continue(state)) {
              return;
            }
            // Check whether the maximum weight is exceeded
