@@ -458,8 +458,8 @@ public:
     void write(std::ostream& os, bool weighted) const
         {
             os.write(reinterpret_cast<const char*>(&input_symbol),
-                     sizeof(input_symbol));
-            if(!weighted and input_symbol == NO_SYMBOL_NUMBER and
+                     sizeof(SymbolNumber));
+            if(!weighted && input_symbol == NO_SYMBOL_NUMBER &&
                first_transition_index != NO_TABLE_INDEX) {
                 // Make sure that we write the correct type of final index
                 unsigned int unweighted_final_index = 1;

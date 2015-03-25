@@ -46,7 +46,7 @@ namespace hfst
       {
         iterator least_upper_bound = get_least_upper_bound(x);
         const X &new_x = *least_upper_bound;
-        if (least_upper_bound == end() or not (x == new_x))
+        if (least_upper_bound == end() || !(x == new_x))
           { add_value(x,least_upper_bound); }
       }
 
@@ -88,7 +88,7 @@ namespace hfst
         const_iterator it = container_.begin();
         for ( ; it != container_.end(); ++it)
           { 
-        if (not comparator(*it,x))
+        if (! comparator(*it,x))
           { break; }
           }
         return it;
@@ -99,7 +99,7 @@ namespace hfst
         iterator it = container_.begin();
         for ( ; it != container_.end(); ++it)
           { 
-        if (not comparator(*it,x))
+        if (! comparator(*it,x))
           { break; }
           }
         return it;

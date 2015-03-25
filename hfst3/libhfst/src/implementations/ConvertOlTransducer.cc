@@ -238,7 +238,7 @@ void get_states_and_symbols(
         // 4) non-input symbols
         for (std::set<std::string>::iterator it = other_symbols->begin();
              it != other_symbols->end(); ++it) {
-            if (!is_epsilon(*it) and input_symbols->count(*it) == 0 and
+            if (!is_epsilon(*it) && input_symbols->count(*it) == 0 &&
               flag_diacritics->count(*it) == 0) {
                 string_symbol_map[*it] = symbol_table.size();
                 symbol_table.push_back(*it);

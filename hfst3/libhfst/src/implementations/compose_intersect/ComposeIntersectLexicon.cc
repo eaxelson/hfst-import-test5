@@ -24,7 +24,7 @@ namespace hfst
       state_pair_map.clear();
       pair_vector.clear();
 
-      while (not agenda.empty())
+      while (! agenda.empty())
     { agenda.pop(); }
 
       result = HfstBasicTransducer();
@@ -35,7 +35,7 @@ namespace hfst
     {
       HfstState s;
 
-      if (p.first == START and p.second == ComposeIntersectRule::START)
+      if (p.first == START && p.second == ComposeIntersectRule::START)
     { s = 0; }
       else
     { s = result.add_state(); }
@@ -85,7 +85,7 @@ namespace hfst
     HfstBasicTransducer &ComposeIntersectLexicon::compute_composition_result
     (ComposeIntersectRule * rules)
     { 
-      while (not agenda.empty())
+      while (! agenda.empty())
     {
       HfstState s = agenda.front();
       agenda.pop();
@@ -123,39 +123,39 @@ namespace hfst
           lexicon_skip_symbol_compose(it->second,p.second,state);
           lexicon_eps_transition_found = true;
         }
-      else if (is_flag_diacritic(it->first) and 
-           (not rules->known_symbol(it->first)))
+      else if (is_flag_diacritic(it->first) &&
+           (! rules->known_symbol(it->first)))
         { 
-	  lexicon_skip_symbol_compose(it->second,p.second,state); 
+          lexicon_skip_symbol_compose(it->second,p.second,state); 
           lexicon_eps_transition_found = true;
-	}
+        }
       else
         { 
-	  compose(it->second,rules->get_transitions
+          compose(it->second,rules->get_transitions
               (p.second,it->first),state); 
-	}
+        }
     }
       
       if (!lexicon_eps_transition_found)
-	{
-	  rule_skip_symbol_compose
+        {
+          rule_skip_symbol_compose
             (rules->get_transitions
-	     (p.second,HfstTropicalTransducerTransitionData::get_number
-	      ("@_EPSILON_SYMBOL_@")),p.first,state);
-	}
+             (p.second,HfstTropicalTransducerTransitionData::get_number
+              ("@_EPSILON_SYMBOL_@")),p.first,state);
+        }
     }
     
     void ComposeIntersectLexicon::lexicon_skip_symbol_compose
     (const TransitionSet &transitions,HfstState rule_state,HfstState origin)
     {
       for (TransitionSet::const_iterator it = transitions.begin();
-	   it != transitions.end();
-	   ++it)
-	{ 
-	  add_transition
-	    (origin,it->ilabel,it->olabel,it->weight,
-	     get_state(StatePair(it->target,rule_state))); 
-	}
+           it != transitions.end();
+           ++it)
+        { 
+          add_transition
+            (origin,it->ilabel,it->olabel,it->weight,
+             get_state(StatePair(it->target,rule_state))); 
+        }
     }
 
     void ComposeIntersectLexicon::rule_skip_symbol_compose

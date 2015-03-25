@@ -25,7 +25,7 @@ int main(int argc, char * argv[])
     
   IntSpaceSavingSet sset;
   assert(sset.size() == 0);
-  assert(not sset.has_element(0));
+  assert(! sset.has_element(0));
   
   sset.insert(0);
   assert(sset.size() == 1);
@@ -50,7 +50,7 @@ int main(int argc, char * argv[])
 
   sset.clear();
   assert(sset.size() == 0);
-  assert(not sset.has_element(0));
+  assert(! sset.has_element(0));
   sset.insert(0);
   sset.insert(1);
   assert(sset.has_element(1));
@@ -67,7 +67,7 @@ int main(int argc, char * argv[])
 
   sset.clear();
   assert(sset.size() == 0);
-  assert(not sset.has_element(0));
+  assert(! sset.has_element(0));
   sset.insert(1);
   sset.insert(0);
   assert(sset.has_element(0));
@@ -91,7 +91,7 @@ int main(int argc, char * argv[])
 
   sset.clear();
   sset.insert(2);
-  assert(not sset.has_element(1));
+  assert(! sset.has_element(1));
 
   std::cout << "ok" << std::endl;
   return 0;

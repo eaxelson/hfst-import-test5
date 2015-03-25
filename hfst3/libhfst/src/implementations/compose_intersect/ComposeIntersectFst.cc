@@ -39,9 +39,9 @@ namespace hfst
     (const ComposeIntersectFst::Transition &another) const
     {
       return 
-    ilabel == another.ilabel and
-    olabel == another.olabel and
-    weight == another.weight and
+    ilabel == another.ilabel &&
+    olabel == another.olabel &&
+    weight == another.weight &&
     target == another.target;
     }
     bool ComposeIntersectFst::CompareTransitions::operator()
@@ -115,7 +115,7 @@ namespace hfst
              (jt->get_output_symbol())].
             insert(*jt); }
         }
-      if (not identity_found)
+      if (! identity_found)
         { identity_transition_vector.push_back
         (Transition
          (0,
@@ -149,7 +149,7 @@ namespace hfst
       if (transition_map_vector.at(s).find(symbol) == 
       transition_map_vector.at(s).end())
     { 
-      if (is_known_symbol(symbol) or not has_identity_transition(s))
+      if (is_known_symbol(symbol) || ! has_identity_transition(s))
         { return transition_map_vector.at(s)[symbol] = TransitionSet(); }
       else
         { 
