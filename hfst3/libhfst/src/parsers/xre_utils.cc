@@ -50,7 +50,7 @@ int xreerror(yyscan_t scanner, const char* msg)
                   hfst::xre::data, xreget_text(scanner));
     }
 
-  buffer[1023] == '\0';
+  buffer[1023] = '\0';
   hfst::xre::error_message = std::string(buffer);
   return 0;
 }
@@ -60,7 +60,7 @@ xreerror(const char *msg)
 {
   char buffer [1024];
   int n = sprintf(buffer, "*** xre parsing failed: %s\n", msg);
-  buffer[1023] == '\0';
+  buffer[1023] = '\0';
   hfst::xre::error_message = std::string(buffer);
   return 0;
 }
