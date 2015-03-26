@@ -76,7 +76,7 @@ namespace hfst
     {
       float lexicon_weight = get_final_weight(pair_vector[s].first);
       float rules_weight = rules->get_final_weight(pair_vector[s].second);
-      if (lexicon_weight != std::numeric_limits<float>::infinity() and
+      if (lexicon_weight != std::numeric_limits<float>::infinity() &&
           rules_weight != std::numeric_limits<float>::infinity())
         { result.set_final_weight(s,lexicon_weight+rules_weight); }
     }
