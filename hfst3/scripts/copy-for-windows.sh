@@ -148,6 +148,20 @@ done
 # make scripts and headers
 cp scripts/make-foma.bat $1/back-ends/foma/
 cp scripts/make-openfstwin.bat $1/back-ends/openfstwin/src/lib/
+cp scripts/make-parsers.bat $1/libhfst/src/parsers/
+cp scripts/make-implementations.bat $1/libhfst/src/implementations/
 # todo: make scripts for all directories
+
+# copy missing headers and change some headers included
 cp scripts/stdint.h $1/back-ends/foma/
 cp scripts/inttypes.h $1/back-ends/foma/
+# unistd.h is included in some generated files
+for file in \
+$1/libhfst/src/parsers/pmatch_lex.cpp \
+$1/libhfst/src/parsers/xre_lex.cpp \
+$1/libhfst/src/parsers/lexc-lexer.cpp \
+$1/back-ends/foma/lex.cmatrix.c;
+do
+    sed -i 's/#include <unistd.h>/#include <io.h>/' $file
+done
+
