@@ -393,9 +393,9 @@ std::string PmatchContainer::parse_name_from_hfst3_header(std::istream & f)
         if (headervalue[remaining_header_len - 1] != '\0') {
             HFST_THROW(TransducerHeaderException);
         }
-        char type[remaining_header_len];
+        char * type = new char [remaining_header_len];
         bool type_defined = false;
-        char name[remaining_header_len];
+        char * name = new char [remaining_header_len];
         bool name_defined = false;
         int i = 0;
         while (i < remaining_header_len) {
@@ -421,7 +421,10 @@ std::string PmatchContainer::parse_name_from_hfst3_header(std::istream & f)
         if (strcmp(type, "HFST_OLW") != 0) {
             HFST_THROW(TransducerHeaderException);
         }
-        return std::string(name);
+        std::string retval = std::string(name);
+        delete [] type;
+        delete [] name;
+        return retval;
     } else // nope. put back what we've taken
     {
         f.unget(); // first the non-matching character
@@ -968,7 +971,7 @@ void PmatchContainer::initialize_input(const char * input_s)
                 // even if it's not utf-8, tokenize a byte at a time
                 bytes_to_tokenize = 1;
             }
-            char new_symbol[bytes_to_tokenize + 1];
+            char * new_symbol = new char [bytes_to_tokenize + 1];
             memcpy(new_symbol, *input_str_ptr, bytes_to_tokenize);
             new_symbol[bytes_to_tokenize] = '\0';
             (*input_str_ptr) += bytes_to_tokenize;
@@ -976,6 +979,7 @@ void PmatchContainer::initialize_input(const char * input_s)
             encoder->read_input_symbol(new_symbol, symbol_count);
             k = symbol_count;
             ++symbol_count;
+            delete [] new_symbol;
         }
         input.push_back(k);
     }

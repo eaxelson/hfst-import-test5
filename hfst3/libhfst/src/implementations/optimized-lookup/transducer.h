@@ -31,6 +31,12 @@
 #include "../../HfstFlagDiacritics.h"
 #include "../../HfstSymbolDefs.h"
 
+#ifdef _MSC_VER
+ #include <BaseTsd.h>
+ typedef SSIZE_T ssize_t;
+#endif
+
+
 /** \brief A namespace for optimized-lookup functions and datatypes.*/
 namespace hfst_ol {
 using hfst::FdOperation;
