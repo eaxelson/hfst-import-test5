@@ -1,4 +1,4 @@
-#ifdef WINDOWS
+#if defined (_MSC_VER) || (__MINGW32__)
 typedef long off_t;
 #endif
 
