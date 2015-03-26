@@ -7,13 +7,13 @@
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
 \usepackage{textcomp}      % for ° symbol
-
 \usepackage{multirow}
 \usepackage{caption}
 \usepackage{url}
 \usepackage{tabularx}
 \usepackage{tikz}
 \usetikzlibrary{automata,positioning}
+\usepackage{framed}
 
 %% XeLaTeX
 % \usepackage{fontspec}
@@ -49,6 +49,33 @@
 
 \section{Tokenization using {\tt hfst-pmatch}}\label{sec:tokenization}
 % Sam (4 p.)
+Tokenization is a necessary first step in most text-based NLP tasks. For some
+languages (eg. English) it is often considered to be a mechanical
+preprocessing task without linguistic importance, and for others (eg. Chinese)
+it is a subtle task given a different name (``segmentation'').
+
+However, even in languages that generally insert spaces between words, there
+are issues that influence the quality or feasibility of tools down the
+pipeline. We may, for example, want to be able to identify multiword units,
+identify compound words and mark their internal boundaries, control various
+dimensions of normalisation, or produce possible part-of-speech tags or
+deeper morphological analyses.
+
+We describe a general approach to these issues based on morphological
+transducers, regular expressions and the pattern matching operation
+\verb+pmatch+~\cite{pmatchcite}.
+
+\subsection{Tokenizing with a Dictionary}
+
+\subsubsection{Preserving the Parts of a Multiword Unit}
+
+\subsection{Tokenization Rules as an OOV Fallback}
+
+\subsection{Analysis Cohorts}
+
+\subsection{Chunking}
+
+\subsection{Incorporating other Linguistic Resources}
 
 \section{Morphological Tagging using {\tt hfst-finnpos}}\label{sec:morph-tagging}
 % Miikka (4 p.)
@@ -73,7 +100,7 @@ For words not recognized by the morphological analyzer, Finnpos
 includes a data driven lemmatizer which is based on the averaged
 perceptron classifier..
 
-\section{Semantic Tagging using {\tt hfst-pamtch}}\label{sec:sem-tagging}
+\section{Semantic Tagging using {\tt hfst-pmatch}}\label{sec:sem-tagging}
 % Sam (4 p.)
 
 \section{Distortion Filtering with Weighted Regular Expressions}
