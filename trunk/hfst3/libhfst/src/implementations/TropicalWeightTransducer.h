@@ -16,10 +16,13 @@
 #include "HfstExceptionDefs.h"
 #include "HfstFlagDiacritics.h"
 
+#if HAVE_CONFIG_H
+  #include "../../../config.h"
+#endif
+
 #ifdef _MSC_VER
 #include "back-ends/openfstwin/src/include/fst/fstlib.h"
 #else
-#include "../../../config.h"
 #include "back-ends/openfst/src/include/fst/fstlib.h"
 #endif // _MSC_VER
 
