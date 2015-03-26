@@ -267,13 +267,14 @@ bool Transducer::initialize_input(const char * input)
             if (bytes_to_tokenize == 0) {
                 return false; // tokenization failed
             }
-            char new_symbol[bytes_to_tokenize + 1];
+            char * new_symbol = new char[bytes_to_tokenize + 1];
             memcpy(new_symbol, *input_str_ptr, bytes_to_tokenize);
             new_symbol[bytes_to_tokenize] = '\0';
             (*input_str_ptr) += bytes_to_tokenize;
             alphabet->add_symbol(new_symbol);
             k = alphabet->get_symbol_table().size() - 1;
             encoder->read_input_symbol(new_symbol, k);
+            delete [] new_symbol;
         }
         input_tape.write(i, k);
         ++i;
