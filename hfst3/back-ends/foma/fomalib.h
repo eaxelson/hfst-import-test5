@@ -376,11 +376,12 @@ FEXPORT int fsm_construct_check_symbol(struct fsm_construct_handle *handle, char
 FEXPORT void fsm_construct_copy_sigma(struct fsm_construct_handle *handle, struct sigma *sigma);
 FEXPORT struct fsm *fsm_construct_done(struct fsm_construct_handle *handle);
 
-
+#ifndef __cplusplus
 #ifndef bool
   #define bool int
   #define false((bool)0)
   #define true((bool)1)
+#endif
 #endif
 
 /******************/
