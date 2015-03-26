@@ -263,7 +263,7 @@ process_stream(HfstOutputStream& outstream)
   HfstBasicTransducer disjunction;
   size_t line_n = 0;
 
-  HfstStrings2FstTokenizer
+  hfst::HfstStrings2FstTokenizer
     multichar_symbol_tokenizer(multichar_symbols,std::string(epsilonname));
 
   while (hfst_getline(&line, &len, inputfile) != -1)
@@ -312,7 +312,7 @@ process_stream(HfstOutputStream& outstream)
             { spv = multichar_symbol_tokenizer.tokenize_string_pair
                 (line,has_spaces); }
         }
-      catch (const UnescapedColsFound &e)
+      catch (const hfst::UnescapedColsFound &e)
         { 
           if (pairstrings)
             {

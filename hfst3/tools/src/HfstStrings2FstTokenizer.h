@@ -29,8 +29,6 @@ typedef std::vector<std::string> StringVector;
 typedef std::pair<std::string,std::string> StringPair;
 typedef std::vector<StringPair> StringPairVector;
 
-using hfst::HfstTokenizer;
-
 #define COL  ":"
 #define BACKSLASH  "\\"
 #define SPACE " "
@@ -44,6 +42,8 @@ using hfst::HfstTokenizer;
 #define COL_ESCAPE "@_COLON_@"
 #define TAB_ESCAPE "@_TAB_@"
 #define SPACE_ESCAPE "@_SPACE_@"
+
+namespace hfst {
 
 class EmptyMulticharSymbol
 {};
@@ -69,7 +69,7 @@ class HfstStrings2FstTokenizer
 
  protected:
 
-  HfstTokenizer tokenizer;
+  hfst::HfstTokenizer tokenizer;
   std::string eps;
 
   // Add the multichar symbol XYZ to the tokenizer.
@@ -104,5 +104,7 @@ class HfstStrings2FstTokenizer
   //! Throw UnescapedColsFound, if symbols contains unescaped ':'-symbols.
   void check_cols(const std::string &symbol); 
 };
+
+} // namespace hfst
 
 #endif // HEADER_STRINGS_2_FST_TOKENIZER_H

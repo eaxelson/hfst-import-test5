@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <cstring>
 
+namespace hfst {
+
 HfstStrings2FstTokenizer::HfstStrings2FstTokenizer
 (StringVector &multichar_symbols,const std::string &eps):
   eps(eps)
@@ -268,9 +270,11 @@ StringVector HfstStrings2FstTokenizer::split_at_spaces(const std::string &str)
   return res;
 }
 
+}  // namespace hfst
+
 #ifdef TEST_FST_2_STRINGS_TOKENIZER
 void test_ps
-(const std::string &input,HfstStrings2FstTokenizer &tokenizer,bool spaces)
+(const std::string &input,hfst::HfstStrings2FstTokenizer &tokenizer,bool spaces)
 {
   std::cout << "Tokenizing: " << input << std::endl;
   std::cout << "Tokenized:" << std::endl;
@@ -288,7 +292,7 @@ void test_ps
 }
 
 void test_sp
-(const std::string &input,HfstStrings2FstTokenizer &tokenizer,bool spaces)
+(const std::string &input,hfst::HfstStrings2FstTokenizer &tokenizer,bool spaces)
 {
   std::cout << "Tokenizing: " << input << std::endl;
   std::cout << "Tokenized:" << std::endl;
@@ -311,7 +315,7 @@ int main(void)
   multichar_symbols.push_back("##");
   multichar_symbols.push_back("+NOM");
   multichar_symbols.push_back(":NOM:SG");
-  HfstStrings2FstTokenizer tokenizer(multichar_symbols,"@_EPS_@");
+  hfst::HfstStrings2FstTokenizer tokenizer(multichar_symbols,"@_EPS_@");
   test_ps("@_EPS_@:xa:b\\::c\\\\d:\\e:NOM:SG:\\+NOM:",tokenizer,false);
   test_ps("@_EPS_@:x a:b   \\::c \\\\ d:\\e \\:NOM\\:SG\\::\\+ N O M : ",
       tokenizer,true);
