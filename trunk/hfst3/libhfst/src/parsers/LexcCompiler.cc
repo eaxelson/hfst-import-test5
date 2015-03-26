@@ -41,7 +41,8 @@ using std::set_difference;
 #include "lexc-utils.h"
 #include "lexc-parser.hh"
 #include "xre_utils.h"
-#include "../../../tools/src/HfstStrings2FstTokenizer.h"
+#include "HfstSymbolDefs.h"
+//#include "../../../tools/src/HfstStrings2FstTokenizer.h"
 
 using hfst::HfstTransducer;
 using hfst::implementations::HfstTransitionGraph;
@@ -50,7 +51,7 @@ using hfst::implementations::HfstState;
 using hfst::implementations::HfstBasicTransition;
 using hfst::ImplementationType;
 using hfst::xre::XreCompiler;
-
+using hfst::StringVector;
 
 //using same alg as strings to fst
 static char *epsilonname=NULL; // FIX: use this

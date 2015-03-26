@@ -902,7 +902,7 @@ static std::string escape_special_characters(char *s)
 }
 
 HfstOneLevelPath*
-line_to_lookup_path(char** s, HfstStrings2FstTokenizer& tok,
+line_to_lookup_path(char** s, hfst::HfstStrings2FstTokenizer& tok,
                     char** markup, bool* outside_sigma, bool optimized_lookup)
 {
     HfstOneLevelPath* rv = new HfstOneLevelPath;
@@ -1506,7 +1506,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     char* line = 0;
     size_t llen = 0;
 
-    HfstStrings2FstTokenizer input_tokenizer(mc_symbols, 
+    hfst::HfstStrings2FstTokenizer input_tokenizer(mc_symbols, 
                          std::string(epsilon_format));
 
     if (!only_optimized_lookup)

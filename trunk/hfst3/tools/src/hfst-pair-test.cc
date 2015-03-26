@@ -474,7 +474,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     // Define tokenizer with no multi character symbols and an
     // empty epsilon representation.
     StringVector empty_v;
-    HfstStrings2FstTokenizer input_tokenizer
+    hfst::HfstStrings2FstTokenizer input_tokenizer
       (empty_v, std::string("0"));
 
     int exit_code = 0;
@@ -514,7 +514,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
            positive_test,outfile,known_symbols);
         
       }
-    catch (const UnescapedColsFound &e)
+    catch (const hfst::UnescapedColsFound &e)
       {
         error(EXIT_FAILURE, 0, 
           "The correspondence %s contains unquoted colon-symbols. If "

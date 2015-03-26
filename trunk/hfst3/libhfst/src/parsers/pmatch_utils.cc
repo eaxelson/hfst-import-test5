@@ -11,7 +11,7 @@
 
 #include "pmatch_utils.h"
 #include "HfstTransducer.h"
-#include "tools/src/HfstUtf8.h"
+//#include "tools/src/HfstUtf8.h"
 #include "implementations/optimized-lookup/pmatch.h"
 
 using std::string;
