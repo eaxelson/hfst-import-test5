@@ -1,7 +1,7 @@
 #line 22 "lexc.l"
 #define YY_BUF_SIZE 16777216
 
-#ifdef WINDOWS
+#if defined (_MSC_VER) || (__MINGW32__)
 typedef long off_t;
 #endif
 

@@ -104,7 +104,7 @@ int foma_write_prolog(struct fsm *net, char *filename) {
 #else
 
 // HFST addition
-#ifdef WINDOWS
+#if defined (_MSC_VER) || (__MINGW32__)
 #define LONG_LONG_SPECIFIER "%I64d"
 #else
 #define LONG_LONG_SPECIFIER "%lld"

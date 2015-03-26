@@ -24,7 +24,9 @@
 #include <ctype.h>
 
 #include "foma.h"
+#ifdef ZLIB
 #include "zlib.h"
+#endif
 
 extern int g_show_flags;
 extern int g_obey_flags;
