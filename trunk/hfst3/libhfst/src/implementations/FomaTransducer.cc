@@ -77,7 +77,7 @@ namespace hfst { namespace implementations {
   
   bool FomaInputStream::is_good(void)
   {
-    return not is_bad();
+    return ! is_bad();
   };
   
   bool FomaInputStream::is_fst(void)
@@ -849,7 +849,7 @@ namespace hfst { namespace implementations {
     /* Read foma transducer . */
     struct fsm * FomaTransducer::read_net(FILE *infile) {
       
-    unsigned int READ_BUF_SIZE=4096; 
+    const unsigned int READ_BUF_SIZE=4096; 
     char buf[READ_BUF_SIZE];
     struct fsm *net;
     struct fsm_state *fsm;
