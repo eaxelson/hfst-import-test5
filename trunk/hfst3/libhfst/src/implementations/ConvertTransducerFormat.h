@@ -23,11 +23,11 @@
 #include <map>
 
 #if HAVE_OPENFST
-#ifdef WINDOWS
+#ifdef _MSC_VER
 #include "back-ends/openfstwin/src/include/fst/fstlib.h"
 #else 
 #include "back-ends/openfst/src/include/fst/fstlib.h"
-#endif // WINDOWS
+#endif // _MSC_VER
 #endif // HAVE_OPENFST
 
 #if HAVE_SFST
@@ -37,8 +37,6 @@
 #if HAVE_FOMA
 #ifndef _FOMALIB_H_
 #define _FOMALIB_H_
-#include <stdbool.h>
-#define _Bool bool
 #include "back-ends/foma/fomalib.h"
 #endif // _FOMALIB_H_
 #endif // HAVE_FOMA

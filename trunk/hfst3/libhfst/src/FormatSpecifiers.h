@@ -13,7 +13,7 @@
 #ifndef _FORMAT_SPECIFIERS_H_
 #define _FORMAT_SPECIFIERS_H_
 
-#ifdef WINDOWS
+#if defined (_MSC_VER) || (__MINGW32__)
   #define SIZE_T_SPECIFIER    "%Iu"
   #define SSIZE_T_SPECIFIER   "%Id"
   #define PTRDIFF_T_SPECIFIER "%Id"
