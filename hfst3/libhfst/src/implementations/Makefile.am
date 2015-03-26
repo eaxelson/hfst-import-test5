@@ -42,6 +42,10 @@ else
   AM_CPPFLAGS += -I${top_srcdir}/back-ends/openfst/src/include
 endif
 
+if WANT_LEXC_WRAPPER
+  AM_CPPFLAGS += -DZLIB
+endif
+
 # the bridges
 if WANT_SFST
 MAYBE_SFST=SfstTransducer.cc

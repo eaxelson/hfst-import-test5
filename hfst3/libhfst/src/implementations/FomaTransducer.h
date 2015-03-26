@@ -17,7 +17,9 @@
 #include "HfstExceptionDefs.h"
 #include "HfstExtractStrings.h"
 #include "HfstFlagDiacritics.h"
-#include <stdbool.h>  // foma uses _Bool
+#ifndef _MSC_VER
+ #include <stdbool.h>  // foma uses _Bool
+#endif
 #include <stdlib.h>
 
 #ifndef _FOMALIB_H_
@@ -26,9 +28,6 @@
 #include "back-ends/foma/fomalib.h"
 #endif
 
-#ifndef WINDOWS
-  #include <zlib.h>
-#endif
 #include <cstdio>
 #include <string>
 #include <sstream>
