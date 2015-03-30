@@ -80,13 +80,12 @@ transducers, regular expressions and the pattern matching operation
 \section{Morphological Tagging using {\tt hfst-finnpos}}\label{sec:morph-tagging}
 % Miikka (4 p.)
 
-Finnpos \cite{silfverberg2015} is a morphological tagger toolkit based
+FinnPos \cite{silfverberg2015} is a morphological tagger toolkit based
 on the Conditional Random Field framework. It is especially geared
-toward morphologically rich languages.  It utilizes several
-optimizations to ensure fast estimation and inference even with large
-label sets. Additionally, it uses sub label dependencies in
-unstructured and structured features for counteracting data sparsity
-and modeling grammatical phenomena such as case and number congruence.
+toward morphologically rich languages with large label sets which
+cause data sparsity and slow down estimation.
+
+
 
 Besides optimizations and sub-label dependencies
 \cite{silfverberg2014}, Finnpos also provides a flexible way of
@@ -98,7 +97,96 @@ used in lemmatization.
 
 For words not recognized by the morphological analyzer, Finnpos
 includes a data driven lemmatizer which is based on the averaged
-perceptron classifier..
+perceptron classifier.
+
+\subsection{Data Format and Feature Extraction}
+
+\begin{figure}
+\begin{verbatim}
+The    WORD=The LC_WORD=the       the  DT    _
+dog    WORD=dog LC_WORD=dog       dog  NN    _
+barks  WORD=barks LC_WORD=barks   bark VBZ   _
+.      WORD=. LC_WORD=.           .    .     _
+
+The    WORD=The LC_WORD=the       the  DT    _
+cat    WORD=cat LC_WORD=cat       cat  NN    _
+meows  WORD=meows LC_WORD=meows   meow VBZ   _
+.      WORD=. LC_WORD=.           .    .     _
+\end{verbatim}
+\caption{Small example of data format.}
+\end{figure}
+
+The utilities finnpos-train and finnpos-label read and write input sentences in a five column tab-separated format where each row corresponds to one input word and the columns denote
+
+\begin{enumerate}
+  \item  Word form (e.g. ``Dogs'').
+  \item  Features separated by spaces (e.g. \verb|WORD=dogs PREV_WORD=the|).
+  \item  lemma (e.g. ``dog'').
+  \item  Label (e.g. \verb|NNS|).
+  \item  Annotations (arbitrary text not containing tabulators).
+\end{enumerate}
+
+When using a file as training or development file for finnpos-train, the lemma and label fields have to contain exactly one value each.
+
+If the label field is non-empty in the input for finnpos-label, the tagger will disambiguate between the candidates provided.
+
+The default feature extraction script {\tt finnpos-ratna-feats.py}
+extracts the following features for frequent words:
+
+\begin{enumerate}
+\item Word form.
+\item Previous word form.
+\item Next word form.
+\item Previous two words.
+\item Next two words.
+\end{enumerate}
+
+For rare words, the script also extracts orthographic features
+
+\begin{enumerate}
+\item Suffixes and prefixes up to length 10.
+\item Capitalization.
+\item Whether the word includes digits or dashes.
+\end{enumerate}
+
+Users may add their own features or write their own feature extraction script.
+
+\subsection{Training and Using a Model}
+
+Users can train their own models using the utility {\tt
+  finnpos-train}. The parameters of the training process are set using
+a configuation file.
+
+\begin{figure}
+\begin{verbatim}
+# Config file for FinnTreeBank tagger.
+
+guess_mass=0.999
+beam_mass=0.999
+max_train_passes=3
+max_lemmatizer_passes=7
+\end{verbatim}
+\caption{Example configuration file.}
+\end{figure}
+
+\begin{figure}
+\begin{tabular}{ll}
+{\tt suffix\_length} & The maximal suffix length used in feature extraction during lemmatization.\\
+{\tt degree} & The degree of structured features used by the tagger. \\
+{\tt max\_train\_passes} & The maximal number of training passes during estimation of tagger parameters.\\
+{\tt max\_lemmatizer\_passes} & The maximal number of training passes during estimation of lemmatizer parameters.\\
+{\tt max\_useless\_passes} & Determined the maximal number of passes over the training data that do not improve\\
+&  the tagging accuracy for the development data.\\
+{\tt guess\_mass} & A generative label guesser is used to prune the label candidates considered for each word \\
+                  & during training. {\tt guess\_mass} is a float in range (0, 1.0) which detemines the mass \\
+                  &  preserved by the guesser for each word.\\
+{\tt beam\_mass} & FinnPos uses an adaptive beam to prune search histories during beam search. \\
+                 &  This parameter determines the probability mass of the beam.
+\end{tabular}
+\caption{Description of configuration file fields.}
+\end{figure}
+
+\subsection{Using a Morphological Analyzer}
 
 \section{Semantic Tagging using {\tt hfst-pmatch}}\label{sec:sem-tagging}
 % Sam (4 p.)
