@@ -260,7 +260,7 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_unknown_symbols
                      jt->get_weight())); }
 
         }
-      if (jt->get_input_symbol() == unknown and 
+      if (jt->get_input_symbol() == unknown &&
           jt->get_output_symbol() == unknown)
         {
           for (StringSet::const_iterator kt = missing_symbols.begin();

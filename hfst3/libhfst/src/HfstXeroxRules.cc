@@ -2952,7 +2952,7 @@ namespace hfst
         HfstTransducer c_proj2(_center);
         c_proj2.output_project();
 
-        if ( not c_proj1.compare(_center) || not c_proj2.compare(_center) )
+        if ( ! c_proj1.compare(_center) || ! c_proj2.compare(_center) )
         {
                 HFST_THROW_MESSAGE(TransducersAreNotAutomataException, "HfstXeroxRules::restriction");
         }
@@ -3059,8 +3059,8 @@ namespace hfst
         HfstTransducer r_proj2(right);
         r_proj2.output_project();
 
-        if ( not l_proj1.compare(left) || not l_proj2.compare(left)
-             || not r_proj1.compare(right) || not r_proj2.compare(right)  )
+        if ( ! l_proj1.compare(left) || ! l_proj2.compare(left)
+             || ! r_proj1.compare(right) || ! r_proj2.compare(right)  )
         {
                 HFST_THROW_MESSAGE(TransducersAreNotAutomataException, "HfstXeroxRules::restriction");
         }
@@ -3097,8 +3097,8 @@ namespace hfst
         HfstTransducer r_proj2(right);
         r_proj2.output_project();
 
-        if ( not l_proj1.compare(left) || not l_proj2.compare(left)
-             || not r_proj1.compare(right) || not r_proj2.compare(right)  )
+        if ( ! l_proj1.compare(left) || ! l_proj2.compare(left)
+          || ! r_proj1.compare(right) || ! r_proj2.compare(right)  )
         {
                 HFST_THROW_MESSAGE(TransducersAreNotAutomataException, "HfstXeroxRules::restriction");
         }
