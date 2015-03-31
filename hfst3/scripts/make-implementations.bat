@@ -1,4 +1,4 @@
-cl /EHsc /I..\..\..\libhfst\src /I..\..\..\back-ends\foma /I..\..\..\back-ends /I..\..\..\back-ends\openfstwin\src\include /I ..\..\.. ^
+cl /c /EHsc /I..\..\..\libhfst\src /I..\..\..\back-ends\foma /I..\..\..\back-ends /I..\..\..\back-ends\openfstwin\src\include /I ..\..\.. ^
 HfstTransitionGraph.cpp ^
 ConvertTransducerFormat.cpp ^
 HfstTropicalTransducerTransitionData.cpp ^
