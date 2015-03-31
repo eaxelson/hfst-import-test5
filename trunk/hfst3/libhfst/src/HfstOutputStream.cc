@@ -24,7 +24,7 @@ namespace hfst
   HfstOutputStream::HfstOutputStream(ImplementationType type, bool hfst_format):
     type(type), hfst_format(hfst_format), is_open(false)
   { 
-    if (not HfstTransducer::is_implementation_type_available(type)) {
+    if (! HfstTransducer::is_implementation_type_available(type)) {
       HFST_THROW(ImplementationTypeNotAvailableException);
     }
 
@@ -87,7 +87,7 @@ namespace hfst
   (const std::string &filename,ImplementationType type, bool hfst_format_):
     type(type), hfst_format(hfst_format_), is_open(false)
   { 
-    if (not HfstTransducer::is_implementation_type_available(type)) {
+    if (! HfstTransducer::is_implementation_type_available(type)) {
       HFST_THROW(ImplementationTypeNotAvailableException);
     }
 
@@ -340,7 +340,7 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
 
   HfstOutputStream &HfstOutputStream::flush()
   {
-    if (not this->is_open) {
+    if (! this->is_open) {
       HFST_THROW(StreamIsClosedException); }
 #if HAVE_XFSM
     if (type == XFSM_TYPE)
@@ -358,7 +358,7 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
 
   HfstOutputStream &HfstOutputStream::operator<< (HfstTransducer &transducer)
   {
-    if (not this->is_open) {
+    if (! this->is_open) {
       HFST_THROW(StreamIsClosedException);
     }
       

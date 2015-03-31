@@ -116,6 +116,7 @@ namespace hfst
         assert(false);
         break;
       }
+    HFST_THROW(HfstFatalException); // make compiler happy
   }
 
   short &HfstInputStream::stream_get(short &i)
@@ -162,6 +163,7 @@ namespace hfst
         assert(false);
         break;
       }
+    HFST_THROW(HfstFatalException); // make compiler happy
   }
 
   unsigned short &HfstInputStream::stream_get(unsigned short &i)
@@ -212,6 +214,7 @@ namespace hfst
         assert(false);
         break;
       }
+    HFST_THROW(HfstFatalException); // make compiler happy
   }
 
   void HfstInputStream::stream_unget(char c)
@@ -650,7 +653,7 @@ namespace hfst
     }
 
     // (1) first pair "version", "3.0"
-    if ( not ( ( strcmp("version", header_data[0].first.c_str()) == 0 ) &&
+    if ( ! ( ( strcmp("version", header_data[0].first.c_str()) == 0 ) &&
                ( ( strcmp("3.0", header_data[0].second.c_str()) == 0 ) ||
                  ( strcmp("3.3", header_data[0].second.c_str()) == 0 ) ) ) ){
       HFST_THROW_MESSAGE(TransducerHeaderException,
@@ -658,7 +661,7 @@ namespace hfst
     }
 
     // (2) second pair "type", (valid type field)
-    if ( not ( strcmp("type", header_data[1].first.c_str()) == 0 ) ) {
+    if ( ! ( strcmp("type", header_data[1].first.c_str()) == 0 ) ) {
       HFST_THROW_MESSAGE(TransducerHeaderException,
                          "Hfst header: transducer type not given");
     }
@@ -936,7 +939,7 @@ namespace hfst
     catch (const HfstException e)
     { throw e; }
 
-    if ( not HfstTransducer::is_implementation_type_available(type)) {
+    if ( ! HfstTransducer::is_implementation_type_available(type)) {
       HFST_THROW(ImplementationTypeNotAvailableException);
     }
 
@@ -1018,7 +1021,7 @@ namespace hfst
 
     catch( const HfstException e)
       { throw e; }
-    if ( not HfstTransducer::is_implementation_type_available(type)) {
+    if ( ! HfstTransducer::is_implementation_type_available(type)) {
       HFST_THROW(ImplementationTypeNotAvailableException);
     }
 

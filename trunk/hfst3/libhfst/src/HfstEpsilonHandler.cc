@@ -12,7 +12,7 @@ namespace hfst {
      Appends state \a s to the epsilon path if not found at the end already. */
   void HfstEpsilonHandler::push_back(hfst::implementations::HfstState s)
   {
-    if (not epsilon_path.empty()) {
+    if (! epsilon_path.empty()) {
       if  (epsilon_path.back() != s ) {
         epsilon_path.push_back(s);
       }
@@ -26,7 +26,7 @@ namespace hfst {
      unless the path it is empty. */
   void HfstEpsilonHandler::pop_back()
   {
-    if (not epsilon_path.empty())
+    if (! epsilon_path.empty())
       epsilon_path.pop_back();
   };
   

@@ -834,7 +834,7 @@ HfstTransducer::HfstTransducer():
 HfstTransducer::HfstTransducer(ImplementationType type):
     type(type),anonymous(false),is_trie(true), name("")
 {
-    if (not is_implementation_type_available(type))
+    if (! is_implementation_type_available(type))
     HFST_THROW(ImplementationTypeNotAvailableException);
 
     switch (type)
@@ -893,7 +893,7 @@ HfstTransducer::HfstTransducer(const std::string& utf8_str,
                    ImplementationType type):
     type(type),anonymous(false),is_trie(true), name("")
 {
-    if (not is_implementation_type_available(type))
+    if (! is_implementation_type_available(type))
     HFST_THROW(ImplementationTypeNotAvailableException);
 
     if (utf8_str == "")
@@ -947,7 +947,7 @@ HfstTransducer::HfstTransducer(const StringPairVector & spv,
                    ImplementationType type):
     type(type), anonymous(false), is_trie(false), name("")
 {
-    if (not is_implementation_type_available(type))
+    if (! is_implementation_type_available(type))
       HFST_THROW(ImplementationTypeNotAvailableException);
     
     for (StringPairVector::const_iterator it = spv.begin();
@@ -1007,7 +1007,7 @@ HfstTransducer::HfstTransducer(const StringPairSet & sps,
                    bool cyclic):
     type(type),anonymous(false),is_trie(false), name("")
 {
-    if (not is_implementation_type_available(type))
+    if (! is_implementation_type_available(type))
         HFST_THROW(ImplementationTypeNotAvailableException);
 
     for (StringPairSet::const_iterator it = sps.begin();
@@ -1066,7 +1066,7 @@ HfstTransducer::HfstTransducer(const std::vector<StringPairSet> & spsv,
                    ImplementationType type):
     type(type),anonymous(false),is_trie(false), name("")
 {
-    if (not is_implementation_type_available(type))
+    if (! is_implementation_type_available(type))
         HFST_THROW(ImplementationTypeNotAvailableException);
 
     for (std::vector<StringPairSet>::const_iterator it = spsv.begin();
@@ -1133,7 +1133,7 @@ HfstTransducer::HfstTransducer(const std::string& upper_utf8_str,
                    ImplementationType type):
     type(type),anonymous(false),is_trie(true), name("")
 {
-    if (not is_implementation_type_available(type))
+    if (! is_implementation_type_available(type))
     HFST_THROW(ImplementationTypeNotAvailableException);
 
     if (upper_utf8_str == "" || 
@@ -1189,7 +1189,7 @@ HfstTransducer::HfstTransducer(const std::string& upper_utf8_str,
 HfstTransducer::HfstTransducer(HfstInputStream &in):
     type(in.type), anonymous(false),is_trie(false), name("")
 {
-    if (not is_implementation_type_available(type)) {
+    if (! is_implementation_type_available(type)) {
         HFST_THROW(ImplementationTypeNotAvailableException);
     }
 
@@ -1200,7 +1200,7 @@ HfstTransducer::HfstTransducer(const HfstTransducer &another):
     type(another.type),anonymous(another.anonymous),
     is_trie(another.is_trie), name("")
 {
-    if (not is_implementation_type_available(type))
+    if (! is_implementation_type_available(type))
     HFST_THROW(ImplementationTypeNotAvailableException);
     for (map<string,string>::const_iterator prop = another.props.begin();
          prop != another.props.end();
@@ -1262,7 +1262,7 @@ HfstTransducer::HfstTransducer
   ImplementationType type):
     type(type),anonymous(false),is_trie(false), name("")
 {
-    if (not is_implementation_type_available(type))
+    if (! is_implementation_type_available(type))
         HFST_THROW(ImplementationTypeNotAvailableException);
 
     switch (type)
@@ -1315,7 +1315,7 @@ HfstTransducer::HfstTransducer
 
 HfstTransducer::~HfstTransducer(void)
 {
-    if (not is_implementation_type_available(type))
+    if (! is_implementation_type_available(type))
         HFST_THROW(ImplementationTypeNotAvailableException);
 
     switch (type)
@@ -1362,7 +1362,7 @@ HfstTransducer::HfstTransducer(const std::string &symbol,
                                ImplementationType type): 
     type(type),anonymous(false),is_trie(false), name("")
 {
-    if (not is_implementation_type_available(type))
+    if (! is_implementation_type_available(type))
         HFST_THROW(ImplementationTypeNotAvailableException);
 
     HfstTokenizer::check_utf8_correctness(symbol);
@@ -1415,7 +1415,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
                                ImplementationType type):
     type(type),anonymous(false),is_trie(false), name("")
 {
-    if (not is_implementation_type_available(type))
+    if (! is_implementation_type_available(type))
         HFST_THROW(ImplementationTypeNotAvailableException);
 
     HfstTokenizer::check_utf8_correctness(isymbol);
@@ -2767,7 +2767,7 @@ void HfstTransducer::extract_random_paths_fd
 
 HfstTransducer &HfstTransducer::n_best(unsigned int n) 
 {
-    if (not is_implementation_type_available(TROPICAL_OPENFST_TYPE)) {
+    if (! is_implementation_type_available(TROPICAL_OPENFST_TYPE)) {
     (void)n;
     HFST_THROW_MESSAGE(ImplementationTypeNotAvailableException,
                "HfstTransducer::n_best implemented only for "
@@ -3242,7 +3242,7 @@ void HfstTransducer::harmonize_flag_diacritics(HfstTransducer &another,
   bool this_has_flag_diacritics    = has_flags(*this);
   bool another_has_flag_diacritics = has_flags(another);
 
-  if (this_has_flag_diacritics and another_has_flag_diacritics)
+  if (this_has_flag_diacritics && another_has_flag_diacritics)
     {
       rename_flag_diacritics(*this,"_1");
       rename_flag_diacritics(another,"_2");
@@ -3254,9 +3254,9 @@ void HfstTransducer::harmonize_flag_diacritics(HfstTransducer &another,
           this->remove_illegal_flag_paths();
         }
     }
-  else if (this_has_flag_diacritics and insert_renamed_flags)
+  else if (this_has_flag_diacritics && insert_renamed_flags)
     { another.insert_freely_missing_flags_from(*this); }
-  else if (another_has_flag_diacritics and insert_renamed_flags)
+  else if (another_has_flag_diacritics && insert_renamed_flags)
     { this->insert_freely_missing_flags_from(another); }
 }
 
@@ -4224,7 +4224,7 @@ HfstTransducer &HfstTransducer::remove_illegal_flag_paths(void)
        it != alphabet.end();
        ++it)
     {
-      if (not FdOperation::is_diacritic(*it))
+      if (! FdOperation::is_diacritic(*it))
         { continue; }
 
       if (it->find("_1.") != std::string::npos)
@@ -4240,7 +4240,7 @@ HfstTransducer &HfstTransducer::remove_illegal_flag_paths(void)
 
   // if there aren't both _1 and _2 flag diaciritcs, there can be no
   // illegal paths.
-  if (_1_flags.empty() or _2_flags.empty())
+  if (_1_flags.empty() || _2_flags.empty())
     { return *this; }
 
   // Rename @...@ flags to $...$ flags and compile restriction.
@@ -4330,7 +4330,7 @@ HfstTransducer &HfstTransducer::cross_product( const HfstTransducer &another, bo
     HfstTransducer t2_proj(automata2);
     t2_proj.input_project();
 
-    if ( not t1_proj.compare(automata1) || not t2_proj.compare(automata2) )
+    if ( ! t1_proj.compare(automata1) || ! t2_proj.compare(automata2) )
     {
             HFST_THROW_MESSAGE(TransducersAreNotAutomataException, "HfstTransducer::cross_product");
     }
@@ -5077,7 +5077,7 @@ HfstTransducer &HfstTransducer::convert(const HfstTransducer &t,
     }
     if (type == t.type)
     { return *(new HfstTransducer(t)); }
-    if (not is_implementation_type_available(type)) {
+    if (! is_implementation_type_available(type)) {
     HFST_THROW_MESSAGE
         (ImplementationTypeNotAvailableException, 
          "HfstTransducer::convert");
@@ -5123,7 +5123,7 @@ bool HfstTransducer::is_implementation_type_available
 HfstTransducer &HfstTransducer::convert(ImplementationType type,
                     std::string options)
 {
-  if (not is_implementation_type_available(this->type)) {
+  if (! is_implementation_type_available(this->type)) {
     HFST_THROW_MESSAGE(HfstFatalException,
                        "HfstTransducer::convert: the original type "
                        "of the transducer is not available!");
@@ -5135,7 +5135,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
                            "HfstTransducer::convert"); }
     if (type == this->type)
     { return *this; }
-    if (not is_implementation_type_available(type)) {
+    if (! is_implementation_type_available(type)) {
       HFST_THROW_MESSAGE(ImplementationTypeNotAvailableException,
                          "HfstTransducer::convert");
     }
@@ -5378,7 +5378,7 @@ HfstTransducer::HfstTransducer(FILE * ifile,
 #endif
   unsigned int linecount=0;
 
-    if (not is_implementation_type_available(type))
+    if (! is_implementation_type_available(type))
     HFST_THROW_MESSAGE(ImplementationTypeNotAvailableException,
                "HfstTransducer::HfstTransducer"
                "(FILE*, ImplementationType, const std::string&)");
@@ -5456,7 +5456,7 @@ HfstTransducer::HfstTransducer(FILE * ifile,
     HFST_THROW(FunctionNotImplementedException);
 #endif
 
-    if (not is_implementation_type_available(type))
+    if (! is_implementation_type_available(type))
     HFST_THROW_MESSAGE(ImplementationTypeNotAvailableException,
                "HfstTransducer::HfstTransducer"
                "(FILE*, ImplementationType, const std::string&)");
@@ -5532,7 +5532,7 @@ HfstTransducer::HfstTransducer(HfstFile & ifile,
     HFST_THROW(FunctionNotImplementedException);
 #endif
 
-    if (not is_implementation_type_available(type))
+    if (! is_implementation_type_available(type))
     HFST_THROW_MESSAGE(ImplementationTypeNotAvailableException,
                "HfstTransducer::HfstTransducer"
                "(FILE*, ImplementationType, const std::string&)");
@@ -5625,7 +5625,7 @@ HfstTransducer &HfstTransducer::read_in_att_format
   if (type == XFSM_TYPE)
     { HFST_THROW(FunctionNotImplementedException); }
 
-    if (not is_implementation_type_available(type))
+    if (! is_implementation_type_available(type))
     HFST_THROW_MESSAGE(ImplementationTypeNotAvailableException,
                "HfstTransducer::read_in_att_format");
 
@@ -5845,7 +5845,7 @@ HfstTransducer * HfstTransducer::read_lexc_ptr(const std::string &filename,
     { HFST_THROW(FunctionNotImplementedException); }
 
   (void)filename;
-  if (not is_implementation_type_available(type))
+  if (! is_implementation_type_available(type))
     HFST_THROW(ImplementationTypeNotAvailableException);
   
   HfstTransducer * retval = new HfstTransducer();

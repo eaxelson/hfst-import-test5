@@ -289,8 +289,8 @@ namespace hfst
       HfstTransducer t2_proj(context.second);
       t2_proj.input_project();
 
-      if ( not t1_proj.compare(context.first) ||
-           not t2_proj.compare(context.second) ) {
+      if ( ! t1_proj.compare(context.first) ||
+           ! t2_proj.compare(context.second) ) {
         HFST_THROW(ContextTransducersAreNotAutomataException); }
       
       std::string leftm("@_LEFT_MARKER_@");
@@ -563,7 +563,7 @@ namespace hfst
       for (HfstTransducerPairVector::const_iterator it = contexts.begin();
            it != contexts.end(); it++)
         {
-          if (not type_defined) {
+          if (! type_defined) {
             type = it->first.get_type();
             type_defined=true;
           } 
@@ -578,7 +578,7 @@ namespace hfst
                                "rules::restriction");
       }
          }
-      if (not type_defined) {
+      if (! type_defined) {
     HFST_THROW_MESSAGE(EmptySetOfContextsException, "rules::restriction");
       }
 
@@ -659,9 +659,10 @@ namespace hfst
 
         return retval1.intersect(retval2);
       }
-      else
+      else {
         assert(false);
-
+        return HfstTransducer(type); // make compiler happy 
+          }
     }
 
     HfstTransducer restriction(HfstTransducerPairVector &contexts, 

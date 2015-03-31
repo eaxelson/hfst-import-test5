@@ -88,7 +88,7 @@ namespace hfst
 int HfstTokenizer::get_next_symbol_size(const char * symbol)
 const
 {
-  if (not *symbol)
+  if (! *symbol)
     { return 0; }
 
   const char * multi_char_symbol_end = multi_char_symbols.find(symbol);  
@@ -109,7 +109,7 @@ const
 }
 
   bool HfstTokenizer::is_skip_symbol(hfst::String &s) const
-{ return (s == "") or (skip_symbol_set.find(s) != skip_symbol_set.end()); }
+{ return (s == "") || (skip_symbol_set.find(s) != skip_symbol_set.end()); }
 
 void
 HfstTokenizer::add_multichar_symbol(const string& symbol)
@@ -374,8 +374,8 @@ StringPairVector HfstTokenizer::tokenize_and_align_flag_diacritics
       size_t additional_chars = 0;
   
       // The bytes 192, 193, 245, 246 and 247 are invalid in utf8.
-      if (initial_char == 192 or initial_char == 193 or
-      initial_char == 245 or initial_char == 246 or initial_char == 247)
+      if (initial_char == 192 || initial_char == 193 ||
+      initial_char == 245 || initial_char == 246 || initial_char == 247)
     { HFST_THROW_MESSAGE(IncorrectUtf8CodingException, 
                          "leading octet in [192, 193, 245, 246, 247]"); }
       // Case 0xxxxxxx, i.e. ASCII byte.
@@ -409,7 +409,7 @@ StringPairVector HfstTokenizer::tokenize_and_align_flag_diacritics
                              "eos in multioctet sequence"); }
       unsigned char byte = *it;
       // All continuation bytes look like 10xxxxxx.
-      if (not (128 & byte and 64 ^ byte))
+      if (! (128 & byte && 64 ^ byte))
         { HFST_THROW_MESSAGE(IncorrectUtf8CodingException,
                              "not continuation octet & 100000000b"); }
     }
