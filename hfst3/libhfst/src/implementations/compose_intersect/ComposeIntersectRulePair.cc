@@ -6,7 +6,7 @@ namespace hfst
 {
   namespace implementations
   {
-    const HfstState ComposeIntersectRulePair::START;
+    const HfstState ComposeIntersectRulePair::START = 0;
     
     ComposeIntersectRulePair::ComposeIntersectRulePair
     (ComposeIntersectRule * fst1,ComposeIntersectRule * fst2):
