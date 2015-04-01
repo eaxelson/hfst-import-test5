@@ -260,10 +260,11 @@ return REGEX;
     return CATENATE_N;
 }
 
-".r" { return REVERSE; }
-".i" { return INVERT; }
-".u" { return PMATCH_UPPER; }
-".l" { return PMATCH_LOWER; }
+".r"  { return REVERSE; }
+".i"  { return INVERT; }
+".u"  { return PMATCH_UPPER; }
+".l"  { return PMATCH_LOWER; }
+".t(" { return TAG_LEFT; }
 
 "@bin\""[^""]+"\""|"@\""[^""]+"\"" { 
     pmatchlval.label = hfst::pmatch::get_escaped_delimited(pmatchtext, '"');
