@@ -18,7 +18,7 @@ namespace hfst
     public:
       typedef ComposeIntersectRule::TransitionSet TransitionSet;
       
-      static const HfstState START = 0;
+      static const HfstState START; // = 0;
       
       ComposeIntersectRulePair(ComposeIntersectRule *,ComposeIntersectRule *);
       

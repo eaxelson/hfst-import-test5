@@ -9,7 +9,7 @@ namespace hfst
   namespace implementations
   {
 
-    const HfstState ComposeIntersectFst::START;
+    const HfstState ComposeIntersectFst::START = 0;
 
     template<> ComposeIntersectFst::CompareTransitions 
     ComposeIntersectFst::TransitionSet::comparator = 
