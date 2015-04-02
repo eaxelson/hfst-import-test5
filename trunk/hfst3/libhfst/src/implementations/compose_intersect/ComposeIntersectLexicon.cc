@@ -31,7 +31,7 @@ namespace hfst
     }
 
     HfstState ComposeIntersectLexicon::map_state_and_add_to_agenda
-    (const StatePair &p)
+    (const StatePair &p, bool allow_lexicon_epsilons)
     {
       HfstState s;
 
@@ -46,8 +46,13 @@ namespace hfst
       state_pair_map[p] = s;
       pair_vector.push_back(p);
       agenda.push(s);
+      lexicon_non_epsilon_states.insert(s);
+
       return s;
     }
+
+    bool ComposeIntersectLexicon::can_have_lexicon_epsilons(HfstState s)
+    { return lexicon_non_epsilon_states.count(s) > 0; }
 
     HfstBasicTransducer ComposeIntersectLexicon::compose_with_rules
     (ComposeIntersectRule * rules)
@@ -56,15 +61,18 @@ namespace hfst
       StatePair start_pair = StatePair(START,ComposeIntersectRule::START);
 
       // This will return 0.
-      (void)map_state_and_add_to_agenda(start_pair);
+      (void)map_state_and_add_to_agenda(start_pair, true);
 
       return compute_composition_result(rules);
     }
 
-    HfstState ComposeIntersectLexicon::get_state(const StatePair &p)
+    HfstState ComposeIntersectLexicon::get_state(const StatePair &p, 
+                                                 bool allow_lexicon_epsilons)
     { 
       if (state_pair_map.find(p) == state_pair_map.end())
-    { return map_state_and_add_to_agenda(p); }
+    { 
+      return map_state_and_add_to_agenda(p, allow_lexicon_epsilons); 
+    }
 
       return state_pair_map[p];
     }
@@ -86,12 +94,13 @@ namespace hfst
     (ComposeIntersectRule * rules)
     { 
       while (! agenda.empty())
-    {
-      HfstState s = agenda.front();
-      agenda.pop();
-      compute_state(s,rules);
-    }
-
+        {
+          HfstState s = agenda.front();
+          agenda.pop();
+          
+          compute_state(s, rules, can_have_lexicon_epsilons(s));
+        }
+      
       set_final_state_weights(rules);
       return result; 
     }
@@ -106,7 +115,7 @@ namespace hfst
     }
 
     void ComposeIntersectLexicon::compute_state
-    (HfstState state,ComposeIntersectRule * rules)
+    (HfstState state,ComposeIntersectRule * rules, bool allow_lexicon_epsilons)
     {
       StatePair p = get_pair(state);
 
@@ -120,8 +129,11 @@ namespace hfst
       if (it->first == HfstTropicalTransducerTransitionData::get_number
           ("@_EPSILON_SYMBOL_@"))
         { 
-          lexicon_skip_symbol_compose(it->second,p.second,state);
-          lexicon_eps_transition_found = true;
+          if (allow_lexicon_epsilons)
+            {
+              lexicon_skip_symbol_compose(it->second,p.second,state);
+              lexicon_eps_transition_found = true;
+            }
         }
       else if (is_flag_diacritic(it->first) &&
            (! rules->known_symbol(it->first)))
@@ -132,19 +144,17 @@ namespace hfst
       else
         { 
           compose(it->second,rules->get_transitions
-              (p.second,it->first),state); 
+                  (p.second,it->first),state); 
         }
     }
       
-      if (!lexicon_eps_transition_found)
-        {
-          rule_skip_symbol_compose
-            (rules->get_transitions
-             (p.second,HfstTropicalTransducerTransitionData::get_number
-              ("@_EPSILON_SYMBOL_@")),p.first,state);
-        }
+      rule_skip_symbol_compose
+        (rules->get_transitions
+         (p.second,HfstTropicalTransducerTransitionData::get_number
+          ("@_EPSILON_SYMBOL_@")),p.first,state);
     }
-    
+
+
     void ComposeIntersectLexicon::lexicon_skip_symbol_compose
     (const TransitionSet &transitions,HfstState rule_state,HfstState origin)
     {
@@ -167,7 +177,7 @@ namespace hfst
     { 
       add_transition
         (origin,it->ilabel,it->olabel,it->weight,
-         get_state(StatePair(lex_state,it->target))); 
+         get_state(StatePair(lex_state,it->target), false)); 
     }
 
     }
