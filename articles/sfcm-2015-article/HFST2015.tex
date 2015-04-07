@@ -270,8 +270,65 @@ max_lemmatizer_passes=7
 \section{Semantic Tagging using {\tt hfst-pmatch}}\label{sec:sem-tagging}
 % Sam (4 p.)
 
-\section{Distortion Filtering with Weighted Regular Expressions}
+\section{Weighted Regular Expressions}
 % Sam & Miikka (3 p.)
+
+\subsection{A Weighted Edit Distance Model}
+
+Parallel weighted replace rules offer a systematic representation of various
+regular transformations. Consider an edit distance transducer that accepts
+any string and outputs all the strings that result from making up to $n$ edits
+to it. An abbreviated example:
+
+\begin{framed}
+\begin{verbatim}
+"a" -> "a" | ["" | "b" | "c" | ...]::1.0 ,,
+"b" -> "b" | ["" | "a" | "c" | ...]::1.0 ,,
+...
+"" -> "" | ["a" | "b" | ...]::1.0 ;
+\end{verbatim}
+\end{framed}
+
+the \verb+,,+ indicates that the replacements are to be compiled to operate
+in parallel. Completed, this example results in a transducer that rewrites
+its input with any number of edits, and gives it a cumulative weight of
+$1.0$ per edit (assuming that weights are added, ie.\@ that the weight semiring
+has addition as its multiplication operation, as in the log or tropical
+semirings).
+
+Suppose we have a different notion of edit, and further that we want to weight
+different edits differently. We can incorporate swaps of consecutive
+characters as follows:
+
+\begin{framed}
+\begin{verbatim}
+{ab} -> {ab} | {ba}::1.5 ,,
+{ac} -> {ac} | {ca}::1.1 ,,
+... 
+\end{verbatim}
+\end{framed}
+
+The replacements are quite arbitrary. They can also include context conditions,
+with a number of different replacements operating in different contexts with
+different weights all compiled together in parallel into one rule.
+
+The edits can be constrained to occur a given number of times with an edit
+filter:
+
+\begin{framed}
+\begin{verbatim}
+define edit_distance_with_markers
+  "a" -> "a" | [ ["b"::1.1 | "c"::1.2 ...] "<EDIT>"] ,,
+  "b" -> "b" | [ ["a"::0.9 | "c"::1.0 ...] "<EDIT>"] ,,
+  ...
+define filter [ [? - "<EDIT>"]* ["<EDIT>":""] [? - "<EDIT>"*] ]^{1,3}
+define 1_to_3_edits edit_distance_with_markers .o. filter;
+\end{verbatim}
+\end{framed}
+
+Here each rule making an edit appends a special marker, which is removed
+by composing with \verb+filter+, which allows (in this case) between 1 and 3
+edits to pass through, replacing them with the empty string.
 
 \section{Background}\label{sec:background}
 % Erik (2 p.)
