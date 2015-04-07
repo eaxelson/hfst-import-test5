@@ -12,6 +12,9 @@
 \usepackage{url}
 \usepackage{tabularx}
 \usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{mathptmx}
+\usepackage{latexsym}
 \usetikzlibrary{automata,positioning}
 \usepackage{framed}
 \usepackage{gb4e}
@@ -270,6 +273,279 @@ max_lemmatizer_passes=7
 \section{Semantic Tagging using {\tt hfst-pmatch}}\label{sec:sem-tagging}
 % Sam (4 p.)
 
+This section contains material intended for presentation in the
+demonstration session of NODALIDA 2015.
+
+\subsection{Introduction}
+
+In this section we outline a scheme for extracting semantic frames from text
+using hand-written rules. While the rules presented here have actual
+implementations, this does not represent a full-fledged system
+for extracting a large number of different frames -- rather, our motivation is
+to give a description of \verb+hfst-pmatch+ as a NLP system in context.
+
+A semantic frame \cite{semantic-frame} is a description of a \emph{type} of event, relation or entity
+and related participants. For example, in FrameNet,
+a database of semantic frames,
+the description of an \verb+Entity+ in terms of physical space occupied by it is
+an instance of the semantic frame \verb+Size+. The frame is evoked by
+a lexical unit (LU), also known as a frame evoking element (FEE), which is a
+word (in this case an adjective)
+such as ``big'' or ``tiny'', descriptive of the size of the \verb+Entity+.
+Apart from \verb+Entity+, which is a core or compulsory element, the
+frame may identify a \verb+Degree+ to which the \verb+Entity+ deviates
+from the norm (``a \textbf{really} big dog'') and a \verb+Standard+ to
+which it is compared (``tall \textbf{for a jockey}'').
+
+  \begin{center}
+\begin{table}[h]
+  \begin{tabular}{ | l | p{4cm} |}
+\hline
+Lexical Unit (LU) & Adjective describing magnitude (large, tiny, ...) \\
+\hline
+Entity (E) & That which is being described (house, debt, ...) \\
+\hline
+Degree (D), optional & Intensity or extent of description
+(really, quite, ...) \\
+\hline
+Standard (S), optional & A point of comparison (for a jockey, ...) \\
+\hline
+    \end{tabular}
+    \caption{The semantic frame \emph{Size}.}
+\end{table}
+      \end{center}
+
+For example:
+
+\begin{table}[h]
+
+\begin{math}
+\Big[_{\text{Size}}\Big[_{\text{E}}\text{He} \Big]
+  \text{is} \Big[_{\text{D}} \text{quite} \Big] \Big[_{\text{LU}}\text{tall} \Big]
+  \Big[_{\text{S}} \text{for a jockey} \Big] \Big]
+\end{math}
+\caption{A tagged example of \emph{Size}}
+\end{table}
+
+\subsection{A Rule}
+
+A simple and common syntactic realisation of the \verb+Size+ frame is a single
+noun phrase containing one of the LUs, such as
+``the big brown dog that ran away''. Here we'd like to identify ``big'' as \verb+LU+,
+``brown dog'' as \verb+Entity+ and the combination as \verb+Size+.
+Our first rule for identifying this type of construction might be
+
+\begin{table}[h]
+  \small
+  \begin{framed}
+\begin{verbatim}
+define LU {small} | {large} | {big} EndTag(LU);
+define Size1 LU (Adjective) [Noun EndTag(Entity)].t(Entity);
+define TOP Size1 EndTag(Size);  
+\end{verbatim}
+\end{framed}
+\normalsize
+\caption{A simplified first rule}
+\end{table}
+
+This ruleset has been simplified for brevity -- it has only a few of the
+permitted LUs, and word boundary issues have not been addressed.
+
+The \verb+[].t()+ syntax in the definition of \verb+Size1+ is a tag delimiter
+controlling the are tagged as \verb+Entity+. The extra \verb+Adjective+ is
+optional, which is conveyed by the surrounding parentheses.
+
+We can verify that our rules extract instances of our desired pattern by compiling
+them with \verb+hfst-pmatch2fst+ and running the compiled result with
+\verb+hfst-pmatch --extract-tags+. In the following we have
+inputted the text of the King James Bible from Project
+Gutenberg (\url{gutenberg.org}) and added some extra characters on both
+sides for
+a concordance-like effect:
+
+%\begin{table}[h]
+\hfill \break
+  \small
+  \begin{framed}
+\begin{verbatim}
+...
+there lay a <Size><LU>small</LU>
+round <Entity>thing</Entity></Size>
+...
+there was a <Size><LU>great</LU>
+<Entity>cry</Entity></Size> in Egypt
+...
+saw that <Size><LU>great</LU>
+<Entity>work</Entity></Size> which
+...
+\end{verbatim}
+\end{framed}
+\normalsize
+%\caption{Fragments of tagged running text}
+%  \label{bibletext}
+%\end{table}
+
+\verb+pmatch+ may be operated in various modes. In \verb+locate+ mode the
+position and length of each match is given, and only the outermost tag is
+supplied. \verb+match+ mode (which is the default) tags and outputs running
+text, and \verb+extract+ mode does the same but omits parts of the input that
+aren't matched by a rule. Matches may also be extracted via an API call, for
+example in order to achieve the above-seen concordance effect.
+
+A natural next step is to add optional non-core elements, such as an adverb
+preceding the LU being tagged as \verb+Degree+ and a noun phrase beginning with
+``for a'' following it as \verb+Standard+.
+
+\begin{table}[h]
+  \small
+  \begin{framed}
+\begin{verbatim}
+define Size1
+  Define(Adverb EndTag(Degree))
+  LU (Adjective)
+  Define(Noun EndTag(Entity))
+  Define({for a} NP EndTag(Standard));
+\end{verbatim}
+\end{framed}
+\normalsize
+\caption{Extending the rule with optional elements}
+\end{table}
+
+Here are some examples this rule finds in the British National
+Corpus~\cite{bnc}.
+
+%\begin{table}[h]
+  \small
+  \begin{framed}
+\begin{verbatim}
+...
+presence of an <Size>
+  <Degree>arbitrarily</Degree>
+  <LU>small</LU> <Entity>
+  amount</Entity></Size> of dust
+...
+one <Size><LU>small</LU>
+  <Entity>step</Entity>
+  <Standard>for a man</Standard>
+  </Size>
+...
+\end{verbatim}
+  \end{framed}
+  \normalsize
+%  \caption{Tagged text with optional elements}
+%  \label{bnctext}
+%  \end{table}
+
+We can see that in ``small amount of dust'' we might want to
+tag not just the immediate noun as \verb+Entity+ but the entire noun phrase
+(which could be implemented up to a context-free definition of a noun phrase),
+and in ``one small step for a man'' a common indirect use of the \verb+Standard+
+construction.
+
+As well as correct matches, such as ``small round thing'' in the biblical
+example, we have metaphorical meanings of \verb+Size+, such as ``great cry''.
+This may or may not be desired -- perhaps we wish to do further processing to
+identify the target domains of such metaphors, or perhaps we wish to be able
+to annotate physical size and physical size only.
+
+\subsection{Incorporating Semantic Information}
+
+Size is a very metaphorical concept, and syntactic rules as above will produce a large amount of matches that relate to such uses, eg. ``a great cry'' or ``a big deal''. If we wish to refine our rules to detect such uses, there are a few avenues for refinement.
+
+First of all, some LUs are much more metaphorical than others. A ``great man'' is almost certainly a metaphorical use, whereas a ``large man'' is almost certainly concrete. Accuracy may be improved by requiring ``great'' to be used together with a common concrete complement, like ``great crowd''.
+
+There are also semantic classifications of words, such as WordNet~\cite{wordnet}. We may compile the set of hyponyms of \emph{physical entity} and require them to appear as the nouns in our rules.
+
+\begin{table}[h]
+\small
+\begin{framed}
+\begin{verbatim}
+define phys_entity
+  @txt"phys_entity.txt";
+! a list of singular baseforms can be expanded to include
+! eg. plurals by suitably composing it with a dictionary automaton
+\end{verbatim}
+\end{framed}
+\normalsize
+\caption{Reading an external linguistic resource}
+\end{table}
+
+\subsection{Incorporating Part-of-speech Information}
+
+We have hitherto used named rules for matching word classes, like \verb+Noun+,
+without specifying how they are written. Even our collection of LUs might need
+some closer attention -- for example ``little'' could be an adverb.
+
+Considering that in writing our
+rules we are effectively doing shallow syntactic parsing, even a very simple
+way to identify parts of speech may suffice: a morphological dictionary.
+For example, a finite-state transducer representing English morphology may be
+used to define the class of common nouns as in table \ref{dictrules}.
+
+\begin{table}[h]
+\small
+  \begin{framed}
+\begin{verbatim}
+! The file we want to read
+define English @bin"english.hfst";
+! We compose it with a noun filter
+! and extract the input side
+define Noun English .o.
+ [?+ "<NN1>" | "<NN2>"].u;
+! (NN1 is singular, NN2 plural)
+\end{verbatim}
+\end{framed}
+  \normalsize
+  \caption{Using a dictionary to write POS rules}
+  \label{dictrules}
+  \end{table}
+
+If we have the use of a part-of-speech tagger, we may write our rules to act
+on its output, as in table \ref{posrules}.
+
+\begin{table}[h]
+  \small
+  \begin{framed}
+\begin{verbatim}
+define Noun LC(W) Wordchar+
+ ["<NN1>"|"<NN2>"] RC(W);
+\end{verbatim}
+\end{framed}
+  \normalsize
+  \caption{Using tags in pre-tagged text}
+  \label{posrules}
+  \end{table}
+
+\section{Increasing Coverage}
+Having considered for each rule where \verb+Degree+ and \verb+Standard+ may occur, coverage may be evaluated by also finding those cases where a LU is used as an adjective but hasn't been tagged, eg.
+
+\small
+\begin{verbatim}
+define TOP Size1 | Size2 | ...
+ Define(LU EndTag(NonmatchingLU));
+\end{verbatim}
+\normalsize
+
+The valid match is always the longest possible one, so \verb+NonmatchingLU+ will be the tag only if no subsuming \verb+SizeN+ rule applies.
+
+For example in
+
+\small
+\begin{framed}
+\begin{verbatim}
+the moving human body is
+<NonmatchingLU>large</NonmatchingLU>
+obtrusive and highly visible
+\end{verbatim}
+\end{framed}
+\normalsize
+
+We see another realisation of the frame: the \verb+Entity+ being followed by a
+copula, and the \verb+LU+ appearing to the right. We could write the rule
+\verb+Size2+ to capture this, adding positions for non-core elements either by
+linguistic reasoning or by searching the corpus.
+
+
 \section{Weighted Regular Expressions}
 % Sam & Miikka (3 p.)
 
@@ -318,10 +594,10 @@ filter:
 \begin{framed}
 \begin{verbatim}
 define edit_distance_with_markers
-  "a" -> "a" | [ ["b"::1.1 | "c"::1.2 ...] "<EDIT>"] ,,
-  "b" -> "b" | [ ["a"::0.9 | "c"::1.0 ...] "<EDIT>"] ,,
+  "a" -> "a" | [ ["b"::1.1 | "c"::1.2 ...] "EDIT"] ,,
+  "b" -> "b" | [ ["a"::0.9 | "c"::1.0 ...] "EDIT"] ,,
   ...
-define filter [ [? - "<EDIT>"]* ["<EDIT>":""] [? - "<EDIT>"*] ]^{1,3}
+define filter [[? - "EDIT"]* ["EDIT":""] [? - "EDIT"*]]^{1,3}
 define 1_to_3_edits edit_distance_with_markers .o. filter;
 \end{verbatim}
 \end{framed}
