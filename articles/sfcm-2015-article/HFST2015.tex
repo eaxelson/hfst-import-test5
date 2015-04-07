@@ -336,20 +336,25 @@ During the past two years, there have been many improvements to the HFST
 interface. We now have a native lexc compiler and the possibility to 
 hyperminimize the lexc lexicons. There have also been many bugfixes and 
 improvements to the native XFST compiler. Flag diacritics are fully supported 
-in all HFST command line tools. Weighted regular expressions, especially replace rules.
+in all HFST command line tools. Weights can be defined for all regular expressions,
+including replace rules.
 
-We have a download page (http://hfst.sourceforge.net/downloads/). For Linux 
-users, we recommend a Debian installation which is offered via Apertium. There
-are instructions and links to Apertium web pages. For Mac and Windows users,
+We have a download page (http://hfst.sourceforge.net/downloads/) that tells what 
+we offer and where it can be found. For Linux users, we recommend a Debian installation
+which is offered via Apertium. For Mac and Windows users,
 we offer binaries for eight tools: hfst-xfst, hfst-lexc, hfst-pmatch,
 hfst-pmatch2fst, hfst-twolc, hfst-proc, hfst-lookup and hfst-optimized-lookup.
 There is also a separate MacPorts installation available.
 
+We currently have a Python interface for HFST for Linux and Mac, generated with SWIG directly
+from our C++ API. We are working to create an alternative, more Python-like interface
+and implement it also for Windows.
+
 We have tentatively added Xerox's xfsm library as one implementation to HFST.
-In Table~\ref{operationtimes} we whow preliminary benchmarking results for
-minimization and composition implementations for an unweighted OMorFi intermediate
-transducer with ca 250 000 states and 600 000 transitions (in composition the transducer was composed
-with itself).
+In Table~\ref{operationtimes} we whow preliminary benchmarking results for different back-end
+implementations for two opearations, minimization and composition. As a test transducer we use an 
+unweighted OMorFi intermediate transducer with ca 250 000 states and 600 000 transitions (in composition
+the transducer is composed with itself).
 
 \begin{table}[h!]
   \centering
@@ -366,14 +371,16 @@ with itself).
   \label{operationtimes}
 \end{table}
 
-(fstminimize, old and new version, are there differences)
+In minimization, the openfst implementation is clearly the slowest. We tested minimizing
+the transducer with native openfst command line tools, but the result was still 5,36 seconds.
+The few extra milliseconds come from reading and writing files because not all openfst tools support reading
+and writing in a pipeline. As we have an old version (1.3.1) of openfst as our back-end, we also
+used the command line tools of the newest version (1.4.1), but minimization was not any faster.
+The slowness is probably due to the fact that openfst must be ready to handle weights.
 
-The slowness of openfst is possibly due to the old version (our and the newest 
-version number) that we have as our
-back-end and maybe because openfst handles weighted transducers. In xfsm
-composition, unknown and identity symbols are handled as a part of the 
-composition itself, but for other back-ends some post- and preprocessing is
-needed. This might explain why they are slower in composition.
+In composition, the xfsm implementation is the fastest. In xfsm composition, unknown and identity
+symbols are handled as a part of the composition itself, but for other back-ends some post- and preprocessing is
+needed. This probably explains why they are all slower.
 
 \section{Discussion and Conclusion}\label{sec:discussion}
 % Krister (1 p.)
