@@ -17,7 +17,7 @@
 #define YY_INPUT(buf, retval, maxlen)   (retval = hfst::pmatch::getinput(buf, maxlen))
 
 extern
-void pmatcherror(char *text);
+int pmatcherror(char *text);
 
 %}
 

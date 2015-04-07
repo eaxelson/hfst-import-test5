@@ -19,7 +19,7 @@
 #include "pmatch_utils.h"
     using hfst::pmatch::PmatchAstNode;
     
-    extern void pmatcherror(const char * text);
+    extern int pmatcherror(const char * text);
     extern int pmatchlex();
     extern int pmatchlineno;
 

@@ -66,7 +66,7 @@ static StringVector multichar_symbols;
 extern FILE* hlexcin;
 extern int hlexcparse();
 extern int hlexcnerrs;
-extern void hlexclex_destroy();
+extern int hlexclex_destroy();
 
 #ifndef DEBUG_MAIN
 
