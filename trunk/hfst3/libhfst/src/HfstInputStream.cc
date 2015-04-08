@@ -371,7 +371,7 @@ namespace hfst
              and/or that epsilon is coded differently than "@_EPSILON_SYMBOL_@"
              and/or that numbers 1 and 2 are reserved for other use than
              "@_UNKNOWN_SYMBOL_@" or "@_IDENTITY_SYMBOL_@". */
-          if (not has_hfst_header)
+          if (! has_hfst_header)
             {
               HfstBasicTransducer * net = 
                 ConversionFunctions::
@@ -487,7 +487,7 @@ namespace hfst
              and/or that epsilon is coded differently than "@_EPSILON_SYMBOL_@"
              and/or that numbers 1 and 2 are reserved for other use than
              "@_UNKNOWN_SYMBOL_@" or "@_IDENTITY_SYMBOL_@". */
-          if (not has_hfst_header)
+          if (! has_hfst_header)
             {
               HfstBasicTransducer * net = 
                 ConversionFunctions::

@@ -46,7 +46,7 @@ namespace hfst { namespace implementations
         if (inputsym != NULL) {
           for ( fst::SymbolTableIterator it = 
                   fst::SymbolTableIterator(*(inputsym));
-              not it.Done(); it.Next() ) {
+              ! it.Done(); it.Next() ) {
           assert(it.Symbol() != "");
 
           if (it.Value() != 0) // epsilon is not inserted
@@ -57,10 +57,10 @@ namespace hfst { namespace implementations
          symbol table. If the transducer is an HFST tropical transducer, it
          can have an output symbol table, but it is equivalent to the 
          input symbol table. */
-        if (not has_hfst_header && outputsym != NULL) {
+        if (! has_hfst_header && outputsym != NULL) {
           for ( fst::SymbolTableIterator it = 
                   fst::SymbolTableIterator(*(outputsym));
-                not it.Done(); it.Next() ) {
+                ! it.Done(); it.Next() ) {
             assert(it.Symbol() != "");
             if (it.Value() != 0) // epsilon is not inserted
               net->add_symbol_to_alphabet( it.Symbol() );
@@ -89,7 +89,7 @@ namespace hfst { namespace implementations
       {
         for ( fst::SymbolTableIterator it = 
                 fst::SymbolTableIterator(*(inputsym));
-              not it.Done(); it.Next() ) 
+              ! it.Done(); it.Next() ) 
           {
             assert(it.Symbol() != "");
             if (it.Value() != 0) // epsilon is not inserted
@@ -100,7 +100,7 @@ namespace hfst { namespace implementations
       {
         for ( fst::SymbolTableIterator it = 
                 fst::SymbolTableIterator(*(outputsym));
-              not it.Done(); it.Next() ) 
+              ! it.Done(); it.Next() ) 
           {
             assert(it.Symbol() != "");
             if (it.Value() != 0) // epsilon is not inserted
@@ -139,7 +139,7 @@ namespace hfst { namespace implementations
     
     /* Go through all states */
     for (fst::StateIterator<fst::StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next()) 
+         ! siter.Done(); siter.Next()) 
       {
         StateId s = siter.Value();
         
@@ -230,7 +230,7 @@ namespace hfst { namespace implementations
     for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
            = net->alphabet.begin();
          it != net->alphabet.end(); it++) {
-      assert(not it->empty());
+      assert(! it->empty());
       st.AddSymbol(*it, net->get_symbol_number(*it));
     }
 
