@@ -207,17 +207,19 @@ unmatched characters to empty strings. This abbreviated example for English
 employs some knowledge about intra-word punctuation.
 
 \begin{framed}
+\begin{verbatim}
 define special_plurals [abbreviation | numeric_expression] {'s};
 define possessive_s_ending
-  OR(LC({s}) LC({se}) LC({z}) LC({ze}) LC({ce}) LC({x}) LC({xe}))
-  ! at runtime check for these strings on the left side
-  {'} ({s});
-  ! then allow an apostrophe and possibly an s 
-define possessive_endings {'s} | possessive_s_ending;
-define OOVwordpart [Alpha+ (possessive_endings)] | special_plurals;
+ OR(LC({s}) LC({se}) LC({z}) LC({ze}) LC({ce}) LC({x}) LC({xe}))
+ ! at runtime check for these strings on the left side
+ {'} ({s});
+ ! then allow an apostrophe and possibly an s 
+define possessive_suff {'s} | possessive_s_suff;
+define OOVwordpart [Alpha+ (possessive_suff)] | special_plurals;
 ! assume contractions are all in the dictionary
 define OOVword OOVwordpart [{-} OOVwordpart]*;
 define TOP dict | OOVword;
+\end{verbatim}
 \end{framed}
 
 Here we join possessive endings and hyphen-joined compound words at the top
