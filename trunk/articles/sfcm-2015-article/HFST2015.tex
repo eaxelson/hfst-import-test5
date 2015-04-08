@@ -176,6 +176,20 @@ tagger won't be able to make the correct choice in
 
 if it only sees a tokenization where \emph{in view of} is a single token.
 
+We can extend the dictionary in a simple way to also contain the other
+possible tokenizations (and, in the case of a morphological dictionary,
+the analyses) as follows.
+
+\begin{verb}
+define combined_tokenizations [dict].u .o. [dict | [" " dict]*]  
+\end{verb}
+
+Here, \verb+dict+ is our dictionary and \verb+[dict].u+ is its input
+projection. We compose it with arbitrarily many copies of itself,
+interpolated with space characters. The result contains every multiword
+expression both as itself, and as a combination of other words found
+in the dictionary.
+
 \subsection{Tokenization Rules as an OOV Fallback}
 
 When no match from the dictionary is possible, \verb+pmatch+ by default
