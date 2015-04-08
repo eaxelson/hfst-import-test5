@@ -363,6 +363,20 @@ public:
     	 $self->write_in_att_format(tmp);
 	 return tmp;    
     }
+
+    HfstTransducer & __add__(const HfstTransducer & another) {
+         return $self->concatenate(another);
+    }
+    HfstTransducer & __sub__(const HfstTransducer & another) {
+         return $self->subtract(another);
+    }
+    HfstTransducer & __or__(const HfstTransducer & another) {
+         return $self->intersect(another);
+    }
+    HfstTransducer & __and__(const HfstTransducer & another) {
+         return $self->disjunct(another);
+    }
+    
     };
 
 };
@@ -406,7 +420,7 @@ public:
     LexcCompiler(hfst::ImplementationType impl);
     LexcCompiler& parse(FILE* infile);
     LexcCompiler& parse(const char* filename);
-    LexcCompiler& setVerbosity(bool verbose);
+    LexcCompiler& setVerbosity(unsigned int verbose);
     LexcCompiler& addAlphabet(const std::string& alphabet);
     LexcCompiler& setCurrentLexiconName(const std::string& lexicon_name);
     LexcCompiler& addStringEntry(const std::string& entry, const std::string& continuation, const double weight);
