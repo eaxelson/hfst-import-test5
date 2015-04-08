@@ -217,7 +217,7 @@ define possessive_s_ending
 define possessive_suff {'s} | possessive_s_suff;
 define OOVwordpart [Alpha+ (possessive_suff)] | special_plurals;
 ! assume contractions are all in the dictionary
-define OOVword OOVwordpart [{-} OOVwordpart]*;
+define OOVword [OOVwordpart [{-} OOVwordpart]*]::1.0;
 define TOP dict | OOVword;
 \end{verbatim}
 \end{framed}
@@ -226,6 +226,10 @@ Here we join possessive endings and hyphen-joined compound words at the top
 level into single matches, but by either adding tags at the appropriate levels
 or by changing what is included at the top level it is easy to control the
 level of tokenization.
+
+\verb+hfst-pmatch+ expressions are weighted, and the \verb+::1.0+ at the end
+of the \verb+OOVword+ rule ensures that dictionary matches, which have
+weight zero, will be preferred over \verb+OOVword+ matches.
 
 \subsection{Analysis Cohorts}
 
