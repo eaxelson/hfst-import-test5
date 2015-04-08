@@ -16,7 +16,7 @@ using std::string;
 using std::map;
 using std::ostringstream;
 
-class yy_buffer_state;
+struct yy_buffer_state;
 typedef yy_buffer_state * YY_BUFFER_STATE;
 typedef void * yyscan_t;
 extern int xreparse(yyscan_t);
