@@ -539,7 +539,7 @@ TransitionTableIndex ConvertFstState::set_transition_table_indices(
   ++place;
   
   // update the TransitionIndex's to store the table location of the
-  associated transition
+  // associated transition
   for(ConvertTransitionIndexSet::iterator it=transition_indices.begin();
       it!=transition_indices.end(); ++it)
   {
