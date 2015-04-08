@@ -5854,10 +5854,12 @@ HfstTransducer * HfstTransducer::read_lexc_ptr(const std::string &filename,
     {
 #if HAVE_FOMA
     case FOMA_TYPE:
+#if GENERATE_LEXC_WRAPPER
       retval->implementation.foma = foma_interface.read_lexc(filename, verbose);
       retval->type=FOMA_TYPE;
       break;
-#endif
+#endif // GENERATE_LEXC_WRAPPER
+#endif // HAVE_FOMA
 #if HAVE_SFST
     case SFST_TYPE:
 #endif

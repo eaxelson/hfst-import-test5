@@ -95,7 +95,7 @@ endif
 if WANT_INVERT
 MAYBE_INVERT=hfst-invert$(EXEEXT)
 endif
-if WANT_LEXC_WRAPPER
+if GENERATE_LEXC_WRAPPER
 MAYBE_LEXC_WRAPPER=hfst-lexc-wrapper$(EXEEXT)
 endif
 if WANT_LEXC
