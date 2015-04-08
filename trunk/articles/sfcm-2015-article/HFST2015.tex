@@ -69,9 +69,54 @@ We describe a general approach to these issues based on morphological
 transducers, regular expressions and the pattern matching operation
 \verb+pmatch+~\cite{pmatchcite}.
 
-\subsection{A Short Introduction to pmatch}
+\subsection{A Short Introduction to {\tt pmatch}}
 
+\verb+pmatch+~\cite{pmatch} is a pattern-matching operation for text based on
+regular expressions. The regular expressions (or ``rules'') are named, and are
+invoked ultimately by a root expression (the ``top level'', which by convention
+has the name ``TOP''). Expressions may be refer to themselves or each other
+circularly by way of special arcs which are interpreted at runtime, allowing
+context-free grammars to be expressed.
 
+Matching operates in a loop, accepting the largest
+possible amount of input from the current position, possibly modifying it
+according to the rules and tagging left and right boundaries of sub-rules, and
+continuing on the the next position in the input.
+
+When the rules successfully accept (and possibly transform) some length of
+input, that is a ``match''.
+When the match has triggered the operation of a tagging directive
+(\verb+EndTag()+ or \verb+[].t()+), the enclosed length of input is ``tagged'' with
+``tags''. For example, here is a very naïve tokenizer.
+
+\begin{verbatim}
+define TOP [[Alpha | "'"]+ | Sigma({,.;!?})]] EndTag(w);
+\end{verbatim}
+
+\verb+Sigma()+ is a function that extracts the alphabet of its argument, here
+some punctuation given as a string (which is the effect of the curly braces).
+When operated on the sentence
+``If I am out of my mind, it's all right with me, thought Moses Herzog.'',
+it produces output that looks like this:
+
+\begin{verbatim}
+<w>If</w> <w>I</w> <w>am</w> <w>out</w> <w>of</w> <w>my</w>
+<w>mind</w><w>,</w> <w>it's</w> <w>all</w> <w>right</w> <w>with</w>
+<w>me</w><w>,</w> <w>thought</w> <w>Moses</w> <w>Herzog</w><w>.</w>
+\end{verbatim}
+
+in normal, ``matching'' mode. The runtime operation of matching can be
+controlled to only output the matched parts, or give positions and
+lengths of tagged parts (``locate mode''). Matches may also be extracted
+via an API call to control the flow of data more precisely. The above example
+operating as a more conventional tokenizer (outputting one token per line and
+omitting everything else) could be written as
+
+\begin{verbatim}
+define TOP [[Alpha | "'"]+ | Sigma({,.;!?})]] 0:"\n";
+\end{verbatim}
+
+and run in \verb+extract-matches+ mode.
 
 \subsection{Tokenizing with a Dictionary}
 
@@ -384,13 +429,6 @@ saw that <Size><LU>great</LU>
 %\caption{Fragments of tagged running text}
 %  \label{bibletext}
 %\end{table}
-
-\verb+pmatch+ may be operated in various modes. In \verb+locate+ mode the
-position and length of each match is given, and only the outermost tag is
-supplied. \verb+match+ mode (which is the default) tags and outputs running
-text, and \verb+extract+ mode does the same but omits parts of the input that
-aren't matched by a rule. Matches may also be extracted via an API call, for
-example in order to achieve the above-seen concordance effect.
 
 A natural next step is to add optional non-core elements, such as an adverb
 preceding the LU being tagged as \verb+Degree+ and a noun phrase beginning with
