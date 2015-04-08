@@ -47,7 +47,7 @@ using hfst::xre::harmonize_;
 using hfst::xre::harmonize_flags_;
 
 union YYSTYPE;
-class yy_buffer_state;
+struct yy_buffer_state;
 typedef yy_buffer_state * YY_BUFFER_STATE;
 typedef void * yyscan_t;
 
