@@ -798,6 +798,7 @@ namespace hfst { namespace implementations {
     return table;
   }
 
+#if GENERATE_LEXC_WRAPPER
     fsm * FomaTransducer::read_lexc(const std::string &filename, bool verbose)
   {
     char * filename_ = strdup(filename.c_str());
@@ -822,6 +823,7 @@ namespace hfst { namespace implementations {
     free(lexcfile);
     return retval;
   }
+#endif
 
   struct fsm * FomaTransducer::eliminate_flags(struct fsm * t)
   {

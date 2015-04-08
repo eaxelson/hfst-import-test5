@@ -506,17 +506,22 @@ AM_CONDITIONAL([WANT_XFST], [test x$enable_xfst != xno])
 
 # Check if zlib is available
 AC_CHECK_LIB([z], [main], [zlib_exists=yes], [zlib_exists=no])
-# Check if foma wrapper is wanted and possible to generate 
+# Check if foma and lexc wrappers are wanted and possible to generate 
 AM_CONDITIONAL([GENERATE_FOMA_WRAPPER], [test "x$enable_foma_wrapper" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" != "xno"])
-# The same as a variable..
+AM_CONDITIONAL([GENERATE_LEXC_WRAPPER], [test "x$enable_lexc_wrapper" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" != "xno"])
+# The same as variables..
 AS_IF([test "x$enable_foma_wrapper" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" != "xno"], [generate_foma_wrapper=yes], [generate_foma_wrapper=no])
+AS_IF([test "x$enable_lexc_wrapper" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" != "xno"], [generate_lexc_wrapper=yes], [generate_lexc_wrapper=no])
 
-# Check if we have to warn the user for missing foma wrapper because zlib is not available 
-AS_IF([test "x$enable_foma_wrapper" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" == "xno"], [warn_about_missing_zlib=yes], [warn_about_missing_zlib=no])
+# Check if we have to warn the user for missing foma and lexc wrappers because zlib is not available 
+# AS_IF([test "x$enable_foma_wrapper" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" == "xno"], [warn_about_missing_zlib_foma=yes], [warn_about_missing_zlib_foma=no])
+# AS_IF([test "x$enable_lexc_wrapper" != "xno" -a "x$with_foma" != "xno" -a "x$zlib_exists" == "xno"], [warn_about_missing_zlib_lexc=yes], [warn_about_missing_zlib_lexc=no])
 
 # If foma wrapper is not wanted or possible to generate, set these conditionals/variables to 'no'
 AM_COND_IF([GENERATE_FOMA_WRAPPER], [], [AM_CONDITIONAL([WANT_FOMA_WRAPPER], [false])])
 AM_COND_IF([GENERATE_FOMA_WRAPPER], [], [enable_foma_wrapper=no])
+AM_COND_IF([GENERATE_LEXC_WRAPPER], [], [AM_CONDITIONAL([WANT_LEXC_WRAPPER], [false])])
+AM_COND_IF([GENERATE_LEXC_WRAPPER], [], [enable_lexc_wrapper=no])
 
 # Disable stress tests by default
 AC_ARG_ENABLE([stress-tests],
@@ -602,6 +607,7 @@ AC_LANG_POP
 AC_LANG_PUSH([C])
 
 AM_COND_IF([GENERATE_FOMA_WRAPPER], [AC_CHECK_LIB([z], [main], [], [AC_MSG_FAILURE([foma test failed because zlib.h was not found (--without-foma to disable)])])])
+AM_COND_IF([GENERATE_LEXC_WRAPPER], [AC_CHECK_LIB([z], [main], [], [AC_MSG_FAILURE([foma test failed because zlib.h was not found (--without-foma to disable)])])])
 
 AM_CONDITIONAL(HAVE_NCURSES,[false])
 AM_CONDITIONAL(HAVE_CURSES,[false])
