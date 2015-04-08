@@ -87,10 +87,12 @@ When the rules successfully accept (and possibly transform) some length of
 input, that is a ``match''.
 When the match has triggered the operation of a tagging directive
 (\verb+EndTag()+ or \verb+[].t()+), the enclosed length of input is ``tagged'' with
-``tags''. For example, here is a very naïve tokenizer.
+``tags''. For example, here is a very naïve tokenizer for English.
 
 \begin{verbatim}
-define TOP [[Alpha | "'"]+ | Sigma({,.;!?})]] EndTag(w);
+define TOP [[ ("'") Alpha+ ] | Sigma({,.;!?})]] EndTag(w);
+! If you want apostrophe-joined elisions as single tokens, use
+! [Alpha | "'"]+
 \end{verbatim}
 
 \verb+Sigma()+ is a function that extracts the alphabet of its argument, here
@@ -100,8 +102,8 @@ When operated on the sentence
 it produces output that looks like this:
 
 \begin{verbatim}
-<w>If</w> <w>I</w> <w>am</w> <w>out</w> <w>of</w> <w>my</w>
-<w>mind</w><w>,</w> <w>it's</w> <w>all</w> <w>right</w> <w>with</w>
+<w>If</w> <w>I</w> <w>am</w> <w>out</w> <w>of</w> <w>my</w> <w>mind</w>
+<w>,</w> <w>it</w> <w>'s</w> <w>all</w> <w>right</w> <w>with</w>
 <w>me</w><w>,</w> <w>thought</w> <w>Moses</w> <w>Herzog</w><w>.</w>
 \end{verbatim}
 
@@ -192,7 +194,8 @@ in the dictionary.
 
 \subsection{Tokenization Rules as an OOV Fallback}
 
-When no match from the dictionary is possible, \verb+pmatch+ by default
+When no match from the dictionary (or a morphological guesser) is possible,
+\verb+pmatch+ by default
 writes input to output as-is. Ideally, we'd like to assign every character
 in input either to some intentional token, or discard it (this concerns mainly
 whitespace between tokens). To achieve this, we must write a rule representing
@@ -200,17 +203,33 @@ whitespace between tokens). To achieve this, we must write a rule representing
 our tokenizer. To discard unwanted input, we must either adopt the convention
 (and use an appropriate operating mode) that parts of input that haven't been
 given any tag are discarded, or explicitly add a rule that rewrites single
-unmatched characters to empty strings.
+unmatched characters to empty strings. This abbreviated example for English
+employs some knowledge about intra-word punctuation.
 
 \begin{framed}
-define wordchars 
+define special_plurals [abbreviation | numeric_expression] {'s};
+define possessive_s_ending
+  OR(LC({s}) LC({se}) LC({z}) LC({ze}) LC({ce}) LC({x}) LC({xe}))
+  ! at runtime check for these strings on the left side
+  {'} ({s});
+  ! then allow an apostrophe and possibly an s 
+define possessive_endings {'s} | possessive_s_ending;
+define OOVwordpart [Alpha+ (possessive_endings)] | special_plurals;
+! assume contractions are all in the dictionary
+define OOVword OOVwordpart [{-} OOVwordpart]*;
+define TOP dict | OOVword;
 \end{framed}
+
+Here we join possessive endings and hyphen-joined compound words at the top
+level into single matches, but by either adding tags at the appropriate levels
+or by changing what is included at the top level it is easy to control the
+level of tokenization.
 
 \subsection{Analysis Cohorts}
 
 In addition to bare tokens, many downstream tools use analysis cohorts, ie.\@
 the full set of possible baseforms and morphological tags for the token in
-question.
+question. 
 
 \subsection{Chunking}
 
