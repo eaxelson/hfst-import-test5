@@ -221,28 +221,78 @@ Abbreviations ending in a period
 \section{Morphological Tagging using {\tt hfst-finnpos}}\label{sec:morph-tagging}
 % Miikka (4 p.)
 
-FinnPos \cite{silfverberg2015} is a morphological tagger toolkit based
-on the Conditional Random Field framework. It is especially geared
-toward morphologically rich languages with large label sets which
-cause data sparsity and slow down estimation.
+FinnPos \cite{silfverberg2015} is a {\it morphological tagging} toolkit
+distributed with the HFST interface. The term morphological tagging
+\cite{Chrupala} refers to assigning one full morphological label (including for example part-of-speech, tense, case and number) for
+each word in a text. It can be contrasted with POS tagging where the
+task is to infer the part-of-speech of each word in a text.
 
+The FinnPos toolkit is based on the Conditional Random Field framework
+\cite{lafferty2001}. Most work on CRF taggers and other discriminative
+taggers has concentrated on POS tagging for English, which has a very
+limited selection of productive morphological phenomena. In contrast,
+FinnPos is especially geared toward morphologically rich languages
+with large label sets, which cause data sparsity and slow down
+estimation when using standard solutions. FinnPos gives state-of-the-art
+results for the morphologically rich language Finnish
+\cite{silfverberg2015}.
 
+In addition to morphological tagging, FinnPos also performs data
+driven lemmatization. It can also be combined with a morphological
+analyzer to make a data-driven morphological disambiguator.
 
-Besides optimizations and sub-label dependencies
-\cite{silfverberg2014}, Finnpos also provides a flexible way of
-integrating a morphological analyzer in the tagging
-process. Morphological analyses can be use both as features during
-estimation and inference and for constraining the set of possible
-morphological labels for word forms. Additionally, the analyzer is
-used in lemmatization.
+In this section, we will describe the FinnPos tagger from a
+practical point of view.
 
-For words not recognized by the morphological analyzer, Finnpos
-includes a data driven lemmatizer which is based on the averaged
-perceptron classifier.
+\subsection{FinnPos for Morphologically Rich Languages}
+
+Large label sets commonly used in morphological tagging of
+morphologically rich languages cause data sparsity. Label set sizes of
+around 1,000 label types frequently occur. For a second order
+morphological tagger, this means that a overwhelming majority of the
+one billion possible (1,000$^3$) label trigrams are never seen in a
+training corpus of realistic scope.
+
+Although morpholgical label sets can be very large, they are usually
+structured. A typical example is the label {\tt
+  Noun+Singular+Nominative}, where the main word class is {\tt Noun},
+the number is {\tt Singular} and the case is {\tt Nominative}. FinnPos
+utilizes the internal structure of large label sets by extracting
+features for the sub units of labels as well as for the entire labels
+\cite{silfverberg2014}. It can, for example, extract a structured
+feature stating that two words agree in case.
+
+In addition to data sparsity, training time is a problem because the
+complexity of standard CRF training of an $n$th order model depends on
+the $(n+1)$st power of the label set size. To speed up training,
+FinnPos uses an adaptive beam search and a label guesser
+\cite{silfverberg2015} during inference and estimation. These reduce
+run time to fraction in practice.
+
+\subsection{FinnPos Tools}
+
+The FinnPos toolkit includes three commandline tools
+
+\begin{itemize}
+\item {\tt finnpos-train} for training tagger models.
+\item {\tt finnpos-label} for using models to label data.
+\item {\tt finnpos-eval} for evaluation against a gold standard.
+\end{itemize}
+
+Additionally, FinnPos provides a feature extraction script {\tt
+  finnpos-ratna-feat.py}.
+
+FinnPos can utilize HFST morphological analyzers but it is independent
+from the HFST interface in the sense that other morphological
+analyzers can also be used. The integration of a morphological
+analyzer happens by piping the output of the analyzer to
+FinnPos. Possibly some intermediate editing is required to make the
+output of the analyzer compatible with FinnPos.
 
 \subsection{Data Format and Feature Extraction}
 
 \begin{figure}
+\begin{framed}
 \begin{verbatim}
 The    WORD=The LC_WORD=the       the  DT    _
 dog    WORD=dog LC_WORD=dog       dog  NN    _
@@ -254,10 +304,13 @@ cat    WORD=cat LC_WORD=cat       cat  NN    _
 meows  WORD=meows LC_WORD=meows   meow VBZ   _
 .      WORD=. LC_WORD=.           .    .     _
 \end{verbatim}
+\end{framed}
 \caption{Small example of data format.}
 \end{figure}
 
-The utilities finnpos-train and finnpos-label read and write input sentences in a five column tab-separated format where each row corresponds to one input word and the columns denote
+The utilities finnpos-train and finnpos-label read and write input
+sentences in a five column tab-separated format where each row
+corresponds to one input word and the columns denote
 
 \begin{enumerate}
   \item  Word form (e.g. ``Dogs'').
@@ -290,15 +343,23 @@ For rare words, the script also extracts orthographic features
 \item Whether the word includes digits or dashes.
 \end{enumerate}
 
-Users may add their own features or write their own feature extraction script.
+Users may add their own features (such as the output of a
+morphological analyzer) before calling {\tt finnpos-ratna-feats.py} or
+write their own feature extraction script.
+
+The fifth field in the data format is reserved for annotations. These
+are passed unchanged through the tool {\tt finnpos-label}. The
+annotation field can be used to transport lemmatization information
+through the tagger. It can also be used for e.g. named entity labels.
 
 \subsection{Training and Using a Model}
 
 Users can train their own models using the utility {\tt
   finnpos-train}. The parameters of the training process are set using
-a configuation file.
+a configuation file (see Figure \ref{}).
 
 \begin{figure}
+\begin{framed}
 \begin{verbatim}
 # Config file for FinnTreeBank tagger.
 
@@ -307,27 +368,49 @@ beam_mass=0.999
 max_train_passes=3
 max_lemmatizer_passes=7
 \end{verbatim}
+\end{framed}
 \caption{Example configuration file.}
 \end{figure}
 
 \begin{figure}
 \begin{tabular}{ll}
-{\tt suffix\_length} & The maximal suffix length used in feature extraction during lemmatization.\\
+{\tt suffix\_length} & The maximal suffix length used in feature extraction during\\
+                     & lemmatization.\\
 {\tt degree} & The degree of structured features used by the tagger. \\
-{\tt max\_train\_passes} & The maximal number of training passes during estimation of tagger parameters.\\
-{\tt max\_lemmatizer\_passes} & The maximal number of training passes during estimation of lemmatizer parameters.\\
-{\tt max\_useless\_passes} & Determined the maximal number of passes over the training data that do not improve\\
-&  the tagging accuracy for the development data.\\
-{\tt guess\_mass} & A generative label guesser is used to prune the label candidates considered for each word \\
-                  & during training. {\tt guess\_mass} is a float in range (0, 1.0) which detemines the mass \\
+{\tt max\_train\_passes} & The maximal number of training passes during estimation of tagger\\
+                         & parameters.\\
+{\tt max\_lemmatizer\_passes} & The maximal number of training passes during estimation of\\
+                              & lemmatizer parameters.\\
+{\tt max\_useless\_passes} & Determined the maximal number of passes over the training data\\
+                           & that do not improve the tagging accuracy for the development data.\\
+{\tt guess\_mass} & A generative label guesser is used to prune the label candidates\\
+                  & considered for each word during training. {\tt guess\_mass} is a float\\
+                  & in range (0, 1.0) which detemines the mass \\
                   &  preserved by the guesser for each word.\\
-{\tt beam\_mass} & FinnPos uses an adaptive beam to prune search histories during beam search. \\
-                 &  This parameter determines the probability mass of the beam.
+{\tt beam\_mass} & FinnPos uses an adaptive beam to prune search histories during\\
+                 & beam search. This parameter determines the probability mass of the\\
+                 & beam.
 \end{tabular}
 \caption{Description of configuration file fields.}
 \end{figure}
 
-\subsection{Using a Morphological Analyzer}
+\subsection{FinnPos and Morphological Analyzers}
+
+FinnPos can be used for morphological disambiguation together with a
+morphological analyzer. The analyzer can be used in two ways: to
+provide label candidate for words and as a generator of features.
+
+For words not recognized by the analyzer, FinnPos will use a built-in
+suffix-based guesser.
+
+FinnPos does not depend on HFST for morphological analysis. Any
+morphological analyzer may be used, because morphological
+disambiguation is accomplished using a pipeline of tools.
+
+In addition to the morpological tag, FinnPos also uses the
+morphological analyzer for determining the lemma of a given word. For
+words not recognized by the analyzer, a data-driven lemmatizer is used
+instead.
 
 \section{Semantic Tagging using {\tt hfst-pmatch}}\label{sec:sem-tagging}
 % Sam (4 p.)
