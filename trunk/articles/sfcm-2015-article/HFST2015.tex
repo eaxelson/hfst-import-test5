@@ -256,11 +256,13 @@ time expressions? numeric quantities? money? (or remove section?)
 \section{Morphological Tagging using {\tt hfst-finnpos}}\label{sec:morph-tagging}
 % Miikka (4 p.)
 
-FinnPos \cite{silfverberg2015} is a {\it morphological tagging} toolkit
-distributed with the HFST interface. The term morphological tagging
-\cite{Chrupala} refers to assigning one full morphological label (including for example part-of-speech, tense, case and number) for
-each word in a text. It can be contrasted with POS tagging where the
-task is to infer the part-of-speech of each word in a text.
+FinnPos \cite{silfverberg2015} is a data driven {\it morphological
+  tagging} toolkit distributed with the HFST interface. The term
+morphological tagging \cite{Chrupala} refers to assigning one full
+morphological label (including for example part-of-speech, tense, case
+and number) for each word in a text. It can be contrasted with POS
+tagging where the task is to infer the only the correct part-of-speech
+of each word.
 
 The FinnPos toolkit is based on the Conditional Random Field framework
 \cite{lafferty2001}. Most work on CRF taggers and other discriminative
@@ -268,34 +270,35 @@ taggers has concentrated on POS tagging for English, which has a very
 limited selection of productive morphological phenomena. In contrast,
 FinnPos is especially geared toward morphologically rich languages
 with large label sets, which cause data sparsity and slow down
-estimation when using standard solutions. FinnPos gives state-of-the-art
-results for the morphologically rich language Finnish
-\cite{silfverberg2015}.
+estimation when using standard solutions. FinnPos gives
+state-of-the-art results for the morphologically rich language Finnish
+\cite{silfverberg2015} both with regard to runtime and accuracy.
 
 In addition to morphological tagging, FinnPos also performs data
-driven lemmatization. It can also be combined with a morphological
-analyzer to make a data-driven morphological disambiguator.
+driven lemmatization. Moreover, it can be combined with a
+morphological analyzer to make a data-driven morphological
+disambiguator.
 
 In this section, we will describe the FinnPos tagger from a
 practical point of view.
 
 \subsection{FinnPos for Morphologically Rich Languages}
 
-Large label sets commonly used in morphological tagging of
-morphologically rich languages cause data sparsity. Label set sizes of
-around 1,000 label types frequently occur. For a second order
-morphological tagger, this means that a overwhelming majority of the
-one billion possible (1,000$^3$) label trigrams are never seen in a
-training corpus of realistic scope.
+Large label sets commonly used in tagging of morphologically rich
+languages cause data sparsity. Label set sizes of around 1,000 label
+types frequently occur. For a second order morphological tagger, this
+means that an overwhelming majority of the one billion possible
+(1,000$^3$) label trigrams are never seen in a training corpus of
+realistic scope.
 
 Although morpholgical label sets can be very large, they are usually
-structured. A typical example is the label {\tt
-  Noun+Singular+Nominative}, where the main word class is {\tt Noun},
-the number is {\tt Singular} and the case is {\tt Nominative}. FinnPos
-utilizes the internal structure of large label sets by extracting
-features for the sub units of labels as well as for the entire labels
-\cite{silfverberg2014}. It can, for example, extract a structured
-feature stating that two words agree in case.
+structured. A typical example of a structured morphological label is
+the label {\tt Noun+Singular+Nominative}, where the main word class is
+{\tt Noun}, the number is {\tt Singular} and the case is {\tt
+  Nominative}. FinnPos utilizes the internal structure of large label
+sets by extracting features for sub units of labels as well as for
+the entire labels \cite{silfverberg2014}. It can, for example, extract
+a structured feature expressing case congruence.
 
 In addition to data sparsity, training time is a problem because the
 complexity of standard CRF training of an $n$th order model depends on
@@ -314,11 +317,11 @@ The FinnPos toolkit includes three commandline tools
 \item {\tt finnpos-eval} for evaluation against a gold standard.
 \end{itemize}
 
-Additionally, FinnPos provides a feature extraction script {\tt
-  finnpos-ratna-feat.py}.
+Additionally, FinnPos provides a Python script {\tt
+  finnpos-ratna-feat.py} used for feature extraction.
 
 FinnPos can utilize HFST morphological analyzers but it is independent
-from the HFST interface in the sense that other morphological
+of the HFST interface in the sense that other morphological
 analyzers can also be used. The integration of a morphological
 analyzer happens by piping the output of the analyzer to
 FinnPos. Possibly some intermediate editing is required to make the
@@ -389,9 +392,21 @@ through the tagger. It can also be used for e.g. named entity labels.
 
 \subsection{Training and Using a Model}
 
+FinnPos uses an early stopping averaged perceptron algorithm for estimation of model parameters. The error-driven perceptron training algorithm iterates through the training corpus one sentence at a time, labels the sentence and adjusts model weights when erroneous labels are detected. Usually the Viterbi algorithm \cite{Collins/2002} is used for labeling. This however, is too slow in practice when dealing with large label sets.
+
+Instead of the Viterbi algorithm, FinnPos uses a beam search with
+adaptive beam width \cite{Pal}. Additionally FinnPos uses a generative
+label guesser (modeled after the OOV word model used in
+\cite{Brants/2000}) to restrict label candidates during
+training. Because of inexact inference during the training phase,
+FinnPos additionally uses violation fixing \cite{}.
+
 Users can train their own models using the utility {\tt
   finnpos-train}. The parameters of the training process are set using
-a configuation file (see Figure \ref{}).
+a configuation file (see Figure \ref{fig:config-file}). The
+configuration file is used to set the hyper parameters of the beam
+search and label guesser as well as the stopping conditions for the
+perceptron algorithm. See figure \ref{fig:config-fields}.
 
 \begin{figure}
 \begin{framed}
@@ -404,7 +419,7 @@ max_train_passes=3
 max_lemmatizer_passes=7
 \end{verbatim}
 \end{framed}
-\caption{Example configuration file.}
+\caption{Example configuration file.}\label{fig:config-file}
 \end{figure}
 
 \begin{figure}
@@ -426,7 +441,7 @@ max_lemmatizer_passes=7
                  & beam search. This parameter determines the probability mass of the\\
                  & beam.
 \end{tabular}
-\caption{Description of configuration file fields.}
+\caption{Description of configuration file fields.}\label{fig:config-fields}
 \end{figure}
 
 \subsection{FinnPos and Morphological Analyzers}
