@@ -148,9 +148,10 @@ done
 # make scripts and headers
 cp scripts/make-foma.bat $1/back-ends/foma/
 cp scripts/make-openfstwin.bat $1/back-ends/openfstwin/src/lib/
-cp scripts/make-parsers.bat $1/libhfst/src/parsers/
-cp scripts/make-implementations.bat $1/libhfst/src/implementations/
+# cp scripts/make-parsers.bat $1/libhfst/src/parsers/
+# cp scripts/make-implementations.bat $1/libhfst/src/implementations/
 cp scripts/make-libhfst.bat $1/libhfst/src/
+cp scripts/generate-python-bindings.bat $1/libhfst/src
 
 # copy missing headers and change some headers included
 cp scripts/stdint.h $1/back-ends/foma/
