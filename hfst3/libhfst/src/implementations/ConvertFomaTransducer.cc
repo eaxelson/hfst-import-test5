@@ -67,7 +67,7 @@ namespace hfst { namespace implementations
        bool &start_state_found)
     {
         // If the start state has not yet been encountered.
-      if (not start_state_found) {
+      if (! start_state_found) {
         start_state_id = (fsm)->state_no; // define the start state
         start_state_found=true;           // define that it is found
       }
@@ -191,7 +191,7 @@ namespace hfst { namespace implementations
   }
 
   // If there was not an initial state in foma transducer,
-  if (not start_state_found) {
+  if (! start_state_found) {
     copy_alphabet(t, net);
     return net; // we assume that the transducer is empty.
     // instead of throwing an exception.
