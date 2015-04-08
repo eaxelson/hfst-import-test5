@@ -231,13 +231,23 @@ level of tokenization.
 
 In addition to bare tokens, many downstream tools use analysis cohorts, ie.\@
 the full set of possible baseforms and morphological tags for the token in
-question. 
+question. \verb+hfst-pmatch+ exposes an API that allows retrieval of the
+position, length, input, output, tag and weight of each longest match (when
+there are many equally long ones). To go directly from running text to, say,
+Constraint Grammar cohorts (possibly via some intermediate processing) is a
+matter of string interpolation of the fields retrieved from \verb+pmatch+.
 
 \subsection{Chunking}
 
-Abbreviations ending in a period
+Since in \verb+pmatch+ multiple rules operate on the same input, it is possible
+to integrate higher-level tokenization, such as grouping tokens into sentences
+and sentences into paragraphs in the same ruleset.
+
+(example if deemed useful, otherwise remove this section)
 
 \subsection{Incorporating other Linguistic Units}
+
+time expressions? numeric quantities? money? (or remove section?)
 
 \section{Morphological Tagging using {\tt hfst-finnpos}}\label{sec:morph-tagging}
 % Miikka (4 p.)
