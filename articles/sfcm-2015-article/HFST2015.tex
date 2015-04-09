@@ -506,7 +506,7 @@ which it is compared (``tall \textbf{for a jockey}'').
 
   \begin{center}
 \begin{table}[h]
-  \begin{tabular}{ | l | p{4cm} |}
+  \begin{tabular}{ | l | l |}
 \hline
 Lexical Unit (LU) & Adjective describing magnitude (large, tiny, ...) \\
 \hline
@@ -525,12 +525,13 @@ Standard (S), optional & A point of comparison (for a jockey, ...) \\
 For example:
 
 \begin{table}[h]
-
+\begin{center}
 \begin{math}
 \Big[_{\text{Size}}\Big[_{\text{E}}\text{He} \Big]
   \text{is} \Big[_{\text{D}} \text{quite} \Big] \Big[_{\text{LU}}\text{tall} \Big]
   \Big[_{\text{S}} \text{for a jockey} \Big] \Big]
 \end{math}
+\end{center}
 \caption{A tagged example of \emph{Size}}
 \end{table}
 
@@ -600,11 +601,8 @@ preceding the LU being tagged as \verb+Degree+ and a noun phrase beginning with
   \small
   \begin{framed}
 \begin{verbatim}
-define Size1
-  Define(Adverb EndTag(Degree))
-  LU (Adjective)
-  Define(Noun EndTag(Entity))
-  Define({for a} NP EndTag(Standard));
+define Size1 [Adverb].t(Degree) LU (Adjective)
+  [Noun].t(Entity) [{for a} NP].t(Standard);
 \end{verbatim}
 \end{framed}
 \normalsize
@@ -688,10 +686,8 @@ used to define the class of common nouns as in table \ref{dictrules}.
 \begin{verbatim}
 ! The file we want to read
 define English @bin"english.hfst";
-! We compose it with a noun filter
-! and extract the input side
-define Noun English .o.
- [?+ "<NN1>" | "<NN2>"].u;
+! We compose it with a noun filter and extract the input side
+define Noun English .o. [?+ "<NN1>" | "<NN2>"].u;
 ! (NN1 is singular, NN2 plural)
 \end{verbatim}
 \end{framed}
@@ -707,8 +703,7 @@ on its output, as in table \ref{posrules}.
   \small
   \begin{framed}
 \begin{verbatim}
-define Noun LC(W) Wordchar+
- ["<NN1>"|"<NN2>"] RC(W);
+define Noun LC(W) Wordchar+ ["<NN1>"|"<NN2>"] RC(W);
 \end{verbatim}
 \end{framed}
   \normalsize
@@ -721,8 +716,7 @@ Having considered for each rule where \verb+Degree+ and \verb+Standard+ may occu
 
 \small
 \begin{verbatim}
-define TOP Size1 | Size2 | ...
- Define(LU EndTag(NonmatchingLU));
+define TOP Size1 | Size2 | [LU].t(NonmatchingLU);
 \end{verbatim}
 \normalsize
 
@@ -733,8 +727,7 @@ For example in
 \small
 \begin{framed}
 \begin{verbatim}
-the moving human body is
-<NonmatchingLU>large</NonmatchingLU>
+the moving human body is <NonmatchingLU>large</NonmatchingLU>,
 obtrusive and highly visible
 \end{verbatim}
 \end{framed}
