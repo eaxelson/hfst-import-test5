@@ -29,7 +29,7 @@
 %
 \begin{document}
 %
-\title{Semantic tagging using HFST}
+\title{Using HFST--Helsinki Finite-State Technology in Digital Humanities}
 %
 \author{N.N. and N.N.}
 
@@ -50,6 +50,84 @@
 
 \section*{Introduction}
 % Krister (1 p.)
+Digital Humanities can roughly be divided into four areas of research
+according to Manfred Thaller \cite{Thaller2012}, i.e. textual research
+of text and speech, text and data mining for factoids, non-textual
+research of images and 3D-modeling and, finally, research trying to
+pinpoint how digital humanities differs from both computer science and
+humanities research. According to Thaller computational linguistics is
+considered a branch of the first area of digital humanities doing
+textual research, which is true if the task of computational
+linguistics is to support linguistic study. He even questions whether
+computational linguistics is a proper branch of digital humanities. We
+argue that language technology is broader in focus than traditional
+computational linguistics, e.g. language technology underlies the
+mining of text for factoids, and language technology is involved in
+research on images and 3D-modeling when images are interpreted by
+computers and automatically provided with metadata and natural
+language descriptions. Thus language technology supports all the areas
+of digital humanities. Our claim is that named entities bridge the gap
+between computational linguistics and digital humanities,
+i.e. named-entity processing is to digital humanities what
+morphological processing was to computational linguistics. In this
+paper we will look at one particular framework, HFST--Helsinki
+Finite-State Technology, and its use in processing text to recognize
+named entities in context.
+
+Morphological processing deals with morphemes in context whereas
+named-entity processing deals with named entities in context. Let us
+explore the analogy between the two. Simplistically a named entity is
+a sequence of morphemes and many of the phenomena found in morphology
+carry over to named entities such as ambiguity, context, compounding
+as well as normalization. Ambiguity pertains both to homonyms such as
+Nokia being a company, a product or a village in Finland as well as to
+multiple external references such as John meaning several
+individuals. For named entities, we have authority lists that are
+controlled lists of terms, names, phrases or similar entries relative
+to a specific domain. An authority list may or may not contain
+definitions or other information about each
+item\footnote{\url{http://www.tomwason.com/glossary.html}}. In
+morphology, we have lexicons as authority lists.  Context is relevant
+when analyzing either morphemes or named entities. We need to decide
+whether we want all possible analyses, only the most likely analysis
+in context or perhaps an approximate analysis for an unknown
+word. Local context extends to phonemes, morphemes, words, multi-word
+expressions and head words depending on how much context is needed and
+available. Compounding in named entities is seen e.g. in John Smith as
+a name consisting of a first name and a surname. One can even claim
+that a named entity like ``a day in June 2015'' represents
+inter-digitization of named entities in the expression ``June X,
+2015'', where X is 1 \ldots 30, a phenomenon which is known in the
+morphology of Semitic languages when adding vowels to roots to derive
+new words. Normalization is important to identify the intended
+referent. Initially, there was a debate on whether linguistics and
+morphology should be descriptive or prescriptive but the pragmatic
+approach has prevailed and we accept that there are normalized forms
+that we use for identifying base forms in morphology or authorities
+among named entities while we accept that in practice words and names
+end up being written in many different ways and we need to enable
+language technology to recognize problematic cases and sometimes also
+to resolve what was intended.
+
+HFST--Helsinki Finite Technology is a framework for building
+morphologies including morphological lexicons, which then extends to
+building authorities lists with the variants found in text. In
+addition, HFST has the capability to describe and identify structured
+named entities in context.  HFST supports building tokenizers and
+taggers which deliver only one output considering the local context
+and authorities lists, but HFST can also provide multiple analyses of
+words and multi-word expressions. In addition, HFST supports guessing
+for out of vocabulary words and approximate spelling normalization. In
+Section 1, we get an overview and some examples on how to develop a
+tokenizer based on a lexicon containing multi-word expressions in HFST
+using the p-match syntax. In Section 2, we get an introduction to
+building morphological taggers with HFST using machine learning which
+provides a basis for doing named-entity recognition based on
+morphological information. In Section 3, we get an introduction to
+named entities extended to semantic frame recognition. In Section 4,
+we are introduced to approximate recognition of words and names using
+weighted regular expressions. In Section 5, we conclude the
+presentation.
 
 \section{Tokenization using {\tt hfst-pmatch}}\label{sec:tokenization}
 % Sam (4 p.)
@@ -829,7 +907,7 @@ Here each rule making an edit appends a special marker, which is removed
 by composing with \verb+filter+, which allows (in this case) between 1 and 3
 edits to pass through, replacing them with the empty string.
 
-\section{Background}\label{sec:background}
+\section{Implementation aspects}\label{sec:background}
 % Erik (2 p.)
 During the past two years, there have been many improvements to the HFST 
 interface. We now have a native lexc compiler and the possibility to 
@@ -883,6 +961,29 @@ needed. This probably explains why they are all slower.
 
 \section{Discussion and Conclusion}\label{sec:discussion}
 % Krister (1 p.)
+
+As morphemes and words have formed the basis for structural analysis
+of sentences, named entities form the basis for structural analysis of
+discourse and information content. Sometimes it is claimed that
+linguists are interested in words and satisfied with the sentence
+context, but this is a slightly too narrow view of linguistics. In
+order to study language in change linguists also need access to whole
+documents and document collections as well as evidence for how
+language interacts with the non-textual world, which from a linguistic
+perspective has been labeled pragmatics and which is the essence of
+the rest of the digital humanities. With the advent of large
+collections of textual data, i.e. both written and spoken language in
+internet fora and radio talk shows, as well as textually annotated
+collections of images and video recordings, language studies also need
+tools that are capable of going beyond the assumption that one
+sentence or utterance sets the global scope. This is also where the
+researchers of language studies join the rest of the digital
+humanities researchers. In this paper we have demonstrated how one
+particular framework, HFST--Helsinki Finite-State Technology, and its
+use in processing text to recognize named entities in context can
+contribute to re-integrating computational linguistics with the rest
+of digital humanities.
+
 
 \bibliographystyle{splncs03}
 \bibliography{sfcm-2015}
