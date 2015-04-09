@@ -83,7 +83,7 @@ print_usage()
         "  -o, --output=OUTFILE   Write test output to OUTFILE\n"
         "  -N  --negative-test    Test fails if any of the pair strings is\n"
         "                         accepted.\n"
-        "  -x  --xerox-mode       In xerox mode, test cases are harvested\n"
+        "  -X  --xerox-mode       In xerox mode, test cases are harvested\n"
         "                         from a twolc source file.\n");
 
     fprintf(message_out, "Pair test options:\n"
@@ -166,7 +166,7 @@ parse_options(int argc, char** argv)
           // add tool-specific options here
             {"input-strings", required_argument, 0, 'I'},
             {"negative-test", no_argument, 0, 'N'},
-            {"xerox-mode", no_argument, 0, 'x'},
+            {"xerox-mode", no_argument, 0, 'X'},
             {0,0,0,0}
         };
         int option_index = 0;
