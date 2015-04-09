@@ -344,50 +344,58 @@ tagging where the task is to infer the only the correct part-of-speech
 of each word.
 
 The FinnPos toolkit is based on the Conditional Random Field framework
-\cite{lafferty/2001}. Most work on CRF taggers and other discriminative
-taggers has concentrated on POS tagging for English, which has a very
-limited selection of productive morphological phenomena. In contrast,
-FinnPos is especially geared toward morphologically rich languages
-with large label sets, which cause data sparsity and slow down
-estimation when using standard solutions. FinnPos gives
-state-of-the-art results for the morphologically rich language Finnish
-\cite{silfverberg/2015} both with regard to runtime and accuracy.
+\cite{lafferty/2001} for data driven learning. Most work on CRF
+taggers and other discriminative taggers has concentrated on POS
+tagging for English, which has a very limited selection of productive
+morphological phenomena. In contrast, FinnPos is especially geared
+toward morphologically rich languages with large label sets, that
+cause data sparsity and slow down estimation when using standard
+solutions. FinnPos gives state-of-the-art results for the
+morphologically rich language Finnish \cite{silfverberg/2015} both
+with regard to runtime and accuracy.
 
 In addition to morphological tagging, FinnPos also performs data
 driven lemmatization. Moreover, it can be combined with a
 morphological analyzer to make a data-driven morphological
 disambiguator.
 
-In this section, we will describe the FinnPos tagger from a
-practical point of view.
+In this section, we will focus on describing FinnPos from a
+practical point of view. A more detailed description of the theoretical foundations as well evaluation can be found in
+\cite{silfverberg/2015}.
 
 \subsection{FinnPos for Morphologically Rich Languages}
 
-Large label sets commonly used in tagging of morphologically rich
-languages are a source of data sparsity. Label set sizes of around
-1,000 label types frequently occur. For a second order morphological
-tagger, this means that an overwhelming majority of the one billion
+In POS tagging, the label sets are usually fairly small. For example,
+the Penn Treebank uses only 45 distinct label types. For tagging of
+morphologically complex languages, where full morphological labels are
+used, vastly larger label sets are used. Label sets of around 1,000
+distinct label types frequently occur. This creates a data sparsity problem.
+
+For a second order morphological tagger, a label set of 1,000 distinct
+label types means that an overwhelming majority of the one billion
 possible (1,000$^3$) label trigrams are never seen in a training
-corpus of realistic scope.
+corpus of realistic scope. Moreover, there is necessarily going to be
+a lot of label unigrams that occur only a couple of times in the entire
+training corpus.
 
-Although morpholgical label sets can be very large, they are usually
-structured. A typical example of a structured morphological label is
-the label {\tt Noun|Sg|Nom}, where the main word class is {\tt Noun},
-the number is singular ({\tt Sg}) and the case is nominative ({\tt
-  Nom}). FinnPos utilizes the internal structure of large label sets
-by extracting features for sub units of labels as well as for the
-entire labels \cite{silfverberg/2014}. This alleviates the data
-sparsity problem because features relating to sub units of entire tags
-can be used as fallback. Additionally, we can now model grammatical
-phenomena such as congurence in case which can occur in a variety of
-word classes.
+Although morphological label sets can be very large, individual labels
+are usually created by combining smaller sub units from a relatively
+small inventory. A typical example of a structured morphological label
+is the label {\tt Noun|Sg|Nom}, which consists of three sub units: the
+main word class {\tt Noun}, the singular number {\tt Sg} and the
+nominative case {\tt Nom}. FinnPos utilizes the internal structure of
+complex labels by extracting features for sub units  as
+well as for the entire labels \cite{silfverberg/2014}. This alleviates
+the data sparsity problem because features relating to sub units of
+entire tags are used as fallback. Additionally, sub unit features
+allow FinnPos to model grammatical phenomena such as case congurence, which can occur in a variety of word classes.
 
-In addition to data sparsity, training time is a problem because the
-complexity of standard CRF training of an $n$th order model depends on
-the $(n+1)$st power of the label set size. To speed up training,
-FinnPos uses an adaptive beam search and a label guesser
-\cite{silfverberg/2015} during inference and estimation. These reduce
-run time to fraction in practice.
+In addition to data sparsity, large label sets cause long training
+times because the complexity of standard CRF training of an $n$th
+order model depends on the $(n+1)$st power of the label set size. To
+speed up training, FinnPos uses an adaptive beam search and a label
+guesser \cite{silfverberg/2015} during inference and estimation. These
+substantially reduce run-time.
 
 \subsection{FinnPos Tools}
 
@@ -400,17 +408,17 @@ The FinnPos toolkit includes three commandline tools
 \end{itemize}
 
 Additionally, FinnPos provides a Python script {\tt
-  finnpos-ratna-feat.py} used for feature extraction \footnote{so
-  named after Adwait Ratnaparkhi because FinnPos uses a modified version of
-  the feature set introduced by Ratnaparkhi in
-  \cite{ratnaparkhi/1996}}.
+  finnpos-ratna-feat.py} used for feature extraction. The script is
+named after Adwait Ratnaparkhi because FinnPos uses a modified version
+of the feature set introduced by Ratnaparkhi in
+\cite{ratnaparkhi/1996}.
 
 FinnPos can utilize HFST morphological analyzers and other
 morphological analyzers. The integration of a morphological analyzer
 is accomplished by piping the output of the analyzer to FinnPos. The
 tags emitted by particular morphological analyzers may require post
 editing because FinnPos uses the '\verb@|@' sign to separate sub units
-of structured tags (for example in {\tt Noun\|Sg\|Nom}). For HFST
+of structured tags (for example in {\tt Noun|Sg|Nom}). For HFST
 morphological analyzers, editing can be accomplished using the utility
 {\tt hfst-xfst}.
 
@@ -435,7 +443,7 @@ meows  WORD=meows LC_WORD=meows   meow  Verb|Ind|Pres|3sg  _
 
 The utilities {\tt finnpos-train} and {\tt finnpos-label} read and write input
 sentences in a five column tab-separated format where each row
-corresponds to one input word and the columns denote
+corresponds to one text token and the columns denote
 
 \begin{enumerate}
   \item  Word form (e.g. ``Dogs'').
