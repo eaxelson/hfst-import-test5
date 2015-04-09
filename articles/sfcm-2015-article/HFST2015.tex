@@ -285,20 +285,23 @@ practical point of view.
 \subsection{FinnPos for Morphologically Rich Languages}
 
 Large label sets commonly used in tagging of morphologically rich
-languages cause data sparsity. Label set sizes of around 1,000 label
-types frequently occur. For a second order morphological tagger, this
-means that an overwhelming majority of the one billion possible
-(1,000$^3$) label trigrams are never seen in a training corpus of
-realistic scope.
+languages are a source of data sparsity. Label set sizes of around
+1,000 label types frequently occur. For a second order morphological
+tagger, this means that an overwhelming majority of the one billion
+possible (1,000$^3$) label trigrams are never seen in a training
+corpus of realistic scope.
 
 Although morpholgical label sets can be very large, they are usually
 structured. A typical example of a structured morphological label is
-the label {\tt Noun+Singular+Nominative}, where the main word class is
-{\tt Noun}, the number is {\tt Singular} and the case is {\tt
-  Nominative}. FinnPos utilizes the internal structure of large label
-sets by extracting features for sub units of labels as well as for
-the entire labels \cite{silfverberg2014}. It can, for example, extract
-a structured feature expressing case congruence.
+the label {\tt Noun|Sg|Nom}, where the main word class is {\tt Noun},
+the number is singular ({\tt Sg}) and the case is nominative ({\tt
+  Nom}). FinnPos utilizes the internal structure of large label sets
+by extracting features for sub units of labels as well as for the
+entire labels \cite{silfverberg2014}. This alleviates the data
+sparsity problem because features relating to sub units of entire tags
+can be used as fallback. Additionally, we can now model grammatical
+phenomena such as congurence in case which can occur in a variety of
+word classes.
 
 In addition to data sparsity, training time is a problem because the
 complexity of standard CRF training of an $n$th order model depends on
@@ -318,35 +321,40 @@ The FinnPos toolkit includes three commandline tools
 \end{itemize}
 
 Additionally, FinnPos provides a Python script {\tt
-  finnpos-ratna-feat.py} used for feature extraction.
+  finnpos-ratna-feat.py} used for feature extraction \footnote{so
+  named after Adwait Ratnaparkhi because FinnPos uses a modified version of
+  the feature set introduced by Ratnaparkhi in
+  \cite{ratnaparkhi/1996}}.
 
-FinnPos can utilize HFST morphological analyzers but it is independent
-of the HFST interface in the sense that other morphological
-analyzers can also be used. The integration of a morphological
-analyzer happens by piping the output of the analyzer to
-FinnPos. Possibly some intermediate editing is required to make the
-output of the analyzer compatible with FinnPos.
+FinnPos can utilize HFST morphological analyzers and other
+morphological analyzers. The integration of a morphological analyzer
+is accomplished by piping the output of the analyzer to FinnPos. The
+tags emitted by particular morphological analyzers may require post
+editing because FinnPos uses the '\verb@|@' sign to separate sub units
+of structured tags (for example in {\tt Noun\|Sg\|Nom}). For HFST
+morphological analyzers, editing can be accomplished using the utility
+{\tt hfst-xfst}.
 
 \subsection{Data Format and Feature Extraction}
 
 \begin{figure}
 \begin{framed}
 \begin{verbatim}
-The    WORD=The LC_WORD=the       the  DT    _
-dog    WORD=dog LC_WORD=dog       dog  NN    _
-barks  WORD=barks LC_WORD=barks   bark VBZ   _
-.      WORD=. LC_WORD=.           .    .     _
+The    WORD=The LC_WORD=the       the   Determiner         _
+dog    WORD=dog LC_WORD=dog       dog   Noun|Sg|Nom        _
+barks  WORD=barks LC_WORD=barks   bark  Verb|Ind|Pres|3sg  _
+.      WORD=. LC_WORD=.           .     .                  _
 
-The    WORD=The LC_WORD=the       the  DT    _
-cat    WORD=cat LC_WORD=cat       cat  NN    _
-meows  WORD=meows LC_WORD=meows   meow VBZ   _
-.      WORD=. LC_WORD=.           .    .     _
+Their  WORD=Their LC_WORD=their   they  Pronoun|Pl|Gen     _
+cat    WORD=cat LC_WORD=cat       cat   Noun|Sg|Nom        _
+meows  WORD=meows LC_WORD=meows   meow  Verb|Ind|Pres|3sg  _
+.      WORD=. LC_WORD=.           .     .                  _
 \end{verbatim}
 \end{framed}
 \caption{Small example of data format.}
 \end{figure}
 
-The utilities finnpos-train and finnpos-label read and write input
+The utilities {\tt finnpos-train} and {\tt finnpos-label} read and write input
 sentences in a five column tab-separated format where each row
 corresponds to one input word and the columns denote
 
@@ -358,9 +366,9 @@ corresponds to one input word and the columns denote
   \item  Annotations (arbitrary text not containing tabulators).
 \end{enumerate}
 
-When using a file as training or development file for finnpos-train, the lemma and label fields have to contain exactly one value each.
+When using a file as training or development file for {\tt finnpos-train}, the lemma and label fields have to contain exactly one value each.
 
-If the label field is non-empty in the input for finnpos-label, the tagger will disambiguate between the candidates provided.
+If the label field is non-empty in the input for {\tt finnpos-label}, the tagger will disambiguate between the candidates provided.
 
 The default feature extraction script {\tt finnpos-ratna-feats.py}
 extracts the following features for frequent words:
