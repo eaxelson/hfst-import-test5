@@ -259,17 +259,57 @@ if it only sees a tokenization where \emph{in view of} is a single token.
 
 We can extend the dictionary in a simple way to also contain the other
 possible tokenizations (and, in the case of a morphological dictionary,
-the analyses) as follows.
+the analyses) as follows:
 
+\begin{framed}
 \begin{verb}
-define combined_tokenizations [dict].u .o. [dict | [" " dict]*]  
+define combined_tokens [dict].u .o. [dict | [" " dict]*]  
 \end{verb}
+\end{framed}
 
 Here, \verb+dict+ is our dictionary and \verb+[dict].u+ is its input
 projection. We compose it with arbitrarily many copies of itself,
 interpolated with space characters. The result contains every multiword
 expression both as itself, and as a combination of other words found
 in the dictionary.
+
+In addition to bare tokens, many downstream tools use analysis cohorts, ie.\@
+the full set of possible baseforms and morphological tags for the token in
+question. \verb+hfst-pmatch+ exposes an API that allows retrieval of the
+position, length, input, output, tag and weight of each longest match (when
+there are many equally long ones), so cohort formatters can be written to
+support such tools. For example, suppose our dictionary includes the
+following entries:
+
+\begin{table}[h!]
+  \begin{center}
+\begin{tabular}{| l | c  c  c |}
+  \hline
+  \textbf{in} & in AVP & in NN0 & in PRP \\
+  \hline
+  \textbf{view} & view NN1 & view VVB & view VVI \\
+  \hline
+\textbf{of} & of PRF & of PRP & \\
+\hline
+\textbf{in view of} & & in view of PRP & \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+The matches produced by the combined dictionary might be formatted as
+
+\begin{framed}
+\begin{verbatim}
+"<in view of>"
+   "in" AVP "view" VVI "of" PRF
+   "in view of" PRP
+   "in" NN0 "view" VVB "of" PRF
+   "in" NN0 "view" VVB "of" PRP
+   "in" NN0 "view" VVI "of" PRF
+   etc.
+\end{verbatim}
+\end{framed}
 
 \subsection{Tokenization Rules as an OOV Fallback}
 
@@ -309,16 +349,6 @@ level of tokenization.
 \verb+hfst-pmatch+ expressions are weighted, and the \verb+::1.0+ at the end
 of the \verb+OOVword+ rule ensures that dictionary matches, which have
 weight zero, will be preferred over \verb+OOVword+ matches.
-
-\subsection{Analysis Cohorts}
-
-In addition to bare tokens, many downstream tools use analysis cohorts, ie.\@
-the full set of possible baseforms and morphological tags for the token in
-question. \verb+hfst-pmatch+ exposes an API that allows retrieval of the
-position, length, input, output, tag and weight of each longest match (when
-there are many equally long ones). To go directly from running text to, say,
-Constraint Grammar cohorts (possibly via some intermediate processing) is a
-matter of string interpolation of the fields retrieved from \verb+pmatch+.
 
 \subsection{Chunking}
 
