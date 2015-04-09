@@ -893,19 +893,29 @@ corresponding weights 3 + 5 = 8, 3 + 3 + 5 = 11 and 3 + 3 + 3 + 5 = 14.
 Parallel weighted replace rules offer a systematic representation of various
 regular transformations. Consider an edit distance transducer that accepts
 any string and outputs all the strings that result from making up to $n$ edits
-to it. An abbreviated example:
+to it. An abbreviated example, with an alphabet consisting of a, b and c:
 
 \begin{framed}
 \begin{verbatim}
-"a" -> "a" | ["" | "b" | "c" | ...]::1.0 ,,
-"b" -> "b" | ["" | "a" | "c" | ...]::1.0 ,,
-...
-"" -> "" | ["a" | "b" | ...]::1.0 ;
+"a" (->) ["" | "b" | "c" ]::1.0 ,,
+"b" (->) ["" | "a" | "c" ]::1.0 ,,
+"c" (->) ["" | "a" | "b" ]::1.0 ,,
+"" (->) ["a" | "b" | "c"]::1.0 ;
 \end{verbatim}
 \end{framed}
 
 the \verb+,,+ indicates that the replacements are to be compiled to operate
-in parallel. Completed, this example results in a transducer that rewrites
+in parallel. \verb+(->)+ is the optional replacement, allowing but not
+necessitating replacement. Its effect is the same as including identities
+in normal replacement:
+
+\begin{framed}
+\begin{verbatim}
+"a" -> "a" | ["" | "b" | "c" ]::1.0;
+\end{verbatim}
+\end{framed}
+
+Completed, this example results in a transducer that rewrites
 its input with any number of edits, and gives it a cumulative weight of
 $1.0$ per edit (assuming that weights are added, ie.\@ that the weight semiring
 has addition as its multiplication operation, as in the log or tropical
@@ -917,13 +927,14 @@ characters as follows:
 
 \begin{framed}
 \begin{verbatim}
-{ab} -> {ab} | {ba}::1.5 ,,
-{ac} -> {ac} | {ca}::1.1 ,,
-... 
+{ab} (->) {ba}::1.5 ,, {ac} (->) {ca}::1.1 ,,
+{ba} (->) {ab}::1.9 ,, {bc} (->) {cb}::1.4 ,,
+{ca} (->) {ac}::2.1 ,, {cb} (->) {bc}::1.1;
 \end{verbatim}
 \end{framed}
 
-The replacements are quite arbitrary. They can also include context conditions,
+The replacements are quite arbitrary (eg. zero-weighted spelling normalization
+rules). They can also include context conditions,
 with a number of different replacements operating in different contexts with
 different weights all compiled together in parallel into one rule.
 
@@ -933,9 +944,10 @@ filter:
 \begin{framed}
 \begin{verbatim}
 define edit_distance_with_markers
-  "a" -> "a" | [ ["b"::1.1 | "c"::1.2 ...] "EDIT"] ,,
-  "b" -> "b" | [ ["a"::0.9 | "c"::1.0 ...] "EDIT"] ,,
-  ...
+  "a" (->) [""::0.5 | "b"::1.1 | "c"::1.2] "EDIT" ,,
+  "b" (->) [""::0.7 | "a"::0.9 | "c"::1.0] "EDIT" ,,
+  "c" (->) [""::0.6 | "a"::0.8 | "b"::1.7] "EDIT" ,,
+  "" (->) ["a"::1.1 | "b"::1.2 | "c"::1.9] "EDIT";
 define filter [[? - "EDIT"]* ["EDIT":""] [? - "EDIT"*]]^{1,3}
 define 1_to_3_edits edit_distance_with_markers .o. filter;
 \end{verbatim}
