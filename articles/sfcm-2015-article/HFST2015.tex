@@ -734,6 +734,38 @@ linguistic reasoning or by searching the corpus.
 \section{Weighted Regular Expressions}
 % Sam & Miikka (3 p.)
 
+\subsection{Syntax}
+
+Weights can be assigned to individual transitions or to any regular expression surrounded by brackets
+with the $::$ operator. The weights are most often from the tropical semiring. The tropical weight is
+represented as a float, i.e. one or more digits that may be preceded by a minus or plus sign and followed
+by a comma followed by at least one digit. For example the regular expression
+
+\begin{framed}
+\begin{verbatim}
+[ a b:c::0.5 d::0.3 ]::0.2
+\end{verbatim}
+\end{framed}
+
+will produce a transducer that maps abd to acd with weight 0.5 + 0.3 + 0.2 = 1.0. In this example,
+we basically have a transition a:a with no weight followed by a transition b:c with weight 0.5
+followed by transition d:d with weight 0.3 leading to a final state with weight 0.2. However, it is
+possible that operations that are called afterwards, e.g. minimization, modify the exact positions
+of weights in the transducer. 
+
+In replace rules weighted expressions can be used on both sides of the rule.
+For example the rule
+
+\begin{framed}
+\begin{verbatim}
+[a::3]+ -> [b::5] || c __ c
+\end{verbatim}
+\end{framed}
+
+will map one or more a:s between two c:s into one b weighting each a with 3
+and the b with 5. It will map 'cac', 'caac' and 'caaac' all into 'cbc' with
+corresponding weights 3 + 5 = 8, 3 + 3 + 5 = 11 and 3 + 3 + 3 + 5 = 14.
+
 \subsection{A Weighted Edit Distance Model}
 
 Parallel weighted replace rules offer a systematic representation of various
