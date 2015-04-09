@@ -367,11 +367,11 @@ and sentences into paragraphs in the same ruleset.
 
 FinnPos \cite{silfverberg/2015} is a data driven {\it morphological
   tagging} toolkit distributed with the HFST interface. The term
-morphological tagging \cite{chrupala/2008} refers to assigning one full
-morphological label (including for example part-of-speech, tense, case
-and number) for each word in a text. It can be contrasted with POS
-tagging where the task is to infer the only the correct part-of-speech
-of each word.
+morphological tagging \cite{chrupala/2008} refers to assigning one
+full morphological label (including for example part-of-speech, tense,
+case and number) for each word in a text. It can be contrasted with
+POS tagging where the task is to infer the correct part-of-speech of
+each word.
 
 The FinnPos toolkit is based on the Conditional Random Field framework
 \cite{lafferty/2001} for data driven learning. Most work on CRF
@@ -398,27 +398,29 @@ practical point of view. A more detailed description of the theoretical foundati
 In POS tagging, the label sets are usually fairly small. For example,
 the Penn Treebank uses only 45 distinct label types. For tagging of
 morphologically complex languages, where full morphological labels are
-used, vastly larger label sets are used. Label sets of around 1,000
-distinct label types frequently occur. This creates a data sparsity problem.
+required, vastly larger label sets are used. Label sets of around 1,000
+distinct label types frequently occur. 
 
-For a second order morphological tagger, a label set of 1,000 distinct
-label types means that an overwhelming majority of the one billion
-possible (1,000$^3$) label trigrams are never seen in a training
-corpus of realistic scope. Moreover, there is necessarily going to be
-a lot of label unigrams that occur only a couple of times in the entire
-training corpus.
+Lage label sets create a data sparsity problem. For example, for a
+second order model and a label set of 1,000 distinct label types, an
+overwhelming majority of the one billion possible (1,000$^3$) label
+trigrams are never seen in a training corpus of realistic scope. Even
+label unigrams are rare in a sense -- there is necessarily going to be
+a lot of label unigrams that occur only a couple of times in the
+entire training corpus.
 
 Although morphological label sets can be very large, individual labels
 are usually created by combining smaller sub units from a relatively
-small inventory. A typical example of a structured morphological label
-is the label {\tt Noun|Sg|Nom}, which consists of three sub units: the
-main word class {\tt Noun}, the singular number {\tt Sg} and the
-nominative case {\tt Nom}. FinnPos utilizes the internal structure of
-complex labels by extracting features for sub units  as
+small inventory. A typical example of such a structured morphological
+label is the label {\tt Noun|Sg|Nom}, which consists of three sub
+units: the main word class {\tt Noun}, the singular number {\tt Sg}
+and the nominative case {\tt Nom}. FinnPos utilizes the internal
+structure of complex labels by extracting features for sub units as
 well as for the entire labels \cite{silfverberg/2014}. This alleviates
 the data sparsity problem because features relating to sub units of
 entire tags are used as fallback. Additionally, sub unit features
-allow FinnPos to model grammatical phenomena such as case congurence, which can occur in a variety of word classes.
+allow FinnPos to model grammatical generalizations such as case
+congurence in isolation of the full labels.
 
 In addition to data sparsity, large label sets cause long training
 times because the complexity of standard CRF training of an $n$th
@@ -483,9 +485,11 @@ corresponds to one text token and the columns denote
   \item  Annotations (arbitrary text not containing tabulators).
 \end{enumerate}
 
-When using a file as training or development file for {\tt finnpos-train}, the lemma and label fields have to contain exactly one value each.
-
-If the label field is non-empty in the input for {\tt finnpos-label}, the tagger will disambiguate between the candidates provided.
+When using a file as training or development file for {\tt
+  finnpos-train}, the lemma and label fields have to contain exactly
+one value each. When using {\tt finnpos-label} for tagging data, the
+label field can either be empty or contain a number of label
+candidates separated by spaces. 
 
 The default feature extraction script {\tt finnpos-ratna-feats.py}
 extracts the following features for frequent words:
@@ -498,7 +502,7 @@ extracts the following features for frequent words:
 \item Next two words.
 \end{enumerate}
 
-For rare words, the script also extracts orthographic features
+For rare words, the script also extracts orthographic features:
 
 \begin{enumerate}
 \item Suffixes and prefixes up to length 10.
@@ -517,10 +521,10 @@ through the tagger. It can also be used for e.g. named entity labels.
 
 \subsection{Training and Using a Model}
 
-FinnPos uses an early stopping averaged perceptron algorithm for
+FinnPos uses an averaged perceptron algorithm with early stopping for
 estimation of model parameters. The error-driven perceptron training
 algorithm iterates through the training corpus one sentence at a time,
-labels the sentence and adjusts model weights when erroneous labels
+labels the sentences and adjusts model weights when erroneous labels
 are detected. Usually the Viterbi algorithm \cite{collins/2002} is
 used for labeling. This however, is too slow in practice when dealing
 with large label sets.
@@ -533,8 +537,8 @@ training. Because of inexact inference during the training phase,
 FinnPos additionally uses violation fixing \cite{huang/2012}.
 
 Users can train their own models using the utility {\tt
-  finnpos-train}. The parameters of the training process are set using
-a configuation file (see Figure \ref{fig:config-file}). The
+  finnpos-train}. The training process is regulated using a
+configuation file (see Figure \ref{fig:config-file}). The
 configuration file is used to set the hyper parameters of the beam
 search and label guesser as well as the stopping conditions for the
 perceptron algorithm. See figure \ref{fig:config-fields}.
@@ -580,7 +584,6 @@ max_lemmatizer_passes=7
 FinnPos can be used for morphological disambiguation together with a
 morphological analyzer. The analyzer can be used in two ways: to
 provide label candidate for words and as a generator of features.
-
 For words not recognized by the analyzer, FinnPos will use a built-in
 suffix-based guesser.
 
