@@ -256,23 +256,23 @@ time expressions? numeric quantities? money? (or remove section?)
 \section{Morphological Tagging using {\tt hfst-finnpos}}\label{sec:morph-tagging}
 % Miikka (4 p.)
 
-FinnPos \cite{silfverberg2015} is a data driven {\it morphological
+FinnPos \cite{silfverberg/2015} is a data driven {\it morphological
   tagging} toolkit distributed with the HFST interface. The term
-morphological tagging \cite{Chrupala} refers to assigning one full
+morphological tagging \cite{chrupala/2008} refers to assigning one full
 morphological label (including for example part-of-speech, tense, case
 and number) for each word in a text. It can be contrasted with POS
 tagging where the task is to infer the only the correct part-of-speech
 of each word.
 
 The FinnPos toolkit is based on the Conditional Random Field framework
-\cite{lafferty2001}. Most work on CRF taggers and other discriminative
+\cite{lafferty/2001}. Most work on CRF taggers and other discriminative
 taggers has concentrated on POS tagging for English, which has a very
 limited selection of productive morphological phenomena. In contrast,
 FinnPos is especially geared toward morphologically rich languages
 with large label sets, which cause data sparsity and slow down
 estimation when using standard solutions. FinnPos gives
 state-of-the-art results for the morphologically rich language Finnish
-\cite{silfverberg2015} both with regard to runtime and accuracy.
+\cite{silfverberg/2015} both with regard to runtime and accuracy.
 
 In addition to morphological tagging, FinnPos also performs data
 driven lemmatization. Moreover, it can be combined with a
@@ -297,7 +297,7 @@ the label {\tt Noun|Sg|Nom}, where the main word class is {\tt Noun},
 the number is singular ({\tt Sg}) and the case is nominative ({\tt
   Nom}). FinnPos utilizes the internal structure of large label sets
 by extracting features for sub units of labels as well as for the
-entire labels \cite{silfverberg2014}. This alleviates the data
+entire labels \cite{silfverberg/2014}. This alleviates the data
 sparsity problem because features relating to sub units of entire tags
 can be used as fallback. Additionally, we can now model grammatical
 phenomena such as congurence in case which can occur in a variety of
@@ -307,7 +307,7 @@ In addition to data sparsity, training time is a problem because the
 complexity of standard CRF training of an $n$th order model depends on
 the $(n+1)$st power of the label set size. To speed up training,
 FinnPos uses an adaptive beam search and a label guesser
-\cite{silfverberg2015} during inference and estimation. These reduce
+\cite{silfverberg/2015} during inference and estimation. These reduce
 run time to fraction in practice.
 
 \subsection{FinnPos Tools}
@@ -400,14 +400,20 @@ through the tagger. It can also be used for e.g. named entity labels.
 
 \subsection{Training and Using a Model}
 
-FinnPos uses an early stopping averaged perceptron algorithm for estimation of model parameters. The error-driven perceptron training algorithm iterates through the training corpus one sentence at a time, labels the sentence and adjusts model weights when erroneous labels are detected. Usually the Viterbi algorithm \cite{Collins/2002} is used for labeling. This however, is too slow in practice when dealing with large label sets.
+FinnPos uses an early stopping averaged perceptron algorithm for
+estimation of model parameters. The error-driven perceptron training
+algorithm iterates through the training corpus one sentence at a time,
+labels the sentence and adjusts model weights when erroneous labels
+are detected. Usually the Viterbi algorithm \cite{collins/2002} is
+used for labeling. This however, is too slow in practice when dealing
+with large label sets.
 
 Instead of the Viterbi algorithm, FinnPos uses a beam search with
-adaptive beam width \cite{Pal}. Additionally FinnPos uses a generative
+adaptive beam width \cite{pal/2006}. Additionally FinnPos uses a generative
 label guesser (modeled after the OOV word model used in
-\cite{Brants/2000}) to restrict label candidates during
+\cite{brants/2000}) to restrict label candidates during
 training. Because of inexact inference during the training phase,
-FinnPos additionally uses violation fixing \cite{}.
+FinnPos additionally uses violation fixing \cite{huang/2012}.
 
 Users can train their own models using the utility {\tt
   finnpos-train}. The parameters of the training process are set using
