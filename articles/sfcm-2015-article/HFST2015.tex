@@ -227,8 +227,9 @@ at line boundaries with hyphens, as in
   human strength
 \end{exe}
 
-Here the only correct tokenization is ``superhuman'' rather than ``super''
-and ``human'', but a dictionary would miss this possibility. However,
+Here the only correct tokenization is \mbox{``superhuman''} rather than
+\mbox{``super''}
+and \mbox{``human''}, but a dictionary would miss this possibility. However,
 we can use a finite-state operation to allow the string \verb+-\n+ (hyphen
 followed by a newline) to appear anywhere inside the words in the dictionary.
 In regular expressions this operation is sometimes called ``ignoring'' and in
@@ -354,7 +355,9 @@ level of tokenization.
 of the \verb+OOVword+ rule ensures that dictionary matches, which have
 weight zero, will be preferred over \verb+OOVword+ matches.
 
-\subsection{Incorporating other Linguistic Units}
+\subsubsection{Incorporating other Linguistic Units}
+
+Many expressions 
 
 time expressions? numeric quantities? money? chunking?
 
