@@ -1015,29 +1015,6 @@ used the command line tools of the newest version (1.4.1), but minimization was 
 We even tried to encode weights as a part of the transitions (i.e. ignore them) before determinization
 and minimization, but it did not have a noticeable effect.
 
-real    0m0.770s
-user    0m0.684s
-sys     0m0.084s
-
-real    0m0.326s
-user    0m0.268s
-sys     0m0.056s
-
-real    0m1.129s
-user    0m1.024s
-sys     0m0.104s
-
-real    0m1.568s
-user    0m1.440s
-sys     0m0.124s
-
-real    0m0.501s
-user    0m0.408s
-sys     0m0.092s
-
-
-The slowness is probably due to the fact that openfst must be ready to handle weights.
-
 In composition, the xfsm implementation is the fastest. In xfsm composition, unknown and identity
 symbols are handled as a part of the composition itself, but for other back-ends some post- and preprocessing is
 needed. This probably explains why they are all slower.
