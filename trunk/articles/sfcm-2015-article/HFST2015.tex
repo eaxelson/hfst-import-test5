@@ -355,15 +355,16 @@ level of tokenization.
 of the \verb+OOVword+ rule ensures that dictionary matches, which have
 weight zero, will be preferred over \verb+OOVword+ matches.
 
-\subsubsection{Incorporating other Linguistic Units}
+%% \subsubsection{Incorporating other Linguistic Units}
 
-Many expressions 
+%% Many nonverbal expressions that are (usually) not covered by dictionaries,
+%% eg.\@ ``7:39 PM'', ``21.05 €'' or ``December 10th, 2101''
 
-time expressions? numeric quantities? money? chunking?
+%% time expressions? numeric quantities? money? chunking?
 
-Since in \verb+pmatch+ multiple rules operate on the same input, it is possible
-to integrate higher-level tokenization, such as grouping tokens into sentences
-and sentences into paragraphs in the same ruleset.
+%% Since in \verb+pmatch+ multiple rules operate on the same input, it is possible
+%% to integrate higher-level tokenization, such as grouping tokens into sentences
+%% and sentences into paragraphs in the same ruleset.
 
 \section{Morphological Tagging using {\tt hfst-finnpos}}\label{sec:morph-tagging}
 % Miikka (4 p.)
