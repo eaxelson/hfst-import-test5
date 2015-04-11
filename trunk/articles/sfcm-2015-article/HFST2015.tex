@@ -31,7 +31,7 @@
 %
 \begin{document}
 %
-\title{Using HFST--Helsinki Finite-State Technology in Digital Humanities}
+\title{Using HFST--Helsinki Finite-State Technology \\for Digital Humanities}
 %
 \author{N.N. and N.N.}
 
@@ -48,6 +48,12 @@
 
 \begin{abstract}
 %Krister
+Named entities bridge the gap between computational linguistics and the rest of the digital humanities 
+as named entities are the building blocks for text and data mining 
+as well as the output of many processes used for providing images 
+with meta-data. Named entities can be extracted from textual data with computational linguistic methods. 
+In this paper, we look at one particular framework, HFST--Helsinki Finite-State Technology, and its
+use in processing and normalizing textual data to recognize named entities and semantic frames in context.
 \end{abstract}
 
 \section*{Introduction}
@@ -66,155 +72,163 @@ argue that language technology is broader in focus than traditional
 computational linguistics, e.g. language technology underlies the
 mining of text for factoids, and language technology is involved in
 research on images and 3D-modeling when images are interpreted by
-computers and automatically provided with metadata and natural
+computers and automatically provided with meta-data and natural
 language descriptions. Thus language technology supports all the areas
 of digital humanities. Our claim is that named entities bridge the gap
-between computational linguistics and digital humanities,
-i.e. named-entity processing is to digital humanities what
+between computational linguistics and digital humanities, 
+as named entities are relevant to textual research of language corpora. 
+Named entities are also the building blocks of text and data mining 
+as well as the output of many of the processes used for providing images 
+with meta-data, i.e. named-entity processing is to digital humanities what
 morphological processing was to computational linguistics. In this
 paper we will look at one particular framework, HFST--Helsinki
 Finite-State Technology, and its use in processing text to recognize
-named entities in context.
+named entities in context and semantic frame labeling.
 
 Morphological processing deals with morphemes in context whereas
 named-entity processing deals with named entities in context. Let us
 explore the analogy between the two. Simplistically a named entity is
 a sequence of morphemes and many of the phenomena found in morphology
 carry over to named entities such as ambiguity, context, compounding
-as well as normalization. Ambiguity pertains both to homonyms such as
+as well as normalization. \emph{Ambiguity} pertains both to homonyms such as
 Nokia being a company, a product or a village in Finland as well as to
-multiple external references such as John meaning several
+multiple external references such as John potentially referring to several
 individuals. For named entities, we have authority lists that are
 controlled lists of terms, names, phrases or similar entries relative
 to a specific domain. An authority list may or may not contain
 definitions or other information about each
 item\footnote{\url{http://www.tomwason.com/glossary.html}}. In
-morphology, we have lexicons as authority lists.  Context is relevant
+morphology, we use lexicons or gazetteers in the role of authority lists.  
+\emph{Context} is relevant
 when analyzing either morphemes or named entities. We need to decide
 whether we want all possible analyses, only the most likely analysis
 in context or perhaps an approximate analysis for an unknown
 word. Local context extends to phonemes, morphemes, words, multi-word
 expressions and head words depending on how much context is needed and
-available. Compounding in named entities is seen e.g. in John Smith as
+available. \emph{Compounding} in named entities is seen e.g. in John Smith as
 a name consisting of a first name and a surname. One can even claim
 that a named entity like ``a day in June 2015'' represents
 inter-digitization of named entities in the expression ``June X,
-2015'', where X is 1 \ldots 30, a phenomenon which is known in the
+2015'', where X is 1\ldots30, a phenomenon which is well-known in the
 morphology of Semitic languages when adding vowels to roots to derive
-new words. Normalization is important to identify the intended
+new words. \emph{Normalization} is important to identify the intended
 referent. Initially, there was a debate on whether linguistics and
 morphology should be descriptive or prescriptive but the pragmatic
 approach has prevailed and we accept that there are normalized forms
 that we use for identifying base forms in morphology or authorities
 among named entities while we accept that in practice words and names
-end up being written in many different ways and we need to enable
+may end up being written in many different ways and we need to enable
 language technology to recognize problematic cases and sometimes also
 to resolve what was intended.
 
 HFST--Helsinki Finite Technology is a framework for building
-morphologies including morphological lexicons, which then extends to
-building authorities lists with the variants found in text. In
-addition, HFST has the capability to describe and identify structured
-named entities in context.  HFST supports building tokenizers and
-taggers which deliver only one output considering the local context
-and authorities lists, but HFST can also provide multiple analyses of
-words and multi-word expressions. In addition, HFST supports guessing
-for out of vocabulary words and approximate spelling normalization. In
-Section 1, we get an overview and some examples on how to develop a
+morphologies including morphological lexicons \cite{hfst-pmatch}, \cite{hfst/2011}, \cite{linden/2009/sfcm}, which then extends to
+encoding and storing authorities lists with the variants found in text. In
+addition, we present how HFST \emph{identifies semantic frames and structured
+named entities in context}.  We also present how HFST supports building tokenizers and
+taggers which deliver only one output considering the local context, 
+while HFST can provide multiple analyses of words and multi-word expressions as a starting point. 
+In addition, HFST now fully supports \emph{weighted regular expressions for approximate string matching} 
+for spelling normalization and multi-lingual transliteration. In
+Section~1, we get an overview and some examples of how to develop a
 tokenizer based on a lexicon containing multi-word expressions in HFST
-using the p-match syntax. In Section 2, we get an introduction to
+using the p-match syntax. In Section~2, we get an introduction to
 building morphological taggers with HFST using machine learning which
 provides a basis for doing named-entity recognition based on
-morphological information. In Section 3, we get an introduction to
-named entities extended to semantic frame recognition. In Section 4,
+morphological information. In Section~3, we get an introduction to
+named entities extended to semantic frame recognition. In Section~4,
 we are introduced to approximate recognition of words and names using
-weighted regular expressions. In Section 5, we conclude the
-presentation.
+weighted regular expressions. In Section~5, we recapitulate some implementation aspects 
+and in Section~6, we conclude the presentation.
 
 \section{Tokenization using {\tt hfst-pmatch}}\label{sec:tokenization}
 % Sam (4 p.)
-Tokenization is a necessary first step in most text-based NLP tasks. For some
-languages (eg. English) it is often considered to be a mechanical
-preprocessing task without linguistic importance, and for others (eg. Chinese)
-it is a subtle task given a different name (``segmentation'').
-
-However, even in languages that generally insert spaces between words, there
+Tokenization is a necessary first step in most text-based natural language processing tasks. For some
+languages, e.g. English, it is often considered to be a mechanical
+preprocessing task without linguistic importance, and for others, e.g. Chinese,
+it is an intricate task called segmentation. However, even in languages that generally insert spaces between words, there
 are issues that influence the quality or feasibility of tools down the
-pipeline. We may, for example, want to be able to identify multiword units,
+pipeline. We may, for example, want to be able to identify multi-word units,
 identify compound words and mark their internal boundaries, control various
-dimensions of normalisation, or produce possible part-of-speech tags or
-deeper morphological analyses.
-
-We describe a general approach to these issues based on morphological
+dimensions of normalization, or produce possible part-of-speech tags or
+deeper morphological analyses. We describe a general approach to these issues based on morphological
 transducers, regular expressions and the pattern matching operation
 \verb+pmatch+~\cite{karttunen/2011}.
 
 \subsection{A Short Introduction to {\tt pmatch}}
 
 \verb+pmatch+~\cite{hfst-pmatch} is a pattern-matching operation for text based
-on regular expressions. It is a HFST development of the original ideas in Xerox
-\verb+fst+. The regular expressions (or ``rules'') are named, and are
-invoked ultimately by a root expression (the ``top level'', which by convention
-has the name ``TOP''). Expressions may be refer to themselves or each other
-circularly by way of special arcs which are interpreted at runtime, allowing
+on regular expressions. In HFST, it has been further developed from the ideas in Xerox
+\verb+fst+. The regular expressions, i.e. \emph{rules}, are named, and are
+invoked ultimately by a root expression , i.e. the \emph{top level}, which by convention
+has the name \verb+TOP+. Expressions may refer to themselves or each other
+circularly by special arcs which are interpreted at runtime, allowing
 context-free grammars to be expressed.
 
 Matching operates in a loop, accepting the largest
 possible amount of input from the current position, possibly modifying it
 according to the rules and tagging left and right boundaries of sub-rules, and
-continuing on the the next position in the input.
-
+continuing on the the next position in the input. 
 When the rules successfully accept (and possibly transform) some length of
-input, that is a ``match''.
-When the match has triggered the operation of a tagging directive
-(\verb+EndTag()+ or \verb+[].t()+), the enclosed length of input is ``tagged'' with
-``tags''. For example, here is a very naïve tokenizer for English.
+input, that is a \emph{match}.
+When the match has triggered the operation of a tagging directive, e.g. 
+\verb+EndTag(TagName)+ or \verb+[].t(TagName)+, the enclosed length of the input is tagged with \emph{TagName}. 
+For example, here is a very naïve tokenizer for English
 
+\begin{center}
+  \begin{framed}
 \begin{verbatim}
 define TOP [[ ("'") Alpha+ ] | Sigma({,.;!?})]] EndTag(w);
-! If you want apostrophe-joined elisions as single tokens, use
-! [Alpha | "'"]+
 \end{verbatim}
+  \end{framed}
+\end{center}
+% ! If you want apostrophe-joined elisions as single tokens, use
+% ! [Alpha | "'"]+
 
-\verb+Sigma()+ is a function that extracts the alphabet of its argument, here
-some punctuation given as a string (which is the effect of the curly braces).
+\noindent where \verb+Sigma()+ is a function that extracts the alphabet of its argument, which in this case is
+some punctuation marks given as a string denoted by curly braces.
 When operated on the sentence
-``If I am out of my mind, it's all right with me, thought Moses Herzog.'',
-it produces output that looks like this:
+\emph{``If I am out of my mind, it's all right with me, thought Moses Herzog.''},
+it produces output that looks like this
 
 \begin{verbatim}
-<w>If</w> <w>I</w> <w>am</w> <w>out</w> <w>of</w> <w>my</w> <w>mind</w>
-<w>,</w> <w>it</w> <w>'s</w> <w>all</w> <w>right</w> <w>with</w>
-<w>me</w><w>,</w> <w>thought</w> <w>Moses</w> <w>Herzog</w><w>.</w>
+ <w>If</w> <w>I</w> <w>am</w> <w>out</w> <w>of</w> <w>my</w>
+ <w>mind</w> <w>,</w> <w>it</w> <w>'s</w> <w>all</w> <w>right</w> 
+ <w>with</w> <w>me</w><w>,</w> <w>thought</w> <w>Moses</w>
+ <w>Herzog</w> <w>.</w>
 \end{verbatim}
 
-in normal, ``matching'' mode. The runtime operation of matching can be
+\noindent in normal \emph{matching mode}. The runtime operation of matching can be
 controlled to only output the matched parts, or give positions and
-lengths of tagged parts (``locate mode''). Matches may also be extracted
+lengths of tagged parts in \emph{locate mode}. Matches may also be extracted
 via an API call to control the flow of data more precisely. The above example
-operating as a more conventional tokenizer (outputting one token per line and
-omitting everything else) could be written as
+operating as a more conventional tokenizer outputting one token per line and
+omitting everything else can be written as
 
+\begin{center}
+  \begin{framed}
 \begin{verbatim}
 define TOP [[Alpha | "'"]+ | Sigma({,.;!?})]] 0:"\n";
 \end{verbatim}
+  \end{framed}
+\end{center}
 
-and run in \verb+extract-matches+ mode.
+\noindent and run in \emph{extract-matches mode}.
 
 \subsection{Tokenizing with a Dictionary}
 
-A tokenizer consisting of the input side of a morphological dictionary
-with good coverage in vocabulary and derivation can satisfactorily solve
-many tokenization headaches on its own. For example, consider the compound
-plural possessive in
+A tokenizer consisting of the input side of a morphological dictionary.
+Good coverage in vocabulary and derivation can satisfactorily solve
+many tokenization headaches on its own. For example, consider the plural 
+possessive of the compound in
 
 \begin{exe}
   \item The Attorney-Generals' biographies are over there.
 \end{exe}
 
-To get tokenization exactly right, a tokenization rule needs to understand that
-the hyphen is joining parts of a compound word (unlike in eg.
-``Borg-McEnroe'') and that the apostrophe is indicating the possessive form,
+\noindent To get the tokenization of the example exactly right, a tokenization rule 
+needs to understand that the hyphen is joining parts of a compound word, unlike in e.g.
+\emph{Borg-McEnroe}, and that the apostrophe is indicating the possessive form,
 not the end of a quotation.
 
 A dictionary can also be augmented to recover from
@@ -227,133 +241,132 @@ at line boundaries with hyphens, as in
   human strength
 \end{exe}
 
-Here the only correct tokenization is \mbox{``superhuman''} rather than
-\mbox{``super''}
-and \mbox{``human''}, but a dictionary would miss this possibility. However,
+\noindent In this example,  the correct tokenization is \mbox{\emph{superhuman}} rather than
+\mbox{\emph{super}} and \mbox{\emph{human}}, but a dictionary would miss this possibility. However,
 we can use a finite-state operation to allow the string \verb+-\n+ (hyphen
 followed by a newline) to appear anywhere inside the words in the dictionary.
-In regular expressions this operation is sometimes called ``ignoring'' and in
+In regular expressions this operation is sometimes called \emph{ignoring} and in
 \verb+pmatch+ is invoked with a forwards slash, like so:
 
 \begin{center}
   \begin{framed}
 \begin{verbatim}
-    define dict_with_linebreaks [dict]/[{-}"\n"]
+define dict_with_linebreaks [dict]/[{-}"\n"]
 \end{verbatim}
   \end{framed}
 \end{center}
 
-The \verb+\n+ is in double quotes in order to invoke parsing it as a newline
-rather than as a literal ``\textbackslash n''.
+\noindent The \verb+\n+ is in double quotes in order to invoke parsing it as a newline
+rather than as a literal ``\textbackslash n'' and \verb+dict+ is the name of dictionary transducer. 
 
-\subsubsection{Preserving the Parts of a Multiword Unit}
+\subsubsection{Preserving the Parts of a Multi-word Unit}
 
-Dictionaries are often equipped with a collection of short idioms (eg.\@
-``in view of'') and other tokens which include whitespace (eg.\@
-``New York''). While these are useful, it may be too early at this stage
+Dictionaries are often equipped with a collection of short idioms, e.g.\@
+\emph{in view of}, and other tokens which include whitespace, e.g.\@
+\emph{New York}. While these are useful, it may be too early at this stage
 to fix the tokenization as the longest possible match. A discriminative
-tagger won't be able to make the correct choice in
+tagger may not be able to make the correct choice in
 
 \begin{exe}
 \item The ball was in view of the referee.
   \label{inview}
 \end{exe}
 
-if it only sees a tokenization where \emph{in view of} is a single token.
+\noindent if it only sees a tokenization where \emph{in view of} is a single token.
 
 We can extend the dictionary in a simple way to also contain the other
-possible tokenizations (and, in the case of a morphological dictionary,
-the analyses) as follows:
+possible tokenizations and, in the case of a morphological dictionary,
+the analyses, as follows
 
+\begin{center}
 \begin{framed}
 \begin{verb}
 define combined_tokens [dict].u .o. [dict | [" " dict]*]  
 \end{verb}
 \end{framed}
+\end{center}
 
-Here, \verb+dict+ is our dictionary and \verb+[dict].u+ is its input
+\noindent where \verb+dict+ is our dictionary and \verb+[dict].u+ is its input
 projection. We compose it with arbitrarily many copies of itself,
-interpolated with space characters. The result contains every multiword
+interpolated with space characters. The result contains every multi-word
 expression both as itself, and as a combination of other words found
 in the dictionary.
 
-In addition to bare tokens, many downstream tools use analysis cohorts, ie.\@
-the full set of possible baseforms and morphological tags for the token in
-question. \verb+hfst-pmatch+ exposes an API that allows retrieval of the
-position, length, input, output, tag and weight of each longest match (when
-there are many equally long ones), so cohort formatters can be written to
-support such tools. For example, suppose our dictionary includes the
-following entries:
+In addition to bare tokens, many downstream tools use analysis cohorts, i.e.\@
+the full set of possible base forms and morphological tags for the token in
+question. The \verb+hfst-pmatch+ utility exposes an API that allows retrieval of the
+position, length, input, output, tag and weight of each of the longest matches, 
+so cohort formatters can be written. 
+For example, suppose our dictionary includes the
+following entries
 
 \begin{table}[H]
-  \begin{center}
+\begin{center}
 \begin{tabular}{| l | c  c  c |}
   \hline
   \textbf{in} & in AVP & in NN0 & in PRP \\
   \hline
   \textbf{view} & view NN1 & view VVB & view VVI \\
   \hline
-\textbf{of} & of PRF & of PRP & \\
-\hline
-\textbf{in view of} & & in view of PRP & \\
-\hline
+  \textbf{of} & of PRF & of PRP & \\
+  \hline
+  \textbf{in view of} & & in view of PRP & \\
+  \hline
 \end{tabular}
 \end{center}
 \end{table}
 
-When tokenizing ``in view of'', the combined dictionary will produce the full
-set of combinations thereof, which might be formatted as follows:
+\noindent when tokenizing \emph{in view of}. The combined dictionary will then produce the full
+set of combinations which may be formatted as follows
 
+\begin{center}
 \begin{framed}
 \begin{verbatim}
 "<in view of>"
-   "in" AVP "view" VVI "of" PRF
    "in view of" PRP
+   "in" AVP "view" VVI "of" PRF
    "in" NN0 "view" VVB "of" PRF
    "in" NN0 "view" VVB "of" PRP
    "in" NN0 "view" VVI "of" PRF
    etc.
 \end{verbatim}
 \end{framed}
+\end{center}
 
-\subsection{Tokenization Rules as an OOV Fallback}
+\subsection{Tokenization Rules as Fallback}
 
-When no match from the dictionary (or a morphological guesser) is possible,
+When no match from the dictionary or a morphological guesser is available,
 \verb+pmatch+ by default
-writes input to output as-is. Ideally, we'd like to assign every character
-in input either to some intentional token, or discard it (this concerns mainly
-whitespace between tokens). To achieve this, we must write a rule representing
-``some other word'' and disjunct it with the dictionary at the top level of
+writes input to output as-is. Ideally, we would like to assign every character
+in the input either to some intentional token, or discard it. 
+To achieve this, we must write a rule representing
+\emph{some other word} and disjunct it with the dictionary at the top level of
 our tokenizer. To discard unwanted input, we must either adopt the convention
-(and use an appropriate operating mode) that parts of input that haven't been
+that the parts of the input that have not been
 given any tag are discarded, or explicitly add a rule that rewrites single
-unmatched characters to empty strings. This abbreviated example for English
+unmatched characters to empty strings. The following abbreviated example for English
 employs some knowledge about intra-word punctuation.
 
+\begin{center}
 \begin{framed}
 \begin{verbatim}
 define special_plurals [abbreviation | numeric_expression] {'s};
 define possessive_s_ending
  OR(LC({s}) LC({se}) LC({z}) LC({ze}) LC({ce}) LC({x}) LC({xe}))
- ! at runtime check for these strings on the left side
  {'} ({s});
- ! then allow an apostrophe and possibly an s 
-define possessive_suff {'s} | possessive_s_suff;
+define possessive_suff [{'s} | possessive_s_suff];
 define OOVwordpart [Alpha+ (possessive_suff)] | special_plurals;
-! assume contractions are all in the dictionary
 define OOVword [OOVwordpart [{-} OOVwordpart]*]::1.0;
 define TOP dict | OOVword;
 \end{verbatim}
 \end{framed}
+\end{center}
 
-Here we join possessive endings and hyphen-joined compound words at the top
-level into single matches, but by either adding tags at the appropriate levels
+\noindent In the above example, we join possessive endings and hyphen-joined compound words at the top
+level into single matches, but by either adding tags at the appropriate level
 or by changing what is included at the top level it is easy to control the
-level of tokenization.
-
-\verb+hfst-pmatch+ expressions are weighted, and the \verb+::1.0+ at the end
-of the \verb+OOVword+ rule ensures that dictionary matches, which have
-weight zero, will be preferred over \verb+OOVword+ matches.
+tokenization. By weighting the out-of-vocabulary (OOV) \verb+OOVword+ rule in the \verb+hfst-pmatch+ expression with \verb+::1.0+, 
+we ensure that equally long dictionary matches, which have zero weight, will be preferred over \verb+OOVword+ matches.
 
 %% \subsubsection{Incorporating other Linguistic Units}
 
@@ -372,12 +385,12 @@ weight zero, will be preferred over \verb+OOVword+ matches.
 FinnPos \cite{silfverberg/2015} is a data driven {\it morphological
   tagging} toolkit distributed with the HFST interface. The term
 morphological tagging \cite{chrupala/2008} refers to assigning one
-full morphological label (including for example part-of-speech, tense,
-case and number) for each word in a text. It can be contrasted with
-POS tagging where the task is to infer the correct part-of-speech of
+full morphological label, including for example part-of-speech, tense,
+case and number, to each word in a text. It can be contrasted with
+POS tagging where the task is to infer the correct part-of-speech for
 each word.
 
-The FinnPos toolkit is based on the Conditional Random Field framework
+The FinnPos toolkit is based on the Conditional Random Field (CRF) framework
 \cite{lafferty/2001} for data driven learning. Most work on CRF
 taggers and other discriminative taggers has concentrated on POS
 tagging for English, which has a very limited selection of productive
@@ -386,45 +399,46 @@ toward morphologically rich languages with large label sets, that
 cause data sparsity and slow down estimation when using standard
 solutions. FinnPos gives state-of-the-art results for the
 morphologically rich language Finnish \cite{silfverberg/2015} both
-with regard to runtime and accuracy.
-
-In addition to morphological tagging, FinnPos also performs data
-driven lemmatization. Moreover, it can be combined with a
-morphological analyzer to make a data-driven morphological
-disambiguator.
+with regard to runtime and accuracy.  In addition to morphological tagging, 
+FinnPos also performs data driven lemmatization. 
+Moreover, it can be combined with a morphological analyzer 
+to make a data-driven morphological disambiguator. 
+The capability of FinnPos to take advantage of the linguistic choices 
+made by developers of morphological lexicons is the reason for including 
+FinnPos in the HFST tool set.
 
 In this section, we will focus on describing FinnPos from a
-practical point of view. A more detailed description of the theoretical foundations as well evaluation can be found in
+practical point of view. A more detailed description of the theoretical foundations 
+as well as evaluation can be found in
 \cite{silfverberg/2015}.
 
 \subsection{FinnPos for Morphologically Rich Languages}
 
-In POS tagging, the label sets are usually fairly small. For example,
+In part-of-speech (POS) tagging, the label sets are usually fairly small. For example,
 the Penn Treebank uses only 45 distinct label types. For tagging of
 morphologically complex languages, where full morphological labels are
 required, vastly larger label sets are used. Label sets of around 1,000
 distinct label types frequently occur. 
 
-Lage label sets create a data sparsity problem. For example, for a
-second order model and a label set of 1,000 distinct label types, an
+Large label sets create a data sparsity problem. For example, for a
+second order language model and a label set of 1,000 distinct label types, an
 overwhelming majority of the one billion possible (1,000$^3$) label
 trigrams are never seen in a training corpus of realistic scope. Even
-label unigrams are rare in a sense -- there is necessarily going to be
-a lot of label unigrams that occur only a couple of times in the
-entire training corpus.
+label unigrams may be rare as many label unigrams tyically occur only a couple 
+of times in a training corpus.
 
 Although morphological label sets can be very large, individual labels
-are usually created by combining smaller sub units from a relatively
+are usually created by combining smaller sub-units from a relatively
 small inventory. A typical example of such a structured morphological
 label is the label {\tt Noun|Sg|Nom}, which consists of three sub
 units: the main word class {\tt Noun}, the singular number {\tt Sg}
 and the nominative case {\tt Nom}. FinnPos utilizes the internal
-structure of complex labels by extracting features for sub units as
+structure of complex labels by extracting features for sub-units as
 well as for the entire labels \cite{silfverberg/2014}. This alleviates
-the data sparsity problem because features relating to sub units of
-entire tags are used as fallback. Additionally, sub unit features
+the data sparsity problem because features relating to sub-units of
+entire tags are used as fall-back. Additionally, sub-unit features
 allow FinnPos to model grammatical generalizations such as case
-congurence in isolation of the full labels.
+congruence in isolation of the full labels.
 
 In addition to data sparsity, large label sets cause long training
 times because the complexity of standard CRF training of an $n$th
@@ -435,7 +449,7 @@ substantially reduce run-time.
 
 \subsection{FinnPos Tools}
 
-The FinnPos toolkit includes three commandline tools
+The FinnPos toolkit includes three command-line tools
 
 \begin{itemize}
 \item {\tt finnpos-train} for training tagger models.
@@ -449,14 +463,14 @@ named after Adwait Ratnaparkhi because FinnPos uses a modified version
 of the feature set introduced by Ratnaparkhi in
 \cite{ratnaparkhi/1996}.
 
-FinnPos can utilize HFST morphological analyzers and other
-morphological analyzers. The integration of a morphological analyzer
-is accomplished by piping the output of the analyzer to FinnPos. The
-tags emitted by particular morphological analyzers may require post
-editing because FinnPos uses the '\verb@|@' sign to separate sub units
-of structured tags (for example in {\tt Noun|Sg|Nom}). For HFST
-morphological analyzers, editing can be accomplished using the utility
-{\tt hfst-xfst}.
+% FinnPos can utilize HFST morphological analyzers and other
+% morphological analyzers. 
+The integration of a morphological analyzer
+is accomplished by piping the output of the analyzer to FinnPos. 
+FinnPos uses the '\verb@|@' sign to separate sub-units
+of structured tags, e.g. {\tt Noun|Sg|Nom}, so tags emitted 
+by a particular morphological lexicon may require minor editing. 
+In HFST, morphological lexicons can be edited with the {\tt hfst-xfst} utility.
 
 \subsection{Data Format and Feature Extraction}
 
@@ -506,7 +520,7 @@ extracts the following features for frequent words:
 \item Next two words.
 \end{enumerate}
 
-For rare words, the script also extracts orthographic features:
+\noindent For rare words, the script also extracts orthographic features:
 
 \begin{enumerate}
 \item Suffixes and prefixes up to length 10.
@@ -514,14 +528,14 @@ For rare words, the script also extracts orthographic features:
 \item Whether the word includes digits or dashes.
 \end{enumerate}
 
-Users may add their own features (such as the output of a
-morphological analyzer) before calling {\tt finnpos-ratna-feats.py} or
+\noindent Users may add their own features such as the output of a
+morphological analyzer before calling {\tt finnpos-ratna-feats.py} or
 write their own feature extraction script.
 
 The fifth field in the data format is reserved for annotations. These
 are passed unchanged through the tool {\tt finnpos-label}. The
-annotation field can be used to transport lemmatization information
-through the tagger. It can also be used for e.g. named entity labels.
+annotation field can be used to transport word-specific information
+through the tagger, e.g., lemmatization or named entity labels.
 
 \subsection{Training and Using a Model}
 
@@ -530,22 +544,22 @@ estimation of model parameters. The error-driven perceptron training
 algorithm iterates through the training corpus one sentence at a time,
 labels the sentences and adjusts model weights when erroneous labels
 are detected. Usually the Viterbi algorithm \cite{collins/2002} is
-used for labeling. This however, is too slow in practice when dealing
+used for labeling. This, however, is too slow in practice when dealing
 with large label sets.
 
 Instead of the Viterbi algorithm, FinnPos uses a beam search with
 adaptive beam width \cite{pal/2006}. Additionally FinnPos uses a generative
-label guesser (modeled after the OOV word model used in
-\cite{brants/2000}) to restrict label candidates during
+label guesser modeled after the OOV word model used in
+\cite{brants/2000} to restrict label candidates during
 training. Because of inexact inference during the training phase,
 FinnPos additionally uses violation fixing \cite{huang/2012}.
 
 Users can train their own models using the utility {\tt
   finnpos-train}. The training process is regulated using a
-configuation file (see Figure \ref{fig:config-file}). The
+configuation file, see Figure~\ref{fig:config-file}. The
 configuration file is used to set the hyper parameters of the beam
 search and label guesser as well as the stopping conditions for the
-perceptron algorithm. See figure \ref{fig:config-fields}.
+perceptron algorithm, see Figure~\ref{fig:config-fields}.
 
 \begin{figure}
 \begin{framed}
@@ -570,11 +584,11 @@ max_lemmatizer_passes=7
                          & parameters.\\
 {\tt max\_lemmatizer\_passes} & The maximal number of training passes during estimation of\\
                               & lemmatizer parameters.\\
-{\tt max\_useless\_passes} & Determined the maximal number of passes over the training data\\
+{\tt max\_useless\_passes} & The maximal number of passes over the training data\\
                            & that do not improve the tagging accuracy for the development data.\\
 {\tt guess\_mass} & A generative label guesser is used to prune the label candidates\\
-                  & considered for each word during training. {\tt guess\_mass} is a float\\
-                  & in range (0, 1.0) which detemines the mass \\
+                  & considered for each word during training, where {\tt guess\_mass}\\
+                  & is a float in range (0\ldots1) which determines the mass of the candidates\\
                   &  preserved by the guesser for each word.\\
 {\tt beam\_mass} & FinnPos uses an adaptive beam to prune search histories during\\
                  & beam search. This parameter determines the probability mass of the\\
@@ -585,63 +599,60 @@ max_lemmatizer_passes=7
 
 \subsection{FinnPos and Morphological Analyzers}
 
-FinnPos can be used for morphological disambiguation together with a
-morphological analyzer. The analyzer can be used in two ways: to
-provide label candidate for words and as a generator of features.
-For words not recognized by the analyzer, FinnPos will use a built-in
-suffix-based guesser.
-
-FinnPos does not depend on HFST for morphological analysis. Any
-morphological analyzer may be used, because morphological
-disambiguation is accomplished using a pipeline of tools.
-
-In addition to the morpological tag, FinnPos also uses the
+FinnPos benefits from a morphological analyzer for morphological disambiguation. 
+The analyzer can be used in two ways: to provide label candidates for words 
+and as a generator of features. For words not recognized by the analyzer, 
+FinnPos will use a data-driven suffix-based guesser to generate label candidates.
+In addition to the morpological label, FinnPos also uses the
 morphological analyzer for determining the lemma of a given word. For
 words not recognized by the analyzer, a data-driven lemmatizer is used
-instead.
+instead. The data-driven components are learned from the training corpora, which means
+that the FinnPos tagger could be used without a morphological analyzer, 
+but a lexicon with reasonable coverage improves the tagging performance.
 
 \section{Semantic Tagging using {\tt hfst-pmatch}}\label{sec:sem-tagging}
 % Sam (4 p.)
 
+In this section, we outline a scheme for extracting semantic frames from text
+using hand-written rules. The rules and approach has been demonstrated in~\cite{hardwick/2015}. 
+In this paper, we also include an evaluation of the rule set. While it does not currently 
+represent a system for extracting a large number of different frames, 
+the \verb+hfst-pmatch+ tool has been extensively tested in a full-fledged 
+named-entity recognizer for Swedish \cite{Kokkinakis-Dimitrios2014-3}. 
+Our motivation here is to present additional capabilities of 
+\verb+hfst-pmatch+ as a natural language processing system for extracting 
+factoids from textual data to be used in text and data mining.
+
 \subsection{Introduction}
 
-In this section we outline a scheme for extracting semantic frames from text
-using hand-written rules. The rules and approach presented is due (at time of
-writing) to be demonstrated and published in~\cite{hardwick/2015}. It does not
-represent a full-fledged system for extracting a large number of different
-frames -- rather, our motivation is to give a description of
-\verb+hfst-pmatch+ as a NLP system in context.
-
 A semantic frame \cite{semantic-frame} is a description of a \emph{type} of event, relation or entity
-and related participants. For example, in FrameNet,
-a database of semantic frames,
+and related participants. For example, in FrameNet, a database of semantic frames,
 the description of an \verb+Entity+ in terms of physical space occupied by it is
 an instance of the semantic frame \verb+Size+. The frame is evoked by
 a lexical unit (LU), also known as a frame evoking element (FEE), which is a
-word (in this case an adjective)
-such as ``big'' or ``tiny'', descriptive of the size of the \verb+Entity+.
-Apart from \verb+Entity+, which is a core or compulsory element, the
+word, in this case an adjective,
+such as \emph{big} or \emph{tiny}, descriptive of the size of the \verb+Entity+.
+Apart from an \verb+Entity+, which is a core or compulsory element, the
 frame may identify a \verb+Degree+ to which the \verb+Entity+ deviates
-from the norm (``a \textbf{really} big dog'') and a \verb+Standard+ to
-which it is compared (``tall \textbf{for a jockey}'').
+from the norm, e.g., \emph{a \textbf{really} big dog}, and a \verb+Standard+ with
+which it is compared, e.g., \emph{tall \textbf{for a jockey}}.
 
-  \begin{center}
 \begin{table}[h]
+\begin{center}
   \begin{tabular}{ | l | l |}
 \hline
 Lexical Unit (LU) & Adjective describing magnitude (large, tiny, ...) \\
 \hline
 Entity (E) & That which is being described (house, debt, ...) \\
 \hline
-Degree (D), optional & Intensity or extent of description
-(really, quite, ...) \\
+Degree (D), optional & Intensity or extent of description (really, quite, ...) \\
 \hline
 Standard (S), optional & A point of comparison (for a jockey, ...) \\
 \hline
     \end{tabular}
     \caption{The semantic frame \emph{Size}.}
+\end{center}
 \end{table}
-      \end{center}
 
 For example:
 
@@ -658,13 +669,14 @@ For example:
 
 \subsection{A Rule}
 
-A simple and common syntactic realisation of the \verb+Size+ frame is a single
+A simple and common syntactic realization of the \verb+Size+ frame is a single
 noun phrase containing one of the LUs, such as
-``the big brown dog that ran away''. Here we'd like to identify ``big'' as \verb+LU+,
-``brown dog'' as \verb+Entity+ and the combination as \verb+Size+.
+\emph{the big brown dog that ran away}. Here we would like to identify \emph{big} as \verb+LU+,
+\emph{brown dog} as \verb+Entity+ and the combination as \verb+Size+.
 Our first rule for identifying this type of construction might be
 
 \begin{table}[h]
+\begin{center}
   \small
   \begin{framed}
 \begin{verbatim}
@@ -675,40 +687,38 @@ define TOP Size1 EndTag(Size);
 \end{framed}
 \normalsize
 \caption{A simplified first rule}
+\end{center}
 \end{table}
 
-This ruleset has been simplified for brevity -- it has only a few of the
+\noindent This rule set has been simplified for brevity -- it only has a few of the
 permitted LUs, and word boundary issues have not been addressed.
-
 The \verb+[].t()+ syntax in the definition of \verb+Size1+ is a tag delimiter
-controlling the are tagged as \verb+Entity+. The extra \verb+Adjective+ is
+controlling the area tagged as \verb+Entity+. The extra \verb+Adjective+ is
 optional, which is conveyed by the surrounding parentheses.
 
-We can verify that our rules extract instances of our desired pattern by compiling
+\sloppy We can verify that our rules extract instances of our intended pattern by compiling
 them with \verb+hfst-pmatch2fst+ and running the compiled result with
 \verb+hfst-pmatch --extract-tags+. In the following we have
 inputted the text of the King James Bible from Project
-Gutenberg (\url{gutenberg.org}) and added some extra characters on both
-sides for
-a concordance-like effect:
+Gutenberg\footnote{\url{http://gutenberg.org}} and allowed some extra characters on both
+sides for a concordance-like effect
 
 %\begin{table}[h]
 \hfill \break
   \small
+\begin{center}
   \begin{framed}
 \begin{verbatim}
 ...
-there lay a <Size><LU>small</LU>
-round <Entity>thing</Entity></Size>
+there lay a <Size><LU>small</LU> round <Entity>thing</Entity></Size>
 ...
-there was a <Size><LU>great</LU>
-<Entity>cry</Entity></Size> in Egypt
+there was a <Size><LU>great</LU> <Entity>cry</Entity></Size> in Egypt
 ...
-saw that <Size><LU>great</LU>
-<Entity>work</Entity></Size> which
+saw that <Size><LU>great</LU> <Entity>work</Entity></Size> which
 ...
 \end{verbatim}
 \end{framed}
+\end{center}
 \normalsize
 %\caption{Fragments of tagged running text}
 %  \label{bibletext}
@@ -716,135 +726,135 @@ saw that <Size><LU>great</LU>
 
 A natural next step is to add optional non-core elements, such as an adverb
 preceding the LU being tagged as \verb+Degree+ and a noun phrase beginning with
-``for a'' following it as \verb+Standard+.
+\emph{for a} following it as \verb+Standard+.
 
 \begin{table}[h]
+\begin{center}
   \small
   \begin{framed}
 \begin{verbatim}
-define Size1 [Adverb].t(Degree) LU (Adjective)
-  [Noun].t(Entity) [{for a} NP].t(Standard);
+define Size1 [Adverb].t(Degree) LU (Adjective) [Noun].t(Entity) 
+             [{for a} NP].t(Standard);
 \end{verbatim}
 \end{framed}
+\end{center}
 \normalsize
 \caption{Extending the rule with optional elements}
 \end{table}
 
-Here are some examples this rule finds in the British National
-Corpus~\cite{bnc}.
+\noindent and here are some examples this rule finds in the British National
+Corpus~\cite{bnc}
 
 %\begin{table}[h]
+\begin{center}
   \small
   \begin{framed}
 \begin{verbatim}
 ...
-presence of an <Size>
-  <Degree>arbitrarily</Degree>
-  <LU>small</LU> <Entity>
-  amount</Entity></Size> of dust
+presence of an <Size><Degree>arbitrarily</Degree>
+  <LU>small</LU> <Entity>amount</Entity></Size> of dust
 ...
-one <Size><LU>small</LU>
-  <Entity>step</Entity>
-  <Standard>for a man</Standard>
-  </Size>
+one <Size><LU>small</LU> <Entity>step</Entity>
+  <Standard>for a man</Standard> </Size>
 ...
 \end{verbatim}
   \end{framed}
+\end{center}
   \normalsize
 %  \caption{Tagged text with optional elements}
 %  \label{bnctext}
 %  \end{table}
 
-We can see that in ``small amount of dust'' we might want to
+\noindent We can see that in \emph{small amount of dust}, we might want to
 tag not just the immediate noun as \verb+Entity+ but the entire noun phrase
-(which could be implemented up to a context-free definition of a noun phrase),
-and in ``one small step for a man'' a common indirect use of the \verb+Standard+
-construction.
-
-As well as correct matches, such as ``small round thing'' in the biblical
-example, we have metaphorical meanings of \verb+Size+, such as ``great cry''.
+which could be implemented up to a context-free definition of a noun phrase,
+and in \emph{one small step for a man} a common indirect use of the \verb+Standard+
+construction. As well as correct matches, such as \emph{small round thing} in the biblical
+example, we have metaphorical meanings of \verb+Size+, such as \emph{great cry}.
 This may or may not be desired -- perhaps we wish to do further processing to
 identify the target domains of such metaphors, or perhaps we wish to be able
 to annotate physical size and physical size only.
 
 \subsection{Incorporating Semantic Information}
 
-Size is a very metaphorical concept, and syntactic rules as above will produce a large amount of matches that relate to such uses, eg. ``a great cry'' or ``a big deal''. If we wish to refine our rules to detect such uses, there are a few avenues for refinement.
-
-First of all, some LUs are much more metaphorical than others. A ``great man'' is almost certainly a metaphorical use, whereas a ``large man'' is almost certainly concrete. Accuracy may be improved by requiring ``great'' to be used together with a common concrete complement, like ``great crowd''.
-
-There are also semantic classifications of words, such as WordNet~\cite{wordnet}. We may compile the set of hyponyms of \emph{physical entity} and require them to appear as the nouns in our rules.
+Size is a very metaphorical concept, and syntactic rules as above will produce a large amount of matches that relate to such uses, e.g., \emph{a great cry} or \emph{a big deal}. If we wish to refine our rules to detect such uses, there are a few avenues to explore. First of all, some LUs are much more metaphorical than others. A \emph{great man} is almost certainly a metaphorical use, whereas a \emph{tall man} is almost certainly concrete. Accuracy may be improved by requiring \emph{great} to be used together with common nouns meaning several individuals like \emph{great crowd}. In addition, there are semantic classifications of words, such as WordNet~\cite{wordnet}. We may compile the set of hyponyms of \emph{physical entity} and require them to appear as the nouns in our rules as shown in Table~\ref{physical}.
 
 \begin{table}[h]
+\begin{center}
 \small
 \begin{framed}
 \begin{verbatim}
-define phys_entity
-  @txt"phys_entity.txt";
-! a list of singular baseforms can be expanded to include
-! eg. plurals by suitably composing it with a dictionary automaton
+define phys_entity  @txt"phys_entity.txt";
 \end{verbatim}
 \end{framed}
+\end{center}
 \normalsize
 \caption{Reading an external linguistic resource}
+  \label{physical}
 \end{table}
 
 \subsection{Incorporating Part-of-speech Information}
 
-We have hitherto used named rules for matching word classes, like \verb+Noun+,
-without specifying how they are written. Even our collection of LUs might need
-some closer attention -- for example ``little'' could be an adverb.
-
+We have so far used named rules for matching word classes like \verb+Noun+,
+without specifying how they are identified. Also our collection of LUs might need
+some closer attention -- for example \emph{little} could be an adverb.
 Considering that in writing our
-rules we are effectively doing shallow syntactic parsing, even a very simple
-way to identify parts of speech may suffice: a morphological dictionary.
+rules, we are effectively doing shallow syntactic parsing, even a very simple
+way to identify parts of speech may suffice, e.g. a morphological dictionary.
 For example, a finite-state transducer representing English morphology may be
-used to define the class of common nouns as in table \ref{dictrules}.
+used to define the class of common nouns as in Table~\ref{dictrules}.
+If we have the use of a part-of-speech tagger, we may write our rules to act
+on its output, as in Table~\ref{posrules} where \verb+W+ refers to some word delimiter.
 
 \begin{table}[h]
+\begin{center}
 \small
   \begin{framed}
 \begin{verbatim}
-! The file we want to read
+! The lexicon we want to read
 define English @bin"english.hfst";
 ! We compose it with a noun filter and extract the input side
-define Noun English .o. [?+ "<NN1>" | "<NN2>"].u;
+define Noun  [ English .o. [?+ "<NN1>" | "<NN2>"] ].u;
 ! (NN1 is singular, NN2 plural)
 \end{verbatim}
 \end{framed}
+\end{center}
   \normalsize
-  \caption{Using a dictionary to write POS rules}
+  \caption{Using a dictionary to extract words of a given word-class}
   \label{dictrules}
   \end{table}
 
-If we have the use of a part-of-speech tagger, we may write our rules to act
-on its output, as in table \ref{posrules}.
-
 \begin{table}[h]
+\begin{center}
   \small
   \begin{framed}
 \begin{verbatim}
 define Noun LC(W) Wordchar+ ["<NN1>"|"<NN2>"] RC(W);
 \end{verbatim}
 \end{framed}
+\end{center}
   \normalsize
   \caption{Using tags in pre-tagged text}
   \label{posrules}
   \end{table}
 
-\section{Increasing Coverage}
-Having considered for each rule where \verb+Degree+ and \verb+Standard+ may occur, coverage may be evaluated by also finding those cases where a LU is used as an adjective but hasn't been tagged, eg.
+\subsection{Increasing Coverage}
+Having considered for each rule where \verb+Degree+ and \verb+Standard+ may occur, coverage may be evaluated by also finding those cases where a LU is used as an adjective but does not match the current rules, e.g.
 
-\small
+\begin{center}
+  \small
+  \begin{framed}
 \begin{verbatim}
 define TOP Size1 | Size2 | [LU].t(NonmatchingLU);
 \end{verbatim}
+  \end{framed}
+\end{center}
 \normalsize
 
 The valid match is always the longest possible one, so \verb+NonmatchingLU+ will be the tag only if no subsuming \verb+SizeN+ rule applies.
-
 For example in
 
+\begin{center}
 \small
 \begin{framed}
 \begin{verbatim}
@@ -852,16 +862,30 @@ the moving human body is <NonmatchingLU>large</NonmatchingLU>,
 obtrusive and highly visible
 \end{verbatim}
 \end{framed}
+\end{center}
 \normalsize
 
-We see another realisation of the frame: the \verb+Entity+ being followed by a
-copula, and the \verb+LU+ appearing to the right. We could write the rule
+\noindent we see another realization of the \verb+Size+ frame: the \verb+Entity+ is followed by a
+copula, and the \verb+LU+ appears to the right. We can write a new rule
 \verb+Size2+ to capture this, adding positions for non-core elements either by
 linguistic reasoning or by searching the corpus.
 
+\subsection{Evaluation}
+
+We took a sample X of sentences and developed our set of rules for tagging all the \verb+Size+ frame examples 
+to determine how laborious the task would be and what coverage could be expected with our current set of tools.
 
 \section{Weighted Regular Expressions}
-% Sam & Miikka (3 p.)
+% Sam & Miikka & Krister (3 p.)
+
+Weighted regular expressions are a way to express approximate string matching for spelling variants or 
+unknown words. This has been used for constructing error models for normalizing spelling variation \cite{pirinen2014}, 
+for approximate matching of transliterated names or terms in multi-lingual search \cite{Linden06multilingualmodeling}
+as well as for correcting mistakes in optical character recognition and speech recognition, which are important subtasks 
+when extracting factoids from written and spoken documents
+for text and data mining. The approximate strings are described by error models or distortion filters. 
+We present the notation provided by HFST for implementing such error models and show how to describe 
+a basic weighted edit distance error model.
 
 \subsection{Syntax}
 
@@ -870,38 +894,43 @@ with the $::$ operator. The weights are most often from the tropical semiring. T
 represented as a float, i.e. one or more digits that may be preceded by a minus or plus sign and followed
 by a comma followed by at least one digit. For example the regular expression
 
+\begin{center}
 \begin{framed}
 \begin{verbatim}
 [ a b:c::0.5 d::0.3 ]::0.2
 \end{verbatim}
 \end{framed}
+\end{center}
 
-will produce a transducer that maps abd to acd with weight 0.5 + 0.3 + 0.2 = 1.0. In this example,
+\noindent will produce a transducer that maps {\tt abd} to {\tt acd} with weight 0.5 + 0.3 + 0.2 = 1.0. In this example,
 we basically have a transition a:a with no weight followed by a transition b:c with weight 0.5
-followed by transition d:d with weight 0.3 leading to a final state with weight 0.2. However, it is
+followed by transition {\tt d:d} with weight 0.3 leading to a final state with weight 0.2. However, it is
 possible that operations that are called afterwards, e.g. minimization, modify the exact positions
 of weights in the transducer. 
 
 In replace rules weighted expressions can be used on both sides of the rule.
 For example the rule
 
+\begin{center}
 \begin{framed}
 \begin{verbatim}
-[a::3]+ -> [b::5] || c __ c
+[a::3]+ -> [b::5] || c _ c
 \end{verbatim}
 \end{framed}
+\end{center}
 
-will map one or more a:s between two c:s into one b weighting each a with 3
-and the b with 5. It will map 'cac', 'caac' and 'caaac' all into 'cbc' with
+\noindent will map one or more {\tt a} between two {\tt c} into one {\tt b} weighting each {\tt a} with 3
+and the {\tt b} with 5. It will map {\tt cac}, {\tt caac} and {\tt caaac} all into {\tt cbc} with
 corresponding weights 3 + 5 = 8, 3 + 3 + 5 = 11 and 3 + 3 + 3 + 5 = 14.
 
 \subsection{A Weighted Edit Distance Model}
 
 Parallel weighted replace rules offer a systematic representation of various
 regular transformations. Consider an edit distance transducer that accepts
-any string and outputs all the strings that result from making up to $n$ edits
-to it. An abbreviated example, with an alphabet consisting of a, b and c:
+any string and outputs all the strings that result from making edits
+to it. An abbreviated example, with an alphabet consisting of {\tt a}, {\tt b} and {\tt c}.
 
+\begin{center}
 \begin{framed}
 \begin{verbatim}
 "a" (->) ["" | "b" | "c" ]::1.0 ,,
@@ -910,28 +939,31 @@ to it. An abbreviated example, with an alphabet consisting of a, b and c:
 "" (->) ["a" | "b" | "c"]::1.0 ;
 \end{verbatim}
 \end{framed}
+\end{center}
 
-the \verb+,,+ indicates that the replacements are to be compiled to operate
-in parallel. \verb+(->)+ is the optional replacement, allowing but not
-necessitating replacement. Its effect is the same as including identities
-in normal replacement:
+\noindent the \verb+,,+ indicates that the replacements are to operate
+in parallel, where \verb+(->)+ is the optional replacement, allowing but not
+necessitating replacement. Its effect is the same as allowing zero weight identities
+in normal replacement.
 
+\begin{center}
 \begin{framed}
 \begin{verbatim}
 "a" -> "a" | ["" | "b" | "c" ]::1.0;
 \end{verbatim}
 \end{framed}
+\end{center}
 
-Completed, this example results in a transducer that rewrites
-its input with any number of edits, and gives it a cumulative weight of
-$1.0$ per edit (assuming that weights are added, ie.\@ that the weight semiring
-has addition as its multiplication operation, as in the log or tropical
-semirings).
+\noindent Completed, this example results in a transducer that rewrites
+its input with any number of edits, and gives the output a cumulative weight of
+$1.0$ per edit assuming that the weights are in the log or tropical
+semi-rings.
 
-Suppose we have a different notion of edit, and further that we want to weight
-different edits differently. We can incorporate swaps of consecutive
-characters as follows:
+Suppose we wish to weight different edits differently by, e.g., 
+estimating their likelihood from training data and using log-probabilities as weights. 
+We can incorporate weighted swaps of consecutive characters as follows.
 
+\begin{center}
 \begin{framed}
 \begin{verbatim}
 {ab} (->) {ba}::1.5 ,, {ac} (->) {ca}::1.1 ,,
@@ -939,15 +971,16 @@ characters as follows:
 {ca} (->) {ac}::2.1 ,, {cb} (->) {bc}::1.1;
 \end{verbatim}
 \end{framed}
+\end{center}
 
-The replacements are quite arbitrary (eg. zero-weighted spelling normalization
-rules). They can also include context conditions,
-with a number of different replacements operating in different contexts with
-different weights all compiled together in parallel into one rule.
+\noindent The weighted replacements can also have context conditions as specified 
+in the Xerox replace rules \cite{drobac/2012} 
+with different replacements operating in different contexts.
 
-The edits can be constrained to occur a given number of times with an edit
-filter:
+If we wish the edits to be limited in number, they can be constrained to occur a given number of times with an edit
+filter.
 
+\begin{center}
 \begin{framed}
 \begin{verbatim}
 define edit_distance_with_markers
@@ -959,43 +992,41 @@ define filter [[? - "EDIT"]* ["EDIT":""] [? - "EDIT"*]]^{1,3}
 define 1_to_3_edits edit_distance_with_markers .o. filter;
 \end{verbatim}
 \end{framed}
+\end{center}
 
-Here each rule making an edit appends a special marker, which is removed
-by composing with \verb+filter+, which allows (in this case) between 1 and 3
-edits to pass through, replacing them with the empty string.
+\noindent Here each rule making an edit appends a special marker, which is removed
+by composing with a \verb+filter+ allowing between 1 and 3
+edits to pass through.
 
 \section{Implementation aspects}\label{sec:background}
 % Erik (2 p.)
 During the past two years, there have been many improvements to the HFST 
-interface. We now have a native lexc compiler and the possibility to 
-hyperminimize the lexc lexicons in a lossless way \cite{drobac/2014}. There have also been many bugfixes and 
-improvements to the native XFST compiler. Flag diacritics are fully supported 
+interface. There is now a native {\tt hfst-lexc} compiler and the possibility to 
+hyperminimize the lexc lexicons in a lossless way \cite{drobac/2014}. There have also been many bug-fixes and 
+improvements to the native {\tt hfst-xfst} compiler. Flag diacritics are fully supported 
 in all HFST command line tools. Weights can be defined for all regular expressions,
 including replace rules.
 
-We have a download page (http://hfst.sourceforge.net/downloads/) that tells what 
-we offer and where it can be found. For Linux users, we recommend a Debian installation
+HFST has a download page\footnote{\url{http://hfst.sourceforge.net/downloads/}} for interested users. 
+For Linux users, we recommend a Debian installation
 which is offered via Apertium. For Mac and Windows users,
-we offer binaries for eight tools: hfst-xfst, hfst-lexc, hfst-pmatch,
+there are binaries for eight tools: hfst-xfst, hfst-lexc, hfst-pmatch,
 hfst-pmatch2fst, hfst-twolc, hfst-proc, hfst-lookup and hfst-optimized-lookup.
-There is also a separate MacPorts installation available.
+There is also a separate MacPorts installation available. 
+There is also a Python interface for HFST for Linux and Mac, generated with SWIG directly
+from the C++ API. 
 
-We currently have a Python interface for HFST for Linux and Mac, generated with SWIG directly
-from our C++ API. We are working to create an alternative, more Python-like interface
-and implement it also for Windows.
-
-We have tentatively added Xerox's xfsm library as one implementation to HFST.
-In Table~\ref{operationtimes} we whow preliminary benchmarking results for different back-end
-implementations for two opearations, minimization and composition. Minimization includes epsilon
-removal and determinization.
-As a test transducer we use an 
-unweighted OMorFi intermediate transducer with ca 250 000 states and 600 000 transitions (in composition
+ HFST alsotentatively has the Xerox's xfsm library as one of the back-ends for HFST.
+In Table~\ref{operationtimes}, preliminary benchmarking results are shown for different back-end
+implementations for two opearations: minimization and composition. Minimization includes epsilon
+removal and determinization. As a test transducer we use an 
+unweighted OMorFi intermediate transducer with approximately 250~000 states and 600~000 transitions (in composition
 the transducer is composed with itself).
 
 \begin{table}[h!]
   \centering
-  \caption{Times for two transducer operations with different back-end implementations.
-    Times are given in seconds and averaged over 10 runs.}
+  \caption{Run-times for two transducer operations with the different back-end implementations.
+    Run-times are given in seconds and averaged over 10 runs.}
   \begin{tabular}{c c c }
     \hline
     Back-End & Minimization & Composition \\ \hline
@@ -1007,43 +1038,32 @@ the transducer is composed with itself).
   \label{operationtimes}
 \end{table}
 
-In minimization, the openfst implementation is clearly the slowest. We tested minimizing
-the transducer with native openfst command line tools, but the result was still 5,36 seconds.
-The few extra milliseconds come from reading and writing files because not all openfst tools support reading
-and writing in a pipeline. As we have an old version (1.3.1) of openfst as our back-end, we also
-used the command line tools of the newest version (1.4.1), but minimization was not any faster.
-We even tried to encode weights as a part of the transitions (i.e. ignore them) before determinization
-and minimization, but it did not have a noticeable effect.
+For minimization, the {\tt OpenFst} implementation is clearly the slowest. We tested minimizing
+the transducer with native {\tt OpenFst} command line tools, but the result was still 5,36 seconds.
+The few extra milliseconds come from reading and writing files because not all {\tt OpenFst} tools support reading
+and writing in a pipeline. As we have an old version (1.3.1) of {\tt OpenFst} as our back-end, we also
+used the command line tools of the newest version (1.4.1), but minimization was no faster.
+We even tried to encode weights as a part of the transitions, i.e. ignore them, before determinization
+and minimization, but it did not have any noticeable effect.
 
-In composition, the xfsm implementation is the fastest. In xfsm composition, unknown and identity
+For composition, the {\tt xfsm} implementation is the fastest. In {\tt xfsm} composition, unknown and identity
 symbols are handled as a part of the composition itself, but for other back-ends some post- and preprocessing is
-needed. This probably explains why they are all slower.
+needed. This may  explain why they are slightly slower.
 
 \section{Discussion and Conclusion}\label{sec:discussion}
 % Krister (1 p.)
 
-As morphemes and words have formed the basis for structural analysis
-of sentences, named entities form the basis for structural analysis of
-discourse and information content. Sometimes it is claimed that
-linguists are interested in words and satisfied with the sentence
-context, but this is a slightly too narrow view of linguistics. In
-order to study language in change linguists also need access to whole
-documents and document collections as well as evidence for how
-language interacts with the non-textual world, which from a linguistic
-perspective has been labeled pragmatics and which is the essence of
-the rest of the digital humanities. With the advent of large
-collections of textual data, i.e. both written and spoken language in
-internet fora and radio talk shows, as well as textually annotated
-collections of images and video recordings, language studies also need
-tools that are capable of going beyond the assumption that one
-sentence or utterance sets the global scope. This is also where the
-researchers of language studies join the rest of the digital
-humanities researchers. In this paper we have demonstrated how one
+As morphemes and words in context have formed the basis for structural analysis
+of sentences in computational linguistics, named entities and semantic frames in context 
+form the basis for structural analysis of discourse and information content. 
+With the advent of large collections of textual data, i.e. both written and spoken language from
+Internet forums and radio programs as well as textually annotated
+collections of images and video recordings, we need tools that provide access to
+the building blocks of information content. In this paper, we have demonstrated how one
 particular framework, HFST--Helsinki Finite-State Technology, and its
-use in processing text to recognize named entities in context can
-contribute to re-integrating computational linguistics with the rest
-of digital humanities.
-
+use in processing and normalizing text to recognize named entities and semantic frames in context can
+use computational linguistic methods to process and extract information 
+for text and data mining in digital humanities.
 
 \bibliographystyle{splncs03}
 \bibliography{sfcm-2015}
