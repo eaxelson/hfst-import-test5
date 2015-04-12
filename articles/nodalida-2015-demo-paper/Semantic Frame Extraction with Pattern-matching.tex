@@ -11,29 +11,34 @@
 \usepackage{framed}
 \special{papersize=210mm,297mm} % to avoid having to use "-t a4" with dvips 
 %\setlength\titlebox{6.5cm}  % You can expand the title box if you really have to
+\usepackage{float}
+
+\floatstyle{boxed}
+\newfloat{listing}{thp}{lop}
+\floatname{listing}{Listing}
+
+\usepackage[font=normalsize]{caption}
 
 \title{Extracting Semantic Frames using hfst-pmatch}
 
 \author{Sam Hardwick \\
-  University of Helsinki \\
-  {\tt sam.hardwick} \\ {\tt @iki.fi} \\\And
+  University of Helsinki \\\And
   Miikka Silfverberg \\
   University of Helsinki \\
-  {\tt miikka.silfverberg} \\ {\tt @iki.fi}\\\And
+  {\normalsize \tt \{sam.hardwick, miikka.silfverberg\}@iki.fi, krister.linden@helsinki.fi} \\\And
   Krister Lind{é}n \\
-  University of Helsinki \\
-  {\tt krister.linden} \\ {\tt @helsinki.fi}}
+  University of Helsinki \\}
 
 \date{}
 
 \begin{document}
 \maketitle
 \begin{abstract}
-  We use \verb+hfst-pmatch+~(\newcite{pmatch}), a
+  We use \verb+hfst-pmatch+~\cite{pmatch}, a
   pattern-matching tool mimicking and extending Xerox
-  \verb+fst+~(\newcite{karttunen/2011}), for demonstrating how to develop a
+  \verb+fst+~\cite{karttunen/2011}, for demonstrating how to develop a
   semantic frame extractor. We
-  select a FrameNet~(\newcite{framenet}) frame and write shallowly syntactic pattern-matching rules
+  select a FrameNet~\cite{framenet} frame and write shallowly syntactic pattern-matching rules
   based on part-of-speech information and morphology from either a morphological automaton or
   tagged text.
 \end{abstract}
@@ -51,7 +56,7 @@ to using it to identify the frame ``Size'' in FrameNet.
 
 \section{A Semantic Frame}
 
-A semantic frame~(\newcite{semantic-frame}) is a description of a \emph{type} of event, relation or entity
+A semantic frame~\cite{semantic-frame} is a description of a \emph{type} of event, relation or entity
 and related participants. For example, in FrameNet,
 a database of semantic frames,
 the description of an \verb+Entity+ in terms of physical space occupied by it is
@@ -85,14 +90,14 @@ Standard (S), optional & A point of comparison (for a jockey, ...) \\
 
 For example:
 
-\begin{table}[h]
+\begin{figure}[h]
 $$
 \Big[_\text{Size}\Big[_\text{E}\text{He} \Big]
   \text{is} \Big[_\text{D} \text{quite} \Big] \Big[_\text{LU}\text{tall} \Big]
   \Big[_\text{S} \text{for a jockey} \Big] \Big]
 $$
 \caption{A tagged example of \emph{Size}}
-\end{table}
+\end{figure}
 
 \section{A Rule}
 
@@ -100,17 +105,17 @@ A \verb+pmatch+ ruleset consists of a number of named regular expressions and
 functions, exactly one of which is the top-level rule which is named \verb+TOP+
 or is introduced with the directive \verb+regex+. For example:
 
-\begin{table}[h]
+\begin{listing}[h!]
 \small
-\begin{framed}
+%\begin{framed}
 \begin{verbatim}
 define my_colours {green} | {red};
 define TOP my_colours EndTag(colour);
 \end{verbatim}
-\end{framed}
 \normalsize
+%\end{framed}
 \caption{Introducing \texttt{pmatch} syntax}
-\end{table}
+\end{listing}
 
 The effect of the directive \verb+EndTag()+ is to tag whatever is matched by its
 rule (here shown with an unintentional effect):
@@ -143,26 +148,26 @@ noun phrase containing one of the LUs, such as
 ``brown dog'' as \verb+Entity+ and the combination as \verb+Size+.
 Our first rule for identifying this type of construction might be
 
-\begin{table}[h]
+\begin{listing}[h]
   \small
-  \begin{framed}
+%  \begin{framed}
 \begin{verbatim}
 define LU {small} | {large} |
   {big} EndTag(LU);
 define Size1 LU (Adjective)
-  Define(Noun EndTag(Entity));
+  [Noun].t(Entity);
 define TOP Size1 EndTag(Size);  
 \end{verbatim}
-\end{framed}
+%\end{framed}
 \normalsize
 \caption{A simplified first rule}
-\end{table}
+\end{listing}
 
 This ruleset has been simplified for brevity -- it has only a few of the
 permitted LUs, and word boundary issues have not been addressed.
 
-The \verb+Define()+ in the definition of \verb+Size1+ is an anonymous rule
-that delimits the effect of the \verb+EndTag+. The extra \verb+Adjective+ is
+The \verb+[].t()+ syntax in the definition of \verb+Size1+ is a tag delimiter
+that controls the area tagged as \verb+Entity+. The extra \verb+Adjective+ is
 optional, which is conveyed by the surrounding parentheses.
 
 We can verify that our rules extract instances of our desired pattern by compiling
@@ -206,23 +211,19 @@ A natural next step is to add optional non-core elements, such as an adverb
 preceding the LU being tagged as \verb+Degree+ and a noun phrase beginning with
 ``for a'' following it as \verb+Standard+.
 
-\begin{table}[h]
+\begin{listing}[h!]
   \small
-  \begin{framed}
 \begin{verbatim}
-define Size1
-  Define(Adverb EndTag(Degree))
-  LU (Adjective)
-  Define(Noun EndTag(Entity))
-  Define({for a} NP EndTag(Standard));
+define Size1 [Adverb].t(Degree)
+  LU (Adjective) [Noun].t(Entity)
+  [{for a} NP].t(Standard);
 \end{verbatim}
-\end{framed}
 \normalsize
 \caption{Extending the rule with optional elements}
-\end{table}
+\end{listing}
 
 Here are some examples this rule finds in the British National
-Corpus~(\newcite{bnc}).
+Corpus~\cite{bnc}.
 
 %\begin{table}[h]
   \small
@@ -265,13 +266,22 @@ to annotate physical size and physical size only.
 
 Size is a very metaphorical concept, and syntactic rules as above will produce a large amount of matches that relate to such uses, eg. ``a great cry'' or ``a big deal''. If we wish to refine our rules to detect such uses, there are a few avenues for refinement.
 
-First of all, some LUs are much more metaphorical than others. A ``great man'' is almost certainly a metaphorical use, whereas a ``large man'' is almost certainly concrete. Accuracy may be improved by requiring ``great'' to be used together with a common concrete complement, like ``great crowd''. This is a matter of running the rules on a corpus and doing some statistics on the result.
+First of all, some LUs are much more metaphorical than others. During the
+rule-writing process, a training set taken from a corpus (ideally a tagged corpus, but
+in this case taken from from a collection of appearances of the LU) is
+subjectively perused for more or less metaphorical cases.
 
-There are also semantic classifications of words, such as WordNet~(\newcite{wordnet}). We may compile the set of hyponyms of \emph{physical entity} and require them to appear as the nouns in our rules.
+A ``great man''
+is almost certainly a metaphorical use, whereas a ``large man'' is almost
+certainly concrete. Accuracy may be improved by requiring ``great'' to be used
+together with a common concrete complement, like ``great crowd''. Improvements
+are rejected or accepted on the basis of performance on the training set.
 
-\begin{table}[h]
+There are also semantic classifications of words, such as WordNet~\cite{wordnet}. We may compile the set of hyponyms of \emph{physical entity} and require them to appear as the nouns in our rules.
+
+\begin{listing}[h!]
 \small
-\begin{framed}
+%\begin{framed}
 \begin{verbatim}
 define phys_entity
   @txt"phys_entity.txt";
@@ -279,11 +289,13 @@ define phys_entity
 ! can be expanded to include
 ! eg. plurals by suitably composing
 ! it with a dictionary automaton
+define phys_entities
+  phys_entity .o. noun_baseform_expander;
 \end{verbatim}
-\end{framed}
+%\end{framed}
 \normalsize
 \caption{Reading an external linguistic resource}
-\end{table}
+\end{listing}
 
 \subsection{Incorporating Part-of-speech Information}
 
@@ -295,11 +307,10 @@ Considering that in writing our
 rules we are effectively doing shallow syntactic parsing, even a very simple
 way to identify parts of speech may suffice: a morphological dictionary.
 For example, a finite-state transducer representing English morphology may be
-used to define the class of common nouns as in table \ref{dictrules}.
+used to define the class of common nouns as in listing \ref{dictrules}.
 
-\begin{table}[h]
+\begin{listing}[h!]
 \small
-  \begin{framed}
 \begin{verbatim}
 ! The file we want to read
 define English @bin"english.hfst";
@@ -309,27 +320,26 @@ define Noun English .o.
  [?+ "<NN1>" | "<NN2>"].u;
 ! (NN1 is singular, NN2 plural)
 \end{verbatim}
-\end{framed}
   \normalsize
   \caption{Using a dictionary to write POS rules}
   \label{dictrules}
-  \end{table}
+  \end{listing}
 
 If we have the use of a part-of-speech tagger, we may write our rules to act
 on its output, as in table \ref{posrules}.
 
-\begin{table}[h]
+\begin{listing}[h!]
   \small
-  \begin{framed}
+%  \begin{framed}
 \begin{verbatim}
 define Noun LC(W) Wordchar+
  ["<NN1>"|"<NN2>"] RC(W);
 \end{verbatim}
-\end{framed}
+%\end{framed}
   \normalsize
   \caption{Using tags in pre-tagged text}
   \label{posrules}
-  \end{table}
+  \end{listing}
 
 \section{Increasing Coverage}
 Having considered for each rule where \verb+Degree+ and \verb+Standard+ may occur, coverage may be evaluated by also finding those cases where a LU is used as an adjective but hasn't been tagged, eg.
@@ -337,7 +347,7 @@ Having considered for each rule where \verb+Degree+ and \verb+Standard+ may occu
 \small
 \begin{verbatim}
 define TOP Size1 | Size2 | ...
- Define(LU EndTag(NonmatchingLU));
+ [LU].t(NonmatchingLU);
 \end{verbatim}
 \normalsize
 
