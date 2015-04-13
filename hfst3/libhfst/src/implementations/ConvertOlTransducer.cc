@@ -228,7 +228,8 @@ void get_states_and_symbols(
              it != flag_diacritics->end(); ++it) {
             if (!is_epsilon(*it)) {
                 string_symbol_map[*it] = symbol_table.size();
-                flag_symbols.insert(symbol_table.size());
+                // TODO: cl.exe: conversion from 'size_t' to 'char16_t'
+                flag_symbols.insert((unsigned short)symbol_table.size());
                 symbol_table.push_back(*it);
                 // don't increment seen_input_symbols - we use it for
                 // indexing

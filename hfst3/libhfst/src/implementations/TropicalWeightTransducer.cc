@@ -1936,12 +1936,13 @@ namespace hfst {
   {
     assert(t->InputSymbols() != NULL);
     SymbolTable * st = t->InputSymbols()->Copy();
+    // TODO: cl.exe: conversion from 'int64' to 'unsigned int'
     pair<unsigned int, unsigned int> old_pair
-      (st->AddSymbol(old_symbol_pair.first),
-       st->AddSymbol(old_symbol_pair.second));
+      ((unsigned int)st->AddSymbol(old_symbol_pair.first),
+       (unsigned int)st->AddSymbol(old_symbol_pair.second));
     pair<unsigned int, unsigned int> new_pair
-      (st->AddSymbol(new_symbol_pair.first),
-       st->AddSymbol(new_symbol_pair.second));
+      ((unsigned int)st->AddSymbol(new_symbol_pair.first),
+       (unsigned int)st->AddSymbol(new_symbol_pair.second));
     StdVectorFst * retval = substitute(t, old_pair, new_pair);
     retval->SetInputSymbols(st);
     delete st;

@@ -525,7 +525,7 @@ namespace hfst { namespace implementations {
               }
           }
         
-        hfst::HfstTwoLevelPath path(0, spv);
+        hfst::HfstTwoLevelPath path(float(0), spv);
         hfst::ExtractStringsCb::RetVal ret = callback(path, final);
         if(!ret.continueSearch || !ret.continuePath)
           {
@@ -671,7 +671,7 @@ namespace hfst { namespace implementations {
           }
         if (final_initial) {
           StringPairVector empty_spv;
-          HfstTwoLevelPath epsilon_path(0, empty_spv);
+          HfstTwoLevelPath epsilon_path(float(0), empty_spv);
           callback(epsilon_path, true /* final*/);
         }
       }
