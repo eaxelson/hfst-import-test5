@@ -72,6 +72,7 @@ char* input_symbol = 0;
 char* output_symbol = 0;
 char* symbol = 0;
 bool ends_only = false;
+bool arcs_only = false;
 char* tsv_file_name = 0;
 FILE* tsv_file = 0;
 
@@ -96,6 +97,7 @@ print_usage()
             "  -O, --output-symbol=OSYM   match arcs with output symbol OSYM\n"
             "  -S, --symbol=SYM           match arcs havins symbol SYM\n"
             "  -e, --end-states-only      match end states only, no arcs\n"
+            "  -A, --arcs-only            match arcs only, no end states\n"
             "  -T, --tsv-file=TFILE       read reweighting rules from TFILE\n"
             "\n");
     fprintf(message_out, "\n");
@@ -117,7 +119,8 @@ print_usage()
             "where w is weight of arc, and \n"
             "(ISYM == i) && (OSYM == o) && ((SYM == i) || (SYM == o)) ^^ \n"
             "(end state && -e).\n"
-            "\n");
+            "Weights are by default modified for all arcs and end states,\n"
+            "unless option --end-states-only or --arcs-only is used.\n");
     fprintf(message_out, "\n");
     print_report_bugs();
     fprintf(message_out, "\n");
@@ -145,14 +148,15 @@ parse_options(int argc, char** argv)
             {"input-symbol", required_argument, 0, 'I'},
             {"output-symbol", required_argument, 0, 'O'},
             {"symbol", required_argument, 0, 'S'},
-            {"end-state-only", required_argument, 0, 'e'},
+            {"end-states-only", no_argument, 0, 'e'},
+            {"arcs-only", no_argument, 0, 'A'},
             {"tsv", required_argument, 0, 'T'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "a:b:F:l:u:I:O:S:eT:",
+                             HFST_GETOPT_UNARY_SHORT "a:b:F:l:u:I:O:S:eT:A",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -256,12 +260,21 @@ parse_options(int argc, char** argv)
         case 'e':
           ends_only = true;
           break;
+        case 'A':
+          arcs_only = true;
+          break;
         case 'T':
           tsv_file_name = hfst_strdup(optarg);
           break;
 #include "inc/getopt-cases-error.h"
         }
     }
+
+    if (arcs_only && ends_only)
+      {
+        error(EXIT_FAILURE, 0, "Options '--arcs-only' and '--end-states-only' cannot be used at the same time");
+        return EXIT_FAILURE;
+      }
 
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
@@ -292,7 +305,7 @@ reweight(float w, const char* i, const char* o)
     }
   if ((i == 0) && (o == 0))
     {
-      if (!ends_only)
+      if (arcs_only)
         {
           return w;
         }
@@ -504,7 +517,11 @@ int main( int argc, char **argv ) {
       }
     if (ends_only)
       {
-        verbose_printf("only on final weights");
+        verbose_printf("only on final weights, no arcs");
+      }
+    if (arcs_only)
+      {
+        verbose_printf("only on arc weights, no end states");
       }
     // here starts the buffer handling part
     HfstInputStream* instream = NULL;
