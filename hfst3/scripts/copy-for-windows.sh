@@ -35,14 +35,16 @@ mkdir $1/back-ends/openfstwin/src/include
 mkdir $1/back-ends/openfstwin/src/include/fst
 mkdir $1/back-ends/openfstwin/src/lib
 
+# use an older version of openfst, newer versions either cause
+# an appcrash with cl.exe or require a compiler newer than vc10.
 for file in \
 compat flags fst properties symbol-table \
-symbol-table-ops util;
+util test-win; # file symbol-table-ops.cc not in version 1.2.6
 do
-    cp back-ends/openfstwin/src/lib/$file.cc $1/back-ends/openfstwin/src/lib/$file.cpp 
+    cp back-ends/openfstwin-1.2.6/src/lib/$file.cc $1/back-ends/openfstwin/src/lib/$file.cpp 
 done
 
-cp back-ends/openfstwin/src/include/fst/*.h $1/back-ends/openfstwin/src/include/fst/
+cp back-ends/openfstwin-1.2.6/src/include/fst/*.h $1/back-ends/openfstwin/src/include/fst/
 
 # libhfst/src and subdirectories
 mkdir $1/libhfst
@@ -59,7 +61,7 @@ HfstDataTypes.h HfstEpsilonHandler.h HfstExceptionDefs.h \
 HfstExceptions.h HfstExtractStrings.h HfstFlagDiacritics.h \
 HfstInputStream.h HfstLookupFlagDiacritics.h HfstOutputStream.h \
 HfstSymbolDefs.h HfstTokenizer.h HfstTransducer.h HfstXeroxRules.h \
-hfst.h hfst.hpp.in hfst_apply_schemas.h;
+hfst.h hfst.hpp.in hfst_apply_schemas.h hfstdll.h;
 do
     cp libhfst/src/$file $1/libhfst/src/
 done
@@ -69,7 +71,7 @@ HarmonizeUnknownAndIdentitySymbols HfstApply HfstDataTypes \
 HfstEpsilonHandler HfstExceptionDefs HfstExceptions HfstFlagDiacritics \
 HfstInputStream HfstLookupFlagDiacritics HfstOutputStream HfstRules \
 HfstSymbolDefs HfstTokenizer HfstTransducer HfstXeroxRules \
-HfstXeroxRulesTest;
+HfstXeroxRulesTest test-win;
 do
     cp libhfst/src/$file.cc $1/libhfst/src/$file.cpp
 done
@@ -148,10 +150,13 @@ done
 # make scripts and headers
 cp scripts/make-foma.bat $1/back-ends/foma/
 cp scripts/make-openfstwin.bat $1/back-ends/openfstwin/src/lib/
+cp scripts/test-openfstwin.bat $1/back-ends/openfstwin/src/lib/
 # cp scripts/make-parsers.bat $1/libhfst/src/parsers/
 # cp scripts/make-implementations.bat $1/libhfst/src/implementations/
 cp scripts/make-libhfst.bat $1/libhfst/src/
-cp scripts/generate-python-bindings.bat $1/libhfst/src
+cp scripts/test-libhfst.bat $1/libhfst/src/
+cp scripts/generate-python-bindings.bat $1/libhfst/src/
+cp scripts/libhfst_win.i $1/libhfst/src/
 
 # copy missing headers and change some headers included
 cp scripts/stdint.h $1/back-ends/foma/
