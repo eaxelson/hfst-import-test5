@@ -1,7 +1,7 @@
 copy ..\..\back-ends\foma\libfoma.* .
 copy ..\..\back-ends\openfstwin\src\lib\openfst.* .
 cl /EHsc /LD /Felibhfst.dll ^
-/D HAVE_FOMA /D HAVE_OPENFST ^
+/D HAVE_FOMA /D HAVE_OPENFST /D HFSTEXPORT /D_MSC_VER /DWINDOWS /DWIN32 ^
 /I..\..\libhfst\src /I..\..\back-ends\foma /I..\..\back-ends /I..\..\back-ends\openfstwin\src\include /I ..\.. ^
 /Iparsers /I..\.. /I..\..\libhfst\src /I..\..\libhfst\src\parsers /I..\..\back-ends\foma /I..\..\back-ends /I..\..\back-ends\openfstwin\src\include ^
 HfstApply.cpp ^
