@@ -7,6 +7,8 @@
 void hfst_set_exception(std::string name);
 std::string hfst_get_exception();
 
+#include "hfstdll.h"
+
 //! @file HfstExceptionDefs.h
 //! @brief A file for exceptions
 
@@ -20,7 +22,7 @@ struct HfstException
   HfstException(void);
   HfstException(const std::string &name,const std::string &file,size_t line);
   //! @brief Get the error message.
-  std::string operator() (void) const;
+  HFSTDLL std::string operator() (void) const;
 };
 
 //! @brief Macro to throw an exception of type @a E.

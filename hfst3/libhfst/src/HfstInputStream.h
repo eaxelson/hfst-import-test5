@@ -18,6 +18,8 @@
 
 #include "HfstDataTypes.h"
 
+#include "hfstdll.h"
+
 /** @file HfstInputStream.h 
     \brief Declaration of class HfstInputStream.
  */
@@ -231,7 +233,7 @@ For documentation on the HFST binary transducer format, see
         @throws EndOfStreamException
         @throws TransducerHeaderException
     */
-    HfstInputStream(void);
+    HFSTDLL HfstInputStream(void);
 
     /** \brief Open a stream to file \a filename for reading binary 
         transducers. 
@@ -244,29 +246,29 @@ For documentation on the HFST binary transducer format, see
         @throws EndOfStreamException
         @throws TransducerHeaderException
     */
-    HfstInputStream(const std::string &filename);
+    HFSTDLL HfstInputStream(const std::string &filename);
 
     /** \brief Destructor. */
-    ~HfstInputStream(void);
+    HFSTDLL ~HfstInputStream(void);
 
     /** \brief Close the stream.
 
         If the stream points to standard input, nothing is done. */
-    void close(void);
+    HFSTDLL void close(void);
 
     /** \brief Whether the stream is at end. */
-    bool is_eof(void);
+    HFSTDLL bool is_eof(void);
     /** \brief Whether badbit is set. */
-    bool is_bad(void);
+    HFSTDLL bool is_bad(void);
     /** \brief Whether the state of the stream is good for input operations. */
-    bool is_good(void);
+    HFSTDLL bool is_good(void);
     
     /** \brief The type of the first transducer in the stream. 
 
         By default, all transducers in a stream have the same type, else
         a TransducerTypeMismatchException is thrown when reading the first
     transducer that has a different type than the previous ones. */
-    ImplementationType get_type(void) const;
+    HFSTDLL ImplementationType get_type(void) const;
 
     friend class HfstTransducer;
   };

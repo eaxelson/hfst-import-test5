@@ -18,6 +18,8 @@
 #include <climits>
 #include <string>
 
+#include "hfstdll.h"
+
 /** @file HfstTokenizer.h
     \brief Declaration of class #hfst::HfstTokenizer. */
 
@@ -50,10 +52,10 @@ namespace hfst
     MultiCharSymbolTrie * get_symbol_rest_trie(const char * p) const;
 
   public:
-    MultiCharSymbolTrie(void);
-    ~MultiCharSymbolTrie(void);
-    void add(const char * p);
-    const char * find(const char * p) const;  
+    HFSTDLL MultiCharSymbolTrie(void);
+    HFSTDLL ~MultiCharSymbolTrie(void);
+    HFSTDLL void add(const char * p);
+    HFSTDLL const char * find(const char * p) const;  
   };
   
   /** \brief A tokenizer for creating transducers from UTF-8 strings.
@@ -93,7 +95,7 @@ namespace hfst
   public:
 
     /** \brief Create a tokenizer that recognizes utf-8 symbols. */
-    HfstTokenizer();
+    HFSTDLL HfstTokenizer();
 
     /** \brief Add a symbol to be skipped to this tokenizer. 
 
@@ -101,7 +103,7 @@ namespace hfst
         For example if we have a multicharacter symbol "foo" and a 
         skip symbol "bar", the string "fobaro" will be tokenized 
         "f" "o" "o", not "foo". */
-    void add_skip_symbol(const std::string &symbol);
+    HFSTDLL void add_skip_symbol(const std::string &symbol);
 
     /** \brief Add a multicharacter symbol \a symbol to this tokenizer. 
 
@@ -109,15 +111,15 @@ namespace hfst
         not considered a multicharacter symbol. For example if we have 
         a multicharacter symbol "foo" and a skip symbol "bar", the string
         "fobaro" will be tokenized "f" "o" "o", not "foo". */
-    void add_multichar_symbol(const std::string& symbol);
+    HFSTDLL void add_multichar_symbol(const std::string& symbol);
 
     /** \brief Tokenize the string \a input_string. */
-    StringPairVector tokenize(const std::string &input_string) const;
+    HFSTDLL StringPairVector tokenize(const std::string &input_string) const;
 
     /** \brief Tokenize the string \a input_string. */
-    StringVector tokenize_one_level(const std::string &input_string) const;
+    HFSTDLL StringVector tokenize_one_level(const std::string &input_string) const;
 
-    static StringPairVector tokenize_space_separated(const std::string & str);
+    HFSTDLL static StringPairVector tokenize_space_separated(const std::string & str);
 
     /** \brief Tokenize the string pair \a input_string : \a output_string. 
 
@@ -125,14 +127,14 @@ namespace hfst
         inserted to the end of the tokenized string with less tokens
         so that both tokenized strings have the same number of tokens.
      */
-    StringPairVector tokenize(const std::string &input_string,
+    HFSTDLL StringPairVector tokenize(const std::string &input_string,
                               const std::string &output_string) const;
 
-    StringPairVector tokenize(const std::string &input_string,
+    HFSTDLL StringPairVector tokenize(const std::string &input_string,
                               const std::string &output_string,
                               void (*warn_about_pair)(const std::pair<std::string, std::string> &symbol_pair)) const;
 
-    StringPairVector tokenize_and_align_flag_diacritics
+    HFSTDLL StringPairVector tokenize_and_align_flag_diacritics
       (const std::string &input_string,
        const std::string &output_string,
        void (*warn_about_pair)(const std::pair<std::string, std::string> &symbol_pair)) const;
@@ -154,7 +156,7 @@ namespace hfst
     //!     -# Initial bytes 11110xxx are followed by exactly three 
     //!        continuation bytes.
     //! (For reference: http://en.wikipedia.org/wiki/UTF-8)
-    static void check_utf8_correctness(const std::string &input_string);
+    HFSTDLL static void check_utf8_correctness(const std::string &input_string);
   };
 }
 #endif
