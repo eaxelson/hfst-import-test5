@@ -60,6 +60,8 @@
 #include <map>
 #include <set>
 
+#include "hfstdll.h"
+
 /** @file HfstTransducer.h
     \brief Declarations of HFST API functions and datatypes. 
 
@@ -113,19 +115,19 @@ namespace hfst
   //  using hfst::implementations::MyTransducerLibraryTransducer;
   //#endif // #if HAVE_MY_TRANSDUCER_LIBRARY
 
-  HfstFile hfst_open(const char * filename, const char * mode);
-  HfstFile hfst_stdout();
-  HfstFile hfst_stdin();
+  HFSTDLL HfstFile hfst_open(const char * filename, const char * mode);
+  HFSTDLL HfstFile hfst_stdout();
+  HFSTDLL HfstFile hfst_stdin();
 
   // *** TESTING AND OPTIMIZATION...
 
 #if HAVE_XFSM
-  void initialize_xfsm();
+  HFSTDLL void initialize_xfsm();
 
   class InitializeXfsm
   {
   public:
-    InitializeXfsm();
+    HFSTDLL InitializeXfsm();
   };
 #endif
 
@@ -133,32 +135,32 @@ namespace hfst
   /* Which minimization algorithm is used. 
      In foma, Hopcroft is always used. 
      In OpenFst and SFST, the default algorithm is Hopcroft. */
-  void set_minimization_algorithm(MinimizationAlgorithm);
-  MinimizationAlgorithm get_minimization_algorithm(); 
+  HFSTDLL void set_minimization_algorithm(MinimizationAlgorithm);
+  HFSTDLL MinimizationAlgorithm get_minimization_algorithm(); 
 
-  void set_encode_weights(bool);
-  bool get_encode_weights();
+  HFSTDLL void set_encode_weights(bool);
+  HFSTDLL bool get_encode_weights();
 
-  void set_minimize_even_if_already_minimal(bool);
-  bool get_minimize_even_if_already_minimal();
+  HFSTDLL void set_minimize_even_if_already_minimal(bool);
+  HFSTDLL bool get_minimize_even_if_already_minimal();
 
-  void set_xerox_composition(bool);
-  bool get_xerox_composition();
+  HFSTDLL void set_xerox_composition(bool);
+  HFSTDLL bool get_xerox_composition();
 
-  void set_flag_is_epsilon_in_composition(bool);
-  bool get_flag_is_epsilon_in_composition();
+  HFSTDLL void set_flag_is_epsilon_in_composition(bool);
+  HFSTDLL bool get_flag_is_epsilon_in_composition();
 
   /* Whether in harmonization the smaller transducer is always harmonized
      according to the bigger transducer. */
-  void set_harmonize_smaller(bool);
-  bool get_harmonize_smaller();
+  HFSTDLL void set_harmonize_smaller(bool);
+  HFSTDLL bool get_harmonize_smaller();
 
   /* Whether unknown and identity symbols are used. By default, they are used.
      These symbols are always reserved for use and included in alphabets 
      of transducers, but code optimization is possible if it is known 
      that they do not appear in transducer transitions. */
-  void set_unknown_symbols_in_use(bool);
-  bool get_unknown_symbols_in_use();
+  HFSTDLL void set_unknown_symbols_in_use(bool);
+  HFSTDLL bool get_unknown_symbols_in_use();
 
   // *** ...TESTING AND OPTIMIZATION
 
@@ -367,12 +369,12 @@ An example:
   public:
     /* whether HFST is linked to the transducer library 
        needed by implementation type \a type. */
-    static bool is_implementation_type_available(ImplementationType type);
+    HFSTDLL static bool is_implementation_type_available(ImplementationType type);
 
-    unsigned int number_of_states() const;
-    unsigned int number_of_arcs() const;
+    HFSTDLL unsigned int number_of_states() const;
+    HFSTDLL unsigned int number_of_arcs() const;
 
-    void twosided_flag_diacritics();
+    HFSTDLL void twosided_flag_diacritics();
 
   protected:
     /* For internal use: Create a tokenizer that recognizes all symbols 
@@ -432,12 +434,12 @@ An example:
        const std::string &epsilon_symbol);
 
   public:
-    static HfstTransducer * prolog_file_to_xfsm_transducer(const char * filename);
+    HFSTDLL static HfstTransducer * prolog_file_to_xfsm_transducer(const char * filename);
 
 
     /* For debugging */
   public:
-    void print_alphabet();
+    HFSTDLL void print_alphabet();
   protected:
     static float get_profile_seconds(ImplementationType type);
 
@@ -460,7 +462,7 @@ An example:
         uninitialized. An uninitialized transducer is likely to cause a
         TransducerHasWrongTypeException at some point unless it is given
     a value at some point. */
-    HfstTransducer();
+    HFSTDLL HfstTransducer();
 
     /** \brief Create an empty transducer, i.e. a transducer that does not 
         recognize any string. The type of the transducer is defined by \a type.
@@ -468,7 +470,7 @@ An example:
         @note Use HfstTransducer("@_EPSILON_SYMBOL_@") 
         to create an epsilon transducer.
      **/
-    HfstTransducer(ImplementationType type);
+    HFSTDLL HfstTransducer(ImplementationType type);
 
     /** \brief Create a transducer by tokenizing the utf8 string \a utf8_string
         with tokenizer \a multichar_symbol_tokenizer.
@@ -488,7 +490,7 @@ An example:
 \endverbatim
 
         @see HfstTokenizer **/
-    HfstTransducer(const std::string& utf8_str, 
+    HFSTDLL HfstTransducer(const std::string& utf8_str, 
            const HfstTokenizer &multichar_symbol_tokenizer,
                    ImplementationType type);
 
@@ -516,7 +518,7 @@ An example:
 \endverbatim
 
         @see HfstTokenizer **/
-    HfstTransducer(const std::string& input_utf8_str,
+    HFSTDLL HfstTransducer(const std::string& input_utf8_str,
                    const std::string& output_utf8_str,
                    const HfstTokenizer &multichar_symbol_tokenizer,
                    ImplementationType type);
@@ -525,18 +527,18 @@ An example:
        \a sps. The type of the transducer is defined by \a type. \a cyclic
        defines whether the transducer recognizes any number (from zero to
        infinity, inclusive) of consecutive string pairs in \s sps. */
-    HfstTransducer(const StringPairSet & sps, ImplementationType type, 
+    HFSTDLL HfstTransducer(const StringPairSet & sps, ImplementationType type, 
                    bool cyclic=false);
 
     /* \brief Create a transducer that recognizes the concatenation of
        string pairs in \a spv. The type of the transducer is defined
        by \a type. */
-    HfstTransducer(const StringPairVector & spv, ImplementationType type);
+    HFSTDLL HfstTransducer(const StringPairVector & spv, ImplementationType type);
 
     /* \brief Create a transducer that recognizes the concatenation of the 
        unions of string pairs in string pair sets in \a spsv. The type of
        the transducer is defined by \a type. */
-    HfstTransducer(const std::vector<StringPairSet> & spsv, 
+    HFSTDLL HfstTransducer(const std::vector<StringPairSet> & spsv, 
                    ImplementationType type);
 
     /** \brief Read a binary transducer from transducer stream \a in. 
@@ -559,29 +561,29 @@ An example:
         @throws MissingOpenFstInputSymbolTableException
   
         @see HfstInputStream **/
-    HfstTransducer(HfstInputStream &in);
+    HFSTDLL HfstTransducer(HfstInputStream &in);
 
     /** \brief Create a deep copy of transducer \a another. **/
-    HfstTransducer(const HfstTransducer &another);
+    HFSTDLL HfstTransducer(const HfstTransducer &another);
 
     /** \brief Create an HFST transducer equivalent to 
         HFST basic transducer \a t. The type of the created transducer
         is defined by \a type.  **/
-    HfstTransducer(const hfst::implementations::HfstBasicTransducer &t, 
+    HFSTDLL HfstTransducer(const hfst::implementations::HfstBasicTransducer &t, 
                    ImplementationType type);
 
     /** \brief Create a transducer that recognizes the string pair
         &lt;"symbol","symbol"&gt;, i.e. [symbol:symbol]. 
         The type of the transducer is defined by \a type. 
         @see String **/
-    HfstTransducer(const std::string &symbol, ImplementationType type);
+    HFSTDLL HfstTransducer(const std::string &symbol, ImplementationType type);
 
     /** \brief Create a transducer that recognizes the string pair 
         &lt;"isymbol","osymbol"&gt;, i.e [isymbol:osymbol]. 
         The type of the transducer is defined by \a type. 
         @see String **/
-    HfstTransducer(const std::string &isymbol, const std::string &osymbol, 
-                   ImplementationType type);
+    HFSTDLL HfstTransducer(const std::string &isymbol, const std::string &osymbol, 
+                           ImplementationType type);
 
     /** \brief Create a transducer of type \a type as defined in AT&T format 
         in FILE \a ifile. \a epsilon_symbol defines how epsilons 
@@ -656,24 +658,24 @@ in \a ifile.
 @see #write_in_att_format(FILE*,bool)const 
 @see String
 **/
-    HfstTransducer(FILE * ifile, ImplementationType type, 
+    HFSTDLL HfstTransducer(FILE * ifile, ImplementationType type, 
                    const std::string &epsilon_symbol, unsigned int & linecount);
 
-    HfstTransducer(FILE * ifile, ImplementationType type, 
+    HFSTDLL HfstTransducer(FILE * ifile, ImplementationType type, 
                    const std::string &epsilon_symbol);
 
-    HfstTransducer(HfstFile &ifile, ImplementationType type, 
+    HFSTDLL HfstTransducer(HfstFile &ifile, ImplementationType type, 
                    const std::string &epsilon_symbol);
 
 
     /** \brief Destructor. **/
-    virtual ~HfstTransducer(void);
+    HFSTDLL virtual ~HfstTransducer(void);
 
     /** @brief Assign this transducer a new value equivalent to transducer
         \a another. */
-    HfstTransducer &operator=(const HfstTransducer &another);
+    HFSTDLL HfstTransducer &operator=(const HfstTransducer &another);
 
-    HfstTransducer &assign(const HfstTransducer &another);
+    HFSTDLL HfstTransducer &assign(const HfstTransducer &another);
 
     // ------------------------------------------------------------
     // ----------- Properties, comparison, conversion -------------
@@ -681,11 +683,11 @@ in \a ifile.
 
     /** \brief Rename the transducer \a name. 
         @see get_name */
-    void set_name(const std::string &name);
+    HFSTDLL void set_name(const std::string &name);
 
     /** \brief Get the name of the transducer. 
         @see set_name */
-    std::string get_name() const;
+    HFSTDLL std::string get_name() const;
 
     /**
      * @brief Set arbitrary string property @a property to @a value.
@@ -696,26 +698,26 @@ in \a ifile.
      *        that does not follow this convention may affect the behavior of
      *        transducer in future releases.
      */
-    void set_property(const std::string& property, const std::string& value);
+    HFSTDLL void set_property(const std::string& property, const std::string& value);
     
     /** 
      * @brief Get arbitrary string propert @a property.
      *        get_property("name") works like get_name.
      */
-    std::string get_property(const std::string& property) const;
+    HFSTDLL std::string get_property(const std::string& property) const;
     /**
      *  @brief Get all properties form transducer.
      */
-    const std::map<std::string,std::string>& get_properties() const;
+    HFSTDLL const std::map<std::string,std::string>& get_properties() const;
     /** \brief Get the alphabet of the transducer. 
     
     The alphabet is defined as the set of symbols known 
     to the transducer. */
-    StringSet get_alphabet() const;
+    HFSTDLL StringSet get_alphabet() const;
 
     /** \brief Get first input level symbols of strings recognized 
         (or rejected, if they end in a non-final state) by the transducer. */
-    StringSet get_first_input_symbols() const;
+    HFSTDLL StringSet get_first_input_symbols() const;
 
     /** \brief Harmonize transducers this and another.
 
@@ -725,15 +727,15 @@ in \a ifile.
        Then the unknown and identity symbols are expanded
        in both transducers. If this and \a another have type FOMA_TYPE, 
        nothing is done, since foma takes care of harmonization. */
-    void harmonize(HfstTransducer &another);
+    HFSTDLL void harmonize(HfstTransducer &another);
 
     /** \brief Explicitly insert \a symbol to the alphabet 
     of the transducer. 
 
     @note Usually this function is not needed since new symbols are
     added to the alphabet by default. */
-    void insert_to_alphabet(const std::string &symbol); 
-    void insert_to_alphabet(const std::set<std::string> &symbols); 
+    HFSTDLL void insert_to_alphabet(const std::string &symbol); 
+    HFSTDLL void insert_to_alphabet(const std::set<std::string> &symbols); 
 
     /** \brief Remove \a symbol from the alphabet of the transducer.
     CURRENTLY NOT IMPLEMENTED.
@@ -741,11 +743,11 @@ in \a ifile.
     @pre \a symbol does not occur in any transition of the transducer.
     @note Use with care, removing a symbol that occurs in a transition
     of the transducer can have unexpected results. */
-    void remove_from_alphabet(const std::string &symbol);
-    void remove_from_alphabet(const std::set<std::string> &symbols);
+    HFSTDLL void remove_from_alphabet(const std::string &symbol);
+    HFSTDLL void remove_from_alphabet(const std::set<std::string> &symbols);
 
     // For XFSM format
-    void remove_symbols_from_alphabet(const StringSet & symbols);
+    HFSTDLL void remove_symbols_from_alphabet(const StringSet & symbols);
 
 
     /** @brief Remove all symbols that do not occur in transitions of
@@ -759,16 +761,16 @@ in \a ifile.
 
         Epsilon, unknown and identity \link hfst::String symbols\endlink
         are always included in the alphabet. */
-    HfstTransducer &prune_alphabet(bool force=true);
+    HFSTDLL HfstTransducer &prune_alphabet(bool force=true);
 
     /** \brief Whether the transducer is cyclic. */
-    bool is_cyclic(void) const;
+    HFSTDLL bool is_cyclic(void) const;
 
     /** \brief Whether the transducer is an automaton. */
-    bool is_automaton(void) const;
+    HFSTDLL bool is_automaton(void) const;
 
     /** \brief The implementation type of the transducer. */
-    ImplementationType get_type(void) const;
+    HFSTDLL ImplementationType get_type(void) const;
 
     /** \brief Whether this transducer and \a another are equivalent.
 
@@ -776,7 +778,7 @@ in \a ifile.
         string pairs with the same weights
         and the same alignments. 
     */
-    bool compare(const HfstTransducer &another, bool harmonize=true) const;
+    HFSTDLL bool compare(const HfstTransducer &another, bool harmonize=true) const;
 
     /** \brief Convert the transducer into an equivalent transducer 
         in format \a type. 
@@ -794,7 +796,7 @@ in \a ifile.
         @note For conversion between implementations::HfstTransitionGraph and HfstTransducer,
         see HfstTransducer(const hfst::implementations::HfstBasicTransducer&, ImplementationType) and #hfst::implementations::HfstTransitionGraph::HfstTransitionGraph(const hfst::HfstTransducer&).
     */
-    HfstTransducer &convert(ImplementationType type, std::string options="");
+    HFSTDLL HfstTransducer &convert(ImplementationType type, std::string options="");
 
 
     // --------------------------------------------------------
@@ -855,21 +857,21 @@ This will yield a file "testfile.att" that looks as follows:
 
         @see operator<<(std::ostream &out, const HfstTransducer &t)
         @see HfstTransducer(FILE*, ImplementationType, const std::string&) */
-    void write_in_att_format(FILE * ofile, bool write_weights=true) const;
+    HFSTDLL void write_in_att_format(FILE * ofile, bool write_weights=true) const;
 
-    void write_in_att_format(HfstFile & ofile, bool write_weights=true) const;
+    HFSTDLL void write_in_att_format(HfstFile & ofile, bool write_weights=true) const;
 
-    void write_in_att_format(char * buffer, bool write_weights=true) const;
+    HFSTDLL void write_in_att_format(char * buffer, bool write_weights=true) const;
 
     /* For XFSM_TYPE. */
-    void write_xfsm_transducer_in_att_format(const char * filename) const;
-    void write_xfsm_transducer_in_prolog_format(const char * filename) const;
+    HFSTDLL void write_xfsm_transducer_in_att_format(const char * filename) const;
+    HFSTDLL void write_xfsm_transducer_in_prolog_format(const char * filename) const;
 
     /* For other types. */
-    void write_in_prolog_format(FILE * file, const std::string & name,
+    HFSTDLL void write_in_prolog_format(FILE * file, const std::string & name,
                                 bool write_weights=true);
 
-    void write_in_att_format_number
+    HFSTDLL void write_in_att_format_number
       (FILE * ofile, bool write_weights=true) const;
 
 
@@ -881,8 +883,8 @@ This will yield a file "testfile.att" that looks as follows:
         If the file does not exist, it is created. 
 
         @see #write_in_att_format */
-    void write_in_att_format(const std::string &filename, 
-                             bool write_weights=true) const;
+    HFSTDLL void write_in_att_format(const std::string &filename, 
+                                     bool write_weights=true) const;
 
 
   public:
@@ -895,7 +897,7 @@ This will yield a file "testfile.att" that looks as follows:
         indicating unlimited. Note that if the transducer is cyclic and 
         cycles aren't capped,
         the search will not end until the callback returns false. */
-    void extract_paths(ExtractStringsCb& callback, int cycles=-1) const;
+    HFSTDLL void extract_paths(ExtractStringsCb& callback, int cycles=-1) const;
 
     /** \brief Extract a maximum of \a max_num paths that are 
         recognized by the transducer following a maximum of \a cycles cycles
@@ -978,31 +980,31 @@ ccc : ddd
         @see #n_best 
         @see hfst::HfstTransducer::extract_paths_fd(hfst::HfstTwoLevelPaths&, int, int, bool) const
     */
-    void extract_paths
+    HFSTDLL void extract_paths
       (HfstTwoLevelPaths &results, int max_num=-1, int cycles=-1) const;
 
-    void extract_random_paths
+    HFSTDLL void extract_random_paths
       (HfstTwoLevelPaths &results, int max_num) const;
 
-    void extract_random_paths_fd
+    HFSTDLL void extract_random_paths_fd
       (HfstTwoLevelPaths &results, int max_num, bool filter_fd) const;
 
     /* \brief Call \a callback with extracted strings that are not 
        invalidated by flag diacritic rules.
 
        @see extract_paths(HfstTwoLevelPaths&, int, int) */
-    void extract_paths_fd
+    HFSTDLL void extract_paths_fd
       (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true) const;
 
     // todo: handle flag diacritics
     // todo: throw TransducerIsCyclicException, if cyclic
-    void extract_shortest_paths
+    HFSTDLL void extract_shortest_paths
       (HfstTwoLevelPaths &results) const;
     
-    bool extract_longest_paths
+    HFSTDLL bool extract_longest_paths
       (HfstTwoLevelPaths &results, bool obey_flags=true /*,bool show_flags=false*/) const;
 
-    int longest_path_size(bool obey_flags=true) const;
+    HFSTDLL int longest_path_size(bool obey_flags=true) const;
 
   public:
     /** \brief Extract a maximum of \a max_num paths that are 
@@ -1038,7 +1040,7 @@ ccc : ddd
         @bug Does not work for HFST_OL_TYPE or HFST_OLW_TYPE?
         @throws TransducerIsCyclicException
         @see extract_paths(HfstTwoLevelPaths&, int, int) const */
-    void extract_paths_fd
+    HFSTDLL void extract_paths_fd
       (HfstTwoLevelPaths &results, int max_num=-1, int cycles=-1, 
        bool filter_fd=true) const;
 
@@ -1052,7 +1054,7 @@ ccc : ddd
     //! @todo Handle flag diacritics as ordinary symbols instead of calling
     //!       lookup_fd.
     //! @sa lookup_fd
-    HfstOneLevelPaths * lookup(const StringVector& s,
+    HFSTDLL HfstOneLevelPaths * lookup(const StringVector& s,
                    ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string \a s and
@@ -1060,7 +1062,7 @@ ccc : ddd
     //! 
     //! This is an overloaded lookup function that leaves tokenizing to the
     //! transducer.
-    HfstOneLevelPaths * lookup(const std::string & s,
+    HFSTDLL HfstOneLevelPaths * lookup(const std::string & s,
                    ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string \a s minding flag diacritics
@@ -1092,7 +1094,7 @@ ccc : ddd
     //!
     //! @todo Do not ignore argument \a limit.
     //!
-    HfstOneLevelPaths * lookup_fd(const StringVector& s,
+    HFSTDLL HfstOneLevelPaths * lookup_fd(const StringVector& s,
                   ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string \a s minding flag diacritics
@@ -1109,7 +1111,7 @@ ccc : ddd
     //!
     //!
     //!@sa lookup_fd
-    HfstOneLevelPaths * lookup_fd(const std::string& s,
+    HFSTDLL HfstOneLevelPaths * lookup_fd(const std::string& s,
                   ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string \a s and store a maximum of 
@@ -1120,7 +1122,7 @@ ccc : ddd
     //! #lookup(const StringVector&, ssize_t) const
     //! but lookup is not done using a string and a tokenizer instead of
     //! a StringVector.
-    HfstOneLevelPaths * lookup(const HfstTokenizer& tok,
+    HFSTDLL HfstOneLevelPaths * lookup(const HfstTokenizer& tok,
                    const std::string &s, ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string \a s minding flag diacritics 
@@ -1131,7 +1133,7 @@ ccc : ddd
     //! #lookup_fd(const StringVector&, ssize_t) const 
     //! but uses a tokenizer and a string instead of a StringVector.
     //!
-    HfstOneLevelPaths * lookup_fd(
+    HFSTDLL HfstOneLevelPaths * lookup_fd(
     const HfstTokenizer& tok,
     const std::string &s, ssize_t limit = -1) const;
 
@@ -1149,10 +1151,10 @@ ccc : ddd
     //!             may get stuck if infinitely ambiguous
     //! @return  output parameter to store unique results
     //! @todo todo
-    HfstOneLevelPaths * lookdown(const StringVector& s,
+    HFSTDLL HfstOneLevelPaths * lookdown(const StringVector& s,
                  ssize_t limit = -1) const;
 
-    HfstOneLevelPaths * lookdown(const std::string& s,
+    HFSTDLL HfstOneLevelPaths * lookdown(const std::string& s,
                  ssize_t limit = -1) const;
 
     //! @brief (Not implemented) Lookdown a single string minding 
@@ -1163,10 +1165,10 @@ ccc : ddd
     //!
     //! @sa lookdown
     //! @todo todo
-    HfstOneLevelPaths * lookdown_fd(StringVector& s,
+    HFSTDLL HfstOneLevelPaths * lookdown_fd(StringVector& s,
                     ssize_t limit = -1) const;
 
-    HfstOneLevelPaths * lookdown_fd(const std::string& s,
+    HFSTDLL HfstOneLevelPaths * lookdown_fd(const std::string& s,
                     ssize_t limit = -1) const;
 
     //! @brief Whether lookup of path \a s will have infinite results.
@@ -1176,37 +1178,37 @@ ccc : ddd
     //! i.e. the argument \a s is ignored.
     //!
     //! @see lookup(HfstOneLevelPaths&, const StringVector&, ssize_t) const
-    bool is_lookup_infinitely_ambiguous(const StringVector & s) const;
-    bool is_lookup_infinitely_ambiguous(const std::string & s) const;
+    HFSTDLL bool is_lookup_infinitely_ambiguous(const StringVector & s) const;
+    HFSTDLL bool is_lookup_infinitely_ambiguous(const std::string & s) const;
 
     //! @brief (Not implemented) Whether lookdown of path \a s will have
     //! infinite results.
     //! @todo todo
-    bool is_lookdown_infinitely_ambiguous(const StringVector& s) const;
+    HFSTDLL bool is_lookdown_infinitely_ambiguous(const StringVector& s) const;
 
-    bool is_infinitely_ambiguous() const ;
+    HFSTDLL bool is_infinitely_ambiguous() const ;
 
 
     // -------------------------------------------
     // --------- Optimization operations ---------
     // -------------------------------------------
 
-    HfstTransducer &eliminate_flags();
-    HfstTransducer &eliminate_flag(const std::string &flag);
+    HFSTDLL HfstTransducer &eliminate_flags();
+    HFSTDLL HfstTransducer &eliminate_flag(const std::string &flag);
 
     /** \brief Remove all <i>epsilon:epsilon</i> transitions 
         from the transducer so that the transducer remains equivalent. */
-    HfstTransducer &remove_epsilons();
+    HFSTDLL HfstTransducer &remove_epsilons();
 
     /** \brief Make transducer coaccessible. */
-    HfstTransducer &prune();
+    HFSTDLL HfstTransducer &prune();
 
     /** \brief Determinize the transducer.
 
         Determinizing a transducer yields an equivalent transducer that has
         no state with two or more transitions whose input:output symbol
         pairs are the same. */
-    HfstTransducer &determinize();
+    HFSTDLL HfstTransducer &determinize();
 
     /** \brief Minimize the transducer.
 
@@ -1215,7 +1217,7 @@ ccc : ddd
      
         @bug OpenFst's minimization algorithm seems to add epsilon 
         transitions to weighted transducers? */
-    HfstTransducer &minimize();
+    HFSTDLL HfstTransducer &minimize();
 
     /** \brief Extract \a n best paths of the transducer. 
 
@@ -1232,7 +1234,7 @@ ccc : ddd
         #SFST_TYPE. If HFST is not linked to OpenFst library, an
         ImplementationTypeNotAvailableException is thrown.
     */
-    HfstTransducer &n_best(unsigned int n);
+    HFSTDLL HfstTransducer &n_best(unsigned int n);
 
 
     // ------------------------------------------------
@@ -1241,60 +1243,60 @@ ccc : ddd
 
     /** \brief A concatenation of N transducers where N is any number 
         from zero to infinity. */
-    HfstTransducer &repeat_star();
+    HFSTDLL HfstTransducer &repeat_star();
 
     /** \brief A concatenation of N transducers where N is any number 
         from one to infinity. */
-    HfstTransducer &repeat_plus();
+    HFSTDLL HfstTransducer &repeat_plus();
 
     /** \brief A concatenation of \a n transducers. */
-    HfstTransducer &repeat_n(unsigned int n);
+    HFSTDLL HfstTransducer &repeat_n(unsigned int n);
 
     /** \brief A concatenation of N transducers where N is any number 
         from zero to \a n, inclusive.*/
-    HfstTransducer &repeat_n_minus(unsigned int n);
+    HFSTDLL HfstTransducer &repeat_n_minus(unsigned int n);
 
     /** \brief A concatenation of N transducers where N is any number 
         from \a n to infinity, inclusive.*/
-    HfstTransducer &repeat_n_plus(unsigned int n);
+    HFSTDLL HfstTransducer &repeat_n_plus(unsigned int n);
 
     /** \brief A concatenation of N transducers where N is any number 
         from \a n to \a k, inclusive.*/
-    HfstTransducer& repeat_n_to_k(unsigned int n, unsigned int k);
+    HFSTDLL HfstTransducer& repeat_n_to_k(unsigned int n, unsigned int k);
 
     /** \brief Disjunct the transducer with an epsilon transducer. */
-    HfstTransducer &optionalize();
+    HFSTDLL HfstTransducer &optionalize();
 
     /** \brief Swap the input and output symbols of each transition 
         in the transducer. */
-    HfstTransducer &invert();
+    HFSTDLL HfstTransducer &invert();
 
     /** \brief Reverse the transducer. 
 
         A reverted transducer accepts the string "n(0) n(1) ... n(N)" 
         iff the original
         transducer accepts the string "n(N) n(N-1) ... n(0)" */
-    HfstTransducer &reverse();
+    HFSTDLL HfstTransducer &reverse();
 
     /** \brief Extract the input language of the transducer. 
 
         All transition symbol pairs <i>isymbol:osymbol</i> are changed 
         to <i>isymbol:isymbol</i>. */
-    HfstTransducer &input_project();
+    HFSTDLL HfstTransducer &input_project();
 
     /** \brief Extract the output language of the transducer.
 
         All transition symbol pairs <i>isymbol:osymbol</i> are changed 
         to <i>osymbol:osymbol</i>. */
-    HfstTransducer &output_project();
+    HFSTDLL HfstTransducer &output_project();
 
     /** \brief Compose this transducer with \a another. */
-    HfstTransducer &compose(const HfstTransducer &another, 
+    HFSTDLL HfstTransducer &compose(const HfstTransducer &another, 
                             bool harmonize=true);
 
-    HfstTransducer &merge(const HfstTransducer &another, const std::map<std::string, std::set<std::string> > & list_symbols);
+    HFSTDLL HfstTransducer &merge(const HfstTransducer &another, const std::map<std::string, std::set<std::string> > & list_symbols);
 
-    HfstTransducer &merge(const HfstTransducer &another, const struct hfst::xre::XreConstructorArguments & args);
+    HFSTDLL HfstTransducer &merge(const HfstTransducer &another, const struct hfst::xre::XreConstructorArguments & args);
 
     /** \brief Compose this transducer with the intersection of
         transducers in \a v. If \a invert is true, then compose the
@@ -1306,14 +1308,14 @@ ccc : ddd
 
         @pre The transducers in \a v are deterministic and epsilon-free.
     */
-    HfstTransducer &compose_intersect(const HfstTransducerVector &v,
+    HFSTDLL HfstTransducer &compose_intersect(const HfstTransducerVector &v,
                                       bool invert=false, bool harmonize=true);
 
     /** \brief Concatenate this transducer with \a another. */
-    HfstTransducer &concatenate(const HfstTransducer &another, bool harmonize=true);
+    HFSTDLL HfstTransducer &concatenate(const HfstTransducer &another, bool harmonize=true);
 
     /** \brief Disjunct this transducer with \a another. */
-    HfstTransducer &disjunct(const HfstTransducer &another, bool harmonize=true);
+    HFSTDLL HfstTransducer &disjunct(const HfstTransducer &another, bool harmonize=true);
 
     /** \brief Make priority union of this transducer with \a another.
      *
@@ -1338,13 +1340,13 @@ ccc : ddd
      *
      * For more information, read: www.fsmbook.com
      *  */
-    HfstTransducer &priority_union(const HfstTransducer &another, bool harmonize=true, bool encode_epsilons=true);
+    HFSTDLL HfstTransducer &priority_union(const HfstTransducer &another, bool harmonize=true, bool encode_epsilons=true);
 
 
     /**  \brief Make lenient composition of this transducer with \a.
      *  A .O. B = [ A .o. B ] .P. A
      */
-    HfstTransducer &lenient_composition(const HfstTransducer &another, bool harmonize=true);
+    HFSTDLL HfstTransducer &lenient_composition(const HfstTransducer &another, bool harmonize=true);
 
     /**  \brief Make cross product of this transducer with \a.
      *  It pairs every string of this with every string of \a.
@@ -1354,7 +1356,7 @@ ccc : ddd
      *  If strings are not the same length, epsilon padding will be added in the end of the shorter string.
      *
      */
-    HfstTransducer &cross_product(const HfstTransducer &another, bool harmonize=true);
+    HFSTDLL HfstTransducer &cross_product(const HfstTransducer &another, bool harmonize=true);
 
 
     /*
@@ -1367,7 +1369,7 @@ ccc : ddd
      *  @pre Both transducers must be automata, i.e. map strings onto themselves.
      *
      */
-    HfstTransducer &shuffle(const HfstTransducer &another, bool harmonize=true);
+    HFSTDLL HfstTransducer &shuffle(const HfstTransducer &another, bool harmonize=true);
 
     /** \brief Create universal pair transducer of \a type.
      *
@@ -1376,7 +1378,7 @@ ccc : ddd
      *
      *  Transducer weight is 0.
      */
-    static HfstTransducer universal_pair ( ImplementationType type );
+    HFSTDLL static HfstTransducer universal_pair ( ImplementationType type );
 
     /** \brief Create identity pair transducer of \a type.
       *
@@ -1385,20 +1387,20 @@ ccc : ddd
       *
       * Transducer weight is 0.
       */
-    static HfstTransducer identity_pair ( ImplementationType type );
+    HFSTDLL static HfstTransducer identity_pair ( ImplementationType type );
 
 
 
 
 
     /* For HfstCompiler: Optimized disjunction function. */
-    HfstTransducer &disjunct(const StringPairVector &spv);
+    HFSTDLL HfstTransducer &disjunct(const StringPairVector &spv);
 
     /** \brief Intersect this transducer with \a another. */
-    HfstTransducer &intersect(const HfstTransducer &another, bool harmonize=true);
+    HFSTDLL HfstTransducer &intersect(const HfstTransducer &another, bool harmonize=true);
 
     /** \brief Subtract transducer \a another from this transducer. */
-    HfstTransducer &subtract(const HfstTransducer &another, bool harmonize=true);
+    HFSTDLL HfstTransducer &subtract(const HfstTransducer &another, bool harmonize=true);
 
 
     // ------------------------------------------------
@@ -1415,7 +1417,7 @@ ccc : ddd
     transducer will be exapanded byt the symbols in symbol
     pair. Otherwise they aren't.
      */
-    HfstTransducer &insert_freely(const StringPair &symbol_pair, bool harmonize=true);
+    HFSTDLL HfstTransducer &insert_freely(const StringPair &symbol_pair, bool harmonize=true);
 
     /** \brief Freely insert a copy of \a tr into the transducer. 
 
@@ -1432,7 +1434,7 @@ ccc : ddd
         Conversion is carried out for an HfstTransducer, if this function
         is called.
      */
-    HfstTransducer &insert_freely(const HfstTransducer &tr, bool harmonize=true);
+    HFSTDLL HfstTransducer &insert_freely(const HfstTransducer &tr, bool harmonize=true);
 
     /** \brief Substitute all transition \a sp with transitions \a sps 
         as defined by function \a func. 
@@ -1475,7 +1477,7 @@ t.substitute(&function);
 
 @see String
 */
-  HfstTransducer &substitute
+  HFSTDLL HfstTransducer &substitute
   (bool (*func)(const StringPair &sp, StringPairSet &sps));
 
     /** \brief Substitute all transition symbols equal to \a old_symbol 
@@ -1493,7 +1495,7 @@ t.substitute(&function);
         The transition weights remain the same. 
 
         @see String */
-    HfstTransducer &substitute(const std::string &old_symbol,
+    HFSTDLL HfstTransducer &substitute(const std::string &old_symbol,
                                const std::string &new_symbol,
                                bool input_side=true,
                                bool output_side=true);
@@ -1511,7 +1513,7 @@ t.substitute(&function);
 
         @see String
      */
-    HfstTransducer &substitute(const StringPair &old_symbol_pair,
+    HFSTDLL HfstTransducer &substitute(const StringPair &old_symbol_pair,
                                const StringPair &new_symbol_pair);
 
     /** \brief Substitute all transitions equal to \a old_symbol_pair 
@@ -1526,7 +1528,7 @@ t.substitute(&function);
 
         @see String
      */
-    HfstTransducer &substitute(const StringPair &old_symbol_pair,
+    HFSTDLL HfstTransducer &substitute(const StringPair &old_symbol_pair,
                                const StringPairSet &new_symbol_pair_set);
 
     /** \brief Substitute all transition symbols as defined in \a substitutions.
@@ -1538,9 +1540,9 @@ t.substitute(&function);
         This function performs all substitutions at the same time, so it is
         more efficient than calling substitute separately for each substitution.
      */
-    HfstTransducer &substitute(const HfstSymbolSubstitutions &substitutions);
+    HFSTDLL HfstTransducer &substitute(const HfstSymbolSubstitutions &substitutions);
 
-    HfstTransducer &substitute_symbols(const HfstSymbolSubstitutions &substitutions);
+    HFSTDLL HfstTransducer &substitute_symbols(const HfstSymbolSubstitutions &substitutions);
 
     /** \brief Substitute all transition symbol pairs as defined in \a substitutions.
 
@@ -1552,9 +1554,9 @@ t.substitute(&function);
         This function performs all substitutions at the same time, so it is
         more efficient than calling substitute separately for each substitution.
      */
-    HfstTransducer &substitute(const HfstSymbolPairSubstitutions &substitutions);
+    HFSTDLL HfstTransducer &substitute(const HfstSymbolPairSubstitutions &substitutions);
 
-    HfstTransducer &substitute_symbol_pairs(const HfstSymbolPairSubstitutions &substitutions);
+    HFSTDLL HfstTransducer &substitute_symbol_pairs(const HfstSymbolPairSubstitutions &substitutions);
 
     /** \brief Substitute all transitions equal to \a symbol_pair 
         with a copy of transducer \a transducer. 
@@ -1572,7 +1574,7 @@ t.substitute(&function);
 
         @see String
      */
-    HfstTransducer &substitute(const StringPair &symbol_pair,
+    HFSTDLL HfstTransducer &substitute(const StringPair &symbol_pair,
                                HfstTransducer &transducer, bool harmonize=true);
 
     // -----------------------------------------------
@@ -1586,7 +1588,7 @@ t.substitute(&function);
         If the HfstTransducer is of unweighted type 
         (#SFST_TYPE or #FOMA_TYPE), nothing is done.
     */
-    HfstTransducer &set_final_weights(float weight, bool increment=false);
+    HFSTDLL HfstTransducer &set_final_weights(float weight, bool increment=false);
 
     /** \brief Transform all transition and state weights as defined 
         in \a func. 
@@ -1610,7 +1612,7 @@ transducer.transform_weights(&func);
     If the HfstTransducer is of unweighted type 
     (#SFST_TYPE or #FOMA_TYPE), nothing is done.
     */
-    HfstTransducer &transform_weights(float (*func)(float));
+    HFSTDLL HfstTransducer &transform_weights(float (*func)(float));
 
     /** \brief Push weights towards initial or final state(s) 
         as defined by \a type.
@@ -1619,16 +1621,16 @@ transducer.transform_weights(&func);
         (#SFST_TYPE or #FOMA_TYPE), nothing is done.
         @see PushType
     */
-    HfstTransducer &push_weights(PushType type);
+    HFSTDLL HfstTransducer &push_weights(PushType type);
 
 
     /** \brief Compile a lexc file in file \a filename into an HfstTransducer
     of type \a type and return the transducer. */
-    static HfstTransducer * read_lexc_ptr(const std::string &filename,
+    HFSTDLL static HfstTransducer * read_lexc_ptr(const std::string &filename,
                                           ImplementationType type,
                                           bool verbose);
 
-    static HfstTransducer read_lexc(const std::string &filename,
+    HFSTDLL static HfstTransducer read_lexc(const std::string &filename,
                                     ImplementationType type,
                                     bool verbose);
 
@@ -1637,7 +1639,7 @@ transducer.transform_weights(&func);
     /* For each flag diacritic fd that is included in the alphabet of
        transducer \a another but not in the alphabet of this transducer,
        insert freely a transition fd:fd in this transducer. */
-    void insert_freely_missing_flags_from
+    HFSTDLL void insert_freely_missing_flags_from
       (const HfstTransducer &another);
 
     /*
@@ -1648,28 +1650,28 @@ transducer.transform_weights(&func);
       If \a insert_renamed_flags is true, then the flags from \a this are 
       inserted freely in \a another and vice versa after replacing.
      */
-    void harmonize_flag_diacritics(HfstTransducer &another,
+    HFSTDLL void harmonize_flag_diacritics(HfstTransducer &another,
                                    bool insert_renamed_flags=true);
     
-    void insert_missing_symbols_to_alphabet_from(const HfstTransducer &another, bool only_special_symbols=false);
+    HFSTDLL void insert_missing_symbols_to_alphabet_from(const HfstTransducer &another, bool only_special_symbols=false);
 
-    StringSet insert_missing_diacritics_to_alphabet_from(const HfstTransducer &another);
+    HFSTDLL StringSet insert_missing_diacritics_to_alphabet_from(const HfstTransducer &another);
 
-    static bool is_special_symbol(const std::string & symbol);
+    HFSTDLL static bool is_special_symbol(const std::string & symbol);
     
     /* Whether the alphabet of transducer \a another includes flag diacritics
        that are not included in the alphabet of this transducer. */
-    bool check_for_missing_flags_in(const HfstTransducer &another) const;
+    HFSTDLL bool check_for_missing_flags_in(const HfstTransducer &another) const;
 
     /* Return true if \a this has flag diacritics in the alphabet. */
-    bool has_flag_diacritics(void) const;
+    HFSTDLL bool has_flag_diacritics(void) const;
 
     
 
     // *** Friends **** //
 
-    friend std::ostream& operator<<(std::ostream &out, const HfstTransducer &t);
-    friend std::ostream& redirect(std::ostream &out, const HfstTransducer &t);
+    HFSTDLL friend std::ostream& operator<<(std::ostream &out, const HfstTransducer &t);
+    HFSTDLL friend std::ostream& redirect(std::ostream &out, const HfstTransducer &t);
     friend class HfstInputStream;
     friend class HfstOutputStream;
     friend class hfst::implementations::HfstTransitionGraph<class C>;
@@ -1686,9 +1688,9 @@ transducer.transform_weights(&func);
       The same as 
       #hfst::HfstTransducer::write_in_att_format(FILE*, bool) const 
       with ostreams. Weights are written if the type of \a t is weighted. */
-  std::ostream &operator<<(std::ostream &out,const HfstTransducer &t);
+  HFSTDLL std::ostream &operator<<(std::ostream &out,const HfstTransducer &t);
 
-  std::ostream &redirect(std::ostream &out,const HfstTransducer &t);
+  HFSTDLL std::ostream &redirect(std::ostream &out,const HfstTransducer &t);
 
   /** \brief A namespace for functions that create two-level, replace, 
       restriction and coercion rule transducers. */
@@ -1699,26 +1701,26 @@ transducer.transform_weights(&func);
     enum TwolType {twol_right, twol_left, twol_both};
 
     /* helping methods */
-    HfstTransducer universal_fst
+    HFSTDLL HfstTransducer universal_fst
       (const StringPairSet &alphabet, ImplementationType type);
-    HfstTransducer negation_fst
+    HFSTDLL HfstTransducer negation_fst
       (const HfstTransducer &t, const StringPairSet &alphabet);
 
-    HfstTransducer replace
+    HFSTDLL HfstTransducer replace
       (HfstTransducer &t, ReplaceType repl_type, bool optional, 
        StringPairSet &alphabet);
-    HfstTransducer replace_transducer
+    HFSTDLL HfstTransducer replace_transducer
       (HfstTransducer &t, std::string lm, std::string rm, 
        ReplaceType repl_type, StringPairSet &alphabet);
-    HfstTransducer replace_context
+    HFSTDLL HfstTransducer replace_context
       (HfstTransducer &t, std::string m1, std::string m2, 
        StringPairSet &alphabet);
-    HfstTransducer replace_in_context
+    HFSTDLL HfstTransducer replace_in_context
       (HfstTransducerPair &context, ReplaceType repl_type, 
        HfstTransducer &t, bool optional, StringPairSet &alphabet);
 
     /* Used by hfst-calculate. */
-    HfstTransducer restriction
+    HFSTDLL HfstTransducer restriction
       (HfstTransducerPairVector &contexts, HfstTransducer &mapping, 
        StringPairSet &alphabet,        TwolType twol_type, int direction ); 
 
@@ -1754,7 +1756,7 @@ alphabet = set(a, a:b, b, c, d, e, ...)
     <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
     SFST manual</a>
     */
-    HfstTransducer two_level_if(HfstTransducerPair &context, 
+    HFSTDLL HfstTransducer two_level_if(HfstTransducerPair &context, 
                                 StringPairSet &mappings, 
                                 StringPairSet &alphabet);
     
@@ -1773,7 +1775,7 @@ alphabet = set(a, a:b, b, c, d, e, ...)
         
         @see #two_level_if
     */
-    HfstTransducer two_level_only_if(HfstTransducerPair &context, 
+    HFSTDLL HfstTransducer two_level_only_if(HfstTransducerPair &context, 
                                      StringPairSet &mappings, 
                                      StringPairSet &alphabet);
 
@@ -1791,7 +1793,7 @@ alphabet = set(a, a:b, b, c, d, e, ...)
         
         @see #two_level_if
     */
-    HfstTransducer two_level_if_and_only_if(HfstTransducerPair &context, 
+    HFSTDLL HfstTransducer two_level_if_and_only_if(HfstTransducerPair &context, 
                                             StringPairSet &mappings, 
                                             StringPairSet &alphabet);
 
@@ -1846,7 +1848,7 @@ alphabet = set(a, b, c)
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
      SFST manual</a>
     */
-    HfstTransducer replace_up(HfstTransducerPair &context, 
+    HFSTDLL HfstTransducer replace_up(HfstTransducerPair &context, 
                               HfstTransducer &mapping, 
                               bool optional, 
                               StringPairSet &alphabet);
@@ -1857,12 +1859,12 @@ alphabet = set(a, b, c)
         @see replace_up 
 <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
 SFST manual</a>. */
-    HfstTransducer replace_down(HfstTransducerPair &context, 
+    HFSTDLL HfstTransducer replace_down(HfstTransducerPair &context, 
                                 HfstTransducer &mapping, 
                                 bool optional, 
                                 StringPairSet &alphabet);
 
-    HfstTransducer replace_down_karttunen(HfstTransducerPair &context, 
+    HFSTDLL HfstTransducer replace_down_karttunen(HfstTransducerPair &context, 
                       HfstTransducer &mapping, 
                       bool optional, 
                       StringPairSet &alphabet);
@@ -1874,7 +1876,7 @@ SFST manual</a>. */
         @see replace_up 
 <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
 SFST manual</a>. */
-    HfstTransducer replace_right(HfstTransducerPair &context, 
+    HFSTDLL HfstTransducer replace_right(HfstTransducerPair &context, 
                                  HfstTransducer &mapping, 
                                  bool optional, 
                                  StringPairSet &alphabet);
@@ -1886,7 +1888,7 @@ SFST manual</a>. */
         @see replace_up 
 <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
 SFST manual</a>. */
-    HfstTransducer replace_left(HfstTransducerPair &context, 
+    HFSTDLL HfstTransducer replace_left(HfstTransducerPair &context, 
                                 HfstTransducer &mapping, 
                                 bool optional, 
                                 StringPairSet &alphabet);
@@ -1896,7 +1898,7 @@ SFST manual</a>. */
         in every context. 
 
         @see replace_up */
-    HfstTransducer replace_up(HfstTransducer &mapping, 
+    HFSTDLL HfstTransducer replace_up(HfstTransducer &mapping, 
                               bool optional, 
                               StringPairSet &alphabet);
 
@@ -1904,7 +1906,7 @@ SFST manual</a>. */
         but \a mapping is performed in every context.
 
         @see replace_up */
-    HfstTransducer replace_down(HfstTransducer &mapping, 
+    HFSTDLL HfstTransducer replace_down(HfstTransducer &mapping, 
                                 bool optional, 
                                 StringPairSet &alphabet);
 
@@ -1916,7 +1918,7 @@ SFST manual</a>. */
      *   \a Mapping is performed in every context.
      *
      *   @see replace_up */
-    HfstTransducer left_replace_up(     HfstTransducer          &mapping,
+    HFSTDLL HfstTransducer left_replace_up(     HfstTransducer          &mapping,
                                     bool                optional,
                                     StringPairSet       &alphabet);
 
@@ -1926,7 +1928,7 @@ SFST manual</a>. */
      *   B <- A is the inversion of A -> B.
      *
      *   @see replace_up */
-    HfstTransducer left_replace_up( HfstTransducerPair  &context,
+    HFSTDLL HfstTransducer left_replace_up( HfstTransducerPair  &context,
                                     HfstTransducer      &mapping,
                                     bool                optional,
                                     StringPairSet       &alphabet);
@@ -1934,7 +1936,7 @@ SFST manual</a>. */
      *   of the input language. However, matching is done on the output side of \a mapping
      *
      *   @see replace_up */
-    HfstTransducer left_replace_down(HfstTransducerPair &context,
+    HFSTDLL HfstTransducer left_replace_down(HfstTransducerPair &context,
                                          HfstTransducer         &mapping,
                                          bool                           optional,
                                          StringPairSet          &alphabet);
@@ -1943,7 +1945,7 @@ SFST manual</a>. */
        *         of the input language. However, matching is done on the output side of \a mapping
        *
        *         @see replace_up */
-    HfstTransducer left_replace_down_karttunen( HfstTransducerPair      &context,
+    HFSTDLL HfstTransducer left_replace_down_karttunen( HfstTransducerPair      &context,
                                                                                 HfstTransducer          &mapping,
                                                                                 bool                            optional,
                                                                                 StringPairSet           &alphabet);
@@ -1953,7 +1955,7 @@ SFST manual</a>. */
      *   and right context on the output side of \a mapping.
      *
      *   @see replace_up */
-    HfstTransducer left_replace_left(HfstTransducerPair &context,
+    HFSTDLL HfstTransducer left_replace_left(HfstTransducerPair &context,
                                          HfstTransducer         &mapping,
                                          bool                           optional,
                                          StringPairSet          &alphabet);
@@ -1963,7 +1965,7 @@ SFST manual</a>. */
      *   and right context on the input side of \a mapping.
      *
      *   @see replace_up */
-    HfstTransducer left_replace_right(HfstTransducerPair        &context,
+    HFSTDLL HfstTransducer left_replace_right(HfstTransducerPair        &context,
                                           HfstTransducer                &mapping,
                                           bool                          optional,
                                           StringPairSet         &alphabet);
@@ -1983,7 +1985,7 @@ SFST manual</a>. */
         @see
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
      SFST manual</a>. */
-    HfstTransducer restriction(HfstTransducerPairVector &contexts, 
+    HFSTDLL HfstTransducer restriction(HfstTransducerPairVector &contexts, 
                                HfstTransducer &mapping, 
                                StringPairSet &alphabet);
 
@@ -1996,7 +1998,7 @@ SFST manual</a>. */
         @see
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
      SFST manual</a>. */
-    HfstTransducer coercion(HfstTransducerPairVector &contexts, 
+    HFSTDLL HfstTransducer coercion(HfstTransducerPairVector &contexts, 
                             HfstTransducer &mapping, 
                             StringPairSet &alphabet);
 
@@ -2012,7 +2014,7 @@ SFST manual</a>. */
         #coercion 
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
      SFST manual</a> */
-    HfstTransducer restriction_and_coercion(HfstTransducerPairVector &contexts,
+    HFSTDLL HfstTransducer restriction_and_coercion(HfstTransducerPairVector &contexts,
                                             HfstTransducer &mapping, 
                                             StringPairSet &alphabet);
 
@@ -2028,7 +2030,7 @@ SFST manual</a>. */
         @see
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
      SFST manual</a>. */
-    HfstTransducer surface_restriction(HfstTransducerPairVector &contexts, 
+    HFSTDLL HfstTransducer surface_restriction(HfstTransducerPairVector &contexts, 
                                        HfstTransducer &mapping, 
                                        StringPairSet &alphabet);
 
@@ -2044,7 +2046,7 @@ SFST manual</a>. */
         @see
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
      SFST manual</a>. */
-    HfstTransducer surface_coercion(HfstTransducerPairVector &contexts, 
+    HFSTDLL HfstTransducer surface_coercion(HfstTransducerPairVector &contexts, 
                                     HfstTransducer &mapping, 
                                     StringPairSet &alphabet);
 
@@ -2054,7 +2056,7 @@ SFST manual</a>. */
         @see #surface_restriction #surface_coercion 
    <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
    SFST manual</a>. */
-    HfstTransducer surface_restriction_and_coercion
+    HFSTDLL HfstTransducer surface_restriction_and_coercion
       (HfstTransducerPairVector &contexts, 
        HfstTransducer &mapping, 
        StringPairSet &alphabet);
@@ -2070,7 +2072,7 @@ SFST manual</a>. */
         @see
   <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
   SFST manual</a>. */
-    HfstTransducer deep_restriction(HfstTransducerPairVector &contexts, 
+    HFSTDLL HfstTransducer deep_restriction(HfstTransducerPairVector &contexts, 
                                     HfstTransducer &mapping, 
                                     StringPairSet &alphabet);
 
@@ -2085,7 +2087,7 @@ SFST manual</a>. */
         @see
    <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
    SFST manual</a>. */
-    HfstTransducer deep_coercion(HfstTransducerPairVector &contexts, 
+    HFSTDLL HfstTransducer deep_coercion(HfstTransducerPairVector &contexts, 
                                  HfstTransducer &mapping, 
                                  StringPairSet &alphabet);
 
@@ -2095,7 +2097,7 @@ SFST manual</a>. */
         @see #deep_restriction #deep_coercion 
   <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
   SFST manual</a>. */
-    HfstTransducer deep_restriction_and_coercion
+    HFSTDLL HfstTransducer deep_restriction_and_coercion
       (HfstTransducerPairVector &contexts, 
        HfstTransducer &mapping, 
        StringPairSet &alphabet);

@@ -8,6 +8,8 @@
 #include <cassert>
 #include <utility>
 
+#include "hfstdll.h"
+
 /** @file HfstFlagDiacritics.h
     \brief Class declarations for flag diacritic handling. */
 
@@ -26,16 +28,16 @@ private:
     FdValue value;
     std::string name;
 public:
-    FdOperation
+    HFSTDLL FdOperation
       (FdOperator op, FdFeature feat, FdValue val, const std::string& str):
     op(op), feature(feat), value(val), name(str) {}
     
-    FdOperator Operator(void) const { return op; }
-    FdFeature Feature(void) const { return feature; }
-    FdValue Value(void) const { return value; }
-    std::string Name(void) const { return name; }
+    HFSTDLL FdOperator Operator(void) const { return op; }
+    HFSTDLL FdFeature Feature(void) const { return feature; }
+    HFSTDLL FdValue Value(void) const { return value; }
+    HFSTDLL std::string Name(void) const { return name; }
     
-    static FdOperator char_to_operator(char c)
+    HFSTDLL static FdOperator char_to_operator(char c)
         {
             switch (c) {
             case 'P': return Pop;
@@ -49,15 +51,15 @@ public:
             }
         }
 
-    static bool is_diacritic(const std::string& diacritic_str);
-    static std::string::size_type find_diacritic
+    HFSTDLL static bool is_diacritic(const std::string& diacritic_str);
+    HFSTDLL static std::string::size_type find_diacritic
       (const std::string& diacritic_str,
        std::string::size_type& length);
 
-    static std::string get_operator(const std::string& diacritic);
-    static std::string get_feature(const std::string& diacritic);
-    static std::string get_value(const std::string& diacritic);
-    static bool has_value(const std::string& diacritic); 
+    HFSTDLL static std::string get_operator(const std::string& diacritic);
+    HFSTDLL static std::string get_feature(const std::string& diacritic);
+    HFSTDLL static std::string get_value(const std::string& diacritic);
+    HFSTDLL static bool has_value(const std::string& diacritic); 
 };
 
 template<class T> class FdState;

@@ -30,6 +30,8 @@ using implementations::HfstBasicTransition;
 #define debug_harmonize 0
 #endif // TEST_HARMONIZE_UNKNOWN_AND_IDENTITY_SYMBOLS
 
+#include "hfstdll.h"
+
 // --- a short documentation
 class HarmonizeUnknownAndIdentitySymbols
 {
@@ -42,7 +44,7 @@ class HarmonizeUnknownAndIdentitySymbols
   
   // Constructor whose side effect it is to harmonize the identity and unknown
   // symbols of its arguments.
-  HarmonizeUnknownAndIdentitySymbols
+  HFSTDLL HarmonizeUnknownAndIdentitySymbols
     (HfstBasicTransducer &,HfstBasicTransducer &);  
  protected:
 
@@ -56,15 +58,15 @@ class HarmonizeUnknownAndIdentitySymbols
   // of HfstBasicTransducers can sometimes unexplainedly be empty...
   // --- the alphabet can contain also symbols that are not found in 
   //     transitions...
-  void populate_symbol_set(const HfstBasicTransducer &,StringSet &);
+  HFSTDLL void populate_symbol_set(const HfstBasicTransducer &,StringSet &);
 
   // Add all symbols in the StringSet to the alphabet of the transducer.
-  void add_symbols_to_alphabet(HfstBasicTransducer &, const StringSet &);
+  HFSTDLL void add_symbols_to_alphabet(HfstBasicTransducer &, const StringSet &);
 
   // For every x in the set, add x:x transitions for every identity:identity 
   // transition in the argument transducer (the source and target states as 
   // well as the weights are the same as in the original identity transition.
-  void harmonize_identity_symbols
+  HFSTDLL void harmonize_identity_symbols
     (HfstBasicTransducer &,const StringSet &);
 
   // For every x in the set 
@@ -78,13 +80,13 @@ class HarmonizeUnknownAndIdentitySymbols
   //
   // (the source and target states as well as the weights are the same as in 
   // the original identity transition)
-  void harmonize_unknown_symbols
+  HFSTDLL void harmonize_unknown_symbols
     (HfstBasicTransducer &,const StringSet &);
 };
 
-void debug_harmonize_print(const StringSet &);
-void debug_harmonize_print(const std::string &);
-size_t max(size_t t1,size_t t2); // --- a short documentation
+HFSTDLL void debug_harmonize_print(const StringSet &);
+HFSTDLL void debug_harmonize_print(const std::string &);
+HFSTDLL size_t max(size_t t1,size_t t2); // --- a short documentation
 
 }
 
