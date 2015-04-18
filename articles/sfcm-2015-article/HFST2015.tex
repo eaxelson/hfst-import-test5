@@ -869,35 +869,34 @@ linguistic reasoning or by searching the corpus.
 
 \subsection{Evaluation}
 
-Evaluating the extraction of a single frame on the basis of existing reference
-corpora or taggers proved unfeasible. FrameNet has most recently published a
-tagged extract of the American National
+FrameNet has recently published a tagged extract of the American National
 Corpus~\cite{anc}~\footnote{The FrameNet-annotated texts are at\\\url{https://framenet.icsi.berkeley.edu/fndrupal/index.php?q=fulltextIndex}},
 consisting of 24 texts. Of these, one uses the \verb+Size+ frame 35 times, but the remainder use it only an additional 6 times
 for a total of 41 times. This is too thin a selection, and suggestive of some inconsistency in the use of this frame vs.\@
-some alternative ones (such as \verb+Dimension+, and various metaphorical subcases of this frame).
+some alternative ones such as \verb+Dimension+, and various metaphorical sub-cases of that frame.
+Evaluating the extraction of the \verb+Size+ frame on the basis of this minute corpus was unfeasible, 
+but we used it as a reference when developing our own training and test set.
 
-To exercise our rules, we took the first 200 sentences in the British National
+To develop our rule set, we took 200 sentences of the British National
 Corpus containing, as a token, one of the \verb+LU+s, and tagged them by hand.
-We considered a LU to be any declension of a word either on the list given by WordNet,
-and included metaphorical meanings related to size.
+We considered a LU to be any inflected form of a word of the synonyms to \emph{size} given by WordNet
+including metaphorical meanings of size.
 The sentences had POS tags from the original material, but punctuation
-and information about multiword units was removed for simplicity in writing
-the rules. This corresponds to running surface text through a POS tagger before
+and information about multi-word units was removed before developing
+the rule set. This corresponds to running surface text through a POS tagger which does not recognize multi-word expressions before
 running the frame extractor.
 
-We spent a working day training on this set of 200, iterating a process
-of observing the difference between the hand-tagged version and the
-tagging produced by our rules, and modifying the rules. This process resulted
-in two top-level rules, one corresponding to cases where the \verb+LU+ predeces
-the \verb+Entity+, and one to cases where it follows (these being the only
-compulsory elements in the frame).
+We had one person spend a working day developing rules based on our set of training samples, iterating a process
+of spotting the difference between the hand-tagged samples and the
+tagging produced by our rules, and modifying the rule set. This  resulted
+in two top-level rules, one corresponding to cases where the \verb+LU+ precedes
+the \verb+Entity+, and one to cases where it follows as these were the only
+compulsory elements in the frame. Overall, the rule set was 46 lines long, excluding comments and whitespace.
 
-Overall, the ruleset was 46 lines long, excluding comments and whitespace.
-
-To give some idea of the quality of the rules, we then hand-tagged a further 100 sentences.
-Of these sentences, 81 were tagged completely correctly by the rules. Results by \verb+LU+ are in
-table~\ref{luperf}.
+To get an idea of the quality of the rules, we also hand-tagged another 100 sentences from the same corpus. 
+These do not necessarily contain the \verb+Size+ frame to test that the rules do not over-generate.
+Of these sentences, 81 were tagged completely correctly by the rule set. Results by \verb+LU+ are in
+Table~\ref{luperf}.
 
 \begin{table}[h]
   \centering
@@ -913,34 +912,34 @@ table~\ref{luperf}.
     Accuracy & 93\% \\
     \hline
   \end{tabular}
-  \caption{LU-level performance on the 100 sentence test set}
+  \caption{LU-level semantic tagging performance on the 100 sentence test set}
   \label{luperf}
 \end{table}
 
-In table~\ref{luperf}, a match is considered correct if the relevant \verb+LU+
-is correctly identified. We go into deeper detail on the quality of both
-correct and incorrect matches in table~\ref{framequality}.
+In Table~\ref{luperf}, a match in the test material is considered correct if the relevant \verb+LU+
+is correctly identified. We explore some further details regarding the quality of both
+correct and incorrect test matches in Table~\ref{framequality}.
 
 \begin{table}[h]
   \centering
   \begin{tabular}{ l | l }
     \hline
-    Correct matches where \verb+Entity+ was partially wrongly tagged & 8 (16\%) \\
-    Correct matches where \verb+Entity+ was completely missed & 4 (8\%) \\
-    Cases where \verb+Degree+ was correctly tagged & 4 (67\% of hand-tagged \verb+Degree+s) \\
+    Matches where wrong \verb+Entity+ was tagged & 4 (8\%) \\
+    Matches where \verb+Entity+ was partially wrongly tagged & 8 (16\%) \\
+    Matches where \verb+Degree+ was incorrectly tagged & 2 (33\% of hand-tagged \verb+Degree+s) \\
     Incorrect tagging due to insufficient rule sophistication & 9 (53\% of mistakes) \\
     Incorrect tagging due to mistakes in POS tagging & 5 (29\% of mistakes) \\
-    Incorrect tagging due to lacking multiword unit information & 2 (12\%) \\
+    Incorrect tagging due to lacking multi-word unit information & 2 (12\%) \\
     Incorrect tagging due to lacking punctuation information & 1 (6\%) \\
     \hline
   \end{tabular}
-  \caption{Quality of matches made by the rules}
+  \caption{Quality of matches made by the rules in the test samples}
   \label{framequality}
 \end{table}
 
-We hesitate to call this process a true evaluation, as the tagging was not independent of us and
-the overall amount of materal is rather small. We don't present it as a conclusive result,
-but as an indication of what can be achieved in a relatively small amount of time with this approach.
+We note that the test tagging was not independent of us but no other tagging existed and that
+the overall amount of both training and test material is rather small. We do not think this is a conclusive result,
+but it is an indication of the semantic tagger that could be developed in a relatively small amount of time with this approach.
 
 \section{Weighted Regular Expressions}
 % Sam & Miikka & Krister (3 p.)
