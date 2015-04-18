@@ -872,8 +872,90 @@ linguistic reasoning or by searching the corpus.
 
 \subsection{Evaluation}
 
-We took a sample X of sentences and developed our set of rules for tagging all the \verb+Size+ frame examples 
-to determine how laborious the task would be and what coverage could be expected with our current set of tools.
+Evaluating the extraction of a single frame on the basis of existing reference
+corpora or taggers proved unfeasible. FrameNet has most recently published a
+tagged extract of the American National
+Corpus~\cite{anc}~\footnote{The FrameNet-annotated texts are at\\\url{https://framenet.icsi.berkeley.edu/fndrupal/index.php?q=fulltextIndex}},
+consisting of 24 texts. Of these, one uses the \verb+Size+ frame 35 times, but the remainder use it only an additional 6 times
+for a total of 41 times. This is too thin a selection, and suggestive of some inconsistency in the use of this frame vs.\@
+some alternative ones (such as \verb+Dimension+, and various metaphorical subcases of this frame).
+
+To exercise our rules, we took the first 200 sentences in the British National
+Corpus containing, as a token, one of the \verb+LU+s and tagged them by hand.
+We considered a LU to be any declension of a word either on the list given by WordNet,
+and included metaphorical meanings related to size.
+The sentences had POS tags from the original material, but punctuation
+and information about multiword units was removed for simplicity in writing
+the rules (it was in fact observed that this information is useful and would improve
+quality). This corresponds to running surface text through a POS tagger before
+running the frame extractor.
+
+We spent a working day training on this set of 200, iterating a process
+of observing the difference between the hand-tagged version and the
+tagging produced by our rules, and modifying the rules. This process resulted
+in two top-level rules, one corresponding to cases where the \verb+LU+ predeces
+the \verb+Entity+, and one to cases where it follows (these being the only
+compulsory elements in the frame).
+
+Overall, the ruleset was 46 lines long, excluding comments and whitespace.
+
+To give some idea of the quality of the rules, we then hand-tagged a further 100 sentences.
+Of these sentences, 81 were tagged completely correctly. Results by \verb+LU+ are in
+table~\ref{luperf}.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|l|c|}
+    \hline
+    Number of sentences & 100 \\
+    \hline
+    Number of LUs & 113 \\
+    \hline
+    Number of LUs corresponding to a \verb+Size+ frame & 56 \\ %non-sizes = 57
+    \hline
+    Number thereof matched by the rules & 50 \\
+    \hline
+    Total number of matches made by the rules & 54 \\
+    \hline
+    Coverage & 89\% \\
+    \hline
+    Accuracy & 93\% \\
+    \hline
+  \end{tabular}
+  \caption{LU-level performance on the 100 sentence test set}
+  \label{luperf}
+\end{table}
+
+In table~\ref{luperf} a match is considered correct if the relevant \verb+LU+
+is correctly identified. We go into deeper detail on the quality of both
+correct and incorrect matches in table~\ref{framequality}.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|l|c|}
+    \hline
+    Correct matches where \verb+Entity+ was partially wrongly tagged & 8 (16\%) \\
+    \hline
+    Correct matches where \verb+Entity+ was completely missed & 4 (8\%) \\
+    \hline
+    Cases where \verb+Degree+ was correctly tagged & 4 (67\% of hand-tagged \verb+Degree+s) \\
+    \hline
+    Incorrect tagging due to insufficient rule sophistication & 9 (53\% of mistakes) \\
+    \hline
+    Incorrect tagging due to mistakes in POS tagging & 5 (29\% of mistakes) \\
+    \hline
+    Incorrect tagging due to lacking compound noun / multiword unit information & 2 (12\%) \\
+    \hline
+    Incorrect tagging due to lacking punctuation information & 1 (6\%) \\
+    \hline
+  \end{tabular}
+  \caption{Quality of matches made by the rules}
+  \label{framequality}
+\end{table}
+
+We hesitate to call this process a true evaluation, as the tagging was not independent of us and
+the overall amount of materal is rather small. We don't present it as a conclusive result,
+but as an indication of what can be achieved in a relatively small amount of time with this approach.
 
 \section{Weighted Regular Expressions}
 % Sam & Miikka & Krister (3 p.)
