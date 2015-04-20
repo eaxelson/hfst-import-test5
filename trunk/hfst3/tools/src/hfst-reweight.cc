@@ -386,7 +386,7 @@ do_reweight(HfstTransducer& trans)
                                                 arc->get_output_symbol().c_str()));
                 replication.add_transition(rebuilt[source_state], nu);
               }
-        source_state++;
+            source_state++;
           }
         trans = HfstTransducer(replication, trans.get_type());
         return trans;
