@@ -422,7 +422,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
             free(symbol);
             addition = 0;
             multiplier = 1;
-            char* line;
+            char* line = NULL;
             size_t len = 0;
             size_t linen = 0;
             verbose_printf("Reading reweights from %s\n", tsv_file_name);
@@ -464,6 +464,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                 free(weightspec);
                 trans = do_reweight(trans);
               } // getline
+              free(line);
             hfst_set_name(trans, trans, "reweight");
             hfst_set_formula(trans, trans, "W");
           } // if tsv_file
