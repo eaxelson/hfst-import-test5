@@ -433,6 +433,10 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                   {
                     continue;
                   }
+                if (*line == '#')
+                  {
+                    continue;
+                  }
                 const char* tab = strstr(line, "\t");
                 if (NULL == tab)
                   {
@@ -462,6 +466,8 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                     multiplier = hfst_strtoweight(weightspec);
                   }
                 free(weightspec);
+                verbose_printf("Modifying weights %f < w < %f as %f * %s(w) + %f for symbol %s\n",
+                   lower_bound, upper_bound, multiplier, funcname, addition, symbol);
                 trans = do_reweight(trans);
               } // getline
               free(line);
@@ -518,11 +524,11 @@ int main( int argc, char **argv ) {
       }
     if (ends_only)
       {
-        verbose_printf("only on final weights, no arcs");
+        verbose_printf("only on final weights, no arcs\n");
       }
     if (arcs_only)
       {
-        verbose_printf("only on arc weights, no end states");
+        verbose_printf("only on arc weights, no end states\n");
       }
     // here starts the buffer handling part
     HfstInputStream* instream = NULL;
