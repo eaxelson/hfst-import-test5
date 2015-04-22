@@ -842,6 +842,10 @@ protected:
     ssize_t max_lookups;
     unsigned int recursion_depth_left;
 
+    // for epsilon chain stuff
+    std::vector<std::vector<bool> > state_inputs;
+    void build_state_input_vector();
+
     void try_epsilon_transitions(unsigned int input_tape_pos,
                                  unsigned int output_tape_pos,
                                  TransitionTableIndex i);
@@ -1175,6 +1179,10 @@ public:
 typedef std::deque<TreeNode> TreeNodeQueue;
 
 int nByte_utf8(unsigned char c);
+
+unsigned int transition_from_epsilon_chain_marker(const std::string & sym);
+SymbolNumberVector symbols_from_epsilon_chain_marker(const std::string & sym);
+bool is_epsilon_chain_marker(const std::string & sym);
 
 class InputString
 {
