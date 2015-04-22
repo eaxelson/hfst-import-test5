@@ -373,8 +373,9 @@ void Transducer::try_epsilon_transitions(unsigned int input_pos,
         Weight weight = tables->get_weight(i);
         if (input == 0) // epsilon
         {
-            if (state_inputs.size() > target &&
-                state_inputs[target][input_tape[input_pos]] == false) {
+            if (indexes_transition_table(target) &&
+                state_inputs.size() > (target - TRANSITION_TARGET_TABLE_START) &&
+                state_inputs[target - TRANSITION_TARGET_TABLE_START][input_tape[input_pos]] == false) {
                 // we're starting an epsilon chain with no prospects
                 ++i;
                 continue;
@@ -421,6 +422,13 @@ void Transducer::try_epsilon_indices(unsigned int input_pos,
 {
     if (tables->get_index_input(i) == 0)
     {
+        unsigned int target = tables->get_index_target(i) - TRANSITION_TARGET_TABLE_START;
+        if (state_inputs.size() > target &&
+            state_inputs[target][input_tape[input_pos]] == false) {
+            // we're starting an epsilon chain with no prospects
+            return;
+        }
+
         try_epsilon_transitions(input_pos,
                                 output_pos,
                                 tables->get_index_target(i) - 
