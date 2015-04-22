@@ -1,0 +1,19 @@
+Files to update before creating the installer:
+
+ - copy_files.sh      (update library version number)
+ - AddHfstLibrary.nsi (update library version number)
+ - CheckLibraries.nsi (define which exception library is used)
+
+Exception library can be checked with
+ grep [dw2|seh] libhfst-NN.dll
+
+First, copy the relevant files:
+ ./copy_files.sh
+
+If you want hfst-ospell installer, you need to copy files
+ 
+
+Create the installer(s):
+ /c/hyapp/NSIS/makensis.exe [hfst|xfst|lexc|twolc]_installer.nso
+ mv install-FOO-XX-bit.exe install-[hfst|xfst|lexc|twolc]-[32|64]-bit.exe
+
