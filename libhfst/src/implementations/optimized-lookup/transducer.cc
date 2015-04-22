@@ -340,6 +340,27 @@ HfstOneLevelPaths * Transducer::lookup_fd(const char * s, ssize_t limit)
     return results;
 }
 
+void Transducer::build_state_input_vector(void)
+{
+    SymbolTable const & symbols = alphabet->get_symbol_table();
+    for (SymbolTable::const_iterator it = symbols.begin(); it != symbols.end(); ++it) {
+        if (is_epsilon_chain_marker(*it)) {
+            unsigned int transition_number = transition_from_epsilon_chain_marker(*it);
+            SymbolNumberVector possible_syms = symbols_from_epsilon_chain_marker(*it);
+            while (state_inputs.size() <= transition_number) {
+                state_inputs.push_back(std::vector<bool>());
+            }
+            for (SymbolNumberVector::const_iterator it = possible_syms.begin();
+                 it != possible_syms.end(); ++it) {
+                while (state_inputs[transition_number].size() <= *it) {
+                    state_inputs[transition_number].push_back(false);
+                }
+                state_inputs[transition_number][*it] = true;
+            }
+        }
+    }
+}
+
 void Transducer::try_epsilon_transitions(unsigned int input_pos,
                                          unsigned int output_pos,
                                          TransitionTableIndex i)
@@ -352,6 +373,12 @@ void Transducer::try_epsilon_transitions(unsigned int input_pos,
         Weight weight = tables->get_weight(i);
         if (input == 0) // epsilon
         {
+            if (state_inputs.size() > target &&
+                state_inputs[target][input_tape[input_pos]] == false) {
+                // we're starting an epsilon chain with no prospects
+                ++i;
+                continue;
+            }
             output_tape.write(output_pos, output);
             current_weight += weight;
             get_analyses(input_pos, output_pos + 1, target);
@@ -604,6 +631,7 @@ Transducer::Transducer(std::istream& is):
     recursion_depth_left(MAX_RECURSION_DEPTH)
 {
     load_tables(is);
+    build_state_input_vector();
 }
 
 
@@ -911,6 +939,21 @@ Weight Transducer::final_weight(const TransitionTableIndex i) const
     }
 }
 
+unsigned int transition_from_epsilon_chain_marker(const std::string & sym)
+{
+    return 0;
+}
+
+SymbolNumberVector symbols_from_epsilon_chain_marker(const std::string & sym)
+{
+    SymbolNumberVector retval;
+    return retval;
+}
+
+bool is_epsilon_chain_marker(const std::string & sym)
+{
+    return true;
+}
 
 }
 
