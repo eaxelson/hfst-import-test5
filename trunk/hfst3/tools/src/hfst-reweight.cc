@@ -106,19 +106,23 @@ print_usage()
             "elements of addition, multiplication or identity function.\n"
             "If LVAL or UVAL are omitted, they default to minimum and maximum "
             "values of the weight structure.\n"
-            "If ISYM, OSYM or SYM are omitted, they default to value that "
-            "matches all arcs.\n"
-            "Float values are parsed with strtod(3) and integers strtoul(3)\n"
+            "If ISYM, OSYM or SYM are omitted, they default to a value that "
+            "matches all arcs.\n\n"
+            "Float values are parsed with strtod(3) and integers strtoul(3).\n"
             "The functions allowed for FNAME are <cmath> float functions with "
             "parameter count of 1 and a matching return value:\n"
-            "abs, acos, asin, ... sqrt, tan, tanh\n"
+            "abs, acos, asin, ... sqrt, tan, tanh\n\n"
             "The precedence of operands follows the formula "
-            "BVAL * FNAME(w) + AVAL\n"
-            "The formula is applied iff\n"
+            "BVAL * FNAME(w) + AVAL.\n"
+            "The formula is applied iff:\n"
             "((LVAL <= w) && (w <= UVAL)),\n"
             "where w is weight of arc, and \n"
             "(ISYM == i) && (OSYM == o) && ((SYM == i) || (SYM == o)) ^^ \n"
-            "(end state && -e).\n"
+            "(end state && -e).\n\n"
+            "TFILE should contain lines with tab-separated pairs of SYM and "
+            "AVAL or BVAL. AVAL values must be preceded by a + character, "
+            "BVAL should be given as plain digits. "
+            "Comment lines starting with # and empty lines are ignored.\n\n"
             "Weights are by default modified for all arcs and end states,\n"
             "unless option --end-states-only or --arcs-only is used.\n");
     fprintf(message_out, "\n");
@@ -516,11 +520,11 @@ int main( int argc, char **argv ) {
       }
     if (input_symbol)
       {
-        verbose_printf("only if first symbol is %s\n", input_symbol);
+        verbose_printf("only if input symbol is %s\n", input_symbol);
       }
     if (output_symbol)
       {
-        verbose_printf("only if second symbol is %s\n", output_symbol);
+        verbose_printf("only if output symbol is %s\n", output_symbol);
       }
     if (ends_only)
       {
