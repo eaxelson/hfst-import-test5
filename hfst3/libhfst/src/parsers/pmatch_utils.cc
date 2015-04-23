@@ -696,30 +696,35 @@ compile(const string& pmatch, map<string,HfstTransducer*>& defs,
         std::cerr << "\nHarmonizing... ";
     }
 
-    HfstTransducer dummy(format);
-    // We keep TOP and any inserted transducers
-    std::map<std::string, hfst::HfstTransducer *>::iterator defs_itr;
-    for (defs_itr = definitions.begin(); defs_itr != definitions.end();
-         ++defs_itr) {
-        if (defs_itr->first.compare("TOP") == 0 ||
-            inserted_transducers.count(defs_itr->first) != 0) {
-            dummy.harmonize(*defs_itr->second);
+    if (inserted_transducers.size() > 0) {
+
+        HfstTransducer dummy(format);
+        // We keep TOP and any inserted transducers
+        std::map<std::string, hfst::HfstTransducer *>::iterator defs_itr;
+        for (defs_itr = definitions.begin(); defs_itr != definitions.end();
+             ++defs_itr) {
+            if (defs_itr->first.compare("TOP") == 0 ||
+                inserted_transducers.count(defs_itr->first) != 0) {
+                dummy.harmonize(*defs_itr->second);
+            }
         }
-    }
-    
-    // Now that dummy is harmonized with everything, we harmonize everything
-    // with dummy and insert them into the result
-    for(defs_itr = definitions.begin(); defs_itr != definitions.end();
-        ++defs_itr) {
-        if (defs_itr->first.compare("TOP") == 0 ||
-            inserted_transducers.count(defs_itr->first) != 0) {
-            dummy.harmonize(*defs_itr->second);
-            retval.insert(std::pair<std::string, hfst::HfstTransducer*>(
-                              defs_itr->first,
-                              defs_itr->second));
-        } else {
-            delete defs_itr->second;
+        
+        // Now that dummy is harmonized with everything, we harmonize everything
+        // with dummy and insert them into the result
+        for(defs_itr = definitions.begin(); defs_itr != definitions.end();
+            ++defs_itr) {
+            if (defs_itr->first.compare("TOP") == 0 ||
+                inserted_transducers.count(defs_itr->first) != 0) {
+                dummy.harmonize(*defs_itr->second);
+                retval.insert(std::pair<std::string, hfst::HfstTransducer*>(
+                                  defs_itr->first,
+                                  defs_itr->second));
+            } else {
+                delete defs_itr->second;
+            }
         }
+    } else {
+        retval.insert(std::pair<std::string, hfst::HfstTransducer*>("TOP", definitions["TOP"]));
     }
     if (hfst::pmatch::verbose) {
         double duration = (clock() - hfst::pmatch::timer) /
