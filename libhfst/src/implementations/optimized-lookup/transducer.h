@@ -843,8 +843,12 @@ protected:
     unsigned int recursion_depth_left;
 
     // for epsilon chain stuff
-    std::vector<std::vector<bool> > state_inputs;
+    std::map<size_t, std::vector<bool> > state_inputs;
+//    std::vector<std::vector<bool> > state_inputs;
     void build_state_input_vector();
+    SymbolNumberVector symbol_numbers_from_epsilon_chain_guard(
+    const std::string & sym);
+
 
     void try_epsilon_transitions(unsigned int input_tape_pos,
                                  unsigned int output_tape_pos,
@@ -911,7 +915,8 @@ public:
         { return alphabet->get_fd_table(); }
     const SymbolTable& get_symbol_table() const
         { return alphabet->get_symbol_table(); }
-
+    const std::map<size_t, std::vector<bool> > & get_state_inputs() const
+        { return state_inputs;}
 
     const TransitionIndex& get_index(TransitionTableIndex i) const
         { return tables->get_index(i); }
@@ -1180,9 +1185,13 @@ typedef std::deque<TreeNode> TreeNodeQueue;
 
 int nByte_utf8(unsigned char c);
 
-unsigned int transition_from_epsilon_chain_marker(const std::string & sym);
-SymbolNumberVector symbols_from_epsilon_chain_marker(const std::string & sym);
-bool is_epsilon_chain_marker(const std::string & sym);
+// Functions for parsing and writing markers in the alphabet for epsilon chains.
+// @_TARGET_STATES_4_6_INPUT_SYMBOLS_a_d_@ means that epsilons leading to
+// states 4 and 6 should only be taken if input is a or d, because that's the
+// only way to end up in a final state.
+bool is_epsilon_chain_guard(const std::string & sym);
+std::vector<unsigned int> states_from_epsilon_chain_guard(const std::string & sym);
+std::vector<std::string> symbols_from_epsilon_chain_guard(const std::string & sym);
 
 class InputString
 {

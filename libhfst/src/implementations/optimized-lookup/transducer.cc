@@ -342,20 +342,24 @@ HfstOneLevelPaths * Transducer::lookup_fd(const char * s, ssize_t limit)
 
 void Transducer::build_state_input_vector(void)
 {
+    state_inputs.clear();
+//    state_input_index_vector.clear();
     SymbolTable const & symbols = alphabet->get_symbol_table();
     for (SymbolTable::const_iterator it = symbols.begin(); it != symbols.end(); ++it) {
-        if (is_epsilon_chain_marker(*it)) {
-            unsigned int transition_number = transition_from_epsilon_chain_marker(*it);
-            SymbolNumberVector possible_syms = symbols_from_epsilon_chain_marker(*it);
-            while (state_inputs.size() <= transition_number) {
-                state_inputs.push_back(std::vector<bool>());
-            }
+        if (is_epsilon_chain_guard(*it)) {
+            std::vector<unsigned int> states = states_from_epsilon_chain_guard(*it);
+            SymbolNumberVector possible_syms = symbol_numbers_from_epsilon_chain_guard(*it);
+            std::vector<bool> allowed_syms;
             for (SymbolNumberVector::const_iterator it = possible_syms.begin();
                  it != possible_syms.end(); ++it) {
-                while (state_inputs[transition_number].size() <= *it) {
-                    state_inputs[transition_number].push_back(false);
+                while (allowed_syms.size() <= *it) {
+                    allowed_syms.push_back(false);
                 }
-                state_inputs[transition_number][*it] = true;
+                allowed_syms[*it] = true;
+            }
+            for (std::vector<unsigned int>::const_iterator it = states.begin();
+                 it != states.end(); ++it) {
+                state_inputs[*it] = allowed_syms;
             }
         }
     }
@@ -374,7 +378,7 @@ void Transducer::try_epsilon_transitions(unsigned int input_pos,
         if (input == 0) // epsilon
         {
             if (indexes_transition_table(target) &&
-                state_inputs.size() > (target - TRANSITION_TARGET_TABLE_START) &&
+                state_inputs.count((target - TRANSITION_TARGET_TABLE_START) == 1) &&
                 state_inputs[target - TRANSITION_TARGET_TABLE_START][input_tape[input_pos]] == false) {
                 // we're starting an epsilon chain with no prospects
                 ++i;
@@ -423,7 +427,7 @@ void Transducer::try_epsilon_indices(unsigned int input_pos,
     if (tables->get_index_input(i) == 0)
     {
         unsigned int target = tables->get_index_target(i) - TRANSITION_TARGET_TABLE_START;
-        if (state_inputs.size() > target &&
+        if (state_inputs.count(target) == 1 &&
             state_inputs[target][input_tape[input_pos]] == false) {
             // we're starting an epsilon chain with no prospects
             return;
@@ -639,7 +643,6 @@ Transducer::Transducer(std::istream& is):
     recursion_depth_left(MAX_RECURSION_DEPTH)
 {
     load_tables(is);
-    build_state_input_vector();
 }
 
 
@@ -675,7 +678,8 @@ Transducer::Transducer(const TransducerHeader& header,
     input_tape(), output_tape(),
     flag_state(alphabet.get_fd_table()), found_transition(false), max_lookups(-1),
     recursion_depth_left(MAX_RECURSION_DEPTH)
-{}
+{    build_state_input_vector();
+}
 
 Transducer::Transducer(const TransducerHeader& header,
                        const TransducerAlphabet& alphabet,
@@ -692,7 +696,8 @@ Transducer::Transducer(const TransducerHeader& header,
     input_tape(), output_tape(),
     flag_state(alphabet.get_fd_table()), found_transition(false), max_lookups(-1),
     recursion_depth_left(MAX_RECURSION_DEPTH)
-{}
+{    build_state_input_vector();
+}
 
 Transducer::~Transducer()
 {
@@ -946,21 +951,67 @@ Weight Transducer::final_weight(const TransitionTableIndex i) const
         return get_index(i).final_weight();
     }
 }
-
-unsigned int transition_from_epsilon_chain_marker(const std::string & sym)
+    
+SymbolNumberVector Transducer::symbol_numbers_from_epsilon_chain_guard(const std::string & sym)
 {
-    return 0;
-}
-
-SymbolNumberVector symbols_from_epsilon_chain_marker(const std::string & sym)
-{
+    std::vector<std::string> syms = symbols_from_epsilon_chain_guard(sym);
     SymbolNumberVector retval;
+    for(std::vector<std::string>::iterator it = syms.begin(); it != syms.end(); ++it) {
+        retval.push_back(alphabet->symbol_from_string(*it));
+    }
     return retval;
 }
 
-bool is_epsilon_chain_marker(const std::string & sym)
+bool is_epsilon_chain_guard(const std::string & sym)
 {
+    if (sym.find("@_TARGET_STATES_") != 0) {
+        return false;
+    }
+    if (sym.find("_INPUT_SYMBOLS_") == std::string::npos &&
+        sym.find("_INPUT_SYMBOLS_") < 17) {
+        // at least one char after @_TARGET_STATES
+        return false;
+    }
+    if (sym.rfind("_@") != sym.size() - 2) {
+        return false;
+    }
     return true;
+}
+
+std::vector<unsigned int> states_from_epsilon_chain_guard(const std::string & sym)
+{
+    std::vector<unsigned int> retval;
+    size_t pos = 16; // first char after @_TARGET_STATES_
+    std::string current_num;
+    while (sym.find("_INPUT_SYMBOLS_") + 1 > pos) {
+        if (sym[pos] == '_') {
+            retval.push_back(strtol(current_num.c_str(), NULL, 10));
+            current_num.clear();
+        } else {
+            current_num.append(std::string(1, sym[pos]));
+        }
+        ++pos;
+    }
+    return retval;
+}
+
+std::vector<std::string> symbols_from_epsilon_chain_guard(const std::string & sym)
+{
+    std::vector<std::string> retval;
+    size_t pos = sym.find("_INPUT_SYMBOLS_") + 15;
+    std::string current_sym;
+    while (pos < sym.size() - 1) {
+        if (sym[pos] == '_') {
+            if (current_sym.size() > 0) {
+                retval.push_back(current_sym);
+                current_sym.clear();
+            }
+        } else {
+            current_sym.append(std::string(1, sym[pos]));
+        }
+        ++pos;
+    }
+    return retval;
 }
 
 }
