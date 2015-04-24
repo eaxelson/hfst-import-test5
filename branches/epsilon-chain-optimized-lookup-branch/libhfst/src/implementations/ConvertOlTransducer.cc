@@ -170,6 +170,7 @@ void get_states_and_symbols(
     StringSet * input_symbols = new StringSet();
     StringSet * flag_diacritics = new StringSet();
     StringSet * other_symbols = new StringSet();
+    StringSet remaining_symbols = t->get_alphabet();
     
     unsigned int first_transition = 0;
     unsigned int state_number = 0;
@@ -212,6 +213,7 @@ void get_states_and_symbols(
         // 1) epsilon
         string_symbol_map[internal_epsilon] = symbol_table.size();
         symbol_table.push_back(internal_epsilon);
+        remaining_symbols.erase(internal_epsilon);
         
         // 2) input symbols
         for (std::set<std::string>::iterator it = input_symbols->begin();
@@ -220,6 +222,7 @@ void get_states_and_symbols(
                 string_symbol_map[*it] = symbol_table.size();
                 symbol_table.push_back(*it);
                 ++seen_input_symbols;
+                remaining_symbols.erase(*it);
             }
         }
         
@@ -233,6 +236,7 @@ void get_states_and_symbols(
                 symbol_table.push_back(*it);
                 // don't increment seen_input_symbols - we use it for
                 // indexing
+                remaining_symbols.erase(*it);
             }
         }
         
@@ -241,6 +245,17 @@ void get_states_and_symbols(
              it != other_symbols->end(); ++it) {
             if (!is_epsilon(*it) && input_symbols->count(*it) == 0 &&
               flag_diacritics->count(*it) == 0) {
+                string_symbol_map[*it] = symbol_table.size();
+                symbol_table.push_back(*it);
+                remaining_symbols.erase(*it);
+            }
+        }
+
+        // 5) non-output symbols
+        // we currently only keep epsilon chain guards
+        for (std::set<std::string>::iterator it = remaining_symbols.begin();
+             it != remaining_symbols.end(); ++it) {
+            if (hfst_ol::is_epsilon_chain_guard(*it)) {
                 string_symbol_map[*it] = symbol_table.size();
                 symbol_table.push_back(*it);
             }
@@ -442,6 +457,16 @@ void get_states_and_symbols(
         state_placeholders,
         flag_symbols);
 
+    // Now do special processing for symbols with epsilon chain info
+    for (hfst_ol::SymbolTable::iterator it = symbol_table.begin();// + epsilon_chain_guards_start_at;
+         it != symbol_table.end(); ++it) {
+        if (hfst_ol::is_epsilon_chain_guard(*it)) {
+            std::vector<unsigned int> states = hfst_ol::states_from_epsilon_chain_guard(*it);
+            std::vector<std::string> symbols = hfst_ol::symbols_from_epsilon_chain_guard(*it);
+            *it = hfst_ol::write_epsilon_chain_guard(states, symbols, state_placeholders, symbol_table);
+        }
+    }
+    
     hfst_ol::TransducerAlphabet alphabet(symbol_table);
     hfst_ol::TransducerHeader header(seen_input_symbols,
                                      symbol_table.size(),

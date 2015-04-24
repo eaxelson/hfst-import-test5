@@ -285,6 +285,17 @@ void add_transitions_with(SymbolNumber symbol,
               & state_placeholders,
               std::set<SymbolNumber> & flag_symbols);
 
+// Functions for writing markers in the alphabet for epsilon chains.
+// @_TARGET_STATES_4_6_INPUT_SYMBOLS_a_d_@ means that epsilons leading to
+// states 4 and 6 should only be taken if input is a or d, because that's the
+// only way to end up in a final state.
+
+std::string write_epsilon_chain_guard(std::vector<unsigned int> & states,
+                                      std::vector<std::string> & symbols,
+                                      std::vector<hfst_ol::StatePlaceholder>
+                                      & state_placeholders,
+                                      SymbolTable & symbol_table);
+
 #if HAVE_OPENFST // Covers remainder of file
 typedef fst::StdArc::StateId StateId;
 typedef fst::StdArc StdArc;

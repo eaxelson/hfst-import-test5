@@ -116,6 +116,30 @@ bool compare_states_by_state_number(
     return lhs.state_number < rhs.state_number;
 }
 
+std::string write_epsilon_chain_guard(std::vector<unsigned int> & states,
+                                      std::vector<std::string> & symbols,
+                                      std::vector<hfst_ol::StatePlaceholder>
+                                      & state_placeholders,
+                                      SymbolTable & symbol_table)
+{
+    std::string retval = "@_TARGET_STATES_";
+    for (std::vector<unsigned int>::const_iterator it = states.begin();
+         it != states.end(); ++it) {
+        std::stringstream ss;
+        ss << state_placeholders[*it].first_transition;
+        retval.append(ss.str());
+        retval.append("_");
+    }
+    retval.append("INPUT_SYMBOLS_");
+    for (std::vector<std::string>::const_iterator it = symbols.begin();
+         it != symbols.end(); ++it) {
+        retval.append(*it);
+        retval.append("_");
+    }
+    retval.append("@");
+    return retval;
+}
+
 #if HAVE_OPENFST
 
 bool check_finality(TransduceR * tr, StateId s)
