@@ -1,6 +1,12 @@
+SET debug_compile=
+SET debug_link=
+
+if "%1%"=="/DEBUG" SET debug_compile=/Zi /O2 /bigobj /MDd
+if "%1%"=="/DEBUG" SET debug_link=/DEBUG /release
+
 copy ..\..\back-ends\foma\libfoma.* .
 copy ..\..\back-ends\openfstwin\src\lib\openfst.* .
-cl /EHsc /LD /Felibhfst.dll ^
+cl %debug_compile% /EHsc /LD /Felibhfst.dll ^
 /D HAVE_FOMA /D HAVE_OPENFST /D HFSTEXPORT /D_MSC_VER /DWINDOWS /DWIN32 ^
 /I..\..\libhfst\src /I..\..\back-ends\foma /I..\..\back-ends /I..\..\back-ends\openfstwin\src\include /I ..\.. ^
 /Iparsers /I..\.. /I..\..\libhfst\src /I..\..\libhfst\src\parsers /I..\..\back-ends\foma /I..\..\back-ends /I..\..\back-ends\openfstwin\src\include ^
@@ -50,4 +56,4 @@ parsers\PmatchCompiler.cpp ^
 parsers\XreCompiler.cpp ^
 parsers\lexc-utils.cpp ^
 parsers\pmatch_utils.cpp ^
-parsers\xre_utils.cpp /link openfst.lib libfoma.lib
+parsers\xre_utils.cpp /link %debug_link% openfst.lib libfoma.lib
