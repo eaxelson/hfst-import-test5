@@ -843,12 +843,13 @@ protected:
     unsigned int recursion_depth_left;
 
     // for epsilon chain stuff
-    std::map<size_t, std::vector<bool> > state_inputs;
-//    std::vector<std::vector<bool> > state_inputs;
+    std::vector<size_t> state_inputs_index_vector;
+    std::vector<std::vector<bool> > state_inputs;
     void build_state_input_vector();
     SymbolNumberVector symbol_numbers_from_epsilon_chain_guard(
     const std::string & sym);
-
+    bool epsilon_disallowed_by_chain_guard(TransitionTableIndex i,
+                                           SymbolNumber sym);
 
     void try_epsilon_transitions(unsigned int input_tape_pos,
                                  unsigned int output_tape_pos,
@@ -915,8 +916,12 @@ public:
         { return alphabet->get_fd_table(); }
     const SymbolTable& get_symbol_table() const
         { return alphabet->get_symbol_table(); }
-    const std::map<size_t, std::vector<bool> > & get_state_inputs() const
-        { return state_inputs;}
+    const std::vector<std::vector<bool> > & get_state_inputs() const
+        { return state_inputs; }
+    const std::vector<size_t> & get_state_input_index_vector() const
+        { return state_inputs_index_vector; }
+//    const std::map<size_t, std::vector<bool> > & get_state_inputs() const
+//        { return state_inputs; }
 
     const TransitionIndex& get_index(TransitionTableIndex i) const
         { return tables->get_index(i); }
