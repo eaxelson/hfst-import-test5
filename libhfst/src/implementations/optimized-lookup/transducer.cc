@@ -396,8 +396,7 @@ void Transducer::try_epsilon_transitions(unsigned int input_pos,
         Weight weight = tables->get_weight(i);
         if (input == 0) // epsilon
         {
-            if (epsilon_disallowed_by_chain_guard(target, input_tape[input_pos])) {
-                std::cerr << "epsilon chain disallowed\n";
+            if (epsilon_disallowed_by_chain_guard(target + 1, input_tape[input_pos])) {
                 // we're starting an epsilon chain with no prospects
                 ++i;
                 continue;
@@ -444,12 +443,6 @@ void Transducer::try_epsilon_indices(unsigned int input_pos,
 {
     if (tables->get_index_input(i) == 0)
     {
-        if (epsilon_disallowed_by_chain_guard(i, input_tape[input_pos])) {
-            std::cerr << "epsilon chain disallowed\n";
-            // we're starting an epsilon chain with no prospects
-            return;
-        }
-
         try_epsilon_transitions(input_pos,
                                 output_pos,
                                 tables->get_index_target(i) - 
