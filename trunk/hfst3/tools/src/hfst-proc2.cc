@@ -27,6 +27,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <set>
 
 using std::string;
 using std::vector;
@@ -54,9 +55,14 @@ std::string tokenizer_filename;
 enum OutputFormat {
     tokenize,
     xerox,
-    cg
+    cg,
+    finnpos
 };
 OutputFormat output_format = tokenize;
+
+using hfst_ol::Location;
+using hfst_ol::LocationVector;
+using hfst_ol::LocationVectorVector;
 
 void
 print_usage()
@@ -72,7 +78,8 @@ print_usage()
             "  -w  --print-weight     Print weights\n"
             "  --segment              Segmenting / tokenization mode (default)\n"
             "  --xerox                Xerox output\n"
-            "  --cg                   cg output\n");
+            "  --cg                   cg output\n"
+            " --finnpos               FinnPos output\n");
     fprintf(message_out, 
             "Use standard streams for input and output (for now).\n"
             "\n"
@@ -84,6 +91,122 @@ print_usage()
     fprintf(message_out, "\n");
 }
 
+void print_no_output(std::string const & input, std::ostream & outstream)
+{
+    if (output_format == tokenize) {
+        outstream << input;
+    } else if (output_format == xerox) {
+        outstream << input << "\t" << input << "+?";
+    } else if (output_format == cg) {
+        outstream << "\"<>\"" << std::endl << input << "\t\"" << input << "\" ?";
+    }
+//    std::cerr << "from print_no_output\n";
+    outstream << "\n\n";
+}
+
+void print_nonmatching_sequence(std::string const & str, std::ostream & outstream)
+{
+    if (output_format == tokenize) {
+        outstream << str;
+    } else if (output_format == xerox) {
+        outstream << str << "\t" << str << "+?";
+    } else if (output_format == cg) {
+        outstream << "\"<>\"" << std::endl << str << "\t\"" << str << "\" ?";
+    } else if (output_format == finnpos) {
+        outstream << str << "\t_\t_\t_\t_";
+    }
+//    std::cerr << "from print_nonmatching_sequence\n";
+    outstream << "\n";
+}
+
+void print_location_vector(LocationVector const & locations, std::ostream & outstream)
+{
+    if (output_format == tokenize && locations.size() != 0) {
+        outstream << locations.at(0).input;
+        if (print_weights) {
+            outstream << "\t" << locations.at(0).weight;
+        }
+        outstream << std::endl;
+    } else if (output_format == cg && locations.size() != 0) {
+        // Print the cg cohort header
+        outstream << "\"<" << locations.at(0).input << ">\"" << std::endl;
+        for (LocationVector::const_iterator loc_it = locations.begin();
+             loc_it != locations.end(); ++loc_it) {
+            // For the most common case, eg. analysis strings that begin with the original input,
+            // we try to do what cg tools expect and surround the original input with double quotes.
+            // Otherwise we omit the double quotes and assume the rule writer knows what he's doing.
+            if (loc_it->output.find(loc_it->input) == 0) {
+                // The nice case obtains
+                outstream << "\t\"" << loc_it->input << "\"" <<
+                    loc_it->output.substr(loc_it->input.size(), std::string::npos);
+            } else {
+                outstream << "\t" << loc_it->output;
+            }
+            if (print_weights) {
+                outstream << "\t" << loc_it->weight;
+            }
+            outstream << std::endl;
+        }
+    } else if (output_format == xerox) {
+        for (LocationVector::const_iterator loc_it = locations.begin();
+             loc_it != locations.end(); ++loc_it) {
+            outstream << loc_it->input << "\t" << loc_it->output;
+            if (print_weights) {
+                outstream << "\t" << loc_it->weight;
+            }
+            outstream << std::endl;
+        }
+    } else if (output_format == finnpos) {
+        std::set<std::string> tags;
+        std::set<std::string> lemmas;
+            for (LocationVector::const_iterator loc_it = locations.begin();
+                 loc_it != locations.end(); ++loc_it) {
+                // Assume the last space is where the tags begin
+                size_t tags_start_at = loc_it->output.find_last_of(" ");
+                if (tags_start_at != std::string::npos) {
+                    std::string lemma = loc_it->output.substr(0, tags_start_at);
+                    if (lemma.find_first_of(" ") == std::string::npos) {
+                        // can't have spaces in lemmas
+                        lemmas.insert(lemma);
+                    }
+                    std::string tag = loc_it->output.substr(tags_start_at + 1);
+                    if (tag.find_first_of(" ") == std::string::npos) {
+                        // or tags
+                        tags.insert(tag);
+                    }
+                }
+            }
+        outstream << locations.at(0).input << "\t_\t";
+        // the input and a blank for features
+        if (lemmas.empty()) {
+            outstream << "_";
+        } else {
+            std::string accumulator;
+            for (std::set<std::string>::const_iterator it = lemmas.begin();
+                 it != lemmas.end(); ++it) {
+                accumulator.append(*it);
+                accumulator.append(" ");
+            }
+            outstream << accumulator.substr(0, accumulator.size() - 1);
+        }
+        outstream << "\t";
+        if (tags.empty()) {
+            outstream << "_";
+        } else {
+            std::string accumulator;
+            for (std::set<std::string>::const_iterator it = tags.begin();
+                 it != tags.end(); ++it) {
+                accumulator.append(*it);
+                accumulator.append(" ");
+            }
+            outstream << accumulator.substr(0, accumulator.size() - 1);
+        }
+        outstream << "\t_";
+    }
+//    std::cerr << "from print_location_vector\n";
+    outstream << std::endl;
+}
+
 void match_and_print(hfst_ol::PmatchContainer & container,
                      std::ostream & outstream,
                      std::string & input_text)
@@ -92,72 +215,21 @@ void match_and_print(hfst_ol::PmatchContainer & container,
         // Remove final newline
         input_text.erase(input_text.size() -1, 1);
     }
-    hfst_ol::LocationVectorVector locations = container.locate(input_text);
+    LocationVectorVector locations = container.locate(input_text);
     if (locations.size() == 0 && print_all) {
-        // If we got nothing at all
-        if (output_format == tokenize) {
-            outstream << input_text;
-        } else if (output_format == xerox) {
-            outstream << input_text << "\t" << input_text << "+?";
-        } else if (output_format == cg) {
-            outstream << "\"<>\"" << std::endl << input_text << "\t\"" << input_text << "\" ?";
-        }
-        outstream << "\n\n";
+        print_no_output(input_text, outstream);
     }
-    for(hfst_ol::LocationVectorVector::const_iterator it = locations.begin();
+    for(LocationVectorVector::const_iterator it = locations.begin();
         it != locations.end(); ++it) {
         if ((it->size() == 1 && it->at(0).output.compare("@_NONMATCHING_@") == 0)) {
             if (print_all) {
-                if (output_format == tokenize) {
-                    outstream << it->at(0).input;
-                } else if (output_format == xerox) {
-                    outstream << it->at(0).input << "\t" << it->at(0).input << "+?";
-                } else if (output_format == cg) {
-                    outstream << "\"<>\"" << std::endl << it->at(0).input << "\t\"" << it->at(0).input << "\" ?";
-                }
-                outstream << "\n\n";
+                print_nonmatching_sequence(it->at(0).input, outstream);
             }
             continue;
             // All nonmatching cases have been handled
         }
-        if (output_format == tokenize && it->size() != 0) {
-            outstream << it->at(0).input;
-            if (print_weights) {
-                    outstream << "\t" << it->at(0).weight;
-                }
-                outstream << std::endl;
-                // All output_format == tokenize cases have been handled
-            } else if (output_format == cg && it->size() != 0) {
-                // Print the cg cohort header
-                outstream << "\"<" << it->at(0).input << ">\"" << std::endl;
-            }
-            for (hfst_ol::LocationVector::const_iterator loc_it = it->begin();
-                 loc_it != it->end(); ++loc_it) {
-                if (output_format == xerox) {
-                    outstream << loc_it->input << "\t" << loc_it->output;
-                    if (print_weights) {
-                        outstream << "\t" << loc_it->weight;
-                    }
-                    outstream << std::endl;
-                } else if (output_format == cg) {
-                    // For the most common case, eg. analysis strings that begin with the original input,
-                    // we try to do what cg tools expect and surround the original input with double quotes.
-                    // Otherwise we omit the double quotes and assume the rule writer knows what he's doing.
-                    if (loc_it->output.find(loc_it->input) == 0) {
-                        // The nice case obtains
-                        outstream << "\t\"" << loc_it->input << "\"" <<
-                            loc_it->output.substr(loc_it->input.size(), std::string::npos);
-                    } else {
-                        outstream << "\t" << loc_it->output;
-                    }
-                    if (print_weights) {
-                        outstream << "\t" << loc_it->weight;
-                    }
-                    outstream << std::endl;
-                }
-            }
-            outstream << std::endl;
-        }
+        print_location_vector(*it, outstream);
+    }
 }
         
 
@@ -204,10 +276,11 @@ int parse_options(int argc, char** argv)
                 {"segment", no_argument, 0, 't'},
                 {"xerox", no_argument, 0, 'x'},
                 {"cg", no_argument, 0, 'c'},
+                {"finnpos", no_argument, 0, 'f'},
                 {0,0,0,0}
             };
         int option_index = 0;
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "naw",
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "nawtxcf",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -235,6 +308,9 @@ int parse_options(int argc, char** argv)
             break;
         case 'c':
             output_format = cg;
+            break;
+        case 'f':
+            output_format = finnpos;
             break;
 #include "inc/getopt-cases-error.h"
         }
