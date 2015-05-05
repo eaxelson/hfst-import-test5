@@ -1,0 +1,97 @@
+\documentclass[25pt, a0papper, portrait]{tikzposter}
+\usepackage[utf8]{inputenc}
+ 
+\title{Extracting Semantic Frames using Handwritten \texttt{hfst-pmatch Rules}}
+\author{Sam Hardwick, Miikka Silfverberg and Krister Lind{é}n}
+\date{\today}
+\institute{University of Helsinki}
+ 
+\usepackage{amsmath}
+\usepackage{xyling}
+\usepackage{graphicx}
+ 
+\usetheme{Desert}
+ 
+\begin{document}
+ 
+\maketitle
+ 
+ 
+\begin{columns}
+    \column{0.5}
+    \block{A Semantic Frame}{
+      A semantic frame is a description of a \emph{type} of event, relation or entity
+      and related participants.
+      \vspace{2cm}
+      $$
+  \Big[_\text{Size}\Big[_\text{Entity}\text{He} \Big]
+  \text{is} \Big[_\text{Degree} \text{quite} \Big] \Big[_\text{Lexical Unit}\text{tall} \Big]
+  \Big[_\text{Standard} \text{for a jockey} \Big] \Big]
+  $$
+
+  \vspace {2cm}
+
+  Tagging it and its parts is \emph{frame extraction}.
+      
+%      A bracketed diagram and some text
+    }
+    
+    \column{0.5}
+    \block{Surface Syntactic Representation}{
+
+      We describe the frame and its elements with a form of surface syntax.
+
+      \vspace{2cm}
+\begin{center}
+  \includegraphics[width=32cm]{images/tagged_tree.pdf}
+  \end{center}
+      
+      %% \Tree[7]{
+      %%   & & & \K{Size1} \B{dll} & & & \\
+      %%   \K{Degree} \B{d} & & & & & & \\
+      %%   \K{rather} & \K{large} jagged & \K{chunk} & \K{of} & \K{the} & \K{marble} & \K{statue}
+      %% }
+
+      \vspace{2cm}
+
+      Our formalism permits context-free rules.
+
+      (Another simpler example first? This one has an embedded NounChunk which is nice for exposition)
+
+
+}
+\end{columns}
+
+ \block{Rule design and training}
+ {
+   Full-width block with big flowchart:
+   
+ }
+
+ \begin{columns}
+   \column{0.4}{
+     \block{Formalism and implementation}{
+     Info about pmatch, fst basis
+     }
+   }
+   \column{0.6}{
+     \block{Evaluation}{
+       Cursory eval
+       }
+}
+   \end{columns}
+
+ 
+%% \begin{columns}
+%%     \column{0.8}
+%%     \block{A figure}
+%%     {
+%%         %% \begin{tikzfigure}
+%%         %%     \includegraphics[width=0.4\textwidth]{images/logo.png}
+%%         %% \end{tikzfigure}
+%%     }
+%%     \column{0.2}
+%%     \block{Or maybe have description to right}{}
+%% \end{columns}
+ 
+\end{document}
