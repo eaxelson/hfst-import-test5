@@ -19,11 +19,10 @@ exit /B
 if not exist "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Include" echo Error: missing include directory "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Include" && ^
 exit /B
 
-echo Renaming foma's flags.c into _flags.c as there is a file with the same name in openfst
+if exist "..\..\back-ends\foma\flags.c" echo Renaming foma's flags.c into _flags.c as there is a file with the same name in openfst ^
+move ..\..\back-ends\foma\flags.c ..\..\back-ends\foma\_flags.c 
 
 @echo ON
-
-move ..\..\back-ends\foma\flags.c ..\..\back-ends\foma\_flags.c 
 
 copy C:\python33\libs\python33.lib .
 
