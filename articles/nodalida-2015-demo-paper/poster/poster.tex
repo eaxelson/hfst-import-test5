@@ -1,7 +1,9 @@
 \documentclass[25pt, a0papper, portrait]{tikzposter}
 \usepackage[utf8]{inputenc}
+
  
-\title{Extracting Semantic Frames using Handwritten \texttt{hfst-pmatch Rules}}
+\title{Extracting Semantic Frames using Handwritten Rules}
+\titlegraphic{\includegraphics[width=10cm]{images/hy_logo.pdf}}
 \author{Sam Hardwick, Miikka Silfverberg and Krister Lind{é}n}
 \date{\today}
 \institute{University of Helsinki}
@@ -11,9 +13,46 @@
 \usepackage{graphicx}
  
 \usetheme{Desert}
+
+%% \makeatletter
+%% \renewcommand\TP@maketitle{%
+%%    \begin{minipage}{0.8\linewidth}
+%%         \centering
+%%         \color{titlefgcolor}
+%%         {\bfseries \Huge \sc \@title \par}
+%%         \vspace*{1em}
+%%         {\huge \@author \par}
+%%         \vspace*{1em}
+%%         {\LARGE \@institute}
+%%     \end{minipage}
+%%     \hfill
+%%     \begin{minipage}{0.2\linewidth}
+%%        \centering
+%%        \@titlegraphic
+%%     \end{minipage}
+%% }
+%% \makeatother
+
+\makeatletter
+\renewcommand\TP@maketitle{%
+   \centering
+   \begin{minipage}[b]{0.8\linewidth}
+        \centering
+        \color{titlefgcolor}
+        {\bfseries \Huge \sc \@title \par}
+        \vspace*{1em}
+        {\huge \@author \par}
+        \vspace*{1em}
+        {\LARGE \@institute}
+    \end{minipage}%
+      \tikz[remember picture,overlay]\node[scale=0.8,anchor=east,xshift=0.56\linewidth,yshift=3.9cm,inner sep=0pt] {%
+       \@titlegraphic
+    };
+}
+\makeatother
  
 \begin{document}
- 
+
 \maketitle
  
  
@@ -77,6 +116,9 @@ Standard, optional & A point of comparison (for a jockey, ...) \\
 
  \block{Rule design and training}
  {
+\note[targetoffsetx=2cm, targetoffsety=-1cm, angle=90, radius=3cm,
+width=5cm, rotate=30, connection, linewidth=.2cm,
+roundedcorners=30, innersep=1cm]{Text}
    Full-width block with big flowchart:
    
  }
