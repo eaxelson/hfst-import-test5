@@ -50,6 +50,9 @@
     };
 }
 \makeatother
+
+\def\changemargin#1#2{\list{}{\rightmargin#2\leftmargin#1}\item[]}
+\let\endchangemargin=\endlist 
  
 \begin{document}
 
@@ -119,7 +122,20 @@ Standard, optional & A point of comparison (for a jockey, ...) \\
 %   Full-width block with big flowchart
    \begin{center}
      \includegraphics[width=0.85\textwidth]{images/sigma.pdf}
+
    \end{center}
+\vspace{1cm}
+\begin{changemargin}{5cm}{5cm} 
+
+First, the feasible realizations of the frame are sketched out.
+Then realizations in a corpus are discovered using known lexical units.
+Common features are combined and corresponding regular expressions, 
+denoting surface syntactic production rules, are written. The rules
+use POS tags from a tagger or a dictionary.
+The tagger is run on a corpus and compared against a known standard.
+When rules overtag badly, they are improved or special-cased to improve accuracy.
+\end{changemargin} 
+
  }
 
 %\note[targetoffsetx=-40cm, targetoffsety=13cm, roundedcorners=30, innersep=1cm, width=30cm]{TextTextTextTextTextTextTextTextTextTextText}
