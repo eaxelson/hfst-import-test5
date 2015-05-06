@@ -32,6 +32,7 @@
   \vspace {2cm}
 
   Tagging it and its parts is \emph{frame extraction}.
+\vspace{1cm}
 
   We demonstrate an extraction approach to one particular frame, \emph{Size}. It
 has the following elements:
@@ -48,7 +49,7 @@ Standard, optional & A point of comparison (for a jockey, ...) \\
       
 %      A bracketed diagram and some text
     }
-\block{Another block}{foo}
+%\block{Context-}{foo}
     
     \column{0.5}
     \block{Surface Syntactic Representation}{
@@ -83,12 +84,43 @@ Standard, optional & A point of comparison (for a jockey, ...) \\
  \begin{columns}
    \column{0.4}{
      \block{Formalism and implementation}{
-     Info about pmatch, fst basis
+     \texttt{hfst-pmatch} is a development of Xerox's \texttt{fst} and its command \texttt{pmatch}.
+     It is a regular expression compiler that inserts tags around recognised parts of the input.
+
+\vspace{0.6cm}
+\begin{center}
+{\Large \texttt{<Entity>ball and chain</Entity>}}
+\end{center}
+
+\vspace{0.6cm}
+
+     It features fast left-to-right longest-match tagging, recursive transition network -style arcs (which allows context-free parsing) and runtime context-checking.
+
+\vspace{1cm}
+\begin{center}
+ \includegraphics[width=22cm]{images/rtn.pdf}
+\end{center}
      }
    }
    \column{0.6}{
      \block{Evaluation}{
-       
+       For a single frame such as \emph{Size}, proper evaluation is challenging due to lack of systematic reference corpora.
+       We tagged 200 sentences for training and 100 for evaluation ourselves, with the following results:
+
+\begin{center}
+  \begin{tabular}{l | l}
+    \hline
+    Number of sentences & 100 \\
+    Number of LUs & 113 \\
+    Number of LUs corresponding to a \verb+Size+ frame & 56 \\ %non-sizes = 57
+    Number thereof matched by the rules & 50 \\
+    Total number of matches made by the rules & 54 \\
+    \hline
+    Coverage & 89\% \\
+    Accuracy & 93\% \\
+    \hline
+  \end{tabular}
+\end{center}
        }
 }
    \end{columns}
