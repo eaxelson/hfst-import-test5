@@ -32,9 +32,23 @@
   \vspace {2cm}
 
   Tagging it and its parts is \emph{frame extraction}.
+
+  We demonstrate an extraction approach to one particular frame, \emph{Size}. It
+has the following elements:
+\vspace{1cm}
+
+\begin{center}
+  \begin{tabular}{ l | l }
+Lexical Unit (LU) & Adjective describing magnitude (large, tiny, ...) \\ \hline
+Entity & That which is being described (house, debt, ...) \\ \hline
+Degree, optional & Intensity or extent of description (really, quite, ...) \\ \hline
+Standard, optional & A point of comparison (for a jockey, ...) \\
+    \end{tabular}
+\end{center}
       
 %      A bracketed diagram and some text
     }
+\block{Another block}{foo}
     
     \column{0.5}
     \block{Surface Syntactic Representation}{
@@ -54,9 +68,7 @@
 
       \vspace{2cm}
 
-      Our formalism permits context-free rules.
-
-      (Another simpler example first? This one has an embedded NounChunk which is nice for exposition)
+      Our finite-state -based formalism permits context-free rules; here, \textbf{NounChunk} appears in its own production.
 
 
 }
@@ -76,7 +88,7 @@
    }
    \column{0.6}{
      \block{Evaluation}{
-       Cursory eval
+       
        }
 }
    \end{columns}
