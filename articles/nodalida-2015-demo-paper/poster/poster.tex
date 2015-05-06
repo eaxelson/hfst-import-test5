@@ -82,7 +82,7 @@ Standard, optional & A point of comparison (for a jockey, ...) \\
  }
 
  \begin{columns}
-   \column{0.4}{
+   \column{0.6}{
      \block{Formalism and implementation}{
      \texttt{hfst-pmatch} is a development of Xerox's \texttt{fst} and its command \texttt{pmatch}.
      It is a regular expression compiler that inserts tags around recognised parts of the input.
@@ -98,21 +98,21 @@ Standard, optional & A point of comparison (for a jockey, ...) \\
 
 \vspace{1cm}
 \begin{center}
- \includegraphics[width=22cm]{images/rtn.pdf}
+ \includegraphics[width=28cm]{images/rtn.pdf}
 \end{center}
      }
    }
-   \column{0.6}{
+   \column{0.4}{
      \block{Evaluation}{
        For a single frame such as \emph{Size}, proper evaluation is challenging due to lack of systematic reference corpora.
        We tagged 200 sentences for training and 100 for evaluation ourselves, with the following results:
-
+\vspace{1.6cm}
 \begin{center}
   \begin{tabular}{l | l}
     \hline
     Number of sentences & 100 \\
     Number of LUs & 113 \\
-    Number of LUs corresponding to a \verb+Size+ frame & 56 \\ %non-sizes = 57
+    Number of LUs corresponding to a \emph{Size} frame & 56 \\ %non-sizes = 57
     Number thereof matched by the rules & 50 \\
     Total number of matches made by the rules & 54 \\
     \hline
