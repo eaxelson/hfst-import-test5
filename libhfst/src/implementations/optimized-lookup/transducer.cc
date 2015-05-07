@@ -980,12 +980,25 @@ bool Transducer::epsilon_disallowed_by_chain_guard(TransitionTableIndex i,
     } else {
         return false;
     }
+    std::cerr << "at transition table entry " << i << " ";
+    if (sym == NO_SYMBOL_NUMBER) {
+        std::cerr << "allowed epsilon at end of input\n";
+        return false;
+    }
     if (state_inputs_index_vector.size() <= i ||
         state_inputs_index_vector[i] == std::numeric_limits<size_t>::max() ||
         state_inputs[state_inputs_index_vector[i]].size() <= sym) {
+        std::cerr << "allowed epsilon at input symbol " <<alphabet->string_from_symbol(sym) << std::endl;
         return false;
     }
-    return (state_inputs[state_inputs_index_vector[i]][sym] == false);
+    bool retval = (state_inputs[state_inputs_index_vector[i]][sym] == false);
+    if (retval) {
+        std::cerr << "disallowed epsilon at input symbol " << alphabet->string_from_symbol(sym) << std::endl;
+    } else {
+        std::cerr << "allowed epsilon at input symbol " << alphabet->string_from_symbol(sym) << std::endl;
+    }
+    return retval;
+
 }
 
 bool is_epsilon_chain_guard(const std::string & sym)
