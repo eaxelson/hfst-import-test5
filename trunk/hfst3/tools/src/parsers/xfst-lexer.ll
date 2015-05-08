@@ -663,13 +663,14 @@ LWSP [\t ]*
     unsigned int endpos = (unsigned int)end_found; 
 
     // copy the input to apply and set is as return value
-    char buf [endpos + 1];
+    char * buf = (char*) malloc(endpos + 1);
     for (unsigned int i=0; i < endpos; i++)
     { 
       buf[i] = hxfsttext[i];
     }
     buf[endpos] = '\0';
     hxfstlval.text = strdup(buf);
+    free(buf);
 
     // put back the rest of the input text, excluding the "<ctrl-d>"
     if (total_length > 0) 
@@ -704,13 +705,14 @@ LWSP [\t ]*
     (void) hfst::xfst::xfst_->compile_regex(hxfsttext, chars_read);
 
     // copy the input to regex and set is as return value
-    char buf [chars_read+1];
+    char * buf = (char*) malloc(chars_read+1);
     for (unsigned int i=0; i < chars_read; i++)
     { 
       buf[i] = hxfsttext[i];
     }
     buf[chars_read] = '\0';
     hxfstlval.text = strdup(buf);
+    free(buf);
 
     // put back the rest of the input text
     if (total_length > 0) 

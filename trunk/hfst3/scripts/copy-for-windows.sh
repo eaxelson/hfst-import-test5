@@ -170,6 +170,7 @@ done
 cp scripts/make-python-bindings.bat $1/libhfst/src/
 cp scripts/test_libhfst_win.py $1/libhfst/src/
 cp scripts/libhfst_win.i $1/libhfst/src/
+cp scripts/make-hfst-xfst.bat $1/libhfst/src/
 
 # copy missing headers and change some headers included
 cp scripts/stdint.h $1/back-ends/foma/
@@ -184,3 +185,50 @@ do
     sed -i 's/#include <unistd.h>/#include <io.h>/' $file
 done
 
+# copy files for hfst-xfst
+mkdir $1/tools
+mkdir $1/tools/src
+mkdir $1/tools/src/parsers
+mkdir $1/tools/src/inc
+
+for file in \
+xfst-utils XfstCompiler hfst-xfst xfst-parser xfst-lexer \
+init_help  help_message;
+do
+    cp tools/src/parsers/$file.cc $1/tools/src/parsers/$file.cpp
+done
+
+sed -i 's/#include <getopt.h>/#include "..\/getopt.h"/' $1/tools/src/parsers/hfst-xfst.cpp
+sed -i 's/#include <unistd.h>/#include <io.h>/' $1/tools/src/parsers/xfst-lexer.cpp
+sed -i 's/#include "help_message.cc"/#include "help_message.cpp"/' $1/tools/src/parsers/XfstCompiler.cpp
+
+for file in \
+hfst-program-options hfst-commandline hfst-tool-metadata HfstStrings2FstTokenizer \
+hfst-file-to-mem hfst-string-conversions getopt_long;
+do
+    cp tools/src/$file.cc $1/tools/src/$file.cpp
+done
+
+for file in \
+hfst-commandline.h hfst-program-options.h hfst-tool-metadata.h \
+getopt_long.h HfstStrings2FstTokenizer.h hfst-string-conversions.h \
+hfst-file-to-mem.h;
+do
+    cp tools/src/$file $1/tools/src/
+done
+
+sed -i 's/#include <unistd.h>/#include <io.h>/' $1/tools/src/hfst-commandline.cpp
+
+for file in \
+XfstCompiler.h xfst-utils.h xfst-parser.hh cmd.h abbrcmd.h;
+do
+    cp tools/src/parsers/$file $1/tools/src/parsers/
+done
+
+for file in \
+check-params-binary.h check-params-common.h check-params-unary.h getopt-cases-binary.h \
+getopt-cases-common.h getopt-cases-error.h getopt-cases-unary.h globals-binary.h \
+globals-common.h globals-unary.h;
+do
+    cp tools/src/inc/$file $1/tools/src/inc/
+done
