@@ -230,6 +230,9 @@ void match_and_print(hfst_ol::PmatchContainer & container,
         }
         print_location_vector(*it, outstream);
     }
+    if (output_format == finnpos) {
+        outstream << std::endl;
+    }
 }
         
 
