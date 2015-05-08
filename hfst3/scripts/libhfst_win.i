@@ -103,13 +103,11 @@ namespace std {
 %template(StringPairVector) vector<pair<string, string > >;
 %template(FloatVector) vector<float>;
 %template(StringSet) set<string>;
-%template(HfstOneLevelPath) pair<float, vector<string> >;
-%template(HfstOneLevelPaths) set<pair<float, vector<string> > >;
+//%template(HfstOneLevelPath) pair<float, vector<string> >;
+//%template(HfstOneLevelPaths) set<pair<float, vector<string> > >;
 }
 
 %ignore hfst::HfstTransducer::lookup_fd(const std::string & s) const;
-
-typedef __int64 ssize_t;
 
 namespace hfst
 {
@@ -135,6 +133,24 @@ enum ImplementationType
     UNSPECIFIED_TYPE,
     ERROR_TYPE
 };
+
+%typemap(out) HfstOneLevelPaths* {
+	$result = PyList_New((*$1).size());
+	unsigned int i = 0;
+	for (hfst::HfstOneLevelPaths::const_iterator it = (*$1).begin(); it != (*$1).end(); it++)
+	{
+		std::string result_string("");
+		for (hfst::StringVector::const_iterator svit = it->second.begin(); svit != it->second.end(); svit++)
+		{
+			result_string += *svit;
+		}
+		PyObject * res = PyTuple_New(2);
+		PyTuple_SetItem(res, 0, PyString_FromString(result_string.c_str()));
+		PyTuple_SetItem(res, 1, PyFloat_FromDouble(it->first));
+		PyList_SetItem($result, i, res);
+		i++;
+	}
+}
 
 class HfstTransducer 
 {

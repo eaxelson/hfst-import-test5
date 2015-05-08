@@ -95,18 +95,18 @@ StringPairVector HfstStrings2FstTokenizer::make_pair_vector
        it != v.end();
        ++it)
     {
-      if (not is_pair_input_symbol(it,v.end()))
+      if (! is_pair_input_symbol(it,v.end()))
     { 
       std::string symbol = unescape(*it);
-      symbol = (symbol.empty() or symbol == eps ? 
+      symbol = (symbol.empty() || symbol == eps ? 
             EPSILON_SYMBOL : symbol);
       spv.push_back(StringPair(symbol,symbol)); }
       else
     {
-      std::string input = (it->empty() or *it == eps ? 
+      std::string input = (it->empty() || *it == eps ? 
                    EPSILON_SYMBOL : unescape(*it));
       ++(++it);
-      std::string output = (it->empty() or *it == eps ? 
+      std::string output = (it->empty() || *it == eps ? 
                 EPSILON_SYMBOL : unescape(*it));
       spv.push_back(StringPair(input,output));
     }
@@ -120,15 +120,15 @@ StringPairVector HfstStrings2FstTokenizer::make_pair_vector
   StringPairVector spv;
   StringVector::const_iterator input_it = input.begin();
   StringVector::const_iterator output_it = output.begin();
-  while (input_it != input.end() and output_it != output.end())
+  while (input_it != input.end() && output_it != output.end())
     { 
       std::string input_symbol = unescape(*input_it);
       std::string output_symbol = unescape(*output_it);
 
       spv.push_back
-        (StringPair(input_symbol.empty() or input_symbol == eps ? 
+        (StringPair(input_symbol.empty() || input_symbol == eps ? 
                     EPSILON_SYMBOL : input_symbol,
-                    output_symbol.empty() or output_symbol == eps ? 
+                    output_symbol.empty() || output_symbol == eps ? 
                     EPSILON_SYMBOL : output_symbol)); 
       ++input_it;
       ++output_it;
@@ -138,14 +138,14 @@ StringPairVector HfstStrings2FstTokenizer::make_pair_vector
       for ( ; output_it != output.end(); ++output_it)
     { spv.push_back
         (StringPair(EPSILON_SYMBOL,
-            output_it->empty() or *output_it == eps ? 
+            output_it->empty() || *output_it == eps ? 
             EPSILON_SYMBOL : unescape(*output_it))); }
     }
   else
     {
       for ( ; input_it != input.end(); ++input_it)
     { spv.push_back
-        (StringPair(input_it->empty() or *input_it == eps ? 
+        (StringPair(input_it->empty() || *input_it == eps ? 
             EPSILON_SYMBOL : unescape(*input_it),
             EPSILON_SYMBOL)); }
     }
@@ -204,7 +204,7 @@ bool HfstStrings2FstTokenizer::is_pair_input_symbol
 
 void HfstStrings2FstTokenizer::check_cols(const std::string &symbol)
 {
-  if (not symbol.empty())
+  if (! symbol.empty())
     {
       if (symbol[0] == COL_CHAR)
     { throw UnescapedColsFound(); }
@@ -213,7 +213,7 @@ void HfstStrings2FstTokenizer::check_cols(const std::string &symbol)
     { 
       if (symbol[pos-1] != BACKSLASH_CHAR)
         { throw UnescapedColsFound(); }
-      if (pos > 1 and symbol[pos-2] == BACKSLASH_CHAR)
+      if (pos > 1 && symbol[pos-2] == BACKSLASH_CHAR)
         { throw UnescapedColsFound(); }
     }
     }
@@ -240,10 +240,10 @@ StringVector HfstStrings2FstTokenizer::split_at_spaces(const std::string &str)
   StringVector res;
   for (StringVector::const_iterator it = sv.begin(); it != sv.end(); ++it)
     {
-      if (*it == SPACE and not symbol.empty())
+      if (*it == SPACE && ! symbol.empty())
       { 
         res.push_back(symbol);
-        while (it + 1 != sv.end() and *(it + 1) == SPACE)
+        while (it + 1 != sv.end() && *(it + 1) == SPACE)
           { ++it; }
         symbol = EMPTY;
         if (it == sv.end())
@@ -251,10 +251,10 @@ StringVector HfstStrings2FstTokenizer::split_at_spaces(const std::string &str)
       }
       else if (* it == SPACE)
     { 
-      while (it + 1 != sv.end() and *(it + 1) == SPACE)
+      while (it + 1 != sv.end() && *(it + 1) == SPACE)
         { ++it; }
     }
-      else if (*it == COL and not symbol.empty())
+      else if (*it == COL && ! symbol.empty())
     { 
       res.push_back(symbol);
       res.push_back(COL);
@@ -265,7 +265,7 @@ StringVector HfstStrings2FstTokenizer::split_at_spaces(const std::string &str)
       else
     { symbol += *it; }
     }
-  if (not symbol.empty())
+  if (! symbol.empty())
     { res.push_back(symbol); }
   return res;
 }

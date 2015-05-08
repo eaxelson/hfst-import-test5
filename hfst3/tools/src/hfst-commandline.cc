@@ -19,6 +19,9 @@
 
 #if HAVE_CONFIG_H
 #  include <config.h>
+#else
+#  define PACKAGE_STRING ""
+#  define PACKAGE_BUGREPORT ""
 #endif
 
 #include <cassert>
@@ -51,6 +54,12 @@
 #include "HfstOutputStream.h"
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
+
+// LLONG_MAX for 64-bit...
+#ifdef _MSC_VER
+#  define strcasecmp _stricmp
+#  define SSIZE_MAX LLONG_MAX
+#endif
 
 #ifndef HAVE_ERROR_AT_LINE
 void error_at_line(int status, int errnum, const char* filename, 

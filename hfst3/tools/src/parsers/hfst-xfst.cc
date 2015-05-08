@@ -32,7 +32,15 @@
   #include <readline/history.h>
 #endif
 
-#include <getopt.h>
+#ifndef _MSC_VER
+#  include <getopt.h>
+#else
+#  include <../getopt_long.h>
+   int optind = 1;
+   char * optarg = "";
+   int optopt = 0;
+#endif
+
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 #include "hfst-tool-metadata.h"
