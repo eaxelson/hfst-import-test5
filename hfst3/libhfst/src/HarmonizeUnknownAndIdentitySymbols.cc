@@ -17,7 +17,7 @@ const char * HarmonizeUnknownAndIdentitySymbols::unknown =
 
   // --- these functions could be useful elsewhere, too
   //     maybe they should be in separate h- and cc-files?
-size_t max(size_t t1,size_t t2)
+size_t max_(size_t t1,size_t t2)
 { return t1 < t2 ? t2 : t1; }
 
 static bool is_subset(const StringSet &subset,const StringSet &superset)
@@ -66,7 +66,7 @@ HarmonizeUnknownAndIdentitySymbols::HarmonizeUnknownAndIdentitySymbols
 
   // --- typedef StringVector (not in HfstSymbolDefs.h, maybe it should be?)
   std::vector<std::string> diff_vector
-    (max(t1_symbol_set.size(),t2_symbol_set.size()),"");
+    (max_(t1_symbol_set.size(),t2_symbol_set.size()),"");
   
   if (debug_harmonize)
     { debug_harmonize_print("Computing t1 symbols - t2 symbols."); }

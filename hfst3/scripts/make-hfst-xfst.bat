@@ -15,7 +15,7 @@ move ..\..\back-ends\foma\flags.c ..\..\back-ends\foma\_flags.c
 
 @echo ON
 
-cl /EHsc /Fehfst-xfst.exe ^
+cl /EHsc /Zc:wchar_t /Fehfst-xfst.exe ^
 /D HAVE_FOMA /D HAVE_OPENFST /D HFSTEXPORT /D OPENFSTEXPORT /D_MSC_VER /DWINDOWS /DWIN32 ^
 /I..\..\libhfst\src /I..\..\back-ends\foma /I..\..\back-ends /I..\..\back-ends\openfstwin\src\include /I ..\.. ^
 /Iparsers /I..\.. /I..\..\libhfst\src /I..\..\libhfst\src\parsers /I..\..\back-ends\foma ^
@@ -86,4 +86,5 @@ parsers\xre_utils.cpp ^
 ..\..\back-ends\openfstwin\src\lib\symbol-table.cpp ^
 ..\..\back-ends\openfstwin\src\lib\symbol-table-ops.cpp ^
 ..\..\back-ends\openfstwin\src\lib\util.cpp ^
-..\..\back-ends\foma\*.c
+..\..\back-ends\foma\*.c user32.lib
+
