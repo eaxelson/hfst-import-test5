@@ -86,7 +86,8 @@ class HarmonizeUnknownAndIdentitySymbols
 
 HFSTDLL void debug_harmonize_print(const StringSet &);
 HFSTDLL void debug_harmonize_print(const std::string &);
-HFSTDLL size_t max(size_t t1,size_t t2); // --- a short documentation
+// use name 'max_' to avoid collision with windows macro 'max'
+HFSTDLL size_t max_(size_t t1,size_t t2); // --- a short documentation
 
 }
 

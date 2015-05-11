@@ -521,6 +521,7 @@ hfst_mkstemp(char* templ)
 #ifdef _WIN32
   error(EXIT_FAILURE, errno, 
         "'int hfst_mkstemp(char * temp1)' not implemented for windows");
+  return 1; // keep compiler happy
 #else 
   errno = 0;
   int rv = mkstemp(templ);

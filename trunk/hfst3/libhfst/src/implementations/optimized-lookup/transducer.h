@@ -81,10 +81,11 @@ struct TraversalState
 };
 typedef std::set<TraversalState> TraversalStates;
 
-const SymbolNumber NO_SYMBOL_NUMBER = std::numeric_limits<SymbolNumber>::max();
+  // parentheses avoid collision with windows macro 'max'
+  const SymbolNumber NO_SYMBOL_NUMBER = (std::numeric_limits<SymbolNumber>::max)();
 const TransitionTableIndex NO_TABLE_INDEX =
-    std::numeric_limits<TransitionTableIndex>::max();
-const unsigned long NO_COUNTER = std::numeric_limits<unsigned long>::max();
+  (std::numeric_limits<TransitionTableIndex>::max)();
+  const unsigned long NO_COUNTER = (std::numeric_limits<unsigned long>::max)();
 const Weight INFINITE_WEIGHT = static_cast<float>(NO_TABLE_INDEX);
 
 enum HeaderFlag {Weighted, Deterministic, Input_deterministic, Minimized,

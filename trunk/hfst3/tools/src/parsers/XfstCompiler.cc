@@ -56,7 +56,7 @@ extern FILE* hxfstin;
 extern int hxfstparse(void);
 
 extern int hxfstlex(void);
-class yy_buffer_state;
+struct yy_buffer_state;
 typedef yy_buffer_state *YY_BUFFER_STATE;
 extern YY_BUFFER_STATE hxfst_scan_string(const char*);
 extern void hxfst_delete_buffer(YY_BUFFER_STATE);
