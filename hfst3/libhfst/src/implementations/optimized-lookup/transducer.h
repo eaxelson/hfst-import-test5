@@ -14,7 +14,12 @@
 #ifndef _HFST_OL_TRANSDUCER_TRANSDUCER_H_
 #define _HFST_OL_TRANSDUCER_TRANSDUCER_H_
 
-#include <unistd.h>
+#ifndef _MSC_VER
+#  include <unistd.h>
+#else
+#  include <io.h>
+#endif
+
 #include <vector>
 #include <set>
 #include <iostream>
