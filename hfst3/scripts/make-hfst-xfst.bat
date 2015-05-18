@@ -10,7 +10,7 @@ rem copy ..\..\back-ends\openfstwin\src\lib\openfst.* .
 if not exist "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Include" echo Error: missing include directory "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Include" && ^
 exit /B
 
-if exist "..\..\back-ends\foma\flags.c" echo Renaming foma's flags.c into _flags.c as there is a file with the same name in openfst ^
+if exist "..\..\back-ends\foma\flags.c" echo Renaming foma's flags.c into _flags.c as there is a file with the same name in openfst && ^
 move ..\..\back-ends\foma\flags.c ..\..\back-ends\foma\_flags.c 
 
 @echo ON
@@ -20,7 +20,6 @@ cl /EHsc /Zc:wchar_t /Fehfst-xfst.exe ^
 /I..\..\libhfst\src /I..\..\back-ends\foma /I..\..\back-ends /I..\..\back-ends\openfstwin\src\include /I ..\.. ^
 /Iparsers /I..\.. /I..\..\libhfst\src /I..\..\libhfst\src\parsers /I..\..\back-ends\foma ^
 /I..\..\back-ends /I..\..\back-ends\openfstwin\src\include /I..\..\tools\src /I..\..\tools\src\parsers ^
-..\..\tools\src\getopt_long.cpp ^
 ..\..\tools\src\hfst-commandline.cpp ^
 ..\..\tools\src\hfst-file-to-mem.cpp ^
 ..\..\tools\src\hfst-program-options.cpp ^
@@ -87,4 +86,5 @@ parsers\xre_utils.cpp ^
 ..\..\back-ends\openfstwin\src\lib\symbol-table-ops.cpp ^
 ..\..\back-ends\openfstwin\src\lib\util.cpp ^
 ..\..\back-ends\foma\*.c user32.lib
+
 
