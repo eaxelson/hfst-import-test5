@@ -34,11 +34,6 @@
 
 #ifndef _MSC_VER
 #  include <getopt.h>
-#else
-#  include <../getopt_long.h>
-   int optind = 1;
-   char * optarg = "";
-   int optopt = 0;
 #endif
 
 #include "hfst-commandline.h"
@@ -96,6 +91,7 @@ print_usage()
 int
 parse_options(int argc, char** argv)
 {
+#ifndef _MSC_VER
   extend_options_getenv(&argc, &argv);
   // use of this function requires options are settable on global scope                                                                                                                                                                    
   while (true)
@@ -174,6 +170,83 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-error.h"
           }
     }
+#else // _MSC_VER
+  for (unsigned int i=1; i < (unsigned int)argc; i++)
+    {
+      std::string arg(argv[i]);
+      
+      if (arg == "-d" || arg == "--debug")
+        {
+          debug = true;
+        }
+      else if (arg == "-h" || arg == "--help")
+        {
+          print_usage();
+          return EXIT_SUCCESS;
+        }
+      else if (arg == "-V" || arg == "--version")
+        {
+          print_version();
+          return EXIT_SUCCESS;
+        }
+      else if (arg == "-v" || arg == "--verbose")
+        {
+          verbose = true;
+          silent = false;
+        }
+      else if (arg == "-s" || arg == "--silent")
+        {
+          verbose = false;
+          silent = true;
+        }
+      else if (arg == "-f" || arg == "--format")
+        {
+          if (i+1 == argc) { error(EXIT_FAILURE, 0 , "option '%s' requires an argument", arg.c_str()); return EXIT_FAILURE; }
+          output_format = hfst_parse_format_name(argv[i+1]);
+          i++;
+        }
+      else if (arg == "-F" || arg == "--scriptfile")
+        {
+          if (i+1 == argc) { error(EXIT_FAILURE, 0 , "option '%s' requires an argument", arg.c_str()); return EXIT_FAILURE; }
+          scriptfilename = hfst_strdup(argv[i+1]);
+          i++;
+        }
+      else if (arg == "-e" || arg == "--execute")
+        {
+          if (i+1 == argc) { error(EXIT_FAILURE, 0 , "option '%s' requires an argument", arg.c_str()); return EXIT_FAILURE; }
+          execute_commands.push_back(hfst_strdup(argv[i+1]));
+          i++;
+        }
+      else if (arg == "-l" || arg == "--startupfile")
+        {
+          if (i+1 == argc) { error(EXIT_FAILURE, 0 , "option '%s' requires an argument", arg.c_str()); return EXIT_FAILURE; }
+          startupfilename = hfst_strdup(argv[i+1]);
+          i++;
+        }
+      else if (arg == "-p" || arg == "--pipe-mode")
+        {
+          pipemode = true;
+          use_readline = false;
+        }
+      else if (arg == "-r" || arg == "--no-readline")
+        {
+          use_readline = false;
+        }
+      else if (arg == "-w" || arg == "--print-weight")
+        {
+          print_weight = true;
+        }
+      else if (arg == "-k" || arg == "--output-to-console")
+        {
+          output_to_console = true;
+        }
+      else
+        {
+          error(EXIT_FAILURE, 0 , "invalid option '%s'", arg.c_str());
+          return EXIT_FAILURE;
+        }
+    }  
+#endif // _MSC_VER
 
   if (output_format == hfst::UNSPECIFIED_TYPE)
     {
