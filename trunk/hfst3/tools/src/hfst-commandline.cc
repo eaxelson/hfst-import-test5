@@ -31,7 +31,13 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <unistd.h>
+
+#ifndef _MSC_VER
+#  include <unistd.h>
+#else
+#  include  <io.h>
+#endif
+
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -218,12 +224,16 @@ hfst_strtonumber(const char *s, bool *infinite)
     double rv = strtod(s, &endptr); 
     if (*endptr == '\0')
       {
+#ifndef _MSC_VER
         if (std::isinf(rv) && infinite != NULL)
         {
             *infinite = true;
             return std::signbit(rv);
         }
         else if (rv > INT_MAX)
+#else
+        if (rv > INT_MAX)
+#endif
         {
             return INT_MAX;
         }
