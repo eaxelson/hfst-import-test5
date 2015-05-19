@@ -168,22 +168,28 @@ descriptions in the \texttt{lexc} formalism.
 Hyper-minimization of minimal deterministic finite-state machines
 refers to procedures which produce an even smaller finite-state
 machine which preserves some of the qualities of the original
-deterministic minimal machine. Hyper-minimization comes in two flavors:
-lossy and lossless.
+deterministic minimal machine. This definition of hyper-minimization
+encompasses a number of different approaches.
 
-Lossy hyper-minimization algorithms~\cite{maletti2011} introduce a
-limited amount of changes to the language accepted by the original
-machine. This makes the machine susceptible to further size reduction
-using conventional minimization algorithms. Lossy hyper-minimization
-results in a deterministic machine which allows fast lookup.
+Originally hyper-minimization was introduced by \cite{badr2009} and
+further developped by \cite{maletti2011}. Their hyper-minimization
+algorithms introduce a limited amount of changes to
+the language accepted by the original machine. This makes the machine
+susceptible to further size reduction using conventional minimization
+algorithms. We call this kind of hyper-minimization {\it lossy
+  hyper-minimization} because the resulting finite-state machine does
+not accept the same language as the original machine. Lossy
+hyper-minimization results in a deterministic machine which allows
+fast lookup.
 
 In contrast to lossy hyper-minimization, the approach presented in
-this paper is lossless. We introduce a limited amount of
-non-determinism into the finite-state machine using flag
-diacritics. Thus we achieve size reduction, while at the same time
-preserving the original language accepted by the finite-state
-machine. The non-determinism introduced by the algorithm results in
-some reduction in lookup speed, which is not prohibitive in practice.
+this paper is {\it lossless}. We introduce a limited amount of
+non-determinism into the finite-state machine using labeled epsilon
+symbols (flag diacritics). This allows us to achieve a size reduction,
+while at the same time preserving the original language accepted by
+the finite-state machine. The non-determinism introduced by the
+algorithm results in some reduction in lookup speed, which is not
+prohibitive in practice.
 
 Finding the smallest non-deterministic finite-state machine equivalent
 to a given machine is PSPACE complete \cite{jiang1993} for general
@@ -207,12 +213,12 @@ LEXICON Root
 0 Adj ;
 
 LEXICON N
-cat+A:cat Num ;
+cat+N:cat Num ;
 
 LEXICON Adj
 small+A:small Deg ;
 
-LEXCION Num
+LEXICON Num
 +Sg:0 # ;
 +Pl:s # ;
 
@@ -280,17 +286,21 @@ symbols. However, joiner symbols seem to add useful structure into
 the lexicon which helps to maintain a smaller size.
 
 By transforming each joiner {\tt \$J\$} into a flag diacritic {\tt
-  @P.J.ON@}, we can maintain the useful structure while at the same
-time allowing for lookup of word forms and further processing such as application of
-rules. Note, that there is no actual flag diacritic functionality involved
-apart from the fact that the symbols are treated as labeled epsilon
-symbols.
+  @P.J.ON@}\footnote{The flag diacritic {\tt @P.J.ON@} sets the value
+  {\tt ON} for feature {\tt J}.}, we can
+maintain the useful structure while at the same time allowing for
+lookup of word forms and further processing such as application of
+rules and minimization. Note, that there is no actual flag diacritic
+functionality involved apart from the fact that the symbols are
+treated as labeled epsilon symbols. We use flag diacritics instead of
+custom made labeled epsilon symbols because flag diacritics are
+supported by a number of different finite-state toolkits.
 
 \subsection{Path Condensation}
 
 Although using joiners results in a smaller lexicon, it also slows down transducer lookup. Sometimes the slowdown can be rather drastic, even around 70\% \cite{drobac2014}.  Our initial experiments showed that this happens mainly because of empty lexicon entries, which can result in long sequences of joiner symbols when chained together. During regular compilation, the chains of joiners vanish when all joiners are removed. In our case, however, the chains are unfortunately preserved.
 
-In order to speed up lookup, we apply a final optimization stage before converting joiners into flag diacritics. In this stage we apply a parallel rewrite rule which transform all sequences of joiner symbols into a single joiner symbol, i.e. ``condenses'' consecutive joiners into one joiner. Let {\tt JOINER} be the set of of joiner symbols {\tt [\$J1\$| ... | \$JN\$]}, then the rule is
+In order to speed up lookup, we apply a final optimization stage before converting joiners into flag diacritics. In this stage we apply a parallel rewrite rule which transforms all sequences of joiner symbols into a single joiner symbol, i.e. ``condenses'' consecutive joiners into one joiner. Let {\tt JOINER} be the set of of joiner symbols {\tt [\$J1\$| ... | \$JN\$]}, then the rule is
 \begin{verbatim} 
     JOINER -> 0 || _ JOINER ;
 \end{verbatim}
@@ -336,7 +346,7 @@ The results of experiments are shown in Table
 
 Compilation time using hyper-minimization and path condensation does
 not seem to be prohibitive for any of the analyzers. In fact
-compilation time for both Greenlandic and Norther Sami is reduced by
+compilation time for both Greenlandic and Northern Sami is reduced by
 over 60\% compared to compilation without hyper-minimization. The
 compilation time for Finnish, however, increases compared with compilation without
 hyper-minimization.
