@@ -3019,6 +3019,7 @@ namespace xfst {
     {
       GET_TOP(tmp);
       HfstBasicTransducer basic(*tmp);
+#ifdef WINDOWS
       if (output_to_console_ && (outfile == stdout))
         {
           std::ostringstream ostr;
@@ -3026,6 +3027,7 @@ namespace xfst {
           hfst_fprintf(outfile, ostr.str().c_str());
         }
       else
+#endif
         {
           basic.write_in_xfst_format(outfile, variables_["print-weight"] == "ON");
         }

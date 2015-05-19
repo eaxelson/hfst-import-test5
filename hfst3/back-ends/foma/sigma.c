@@ -336,9 +336,16 @@ struct ssort {
   int number;
 };
 
-int ssortcmp(struct ssort *a, struct ssort *b) {
-  return(strcmp(a->symbol, b->symbol));
-}
+
+#ifdef _MSC_VER
+  int ssortcmp(const void *a, const void *b) {
+    return(strcmp(((struct ssort*)a)->symbol, ((struct ssort*)b)->symbol));
+  }
+#else
+  int ssortcmp(struct ssort *a, struct ssort *b) {
+    return(strcmp(a->symbol, b->symbol));
+  }
+#endif // _MSC_VER
 
 struct sigma *sigma_copy(struct sigma *sigma) {
     int f = 0;
@@ -367,7 +374,11 @@ struct sigma *sigma_copy(struct sigma *sigma) {
 /* and sorts the sigma based on the symbol string contents        */
 
 int sigma_sort(struct fsm *net) {
+#ifdef _MSC_VER
+  int(*comp)(const void*, const void*) = ssortcmp;
+#else
   int(*comp)() = ssortcmp;
+#endif // _MSC_VER
   int size, i, max, *replacearray;
   struct ssort *ssort;
   struct sigma *sigma;

@@ -1221,7 +1221,7 @@ ECHO;
 				{
 				(yy_did_buffer_switch_on_eof) = 0;
 
-				if ( cmatrixwrap( ) )
+				if ( cmatrixwrap( void ) )
 					{
 					/* Note: because we've taken care in
 					 * yy_get_next_buffer() to have set up
@@ -1486,7 +1486,7 @@ static int yy_get_next_buffer (void)
 
 				case EOB_ACT_END_OF_FILE:
 					{
-					if ( cmatrixwrap( ) )
+					if ( cmatrixwrap( void ) )
 						return 0;
 
 					if ( ! (yy_did_buffer_switch_on_eof) )

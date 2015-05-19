@@ -31,20 +31,36 @@ char *fsm_get_library_version_string() {
     return(s);
 }
 
-int linesortcompin(struct fsm_state *a, struct fsm_state *b) {
-    return (a->in - b->in);
-}
 
-int linesortcompout(struct fsm_state *a, struct fsm_state *b) {
-    return (a->out - b->out);
+#ifdef _MSC_VER
+int linesortcompin(const void *a, const void *b) {
+  return (((struct fsm_state*)a)->in - ((struct fsm_state*)b)->in);
 }
+int linesortcompout(const void *a, const void *b) {
+  return (((struct fsm_state*)a)->out - ((struct fsm_state*)b)->out);
+}
+#else
+int linesortcompin(struct fsm_state *a, struct fsm_state *b) {
+  return (a->in - b->in);
+}
+int linesortcompout(struct fsm_state *a, struct fsm_state *b) {
+  return (a->out - b->out);
+}
+#endif // _MSC_VER
 
 void fsm_sort_arcs(struct fsm *net, int direction) {
     /* direction 1 = in, direction = 2, out */
     struct fsm_state *fsm;
     int i, lasthead, numlines;
+
+#ifdef _MSC_VER
+    int(*scin)(const void*, const void*) = linesortcompin;
+    int(*scout)(const void*, const void*) = linesortcompout;
+#else
     int(*scin)() = linesortcompin;
     int(*scout)() = linesortcompout;
+#endif // _MSC_VER
+
     fsm = net->states;
     for (i=0, numlines = 0, lasthead = 0 ; (fsm+i)->state_no != -1; i++) {
         if ((fsm+i)->state_no != (fsm+i+1)->state_no || (fsm+i)->target == -1) {
