@@ -184,6 +184,8 @@ $1/back-ends/foma/lex.cmatrix.c;
 do
     sed -i 's/#include <unistd.h>/#include <io.h>/' $file
 done
+sed -i 's/pmatchwrap( )/pmatchwrap(void)/' $1/libhfst/src/parsers/pmatch_lex.cpp
+sed -i 's/hlexcwrap( )/hlexcwrap(void)/' $1/libhfst/src/parsers/lexc-lexer.cpp
 
 # copy files for hfst-xfst
 mkdir $1/tools
@@ -200,7 +202,10 @@ done
 
 #sed -i 's/#include <getopt.h>/#include "..\/getopt.h"/' $1/tools/src/parsers/hfst-xfst.cpp
 sed -i 's/#include <unistd.h>/#include <io.h>/' $1/tools/src/parsers/xfst-lexer.cpp
+sed -i 's/hxfstwrap( )/hxfstwrap(void)/' $1/tools/src/parsers/xfst-lexer.cpp
 sed -i 's/#include "help_message.cc"/#include "help_message.cpp"/' $1/tools/src/parsers/XfstCompiler.cpp
+
+
 
 for file in \
 hfst-program-options hfst-commandline hfst-tool-metadata HfstStrings2FstTokenizer \

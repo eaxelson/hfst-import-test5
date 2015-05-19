@@ -47,7 +47,8 @@ static char* scriptfilename = NULL;
 static char* startupfilename = NULL;
 static std::vector<char*> execute_commands;
 static bool pipemode = false;
-static bool output_to_console = false;
+static bool output_to_console = true; // this has no effect on non-windows platforms
+
 #ifdef HAVE_READLINE
   static bool use_readline = true;
 #else
@@ -75,7 +76,7 @@ print_usage()
           "  -p, --pipe-mode          Read commands from standard input (non-interactive)\n"
           "  -r, --no-readline        Do not use readline library for input\n"
           "  -w, --print-weight       Print weights for each operation\n"
-          "  -k, --output-to-console  Output directly to console (Windows-specific)\n"
+          "  -k, --no-console         Do not output directly to console (Windows-specific)\n"
           "\n"
           "Option --execute can be invoked many times.\n"
           "If FMT is not given, OpenFst's tropical format will be used.\n"
@@ -107,7 +108,7 @@ parse_options(int argc, char** argv)
             {"pipe-mode", no_argument, 0, 'p'},
             {"no-readline", no_argument, 0, 'r'},
             {"print-weight", no_argument, 0, 'w'},
-            {"output-to-console", no_argument, 0, 'k'},
+            {"no-console", no_argument, 0, 'k'},
             {0,0,0,0}
           };
         int option_index = 0;
@@ -165,86 +166,123 @@ parse_options(int argc, char** argv)
             print_weight = true;
             break;
           case 'k':
-            output_to_console = true;
+            output_to_console = false;
             break;
 #include "inc/getopt-cases-error.h"
           }
     }
 #else // _MSC_VER
+
+  // if arguments are given in format --option=arg
+  std::string prefixes [] = {"-f=","--format=","-F=","--scriptfile=","-e=","--execute=","-l=","--startupfile="};
+  const unsigned int num_prefixes = 8;
+
   for (unsigned int i=1; i < (unsigned int)argc; i++)
     {
-      std::string arg(argv[i]);
+      std::string option(argv[i]);
+
+      // check for format --option=arg
+      std::string argument("");
+      for (unsigned int j=0; j < num_prefixes; j++)
+        {
+          if (option.compare(0, prefixes[j].size(), prefixes[j]) == 0)
+            {
+              argument=option.substr(prefixes[j].size());
+              option=option.substr(0, prefixes[j].size()-1);
+            }
+        }
       
-      if (arg == "-d" || arg == "--debug")
+      if (option == "-d" || option == "--debug")
         {
           debug = true;
         }
-      else if (arg == "-h" || arg == "--help")
+      else if (option == "-h" || option == "--help")
         {
           print_usage();
           return EXIT_SUCCESS;
         }
-      else if (arg == "-V" || arg == "--version")
+      else if (option == "-V" || option == "--version")
         {
           print_version();
           return EXIT_SUCCESS;
         }
-      else if (arg == "-v" || arg == "--verbose")
+      else if (option == "-v" || option == "--verbose")
         {
           verbose = true;
           silent = false;
         }
-      else if (arg == "-s" || arg == "--silent")
+      else if (option == "-s" || option == "--silent")
         {
           verbose = false;
           silent = true;
         }
-      else if (arg == "-f" || arg == "--format")
+      else if (option == "-f" || option == "--format")
         {
-          if (i+1 == argc) { error(EXIT_FAILURE, 0 , "option '%s' requires an argument", arg.c_str()); return EXIT_FAILURE; }
-          output_format = hfst_parse_format_name(argv[i+1]);
-          i++;
+          if (argument != "")
+            output_format = hfst_parse_format_name(argument.c_str());
+          else
+            {
+              if (i+1 == argc) { error(EXIT_FAILURE, 0 , "option '%s' requires an argument", option.c_str()); return EXIT_FAILURE; }
+              output_format = hfst_parse_format_name(argv[i+1]);
+              i++;
+            }
         }
-      else if (arg == "-F" || arg == "--scriptfile")
+      else if (option == "-F" || option == "--scriptfile")
         {
-          if (i+1 == argc) { error(EXIT_FAILURE, 0 , "option '%s' requires an argument", arg.c_str()); return EXIT_FAILURE; }
-          scriptfilename = hfst_strdup(argv[i+1]);
-          i++;
+          if (argument != "")
+            scriptfilename = strdup(argument.c_str());
+          else
+            {
+              if (i+1 == argc) { error(EXIT_FAILURE, 0 , "option '%s' requires an argument", option.c_str()); return EXIT_FAILURE; }
+              scriptfilename = hfst_strdup(argv[i+1]);
+              i++;
+            }
         }
-      else if (arg == "-e" || arg == "--execute")
+      else if (option == "-e" || option == "--execute")
         {
-          if (i+1 == argc) { error(EXIT_FAILURE, 0 , "option '%s' requires an argument", arg.c_str()); return EXIT_FAILURE; }
-          execute_commands.push_back(hfst_strdup(argv[i+1]));
-          i++;
+          if (argument != "")
+            execute_commands.push_back(strdup(argument.c_str()));
+          else
+            {
+              if (i+1 == argc) { error(EXIT_FAILURE, 0 , "option '%s' requires an argument", option.c_str()); return EXIT_FAILURE; }
+              execute_commands.push_back(hfst_strdup(argv[i+1]));
+              i++;
+            }
         }
-      else if (arg == "-l" || arg == "--startupfile")
+      else if (option == "-l" || option == "--startupfile")
         {
-          if (i+1 == argc) { error(EXIT_FAILURE, 0 , "option '%s' requires an argument", arg.c_str()); return EXIT_FAILURE; }
-          startupfilename = hfst_strdup(argv[i+1]);
-          i++;
+          if (argument != "")
+            startupfilename = strdup(argument.c_str());
+          else
+            {
+              if (i+1 == argc) { error(EXIT_FAILURE, 0 , "option '%s' requires an argument", option.c_str()); return EXIT_FAILURE; }
+              startupfilename = hfst_strdup(argv[i+1]);
+              i++;
+            }
         }
-      else if (arg == "-p" || arg == "--pipe-mode")
+      else if (option == "-p" || option == "--pipe-mode")
         {
           pipemode = true;
           use_readline = false;
         }
-      else if (arg == "-r" || arg == "--no-readline")
+      else if (option == "-r" || option == "--no-readline")
         {
           use_readline = false;
         }
-      else if (arg == "-w" || arg == "--print-weight")
+      else if (option == "-w" || option == "--print-weight")
         {
           print_weight = true;
         }
-      else if (arg == "-k" || arg == "--output-to-console")
+      else if (option == "-k" || option == "--no-console")
         {
-          output_to_console = true;
+          output_to_console = false;
         }
       else
         {
-          error(EXIT_FAILURE, 0 , "invalid option '%s'", arg.c_str());
+          error(EXIT_FAILURE, 0 , "invalid option '%s'", option.c_str());
           return EXIT_FAILURE;
         }
+
     }  
 #endif // _MSC_VER
 
