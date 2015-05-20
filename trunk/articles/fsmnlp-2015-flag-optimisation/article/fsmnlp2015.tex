@@ -30,21 +30,32 @@
 
 \title{Automated Lossless Hyper-Minimization for Morphological Analyzers}
 
-\author{First Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  {\tt email@domain} \\\And
-  Second Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  {\tt email@domain} \\\And
-  Third Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  {\tt email@domain} \\}
+  \iffalse
+\author{Senka Drobac \\
+Department of Modern Languages \\
+PO Box 24 \\
+00014 University of Helsinki \\
+  {\tt senka.drobac@helsinki.fi} \\\And
+  Miikka Silfverberg \\
+  Department of Modern Languages \\
+    PO Box 24 \\
+    00014 University of Helsinki \\
+    {\tt miikka.silfverberg@helsinki.fi} \\\And
+	  Krister Lind\'{e}n \\
+Department of Modern Languages \\
+    PO Box 24 \\
+00014 University of Helsinki\\
+  {\tt krister.linden@helsinki.fi} \\}
+  
+  \fi
+
+\author{Senka Drobac  \and Miikka Silfverberg \and Krister Lind\'{e}n  \\
+Department of Modern Languages \\
+PO Box 24 \\
+00014 University of Helsinki \\
+{\tt \{senka.drobac, miikka.silfverberg, krister.linden\}@helsinki.fi} \\}
+
+
 
 
 \date{}
@@ -78,7 +89,7 @@ Morphological analyzers are commonly implemented as finite state
 machines (FSM) because finite-state technology enables both fast
 processing of large amounts of input and manipulation of the analyzer
 using finite-state algebra. Sometimes finite-state analyzers may,
-however, become quite large. This may be a problem e.g. when analyzers are
+however, become quite large. This can be a problem e.g. when analyzers are
 used on mobile devices where a moderate memory footprint is required.
  
 %Finite-state transducers are an established way of encoding
@@ -88,8 +99,7 @@ used on mobile devices where a moderate memory footprint is required.
 %which should have a moderate memory footprint.
 
 The usual way to reduce the size of FSMs is to use a minimization
-algorithm which combines suffix-equivalent states
-\cite{Aho1986}. Minimization can have a substantial effect on the size
+algorithm \cite{hopcroft1971n}. Minimization can have a substantial effect on the size
 of the FSM but, as it is only able to combine suffix-equivalent
 states, there may still be residual redundancy in the state space of the
 machine.
@@ -136,7 +146,7 @@ This paper introduces an automated method for inducing flag diacritics
 into finite-state morphological analyzers based on the Xerox {\tt
   lexc} formalism.  We refine an earlier approach by Drobac et
 al. \shortcite{drobac2014}, which requires manual selection of flag
-diacritics to obtain substantial size reduction. We show that
+diacritics, to obtain substantial size reduction. We show that
 our approach achieves similar reductions in size, but with a fully
 automated process. Moreover, the approach presented in this paper is
 conceptually simpler and faster because, unlike Drobac et
@@ -147,13 +157,13 @@ al. \shortcite{drobac2014} due to an operation which we call path
 condensation.
 
 We apply our approach to morphological analyzers for three
-morphologically complex languages Greenlandic, North Saami, and
+morphologically complex languages: Greenlandic, North Saami, and
 Finnish. Compared to Drobac et al. \shortcite{drobac2014}, our
 approach results in near equal size reduction for these languages
-without requiring any manual intervention. Furthermore, because of the
+without requiring any manual intervention. Furthermore, due to path condensation introduced in Section \ref{pc},
+lookup time is reduced for all three languages and because of the
 new \texttt{lexc} approach, compilation time is reduced for all
-languages and due to path condensation introduced in Section \ref{pc},
-lookup time is reduced for all three languages.
+languages.
 
 \section{Background}
 Finite state morphology~\cite{beesley2003finite} is the
@@ -168,7 +178,7 @@ descriptions in the \texttt{lexc} formalism.
 
 In this paper, we use the term hyper-minimization of minimal
 deterministic finite-state machines to refer to procedures which
-produce an even smaller finite-state machine which preserves some of
+produce an even smaller finite-state machine, that preserves some of
 the qualities of the original deterministic minimal machine. This
 definition of hyper-minimization is broad enough to encompass a number
 of different approaches. The generally used definition of
