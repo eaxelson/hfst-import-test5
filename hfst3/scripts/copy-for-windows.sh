@@ -171,6 +171,7 @@ cp scripts/make-python-bindings.bat $1/libhfst/src/
 cp scripts/test_libhfst_win.py $1/libhfst/src/
 cp scripts/libhfst_win.i $1/libhfst/src/
 cp scripts/make-hfst-xfst.bat $1/libhfst/src/
+cp scripts/make-hfst-lexc.bat $1/libhfst/src/
 
 # copy missing headers and change some headers included
 cp scripts/stdint.h $1/back-ends/foma/
@@ -187,7 +188,7 @@ done
 sed -i 's/pmatchwrap( )/pmatchwrap(void)/' $1/libhfst/src/parsers/pmatch_lex.cpp
 sed -i 's/hlexcwrap( )/hlexcwrap(void)/' $1/libhfst/src/parsers/lexc-lexer.cpp
 
-# copy files for hfst-xfst
+# copy files for hfst-xfst and hfst-lexc
 mkdir $1/tools
 mkdir $1/tools/src
 mkdir $1/tools/src/parsers
@@ -209,7 +210,7 @@ sed -i 's/#include "help_message.cc"/#include "help_message.cpp"/' $1/tools/src/
 
 for file in \
 hfst-program-options hfst-commandline hfst-tool-metadata HfstStrings2FstTokenizer \
-hfst-file-to-mem hfst-string-conversions;
+hfst-file-to-mem hfst-string-conversions hfst-lexc-compiler;
 do
     cp tools/src/$file.cc $1/tools/src/$file.cpp
 done
