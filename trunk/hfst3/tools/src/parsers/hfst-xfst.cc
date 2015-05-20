@@ -89,10 +89,138 @@ print_usage()
   print_more_info();
 }
 
+#ifdef _MSC_VER
+int no_argument = 0 ;
+int required_argument = 1;
+int optional_argument = 2;
+struct option
+{
+  const char *name;
+  int has_arg;
+  int *flag;
+  int val;
+};
+char * optarg = NULL;
+int optopt = 0;
+int optind = 1;
+char getopt_long(int argc, char * const argv [], const char * optstring, 
+                 const struct option * longopts, int * longindex)
+{
+  // check that there are more args
+  if (optind > (argc-1))
+    return -1;
+
+  // skip free arguments
+  while(*(argv[optind]) != '-')
+    {
+      optind++;
+      if (optind > (argc-1))
+        return -1;
+    }
+
+  // strdup because we are possibly modifying the argument
+  char * arg = strdup(argv[optind]); // free() should be called at the end...
+
+  // skip initial '-' signs
+  while(*arg == '-')
+    arg++;
+
+  // empty arg string
+  if (*arg == '\0')
+    {
+      optopt = -2;
+      return '?';
+    }
+
+  // whether arg is used in its short form: -f(=bar)
+  bool short_option = false;
+  arg++;
+  if (*arg == '\0' || *arg == '=')
+    short_option = true;
+  arg--;
+
+  // whether option argument is given after an '=' sign (--foo=bar, -f=bar)
+  bool eq_used = false;
+  char * argptr = arg;  // this will point to the char after the '=' sign if eq_used is true
+  while (*argptr != '\0')
+    {
+      if (*argptr == '=')
+        {
+          *argptr = '\0';  // change '=' into '\0' to make string comparison easier
+          argptr++;
+          eq_used = true;
+          break;
+        }
+      argptr++;
+    }
+
+  // Go through all possible option strings
+  while(longopts->name != 0)
+    {
+      // match found, short or long format
+      if (strcmp(longopts->name, arg) == 0 || (short_option && longopts->val == (int)*arg))
+        {
+          optind++;
+          // no argument
+          if (longopts->has_arg == no_argument)
+            {
+              // argument given for an option that does not take one
+              if (eq_used)
+                {
+                  fprintf(stderr, "warning: argument ignored for option '--%s'\n", longopts->name);
+                }
+              return longopts->val;
+            }
+          // required argument
+          else if (longopts->has_arg == required_argument)
+            {
+              if (eq_used)
+                {
+                  // we already have a pointer to the argument
+                  optarg = strdup(argptr);
+                  argptr--;
+                  *argptr = '='; // change '\0' back to '=' (not sure if this is needed...)
+                  return longopts->val;
+                }
+              // no more args, required argument thus missing
+              if (optind > (argc-1))
+                {
+                  optopt = longopts->val;
+                  return ':';
+                }
+              // next arg is required argument
+              optarg = strdup(argv[optind]);
+              optind++;
+              return longopts->val;
+            }
+          // optional argument
+          else if (longopts->has_arg == optional_argument)
+            {
+              assert(false); // not implemented
+              return 0;
+            }
+          // this should not happen
+          else
+            {
+              assert(false);
+              return 0;
+            }
+        }
+      longopts++;
+    }
+
+  // no match found
+  optind++;
+  optopt = -2;
+  if (short_option)
+    optopt = (int)*arg;
+  return '?';
+}
+#endif // _MSC_VER
+
 int
 parse_options(int argc, char** argv)
 {
-#ifndef _MSC_VER
   extend_options_getenv(&argc, &argv);
   // use of this function requires options are settable on global scope                                                                                                                                                                    
   while (true)
@@ -171,120 +299,6 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-error.h"
           }
     }
-#else // _MSC_VER
-
-  // if arguments are given in format --option=arg
-  std::string prefixes [] = {"-f=","--format=","-F=","--scriptfile=","-e=","--execute=","-l=","--startupfile="};
-  const unsigned int num_prefixes = 8;
-
-  for (unsigned int i=1; i < (unsigned int)argc; i++)
-    {
-      std::string option(argv[i]);
-
-      // check for format --option=arg
-      std::string argument("");
-      for (unsigned int j=0; j < num_prefixes; j++)
-        {
-          if (option.compare(0, prefixes[j].size(), prefixes[j]) == 0)
-            {
-              argument=option.substr(prefixes[j].size());
-              option=option.substr(0, prefixes[j].size()-1);
-            }
-        }
-      
-      if (option == "-d" || option == "--debug")
-        {
-          debug = true;
-        }
-      else if (option == "-h" || option == "--help")
-        {
-          print_usage();
-          return EXIT_SUCCESS;
-        }
-      else if (option == "-V" || option == "--version")
-        {
-          print_version();
-          return EXIT_SUCCESS;
-        }
-      else if (option == "-v" || option == "--verbose")
-        {
-          verbose = true;
-          silent = false;
-        }
-      else if (option == "-s" || option == "--silent")
-        {
-          verbose = false;
-          silent = true;
-        }
-      else if (option == "-f" || option == "--format")
-        {
-          if (argument != "")
-            output_format = hfst_parse_format_name(argument.c_str());
-          else
-            {
-              if (i+1 == argc) { error(EXIT_FAILURE, 0 , "option '%s' requires an argument", option.c_str()); return EXIT_FAILURE; }
-              output_format = hfst_parse_format_name(argv[i+1]);
-              i++;
-            }
-        }
-      else if (option == "-F" || option == "--scriptfile")
-        {
-          if (argument != "")
-            scriptfilename = strdup(argument.c_str());
-          else
-            {
-              if (i+1 == argc) { error(EXIT_FAILURE, 0 , "option '%s' requires an argument", option.c_str()); return EXIT_FAILURE; }
-              scriptfilename = hfst_strdup(argv[i+1]);
-              i++;
-            }
-        }
-      else if (option == "-e" || option == "--execute")
-        {
-          if (argument != "")
-            execute_commands.push_back(strdup(argument.c_str()));
-          else
-            {
-              if (i+1 == argc) { error(EXIT_FAILURE, 0 , "option '%s' requires an argument", option.c_str()); return EXIT_FAILURE; }
-              execute_commands.push_back(hfst_strdup(argv[i+1]));
-              i++;
-            }
-        }
-      else if (option == "-l" || option == "--startupfile")
-        {
-          if (argument != "")
-            startupfilename = strdup(argument.c_str());
-          else
-            {
-              if (i+1 == argc) { error(EXIT_FAILURE, 0 , "option '%s' requires an argument", option.c_str()); return EXIT_FAILURE; }
-              startupfilename = hfst_strdup(argv[i+1]);
-              i++;
-            }
-        }
-      else if (option == "-p" || option == "--pipe-mode")
-        {
-          pipemode = true;
-          use_readline = false;
-        }
-      else if (option == "-r" || option == "--no-readline")
-        {
-          use_readline = false;
-        }
-      else if (option == "-w" || option == "--print-weight")
-        {
-          print_weight = true;
-        }
-      else if (option == "-k" || option == "--no-console")
-        {
-          output_to_console = false;
-        }
-      else
-        {
-          error(EXIT_FAILURE, 0 , "invalid option '%s'", option.c_str());
-          return EXIT_FAILURE;
-        }
-
-    }  
-#endif // _MSC_VER
 
   if (output_format == hfst::UNSPECIFIED_TYPE)
     {
