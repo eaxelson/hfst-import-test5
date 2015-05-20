@@ -148,12 +148,12 @@ condensation.
 
 We apply our approach to morphological analyzers for three
 morphologically complex languages Greenlandic, North Saami, and
-Finnish. Compared to Drobac et al. \shortcite{drobac2014}, our approach
-results in near equal size reduction for these languages without
-requiring any manual intervention. Furthermore, because of the new
-\texttt{lexc} approach, compilation time is reduced for all languages
-and due to path condensation, lookup time is reduced for all three
-languages.
+Finnish. Compared to Drobac et al. \shortcite{drobac2014}, our
+approach results in near equal size reduction for these languages
+without requiring any manual intervention. Furthermore, because of the
+new \texttt{lexc} approach, compilation time is reduced for all
+languages and due to path condensation introduced in Section \ref{pc},
+lookup time is reduced for all three languages.
 
 \section{Background}
 Finite state morphology~\cite{beesley2003finite} is the
@@ -166,16 +166,20 @@ variations as regular expression rules. In this paper, we study lossless
 hyper-minimization of finite-state machines derived from lexicographic
 descriptions in the \texttt{lexc} formalism.
 
-Hyper-minimization of minimal deterministic finite-state machines
-refers to procedures which produce an even smaller finite-state
-machine which preserves some of the qualities of the original
-deterministic minimal machine. This definition of hyper-minimization
-encompasses a number of different approaches.
+In this paper, we use the term hyper-minimization of minimal
+deterministic finite-state machines to refer to procedures which
+produce an even smaller finite-state machine which preserves some of
+the qualities of the original deterministic minimal machine. This
+definition of hyper-minimization is broad enough to encompass a number
+of different approaches. The generally used definition of
+hyper-minimization, introduced by Badr et al. \shortcite{badr2009} and
+further developed by for example Maletti and Quarnheim \shortcite{maletti2011}, is
+more restricted.
 
-Originally hyper-minimization was introduced by \cite{badr2009} and
-further developped by \cite{maletti2011}. Their hyper-minimization
-algorithms introduce a limited amount of changes to
-the language accepted by the original machine. This makes the machine
+The hyper-minimization algorithms investigated by Badr et
+al. \shortcite{badr2009} and by Maletti and Quarnheim
+\shortcite{maletti2011} introduce a limited amount of changes to the
+language accepted by the original machine. This makes the machine
 susceptible to further size reduction using conventional minimization
 algorithms. We call this kind of hyper-minimization {\it lossy
   hyper-minimization} because the resulting finite-state machine does
@@ -204,7 +208,10 @@ the size of the machine without penalties in compilation time.
 In this section, we describe our lossless hyper-minimization algorithm
 of morphological lexicons. The algorithm is applicable on finite-state
 lexicons formulated as regular grammars. An example of this kind of
-formalism is the Xerox {\tt lexc} formalism \cite{beesley2003finite}.
+formalism is the Xerox {\tt lexc} formalism
+\cite{beesley2003finite}. Sections \ref{cl} and \ref{hm} closely
+follow Drobac et al. \shortcite{drobac2014} but path condensation
+presented in Section \ref{pc} represents new work.
 
 \begin{figure}
 \begin{small}
@@ -251,9 +258,11 @@ its continuation class. Together with a set of finite-state
 constraints, this completely encodes the structure of the original
 grammar.
 
-All regular expressions in this paper use Xerox {\tt xfst} formalism.
+All regular expressions and regular rewrite rules in this paper use
+Xerox {\tt xfst} formalism.
 
 \subsection{Compiling lexicons using joiners}
+\label{cl}
 
 Compiling a lexicon using joiners starts with appending appropriate joiners to each lexicon entry. E.g. the entry {\tt cat+N:cat} with continuation class {\tt Num} in sub-lexicon {\tt N} becomes {\tt \$N\$cat+N\$Num\$:\$N\$cat\$Num\$}. We then compile all the modified lexicon entries into one trie {\tt T} and form its Kleene closure {\tt T*}. 
 
@@ -277,6 +286,7 @@ though interspersed with joiner symbols. In a final processing state,
 the joiners are removed and the lexicon is determinized and minimized.
 
 \subsection{Hyperminimization using Flag Diacritics}
+\label{hm}
 
 When compiling lexicons using joiners, it is often the case that the
 lexicon is small before the joiners are removed and the lexicon is
@@ -297,11 +307,17 @@ treated as labeled epsilon symbols. We use flag diacritics instead of
 custom made labeled epsilon symbols because flag diacritics are
 supported by a number of different finite-state toolkits.
 
-\subsection{Path Condensation}
+\subsection{Path Condensation}\label{pc}
 
 Although using joiners results in a smaller lexicon, it also slows down transducer lookup. Sometimes the slowdown can be rather drastic, even around 70\% \cite{drobac2014}.  Our initial experiments showed that this happens mainly because of empty lexicon entries, which can result in long sequences of joiner symbols when chained together. During regular compilation, the chains of joiners vanish when all joiners are removed. In our case, however, the chains are unfortunately preserved.
 
-In order to speed up lookup, we apply a final optimization stage before converting joiners into flag diacritics. In this stage we apply a parallel rewrite rule which transforms all sequences of joiner symbols into a single joiner symbol, i.e. ``condenses'' consecutive joiners into one joiner. Let {\tt JOINER} be the set of of joiner symbols {\tt [\$J1\$| ... | \$JN\$]}, then the rule is
+In order to speed up lookup, we apply a final optimization stage
+before converting joiners into flag diacritics. In this stage we apply
+a parallel rewrite rule which transforms all sequences of joiner
+symbols into a single joiner symbol, i.e. ``condenses'' consecutive
+joiners into one joiner. Let {\tt JOINER} be the set of of joiner
+symbols {\tt [\$J1\$| ... | \$JN\$]}, then the rule (in Xerox {\tt
+  xfst} notation) is
 \begin{verbatim} 
     JOINER -> 0 || _ JOINER ;
 \end{verbatim}
@@ -417,9 +433,8 @@ al. \shortcite{drobac2014} would probably give us an even smaller binary
 size while maintaining high lookup speed.
 
 \section{Acknowledgements}
-...\\
-...\\
-...
+We want to thank the anonymous reviewers for their useful comments and suggestions.
+
 \bibliographystyle{acl}
 \bibliography{fsmnlp}
 
