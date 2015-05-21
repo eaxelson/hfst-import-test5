@@ -32,7 +32,12 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <getopt.h>
+
+#ifdef _MSC_VER
+#  include "hfst-getopt.h"
+#else
+#  include <getopt.h>
+#endif
 
 #include "HfstTransducer.h"
 #include "HfstOutputStream.h"
@@ -215,6 +220,7 @@ parse_options(int argc, char** argv)
           }
         format = hfst::TROPICAL_OPENFST_TYPE;
       }
+
     if (argc - optind > 0)
       {
         lexcfilenames = static_cast<char**>(malloc(sizeof(char*)*(argc-optind)));
