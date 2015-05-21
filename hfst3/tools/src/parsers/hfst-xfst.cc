@@ -32,7 +32,9 @@
   #include <readline/history.h>
 #endif
 
-#ifndef _MSC_VER
+#ifdef _MSC_VER
+#  include "../hfst-getopt.h"
+#else
 #  include <getopt.h>
 #endif
 
@@ -88,135 +90,6 @@ print_usage()
   fprintf(message_out, "\n");
   print_more_info();
 }
-
-#ifdef _MSC_VER
-int no_argument = 0 ;
-int required_argument = 1;
-int optional_argument = 2;
-struct option
-{
-  const char *name;
-  int has_arg;
-  int *flag;
-  int val;
-};
-char * optarg = NULL;
-int optopt = 0;
-int optind = 1;
-char getopt_long(int argc, char * const argv [], const char * optstring, 
-                 const struct option * longopts, int * longindex)
-{
-  // check that there are more args
-  if (optind > (argc-1))
-    return -1;
-
-  // skip free arguments
-  while(*(argv[optind]) != '-')
-    {
-      optind++;
-      if (optind > (argc-1))
-        return -1;
-    }
-
-  // strdup because we are possibly modifying the argument
-  char * arg = strdup(argv[optind]); // free() should be called at the end...
-
-  // skip initial '-' signs
-  while(*arg == '-')
-    arg++;
-
-  // empty arg string
-  if (*arg == '\0')
-    {
-      optopt = -2;
-      return '?';
-    }
-
-  // whether arg is used in its short form: -f(=bar)
-  bool short_option = false;
-  arg++;
-  if (*arg == '\0' || *arg == '=')
-    short_option = true;
-  arg--;
-
-  // whether option argument is given after an '=' sign (--foo=bar, -f=bar)
-  bool eq_used = false;
-  char * argptr = arg;  // this will point to the char after the '=' sign if eq_used is true
-  while (*argptr != '\0')
-    {
-      if (*argptr == '=')
-        {
-          *argptr = '\0';  // change '=' into '\0' to make string comparison easier
-          argptr++;
-          eq_used = true;
-          break;
-        }
-      argptr++;
-    }
-
-  // Go through all possible option strings
-  while(longopts->name != 0)
-    {
-      // match found, short or long format
-      if (strcmp(longopts->name, arg) == 0 || (short_option && longopts->val == (int)*arg))
-        {
-          optind++;
-          // no argument
-          if (longopts->has_arg == no_argument)
-            {
-              // argument given for an option that does not take one
-              if (eq_used)
-                {
-                  fprintf(stderr, "warning: argument ignored for option '--%s'\n", longopts->name);
-                }
-              return longopts->val;
-            }
-          // required argument
-          else if (longopts->has_arg == required_argument)
-            {
-              if (eq_used)
-                {
-                  // we already have a pointer to the argument
-                  optarg = strdup(argptr);
-                  argptr--;
-                  *argptr = '='; // change '\0' back to '=' (not sure if this is needed...)
-                  return longopts->val;
-                }
-              // no more args, required argument thus missing
-              if (optind > (argc-1))
-                {
-                  optopt = longopts->val;
-                  return ':';
-                }
-              // next arg is required argument
-              optarg = strdup(argv[optind]);
-              optind++;
-              return longopts->val;
-            }
-          // optional argument
-          else if (longopts->has_arg == optional_argument)
-            {
-              assert(false); // not implemented
-              return 0;
-            }
-          // this should not happen
-          else
-            {
-              assert(false);
-              return 0;
-            }
-        }
-      longopts++;
-    }
-
-  // no match found
-  optind++;
-  optopt = -2;
-  if (short_option)
-    optopt = (int)*arg;
-  return '?';
-}
-#endif // _MSC_VER
 
 int
 parse_options(int argc, char** argv)
@@ -277,6 +150,8 @@ parse_options(int argc, char** argv)
           case 'F':
             scriptfilename = hfst_strdup(optarg);
             break;
+            // todo: on windows getopt_long does not support unicode:
+            // e.g. option  -e 'regex U;'  where U is a unicode character is not possible
           case 'e':
             execute_commands.push_back(hfst_strdup(optarg));
             break;
