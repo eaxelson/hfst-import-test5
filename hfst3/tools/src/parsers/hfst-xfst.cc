@@ -84,7 +84,17 @@ print_usage()
           "If FMT is not given, OpenFst's tropical format will be used.\n"
           "The possible values for FMT are { foma, openfst-tropical, openfst-log, sfst }.\n"
           "Readline library, if enabled when configuring, is used for input by default.\n"
-          "Input files are always treated as UTF-8.\n");
+          "Input files are always treated as UTF-8.\n"
+#ifdef _MSC_VER
+          "\n"
+          "If input file is not specified with -F, input is read interactively via the\n"
+          "console, i.e. line by line from the user. If you redirect input from a file,\n"
+          "use -p. Output is by default printed to the console. If you redirect output\n"
+          "to a file, use -k.\n");
+#else
+          "If input file is not specified with -F, input is read interactively line by\n"
+          "line from the user. If you redirect input from a file, use -p.\n");
+#endif
   fprintf(message_out, "\n");
   print_report_bugs();
   fprintf(message_out, "\n");
