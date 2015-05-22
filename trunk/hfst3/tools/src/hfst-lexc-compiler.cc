@@ -254,6 +254,13 @@ lexc_streams(LexcCompiler& lexc, HfstOutputStream& outstream)
         verbose_printf("Parsing lexc file %s\n", lexcfilenames[i]);
         if (lexcfiles[i] == stdin)
           {
+#ifdef _MSC_VER
+        if (!silent)
+          {
+            warning(0, 0, "Reading from standard input. UTF-8 characters outside\n"
+                    "ascii range are supported only if input comes from a file.");
+          }
+#endif
             lexc.parse(stdin);
           }
         else

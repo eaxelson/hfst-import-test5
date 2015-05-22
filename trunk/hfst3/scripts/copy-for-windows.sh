@@ -201,7 +201,6 @@ do
     cp tools/src/parsers/$file.cc $1/tools/src/parsers/$file.cpp
 done
 
-#sed -i 's/#include <getopt.h>/#include "..\/getopt.h"/' $1/tools/src/parsers/hfst-xfst.cpp
 sed -i 's/#include <unistd.h>/#include <io.h>/' $1/tools/src/parsers/xfst-lexer.cpp
 sed -i 's/hxfstwrap( )/hxfstwrap(void)/' $1/tools/src/parsers/xfst-lexer.cpp
 sed -i 's/#include "help_message.cc"/#include "help_message.cpp"/' $1/tools/src/parsers/XfstCompiler.cpp
@@ -210,7 +209,7 @@ sed -i 's/#include "help_message.cc"/#include "help_message.cpp"/' $1/tools/src/
 
 for file in \
 hfst-program-options hfst-commandline hfst-tool-metadata HfstStrings2FstTokenizer \
-hfst-file-to-mem hfst-string-conversions hfst-lexc-compiler;
+hfst-file-to-mem hfst-string-conversions hfst-lexc-compiler hfst-getopt;
 do
     cp tools/src/$file.cc $1/tools/src/$file.cpp
 done
@@ -218,12 +217,10 @@ done
 for file in \
 hfst-commandline.h hfst-program-options.h hfst-tool-metadata.h \
 HfstStrings2FstTokenizer.h hfst-string-conversions.h \
-hfst-file-to-mem.h;
+hfst-file-to-mem.h hfst-getopt.h;
 do
     cp tools/src/$file $1/tools/src/
 done
-
-#sed -i 's/#include <unistd.h>/#include <io.h>/' $1/tools/src/hfst-commandline.cpp
 
 for file in \
 XfstCompiler.h xfst-utils.h xfst-parser.hh cmd.h abbrcmd.h;

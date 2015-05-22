@@ -26,6 +26,7 @@ cl /EHsc /Zc:wchar_t /Fehfst-xfst.exe ^
 ..\..\tools\src\hfst-string-conversions.cpp ^
 ..\..\tools\src\HfstStrings2FstTokenizer.cpp ^
 ..\..\tools\src\hfst-tool-metadata.cpp ^
+..\..\tools\src\hfst-getopt.cpp ^
 ..\..\tools\src\parsers\hfst-xfst.cpp ^
 ..\..\tools\src\parsers\XfstCompiler.cpp ^
 ..\..\tools\src\parsers\xfst-lexer.cpp ^
