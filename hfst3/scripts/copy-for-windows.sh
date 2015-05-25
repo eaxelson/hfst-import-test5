@@ -172,6 +172,7 @@ cp scripts/test_libhfst_win.py $1/libhfst/src/
 cp scripts/libhfst_win.i $1/libhfst/src/
 cp scripts/make-hfst-xfst.bat $1/libhfst/src/
 cp scripts/make-hfst-lexc.bat $1/libhfst/src/
+cp scripts/make-hfst-tool.bat $1/libhfst/src/
 
 # copy missing headers and change some headers included
 cp scripts/stdint.h $1/back-ends/foma/
@@ -206,10 +207,11 @@ sed -i 's/hxfstwrap( )/hxfstwrap(void)/' $1/tools/src/parsers/xfst-lexer.cpp
 sed -i 's/#include "help_message.cc"/#include "help_message.cpp"/' $1/tools/src/parsers/XfstCompiler.cpp
 
 
-
+# compare, strings2fst and txt2fst are needed for testing hfst-xfst
 for file in \
 hfst-program-options hfst-commandline hfst-tool-metadata HfstStrings2FstTokenizer \
-hfst-file-to-mem hfst-string-conversions hfst-lexc-compiler hfst-getopt;
+hfst-file-to-mem hfst-string-conversions hfst-getopt \
+hfst-lexc-compiler hfst-compare hfst-strings2fst hfst-txt2fst;
 do
     cp tools/src/$file.cc $1/tools/src/$file.cpp
 done

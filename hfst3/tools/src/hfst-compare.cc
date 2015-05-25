@@ -32,7 +32,12 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <getopt.h>
+
+#ifdef _MSC_VER
+#  include "hfst-getopt.h"
+#else
+#  include <getopt.h>
+#endif
 
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
@@ -177,12 +182,12 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
               {
                 if (transducer_n_first == 1)
                   {
-                    if (not silent)
+                    if (! silent)
                       fprintf(outfile, "%s == %s\n", firstname, secondname);
                   }
                 else
                   {
-                    if (not silent)
+                    if (! silent)
                       fprintf(outfile, "%s[" SIZE_T_SPECIFIER "] == %s[" SIZE_T_SPECIFIER "]\n",
                               firstname, transducer_n_first,
                               secondname, transducer_n_second);
@@ -192,12 +197,12 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
               {
                 if (transducer_n_first == 1)
                   {
-                    if (not silent)
+                    if (! silent)
                       fprintf(outfile, "%s != %s\n", firstname, secondname);
                   }
                 else
                   {
-                    if (not silent)
+                    if (! silent)
                       fprintf(outfile, "%s[" SIZE_T_SPECIFIER "] != %s[" SIZE_T_SPECIFIER "]\n",
                               firstname, transducer_n_first, 
                               secondname, transducer_n_second);
@@ -222,7 +227,7 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
         first=0;
         // delete the transducer of second stream, unless we continue reading
         // the first stream and there is only one transducer in the second stream
-        if ((continueReading && secondstream.is_good()) || not continueReading)
+        if ((continueReading && secondstream.is_good()) || ! continueReading)
           {
             delete second;
             second=0;

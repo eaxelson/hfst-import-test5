@@ -38,7 +38,13 @@ using std::pair;
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <getopt.h>
+
+#ifdef _MSC_VER
+#  include "hfst-getopt.h"
+#else
+#  include <getopt.h>
+#endif
+
 #include <math.h>
 #include <errno.h>
 
@@ -421,7 +427,7 @@ int main( int argc, char **argv )
                      multichar_symbol_filename);
       std::ifstream multichar_in(multichar_symbol_filename);
       (void)multichar_in.peek();
-      if (not multichar_in.good())
+      if (! multichar_in.good())
         { error(EXIT_FAILURE, errno,"Multichar symbol file can't be read."); }
       char multichar_line[1000];
       while (multichar_in.good())
