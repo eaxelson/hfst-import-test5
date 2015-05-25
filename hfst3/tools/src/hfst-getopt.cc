@@ -143,6 +143,7 @@ char getopt_long(int argc, char * /*const*/ argv [], const char * optstring,
                 }
               // next arg is required argument
               optarg = strdup(argv[optind]);
+              other_arguments.push_back(argv[optind]);
               optind++;
               return longopts->val;
             }
