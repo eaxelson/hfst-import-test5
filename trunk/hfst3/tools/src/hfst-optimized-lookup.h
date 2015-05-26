@@ -30,7 +30,12 @@ const char * PACKAGE_STRING = "hfst-optimized-lookup 1.2";
   SO THE CURRENT STRUCTURE IS NOT SO GREAT. TODO: FIX THIS.
 */
 
-#include <getopt.h>
+#ifdef _MSC_VER
+#  include "hfst-getopt.h"
+#else
+#  include <getopt.h>
+#endif
+
 #include <cstdio>
 #include <vector>
 #include <map>
@@ -41,6 +46,7 @@ const char * PACKAGE_STRING = "hfst-optimized-lookup 1.2";
 #include <cassert>
 #include <ctime>
 #include <iostream>
+#include <string>
 
 
 enum OutputType {HFST, xerox};
