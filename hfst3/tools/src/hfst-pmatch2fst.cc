@@ -41,7 +41,13 @@ using std::pair;
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <getopt.h>
+
+#ifdef _MSC_VER
+#  include "hfst-getopt.h"
+#else
+#  include <getopt.h>
+#endif
+
 #include <math.h>
 #include <errno.h>
 #include <time.h>

@@ -22,7 +22,7 @@
 #endif
 
 #ifdef WINDOWS
-#include <io.h>
+#  include <io.h>
 #endif
 
 #include <iostream>
@@ -32,7 +32,13 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdarg>
-#include <getopt.h>
+
+#ifdef _MSC_VER
+#  include "hfst-getopt.h"
+#else
+#  include <getopt.h>
+#endif
+
 #include <limits>
 #include <math.h>
 
@@ -705,7 +711,11 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
       }
     else
       {
+#ifdef _MSC_VER
+        w = std::numeric_limits<float>::infinity();
+#else
         w = INFINITY;
+#endif
       }
     i = strdup(inputform);
     if (lookupform != NULL)
@@ -842,7 +852,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
     free(inputform);
     free(lookupform);
     int rv;
-    if (not quote_special)
+    if (! quote_special)
       rv = fprintf(ofile, "%s", res);
     else
       rv = fprintf(ofile, "%s", get_print_format(res).c_str());
@@ -1159,7 +1169,7 @@ void lookup_fd_and_print(HfstBasicTransducer &t, HfstOneLevelPaths& results,
             bool first_pair=true;
             for (StringPairVector::const_iterator IT = it->second.begin();
                  IT != it->second.end(); IT++) {
-              if (print_space && not first_pair) {
+              if (print_space && ! first_pair) {
                 fprintf(outfile, " ");
               }
               first_pair=false;
@@ -1591,7 +1601,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                                   unknown, &infinite);
           }
 
-        if (not print_pairs) { 
+        if (! print_pairs) { 
           // printing was already done in function lookup_fd
           print_lookups(*kvs, *kv, markup, unknown, infinite, outstream);
         }

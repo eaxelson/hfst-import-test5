@@ -211,15 +211,18 @@ sed -i 's/#include "help_message.cc"/#include "help_message.cpp"/' $1/tools/src/
 for file in \
 hfst-program-options hfst-commandline hfst-tool-metadata HfstStrings2FstTokenizer \
 hfst-file-to-mem hfst-string-conversions hfst-getopt \
-hfst-lexc-compiler hfst-compare hfst-strings2fst hfst-txt2fst;
+hfst-lexc-compiler hfst-compare hfst-strings2fst hfst-txt2fst hfst-pmatch hfst-pmatch2fst \
+hfst-lookup hfst-optimized-lookup;
 do
     cp tools/src/$file.cc $1/tools/src/$file.cpp
 done
 
+# todo: proc and twolc
+
 for file in \
 hfst-commandline.h hfst-program-options.h hfst-tool-metadata.h \
 HfstStrings2FstTokenizer.h hfst-string-conversions.h \
-hfst-file-to-mem.h hfst-getopt.h;
+hfst-file-to-mem.h hfst-getopt.h hfst-optimized-lookup.h;
 do
     cp tools/src/$file $1/tools/src/
 done

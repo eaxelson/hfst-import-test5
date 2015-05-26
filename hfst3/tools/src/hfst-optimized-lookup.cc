@@ -24,6 +24,7 @@
  */
 
 #include "hfst-optimized-lookup.h"
+#include "inc/globals-common.h" // some cc files include extern declarations for these variables...
 
 static float beam=-1;
 
@@ -1232,7 +1233,7 @@ void TransducerW::try_epsilon_transitions(SymbolNumber * input_symbol,
       return;
     }
 
-  while ((transitions[i] != NULL) and (transitions[i]->get_input() == 0))
+  while ((transitions[i] != NULL) && (transitions[i]->get_input() == 0))
     {
       *output_symbol = transitions[i]->get_output();
       current_weight += transitions[i]->get_weight();
