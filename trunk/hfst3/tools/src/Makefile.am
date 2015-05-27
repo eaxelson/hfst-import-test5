@@ -271,7 +271,7 @@ hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC) \
 HfstStrings2FstTokenizer.cc 
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_name_SOURCES=hfst-name.cc $(HFST_COMMON_SRC)
-hfst_optimized_lookup_SOURCES=hfst-optimized-lookup.cc
+hfst_optimized_lookup_SOURCES=hfst-optimized-lookup.cc hfst-string-conversions.cc
 hfst_pmatch_SOURCES=hfst-pmatch.cc $(HFST_COMMON_SRC)
 #hfst_preprocess_for_optimized_lookup_format_SOURCES=hfst-preprocess-for-optimized-lookup-format.cc
 #	$(HFST_COMMON_SRC)
