@@ -37,8 +37,9 @@ using std::stack;
   #include <glob.h>
 #else
   #include <windows.h>
-  #include "../hfst-string-conversions.h"
 #endif  // WINDOWS
+
+#include "../hfst-string-conversions.h"
 
 #include "XfstCompiler.h"
 #include "xfst-utils.h"
@@ -65,6 +66,7 @@ extern void hxfst_delete_buffer(YY_BUFFER_STATE);
 
 using hfst::implementations::HfstBasicTransducer;
 using hfst::implementations::HfstBasicTransition;
+using hfst::hfst_fprintf;
 
 #define GET_TOP(x) HfstTransducer * x = this->top(); if ((x) == NULL) { xfst_lesser_fail(); return *this; }
 #define PROMPT_AND_RETURN_THIS prompt(); return *this;
@@ -238,47 +240,6 @@ namespace xfst {
     std::string formatter("%.");
     formatter = formatter + variables_["precision"] + std::string("f");
     return hfst_fprintf(stream, formatter.c_str(), weight);
-  }
-
-  int XfstCompiler::hfst_fprintf(FILE * stream, const char * format, ...) const
-  {
-    va_list args;
-    va_start(args, format);
-#ifdef WINDOWS
-    if (output_to_console_ && (stream == stdout || stream == stderr))
-      {
-        char buffer [1024];
-        int r = vsprintf(buffer, format, args);
-        va_end(args);
-        if (r < 0)
-          return r;
-        HANDLE stdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-        if (stream == stderr)
-          stdHandle = GetStdHandle(STD_ERROR_HANDLE);
-
-        std::string pstr(buffer);
-        DWORD numWritten = 0;
-        int wchars_num =
-          MultiByteToWideChar(CP_UTF8 , 0 , pstr.c_str() , -1, NULL , 0 );
-        wchar_t* wstr = new wchar_t[wchars_num];
-        MultiByteToWideChar(CP_UTF8 , 0 ,
-                            pstr.c_str() , -1, wstr , wchars_num );
-        int retval = WriteConsoleW(stdHandle, wstr, wchars_num-1, &numWritten, NULL);
-        delete[] wstr;
-
-        return retval;
-      }
-    else
-      {
-        int retval = vfprintf(stream, format, args);
-        va_end(args);
-        return retval;
-      }
-#else
-    int retval = vfprintf(stream, format, args);
-    va_end(args);
-    return retval;
-#endif
   }
 
   void XfstCompiler::xfst_fail()
@@ -4097,6 +4058,10 @@ namespace xfst {
           {
             std::wstring wstr(buffer);
             std::string linestr = wide_string_to_string(wstr);
+            if (linestr[0] == (char)32) // control+Z
+              {
+                return NULL;
+              }
             return strdup(linestr.c_str());
           }
         else
@@ -4717,6 +4682,7 @@ namespace xfst {
   XfstCompiler::setOutputToConsole(bool value)
   {
     output_to_console_ = value;
+    hfst::print_output_to_console(output_to_console_);
     return *this;
   }
   bool

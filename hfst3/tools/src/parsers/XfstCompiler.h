@@ -626,9 +626,6 @@ class XfstCompiler
   //! @brief Print weight.
   int hfst_print_weight(FILE * stream, float weight);
 
-  //! @brief Wrapper for fprintf.
-  int hfst_fprintf(FILE * stream, const char * format, ...) const;
-
   //! @brief Get current readline history index.
   int current_history_index();
 
