@@ -33,6 +33,8 @@
 #include "hfst-string-conversions.h"
 #include <cstdarg>
 
+#include <iostream> // DEBUG
+
 using hfst::hfst_fprintf;
 
 static float beam=-1;
@@ -407,41 +409,6 @@ SymbolNumber Encoder::find_key(char ** p)
   return s;
 }
 
-#ifdef WINDOWS
-bool getline_from_console(std::string & str, size_t buffer_size)
-{
-  SetConsoleCP(65001);
-  const HANDLE stdIn = GetStdHandle(STD_INPUT_HANDLE);
-  WCHAR * buffer = new WCHAR [buffer_size];
-  DWORD numRead = 0;
-  if (ReadConsoleW(stdIn, buffer, sizeof (buffer), &numRead, NULL))
-    {
-      std::wstring wstr(buffer);
-      delete buffer;
-      str = hfst::wide_string_to_string(wstr);
-
-      if (str[0] == (char)26) // control+Z
-        {
-          return false;
-        }
-
-      // Get rid of carriage returns and newlines.
-
-      if (str.size() == 0) // empty line without CR or NEWLINE
-        return true;
-      if (str[str.length()-1] == '\n') // NEWLINE
-        str.erase(str.length()-1);
-      if (str.size() == 0)  // empty line with NEWLINE
-        return true;
-      if (str[str.length()-1] == '\r') // CR
-        str.erase(str.length()-1);
-
-      return true;
-    }
-  return false;
-}
-#endif
-
 template <class genericTransducer>
 void runTransducer (genericTransducer T)
 {
@@ -454,8 +421,9 @@ void runTransducer (genericTransducer T)
   // In Windows, we are by default reading from console.
 #ifdef WINDOWS
   std::string linestr("");
-  while(getline_from_console(linestr, MAX_IO_STRING*sizeof(char)))
+  while(hfst::get_line_from_console(linestr, MAX_IO_STRING*sizeof(char)))
     {
+          //std::cerr << "got_line_from_console..." << std::endl;
       char * str = strdup(linestr.c_str());
       char * old_str = str;     
 #else
@@ -474,6 +442,7 @@ void runTransducer (genericTransducer T)
         
       if (echoInputsFlag)
         {
+                        //std::cerr << "echoing input:" << std::endl;  // DEBUG
           //std::cout << str << std::endl;
           hfst_fprintf(stdout, "%s\n", str); // fix: add \r in windows?
         }
@@ -504,10 +473,14 @@ void runTransducer (genericTransducer T)
         { // tokenization failed
           if (outputType == xerox)
             {
+                                std::cerr << "tokenization failed, xerox:" << std::endl;
               //std::cout << str << "\t+?" << std::endl;
                           hfst_fprintf(stdout, "%s\t+?\n", str);
               std::cout << std::endl;
             }
+#ifdef WINDOWS    
+                        linestr = std::string();
+#endif    
           continue;
         }
 
@@ -515,6 +488,10 @@ void runTransducer (genericTransducer T)
 
       T.analyze(input_string);
       T.printAnalyses(std::string(str));
+
+#ifdef WINDOWS    
+          linestr = std::string();
+#endif    
     }
 }
 

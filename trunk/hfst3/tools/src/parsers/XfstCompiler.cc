@@ -4050,6 +4050,17 @@ namespace xfst {
     // if we are reading directly from console
     if ((file == stdin) && read_interactive_text_from_stdin_)
       {
+        std::string str("");
+        size_t bufsize = 1000;
+        if (hfst::get_line_from_console(str, bufsize))
+          {
+            return strdup(str.c_str());
+          }
+        else
+          {
+            return NULL;
+          }
+        /*
         SetConsoleCP(65001);
         const HANDLE stdIn = GetStdHandle(STD_INPUT_HANDLE);
         WCHAR buffer[0x1000];
@@ -4058,7 +4069,7 @@ namespace xfst {
           {
             std::wstring wstr(buffer);
             std::string linestr = wide_string_to_string(wstr);
-            if (linestr[0] == (char)32) // control+Z
+            if (linestr[0] == (char)26) // control+Z
               {
                 return NULL;
               }
@@ -4067,7 +4078,7 @@ namespace xfst {
         else
           {
             return NULL;
-          }
+            }*/
       }
 #endif
 

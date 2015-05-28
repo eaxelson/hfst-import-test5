@@ -414,6 +414,7 @@ int main(int argc, char** argv)
 
       std::string expression = "";
       //unsigned int lines = 0;
+      const unsigned int MAX_LINE_LENGTH = 1024;
 
 #ifdef WINDOWS
       SetConsoleCP(65001);
@@ -426,7 +427,6 @@ int main(int argc, char** argv)
           std::string linestr = hfst::wide_string_to_string(wstr);
           expression += linestr;
 #else
-      const unsigned int MAX_LINE_LENGTH = 1024;
       char line [MAX_LINE_LENGTH];
       insert_zeroes(line, MAX_LINE_LENGTH);
       while (cin.getline(line, MAX_LINE_LENGTH))
