@@ -473,7 +473,6 @@ void runTransducer (genericTransducer T)
         { // tokenization failed
           if (outputType == xerox)
             {
-                                std::cerr << "tokenization failed, xerox:" << std::endl;
               //std::cout << str << "\t+?" << std::endl;
                           hfst_fprintf(stdout, "%s\t+?\n", str);
               std::cout << std::endl;
