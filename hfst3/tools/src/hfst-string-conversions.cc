@@ -11,13 +11,13 @@
 namespace hfst 
 {
 #ifdef WINDOWS
-  std::string wide_string_to_string(const std::wstring & wstr)
+  /*  std::string wide_string_to_string(const std::wstring & wstr)
     {
       int size_needed = WideCharToMultiByte(CP_UTF8, 0, wstr.data(), (int)wstr.size(), NULL, 0, NULL, NULL);
       std::string str( size_needed, 0 );
       WideCharToMultiByte(CP_UTF8, 0, wstr.data(), (int)wstr.size(), &str[0], size_needed, NULL, NULL);
       return str;
-    }
+      }*/
 #endif // WINDOWS*/
 
 #ifdef WINDOWS
@@ -78,7 +78,7 @@ namespace hfst
     const HANDLE stdIn = GetStdHandle(STD_INPUT_HANDLE);
     WCHAR * buffer = new WCHAR [buffer_size];
     DWORD numRead = 0;
-    if (ReadConsoleW(stdIn, buffer, sizeof (buffer), &numRead, NULL))
+    if (ReadConsoleW(stdIn, buffer, size_t(buffer_size/4), &numRead, NULL))
       {
         if (DEBUG) { std::cerr << "get_line_from_console: numRead is " << numRead << std::endl; }
         

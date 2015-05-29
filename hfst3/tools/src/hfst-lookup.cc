@@ -39,6 +39,8 @@
 #  include <getopt.h>
 #endif
 
+#include "hfst-string-conversions.h"
+
 #include <limits>
 #include <math.h>
 
@@ -85,6 +87,8 @@ using hfst::StringSet;
 using std::string;
 using std::vector;
 
+using hfst::hfst_fprintf;
+
 // add tools-specific variables here
 static char* lookup_file_name;
 static FILE* lookup_file;
@@ -93,6 +97,12 @@ static size_t linen = 0;
 static bool lookup_given = false;
 static size_t infinite_cutoff = 5;
 static float beam=-1;
+
+#ifdef WINDOWS
+// todo add option for these
+static bool output_to_console = true;
+static bool read_from_console = true;
+#endif
 
 // symbols actually seen in (non-ol) transducers
 static std::vector<std::set<std::string> > cascade_symbols_seen;
@@ -853,9 +863,9 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
     free(lookupform);
     int rv;
     if (! quote_special)
-      rv = fprintf(ofile, "%s", res);
+      rv = hfst::hfst_fprintf(ofile, "%s", res);
     else
-      rv = fprintf(ofile, "%s", get_print_format(res).c_str());
+      rv = hfst::hfst_fprintf(ofile, "%s", get_print_format(res).c_str());
     free(res);
     return rv;
 }
@@ -1543,8 +1553,28 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
       }
     print_prompt();
     long filepos = ftell(lookup_file);
-    while (hfst_getline(&line, &llen, lookup_file) != -1)
+    while (true)
       {
+#ifdef WINDOWS
+        if (lookup_file == stdin && read_from_console)
+          {
+            std::string str("");
+            size_t bufsize = 1000;
+            if (! hfst::get_line_from_console(str, bufsize))
+              {
+                break;
+              }
+            line = strdup(str.c_str());
+          }
+        else
+          {
+#endif
+            if (hfst_getline(&line, &llen, lookup_file) == -1)
+              break;
+#ifdef WINDOWS
+          }
+#endif
+
         linen++;
         char *p = line;
         while (*p != '\0')
@@ -1632,6 +1662,10 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
 int main( int argc, char **argv ) {
     hfst_setlocale();
     hfst_set_program_name(argv[0], "0.6", "HfstLookup");
+
+    // todo: add option
+    hfst::print_output_to_console(true); // has no effect on windows or mac
+
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)
     {
@@ -1642,6 +1676,12 @@ int main( int argc, char **argv ) {
     if (lookup_given)
       {
         _setmode(0, _O_BINARY);
+      }
+
+    if (inputfile == stdin && read_from_console && show_progress_bar)
+      {
+        // todo: print warning?
+        show_progress_bar = false;
       }
 #endif
 

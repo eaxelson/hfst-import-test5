@@ -26,9 +26,9 @@
 #include "hfst-optimized-lookup.h"
 #include "inc/globals-common.h"  // some cc files include extern declarations for these variables...
 
-#ifdef _MSC_VER
-#  include <windows.h>
-#endif 
+//#ifdef _MSC_VER
+//#  include <windows.h>
+//#endif 
 
 #include "hfst-string-conversions.h"
 #include <cstdarg>
@@ -423,7 +423,6 @@ void runTransducer (genericTransducer T)
   std::string linestr("");
   while(hfst::get_line_from_console(linestr, MAX_IO_STRING*sizeof(char)))
     {
-          //std::cerr << "got_line_from_console..." << std::endl;
       char * str = strdup(linestr.c_str());
       char * old_str = str;     
 #else
@@ -434,17 +433,14 @@ void runTransducer (genericTransducer T)
   while(std::cin.getline(str,MAX_IO_STRING))
     {
 #endif
-                
-      // Carriage returns in Windows..
-      /*unsigned int last_char_index = (unsigned int) (std::cin.gcount() > 2)? (std::cin.gcount()) - 2: 0;
-      if (str[last_char_index] == '\r')
-        str[last_char_index] = '\0';*/
-        
+                        
       if (echoInputsFlag)
         {
-                        //std::cerr << "echoing input:" << std::endl;  // DEBUG
-          //std::cout << str << std::endl;
-          hfst_fprintf(stdout, "%s\n", str); // fix: add \r in windows?
+#ifndef WINDOWS
+          std::cout << str << std::endl;
+#else
+          hfst_fprintf(stdout, "%s\n", str); // fix: add \r?
+#endif
         }
       int i = 0;
       SymbolNumber k = NO_SYMBOL_NUMBER;
@@ -473,12 +469,15 @@ void runTransducer (genericTransducer T)
         { // tokenization failed
           if (outputType == xerox)
             {
-              //std::cout << str << "\t+?" << std::endl;
-                          hfst_fprintf(stdout, "%s\t+?\n", str);
+#ifndef WINDOWS
+              std::cout << str << "\t+?" << std::endl;
+#else
+              hfst_fprintf(stdout, "%s\t+?\n", str);
+#endif
               std::cout << std::endl;
             }
 #ifdef WINDOWS    
-                        linestr = std::string();
+          linestr = std::string();
 #endif    
           continue;
         }
@@ -891,8 +890,11 @@ void Transducer::note_analysis(SymbolNumber * whole_output_string)
     {
       for (SymbolNumber * num = whole_output_string; *num != NO_SYMBOL_NUMBER; ++num)
         {
-                        hfst_fprintf(stdout, "%s", symbol_table[*num]);
-          //std::cout << symbol_table[*num];
+#ifndef WINDOWS
+          std::cout << symbol_table[*num];
+#else
+          hfst_fprintf(stdout, "%s", symbol_table[*num]);
+#endif
         }
       std::cout << std::endl;
     } else
@@ -1007,8 +1009,11 @@ void Transducer::printAnalyses(std::string prepend)
     {
       if (outputType == xerox && display_vector.size() == 0)
         {
-                        hfst_fprintf(stdout, "%s\t+?\n", prepend.c_str());
-          //std::cout << prepend << "\t+?" << std::endl;
+#ifndef WINDOWS
+          std::cout << prepend << "\t+?" << std::endl;
+#else
+          hfst_fprintf(stdout, "%s\t+?\n", prepend.c_str());
+#endif
           std::cout << std::endl;
           return;
         }
@@ -1018,11 +1023,17 @@ void Transducer::printAnalyses(std::string prepend)
         {
           if (outputType == xerox)
             {
-              //std::cout << prepend << "\t";
-                          hfst_fprintf(stdout, "%s\t", prepend.c_str());
+#ifndef WINDOWS
+              std::cout << prepend << "\t";
+#else
+              hfst_fprintf(stdout, "%s\t", prepend.c_str());
+#endif
             }                   
-          //std::cout << *it << std::endl;
-                        hfst_fprintf(stdout, "%s\n", it->c_str());
+#ifndef WINDOWS
+          std::cout << *it << std::endl;
+#else
+          hfst_fprintf(stdout, "%s\n", it->c_str());
+#endif
           ++it;
           ++i;
         }
@@ -1035,8 +1046,11 @@ void TransducerUniq::printAnalyses(std::string prepend)
 {
   if (outputType == xerox && display_vector.size() == 0)
     {
-                hfst_fprintf(stdout, "%s\t+?\n", prepend.c_str());
-      //std::cout << prepend << "\t+?" << std::endl;
+#ifndef WINDOWS
+      std::cout << prepend << "\t+?" << std::endl;
+#else
+      hfst_fprintf(stdout, "%s\t+?\n", prepend.c_str());
+#endif
       std::cout << std::endl;
       return;
     }
@@ -1046,11 +1060,17 @@ void TransducerUniq::printAnalyses(std::string prepend)
     {
       if (outputType == xerox)
         {
-                        hfst_fprintf(stdout, "%s\t", prepend.c_str());
-          //std::cout << prepend << "\t";
+#ifndef WINDOWS
+          std::cout << prepend << "\t";
+#else
+          hfst_fprintf(stdout, "%s\t", prepend.c_str());
+#endif
         }
-                hfst_fprintf(stdout, "%s\n", it->c_str());
-      //std::cout << *it << std::endl;
+#ifndef WINDOWS
+      std::cout << *it << std::endl;
+#else
+      hfst_fprintf(stdout, "%s\n", it->c_str());
+#endif
       ++it;
       ++i;
     }
@@ -1062,8 +1082,11 @@ void TransducerFdUniq::printAnalyses(std::string prepend)
 {
   if (outputType == xerox && display_vector.size() == 0)
     {
-                hfst_fprintf(stdout, "%s\t+?\n", prepend.c_str());
-      //std::cout << prepend << "\t+?" << std::endl;
+#ifndef WINDOWS
+      std::cout << prepend << "\t+?" << std::endl;
+#else
+      hfst_fprintf(stdout, "%s\t+?\n", prepend.c_str());
+#endif
       std::cout << std::endl;
       return;
     }
@@ -1073,11 +1096,17 @@ void TransducerFdUniq::printAnalyses(std::string prepend)
     {
       if (outputType == xerox)
         {
-                        hfst_fprintf(stdout, "%s\t", prepend.c_str());
-          //std::cout << prepend << "\t";
+#ifndef WINDOWS
+          std::cout << prepend << "\t";
+#else
+          hfst_fprintf(stdout, "%s\t", prepend.c_str());
+#endif
         }
-      //std::cout << *it << std::endl;
-          hfst_fprintf(stdout, "%s\n", it->c_str());
+#ifndef WINDOWS
+      std::cout << *it << std::endl;
+#else
+      hfst_fprintf(stdout, "%s\n", it->c_str());
+#endif
       ++it;
       ++i;
     }
@@ -1473,8 +1502,11 @@ void TransducerW::printAnalyses(std::string prepend)
 {
   if (outputType == xerox && display_map.size() == 0)
     {
-                hfst_fprintf(stdout, "%s\t+?\n", prepend.c_str());
-      //std::cout << prepend << "\t+?" << std::endl;
+#ifndef WINDOWS
+      std::cout << prepend << "\t+?" << std::endl;
+#else
+      hfst_fprintf(stdout, "%s\t+?\n", prepend.c_str());
+#endif
       std::cout << std::endl;
       return;
     }
@@ -1491,11 +1523,17 @@ void TransducerW::printAnalyses(std::string prepend)
       {
         if (outputType == xerox)
           {
-                         hfst_fprintf(stdout, "%s\t", prepend.c_str()); 
-            //std::cout << prepend << "\t";
+#ifndef WINDOWS
+            std::cout << prepend << "\t";
+#else
+            hfst_fprintf(stdout, "%s\t", prepend.c_str()); 
+#endif
           }
-                  hfst_fprintf(stdout, "%s", (*it).second.c_str());
-        //std::cout << (*it).second;
+#ifndef WINDOWS
+        std::cout << (*it).second;
+#else
+        hfst_fprintf(stdout, "%s", (*it).second.c_str());
+#endif
         if (displayWeightsFlag)
           {
             std::cout << '\t' << (*it).first;
@@ -1513,8 +1551,11 @@ void TransducerWUniq::printAnalyses(std::string prepend)
 {
   if (outputType == xerox && display_map.size() == 0)
     {
-                hfst_fprintf(stdout, "%s\t+?\n", prepend.c_str());
-      //std::cout << prepend << "\t+?" << std::endl;
+#ifndef WINDOWS
+      std::cout << prepend << "\t+?" << std::endl;
+#else
+      hfst_fprintf(stdout, "%s\t+?\n", prepend.c_str());
+#endif      
       std::cout << std::endl;
       return;
     }
@@ -1535,11 +1576,17 @@ void TransducerWUniq::printAnalyses(std::string prepend)
     {
       if (outputType == xerox)
         {
-                        hfst_fprintf(stdout, "%s\t", prepend.c_str());
-          //std::cout << prepend << "\t";
+#ifndef WINDOWS
+          std::cout << prepend << "\t";
+#else
+          hfst_fprintf(stdout, "%s\t", prepend.c_str());
+#endif
         }
-                hfst_fprintf(stdout, "%s", (*display_it).second.c_str());
-      //std::cout << (*display_it).second;
+#ifndef WINDOWS
+      std::cout << (*display_it).second;
+#else
+      hfst_fprintf(stdout, "%s", (*display_it).second.c_str());
+#endif
       if (displayWeightsFlag)
         {
           std::cout << '\t' << (*display_it).first;
@@ -1556,7 +1603,11 @@ void TransducerWFdUniq::printAnalyses(std::string prepend)
 {
   if (outputType == xerox && display_map.size() == 0)
     {
+#ifndef WINDOWS
       std::cout << prepend << "\t+?" << std::endl;
+#else
+      hfst_fprintf(stdout, "%s\t+?", prepend);
+#endif
       std::cout << std::endl;
       return;
     }
@@ -1578,7 +1629,11 @@ void TransducerWFdUniq::printAnalyses(std::string prepend)
     {
       if (outputType == xerox)
         {
+#ifndef WINDOWS
           std::cout << prepend << "\t";
+#else
+          hfst_fprintf(stdout, "%s\t", prepend);
+#endif
         }
       std::cout << (*display_it).second;
       if (displayWeightsFlag)
