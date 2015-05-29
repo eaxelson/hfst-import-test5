@@ -266,7 +266,7 @@ hfst_lexc_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
 #					  parsers/LexcCompiler.h parsers/lexc-utils.h
 #hfst_lexc2fst_BUILT=parsers/lexc-parser.h parsers/xre_parse.h
 hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC) \
-HfstStrings2FstTokenizer.cc
+HfstStrings2FstTokenizer.cc hfst-string-conversions.cc
 hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC) \
 HfstStrings2FstTokenizer.cc 
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)

@@ -226,15 +226,22 @@ void insert_zeroes(char * array, unsigned int number)
 static bool expression_continues(std::string & expr)
 {
   size_t s = expr.size();
+
+  // get rid of extra newlines...
+  if (s > 0 && expr.at(s-1) == '\n')
+    {
+      expr.erase(s-1);
+    }
+  s = expr.size();
+  // and carriage returns
+  if (s > 0 && expr.at(s-1) == '\r')
+    {
+      expr.erase(s-1);
+    }
+  s = expr.size();
   if (s > 0 && expr.at(s-1) == '\\')
     {
       expr.at(s-1) = '\n';
-      return true;
-    }
-  if (s > 1 && expr.at(s-1) == '\r' && expr.at(s-2) == '\\')
-    {
-      expr.at(s-1) = '\n';
-      expr.at(s-2) = '\r';
       return true;
     }
   return false;
@@ -417,15 +424,20 @@ int main(int argc, char** argv)
       const unsigned int MAX_LINE_LENGTH = 1024;
 
 #ifdef WINDOWS
-      SetConsoleCP(65001);
+      /*SetConsoleCP(65001);
       const HANDLE stdIn = GetStdHandle(STD_INPUT_HANDLE);
       WCHAR buffer[0x1000];
       DWORD numRead = 0;
-      while (ReadConsoleW(stdIn, buffer, sizeof buffer, &numRead, NULL))
+      while (ReadConsoleW(stdIn, buffer, size_t((0x1000)/4), &numRead, NULL))
         {
           std::wstring wstr(buffer, numRead);
           std::string linestr = hfst::wide_string_to_string(wstr);
-          expression += linestr;
+          expression += linestr;*/
+      std::string str("");
+      while(hfst::get_line_from_console(str, MAX_LINE_LENGTH))
+        {
+          expression += str;
+          str = std::string("");
 #else
       char line [MAX_LINE_LENGTH];
       insert_zeroes(line, MAX_LINE_LENGTH);
