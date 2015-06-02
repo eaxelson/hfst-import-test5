@@ -48,8 +48,8 @@ static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
 static char* scriptfilename = NULL;
 static char* startupfilename = NULL;
 static std::vector<char*> execute_commands;
-static bool pipemode = false;
-static bool output_to_console = true; // this has no effect on non-windows platforms
+static bool pipe_input = false;
+static bool pipe_output = false; // this has no effect on non-windows platforms
 
 #ifdef HAVE_READLINE
   static bool use_readline = true;
@@ -75,25 +75,27 @@ print_usage()
           "  -f, --format=FMT         Write result using FMT as backend format\n"
           "  -F, --scriptfile=FILE    Read commands from FILE, and quit\n"
           "  -l, --startupfile=FILE   Read commands from FILE on startup\n"
-          "  -p, --pipe-mode          Read commands from standard input (non-interactive)\n"
+          "  -p, --pipe-mode[=STREAM] Control input and output streams\n"
           "  -r, --no-readline        Do not use readline library for input\n"
           "  -w, --print-weight       Print weights for each operation\n"
-          "  -k, --no-console         Do not output directly to console (Windows-specific)\n"
+          //          "  -k, --no-console         Do not output directly to console (Windows-specific)\n"
           "\n"
           "Option --execute can be invoked many times.\n"
           "If FMT is not given, OpenFst's tropical format will be used.\n"
           "The possible values for FMT are { foma, openfst-tropical, openfst-log, sfst }.\n"
           "Readline library, if enabled when configuring, is used for input by default.\n"
           "Input files are always treated as UTF-8.\n"
-#ifdef _MSC_VER
           "\n"
+          "STREAM can be { input, output, both }. If not given, defaults to {both}.\n"
+#ifdef _MSC_VER
           "If input file is not specified with -F, input is read interactively via the\n"
           "console, i.e. line by line from the user. If you redirect input from a file,\n"
-          "use -p. Output is by default printed to the console. If you redirect output\n"
-          "to a file, use -k.\n");
+          "use --pipe-mode=input. Output is by default printed to the console. If you\n"
+          "redirect output to a file, use --pipe-mode=output.\n");
 #else
           "If input file is not specified with -F, input is read interactively line by\n"
-          "line from the user. If you redirect input from a file, use -p.\n");
+          "line from the user. If you redirect input from a file, use --pipe-mode=input.\n"
+          "--pipe-mode=output is ignored on non-windows platforms.\n");
 #endif
   fprintf(message_out, "\n");
   print_report_bugs();
@@ -116,15 +118,15 @@ parse_options(int argc, char** argv)
             {"scriptfile", required_argument, 0, 'F'},
             {"execute", required_argument, 0, 'e'},
             {"startupfile", required_argument, 0, 'l'},
-            {"pipe-mode", no_argument, 0, 'p'},
+            {"pipe-mode", optional_argument, 0, 'p'},
             {"no-readline", no_argument, 0, 'r'},
             {"print-weight", no_argument, 0, 'w'},
-            {"no-console", no_argument, 0, 'k'},
+            //            {"no-console", no_argument, 0, 'k'},
             {0,0,0,0}
           };
         int option_index = 0;
         // add tool-specific options here
-        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "f:F:e:l:prwk",
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "f:F:e:l:p::rwk",
                              long_options, &option_index);
         if (-1 == c)
           {
@@ -168,10 +170,26 @@ parse_options(int argc, char** argv)
           case 'l':
             startupfilename = hfst_strdup(optarg);
             break;
+
           case 'p':
-            pipemode = true;
-            use_readline = false;
+            if (optarg == NULL)
+              { pipe_input = true; pipe_output = true; }
+            else if (strcmp(optarg, "both") == 0 || strcmp(optarg, "BOTH") == 0)
+              { pipe_input = true; pipe_output = true; }
+            else if (strcmp(optarg, "input") == 0 || strcmp(optarg, "INPUT") == 0 ||
+                     strcmp(optarg, "in") == 0 || strcmp(optarg, "IN") == 0)
+              { pipe_input = true; }
+            else if (strcmp(optarg, "output") == 0 || strcmp(optarg, "OUTPUT") == 0 ||
+                     strcmp(optarg, "out") == 0 || strcmp(optarg, "OUT") == 0)
+              { pipe_output = true; }
+            else
+              { error(EXIT_FAILURE, 0, "--pipe-mode argument %s unrecognised", optarg); }
             break;
+
+            //          case 'p':
+            //pipe_input = true;
+            //use_readline = false;
+            //break;
           case 'r':
             use_readline = false;
             break;
@@ -179,7 +197,7 @@ parse_options(int argc, char** argv)
             print_weight = true;
             break;
           case 'k':
-            output_to_console = false;
+            pipe_output = true;
             break;
 #include "inc/getopt-cases-error.h"
           }
@@ -337,7 +355,7 @@ int main(int argc, char** argv)
       return EXIT_FAILURE;
     }
   
-  if (pipemode && (scriptfilename != NULL))
+  if (pipe_input && (scriptfilename != NULL))
     {
       error(EXIT_FAILURE, 0 , "--pipe-mode and --scriptfile cannot be used simultaneously\n");
       return EXIT_FAILURE;
@@ -366,7 +384,7 @@ int main(int argc, char** argv)
       comp.setPromptVerbosity(true);
     }
 
-  if (output_to_console)
+  if (!pipe_output)
     comp.setOutputToConsole(true);
 
   // If needed, execute scripts given in command line
@@ -390,7 +408,7 @@ int main(int argc, char** argv)
         }
     }
 
-  if (pipemode) 
+  if (pipe_input) 
     {
       verbose_printf("Reading from standard input...\n");
       comp.setReadInteractiveTextFromStdin(false);

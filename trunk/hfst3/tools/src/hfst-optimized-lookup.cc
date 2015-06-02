@@ -38,6 +38,8 @@
 using hfst::hfst_fprintf;
 
 static float beam=-1;
+static bool pipe_input = false;
+static bool pipe_output = false;
 
 bool print_usage(void)
 {
@@ -63,10 +65,22 @@ bool print_usage(void)
     "  -f, --fast                  Be as fast as possible.\n" <<
     "                              (with this option enabled -u and -n don't work and\n" <<
     "                              output won't be ordered by weight).\n" <<
+    "  -p, --pipe-mode[=STREAM]    Control input and output streams.\n" <<
     "\n" <<
     "N must be a positive integer. B must be a non-negative float.\n" <<
     "Options -n and -b are combined with AND, i.e. they both restrict the output.\n" <<
     "\n" << 
+    "STREAM can be { input, output, both }. If not given, defaults to {both}.\n" <<
+#ifdef _MSC_VER
+    "Input is read interactively via the console, i.e. line by line from the user.\n" <<
+    "If you redirect input from a file, use --pipe-mode=input. Output is by default\n" << 
+    "printed to the console. If you redirect output to a file, use --pipe-mode=output.\n" <<
+#else
+    "Input is read interactively line by line from the user. If you redirect input\n" << 
+    "from a file, use --pipe-mode=input. --pipe-mode=output is ignored on non-windows\n" <<
+    "platforms.\n" <<
+#endif
+    "\n" <<
     "Report bugs to " << PACKAGE_BUGREPORT << "\n" <<
     "\n";
   return true;
@@ -90,8 +104,6 @@ bool print_short_help(void)
 
 int main(int argc, char **argv)
 {
-  // todo: add option
-  hfst::print_output_to_console(true);
 
   int c;
  
@@ -112,12 +124,13 @@ int main(int argc, char **argv)
           {"unique",       no_argument,       0, 'u'},
           {"xerox",        no_argument,       0, 'x'},
           {"fast",         no_argument,       0, 'f'},
+          {"pipe-mode",    optional_argument,       0, 'p'},
           {"analyses",     required_argument, 0, 'n'},
           {0,              0,                 0,  0 }
         };
       
       int option_index = 0;
-      c = getopt_long(argc, argv, "hVvqsewb:uxfn:", long_options, &option_index);
+      c = getopt_long(argc, argv, "hVvqsewb:uxfn:p::", long_options, &option_index);
 
       if (c == -1) // no more options to look at
         break;
@@ -196,6 +209,22 @@ int main(int argc, char **argv)
         case 'f':
           beFast = true;
           break;
+
+        case 'p':
+          if (optarg == NULL)
+            { pipe_input = true; pipe_output = true; }
+          else if (strcmp(optarg, "both") == 0 || strcmp(optarg, "BOTH") == 0)
+            { pipe_input = true; pipe_output = true; }
+          else if (strcmp(optarg, "input") == 0 || strcmp(optarg, "INPUT") == 0 ||
+                   strcmp(optarg, "in") == 0 || strcmp(optarg, "IN") == 0)
+            { pipe_input = true; }
+          else if (strcmp(optarg, "output") == 0 || strcmp(optarg, "OUTPUT") == 0 ||
+                   strcmp(optarg, "out") == 0 || strcmp(optarg, "OUT") == 0)
+            { pipe_output = true; }
+          else
+            { std::cerr << "--pipe-mode argument " << std::string(optarg) << " unrecognised\n\n"; 
+              return EXIT_FAILURE; }
+          break;
           
         default:
           std::cerr << "Invalid option\n\n";
@@ -204,6 +233,9 @@ int main(int argc, char **argv)
           break;
         }
     }
+
+  hfst::print_output_to_console(!pipe_output); // has no effect on windows or mac
+
   // no more options, we should now be at the input filename
   if ( (optind + 1) < argc)
     {
@@ -418,21 +450,28 @@ void runTransducer (genericTransducer T)
       input_string[i] = NO_SYMBOL_NUMBER;
     }
 
-  // In Windows, we are by default reading from console.
-#ifdef WINDOWS
-  std::string linestr("");
-  while(hfst::get_line_from_console(linestr, MAX_IO_STRING*sizeof(char)))
-    {
-      char * str = strdup(linestr.c_str());
-      char * old_str = str;     
-#else
   char * str = (char*)(malloc(MAX_IO_STRING*sizeof(char)));  
   *str = 0;
   char * old_str = str;
         
-  while(std::cin.getline(str,MAX_IO_STRING))
+  while(true)
     {
+#ifdef WINDOWS
+      if (!pipe_input)
+        {
+          free(str);
+          std::string linestr("");
+          if (! hfst::get_line_from_console(linestr, MAX_IO_STRING*sizeof(char)))
+            break;
+          str = strdup(linestr.c_str());
+          old_str = str;     
+        }
+      else
 #endif
+        {
+          if (! std::cin.getline(str,MAX_IO_STRING))
+            break;
+        }
                         
       if (echoInputsFlag)
         {
@@ -476,9 +515,6 @@ void runTransducer (genericTransducer T)
 #endif
               std::cout << std::endl;
             }
-#ifdef WINDOWS    
-          linestr = std::string();
-#endif    
           continue;
         }
 
@@ -486,10 +522,6 @@ void runTransducer (genericTransducer T)
 
       T.analyze(input_string);
       T.printAnalyses(std::string(str));
-
-#ifdef WINDOWS    
-          linestr = std::string();
-#endif    
     }
 }
 

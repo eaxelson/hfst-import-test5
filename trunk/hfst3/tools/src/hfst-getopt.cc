@@ -125,7 +125,7 @@ char getopt_long(int argc, char * /*const*/ argv [], const char * optstring,
               return longopts->val;
             }
           // required argument
-          else if (longopts->has_arg == required_argument)
+          else if (longopts->has_arg == required_argument || longopts->has_arg == optional_argument)
             {
               if (eq_used)
                 {
@@ -135,23 +135,33 @@ char getopt_long(int argc, char * /*const*/ argv [], const char * optstring,
                   *argptr = '='; // change '\0' back to '=' (not sure if this is needed...)
                   return longopts->val;
                 }
-              // no more args, required argument thus missing
+              // no more args, argument thus missing
               if (optind > (argc-1))
                 {
-                  optopt = longopts->val;
-                  return ':';
+                  if (longopts->has_arg == required_argument)
+                    {
+                      optopt = longopts->val;
+                      return ':';
+                    }
+                  else
+                    {
+                      optopt = NULL;
+                      return longopts->val;
+                    }
                 }
-              // next arg is required argument
-              optarg = strdup(argv[optind]);
-              other_arguments.push_back(argv[optind]);
-              optind++;
-              return longopts->val;
-            }
-          // optional argument
-          else if (longopts->has_arg == optional_argument)
-            {
-              // not implemented
-              return 0;
+              // next arg is required argument (cannot be optional argument)
+              if (longopts->has_arg == required_argument)
+                {
+                  optarg = strdup(argv[optind]);
+                  other_arguments.push_back(argv[optind]);
+                  optind++;
+                  return longopts->val;
+                }
+              else
+                {
+                  optopt = NULL;
+                  return longopts->val;
+                }
             }
           // this should not happen
           else

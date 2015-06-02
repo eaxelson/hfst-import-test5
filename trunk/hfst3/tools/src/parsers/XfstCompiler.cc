@@ -80,7 +80,7 @@ using hfst::hfst_fprintf;
 #define LOOKUP_CYCLE_CUTOFF "5"
 #define PRINT_WORDS_CYCLE_CUTOFF "5"
 
-#include "help_message.cc"
+#include "help_message.cpp"
 
 namespace hfst { 
 namespace xfst {
@@ -4044,7 +4044,7 @@ namespace xfst {
       }
 #endif
 
-    hfst_fprintf(stderr, "%s", promptstr.c_str());
+    hfst_fprintf(outstream_, "%s", promptstr.c_str());
 
 #ifdef WINDOWS
     // if we are reading directly from console
@@ -4731,7 +4731,12 @@ namespace xfst {
     {
       if (verbose_prompt_ && verbose_)
         {
+          // On windows, prompt is always printed to console. On other platforms,
+          // this has no effect.
+          bool val = hfst::is_output_printed_to_console();
+          hfst::print_output_to_console(true);
           hfst_fprintf(outstream_, "hfst[" SIZE_T_SPECIFIER "]: ", stack_.size());
+          hfst::print_output_to_console(val);
         }
       return *this;
     }

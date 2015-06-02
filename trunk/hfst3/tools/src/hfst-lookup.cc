@@ -92,17 +92,12 @@ using hfst::hfst_fprintf;
 // add tools-specific variables here
 static char* lookup_file_name;
 static FILE* lookup_file;
-static bool pipe_mode = false;
+static bool pipe_input = false;
+static bool pipe_output = false;
 static size_t linen = 0;
 static bool lookup_given = false;
 static size_t infinite_cutoff = 5;
 static float beam=-1;
-
-#ifdef WINDOWS
-// todo add option for these
-static bool output_to_console = true;
-static bool read_from_console = true;
-#endif
 
 // symbols actually seen in (non-ol) transducers
 static std::vector<std::set<std::string> > cascade_symbols_seen;
@@ -237,9 +232,9 @@ print_usage()
     print_common_program_options(message_out);
     fprintf(message_out, 
         "Input/Output options:\n"
-        "  -i, --input=INFILE     Read input transducer from INFILE\n"
-        "  -o, --output=OUTFILE   Write output to OUTFILE\n"
-        "  -p, --pipe-mode        Read lookup strings from standard input, do not prompt\n");
+        "  -i, --input=INFILE       Read input transducer from INFILE\n"
+        "  -o, --output=OUTFILE     Write output to OUTFILE\n"
+        "  -p, --pipe-mode[=STREAM] Control input and output streams\n");
 
     fprintf(message_out, "Lookup options:\n"
             "  -I, --input-strings=SFILE        Read lookup strings from SFILE\n"
@@ -266,6 +261,32 @@ print_usage()
             "If the input contains several transducers, a set containing\n"
             "results from all transducers is printed for each input string.\n");
     fprintf(message_out, "\n");
+
+    fprintf(message_out, "STREAM can be { input, output, both }. If not given, defaults to {both}.\n"
+#ifdef _MSC_VER
+          "If input file is not specified with -I, input is read interactively via the\n"
+          "console, i.e. line by line from the user. If you redirect input from a file,\n"
+          "use --pipe-mode=input. Output is by default printed to the console. If you\n"
+          "redirect output to a file, use --pipe-mode=output.\n");
+#else
+          "If input file is not specified with -I, input is read interactively line by\n"
+          "line from the user. If you redirect input from a file, use --pipe-mode=input.\n"
+          "--pipe-mode=output is ignored on non-windows platforms.\n");
+#endif
+    fprintf(message_out, "\n");
+
+/*    fprintf(message_out,
+#ifdef _MSC_VER
+          "If input file is not specified with -I, input is read interactively via the\n"
+          "console, i.e. line by line from the user. If input is redirected  from a file,\n"
+          "use -p. Output is by default printed to the console. If output is redirected\n"
+          "to a file, use -k.\n"
+#else
+          "If input file is not specified with -I, input is read interactively line by\n"
+          "line from the user. If input is redirected from a file, use -p.\n"
+#endif
+);*/
+
 
     fprintf(message_out, 
             "Todo:\n"
@@ -305,14 +326,14 @@ parse_options(int argc, char** argv)
             {"epsilon-format", required_argument, 0, 'e'},
             {"epsilon-format2", required_argument, 0, 'E'},
             {"beam", required_argument, 0, 'b'},
-            {"pipe-mode", no_argument, 0, 'p'},
+            {"pipe-mode", optional_argument, 0, 'p'},
             {"progress", no_argument, 0, 'P'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:b:pP",
+                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:b:p::P",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -418,9 +439,22 @@ parse_options(int argc, char** argv)
         case 'c':
             infinite_cutoff = (size_t)atoi(hfst_strdup(optarg));
             break;
+
         case 'p':
-            pipe_mode = true;
-            break;
+          if (optarg == NULL)
+            { pipe_input = true; pipe_output = true; }
+          else if (strcmp(optarg, "both") == 0 || strcmp(optarg, "BOTH") == 0)
+            { pipe_input = true; pipe_output = true; }
+          else if (strcmp(optarg, "input") == 0 || strcmp(optarg, "INPUT") == 0 ||
+                   strcmp(optarg, "in") == 0 || strcmp(optarg, "IN") == 0)
+            { pipe_input = true; }
+          else if (strcmp(optarg, "output") == 0 || strcmp(optarg, "OUTPUT") == 0 ||
+                   strcmp(optarg, "out") == 0 || strcmp(optarg, "OUT") == 0)
+            { pipe_output = true; }
+          else
+            { error(EXIT_FAILURE, 0, "--pipe-mode argument %s unrecognised", optarg); }
+          break;
+
         case 'P':
             show_progress_bar = true;
             break;
@@ -490,7 +524,7 @@ parse_options(int argc, char** argv)
 
 static void print_prompt()
 {
-  if (!silent && !pipe_mode && !lookup_given)
+  if (!silent && !pipe_input && !lookup_given)
     {
       fprintf(stderr, "> ");
     }
@@ -821,8 +855,20 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
                 src++;
             }
             else if (*src == 'w')
-              {
-                int skip = snprintf(dst, space_left, "%f", w);
+              { 
+                int skip = 0;
+#ifdef _MSC_VER
+                if (w == std::numeric_limits<float>::infinity())
+#else
+                if (false)
+#endif
+                  {
+                    skip = snprintf(dst, space_left, "%s", "inf");
+                  }
+                else
+                  {
+                    skip = snprintf(dst, space_left, "%f", w);
+                  }
                 dst += skip;
                 space_left -= skip;
                 src++;
@@ -1556,7 +1602,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     while (true)
       {
 #ifdef WINDOWS
-        if (lookup_file == stdin && read_from_console)
+        if (lookup_file == stdin && !pipe_input)
           {
             std::string str("");
             size_t bufsize = 1000;
@@ -1575,8 +1621,9 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
           }
 #endif
 
+        char * p = line;
         linen++;
-        char *p = line;
+
         while (*p != '\0')
           {
             if (*p == '\n' || *p == '\r') // '\r' is possible on Windows
@@ -1663,9 +1710,6 @@ int main( int argc, char **argv ) {
     hfst_setlocale();
     hfst_set_program_name(argv[0], "0.6", "HfstLookup");
 
-    // todo: add option
-    hfst::print_output_to_console(true); // has no effect on windows or mac
-
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)
     {
@@ -1678,12 +1722,15 @@ int main( int argc, char **argv ) {
         _setmode(0, _O_BINARY);
       }
 
-    if (inputfile == stdin && read_from_console && show_progress_bar)
+    if (inputfile == stdin && pipe_input && show_progress_bar)
       {
         // todo: print warning?
         show_progress_bar = false;
       }
 #endif
+
+    // has no effect on windows or mac
+    hfst::print_output_to_console(!pipe_output);
 
     // close buffers, we use streams
     if (inputfile != stdin)
