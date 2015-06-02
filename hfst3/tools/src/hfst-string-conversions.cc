@@ -92,7 +92,7 @@ namespace hfst
         
         if (DEBUG) { std::cerr << "get_line_from_console: size of str is now (1) " << str.size() << std::endl; }
         
-        if (str[0] == (char)26) // control+Z
+        if (str[0] == (char)26 || str[0] == (char)4) // control+Z, control+D
           return false;
 
         // Get rid of carriage returns and newlines.
