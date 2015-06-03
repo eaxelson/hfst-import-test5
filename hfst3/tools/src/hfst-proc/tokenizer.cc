@@ -82,28 +82,26 @@ TokenIOStream::read_utf8_char()
 std::string
 TokenIOStream::read_utf8_char(std::istream& is)
 {
+  std::string retval;
   unsigned short u8len = 0;
   int c = is.peek();
   if(is.eof())
-    return "";
+    return retval;
   
   if (c <= 127)
     u8len = 1;
   else if ( (c & (128 + 64 + 32 + 16)) == (128 + 64 + 32 + 16) )
     u8len = 4;
- else if ( (c & (128 + 64 + 32 )) == (128 + 64 + 32) )
+  else if ( (c & (128 + 64 + 32 )) == (128 + 64 + 32) )
     u8len = 3;
   else if ( (c & (128 + 64 )) == (128 + 64))
     u8len = 2;
   else
     stream_error("Invalid UTF-8 character found");
 
-  char * next_u8 = new char [u8len+1];
-  is.get(next_u8, u8len+1, '\0');
-  next_u8[u8len] = '\0';
+  retval.resize(u8len);
+  is.get(&retval[0], u8len);
   
-  std::string retval(next_u8);
-  delete next_u8;
   return retval;
 }
 
