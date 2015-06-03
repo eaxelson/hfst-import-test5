@@ -80,7 +80,7 @@ using hfst::hfst_fprintf;
 #define LOOKUP_CYCLE_CUTOFF "5"
 #define PRINT_WORDS_CYCLE_CUTOFF "5"
 
-#include "help_message.cpp"
+#include "help_message.cc"
 
 namespace hfst { 
 namespace xfst {
@@ -361,9 +361,11 @@ namespace xfst {
               break;
             case 'R': // require
               if (val == "") // empty require
-                if (values[feat] == "") { return false; }
-              else // nonempty require
-                if (is_negatively_set || (values[feat] != val)) { return false; }
+                if (values[feat] == "") 
+                  { return false; }
+                else { // nonempty require
+                  if (is_negatively_set || (values[feat] != val)) { return false; } 
+                }
               break;
             case 'D': // disallow
               if (val == "") { // empty disallow
