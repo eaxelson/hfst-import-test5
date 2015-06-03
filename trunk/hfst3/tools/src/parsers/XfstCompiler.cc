@@ -80,7 +80,7 @@ using hfst::hfst_fprintf;
 #define LOOKUP_CYCLE_CUTOFF "5"
 #define PRINT_WORDS_CYCLE_CUTOFF "5"
 
-#include "help_message.cc"
+#include "xfst_help_message.h"
 
 namespace hfst { 
 namespace xfst {

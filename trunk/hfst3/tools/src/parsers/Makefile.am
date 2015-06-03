@@ -46,7 +46,7 @@ endif
 
 noinst_HEADERS = XfstCompiler.h xfst-utils.h xfst-parser.hh
 
-HFST_COMMON_SRC=../hfst-program-options.cc ../hfst-commandline.cc ../hfst-tool-metadata.cc ../HfstStrings2FstTokenizer.cc ../hfst-file-to-mem.cc ../hfst-string-conversions.cc
+HFST_COMMON_SRC=../hfst-program-options.cc ../hfst-commandline.cc ../hfst-tool-metadata.cc ../HfstStrings2FstTokenizer.cc ../hfst-file-to-mem.cc ../hfst-string-conversions.cc xfst_help_message.cc
 
 bin_PROGRAMS=$(MAYBE_XFST)
 
@@ -62,5 +62,5 @@ xfst-parser.cc: xfst-parser.yy
 
 xfst-lexer.cc: xfst-lexer.ll
 
-EXTRA_DIST=init_help.cc cmd.h abbrcmd.h help_message.cc xfst-parser.cc xfst-lexer.cc xfst-parser.hh
+EXTRA_DIST=init_help.cc cmd.h abbrcmd.h xfst_help_message.h xfst-parser.cc xfst-lexer.cc xfst-parser.hh
 
