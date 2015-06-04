@@ -181,13 +181,24 @@ template<typename T, size_t N>
         "ß"
     };
 
+    // MSVC compiler complains about \u strings...
+
     static const char * combining_accents[] =
     {
         // Combining accents: grave, acute, circumflex, tilde, overline,
         // diaresis, charon, cedilla
+#ifndef _MSC_VER
         "\u0300", "\u0301", "\u0302", "\u0303", "\u0305", "\u0308", "\u030C", "\u0327",
+#else
+        "\xCC\x80", "\xCC\x81", "\xCC\x82", "\xCC\x83", "\xCC\x85", "\xCC\x88", "\xCC\x8C", "\xCC\xA7",
+#endif
+
         // Small solidus and large combining solidus
+#ifndef _MSC_VER
         "\u0337", "\u0338"
+#else
+        "\xCC\xB7", "\xCC\xB8"
+#endif
     };
     
     static const char * latin1_punct[] =
@@ -201,10 +212,18 @@ template<typename T, size_t N>
     {
         " ", "\n", "\t",
         // Non-breaking space, CR
+#ifndef _MSC_VER
         "\u00A0",
+#else
+        "\xC2\xA0",
+#endif
         "\r",
         // punctuation space, thin space, line separator, par separator
+#ifndef _MSC_VER
         "\u2008", "\u2009", "\u2028", "\u2029"
+#else
+        "\xE2\x80\x88", "\xE2\x80\x89", "\xE2\x80\xA8", "\xE2\x80\xA9"
+#endif
     };
 
 
