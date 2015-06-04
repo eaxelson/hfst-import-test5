@@ -99,8 +99,9 @@ TokenIOStream::read_utf8_char(std::istream& is)
   else
     stream_error("Invalid UTF-8 character found");
 
-  retval.resize(u8len);
-  is.get(&retval[0], u8len);
+  retval.resize(u8len+1);
+  is.get(&retval[0], u8len+1, '\0');
+  retval.resize(strlen(&retval[0]));
   
   return retval;
 }
