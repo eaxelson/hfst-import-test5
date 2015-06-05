@@ -30,12 +30,13 @@
 //#  include <windows.h>
 //#endif 
 
-#include "hfst-string-conversions.h"
-#include <cstdarg>
-
-#include <iostream> // DEBUG
-
+#ifdef _MSC_VER
+#  include "hfst-string-conversions.h"
 using hfst::hfst_fprintf;
+#endif
+
+#include <cstdarg>
+#include <iostream> // DEBUG
 
 static float beam=-1;
 static bool pipe_input = false;
@@ -234,7 +235,9 @@ int main(int argc, char **argv)
         }
     }
 
+#ifdef _MSC_VER
   hfst::print_output_to_console(!pipe_output); // has no effect on windows or mac
+#endif
 
   // no more options, we should now be at the input filename
   if ( (optind + 1) < argc)

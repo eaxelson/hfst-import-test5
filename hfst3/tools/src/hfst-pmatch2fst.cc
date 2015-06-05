@@ -168,6 +168,15 @@ process_stream(HfstOutputStream& outstream)
     std::string file_contents;
     std::map<std::string, HfstTransducer*> definitions;
     int c;
+
+#ifdef _MSC_VER
+    if (inputfile == stdin && !silent)
+      {
+        warning(0, 0, "Reading from standard input. UTF-8 characters\n"
+                "outside ascii range are supported only if input comes from a file.");
+      }
+#endif
+
     while ((c = fgetc(inputfile)) != EOF) {
         file_contents.push_back(c);
     }

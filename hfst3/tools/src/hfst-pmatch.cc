@@ -39,6 +39,7 @@ using std::pair;
 
 #ifdef _MSC_VER
 #  include "hfst-getopt.h"
+#  include "hfst-string-conversions.h"
 #else
 #  include <getopt.h>
 #endif
@@ -93,19 +94,28 @@ void match_and_print(hfst_ol::PmatchContainer & container,
         input_text.erase(input_text.size() -1, 1);
     }
     if (!locate_mode) {
-        outstream << container.match(input_text);
+#ifndef _MSC_VER
+      outstream << container.match(input_text);
+#else
+      hfst::hfst_fprintf(stdout, "%s", container.match(input_text).c_str());
+#endif
     } else {
         hfst_ol::LocationVectorVector locations = container.locate(input_text);
         for(hfst_ol::LocationVectorVector::const_iterator it = locations.begin();
             it != locations.end(); ++it) {
             if (it->at(0).output.compare("@_NONMATCHING_@") != 0) {
-                outstream << it->at(0).start << "|" << it->at(0).length << "|"
+#ifndef _MSC_VER
+              outstream << it->at(0).start << "|" << it->at(0).length << "|"
                           << it->at(0).output << "|" << it->at(0).tag << std::endl;
+#else
+              hfst::hfst_fprintf(stdout, "%i|%i|%s|%s\n", it->at(0).start, it->at(0).length, it->at(0).output.c_str(), it->at(0).tag.c_str());
+#endif
             }
         }
     }
     outstream << std::endl;
 }
+
 
 int process_input(hfst_ol::PmatchContainer & container,
                   std::ostream & outstream)
@@ -113,7 +123,19 @@ int process_input(hfst_ol::PmatchContainer & container,
     std::string input_text;
     char * line = NULL;
     size_t len = 0;
-    while (hfst_getline(&line, &len, inputfile) > 0) {
+    while (true) {
+
+#ifndef _MSC_VER
+      if (!(hfst_getline(&line, &len, inputfile) > 0))
+        break;
+#else
+      std::string linestr("");
+      size_t bufsize = 1000;
+      if (! hfst::get_line_from_console(linestr, bufsize, true /* keep newlines */))
+        break;
+      line = strdup(linestr.c_str());
+#endif
+
         if (!blankline_separated) {
             // newline separated
             input_text = line;
@@ -240,5 +262,10 @@ int main(int argc, char ** argv)
 // return process_input(container, outstream);
 // fb.close();
 //     } else {
+
+#ifdef _MSC_VER
+    hfst::print_output_to_console(true);
+#endif
+
     return process_input(container, std::cout);
 }
