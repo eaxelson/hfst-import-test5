@@ -171,6 +171,7 @@ cp scripts/make-python-bindings.bat $1/libhfst/src/
 cp scripts/test_libhfst_win.py $1/libhfst/src/
 cp scripts/libhfst_win.i $1/libhfst/src/
 cp scripts/make-hfst-xfst.bat $1/libhfst/src/
+cp scripts/make-hfst-proc.bat $1/libhfst/src/
 cp scripts/make-hfst-lexc.bat $1/libhfst/src/
 cp scripts/make-hfst-tool.bat $1/libhfst/src/
 
@@ -193,18 +194,21 @@ sed -i 's/hlexcwrap( )/hlexcwrap(void)/' $1/libhfst/src/parsers/lexc-lexer.cpp
 mkdir $1/tools
 mkdir $1/tools/src
 mkdir $1/tools/src/parsers
+mkdir $1/tools/src/hfst-proc
 mkdir $1/tools/src/inc
 
 for file in \
 xfst-utils XfstCompiler hfst-xfst xfst-parser xfst-lexer \
-init_help  help_message;
+init_help  xfst_help_message;
 do
     cp tools/src/parsers/$file.cc $1/tools/src/parsers/$file.cpp
 done
 
+cp tools/src/parsers/xfst_help_message.h $1/tools/src/parsers/
+
 sed -i 's/#include <unistd.h>/#include <io.h>/' $1/tools/src/parsers/xfst-lexer.cpp
 sed -i 's/hxfstwrap( )/hxfstwrap(void)/' $1/tools/src/parsers/xfst-lexer.cpp
-sed -i 's/#include "help_message.cc"/#include "help_message.cpp"/' $1/tools/src/parsers/XfstCompiler.cpp
+#sed -i 's/#include "help_message.cc"/#include "help_message.cpp"/' $1/tools/src/parsers/XfstCompiler.cpp
 
 
 # compare, strings2fst and txt2fst are needed for testing hfst-xfst
@@ -217,7 +221,21 @@ do
     cp tools/src/$file.cc $1/tools/src/$file.cpp
 done
 
-# todo: proc and twolc
+# todo: twolc
+
+# hfst-proc
+for file in \
+hfst-proc formatter lookup-path lookup-state tokenizer transducer applicators alphabet;
+do
+    cp tools/src/hfst-proc/$file.cc $1/tools/src/hfst-proc/$file.cpp
+done
+
+for file in \
+hfst-proc.h formatter.h lookup-path.h lookup-state.h tokenizer.h \
+transducer.h buffer.h applicators.h alphabet.h;
+do
+    cp tools/src/hfst-proc/$file $1/tools/src/hfst-proc/
+done
 
 for file in \
 hfst-commandline.h hfst-program-options.h hfst-tool-metadata.h \

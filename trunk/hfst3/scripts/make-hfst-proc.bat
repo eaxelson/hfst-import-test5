@@ -13,13 +13,16 @@ exit /B
 if exist "..\..\back-ends\foma\flags.c" echo Renaming foma's flags.c into _flags.c as there is a file with the same name in openfst && ^
 move ..\..\back-ends\foma\flags.c ..\..\back-ends\foma\_flags.c 
 
+if exist "..\..\tools\src\hfst-proc\transducer.cpp" echo Renaming hfst-proc's transducer.cpp into _transducer.cpp as there is a file with the same name in optimized-lookup && ^
+move ..\..\tools\src\hfst-proc\transducer.cpp ..\..\tools\src\hfst-proc\_transducer.cpp
+
 @echo ON
 
-cl /EHsc /Zc:wchar_t /Fehfst-xfst.exe ^
+cl /EHsc /Zc:wchar_t /Fehfst-proc.exe ^
 /D HAVE_FOMA /D HAVE_OPENFST /D HFSTEXPORT /D OPENFSTEXPORT /D_MSC_VER /DWINDOWS /DWIN32 ^
 /I..\..\libhfst\src /I..\..\back-ends\foma /I..\..\back-ends /I..\..\back-ends\openfstwin\src\include /I ..\.. ^
 /Iparsers /I..\.. /I..\..\libhfst\src /I..\..\libhfst\src\parsers /I..\..\back-ends\foma ^
-/I..\..\back-ends /I..\..\back-ends\openfstwin\src\include /I..\..\tools\src /I..\..\tools\src\parsers ^
+/I..\..\back-ends /I..\..\back-ends\openfstwin\src\include /I..\..\tools\src ^
 ..\..\tools\src\hfst-commandline.cpp ^
 ..\..\tools\src\hfst-file-to-mem.cpp ^
 ..\..\tools\src\hfst-program-options.cpp ^
@@ -27,12 +30,14 @@ cl /EHsc /Zc:wchar_t /Fehfst-xfst.exe ^
 ..\..\tools\src\HfstStrings2FstTokenizer.cpp ^
 ..\..\tools\src\hfst-tool-metadata.cpp ^
 ..\..\tools\src\hfst-getopt.cpp ^
-..\..\tools\src\parsers\hfst-xfst.cpp ^
-..\..\tools\src\parsers\XfstCompiler.cpp ^
-..\..\tools\src\parsers\xfst-lexer.cpp ^
-..\..\tools\src\parsers\xfst-parser.cpp ^
-..\..\tools\src\parsers\xfst-utils.cpp ^
-..\..\tools\src\parsers\xfst_help_message.cpp ^
+..\..\tools\src\hfst-proc\hfst-proc.cpp ^
+..\..\tools\src\hfst-proc\formatter.cpp ^
+..\..\tools\src\hfst-proc\lookup-path.cpp ^
+..\..\tools\src\hfst-proc\lookup-state.cpp ^
+..\..\tools\src\hfst-proc\tokenizer.cpp ^
+..\..\tools\src\hfst-proc\_transducer.cpp ^
+..\..\tools\src\hfst-proc\applicators.cpp ^
+..\..\tools\src\hfst-proc\alphabet.cpp ^
 HfstApply.cpp ^
 HfstInputStream.cpp ^
 HfstTransducer.cpp ^
