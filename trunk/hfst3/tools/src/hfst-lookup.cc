@@ -1727,10 +1727,10 @@ int main( int argc, char **argv ) {
         // todo: print warning?
         show_progress_bar = false;
       }
-#endif
 
     // has no effect on windows or mac
     hfst::print_output_to_console(!pipe_output);
+#endif
 
     // close buffers, we use streams
     if (inputfile != stdin)

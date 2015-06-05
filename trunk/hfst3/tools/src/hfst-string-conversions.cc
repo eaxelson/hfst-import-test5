@@ -71,7 +71,7 @@ namespace hfst
   }
 
 #ifdef WINDOWS
-  bool get_line_from_console(std::string & str, size_t buffer_size)
+  bool get_line_from_console(std::string & str, size_t buffer_size, bool keep_newline /* = false*/)
   {
     bool DEBUG = false;  
     SetConsoleCP(65001);
@@ -96,15 +96,25 @@ namespace hfst
           return false;
 
         // Get rid of carriage returns and newlines.
-        
-        if (str.size() == 0) // empty line without CR or NEWLINE
+
+        if (str.size() == 0)
           return true;
-        if (str[str.length()-1] == '\n') // NEWLINE
-          str.erase(str.length()-1);
-        if (str.size() == 0)  // empty line with NEWLINE
+
+        // Get rid of carriage return
+        if (str.size() > 1)
+          {
+            if (str[str.size()-2] == '\r')
+              str.erase(str.size()-2, 1);
+          }
+
+        if (str[str.size()-1] != '\n')
           return true;
-        if (str[str.length()-1] == '\r') // CR
-          str.erase(str.length()-1);
+
+        if (keep_newline)
+          return true;
+
+        str.erase(str.size()-1);
+        return true;
         
         if (DEBUG) { std::cerr << "get_line_from_console: size of str is now (2) " << str.size() << std::endl; }
         return true;
