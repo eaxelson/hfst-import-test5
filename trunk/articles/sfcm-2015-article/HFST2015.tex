@@ -317,8 +317,7 @@ we ensure that equally long dictionary matches, which have zero weight, will be 
 \section{Morphological Tagging using {\tt hfst-finnpos}}\label{sec:morph-tagging}
 % Miikka (4 p.)
 
-In this section, we learn how to disambiguate a tokenized and morphologically analyzed
-text. In addition, we learn how to train the morphological tagger {\tt hfst-finnpos}.
+In this section, we describe the morphological tagger {\tt hfst-finnpos}.
 
 FinnPos \cite{silfverberg/2015} is a data driven {\it morphological
   tagging} toolkit distributed with the HFST interface. The term
@@ -353,7 +352,7 @@ as well as evaluation can be found in
 \subsection{FinnPos for Morphologically Rich Languages}
 
 In part-of-speech (POS) tagging, the label sets are usually fairly small. For example,
-the Penn Treebank uses only 45 distinct label types. For tagging of
+the Penn Treebank uses only 45 distinct label types. When tagging
 morphologically complex languages, where full morphological labels are
 required, vastly larger label sets are used. Label sets of around 1,000
 distinct label types frequently occur. 
@@ -385,95 +384,95 @@ speed up training, FinnPos uses an adaptive beam search and a label
 guesser \cite{silfverberg/2015} during inference and estimation. These
 substantially reduce run-time.
 
-\subsection{FinnPos Tools}
+%\subsection{FinnPos Tools}
 
-The FinnPos toolkit includes three command-line tools
+%The FinnPos toolkit includes three command-line tools
 
-\begin{itemize}
-\item {\tt finnpos-train} for training tagger models.
-\item {\tt finnpos-label} for using models to label data.
-\item {\tt finnpos-eval} for evaluation against a gold standard.
-\end{itemize}
+%\begin{itemize}
+%\item {\tt finnpos-train} for training tagger models.
+%\item {\tt finnpos-label} for using models to label data.
+%\item {\tt finnpos-eval} for evaluation against a gold standard.
+%\end{itemize}
 
-Additionally, FinnPos provides a Python script {\tt
-  finnpos-ratna-feat.py} used for feature extraction. The script is
-named after Adwait Ratnaparkhi because FinnPos uses a modified version
-of the feature set introduced by Ratnaparkhi in
-\cite{ratnaparkhi/1996}.
+%Additionally, FinnPos provides a Python script {\tt
+%  finnpos-ratna-feat.py} used for feature extraction. The script is
+%named after Adwait Ratnaparkhi because FinnPos uses a modified version
+%of the feature set introduced by Ratnaparkhi in
+%\cite{ratnaparkhi/1996}.
 
 % FinnPos can utilize HFST morphological analyzers and other
 % morphological analyzers. 
-The integration of a morphological analyzer
-is accomplished by piping the output of the analyzer to FinnPos. 
-FinnPos uses the '\verb@|@' sign to separate sub-units
-of structured tags, e.g. {\tt Noun|Sg|Nom}, so tags emitted 
-by a particular morphological lexicon may require minor editing. 
-In HFST, morphological lexicons can be edited with the {\tt hfst-xfst} utility.
+%The integration of a morphological analyzer
+%is accomplished by piping the output of the analyzer to FinnPos. 
+%FinnPos uses the '\verb@|@' sign to separate sub-units
+%of structured tags, e.g. {\tt Noun|Sg|Nom}, so tags emitted 
+%by a particular morphological lexicon may require minor editing. 
+%In HFST, morphological lexicons can be edited with the {\tt hfst-xfst} utility.
 
-\subsection{Data Format and Feature Extraction}
+%\subsection{Data Format and Feature Extraction}
 
-\begin{figure}
-\begin{framed}
-\begin{verbatim}
-The    WORD=The LC_WORD=the       the   Det                _
-dog    WORD=dog LC_WORD=dog       dog   Noun|Sg|Nom        _
-barks  WORD=barks LC_WORD=barks   bark  Verb|Ind|Pres|3sg  _
-.      WORD=. LC_WORD=.           .     .                  _
-
-Their  WORD=Their LC_WORD=their   they  Pron|Pl|Gen        _
-cat    WORD=cat LC_WORD=cat       cat   Noun|Sg|Nom        _
-meows  WORD=meows LC_WORD=meows   meow  Verb|Ind|Pres|3sg  _
-.      WORD=. LC_WORD=.           .     .                  _
-\end{verbatim}
-\end{framed}
-\caption{Small example of data format.}
-\end{figure}
-
-The utilities {\tt finnpos-train} and {\tt finnpos-label} read and write input
-sentences in a five column tab-separated format where each row
-corresponds to one text token and the columns denote
-
-\begin{enumerate}
-  \item  Word form (e.g. ``Dogs'').
-  \item  Features separated by spaces (e.g. \verb|WORD=dogs PREV_WORD=the|).
-  \item  lemma (e.g. ``dog'').
-  \item  Label (e.g. \verb|NNS|).
-  \item  Annotations (arbitrary text not containing tabulators).
-\end{enumerate}
-
-When using a file as training or development file for {\tt
-  finnpos-train}, the lemma and label fields have to contain exactly
-one value each. When using {\tt finnpos-label} for tagging data, the
-label field can either be empty or contain a number of label
-candidates separated by spaces. 
-
-The default feature extraction script {\tt finnpos-ratna-feats.py}
-extracts the following features for frequent words:
-
-\begin{enumerate}
-\item Word form.
-\item Previous word form.
-\item Next word form.
-\item Previous two words.
-\item Next two words.
-\end{enumerate}
-
-\noindent For rare words, the script also extracts orthographic features:
-
-\begin{enumerate}
-\item Suffixes and prefixes up to length 10.
-\item Capitalization.
-\item Whether the word includes digits or dashes.
-\end{enumerate}
-
-\noindent Users may add their own features such as the output of a
-morphological analyzer before calling {\tt finnpos-ratna-feats.py} or
-write their own feature extraction script.
-
-The fifth field in the data format is reserved for annotations. These
-are passed unchanged through the tool {\tt finnpos-label}. The
-annotation field can be used to transport word-specific information
-through the tagger, e.g., lemmatization or named entity labels.
+%\begin{figure}
+%\begin{framed}
+%\begin{verbatim}
+%The    WORD=The LC_WORD=the       the   Det                _
+%dog    WORD=dog LC_WORD=dog       dog   Noun|Sg|Nom        _
+%barks  WORD=barks LC_WORD=barks   bark  Verb|Ind|Pres|3sg  _
+%.      WORD=. LC_WORD=.           .     .                  _
+%
+%Their  WORD=Their LC_WORD=their   they  Pron|Pl|Gen        _
+%cat    WORD=cat LC_WORD=cat       cat   Noun|Sg|Nom        _
+%meows  WORD=meows LC_WORD=meows   meow  Verb|Ind|Pres|3sg  _
+%.      WORD=. LC_WORD=.           .     .                  _
+%\end{verbatim}
+%\end{framed}
+%\caption{Small example of data format.}
+%\end{figure}
+%
+%The utilities {\tt finnpos-train} and {\tt finnpos-label} read and write input
+%sentences in a five column tab-separated format where each row
+%corresponds to one text token and the columns denote
+%
+%\begin{enumerate}
+%  \item  Word form (e.g. ``Dogs'').
+%  \item  Features separated by spaces (e.g. \verb|WORD=dogs PREV_WORD=the|).
+%  \item  lemma (e.g. ``dog'').
+%  \item  Label (e.g. \verb|NNS|).
+%  \item  Annotations (arbitrary text not containing tabulators).
+%\end{enumerate}
+%
+%When using a file as training or development file for {\tt
+%  finnpos-train}, the lemma and label fields have to contain exactly
+%one value each. When using {\tt finnpos-label} for tagging data, the
+%label field can either be empty or contain a number of label
+%candidates separated by spaces. 
+%
+%The default feature extraction script {\tt finnpos-ratna-feats.py}
+%extracts the following features for frequent words:
+%
+%\begin{enumerate}
+%\item Word form.
+%\item Previous word form.
+%\item Next word form.
+%\item Previous two words.
+%\item Next two words.
+%\end{enumerate}
+%
+%\noindent For rare words, the script also extracts orthographic features:
+%
+%\begin{enumerate}
+%\item Suffixes and prefixes up to length 10.
+%\item Capitalization.
+%\item Whether the word includes digits or dashes.
+%\end{enumerate}
+%
+%\noindent Users may add their own features such as the output of a
+%morphological analyzer before calling {\tt finnpos-ratna-feats.py} or
+%write their own feature extraction script.
+%
+%The fifth field in the data format is reserved for annotations. These
+%are passed unchanged through the tool {\tt finnpos-label}. The
+%annotation field can be used to transport word-specific information
+%through the tagger, e.g., lemmatization or named entity labels.
 
 \subsection{Training and Using a Model}
 
@@ -492,48 +491,48 @@ label guesser modeled after the OOV word model used in
 training. Because of inexact inference during the training phase,
 FinnPos additionally uses violation fixing \cite{huang/2012}.
 
-Users can train their own models using the utility {\tt
-  finnpos-train}. The training process is regulated using a
-configuation file, see Figure~\ref{fig:config-file}. The
-configuration file is used for setting the hyper parameters of the beam
-search and label guesser as well as the stopping conditions for the
-perceptron algorithm, see Figure~\ref{fig:config-fields}.
-
-\begin{figure}
-\begin{framed}
-\begin{verbatim}
-# Config file for FinnTreeBank tagger.
-
-guess_mass=0.999
-beam_mass=0.999
-max_train_passes=3
-max_lemmatizer_passes=7
-\end{verbatim}
-\end{framed}
-\caption{Example configuration file.}\label{fig:config-file}
-\end{figure}
-
-\begin{figure}
-\begin{tabular}{ll}
-{\tt suffix\_length} & The maximal suffix length used in feature extraction during\\
-                     & lemmatization.\\
-{\tt degree} & The degree of structured features used by the tagger. \\
-{\tt max\_train\_passes} & The maximal number of training passes during estimation of tagger\\
-                         & parameters.\\
-{\tt max\_lemmatizer\_passes} & The maximal number of training passes during estimation of\\
-                              & lemmatizer parameters.\\
-{\tt max\_useless\_passes} & The maximal number of passes over the training data\\
-                           & that do not improve the tagging accuracy for the development data.\\
-{\tt guess\_mass} & A generative label guesser is used to prune the label candidates\\
-                  & considered for each word during training, where {\tt guess\_mass}\\
-                  & is a float in range (0\ldots1) which determines the mass of the candidates\\
-                  &  preserved by the guesser for each word.\\
-{\tt beam\_mass} & FinnPos uses an adaptive beam to prune search histories during\\
-                 & beam search. This parameter determines the probability mass of the\\
-                 & beam.
-\end{tabular}
-\caption{Description of configuration file fields.}\label{fig:config-fields}
-\end{figure}
+%Users can train their own models using the utility {\tt
+%  finnpos-train}. The training process is regulated using a
+%configuation file, see Figure~\ref{fig:config-file}. The
+%configuration file is used for setting the hyper parameters of the beam
+%search and label guesser as well as the stopping conditions for the
+%perceptron algorithm, see Figure~\ref{fig:config-fields}.
+%
+%\begin{figure}
+%\begin{framed}
+%\begin{verbatim}
+%# Config file for FinnTreeBank tagger.
+%
+%guess_mass=0.999
+%beam_mass=0.999
+%max_train_passes=3
+%max_lemmatizer_passes=7
+%\end{verbatim}
+%\end{framed}
+%\caption{Example configuration file.}\label{fig:config-file}
+%\end{figure}
+%
+%\begin{figure}
+%\begin{tabular}{ll}
+%{\tt suffix\_length} & The maximal suffix length used in feature extraction during\\
+%                     & lemmatization.\\
+%{\tt degree} & The degree of structured features used by the tagger. \\
+%{\tt max\_train\_passes} & The maximal number of training passes during estimation of tagger\\
+%                         & parameters.\\
+%{\tt max\_lemmatizer\_passes} & The maximal number of training passes during estimation of\\
+%                              & lemmatizer parameters.\\
+%{\tt max\_useless\_passes} & The maximal number of passes over the training data\\
+%                           & that do not improve the tagging accuracy for the development data.\\
+%{\tt guess\_mass} & A generative label guesser is used to prune the label candidates\\
+%                  & considered for each word during training, where {\tt guess\_mass}\\
+%                  & is a float in range (0\ldots1) which determines the mass of the candidates\\
+%                  &  preserved by the guesser for each word.\\
+%{\tt beam\_mass} & FinnPos uses an adaptive beam to prune search histories during\\
+%                 & beam search. This parameter determines the probability mass of the\\
+%                 & beam.
+%\end{tabular}
+%\caption{Description of configuration file fields.}\label{fig:config-fields}
+%\end{figure}
 
 \subsection{FinnPos and Morphological Analyzers}
 
