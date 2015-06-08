@@ -28,7 +28,7 @@ cl /EHsc /Zc:wchar_t /Fehtwolcpre2.exe ^
 ..\..\tools\src\hfst-getopt.cpp ^
 ..\..\tools\src\hfst-twolc\src\htwolcpre2.cpp ^
 ..\..\tools\src\hfst-twolc\src\scanner2.cpp ^
-..\..\tools\src\hfst-twolc\src\cl_src\CommandLine.cpp ^
+..\..\tools\src\hfst-twolc\src\commandline_src\CommandLine.cpp ^
 ..\..\tools\src\hfst-twolc\src\io_src\InputReader.cpp ^
 HfstApply.cpp ^
 HfstInputStream.cpp ^
