@@ -174,6 +174,7 @@ cp scripts/make-hfst-xfst.bat $1/libhfst/src/
 cp scripts/make-hfst-proc.bat $1/libhfst/src/
 cp scripts/make-hfst-lexc.bat $1/libhfst/src/
 cp scripts/make-hfst-tool.bat $1/libhfst/src/
+cp scripts/make-htwolcpre1.bat $1/libhfst/src/
 
 # copy missing headers and change some headers included
 cp scripts/stdint.h $1/back-ends/foma/
@@ -274,7 +275,8 @@ done
 TWOLC_DIR=tools/src/hfst-twolc/src
 
 for file in \
-HfstTwolcDefs.h common_globals.h grammar_defs.h hfst-twolc.bat;
+HfstTwolcDefs.h common_globals.h grammar_defs.h hfst-twolc.bat \
+htwolcpre1.hh htwolcpre2.hh htwolcpre3.hh;
 do
     cp $TWOLC_DIR/$file $1/$TWOLC_DIR/
 done
@@ -283,6 +285,12 @@ for file in \
 hfst-twolc-system htwolcpre1 htwolcpre2 htwolcpre3 scanner1 scanner2 scanner3;
 do
     cp $TWOLC_DIR/$file.cc $1/$TWOLC_DIR/$file.cpp
+done
+
+for file in scanner1.cpp scanner2.cpp scanner3.cpp;
+do
+    sed -i 's/#include <unistd.h>/#include <io.h>/' $1/$TWOLC_DIR/$file
+    sed -i 's/yywrap( )/yywrap(void)/' $1/$TWOLC_DIR/$file
 done
 
 cp $TWOLC_DIR/alphabet_src/Alphabet.cc $1/$TWOLC_DIR/alphabet_src/Alphabet.cpp
