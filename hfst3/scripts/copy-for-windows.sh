@@ -190,12 +190,23 @@ done
 sed -i 's/pmatchwrap( )/pmatchwrap(void)/' $1/libhfst/src/parsers/pmatch_lex.cpp
 sed -i 's/hlexcwrap( )/hlexcwrap(void)/' $1/libhfst/src/parsers/lexc-lexer.cpp
 
-# copy files for hfst-xfst and hfst-lexc
+# copy files for tools
+
+# create subdirectories
 mkdir $1/tools
 mkdir $1/tools/src
 mkdir $1/tools/src/parsers
 mkdir $1/tools/src/hfst-proc
 mkdir $1/tools/src/inc
+mkdir $1/tools/src/hfst-twolc
+mkdir $1/tools/src/hfst-twolc/src
+mkdir $1/tools/src/hfst-twolc/src/alphabet_src
+mkdir $1/tools/src/hfst-twolc/src/commandline_src
+mkdir $1/tools/src/hfst-twolc/src/io_src
+mkdir $1/tools/src/hfst-twolc/src/rule_src
+mkdir $1/tools/src/hfst-twolc/src/string_src
+mkdir $1/tools/src/hfst-twolc/src/variable_src
+
 
 for file in \
 xfst-utils XfstCompiler hfst-xfst xfst-parser xfst-lexer \
@@ -220,8 +231,6 @@ hfst-lookup hfst-optimized-lookup;
 do
     cp tools/src/$file.cc $1/tools/src/$file.cpp
 done
-
-# todo: twolc
 
 # hfst-proc
 for file in \
@@ -258,3 +267,52 @@ globals-common.h globals-unary.h;
 do
     cp tools/src/inc/$file $1/tools/src/inc/
 done
+
+
+# Copy twolc
+
+TWOLC_DIR=tools/src/hfst-twolc/src
+
+for file in \
+HfstTwolcDefs.h common_globals.h grammar_defs.h hfst-twolc.bat;
+do
+    cp $TWOLC_DIR/$file $1/$TWOLC_DIR/
+done
+
+for file in \
+hfst-twolc-system htwolcpre1 htwolcpre2 htwolcpre3 scanner1 scanner2 scanner3;
+do
+    cp $TWOLC_DIR/$file.cc $1/$TWOLC_DIR/$file.cpp
+done
+
+cp $TWOLC_DIR/alphabet_src/Alphabet.cc $1/$TWOLC_DIR/alphabet_src/Alphabet.cpp
+cp $TWOLC_DIR/alphabet_src/Alphabet.h $1/$TWOLC_DIR/alphabet_src/Alphabet.h
+cp $TWOLC_DIR/commandline_src/CommandLine.cc $1/$TWOLC_DIR/commandline_src/CommandLine.cpp
+cp $TWOLC_DIR/commandline_src/CommandLine.h $1/$TWOLC_DIR/commandline_src/CommandLine.h
+cp $TWOLC_DIR/io_src/InputReader.cc $1/$TWOLC_DIR/io_src/InputReader.cpp
+cp $TWOLC_DIR/io_src/InputReader.h $1/$TWOLC_DIR/io_src/InputReader.h
+cp $TWOLC_DIR/io_src/input_defs.h $1/$TWOLC_DIR/io_src/input_defs.h
+
+for file in ConflictResolvingLeftArrowRule ConflictResolvingRightArrowRule \
+LeftArrowRule LeftArrowRuleContainer LeftRestrictionArrowRule OtherSymbolTransducer \
+RightArrowRule RightArrowRuleContainer Rule RuleContainer TwolCGrammar;
+do
+    cp $TWOLC_DIR/rule_src/$file.h $1/$TWOLC_DIR/rule_src/$file.h
+    cp $TWOLC_DIR/rule_src/$file.cc $1/$TWOLC_DIR/rule_src/$file.cpp
+done
+
+cp $TWOLC_DIR/string_src/string_manipulation.cc $1/$TWOLC_DIR/string_src/string_manipulation.cpp
+cp $TWOLC_DIR/string_src/string_manipulation.h $1/$TWOLC_DIR/string_src/string_manipulation.h
+
+for file in ConstContainerIterator.h MatchedConstContainerIterator.h MixedConstContainerIterator.h \
+RuleSymbolVector.h RuleVariables.h RuleVariablesConstIterator.h VariableBlock.h VariableBlockContainer.h \
+VariableContainer.h VariableContainerBase.h VariableDefs.h VariableValueIterator.h VariableValues.h;
+do
+    cp $TWOLC_DIR/variable_src/$file $1/$TWOLC_DIR/variable_src/
+done
+
+for file in RuleSymbolVector RuleVariables RuleVariablesConstIterator VariableValues;
+do
+    cp $TWOLC_DIR/variable_src/$file.cc $1/$TWOLC_DIR/variable_src/$file.cpp
+done
+
