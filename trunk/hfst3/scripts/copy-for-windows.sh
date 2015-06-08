@@ -174,7 +174,10 @@ cp scripts/make-hfst-xfst.bat $1/libhfst/src/
 cp scripts/make-hfst-proc.bat $1/libhfst/src/
 cp scripts/make-hfst-lexc.bat $1/libhfst/src/
 cp scripts/make-hfst-tool.bat $1/libhfst/src/
+cp scripts/make-hfst-tools.bat $1/libhfst/src/
 cp scripts/make-htwolcpre1.bat $1/libhfst/src/
+cp scripts/make-htwolcpre2.bat $1/libhfst/src/
+cp scripts/make-htwolcpre3.bat $1/libhfst/src/
 
 # copy missing headers and change some headers included
 cp scripts/stdint.h $1/back-ends/foma/
