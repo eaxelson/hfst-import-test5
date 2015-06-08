@@ -176,14 +176,14 @@ in/{RESERVED_SYMBOL} { return IN; }
   return SYMBOL; 
 }
 [?]/[:] {
-  if (not regexp_start)
+  if (! regexp_start)
     { return QUESTION_MARK; }
   // Any symbol. 
   symbol_queue.push_back("__HFST_TWOLC_?");
   return SYMBOL; 
 }
 [?]/{RESERVED_EXC_COL} {
-  if (not regexp_start)
+  if (! regexp_start)
     { return QUESTION_MARK; }
   // Any symbol. 
   symbol_queue.push_back("__HFST_TWOLC_?");
@@ -285,7 +285,7 @@ in/{RESERVED_SYMBOL} { return IN; }
 }
 \( {
   // Beginning of an optional bracketed regex.
-  if (not where_seen) 
+  if (! where_seen) 
     {
       symbol_queue.push_back("__HFST_TWOLC_("); 
       reduce_queue();
@@ -294,7 +294,7 @@ in/{RESERVED_SYMBOL} { return IN; }
 }
 \) {
   // End of an optional bracketed regex.
-  if (not where_seen) 
+  if (! where_seen) 
     {
       symbol_queue.push_back("__HFST_TWOLC_)"); 
       reduce_queue();
