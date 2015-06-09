@@ -121,6 +121,11 @@ namespace hfst
       }
     return false;
   }
+
+  void set_console_cp_to_utf8()
+  {
+    SetConsoleCP(65001);
+  }
 #endif // WINDOWS
 
 } // namespace hfst
