@@ -14,6 +14,8 @@ namespace hfst
          \a buffer_size defines maximum of input length. 
          Return whether the read operation was succesful. */
   bool get_line_from_console(std::string & str, size_t buffer_size, bool keep_newline = false);
+
+  void set_console_cp_to_utf8();
 #endif // WINDOWS
 
   /* Whether hfst_fprintf prints directly to console output.

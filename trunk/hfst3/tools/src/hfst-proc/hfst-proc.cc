@@ -12,6 +12,7 @@
 
 #ifdef _MSC_VER
 #  include "hfst-getopt.h"
+#  include "../hfst-string-conversions.h"
 #else
 #  include <getopt.h>
 #endif
@@ -357,6 +358,17 @@ int main(int argc, char **argv)
       return EXIT_FAILURE;
     }
   }
+#ifdef _MSC_VER
+  else
+  {
+    hfst::set_console_cp_to_utf8();
+    if (!silentFlag)
+    {
+      std::cerr << "hfst-proc: warning: Reading from standard input. UTF-8 characters" << std::endl
+                << "outside ascii range are supported only if input comes from a file." << std::endl;
+    }
+  }
+#endif
   
   if(out_arg != -1)
   {
@@ -367,6 +379,19 @@ int main(int argc, char **argv)
       return EXIT_FAILURE;
     }
   }
+#ifdef _MSC_VER
+  else
+  {
+    hfst::set_console_cp_to_utf8();
+    if (!silentFlag)
+    {
+      std::cerr << "hfst-proc: warning: Writing to standard input. UTF-8 characters" << std::endl
+                << "outside ascii range are supported only if output is redirected to a file." << std::endl;
+    }
+  }
+#endif
+
+
   
   CapitalizationMode capitalization_mode;
   switch(capitalization)

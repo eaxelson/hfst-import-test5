@@ -179,6 +179,14 @@ cp scripts/make-htwolcpre1.bat $1/libhfst/src/
 cp scripts/make-htwolcpre2.bat $1/libhfst/src/
 cp scripts/make-htwolcpre3.bat $1/libhfst/src/
 
+for file in test.lexc test.pmatch test.twolc test.xfst \
+test_xfst_result.txt test_twolc_result.txt test_pmatch_result.txt test_lexc_result.txt;
+do
+    cp scripts/windows_tests/$file $1/libhfst/src/
+done
+
+cp scripts/test-hfst-tools.bat $1/libhfst/src/
+
 # copy missing headers and change some headers included
 cp scripts/stdint.h $1/back-ends/foma/
 cp scripts/inttypes.h $1/back-ends/foma/
@@ -327,3 +335,5 @@ do
     cp $TWOLC_DIR/variable_src/$file.cc $1/$TWOLC_DIR/variable_src/$file.cpp
 done
 
+# For convenience
+cp $TWOLC_DIR/hfst-twolc.bat $1/libhfst/src/
