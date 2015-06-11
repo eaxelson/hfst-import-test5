@@ -5,6 +5,15 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.8.3
+---------------------------
+
+* Bugfixes and improvements to many tools, including hfst-xfst, hfst-proc(2),
+  hfst-lexc, hfst-pmatch(2fst), hfst-reweight, hfst-pair-test, hfst-compose-intersect
+
+* Better support for command line tools on windows
+
+
 Noteworthy changes in 3.8.2
 ---------------------------
 
@@ -590,5 +599,4 @@ Noteworthy changes in release 2.1
 ---------------------------------
 
 * hfst-twolc and hfst-compose-intersect understand # like xerox originals
-
 
