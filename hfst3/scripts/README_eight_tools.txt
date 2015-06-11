@@ -40,11 +40,14 @@ program in the same window). They read input from the console, i.e. line by
 line from the user and print their output to the console. Both control+D and
 control+Z can be used to signal end of user input and exit the program.
 
-The tools hfst-lexc, hfst-twolc and hfst-pmatch2fst are meant to be used from
-the command prompt. They take their input from a file and write their input to
-a file. The files can be given as a command line arguments or via standard 
-streams. hfst-proc has currently no support for UTF-8 in interactive mode on
-windows, so it should also be used in the same way.
+The tools hfst-lexc, hfst-twolc.bat and hfst-pmatch2fst are meant to be used
+from the command prompt. They take their input from a file and write their
+input to a file. The files can be given as a command line arguments or via
+standard streams. hfst-proc has currently no support for UTF-8 in interactive
+mode on windows, so it should also be used in the same way.
+
+Note that hfst-twolc.bat is a script that uses programs htwolcpre1, htwolcpre2
+and htwolcpre3, so they should all be located in the same directory.
 
 
 Character encodings
