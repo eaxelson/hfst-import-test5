@@ -1,3 +1,1047 @@
+2015-06-11 10:24  eaxelson
+
+	* scripts/README_eight_tools.txt, scripts/copy-for-windows.sh:
+	  Updated windows scripts.
+
+2015-06-11 10:24  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc: Now a warning message gets
+	  printed if stack contains transducers whose types differ (can
+	  happen if lookup-optimize is called before pushing another
+	  transducer onto stack).
+
+2015-06-10 10:49  eaxelson
+
+	* scripts/README_eight_tools.txt: Added a windows README file for
+	  the package that contains eight command line tools.
+
+2015-06-10 09:54  eaxelson
+
+	* scripts/README_xfst.txt: Added a Windows README file for
+	  hfst-xfst.
+
+2015-06-09 13:09  eaxelson
+
+	* back-ends/openfst/src/include/fst/rmfinalepsilon.h,
+	  back-ends/openfst/src/include/fst/symbol-table-ops.h,
+	  back-ends/openfst/src/include/fst/synchronize.h,
+	  scripts/copy-for-windows.sh, scripts/test-hfst-tools.bat,
+	  scripts/windows_tests, scripts/windows_tests/test.lexc,
+	  scripts/windows_tests/test.pmatch,
+	  scripts/windows_tests/test.twolc,
+	  scripts/windows_tests/test.xfst,
+	  scripts/windows_tests/test_lexc_result.txt,
+	  scripts/windows_tests/test_pmatch_result.txt,
+	  scripts/windows_tests/test_twolc_result.txt,
+	  scripts/windows_tests/test_xfst_result.txt,
+	  tools/src/hfst-proc/hfst-proc.cc,
+	  tools/src/hfst-string-conversions.cc,
+	  tools/src/hfst-string-conversions.h,
+	  tools/src/hfst-twolc/src/hfst-twolc.bat: Added tests for windows.
+	  Made small fixes to hfst-proc and hfst-twolc for windows.
+
+2015-06-08 12:31  eaxelson
+
+	* tools/src/hfst-twolc/src/alphabet_src/Alphabet.cc,
+	  tools/src/hfst-twolc/src/commandline_src/CommandLine.cc,
+	  tools/src/hfst-twolc/src/htwolcpre1.yy,
+	  tools/src/hfst-twolc/src/htwolcpre2.yy,
+	  tools/src/hfst-twolc/src/htwolcpre3.yy,
+	  tools/src/hfst-twolc/src/rule_src/ConflictResolvingLeftArrowRule.cc,
+	  tools/src/hfst-twolc/src/rule_src/OtherSymbolTransducer.cc,
+	  tools/src/hfst-twolc/src/rule_src/Rule.cc,
+	  tools/src/hfst-twolc/src/rule_src/TwolCGrammar.cc,
+	  tools/src/hfst-twolc/src/scanner1.ll,
+	  tools/src/hfst-twolc/src/string_src/string_manipulation.cc,
+	  tools/src/hfst-twolc/src/variable_src/ConstContainerIterator.h,
+	  tools/src/hfst-twolc/src/variable_src/MixedConstContainerIterator.h,
+	  tools/src/hfst-twolc/src/variable_src/RuleSymbolVector.cc,
+	  tools/src/hfst-twolc/src/variable_src/RuleVariables.cc,
+	  tools/src/hfst-twolc/src/variable_src/RuleVariablesConstIterator.cc,
+	  tools/src/hfst-twolc/src/variable_src/VariableValueIterator.h:
+	  Replaced alternative tokens for logical operators with the
+	  standard ones.
+
+2015-06-08 12:22  eaxelson
+
+	* tools/src/hfst-twolc/src/commandline_src/CommandLine.h: Checking
+	  for existence of config.h and getopt.h.
+
+2015-06-08 12:19  eaxelson
+
+	* scripts/copy-for-windows.sh, scripts/make-hfst-tools.bat,
+	  scripts/make-htwolcpre2.bat: Updated scripts.
+
+2015-06-08 10:02  eaxelson
+
+	* scripts/copy-for-windows.sh, scripts/make-htwolcpre1.bat,
+	  scripts/make-htwolcpre2.bat, scripts/make-htwolcpre3.bat: Added
+	  make scripts for twolc.
+
+2015-06-08 08:26  eaxelson
+
+	* scripts/copy-for-windows.sh: Added twolc to windows compilation
+	  scripts.
+
+2015-06-05 13:46  eaxelson
+
+	* scripts/copy-for-windows.sh, scripts/make-hfst-proc.bat,
+	  scripts/make-hfst-xfst.bat: Updated windows scripts.
+
+2015-06-05 13:43  eaxelson
+
+	* tools/src/Makefile.am, tools/src/hfst-lookup.cc,
+	  tools/src/hfst-optimized-lookup.cc, tools/src/hfst-pmatch.cc,
+	  tools/src/hfst-pmatch2fst.cc,
+	  tools/src/hfst-string-conversions.cc,
+	  tools/src/hfst-string-conversions.h: Fixing again reading and
+	  writing to/from console on windows.
+
+2015-06-04 12:58  eaxelson
+
+	* libhfst/src/parsers/pmatch_utils.h: Using hex values for unicode
+	  characters when compiling with msvc to get rid of warnings (and
+	  possible segfaults).
+
+2015-06-04 08:24  jezral
+
+	* test/tools/proc-functionality.sh,
+	  tools/src/hfst-proc/tokenizer.cc: Terminator needs reading, and
+	  yes there are partial reads
+
+2015-06-03 14:34  jezral
+
+	* tools/src/hfst-proc/tokenizer.cc: std::string all the way
+
+2015-06-03 10:29  eaxelson
+
+	* tools/src/hfst-proc/alphabet.cc,
+	  tools/src/hfst-proc/hfst-proc.cc,
+	  tools/src/hfst-proc/tokenizer.cc: Added missing HAVE_CONFIG_H
+	  ifdef. Added globals-common.h header as some compilers complain
+	  about missing extern variables. Now creating variable size array
+	  'next_u8' dynamically with operator 'new'.
+
+2015-06-03 10:04  eaxelson
+
+	* tools/src/parsers/Makefile.am, tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/help_message.cc,
+	  tools/src/parsers/xfst_help_message.cc,
+	  tools/src/parsers/xfst_help_message.h: Renamed help_message.cc
+	  into xfst_help_message.cc and added a header file
+	  xfst_help_message.h. Now XfstCompiler includes only the header
+	  file.
+
+2015-06-03 07:53  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc: Fixed a typo and added
+	  explicit braces to an else statement.
+
+2015-06-02 12:54  eaxelson
+
+	* tools/src/hfst-getopt.cc, tools/src/hfst-lookup.cc,
+	  tools/src/hfst-optimized-lookup.cc,
+	  tools/src/hfst-string-conversions.cc,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/hfst-xfst.cc, tools/src/parsers/test/test.sh:
+	  Now option --pipe-mode takes an optional argument { input,
+	  output, both }, 'both' being the default.
+
+2015-05-29 12:25  mpsilfve
+
+	* libhfst/src/Makefile.am: Install hfstdll.h
+
+2015-05-29 11:24  eaxelson
+
+	* tools/src/Makefile.am, tools/src/hfst-lookup.cc,
+	  tools/src/hfst-optimized-lookup.cc,
+	  tools/src/hfst-string-conversions.cc,
+	  tools/src/hfst-string-conversions.h,
+	  tools/src/parsers/hfst-xfst.cc: Now hfst-lookup and
+	  hfst-optimized-lookup read from console and print to console by
+	  default on windows.
+
+2015-05-28 12:21  eaxelson
+
+	* tools/src/hfst-optimized-lookup.cc: Commented out one debug
+	  print...
+
+2015-05-28 12:20  eaxelson
+
+	* tools/src/hfst-optimized-lookup.cc,
+	  tools/src/hfst-string-conversions.cc,
+	  tools/src/hfst-string-conversions.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/hfst-xfst.cc: More improvements to utf-8
+	  handling on windows.
+
+2015-05-27 13:09  eaxelson
+
+	* tools/src/Makefile.am, tools/src/hfst-optimized-lookup.cc,
+	  tools/src/hfst-string-conversions.cc,
+	  tools/src/hfst-string-conversions.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h: Small modifications for better
+	  utf-8 support on windows.
+
+2015-05-26 12:06  eaxelson
+
+	* scripts/copy-for-windows.sh, tools/src/hfst-lookup.cc,
+	  tools/src/hfst-optimized-lookup.cc,
+	  tools/src/hfst-optimized-lookup.h, tools/src/hfst-pmatch.cc,
+	  tools/src/hfst-pmatch2fst.cc: Small modifications for some
+	  command line tools for windows.
+
+2015-05-25 13:08  eaxelson
+
+	* scripts/copy-for-windows.sh, scripts/make-hfst-lexc.bat,
+	  scripts/make-hfst-tool.bat, tools/src/hfst-compare.cc,
+	  tools/src/hfst-strings2fst.cc, tools/src/hfst-txt2fst.cc,
+	  tools/src/parsers/test/test.sh: Added tool compilation scripts
+	  for windows. Argument handling on windows is also supported for
+	  some tools needed for hfst-xfst testing.
+
+2015-05-25 12:56  eaxelson
+
+	* tools/src/hfst-getopt.cc: Fixed a bug in argument handling.
+
+2015-05-22 11:14  eaxelson
+
+	* scripts/copy-for-windows.sh, scripts/make-hfst-xfst.bat,
+	  tools/src/hfst-lexc-compiler.cc, tools/src/parsers/hfst-xfst.cc:
+	  Edited help messages and warnings of hfst-xfst and hfst-lexc on
+	  windows about character encodings.
+
+2015-05-21 13:06  eaxelson
+
+	* tools/src/hfst-getopt.cc, tools/src/hfst-getopt.h,
+	  tools/src/hfst-lexc-compiler.cc, tools/src/parsers/hfst-xfst.cc:
+	  Moved getopt implementation to a separate file.
+
+2015-05-20 14:01  eaxelson
+
+	* scripts/copy-for-windows.sh, tools/src/parsers/hfst-xfst.cc:
+	  Added an implementation for long options for windows.
+
+2015-05-19 11:50  eaxelson
+
+	* back-ends/foma/lex.cmatrix.c, back-ends/foma/sigma.c,
+	  back-ends/foma/spelling.c, back-ends/foma/structures.c,
+	  scripts/copy-for-windows.sh, tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/hfst-xfst.cc: Fixed some issues noticed during
+	  msvc compilation. Renamed function 'min' to 'min_' to avoid
+	  collision with a macro with the same name. Changed arguments of
+	  comparison function given to qsort to (const void *, const void
+	  *). Added support for commandline arguments of type
+	  '--option=argument' to hfst-xfst for windows. Also changed
+	  hfst-xfst's option --print-to-console (default false) into
+	  --no-console (default false) on windows.
+
+2015-05-18 13:41  eaxelson
+
+	* scripts/copy-for-windows.sh, scripts/make-hfst-xfst.bat,
+	  tools/src/getopt_long.cc, tools/src/getopt_long.h: Updated
+	  windows script files.
+
+2015-05-18 13:40  eaxelson
+
+	* tools/src/parsers/hfst-xfst.cc: Deleted getopt_long cc and h
+	  files. Processing command line arguments manually in hfst-xfst.cc
+	  on windows.
+
+2015-05-18 13:39  eaxelson
+
+	* libhfst/src/implementations/optimized-lookup/transducer.h,
+	  tools/src/hfst-commandline.cc: Added some ifdef _MSC_VER
+	  directives.
+
+2015-05-18 10:36  eaxelson
+
+	* libhfst/src/implementations/optimized-lookup/transducer.h:
+	  Applied patch for musl libc compilation.
+
+2015-05-11 12:04  eaxelson
+
+	* libhfst/src/HarmonizeUnknownAndIdentitySymbols.cc,
+	  libhfst/src/HarmonizeUnknownAndIdentitySymbols.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/implementations/optimized-lookup/transducer.h,
+	  scripts/make-hfst-xfst.bat, tools/src/hfst-commandline.cc,
+	  tools/src/parsers/XfstCompiler.cc: Fixed some bugs noticed when
+	  compiling on windows.
+
+2015-05-08 20:21  hardwick
+
+	* tools/src/hfst-proc2.cc: Blank line between outputs in --finnpos
+	  mode
+
+2015-05-08 14:05  eaxelson
+
+	* scripts/copy-for-windows.sh, scripts/libhfst_win.i,
+	  scripts/make-hfst-xfst.bat,
+	  tools/src/HfstStrings2FstTokenizer.cc, tools/src/getopt_long.cc,
+	  tools/src/getopt_long.h, tools/src/hfst-commandline.cc,
+	  tools/src/hfst-commandline.h, tools/src/parsers/hfst-xfst.cc,
+	  tools/src/parsers/xfst-lexer.ll, tools/src/parsers/xfst-utils.h:
+	  Updated windows scripts. Added ifdefs for msvc compilation.
+
+2015-05-05 12:15  eaxelson
+
+	* scripts/libhfst_win.i, scripts/make-python-bindings.bat,
+	  scripts/test_libhfst_win.py: Updated swig scripts for windows.
+
+2015-04-29 12:32  hardwick
+
+	* tools/src/hfst-proc2.cc: Add FinnPos mode and reorganise
+
+2015-04-27 13:34  eaxelson
+
+	* back-ends/openfstwin/src/include/fst/flags.h,
+	  scripts/copy-for-windows.sh, scripts/make-foma.bat,
+	  scripts/make-libhfst.bat, scripts/make-openfstwin.bat,
+	  scripts/make-python-bindings.bat, scripts/test-libhfst.bat,
+	  scripts/test-openfstwin.bat, scripts/test_libhfst_win.py: Updated
+	  and added scripts for compiling python bindings on windows.
+
+2015-04-23 11:30  hardwick
+
+	* libhfst/src/parsers/pmatch_utils.cc,
+	  tools/src/hfst-pmatch2fst.cc: Fix harmonization issue and speed
+	  up the common case of only on top-level matcher
+
+2015-04-23 06:24  moshagen
+
+	* tools/src/hfst-reweight.cc: Documented the tsv file format, added
+	  some linebreaks to make the helpt text easier to read.
+
+2015-04-21 09:22  moshagen
+
+	* tools/src/hfst-reweight.cc: Always skip comment lines. Added
+	  verbose output for TSV file reweighting.
+
+2015-04-21 07:21  moshagen
+
+	* tools/src/hfst-reweight.cc: Fixed bug #293 by initialising the
+	  line variable before using it.
+
+2015-04-20 13:52  moshagen
+
+	* tools/src/hfst-reweight.cc: Whitespace only.
+
+2015-04-17 18:54  eaxelson
+
+	* libhfst/src/hfstdll.h: Added missing file 'hfstdll.h'.
+
+2015-04-17 12:43  eaxelson
+
+	* scripts/copy-for-windows.sh,
+	  scripts/generate-python-bindings.bat, scripts/libhfst_win.i,
+	  scripts/make-libhfst.bat, scripts/make-openfstwin.bat,
+	  scripts/test-libhfst.bat, scripts/test-openfstwin.bat: Edited and
+	  added scripts for windows compilation.
+
+2015-04-17 12:10  eaxelson
+
+	* libhfst/src/HarmonizeUnknownAndIdentitySymbols.h,
+	  libhfst/src/HfstExceptionDefs.h,
+	  libhfst/src/HfstFlagDiacritics.h, libhfst/src/HfstInputStream.h,
+	  libhfst/src/HfstOutputStream.h, libhfst/src/HfstSymbolDefs.h,
+	  libhfst/src/HfstTokenizer.h, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransition.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/implementations/HfstTropicalTransducerTransitionData.h:
+	  Added HFSTDLL's for some functions for windows compilation.
+
+2015-04-15 11:48  eaxelson
+
+	* tools/src/hfst-reweight.cc: Added option --arcs-only to
+	  hfst-reweight. Now weights of all arcs and end states are
+	  modified unless --arcs-only or --end-states-only is used. Also
+	  fixed '--end-state-only' as '--end-states-only'.
+
+2015-04-13 10:26  eaxelson
+
+	* libhfst/src/implementations/ConvertOlTransducer.cc,
+	  libhfst/src/implementations/FomaTransducer.cc,
+	  libhfst/src/implementations/LogWeightTransducer.cc,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc: Added
+	  some explicit type conversions.
+
+2015-04-09 13:28  moshagen
+
+	* tools/src/hfst-pair-test.cc: Changed the short form of the xerox
+	  mode from -x to -X (upper case), to be more consistent with the
+	  other options, and to match the test on line 195.
+
+2015-04-08 13:12  eaxelson
+
+	* configure.ac, libhfst/src/HfstTransducer.cc,
+	  libhfst/src/implementations/FomaTransducer.cc,
+	  libhfst/src/implementations/FomaTransducer.h,
+	  libhfst/src/implementations/Makefile.am, tools/src/Makefile.am:
+	  Now it is checked if foma back-end and zlib are available before
+	  hfst-lexc-wrapper is generated. This also affects the way
+	  HfstTransducer::read_lexc_ptr is implemented for FOMA_TYPE:
+	  native HFST lexc compiler is used if lexc wrapper is not
+	  generated.
+
+2015-04-08 13:09  eaxelson
+
+	* swig/libhfst.i, swig/setup.py: Updated hfst version number in the
+	  python setup file. Fixed the argument type of
+	  LexcCompiler::setVerbosity from bool to unsigned int.
+
+2015-04-08 13:06  eaxelson
+
+	* libhfst/src/HfstInputStream.cc,
+	  libhfst/src/implementations/ConvertFomaTransducer.cc,
+	  libhfst/src/implementations/ConvertTropicalWeightTransducer.cc:
+	  Changed again some 'not' operators into \!.
+
+2015-04-08 13:01  eaxelson
+
+	* libhfst/src/implementations/optimized-lookup/convert.cc: Added a
+	  missing // in the beginning of a comment line noticed during
+	  windows compilation.
+
+2015-04-08 13:00  eaxelson
+
+	* scripts/copy-for-windows.sh,
+	  scripts/generate-python-bindings.bat, scripts/make-libhfst.bat:
+	  Edited windows batch scripts and added a new one for creating
+	  python bindings.
+
+2015-04-08 09:48  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc: Changed declaration 'class
+	  yy_buffer_state' into 'struct yy_buffer_state'.
+
+2015-04-07 14:23  eaxelson
+
+	* libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy: Fixed declared return type
+	  from 'void' into 'int' for functions hlexclex_destroy and
+	  pmatcherror.
+
+2015-04-07 13:24  mpsilfve
+
+	* tools/src/hfst-pair-test.cc: Xerox twolc test support in
+	  hfst-pair-test
+
+2015-04-02 14:37  mpsilfve
+
+	* libhfst/src/implementations/compose_intersect/ComposeIntersectLexicon.cc,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectLexicon.h:
+	  Tentatively fixed missing paths problem in compose-intersect
+
+2015-04-01 12:21  eaxelson
+
+	* libhfst/src/implementations/compose_intersect/ComposeIntersectFst.cc,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectFst.h,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectRulePair.cc,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectRulePair.h:
+	  Moved definition of member 'static const HfstState START' of
+	  classes ComposeIntersectFst and ComposeIntersectRulePair from
+	  header to cc file.
+
+2015-04-01 11:39  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy: Add [].t() syntax for
+	  delimiting tagged (and context-checked!) regions
+
+2015-03-31 14:47  eaxelson
+
+	* scripts/copy-for-windows.sh, scripts/make-implementations.bat,
+	  scripts/make-libhfst.bat: Added new scripts for testing native
+	  windows compilation.
+
+2015-03-31 14:46  eaxelson
+
+	* libhfst/src/HarmonizeUnknownAndIdentitySymbols.cc,
+	  libhfst/src/HfstEpsilonHandler.cc,
+	  libhfst/src/HfstInputStream.cc, libhfst/src/HfstOutputStream.cc,
+	  libhfst/src/HfstRules.cc, libhfst/src/HfstTokenizer.cc,
+	  libhfst/src/HfstTransducer.cc, libhfst/src/HfstXeroxRules.cc,
+	  libhfst/src/implementations/LogWeightTransducer.cc: Added missing
+	  return values for some functions. Replaced ciso646 keywords for
+	  logical operators with standard ones.
+
+2015-03-26 22:14  eaxelson
+
+	* scripts/make-implementations.bat, scripts/make-parsers.bat: Added
+	  make scripts for windows.
+
+2015-03-26 22:13  eaxelson
+
+	* scripts/copy-for-windows.sh: Updated script.
+
+2015-03-26 21:36  eaxelson
+
+	* libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  tools/src/HfstStrings2FstTokenizer.cc,
+	  tools/src/HfstStrings2FstTokenizer.h, tools/src/hfst-lookup.cc,
+	  tools/src/hfst-pair-test.cc, tools/src/hfst-strings2fst.cc:
+	  Removed unnecessary HfstUtf8.h and HfstStrings2FstTokenizer.h
+	  inclusions from libhfst/src/ files. Also moved
+	  HfstStrings2FstTokenizer into hfst namespace.
+
+2015-03-26 20:44  eaxelson
+
+	* back-ends/foma/fomalib.h, back-ends/foma/fomalibconf.h,
+	  libhfst/src/FormatSpecifiers.h,
+	  libhfst/src/implementations/ConvertTransducerFormat.h,
+	  libhfst/src/implementations/FomaTransducer.h,
+	  libhfst/src/implementations/LogWeightTransducer.h: Now handling
+	  all stdbool definitions in foma headers.
+
+2015-03-26 15:05  eaxelson
+
+	* libhfst/src/implementations/FomaTransducer.h,
+	  libhfst/src/implementations/LogWeightTransducer.h,
+	  libhfst/src/implementations/Makefile.am,
+	  libhfst/src/implementations/TropicalWeightTransducer.h: Now
+	  HAVE_CONFIG_H is checked before including config.h. Removed
+	  inclusion of zlib.h that had no effect.
+
+2015-03-26 15:02  eaxelson
+
+	* back-ends/foma/Makefile.am, back-ends/foma/iface.c,
+	  back-ends/foma/io.c, back-ends/foma/lex.lexc.c,
+	  back-ends/foma/lex.yy.c: Changed ifdef WINDOWS into _MSC_VER. Now
+	  zlib.h is included only when requested with -DZLIB.
+
+2015-03-26 12:20  eaxelson
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Using
+	  dynamic arrays instead of static ones to keep cl.exe happy. Also
+	  added definition for 'ssize_t' on windows.
+
+2015-03-26 12:18  eaxelson
+
+	* libhfst/src/implementations/compose_intersect/ComposeIntersectLexicon.cc:
+	  Replaced 'and' with '&&'.
+
+2015-03-26 12:17  eaxelson
+
+	* libhfst/src/implementations/FomaTransducer.cc: Replaced 'and'
+	  with '&&'. Also made a variable defining the size of an array
+	  const.
+
+2015-03-25 13:34  eaxelson
+
+	* libhfst/src/implementations/ConvertOlTransducer.cc,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectFst.cc,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectLexicon.cc,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectRulePair.cc,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectUtilities.cc,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectUtilities.h,
+	  libhfst/src/implementations/optimized-lookup/transducer.h:
+	  Replaced ciso646 aliases and,or,not with &&,||,\!. Also changed
+	  sizeof(variable) into sizeof(variable_type) in ol transducer
+	  header because cl.exe complained about that for some reason.
+
+2015-03-25 12:47  eaxelson
+
+	* libhfst/src/parsers/xre_utils.cc: Fixed a bug where operator '=='
+	  was used instead of '=' when setting the value of last element in
+	  a char array.
+
+2015-03-23 14:58  eaxelson
+
+	* scripts/copy-for-windows.sh: Added missing files.
+
+2015-03-20 15:11  eaxelson
+
+	* scripts/copy-for-windows.sh, scripts/inttypes.h,
+	  scripts/make-foma.bat, scripts/make-openfstwin.bat,
+	  scripts/stdint.h: Added scripts and headers for windows
+	  compilation.
+
+2015-03-20 15:10  eaxelson
+
+	* libhfst/src/HfstFlagDiacritics.cc,
+	  libhfst/src/HfstLookupFlagDiacritics.cc,
+	  libhfst/src/HfstSymbolDefs.cc,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  libhfst/src/implementations/TropicalWeightTransducer.h: Changed
+	  operators {not,and,or} into {\!,&&,||} because cl.exe complains
+	  about them on windows.
+
+2015-03-20 14:20  eaxelson
+
+	* scripts/copy-for-windows.sh: Added a script for windows
+	  compilation
+
+2015-03-20 08:44  eaxelson
+
+	* back-ends/foma/apply.c, back-ends/foma/constructions.c,
+	  back-ends/foma/determinize.c, back-ends/foma/fomalib.h,
+	  back-ends/foma/fomalibconf.h, back-ends/foma/lex.cmatrix.c,
+	  back-ends/foma/lex.yy.c, back-ends/foma/mem.c,
+	  back-ends/foma/minimize.c, back-ends/foma/structures.c,
+	  back-ends/openfstwin/src/include/fst/compat.h,
+	  back-ends/openfstwin/src/include/fst/properties.h: Added support
+	  for compiling openfst and foma back-ends with cl.exe on windows.
+
+2015-03-15 17:45  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll: Include zero in signed and
+	  unsigned integers
+
+2015-03-15 16:16  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc:
+	  Correction to handling trailing nonmatching material in
+	  locate_mode
+
+2015-03-11 14:22  eaxelson
+
+	* libhfst/src/HfstApply.cc, libhfst/src/HfstTransducer.cc: Forgot
+	  to commit these files too...
+
+2015-03-11 14:21  eaxelson
+
+	* tools/src/hfst-concatenate.cc, tools/src/hfst-conjunct.cc,
+	  tools/src/hfst-disjunct.cc, tools/src/hfst-head.cc,
+	  tools/src/hfst-info.cc, tools/src/hfst-minimize.cc,
+	  tools/src/hfst-split.cc, tools/src/hfst-subtract.cc,
+	  tools/src/hfst-tail.cc: Added xfsm support for some command line
+	  tools.
+
+2015-03-11 10:28  eaxelson
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.h: Now HfstTransducer
+	  functions throw a FunctionNotImplementedExeption if xfsm
+	  implementation is not available.
+
+2015-03-10 15:47  eaxelson
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.h: Added more xfsm
+	  implementations.
+
+2015-03-10 14:54  eaxelson
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.h: Added more
+	  implementations for XFSM_TYPE for HfstTransducer functions.
+
+2015-03-09 12:41  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Add ignoring
+
+2015-03-09 11:20  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Correct parsing order of
+	  PARALLEL_RULES
+
+2015-03-04 15:18  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/ConvertTransducerFormat.cc,
+	  libhfst/src/implementations/XfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.h,
+	  tools/src/hfst-compose.cc: Added support for composition for xfsm
+	  transducers.
+
+2015-03-03 14:48  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/XfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.h,
+	  tools/src/hfst-minimize.cc: Added a variable to control if (xfsm)
+	  transducers that are already minimal are still minimized for
+	  profiling purposes.
+
+2015-03-02 15:13  eaxelson
+
+	* libhfst/src/HfstApply.cc,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/hfst-fst2txt.cc, tools/src/hfst-minimize.cc,
+	  tools/src/hfst-txt2fst.cc: Fixed some bugs in escaping special
+	  symbols in prolog format. Added support for xfsm format in some
+	  command line tools.
+
+2015-03-02 11:29  eaxelson
+
+	* tools/src/hfst-fst2txt.cc: Fixed an error noticed when
+	  -Werror=format-security was enabled during compilation.
+
+2015-02-27 15:00  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/XfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.h,
+	  tools/src/hfst-commandline.cc, tools/src/hfst-fst2fst.cc,
+	  tools/src/hfst-fst2txt.cc, tools/src/hfst-txt2fst.cc: Now xfsm
+	  conversion works in hfst-fst2fst and between prolog and binary
+	  format in hfst-fst2txt and hfst-txt2fst.
+
+2015-02-27 09:55  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h:
+	  Added XFSM initializer class.
+
+2015-02-27 09:52  eaxelson
+
+	* libhfst/src/HfstApply.cc,
+	  libhfst/src/implementations/XfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.h: Added function
+	  minimize to xfsm interface
+
+2015-02-26 10:56  eaxelson
+
+	* tools/src/hfst-commandline.cc,
+	  tools/src/hfst-compose-intersect.cc, tools/src/hfst-fst2fst.cc:
+	  Now hfst-compose-intersect does NOT harmonize transducers by
+	  default, as harmonizing produces unexpected results with
+	  hyperminimized transducers. Option --harmonize turns on
+	  harmonization. This is a partial fix to bug #288.
+
+2015-02-25 11:22  eaxelson
+
+	* configure.ac, libhfst/src/Makefile.am,
+	  tools/src/hfst-commandline.cc, tools/src/parsers/XfstCompiler.cc:
+	  Added a cross-build Windows patch given in bug report #289.
+
+2015-02-24 21:29  eaxelson
+
+	* libhfst/src/HfstOutputStream.cc: Added a missing #if HAVE_XFSM
+	  statement.
+
+2015-02-24 18:43  eaxelson
+
+	* libhfst/src/HfstInputStream.cc, libhfst/src/HfstTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.cc: Fixed some bugs in
+	  xfsm stream handling.
+
+2015-02-24 17:15  eaxelson
+
+	* libhfst/src/HfstOutputStream.cc, libhfst/src/HfstOutputStream.h,
+	  libhfst/src/implementations/XfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.h: Added more
+	  functions for writing and reading xfsm transducers.
+
+2015-02-23 14:33  eaxelson
+
+	* libhfst/src/HfstInputStream.h, libhfst/src/HfstOutputStream.cc,
+	  libhfst/src/HfstOutputStream.h,
+	  libhfst/src/implementations/XfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.h: Tentatively added
+	  input and output stream functions for xfsm transducer.
+
+2015-02-20 15:12  eaxelson
+
+	* scripts/generate-static-binaries.sh, scripts/hfst-twolc-bin,
+	  scripts/package-static-binaries.sh: Modified and added scripts
+	  for creating static binaries.
+
+2015-02-18 17:13  mpsilfve
+
+	* tools/src/hfst-compose-intersect.cc: Fast compose intersect
+	  available using option -f
+
+2015-02-18 14:52  eaxelson
+
+	* libhfst/src/implementations/ConvertXfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.h: Reorganized xfsm
+	  interface.
+
+2015-02-18 14:14  mpsilfve
+
+	* tools/src/hfst-compose-intersect.cc: Hopefully speed up
+	  compose_intersect by doing l .o. (l.2 .o. r) instead of l .o. r
+	  directly.
+
+2015-02-16 12:47  eaxelson
+
+	* scripts/generate-static-binaries.sh: Updated script.
+
+2015-02-16 12:45  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc: Disable hfst-xfst's
+	  auto-complet with rl_insert instead of rl_abort, which is not
+	  found on Mac.
+
+2015-02-16 11:54  eaxelson
+
+	* scripts/generate-static-binaries.sh: Added a script to generate
+	  static binaries.
+
+2015-02-16 08:06  eaxelson
+
+	* libhfst/src/implementations/ConvertXfsmTransducer.cc: Now xfsm
+	  conversion swaps the state numbers to make a more readable state
+	  numbering.
+
+2015-02-13 14:08  eaxelson
+
+	* libhfst/src/implementations/ConvertXfsmTransducer.cc: Now special
+	  symbols should also work in xfsm conversion.
+
+2015-02-13 13:01  eaxelson
+
+	* libhfst/src/implementations/ConvertXfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.h: Xfsm conversion
+	  functions almost work, escaped symbols still need some attention.
+
+2015-02-12 12:05  eaxelson
+
+	* libhfst/src/implementations/ConvertXfsmTransducer.cc: Conversion
+	  functions between xfsm and HfstBasicTransducer formats
+	  implemented, alphabets and special symbols still need some work.
+
+2015-02-11 08:36  hardwick
+
+	* tools/src/hfst-optimized-lookup.h: Autoindent entire file after
+	  removing tab characters to appease commit script
+
+2015-02-11 08:26  hardwick
+
+	* tools/src/hfst-optimized-lookup.cc,
+	  tools/src/hfst-optimized-lookup.h: Handle single-char ascii
+	  symbols shadowing multichar ones
+
+2015-02-10 14:14  eaxelson
+
+	* libhfst/src/HfstApply.cc, libhfst/src/HfstTransducer.cc,
+	  libhfst/src/HfstTransducer.h, libhfst/src/hfst_apply_schemas.h,
+	  libhfst/src/implementations/ConvertXfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.h: Modified hfst to
+	  support xfsm format.
+
+2015-02-10 09:15  hardwick
+
+	* tools/src/hfst-proc2.cc: Fix cg quote interpolation
+
+2015-02-10 08:57  hardwick
+
+	* tools/src/hfst-proc2.cc: Clarify help string
+
+2015-02-10 08:55  hardwick
+
+	* tools/src/hfst-proc2.cc: Add segmenting and cg mode; improve
+	  handling of special cases and weights
+
+2015-02-09 13:43  eaxelson
+
+	* libhfst/src/HfstDataTypes.cc, libhfst/src/HfstDataTypes.h,
+	  libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/ConvertXfsmTransducer.cc,
+	  libhfst/src/implementations/Makefile.am,
+	  libhfst/src/implementations/XfsmTransducer.h: Tentatively
+	  modified hfst to handle xfsm implementation type.
+
+2015-02-09 13:02  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  tools/src/hfst-pmatch.cc, tools/src/hfst-proc2.cc: Preserve
+	  nonmatching sequances in locate_mode and parse the appropriately
+	  downstream
+
+2015-02-06 16:51  eaxelson
+
+	* configure.ac, libhfst/src/Makefile.am,
+	  libhfst/src/implementations/ConvertTransducerFormat.h,
+	  libhfst/src/implementations/ConvertXfsmTransducer.cc,
+	  libhfst/src/implementations/Makefile.am,
+	  libhfst/src/implementations/XfsmTransducer.cc,
+	  libhfst/src/implementations/XfsmTransducer.h: Tentatively added a
+	  skeleton implementation for xfsm library that can be included
+	  with configure option --with-xfsm (default is no). No linking to
+	  the library is performed, this is just a test version.
+
+2015-02-06 16:34  eaxelson
+
+	* tools/src/hfst-twolc/src/alphabet_src/Alphabet.cc,
+	  tools/src/hfst-twolc/src/alphabet_src/Alphabet.h,
+	  tools/src/hfst-twolc/src/htwolcpre3.yy,
+	  tools/src/hfst-twolc/src/rule_src/TwolCGrammar.cc: Added a
+	  preprocessing directive that defines hfst-twols's Alphabet as
+	  TwolCAlphabet if HAVE_XFSM is on. This will prevent variable
+	  collisions.
+
+2015-02-06 13:15  eaxelson
+
+	* tools/src/hfst-txt2fst.cc: Changed hfst-txt2fst's read_prolog
+	  into read_prolog_format to avoid conflict with xfsm library
+	  function.
+
+2015-02-05 16:07  eaxelson
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/xre_lex.ll, libhfst/src/parsers/xre_parse.yy:
+	  Named tokens 'UPPER' and 'LOWER' in pmatch and xre parsers into
+	  'XRE_UPPER', 'XRE_LOWER', 'PMATCH_UPPER' and 'PMATCH_LOWER'
+	  because the xfsm library (that might be added to hfst at some
+	  point) has an enumerator with the same name in C namespace.
+
+2015-02-05 15:58  eaxelson
+
+	* back-ends/foma/fomalib.h, back-ends/foma/iface.c,
+	  back-ends/foma/io.c: Named foma's write_prolog into
+	  foma_write_prolog because the xfsm library (that might be added
+	  to hfst at some point) has a function with the same name in C
+	  namespace.
+
+2015-02-05 15:50  eaxelson
+
+	* tools/src/parsers/xfst-parser.yy: Took away unused token 'LOWER'
+	  from xfst parser.
+
+2015-02-03 17:37  eaxelson
+
+	* tools/src/hfst-compose-intersect.cc: Added an option
+	  --do-not-harmonize to hfst-compose-intersect.
+
+2015-02-03 16:51  eaxelson
+
+	* tools/src/hfst-compose-intersect.cc: Now hfst-compose-intersect
+	  harmonizes the rule transducers with the lexicon.
+
+2015-02-03 15:42  eaxelson
+
+	* tools/src/hfst-fst2strings.cc: Added option --beam to
+	  hfst-strings2fst.
+
+2015-02-03 09:39  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.h,
+	  tools/src/hfst-pmatch.cc: More accurately name set_locate_mode as
+	  set_extract_tags mode
+	  (locate vs. match is determined by function call)
+
+2015-02-02 14:29  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Fix bug in compiling
+	  UNKNOWNs on the left side of pair separators
+
+2015-02-02 13:58  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc: Fix bug
+	  affecting locate-mode where ?-matches were being seen as
+	  IDENTITIES in input.
+
+2015-02-02 10:34  eaxelson
+
+	* tools/src/hfst-lookup.cc: Added option --beam also to
+	  hfst-lookup. It is mostly untested for this tool.
+
+2015-01-30 13:35  eaxelson
+
+	* tools/src/hfst-optimized-lookup.cc: Tentatively added option
+	  --beam to hfst-optimized-lookup.
+
+2015-01-30 11:30  eaxelson
+
+	* tools/src/hfst-compose-intersect.cc: Fixed a typo in warning
+	  message about missing symbols in input tapes of rule transducers
+	  ('output' changed to 'input').
+
+2015-01-28 10:19  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc: In locate
+	  mode, zero-length hits could cause infinite loops. Commit fixes
+	  it.
+
+2015-01-23 15:31  eaxelson
+
+	* tools/src/hfst-lookup.cc: Now hfst-lookup checks it it is
+	  possible for an input to go through a transducer before calling
+	  is_infinitely_ambiguous. Should fix bug #278.
+
+2015-01-22 11:40  eaxelson
+
+	* libhfst/src/HfstTransducer.cc: Now reserved symbols are detected
+	  in composition if xerox-composition is ON. This will prevent
+	  symbol collisions by throwing an error message, giving at least a
+	  temporary solution to issues with reserved symbols.
+
+2015-01-22 09:52  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy: Fixed substitution operator in
+	  regexp, now flag diacritics are allowed both as substituting and
+	  subtituted symbols. Should fix bug #284.
+
+2015-01-21 21:31  eaxelson
+
+	* tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/xfst-parser.yy: Added better support for
+	  special symbols in hfst-xfst's substitute command.
+
+2015-01-21 15:25  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/substitute_symbol_7.att,
+	  tools/src/parsers/test/substitute_symbol_7.xfst,
+	  tools/src/parsers/test/substitute_symbol_8.att,
+	  tools/src/parsers/test/substitute_symbol_8.xfst,
+	  tools/src/parsers/test/test.sh: Added two tests for hfst-xfst's
+	  substitute command. They are skipped until substitute can also
+	  handle them.
+
+2015-01-21 12:48  eaxelson
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/parsers/LexcCompiler.cc: Fixed a bug in composition
+	  when xerox-composition is ON. Flag diacritics @SOMEFLAG@ were
+	  earlier transformed into $ and back into @SOMEFLAG@, but symbols
+	  of form $...$ are already reserved for lexc. Now diacritics are
+	  escaped as %SOMEFLAG% during composition. This creates a new set
+	  of reserved symbols which maybe needs more consideration
+	  though... Also added debug prints for LexcCompiler.
+
+2015-01-16 14:13  eaxelson
+
+	* configure.ac: Removed xml checks from configure, since they cause
+	  unlinked xml references in hfst-edit-metadata on some platforms.
+
+2015-01-16 13:13  eaxelson
+
+	* libhfst/src/HfstFlagDiacritics.cc,
+	  tools/src/parsers/XfstCompiler.cc: Fixed flag diacritic
+	  recognition, now also flags of form e.g. '@D.FOO@' are accepted
+	  and an empty string is returned as their value. Also added full
+	  support for flag handling in hfst-xfst.
+
+2015-01-15 15:55  eaxelson
+
+	* libhfst/src/HfstSymbolDefs.cc, libhfst/src/HfstSymbolDefs.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h: Added some conversion functions
+	  between StringPairVectors and StringVectors. Added checks for
+	  flag diacritics in hfst-xfst non-optimized lookup.
+
+2015-01-08 14:33  eaxelson
+
+	* tools/src/hfst-summarize.cc: A small fix to hfst-summarize option
+	  handling.
+
+2014-12-19 15:34  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am: Ready for release 3.8.2.
+
+2014-12-19 14:41  eaxelson
+
+	* tools/src/hfst-summarize.cc: Added option
+	  --print-symbol-pair-statistics(=N) to hfst-summarize.
+
 2014-12-17 13:28  eaxelson
 
 	* configure.ac, libhfst/src/HfstTransducer.cc,

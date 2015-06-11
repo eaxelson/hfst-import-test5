@@ -1,3 +1,427 @@
+2014-12-17 13:28  eaxelson
+
+	* configure.ac, libhfst/src/HfstTransducer.cc,
+	  libhfst/src/parsers/XreCompiler.cc,
+	  libhfst/src/parsers/XreCompiler.h,
+	  libhfst/src/parsers/xre_lex.ll,
+	  tools/src/parsers/XfstCompiler.cc: Small fixes to
+	  compile-replace. Also restarting the char counter every time a
+	  new xre parsing is started. Removed the xml2 dependecy in
+	  configure.
+
+2014-12-12 10:49  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc: Omit
+	  unnecessary step in stringification
+
+2014-12-12 10:22  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h: Another
+	  slight speed improvement
+
+2014-12-12 09:56  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc: Some
+	  double free insurance related to previous commit
+
+2014-12-12 09:53  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h: Some more
+	  pmatch runtime speedup (around 5-10% in most cases)
+
+2014-12-11 21:54  hardwick
+
+	* libhfst/src/implementations/ConvertOlTransducer.cc: Remove
+	  commented-out lines (same ones I was intending in the previous
+	  commit)
+
+2014-12-11 21:08  hardwick
+
+	* libhfst/src/implementations/ConvertOlTransducer.cc: Remove
+	  extraenous index table fitting test
+
+2014-12-11 20:33  hardwick
+
+	* libhfst/src/implementations/ConvertOlTransducer.cc,
+	  libhfst/src/implementations/optimized-lookup/convert.h: Further
+	  improvements to conversion to optimized lookup format
+	  
+	  This speeds up conversion a bit more, and also improves packing
+	  in one case by around 25% (implying that this commit *does*
+	  change the
+	  output of the conversion, but in a functionally equivalent way).
+	  
+	  The space gain was mainly accomplished by changing what happens
+	  when we fail
+	  to find a suitable index table location several times a row
+	  starting in the
+	  same place. We used to jump up to the previous successful
+	  location and its
+	  indices, now we keep trying to fill in the gaps between those
+	  first.
+	  
+	  This commit also removes the state-relabeling facility, because
+	  it didn't seem
+	  to be doing anything (perhaps something in HfstBasicTransducer
+	  has changed;
+	  it seems state numbers can no longer be non-contiguous). So we
+	  now assume
+	  states are contiguous and iterated in order. If this assumption
+	  is broken,
+	  this needs to be changes. But as I said earlier, looks like
+	  relabeling wasn't
+	  doing anything now anyway.
+
+2014-12-11 13:25  hardwick
+
+	* libhfst/src/implementations/ConvertOlTransducer.cc,
+	  libhfst/src/implementations/optimized-lookup/convert.cc,
+	  libhfst/src/implementations/optimized-lookup/convert.h: Large
+	  speedup in conversion to optimized-lookup format
+	  
+	  In some cases this speeds up conversion by up to 80%. This
+	  involved
+	  a) making the code a bit more convoluted by using multiple data
+	  structures
+	  where there used to be just one
+	  b) omitting some space-oriented optimizations that appear to be
+	  usually
+	  very minor and occasionally even harmful
+	  
+	  While I've tested this with the major transducers I've found,
+	  it's not
+	  unthinkable that refactoring such hairy code as this has
+	  introduced bugs.
+	  No new functionality is introduced so it's ok to roll this back
+	  if it causes
+	  problems.
+
+2014-12-05 16:03  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/compile_replace_1.output,
+	  tools/src/parsers/test/compile_replace_1.xfst,
+	  tools/src/parsers/test/compile_replace_2.output,
+	  tools/src/parsers/test/compile_replace_2.xfst,
+	  tools/src/parsers/test/compile_replace_3.output,
+	  tools/src/parsers/test/compile_replace_3.xfst,
+	  tools/src/parsers/test/test.sh: Added test cases for
+	  compile-replace.
+
+2014-12-05 14:49  eaxelson
+
+	* tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/merge.att,
+	  tools/src/parsers/test/merge.xfst,
+	  tools/src/parsers/test/merge_weighted.att,
+	  tools/src/parsers/test/merge_weighted.xfst,
+	  tools/src/parsers/test/test.sh: Added test cases for merge
+	  operation.
+
+2014-12-05 12:22  eaxelson
+
+	* tools/src/hfst-fst2strings.cc: Fixed an error in hfst-fst2strings
+	  --print-separator where two consecutive lines of -- were printed
+	  between non-empty transducers in some cases.
+
+2014-12-04 13:04  eaxelson
+
+	* libhfst/src/parsers/xre_utils.cc,
+	  tools/src/parsers/XfstCompiler.cc: Now minimizing the merging
+	  automaton before merge operation so that epsilons do not cut a
+	  succesfull merge path. Also allowing epsilon-to-regexp-marker
+	  transitions in the merge filter.
+
+2014-12-03 15:35  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/parsers/XfstCompiler.cc: Improvements to
+	  compile-replace function, now it should work for input and output
+	  sides of a transducer.
+
+2014-12-03 09:36  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Revert bungled change to
+	  precedence order
+
+2014-12-02 20:34  eaxelson
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/parsers/XreCompiler.cc,
+	  libhfst/src/parsers/XreCompiler.h,
+	  libhfst/src/parsers/xre_lex.ll, tools/src/parsers/hfst-xfst.cc:
+	  Now xre compiler of function merge does not increment the char
+	  counter, making it possible to have many merge operators inside
+	  one regex.
+
+2014-12-02 16:07  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/parsers/XreCompiler.cc,
+	  libhfst/src/parsers/XreCompiler.h,
+	  libhfst/src/parsers/xre_utils.cc: Added a constructor
+	  XreCompiler(XreConstructorArguments & args) to facilitate passing
+	  xre variables to merge function which needs them in its internal
+	  xre compiler.
+
+2014-12-02 14:06  eaxelson
+
+	* libhfst/src/parsers/xre_utils.cc: Now using internal starptr
+	  variables in functions hfst::xre::compile and
+	  hfst::xre::compile_first instead of global hfst::xre::startptr.
+	  This should fix the strange memory errors which occurred when
+	  calling merge operation inside a regular expression.
+
+2014-12-02 12:33  eaxelson
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/implementations/HfstTransitionGraph.h: Now merge
+	  operation filters out non-optimal paths.
+
+2014-11-27 14:49  eaxelson
+
+	* libhfst/src/HfstTokenizer.cc, libhfst/src/HfstTokenizer.h:
+	  Tentatively added a function 'tokenize_and_align_flag_diacritics'
+	  to HfstTokenizer.
+
+2014-11-26 16:50  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h: Runtime
+	  speed improvements
+	  Prereserve table vectors, eliminate special_symbols map
+
+2014-11-26 13:00  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h,
+	  libhfst/src/implementations/optimized-lookup/transducer.h,
+	  libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h, tools/src/hfst-pmatch.cc,
+	  tools/src/hfst-proc2.cc: Profiling support with Counter() and
+	  --profile & a bunch of smaller changes
+	  
+	  Counter(arg) in a ruleset inserts a profiling point, hfst-pmatch
+	  --profile
+	  prints profiling info.
+	  
+	  When --verbose, warn about undefined symbols being interpreted as
+	  labels.
+	  When --flatten, flatten Lst() definitions too.
+
+2014-11-25 14:14  eaxelson
+
+	* tools/src/hfst-compose.cc: Allowing 1-to-n composition of
+	  automata in archives. Fixes bug (or feature request) #277.
+
+2014-11-25 10:54  eaxelson
+
+	* libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/LexcCompiler.h,
+	  libhfst/src/parsers/lexc-lexer.ll,
+	  libhfst/src/parsers/lexc-parser.yy,
+	  tools/src/hfst-lexc-compiler.cc: Now passing verbosity to
+	  LexcCompiler as an unsigned integer via setVerbosity(uint). Also
+	  made small fixes to warning prints in lexc compiler.
+
+2014-11-24 13:51  eaxelson
+
+	* test/tools/Makefile.am,
+	  test/tools/lexc-compiler-functionality.sh,
+	  test/tools/warn.one-sided-flags.lexc,
+	  test/tools/warn.one-sided-flags.lexc.flag.result,
+	  test/tools/warn.one-sided-flags.lexc.result: Added tests for
+	  one-sided flag diacritics for hfst-lexc.
+
+2014-11-24 13:50  eaxelson
+
+	* libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/lexc-parser.yy: Now lexc compiler warns about
+	  one-sided flag diacritics in verbose mode.
+
+2014-11-24 13:49  eaxelson
+
+	* libhfst/src/HfstTokenizer.cc, libhfst/src/HfstTokenizer.h: Added
+	  a tokenizing function that warns about symbol pairs, if needed.
+
+2014-11-24 11:07  eaxelson
+
+	* test/tools/Makefile.am,
+	  test/tools/lexc-compiler-functionality.sh,
+	  test/tools/xfail.sublexicon-defined-more-than-once.lexc: Added
+	  test case for previous lexc commit (sublexicon defined more than
+	  once treated as an error).
+
+2014-11-24 10:33  eaxelson
+
+	* libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/LexcCompiler.h,
+	  libhfst/src/parsers/lexc-parser.yy: Now multiple definitions of
+	  the same lexicon in lexc are treated as an error unless
+	  LexcCompiler::setAllowMultipleLexiconDefinitions(true) is called
+	  first.
+
+2014-11-24 09:04  eaxelson
+
+	* libhfst/src/parsers/lexc-lexer.ll,
+	  libhfst/src/parsers/lexc-parser.yy: Now lexc parser updates the
+	  error status hlexcnerrs when hlexcerror is called. In case of
+	  warnings, the error status is nor updated.
+
+2014-11-20 12:15  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h,
+	  libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Speed
+	  up list arc processing by replacing some maps and sets with
+	  vectors
+
+2014-11-19 09:17  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/parsers/LexcCompiler.cc,
+	  libhfst/src/parsers/XreCompiler.cc,
+	  libhfst/src/parsers/XreCompiler.h,
+	  libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/XfstCompiler.h: Changed list to set in merge
+	  operation. Removed commented code.
+
+2014-11-18 17:00  eaxelson
+
+	* tools/src/hfst-lexc-compiler.cc: Added option --encode-weights to
+	  hfst-lexc.
+
+2014-11-17 13:55  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Reinstate undefined symbols
+	  as valid tokens as per documentation
+
+2014-11-17 13:53  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc: Add defined lists
+
+2014-11-17 13:14  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: Add Sigma()
+
+2014-11-17 11:48  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/pmatch.cc,
+	  libhfst/src/implementations/optimized-lookup/pmatch.h,
+	  libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: Added Lst() and support for
+	  list arcs in runtime
+
+2014-11-17 11:21  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Sync precedence rules
+
+2014-11-17 11:17  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy: Switch order of precedence
+	  of concatenation and other binary operations
+
+2014-11-17 07:47  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy: Added Lit()
+
+2014-11-13 07:21  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h: Modified the
+	  function merge, it now takes as an argument a map of list
+	  symbols.
+
+2014-11-13 07:16  eaxelson
+
+	* libhfst/src/parsers/XreCompiler.cc,
+	  libhfst/src/parsers/XreCompiler.h,
+	  libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc,
+	  libhfst/src/parsers/xre_utils.h,
+	  tools/src/parsers/XfstCompiler.cc,
+	  tools/src/parsers/test/Makefile.am,
+	  tools/src/parsers/test/one_transition_regex.att,
+	  tools/src/parsers/test/one_transition_regex.xfst,
+	  tools/src/parsers/test/test.sh: Fixed a bug in xre parser, now
+	  definitions and unknowns can be used together in expressions such
+	  as 'regex [def:?] ;'.
+
+2014-11-11 14:06  eaxelson
+
+	* libhfst/src/HfstTokenizer.cc,
+	  tools/src/HfstStrings2FstTokenizer.cc: Now the epsilon symbol is
+	  not added as a multichar symbol to hfst-lookup tokenizer if it is
+	  the empty string. Should fix bug #275.
+
+2014-11-10 21:26  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_utils.cc: Allow \U00NNNNNN syntax for
+	  code points in utf-8 but above U+FFFF
+
+2014-11-10 20:55  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_utils.cc: Allow \UNNNN as well as
+	  \uNNNN
+
+2014-11-10 20:41  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_utils.cc: Allow \uNNNN in range
+	  notation and make some fixes to utf-8 handling
+
+2014-11-10 18:58  hardwick
+
+	* libhfst/src/parsers/pmatch_lex.ll,
+	  libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: Added utf-8 character range
+	  expressions
+
+2014-11-10 14:57  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/parsers/xre_lex.ll, libhfst/src/parsers/xre_parse.yy:
+	  An untested implementation of the merge operation added to
+	  hfst-xfst.
+
+2014-11-10 13:23  hardwick
+
+	* libhfst/src/parsers/pmatch_parse.yy,
+	  libhfst/src/parsers/pmatch_utils.cc,
+	  libhfst/src/parsers/pmatch_utils.h: Syntax-level completion of
+	  functions (arg placement still not completely free)
+
+2014-11-04 16:35  eaxelson
+
+	* check_installation/copy-tool-tests.sh: Fixed a small bug in hfst
+	  tool tester.
+
+2014-11-04 10:23  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am, swig/setup.py: Ready for release 3.8.1.
+
 2014-10-31 16:44  eaxelson
 
 	* tools/src/hfst-guess.cc: Fixed std::cout into &std::cout in
