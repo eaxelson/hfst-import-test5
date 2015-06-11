@@ -3656,6 +3656,14 @@ namespace xfst {
     while (!stack_.empty())
       {
         HfstTransducer* t = stack_.top();
+
+        if (t->get_type() != result->get_type())
+          {
+            hfst_fprintf(stderr, "Stack contains transducers whose type differs.\n");
+            xfst_lesser_fail();
+            break;
+          }
+
         switch (operation)
           {
           case INTERSECT_NET:
