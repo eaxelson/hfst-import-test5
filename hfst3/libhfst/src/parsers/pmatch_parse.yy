@@ -1045,9 +1045,18 @@ REGEXP7: REGEXP8 { }
     delete $3;
  }
 | REGEXP7 IGNORE_INTERNALLY REGEXP8 {
-    pmatcherror("No ignoring internally");
-    $$ = $1;
+    HfstTransducer * left = new HfstTransducer(*$1);
+    HfstTransducer * right = new HfstTransducer(*$1);
+    HfstTransducer * middle = new HfstTransducer(*$1);
+    middle->disjunct(*$3);
+    middle->repeat_star();
+    left->concatenate(*middle);
+    left->concatenate(*right);
+    $$ = left;
+    delete $1;
     delete $3;
+    delete middle;
+    delete right;
  }
 | REGEXP7 LEFT_QUOTIENT REGEXP8 {
     pmatcherror("No left quotient");
@@ -1059,53 +1068,58 @@ REGEXP7: REGEXP8 { }
 
 REGEXP8: REGEXP9 { }
 | COMPLEMENT REGEXP8 {
-    pmatcherror("No complement");
-    $$ = $2;
- }
+// Defined here only for automata, so we project to input
+    HfstTransducer * complement =
+        new HfstTransducer(hfst::internal_identity, hfst::pmatch::format);
+    complement->repeat_star();
+    complement->subtract(*$2);
+    $$ = complement;
+    delete $2;
+}
 | CONTAINMENT REGEXP8 {
-    HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
-                                              hfst::internal_unknown,
+    HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
                                               hfst::pmatch::format);
-    HfstTransducer* right = new HfstTransducer(hfst::internal_unknown,
-                                               hfst::internal_unknown,
+    HfstTransducer* right = new HfstTransducer(hfst::internal_identity,
                                                hfst::pmatch::format);
     right->repeat_star();
     left->repeat_star();
-    HfstTransducer* contain_once = 
-        & ((right->concatenate(*$2).concatenate(*left)));
-    $$ = & (contain_once->repeat_star());
+    $2->repeat_star();
+    left->concatenate(*$2);
+    left->concatenate(*right);
+    $$ = left;
     delete $2;
-    delete left;
+    delete right;
  }
 | CONTAINMENT_ONCE REGEXP8 {
-    HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
-                                              hfst::internal_unknown,
+    HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
                                               hfst::pmatch::format);
-    HfstTransducer* right = new HfstTransducer(hfst::internal_unknown,
-                                               hfst::internal_unknown,
+    HfstTransducer* right = new HfstTransducer(hfst::internal_identity,
                                                hfst::pmatch::format);
+    left->subtract(*$2);
+    right->subtract(*$2);
     right->repeat_star();
     left->repeat_star();
-    HfstTransducer* contain_once = 
-        & ((right->concatenate(*$2).concatenate(*left)));
-    $$ = contain_once;
+    left->concatenate(*$2);
+    left->concatenate(*right);
+    $$ = left;
     delete $2;
-    delete left;
+    delete right;
  }
 | CONTAINMENT_OPT REGEXP8 {
-    HfstTransducer* left = new HfstTransducer(hfst::internal_unknown,
-                                              hfst::internal_unknown,
+    HfstTransducer* left = new HfstTransducer(hfst::internal_identity,
                                               hfst::pmatch::format);
-    HfstTransducer* right = new HfstTransducer(hfst::internal_unknown,
-                                               hfst::internal_unknown,
+    HfstTransducer* right = new HfstTransducer(hfst::internal_identity,
                                                hfst::pmatch::format);
+    left->subtract(*$2);
+    right->subtract(*$2);
     right->repeat_star();
     left->repeat_star();
-    HfstTransducer* contain_once = 
-        & ((right->concatenate(*$2).concatenate(*left)));
-    $$ = & (contain_once->optionalize());
+    $2->optionalize();
+    left->concatenate(*$2);
+    left->concatenate(*right);
+    $$ = left;
     delete $2;
-    delete left;
+    delete right;
  }
 ;
 
