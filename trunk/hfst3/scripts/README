@@ -1,0 +1,9 @@
+make-hfst-tools.bat            A script for creating eight hfst command line tools for Windows
+make-hfst-tool.bat HFST-FOO    A script for creating hfst command line tool HFST-FOO.exe
+make-hfst-FOO.bat              Individual scripts for creating hfst command line tool hfst-FOO.exe
+make-htwolcpre[1|2|3].bat      Individual scripts for creating htwolcpre*.exe tools that the script hfst-twolc.bat can call
+make-foma.bat                  A script for making foma dll (not used at the moment)
+make-implementations.bat       A script for compiling hfst implementations object files (not used at the moment)
+make-libhfst.bat               A script for making hfst dll (not used at the moment) 
+make-openfstwin.bat            A script for making openfstwin dll (not used at the moment)
+make-parsers.bat               A script for compiling hfst parsers object files (not used at the moment)
