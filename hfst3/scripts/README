@@ -43,4 +43,3 @@ package-static-binaries.sh     For packaging hfst for Linux (not so much needed 
 generate-cc-files.sh           Performs all the flex/bison compilation needed when compiling HFST (call before 'make')
 hfst-twolc-bin                 Twolc script?
 multiple_targets.sh            Cygwin-related?
-
