@@ -28,4 +28,4 @@ cp tools/src/hfst-proc/.libs/hfst-apertium-proc $1/hfst-proc
 cp tools/src/hfst-twolc/src/.libs/htwolcpre1 $1/
 cp tools/src/hfst-twolc/src/.libs/htwolcpre2 $1/
 cp tools/src/hfst-twolc/src/.libs/htwolcpre3 $1/
-cp scripts/hfst-twolc-bin $1/hfst-twolc
+cp scripts/hfst-twolc $1/hfst-twolc
