@@ -186,8 +186,8 @@ do
 done
 
 cp scripts/test-hfst-tools.bat $1/libhfst/src/
-cp scripts/README_xfst.txt $1/libhfst/src/
-cp scripts/README_eight_tools.txt $1/libhfst/src/
+cp scripts/README_xfst_win.txt $1/libhfst/src/
+cp scripts/README_eight_tools_win.txt $1/libhfst/src/
 
 # copy missing headers and change some headers included
 cp scripts/stdint.h $1/back-ends/foma/
