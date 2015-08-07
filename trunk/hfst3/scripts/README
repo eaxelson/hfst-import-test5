@@ -19,11 +19,20 @@ generate-python-bindings.bat   A script for making python hfst bindings for Wind
 windows_tests/                 A directory that contains files for testing hfst tools on Windows
 inttypes.h                     A header file needed for Windows compilation
 stdint.h                       A header file needed for Windows compilation
-README_eight_tools.txt         README file for Windows package that contains eight command line tools 
-README_xfst.txt                README file for Windows package that contains hfst-xfst.exe command line tool 
+README_eight_tools_win.txt     README file for Windows package that contains eight command line tools 
+README_xfst_win.txt            README file for Windows package that contains hfst-xfst.exe command line tool 
 copy-for-windows.sh TARGET SOURCE   Copy winopenfst and foma back-ends as well as libhfst/src (SOURCE is the top directory) under TARGET directory
 libhfst_win.i                  Tentative interface file for new HFST Python bindings for Windows
 test_libhfst_win.py            Tentative test script for HFST Python bindings for Windows 
+
+
+Mac-related files
+-----------------
+
+generate-static-binaries.sh    For packaging hfst for Mac
+package-static-binaries.sh     For packaging hfst for Mac
+README_eight_tools_mac.txt     README file for Mac package that contains eight command line tools 
+README_xfst_mac.txt            README file for MAc package that contains hfst-xfst command line tool 
 
 
 Foma wrapper files
@@ -38,8 +47,6 @@ Miscellaneous files
 -------------------
 
 hfst-fst2tesseract.xfst
-generate-static-binaries.sh    For packaging hfst for Linux (not so much needed because of HFST Debian packages from Apertium)
-package-static-binaries.sh     For packaging hfst for Linux (not so much needed because of HFST Debian packages from Apertium)
 generate-cc-files.sh           Performs all the flex/bison compilation needed when compiling HFST (call before 'make')
 hfst-twolc-bin                 Twolc script?
 multiple_targets.sh            Cygwin-related?
