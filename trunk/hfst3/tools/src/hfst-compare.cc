@@ -154,11 +154,13 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
         char* secondname = strdup(second->get_name().c_str());
         if (strlen(firstname) == 0)
           {
+            free(firstname);
             firstname = strdup(firstfilename);
           }
         if (strlen(secondname) == 0)
           {
-           secondname = strdup(secondfilename);
+            free(secondname);
+            secondname = strdup(secondfilename);
           } 
         if (transducer_n_first == 1)
           {
@@ -232,6 +234,9 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
             delete second;
             second=0;
           }
+
+        free(firstname);
+        free(secondname);
     }
     
     if (firststream.is_good())
