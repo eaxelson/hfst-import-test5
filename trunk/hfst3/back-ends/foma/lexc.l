@@ -1,5 +1,5 @@
 /*     Foma: a finite-state toolkit and library.                             */
-/*     Copyright © 2008-2011 Mans Hulden                                     */
+/*     Copyright © 2008-2015 Mans Hulden                                     */
 
 /*     This file is part of foma.                                            */
 
@@ -31,44 +31,43 @@
 #define YY_USER_ACTION lexccolumn += lexcleng;
 static int lexentries;
 extern int lexclex();
-extern struct defined *defines;
-static struct defined *olddefines;
-extern int my_yyparse(char *my_string, int lineno);
+static struct defined_networks *olddefines;
+extern int my_yyparse(char *my_string, int lineno, struct defined_networks *defined_nets, struct defined_functions *defined_funcs);
 extern struct fsm *current_parse;
 static char *tempstr;
 int lexccolumn = 0;
 
-// verbose parameter added in HFST
+#ifndef ORIGINAL
+int verbose_lexc_ = 1;
+#endif
+
 struct fsm *fsm_lexc_parse_string(char *string, int verbose) {
 
-   olddefines = defines;
+   olddefines = g_defines;
    YY_BUFFER_STATE my_string_buffer;
-   my_string_buffer = lexc_scan_string(string, verbose);
+   my_string_buffer = lexc_scan_string(string);
    lexentries = -1;
    lexclineno = 1;
    lexc_init();
    if (lexclex() != 1) {
      if (lexentries != -1) {
-         if (verbose == 1)
-           printf("%i\n",lexentries);
+         printf("%i\n",lexentries);
      }       
    } 
    lexc_delete_buffer(my_string_buffer);
-   defines = olddefines;
+   g_defines = olddefines;
    return(lexc_to_fsm());
 }
 
-// verbose parameter added in HFST
 struct fsm *fsm_lexc_parse_file(char *filename, int verbose) {
   char *mystring;
   mystring = file_to_mem(filename);
-  return(fsm_lexc_parse_string(mystring, verbose));					       
+  return(fsm_lexc_parse_string(mystring, verbose));
 }
 
 void lexc_trim(char *s) {
   /* Remove trailing ; and = and space and initial space */
   int i,j;
-  i = strlen(s);
   for (i = strlen(s)-1; *(s+i) == ';' || *(s+i) == '=' || *(s+i) == ' ' || *(s+i) == '\t'; i--)
     *(s+i) = '\0';  
   for (i=0; *(s+i) == ' ' || *(s+i) == '\t' || *(s+i) == '\n'; i++) {
@@ -179,7 +178,7 @@ ANY    [\001-\177]|[\300-\337][\200-\277]|[\340-\357][\200-\277][\200-\277]|[\36
  /* \076 = > */
 <REGEX>[\076] {
     *(lexctext+lexcleng-1) = ';';
-    if (my_yyparse(lexctext, lexclineno) == 0) {
+    if (my_yyparse(lexctext, lexclineno, g_defines, NULL) == 0) {
        lexc_set_network(current_parse);
     }    
     BEGIN(LEXENTRIES);
@@ -214,8 +213,8 @@ ANY    [\001-\177]|[\300-\337][\200-\277]|[\340-\357][\200-\277][\200-\277]|[\36
 }
  /* \073 = ; */
 <DEFREGEX>[\073] {
-    if (my_yyparse(lexctext, lexclineno) == 0) {
-      add_defined(fsm_topsort(fsm_minimize(current_parse)),tempstr);
+    if (my_yyparse(lexctext, lexclineno, g_defines, NULL) == 0) {
+      add_defined(g_defines, fsm_topsort(fsm_minimize(current_parse)),tempstr);
     }
     xxfree(tempstr);
     BEGIN(DEF);
@@ -245,6 +244,6 @@ ANY    [\001-\177]|[\300-\337][\200-\277]|[\340-\357][\200-\277][\200-\277]|[\36
   BEGIN(DEFREGEX);
   yymore();
 }
-<*>((!).*[\015]?(\n)) { /* printf ("Comment: [%s]\n",lexctext); */ }
+<*>((!).*[\015]?(\n)) {  /* printf ("Comment: [%s]\n",lexctext); */  }
 
 <*>(.) { printf("\n***Syntax error on line %i column %i at '%s'\n",lexclineno,lexccolumn,lexctext); return 1;}
