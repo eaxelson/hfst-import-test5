@@ -1,5 +1,5 @@
 /*     Foma: a finite-state toolkit and library.                             */
-/*     Copyright © 2008-2011 Mans Hulden                                     */
+/*     Copyright © 2008-2014 Mans Hulden                                     */
 
 /*     This file is part of foma.                                            */
 
@@ -23,7 +23,7 @@
 #define MAX_F_RECURSION 100
 extern int yyerror();
 extern int yylex();
-extern int my_yyparse(char *my_string);
+extern int my_yyparse(char *my_string, int lineno, struct defined_networks *defined_nets, struct defined_functions *defined_funcs);
 struct fsm *current_parse;
 int rewrite, rule_direction;
 int substituting = 0;
@@ -52,15 +52,14 @@ void declare_function_name(char *s) {
     xxfree(s);
 }
 
-struct fsm *function_apply(void) {
+struct fsm *function_apply(struct defined_networks *defined_nets, struct defined_functions *defined_funcs) {
     int i, mygsym, myfargptr;
     char *regex;
     char repstr[13], oldstr[13];
-    if ((regex = find_defined_function(fname[frec],fargptr[frec])) == NULL) {
-        printf("***Error: function %s@%i) not defined!\n",fname[frec], fargptr[frec]);
+    if ((regex = find_defined_function(defined_funcs, fname[frec],fargptr[frec])) == NULL) {
+        fprintf(stderr, "***Error: function %s@%i) not defined!\n",fname[frec], fargptr[frec]);
         return NULL;
     }
-
     regex = xxstrdup(regex);
     mygsym = g_internal_sym;
     myfargptr = fargptr[frec];
@@ -68,19 +67,18 @@ struct fsm *function_apply(void) {
     /* and parse that */
     for (i = 0; i < fargptr[frec]; i++) {
         sprintf(repstr,"%012X",g_internal_sym);
-        sprintf(oldstr, "@ARGUMENT%02i@", (i+1));       
+        sprintf(oldstr, "@ARGUMENT%02i@", (i+1));
         streqrep(regex, oldstr, repstr);
         /* We temporarily define a network and save argument there */
         /* The name is a running counter g_internal_sym */
-        add_defined(fargs[i][frec], repstr);
+        add_defined(defined_nets, fargs[i][frec], repstr);
         g_internal_sym++;
     }
-    
-    my_yyparse(regex);
+    my_yyparse(regex,1,defined_nets, defined_funcs);
     for (i = 0; i < myfargptr; i++) {
         sprintf(repstr,"%012X",mygsym);
         /* Remove the temporarily defined network */
-        remove_defined(repstr);
+        remove_defined(defined_nets, repstr);
         mygsym++;
     }
     xxfree(fname[frec]);
@@ -192,9 +190,11 @@ void add_rule(struct fsm *L, struct fsm *R, struct fsm *R2, int type) {
 }
 
 %pure-parser
-%expect 644
-%parse-param {void     *scanner } /* Assume yyparse is called with this argument */
-%lex-param   {yyscan_t *scanner } /* Call flex functions with this argument      */
+%expect 686
+%parse-param { void *scanner }
+%parse-param { struct defined_networks *defined_nets }
+%parse-param { struct defined_functions *defined_funcs } /* Assume yyparse is called with this argument */
+%lex-param   { yyscan_t *scanner } /* Call flex functions with this argument      */
 %locations
 %initial-action {
     clear_quantifiers();
@@ -222,7 +222,7 @@ void add_rule(struct fsm *L, struct fsm *R, struct fsm *R2, int type) {
 */
 
 %token <net> NET
-%token <string> END LBRACKET RBRACKET LPAREN RPAREN ENDM ENDD CRESTRICT CONTAINS CONTAINS_OPT_ONE CONTAINS_ONE XUPPER XLOWER FLAG_ELIMINATE IGNORE_ALL IGNORE_INTERNAL CONTEXT NCONCAT MNCONCAT MORENCONCAT LESSNCONCAT DOUBLE_COMMA COMMA SHUFFLE PRECEDES FOLLOWS RIGHT_QUOTIENT LEFT_QUOTIENT INTERLEAVE_QUOTIENT UQUANT EQUANT VAR IN IMPLIES BICOND EQUALS NEQ SUBSTITUTE SUCCESSOR_OF PRIORITY_UNION_U PRIORITY_UNION_L LENIENT_COMPOSE TRIPLE_DOT LDOT RDOT FUNCTION SUBVAL ISUNAMBIGUOUS ISIDENTITY ISFUNCTIONAL NOTID LOWERUNIQ LOWERUNIQEPS ALLFINAL UNAMBIGUOUSPART AMBIGUOUSPART AMBIGUOUSDOMAIN EQSUBSTRINGS LETTERMACHINE MARKFSMTAIL MARKFSMTAILLOOP MARKFSMMIDLOOP MARKFSMLOOP ADDSINK LEFTREWR FLATTEN
+%token <string> END LBRACKET RBRACKET LPAREN RPAREN ENDM ENDD CRESTRICT CONTAINS CONTAINS_OPT_ONE CONTAINS_ONE XUPPER XLOWER FLAG_ELIMINATE IGNORE_ALL IGNORE_INTERNAL CONTEXT NCONCAT MNCONCAT MORENCONCAT LESSNCONCAT DOUBLE_COMMA COMMA SHUFFLE PRECEDES FOLLOWS RIGHT_QUOTIENT LEFT_QUOTIENT INTERLEAVE_QUOTIENT UQUANT EQUANT VAR IN IMPLIES BICOND EQUALS NEQ SUBSTITUTE SUCCESSOR_OF PRIORITY_UNION_U PRIORITY_UNION_L LENIENT_COMPOSE TRIPLE_DOT LDOT RDOT FUNCTION SUBVAL ISUNAMBIGUOUS ISIDENTITY ISFUNCTIONAL NOTID LOWERUNIQ LOWERUNIQEPS ALLFINAL UNAMBIGUOUSPART AMBIGUOUSPART AMBIGUOUSDOMAIN EQSUBSTRINGS LETTERMACHINE MARKFSMTAIL MARKFSMTAILLOOP MARKFSMMIDLOOP MARKFSMLOOP ADDSINK LEFTREWR FLATTEN SUBLABEL CLOSESIGMA CLOSESIGMAUNK
 
 %token <type> ARROW DIRECTION
 
@@ -385,7 +385,10 @@ network12: fend    { $$ = $1; } |
          ADDSINK network RPAREN { $$ = fsm_add_sink($2,1); } |
          LEFTREWR network COMMA network RPAREN { $$ = fsm_left_rewr($2,$4); } |
          FLATTEN network COMMA network RPAREN { $$ = fsm_flatten($2,$4); } |
-         EQSUBSTRINGS network COMMA network COMMA network RPAREN { $$ = fsm_equal_substrings($2,$4,$6); } 
+         SUBLABEL network COMMA network COMMA network RPAREN { $$ = fsm_substitute_label($2, fsm_network_to_char($4), $6); } |
+         CLOSESIGMA    network RPAREN { $$ = fsm_close_sigma(fsm_copy($2), 0); } |
+         CLOSESIGMAUNK network RPAREN { $$ = fsm_close_sigma(fsm_copy($2), 1); } |
+         EQSUBSTRINGS network COMMA network COMMA network RPAREN { $$ = fsm_equal_substrings($2,$4,$6); }
       
 fstart: FUNCTION network COMMA
 { frec++; fargptr[frec] = 0 ;declare_function_name($1) ; add_function_argument($2); }
@@ -396,10 +399,10 @@ fmid:   fstart network COMMA   { add_function_argument($2); }
 |       fmid   network COMMA   { add_function_argument($2); }
 
 fend:   fmid   network RPAREN  
-{ add_function_argument($2); if (($$ = function_apply()) == NULL) YYERROR; }
+{ add_function_argument($2); if (($$ = function_apply(defined_nets, defined_funcs)) == NULL) YYERROR; }
 |       fstart network RPAREN  
-{ add_function_argument($2); if (($$ = function_apply()) == NULL) YYERROR; }
+{ add_function_argument($2); if (($$ = function_apply(defined_nets, defined_funcs)) == NULL) YYERROR; }
 |       fstart         RPAREN  
-{ if (($$ = function_apply()) == NULL) YYERROR;}
+{ if (($$ = function_apply(defined_nets, defined_funcs)) == NULL) YYERROR;}
 
 %%

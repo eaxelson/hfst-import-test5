@@ -124,15 +124,14 @@ Compilation requirements
 
 - To use the foma_ backend (default):
 
-  - the foma library version 0.9.16alpha is bundled with HFST and included
+  - the foma library version 0.9.18alpha is bundled with HFST and included
     be default when building HFST
 
   - foma requires editline, termcap (or ncurses) and zlib libraries to compile
 
   - to disable foma backend, configure switch ``--without-foma`` may be used
 
-  - the *hfst-xfst* frontend currently **requires** foma binary; foma library
-    is not needed to be linked for this
+  - the *hfst-xfst* frontend currently does not require foma binary or foma library
 
 - For proper Unicode support in corpus tools:
 
@@ -203,9 +202,6 @@ When running HFST software or using HFST libraries from HFST-enabled software:
   that operating system is aware of this; In linux this may happen by setting
   ``LD_LIBRARY_PATH``, on Mac ``DYLD_LIBRARY_PATH``
 
-- the *hfst-xfst* frontend currently **requires** foma binary 
-  (--with-foma to enable)
-
 - the *hfst-xfst* frontend needs GNU compatible getopt, or basic getopts
   *without* GNU-incompatible getopt installed
 
@@ -247,10 +243,7 @@ If you would rather install in e.g. your home directory
 
 The HFST library may link to numerous FST handling backends with varying
 licences. If you are going to redistribute the HFST library you compiled, make
-sure there are no clashes in the licences of the linked libraries; all
-of them are free and open source, but under strict interpretation you may not
-be able to redistribute combination of strict GNU GPLv2 and Apache APLv2 in the
-same binary (e.g. foma and OpenFST).
+sure there are no clashes in the licences of the linked libraries.
 
 If you are checking out the development versions from SVN you must first create
 and install the necessary autotools files from the host system:
