@@ -59,13 +59,17 @@ struct T_memo {
     unsigned int set_offset;
 };
 
-struct trans_list {
+// HFST MODIFICATIONS: struct trans_list -> struct trans_list_struct
+//                     struct trans_array -> struct trans_list_array
+// because some compilers complain about struct and variable having the same name
+
+struct trans_list_struct {
     int inout;
     int target;
 } *trans_list;
 
-struct trans_array {
-    struct trans_list *transitions;
+struct trans_array_struct {
+    struct trans_list_struct *transitions;
     unsigned int size;
     unsigned int tail;
 } *trans_array;
@@ -221,8 +225,8 @@ static struct fsm *fsm_subset(struct fsm *net, int operation) {
 
     do {
         int i, j, tail, setsize, *theset, stateno, has_trans, minsym, next_minsym, trgt, symbol_in, symbol_out;
-        struct trans_list *transitions;
-        struct trans_array *tptr;
+        struct trans_list_struct *transitions;
+        struct trans_array_struct *tptr;
 
         fsm_state_set_current_state(T, (T_ptr+T)->finalstart, T == 0 ? 1 : 0);
         
@@ -376,16 +380,16 @@ static void init(struct fsm *net) {
 }
 
 static int trans_sort_cmp(const void *a, const void *b) {
-  return (((const struct trans_list *)a)->inout - ((const struct trans_list *)b)->inout);
+  return (((const struct trans_list_struct *)a)->inout - ((const struct trans_list_struct *)b)->inout);
 }
 
 static void init_trans_array(struct fsm *net) {
-    struct trans_list *arrptr;
+    struct trans_list_struct *arrptr;
     struct fsm_state *fsm;
     int i, j, laststate, lastsym, inout, size, state;
 
-    arrptr = trans_list = xxmalloc(net->linecount * sizeof(struct trans_list));
-    trans_array = xxcalloc(net->statecount, sizeof(struct trans_array));
+    arrptr = trans_list = xxmalloc(net->linecount * sizeof(struct trans_list_struct));
+    trans_array = xxcalloc(net->statecount, sizeof(struct trans_array_struct));
     
     laststate = -1;
     fsm = net->states;
@@ -421,7 +425,7 @@ static void init_trans_array(struct fsm *net) {
         arrptr = (trans_array+i)->transitions;
         size = (trans_array+i)->size;
         if (size > 1) {
-            qsort(arrptr, size, sizeof(struct trans_list), trans_sort_cmp);
+            qsort(arrptr, size, sizeof(struct trans_list_struct), trans_sort_cmp);
             lastsym = -1;
             /* Figure out if we're already deterministic */
             for (j=0; j < size; j++) {
