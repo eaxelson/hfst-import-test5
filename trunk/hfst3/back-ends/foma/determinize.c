@@ -63,12 +63,12 @@ struct T_memo {
 //                     struct trans_array -> struct trans_list_array
 // because some compilers complain about struct and variable having the same name
 
-struct trans_list_struct {
+static struct trans_list_struct {
     int inout;
     int target;
 } *trans_list;
 
-struct trans_array_struct {
+static struct trans_array_struct {
     struct trans_list_struct *transitions;
     unsigned int size;
     unsigned int tail;
