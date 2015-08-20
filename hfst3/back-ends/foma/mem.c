@@ -20,6 +20,9 @@
 #include <string.h>
 
 /* Global variables */
+// HFST MODIFICATIONS: Defined here, declared extern in foma.h
+struct defined_networks   *g_defines;
+struct defined_functions  *g_defines_f;
 int g_show_flags = 0;
 int g_obey_flags = 1;
 int g_flag_is_epsilon = 0;
