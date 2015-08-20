@@ -66,31 +66,21 @@ struct agenda {
   _Bool index;
 };
 
-#ifdef ORIGINAL
-struct trans_list {
-#else
+// HFST MODIFICATIONS: struct trans_list -> struct trans_list_struct
+//                     struct trans_array -> struct trans_list_array
+// because some compilers complain about struct and variable having the same name
+
 struct trans_list_struct {
-#endif
     int inout;
     int source;
 } *trans_list;
 
-#ifdef ORIGINAL
-struct trans_array {
-#else
+
 struct trans_array_struct {
-#endif
-#ifdef ORIGINAL
-    struct trans_list *transitions;
-#else
     struct trans_list_struct *transitions;
-#endif
     unsigned int size;
     unsigned int tail;
 } *trans_array;
-
-  // HFST MODIFICATION: struct trans_list -> struct trans_list_struct
-  // HFST MODIFICATION: struct trans_array -> struct trans_array_struct
 
 static struct p *P, *Phead, *Pnext, *current_w;
 static struct e *E;
