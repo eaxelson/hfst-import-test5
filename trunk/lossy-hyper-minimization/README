@@ -1,0 +1,40 @@
+This is implemetation of lossy hyper-minimization algorithm by 
+
+Andreas Maletti and Daniel Quernheim. 2011.
+Optimal hyper-minimization. Int. J. Found. Comput. Sci., 22(8):1877–1891.
+
+which is improvment of:
+
+Andrew Badr, Viliam Geffert, and Ian Shipman. 2009.
+Hyper-minimizing minimized deterministic finite state automata. RAIRO-Theoretical Informatics and Applications, 43(01):69–94.
+
+
+----------
+COMPILING
+----------
+Without encoding transitions:
+gcc hyperminHfst.cc -lboost_graph -lhfst -std=c++0x -o hyperminHfst
+
+--
+Debuging version:
+gcc hyperminHfst.cc -lboost_graph -DDEBUG -lhfst -std=c++0x -o hyperminHfst
+
+--
+Endoded version, transitions are encoded into numbers before hyper-minimization i.e.
+a:b #1
+a:c #2
+...
+after are returned to normal transitions:
+
+gcc hyperminHfst.cc -lboost_graph -DENCODE -lhfst -std=c++0x -o hyperminHfst
+
+-----------------
+RUNNING PROGRAM
+-----------------
+
+program expects input transducer in HFST format
+
+./hyperminHfst data/figure1.foma
+
+Output is hyper-minimimal transducer:
+hyperminimimal.hfst
