@@ -16,6 +16,8 @@
 #include "lookup-path.h"
 #include "tokenizer.h"
 
+typedef std::set<std::string> ProcResult;
+
 /**
  * Abstract base class for handling the outputting of lookup results. Subclasses
  * implement different formatting systems.
