@@ -133,7 +133,7 @@ ApertiumOutputFormatter::process_finals(const LookupPathSet& finals, Capitalizat
     if(dynamic_cast<const LookupPathW*>(*it) != NULL && displayWeightsFlag)
       res << '~' << dynamic_cast<const LookupPathW*>(*it)->get_weight() << '~';
 
-    results.insert(res.str());
+    results.push_back(res.str());
   }
   return results;
 }
@@ -269,7 +269,7 @@ CGOutputFormatter::process_finals(const LookupPathSet& finals, CapitalizationSta
   LookupPathSet new_finals = preprocess_finals(finals);
 
   for(LookupPathSet::const_iterator it=new_finals.begin(); it!=new_finals.end(); it++)
-    results.insert(process_final((*it)->get_output_symbols(), caps));
+    results.push_back(process_final((*it)->get_output_symbols(), caps));
 
   return results;
 }
@@ -357,12 +357,12 @@ XeroxOutputFormatter::process_finals(const LookupPathSet& finals, Capitalization
 //    if(dynamic_cast<const LookupPathW*>(*it) != NULL && displayWeightsFlag)
 //      res << "\t" << dynamic_cast<const LookupPathW*>(*it)->get_weight();
 //
-    results.insert(process_final((*it)->get_output_symbols(), caps));
+    results.push_back(process_final((*it)->get_output_symbols(), caps));
 
     // add weights if requested:
     if(dynamic_cast<const LookupPathW*>(*it) != NULL && displayWeightsFlag)
       res << "\t" << dynamic_cast<const LookupPathW*>(*it)->get_weight();
-    results.insert(res.str());
+    results.push_back(res.str());
 
   }
   return results;
