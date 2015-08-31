@@ -181,7 +181,7 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   prunable_alphabet.hfst non_prunable_alphabet_1.hfst non_prunable_alphabet_2.hfst id.hfst \
 		   a2a_or_a2b_or_a2unk.hfst a2b_or_b2b_or_unk2b.hfst unk2unk_or_id.hfst \
 		   a_or_id.hfst id_star_a_b_c.hfst pmatch_endtag.pmatch
-OL_CHECKS=cat2dog.hfstol cat2dog.genhfstol cat_weight_final.hfstol \
+OL_CHECKS=cat2dog.hfstol cat2dog.genhfstol cat_weight_final.hfstol cat_weight_ambig.hfstol \
 			proc-caps.hfstol proc-caps.genhfstol \
 			compounds.hfstol compounds2.hfstol
 if WANT_SFST
@@ -248,7 +248,7 @@ endif
 
 check_DATA=$(DEFAULT_CHECKS) $(SFST_CHECKS) $(OFST_CHECKS) $(FOMA_CHECKS) $(OL_CHECKS)
 
-FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
+FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt cat_weight_ambig.txt \
 		 cat2cat_or_CAT_uppercased.txt cat2CAT_uppercased.txt \
 		 cat2epsilon.txt another_epsilon.txt cat2dog.txt \
 		 cat+dog.txt catdog.txt cat_or_dog.txt cat.txt CAT_uppercased2cat.txt \
