@@ -86,6 +86,27 @@ if ! diff test.strings $srcdir/proc-caps-out5.strings ; then
     exit 1
 fi
 
+# weight-classes checks
+if ! $TOOLDIR/hfst-proc/hfst-apertium-proc --weight-classes 1 cat_weight_ambig.hfstol < $srcdir/cat.strings | tr -d '\r' > test.strings ; then
+    echo cat_weight_ambig fail:
+    cat test.strings
+    exit 1
+fi
+if ! diff test.strings $srcdir/cat_weight_ambig_out.strings ; then
+    echo cat_weight_ambig diffs
+    exit 1
+fi
+if ! $TOOLDIR/hfst-proc/hfst-apertium-proc --weight-classes 2 -W cat_weight_ambig.hfstol < $srcdir/cat.strings | tr -d '\r' > test.strings ; then
+    echo cat_weight_ambig_W fail:
+    cat test.strings
+    exit 1
+fi
+if ! diff test.strings $srcdir/cat_weight_ambig_W_out.strings ; then
+    echo cat_weight_ambig_W diffs
+    exit 1
+fi
+
+
 # compounding / space handling checks
 if ! $TOOLDIR/hfst-proc/hfst-apertium-proc compounds.hfstol < $srcdir/proc-compounds.strings | tr -d '\r' > test.strings ; then
     echo compound fail
