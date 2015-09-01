@@ -17,6 +17,8 @@ HfstException::HfstException
   line(line)
 {}
 
+HfstException::~HfstException() {}
+
 std::string HfstException::operator() (void) const
 { 
   std::ostringstream o;
