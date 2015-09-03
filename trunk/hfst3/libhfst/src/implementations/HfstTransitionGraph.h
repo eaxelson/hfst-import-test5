@@ -27,6 +27,19 @@
 
  namespace hfst {
 
+   class HfstFile {
+   private:
+     FILE * file;
+   public:
+     HFSTDLL HfstFile();
+     HFSTDLL ~HfstFile();
+     HFSTDLL void set_file(FILE * f);
+     HFSTDLL FILE * get_file();
+     HFSTDLL void close();
+     HFSTDLL void write(const char * str);
+   };
+
+
    /** @brief A namespace for all code that forms a bridge between
        backend libraries and HFST.
 
@@ -202,6 +215,15 @@
          unsigned int linecount=0;
          this->assign(read_in_att_format(file, "@0@", linecount));
        }
+
+       HFSTDLL HfstTransitionGraph(HfstFile &file) {
+         initialize_alphabet(alphabet);
+         HfstTransitions tr;
+         state_vector.push_back(tr);
+         unsigned int linecount=0;
+         this->assign(read_in_att_format(file.get_file(), "@0@", linecount));
+       }
+
 
      /** @brief The assignment operator. */
      HFSTDLL HfstTransitionGraph &operator=(const HfstTransitionGraph &graph)
@@ -1488,6 +1510,16 @@
               file, linecount);
          }       
 
+         HFSTDLL static HfstTransitionGraph read_in_prolog_format
+           (HfstFile &file, 
+            unsigned int & linecount)
+         {
+           return read_in_att_format(std::cin /* a dummy variable */, file.get_file(),
+                                     linecount);
+         }
+
+
+
          /** @brief Write the graph in xfst text format to FILE \a file.
              \a write_weights defines whether weights are printed (todo). */
          HFSTDLL void write_in_xfst_format(FILE * file, bool write_weights=true) 
@@ -1863,6 +1895,15 @@
              (std::cin /* a dummy variable */,
               file, epsilon_symbol, linecount);
          }       
+
+         HFSTDLL static HfstTransitionGraph read_in_att_format
+           (HfstFile &file, 
+            std::string epsilon_symbol,
+            unsigned int & linecount)
+         {
+           return read_in_att_format(std::cin /* a dummy variable */, file.get_file(),
+                                     epsilon_symbol, linecount);
+         }
 
 
      // ----------------------------------------------
